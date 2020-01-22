@@ -12,29 +12,16 @@ import {
 } from '../utils/misc'
 import * as warningCreators from '../warningCreators'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type {
-  InvariantContext,
-  RobotState,
-  SingleLabwareLiquidState,
-  CommandCreatorWarning,
-  RobotStateAndWarnings,
-} from '../types'
-
-// Blend tip's liquid contents (if any) with liquid of the source
-// to update liquid state in all pipette tips
-type PipetteLiquidStateAcc = {
-  pipetteLiquidState: SingleLabwareLiquidState,
-  warnings: Array<CommandCreatorWarning>,
-}
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forAspirate(
   params: AspirateParams,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   const { pipette: pipetteId, volume, labware: labwareId } = params
-
-  const { liquidState: prevLiquidState } = prevRobotState
+  const { robotState, warnings } = robotStateAndWarnings
+  const { liquidState } = robotState
   const pipetteSpec = invariantContext.pipetteEntities[pipetteId].spec
   const labwareDef = invariantContext.labwareEntities[labwareId].def
 
@@ -43,32 +30,6 @@ export function forAspirate(
     labwareDef,
     params.well
   )
-
-  // helper to avoid writing this twice
-  const formatReturn = ({
-    labwareLiquidState,
-    pipetteLiquidState,
-    warnings,
-  }) => {
-    const nextLiquidState = {
-      pipettes: {
-        ...prevLiquidState.pipettes,
-        [pipetteId]: pipetteLiquidState,
-      },
-      labware: {
-        ...prevLiquidState.labware,
-        [labwareId]: labwareLiquidState,
-      },
-    }
-
-    return {
-      robotState: {
-        ...prevRobotState,
-        liquidState: nextLiquidState,
-      },
-      warnings,
-    }
-  }
 
   assert(
     uniq(wellsForTips).length === allWellsShared ? 1 : wellsForTips.length,
@@ -79,104 +40,74 @@ export function forAspirate(
   if (pipetteSpec.channels > 1 && allWellsShared) {
     // special case: trough-like "shared" well with multi-channel pipette
     const commonWell = wellsForTips[0]
-    const prevSourceLiquidState = prevLiquidState.labware[labwareId][commonWell]
-    let warnings = []
+    const sourceLiquidState = liquidState.labware[labwareId][commonWell]
 
     const isOveraspirate =
-      volume * pipetteSpec.channels > totalVolume(prevSourceLiquidState)
+      volume * pipetteSpec.channels > totalVolume(sourceLiquidState)
 
-    if (isEmpty(prevSourceLiquidState)) {
-      warnings = [...warnings, warningCreators.aspirateFromPristineWell()]
+    if (isEmpty(sourceLiquidState)) {
+      warnings.push(warningCreators.aspirateFromPristineWell())
     } else if (isOveraspirate) {
-      warnings = [...warnings, warningCreators.aspirateMoreThanWellContents()]
+      warnings.push(warningCreators.aspirateMoreThanWellContents())
     }
 
     const volumePerTip = isOveraspirate
-      ? totalVolume(prevSourceLiquidState) / pipetteSpec.channels
+      ? totalVolume(sourceLiquidState) / pipetteSpec.channels
       : volume
 
     // all tips get the same amount of the same liquid added to them, from the source well
-    const newLiquidFromWell = splitLiquid(volumePerTip, prevSourceLiquidState)
-      .dest
+    const newLiquidFromWell = splitLiquid(volumePerTip, sourceLiquidState).dest
 
-    const pipetteLiquidState = range(pipetteSpec.channels).reduce(
-      (acc: SingleLabwareLiquidState, tipIndex): SingleLabwareLiquidState => {
-        const prevTipLiquidState =
-          prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
+    range(pipetteSpec.channels).forEach((tipIndex): void => {
+      const pipette = liquidState.pipettes[pipetteId]
+      const indexToString = tipIndex.toString()
+      let tipLiquidState = pipette[indexToString]
 
-        // since volumePerTip is being calculated to avoid splitting unevenly across tips,
-        // AIR needs to be added in here if it's an over-aspiration
-        const nextTipLiquidState = isOveraspirate
-          ? mergeLiquid(prevTipLiquidState, {
-              ...newLiquidFromWell,
-              [AIR]: { volume: volume - volumePerTip },
-            })
-          : mergeLiquid(prevTipLiquidState, newLiquidFromWell)
+      // since volumePerTip is being calculated to avoid splitting unevenly across tips,
+      // AIR needs to be added in here if it's an over-aspiration
+      const nextTipLiquidState = isOveraspirate
+        ? mergeLiquid(tipLiquidState, {
+            ...newLiquidFromWell,
+            [AIR]: { volume: volume - volumePerTip },
+          })
+        : mergeLiquid(tipLiquidState, newLiquidFromWell)
 
-        return {
-          ...acc,
-          [tipIndex]: nextTipLiquidState,
-        }
-      },
-      {}
-    )
+      pipette[indexToString] = nextTipLiquidState
+    })
 
     // Remove liquid from source well
-    const labwareLiquidState: SingleLabwareLiquidState = {
-      ...prevLiquidState.labware[labwareId],
-      [commonWell]: splitLiquid(
-        volume * pipetteSpec.channels,
-        prevLiquidState.labware[labwareId][commonWell]
-      ).source,
-    }
-
-    return formatReturn({ labwareLiquidState, pipetteLiquidState, warnings })
+    liquidState.labware[labwareId][commonWell] = splitLiquid(
+      volume * pipetteSpec.channels,
+      liquidState.labware[labwareId][commonWell]
+    ).source
+    return
   }
 
   // general case (no common well shared across all tips)
-  const { pipetteLiquidState, warnings } = range(pipetteSpec.channels).reduce(
-    (acc: PipetteLiquidStateAcc, tipIndex) => {
-      const prevTipLiquidState =
-        prevLiquidState.pipettes[pipetteId][tipIndex.toString()]
-      const prevSourceLiquidState =
-        prevLiquidState.labware[labwareId][wellsForTips[tipIndex]]
+  range(pipetteSpec.channels).forEach(tipIndex => {
+    const indexToString = tipIndex.toString()
+    const pipette = liquidState.pipettes[pipetteId]
+    const tipLiquidState = pipette[indexToString]
+    const sourceLiquidState =
+      liquidState.labware[labwareId][wellsForTips[tipIndex]]
 
-      const newLiquidFromWell = splitLiquid(volume, prevSourceLiquidState).dest
+    const newLiquidFromWell = splitLiquid(volume, sourceLiquidState).dest
 
-      let nextWarnings = []
-      if (isEmpty(prevSourceLiquidState)) {
-        nextWarnings = [
-          ...nextWarnings,
-          warningCreators.aspirateFromPristineWell(),
-        ]
-      } else if (volume > totalVolume(prevSourceLiquidState)) {
-        nextWarnings = [
-          ...nextWarnings,
-          warningCreators.aspirateMoreThanWellContents(),
-        ]
-      }
+    if (isEmpty(sourceLiquidState)) {
+      warnings.push(warningCreators.aspirateFromPristineWell())
+    } else if (volume > totalVolume(sourceLiquidState)) {
+      warnings.push(warningCreators.aspirateMoreThanWellContents())
+    }
 
-      return {
-        pipetteLiquidState: {
-          ...acc.pipetteLiquidState,
-          [tipIndex]: mergeLiquid(prevTipLiquidState, newLiquidFromWell),
-        },
-        warnings: [...acc.warnings, ...nextWarnings],
-      }
-    },
-    { pipetteLiquidState: {}, warnings: [] }
-  )
+    pipette[indexToString] = mergeLiquid(tipLiquidState, newLiquidFromWell)
+  })
 
   // Remove liquid from source well(s)
-  const labwareLiquidState: SingleLabwareLiquidState = {
-    ...wellsForTips.reduce(
-      (acc: SingleLabwareLiquidState, well) => ({
-        ...acc,
-        [well]: splitLiquid(volume, acc[well]).source,
-      }),
-      { ...prevLiquidState.labware[labwareId] }
-    ),
-  }
-
-  return formatReturn({ labwareLiquidState, pipetteLiquidState, warnings })
+  const labwareLiquidState = liquidState.labware[labwareId]
+  wellsForTips.forEach(well => {
+    labwareLiquidState[well] = splitLiquid(
+      volume,
+      labwareLiquidState[well]
+    ).source
+  })
 }

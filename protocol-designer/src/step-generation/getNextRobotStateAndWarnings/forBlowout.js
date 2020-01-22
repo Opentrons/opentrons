@@ -1,30 +1,21 @@
 // @flow
 import { dispenseUpdateLiquidState } from './dispenseUpdateLiquidState'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forBlowout(
   params: BlowoutParams,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   const { pipette, labware, well } = params
-  return {
-    warnings: [],
-    robotState: {
-      ...prevRobotState,
-      liquidState: dispenseUpdateLiquidState({
-        pipette,
-        labware,
-        useFullVolume: true,
-        well,
-        prevLiquidState: prevRobotState.liquidState,
-        invariantContext,
-      }),
-    },
-  }
+  const { robotState } = robotStateAndWarnings
+  dispenseUpdateLiquidState({
+    pipette,
+    labware,
+    useFullVolume: true,
+    well,
+    prevLiquidState: robotState.liquidState,
+    invariantContext,
+  })
 }

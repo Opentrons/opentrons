@@ -1,33 +1,22 @@
 // @flow
 import {
-  getInitialRobotStateStandard,
-  getRobotStateWithTipStandard,
   makeStateArgsStandard,
   makeContext,
   makeState,
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
 } from './fixtures'
-import { forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
+import { makeImmutableStateUpdater } from './utils'
 
-import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+const forDropTip = makeImmutableStateUpdater(_forDropTip)
 
 describe('dropTip', () => {
   let invariantContext
-  let initialRobotState
-  let robotStateWithTip
 
   beforeEach(() => {
     invariantContext = makeContext()
-    initialRobotState = getInitialRobotStateStandard(invariantContext)
-    robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
-
-    // $FlowFixMe: mock methods
-    dispenseUpdateLiquidState.mockClear()
-    // $FlowFixMe: mock methods
-    dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
   })
 
   // TODO Ian 2019-04-19: this is a ONE-OFF fixture
@@ -51,7 +40,6 @@ describe('dropTip', () => {
         singleHasTips: true,
         multiHasTips: true,
       })
-
       const params = {
         pipette: DEFAULT_PIPETTE,
         labware: FIXED_TRASH_ID,
@@ -59,10 +47,14 @@ describe('dropTip', () => {
       }
 
       const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(result.warnings).toEqual([])
-      expect(result.robotState).toEqual(
-        makeRobotState({ singleHasTips: false, multiHasTips: true })
-      )
+
+      expect(result).toEqual({
+        warnings: [],
+        robotState: makeRobotState({
+          singleHasTips: false,
+          multiHasTips: true,
+        }),
+      })
     })
 
     // TODO: IL 2019-11-20
@@ -75,54 +67,59 @@ describe('dropTip', () => {
         singleHasTips: true,
         multiHasTips: true,
       })
-
       const params = {
         pipette: 'p300MultiId',
         labware: FIXED_TRASH_ID,
         well: 'A1',
       }
 
-      const res = forDropTip(params, invariantContext, prevRobotState)
-      expect(res.robotState).toEqual(
-        makeRobotState({ singleHasTips: true, multiHasTips: false })
-      )
-    })
+      const result = forDropTip(params, invariantContext, prevRobotState)
 
-    // TODO: IL 2019-11-20
-    test.skip('no tip on pipette', () => {})
+      expect(result).toEqual({
+        warnings: [],
+        robotState: makeRobotState({
+          singleHasTips: true,
+          multiHasTips: false,
+        }),
+      })
+    })
   })
 
   describe('liquid tracking', () => {
-    const mockLiquidReturnValue = 'expected liquid state'
-    beforeEach(() => {
-      // $FlowFixMe: mock methods
-      dispenseUpdateLiquidState.mockClear()
-      // $FlowFixMe: mock methods
-      dispenseUpdateLiquidState.mockReturnValue(mockLiquidReturnValue)
-    })
-
-    test('dropTip calls dispenseUpdateLiquidState with useFullVolume: true', () => {
+    test('dropTip uses full volume when transfering tip to trash', () => {
       const prevRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: true,
       })
-
       const params = {
         pipette: 'p300MultiId',
         labware: FIXED_TRASH_ID,
         well: 'A1',
       }
-      const result = forDropTip(params, invariantContext, prevRobotState)
-      expect(dispenseUpdateLiquidState).toHaveBeenCalledWith({
-        invariantContext,
-        pipette: 'p300MultiId',
-        labware: FIXED_TRASH_ID,
-        useFullVolume: true,
-        well: 'A1',
-        prevLiquidState: robotStateWithTip.liquidState,
-      })
+      prevRobotState.liquidState.pipettes.p300MultiId['0'] = {
+        ingred1: { volume: 150 },
+      }
 
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
+      const result = forDropTip(params, invariantContext, prevRobotState)
+
+      expect(result).toMatchObject({
+        robotState: {
+          liquidState: {
+            pipettes: {
+              p300MultiId: {
+                '0': {
+                  ingred1: { volume: 0 },
+                },
+              },
+            },
+            labware: {
+              [FIXED_TRASH_ID]: {
+                A1: { ingred1: { volume: 150 } },
+              },
+            },
+          },
+        },
+      })
     })
   })
 })

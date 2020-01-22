@@ -179,6 +179,17 @@ export const getInitialRobotStateStandard = (
   return initialRobotState
 }
 
+export const getRobotStateAndWarningsStandard = (
+  invariantContext: InvariantContext
+) => {
+  const initialRobotState = getInitialRobotStateStandard(invariantContext)
+
+  return {
+    robotState: initialRobotState,
+    warnings: [],
+  }
+}
+
 export const getRobotStateWithTipStandard = (
   invariantContext: InvariantContext
 ) => {

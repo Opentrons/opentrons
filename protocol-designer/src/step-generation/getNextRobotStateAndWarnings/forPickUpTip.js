@@ -1,19 +1,14 @@
 // @flow
 import assert from 'assert'
-import cloneDeep from 'lodash/cloneDeep'
 import { getIsTiprack } from '@opentrons/shared-data'
 import type { PipetteAccessParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 export function forPickUpTip(
   params: PipetteAccessParams,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   const { pipette, labware, well } = params
 
   const pipetteSpec = invariantContext.pipetteEntities[pipette].spec
@@ -23,8 +18,7 @@ export function forPickUpTip(
     `forPickUpTip expected ${labware} to be a tiprack`
   )
 
-  // PERF: Only clone needed part of robot state
-  const tipState = cloneDeep(prevRobotState.tipState)
+  const tipState = robotStateAndWarnings.robotState.tipState
 
   // pipette now has tip(s)
   tipState.pipettes[pipette] = true
@@ -41,10 +35,5 @@ export function forPickUpTip(
     allWells.forEach(function(well) {
       tipState.tipracks[labware][well] = false
     })
-  }
-
-  return {
-    warnings: [],
-    robotState: { ...prevRobotState, tipState },
   }
 }

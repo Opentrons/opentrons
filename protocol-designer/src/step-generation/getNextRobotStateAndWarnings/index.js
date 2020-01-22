@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import produce from 'immer'
 import { forAspirate } from './forAspirate'
 import { forDispense } from './forDispense'
 import { forBlowout } from './forBlowout'
@@ -13,45 +14,67 @@ import type {
   RobotStateAndWarnings,
 } from '../types'
 
-export function getNextRobotStateAndWarningsSingleCommand(
+// WARNING this will mutate the prevRobotState
+function _getNextRobotStateAndWarningsSingleCommand(
   command: Command,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   assert(command, 'undefined command passed to getNextRobotStateAndWarning')
+
   switch (command.command) {
     case 'aspirate':
-      return forAspirate(command.params, invariantContext, prevRobotState)
+      forAspirate(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'dispense':
-      return forDispense(command.params, invariantContext, prevRobotState)
+      forDispense(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'blowout':
-      return forBlowout(command.params, invariantContext, prevRobotState)
+      forBlowout(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'dropTip':
-      return forDropTip(command.params, invariantContext, prevRobotState)
+      forDropTip(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'pickUpTip':
-      return forPickUpTip(command.params, invariantContext, prevRobotState)
+      forPickUpTip(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'airGap':
       // TODO: IL 2019-11-19 implement air gap (eventually)
-      return { robotState: prevRobotState, warnings: [] }
+      break
     case 'magneticModule/engageMagnet':
-      return forEngageMagnet(command.params, invariantContext, prevRobotState)
+      forEngageMagnet(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'magneticModule/disengageMagnet':
-      return forDisengageMagnet(
+      forDisengageMagnet(
         command.params,
         invariantContext,
-        prevRobotState
+        robotStateAndWarnings
       )
+      break
     case 'touchTip':
     case 'delay':
       // these commands don't have any effects on the state
-      return { robotState: prevRobotState, warnings: [] }
+      break
     default:
       assert(
         false,
         `unknown command: ${command.command} passed to getNextRobotStateAndWarning`
       )
-      return { robotState: prevRobotState, warnings: [] }
   }
+}
+
+export function getNextRobotStateAndWarningsSingleCommand(
+  command: Command,
+  invariantContext: InvariantContext,
+  prevRobotState: RobotState
+): RobotStateAndWarnings {
+  const prevState = {
+    warnings: [],
+    robotState: prevRobotState,
+  }
+  return produce(prevState, draft => {
+    _getNextRobotStateAndWarningsSingleCommand(command, invariantContext, draft)
+  })
 }
 
 // Get next state after multiple commands
@@ -60,18 +83,17 @@ export function getNextRobotStateAndWarnings(
   invariantContext: InvariantContext,
   initialRobotState: RobotState
 ): RobotStateAndWarnings {
-  return commands.reduce(
-    (acc, command) => {
-      const next = getNextRobotStateAndWarningsSingleCommand(
+  const prevState = {
+    warnings: [],
+    robotState: initialRobotState,
+  }
+  return produce(prevState, draft => {
+    commands.forEach(command => {
+      _getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
-        acc.robotState
+        draft
       )
-      return {
-        robotState: next.robotState,
-        warnings: [...acc.warnings, ...next.warnings],
-      }
-    },
-    { robotState: initialRobotState, warnings: [] }
-  )
+    })
+  })
 }

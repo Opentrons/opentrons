@@ -9,7 +9,7 @@ import type {
   MoveToSlotParams,
   DelayParams,
 } from './schemaV3'
-export type { BlowoutParams, FilePipette, FileLabware } from './schemaV4'
+export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 
 export type FileModule = {|
   slot: DeckSlotId,

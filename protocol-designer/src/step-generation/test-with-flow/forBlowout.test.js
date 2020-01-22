@@ -1,31 +1,22 @@
 // @flow
-import { forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
+import { forBlowout as _forBlowout } from '../getNextRobotStateAndWarnings/forBlowout'
+import { makeImmutableStateUpdater } from './utils'
 import {
   makeContext,
-  getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from './fixtures'
 
-import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
-
-jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
+const forBlowout = makeImmutableStateUpdater(_forBlowout)
 
 let invariantContext
-let initialRobotState
 let robotStateWithTip
 let params
 
 beforeEach(() => {
   invariantContext = makeContext()
-  initialRobotState = getInitialRobotStateStandard(invariantContext)
   robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
-
-  // $FlowFixMe: mock methods
-  dispenseUpdateLiquidState.mockClear()
-  // $FlowFixMe: mock methods
-  dispenseUpdateLiquidState.mockReturnValue(initialRobotState.liquidState)
 
   params = {
     pipette: DEFAULT_PIPETTE,
@@ -38,25 +29,31 @@ beforeEach(() => {
 
 describe('Blowout command', () => {
   describe('liquid tracking', () => {
-    const mockLiquidReturnValue = 'expected liquid state'
-    beforeEach(() => {
-      // $FlowFixMe
-      dispenseUpdateLiquidState.mockReturnValue(mockLiquidReturnValue)
-    })
+    test('blowout updates with max volume of pipette', () => {
+      robotStateWithTip.liquidState.pipettes.p300SingleId['0'] = {
+        ingred1: { volume: 150 },
+      }
 
-    test('blowout calls dispenseUpdateLiquidState with max volume of pipette', () => {
       const result = forBlowout(params, invariantContext, robotStateWithTip)
 
-      expect(dispenseUpdateLiquidState).toHaveBeenCalledWith({
-        invariantContext,
-        labware: SOURCE_LABWARE,
-        pipette: DEFAULT_PIPETTE,
-        prevLiquidState: robotStateWithTip.liquidState,
-        useFullVolume: true,
-        well: 'A1',
+      expect(result).toMatchObject({
+        robotState: {
+          liquidState: {
+            pipettes: {
+              p300SingleId: {
+                '0': {
+                  ingred1: { volume: 0 },
+                },
+              },
+            },
+            labware: {
+              sourcePlateId: {
+                A1: { ingred1: { volume: 150 } },
+              },
+            },
+          },
+        },
       })
-
-      expect(result.robotState.liquidState).toBe(mockLiquidReturnValue)
     })
   })
 })

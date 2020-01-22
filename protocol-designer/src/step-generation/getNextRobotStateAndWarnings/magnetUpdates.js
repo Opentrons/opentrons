@@ -4,58 +4,39 @@ import type {
   EngageMagnetParams,
   DisengageMagnetParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type {
-  InvariantContext,
-  RobotState,
-  RobotStateAndWarnings,
-} from '../types'
+import type { InvariantContext, RobotStateAndWarnings } from '../types'
+import { MAGDECK } from '../../constants'
 
-const _setMagnet = (
-  robotState: RobotState,
-  moduleId: string,
-  engaged: boolean
-): RobotState => ({
-  ...robotState,
-  modules: {
-    ...robotState.modules,
-    [moduleId]: {
-      ...robotState.modules[moduleId],
-      moduleState: {
-        ...robotState.modules[moduleId].moduleState,
-        engaged,
-      },
-    },
-  },
-})
+function _setMagnet(moduleState, engaged) {
+  if (moduleState.type === MAGDECK) {
+    moduleState.engaged = engaged
+  }
+}
 
 export function forEngageMagnet(
   params: EngageMagnetParams,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   const { module } = params
+  let { robotState } = robotStateAndWarnings
   assert(
-    module in prevRobotState.modules,
+    module in robotState.modules,
     `forEngageMagnet expected module id "${module}"`
   )
-  return {
-    warnings: [],
-    robotState: _setMagnet(prevRobotState, module, true),
-  }
+  _setMagnet(robotState.modules[module].moduleState, true)
 }
 
 export function forDisengageMagnet(
   params: DisengageMagnetParams,
   invariantContext: InvariantContext,
-  prevRobotState: RobotState
-): RobotStateAndWarnings {
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
   const { module } = params
+  const { robotState } = robotStateAndWarnings
   assert(
-    module in prevRobotState.modules,
+    module in robotState.modules,
     `forDisengageMagnet expected module id "${module}"`
   )
-  return {
-    warnings: [],
-    robotState: _setMagnet(prevRobotState, module, false),
-  }
+  _setMagnet(robotState.modules[module].moduleState, false)
 }

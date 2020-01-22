@@ -1,14 +1,17 @@
 // @flow
 import merge from 'lodash/merge'
+import { makeImmutableStateUpdater } from './utils'
 import {
   getInitialRobotStateStandard,
   makeContext,
   getTipColumn,
   DEFAULT_PIPETTE,
 } from './fixtures'
-import { forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
+import { forPickUpTip as _forPickUpTip } from '../getNextRobotStateAndWarnings/forPickUpTip'
 
 import { dispenseUpdateLiquidState } from '../getNextRobotStateAndWarnings/dispenseUpdateLiquidState'
+
+const forPickUpTip = makeImmutableStateUpdater(_forPickUpTip)
 
 jest.mock('../getNextRobotStateAndWarnings/dispenseUpdateLiquidState')
 

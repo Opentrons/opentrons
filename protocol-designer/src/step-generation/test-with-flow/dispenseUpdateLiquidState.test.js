@@ -5,6 +5,7 @@ import fixture_384_plate from '@opentrons/shared-data/labware/fixtures/2/fixture
 
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
+import produce from 'immer'
 import { createEmptyLiquidState, createTipLiquidState } from '../utils'
 import { makeContext, DEFAULT_PIPETTE, SOURCE_LABWARE } from './fixtures'
 
@@ -25,6 +26,15 @@ beforeEach(() => {
   }
 })
 
+function getUpdatedLiquidState(params, initialLiquidState) {
+  return produce(initialLiquidState, draft => {
+    dispenseUpdateLiquidState({
+      ...params,
+      prevLiquidState: draft,
+    })
+  })
+}
+
 describe('...single-channel pipette', () => {
   test('fully dispense single ingredient into empty well, with explicit volume', () => {
     const initialLiquidState = merge(
@@ -41,10 +51,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = dispenseUpdateLiquidState({
-      ...dispenseSingleCh150ToA1Args,
-      prevLiquidState: initialLiquidState,
-    })
+    const result = getUpdatedLiquidState(
+      dispenseSingleCh150ToA1Args,
+      initialLiquidState
+    )
 
     expect(result).toMatchObject({
       pipettes: {
@@ -79,11 +89,13 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = dispenseUpdateLiquidState({
-      ...omit(dispenseSingleCh150ToA1Args, 'volume'),
-      useFullVolume: true,
-      prevLiquidState: initialLiquidState,
-    })
+    const result = getUpdatedLiquidState(
+      {
+        ...omit(dispenseSingleCh150ToA1Args, 'volume'),
+        useFullVolume: true,
+      },
+      initialLiquidState
+    )
 
     expect(result).toMatchObject({
       pipettes: {
@@ -126,10 +138,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = dispenseUpdateLiquidState({
-      ...dispenseSingleCh150ToA1Args,
-      prevLiquidState: initialLiquidState,
-    })
+    const result = getUpdatedLiquidState(
+      dispenseSingleCh150ToA1Args,
+      initialLiquidState
+    )
 
     expect(result).toMatchObject({
       pipettes: {
@@ -176,10 +188,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = dispenseUpdateLiquidState({
-      ...dispenseSingleCh150ToA1Args,
-      prevLiquidState: initialLiquidState,
-    })
+    const result = getUpdatedLiquidState(
+      dispenseSingleCh150ToA1Args,
+      initialLiquidState
+    )
 
     expect(result).toMatchObject({
       pipettes: {
@@ -228,10 +240,10 @@ describe('...single-channel pipette', () => {
       }
     )
 
-    const result = dispenseUpdateLiquidState({
-      ...dispenseSingleCh150ToA1Args,
-      prevLiquidState: initialLiquidState,
-    })
+    const result = getUpdatedLiquidState(
+      dispenseSingleCh150ToA1Args,
+      initialLiquidState
+    )
 
     expect(result).toMatchObject({
       pipettes: {
@@ -359,15 +371,17 @@ describe('...8-channel pipette', () => {
           },
         })
 
-        const result = dispenseUpdateLiquidState({
-          invariantContext: customInvariantContext,
-          labware: SOURCE_LABWARE,
-          pipette: 'p300MultiId',
-          prevLiquidState: initialLiquidState,
-          useFullVolume: false,
-          volume: 150,
-          well: 'A1',
-        })
+        const result = getUpdatedLiquidState(
+          {
+            invariantContext: customInvariantContext,
+            labware: SOURCE_LABWARE,
+            pipette: 'p300MultiId',
+            useFullVolume: false,
+            volume: 150,
+            well: 'A1',
+          },
+          initialLiquidState
+        )
 
         expect(result).toMatchObject({
           pipettes: {
