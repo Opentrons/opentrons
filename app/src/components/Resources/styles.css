@@ -21,4 +21,5 @@
 
 .link_button {
   flex-shrink: 0;
+  margin-left: var(--resources_card_spacing);
 }
