@@ -10,4 +10,5 @@ export {
   modulePipetteCollision,
 }
 
+export * from './commandCreatorArgsGetters'
 export * from './misc'

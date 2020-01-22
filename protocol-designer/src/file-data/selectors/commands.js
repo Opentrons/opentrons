@@ -204,17 +204,7 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         // - If we don't have a 'changeTip: never' step for this pipette in the future,
         // we know the current tip(s) aren't going to be reused, so we can drop them
         // immediately after the current step is done.
-        //
-        // NOTE: this implementation assumes all step forms that use a pipette have both
-        // 'pipette' and 'changeTip' fields (and they're not named something else).
-        const pipetteId =
-          args.commandCreatorFnName !== 'delay' &&
-          args.commandCreatorFnName !== 'engageMagnet' &&
-          args.commandCreatorFnName !== 'disengageMagnet' &&
-          args.commandCreatorFnName !== 'setTemperature' &&
-          args.commandCreatorFnName !== 'deactivateTemperature'
-            ? args.pipette
-            : false
+        const pipetteId = StepGeneration.getPipetteIdFromCCArgs(args)
         if (pipetteId) {
           const nextStepArgsForPipette = continuousStepArgs
             .slice(stepIndex + 1)
