@@ -14,7 +14,7 @@ class HTTPServer:
         self.app['com.opentrons.max_version'] = max_version
         self.log_file_path = log_file_path
         self.app.router.add_get(
-            '/openapi/{version}', endp.get_openapi_spec)
+            '/openapi', endp.get_openapi_spec)
         self.app.router.add_get(
             '/health', endp.health)
         self.app.router.add_get(

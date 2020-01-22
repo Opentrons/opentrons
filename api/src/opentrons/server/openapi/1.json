@@ -609,6 +609,17 @@
               }
             }
           },
+          "404": {
+            "description": "The spec requested is not found",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {
+                  "message": "No spec found for version 2"
+                }
+              }
+            }
+          },
           "502": {"$ref": "#/components/responses/serverDown"}
         }
       }

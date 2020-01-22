@@ -3,18 +3,6 @@ from aiohttp import helpers, web
 MAX_VERSION = 1
 SUPPORTED_VERSIONS = range(1, MAX_VERSION+1)
 
-ERROR_CODES = {
-    'unsupportedVersion': 1,
-    'HTTPNotFound': 2
-}
-
-
-class HTTPVersionMismatchError(Exception):
-    def __init__(self, message, versions):
-        Exception.__init__(self, message)
-        self.dErrorArguments = versions
-        self.message = message
-
 
 def determine_requested_version(request: web.Request) -> int:
     headers = getattr(request, 'headers', {})

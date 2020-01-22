@@ -7,16 +7,16 @@ import tempfile
 import threading
 import time
 import traceback
+import sys
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Callable
 from aiohttp import web
 
-from .util import (
-    HTTPVersionMismatchError, SUPPORTED_VERSIONS,
-    ERROR_CODES, determine_requested_version)
+from .util import (SUPPORTED_VERSIONS, MAX_VERSION,
+                   determine_requested_version)
 from opentrons.config import CONFIG
 from .rpc import RPCServer
-from .http import HTTPServerLegacy, HTTPServer
+from .http import HTTPServer
 from opentrons.api.routers import MainRouter
 
 if TYPE_CHECKING:
@@ -25,61 +25,41 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-def error_handling(error, request):
-    minVersion = SUPPORTED_VERSIONS[0]
-    maxVersion = SUPPORTED_VERSIONS[-1]
-    if isinstance(error, HTTPVersionMismatchError):
-        msg = error.message
-        data = {
-            "type": "error",
-            "errorId": ERROR_CODES["unsupportedVersion"],
-            "errorType": "unsupportedVersion",
-            "message": msg,
-            "supportedHttpApiVersions": {
-                "minimum": minVersion, "maximum": maxVersion},
-            "links": {}
-        }
-        # Client is trying to use a version higher than supported
-        response = web.json_response(data, status=406)
-    elif isinstance(error, web.HTTPNotFound):
+@web.middleware
+async def version_middleware(request: web.Request, handler: Callable):
+    """
+    Helper middleware to determine the version requested by a client. If the
+    client does not specify a version, then that version will default to
+    latest. To determine the
+    """
+    try:
+        header_version = determine_requested_version(request)
+        version_to_use = min(header_version, MAX_VERSION)
+        request['requested_version'] = version_to_use
+        response = await handler(request)
+        response.headers['X-Opentrons-Media-Type'] =\
+            f'vnd.opentrons.api.{version_to_use}'
+    except web.HTTPNotFound:
         log.exception("Exception handler for request {}".format(request))
         msg = "Request was not found at {}".format(request)
         data = {
             "type": "error",
-            "errorId": ERROR_CODES["HTTPNotFound"],
+            "errorId": 2,
             "errorType": "HTTPNotFound",
             "message": msg,
-            "supportedHttpApiVersions": {
-                "minimum": minVersion, "maximum": maxVersion},
+            "supportedHttpApiVersions": SUPPORTED_VERSIONS,
+            "maxHttpApiVersion": MAX_VERSION,
             "links": {}
         }
         response = web.json_response(data, status=404)
-    else:
+    except Exception as e:
         log.exception("Exception in handler for request {}".format(request))
+        exc_type, exc_val, tb = sys.exc_info()
         data = {
-            "message": 'An unexpected error occured - {}'.format(error),
-            "traceback": traceback.format_exc()
+            "message": 'An unexpected error occured - {}'.format(e),
+            "traceback": traceback.format_exception(exc_type, exc_val, tb)
         }
         response = web.json_response(data, status=500)
-    return response
-
-
-@web.middleware
-async def version_middleware(request, handler):
-    """
-    Helper middleware to route any requests to the default HTTP API (v0)
-    webserver paths. If the route still does not exist in v0, then the
-    error middleware will be called.
-    """
-    try:
-        header_version = determine_requested_version(request)
-        version_to_use = min(header_version, max_accepted_version)
-        request['requested_version'] = header_version
-        response = await handler(request)
-        response.headers['X-Opentrons-Media-Type'] =\
-            f'opentrons.api.{header_version}'
-    except Exception as e:
-        response = error_handling(e, request)
     return response
 
 
@@ -144,7 +124,7 @@ def init(hardware: 'HardwareAPILike' = None,
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
-    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'], MAX_VERSION)
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')

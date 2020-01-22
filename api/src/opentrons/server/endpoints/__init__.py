@@ -4,7 +4,7 @@ import logging
 import pkgutil
 from aiohttp import web
 
-from ..util import http_version
+from ..util import SUPPORTED_VERSIONS, MAX_VERSION
 from opentrons import __version__, config, protocol_api, protocols
 
 log = logging.getLogger(__name__)
@@ -33,9 +33,10 @@ async def health(request: web.Request) -> web.Response:
         'links': {
             'apiLog': '/logs/api.log',
             'serialLog': '/logs/serial.log',
-            'apiSpec': '/openapi/{version}'
+            'apiSpec': '/openapi'
         },
-        'maxSupportedHttpApiVersions': SUPPORTED_VERSIONS[-1]
+        'maxHttpApiVersion': MAX_VERSION,
+        'supportedHttpApiVersions': SUPPORTED_VERSIONS
         }
     return web.json_response(
         headers={'Access-Control-Allow-Origin': '*'},
@@ -45,7 +46,7 @@ async def health(request: web.Request) -> web.Response:
 async def get_openapi_spec(request: web.Request) -> web.Response:
     version = request.get('requested_version')
     spec = json.loads(pkgutil.get_data(  # type: ignore
-        'opentrons', 'server/openapi/1.json'))
+        'opentrons', f'server/openapi/{version}.json'))
     if spec:
         return web.json_response(spec, status=200)
     else:

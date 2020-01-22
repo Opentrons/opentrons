@@ -8,32 +8,13 @@ from aiohttp import web
 from . import constants, name_management
 
 from . import config, control, update, ssh_key_management
-from .util import (ERROR_CODES, MAX_VERSION,
-                   SUPPORTED_VERSIONS, determine_requested_version)
+from .util import (MAX_VERSION, SUPPORTED_VERSIONS,
+                   determine_requested_version)
 
 BR_BUILTIN_VERSION_FILE = '/etc/VERSION.json'
 #: Location of the builtin system version
 
 LOG = logging.getLogger(__name__)
-
-
-async def error_handling(error, request):
-    if isinstance(error, web.HTTPNotFound):
-        LOG.exception("Exception handler for request {}".format(request))
-        msg = "Request was not found at {}".format(request)
-        data = {
-            "type": "error",
-            "errorId": ERROR_CODES["HTTPNotFound"],
-            "errorType": "HTTPNotFound",
-            "message": msg,
-            "supportedHttpApiVersions": SUPPORTED_VERSIONS,
-            "links": {}
-        }
-        resp = web.json_response(data, status=404)
-    else:
-        LOG.exception(f"Exception serving {request.method} {request.path}")
-        raise
-    return resp
 
 
 @web.middleware
@@ -50,8 +31,21 @@ async def version_middleware(request, handler):
         response = await handler(request)
         response.headers['X-Opentrons-Media-Type'] =\
             f'opentrons.api.{version_to_use}'
-    except Exception as e:
-        response = error_handling(e, request)
+    except web.HTTPNotFound:
+        LOG.exception("Exception handler for request {}".format(request))
+        msg = "Request was not found at {}".format(request)
+        data = {
+            "type": "error",
+            "errorId": 2,
+            "errorType": "HTTPNotFound",
+            "message": msg,
+            "supportedHttpApiVersions": SUPPORTED_VERSIONS,
+            "links": {}
+        }
+        response = web.json_response(data, status=404)
+    except Exception:
+        LOG.exception(f"Exception serving {request.method} {request.path}")
+        raise
     return response
 
 

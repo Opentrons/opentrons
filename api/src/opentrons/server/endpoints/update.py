@@ -10,6 +10,20 @@ log = logging.getLogger(__name__)
 UPDATE_TIMEOUT = 15
 
 
+# TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
+#  this should be removed
+async def cannot_update_firmware(request):
+    """
+     This handler refuses a module firmware update request
+     in the case that the API server isn't equipped to handle it.
+    """
+    log.debug('Cannot update module firmware on this server version')
+    status = 501
+    res = {'message': 'Cannot update module firmware \
+                        via APIv1 server, please update server to APIv2'}
+    return web.json_response(res, status=status)
+
+
 async def update_module_firmware(request: web.Request) -> web.Response:
     """
      This handler accepts a POST request with Content-Type: multipart/form-data
