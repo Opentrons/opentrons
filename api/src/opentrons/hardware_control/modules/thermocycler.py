@@ -336,7 +336,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def device_info(self):
-        return self._device_info
+        return {**self._device_info, "available_version": self._available_version}
 
     @property
     def total_cycle_count(self):
@@ -397,7 +397,9 @@ class Thermocycler(mod_abc.AbstractModule):
     async def _connect(self):
         await self._driver.connect(self._port)
         self._device_info = await self._driver.get_device_info()
-        self._available_version =
+        self._available_version = update.get_available_update(
+            module_type=self.name(),
+            device_version_raw=self.device_info.get('version', None))
 
     @property
     def port(self):
@@ -405,8 +407,9 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def has_available_update(self) -> bool:
-        device_version_raw = self.device_info.get('version', None)
-        available_version_raw = self._
+        return update.get_available_update(
+            module_type=self.name(),
+            device_version_raw=self.device_info.get('version', None))
 
     async def prep_for_update(self):
         new_port = await update.enter_bootloader(self._driver,

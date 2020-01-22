@@ -2,10 +2,11 @@ import asyncio
 import logging
 import os
 import sys
+from pathlib import Path
 from glob import glob
+from pkg_resources import parse_version
 from typing import Any, Dict, Optional, Tuple
 from opentrons.config import IS_ROBOT
-from opentrons.main import ROBOT_FIRMWARE_DIR
 
 from .mod_abc import UploadFunction
 
@@ -13,6 +14,7 @@ log = logging.getLogger(__name__)
 
 PORT_SEARCH_TIMEOUT = 5.5
 
+ROBOT_FIRMWARE_DIR = Path('/usr/lib/firmware')
 # avrdude_options
 PART_NO = 'atmega32u4'
 PROGRAMMER_ID = 'avr109'
@@ -200,23 +202,24 @@ async def _discover_ports():
     raise Exception("No ot_modules found in /dev. Try again")
 
 
-def get_available_version(module_type: str) -> str:
-    resources = []
+def get_available_update(module_type: str, device_version_raw: str) -> Optional[str]:
+    """Returns path to newer version of given module fw if available."""
 
-    MODULE_FW_RE = re.compile(f'{module_type}-v(.*).hex')
-    # Search for module fw files in /usr/lib/firmware
-    if IS_ROBOT:
-        resources.extend([ROBOT_FIRMWARE_DIR / item
-                          for item in os.listdir(ROBOT_FIRMWARE_DIR)])
+    MODULE_FW_RE = re.compile(f'{module_type}@v(.*).(hex|bin)')
 
-    resources_path = Path(HERE) / 'resources'
-    resources.extend([resources_path / item
-                      for item in os.listdir(resources_path)])
+    fw_resources = [ROBOT_FIRMWARE_DIR / item for item in
+                    os.listdir(ROBOT_FIRMWARE_DIR)]
 
-    for fi in resources:
-        matches = SMOOTHIE_HEX_RE.search(str(fi))
-        if matches:
-            branch_plus_ref = matches.group(1)
-            return fi, branch_plus_ref
-    raise OSError("Could not find smoothie firmware file in {}"
-                  .format(os.path.join(HERE, 'resources')))
+    device_version = parse_version(device_version)
+
+    for fw_resource in fw_resources:
+        matches = MODULE_FW_RE.search(str(fw_resource))
+        if matches and parse_version(matches.group(1)) > device_version:
+            available_version = parse_version(matches.group(1))
+            if available_version > device_version:
+                return fw_resource
+            elif available_version == device_version:
+                log.info(f"fw for module of type: {module_type} is up to date")
+    log.info(
+        f"no available fw update found for: {module_type}"
+        f"on version: {device_version_raw}")
