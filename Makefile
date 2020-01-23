@@ -127,19 +127,19 @@ lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
+# TODO(mc, 2020-01-22): turn on warning logs in CI once this issue is resolved:
+# https://github.com/Opentrons/opentrons/issues/4830
 .PHONY: lint-js
 lint-js:
-	eslint '.*.js' '**/*.js'
+	eslint $(and $(CI),--quiet) ".*.js" "**/*.js"
 
 .PHONY: lint-json
 lint-json:
 	eslint --max-warnings 0 --ext .json .
 
-# stylelint seems to close stdout before make can, causing spurious failures
-# with `write error: stdout`; pipe to tee which will hopefully paper over it
 .PHONY: lint-css
 lint-css:
-	stylelint '**/*.css'
+	stylelint "**/*.css"
 
 .PHONY: check-js
 check-js:
@@ -148,9 +148,9 @@ check-js:
 # TODO: Ian 2019-12-17 gradually add components and shared-data
 .PHONY: circular-dependencies-js
 circular-dependencies-js:
-	madge --circular protocol-designer/src/index.js
-	madge --circular labware-library/src/index.js
-	madge --circular app/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular protocol-designer/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular labware-library/src/index.js
+	madge $(and $(CI),--no-spinner --no-color) --circular app/src/index.js
 
 # upload coverage reports
 .PHONY: coverage
