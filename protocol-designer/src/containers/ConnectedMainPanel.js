@@ -25,7 +25,7 @@ type Props = {
   ingredSelectionMode: boolean,
 }
 
-function MainPanelComponent(props: Props) {
+function MainPanel(props: Props) {
   const { page, selectedTerminalItemId, ingredSelectionMode } = props
   switch (page) {
     case 'file-splash':
@@ -68,4 +68,4 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
 
 export const ConnectedMainPanel = connect<Props, {||}, _, _, _, _>(
   mapStateToProps
-)(MainPanelComponent)
+)(MainPanel)
