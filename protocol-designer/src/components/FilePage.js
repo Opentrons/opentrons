@@ -45,7 +45,7 @@ const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
 
 // TODO: Ian 2019-03-15 use i18n for labels
-class FilePage extends React.Component<Props, State> {
+export class FilePage extends React.Component<Props, State> {
   state = {
     isEditPipetteModalOpen: false,
     isEditModulesModalOpen: false,
@@ -240,5 +240,3 @@ class FilePage extends React.Component<Props, State> {
     )
   }
 }
-
-export default FilePage

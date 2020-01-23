@@ -277,7 +277,15 @@ export class FilePipettesModal extends React.Component<Props, State> {
               </form>
 
               {showCrashInfoBox && (
-                <CrashInfoBox modules={this.state.modulesByType} />
+                <CrashInfoBox
+                  showDiagram
+                  magnetOnDeck={Boolean(
+                    this.state.modulesByType.magdeck.onDeck
+                  )}
+                  temperatureOnDeck={Boolean(
+                    this.state.modulesByType.tempdeck.onDeck
+                  )}
+                />
               )}
 
               <div className={styles.button_row}>

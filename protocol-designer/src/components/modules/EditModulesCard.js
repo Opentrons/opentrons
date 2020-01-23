@@ -22,7 +22,7 @@ type Props = {
 
 export function EditModulesCard(props: Props) {
   const { modules, thermocyclerEnabled, openEditModuleModal } = props
-  console.log(modules.magdeck, modules.tempdeck)
+
   const visibleModules = thermocyclerEnabled
     ? SUPPORTED_MODULE_TYPES
     : SUPPORTED_MODULE_TYPES.filter(m => m !== THERMOCYCLER)
@@ -38,7 +38,12 @@ export function EditModulesCard(props: Props) {
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
-        {showCrashInfoBox && <CrashInfoBox />}
+        {showCrashInfoBox && (
+          <CrashInfoBox
+            magnetOnDeck={Boolean(modules.magdeck)}
+            temperatureOnDeck={Boolean(modules.tempdeck)}
+          />
+        )}
         {visibleModules.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {
