@@ -1,4 +1,4 @@
 include src/opentrons/package.json
 graft src/opentrons/config
 graft src/opentrons/resources
-include src/opentrons/server/openapi.json
+include src/opentrons/server/openapi/*.json

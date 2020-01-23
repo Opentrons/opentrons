@@ -45,10 +45,10 @@ async def health(request: web.Request) -> web.Response:
 
 async def get_openapi_spec(request: web.Request) -> web.Response:
     version = request.get('requested_version')
-    spec = json.loads(pkgutil.get_data(  # type: ignore
-        'opentrons', f'server/openapi/{version}.json'))
-    if spec:
+    try:
+        spec = json.loads(pkgutil.get_data(  # type: ignore
+            'opentrons', f'server/openapi/{version}.json'))
         return web.json_response(spec, status=200)
-    else:
+    except FileNotFoundError:
         data = {'message': f'No spec found for version {version}'}
         return web.json_response(data, status=404)
