@@ -1,29 +1,44 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
-import ModuleRow from './ModuleRow'
-import styles from './styles.css'
-
-import type { ModuleType } from '@opentrons/shared-data'
+import {
+  selectors as stepFormSelectors,
+  getCrashablePipetteSelected,
+} from '../../step-forms'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { THERMOCYCLER } from '../../constants'
+import { CrashInfoBox } from './CrashInfoBox'
+import { ModuleRow } from './ModuleRow'
+import styles from './styles.css'
+import type { ModuleType } from '@opentrons/shared-data'
 import type { ModulesForEditModulesCard } from '../../step-forms'
+
 type Props = {
   modules: ModulesForEditModulesCard,
   thermocyclerEnabled: ?boolean,
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
-export default function EditModulesCard(props: Props) {
+export function EditModulesCard(props: Props) {
   const { modules, thermocyclerEnabled, openEditModuleModal } = props
-
+  console.log(modules.magdeck, modules.tempdeck)
   const visibleModules = thermocyclerEnabled
     ? SUPPORTED_MODULE_TYPES
     : SUPPORTED_MODULE_TYPES.filter(m => m !== THERMOCYCLER)
 
+  const pipettesByMount = useSelector(
+    stepFormSelectors.getPipettesForEditPipetteForm
+  )
+
+  const showCrashInfoBox =
+    getCrashablePipetteSelected(pipettesByMount) &&
+    (modules.magdeck || modules.tempdeck)
+
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
+        {showCrashInfoBox && <CrashInfoBox />}
         {visibleModules.map((moduleType, i) => {
           const moduleData = modules[moduleType]
           if (moduleData) {

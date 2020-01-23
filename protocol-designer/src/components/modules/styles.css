@@ -52,15 +52,22 @@
 }
 
 .crash_info_container {
-  display: flex;
   margin: 1rem 0;
-  justify-content: flex-start;
+  padding: 1rem;
+  background-color: var(--c-light-gray);
+}
+
+.crash_info_title {
+  @apply --font-body-2-dark;
+
+  display: flex;
+  align-items: center;
+  margin-bottom: 0.5rem;
 }
 
 .crash_info_diagram {
-  width: auto;
-  height: 100%;
-  max-height: 8.875rem;
+  margin-top: 1rem;
+  max-width: 100%;
 }
 
 .crash_info_box {
@@ -69,8 +76,6 @@
   display: flex;
   flex-direction: column;
   justify-content: space-around;
-  padding: 1rem;
-  background-color: var(--c-light-gray);
 
   & strong {
     font-weight: var(--fw-semibold);

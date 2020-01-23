@@ -15,7 +15,6 @@ import {
   actions as stepFormActions,
   getSlotIsEmpty,
   getSlotsBlockedBySpanning,
-  getCrashablePipetteSelected,
 } from '../../../step-forms'
 import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -23,10 +22,9 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../../constants'
+import { THERMOCYCLER } from '../../../constants'
 import i18n from '../../../localization'
 import { PDAlert } from '../../alerts/PDAlert'
-import { CrashInfoBox } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -50,14 +48,6 @@ export default function EditModulesModal(props: EditModulesProps) {
   const [selectedModel, setSelectedModel] = React.useState<string>(
     (module && module.model) || 'GEN1'
   )
-
-  const pipettesByMount = useSelector(
-    stepFormSelectors.getPipettesForEditPipetteForm
-  )
-
-  const showCrashInfoBox =
-    getCrashablePipetteSelected(pipettesByMount) &&
-    (moduleType === MAGDECK || moduleType === TEMPDECK)
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
@@ -164,7 +154,6 @@ export default function EditModulesModal(props: EditModulesProps) {
           )}
         </div>
       </form>
-      {showCrashInfoBox && <CrashInfoBox />}
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>

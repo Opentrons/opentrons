@@ -13,7 +13,7 @@ import {
   actions as stepFormActions,
   selectors as stepFormSelectors,
 } from '../../../step-forms'
-import FilePipettesModal from '../FilePipettesModal'
+import { FilePipettesModal } from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type {
   PipetteOnDeck,
