@@ -50,9 +50,9 @@ export const commandCreatorsTimeline = (
       const nextResult = {
         commands: commandCreatorResult.commands,
         robotState: nextRobotStateAndWarnings.robotState,
+        warnings: commandCreatorResult.warnings,
       }
 
-      // TODO: Ian 2019-11-20 allow warnings in timeline frames?
       return {
         timeline: [...acc.timeline, nextResult],
         errors: null,

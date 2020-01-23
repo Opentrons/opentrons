@@ -243,7 +243,12 @@ describe('commandCreatorsTimeline', () => {
         {
           robotState: { count: 5 + 4 },
           commands: [{ command: 'add', params: { value: 4 } }],
-          // NOTE: IL 2019-11-19 command creator warnings do not appear in timeline
+          warnings: [
+            {
+              message: 'adding 4 with warning example',
+              type: 'ADD_WARNING',
+            },
+          ],
         },
         // no more steps in the timeline, stopped by error
       ],
@@ -252,6 +257,7 @@ describe('commandCreatorsTimeline', () => {
 
   test('warnings are indexed in an indexed command chain', () => {
     const initialState: any = { count: 5 }
+
     const result = commandCreatorsTimeline(
       [
         curryCommandCreator(addCreatorWithWarning, { value: 3 }),
@@ -267,19 +273,29 @@ describe('commandCreatorsTimeline', () => {
       {
         robotState: { count: 8 },
         commands: [{ command: 'add', params: { value: 3 } }],
-        // NOTE: IL 2019-11-19 command creator warnings do not appear in timeline
+        warnings: [
+          {
+            message: 'adding 3 with warning example',
+            type: 'ADD_WARNING',
+          },
+        ],
       },
       // multiply by 2
       {
         robotState: { count: 16 },
         commands: [{ command: 'multiply', params: { value: 2 } }],
-        // no warnings -> no `warnings` key
+        warnings: [],
       },
       // add 1 w/ warning
       {
         robotState: { count: 17 },
         commands: [{ command: 'add', params: { value: 1 } }],
-        // NOTE: IL 2019-11-19 command creator warnings do not appear in timeline
+        warnings: [
+          {
+            message: 'adding 1 with warning example',
+            type: 'ADD_WARNING',
+          },
+        ],
       },
     ])
   })
