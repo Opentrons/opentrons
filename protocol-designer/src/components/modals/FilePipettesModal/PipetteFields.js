@@ -34,7 +34,11 @@ type Props = {|
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
 type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
 
+<<<<<<< HEAD
 export function PipetteFields(props: Props) {
+=======
+export function ChangePipetteFields(props: Props) {
+>>>>>>> style(protocol-designer): change default exports to named exports
   const { values, onFieldChange } = props
   const enableMultiGEN2 = useSelector(getEnableMultiGEN2Pipettes)
 

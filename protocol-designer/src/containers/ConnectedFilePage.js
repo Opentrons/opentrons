@@ -3,7 +3,7 @@ import { connect } from 'react-redux'
 import * as React from 'react'
 import mapValues from 'lodash/mapValues'
 import type { BaseState, ThunkDispatch } from '../types'
-import { FilePage } from '../components/FilePage'
+import { FilePage as FilePageComponent } from '../components/FilePage'
 import { actions, selectors as fileSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { actions as steplistActions } from '../steplist'
@@ -13,7 +13,7 @@ import type { FileMetadataFields } from '../file-data'
 import { actions as navActions } from '../navigation'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 
-type Props = React.ElementProps<typeof FilePage>
+type Props = React.ElementProps<typeof FilePageComponent>
 
 type SP = {|
   instruments: $PropertyType<Props, 'instruments'>,
@@ -65,4 +65,4 @@ export const ConnectedFilePage = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(FilePage)
+)(FilePageComponent)
