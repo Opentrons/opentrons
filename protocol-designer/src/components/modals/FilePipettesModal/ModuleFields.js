@@ -16,7 +16,7 @@ type Props = {|
   onFieldChange: (type: ModuleType, value: boolean) => mixed,
 |}
 
-export default function ModuleFields(props: Props) {
+export function ModuleFields(props: Props) {
   const { onFieldChange, values, thermocyclerEnabled } = props
   const modules = Object.keys(values)
   const handleOnDeckChange = (type: ModuleType) => (

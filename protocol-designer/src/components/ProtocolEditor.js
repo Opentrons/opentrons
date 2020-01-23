@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
-import PrereleaseModeIndicator from './PrereleaseModeIndicator'
+import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import ConnectedNav from '../containers/ConnectedNav'
 import ConnectedSidebar from '../containers/ConnectedSidebar'
 import ConnectedTitleBar from '../containers/ConnectedTitleBar'
@@ -20,7 +20,7 @@ import styles from './ProtocolEditor.css'
 const showGateModal =
   process.env.NODE_ENV === 'production' || process.env.OT_PD_SHOW_GATE
 
-function ProtocolEditor() {
+function ProtocolEditorComponent() {
   return (
     <div>
       <TopPortalRoot />
@@ -53,4 +53,6 @@ function ProtocolEditor() {
   )
 }
 
-export default DragDropContext(MouseBackEnd)(ProtocolEditor)
+export const ProtocolEditor = DragDropContext(MouseBackEnd)(
+  ProtocolEditorComponent
+)

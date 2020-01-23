@@ -35,7 +35,7 @@ type EditModulesProps = {
   onCloseClick: () => mixed,
 }
 
-export default function EditModulesModal(props: EditModulesProps) {
+export function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
 

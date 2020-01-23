@@ -38,7 +38,7 @@ export const liquidEditFormSchema = Yup.object().shape({
   serialize: Yup.boolean(),
 })
 
-export default function LiquidEditForm(props: Props) {
+export function LiquidEditForm(props: Props) {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues = {

@@ -118,7 +118,7 @@ type Props = {|
   overwriteLabwareDef?: () => mixed,
 |}
 
-const LabwareUploadMessageModal = (props: Props) => {
+export const LabwareUploadMessageModal = (props: Props) => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
@@ -153,5 +153,3 @@ const LabwareUploadMessageModal = (props: Props) => {
     </AlertModal>
   )
 }
-
-export default LabwareUploadMessageModal

@@ -29,7 +29,7 @@ type MultiChannelSubstepState = {
   collapsed: boolean,
 }
 
-export default class MultiChannelSubstep extends React.PureComponent<
+export class MultiChannelSubstep extends React.PureComponent<
   MultiChannelSubstepProps,
   MultiChannelSubstepState
 > {

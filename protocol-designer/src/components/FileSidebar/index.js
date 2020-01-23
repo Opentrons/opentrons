@@ -8,10 +8,10 @@ import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import FileSidebar from './FileSidebar'
+import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof FileSidebar>
+type Props = React.ElementProps<typeof FileSidebarComponent>
 
 type SP = {|
   canDownload: boolean,
@@ -20,11 +20,11 @@ type SP = {|
   _hasUnsavedChanges: ?boolean,
 |}
 
-export default connect<Props, {||}, SP, {||}, _, _>(
+export const FileSidebar = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(FileSidebar)
+)(FileSidebarComponent)
 
 function mapStateToProps(state: BaseState): SP {
   const protocolName =

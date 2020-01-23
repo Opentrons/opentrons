@@ -15,7 +15,7 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import getDefaultsForStepType from '../getDefaultsForStepType'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { getWellRatio } from '../../utils'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -439,7 +439,7 @@ export function updatePatchBlowoutFields(
   return patch
 }
 
-export default function dependentFieldsUpdateMoveLiquid(
+export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,

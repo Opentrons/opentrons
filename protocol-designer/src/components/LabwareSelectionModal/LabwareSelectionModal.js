@@ -26,9 +26,9 @@ import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/l
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
-import useBlockingHint from '../Hints/useBlockingHint'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
-import LabwareItem from './LabwareItem'
+import { useBlockingHint } from '../Hints/useBlockingHint'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import { LabwareItem } from './LabwareItem'
 import LabwarePreview from './LabwarePreview'
 import styles from './styles.css'
 import type { DeckSlot } from '../../types'
@@ -76,7 +76,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
   thermocycler: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
-const LabwareSelectionModal = (props: Props) => {
+export const LabwareSelectionModal = (props: Props) => {
   const {
     customLabwareDefs,
     permittedTipracks,
@@ -360,5 +360,3 @@ const LabwareSelectionModal = (props: Props) => {
     </>
   )
 }
-
-export default LabwareSelectionModal

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import FileUploadMessageModal from './FileUploadMessageModal'
+import { FileUploadMessageModal as FileUploadMessageModalComponent } from './FileUploadMessageModal'
 import { connect } from 'react-redux'
 import {
   selectors as loadFileSelectors,
@@ -9,7 +9,7 @@ import {
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../../../types'
 
-type Props = React.ElementProps<typeof FileUploadMessageModal>
+type Props = React.ElementProps<typeof FileUploadMessageModalComponent>
 
 type SP = {|
   message: $PropertyType<Props, 'message'>,
@@ -30,7 +30,7 @@ function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   }
 }
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const FileUploadMessageModal = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(FileUploadMessageModal)
+)(FileUploadMessageModalComponent)

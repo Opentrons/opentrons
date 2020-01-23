@@ -32,7 +32,7 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   saveAs(blob, downloadData.fileName)
 }
 
-export default function FileSidebar(props: Props) {
+export function FileSidebar(props: Props) {
   const {
     canDownload,
     downloadData,

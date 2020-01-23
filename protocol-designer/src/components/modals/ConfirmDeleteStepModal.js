@@ -7,7 +7,7 @@ import modalStyles from './modal.css'
 
 type Props = $Diff<React.ElementProps<typeof ContinueModal>, { children: * }>
 
-function ConfirmDeleteStepModal(props: Props) {
+export function ConfirmDeleteStepModal(props: Props) {
   return (
     <Portal>
       <ContinueModal className={modalStyles.modal} {...props}>
@@ -16,5 +16,3 @@ function ConfirmDeleteStepModal(props: Props) {
     </Portal>
   )
 }
-
-export default ConfirmDeleteStepModal

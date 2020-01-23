@@ -62,8 +62,6 @@ export type RootState = {|
   selectedWells: SelectedWellsState,
 |}
 
-const rootReducer = combineReducers<_, Action>({
+export const rootReducer = combineReducers<_, Action>({
   selectedWells,
 })
-
-export default rootReducer

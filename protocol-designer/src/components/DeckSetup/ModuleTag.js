@@ -46,7 +46,7 @@ const ModuleStatus = ({
   }
 }
 
-const ModuleTag = (props: Props) => {
+const ModuleTagComponent = (props: Props) => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
@@ -92,4 +92,4 @@ const ModuleTag = (props: Props) => {
   )
 }
 
-export default React.memo<Props>(ModuleTag)
+export const ModuleTag = React.memo<Props>(ModuleTagComponent)

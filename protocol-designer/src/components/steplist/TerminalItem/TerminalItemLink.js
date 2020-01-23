@@ -12,7 +12,7 @@ type OP = {| terminalId: TerminalItemId |}
 type DP = {| selectTerminalItem: TerminalItemId => mixed |}
 type Props = {| ...OP, ...DP |}
 
-class TerminalItemLink extends React.Component<Props> {
+class TerminalItemLinkComponent extends React.Component<Props> {
   handleClick = () => {
     this.props.selectTerminalItem(this.props.terminalId)
   }
@@ -31,7 +31,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export default connect<Props, OP, {||}, DP, _, _>(
+export const TerminalItemLink = connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDTP
-)(TerminalItemLink)
+)(TerminalItemLinkComponent)

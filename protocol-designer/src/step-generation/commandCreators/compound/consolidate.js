@@ -16,7 +16,7 @@ import {
 import { aspirate, dispense, replaceTip, touchTip } from '../atomic'
 import { mixUtil } from './mix'
 
-const consolidate: CommandCreator<ConsolidateArgs> = (
+export const consolidate: CommandCreator<ConsolidateArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -212,5 +212,3 @@ const consolidate: CommandCreator<ConsolidateArgs> = (
     prevRobotState
   )
 }
-
-export default consolidate

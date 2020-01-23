@@ -24,7 +24,7 @@ type Props = {
     | null,
 }
 
-const LabwarePreview = (props: Props) => {
+export const LabwarePreview = (props: Props) => {
   const { labwareDef, moduleCompatibility } = props
   if (!labwareDef) return null
   const maxVolumes = reduce(
@@ -88,5 +88,3 @@ const LabwarePreview = (props: Props) => {
     </div>
   )
 }
-
-export default LabwarePreview

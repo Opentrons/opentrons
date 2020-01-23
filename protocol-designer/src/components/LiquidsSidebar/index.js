@@ -23,7 +23,7 @@ type DP = {|
 
 type Props = {| ...SP, ...DP |}
 
-function LiquidsSidebar(props: Props) {
+function LiquidsSidebarComponent(props: Props) {
   const { liquids, selectedLiquid, createNewLiquid, selectLiquid } = props
   return (
     <SidePanel title="Liquids">
@@ -65,7 +65,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const LiquidsSidebar = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(LiquidsSidebar)
+)(LiquidsSidebarComponent)

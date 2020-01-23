@@ -3,7 +3,7 @@ import * as React from 'react'
 import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
 import i18n from '../../localization'
-import ErrorContents from './ErrorContents'
+import { ErrorContents } from './ErrorContents'
 import WarningContents from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
@@ -11,7 +11,7 @@ import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { BaseState } from '../../types'
 import type { StepIdType } from '../../form-types'
-import Alerts, { type Props } from './Alerts'
+import { Alerts, type Props } from './Alerts'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
@@ -70,7 +70,7 @@ function mergeProps(
   }
 }
 
-export default connect<Props, {||}, SP, {||}, _, _>(
+export const TimelineAlerts = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

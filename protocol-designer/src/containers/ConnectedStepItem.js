@@ -20,7 +20,7 @@ import {
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
-import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
+import { StepItem } from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
 
@@ -113,7 +113,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const ConnectedStepItem = connect<Props, OP, SP, DP, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(StepItem)

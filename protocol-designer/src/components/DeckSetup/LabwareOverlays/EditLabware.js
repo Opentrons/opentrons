@@ -44,7 +44,7 @@ type DNDP = {|
 
 type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
 
-const EditLabware = (props: Props) => {
+const EditLabwareComponent = (props: Props) => {
   const {
     labwareOnDeck,
     isYetUnnamed,
@@ -146,7 +146,7 @@ const DragEditLabware = DragSource(
   DND_TYPES.LABWARE,
   labwareSource,
   collectLabwareSource
-)(EditLabware)
+)(EditLabwareComponent)
 
 const labwareDropTarget = {
   canDrop: (props: { ...OP, ...SP, ...DP }, monitor) => {
@@ -176,7 +176,7 @@ const collectLabwareDropTarget = (connect, monitor) => ({
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,
 })
-export const DragDropEditLabware = DropTarget(
+const DragDropEditLabware = DropTarget(
   DND_TYPES.LABWARE,
   labwareDropTarget,
   collectLabwareDropTarget
@@ -205,7 +205,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
     dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
-export default connect<
+export const EditLabware = connect<
   {| ...OP, ...SP, ...DP |},
   OP,
   SP,

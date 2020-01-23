@@ -9,7 +9,7 @@ import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import LiquidPlacementForm from '../components/LiquidPlacementForm'
+import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
 import WellSelectionInstructions from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'
@@ -43,7 +43,7 @@ type Props = { ...SP, ...DP }
 
 type State = { highlightedWells: WellGroup }
 
-class LiquidPlacementModal extends React.Component<Props, State> {
+class LiquidPlacementModalComponent extends React.Component<Props, State> {
   state = { highlightedWells: {} }
   constructor(props: Props) {
     super(props)
@@ -127,7 +127,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export default connect<Props, {||}, _, _, _, _>(
+export const LiquidPlacementModal = connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(LiquidPlacementModal)
+)(LiquidPlacementModalComponent)

@@ -9,7 +9,7 @@ import {
 } from '../../utils'
 import { SELECTABLE_WELL_CLASS } from '../../constants'
 import SingleLabware from './SingleLabware'
-import SelectionRect from '../SelectionRect'
+import { SelectionRect } from '../SelectionRect'
 import WellTooltip from './WellTooltip'
 
 import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
@@ -32,7 +32,7 @@ export type Props = {|
   wellContents: ContentsByWell,
 |}
 
-class SelectableLabware extends React.Component<Props> {
+export class SelectableLabware extends React.Component<Props> {
   _getWellsFromRect = (rect: GenericRect): * => {
     const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
     return this._wellsFromSelected(selectedWells)
@@ -168,5 +168,3 @@ class SelectableLabware extends React.Component<Props> {
     )
   }
 }
-
-export default SelectableLabware

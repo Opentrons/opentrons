@@ -13,7 +13,7 @@ type SP = {| currentPage: Page |}
 type DP = {| makeNavigateToPage: Page => () => mixed |}
 type Props = { ...SP, ...DP }
 
-const SettingsSidebar = (props: Props) => (
+const SettingsSidebarComponent = (props: Props) => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>
     <PDTitledList
       className={styles.sidebar_item}
@@ -38,7 +38,7 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(actions.navigateToPage(pageName)),
 })
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const SettingsSidebar = connect<Props, {||}, SP, DP, _, _>(
   STP,
   DTP
-)(SettingsSidebar)
+)(SettingsSidebarComponent)

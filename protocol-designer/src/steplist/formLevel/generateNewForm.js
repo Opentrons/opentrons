@@ -1,5 +1,5 @@
 // @flow
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import getDefaultsForStepType from './getDefaultsForStepType'
 import type {
   StepType,
@@ -14,7 +14,7 @@ type NewFormArgs = {
 }
 
 // Add default values to a new step form
-export default function generateNewForm(args: NewFormArgs): FormData {
+export function generateNewForm(args: NewFormArgs): FormData {
   const { stepId, stepType } = args
   const baseForm: BlankForm = {
     id: stepId,

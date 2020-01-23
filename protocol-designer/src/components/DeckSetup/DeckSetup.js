@@ -299,7 +299,7 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-const DeckSetup = (props: Props) => {
+export const DeckSetup = (props: Props) => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
@@ -345,5 +345,3 @@ const DeckSetup = (props: Props) => {
     </React.Fragment>
   )
 }
-
-export default DeckSetup

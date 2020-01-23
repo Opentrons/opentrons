@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { HoverTooltip } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
-import LabwareTooltipContents from './LabwareTooltipContents'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
 import { Portal } from './TooltipPortal'
 
 type Props = {
@@ -14,7 +14,7 @@ type Props = {
   labwareDefDisplayName: ?string,
 }
 
-export default function MixHeader(props: Props) {
+export function MixHeader(props: Props) {
   const { volume, times, labwareNickname, labwareDefDisplayName } = props
   return (
     <PDListItem className={styles.step_subitem}>

@@ -33,7 +33,7 @@ type State = {
   stepId: ?StepIdType,
 }
 
-class ContextMenu extends React.Component<Props, State> {
+class ContextMenuComponent extends React.Component<Props, State> {
   state = {
     visible: false,
     left: null,
@@ -150,7 +150,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.duplicateStep(stepId)),
 })
 
-export default connect<Props, OP, {||}, DP, _, _>(
+export const ContextMenu = connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
-)(ContextMenu)
+)(ContextMenuComponent)

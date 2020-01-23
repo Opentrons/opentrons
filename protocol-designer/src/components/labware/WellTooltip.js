@@ -42,7 +42,7 @@ const initialState: State = {
   tooltipOffset: DEFAULT_TOOLTIP_OFFSET,
 }
 
-class WellTooltip extends React.Component<Props, State> {
+export class WellTooltip extends React.Component<Props, State> {
   state: State = initialState
 
   makeHandleMouseEnterWell = (
@@ -129,5 +129,3 @@ class WellTooltip extends React.Component<Props, State> {
     )
   }
 }
-
-export default WellTooltip

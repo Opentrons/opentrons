@@ -25,7 +25,7 @@ const scrollToTop = () => {
   if (editPage) editPage.scrollTop = 0
 }
 
-const FeatureFlagCard = (props: Props) => {
+export const FeatureFlagCard = (props: Props) => {
   const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
@@ -121,5 +121,3 @@ const FeatureFlagCard = (props: Props) => {
     </>
   )
 }
-
-export default FeatureFlagCard

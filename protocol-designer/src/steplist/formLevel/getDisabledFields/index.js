@@ -1,7 +1,7 @@
 // @flow
 import { defaultMemoize } from 'reselect'
-import getDisabledFieldsMoveLiquidForm from './getDisabledFieldsMoveLiquidForm'
-import getDisabledFieldsMixForm from './getDisabledFieldsMixForm'
+import { getDisabledFieldsMoveLiquidForm } from './getDisabledFieldsMoveLiquidForm'
+import { getDisabledFieldsMixForm } from './getDisabledFieldsMixForm'
 import type { FormData } from '../../../form-types'
 
 function _getDisabledFields(rawForm: FormData): Set<string> {
@@ -25,6 +25,4 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
 
 // shallow-memoized because every disable-able field in the form calls this function once
 // WARNING: do not mutate the same rawForm obj or this memoization will break
-const getDisabledFields = defaultMemoize(_getDisabledFields)
-
-export default getDisabledFields
+export const getDisabledFields = defaultMemoize(_getDisabledFields)

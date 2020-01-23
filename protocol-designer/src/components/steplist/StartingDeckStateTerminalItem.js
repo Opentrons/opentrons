@@ -14,7 +14,7 @@ type Props = {
 
 type SP = $Exact<Props>
 
-function StartingDeckStateTerminalItem(props: Props) {
+function StartingDeckStateTerminalItemComponent(props: Props) {
   const { showHint } = props
   const hintContents = (
     <PDListItem>
@@ -36,6 +36,6 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export default connect<Props, {||}, SP, _, _, _>(mapStateToProps)(
-  StartingDeckStateTerminalItem
-)
+export const StartingDeckStateTerminalItem = connect<Props, {||}, SP, _, _, _>(
+  mapStateToProps
+)(StartingDeckStateTerminalItemComponent)

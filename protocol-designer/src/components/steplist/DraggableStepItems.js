@@ -13,7 +13,7 @@ import {
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState } from '../../types'
-import ContextMenu from './ContextMenu'
+import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
 
 const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
@@ -88,7 +88,10 @@ type StepItemsProps = {
   connectDropTarget: mixed => React.Element<any>,
 }
 type StepItemsState = { stepIds: Array<StepIdType> }
-class StepItems extends React.Component<StepItemsProps, StepItemsState> {
+class StepItemsComponent extends React.Component<
+  StepItemsProps,
+  StepItemsState
+> {
   constructor(props) {
     super(props)
     this.state = { stepIds: this.props.orderedStepIds }
@@ -220,6 +223,8 @@ const collectListTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 })
 
-export default DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(
-  StepItems
-)
+export const StepItems = DropTarget(
+  DND_TYPES.STEP_ITEM,
+  listTarget,
+  collectListTarget
+)(StepItemsComponent)

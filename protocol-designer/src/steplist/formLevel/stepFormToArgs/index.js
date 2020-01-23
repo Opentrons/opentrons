@@ -16,7 +16,7 @@ import type { CommandCreatorArgs } from '../../../step-generation'
 type StepArgs = CommandCreatorArgs | null
 
 // TODO: Ian 2019-01-29 use hydrated form type
-const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
+export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
   // cast all fields that have 'fieldCaster' in stepFieldHelperMap
   const castForm = mapValues(hydratedForm, (value, name) =>
     castField(name, value)
@@ -38,5 +38,3 @@ const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return null
   }
 }
-
-export default stepFormToArgs

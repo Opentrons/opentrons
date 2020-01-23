@@ -34,7 +34,7 @@ type Props = {
   saveForm: ValidFormValues => mixed,
 }
 
-export default class LiquidPlacementForm extends React.Component<Props> {
+export class LiquidPlacementForm extends React.Component<Props> {
   getInitialValues = () => {
     const { commonSelectedLiquidId, commonSelectedVolume } = this.props
     return {

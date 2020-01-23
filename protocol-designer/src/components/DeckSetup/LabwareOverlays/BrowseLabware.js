@@ -48,7 +48,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export default connect<Props, OP, _, DP, _, _>(
+export const BrowseLabware = connect<Props, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
 )(BrowseLabwareOverlay)

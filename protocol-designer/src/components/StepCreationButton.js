@@ -34,7 +34,7 @@ type Props = {|
 
 type State = { expanded?: boolean }
 
-class StepCreationButton extends React.Component<Props, State> {
+class StepCreationButtonComponent extends React.Component<Props, State> {
   state = { expanded: false }
 
   handleExpandClick = (e: SyntheticEvent<>) => {
@@ -131,7 +131,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.addStep({ stepType })),
 })
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const StepCreationButton = connect<Props, {||}, SP, DP, _, _>(
   mapSTP,
   mapDTP
-)(StepCreationButton)
+)(StepCreationButtonComponent)

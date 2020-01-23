@@ -86,5 +86,3 @@ export const useBlockingHint = (args: {|
     />
   )
 }
-
-export default useBlockingHint

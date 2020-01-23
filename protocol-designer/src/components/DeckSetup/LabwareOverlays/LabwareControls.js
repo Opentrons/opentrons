@@ -10,9 +10,9 @@ import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { selectors as stepsSelectors } from '../../../ui/steps'
 import { BlockedSlot } from './BlockedSlot'
-import BrowseLabware from './BrowseLabware'
-import EditLabware from './EditLabware'
-import LabwareName from './LabwareName'
+import { BrowseLabware } from './BrowseLabware'
+import { EditLabware } from './EditLabware'
+import { LabwareName } from './LabwareName'
 import styles from './LabwareOverlays.css'
 
 type OP = {|
@@ -30,7 +30,7 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-const LabwareControls = (props: Props) => {
+const LabwareControlsComponent = (props: Props) => {
   const {
     labwareOnDeck,
     slot,
@@ -83,6 +83,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
     .includes(ownProps.labwareOnDeck.id),
 })
 
-export default connect<Props, OP, SP, {||}, _, _>(mapStateToProps)(
-  LabwareControls
-)
+export const LabwareControls = connect<Props, OP, SP, {||}, _, _>(
+  mapStateToProps
+)(LabwareControlsComponent)

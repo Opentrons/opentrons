@@ -76,6 +76,4 @@ export type RootState = {
   unsavedChanges: boolean,
 }
 
-const rootReducer = combineReducers<_, Action>(_allReducers)
-
-export default rootReducer
+export const rootReducer = combineReducers<_, Action>(_allReducers)

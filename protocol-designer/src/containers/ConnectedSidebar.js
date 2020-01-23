@@ -6,8 +6,8 @@ import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors
 
 import ConnectedStepList from './ConnectedStepList'
 import IngredientsList from './IngredientsList'
-import FileSidebar from '../components/FileSidebar'
-import LiquidsSidebar from '../components/LiquidsSidebar'
+import { FileSidebar } from '../components/FileSidebar'
+import { LiquidsSidebar } from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
 import type { BaseState } from '../types'
@@ -49,4 +49,6 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(Sidebar)
+export const ConnectedSidebar = connect<Props, {||}, _, _, _, _>(
+  mapStateToProps
+)(Sidebar)

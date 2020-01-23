@@ -9,7 +9,7 @@ import {
   actions as stepsActions,
 } from '../../../ui/steps'
 import { PDTitledList } from '../../lists'
-export { default as TerminalItemLink } from './TerminalItemLink'
+export { TerminalItemLink } from './TerminalItemLink'
 
 type Props = React.ElementProps<typeof PDTitledList>
 
@@ -52,7 +52,7 @@ function mergeProps(
   }
 }
 
-export default connect<Props, OP, SP, {||}, _, _>(
+export const TerminalItem = connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

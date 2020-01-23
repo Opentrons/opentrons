@@ -9,7 +9,7 @@ import modalStyles from '../modal.css'
 
 type Props = { onCancel: () => void, onConfirm: () => void }
 
-const StepChangesConfirmModal = (props: Props) => {
+export const StepChangesConfirmModal = (props: Props) => {
   const { onCancel, onConfirm } = props
 
   return (
@@ -77,5 +77,3 @@ const StepChangesConfirmModal = (props: Props) => {
     </AlertModal>
   )
 }
-
-export default StepChangesConfirmModal

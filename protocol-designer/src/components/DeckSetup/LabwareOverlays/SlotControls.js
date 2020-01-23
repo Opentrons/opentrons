@@ -41,7 +41,7 @@ type DP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 
-const SlotControls = (props: Props) => {
+const SlotControlsComponent = (props: Props) => {
   const {
     slot,
     addLabware,
@@ -135,7 +135,11 @@ const collectSlotTarget = (connect, monitor) => ({
   draggedDef: monitor.getItem()?.labwareOnDeck?.def || null,
 })
 
-export default connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
+export const SlotControls = connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
-)(DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(SlotControls))
+)(
+  DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(
+    SlotControlsComponent
+  )
+)

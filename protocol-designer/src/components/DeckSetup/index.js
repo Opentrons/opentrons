@@ -7,12 +7,12 @@ import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { InitialDeckSetup } from '../../step-forms'
-import DeckSetup from './DeckSetup'
+import { DeckSetup as DeckSetupComponent } from './DeckSetup'
 
 import type { TerminalItemId } from '../../steplist'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof DeckSetup>
+type Props = React.ElementProps<typeof DeckSetupComponent>
 
 type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
@@ -41,8 +41,8 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   },
 })
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const DeckSetup = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
-)(DeckSetup)
+)(DeckSetupComponent)

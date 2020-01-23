@@ -13,7 +13,7 @@ type Props = {|
   slotName: string,
 |}
 
-const ModuleViz = (props: Props) => {
+export const ModuleViz = (props: Props) => {
   const moduleType = props.module.type
   const {
     xOffset,
@@ -45,5 +45,3 @@ const ModuleViz = (props: Props) => {
     </g>
   )
 }
-
-export default ModuleViz

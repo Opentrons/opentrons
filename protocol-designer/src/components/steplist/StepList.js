@@ -2,15 +2,15 @@
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
-import StartingDeckStateTerminalItem from './StartingDeckStateTerminalItem'
+import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
 import TerminalItem from './TerminalItem'
 import { END_TERMINAL_TITLE } from '../../constants'
 import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
-import StepCreationButton from '../StepCreationButton'
+import { StepCreationButton } from '../StepCreationButton'
 import type { StepIdType } from '../../form-types'
 import { PortalRoot } from './TooltipPortal'
-import DraggableStepItems from './DraggableStepItems'
+import { DraggableStepItems } from './DraggableStepItems'
 
 type Props = {
   orderedStepIds: Array<StepIdType>,
@@ -18,7 +18,7 @@ type Props = {
   reorderSteps: (Array<StepIdType>) => mixed,
 }
 
-export default class StepList extends React.Component<Props> {
+export class StepList extends React.Component<Props> {
   handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
     const { reorderSelectedStep } = this.props
     const key = e.key

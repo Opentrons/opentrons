@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { AppContainer } from 'react-hot-loader'
 
 import configureStore from './configureStore'
-import App from './components/App'
+import { App } from './components/App'
 import initialize from './initialize'
 const store = configureStore()
 

@@ -16,11 +16,11 @@ import {
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import { FilePipettesModal } from '../FilePipettesModal'
+import { FilePipettesModal as FilePipettesModalComponent } from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 
-type Props = ElementProps<typeof FilePipettesModal>
+type Props = ElementProps<typeof FilePipettesModalComponent>
 
 type OP = {|
   showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
@@ -38,11 +38,11 @@ type DP = {|
   _createNewProtocol: $PropertyType<Props, 'onSave'>,
 |}
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const FilePipettesModal = connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
-)(FilePipettesModal)
+)(FilePipettesModalComponent)
 
 function mapStateToProps(state: BaseState): SP {
   return {

@@ -21,7 +21,7 @@ type DP = {|
 
 type Props = { ...OP, ...DP }
 
-const NameThisLabware = (props: Props) => {
+const NameThisLabwareComponent = (props: Props) => {
   const [inputValue, setInputValue] = useState('')
 
   const saveNickname = () => {
@@ -75,7 +75,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   }
 }
 
-export default connect<Props, OP, _, DP, BaseState, ThunkDispatch<*>>(
+export const NameThisLabware = connect<
+  Props,
+  OP,
+  _,
+  DP,
+  BaseState,
+  ThunkDispatch<*>
+>(
   null,
   mapDispatchToProps
-)(NameThisLabware)
+)(NameThisLabwareComponent)

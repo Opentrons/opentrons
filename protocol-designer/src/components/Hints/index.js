@@ -26,7 +26,7 @@ type State = { rememberDismissal: boolean }
 // (versus calmer non-alert header)
 const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
 
-class Hints extends React.Component<Props, State> {
+class HintsComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { rememberDismissal: false }
@@ -139,7 +139,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const Hints = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(Hints)
+)(HintsComponent)

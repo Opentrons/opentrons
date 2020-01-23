@@ -14,7 +14,7 @@ import type { MixArgs } from '../../../step-generation'
 
 type MixStepArgs = MixArgs
 
-const mixFormToArgs = (
+export const mixFormToArgs = (
   hydratedFormData: HydratedMixFormDataLegacy
 ): MixStepArgs => {
   const { labware, pipette } = hydratedFormData
@@ -92,5 +92,3 @@ const mixFormToArgs = (
     blowoutOffsetFromTopMm,
   }
 }
-
-export default mixFormToArgs

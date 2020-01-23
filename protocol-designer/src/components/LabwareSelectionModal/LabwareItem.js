@@ -23,7 +23,7 @@ type Props = {|
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-export default function LabwareItem(props: Props) {
+export function LabwareItem(props: Props) {
   const {
     disabled,
     icon,

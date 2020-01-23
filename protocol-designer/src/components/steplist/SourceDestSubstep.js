@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import MultiChannelSubstep from './MultiChannelSubstep'
+import { MultiChannelSubstep } from './MultiChannelSubstep'
 import SubstepRow from './SubstepRow'
 import styles from './StepItem.css'
 
@@ -23,7 +23,7 @@ type SourceDestSubstepProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
-export default function SourceDestSubstep(props: SourceDestSubstepProps) {
+export function SourceDestSubstep(props: SourceDestSubstepProps) {
   const { substeps, selectSubstep, hoveredSubstep } = props
   if (substeps.multichannel) {
     // multi-channel row item (collapsible)

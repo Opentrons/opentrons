@@ -14,7 +14,7 @@ type AspirateDispenseHeaderProps = {
   destLabwareDefDisplayName: ?string,
 }
 
-function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
+export function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
   const {
     sourceLabwareNickname,
     sourceLabwareDefDisplayName,
@@ -78,5 +78,3 @@ function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
     </React.Fragment>
   )
 }
-
-export default AspirateDispenseHeader

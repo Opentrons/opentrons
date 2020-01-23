@@ -58,7 +58,7 @@ function getRootReducer() {
   }
 }
 
-export default function configureStore() {
+export function configureStore() {
   const reducer = getRootReducer()
 
   const composeEnhancers: any =

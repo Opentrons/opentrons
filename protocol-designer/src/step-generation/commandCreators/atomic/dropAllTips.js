@@ -6,7 +6,7 @@ import dropTip from './dropTip'
 /** Drop all tips from equipped pipettes.
  * If no tips are attached to a pipette, do nothing.
  */
-const dropAllTips: CommandCreator<null> = (
+export const dropAllTips: CommandCreator<null> = (
   args,
   invariantContext,
   prevRobotState
@@ -21,5 +21,3 @@ const dropAllTips: CommandCreator<null> = (
     prevRobotState
   )
 }
-
-export default dropAllTips
