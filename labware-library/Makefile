@@ -29,3 +29,10 @@ dev:
 .PHONY: serve
 serve: all
 	node ../scripts/serve-static dist
+
+# end to end tests
+.PHONY: test-e2e
+test-e2e:
+	concurrently --no-color --kill-others --names "server,tests" \
+		"$(MAKE) dev" \
+		"cypress run --browser chrome"

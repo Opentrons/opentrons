@@ -57,5 +57,9 @@ module.exports = {
         jest: true,
       },
     },
+    {
+      files: ['**/cypress/**'],
+      extends: ['plugin:cypress/recommended'],
+    },
   ],
 }
