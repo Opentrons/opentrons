@@ -7,7 +7,13 @@ import {
   savedStepForms,
 } from '../reducers'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  SPAN7_8_10_11_SLOT,
+  TEMPDECK,
+  MAGDECK,
+  THERMOCYCLER,
+} from '../../constants'
 import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
@@ -242,7 +248,7 @@ type MakeDeckSetupStepArgs = {
   moduleLocationUpdate?: { [id: string]: DeckSlot },
 }
 
-const makeDeckSetupStep = (args: MakeDeckSetupStepArgs) => ({
+const makeDeckSetupStep = (args: MakeDeckSetupStepArgs = {}) => ({
   stepType: 'manualIntervention',
   id: '__INITIAL_DECK_SETUP_STEP__',
   labwareLocationUpdate: args.labwareLocationUpdate || {},
@@ -604,53 +610,121 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
 
   describe('create module', () => {
-    const destSlot = '3'
-    const testCases = [
-      {
-        testName:
-          'create module in empty deck slot (labware in unrelated slot unaffected)',
-        makeStateArgs: { labwareLocationUpdate: { [existingLabwareId]: '6' } },
-        expectedLabwareLocations: { [existingLabwareId]: '6' },
-        expectedModuleLocations: { [moduleId]: destSlot },
-      },
-      {
-        testName:
-          'create module in deck slot occupied with labware -> move that labware to the new module',
-        makeStateArgs: {
-          labwareLocationUpdate: { [existingLabwareId]: destSlot },
+    describe('NO existing steps', () => {
+      const destSlot = '3'
+      const testCases = [
+        {
+          testName:
+            'create module in empty deck slot (labware in unrelated slot unaffected)',
+          makeStateArgs: {
+            labwareLocationUpdate: { [existingLabwareId]: '6' },
+          },
+          expectedLabwareLocations: { [existingLabwareId]: '6' },
+          expectedModuleLocations: { [moduleId]: destSlot },
         },
-        expectedLabwareLocations: { [existingLabwareId]: moduleId },
-        expectedModuleLocations: { [moduleId]: destSlot },
-      },
-    ]
-    testCases.forEach(
-      ({
-        testName,
-        makeStateArgs,
-        expectedLabwareLocations,
-        expectedModuleLocations,
-      }) => {
-        test(testName, () => {
-          const action = {
+        {
+          testName:
+            'create module in deck slot occupied with labware -> move that labware to the new module',
+          makeStateArgs: {
+            labwareLocationUpdate: { [existingLabwareId]: destSlot },
+          },
+          expectedLabwareLocations: { [existingLabwareId]: moduleId },
+          expectedModuleLocations: { [moduleId]: destSlot },
+        },
+      ]
+      testCases.forEach(
+        ({
+          testName,
+          makeStateArgs,
+          expectedLabwareLocations,
+          expectedModuleLocations,
+        }) => {
+          test(testName, () => {
+            const action = {
+              type: 'CREATE_MODULE',
+              payload: {
+                id: moduleId,
+                slot: destSlot,
+                type: 'tempdeck',
+                model: 'GEN1',
+              },
+            }
+            const prevRootState = makePrevRootState(makeStateArgs)
+            const result = savedStepForms(prevRootState, action)
+            expect(
+              result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
+            ).toEqual(expectedLabwareLocations)
+            expect(
+              result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate
+            ).toEqual(expectedModuleLocations)
+          })
+        }
+      )
+    })
+    describe('existing steps', () => {
+      let prevRootStateWithMagStep
+      beforeEach(() => {
+        prevRootStateWithMagStep = {
+          savedStepForms: {
+            ...makePrevRootState().savedStepForms,
+            ...{
+              mag_step_form_id: {
+                stepType: 'magnet',
+                moduleId: 'magdeckId',
+              },
+            },
+          },
+        }
+      })
+      let testCases = [
+        {
+          testName: 'create mag mod -> override mag step module id',
+          action: {
             type: 'CREATE_MODULE',
             payload: {
-              id: moduleId,
-              slot: destSlot,
-              type: 'tempdeck',
+              id: 'newMagdeckId',
+              slot: '1',
+              type: MAGDECK,
               model: 'GEN1',
             },
-          }
-          const prevRootState = makePrevRootState(makeStateArgs)
-          const result = savedStepForms(prevRootState, action)
-          expect(
-            result[INITIAL_DECK_SETUP_STEP_ID].labwareLocationUpdate
-          ).toEqual(expectedLabwareLocations)
-          expect(
-            result[INITIAL_DECK_SETUP_STEP_ID].moduleLocationUpdate
-          ).toEqual(expectedModuleLocations)
+          },
+          expectedModuleId: 'newMagdeckId',
+        },
+        {
+          testName: 'create temp mod -> DO NOT override mag step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'tempdeckId',
+              slot: '1',
+              type: TEMPDECK,
+              model: 'GEN1',
+            },
+          },
+          expectedModuleId: 'magdeckId',
+        },
+        {
+          testName: 'create TC -> DO NOT override mag step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'ThermocyclerId',
+              slot: '1',
+              type: THERMOCYCLER,
+              model: 'GEN1',
+            },
+          },
+          expectedModuleId: 'magdeckId',
+        },
+      ]
+
+      testCases.forEach(({ testName, action, expectedModuleId }) => {
+        test(testName, () => {
+          const result = savedStepForms(prevRootStateWithMagStep, action)
+          expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
         })
-      }
-    )
+      })
+    })
   })
 
   describe('delete module -> removes module from initial deck setup step', () => {

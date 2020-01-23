@@ -16,6 +16,7 @@ import {
   FIXED_TRASH_ID,
   SPAN7_8_10_11_SLOT,
   FILE_MODULE_TYPE_TO_MODULE_TYPE,
+  MAGDECK,
 } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -268,7 +269,10 @@ export const savedStepForms = (
         // and since the Magnet step form doesn't allow users to select a dropdown,
         // we auto-select a newly-added magnetic module for all of them
         // to handle the case where users delete and re-add a magnetic module
-        if (savedForm.stepType === 'magnet') {
+        if (
+          savedForm.stepType === 'magnet' &&
+          action.payload.type === MAGDECK
+        ) {
           return { ...savedForm, moduleId }
         }
 
