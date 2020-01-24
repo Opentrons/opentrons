@@ -1,11 +1,19 @@
 import abc
 import asyncio
+import logging
+import re
+import os
+from pathlib import Path
 from pkg_resources import parse_version
-from typing import Dict, Callable, Any, Tuple, Awaitable
+from typing import Dict, Callable, Any, Tuple, Awaitable, Optional
+
+mod_log = logging.getLogger(__name__)
 
 InterruptCallback = Callable[[str], None]
 UploadFunction = Callable[[str, str, Dict[str, Any]],
                           Awaitable[Tuple[bool, str]]]
+
+ROBOT_FIRMWARE_DIR = Path('/usr/lib/firmware')
 
 
 class AbstractModule(abc.ABC):
@@ -36,7 +44,24 @@ class AbstractModule(abc.ABC):
         else:
             self._loop = loop
         self._device_info = None
-        self._available_update_path = update.get_bundled_fw(self.name())
+        self._available_update_path = self.get_bundled_fw()
+
+    def get_bundled_fw(self) -> Optional[Path]:
+        """ Get absolute path to bundled version of module fw if available. """
+        name_to_fw_file_prefix = {
+            "tempdeck": "temperature_module", "magdeck": "magnetic_module"}
+        name = self.name()
+        file_prefix = name_to_fw_file_prefix.get(name, name)
+        MODULE_FW_RE = re.compile(f'{file_prefix}@v(.*).(hex|bin)')
+        fw_resources = [ROBOT_FIRMWARE_DIR /
+                        item for item in os.listdir(ROBOT_FIRMWARE_DIR)]
+        for fw_resource in fw_resources:
+            matches = MODULE_FW_RE.search(str(fw_resource))
+            if matches:
+                return fw_resource
+
+        mod_log.info(f"no available fw file found for: {file_prefix}")
+        return None
 
     @abc.abstractmethod
     def deactivate(self):

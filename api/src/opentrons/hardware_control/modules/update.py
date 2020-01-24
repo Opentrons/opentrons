@@ -2,8 +2,6 @@ import asyncio
 import logging
 import os
 import sys
-import re
-from pathlib import Path
 from glob import glob
 from typing import Any, Dict, Optional, Tuple
 from opentrons.config import IS_ROBOT
@@ -14,7 +12,6 @@ log = logging.getLogger(__name__)
 
 PORT_SEARCH_TIMEOUT = 5.5
 
-ROBOT_FIRMWARE_DIR = Path('/usr/lib/firmware')
 # avrdude_options
 PART_NO = 'atmega32u4'
 PROGRAMMER_ID = 'avr109'
@@ -200,20 +197,3 @@ async def _discover_ports():
             return module_ports
         await asyncio.sleep(2)
     raise Exception("No ot_modules found in /dev. Try again")
-
-
-def get_bundled_fw(module_type: str) -> Optional[Path]:
-    """ Get absolute path to bundled version of module fw if available. """
-    name_to_fw_file_prefix = {
-        "tempdeck": "temperature_module", "magdeck": "magnetic_module"}
-    clean_mod_type = name_to_fw_file_prefix.get(module_type, module_type)
-    MODULE_FW_RE = re.compile(f'{clean_mod_type}@v(.*).(hex|bin)')
-    fw_resources = [ROBOT_FIRMWARE_DIR /
-                    item for item in os.listdir(ROBOT_FIRMWARE_DIR)]
-    for fw_resource in fw_resources:
-        matches = MODULE_FW_RE.search(str(fw_resource))
-        if matches:
-            return fw_resource
-
-    log.info(f"no available fw file found for: {clean_mod_type}")
-    return None

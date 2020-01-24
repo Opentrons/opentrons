@@ -45,6 +45,19 @@ def _log_call(func):
     return _log_call_inner
 
 
+
+async def shutdown(loop, signal=None):
+    if signal:
+        mod_log.info(f"Received exit signal {signal.name}...")
+        mod_log.info("Cleaning up running tasks")
+        tasks = [t for t in asyncio.all_tasks() if t is not
+                asyncio.current_task()]
+
+        [task.cancel() for task in tasks]
+
+        await asyncio.gather(*tasks, return_exceptions=True)
+        loop.stop()
+
 def handle_loop_exception(loop: asyncio.AbstractEventLoop, context):
     msg = context.get("exception", context["message"])
     mod_log.error(f"Caught exception: {msg}")
