@@ -53,7 +53,9 @@ export function getLabwareDefaultEngageHeight(
 ): number | null {
   const defaultEngageHeight: ?number =
     labwareDef.parameters.magneticModuleEngageHeight &&
-    labwareDef.parameters.magneticModuleEngageHeight + ENGAGE_HEIGHT_OFFSET
+    Number(
+      labwareDef.parameters.magneticModuleEngageHeight + ENGAGE_HEIGHT_OFFSET
+    )
   return defaultEngageHeight || null
 }
 

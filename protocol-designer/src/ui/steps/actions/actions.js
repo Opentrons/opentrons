@@ -151,6 +151,10 @@ export const selectStep = (
       state
     )
 
+    const stringDefaultEngageHeight = defaultEngageHeight
+      ? defaultEngageHeight.toString()
+      : null
+
     const prevEngageHeight = getNextDefaultEngageHeight(
       stepFormSelectors.getSavedStepForms(state),
       stepFormSelectors.getOrderedStepIds(state)
@@ -158,7 +162,7 @@ export const selectStep = (
 
     // if no previously saved engageHeight, autopopulate with recommended value
     // recommended value is null when no labware found on module
-    const engageHeight = prevEngageHeight || defaultEngageHeight
+    const engageHeight = prevEngageHeight || stringDefaultEngageHeight
     formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 
