@@ -44,10 +44,10 @@
         "dimensions",
         "calibrationPoint",
         "displayName",
-        "loadName",
+        "loadNames",
         "quirks",
         "slotTransforms",
-        "compatibleLoadNames"
+        "compatibleWith"
       ],
       "additionalProperties": false,
       "properties": {
@@ -63,7 +63,13 @@
         },
         "calibrationPoint": { "$ref": "#/definitions/coordinates" },
         "displayName": { "type": "string" },
-        "loadName": { "type": "string" },
+        "loadNames": {
+          "type": "array",
+          "items": {
+            "type": "string",
+            "description": "A name that can be used to load this module within a protocol. These must be interpreted non-case-sensitively."
+          }
+        },
         "quirks": {
           "type": "array",
           "description": "List of quirks for a given module",
@@ -95,10 +101,12 @@
             }
           }
         },
-        "compatibleLoadNames": {
-          "description": "Array of compatible load names. If this module is specified in a protocol and is not present, other modules with compatible load names are allowed to be substituted.",
+        "compatibleWith": {
           "type": "array",
-          "items": { "type": "string" }
+          "items": {
+            "type": "string",
+            "description": "A JSON path to a compatilbe module definition, e.g. one that may be loaded in place of this one with no behavior changes implied"
+          }
         }
       }
     }

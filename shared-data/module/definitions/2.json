@@ -15,10 +15,10 @@
       "y": 2.75
     },
     "displayName": "Magnetic Module",
-    "loadName": "magdeck",
+    "loadNames": ["magdeck", "magnetic module"],
     "quirks": [],
     "slotTransforms": {},
-    "compatibleLoadNames": ["magdeckGen2"]
+    "compatibleWith": []
   },
   "tempdeck": {
     "labwareOffset": {
@@ -35,10 +35,10 @@
       "y": 8.75
     },
     "displayName": "Temperature Module",
-    "loadName": "tempdeck",
+    "loadNames": ["tempdeck", "temperature module"],
     "quirks": [],
     "slotTransforms": {},
-    "compatibleLoadNames": ["tempdeckGen2"]
+    "compatibleWith": ["#/tempdeckGen2"]
   },
   "thermocycler": {
     "labwareOffset": {
@@ -56,10 +56,10 @@
       "y": 64.93
     },
     "displayName": "Thermocycler Module",
-    "loadName": "thermocycler",
+    "loadNames": ["thermocycler", "thermocycler module"],
     "quirks": [],
     "slotTransforms": {},
-    "compatibleLoadNames": []
+    "compatibleWith": []
   },
   "magdeckGen2": {
     "labwareOffset": {
@@ -76,7 +76,7 @@
       "y": 2.75
     },
     "displayName": "Magnetic Module GEN2",
-    "loadName": "magdeckGen2",
+    "loadNames": ["magdeckgen2", "magnetic module gen2"],
     "quirks": [],
     "slotTransforms": {
       "ot2_standard": {
@@ -89,9 +89,20 @@
         "9": {
           "labwareOffset": [[-1, 0, 0.25], [0, 1, 0], [0, 0, 1]]
         }
+      },
+      "ot2_short_trash": {
+        "3": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "6": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "9": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        }
       }
     },
-    "compatibleLoadNames": ["magdeck"]
+    "compatibleWith": []
   },
   "tempdeckGen2": {
     "labwareOffset": {
@@ -108,19 +119,32 @@
       "y": 8.75
     },
     "displayName": "Temperature Module GEN2",
-    "loadName": "tempdeckGen2",
+    "loadNames": ["tempdeckGen2", "temperature module gen2"],
     "quirks": [],
     "slotTransforms": {
-      "3": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+      "ot2_standard": {
+        "3": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "6": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "9": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        }
       },
-      "6": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
-      },
-      "9": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+      "ot2_short_trash": {
+        "3": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "6": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        },
+        "9": {
+          "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        }
       }
     },
-    "compatibleLoadNames": ["tempdeck"]
+    "compatibleWith": ["#/tempdeck"]
   }
 }
