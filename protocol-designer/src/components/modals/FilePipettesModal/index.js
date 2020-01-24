@@ -279,12 +279,8 @@ export class FilePipettesModal extends React.Component<Props, State> {
               {showCrashInfoBox && (
                 <CrashInfoBox
                   showDiagram
-                  magnetOnDeck={Boolean(
-                    this.state.modulesByType.magdeck.onDeck
-                  )}
-                  temperatureOnDeck={Boolean(
-                    this.state.modulesByType.tempdeck.onDeck
-                  )}
+                  magnetOnDeck={this.state.modulesByType.magdeck.onDeck}
+                  temperatureOnDeck={this.state.modulesByType.tempdeck.onDeck}
                 />
               )}
 
