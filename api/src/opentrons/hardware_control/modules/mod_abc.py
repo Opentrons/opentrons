@@ -1,4 +1,6 @@
 import abc
+import asyncio
+from pkg_resources import parse_version
 from typing import Dict, Callable, Any, Tuple, Awaitable
 
 InterruptCallback = Callable[[str], None]
@@ -13,8 +15,9 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback,
-                    simulating: bool = False) -> 'AbstractModule':
+                    interrupt_callback: InterruptCallback,
+                    simulating: bool = False,
+                    loop: asyncio.AbstractEventLoop = None) -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
@@ -23,9 +26,33 @@ class AbstractModule(abc.ABC):
         pass
 
     @abc.abstractmethod
+    def __init__(self,
+                 port: str,
+                 simulating: bool = False,
+                 loop: asyncio.AbstractEventLoop = None) -> 'AbstractModule':
+        self._port = port
+        if None is loop:
+            self._loop = asyncio.get_event_loop()
+        else:
+            self._loop = loop
+        self._device_info = None
+        self._available_update_path = update.get_bundled_fw(self.name())
+
+    @abc.abstractmethod
     def deactivate(self):
         """ Deactivate the module. """
         pass
+
+    @abc.abstractmethod
+    def has_available_update(self) -> bool:
+        """ Return whether a newer firmware file is available """
+        raw_device_version = self.device_info.get('version', None)
+        if raw_device_version and self._available_update_path:
+            device_version = parse_version(raw_device_version)
+            available_version = parse_version(self._available_update_path)
+            return available_version > device_version
+        else:
+            return False
 
     @property
     @abc.abstractmethod
@@ -37,12 +64,6 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def device_info(self) -> Dict[str, str]:
         """ Return a dict of the module's static information (serial, etc)"""
-        pass
-
-    @property
-    @abc.abstractmethod
-    def has_available_update(self) -> bool:
-        """ Return whether a newer firmware file is available """
         pass
 
     @property

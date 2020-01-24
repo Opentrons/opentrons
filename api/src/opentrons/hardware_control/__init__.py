@@ -16,6 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
+import signal
 from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
@@ -42,6 +43,23 @@ def _log_call(func):
             args[0]._log.debug(func.__name__)
             return func(*args, **kwargs)
     return _log_call_inner
+
+
+def handle_loop_exception(loop: asyncio.AbstractEventLoop, context):
+    msg = context.get("exception", context["message"])
+    mod_log.error(f"Caught exception: {msg}")
+    mod_log.info("Stopping module watcher...")
+
+
+def use_or_initialize_loop(loop: asyncio.AbstractEventLoop):
+    checked_loop = loop or asyncio.get_event_loop()
+    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
+
+    for s in signals:
+        checked_loop.add_signal_handler(
+            s, lambda s=s: asyncio.create_task(shutdown(checked_loop, signal=s)))
+    checked_loop.set_exception_handler(handle_loop_exception)
+    return checked_loop
 
 
 class MustHomeError(RuntimeError):
@@ -124,10 +142,11 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         """
-        checked_loop = loop or asyncio.get_event_loop()
+        checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)
         api_instance = cls(backend, config=config, loop=checked_loop)
+
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
@@ -153,7 +172,7 @@ class API(HardwareAPILike):
 
         if None is attached_modules:
             attached_modules = []
-        checked_loop = loop or asyncio.get_event_loop()
+        checked_loop = use_or_initialize_loop(loop)
         backend = Simulator(attached_instruments,
                             attached_modules,
                             config, checked_loop,

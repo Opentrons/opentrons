@@ -121,18 +121,13 @@ class TempDeck(mod_abc.AbstractModule):
                  port,
                  simulating,
                  loop: asyncio.AbstractEventLoop = None) -> None:
+        super().__init__(port, simulating, loop)
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
 
         self._current_task: Optional[asyncio.Task] = None
-        self._port = port
-        self._device_info = None
         self._poller = None
 
     async def set_temperature(self, celsius):
@@ -219,6 +214,9 @@ class TempDeck(mod_abc.AbstractModule):
     def __del__(self):
         if hasattr(self, '_poller') and self._poller:
             self._poller.join()
+
+    def has_available_update(self) -> bool:
+        return super().has_available_update()
 
     async def prep_for_update(self) -> str:
         if self._poller:

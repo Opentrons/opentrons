@@ -156,16 +156,9 @@ class Thermocycler(mod_abc.AbstractModule):
                  interrupt_callback: mod_abc.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
+        super().__init__(port, simulating, loop)
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
-
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
-
-        self._port = port
-        self._device_info = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
         self._current_task: Optional[asyncio.Task] = None
@@ -336,7 +329,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     @property
     def device_info(self):
-        return {**self._device_info, "available_version": self._available_version}
+        return self._device_info
 
     @property
     def total_cycle_count(self):
@@ -370,6 +363,7 @@ class Thermocycler(mod_abc.AbstractModule):
                 'totalCycleCount': self.total_cycle_count,
                 'currentStepIndex': self.current_step_index,
                 'totalStepCount': self.total_step_count,
+                'availableUpdateVersion': str(self._available_update_path)
             }
         }
 
@@ -397,19 +391,17 @@ class Thermocycler(mod_abc.AbstractModule):
     async def _connect(self):
         await self._driver.connect(self._port)
         self._device_info = await self._driver.get_device_info()
-        self._available_version = update.get_available_update(
-            module_type=self.name(),
-            device_version_raw=self.device_info.get('version', None))
 
     @property
     def port(self):
         return self._port
 
     @property
+    def available_update_path(self):
+        return self._available_update_path
+
     def has_available_update(self) -> bool:
-        return update.get_available_update(
-            module_type=self.name(),
-            device_version_raw=self.device_info.get('version', None))
+        return super().has_available_update()
 
     async def prep_for_update(self):
         new_port = await update.enter_bootloader(self._driver,

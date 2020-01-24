@@ -2,9 +2,9 @@ import asyncio
 import logging
 import os
 import sys
+import re
 from pathlib import Path
 from glob import glob
-from pkg_resources import parse_version
 from typing import Any, Dict, Optional, Tuple
 from opentrons.config import IS_ROBOT
 
@@ -202,24 +202,18 @@ async def _discover_ports():
     raise Exception("No ot_modules found in /dev. Try again")
 
 
-def get_available_update(module_type: str, device_version_raw: str) -> Optional[str]:
-    """Returns path to newer version of given module fw if available."""
-
-    MODULE_FW_RE = re.compile(f'{module_type}@v(.*).(hex|bin)')
-
-    fw_resources = [ROBOT_FIRMWARE_DIR / item for item in
-                    os.listdir(ROBOT_FIRMWARE_DIR)]
-
-    device_version = parse_version(device_version)
-
+def get_bundled_fw(module_type: str) -> Optional[Path]:
+    """ Get absolute path to bundled version of module fw if available. """
+    name_to_fw_file_prefix = {
+        "tempdeck": "temperature_module", "magdeck": "magnetic_module"}
+    clean_mod_type = name_to_fw_file_prefix.get(module_type, module_type)
+    MODULE_FW_RE = re.compile(f'{clean_mod_type}@v(.*).(hex|bin)')
+    fw_resources = [ROBOT_FIRMWARE_DIR /
+                    item for item in os.listdir(ROBOT_FIRMWARE_DIR)]
     for fw_resource in fw_resources:
         matches = MODULE_FW_RE.search(str(fw_resource))
-        if matches and parse_version(matches.group(1)) > device_version:
-            available_version = parse_version(matches.group(1))
-            if available_version > device_version:
-                return fw_resource
-            elif available_version == device_version:
-                log.info(f"fw for module of type: {module_type} is up to date")
-    log.info(
-        f"no available fw update found for: {module_type}"
-        f"on version: {device_version_raw}")
+        if matches:
+            return fw_resource
+
+    log.info(f"no available fw file found for: {clean_mod_type}")
+    return None
