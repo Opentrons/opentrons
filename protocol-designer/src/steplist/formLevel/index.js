@@ -24,15 +24,14 @@ import {
 } from './warnings'
 import type { StepType } from '../../form-types'
 
-export { default as handleFormChange } from './handleFormChange'
-export { default as generateNewForm } from './generateNewForm'
-export { default as getDefaultsForStepType } from './getDefaultsForStepType'
-export { default as getDisabledFields } from './getDisabledFields'
-export { default as getNextDefaultPipetteId } from './getNextDefaultPipetteId'
+export { handleFormChange } from './handleFormChange'
+export { generateNewForm } from './generateNewForm'
+export { getDefaultsForStepType } from './getDefaultsForStepType'
+export { getDisabledFields } from './getDisabledFields'
+export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'
 export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
-export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
-export { default as stepFormToArgs } from './stepFormToArgs'
+export { stepFormToArgs } from './stepFormToArgs'
 
 type FormHelpers = {
   getErrors?: mixed => Array<FormError>,

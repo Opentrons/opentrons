@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal, Icon } from '@opentrons/components'
 import { opentronsWebApi, type GateStage } from '../../../networking'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
 import {
   actions as analyticsActions,

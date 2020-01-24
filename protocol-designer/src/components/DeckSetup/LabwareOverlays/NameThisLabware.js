@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { Icon, useOnClickOutside } from '@opentrons/components'
 import { renameLabware } from '../../../labware-ingred/actions'
 import type { BaseState, ThunkDispatch } from '../../../types'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import type { LabwareOnDeck } from '../../../step-forms'
 import styles from './LabwareOverlays.css'
 

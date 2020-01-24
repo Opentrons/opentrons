@@ -1,6 +1,6 @@
 // @flow
 import assert from 'assert'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'

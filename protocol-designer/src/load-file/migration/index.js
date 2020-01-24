@@ -27,7 +27,7 @@ export const getMigrationVersionsToRunFromVersion = (
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
 }
 
-export const masterMigration = (
+export const migration = (
   file: any
 ): {
   file: PDProtocolFile,

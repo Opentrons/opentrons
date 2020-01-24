@@ -15,10 +15,10 @@ import type {
   StepIdType,
 } from '../../form-types'
 import type { BaseState, ThunkDispatch } from '../../types'
-import getDefaultsForStepType from '../../steplist/formLevel/getDefaultsForStepType.js'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
-import MoreOptionsModal from '../modals/MoreOptionsModal'
-import ConfirmDeleteStepModal from '../modals/ConfirmDeleteStepModal'
+import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
 import styles from './StepEditForm.css'
 
 import {

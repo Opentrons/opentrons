@@ -1,7 +1,7 @@
 // @flow
 import { connect } from 'react-redux'
 import * as React from 'react'
-import TerminalItem from './TerminalItem'
+import { TerminalItem } from './TerminalItem'
 import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'
 import type { BaseState } from '../../types'

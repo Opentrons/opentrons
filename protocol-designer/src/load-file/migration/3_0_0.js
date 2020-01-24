@@ -3,7 +3,7 @@ import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import uniq from 'lodash/uniq'
-import v1LabwareModelToV2Def from './utils/v1LabwareModelToV2Def'
+import { v1LabwareModelToV2Def } from './utils/v1LabwareModelToV2Def'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import type {
   ProtocolFile,

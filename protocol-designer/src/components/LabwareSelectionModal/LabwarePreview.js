@@ -12,7 +12,7 @@ import {
   getLabwareDefIsStandard,
   type LabwareDefinition2,
 } from '@opentrons/shared-data'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import styles from './styles.css'
 
 type Props = {

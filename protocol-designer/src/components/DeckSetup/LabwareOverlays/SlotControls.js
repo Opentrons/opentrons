@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { BlockedSlot } from './BlockedSlot'
 import {

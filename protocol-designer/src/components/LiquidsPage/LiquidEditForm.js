@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import {
   Card,
   CheckboxField,

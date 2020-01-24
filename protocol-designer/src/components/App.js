@@ -1,6 +1,6 @@
 // @flow
 import React from 'react'
-import ProtocolEditor from './ProtocolEditor'
+import { ProtocolEditor } from './ProtocolEditor'
 
 import '../css/reset.css'
 

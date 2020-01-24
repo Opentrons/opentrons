@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { ModuleDiagram } from '../../modules'
 

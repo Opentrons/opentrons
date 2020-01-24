@@ -25,10 +25,10 @@ import {
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
-import ModuleViz from './ModuleViz'
-import ModuleTag from './ModuleTag'
-import SlotWarning from './SlotWarning'
-import LabwareOnDeck from './LabwareOnDeck'
+import { ModuleViz } from './ModuleViz'
+import { ModuleTag } from './ModuleTag'
+import { SlotWarning } from './SlotWarning'
+import { LabwareOnDeck } from './LabwareOnDeck'
 import { SlotControls, LabwareControls, DragPreview } from './LabwareOverlays'
 
 import type {

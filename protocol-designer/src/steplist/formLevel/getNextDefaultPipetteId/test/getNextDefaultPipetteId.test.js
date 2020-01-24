@@ -1,5 +1,5 @@
 // @flow
-import getNextDefaultPipetteId from '../'
+import { getNextDefaultPipetteId } from '../'
 
 describe('getNextDefaultPipetteId', () => {
   describe('no previous forms', () => {

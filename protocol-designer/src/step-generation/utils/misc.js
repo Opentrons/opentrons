@@ -26,7 +26,7 @@ import type {
   CurriedCommandCreator,
 } from '../types'
 import { curryCommandCreator } from './curryCommandCreator'
-import blowout from '../commandCreators/atomic/blowout'
+import { blowout } from '../commandCreators/atomic/blowout'
 
 import { AIR } from '@opentrons/components'
 export { AIR }

@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { MultiChannelSubstep } from './MultiChannelSubstep'
-import SubstepRow from './SubstepRow'
+import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 
 import type {

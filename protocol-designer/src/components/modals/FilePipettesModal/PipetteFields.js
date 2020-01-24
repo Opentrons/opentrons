@@ -11,9 +11,9 @@ import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { PipetteDiagram } from './PipetteDiagram'
-import TiprackDiagram from './TiprackDiagram'
+import { TiprackDiagram } from './TiprackDiagram'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import { getOnlyLatestDefs } from '../../../labware-defs/utils'
@@ -34,7 +34,7 @@ type Props = {|
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
 type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
 
-export function ChangePipetteFields(props: Props) {
+export function PipetteFields(props: Props) {
   const { values, onFieldChange } = props
   const enableMultiGEN2 = useSelector(getEnableMultiGEN2Pipettes)
 

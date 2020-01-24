@@ -23,7 +23,7 @@ import {
   getAllModuleSlotsByType,
 } from '../../../modules'
 import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { PDAlert } from '../../alerts/PDAlert'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'

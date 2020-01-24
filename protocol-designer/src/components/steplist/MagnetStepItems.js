@@ -2,10 +2,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { HoverTooltip } from '@opentrons/components'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import { Portal } from './TooltipPortal'
-import LabwareTooltipContents from './LabwareTooltipContents'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
 
 type Props = {|

@@ -1,9 +1,9 @@
 // @flow
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import * as React from 'react'
 import { AlertModal, OutlineButton } from '@opentrons/components'
 import modalStyles from '../modal.css'
-import getModalContents from './modalContents'
+import { getModalContents } from './modalContents'
 import type { FileUploadMessage } from '../../../load-file'
 
 type Props = {

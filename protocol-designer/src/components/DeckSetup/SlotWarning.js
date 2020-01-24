@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import styles from './SlotWarning.css'
 import type { ModuleOrientation } from '../../types'

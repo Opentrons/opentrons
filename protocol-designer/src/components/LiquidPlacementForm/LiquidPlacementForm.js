@@ -11,7 +11,7 @@ import {
   OutlineButton,
   PrimaryButton,
 } from '@opentrons/components'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'

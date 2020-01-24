@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
-import i18n from '../localization'
+import { i18n } from '../localization'
 import { type Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 

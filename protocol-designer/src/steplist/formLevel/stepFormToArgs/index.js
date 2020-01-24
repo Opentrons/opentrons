@@ -1,11 +1,11 @@
 // @flow
 import mapValues from 'lodash/mapValues'
 import { castField } from '../../../steplist/fieldLevel'
-import mixFormToArgs from './mixFormToArgs'
-import pauseFormToArgs from './pauseFormToArgs'
+import { mixFormToArgs } from './mixFormToArgs'
+import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
-import moveLiquidFormToArgs from './moveLiquidFormToArgs'
+import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import type { FormData } from '../../../form-types'
 import type { CommandCreatorArgs } from '../../../step-generation'
 

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { ContinueModal } from '@opentrons/components'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from './modal.css'
 

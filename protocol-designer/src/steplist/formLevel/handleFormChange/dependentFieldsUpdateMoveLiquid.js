@@ -4,7 +4,7 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
+import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
   fieldHasChanged,

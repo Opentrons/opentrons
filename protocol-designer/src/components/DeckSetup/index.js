@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import { selectors as stepsSelectors } from '../../ui/steps'
+import { getSelectedTerminalItemId } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { InitialDeckSetup } from '../../step-forms'
 import { DeckSetup as DeckSetupComponent } from './DeckSetup'
@@ -23,7 +23,7 @@ type SP = {|
 type DP = {| drillUpFromLabware: () => mixed |}
 
 const mapStateToProps = (state: BaseState): SP => ({
-  selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
+  selectedTerminalItemId: getSelectedTerminalItemId(state),
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
   initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
 })

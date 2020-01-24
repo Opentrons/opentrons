@@ -2,12 +2,12 @@
 import * as React from 'react'
 import type { Dispatch } from 'redux'
 import { connect } from 'react-redux'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { ErrorContents } from './ErrorContents'
-import WarningContents from './WarningContents'
+import { WarningContents } from './WarningContents'
 import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-import { selectors as stepsSelectors } from '../../ui/steps'
+import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { BaseState } from '../../types'
 import type { StepIdType } from '../../form-types'
@@ -43,7 +43,7 @@ function mapStateToProps(state: BaseState): SP {
       ),
       dismissId: warning.type,
     }))
-  const _stepId = stepsSelectors.getSelectedStepId(state)
+  const _stepId = getSelectedStepId(state)
 
   return {
     errors,

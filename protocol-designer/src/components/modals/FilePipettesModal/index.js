@@ -12,7 +12,7 @@ import {
   OutlineButton,
   type Mount,
 } from '@opentrons/components'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT, THERMOCYCLER } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { ModuleFields } from './ModuleFields'

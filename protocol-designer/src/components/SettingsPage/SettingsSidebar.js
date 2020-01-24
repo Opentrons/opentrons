@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import type { BaseState, ThunkDispatch } from '../../types'
 import { actions, selectors, type Page } from '../../navigation'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 

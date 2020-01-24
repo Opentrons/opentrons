@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { actions, selectors } from '../../navigation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import {

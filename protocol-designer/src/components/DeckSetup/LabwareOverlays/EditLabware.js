@@ -5,8 +5,8 @@ import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
-import i18n from '../../../localization'
-import NameThisLabware from './NameThisLabware'
+import { i18n } from '../../../localization'
+import { NameThisLabware } from './NameThisLabware'
 import { DND_TYPES } from './constants'
 import {
   openIngredientSelector,

@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import { connect } from 'react-redux'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import {
   Card,
   OutlineButton,

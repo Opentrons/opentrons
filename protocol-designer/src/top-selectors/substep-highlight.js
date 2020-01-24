@@ -10,7 +10,7 @@ import { allSubsteps } from './substeps'
 import * as StepGeneration from '../step-generation'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { selectors as fileDataSelectors } from '../file-data'
-import { selectors as stepsSelectors } from '../ui/steps'
+import { getHoveredStepId, getHoveredSubstep } from '../ui/steps'
 
 import type { WellGroup } from '@opentrons/components'
 import type { Selector } from '../types'
@@ -204,8 +204,8 @@ export const wellHighlightsByLabwareId: Selector<{
   fileDataSelectors.getRobotStateTimeline,
   stepFormSelectors.getInvariantContext,
   stepFormSelectors.getArgsAndErrorsByStepId,
-  stepsSelectors.getHoveredStepId,
-  stepsSelectors.getHoveredSubstep,
+  getHoveredStepId,
+  getHoveredSubstep,
   allSubsteps,
   stepFormSelectors.getOrderedStepIds,
   (

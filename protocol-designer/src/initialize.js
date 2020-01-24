@@ -1,6 +1,6 @@
 // @flow
 
-import i18n from './localization'
+import { i18n } from './localization'
 import { selectors as loadFileSelectors } from './load-file'
 import { selectors as analyticsSelectors } from './analytics'
 import { initializeFullstory } from './analytics/fullstory'

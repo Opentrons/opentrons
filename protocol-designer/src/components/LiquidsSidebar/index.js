@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { PrimaryButton, SidePanel, swatchColors } from '@opentrons/components'
 import { PDTitledList } from '../lists'
 import listButtonStyles from '../listButtons.css'

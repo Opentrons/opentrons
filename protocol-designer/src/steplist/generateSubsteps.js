@@ -5,7 +5,7 @@ import range from 'lodash/range'
 import mapValues from 'lodash/mapValues'
 import isEmpty from 'lodash/isEmpty'
 
-import substepTimeline from './substepTimeline'
+import { substepTimeline } from './substepTimeline'
 import * as steplistUtils from './utils'
 import {
   consolidate,

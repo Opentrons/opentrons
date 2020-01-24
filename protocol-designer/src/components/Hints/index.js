@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import type { TerminalItemId } from '../../steplist'
 import { actions, selectors } from '../../tutorial'

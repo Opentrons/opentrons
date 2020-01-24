@@ -6,7 +6,7 @@ import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { selectors, actions as navigationActions } from '../../../navigation'
 import {
@@ -38,7 +38,7 @@ type DP = {|
   _createNewProtocol: $PropertyType<Props, 'onSave'>,
 |}
 
-export const FilePipettesModal = connect<Props, OP, SP, DP, _, _>(
+export const NewFileModal = connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

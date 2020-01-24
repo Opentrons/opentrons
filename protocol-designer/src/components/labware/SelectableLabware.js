@@ -8,9 +8,9 @@ import {
   getWellSetForMultichannel,
 } from '../../utils'
 import { SELECTABLE_WELL_CLASS } from '../../constants'
-import SingleLabware from './SingleLabware'
+import { SingleLabware } from './SingleLabware'
 import { SelectionRect } from '../SelectionRect'
-import WellTooltip from './WellTooltip'
+import { WellTooltip } from './WellTooltip'
 
 import type { Channels, WellMouseEvent, WellGroup } from '@opentrons/components'
 import type { ContentsByWell } from '../../labware-ingred/types'

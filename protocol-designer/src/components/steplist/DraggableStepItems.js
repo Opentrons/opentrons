@@ -5,7 +5,7 @@ import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
 import { PDTitledList } from '../lists'
-import StepItem from '../../containers/ConnectedStepItem'
+import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
 import {
   stepIconsByType,
   type StepIdType,
@@ -21,7 +21,7 @@ const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
 }
 
 type DragDropStepItemProps = {|
-  ...$Exact<React.ElementProps<typeof StepItem>>,
+  ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
   stepId: StepIdType,
@@ -37,7 +37,7 @@ const DragSourceStepItem = (props: DragDropStepItemProps) =>
     props.connectDropTarget(
       <div style={{ opacity: props.isDragging ? 0.3 : 1 }}>
         {/* $FlowFixMe: (mc, 2019-04-18): connected components have exact props, which makes flow complain here */}
-        <StepItem {...props} />
+        <ConnectedStepItem {...props} />
       </div>
     )
   )
@@ -88,10 +88,7 @@ type StepItemsProps = {
   connectDropTarget: mixed => React.Element<any>,
 }
 type StepItemsState = { stepIds: Array<StepIdType> }
-class StepItemsComponent extends React.Component<
-  StepItemsProps,
-  StepItemsState
-> {
+class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor(props) {
     super(props)
     this.state = { stepIds: this.props.orderedStepIds }
@@ -223,8 +220,8 @@ const collectListTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 })
 
-export const StepItems = DropTarget(
+export const DraggableStepItems = DropTarget(
   DND_TYPES.STEP_ITEM,
   listTarget,
   collectListTarget
-)(StepItemsComponent)
+)(StepItems)

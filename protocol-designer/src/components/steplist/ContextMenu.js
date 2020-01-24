@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import type { ThunkDispatch } from '../../types'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'

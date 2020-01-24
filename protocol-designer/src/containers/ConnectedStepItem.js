@@ -14,7 +14,10 @@ import {
   type LabwareEntity,
 } from '../step-forms'
 import {
-  selectors as stepsSelectors,
+  getCollapsedSteps,
+  getHoveredSubstep,
+  getHoveredStepId,
+  getSelectedStepId,
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
@@ -69,11 +72,11 @@ const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
       timelineWarningSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
       dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
-    const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
+    const collapsed = getCollapsedSteps(state)[stepId]
 
-    const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
-    const hoveredStep = stepsSelectors.getHoveredStepId(state)
-    const selected = stepsSelectors.getSelectedStepId(state) === stepId
+    const hoveredSubstep = getHoveredSubstep(state)
+    const hoveredStep = getHoveredStepId(state)
+    const selected = getSelectedStepId(state) === stepId
 
     return {
       stepType: step.stepType,

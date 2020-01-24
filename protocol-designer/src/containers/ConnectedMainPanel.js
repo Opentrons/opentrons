@@ -14,7 +14,7 @@ import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
 import { StepEditForm } from '../components/StepEditForm'
 import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
-import { selectors as stepsSelectors } from '../ui/steps'
+import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors, type Page } from '../navigation'
 import type { BaseState } from '../types'
@@ -60,12 +60,12 @@ function MainPanelComponent(props: Props) {
 function mapStateToProps(state: BaseState): $Exact<Props> {
   return {
     page: selectors.getCurrentPage(state),
-    selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
+    selectedTerminalItemId: getSelectedTerminalItemId(state),
     ingredSelectionMode:
       labwareIngredSelectors.getSelectedLabwareId(state) != null,
   }
 }
 
-export const MainPanel = connect<Props, {||}, _, _, _, _>(mapStateToProps)(
-  MainPanelComponent
-)
+export const ConnectedMainPanel = connect<Props, {||}, _, _, _, _>(
+  mapStateToProps
+)(MainPanelComponent)

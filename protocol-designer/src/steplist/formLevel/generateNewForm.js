@@ -1,6 +1,6 @@
 // @flow
 import { i18n } from '../../localization'
-import getDefaultsForStepType from './getDefaultsForStepType'
+import { getDefaultsForStepType } from './getDefaultsForStepType'
 import type {
   StepType,
   StepIdType,

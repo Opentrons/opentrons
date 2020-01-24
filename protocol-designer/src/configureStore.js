@@ -15,13 +15,13 @@ function getRootReducer() {
     dismiss: require('./dismiss').rootReducer,
     featureFlags: require('./feature-flags').rootReducer,
     fileData: require('./file-data').rootReducer,
-    labwareIngred: require('./labware-ingred/reducers').default,
+    labwareIngred: require('./labware-ingred/reducers').rootReducer,
     loadFile: require('./load-file').rootReducer,
     navigation: require('./navigation').rootReducer,
     stepForms: require('./step-forms').rootReducer,
     tutorial: require('./tutorial').rootReducer,
     ui: require('./ui').rootReducer,
-    wellSelection: require('./well-selection/reducers').default,
+    wellSelection: require('./well-selection/reducers').rootReducer,
   })
 
   // TODO: Ian 2019-06-25 consider making file loading non-committal

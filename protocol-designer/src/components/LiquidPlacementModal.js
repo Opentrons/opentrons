@@ -15,7 +15,7 @@ import WellSelectionInstructions from './WellSelectionInstructions'
 import { selectors } from '../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../step-forms'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
-import wellSelectionSelectors from '../well-selection/selectors'
+import { getSelectedWells } from '../well-selection/selectors'
 import { selectWells, deselectWells } from '../well-selection/actions'
 
 import styles from './LiquidPlacementModal.css'
@@ -92,7 +92,7 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
 
 const mapStateToProps = (state: BaseState): SP => {
   const labwareId = selectors.getSelectedLabwareId(state)
-  const selectedWells = wellSelectionSelectors.getSelectedWells(state)
+  const selectedWells = getSelectedWells(state)
   if (labwareId == null) {
     assert(
       false,

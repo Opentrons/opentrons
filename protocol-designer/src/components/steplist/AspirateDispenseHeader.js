@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { Icon, HoverTooltip } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
-import LabwareTooltipContents from './LabwareTooltipContents'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
 import { Portal } from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {

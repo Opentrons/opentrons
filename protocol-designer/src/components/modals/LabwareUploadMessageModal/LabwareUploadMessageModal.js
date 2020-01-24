@@ -7,7 +7,7 @@ import {
   OutlineButton,
   type ButtonProps,
 } from '@opentrons/components'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import modalStyles from '../modal.css'
 import type { LabwareUploadMessage } from '../../../labware-defs'
 

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
 

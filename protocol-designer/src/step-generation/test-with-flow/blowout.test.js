@@ -1,6 +1,6 @@
 // @flow
 import { expectTimelineError } from './testMatchers'
-import blowout from '../commandCreators/atomic/blowout'
+import { blowout } from '../commandCreators/atomic/blowout'
 import {
   makeContext,
   getInitialRobotStateStandard,

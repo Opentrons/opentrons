@@ -8,7 +8,7 @@ import {
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './FileSidebar.css'
 import modalStyles from '../modals/modal.css'

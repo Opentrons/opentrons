@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { FlatButton, FormGroup, InputField, Modal } from '@opentrons/components'
 
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { actions as steplistActions } from '../../steplist'
 import type { StepFieldName } from '../../steplist/fieldLevel'
 import type { FormData } from '../../form-types'

@@ -8,7 +8,7 @@ import type { DeckSlot } from '@opentrons/shared-data'
 import type { BaseState } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
-import { selectors as stepsSelectors } from '../../../ui/steps'
+import { getHoveredStepLabware } from '../../../ui/steps'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
@@ -78,9 +78,7 @@ const LabwareControlsComponent = (props: Props) => {
 }
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
-  highlighted: stepsSelectors
-    .getHoveredStepLabware(state)
-    .includes(ownProps.labwareOnDeck.id),
+  highlighted: getHoveredStepLabware(state).includes(ownProps.labwareOnDeck.id),
 })
 
 export const LabwareControls = connect<Props, OP, SP, {||}, _, _>(

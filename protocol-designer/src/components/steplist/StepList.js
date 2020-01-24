@@ -3,7 +3,7 @@ import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
 import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
-import TerminalItem from './TerminalItem'
+import { TerminalItem } from './TerminalItem'
 import { END_TERMINAL_TITLE } from '../../constants'
 import { END_TERMINAL_ITEM_ID } from '../../steplist'
 

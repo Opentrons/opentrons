@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { Icon } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import SubstepRow from './SubstepRow'
+import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 import { formatVolume } from './utils'
 
