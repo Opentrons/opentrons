@@ -2,11 +2,11 @@
 import { getNextDefaultMagnetAction } from '../'
 
 describe('getNextDefaultMagnetAction', () => {
-  describe('no previous forms', () => {
+  describe('no previous forms defaults to engage', () => {
     const testCases = [
       {
         testMsg: 'no previous magnet action',
-        expected: null,
+        expected: 'engage',
       },
     ]
 

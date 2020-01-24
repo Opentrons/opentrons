@@ -3,7 +3,11 @@ import assert from 'assert'
 import mapValues from 'lodash/mapValues'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
-import { SLOT_RENDER_HEIGHT, FIXED_TRASH_RENDER_HEIGHT } from './constants'
+import {
+  SLOT_RENDER_HEIGHT,
+  FIXED_TRASH_RENDER_HEIGHT,
+  ENGAGE_HEIGHT_OFFSET,
+} from './constants'
 import type {
   LabwareDefinition1,
   LabwareDefinition2,
@@ -42,6 +46,14 @@ export function getIsLabwareV1Tiprack(def: LabwareDefinition1): boolean {
 
 export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
   return labwareDef.parameters.isTiprack
+}
+
+export function getLabwareDefaultEngageHeight(
+  labwareDef: LabwareDefinition2
+): number | null {
+  const rawEngageHeight: ?number =
+    labwareDef.parameters.magneticModuleEngageHeight
+  return rawEngageHeight == null ? null : rawEngageHeight + ENGAGE_HEIGHT_OFFSET
 }
 
 /* Render Helpers */

@@ -18,3 +18,6 @@ export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 
 export const MAGDECK: 'magdeck' = 'magdeck'
+
+// offset added to parameters.magneticModuleEngageHeight for displaying reccomended height in PD
+export const ENGAGE_HEIGHT_OFFSET = -4
