@@ -88,10 +88,7 @@ type StepItemsProps = {
   connectDropTarget: mixed => React.Element<any>,
 }
 type StepItemsState = { stepIds: Array<StepIdType> }
-class StepItemsComponent extends React.Component<
-  StepItemsProps,
-  StepItemsState
-> {
+class StepItems extends React.Component<StepItemsProps, StepItemsState> {
   constructor(props) {
     super(props)
     this.state = { stepIds: this.props.orderedStepIds }
@@ -227,4 +224,4 @@ export const DraggableStepItems = DropTarget(
   DND_TYPES.STEP_ITEM,
   listTarget,
   collectListTarget
-)(StepItemsComponent)
+)(StepItems)
