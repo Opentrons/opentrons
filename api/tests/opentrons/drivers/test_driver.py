@@ -976,3 +976,81 @@ def test_alarm_unhandled(smoothie, robot, monkeypatch):
         robot._driver.move({'X': 25})
 
     assert not robot._driver._is_hard_halting.is_set()
+
+
+def test_move_splitting(smoothie, robot, monkeypatch):
+    smoothie.simulating = False
+    command_log = []
+
+    def send_command_logger(command, timeout=12000.0, ack_timeout=5.0):
+        nonlocal command_log
+        command_log.append(command)
+
+    monkeypatch.setattr(smoothie, '_send_command', send_command_logger)
+    smoothie.move({'X': 100})
+    # no backlash, no move splitting, nice and easy
+    assert command_log\
+        == ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+
+    command_log.clear()
+
+    # move splitting but for a different axis - ignored
+    smoothie.move(
+        {'X': 0},
+        split_moves={'Y': driver_3_0.MoveSplit(
+            split_distance=50, split_current=1.5, split_speed=0.5)})
+    assert command_log\
+        == ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X0']
+
+    command_log.clear()
+    # move split for this axis but no backlash
+    smoothie.move(
+        {'X': 100},
+        split_moves={'X': driver_3_0.MoveSplit(
+            split_distance=50, split_current=1.5, split_speed=0.5)})
+    assert command_log\
+        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X50 '
+            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+    command_log.clear()
+    # move splits that are longer than the move get eaten both in -
+    smoothie.move(
+        {'X': 75},
+        split_moves={'X': driver_3_0.MoveSplit(
+            split_distance=50, split_current=1.5, split_speed=0.5)})
+    assert command_log\
+        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X75 '
+            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X75']
+
+    command_log.clear()
+    # and in +
+    smoothie.move(
+        {'X': 100},
+        split_moves={'X': driver_3_0.MoveSplit(
+            split_distance=30, split_current=1.5, split_speed=0.5)})
+    assert command_log\
+        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X100 '
+            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+
+    # if backlash is involved, it's added on top
+    # prep by moving to 0
+    smoothie.move({'C': 0})
+    command_log.clear()
+    smoothie.move({'C': 20}, split_moves={'C': driver_3_0.MoveSplit(
+        split_distance=1, split_current=2.0, split_speed=1)})
+    assert command_log[0:1]\
+        == ['M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C1 '
+            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']
+
+    # if backlash is involved, the backlash target should be the limit
+    # for the split move
+    smoothie.move({'C': 15})
+    command_log.clear()
+    smoothie.move({'C': 20}, split_moves={'C': driver_3_0.MoveSplit(
+        split_distance=10, split_current=2.0, split_speed=1)})
+    # note that the backlash/target move has a 0.05A current on C even though
+    # it is active because that is the robot config default active plunger
+    # current. when the driver is used with the rest of the robot or hardware
+    # control stack it uses the higher currents
+    assert command_log[0:1]\
+        == ['M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 '
+            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']
