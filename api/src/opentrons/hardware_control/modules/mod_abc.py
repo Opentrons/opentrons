@@ -44,12 +44,13 @@ class AbstractModule(abc.ABC):
         else:
             self._loop = loop
         self._device_info = None
+        self._available_update_version = None
         self._available_update_path = self.get_bundled_fw()
 
     def get_bundled_fw(self) -> Optional[Path]:
         """ Get absolute path to bundled version of module fw if available. """
         name_to_fw_file_prefix = {
-            "tempdeck": "temperature_module", "magdeck": "magnetic_module"}
+            "tempdeck": "temperature-module", "magdeck": "magnetic-module"}
         name = self.name()
         file_prefix = name_to_fw_file_prefix.get(name, name)
         MODULE_FW_RE = re.compile(f'{file_prefix}@v(.*).(hex|bin)')
@@ -58,26 +59,26 @@ class AbstractModule(abc.ABC):
         for fw_resource in fw_resources:
             matches = MODULE_FW_RE.search(str(fw_resource))
             if matches:
+                self._available_update_version = matches.group(1)
                 return fw_resource
 
         mod_log.info(f"no available fw file found for: {file_prefix}")
         return None
 
+    def has_available_update(self) -> bool:
+        """ Return whether a newer firmware file is available """
+        raw_device_version = self._device_info.get('version', None)
+        if raw_device_version and self._available_update_version:
+            device_version = parse_version(raw_device_version)
+            available_version = parse_version(self._available_update_version)
+            return available_version > device_version
+        else:
+            return False
+
     @abc.abstractmethod
     def deactivate(self):
         """ Deactivate the module. """
         pass
-
-    @abc.abstractmethod
-    def has_available_update(self) -> bool:
-        """ Return whether a newer firmware file is available """
-        raw_device_version = self.device_info.get('version', None)
-        if raw_device_version and self._available_update_path:
-            device_version = parse_version(raw_device_version)
-            available_version = parse_version(self._available_update_path)
-            return available_version > device_version
-        else:
-            return False
 
     @property
     @abc.abstractmethod

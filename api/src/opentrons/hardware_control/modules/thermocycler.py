@@ -363,7 +363,6 @@ class Thermocycler(mod_abc.AbstractModule):
                 'totalCycleCount': self.total_cycle_count,
                 'currentStepIndex': self.current_step_index,
                 'totalStepCount': self.total_step_count,
-                'availableUpdateVersion': str(self._available_update_path)
             }
         }
 
