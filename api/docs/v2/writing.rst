@@ -123,9 +123,13 @@ The Opentrons Python package also provides an entrypoint to use the Opentrons si
 
 .. code-block:: python
 
+
    from opentrons.simulate import simulate, format_runlog
+   # read the file
    protocol_file = open('/path/to/protocol.py')
-   runlog = simulate(protocol_file)
+   # simulate() the protocol, keeping the runlog
+   runlog, _bundle = simulate(protocol_file)
+   # print the runlog
    print(format_runlog(runlog))
 
 The :py:meth:`opentrons.simulate.simulate` method does the work of simulating the protocol and returns the run log, which is a list of structured dictionaries. :py:meth:`opentrons.simulate.format_runlog` turns that list of dictionaries into a human readable string, which is then printed out. For more information on the protocol simulator, see :ref:`simulate-block`.
