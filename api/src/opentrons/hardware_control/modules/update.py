@@ -4,7 +4,6 @@ import os
 import sys
 from glob import glob
 from typing import Any, Dict, Optional, Tuple
-from opentrons.config import IS_ROBOT
 
 from .mod_abc import UploadFunction
 

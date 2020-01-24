@@ -183,7 +183,12 @@ CONFIG_ELEMENTS = (
                   'Pipette Config User Overrides',
                   Path('pipettes'),
                   ConfigElementType.DIR,
-                  'The dir where settings overrides for pipettes are stored')
+                  'The dir where settings overrides for pipettes are stored'),
+    ConfigElement('robot_firmware_dir',
+                  'Robot Firmware Files',
+                  Path('/usr/lib/firmware'),
+                  ConfigElementType.DIR,
+                  'The dir where bundled firmware files for opentrons hardware are stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
