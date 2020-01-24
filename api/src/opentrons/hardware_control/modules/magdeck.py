@@ -197,9 +197,6 @@ class MagDeck(mod_abc.AbstractModule):
     def __del__(self):
         self._disconnect()
 
-    def has_available_update(self) -> bool:
-        return super().has_available_update()
-
     async def prep_for_update(self) -> str:
         new_port = await update.enter_bootloader(self._driver,
                                                  self.device_info['model'])

@@ -399,9 +399,6 @@ class Thermocycler(mod_abc.AbstractModule):
     def available_update_path(self):
         return self._available_update_path
 
-    def has_available_update(self) -> bool:
-        return super().has_available_update()
-
     async def prep_for_update(self):
         new_port = await update.enter_bootloader(self._driver,
                                                  self.name())

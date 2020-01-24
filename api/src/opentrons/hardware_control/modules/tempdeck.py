@@ -215,9 +215,6 @@ class TempDeck(mod_abc.AbstractModule):
         if hasattr(self, '_poller') and self._poller:
             self._poller.join()
 
-    def has_available_update(self) -> bool:
-        return super().has_available_update()
-
     async def prep_for_update(self) -> str:
         if self._poller:
             self._poller.join()
