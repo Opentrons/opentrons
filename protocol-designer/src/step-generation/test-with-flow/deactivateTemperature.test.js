@@ -48,20 +48,21 @@ describe('deactivateTemperature', () => {
       moduleId: null,
       expected: missingModuleError,
     },
-    {
-      testName: 'thermocycler',
-      moduleId: thermocyclerId,
-      expected: {
-        commands: [
-          {
-            command: 'thermocycler/deactivate',
-            params: {
-              module: thermocyclerId,
-            },
-          },
-        ],
-      },
-    },
+    // TODO: Ian 2019-01-24 implement deactivateTemperature for thermocycler
+    // {
+    //   testName: 'thermocycler',
+    //   moduleId: thermocyclerId,
+    //   expected: {
+    //     commands: [
+    //       {
+    //         command: 'thermocycler/deactivateLid',
+    //         params: {
+    //           module: thermocyclerId,
+    //         },
+    //       },
+    //     ],
+    //   },
+    // },
   ]
 
   testCases.forEach(({ expected, moduleId, testName }) => {

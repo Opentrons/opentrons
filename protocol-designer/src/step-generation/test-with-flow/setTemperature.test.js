@@ -50,21 +50,22 @@ describe('setTemperature', () => {
       moduleId: null,
       expected: missingModuleError,
     },
-    {
-      testName: 'thermocycler',
-      moduleId: thermocyclerId,
-      expected: {
-        commands: [
-          {
-            command: 'thermocycler/setTargetTemperature',
-            params: {
-              module: thermocyclerId,
-              temperature: targetTemperature,
-            },
-          },
-        ],
-      },
-    },
+    // TODO: Ian 2019-01-24 implement setTemperature for thermocycler
+    // {
+    //   testName: 'thermocycler',
+    //   moduleId: thermocyclerId,
+    //   expected: {
+    //     commands: [
+    //       {
+    //         command: 'thermocycler/setTarget___TODO___Temperature',
+    //         params: {
+    //           module: thermocyclerId,
+    //           temperature: targetTemperature,
+    //         },
+    //       },
+    //     ],
+    //   },
+    // },
   ]
 
   testCases.forEach(({ expected, moduleId, testName }) => {
