@@ -1,7 +1,7 @@
 // mock logger for tests
 import path from 'path'
 
-export const createLogger = filename => {
+export function createLogger(filename) {
   const label = path.relative(path.join(__dirname, '../../..'), filename)
 
   return new Proxy(

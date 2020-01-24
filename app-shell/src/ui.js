@@ -30,7 +30,7 @@ const WINDOW_OPTS = {
   ),
 }
 
-export const createUi = () => {
+export function createUi() {
   log.debug('Creating main window', { options: WINDOW_OPTS })
 
   const mainWindow = new BrowserWindow(WINDOW_OPTS).once(
