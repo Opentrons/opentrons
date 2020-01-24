@@ -4,7 +4,7 @@ import { ProtocolEditor } from './ProtocolEditor'
 
 import '../css/reset.css'
 
-export const App = () => {
+export function App() {
   return (
     <div className="container">
       <ProtocolEditor />
