@@ -45,32 +45,15 @@ def _log_call(func):
     return _log_call_inner
 
 
-
-async def shutdown(loop, signal=None):
-    if signal:
-        mod_log.info(f"Received exit signal {signal.name}...")
-        mod_log.info("Cleaning up running tasks")
-        tasks = [t for t in asyncio.all_tasks() if t is not
-                asyncio.current_task()]
-
-        [task.cancel() for task in tasks]
-
-        await asyncio.gather(*tasks, return_exceptions=True)
-        loop.stop()
-
 def handle_loop_exception(loop: asyncio.AbstractEventLoop, context):
     msg = context.get("exception", context["message"])
     mod_log.error(f"Caught exception: {msg}")
-    mod_log.info("Stopping module watcher...")
 
 
 def use_or_initialize_loop(loop: asyncio.AbstractEventLoop):
     checked_loop = loop or asyncio.get_event_loop()
-    signals = (signal.SIGHUP, signal.SIGTERM, signal.SIGINT)
 
-    for s in signals:
-        checked_loop.add_signal_handler(
-            s, lambda s=s: asyncio.create_task(shutdown(checked_loop, signal=s)))
+    # TODO: BC 2020-01-24 use loop.add_signal_handler for proper cleanup
     checked_loop.set_exception_handler(handle_loop_exception)
     return checked_loop
 
