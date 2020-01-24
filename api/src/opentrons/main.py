@@ -10,7 +10,8 @@ from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
-from opentrons.config import feature_flags as ff, name, robot_configs, IS_ROBOT, CONFIG
+from opentrons.config import (feature_flags as ff, name,
+                              robot_configs, IS_ROBOT, CONFIG)
 from opentrons.system import udev
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0

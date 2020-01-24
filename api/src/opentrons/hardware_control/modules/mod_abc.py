@@ -24,7 +24,8 @@ class AbstractModule(abc.ABC):
                     port: str,
                     interrupt_callback: InterruptCallback,
                     simulating: bool = False,
-                    loop: asyncio.AbstractEventLoop = None) -> 'AbstractModule':
+                    loop: asyncio.AbstractEventLoop = None) \
+            -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
@@ -36,15 +37,16 @@ class AbstractModule(abc.ABC):
     def __init__(self,
                  port: str,
                  simulating: bool = False,
-                 loop: asyncio.AbstractEventLoop = None) -> 'AbstractModule':
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         self._port = port
         if None is loop:
             self._loop = asyncio.get_event_loop()
         else:
             self._loop = loop
         self._device_info = None
-        self._available_update_version = None
+        self._available_update_version: Optional[str] = None
         self._available_update_path = self.get_bundled_fw()
+        return None
 
     def get_bundled_fw(self) -> Optional[Path]:
         """ Get absolute path to bundled version of module fw if available. """
@@ -66,13 +68,14 @@ class AbstractModule(abc.ABC):
 
     def has_available_update(self) -> bool:
         """ Return whether a newer firmware file is available """
-        raw_device_version = self._device_info.get('version', None)
-        if raw_device_version and self._available_update_version:
-            device_version = parse_version(raw_device_version)
-            available_version = parse_version(self._available_update_version)
-            return available_version > device_version
-        else:
-            return False
+        if self._device_info is not None:
+            raw_device_version = self._device_info.get('version', None)
+            if raw_device_version and self._available_update_version:
+                device_version = parse_version(raw_device_version)
+                available_version = parse_version(
+                    self._available_update_version)
+                return available_version > device_version
+        return False
 
     @abc.abstractmethod
     def deactivate(self):

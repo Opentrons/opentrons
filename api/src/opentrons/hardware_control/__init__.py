@@ -16,7 +16,6 @@ import contextlib
 import functools
 import inspect
 import logging
-import signal
 from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
@@ -50,7 +49,7 @@ def handle_loop_exception(loop: asyncio.AbstractEventLoop, context):
     mod_log.error(f"Caught exception: {msg}")
 
 
-def use_or_initialize_loop(loop: asyncio.AbstractEventLoop):
+def use_or_initialize_loop(loop: Optional[asyncio.AbstractEventLoop]):
     checked_loop = loop or asyncio.get_event_loop()
 
     # TODO: BC 2020-01-24 use loop.add_signal_handler for proper cleanup
