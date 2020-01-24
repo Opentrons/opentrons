@@ -22,13 +22,9 @@ export type EngageMagnetParams = {|
   engageHeight: number,
 |}
 
-export type DisengageMagnetParams = {|
-  module: string,
-|}
+export type TempParams = {| module: string, temperature: number |}
 
-export type SetTargetTempParams = {| module: string, temperature: number |}
-
-export type DeactivateTempParams = {| module: string |}
+export type ModuleOnlyParams = {| module: string |}
 
 export type Command =
   | {|
@@ -58,24 +54,49 @@ export type Command =
   | {| command: 'magneticModule/engageMagnet', params: EngageMagnetParams |}
   | {|
       command: 'magneticModule/disengageMagnet',
-      params: DisengageMagnetParams,
+      params: ModuleOnlyParams,
     |}
   | {|
       command: 'temperatureModule/setTargetTemperature',
-      params: SetTargetTempParams,
+      params: TempParams,
     |}
-  | {| command: 'temperatureModule/deactivate', params: DeactivateTempParams |}
+  | {| command: 'temperatureModule/deactivate', params: ModuleOnlyParams |}
   | {|
-      command: 'thermocycler/setTargetTemperature',
-      params: SetTargetTempParams,
+      command: 'temperatureModule/awaitTemperature',
+      params: TempParams,
     |}
-  | {| command: 'thermocycler/deactivate', params: DeactivateTempParams |}
+  | {|
+      command: 'thermocycler/setTargetBlockTemperature',
+      params: TempParams,
+    |}
+  | {|
+      command: 'thermocycler/setTargetLidTemperature',
+      params: TempParams,
+    |}
+  | {|
+      command: 'thermocycler/awaitBlockTemperature',
+      params: TempParams,
+    |}
+  | {|
+      command: 'thermocycler/awaitLidTemperature',
+      params: TempParams,
+    |}
+  | {| command: 'thermocycler/deactivateBlock', params: ModuleOnlyParams |}
+  | {| command: 'thermocycler/deactivateLid', params: ModuleOnlyParams |}
+  | {|
+      command: 'thermocycler/runProfile',
+      params: {|
+        module: string,
+        profile: Array<{| temperature: number, holdTime: number |}>,
+      |},
+    |}
+  | {| command: 'thermocycler/awaitProfileComplete', params: ModuleOnlyParams |}
 
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|
   ...V3ProtocolFile<DesignerApplicationData>,
   schemaVersion: 4,
-  // TODO: Ian 2019-11-11 make modules a required key when v4 is legit
+  // TODO: Ian 2019-11-11 make modules a required key when PD drops support for v3
   modules?: {
     [moduleId: string]: FileModule,
   },

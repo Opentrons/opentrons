@@ -369,6 +369,100 @@
                 }
               }
             }
+          },
+
+          {
+            "description": "Magnetic module engage command. Engages magnet to specified height",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": ["magneticModule/engageMagnet"]
+              },
+              "params": {
+                "required": ["module", "engageHeight"],
+                "additionalProperties": false,
+                "properties": {
+                  "engageHeight": {
+                    "description": "Height in mm from bottom plane of labware (above if positive, below if negative)",
+                    "type": "number"
+                  },
+                  "module": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Magnetic module disengage command. Moves magnet down to disengaged (home) position",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": {
+                "enum": ["magneticModule/disengageMagnet"]
+              },
+              "params": {
+                "required": ["module"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": {
+                    "type": "string"
+                  }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Temperature module set target temperature command. Module will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
+          },
+
+          {
+            "description": "Temperature module deactivate command. Module will stop actively regulating its temperature and drift to ambient temperature.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
+          },
+
+          {
+            "description": "Thermocycler open lid command. This command will block until the lid is fully open.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
+          },
+
+          {
+            "description": "Thermocycler close lid command. This command will block until the lid is fully closed.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
+          },
+
+          {
+            "description": "Thermocycler set target lid temperature command. The lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
+          },
+
+          {
+            "description": "Thermocycler set target body temperature command. The body will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {}
           }
         ]
       }
