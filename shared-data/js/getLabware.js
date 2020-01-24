@@ -51,12 +51,10 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
-  const defaultEngageHeight: ?number =
-    labwareDef.parameters.magneticModuleEngageHeight &&
-    Number(
-      labwareDef.parameters.magneticModuleEngageHeight + ENGAGE_HEIGHT_OFFSET
-    )
-  return defaultEngageHeight || null
+  const rawEngageHeight = labwareDef.parameters.magneticModuleEngageHeight
+  return rawEngageHeight === null
+    ? null
+    : rawEngageHeight + ENGAGE_HEIGHT_OFFSET
 }
 
 /* Render Helpers */
