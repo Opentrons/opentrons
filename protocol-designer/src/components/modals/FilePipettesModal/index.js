@@ -77,7 +77,7 @@ const initialState: State = {
 }
 
 // TODO: Ian 2019-03-15 use i18n for labels
-export default class FilePipettesModal extends React.Component<Props, State> {
+export class FilePipettesModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -276,7 +276,13 @@ export default class FilePipettesModal extends React.Component<Props, State> {
                 )}
               </form>
 
-              {showCrashInfoBox && <CrashInfoBox />}
+              {showCrashInfoBox && (
+                <CrashInfoBox
+                  showDiagram
+                  magnetOnDeck={this.state.modulesByType.magdeck.onDeck}
+                  temperatureOnDeck={this.state.modulesByType.tempdeck.onDeck}
+                />
+              )}
 
               <div className={styles.button_row}>
                 <OutlineButton

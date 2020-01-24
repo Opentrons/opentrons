@@ -1,9 +1,9 @@
 // @flow
 import * as React from 'react'
 import i18n from '../../localization'
-import { useSelector, useDispatch } from 'react-redux'
+import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
+
 import { LabeledValue, OutlineButton } from '@opentrons/components'
 import ModuleDiagram from './ModuleDiagram'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -18,7 +18,7 @@ type Props = {
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
-export default function ModuleRow(props: Props) {
+export function ModuleRow(props: Props) {
   const { module, openEditModuleModal } = props
   const type = module?.type || props.type
 
@@ -44,9 +44,6 @@ export default function ModuleRow(props: Props) {
     ? () => dispatch(stepFormActions.deleteModule(module.id))
     : setCurrentModule(type)
 
-  const enableEditModules = useSelector(
-    featureFlagSelectors.getDisableModuleRestrictions
-  )
   const handleEditModule = module && setCurrentModule(type, module.id)
 
   return (
@@ -62,14 +59,13 @@ export default function ModuleRow(props: Props) {
           {model && <LabeledValue label="Model" value={model} />}
         </div>
         <div className={styles.module_col}>
-          {slot && <LabeledValue label="Slot" value={slotDisplayName} />}
+          {slot && <LabeledValue label="Position" value={slotDisplayName} />}
         </div>
         <div className={styles.modules_button_group}>
           {module && (
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}
-              disabled={!enableEditModules}
             >
               Edit
             </OutlineButton>

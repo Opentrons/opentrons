@@ -16,7 +16,7 @@ import {
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import FilePipettesModal from '../FilePipettesModal'
+import { FilePipettesModal } from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 
