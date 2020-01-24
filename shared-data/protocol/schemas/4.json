@@ -8,6 +8,16 @@
       "type": "string"
     },
 
+    "moduleOnlyParams": {
+      "required": ["module"],
+      "additionalProperties": false,
+      "properties": {
+        "module": {
+          "type": "string"
+        }
+      }
+    },
+
     "mmOffset": {
       "description": "Millimeters for pipette location offsets",
       "type": "number"
@@ -63,6 +73,7 @@
   "type": "object",
   "additionalProperties": false,
   "required": [
+    "schemaIdentifier",
     "schemaVersion",
     "metadata",
     "robot",
@@ -72,6 +83,11 @@
     "commands"
   ],
   "properties": {
+    "schemaIdentifier": {
+      "description": "Identifies the file as an Opentrons JSON protocol (as opposed to a labware def, etc)",
+      "enum": ["opentrons/protocol"]
+    },
+
     "schemaVersion": {
       "description": "Schema version of a protocol is a single integer",
       "enum": [4]
@@ -406,13 +422,7 @@
                 "enum": ["magneticModule/disengageMagnet"]
               },
               "params": {
-                "required": ["module"],
-                "additionalProperties": false,
-                "properties": {
-                  "module": {
-                    "type": "string"
-                  }
-                }
+                "$ref": "#/definitions/moduleOnlyParams"
               }
             }
           },
@@ -422,15 +432,146 @@
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["temperatureModule/setTargetTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
           },
 
           {
-            "description": "Temperature module deactivate command. Module will stop actively regulating its temperature and drift to ambient temperature.",
+            "description": "Temperature module await temperature command. Delay further protocol execution until the specified temperature is reached.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["temperatureModule/awaitTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Temperature module deactivate command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["temperatureModule/deactivate"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Themocycler set target block temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/setTargetBlockTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Themocycler set target lid temperature command. Lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/setTargetLidTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Themocycler await block temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/awaitBlockTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Themocycler await lid temperature command. Delay further protocol execution until the specified temperature is reached.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/awaitLidTemperature"] },
+              "params": {
+                "required": ["module", "temperature"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "temperature": { "type": "number" }
+                }
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler deactivate block command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/deactivateBlock"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
+          },
+
+          {
+            "description": "Thermocycler deactivate lid command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "type": "object",
+            "required": ["command", "params"],
+            "additionalProperties": false,
+            "properties": {
+              "command": { "enum": ["thermocycler/deactivateLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
           },
 
           {
@@ -438,7 +579,12 @@
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["thermocycler/openLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
           },
 
           {
@@ -446,23 +592,61 @@
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["thermocycler/closeLid"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
           },
 
           {
-            "description": "Thermocycler set target lid temperature command. The lid will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler run profile command. Begin running the specified profile steps on the thermocycler. This command is non-blocking, it does not delay protocol execution outside of thermocycler steps. No more thermocycler commands should be given until a 'thermocycler/awaitProfileComplete' command is executed.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["thermocycler/closeLid"] },
+              "params": {
+                "type": "object",
+                "required": ["module", "profile"],
+                "additionalProperties": false,
+                "properties": {
+                  "module": { "type": "string" },
+                  "profile": {
+                    "type": "array",
+                    "items": {
+                      "type": "object",
+                      "required": ["temperature", "holdTime"],
+                      "additionalProperties": false,
+                      "properties": {
+                        "temperature": {
+                          "description": "Target temperature of profile step",
+                          "type": "number"
+                        },
+                        "holdTime": {
+                          "description": "Time (in seconds) to hold once temperature is reached",
+                          "type": "number"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
           },
 
           {
-            "description": "Thermocycler set target body temperature command. The body will begin moving to the target temperature. This command is non-blocking, it does not delay until the temperature is reached.",
+            "description": "Thermocycler await profile complete command. Blocks further protocol execution until profile execution is complete.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
-            "properties": {}
+            "properties": {
+              "command": { "enum": ["thermocycler/awaitProfileComplete"] },
+              "params": {
+                "$ref": "#/definitions/moduleOnlyParams"
+              }
+            }
           }
         ]
       }

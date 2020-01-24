@@ -81,6 +81,8 @@ export type Command =
       command: 'thermocycler/awaitLidTemperature',
       params: TempParams,
     |}
+  | {| command: 'thermocycler/openLid', params: ModuleOnlyParams |}
+  | {| command: 'thermocycler/closeLid', params: ModuleOnlyParams |}
   | {| command: 'thermocycler/deactivateBlock', params: ModuleOnlyParams |}
   | {| command: 'thermocycler/deactivateLid', params: ModuleOnlyParams |}
   | {|
