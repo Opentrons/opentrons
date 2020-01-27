@@ -7,7 +7,7 @@ import styles from './styles.css'
 type Props = {|
   active: boolean,
 |}
-export default function SupportMenu(props: Props) {
+export function SupportMenu(props: Props) {
   const { active } = props
   const {
     start,

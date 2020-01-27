@@ -10,7 +10,7 @@ import {
 import { useState, useCallback, useEffect } from 'react'
 import type { AnalyticsState } from './types'
 
-const useAnalyticsOptInOrOut = () => {
+export const useAnalyticsOptInOrOut = () => {
   const [analyticsState, setAnalyticsState] = useState<AnalyticsState>(
     getDefaultAnalyticsState
   )
@@ -31,5 +31,3 @@ const useAnalyticsOptInOrOut = () => {
 
   return { setAnalyticsOptIn, analyticsState }
 }
-
-export default useAnalyticsOptInOrOut

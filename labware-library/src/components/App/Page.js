@@ -11,7 +11,7 @@ export type PageProps = {|
   content: React.Node,
 |}
 
-export default function Page(props: PageProps) {
+export function Page(props: PageProps) {
   const { scrollRef, detailPage, sidebar, content } = props
 
   return (

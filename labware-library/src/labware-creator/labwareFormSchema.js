@@ -54,7 +54,7 @@ const nameExistsError = (nameName: string) =>
   `This ${nameName} already exists in the Opentrons default labware library. Please edit the ${nameName} to make it unique.`
 
 // NOTE: all IRREGULAR_LABWARE_ERROR messages will be converted to a special 'error' Alert
-const labwareFormSchema = Yup.object()
+export const labwareFormSchema = Yup.object()
   .shape({
     labwareType: requiredString(LABELS.labwareType).oneOf(
       labwareTypeOptions.map(o => o.value)
@@ -216,5 +216,3 @@ const labwareFormSchema = Yup.object()
       displayName,
     }
   })
-
-export default labwareFormSchema

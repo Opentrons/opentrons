@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import { protocolLinkProps } from './nav-data'
 
 type Props = {|
   active: boolean,
 |}
 
-export default function ProtocolMenu(props: Props) {
+export function ProtocolMenu(props: Props) {
   const { active } = props
   const {
     options,

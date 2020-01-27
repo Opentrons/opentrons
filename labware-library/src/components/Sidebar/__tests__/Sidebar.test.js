@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import Sidebar from '..'
+import { Sidebar } from '..'
 
 jest.mock('../../../definitions')
 

@@ -14,7 +14,7 @@ type UploadInputProps = {|
   isButton?: boolean,
 |}
 
-export default function ImportLabware(props: Props) {
+export function ImportLabware(props: Props) {
   return (
     <div className={styles.upload_group}>
       <UploadInput onUpload={props.onUpload} />

@@ -10,7 +10,7 @@ type Props = {|
   className?: string,
 |}
 
-export default function NavLink(props: Props) {
+export function NavLink(props: Props) {
   const {
     gtm: { category, label, action },
   } = props

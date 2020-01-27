@@ -10,7 +10,7 @@ import { DISPLAY_VOLUME_UNITS, type ProcessedLabwareFields } from './fields'
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
 export const MULTI_CHANNEL_WIDTH_MM = 64
 
-export default function fieldsToLabware(
+export function fieldsToLabware(
   fields: ProcessedLabwareFields
 ): LabwareDefinition2 {
   // NOTE Ian 2019-07-27: only the 15-50-esque tube rack has multiple grids,

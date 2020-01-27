@@ -16,7 +16,7 @@ export type FilterManufacturerProps = {|
   filters: FilterParams,
 |}
 
-export function FilterManufacturer(props: FilterManufacturerProps) {
+export function FilterManufacturerComponent(props: FilterManufacturerProps) {
   const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
@@ -42,4 +42,4 @@ export function FilterManufacturer(props: FilterManufacturerProps) {
   )
 }
 
-export default withRouter(FilterManufacturer)
+export const FilterManufacturer = withRouter(FilterManufacturerComponent)

@@ -6,9 +6,7 @@ import type { LabwareFields, BooleanString } from './fields'
 // NOTE: this is just String() with some typing for flow
 const boolToBoolString = (b: boolean): BooleanString => (b ? 'true' : 'false')
 
-export default function labwareDefToFields(
-  def: LabwareDefinition2
-): ?LabwareFields {
+export function labwareDefToFields(def: LabwareDefinition2): ?LabwareFields {
   const allUniqueWellGroupProps = getUniqueWellProperties(def)
 
   if (allUniqueWellGroupProps.length === 0) {
