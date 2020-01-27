@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Dict, Union, List, Optional, Any
+from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator

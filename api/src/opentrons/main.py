@@ -11,7 +11,7 @@ from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
-                              robot_configs, IS_ROBOT, CONFIG)
+                              robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
 from opentrons.system import udev
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
@@ -36,7 +36,7 @@ def _find_smoothie_file():
     # Search for smoothie files in /usr/lib/firmware first then fall back to
     # value packed in wheel
     if IS_ROBOT:
-        resources.extend(CONFIG['robot_firmware_dir'].iterdir())
+        resources.extend(ROBOT_FIRMWARE_DIR.iterdir())
 
     resources_path = Path(HERE) / 'resources'
     resources.extend(resources_path.iterdir())
