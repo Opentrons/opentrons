@@ -39,19 +39,6 @@ First, read the `top-level contributing guide section on setup <https://github.c
 The only additional prerequisite concerns building documentation. If you want to build the PDF version of the documentation, you will need an installation of `LaTeX <https://www.latex-project.org/get/>`_ that includes the ``pdflatex`` tool. Note that if you don’t install this, everything will still work - you just won’t get the PDF documentation.
 
 
-.. _venvs:
-
-Pipenv, Virtual Environments, and Using Built Wheels
-----------------------------------------------------
-
-The API server is not importable in source form: if you put a terminal in ``src``, doing ``python -im opentrons`` won’t work even after you’ve installed all the dependencies. This is because we bundle data files from elsewhere in the repository (namely labware definitions from `shared-data <https://github.com/Opentrons/opentrons/tree/edge/shared-data>`_) into the Python module when we build it. This is also why we can’t do an editable install with ``pip -e`` - the way that Python does editable installs would point back to ``api/src``, which can’t be imported because it’s missing data files.
-
-In addition, because we use `pipenv <https://pipenv.readthedocs.io/en/latest/>`_ to control the Python environment of the API server during development, we don’t expect the developer’s system in general to have the python docs.
-
-The way we get around this is by using the virtualenvs that ``pipenv`` creates and installs dependencies into, and the associated commands like ``pipenv run`` and ``pipenv shell``. What this all adds up to is that if you, the developer, want to run changes you’ve just made, you need to run ``make local-shell`` (which will build the Python package and invoke a shell in the virtualenv with the built wheel) to do so.
-
-Also, our use of a ``src`` subdirectory may require special handling in `some IDEs <https://www.jetbrains.com/help/pycharm/configuring-folders-within-a-content-root.html>`_.
-
 
 Updating A Robot
 ----------------
@@ -73,8 +60,6 @@ Tests should be organized similarly to the organization of the module itself.
 We use `PyLama <https://github.com/klen/pylama>`_ for lint checks, and `mypy <http://mypy-lang.org/>`_ for type-checking annotations. Both of these tools are run in the ``lint`` makefile target, and is run in CI; PRs will not be merged with failing lint. Usage of ``noqa`` to temporarily disable lint is discouraged, but if you need to please disable only a specific rule and leave a comment explaining exactly why. The same goes with ``type: ignore``.
 
 New code should have appropriate type annotations, and refactors of old code should try to add type annotations. We’re flexible about the refactor part, though - if adding type annotations greatly expands the scope of a PR, it’s OK to not add them as long as you explain this in the PR message.
-
-Note that because of the reasons explained in venvs_ you can’t just run the ``py.test``, ``pylama``, and ``mypy`` tools directly; you have to use the Makefile ``test`` and ``lint`` targets, which run these tools inside a virtualenv and make sure that the module is properly built first.
 
 
 Simulating Protocols
