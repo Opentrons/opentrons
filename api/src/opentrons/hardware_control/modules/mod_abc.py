@@ -54,7 +54,7 @@ class AbstractModule(abc.ABC):
             "tempdeck": "temperature-module", "magdeck": "magnetic-module"}
         name = self.name()
         file_prefix = name_to_fw_file_prefix.get(name, name)
-        MODULE_FW_RE = re.compile(f'{file_prefix}@v(.*).(hex|bin)')
+        MODULE_FW_RE = re.compile(f'{file_prefix}@v(.*)\.(hex|bin)')
         fw_dir = CONFIG['robot_firmware_dir']
         fw_resources = [fw_dir / item for item in os.listdir(fw_dir)]
         for fw_resource in fw_resources:
