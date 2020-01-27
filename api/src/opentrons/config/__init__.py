@@ -77,11 +77,9 @@ if IS_ROBOT:
         = Path('/var/lib/jupyter/notebooks/')
     JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path]\
         = JUPYTER_NOTEBOOK_ROOT_DIR / 'labware'  # type: ignore
-    ROBOT_FIRMWARE_DIR: Optional[Path] = Path('/usr/lib/firmware')
 else:
     JUPYTER_NOTEBOOK_ROOT_DIR = None
     JUPYTER_NOTEBOOK_LABWARE_DIR = None
-    ROBOT_FIRMWARE_DIR = Path()
 
 
 def name() -> str:
@@ -186,6 +184,12 @@ CONFIG_ELEMENTS = (
                   Path('pipettes'),
                   ConfigElementType.DIR,
                   'The dir where settings overrides for pipettes are stored'),
+    ConfigElement('robot_firmware_dir',
+                  'Robot Firmware Files',
+                  Path('/usr/lib/firmware'),
+                  ConfigElementType.DIR,
+                  'The dir where bundled firmware files for opentrons'
+                  ' hardware are stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,

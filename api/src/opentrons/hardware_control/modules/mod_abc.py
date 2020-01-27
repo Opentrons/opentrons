@@ -4,7 +4,7 @@ import logging
 import re
 from pkg_resources import parse_version
 from typing import Dict, Callable, Any, Tuple, Awaitable, Optional
-from opentrons.config import ROBOT_FIRMWARE_DIR
+from opentrons.config import CONFIG
 from opentrons.hardware_control.util import use_or_initialize_loop
 from .types import BundledFirmware
 
@@ -51,7 +51,7 @@ class AbstractModule(abc.ABC):
         file_prefix = name_to_fw_file_prefix.get(name, name)
 
         MODULE_FW_RE = re.compile(f'^{file_prefix}@v(.*)\.(hex|bin)$')
-        for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():
+        for fw_resource in CONFIG['robot_firmware_dir'].iterdir():
             matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
                 return BundledFirmware(version=matches.group(1),

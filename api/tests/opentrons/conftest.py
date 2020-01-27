@@ -137,6 +137,15 @@ def offsets_tempdir(tmpdir, template_db):
     yield tmpdir
 
 
+@pytest.fixture(scope='function')
+def robot_firmware_tempdir(tmpdir):
+    dummy_file = Path(tmpdir) / 'smoothie-edge-2cac98asda.hex'
+    dummy_file.write_text("hello")
+    config.CONFIG['robot_firmware_dir'] = str(tmpdir)
+    config.reload()
+    yield tmpdir
+
+
 @pytest.fixture(autouse=True)
 def clear_feature_flags():
     ff_file = config.CONFIG['feature_flags_file']
