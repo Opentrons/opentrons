@@ -77,16 +77,11 @@ const LabwareControls = (props: Props) => {
   )
 }
 
-const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
-  const hoveredLabware = stepsSelectors.getHoveredStepLabware(state)
-  const isLabwareOrOnModule =
-    hoveredLabware.includes(ownProps.labwareOnDeck.id) ||
-    hoveredLabware.includes(ownProps.labwareOnDeck.slot)
-
-  return {
-    highlighted: isLabwareOrOnModule,
-  }
-}
+const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
+  highlighted: stepsSelectors
+    .getHoveredStepLabware(state)
+    .includes(ownProps.labwareOnDeck.id),
+})
 
 export default connect<Props, OP, SP, {||}, _, _>(mapStateToProps)(
   LabwareControls
