@@ -7,7 +7,7 @@ import { OutlineButton, PrimaryButton } from '@opentrons/components'
 import { actions as steplistActions } from '../../../steplist'
 import { actions as stepFormActions } from '../../../step-forms'
 
-import { getCurrentFormCanBeSaved } from './selector'
+import { getCurrentFormCanBeSaved } from '../../../step-forms/selectors'
 
 import type { BaseState } from '../../../types'
 
