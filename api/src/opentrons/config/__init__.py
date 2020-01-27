@@ -81,7 +81,7 @@ if IS_ROBOT:
 else:
     JUPYTER_NOTEBOOK_ROOT_DIR = None
     JUPYTER_NOTEBOOK_LABWARE_DIR = None
-    ROBOT_FIRMWARE_DIR = None
+    ROBOT_FIRMWARE_DIR = Path()
 
 
 def name() -> str:

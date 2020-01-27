@@ -47,7 +47,6 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename', 'filelike'])
 
-
 @pytest.fixture
 def singletons(virtual_smoothie_env):
     rb.reset()
