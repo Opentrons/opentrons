@@ -33,13 +33,9 @@ from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
 from opentrons.system.shared_data import load_shared_data, get_shared_data_root
-<<<<<<< HEAD
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
-=======
-from .definitions import MAX_SUPPORTED_VERSION
->>>>>>> use shared_data module instead of pkgutil.get_data
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -47,11 +43,6 @@ MODULE_LOG = logging.getLogger(__name__)
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
-<<<<<<< HEAD
-=======
-# STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
-#     'shared_data' / 'labware' / 'definitions' / '2'
->>>>>>> use shared_data module instead of pkgutil.get_data
 STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 
