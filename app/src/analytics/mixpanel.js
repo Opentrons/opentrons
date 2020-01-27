@@ -2,7 +2,7 @@
 // mixpanel actions
 import mixpanel from 'mixpanel-browser'
 
-import createLogger from '../logger'
+import { createLogger } from '../logger'
 import { CURRENT_VERSION } from '../shell'
 
 import type { AnalyticsEvent, AnalyticsConfig } from './types'

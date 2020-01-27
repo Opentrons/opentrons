@@ -4,7 +4,7 @@ import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
-import createLogger from '../log'
+import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
 import { downloadManifest, getReleaseSet } from './release-manifest'

@@ -9,7 +9,7 @@ import { move, readdir } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
-import createLogger from '../log'
+import { createLogger } from '../log'
 import { fetchToFile } from '../http'
 import type { DownloadProgress } from '../http'
 import type { ReleaseSetUrls, ReleaseSetFilepaths, UserFileInfo } from './types'

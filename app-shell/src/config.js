@@ -9,7 +9,7 @@ import uuid from 'uuid/v4'
 import yargsParser from 'yargs-parser'
 
 import pkg from '../package.json'
-import createLogger from './log'
+import { createLogger } from './log'
 
 // TODO(mc, 2018-08-08): figure out type exports from app
 import type { Config } from '@opentrons/app/src/config/types'

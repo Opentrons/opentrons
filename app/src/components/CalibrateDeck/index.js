@@ -9,7 +9,7 @@ import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { chainActions } from '../../util'
-import createLogger from '../../logger'
+import { createLogger } from '../../logger'
 
 import { home, ROBOT } from '../../robot-controls'
 import {

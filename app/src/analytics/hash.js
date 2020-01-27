@@ -4,7 +4,7 @@
 // considered secure nor should they ever be released publicly
 const ALGORITHM = 'SHA-256'
 
-export default function hash(source: string): Promise<string> {
+export function hash(source: string): Promise<string> {
   const encoder = new TextEncoder()
   const data = encoder.encode(source)
 
