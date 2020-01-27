@@ -7,6 +7,8 @@ from pathlib import Path
 from pkg_resources import parse_version
 from typing import Dict, Callable, Any, Tuple, Awaitable, Optional
 from opentrons.config import CONFIG
+from opentrons.hardware_control.util import use_or_initialize_loop
+from .types import BundledFirmware
 
 mod_log = logging.getLogger(__name__)
 
@@ -39,42 +41,33 @@ class AbstractModule(abc.ABC):
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._port = port
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
+        self._loop = use_or_initialize_loop(loop)
         self._device_info = None
-        self._available_update_version: Optional[str] = None
-        self._available_update_path = self.get_bundled_fw()
-        return None
+        self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
-    def get_bundled_fw(self) -> Optional[Path]:
+    def get_bundled_fw(self) -> Optional[BundledFirmware]:
         """ Get absolute path to bundled version of module fw if available. """
         name_to_fw_file_prefix = {
             "tempdeck": "temperature-module", "magdeck": "magnetic-module"}
         name = self.name()
         file_prefix = name_to_fw_file_prefix.get(name, name)
-        MODULE_FW_RE = re.compile(f'{file_prefix}@v(.*)\.(hex|bin)')
-        fw_dir = CONFIG['robot_firmware_dir']
-        fw_resources = [fw_dir / item for item in os.listdir(fw_dir)]
-        for fw_resource in fw_resources:
-            matches = MODULE_FW_RE.search(str(fw_resource))
+
+        MODULE_FW_RE = re.compile(f'^{file_prefix}@v(.*)\.(hex|bin)$')
+        for fw_resource in CONFIG['robot_firmware_dir'].iterdir():
+            matches = MODULE_FW_RE.search(fw_resource.name)
             if matches:
-                self._available_update_version = matches.group(1)
-                return fw_resource
+                return BundledFirmware(version=matches.group(1),
+                                       path=fw_resource)
 
         mod_log.info(f"no available fw file found for: {file_prefix}")
         return None
 
     def has_available_update(self) -> bool:
         """ Return whether a newer firmware file is available """
-        if self._device_info is not None:
-            raw_device_version = self._device_info.get('version', None)
-            if raw_device_version and self._available_update_version:
-                device_version = parse_version(raw_device_version)
-                available_version = parse_version(
-                    self._available_update_version)
-                return available_version > device_version
+        if self._device_info is not None and self._bundled_fw:
+            device_version = parse_version(self._device_info.get('version'))
+            available_version = parse_version(self._bundled_fw.version)
+            return available_version > device_version
         return False
 
     @abc.abstractmethod
@@ -129,6 +122,10 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def interrupt_callback(self) -> InterruptCallback:
         pass
+
+    @property
+    def bundled_fw(self):
+        return self._bundled_fw
 
     @classmethod
     @abc.abstractmethod

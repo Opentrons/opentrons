@@ -36,20 +36,17 @@ def _find_smoothie_file():
     # Search for smoothie files in /usr/lib/firmware first then fall back to
     # value packed in wheel
     if IS_ROBOT:
-        fw_dir = CONFIG['robot_firmware_dir']
-        resources.extend([fw_dir / item for item in os.listdir(fw_dir)])
+        resources.extend(CONFIG['robot_firmware_dir'].iterdir())
 
     resources_path = Path(HERE) / 'resources'
-    resources.extend([resources_path / item
-                      for item in os.listdir(resources_path)])
+    resources.extend(resources_path.iterdir())
 
-    for fi in resources:
-        matches = SMOOTHIE_HEX_RE.search(str(fi))
+    for path in resources:
+        matches = SMOOTHIE_HEX_RE.search(path.name)
         if matches:
             branch_plus_ref = matches.group(1)
-            return fi, branch_plus_ref
-    raise OSError("Could not find smoothie firmware file in {}"
-                  .format(os.path.join(HERE, 'resources')))
+            return path, branch_plus_ref
+    raise OSError(f"Could not find smoothie firmware file in {resources_path}")
 
 
 async def _do_fw_update(new_fw_path, new_fw_ver):

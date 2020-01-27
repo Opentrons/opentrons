@@ -225,7 +225,7 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_task = self._loop.create_task(self.wait_for_hold())
         else:
             self._current_task = self._loop.create_task(self.wait_for_temp())
-        await self._current_task
+        await self._current_task  # type: ignore
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
@@ -394,10 +394,6 @@ class Thermocycler(mod_abc.AbstractModule):
     @property
     def port(self):
         return self._port
-
-    @property
-    def available_update_path(self):
-        return self._available_update_path
 
     async def prep_for_update(self):
         new_port = await update.enter_bootloader(self._driver,

@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Any
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
@@ -24,6 +24,7 @@ from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 from .controller import Controller
 from . import modules
+from .util import use_or_initialize_loop
 from .types import Axis, HardwareAPILike, CriticalPoint
 
 
@@ -42,19 +43,6 @@ def _log_call(func):
             args[0]._log.debug(func.__name__)
             return func(*args, **kwargs)
     return _log_call_inner
-
-
-def handle_loop_exception(loop: asyncio.AbstractEventLoop, context):
-    msg = context.get("exception", context["message"])
-    mod_log.error(f"Caught exception: {msg}")
-
-
-def use_or_initialize_loop(loop: Optional[asyncio.AbstractEventLoop]):
-    checked_loop = loop or asyncio.get_event_loop()
-
-    # TODO: BC 2020-01-24 use loop.add_signal_handler for proper cleanup
-    checked_loop.set_exception_handler(handle_loop_exception)
-    return checked_loop
 
 
 class MustHomeError(RuntimeError):
@@ -88,8 +76,9 @@ class API(HardwareAPILike):
 
     def __init__(self,
                  backend: _Backend,
-                 config: robot_configs.robot_config = None,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop,
+                 config: robot_configs.robot_config = None
+                 ) -> None:
         """ Initialize an API instance.
 
         This should rarely be explicitly invoked by an external user; instead,
@@ -99,10 +88,7 @@ class API(HardwareAPILike):
         self._log = self.CLS_LOG.getChild(str(id(self)))
         self._config = config or robot_configs.load()
         self._backend = backend
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
+        self._loop = loop
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -140,7 +126,7 @@ class API(HardwareAPILike):
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
 
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
@@ -172,7 +158,7 @@ class API(HardwareAPILike):
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance
