@@ -1,10 +1,10 @@
 """ Test the functions and classes in the protocol context """
 
 import json
-import pkgutil
 from unittest import mock
 
 import opentrons.protocol_api as papi
+from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
@@ -42,9 +42,7 @@ def get_labware_def(monkeypatch):
     def dummy_load(labware_name, namespace=None, version=None):
         # TODO: Ian 2019-05-30 use fixtures not real defs
         labware_def = json.loads(
-            pkgutil.get_data(
-                'opentrons',
-                f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+            load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
         return labware_def
     monkeypatch.setattr(papi.labware, 'get_labware_definition', dummy_load)
 

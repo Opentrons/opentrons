@@ -1,9 +1,9 @@
 import json
-import pkgutil
 
 import pytest
 
 from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
+from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Point, Location
 
 test_data = {
@@ -339,8 +339,7 @@ def test_return_tips():
 def test_module_load():
     module_names = ['tempdeck', 'magdeck']
     module_defs = json.loads(
-        pkgutil.get_data('opentrons',
-                         'shared_data/module/definitions/1.json'))
+        load_shared_data('module/definitions/1.json'))
     for name in module_names:
         mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
         mod_def = module_defs[name]

@@ -1,7 +1,6 @@
 from collections import UserDict
 import functools
 import logging
-import pkgutil
 import json
 from typing import Any, List, Optional, Tuple, Dict
 
@@ -9,6 +8,7 @@ from opentrons import types
 from .labware import (Labware, Well,
                       quirks_from_any_parent, ThermocyclerGeometry, DeckItem)
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.system.shared_data import load_shared_data
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -132,9 +132,9 @@ class Deck(UserDict):
                            for idx in range(12)}
         self._highest_z = 0.0
         # TODO: support deck loadName as a param
-        def_path = 'shared_data/deck/definitions/1/ot2_standard.json'
+        def_path = 'deck/definitions/1/ot2_standard.json'
         self._definition = json.loads(  # type: ignore
-            pkgutil.get_data('opentrons', def_path))
+            load_shared_data(def_path))
 
     @staticmethod
     def _assure_int(key: object) -> int:
