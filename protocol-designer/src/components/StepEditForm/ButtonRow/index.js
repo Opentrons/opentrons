@@ -18,8 +18,8 @@ const { cancelStepForm } = steplistActions
 const { saveStepForm } = stepFormActions
 
 type Props = {|
-  onClickMoreOptions: (event: SyntheticEvent<>) => void,
-  onDelete?: (event: SyntheticEvent<>) => void,
+  onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
+  onDelete?: (event: SyntheticEvent<>) => mixed,
 |}
 
 export const ButtonRow = ({ onDelete, onClickMoreOptions }: Props) => {

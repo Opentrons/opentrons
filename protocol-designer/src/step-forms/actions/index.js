@@ -7,11 +7,10 @@ import type { GetState } from '../../types'
 export * from './modules'
 export * from './pipettes'
 
-type SaveStepFormType = 'SAVE_STEP_FORM'
-const SAVE_STEP_FORM = 'SAVE_STEP_FORM'
+export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
 
 export type SaveStepFormAction = {|
-  type: SaveStepFormType,
+  type: typeof SAVE_STEP_FORM,
   payload: { id: StepIdType },
 |}
 
