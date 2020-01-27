@@ -56,5 +56,3 @@ def load_shared_data(path: typing.Union[str, Path]) -> bytes:
     """
     with open(str(get_shared_data_root() / path), 'rb') as f:
         return f.read()
-
-

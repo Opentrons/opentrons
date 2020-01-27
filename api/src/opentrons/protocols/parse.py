@@ -289,7 +289,7 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
         schema = load_shared_data(
             f'protocol/schemas/{version_num}.json')
     except FileNotFoundError:
-        schema = None # type: ignore
+        schema = None  # type: ignore
     if not schema:
         raise RuntimeError('JSON Protocol schema "{}" does not exist'
                            .format(version_num))

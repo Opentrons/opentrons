@@ -1096,7 +1096,8 @@ def _get_path_to_labware(
         ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
         # all labware in OPENTRONS_NAMESPACE is stored in shared data
-        return get_shared_data_root() / STANDARD_DEFS_PATH / load_name / f'{version}.json'
+        return get_shared_data_root() / STANDARD_DEFS_PATH \
+               / load_name / f'{version}.json'
     if not base_path:
         base_path = CONFIG['labware_user_definitions_dir_v2']
     def_path = base_path / namespace / load_name / f'{version}.json'
