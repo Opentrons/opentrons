@@ -63,15 +63,13 @@ class Controller:
              home_flagged_axes: bool = True, speed: float = None,
              axis_max_speeds: Dict[str, float] = None):
         with ExitStack() as cmstack:
-            if speed:
-                cmstack.enter_context(
-                    self._smoothie_driver.restore_speed(speed))
             if axis_max_speeds:
                 cmstack.enter_context(
                     self._smoothie_driver.restore_axis_max_speed(
                         axis_max_speeds))
             self._smoothie_driver.move(
-                target_position, home_flagged_axes=home_flagged_axes)
+                target_position, home_flagged_axes=home_flagged_axes,
+                speed=speed)
 
     def home(self, axes: List[str] = None) -> Dict[str, float]:
         if axes:

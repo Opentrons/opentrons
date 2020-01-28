@@ -275,7 +275,7 @@ def test_plunger_commands(smoothie, monkeypatch):
         'C': 5.55})
     expected = [
         # Set active axes high
-        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'],
+        ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0.+[BC].+'], # noqa(E501)
         ['M400'],
         # Set plunger current low
         ['M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005'],
@@ -312,11 +312,13 @@ def test_set_active_current(smoothie, monkeypatch):
     smoothie.set_active_current({'B': 0.42, 'C': 0.42})
     smoothie.home('BC')
     expected = [
-        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0'],  # move all
+        # move all
+        ['M907 A2 B2 C2 X2 Y2 Z2 G4P0.005 G0A0B0C0X0Y0Z0'],
         ['M400'],
         ['M907 A2 B0 C0 X2 Y2 Z2 G4P0.005'],  # disable BC axes
         ['M400'],
-        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1'],  # move BC
+        # move BC
+        ['M907 A0 B2 C2 X0 Y0 Z0 G4P0.005 G0B1.3C1.3 G0B1C1'],
         ['M400'],
         ['M907 A0 B0 C0 X0 Y0 Z0 G4P0.005'],  # disable BC axes
         ['M400'],
@@ -685,7 +687,7 @@ def test_clear_limit_switch(smoothie, monkeypatch):
 
     assert [c.strip() for c in cmd_list] == [
         # attempt to move and fail
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C100.3 G0C100',  # noqa(E501)
         # recover from failure
         'M999',
         'M400',
@@ -884,7 +886,8 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 B1 C1',  # slow them down
         'M119',  # get the switch status
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',  # move
+        # move
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-1C-1',
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # set plunger current
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
@@ -897,7 +900,7 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 A1 X1 Y1 Z1',  # slow them down
         'M119',  # get the switch status
-        'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0A-1X-1Y-1Z-1',
+        'M907 A0.8 B0.05 C0.05 X1.25 Y1.25 Z0.8 G4P0.005 G0A-1X-1Y-1Z-1',  # noqa(E501)
         'M203.1 A125 B40 C40 X600 Y400 Z125'  # return to normal speed
     ]
 
@@ -922,7 +925,8 @@ def test_unstick_axes(robot, smoothie):
     expected = [
         'M203.1 B1 C1',  # set max-speeds
         'M119',  # get switch status
-        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-2',  # MOVE B
+        # MOVE B
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B-2',
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current B
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G28.2C',  # HOME C
         'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',  # low current C
@@ -1009,8 +1013,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         split_moves={'X': driver_3_0.MoveSplit(
             split_distance=50, split_current=1.5, split_speed=0.5)})
     assert command_log\
-        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X50 '
-            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+        == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X50 '
+            'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
     command_log.clear()
     # move splits that are longer than the move get eaten both in -
     smoothie.move(
@@ -1018,8 +1022,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         split_moves={'X': driver_3_0.MoveSplit(
             split_distance=50, split_current=1.5, split_speed=0.5)})
     assert command_log\
-        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X75 '
-            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X75']
+        == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X75 '
+            'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X75']
 
     command_log.clear()
     # and in +
@@ -1028,8 +1032,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         split_moves={'X': driver_3_0.MoveSplit(
             split_distance=30, split_current=1.5, split_speed=0.5)})
     assert command_log\
-        == ['M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X100 '
-            'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+        == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X100 '
+            'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
 
     # if backlash is involved, it's added on top
     # prep by moving to 0
@@ -1038,8 +1042,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     smoothie.move({'C': 20}, split_moves={'C': driver_3_0.MoveSplit(
         split_distance=1, split_current=2.0, split_speed=1)})
     assert command_log[0:1]\
-        == ['M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C1 '
-            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']
+        == ['G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C1 '
+            'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']  # noqa(E501)
 
     # if backlash is involved, the backlash target should be the limit
     # for the split move
@@ -1052,5 +1056,29 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     # current. when the driver is used with the rest of the robot or hardware
     # control stack it uses the higher currents
     assert command_log[0:1]\
-        == ['M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 '
-            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']
+        == ['G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 '
+            'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']  # noqa(E501)
+
+
+def test_per_move_speed(smoothie, robot, monkeypatch):
+    smoothie.simulating = False
+    command_log = []
+
+    def send_command_logger(command, timeout=12000.0, ack_timeout=5.0):
+        nonlocal command_log
+        command_log.append(command)
+
+    monkeypatch.setattr(smoothie, '_send_command', send_command_logger)
+
+    # no speed argument: use combined speed
+    smoothie.move({'X': 100})
+
+    assert command_log[0]\
+        == 'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100'
+
+    command_log.clear()
+
+    # specify speed: both set and reset
+    smoothie.move({'Y': 100}, speed=100)
+    assert command_log[0]\
+        == 'G0F6000 M907 A0.1 B0.05 C0.05 X0.3 Y1.25 Z0.1 G4P0.005 G0Y100 G0F24000'  # noqa(E501)

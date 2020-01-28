@@ -661,12 +661,15 @@ class SmoothieDriver_3_0_0:
         finally:
             self.set_speed(self._combined_speed)
 
+    def _build_speed_command(self, speed: float) -> str:
+        speed_per_min = int(float(speed) * SEC_PER_MIN)
+        return GCODES['SET_SPEED'] + str(speed_per_min)
+
     def set_speed(self, value: Union[float, str], update: bool = True):
         ''' set total axes movement speed in mm/second'''
         if update:
             self._combined_speed = float(value)
-        speed_per_min = int(float(value) * SEC_PER_MIN)
-        command = GCODES['SET_SPEED'] + str(speed_per_min)
+        command = self._build_speed_command(float(value))
         log.debug("set_speed: {}".format(command))
         self._send_command(command)
 
@@ -1280,6 +1283,7 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Public interface ---------------- #
     def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa(C901)
+             speed: float = None,
              split_moves: MoveSplits = None):
         '''
         Move to the `target` Smoothieware coordinate, along any of the size
@@ -1295,6 +1299,10 @@ class SmoothieDriver_3_0_0:
             flags are set to `False` by Smoothieware under three conditions:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
+        :param speed: Optional speed for the move. If not specified, set to the
+            current cached _combined_speed. To avoid conflict with callers that
+            expect the smoothie's speed setting to always be combined_speed,
+            the smoothie is set back to this state after every move
         :param split_moves: object (see typedef) describing how (or if) to
            split the move on any of the specified axes. If the new position
            requires a change in position of a specified axis, it may be split
@@ -1381,10 +1389,14 @@ class SmoothieDriver_3_0_0:
         self.dwell_axes(''.join(non_moving_axes))
         self.activate_axes(''.join(moving_axes))
 
+        checked_speed = speed or self._combined_speed
+
         command = ''
 
         if split_command_string:
             cached = {}
+            command += self._build_speed_command(
+                tuple(checked_split.values())[0].split_speed) + ' '
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
                 self.current[ax] = checked_split[ax].split_current
@@ -1393,14 +1405,18 @@ class SmoothieDriver_3_0_0:
                 self.current[ax] = cached[ax]
             command += ' ' + GCODES['MOVE'] + split_command_string + ' '
 
+        if split_command_string or (checked_speed != self._combined_speed):
+            command += self._build_speed_command(checked_speed) + ' '
+
         # introduce the standard currents
-        command += self._generate_current_command()
+        command += self._generate_current_command() + ' '
 
         if backlash_command_string:
-            command += ' ' + GCODES['MOVE'] + backlash_command_string
+            command += GCODES['MOVE'] + backlash_command_string + ' '
 
-        command += ' ' + GCODES['MOVE'] + primary_command_string
-
+        command += GCODES['MOVE'] + primary_command_string
+        if checked_speed != self._combined_speed:
+            command += ' ' + self._build_speed_command(self._combined_speed)
         try:
             for axis in target.keys():
                 self.engaged_axes[axis] = True
