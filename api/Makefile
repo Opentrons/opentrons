@@ -136,6 +136,10 @@ dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
 	$(python) -m opentrons.main -P 31950
 
+.PHONY: local-shell
+local-shell:
+	$(pipenv_envvars) pipenv shell
+
 .PHONY: simulate
 simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
