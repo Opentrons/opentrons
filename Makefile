@@ -1,10 +1,11 @@
 # opentrons platform makefile
 # https://github.com/Opentrons/opentrons
 
+# adding the -c to SHELL prevents macOS optimizing away our PATH update
+SHELL := /bin/bash -c
+
 # add node_modules/.bin to PATH
 PATH := $(shell yarn bin):$(PATH)
-# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
-SHELL := env PATH=$(PATH) /bin/bash
 
 API_DIR := api
 DISCOVERY_CLIENT_DIR := discovery-client

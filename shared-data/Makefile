@@ -1,9 +1,10 @@
 # opentrons app makefile
 
+# adding the -c to SHELL prevents macOS optimizing away our PATH update
+SHELL := /bin/bash -c
+
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
-# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
-SHELL := env PATH=$(PATH) /bin/bash
 
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build

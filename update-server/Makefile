@@ -1,7 +1,7 @@
-PATH := $(shell cd .. && yarn bin):$(PATH)
-# ensure PATH is honored when shell invoked (this gets round an issue on macOS)
-SHELL := env PATH=$(PATH) /bin/bash
+# adding the -c to SHELL prevents macOS optimizing away our PATH update
+SHELL := /bin/bash -c
 
+PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
