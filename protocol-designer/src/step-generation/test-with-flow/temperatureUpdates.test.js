@@ -10,13 +10,26 @@ import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
 } from '../../constants'
+import type { RobotState } from '../types'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(
   _forDeactivateTemperature
 )
+
+function createRobotWithTemp(robot: RobotState, temperature: number) {
+  const robotWithTemp = cloneDeep(robot)
+  robotWithTemp.modules[moduleId].moduleState = {
+    type: 'tempdeck',
+    targetTemperature: temperature,
+    status: TEMPERATURE_APPROACHING_TARGET,
+  }
+  return robotWithTemp
+}
+
 const moduleId = 'temperatureModuleId'
 const slot = '3'
+const temperature = 45
 let invariantContext, deactivatedRobot, robotWithTemp
 beforeEach(() => {
   invariantContext = makeContext()
@@ -35,19 +48,14 @@ beforeEach(() => {
       status: TEMPERATURE_DEACTIVATED,
     },
   }
-  robotWithTemp = cloneDeep(deactivatedRobot)
-  robotWithTemp.modules[moduleId].moduleState = {
-    type: 'tempdeck',
-    targetTemperature: 45,
-    status: TEMPERATURE_APPROACHING_TARGET,
-  }
+  robotWithTemp = createRobotWithTemp(deactivatedRobot, temperature)
 })
 
 describe('forSetTemperature', () => {
   test('module status is set to approaching and temp is set to target', () => {
     const params = {
       module: moduleId,
-      temperature: 45,
+      temperature: temperature,
     }
 
     const result = forSetTemperature(params, invariantContext, deactivatedRobot)
@@ -59,28 +67,18 @@ describe('forSetTemperature', () => {
   })
 
   test('module temp is changed to new target temp when already active', () => {
+    const newTemperature = 55
     const params = {
       module: moduleId,
-      temperature: 55,
+      temperature: newTemperature,
     }
+    const robotWithNewTemp = createRobotWithTemp(robotWithTemp, newTemperature)
 
-    const result = forSetTemperature(params, invariantContext, deactivatedRobot)
+    const result = forSetTemperature(params, invariantContext, robotWithTemp)
 
     expect(result).toEqual({
       warnings: [],
-      robotState: {
-        ...robotWithTemp,
-        modules: {
-          [moduleId]: {
-            moduleState: {
-              type: 'tempdeck',
-              targetTemperature: 55,
-              status: TEMPERATURE_APPROACHING_TARGET,
-            },
-            slot,
-          },
-        },
-      },
+      robotState: robotWithNewTemp,
     })
   })
 })
