@@ -549,7 +549,7 @@
           },
 
           {
-            "description": "Thermocycler deactivate block command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "description": "Thermocycler deactivate block command. Module will stop actively controlling its block temperature.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
@@ -562,7 +562,7 @@
           },
 
           {
-            "description": "Thermocycler deactivate lid command. Module will stop actively controlling its temperature and drift to ambient temperature.",
+            "description": "Thermocycler deactivate lid command. Module will stop actively controlling its lid temperature.",
             "type": "object",
             "required": ["command", "params"],
             "additionalProperties": false,
