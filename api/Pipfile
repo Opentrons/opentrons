@@ -23,6 +23,7 @@ sphinx = "==2.2.0"
 twine = "==2.0.0"
 typing-extensions = "*"
 wheel = "==0.30.0"
+"e1839a8" = {editable = true, path = "."}
 
 [packages]
 aiohttp = "==3.4.4"
