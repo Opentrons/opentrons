@@ -4,7 +4,6 @@ import last from 'lodash/last'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getLabwareOnModule } from '../modules/utils'
-import { getInitialDeckSetup } from '../../step-forms/selectors'
 import type { StepIdType } from '../../form-types'
 import type { BaseState, Selector } from '../../types'
 import {
@@ -59,7 +58,7 @@ const getHoveredStepId: Selector<?StepIdType> = createSelector(
 const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
-  getInitialDeckSetup,
+  stepFormSelectors.getInitialDeckSetup,
   (allStepArgsAndErrors, hoveredStep, initialDeckState) => {
     const blank = []
     if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
