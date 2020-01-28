@@ -1,5 +1,6 @@
 // @flow
 import assert from 'assert'
+import { getModuleState } from '../utils/misc'
 import type {
   EngageMagnetParams,
   DisengageMagnetParams,
@@ -20,11 +21,12 @@ export function forEngageMagnet(
 ): void {
   const { module } = params
   let { robotState } = robotStateAndWarnings
+  const moduleState = getModuleState(robotState, module)
   assert(
     module in robotState.modules,
     `forEngageMagnet expected module id "${module}"`
   )
-  _setMagnet(robotState.modules[module].moduleState, true)
+  _setMagnet(moduleState, true)
 }
 
 export function forDisengageMagnet(
@@ -34,9 +36,10 @@ export function forDisengageMagnet(
 ): void {
   const { module } = params
   const { robotState } = robotStateAndWarnings
+  const moduleState = getModuleState(robotState, module)
   assert(
     module in robotState.modules,
     `forDisengageMagnet expected module id "${module}"`
   )
-  _setMagnet(robotState.modules[module].moduleState, false)
+  _setMagnet(moduleState, false)
 }

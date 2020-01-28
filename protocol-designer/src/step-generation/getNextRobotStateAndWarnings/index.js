@@ -7,6 +7,10 @@ import { forBlowout } from './forBlowout'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import {
+  forSetTemperature,
+  forDeactivateTemperature,
+} from './temperatureUpdates'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   InvariantContext,
@@ -56,7 +60,15 @@ function _getNextRobotStateAndWarningsSingleCommand(
       // these commands don't have any effects on the state
       break
     case 'temperatureModule/setTargetTemperature':
+      forSetTemperature(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'temperatureModule/deactivate':
+      forDeactivateTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/setTargetTemperature':
     case 'thermocycler/deactivate':
       console.warn(`NOT IMPLEMENTED: ${command.command}`)

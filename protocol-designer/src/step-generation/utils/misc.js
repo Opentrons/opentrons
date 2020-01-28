@@ -13,7 +13,11 @@ import {
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-import type { PipetteEntity, LabwareEntity } from '../../step-forms'
+import type {
+  PipetteEntity,
+  LabwareEntity,
+  ModuleTemporalProperties,
+} from '../../step-forms'
 import type {
   LocationLiquidState,
   InvariantContext,
@@ -313,4 +317,11 @@ export function makeInitialRobotState(args: {|
       ),
     },
   }
+}
+
+export function getModuleState(
+  robotState: RobotState,
+  module: string
+): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
+  return robotState.modules[module].moduleState
 }
