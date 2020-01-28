@@ -4,13 +4,15 @@ from os import environ
 import logging
 from time import sleep
 from threading import Event, RLock
-from typing import Any, Dict, List, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
+from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.drivers.utils import AxisMoveTimestamp
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
@@ -35,6 +37,7 @@ HOMED_POSITION = {
     'B': 19,
     'C': 19
 }
+
 
 PLUNGER_BACKLASH_MM = 0.3
 LOW_CURRENT_Z_SPEED = 30
@@ -358,6 +361,9 @@ class SmoothieDriver_3_0_0:
 
             self._serial_lock = DummyLock()
         self._is_hard_halting = Event()
+        self._move_split_config: MoveSplits = {}
+        #: Cache of currently configured splits from callers
+        self._axes_moved_at = AxisMoveTimestamp(AXES)
 
     @property
     def homed_position(self):
@@ -396,6 +402,15 @@ class SmoothieDriver_3_0_0:
                 DEFAULT_COMMAND_RETRIES)
 
         self._update_position(updated_position)
+
+    def configure_splits_for(self, config: MoveSplits):
+        """ Configure the driver to automatically split moves on a given
+        axis that execute (including pauses) after a specified amount of
+        time. The move created will adhere to the split config.
+
+        To remove the setting, set None for the specified axis.
+        """
+        self._move_split_config.update(config)
 
     def read_pipette_id(self, mount) -> Optional[str]:
         '''
@@ -650,12 +665,15 @@ class SmoothieDriver_3_0_0:
         finally:
             self.set_speed(self._combined_speed)
 
+    def _build_speed_command(self, speed: float) -> str:
+        speed_per_min = int(float(speed) * SEC_PER_MIN)
+        return GCODES['SET_SPEED'] + str(speed_per_min)
+
     def set_speed(self, value: Union[float, str], update: bool = True):
         ''' set total axes movement speed in mm/second'''
         if update:
             self._combined_speed = float(value)
-        speed_per_min = int(float(value) * SEC_PER_MIN)
-        command = GCODES['SET_SPEED'] + str(speed_per_min)
+        command = self._build_speed_command(float(value))
         log.debug("set_speed: {}".format(command))
         self._send_command(command)
 
@@ -1268,87 +1286,169 @@ class SmoothieDriver_3_0_0:
     # ----------- END Private functions ----------- #
 
     # ----------- Public interface ---------------- #
-    def move(self, target: Dict[str, float], home_flagged_axes: bool = False):
+    def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa(C901)
+             speed: float = None):
         '''
         Move to the `target` Smoothieware coordinate, along any of the size
         axes, XYZABC.
 
-        target: dict
-            dict setting the coordinate that Smoothieware will be at when
-            `move()` returns. `target` keys are the axis in upper-case, and the
-            values are the coordinate in millimeters (float)
-
-        home_flagged_axes: boolean (default=False)
+        :param target: dict setting the coordinate that Smoothieware will be
+            at when `move()` returns. `target` keys are the axis in
+            upper-case, and the values are the coordinate in mm (float)
+        :param home_flagged_axes: boolean (default=False)
             If set to `True`, each axis included within the target coordinate
             may be homed before moving, determined by Smoothieware's internal
             homing-status flags (`True` means it has already homed). All axes'
             flags are set to `False` by Smoothieware under three conditions:
             1) Smoothieware boots or resets, 2) if a HALT gcode or signal
             is sent, or 3) a homing/limitswitch error occured.
+        :param speed: Optional speed for the move. If not specified, set to the
+            current cached _combined_speed. To avoid conflict with callers that
+            expect the smoothie's speed setting to always be combined_speed,
+            the smoothie is set back to this state after every move
+
+
+        If the current move split config indicates that the move should be
+        broken up, the driver will do so. If the new position requires a
+        change in position of an axis with a split configuration, it may be
+        split into multiple moves such that the axis will move a maximum of the
+        specified split distance at the specified current and speed. If the
+        axis would move less than the split distance, it will move the
+        entire distance at the specified current and speed.
+
+        This command respects the run flag and will wait until it is set.
+
+        The function may issue up to 3 moves:
+        - if move splitting is required, the split move
+        - the actual move, plus a bit extra to give room to preload backlash
+        - if we preload backlash we then issue a third move to preload backlash
         '''
         self.run_flag.wait()
 
-        def valid_movement(coords: Optional[float], axis: str) -> bool:
+        def valid_movement(axis: str, coord: float) -> bool:
+            """ True if the axis is not disabled and the coord is different
+            from the current position cache
+            """
             return not (
                 (axis in DISABLE_AXES) or
-                (coords is None) or
-                isclose(coords, self.position[axis],
+                isclose(coord, self.position[axis],
                         rel_tol=1e-05, abs_tol=1e-08)
             )
 
-        def create_coords_list(coords_dict: Dict[str, float]) -> List[str]:
-            return [
+        def only_moving(move_target: Dict[str, float]) -> Dict[str, float]:
+            """ Filter a target dict to have only those axes which have valid
+            movements"""
+            return {ax: coord for ax, coord in move_target.items()
+                    if valid_movement(ax, coord)}
+
+        def create_coords_list(coords_dict: Dict[str, float]) -> str:
+            """ Build the gcode string for a move """
+            return ''.join([
                 axis + str(round(coords, GCODE_ROUNDING_PRECISION))
                 for axis, coords in sorted(coords_dict.items())
-                if valid_movement(coords, axis)
-            ]
-
-        backlash_target = target.copy()
-        backlash_target.update({
-            axis: value + PLUNGER_BACKLASH_MM
-            for axis, value in sorted(target.items())
-            if axis in 'BC' and self.position[axis] < value
-        })
-
-        target_coords = create_coords_list(
-            {axis: round(coords, GCODE_ROUNDING_PRECISION)
-             for axis, coords in target.items()})
-        backlash_coords = create_coords_list(backlash_target)
-
-        if target_coords:
-            non_moving_axes = ''.join([
-                ax
-                for ax in AXES
-                if not valid_movement(target.get(ax), ax)
+                if valid_movement(axis, coords)
             ])
-            self.dwell_axes(non_moving_axes)
-            self.activate_axes(''.join(ax for ax in target.keys()
-                                       if valid_movement(target[ax], ax)))
-            # include the current-setting gcodes within the moving gcode string
-            # to reduce latency, since we're setting current so much
-            command = self._generate_current_command()
 
-            if backlash_coords != target_coords:
-                command += ' ' + GCODES['MOVE'] + ''.join(backlash_coords)
-            command += ' ' + GCODES['MOVE'] + ''.join(target_coords)
+        moving_target = only_moving(target)
+        if not moving_target:
+            log.info(
+                f"No axes move in {target} from position {self.position}")
+            return
 
-            try:
-                for axis in target.keys():
-                    self.engaged_axes[axis] = True
-                if home_flagged_axes:
-                    self.home_flagged_axes(''.join(list(target.keys())))
-                log.debug("move: {}".format(command))
-                # TODO (hmg) a movement's timeout should be calculated by
-                # how long the movement is expected to take.
-                self._send_command(command, timeout=DEFAULT_EXECUTE_TIMEOUT)
-            finally:
-                # dwell pipette motors because they get hot
-                plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
-                if plunger_axis_moved:
-                    self.dwell_axes(plunger_axis_moved)
-                    self._set_saved_current()
+        backlash_target = {
+            axis: value + PLUNGER_BACKLASH_MM
+            for axis, value in target.items()
+            if axis in 'BC' and self.position[axis] < value
+        }
 
-            self._update_position(target)
+        # whatever else we do to our motion target, if nothing moves in the
+        # input we will not command it to move
+        non_moving_axes = [ax for ax in AXES if ax not in moving_target.keys()]
+
+        # cache which axes move because we might take them out of moving target
+        moving_axes = list(moving_target.keys())
+
+        def build_split(
+                here: float, dest: float, split_distance: float) -> float:
+            """ Return the destination for the split move """
+            if dest < here:
+                return max(dest, here-split_distance)
+            else:
+                return min(dest, here+split_distance)
+
+        since_moved = self._axes_moved_at.time_since_moved()
+        # generate the split moves if necessary
+        split_target = {
+            ax: build_split(
+                self.position[ax],
+                backlash_target.get(ax, moving_target[ax]),
+                split.split_distance)
+            for ax, split in self._move_split_config.items()
+            # a split is only necessary if:
+            # - the axis is moving
+            if (ax in moving_target)
+            # - we have a split configuration
+            and split
+            # - it's been long enough since the last time it moved
+            and ((since_moved[ax] is None)
+                 or (split.after_time < since_moved[ax]))}
+
+        split_command_string = create_coords_list(split_target)
+        primary_command_string = create_coords_list(moving_target)
+        backlash_command_string = create_coords_list(backlash_target)
+
+        self.dwell_axes(''.join(non_moving_axes))
+        self.activate_axes(''.join(moving_axes))
+
+        checked_speed = speed or self._combined_speed
+
+        command = ''
+
+        if split_command_string:
+            cached = {}
+            # move at the slowest required speed
+            split_speed = min([split.split_speed
+                               for ax, split in self._move_split_config.items()
+                               if ax in split_target])
+            command += self._build_speed_command(split_speed) + ' '
+            for ax in split_target.keys():
+                cached[ax] = self.current[ax]
+                self.current[ax] = self._move_split_config[ax].split_current
+            command += self._generate_current_command()
+            for ax in split_target.keys():
+                self.current[ax] = cached[ax]
+            command += ' ' + GCODES['MOVE'] + split_command_string + ' '
+
+        if split_command_string or (checked_speed != self._combined_speed):
+            command += self._build_speed_command(checked_speed) + ' '
+
+        # introduce the standard currents
+        command += self._generate_current_command() + ' '
+
+        if backlash_command_string:
+            command += GCODES['MOVE'] + backlash_command_string + ' '
+
+        command += GCODES['MOVE'] + primary_command_string
+        if checked_speed != self._combined_speed:
+            command += ' ' + self._build_speed_command(self._combined_speed)
+        try:
+            for axis in target.keys():
+                self.engaged_axes[axis] = True
+            if home_flagged_axes:
+                self.home_flagged_axes(''.join(list(target.keys())))
+            log.debug("move: {}".format(command))
+            # TODO (hmg) a movement's timeout should be calculated by
+            # how long the movement is expected to take.
+            self._send_command(command, timeout=DEFAULT_EXECUTE_TIMEOUT)
+        finally:
+            # dwell pipette motors because they get hot
+            plunger_axis_moved = ''.join(set('BC') & set(target.keys()))
+            if plunger_axis_moved:
+                self.dwell_axes(plunger_axis_moved)
+                self._set_saved_current()
+            self._axes_moved_at.mark_moved(moving_axes)
+
+        self._update_position(target)
 
     def home(self,
              axis: str = AXES,
