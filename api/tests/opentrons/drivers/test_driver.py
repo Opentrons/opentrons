@@ -9,7 +9,7 @@ from numpy import isclose
 from opentrons.trackers import pose_tracker
 from tests.opentrons.conftest import fuzzy_assert
 from opentrons.config.robot_configs import DEFAULT_GANTRY_STEPS_PER_MM
-from opentrons.drivers import serial_communication
+from opentrons.drivers import serial_communication, utils, types
 from opentrons.drivers.smoothie_drivers import driver_3_0
 
 
@@ -986,11 +986,17 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     smoothie.simulating = False
     command_log = []
 
+    time_mock = Mock()
+    monkeypatch.setattr(utils.time, 'monotonic', time_mock)
+    time_mock.return_value = 0
+
     def send_command_logger(command, timeout=12000.0, ack_timeout=5.0):
         nonlocal command_log
         command_log.append(command)
 
     monkeypatch.setattr(smoothie, '_send_command', send_command_logger)
+
+    time_mock.return_value = 10
     smoothie.move({'X': 100})
     # no backlash, no move splitting, nice and easy
     assert command_log\
@@ -999,48 +1005,52 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     command_log.clear()
 
     # move splitting but for a different axis - ignored
-    smoothie.move(
-        {'X': 0},
-        split_moves={'Y': driver_3_0.MoveSplit(
-            split_distance=50, split_current=1.5, split_speed=0.5)})
+    smoothie.configure_splits_for({'Y': types.MoveSplit(
+        split_distance=50, split_current=1.5, split_speed=0.5, after_time=0)})
+    time_mock.return_value = 20
+    smoothie.move({'X': 0})
     assert command_log\
         == ['M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X0']
 
     command_log.clear()
     # move split for this axis but no backlash
-    smoothie.move(
-        {'X': 100},
-        split_moves={'X': driver_3_0.MoveSplit(
-            split_distance=50, split_current=1.5, split_speed=0.5)})
+    time_mock.return_value = 30
+    smoothie.configure_splits_for(
+        {'X': types.MoveSplit(
+            split_distance=50, split_current=1.5,
+            split_speed=0.5, after_time=0)})
+    smoothie.move({'X': 100})
     assert command_log\
         == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X50 '
             'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
     command_log.clear()
     # move splits that are longer than the move get eaten both in -
-    smoothie.move(
-        {'X': 75},
-        split_moves={'X': driver_3_0.MoveSplit(
-            split_distance=50, split_current=1.5, split_speed=0.5)})
+    time_mock.return_value = 40
+    smoothie.configure_splits_for(
+        {'X': types.MoveSplit(
+            split_distance=30, split_current=1.5,
+            split_speed=0.5, after_time=0)})
+    smoothie.move({'X': 75})
     assert command_log\
         == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X75 '
             'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X75']
 
     command_log.clear()
     # and in +
-    smoothie.move(
-        {'X': 100},
-        split_moves={'X': driver_3_0.MoveSplit(
-            split_distance=30, split_current=1.5, split_speed=0.5)})
+    time_mock.return_value = 50
+    smoothie.move({'X': 100})
     assert command_log\
         == ['G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X100 '
             'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
 
     # if backlash is involved, it's added on top
     # prep by moving to 0
+    time_mock.return_value = 60
     smoothie.move({'C': 0})
+    smoothie.configure_splits_for({'C': types.MoveSplit(
+        split_distance=1, split_current=2.0, split_speed=1, after_time=0)})
     command_log.clear()
-    smoothie.move({'C': 20}, split_moves={'C': driver_3_0.MoveSplit(
-        split_distance=1, split_current=2.0, split_speed=1)})
+    smoothie.move({'C': 20})
     assert command_log[0:1]\
         == ['G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C1 '
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']  # noqa(E501)
@@ -1048,9 +1058,11 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     # if backlash is involved, the backlash target should be the limit
     # for the split move
     smoothie.move({'C': 15})
+    smoothie.configure_splits_for({'C': types.MoveSplit(
+        split_distance=10, split_current=2.0, split_speed=1, after_time=0)})
     command_log.clear()
-    smoothie.move({'C': 20}, split_moves={'C': driver_3_0.MoveSplit(
-        split_distance=10, split_current=2.0, split_speed=1)})
+    time_mock.return_value = 70
+    smoothie.move({'C': 20})
     # note that the backlash/target move has a 0.05A current on C even though
     # it is active because that is the robot config default active plunger
     # current. when the driver is used with the rest of the robot or hardware
@@ -1058,6 +1070,32 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     assert command_log[0:1]\
         == ['G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 '
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0C20.3 G0C20']  # noqa(E501)
+    smoothie.configure_splits_for(
+        {'X': types.MoveSplit(
+            split_distance=50, split_current=1.5,
+            split_speed=0.5, after_time=10)})
+    # timing: if the axis has moved recently (since we're changing the
+    # time mock) it shouldn't split. first move to reset the last moved at
+    smoothie.move({'X': 0})
+    command_log.clear()
+    # this move therefore should not split
+    smoothie.move({'X': 100})
+    assert command_log[0:1] == [
+        'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
+    command_log.clear()
+    # nor should this move
+    time_mock.return_value = 79
+    smoothie.move({'X': 1})
+    assert command_log[0:1] == [
+        'M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X1']
+    command_log.clear()
+    # now that we advance time, we split
+    time_mock.return_value = 89.01
+    command_log.clear()
+    smoothie.move({'X': 100})
+    assert command_log[0:1] == [
+        'G0F30 M907 A0.1 B0.05 C0.05 X1.5 Y0.3 Z0.1 G4P0.005 G0X51 '
+        'G0F24000 M907 A0.1 B0.05 C0.05 X1.25 Y0.3 Z0.1 G4P0.005 G0X100']
 
 
 def test_per_move_speed(smoothie, robot, monkeypatch):

@@ -1,6 +1,6 @@
-
 import logging
-from typing import Optional, Mapping
+import time
+from typing import Dict, Optional, Mapping, Sequence
 
 log = logging.getLogger(__name__)
 
@@ -117,3 +117,27 @@ def parse_device_information(
         if key not in res:
             raise ParseError(error_msg)
     return res
+
+
+class AxisMoveTimestamp:
+    """ Keeps track of the last time axes were known to move """
+
+    def __init__(self, axis_iter: Sequence[str]):
+        self._moved_at: Dict[str, Optional[float]] = {
+            ax: None for ax in axis_iter
+        }
+
+    def mark_moved(self, axis_iter: Sequence[str]):
+        """ Indicate that a set of axes just moved """
+        now = time.monotonic()
+        self._moved_at.update({ax: now for ax in axis_iter})
+
+    def time_since_moved(self) -> Mapping[str, Optional[float]]:
+        """ Get a mapping of the time since each known axis moved """
+        now = time.monotonic()
+        return {ax: now-val if val else None
+                for ax, val, in self._moved_at.items()}
+
+    def reset_moved(self, axis_iter: Sequence[str]):
+        """ Reset the clocks for a set of axes """
+        self._moved_at.update({ax: None for ax in axis_iter})

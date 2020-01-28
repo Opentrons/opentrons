@@ -4,13 +4,15 @@ from os import environ
 import logging
 from time import sleep
 from threading import Event, RLock
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, Dict, Optional, Union
 
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
+from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.drivers.utils import AxisMoveTimestamp
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
@@ -35,16 +37,6 @@ HOMED_POSITION = {
     'B': 19,
     'C': 19
 }
-
-
-class MoveSplit(NamedTuple):
-    split_distance: float
-    split_current: float
-    split_speed: float
-
-
-MoveSplits = Dict[str, MoveSplit]
-#: Dict mapping axes to their split parameters
 
 
 PLUNGER_BACKLASH_MM = 0.3
@@ -369,6 +361,9 @@ class SmoothieDriver_3_0_0:
 
             self._serial_lock = DummyLock()
         self._is_hard_halting = Event()
+        self._move_split_config: MoveSplits = {}
+        #: Cache of currently configured splits from callers
+        self._axes_moved_at = AxisMoveTimestamp(AXES)
 
     @property
     def homed_position(self):
@@ -407,6 +402,15 @@ class SmoothieDriver_3_0_0:
                 DEFAULT_COMMAND_RETRIES)
 
         self._update_position(updated_position)
+
+    def configure_splits_for(self, config: MoveSplits):
+        """ Configure the driver to automatically split moves on a given
+        axis that execute (including pauses) after a specified amount of
+        time. The move created will adhere to the split config.
+
+        To remove the setting, set None for the specified axis.
+        """
+        self._move_split_config.update(config)
 
     def read_pipette_id(self, mount) -> Optional[str]:
         '''
@@ -1283,8 +1287,7 @@ class SmoothieDriver_3_0_0:
 
     # ----------- Public interface ---------------- #
     def move(self, target: Dict[str, float], home_flagged_axes: bool = False,  # noqa(C901)
-             speed: float = None,
-             split_moves: MoveSplits = None):
+             speed: float = None):
         '''
         Move to the `target` Smoothieware coordinate, along any of the size
         axes, XYZABC.
@@ -1303,13 +1306,15 @@ class SmoothieDriver_3_0_0:
             current cached _combined_speed. To avoid conflict with callers that
             expect the smoothie's speed setting to always be combined_speed,
             the smoothie is set back to this state after every move
-        :param split_moves: object (see typedef) describing how (or if) to
-           split the move on any of the specified axes. If the new position
-           requires a change in position of a specified axis, it may be split
-           into multiple moves such that the axis will move a maximum of the
-           specified split distance at the specified current and speed. If the
-           axis would move less than the split distance, it will move the
-           entire distance at the specified current and speed.
+
+
+        If the current move split config indicates that the move should be
+        broken up, the driver will do so. If the new position requires a
+        change in position of an axis with a split configuration, it may be
+        split into multiple moves such that the axis will move a maximum of the
+        specified split distance at the specified current and speed. If the
+        axis would move less than the split distance, it will move the
+        entire distance at the specified current and speed.
 
         This command respects the run flag and will wait until it is set.
 
@@ -1319,8 +1324,6 @@ class SmoothieDriver_3_0_0:
         - if we preload backlash we then issue a third move to preload backlash
         '''
         self.run_flag.wait()
-
-        checked_split = split_moves or {}
 
         def valid_movement(axis: str, coord: float) -> bool:
             """ True if the axis is not disabled and the coord is different
@@ -1373,14 +1376,22 @@ class SmoothieDriver_3_0_0:
             else:
                 return min(dest, here+split_distance)
 
+        since_moved = self._axes_moved_at.time_since_moved()
         # generate the split moves if necessary
         split_target = {
             ax: build_split(
                 self.position[ax],
                 backlash_target.get(ax, moving_target[ax]),
                 split.split_distance)
-            for ax, split in checked_split.items()
-            if ax in moving_target}
+            for ax, split in self._move_split_config.items()
+            # a split is only necessary if:
+            # - the axis is moving
+            if (ax in moving_target)
+            # - we have a split configuration
+            and split
+            # - it's been long enough since the last time it moved
+            and ((since_moved[ax] is None)
+                 or (split.after_time < since_moved[ax]))}
 
         split_command_string = create_coords_list(split_target)
         primary_command_string = create_coords_list(moving_target)
@@ -1395,11 +1406,14 @@ class SmoothieDriver_3_0_0:
 
         if split_command_string:
             cached = {}
-            command += self._build_speed_command(
-                tuple(checked_split.values())[0].split_speed) + ' '
+            # move at the slowest required speed
+            split_speed = min([split.split_speed
+                               for ax, split in self._move_split_config.items()
+                               if ax in split_target])
+            command += self._build_speed_command(split_speed) + ' '
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
-                self.current[ax] = checked_split[ax].split_current
+                self.current[ax] = self._move_split_config[ax].split_current
             command += self._generate_current_command()
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
@@ -1432,6 +1446,7 @@ class SmoothieDriver_3_0_0:
             if plunger_axis_moved:
                 self.dwell_axes(plunger_axis_moved)
                 self._set_saved_current()
+            self._axes_moved_at.mark_moved(moving_axes)
 
         self._update_position(target)
 
