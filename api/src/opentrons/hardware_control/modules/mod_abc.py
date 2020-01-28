@@ -1,5 +1,14 @@
 import abc
-from typing import Dict, Callable, Any, Tuple, Awaitable
+import asyncio
+import logging
+import re
+from pkg_resources import parse_version
+from typing import Dict, Callable, Any, Tuple, Awaitable, Optional
+from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
+from opentrons.hardware_control.util import use_or_initialize_loop
+from .types import BundledFirmware
+
+mod_log = logging.getLogger(__name__)
 
 InterruptCallback = Callable[[str], None]
 UploadFunction = Callable[[str, str, Dict[str, Any]],
@@ -13,14 +22,53 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback,
-                    simulating: bool = False) -> 'AbstractModule':
+                    interrupt_callback: InterruptCallback,
+                    simulating: bool = False,
+                    loop: asyncio.AbstractEventLoop = None) \
+            -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
         This lets the (perhaps blocking) work of connecting to and initializing
         a module be in a place that can be async.
         """
         pass
+
+    @abc.abstractmethod
+    def __init__(self,
+                 port: str,
+                 simulating: bool = False,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
+        self._port = port
+        self._loop = use_or_initialize_loop(loop)
+        self._device_info = None
+        self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
+
+    def get_bundled_fw(self) -> Optional[BundledFirmware]:
+        """ Get absolute path to bundled version of module fw if available. """
+        if not IS_ROBOT:
+            return None
+        name_to_fw_file_prefix = {
+            "tempdeck": "temperature-module", "magdeck": "magnetic-module"}
+        name = self.name()
+        file_prefix = name_to_fw_file_prefix.get(name, name)
+
+        MODULE_FW_RE = re.compile(f'^{file_prefix}@v(.*)[.](hex|bin)$')
+        for fw_resource in ROBOT_FIRMWARE_DIR.iterdir():  # type: ignore
+            matches = MODULE_FW_RE.search(fw_resource.name)
+            if matches:
+                return BundledFirmware(version=matches.group(1),
+                                       path=fw_resource)
+
+        mod_log.info(f"no available fw file found for: {file_prefix}")
+        return None
+
+    def has_available_update(self) -> bool:
+        """ Return whether a newer firmware file is available """
+        if self._device_info is not None and self._bundled_fw:
+            device_version = parse_version(self._device_info.get('version'))
+            available_version = parse_version(self._bundled_fw.version)
+            return available_version > device_version
+        return False
 
     @abc.abstractmethod
     def deactivate(self):
@@ -74,6 +122,10 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def interrupt_callback(self) -> InterruptCallback:
         pass
+
+    @property
+    def bundled_fw(self):
+        return self._bundled_fw
 
     @classmethod
     @abc.abstractmethod

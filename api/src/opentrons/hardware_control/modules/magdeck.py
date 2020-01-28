@@ -93,18 +93,11 @@ class MagDeck(mod_abc.AbstractModule):
                  port: str,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        self._port = port
+        super().__init__(port, simulating, loop)
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
-
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
-
-        self._device_info = None
 
     def calibrate(self):
         """

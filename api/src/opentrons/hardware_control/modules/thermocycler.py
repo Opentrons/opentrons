@@ -156,16 +156,9 @@ class Thermocycler(mod_abc.AbstractModule):
                  interrupt_callback: mod_abc.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
+        super().__init__(port, simulating, loop)
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
-
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
-
-        self._port = port
-        self._device_info = None
 
         self._running_flag = asyncio.Event(loop=self._loop)
         self._current_task: Optional[asyncio.Task] = None
@@ -232,7 +225,7 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_task = self._loop.create_task(self.wait_for_hold())
         else:
             self._current_task = self._loop.create_task(self.wait_for_temp())
-        await self._current_task
+        await self._current_task  # type: ignore
 
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],

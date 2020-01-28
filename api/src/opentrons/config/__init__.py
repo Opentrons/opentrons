@@ -76,10 +76,12 @@ if IS_ROBOT:
     JUPYTER_NOTEBOOK_ROOT_DIR: Optional[Path]\
         = Path('/var/lib/jupyter/notebooks/')
     JUPYTER_NOTEBOOK_LABWARE_DIR: Optional[Path]\
-        = JUPYTER_NOTEBOOK_ROOT_DIR/'labware'  # type: ignore
+        = JUPYTER_NOTEBOOK_ROOT_DIR / 'labware'  # type: ignore
+    ROBOT_FIRMWARE_DIR: Optional[Path] = Path('/usr/lib/firmware/')
 else:
     JUPYTER_NOTEBOOK_ROOT_DIR = None
     JUPYTER_NOTEBOOK_LABWARE_DIR = None
+    ROBOT_FIRMWARE_DIR = None
 
 
 def name() -> str:
@@ -118,12 +120,12 @@ CONFIG_ELEMENTS = (
                   ' are stored'),
     ConfigElement('labware_calibration_offsets_dir_v2',
                   'API V2 Calibration Offsets Directory',
-                  Path('labware')/'v2'/'offsets',
+                  Path('labware') / 'v2' / 'offsets',
                   ConfigElementType.DIR,
                   'The location where APIV2 labware calibration is stored'),
     ConfigElement('labware_user_definitions_dir_v2',
                   'API V2 Custom Labware Directory',
-                  Path('labware')/'v2'/'custom_definitions',
+                  Path('labware') / 'v2' / 'custom_definitions',
                   ConfigElementType.DIR,
                   'The location where APIV2 labware definitions are stored'),
     ConfigElement('feature_flags_file',
@@ -149,14 +151,14 @@ CONFIG_ELEMENTS = (
                   'The location for saving log files'),
     ConfigElement('api_log_file',
                   'API Log File',
-                  Path('logs')/'api.log',
+                  Path('logs') / 'api.log',
                   ConfigElementType.FILE,
                   'The location of the file to save API logs to. If this is an'
                   ' absolute path, it will be used directly. If it is a '
                   'relative path it will be relative to log_dir'),
     ConfigElement('serial_log_file',
                   'Serial Log File',
-                  Path('logs')/'serial.log',
+                  Path('logs') / 'serial.log',
                   ConfigElementType.FILE,
                   'The location of the file to save serial logs to. If this is'
                   ' an absolute path, it will be used directly. If it is a '
@@ -215,9 +217,9 @@ def infer_config_base_dir() -> Path:
         return Path('/data')
     else:
         search = (Path.cwd(),
-                  Path.home()/'.opentrons')
+                  Path.home() / '.opentrons')
         for path in search:
-            if (path/_CONFIG_FILENAME).exists():
+            if (path / _CONFIG_FILENAME).exists():
                 return path
         else:
             return search[-1]
@@ -245,7 +247,7 @@ def _load_with_overrides(base) -> Dict[str, str]:
     should_write = False
     overrides = _get_environ_overrides()
     try:
-        index = json.load((base/_CONFIG_FILENAME).open())
+        index = json.load((base / _CONFIG_FILENAME).open())
     except (OSError, json.JSONDecodeError):
         should_write = True
         index = generate_config_index(overrides)
@@ -253,7 +255,7 @@ def _load_with_overrides(base) -> Dict[str, str]:
     for key in CONFIG_ELEMENTS:
         if key.name not in index:
             if key.kind in (ConfigElementType.DIR, ConfigElementType.FILE):
-                index[key.name] = base/key.default
+                index[key.name] = base / key.default
             else:
                 index[key.name] = key.default
             should_write = True
@@ -457,13 +459,13 @@ def write_config(config_data: Dict[str, Path],
     valid_names = [ce.name for ce in CONFIG_ELEMENTS]
     try:
         os.makedirs(path, exist_ok=True)
-        with (path/_CONFIG_FILENAME).open('w') as base_f:
+        with (path / _CONFIG_FILENAME).open('w') as base_f:
             json.dump({k: str(v) for k, v in config_data.items()
                        if k in valid_names},
                       base_f, indent=2)
     except OSError as e:
         sys.stderr.write("Config index write to {} failed: {}\n"
-                         .format(path/_CONFIG_FILENAME, e))
+                         .format(path / _CONFIG_FILENAME, e))
 
 
 def reload():
