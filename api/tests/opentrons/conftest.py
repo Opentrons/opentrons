@@ -47,6 +47,7 @@ Protocol = namedtuple(
     'Protocol',
     ['text', 'filename', 'filelike'])
 
+
 @pytest.fixture
 def singletons(virtual_smoothie_env):
     rb.reset()
@@ -133,15 +134,6 @@ def config_tempdir(tmpdir, template_db):
 @pytest.fixture(scope='function')
 def offsets_tempdir(tmpdir, template_db):
     config.CONFIG['labware_calibration_offsets_dir_v2'] = str(tmpdir)
-    config.reload()
-    yield tmpdir
-
-
-@pytest.fixture(scope='function')
-def robot_firmware_tempdir(tmpdir):
-    dummy_file = Path(tmpdir) / 'smoothie-edge-2cac98asda.hex'
-    dummy_file.write_text("hello")
-    config.CONFIG['robot_firmware_dir'] = str(tmpdir)
     config.reload()
     yield tmpdir
 

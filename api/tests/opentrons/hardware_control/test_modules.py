@@ -1,14 +1,17 @@
 import pytest
 import asyncio
+from pathlib import Path
 try:
     import aionotify
 except OSError:
     aionotify = None  # type: ignore
-import opentrons.hardware_control as hardware_control
 from opentrons.hardware_control.modules import ModuleAtPort
+from opentrons.hardware_control.modules.types import BundledFirmware
+from opentrons.hardware_control import Controller
 
 
 async def test_get_modules_simulating():
+    import opentrons.hardware_control as hardware_control
     mods = ['tempdeck', 'magdeck', 'thermocycler']
     api = hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
@@ -17,6 +20,7 @@ async def test_get_modules_simulating():
 
 
 async def test_module_caching():
+    import opentrons.hardware_control as hardware_control
     mod_names = ['tempdeck']
     api = hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names)
@@ -54,10 +58,11 @@ async def test_module_caching():
 @pytest.mark.skip('update module endpoint is unused for now')
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
-@pytest.mark.skipif(not hardware_control.Controller,
+@pytest.mark.skipif(not Controller,
                     reason='hardware controller not available')
 async def test_module_update_integration(monkeypatch, loop,
                                          cntrlr_mock_connect, running_on_pi):
+    import opentrons.hardware_control as hardware_control
     api = await hardware_control.API.build_hardware_controller(loop=loop)
 
     def mock_attached_modules():
@@ -93,3 +98,34 @@ async def test_module_update_integration(monkeypatch, loop,
     assert ok
     new_modules = api.attached_modules
     assert new_modules[0] is not modules[0]
+
+
+async def test_get_bundled_fw(monkeypatch, tmpdir):
+    from opentrons.hardware_control import modules
+
+    dummy_td_file = Path(tmpdir) / 'temperature-module@v1.2.3.hex'
+    dummy_td_file.write_text("hello")
+
+    dummy_md_file = Path(tmpdir) / 'magnetic-module@v3.2.1.hex'
+    dummy_md_file.write_text("hello")
+
+    dummy_tc_file = Path(tmpdir) / 'thermocycler@v0.1.2.bin'
+    dummy_tc_file.write_text("hello")
+
+    dummy_bogus_file = Path(tmpdir) / 'thermoshaker@v6.6.6.bin'
+    dummy_bogus_file.write_text("hello")
+
+    monkeypatch.setattr(modules.mod_abc, 'ROBOT_FIRMWARE_DIR', Path(tmpdir))
+    monkeypatch.setattr(modules.mod_abc, 'IS_ROBOT', True)
+
+    from opentrons.hardware_control import API
+    mods = ['tempdeck', 'magdeck', 'thermocycler']
+    api = API.build_hardware_simulator(attached_modules=mods)
+    await asyncio.sleep(0.05)
+
+    assert api.attached_modules[0].bundled_fw == BundledFirmware(
+        version='1.2.3', path=dummy_td_file)
+    assert api.attached_modules[1].bundled_fw == BundledFirmware(
+        version='3.2.1', path=dummy_md_file)
+    assert api.attached_modules[2].bundled_fw == BundledFirmware(
+        version='0.1.2', path=dummy_tc_file)
