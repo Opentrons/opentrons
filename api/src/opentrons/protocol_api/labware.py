@@ -12,9 +12,7 @@ import json
 import re
 import time
 import os
-import pkgutil
 import shutil
-import sys
 import abc
 from pathlib import Path
 from collections import defaultdict
@@ -29,6 +27,7 @@ from .util import ModifiedList
 from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
+from opentrons.system.shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION
 
 from .util import requires_version
@@ -38,8 +37,7 @@ MODULE_LOG = logging.getLogger(__name__)
 # TODO: Ian 2019-05-23 where to store these constants?
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_PATH = Path(sys.modules['opentrons'].__file__).parent /\
-    'shared_data' / 'labware' / 'definitions' / '2'
+STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 
 LabwareDefinition = Dict[str, Any]
@@ -1097,8 +1095,9 @@ def _get_path_to_labware(
         load_name: str, namespace: str, version: int, base_path: Path = None
         ) -> Path:
     if namespace == OPENTRONS_NAMESPACE:
-        # all labware in OPENTRONS_NAMESPACE is bundled in wheel
-        return STANDARD_DEFS_PATH / load_name / f'{version}.json'
+        # all labware in OPENTRONS_NAMESPACE is stored in shared data
+        return get_shared_data_root() / STANDARD_DEFS_PATH \
+               / load_name / f'{version}.json'
     if not base_path:
         base_path = CONFIG['labware_user_definitions_dir_v2']
     def_path = base_path / namespace / load_name / f'{version}.json'
@@ -1253,9 +1252,7 @@ def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
     :raises jsonschema.ValidationError: If the definition is not valid.
     :returns: The parsed definition
     """
-    schema_body = pkgutil.get_data(  # type: ignore
-        'opentrons',
-        'shared_data/labware/schemas/2.json').decode('utf-8')
+    schema_body = load_shared_data('labware/schemas/2.json').decode('utf-8')
     labware_schema_v2 = json.loads(schema_body)
 
     if isinstance(contents, dict):
@@ -1320,7 +1317,7 @@ def get_all_labware_definitions() -> List[str]:
                 labware_list.append(sub_dir.name) if sub_dir.is_dir() else None
 
     # check for standard labware
-    _check_for_subdirectories(STANDARD_DEFS_PATH)
+    _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
 
     # check for custom labware
     for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
@@ -1392,10 +1389,9 @@ def load_module(
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
-    def_path = 'shared_data/module/definitions/1.json'
+    def_path = 'module/definitions/1.json'
     module_def = json.loads(
-        pkgutil.get_data(  # type: ignore
-            'opentrons', def_path).decode('utf-8'))  # type: ignore
+        load_shared_data(def_path).decode('utf-8'))  # type: ignore
     return load_module_from_definition(module_def[name], parent, api_level)
 
 

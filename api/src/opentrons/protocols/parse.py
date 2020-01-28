@@ -6,7 +6,6 @@ import ast
 import itertools
 import json
 import logging
-import pkgutil
 import re
 from io import BytesIO
 from zipfile import ZipFile
@@ -15,6 +14,7 @@ from typing import Any, Dict, Union
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
+from opentrons.system.shared_data import load_shared_data
 from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
 from .bundle import extract_bundle
 
@@ -286,11 +286,10 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
             f'JSON Protocol version {version_num} is not yet ' +
             'supported in this version of the API')
     try:
-        schema = pkgutil.get_data(
-            'opentrons',
-            f'shared_data/protocol/schemas/{version_num}.json')
+        schema = load_shared_data(
+            f'protocol/schemas/{version_num}.json')
     except FileNotFoundError:
-        schema = None
+        schema = None  # type: ignore
     if not schema:
         raise RuntimeError('JSON Protocol schema "{}" does not exist'
                            .format(version_num))
@@ -309,9 +308,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'definition was specified instead of a protocol.')
     protocol_schema = _get_schema_for_protocol(version_num)
     # instruct schema how to resolve all $ref's used in protocol schemas
-    schema_body = pkgutil.get_data(  # type: ignore
-        'opentrons',
-        'shared_data/labware/schemas/2.json').decode('utf-8')
+    schema_body = load_shared_data(
+        'labware/schemas/2.json').decode('utf-8')
     labware_schema_v2 = json.loads(schema_body)
 
     resolver = jsonschema.RefResolver(

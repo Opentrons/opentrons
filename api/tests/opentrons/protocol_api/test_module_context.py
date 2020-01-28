@@ -1,8 +1,8 @@
 import json
-import pkgutil
 from unittest import mock
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
+from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Point
 
 import pytest
@@ -273,9 +273,7 @@ def test_module_load_labware(loop):
     labware_name = 'corning_96_wellplate_360ul_flat'
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_def = json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+        load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     mod = ctx.load_module('Temperature Module', 1)
@@ -323,9 +321,7 @@ def test_deprecated_module_load_labware(loop):
     labware_name = 'corning_96_wellplate_360ul_flat'
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_def = json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+        load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
     ctx._hw_manager.hardware._backend._attached_modules = [
         ('mod0', 'tempdeck')]
     mod = ctx.load_module('Temperature Module', 1)
@@ -348,9 +344,7 @@ def test_magdeck_labware_props(loop):
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = 'biorad_96_wellplate_200ul_pcr'
     labware_def = json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            f'shared_data/labware/definitions/2/{labware_name}/1.json'))
+        load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
     ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None

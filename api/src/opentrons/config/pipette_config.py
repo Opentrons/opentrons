@@ -3,9 +3,9 @@ import logging
 import json
 from collections import namedtuple
 from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
-import pkgutil
 
 from opentrons.config import feature_flags as ff, CONFIG
+from opentrons.system.shared_data import load_shared_data
 
 
 log = logging.getLogger(__name__)
@@ -71,18 +71,14 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 def model_config() -> Dict[str, Any]:
     """ Load the per-pipette-model config file from within the wheel """
     return json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            'shared_data/pipette/definitions/pipetteModelSpecs.json')
+        load_shared_data('pipette/definitions/pipetteModelSpecs.json')
         or '{}')
 
 
 def name_config() -> Dict[str, Any]:
     """ Load the per-pipette-name config file from within the wheel """
     return json.loads(
-        pkgutil.get_data(
-            'opentrons',
-            'shared_data/pipette/definitions/pipetteNameSpecs.json')
+        load_shared_data('pipette/definitions/pipetteNameSpecs.json')
         or '{}')
 
 

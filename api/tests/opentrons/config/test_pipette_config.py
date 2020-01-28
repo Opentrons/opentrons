@@ -1,15 +1,14 @@
 import json
-import pkgutil
 from numpy import isclose
 
 import pytest
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
+from opentrons.system.shared_data import load_shared_data
 
 
 defs = json.loads(
-    pkgutil.get_data(
-        'opentrons', 'shared_data/pipette/definitions/pipetteModelSpecs.json'))
+    load_shared_data("pipette/definitions/pipetteModelSpecs.json"))
 
 
 def check_sequences_close(first, second):

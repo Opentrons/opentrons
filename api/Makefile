@@ -94,8 +94,7 @@ $(wheel_pattern): setup.py $(ot_sources)
 wheel: $(wheel_file)
 
 .PHONY: test
-test: local-install
-	$(python)	-m twine check $(wheel_file)
+test:
 	$(pytest) $(tests) $(test_opts)
 
 .PHONY: lint
@@ -104,11 +103,11 @@ lint: $(ot_py_sources)
 	$(python) -m pylama src/opentrons tests
 	$(python) -m openapi_spec_validator src/opentrons/server/openapi.json
 
-docs/build/html/v%: docs/v% local-install
+docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
 	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
 
-docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v% local-install
+docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
 	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
 	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
 	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
@@ -134,19 +133,15 @@ docs-clean:
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
-dev: local-install
+dev:
 	$(python) -m opentrons.main -P 31950
 
-.PHONY: local-install
-local-install: wheel
-	$(pip) install --ignore-installed --no-deps $(wildcard dist/opentrons-*.whl)
-
 .PHONY: local-shell
-local-shell: local-install
+local-shell:
 	$(pipenv_envvars) pipenv shell
 
 .PHONY: simulate
-simulate: local-install
+simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
 
 .PHONY: deploy-staging
