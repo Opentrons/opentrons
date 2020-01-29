@@ -237,3 +237,8 @@
 .select_module_message {
   font-size: var(--fs-body-1);
 }
+
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

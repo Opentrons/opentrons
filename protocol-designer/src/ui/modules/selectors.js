@@ -137,3 +137,13 @@ export const getMagnetLabwareEngageHeight: Selector<
     return (labware && getLabwareDefaultEngageHeight(labware.def)) || null
   }
 )
+
+/** Returns boolean if thermocycler module has labware */
+export const getPauseUntilTempEnabled: Selector<boolean> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup => {
+    const tempOnDeck = getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)
+    const tcOnDeck = getModuleOnDeckByType(initialDeckSetup, TEMPDECK)
+    return Boolean(tempOnDeck || tcOnDeck)
+  }
+)

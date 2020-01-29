@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -10,7 +11,6 @@ import {
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
 } from '../../../constants'
-
 import {
   ConditionalOnField,
   TextField,
@@ -23,12 +23,17 @@ import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 
 type PauseFormProps = { focusHandlers: FocusHandlers }
+
 export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
 
   const modulesEnabled = useSelector(featureFlagSelectors.getEnableModules)
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getTemperatureLabwareOptions
+  )
+
+  const pauseUntilTempEnabled = useSelector(
+    uiModuleSelectors.getPauseUntilTempEnabled
   )
 
   // time fields blur together
@@ -108,6 +113,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
             <>
               <div className={styles.checkbox_row}>
                 <RadioGroupField
+                  className={cx({ [styles.disabled]: !pauseUntilTempEnabled })}
                   name="pauseForAmountOfTime"
                   options={[
                     {
