@@ -4830,5 +4830,10 @@
     "defaultBlowOutFlowRate",
     "quirks"
   ],
-  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip", "needsUnstick"]
+  "validQuirks": [
+    "pickupTipShake",
+    "dropTipShake",
+    "doubleDropTip",
+    "needsUnstick"
+  ]
 }
