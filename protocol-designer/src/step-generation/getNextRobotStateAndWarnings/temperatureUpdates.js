@@ -7,8 +7,8 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import type {
-  SetTargetTempParams,
-  DeactivateTempParams,
+  TempParams,
+  ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
@@ -20,7 +20,7 @@ function _setTemperatureAndStatus(moduleState, temperature, status) {
 }
 
 export function forSetTemperature(
-  params: SetTargetTempParams,
+  params: TempParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
@@ -41,7 +41,7 @@ export function forSetTemperature(
 }
 
 export function forDeactivateTemperature(
-  params: DeactivateTempParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
