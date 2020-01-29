@@ -108,5 +108,8 @@ context('File Import', () => {
     cy.contains(
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
+
+    // Wait for the file to finish downloading. We can't control this.
+    cy.wait(1500) // eslint-disable-line cypress/no-unnecessary-waiting
   })
 })

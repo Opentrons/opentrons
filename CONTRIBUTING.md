@@ -189,15 +189,14 @@ We use:
 You can tests with:
 
 ```shell
-# run all tests
+# run all tests (except e2e)
 make test
 
 # run tests per language
 make test-py
 make test-js
 
-# run cypress tests for the labware-library
-cd labware-library
+# run cypress e2e tests
 make test-e2e
 ```
 

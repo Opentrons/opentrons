@@ -33,6 +33,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	concurrently --no-color --kill-others --names "server,tests" \
+	concurrently --no-color --kill-others --success "first" --names "labware-library,labware-library-tests" \
 		"$(MAKE) dev" \
 		"cypress run --browser chrome"
