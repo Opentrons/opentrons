@@ -22,7 +22,7 @@ export type EngageMagnetParams = {|
   engageHeight: number,
 |}
 
-export type TempParams = {| module: string, temperature: number |}
+export type TemperatureParams = {| module: string, temperature: number |}
 
 export type ModuleOnlyParams = {| module: string |}
 
@@ -58,28 +58,28 @@ export type Command =
     |}
   | {|
       command: 'temperatureModule/setTargetTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {| command: 'temperatureModule/deactivate', params: ModuleOnlyParams |}
   | {|
       command: 'temperatureModule/awaitTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {|
       command: 'thermocycler/setTargetBlockTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {|
       command: 'thermocycler/setTargetLidTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {|
       command: 'thermocycler/awaitBlockTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {|
       command: 'thermocycler/awaitLidTemperature',
-      params: TempParams,
+      params: TemperatureParams,
     |}
   | {| command: 'thermocycler/openLid', params: ModuleOnlyParams |}
   | {| command: 'thermocycler/closeLid', params: ModuleOnlyParams |}
