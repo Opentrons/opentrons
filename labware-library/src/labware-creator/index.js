@@ -1012,17 +1012,6 @@ const App = () => {
                       </div>
                     </div>
                     <div className={styles.export_section}>
-                      <PrimaryButton
-                        className={styles.export_button}
-                        onClick={() => {
-                          if (!isValid && !showExportErrorModal) {
-                            setShowExportErrorModal(true, values)
-                          }
-                          handleSubmit()
-                        }}
-                      >
-                        EXPORT FILE
-                      </PrimaryButton>
                       <div
                         className={cx(styles.callout, styles.export_callout)}
                       >
@@ -1052,6 +1041,17 @@ const App = () => {
                           view test guide
                         </LinkOut>
                       </div>
+                      <PrimaryButton
+                        className={styles.export_button}
+                        onClick={() => {
+                          if (!isValid && !showExportErrorModal) {
+                            setShowExportErrorModal(true, values)
+                          }
+                          handleSubmit()
+                        }}
+                      >
+                        EXPORT FILE
+                      </PrimaryButton>
                     </div>
                   </Section>
                 </>
