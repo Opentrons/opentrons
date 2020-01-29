@@ -238,7 +238,7 @@
               "type": "string"
             },
             "model": {
-              "description": "module of module. Eg 'GEN1'.",
+              "description": "model of module. Eg 'GEN1'.",
               "type": "string"
             }
           }
