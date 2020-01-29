@@ -284,8 +284,8 @@ async def position_info(request):
         'positions': {
             'change_pipette': {
                 'target': 'mount',
-                'left': (325, 40, 30),
-                'right': (65, 40, 30)
+                'left': (300, 40, 30),
+                'right': (95, 40, 30)
             },
             'attach_tip': {
                 'target': 'pipette',
