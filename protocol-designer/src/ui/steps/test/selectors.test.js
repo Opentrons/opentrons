@@ -2,10 +2,9 @@
 import selectors from '../selectors'
 import * as utils from '../../modules/utils'
 
-function getArgsAndErrorsByStepId(stepId, stepArgs) {
+function createArgsForStepId(stepId, stepArgs) {
   return {
     [stepId]: {
-      errors: {},
       stepArgs,
     },
   }
@@ -29,14 +28,11 @@ describe('getHoveredStepLabware', () => {
       commandCreatorFnName: mixCommand,
       labware,
     }
-    const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-      hoveredStepId,
-      stepArgs
-    )
+    const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = null
 
     const result = selectors.getHoveredStepLabware.resultFunc(
-      allStepArgsAndErrors,
+      argsByStepId,
       hoveredStep,
       initialDeckState
     )
@@ -49,14 +45,11 @@ describe('getHoveredStepLabware', () => {
       commandCreatorFnName: mixCommand,
       labware,
     }
-    const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-      hoveredStepId,
-      stepArgs
-    )
+    const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = 'another-step'
 
     const result = selectors.getHoveredStepLabware.resultFunc(
-      allStepArgsAndErrors,
+      argsByStepId,
       hoveredStep,
       initialDeckState
     )
@@ -66,13 +59,10 @@ describe('getHoveredStepLabware', () => {
 
   test('no labware is returned when no step arguments', () => {
     const stepArgs = null
-    const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-      hoveredStepId,
-      stepArgs
-    )
+    const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
     const result = selectors.getHoveredStepLabware.resultFunc(
-      allStepArgsAndErrors,
+      argsByStepId,
       hoveredStepId,
       initialDeckState
     )
@@ -87,13 +77,10 @@ describe('getHoveredStepLabware', () => {
         destLabware: labware,
         sourceLabware,
       }
-      const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-        hoveredStepId,
-        stepArgs
-      )
+      const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
       const result = selectors.getHoveredStepLabware.resultFunc(
-        allStepArgsAndErrors,
+        argsByStepId,
         hoveredStepId,
         initialDeckState
       )
@@ -107,13 +94,10 @@ describe('getHoveredStepLabware', () => {
       commandCreatorFnName: mixCommand,
       labware,
     }
-    const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-      hoveredStepId,
-      stepArgs
-    )
+    const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
     const result = selectors.getHoveredStepLabware.resultFunc(
-      allStepArgsAndErrors,
+      argsByStepId,
       hoveredStepId,
       initialDeckState
     )
@@ -154,13 +138,10 @@ describe('getHoveredStepLabware', () => {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
-      const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-        hoveredStepId,
-        stepArgs
-      )
+      const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
       const result = selectors.getHoveredStepLabware.resultFunc(
-        allStepArgsAndErrors,
+        argsByStepId,
         hoveredStepId,
         initialDeckState
       )
@@ -174,13 +155,10 @@ describe('getHoveredStepLabware', () => {
         commandCreatorFnName: setTempCommand,
         module: type,
       }
-      const allStepArgsAndErrors = getArgsAndErrorsByStepId(
-        hoveredStepId,
-        stepArgs
-      )
+      const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
       const result = selectors.getHoveredStepLabware.resultFunc(
-        allStepArgsAndErrors,
+        argsByStepId,
         hoveredStepId,
         initialDeckState
       )
