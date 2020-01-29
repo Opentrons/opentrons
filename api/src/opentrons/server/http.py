@@ -38,7 +38,7 @@ class HTTPServer(object):
             '/modules/{serial}', control.execute_module_command)
         if config.feature_flags.use_protocol_api_v2():
             self.app.router.add_post(
-                '/modules/{serial}/update', update.cannot_update_firmware)
+                '/modules/{serial}/update', update.update_module_firmware)
         else:
             self.app.router.add_post(
                 '/modules/{serial}/update', update.cannot_update_firmware)

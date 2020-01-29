@@ -1,71 +1,74 @@
 import logging
 import asyncio
 import tempfile
-from aiohttp import web
+from aiohttp.web import json_response
 from opentrons.hardware_control import modules
 
 
 log = logging.getLogger(__name__)
-UPDATE_TIMEOUT = 15
+UPDATE_TIMEOUT = 30
 
 
 # TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
 #  this should be removed
 async def cannot_update_firmware(request):
     """
-     This handler refuses a module firmware update request
-     in the case that the API server isn't equipped to handle it.
+    This handler refuses a module firmware update request
+    in the case that the API server isn't equipped to handle it.
     """
     log.debug('Cannot update module firmware on this server version')
     status = 501
-    res = {'message': 'Cannot update module firmware \
-                        via APIv1 server, please update server to APIv2'}
-    return web.json_response(res, status=status)
+    res = {'message': ('Cannot update module firmware'
+                       'via APIv1 server, please update server to APIv2')}
+    return json_response(res, status=status)
 
 
 async def update_module_firmware(request):
     """
-     This handler accepts a POST request with Content-Type: multipart/form-data
-     and a file field in the body named "module_firmware". The file should
-     be a valid HEX/binary image to be flashed to the module. The received
-     file is sent via USB to the board and flashed by the bootloader.
-     The file is then deleted and a success code is returned
+    This handler accepts a POST request and initiates a firmware
+    update on the attached module specified by its serial number in the
+    query string. The update process attempts to bootload the firmware
+    file for the matching module type that is present in the file system
+    onto the specified attached module.
+
+    On update success:
+    # status 200
+
+    On bootloader error:
+    # status 404
+
+    On bootloader not responding:
+    # status 500
+
+    On module or bundled firmware file not found:
+    # status 404
     """
-    log.debug('Update Firmware request received')
-    data = await request.post()
-    module_serial = request.match_info['serial']
-    fw_filename = data['module_firmware'].filename
-    message = 'Server failed to update module firmware'
-    status = 500
+    log.debug('Update Module Firmware request received')
+    serial = request.match_info['serial']
 
-    log.info('Preparing to flash firmware image {}'.format(fw_filename))
-    content = data['module_firmware'].file.read()
-    with tempfile.NamedTemporaryFile(suffix=fw_filename) as fp:
-        fp.write(content)
-        message, status = await _upload_to_module(
-            request.app['com.opentrons.hardware'],
-            module_serial,
-            fp.name,
-            loop=request.loop)
-        log.info('Firmware update complete')
-
-    res = {'filename': fw_filename, 'message': message}
-    return web.json_response(res, status=status)
-
-
-async def _upload_to_module(hw, serialnum, fw_filename, loop):
-    hw_mods = hw.attached_modules
-    for module in hw_mods:
-        if module.device_info.get('serial') == serialnum:
-            log.info("Module with serial {} found".format(serialnum))
+    for module in request.app['com.opentrons.hardware'].attached_modules:
+        if module.device_info.get('serial') == serial:
+            log.info("Module with serial {} found".format(serial))
             try:
-                await asyncio.wait_for(
-                    modules.update_firmware(module, fw_filename, loop),
-                    UPDATE_TIMEOUT)
-                return f'Successully updated module {serialnum}', 200
+                if module.bundled_fw:
+                    await asyncio.wait_for(
+                        modules.update_firmware(
+                            module, module.bundled_fw.path, request.loop),
+                        UPDATE_TIMEOUT)
+                    return json_response({'message': ('Successully updated'
+                                                      f' module {serial}'),
+                                         status=200)
+                else:
+                    return json_response({'message': ('Bundled fw file not '
+                                                     'found for module of '
+                                                     f'type: {module.name()}'),
+                                         status=404)
             except modules.UpdateError as e:
-                return f'Bootloader error: {e}', 400
+                return json_response({'message': f'Bootloader error: {e}'},
+                                     status=400)
             except asyncio.TimeoutError:
-                return 'Bootloader not responding', 500
+                return json_response({'message': 'Module not responding'},
+                                     status=500)
             break
-    return f'Module {serialnum} not found', 404
+    return json_response({'message': f'Module {serial} not found'},
+                         status=404)
