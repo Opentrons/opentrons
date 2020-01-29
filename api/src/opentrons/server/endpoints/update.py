@@ -55,20 +55,21 @@ async def update_module_firmware(request):
                         modules.update_firmware(
                             module, module.bundled_fw.path, request.loop),
                         UPDATE_TIMEOUT)
-                    return json_response({'message': ('Successully updated'
-                                                      f' module {serial}'),
-                                         status=200)
+                    res = f'Successully updated module {serial}'
+                    status = 200
                 else:
-                    return json_response({'message': ('Bundled fw file not '
-                                                     'found for module of '
-                                                     f'type: {module.name()}'),
-                                         status=404)
+                    res = (f'Bundled fw file not found for module of '
+                           f'type: {module.name()}')
+                    status = 404
             except modules.UpdateError as e:
-                return json_response({'message': f'Bootloader error: {e}'},
-                                     status=400)
+                res = f'Bootloader error: {e}'
+                status = 400
             except asyncio.TimeoutError:
-                return json_response({'message': 'Module not responding'},
-                                     status=500)
+                res = 'Module not responding'
+                status = 500
             break
-    return json_response({'message': f'Module {serial} not found'},
-                         status=404)
+    if res is None:
+        return json_response({'message': f'Module {serial} not found'},
+                             status=404)
+    else:
+        return json_response({'message': res}, status=status)
