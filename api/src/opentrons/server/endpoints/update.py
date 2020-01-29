@@ -3,9 +3,6 @@ from aiohttp.web import json_response
 import tempfile
 import logging
 import asyncio
-<< << << < HEAD
-== == == =
->>>>>> > simplify update module func
 
 
 log = logging.getLogger(__name__)
