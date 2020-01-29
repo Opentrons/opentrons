@@ -12,7 +12,6 @@ from argparse import ArgumentParser
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
-from opentrons.system import udev
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
@@ -151,11 +150,6 @@ def run(hardware, **kwargs):  # noqa(C901)
                 loop.run_until_complete(hardware.home_z())
             else:
                 hardware.home_z()
-        try:
-            udev.setup_rules_file()
-        except Exception:
-            log.exception(
-                "Could not setup udev rules, modules may not be detected")
 
     if kwargs.get('hardware_server'):
         if ff.use_protocol_api_v2():

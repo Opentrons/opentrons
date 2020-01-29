@@ -1,7 +1,7 @@
 import asyncio
 import logging
 import os
-import sys
+from pathlib import Path
 from glob import glob
 from typing import Any, Dict, Optional, Tuple
 
@@ -11,26 +11,21 @@ log = logging.getLogger(__name__)
 
 PORT_SEARCH_TIMEOUT = 5.5
 
-# avrdude_options
-PART_NO = 'atmega32u4'
-PROGRAMMER_ID = 'avr109'
-BAUDRATE = '57600'
-
 
 async def enter_bootloader(driver, model):
     """
-    Using the driver method, enter bootloader mode of the atmega32u4.
-    The bootloader mode opens a new port on the uC to upload the hex file.
-    After receiving a 'dfu' command, the firmware provides a 3-second window to
-    close the current port so as to do a clean switch to the bootloader port.
-    The new port shows up as 'ttyn_bootloader' on the pi; upload fw through it.
-    NOTE: Modules with old bootloader will have the bootloader port show up as
-    a regular module port- 'ttyn_tempdeck'/ 'ttyn_magdeck' with the port number
-    being either different or same as the one that the module was originally on
-    So we check for changes in ports and use the appropriate one
+    Using the driver method, enter bootloader mode of the module board.
+    The bootloader mode opens a new port on the uC to upload the firmware file.
+    The new port shows up as 'ot_module_(avrdude|samba)_bootloader' on the pi;
+    upload fw through it.
+    NOTE: Some temperature and magnetic modules have an old bootloader which
+    will show up as a regular module port- 'ot_module_tempdeck'/
+    'ot_module_magdeck' with the port number being either different or
+    same as the one that the module was originally on, so we check for
+    changes in ports and use the appropriate one
     """
     # Required for old bootloader
-    ports_before_dfu_mode = await _discover_ports()
+    ports_before_bootloader = await _discover_ports()
 
     if model == 'thermocycler':
         await driver.enter_programming_mode()
@@ -41,7 +36,7 @@ async def enter_bootloader(driver, model):
     new_port = ''
     try:
         new_port = await asyncio.wait_for(
-            _port_poll(_has_old_bootloader(model), ports_before_dfu_mode),
+            _port_poll(_has_old_bootloader(model), ports_before_bootloader),
             PORT_SEARCH_TIMEOUT)
     except asyncio.TimeoutError:
         pass
@@ -83,9 +78,12 @@ async def upload_firmware(port: str,
 async def upload_via_avrdude(port: str,
                              firmware_file_path: str,
                              kwargs: Dict[str, Any]) -> Tuple[bool, str]:
-    config_file_path = os.path.join(
-        os.path.dirname(sys.modules['opentrons'].__file__),
-        'config', 'modules', 'avrdude.conf')
+    # avrdude_options
+    PART_NO = 'atmega32u4'
+    PROGRAMMER_ID = 'avr109'
+    BAUDRATE = '57600'
+
+    config_file_path = Path('/etc/avrdude.conf')
     proc = await asyncio.create_subprocess_exec(
         'avrdude', '-C{}'.format(config_file_path), '-v',
         '-p{}'.format(PART_NO),

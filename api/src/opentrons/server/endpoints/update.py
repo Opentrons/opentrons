@@ -1,6 +1,5 @@
 import logging
 import asyncio
-import tempfile
 from aiohttp.web import json_response
 from opentrons.hardware_control import modules
 
