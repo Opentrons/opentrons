@@ -13,6 +13,7 @@ from opentrons.commands import CommandPublisher
 from opentrons.data_storage import database, old_container_loading,\
     database_migration
 from opentrons.drivers.smoothie_drivers import driver_3_0
+from opentrons.drivers.types import MoveSplit
 from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as fflags
 from opentrons.config.robot_configs import load
@@ -290,10 +291,16 @@ class Robot(CommandPublisher):
             plunger_axis = 'B' if mount == 'left' else 'C'
             mount_axis = 'Z' if mount == 'left' else 'A'
             model_value = self._driver.read_pipette_model(mount)
+            splits = {plunger_axis: None}
             if model_value:
                 name_value = pipette_config.name_for_model(model_value)
                 pc = pipette_config.load(model_value)
                 home_current = pc.plunger_current
+                if 'needsUnstick' in pc.quirks:
+                    splits[plunger_axis] = MoveSplit(split_distance=1,
+                                                     split_current=1.5,
+                                                     split_speed=1,
+                                                     after_time=1800)
             else:
                 name_value = None
                 home_current = self.config.high_current[plunger_axis]
@@ -312,6 +319,7 @@ class Robot(CommandPublisher):
             self._driver.update_pipette_config(mount_axis, {'home': home_pos})
             self._driver.update_pipette_config(
                 plunger_axis, {'max_travel': max_travel})
+            self._driver.configure_splits_for(splits)
 
             if model_value:
                 id_response = self._driver.read_pipette_id(mount)

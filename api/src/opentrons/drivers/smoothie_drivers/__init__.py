@@ -72,3 +72,6 @@ class SimulatingDriver:
 
     def update_steps_per_mm(self, data):
         pass
+
+    def configure_splits_for(self, config):
+        pass
