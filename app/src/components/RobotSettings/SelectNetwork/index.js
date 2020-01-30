@@ -26,7 +26,7 @@ import { IntervalWrapper, SpinnerModal } from '@opentrons/components'
 import { Portal } from '../../portal'
 import ConnectModal from './ConnectModal'
 import ConnectForm from './ConnectForm'
-import SelectSsid from './SelectSsid'
+import { SelectSsid } from './SelectSsid'
 import WifiConnectModal from './WifiConnectModal'
 
 import type { State, Dispatch } from '../../../types'
@@ -129,7 +129,7 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
     return (
       <IntervalWrapper refresh={refresh} interval={LIST_REFRESH_MS}>
         <SelectSsid
-          list={list}
+          list={list || []}
           disabled={connectingTo != null}
           onValueChange={this.setCurrentSsid}
         />

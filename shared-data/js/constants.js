@@ -19,5 +19,9 @@ export const TEMPDECK: 'tempdeck' = 'tempdeck'
 
 export const MAGDECK: 'magdeck' = 'magdeck'
 
+// pipette display categories
+export const GEN2: 'GEN2' = 'GEN2'
+export const GEN1: 'GEN1' = 'GEN1'
+
 // offset added to parameters.magneticModuleEngageHeight for displaying reccomended height in PD
 export const ENGAGE_HEIGHT_OFFSET = -4

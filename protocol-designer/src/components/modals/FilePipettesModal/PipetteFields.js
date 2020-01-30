@@ -7,11 +7,7 @@ import {
   PipetteSelect,
   type Mount,
 } from '@opentrons/components'
-import {
-  getLabwareDefURI,
-  getLabwareDisplayName,
-  getPipetteNameSpecs,
-} from '@opentrons/shared-data'
+import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
 
@@ -77,10 +73,9 @@ export default function ChangePipetteFields(props: Props) {
         enableNoneOption
         tabIndex={tabIndex}
         nameBlacklist={nameBlacklist}
-        value={pipetteName != null ? getPipetteNameSpecs(pipetteName) : null}
-        onPipetteChange={value => {
-          const name = value !== null ? value.name : null
-          onFieldChange(mount, 'pipetteName', name)
+        pipetteName={pipetteName != null ? pipetteName : null}
+        onPipetteChange={pipetteName => {
+          onFieldChange(mount, 'pipetteName', pipetteName)
         }}
       />
     )

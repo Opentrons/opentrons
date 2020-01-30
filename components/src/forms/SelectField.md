@@ -1,29 +1,35 @@
-This component uses the `react-select` library. So the change/blur events are not
-normal DOM events, but special ones. To make the difference clear, `SelectField`
-doesn't have `onChange` and `onBlur` but instead `onValueChange` and `onLoseFocus`.
+This component is a wrapper around our `Select` component optimized for usage with `Formik`.
+The `onChange` and `onBlur` events of `Select` component are provided by `react-select`; they
+are not normal DOM events. To make the difference clear, `SelectField` instead has
+`onValueChange` and `onLoseFocus` that are passed the `name` of the field and the `value` of
+the selected option.
 
-To use `<SelectField>` with Formik, **do not** try to of pass `formikProps.handleChange` and `formikProps.handleBlur` to `onChange` and `onBlur`. Instead, pass `formikProps.setFieldValue` and `formikProps.setFieldTouched` to `onValueChange` and `onLoseFocus`.
+To use `SelectField` with `Formik`, pass `formikProps.setFieldValue` to `onValueChange` and `formikProps.setFieldTouched` to `onLoseFocus`.
 
 ```js
 initialState = { selectedValue: null }
-;<div style={{ paddingBottom: '10rem' }}>
-  {/* Add some space because options menu does not behave well when overlapping with styleguidist's code blocks! */}
-  <SelectField
-    onValueChange={(name, value) => setState({ selectedValue: value })}
-    value={state.selectedValue}
-    caption={`Selected value: ${state.selectedValue}`}
-    error={state.selectedValue === 'dna' ? 'DNA IS NOT ALLOWED!' : null}
-    options={[
-      { label: <div style={{ color: 'red' }}>DNA</div>, value: 'dna' },
-      { label: 'RNA', value: 'rna' },
-      {
-        label: 'Protein',
-        options: [
-          { label: 'Hemoglobin', value: 'hemoglobin' },
-          { label: 'Actin', value: 'actin' },
-        ],
-      },
-    ]}
-  />
-</div>
+;<SelectField
+  onValueChange={(name, value) => setState({ selectedValue: value })}
+  value={state.selectedValue}
+  caption={`Selected value: ${state.selectedValue}`}
+  error={state.selectedValue === 'dna' ? 'DNA IS NOT ALLOWED!' : null}
+  options={[
+    { label: 'DNA', value: 'dna' },
+    { label: 'RNA', value: 'rna' },
+    {
+      label: 'Protein',
+      options: [
+        { label: 'Hemoglobin', value: 'hemoglobin' },
+        { label: 'Actin', value: 'actin' },
+      ],
+    },
+  ]}
+  formatOptionLabel={option =>
+    option.value === 'dna' ? (
+      <div style={{ color: 'red' }}>{option.label}</div>
+    ) : (
+      option.label
+    )
+  }
+/>
 ```

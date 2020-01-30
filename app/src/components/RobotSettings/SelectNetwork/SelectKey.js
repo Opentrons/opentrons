@@ -7,7 +7,7 @@ import styles from './styles.css'
 
 import type { WifiKeysList } from '../../../http-api-client'
 
-type Props = {
+export type SelectKeyProps = {
   name: string,
   label: string,
   value: ?string,
@@ -22,10 +22,10 @@ type Props = {
 const UPLOAD_KEY_VALUE = '__uploadWifiKey__'
 const UPLOAD_KEY_LABEL = 'Add new...'
 
-export default class SelectKey extends React.Component<Props> {
+export class SelectKey extends React.Component<SelectKeyProps> {
   fileInput: ?HTMLInputElement
 
-  constructor(props: Props) {
+  constructor(props: SelectKeyProps) {
     super(props)
     this.fileInput = null
   }
@@ -45,12 +45,6 @@ export default class SelectKey extends React.Component<Props> {
     }
   }
 
-  handleValueChange = (name: string, value: ?string) => {
-    if (value !== UPLOAD_KEY_VALUE) {
-      this.props.onValueChange(name, value)
-    }
-  }
-
   render() {
     const {
       name,
@@ -63,25 +57,21 @@ export default class SelectKey extends React.Component<Props> {
     } = this.props
     const keyOptions = map(keys, k => ({ value: k.id, label: k.name }))
     const addNewGroup = {
-      label: null,
-      options: [
-        {
-          value: UPLOAD_KEY_VALUE,
-          label: (
-            <div onClick={this.handleInputLabelClick} aria-hidden>
-              {UPLOAD_KEY_LABEL}
-            </div>
-          ),
-        },
-      ],
+      options: [{ value: UPLOAD_KEY_VALUE, label: UPLOAD_KEY_LABEL }],
     }
 
     return (
-      <React.Fragment>
+      <>
         <SelectOptionField
           {...{ name, label, value, error, required, onLoseFocus }}
           options={keyOptions.concat(addNewGroup)}
-          onValueChange={this.handleValueChange}
+          onValueChange={(name, value) => {
+            if (value === UPLOAD_KEY_VALUE) {
+              this.handleInputLabelClick()
+            } else {
+              this.props.onValueChange(name, value)
+            }
+          }}
         />
         <input
           type="file"
@@ -90,7 +80,7 @@ export default class SelectKey extends React.Component<Props> {
           className={styles.wifi_add_key_input}
           aria-label={UPLOAD_KEY_LABEL}
         />
-      </React.Fragment>
+      </>
     )
   }
 }
