@@ -44,7 +44,7 @@
     },
     "pauseForAmountOfTime": {
       "disabled": {
-        "wait_until_temp": "Add a relevant module to use this step, and set a target temperature"
+        "wait_until_temp": "There are no temperature or thermocycler modules on the deck"
       }
     }
   },
