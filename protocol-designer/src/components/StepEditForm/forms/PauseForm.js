@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { useSelector } from 'react-redux'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { FormGroup } from '@opentrons/components'
+import { FormGroup, HoverTooltip } from '@opentrons/components'
 import i18n from '../../../localization'
 import {
   PAUSE_UNTIL_RESUME,
@@ -34,6 +34,14 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
 
   const pauseUntilTempEnabled = useSelector(
     uiModuleSelectors.getPauseUntilTempEnabled
+  )
+
+  const pauseUntilTempTooltip = (
+    <div className={styles.slot_tooltip}>
+      {i18n.t(
+        `tooltip.step_fields.pauseForAmountOfTime.disabled.wait_until_temp`
+      )}
+    </div>
   )
 
   // time fields blur together
@@ -110,53 +118,64 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
             </div>
           </ConditionalOnField>
           {modulesEnabled && (
-            <>
-              <div className={styles.checkbox_row}>
-                <RadioGroupField
-                  className={cx({ [styles.disabled]: !pauseUntilTempEnabled })}
-                  name="pauseForAmountOfTime"
-                  options={[
-                    {
-                      name: i18n.t(
-                        'form.step_edit_form.field.pauseForAmountOfTime.options.untilTemperature'
-                      ),
-                      value: PAUSE_UNTIL_TEMP,
-                    },
-                  ]}
-                  {...focusHandlers}
-                />
-              </div>
-              <ConditionalOnField
-                name={'pauseForAmountOfTime'}
-                condition={val => val === PAUSE_UNTIL_TEMP}
-              >
-                <div className={styles.form_row}>
-                  <FormGroup
-                    label={i18n.t(
-                      'form.step_edit_form.field.moduleActionLabware.label'
-                    )}
-                  >
-                    <StepFormDropdown
-                      {...focusHandlers}
-                      name="moduleId"
-                      options={moduleLabwareOptions}
-                    />
-                  </FormGroup>
-                  <FormGroup
-                    label={i18n.t(
-                      'form.step_edit_form.field.pauseTemperature.label'
-                    )}
-                  >
-                    <TextField
-                      name="pauseTemperature"
-                      className={styles.small_field}
-                      units={i18n.t('application.units.degrees')}
+            <HoverTooltip
+              placement="bottom"
+              tooltipComponent={
+                pauseUntilTempEnabled ? null : pauseUntilTempTooltip
+              }
+            >
+              {hoverTooltipHandlers => (
+                <div {...hoverTooltipHandlers}>
+                  <div className={styles.checkbox_row}>
+                    <RadioGroupField
+                      className={cx({
+                        [styles.disabled]: !pauseUntilTempEnabled,
+                      })}
+                      name="pauseForAmountOfTime"
+                      options={[
+                        {
+                          name: i18n.t(
+                            'form.step_edit_form.field.pauseForAmountOfTime.options.untilTemperature'
+                          ),
+                          value: PAUSE_UNTIL_TEMP,
+                        },
+                      ]}
                       {...focusHandlers}
                     />
-                  </FormGroup>
+                  </div>
+                  <ConditionalOnField
+                    name={'pauseForAmountOfTime'}
+                    condition={val => val === PAUSE_UNTIL_TEMP}
+                  >
+                    <div className={styles.form_row}>
+                      <FormGroup
+                        label={i18n.t(
+                          'form.step_edit_form.field.moduleActionLabware.label'
+                        )}
+                      >
+                        <StepFormDropdown
+                          {...focusHandlers}
+                          name="moduleId"
+                          options={moduleLabwareOptions}
+                        />
+                      </FormGroup>
+                      <FormGroup
+                        label={i18n.t(
+                          'form.step_edit_form.field.pauseTemperature.label'
+                        )}
+                      >
+                        <TextField
+                          name="pauseTemperature"
+                          className={styles.small_field}
+                          units={i18n.t('application.units.degrees')}
+                          {...focusHandlers}
+                        />
+                      </FormGroup>
+                    </div>
+                  </ConditionalOnField>
                 </div>
-              </ConditionalOnField>
-            </>
+              )}
+            </HoverTooltip>
           )}
         </div>
         <div className={styles.section_column}>

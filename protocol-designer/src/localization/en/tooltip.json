@@ -41,6 +41,11 @@
         "$generic": "Incompatible with current path",
         "blowout_checkbox": "Redundant with disposal volume"
       }
+    },
+    "pauseForAmountOfTime": {
+      "disabled": {
+        "wait_until_temp": "Add a relevant module to use this step, and set a target temperature"
+      }
     }
   },
   "edit_module_modal": {
