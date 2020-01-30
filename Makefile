@@ -8,6 +8,8 @@ PATH := $(shell yarn bin):$(PATH)
 
 API_DIR := api
 DISCOVERY_CLIENT_DIR := discovery-client
+LABWARE_LIBRARY_DIR := labware-library
+PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 
@@ -95,6 +97,11 @@ term:
 # all tests
 .PHONY: test
 test: test-py test-js
+
+.PHONY: test-e2e
+test-e2e:
+	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
+	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
 .PHONY: test-py
 test-py:
