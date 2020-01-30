@@ -53,6 +53,10 @@ module.exports = {
       components: 'src/deck/[A-Z]*.js',
     },
     {
+      name: 'SlotMap',
+      components: 'src/slotmap/[A-Z]*.js',
+    },
+    {
       name: 'Instrument',
       components: 'src/instrument/[A-Z]*.js',
     },

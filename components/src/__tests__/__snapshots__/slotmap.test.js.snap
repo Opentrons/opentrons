@@ -1,0 +1,457 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`SlotMap renders correctly with collision warning 1`] = `
+<svg
+  viewBox="0,0,99, 92"
+>
+  <g
+    transform="translate(0 0)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 0)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+    <svg
+      aria-hidden="true"
+      className="collision_icon"
+      fill="currentColor"
+      height={20}
+      version="1.1"
+      viewBox="0 0 24 24"
+      width={20}
+      x={6.5}
+      y={1.5}
+    >
+      <path
+        d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </g>
+  <g
+    transform="translate(33 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 69)"
+  >
+    <rect
+      className="slot_rect slot_occupied"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 69)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 69)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+</svg>
+`;
+
+exports[`SlotMap renders correctly with error 1`] = `
+<svg
+  viewBox="0,0,99, 92"
+>
+  <g
+    transform="translate(0 0)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 0)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 69)"
+  >
+    <rect
+      className="slot_rect slot_occupied slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 69)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 69)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+</svg>
+`;
+
+exports[`SlotMap renders correctly with error and collision warning 1`] = `
+<svg
+  viewBox="0,0,99, 92"
+>
+  <g
+    transform="translate(0 0)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 0)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 23)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+    <svg
+      aria-hidden="true"
+      className="collision_icon"
+      fill="currentColor"
+      height={20}
+      version="1.1"
+      viewBox="0 0 24 24"
+      width={20}
+      x={6.5}
+      y={1.5}
+    >
+      <path
+        d="M13 9h-2V7h2m0 10h-2v-6h2m-1-9A10 10 0 0 0 2 12a10 10 0 0 0 10 10 10 10 0 0 0 10-10A10 10 0 0 0 12 2z"
+        fillRule="evenodd"
+      />
+    </svg>
+  </g>
+  <g
+    transform="translate(33 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 46)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 69)"
+  >
+    <rect
+      className="slot_rect slot_occupied slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 69)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 69)"
+  >
+    <rect
+      className="slot_rect slot_error"
+      height={23}
+      width={33}
+    />
+  </g>
+</svg>
+`;
+
+exports[`SlotMap renders correctly without collision warnings or errors 1`] = `
+<svg
+  viewBox="0,0,99, 92"
+>
+  <g
+    transform="translate(0 0)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 0)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 23)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 46)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(0 69)"
+  >
+    <rect
+      className="slot_rect slot_occupied"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(33 69)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+  <g
+    transform="translate(66 69)"
+  >
+    <rect
+      className="slot_rect"
+      height={23}
+      width={33}
+    />
+  </g>
+</svg>
+`;
