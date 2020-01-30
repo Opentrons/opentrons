@@ -1,0 +1,18 @@
+@import '..';
+
+.slot_rect {
+  stroke: var(--c-med-gray);
+  fill: none;
+}
+
+.slot_occupied {
+  fill: var(--c-light-gray);
+}
+
+.slot_occupied .slot_error {
+  fill: var(--c-warning-light);
+}
+
+.collision_icon {
+  color: var(--c-dark-gray);
+}
