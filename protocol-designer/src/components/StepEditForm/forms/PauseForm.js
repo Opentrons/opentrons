@@ -33,7 +33,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   )
 
   const pauseUntilTempEnabled = useSelector(
-    uiModuleSelectors.getPauseUntilTempEnabled
+    uiModuleSelectors.getTempdeckOrThermocylerOnDeck
   )
 
   const pauseUntilTempTooltip = (
