@@ -9,7 +9,7 @@
   fill: var(--c-light-gray);
 }
 
-.slot_occupied .slot_error {
+.slot_occupied.slot_error {
   fill: var(--c-warning-light);
 }
 

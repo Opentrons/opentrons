@@ -13,7 +13,7 @@ export type SlotMapProps = {
   isError?: boolean,
 }
 
-export const SLOT_MAP_SLOTS = [
+const SLOT_MAP_SLOTS = [
   ['10', '11'],
   ['7', '8', '9'],
   ['4', '5', '6'],
@@ -23,11 +23,13 @@ export const SLOT_MAP_SLOTS = [
 const slotWidth = 33
 const slotHeight = 23
 const iconSize = 20
+const numRows = 4
+const numCols = 3
 
 export function SlotMap(props: SlotMapProps) {
   const { collisionSlots, occupiedSlots, isError } = props
   return (
-    <svg viewBox={`0,0,${slotWidth * 3}, ${slotHeight * 4}`}>
+    <svg viewBox={`0,0,${slotWidth * numCols}, ${slotHeight * numRows}`}>
       {SLOT_MAP_SLOTS.flatMap((row, rowIndex) =>
         row.map((slot, colIndex) => {
           const isCollisionSlot =
