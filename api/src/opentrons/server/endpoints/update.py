@@ -33,9 +33,8 @@ async def update_module_firmware(request):
     On update success:
     # status 200
 
+    On bundled firmware file not found:
     On bootloader error:
-    # status 404
-
     On bootloader not responding:
     # status 500
 
@@ -45,30 +44,32 @@ async def update_module_firmware(request):
     log.debug('Update Module Firmware request received')
     serial = request.match_info['serial']
 
+    matching_module = None
     for module in request.app['com.opentrons.hardware'].attached_modules:
         if module.device_info.get('serial') == serial:
-            log.info("Module with serial {} found".format(serial))
-            try:
-                if module.bundled_fw:
-                    await asyncio.wait_for(
-                        modules.update_firmware(
-                            module, module.bundled_fw.path, request.loop),
-                        UPDATE_TIMEOUT)
-                    res = f'Successully updated module {serial}'
-                    status = 200
-                else:
-                    res = (f'Bundled fw file not found for module of '
-                           f'type: {module.name()}')
-                    status = 404
-            except modules.UpdateError as e:
-                res = f'Bootloader error: {e}'
-                status = 400
-            except asyncio.TimeoutError:
-                res = 'Module not responding'
-                status = 500
+            matching_module = module
             break
-    if res is None:
+
+    if not matching_module:
         return json_response({'message': f'Module {serial} not found'},
                              status=404)
-    else:
-        return json_response({'message': res}, status=status)
+
+    try:
+        if module.bundled_fw:
+            await asyncio.wait_for(
+                modules.update_firmware(
+                    module, module.bundled_fw.path, request.loop),
+                UPDATE_TIMEOUT)
+            res = f'Successully updated module {serial}'
+            status = 200
+        else:
+            res = (f'Bundled fw file not found for module of '
+                   f'type: {module.name()}')
+            status = 500
+    except modules.UpdateError as e:
+        res = f'Bootloader error: {e}'
+        status = 500
+    except asyncio.TimeoutError:
+        res = 'Module not responding'
+        status = 500
+    return json_response({'message': res}, status=status)
