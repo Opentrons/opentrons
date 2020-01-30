@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "23227ee4d618b047f4b793b90a627156b7fedcaeb4e150dda9b8c4b42770f41d"
+            "sha256": "e15e737bc6c0392fdd12578a4b6a5d5045801ff7039226ed6416255a22b6efd1"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -240,6 +240,13 @@
             ],
             "index": "pypi",
             "version": "==3.4"
+        },
+        "python-multipart": {
+            "hashes": [
+                "sha256:f7bb5f611fc600d15fa47b3974c8aa16e93724513b49b5f95c81e6624c83fa43"
+            ],
+            "index": "pypi",
+            "version": "==0.0.5"
         },
         "six": {
             "hashes": [
@@ -545,10 +552,10 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:6e7a3c2934694d59ad334c93dd1b6c96699cf24c53fdb8ec848ac6b23e685734",
-                "sha256:d6609ae5ec3d56212ca7d802eda654eaf2310000816ce815361041465b108be4"
+                "sha256:93187ffbc7808079673ef52771baa950426fd664d3aad1d0fa3e95644360e250",
+                "sha256:b0eaf100007721b5c16c1fc1eecb87409464edc10469ddc9a22a27a99123be49"
             ],
-            "version": "==2.11.0"
+            "version": "==2.11.1"
         },
         "jsonschema": {
             "hashes": [
