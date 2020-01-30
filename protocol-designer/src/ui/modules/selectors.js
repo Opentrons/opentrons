@@ -139,7 +139,7 @@ export const getMagnetLabwareEngageHeight: Selector<
 )
 
 /** Returns boolean if TC or Temperature Modules are present on deck  */
-export const getTempdeckOrThermocylerOnDeck: Selector<boolean> = createSelector(
+export const getTempModuleOrThermocyclerIsOnDeck: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
     const tempOnDeck = getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)
