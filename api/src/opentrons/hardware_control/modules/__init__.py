@@ -93,7 +93,7 @@ async def update_firmware(
     """
     cls = type(module)
     flash_port = await module.prep_for_update()
-    del module
+    # del module
     kwargs: Dict[str, Any] = {
         'stdout': asyncio.subprocess.PIPE,
         'stderr': asyncio.subprocess.PIPE,
