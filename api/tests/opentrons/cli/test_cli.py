@@ -16,19 +16,13 @@ from opentrons.deck_calibration.endpoints import expected_points
 
 
 @pytest.fixture
-def mock_config():
-    yield robot_configs.load()
-    robot_configs.clear()
-
-
-@pytest.fixture
 def model1():
-    return ('p300_single_v1.4', 'p300_single')
+    return 'p300_single_v1.4', 'p300_single'
 
 
 @pytest.fixture
 def model2():
-    return ('p300_single_v2.0', 'p300_single_gen2')
+    return 'p300_single_v2.0', 'p300_single_gen2'
 
 
 @pytest.fixture

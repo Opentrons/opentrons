@@ -1,6 +1,8 @@
 # Uncomment to enable logging during tests
 # import logging
 # from logging.config import dictConfig
+from opentrons.config import robot_configs
+
 try:
     import aionotify
 except OSError:
@@ -117,6 +119,13 @@ def template_db(tmpdir_factory):
     config.CONFIG['labware_database_file'] = str(template_db)
     database_migration.check_version_and_perform_full_migration()
     return template_db
+
+
+@pytest.fixture
+def mock_config():
+    """Robot config setup and teardown"""
+    yield robot_configs.load()
+    robot_configs.clear()
 
 
 @pytest.mark.apiv1
