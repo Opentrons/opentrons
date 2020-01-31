@@ -124,7 +124,7 @@ async def upload_via_bossa(port: str,
     # so we resolve to real path
     resolved_symlink = os.path.realpath(port)
     log.info(
-        f"device at symlinked port: {port}"
+        f"device at symlinked port: {port} "
         f"resolved to path: {resolved_symlink}")
     bossa_args = ['bossac', f'-p{resolved_symlink}',
                   '-e', '-w', '-v', '-R',

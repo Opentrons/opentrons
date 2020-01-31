@@ -38,7 +38,7 @@ async def update_module_firmware(request):
     On bootloader not responding:
     # status 500
 
-    On module or bundled firmware file not found:
+    On module not found:
     # status 404
     """
     log.debug('Update Module Firmware request received')

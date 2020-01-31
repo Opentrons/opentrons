@@ -80,8 +80,7 @@ def discover() -> List[ModuleAtPort]:
 
 
 class UpdateError(RuntimeError):
-    def __init__(self, msg):
-        self.msg = msg
+    pass
 
 
 async def update_firmware(
@@ -89,10 +88,7 @@ async def update_firmware(
         firmware_file: str,
         loop: Optional[asyncio.AbstractEventLoop]) -> AbstractModule:
     """ Update a module.
-
-    If the update succeeds, a Module instance will be returned.
-
-    Otherwise, raises an UpdateError with the reason for the failure.
+        raises an UpdateError with the reason for the failure.
     """
     simulating = module.is_simulated
     cls = type(module)
@@ -105,12 +101,6 @@ async def update_firmware(
         firmware_file_path=firmware_file,
         upload_function=cls.bootloader(),
         loop=loop)
-    await asyncio.sleep(1.0)
-    new_port = after_port or old_port
     if not results[0]:
-        log.debug(f'Bootloader reponse: {results[1]}')
+        log.info(f'Bootloader reponse: {results[1]}')
         raise UpdateError(results[1])
-    return await cls.build(
-        port=new_port,
-        interrupt_callback=callback,
-        simulating=simulating)

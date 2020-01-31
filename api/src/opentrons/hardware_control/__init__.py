@@ -1400,8 +1400,6 @@ class API(HardwareAPILike):
                     port,
                     name,
                     self.pause_with_message)
-            self._log.info(f"{port}")
-            self._log.info(f"{name}")
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}")
