@@ -1607,7 +1607,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": []
+      "quirks": ["needsUnstick"]
     },
     "p50_single_v1": {
       "name": "p50_single",
@@ -4004,7 +4004,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": []
+      "quirks": ["needsUnstick"]
     },
     "p1000_single_v1": {
       "name": "p1000_single",
@@ -4830,5 +4830,10 @@
     "defaultBlowOutFlowRate",
     "quirks"
   ],
-  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
+  "validQuirks": [
+    "pickupTipShake",
+    "dropTipShake",
+    "doubleDropTip",
+    "needsUnstick"
+  ]
 }
