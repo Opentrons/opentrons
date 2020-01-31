@@ -2374,8 +2374,7 @@
     "modules": {
         "magneticModuleId": {
             "slot": "1",
-            "moduleType": "magnetic module",
-            "model": "GEN1"
+            "model": "magdeck"
         }
     }
 }

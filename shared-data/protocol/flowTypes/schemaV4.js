@@ -13,8 +13,7 @@ export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 
 export type FileModule = {|
   slot: DeckSlotId,
-  moduleType: string, // see spec for enum
-  model: string,
+  model: string, // matches key in shared-data/module/definitions/2
 |}
 
 export type EngageMagnetParams = {|
@@ -67,7 +66,7 @@ export type Command =
     |}
   | {|
       command: 'thermocycler/setTargetBlockTemperature',
-      params: TemperatureParams,
+      params: {| module: string, temperature: number, volume: number |},
     |}
   | {|
       command: 'thermocycler/setTargetLidTemperature',
@@ -90,6 +89,7 @@ export type Command =
       params: {|
         module: string,
         profile: Array<{| temperature: number, holdTime: number |}>,
+        volume: number,
       |},
     |}
   | {| command: 'thermocycler/awaitProfileComplete', params: ModuleOnlyParams |}

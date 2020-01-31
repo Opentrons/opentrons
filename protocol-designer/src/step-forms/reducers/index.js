@@ -6,7 +6,10 @@ import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  getModuleTypeFromModuleModel,
+} from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
@@ -15,7 +18,6 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
   SPAN7_8_10_11_SLOT,
-  FILE_MODULE_TYPE_TO_MODULE_TYPE,
   MAGDECK,
 } from '../../constants'
 import { getPDMetadata } from '../../file-types'
@@ -669,7 +671,7 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
         file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
         (fileModule: FileModule, id: string) => ({
           id,
-          type: FILE_MODULE_TYPE_TO_MODULE_TYPE[fileModule.moduleType],
+          type: getModuleTypeFromModuleModel(fileModule.model),
           model: fileModule.model,
         })
       )

@@ -40,6 +40,7 @@
     "^[^$].*": {
       "type": "object",
       "required": [
+        "moduleType",
         "labwareOffset",
         "dimensions",
         "calibrationPoint",
@@ -51,6 +52,14 @@
       ],
       "additionalProperties": false,
       "properties": {
+        "moduleType": {
+          "enum": [
+            "temperatureModuleType",
+            "magneticModuleType",
+            "thermocyclerModuleType"
+          ],
+          "type": "string"
+        },
         "labwareOffset": { "$ref": "#/definitions/coordinates" },
         "dimensions": {
           "type": "object",

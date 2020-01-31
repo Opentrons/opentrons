@@ -1558,8 +1558,7 @@
     "modules": {
         "temperatureModuleId": {
             "slot": "3",
-            "moduleType": "temperature module",
-            "model": "GEN1"
+            "model": "tempdeck"
         }
     },
     "commands": [

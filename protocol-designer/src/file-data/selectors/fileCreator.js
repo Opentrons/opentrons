@@ -17,7 +17,6 @@ import {
   DEFAULT_MM_FROM_BOTTOM_DISPENSE,
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
-  MODULE_TYPE_TO_FILE_MODULE_TYPE,
 } from '../../constants'
 
 import type {
@@ -106,7 +105,6 @@ export const createFile: BaseState => PDProtocolFile = createSelector(
       moduleEntities,
       (module: ModuleEntity, moduleId: string): FileModule => ({
         slot: initialRobotState.modules[moduleId].slot,
-        moduleType: MODULE_TYPE_TO_FILE_MODULE_TYPE[module.type],
         model: module.model,
       })
     )

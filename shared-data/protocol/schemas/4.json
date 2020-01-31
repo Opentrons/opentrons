@@ -229,16 +229,12 @@
         ".+": {
           "description": "Fields describing a single module on the deck",
           "type": "object",
-          "required": ["slot", "moduleType"],
+          "required": ["slot", "model"],
           "additionalProperties": false,
           "properties": {
             "slot": { "$ref": "#/definitions/slot" },
-            "moduleType": {
-              "enum": ["temperature module", "magnetic module", "thermocycler"],
-              "type": "string"
-            },
             "model": {
-              "description": "model of module. Eg 'GEN1'.",
+              "description": "model of module. Eg 'magdeck' or 'magdeckGen2'. This should match a top-level key in shared-data/module/definitions/2.json",
               "type": "string"
             }
           }
@@ -488,7 +484,10 @@
                 "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
-                  "temperature": { "type": "number" }
+                  "temperature": { "type": "number" },
+                  "volume": {
+                    "type": "number"
+                  }
                 }
               }
             }
@@ -609,7 +608,7 @@
               "command": { "enum": ["thermocycler/closeLid"] },
               "params": {
                 "type": "object",
-                "required": ["module", "profile"],
+                "required": ["module", "profile", "volume"],
                 "additionalProperties": false,
                 "properties": {
                   "module": { "type": "string" },
@@ -630,6 +629,9 @@
                         }
                       }
                     }
+                  },
+                  "volume": {
+                    "type": "number"
                   }
                 }
               }
