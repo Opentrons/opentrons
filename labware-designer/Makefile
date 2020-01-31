@@ -1,7 +1,7 @@
 # opentrons labware-designer makefile
 
-# adding the -c to SHELL prevents macOS optimizing away our PATH update
-SHELL := /bin/bash -c
+# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
+SHELL := bash
 
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)

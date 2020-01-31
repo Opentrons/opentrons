@@ -1,7 +1,7 @@
 # opentrons api makefile
 
-# adding the -c to SHELL prevents macOS optimizing away our PATH update
-SHELL := /bin/bash -c
+# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
+SHELL := bash
 
 # add yarn CLI dev deps to PATH (for cross platform POSIX commands via shx)
 # and also make an explicit version for shx for use in the shell function,
