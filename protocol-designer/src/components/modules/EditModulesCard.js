@@ -31,9 +31,10 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
+  const crashablePipettesSelected = getCrashablePipetteSelected(pipettesByMount)
+
   const showCrashInfoBox =
-    getCrashablePipetteSelected(pipettesByMount) &&
-    (modules.magdeck || modules.tempdeck)
+    crashablePipettesSelected && (modules.magdeck || modules.tempdeck)
 
   return (
     <Card title="Modules">
@@ -51,6 +52,7 @@ export function EditModulesCard(props: Props) {
               <ModuleRow
                 type={moduleType}
                 module={moduleData}
+                isCollisionPossible={crashablePipettesSelected}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />
@@ -59,6 +61,7 @@ export function EditModulesCard(props: Props) {
             return (
               <ModuleRow
                 type={moduleType}
+                isCollisionPossible={crashablePipettesSelected}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />

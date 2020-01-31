@@ -4,7 +4,7 @@ import i18n from '../../localization'
 import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
 
-import { LabeledValue, OutlineButton } from '@opentrons/components'
+import { LabeledValue, OutlineButton, SlotMap } from '@opentrons/components'
 import ModuleDiagram from './ModuleDiagram'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
@@ -14,23 +14,33 @@ import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
   module?: ModuleOnDeck,
+  isCollisionPossible: boolean,
   type: ModuleType,
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
 export function ModuleRow(props: Props) {
-  const { module, openEditModuleModal } = props
+  const { module, openEditModuleModal, isCollisionPossible } = props
   const type = module?.type || props.type
 
   const model = module?.model
   const slot = module?.slot
 
   let slotDisplayName = null
+  let occupiedSlotsForMap: Array<string> = []
+  let collisionSlots: Array<string> = []
+  if (isCollisionPossible && slot === '1') {
+    collisionSlots = ['4']
+  } else if (isCollisionPossible && slot === '3') {
+    collisionSlots = ['6']
+  }
   if (slot) {
     slotDisplayName = `Slot ${slot}`
+    occupiedSlotsForMap = [slot]
   }
   if (slot === SPAN7_8_10_11_SLOT) {
     slotDisplayName = 'Slot 7'
+    occupiedSlotsForMap = ['7', '8', '10', '11']
   }
 
   const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
@@ -60,6 +70,14 @@ export function ModuleRow(props: Props) {
         </div>
         <div className={styles.module_col}>
           {slot && <LabeledValue label="Position" value={slotDisplayName} />}
+        </div>
+        <div className={styles.slot_map}>
+          {slot && (
+            <SlotMap
+              occupiedSlots={occupiedSlotsForMap}
+              collisionSlots={collisionSlots}
+            />
+          )}
         </div>
         <div className={styles.modules_button_group}>
           {module && (

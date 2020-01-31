@@ -27,8 +27,12 @@
 }
 
 .module_col {
-  flex: 1 0 20%;
+  flex: 1 0 15%;
   padding-top: 0.5rem; /* TODO remove padding above once images are cropped properly */
+}
+
+.slot_map {
+  flex: 1 0 12%;
 }
 
 .row_title {
