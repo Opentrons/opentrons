@@ -43,7 +43,10 @@ function SettingsApp(props: Props) {
   return (
     <>
       <div className={styles.page_row}>
-        <Card title={i18n.t('card.title.information')}>
+        <Card
+          title={i18n.t('card.title.information')}
+          testId="informationSectionHeader"
+        >
           <div className={styles.card_content}>
             <div className={styles.setting_row}>
               <LabeledValue

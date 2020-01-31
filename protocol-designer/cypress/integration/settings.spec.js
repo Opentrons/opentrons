@@ -11,7 +11,7 @@ describe('The Settings Page', () => {
   })
 
   it('contains an information section', () => {
-    cy.get('h3')
+    cy.get('[data-test-id=informationSectionHeader]')
       .contains('Information')
       .should('exist')
   })

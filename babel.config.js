@@ -3,7 +3,10 @@
 module.exports = {
   env: {
     production: {
-      plugins: ['babel-plugin-unassert'],
+      plugins: [
+        'babel-plugin-unassert',
+        'babel-plugin-jsx-remove-data-test-id',
+      ],
     },
     development: {
       plugins: ['react-hot-loader/babel'],

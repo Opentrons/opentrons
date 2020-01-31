@@ -15,6 +15,8 @@ type Props = {|
   disabled?: boolean,
   /** Additional class names */
   className?: string,
+  /** data-test-id value for use in automated tests */
+  testId?: string,
 |}
 
 /**
@@ -23,14 +25,14 @@ type Props = {|
  * Titles and other children handle their own styles and layout.
  */
 export default function Card(props: Props) {
-  const { title, children } = props
+  const { title, children, testId } = props
 
   const style = cx(styles.card, props.className, {
     [styles.disabled]: props.disabled,
   })
 
   return (
-    <section className={style}>
+    <section className={style} data-test-id={testId}>
       {title && <h3 className={styles.card_title}>{title}</h3>}
       {children}
     </section>
