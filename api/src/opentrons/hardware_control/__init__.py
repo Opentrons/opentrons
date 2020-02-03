@@ -543,8 +543,8 @@ class API(HardwareAPILike):
                 for smoothie_plunger, current in smoothie_plungers.items():
                     self._backend.set_active_current(
                         smoothie_plunger, current)
-                    smoothie_pos.update(
-                        self._backend.home([smoothie_plunger.name.upper()]))
+                    self._backend.home([smoothie_plunger.name.upper()])
+                    smoothie_pos.update(self._backend.update_position())
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     async def add_tip(
