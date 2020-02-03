@@ -15,12 +15,12 @@
       "logPaths": {
         "type": "array",
         "description": "List of URL paths at which to find logs",
-        "items": { "type": "string" }
+        "items": {"type": "string"}
       },
       "protocolApiVersion": {
         "type": "array",
         "description": "A major.minor Protocol API version",
-        "items": { "type": "integer" },
+        "items": {"type": "integer"},
         "minItems": 2,
         "maxItems": 2
       },
@@ -60,7 +60,7 @@
         "description": "OT-2 /networking/status response",
         "type": "object",
         "additionalProperties": false,
-        "required": ["status", "interfaces"],
+        "required": [ "status", "interfaces" ],
         "properties": {
           "status": {
             "description": "Overall connectivity of the robot",
@@ -71,8 +71,8 @@
             "type": "object",
             "description": "Per-interface networking status. Properties are named for network interfaces",
             "properties": {
-              "eth0": { "$ref": "#/components/schemas/interfaceStatus" },
-              "wlan0": { "$ref": "#/components/schemas/interfaceStatus" }
+              "eth0": {"$ref": "#/components/schemas/interfaceStatus"},
+              "wlan0": {"$ref": "#/components/schemas/interfaceStatus"}
             }
           }
         }
@@ -80,7 +80,7 @@
       "networkingSecurityType": {
         "description": "Top-level type of network security",
         "type": "string",
-        "enum": ["wpa-eap", "wpa-psk", "none", "unsupported"]
+        "enum": [ "wpa-eap", "wpa-psk", "none", "unsupported" ]
       },
       "v1ErrorMessage": {
         "description": "An error response with a human readable message",
@@ -168,19 +168,7 @@
             "type": "object",
             "description": "Thermocycler live data",
             "additionalProperties": true,
-            "required": [
-              "lid",
-              "lidTarget",
-              "lidTemp",
-              "currentTemp",
-              "targetTemp",
-              "holdTime",
-              "rampRate",
-              "currentCycleIndex",
-              "totalCycleCount",
-              "currentStepIndex",
-              "totalStepCount"
-            ],
+            "required": ["lid", "lidTarget", "lidTemp", "currentTemp", "targetTemp", "holdTime", "rampRate", "currentCycleIndex", "totalCycleCount", "currentStepIndex", "totalStepCount"],
             "properties": {
               "lid": {
                 "description": "The current state of the lid",
@@ -242,14 +230,7 @@
       "attachedPipette": {
         "description": "Pipette (if any) attached to the mount",
         "type": "object",
-        "required": [
-          "model",
-          "name",
-          "tip_length",
-          "mount_axis",
-          "plunger_axis",
-          "id"
-        ],
+        "required": ["model", "name", "tip_length", "mount_axis", "plunger_axis", "id"],
         "additionalProperties": false,
         "properties": {
           "model": {
@@ -295,7 +276,7 @@
         "minItems": 3,
         "maxItems": 3,
         "description": "A point in deck coordinates (x, y, z)",
-        "items": { "type": "number" }
+        "items": {"type": "number"}
       },
       "lightState": {
         "description": "Whether a light is (or should be turned) on or off",
@@ -321,7 +302,7 @@
       "deckCalibrationDispatchJog": {
         "description": "command: \"jog\" dispatch args",
         "allOf": [
-          { "$ref": "#/components/schemas/deckCalibrationDispatch" },
+          {"$ref": "#/components/schemas/deckCalibrationDispatch"},
           {
             "type": "object",
             "required": ["axis", "direction", "step"],
@@ -347,12 +328,12 @@
       "deckCalibrationDispatchMove": {
         "description": "command: \"move\" dispatch args",
         "allOf": [
-          { "$ref": "#/components/schemas/deckCalibrationDispatch" },
+          {"$ref": "#/components/schemas/deckCalibrationDispatch"},
           {
             "type": "object",
             "required": ["point"],
             "properties": {
-              "point": { "$ref": "#/components/schemas/deckCalibrationPoint" }
+              "point": {"$ref": "#/components/schemas/deckCalibrationPoint"}
             }
           }
         ]
@@ -360,11 +341,11 @@
       "deckCalibrationDispatchSaveXY": {
         "description": "command: \"save xy\" dispatch args",
         "allOf": [
-          { "$ref": "#/components/schemas/deckCalibrationDispatch" },
+          {"$ref": "#/components/schemas/deckCalibrationDispatch"},
           {
             "type": "object",
             "properties": {
-              "point": { "$ref": "#/components/schemas/deckCalibrationPoint" }
+              "point": {"$ref": "#/components/schemas/deckCalibrationPoint"}
             }
           }
         ]
@@ -372,7 +353,7 @@
       "deckCalibrationDispatchAttachTip": {
         "description": "command: \"attach tip\" dispatch args",
         "allOf": [
-          { "$ref": "#/components/schemas/deckCalibrationDispatch" },
+          {"$ref": "#/components/schemas/deckCalibrationDispatch"},
           {
             "type": "object",
             "required": ["tipLength"],
@@ -408,16 +389,7 @@
           },
           "command": {
             "type": "string",
-            "enum": [
-              "jog",
-              "move",
-              "save xy",
-              "attach tip",
-              "detach tip",
-              "save z",
-              "save transform",
-              "release"
-            ],
+            "enum": ["jog", "move", "save xy", "attach tip", "detach tip", "save z", "save transform", "release"],
             "description": "The command to execute"
           }
         },
@@ -440,14 +412,7 @@
         "type": "array",
         "items": {
           "type": "object",
-          "required": [
-            "id",
-            "old_id",
-            "title",
-            "description",
-            "restart_required",
-            "value"
-          ],
+          "required": ["id", "old_id", "title", "description", "restart_required", "value"],
           "properties": {
             "id": {
               "type": "string",
@@ -589,7 +554,7 @@
               "type": "object",
               "required": ["links", "settings"],
               "properties": {
-                "settings": { "$ref": "#/components/schemas/advancedSettings" },
+                "settings": {"$ref": "#/components/schemas/advancedSettings"},
                 "links": {
                   "type": "object",
                   "additionalProperties": true,
@@ -609,34 +574,20 @@
   },
   "servers": [],
   "tags": [
-    {
-      "name": "networking",
-      "description": "Controls or queries the OT-2's network connectivity"
-    },
-    {
-      "name": "control",
-      "description": "Operations that affect the OT-2's hardware"
-    },
-    {
-      "name": "modules",
-      "description": "Operations having to do with connected modules"
-    },
-    {
-      "name": "pipettes",
-      "description": "Operations having to do with pipettes"
-    },
-    {
-      "name": "deckCalibration",
-      "description": "Operations for executing deck calibration"
-    },
-    {
-      "name": "settings",
-      "description": "Operations for viewing or editing robot configuration"
-    },
-    {
-      "name": "metadata",
-      "description": "Operations involving robot or server metadata"
-    }
+    {"name": "networking",
+     "description": "Controls or queries the OT-2's network connectivity"},
+    {"name": "control",
+     "description": "Operations that affect the OT-2's hardware"},
+    {"name": "modules",
+     "description": "Operations having to do with connected modules"},
+    {"name": "pipettes",
+     "description": "Operations having to do with pipettes"},
+    {"name": "deckCalibration",
+     "description": "Operations for executing deck calibration"},
+    {"name": "settings",
+     "description": "Operations for viewing or editing robot configuration"},
+    {"name": "metadata",
+     "description": "Operations involving robot or server metadata"}
   ],
   "security": [],
   "externalDocs": {
@@ -658,7 +609,7 @@
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": {"$ref": "#/components/responses/serverDown"}
         }
       }
     },
@@ -678,35 +629,19 @@
                   "type": "object",
                   "additionalProperties": false,
                   "required": [
-                    "name",
-                    "api_version",
-                    "fw_version",
-                    "logs",
-                    "system_version",
-                    "protocol_api_version",
-                    "links"
+                    "name", "api_version", "fw_version", "logs", "system_version", "protocol_api_version", "links"
                   ],
                   "properties": {
-                    "name": {
-                      "description": "The robot's name. In most cases the same as its mDNS advertisement domain name but this can get out of sync. Mostly useful for user-facing titles.",
-                      "type": "string"
-                    },
-                    "api_version": {
-                      "description": "The SemVer dotted-int version of the API server and by extension robot software.",
-                      "type": "string"
-                    },
-                    "fw_version": {
-                      "description": "The version of the firmware flashed to the OT-2's motor controller board. Doesn't follow a pattern, suitable only for display or exact matching.",
-                      "type": "string"
-                    },
-                    "logs": { "$ref": "#/components/schemas/logPaths" },
-                    "system_version": {
-                      "description": "The SemVer dotted-int version of the robot OS",
-                      "type": "string"
-                    },
-                    "protocol_api_version": {
-                      "$ref": "#/components/schemas/protocolApiVersion"
-                    },
+                    "name": {"description": "The robot's name. In most cases the same as its mDNS advertisement domain name but this can get out of sync. Mostly useful for user-facing titles.",
+                             "type": "string"},
+                    "api_version": {"description": "The SemVer dotted-int version of the API server and by extension robot software.",
+                                    "type": "string"},
+                    "fw_version": {"description": "The version of the firmware flashed to the OT-2's motor controller board. Doesn't follow a pattern, suitable only for display or exact matching.",
+                                   "type": "string"},
+                    "logs": {"$ref": "#/components/schemas/logPaths" },
+                    "system_version": {"description": "The SemVer dotted-int version of the robot OS",
+                                       "type": "string"},
+                    "protocol_api_version": { "$ref": "#/components/schemas/protocolApiVersion" },
                     "links": {
                       "type": "object",
                       "description": "A set of useful links",
@@ -759,7 +694,7 @@
             "description": "The networking state information",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/networkingStatus" },
+                "schema": {"$ref": "#/components/schemas/networkingStatus"},
                 "example": {
                   "status": "full",
                   "interfaces": {
@@ -782,13 +717,13 @@
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" },
+          "502": {"$ref": "#/components/responses/serverDown"},
           "500": {
             "description": "An internal error occurred, probably from NetworkManager. Same schema as the 200, but empty",
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/networkingStatus" },
-                "example": { "status": "none", "interfaces": {} }
+                "example": {"status": "none", "interfaces": {}}
               }
             }
           }
@@ -816,49 +751,30 @@
                       "items": {
                         "type": "object",
                         "description": "A visible network",
-                        "required": [
-                          "ssid",
-                          "signal",
-                          "active",
-                          "security",
-                          "securityType"
-                        ],
+                        "required": ["ssid", "signal", "active", "security", "securityType"],
                         "additionalProperties": false,
                         "properties": {
-                          "ssid": {
-                            "description": "The network's SSID",
-                            "type": "string"
-                          },
-                          "signal": {
-                            "description": "A unitless signal strength; a higher number is a better signal",
-                            "type": "integer"
-                          },
-                          "active": {
-                            "description": "Whether there is a connection active",
-                            "type": "boolean"
-                          },
-                          "security": {
-                            "description": "The raw NetworkManager output about the wifi security",
-                            "type": "string"
-                          },
-                          "securityType": {
-                            "$ref": "#/components/schemas/networkingSecurityType"
-                          }
+                          "ssid": { "description": "The network's SSID",
+                                    "type": "string"},
+                          "signal": { "description": "A unitless signal strength; a higher number is a better signal",
+                                      "type": "integer"},
+                          "active": {"description": "Whether there is a connection active",
+                                     "type": "boolean"},
+                          "security": {"description": "The raw NetworkManager output about the wifi security",
+                                       "type": "string"},
+                          "securityType": {"$ref": "#/components/schemas/networkingSecurityType"}
                         }
                       }
                     }
                   }
                 },
                 "example": {
-                  "list": [
-                    {
-                      "ssid": "linksys",
-                      "signal": 50,
-                      "active": false,
-                      "security": "WPA2 802.1X",
-                      "securityType": "wpa-eap"
-                    }
-                  ]
+                  "list": [{
+                    "ssid": "linksys",
+                    "signal": 50,
+                    "active": false,
+                    "security": "WPA2 802.1X",
+                    "securityType": "wpa-eap"}]
                 }
               }
             }
@@ -874,8 +790,7 @@
                   "properties": {
                     "message": {
                       "type": "string",
-                      "description": "A human-readable error message"
-                    }
+                      "description": "A human-readable error message"}
                   }
                 },
                 "example": {
@@ -900,7 +815,7 @@
             "application/json": {
               "schema": {
                 "type": "object",
-                "required": ["ssid"],
+                "required": [ "ssid" ],
                 "properties": {
                   "ssid": {
                     "description": "The SSID to connect to. If this isn't an SSID that is being broadcast by a network, you should also set hidden to true.",
@@ -984,12 +899,10 @@
                   "required": ["message", "ssid"],
                   "properties": {
                     "message": {
-                      "type": "string",
-                      "description": "A human-readable success message"
+                      "type": "string", "description": "A human-readable success message"
                     },
                     "ssid": {
-                      "type": "string",
-                      "description": "The SSID configured"
+                      "type": "string", "description": "The SSID configured"
                     }
                   }
                 }
@@ -1001,9 +914,7 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Error: JSONDecodeError in /wifi/configure: Expecting delimiter at position 0"
-                }
+                "example": {"message": "Error: JSONDecodeError in /wifi/configure: Expecting delimiter at position 0"}
               }
             }
           },
@@ -1011,10 +922,8 @@
             "description": "The response body was properly formed but the OT-2 could not connect to the specified network, likely because some configuration or password does not match",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Secrets were required but not provided"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Secrets were required but not provided"}
               }
             }
           },
@@ -1047,11 +956,9 @@
                 },
                 "example": {
                   "keys": [
-                    {
-                      "uri": "/wifi/keys/abda234a234",
-                      "id": "abda234a234",
-                      "name": "client.pem"
-                    }
+                    {"uri": "/wifi/keys/abda234a234",
+                     "id": "abda234a234",
+                     "name": "client.pem"}
                   ]
                 }
               }
@@ -1085,12 +992,11 @@
             "description": "The details of the newly uploaded key",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/wifiKeyFile" },
+                "schema": {"$ref": "#/components/schemas/wifiKeyFile" },
                 "example": {
                   "uri": "/wifi/keys/abda234a234",
                   "id": "abda234a234",
-                  "name": "client.pem"
-                }
+                  "name": "client.pem"}
               }
             }
           },
@@ -1113,7 +1019,7 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Must upload key file" }
+                "example": {"message": "Must upload key file"}
               }
             }
           },
@@ -1123,12 +1029,11 @@
     },
     "/wifi/keys/{key_uuid}": {
       "parameters": [
-        {
-          "name": "key_uuid",
+        { "name": "key_uuid",
           "in": "path",
           "description": "The ID of key to delete, as determined by a previous call to GET /wifi/keys ",
           "required": true,
-          "schema": { "type": "string" }
+          "schema": {"type": "string"}
         }
       ],
       "delete": {
@@ -1140,7 +1045,7 @@
             "description": "The key was successfully deleted",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
                 "example": {
                   "message": "Key file client.pem deleted"
                 }
@@ -1151,7 +1056,7 @@
             "description": "The key_uuid is not known",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
                 "example": {
                   "message": "No such key file 44aacab8"
                 }
@@ -1185,26 +1090,17 @@
                         "required": ["name", "displayName", "options"],
                         "additionalProperties": false,
                         "properties": {
-                          "name": {
-                            "type": "string",
-                            "description": "The identifier for the EAP variant"
-                          },
-                          "displayName": {
-                            "type": "string",
-                            "description": "A human-readable formatted name for the EAP variant"
-                          },
+                          "name": {"type": "string",
+                                   "description": "The identifier for the EAP variant"},
+                          "displayName": {"type": "string",
+                                          "description": "A human-readable formatted name for the EAP variant"},
                           "options": {
                             "description": "A list of objects describing configuration options for the EAP variant",
                             "type": "array",
                             "items": {
                               "description": "An object describing the name and format of an EAP config option",
                               "type": "object",
-                              "required": [
-                                "name",
-                                "displayName",
-                                "required",
-                                "type"
-                              ],
+                              "required": ["name", "displayName", "required", "type"],
                               "additionalProperties": false,
                               "properties": {
                                 "name": {
@@ -1234,36 +1130,27 @@
                 },
                 "example": {
                   "options": [
-                    {
-                      "name": "peap/mschapv2",
-                      "displayName": "PEAP/MS-CHAP v2",
-                      "options": [
-                        {
-                          "name": "identity",
-                          "displayName": "Username",
-                          "required": true,
-                          "type": "string"
-                        },
-                        {
-                          "name": "anonymousIdentity",
-                          "displayName": "Anonymous Identity",
-                          "required": false,
-                          "type": "string"
-                        },
-                        {
-                          "name": "caCert",
-                          "displayName": "CA Certificate File",
-                          "required": false,
-                          "type": "file"
-                        },
-                        {
-                          "name": "password",
-                          "displayName": "password",
-                          "required": true,
-                          "type": "password"
-                        }
-                      ]
-                    }
+                    {"name": "peap/mschapv2",
+                     "displayName": "PEAP/MS-CHAP v2",
+                     "options": [
+                       {"name": "identity",
+                        "displayName": "Username",
+                        "required": true,
+                        "type": "string"
+                       },
+                       {"name": "anonymousIdentity",
+                        "displayName": "Anonymous Identity",
+                        "required": false,
+                        "type": "string"},
+                       {"name": "caCert",
+                        "displayName": "CA Certificate File",
+                        "required": false,
+                        "type": "file"},
+                       {"name": "password",
+                        "displayName": "password",
+                        "required": true,
+                        "type": "password"}
+                     ]}
                   ]
                 }
               }
@@ -1283,7 +1170,7 @@
             "name": "seconds",
             "in": "query",
             "required": false,
-            "schema": { "type": "number" },
+            "schema": {"type": "number"},
             "description": "Time to blink the lights for",
             "example": 10
           }
@@ -1293,8 +1180,8 @@
             "description": "A notification that the identification procedure has begun",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "identifying" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "identifying"}
               }
             }
           },
@@ -1322,16 +1209,7 @@
                       "items": {
                         "description": "An object identifying a module",
                         "type": "object",
-                        "required": [
-                          "name",
-                          "displayName",
-                          "port",
-                          "serial",
-                          "model",
-                          "fwVersion",
-                          "status",
-                          "data"
-                        ],
+                        "required": ["name", "displayName", "port", "serial", "model", "fwVersion", "status", "data"],
                         "properties": {
                           "name": {
                             "description": "A machine readable identifying name for a module",
@@ -1361,9 +1239,7 @@
                             "description": "A human-readable module-specific status",
                             "type": "string"
                           },
-                          "data": {
-                            "$ref": "#/components/schemas/moduleLiveData"
-                          }
+                          "data": { "$ref": "#/components/schemas/moduleLiveData" }
                         }
                       }
                     }
@@ -1458,7 +1334,7 @@
         {
           "name": "serial",
           "in": "path",
-          "schema": { "type": "string" },
+          "schema": {"type": "string"},
           "required": true
         }
       ],
@@ -1481,7 +1357,7 @@
                       "description": "A human-readable module-specific status",
                       "type": "string"
                     },
-                    "data": { "$ref": "#/components/schemas/moduleLiveData" }
+                    "data": {"$ref": "#/components/schemas/moduleLiveData"}
                   }
                 },
                 "examples": {
@@ -1565,7 +1441,7 @@
         {
           "name": "serial",
           "in": "path",
-          "schema": { "type": "string" },
+          "schema": {"type": "string"},
           "required": true
         }
       ],
@@ -1759,7 +1635,7 @@
             "description": "The image",
             "content": {
               "image/jpeg": {
-                "schema": { "type": "string", "format": "binary" }
+                "schema": {"type": "string", "format": "binary"}
               }
             }
           },
@@ -1767,8 +1643,8 @@
             "description": "Something went wrong when taking the picture",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "picture not saved" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "picture not saved"}
               }
             }
           },
@@ -1781,7 +1657,7 @@
         {
           "name": "refresh",
           "in": "query",
-          "schema": { "type": "boolean" },
+          "schema": {"type": "boolean"},
           "description": "If true, actively scan for attached pipettes. Note: this requires disabling the pipette motors and should only be done when no protocol is running and you know it won't cause a problem"
         }
       ],
@@ -1799,8 +1675,8 @@
                   "type": "object",
                   "required": ["left", "right"],
                   "properties": {
-                    "left": { "$ref": "#/components/schemas/attachedPipette" },
-                    "right": { "$ref": "#/components/schemas/attachedPipette" }
+                    "left": {"$ref": "#/components/schemas/attachedPipette"},
+                    "right": {"$ref": "#/components/schemas/attachedPipette"}
                   }
                 },
                 "example": {
@@ -1835,7 +1711,7 @@
         "tags": ["control"],
         "responses": {
           "200": {
-            "description": " Which motors are engaged",
+            "description":" Which motors are engaged",
             "content": {
               "application/json": {
                 "schema": {
@@ -1843,51 +1719,39 @@
                   "required": ["x", "y", "z", "a", "b", "c"],
                   "additionalProperties": false,
                   "properties": {
-                    "x": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    },
-                    "y": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    },
-                    "z": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    },
-                    "a": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    },
-                    "b": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    },
-                    "c": {
-                      "type": "object",
-                      "additionalProperties": false,
-                      "required": ["enabled"],
-                      "properties": { "enabled": { "type": "boolean" } }
-                    }
+                    "x": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "y": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "z": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "a": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "b": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}},
+                    "c": {"type": "object",
+                          "additionalProperties": false,
+                          "required": ["enabled"],
+                          "properties": {"enabled": {"type": "boolean"}}}
                   }
                 },
                 "example": {
-                  "x": { "enabled": false },
-                  "y": { "enabled": true },
-                  "z": { "enabled": false },
-                  "a": { "enabled": true },
-                  "b": { "enabled": false },
-                  "c": { "enabled": true }
+                  "x": {"enabled": false},
+                  "y": {"enabled": true},
+                  "z": {"enabled": false},
+                  "a": {"enabled": true},
+                  "b": {"enabled": false},
+                  "c": {"enabled": true}
                 }
               }
             }
@@ -1922,8 +1786,8 @@
             "description": "Requested axes have been disabled",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Disengaged axes: x, y, b" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Disengaged axes: x, y, b"}
               }
             }
           },
@@ -1931,8 +1795,8 @@
             "description": "Bad request body or nonexistent axes",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Invalid axes: v" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Invalid axes: v"}
               }
             }
           },
@@ -1965,9 +1829,7 @@
                           "required": ["target", "left", "right"],
                           "additionalProperties": false,
                           "properties": {
-                            "target": {
-                              "$ref": "#/components/schemas/motionTarget"
-                            },
+                            "target": { "$ref": "#/components/schemas/motionTarget"},
                             "left": { "$ref": "#/components/schemas/point" },
                             "right": { "$ref": "#/components/schemas/point" }
                           }
@@ -1977,9 +1839,7 @@
                           "required": ["target", "point"],
                           "additionalProperties": false,
                           "properties": {
-                            "target": {
-                              "$ref": "#/components/schemas/motionTarget"
-                            },
+                            "target": { "$ref": "#/components/schemas/motionTarget"},
                             "point": { "$ref": "#/components/schemas/point" }
                           }
                         }
@@ -2072,10 +1932,8 @@
             "description": "Move successfully executed",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Move copmlete. New position: (25, 25, 50)"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage" },
+                "example": {"message": "Move copmlete. New position: (25, 25, 50)"}
               }
             }
           },
@@ -2083,10 +1941,8 @@
             "description": "Invalid request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Invalid target key: 'robot' (target must be one of 'mount' or 'pipette')"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage" },
+                "example": {"message": "Invalid target key: 'robot' (target must be one of 'mount' or 'pipette')"}
               }
             }
           },
@@ -2145,8 +2001,8 @@
             "description": "Robot successfully homed",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Homing robot." }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Homing robot."}
               }
             }
           },
@@ -2154,10 +2010,8 @@
             "description": "invalid request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Expected 'left' or 'right' as values for mountgot top instead."
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Expected 'left' or 'right' as values for mountgot top instead."}
               }
             }
           },
@@ -2165,9 +2019,7 @@
             "description": "Internal homing error",
             "content": {
               "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/v1ErrorWithTraceback"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorWithTraceback"}
               }
             }
           },
@@ -2215,8 +2067,8 @@
             "description": "The new state of the lights",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/lightState" },
-                "example": { "on": false }
+                "schema": {"$ref": "#/components/schemas/lightState"},
+                "example": {"on": false}
               }
             }
           },
@@ -2273,7 +2125,7 @@
                       "required": ["mount", "model"],
                       "additionalProperties": false,
                       "properties": {
-                        "mount": { "$ref": "#/components/schemas/mount" },
+                        "mount": {"$ref": "#/components/schemas/mount"},
                         "model": {
                           "type": "string",
                           "description": "The model of the pipette attached in this mount"
@@ -2296,8 +2148,8 @@
             "description": "No pipette is attached, or the attached pipette cannot be read",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Error, pipette not recognized" }
+                "schema": { "$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Error, pipette not recognized"}
               }
             }
           },
@@ -2312,10 +2164,8 @@
             },
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Error, session in progress. Use  \"force\" key in request body to override"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Error, session in progress. Use  \"force\" key in request body to override"}
               }
             }
           },
@@ -2335,28 +2185,14 @@
             "application/json": {
               "schema": {
                 "oneOf": [
-                  { "$ref": "#/components/schemas/deckCalibrationDispatchJog" },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchMove"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchSaveXY"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchAttachTip"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchDetachTip"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchSaveZ"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchSaveTransform"
-                  },
-                  {
-                    "$ref": "#/components/schemas/deckCalibrationDispatchRelease"
-                  }
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchJog"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchMove"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchSaveXY"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchAttachTip"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchDetachTip"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchSaveZ"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchSaveTransform"},
+                  {"$ref": "#/components/schemas/deckCalibrationDispatchRelease"}
                 ]
               },
               "examples": {
@@ -2452,10 +2288,8 @@
             },
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Session must be started before issuing commands"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Session must be started before issuing commands"}
               }
             }
           },
@@ -2463,10 +2297,8 @@
             "description": "Internal assertion failure, probably from a bad request",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "\"command\" field required for calibration requests"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "\"command\" field required for calibration requests"}
               }
             }
           },
@@ -2479,8 +2311,8 @@
             },
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "Invalid token: notatoken" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Invalid token: notatoken"}
               }
             }
           },
@@ -2488,10 +2320,8 @@
             "description": "Internal error during command dispatch",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": {
-                  "message": "Exception FileNotFoundError raised by dispatch of move: <traceback>"
-                }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Exception FileNotFoundError raised by dispatch of move: <traceback>"}
               }
             }
           },
@@ -2549,7 +2379,7 @@
             "description": "Bad settings ID",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v2ErrorMessage" }
+                "schema": {"$ref": "#/components/schemas/v2ErrorMessage"}
               }
             }
           },
@@ -2557,7 +2387,7 @@
             "description": "Internal error",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"}
               }
             }
           },
@@ -2570,7 +2400,7 @@
         "operationId": "getAdvancedSettings",
         "responses": {
           "200": { "$ref": "#/components/responses/advancedSettings" },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": {"$ref": "#/components/responses/serverDown"}
         }
       }
     },
@@ -2616,11 +2446,11 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "invalid log_level hellothere" }
+                "example": {"message": "invalid log_level hellothere"}
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": {"$ref": "#/components/responses/serverDown"}
         }
       }
     },
@@ -2666,11 +2496,11 @@
             "content": {
               "application/json": {
                 "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "invalid log_level hellothere" }
+                "example": {"message": "invalid log_level hellothere"}
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": {"$ref": "#/components/responses/serverDown"}
         }
       }
     },
@@ -2714,7 +2544,7 @@
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": {"$ref": "#/components/responses/serverDown"}
         }
       }
     },
@@ -2759,7 +2589,7 @@
             "description": "Invalid key reset",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v2ErrorMessage" }
+                "schema": {"$ref": "#/components/schemas/v2ErrorMessage"}
               }
             }
           },
@@ -2774,7 +2604,7 @@
         "operationId": "getRobotSettings",
         "responses": {
           "200": {
-            "description": " The robot settings, which are currently not schema controlled and may change without warning",
+            "description":" The robot settings, which are currently not schema controlled and may change without warning",
             "content": {
               "application/json": {
                 "schema": {
@@ -2835,7 +2665,7 @@
                         "type": "float",
                         "default": 19.5
                       },
-                      "quirks": { "dropTipShake": true }
+                      "quirks": {"dropTipShake": true}
                     }
                   }
                 }
@@ -2851,7 +2681,7 @@
         {
           "name": "pipetteId",
           "in": "path",
-          "schema": { "type": "string" },
+          "schema": {"type": "string"},
           "required": true
         }
       ],
@@ -2864,7 +2694,7 @@
             "description": "The settings for this pipette",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/pipetteSettings" },
+                "schema": {"$ref": "#/components/schemas/pipetteSettings"},
                 "example": {
                   "info": {
                     "name": "p20_single_gen2",
@@ -2923,8 +2753,8 @@
               },
               "example": {
                 "fields": {
-                  "top": { "value": null },
-                  "dropTipShake": { "value": false }
+                  "top": {"value": null},
+                  "dropTipShake": {"value": false}
                 }
               }
             }
@@ -2935,7 +2765,7 @@
             "description": "Setting changed OK. Dumps the new settings for the pipette",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/pipetteSettings" }
+                "schema": {"$ref": "#/components/schemas/pipetteSettings"}
               }
             }
           },
@@ -2943,12 +2773,12 @@
             "description": "A specified value was out of range",
             "content": {
               "application/json": {
-                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
-                "example": { "message": "top out of range with 300" }
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "top out of range with 300"}
               }
             }
           },
-          "502": { "$ref": "#/components/responses/serverDown" }
+          "502": { "$ref": "#/components/responses/serverDown"}
         }
       }
     }
