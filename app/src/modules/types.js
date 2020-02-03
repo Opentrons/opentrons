@@ -11,6 +11,7 @@ type BaseModule = {|
   serial: string,
   fwVersion: string,
   port: string,
+  hasAvailableUpdate: boolean,
 |}
 
 export type TemperatureData = {|
