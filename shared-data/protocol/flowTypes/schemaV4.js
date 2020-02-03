@@ -13,8 +13,7 @@ export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 
 export type FileModule = {|
   slot: DeckSlotId,
-  moduleType: string, // see spec for enum
-  model: string,
+  model: string, // matches key in shared-data/module/definitions/2
 |}
 
 export type EngageMagnetParams = {|
@@ -22,13 +21,9 @@ export type EngageMagnetParams = {|
   engageHeight: number,
 |}
 
-export type DisengageMagnetParams = {|
-  module: string,
-|}
+export type TemperatureParams = {| module: string, temperature: number |}
 
-export type SetTargetTempParams = {| module: string, temperature: number |}
-
-export type DeactivateTempParams = {| module: string |}
+export type ModuleOnlyParams = {| module: string |}
 
 export type Command =
   | {|
@@ -58,24 +53,52 @@ export type Command =
   | {| command: 'magneticModule/engageMagnet', params: EngageMagnetParams |}
   | {|
       command: 'magneticModule/disengageMagnet',
-      params: DisengageMagnetParams,
+      params: ModuleOnlyParams,
     |}
   | {|
       command: 'temperatureModule/setTargetTemperature',
-      params: SetTargetTempParams,
+      params: TemperatureParams,
     |}
-  | {| command: 'temperatureModule/deactivate', params: DeactivateTempParams |}
+  | {| command: 'temperatureModule/deactivate', params: ModuleOnlyParams |}
   | {|
-      command: 'thermocycler/setTargetTemperature',
-      params: SetTargetTempParams,
+      command: 'temperatureModule/awaitTemperature',
+      params: TemperatureParams,
     |}
-  | {| command: 'thermocycler/deactivate', params: DeactivateTempParams |}
+  | {|
+      command: 'thermocycler/setTargetBlockTemperature',
+      params: {| module: string, temperature: number, volume: number |},
+    |}
+  | {|
+      command: 'thermocycler/setTargetLidTemperature',
+      params: TemperatureParams,
+    |}
+  | {|
+      command: 'thermocycler/awaitBlockTemperature',
+      params: TemperatureParams,
+    |}
+  | {|
+      command: 'thermocycler/awaitLidTemperature',
+      params: TemperatureParams,
+    |}
+  | {| command: 'thermocycler/openLid', params: ModuleOnlyParams |}
+  | {| command: 'thermocycler/closeLid', params: ModuleOnlyParams |}
+  | {| command: 'thermocycler/deactivateBlock', params: ModuleOnlyParams |}
+  | {| command: 'thermocycler/deactivateLid', params: ModuleOnlyParams |}
+  | {|
+      command: 'thermocycler/runProfile',
+      params: {|
+        module: string,
+        profile: Array<{| temperature: number, holdTime: number |}>,
+        volume: number,
+      |},
+    |}
+  | {| command: 'thermocycler/awaitProfileComplete', params: ModuleOnlyParams |}
 
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|
   ...V3ProtocolFile<DesignerApplicationData>,
   schemaVersion: 4,
-  // TODO: Ian 2019-11-11 make modules a required key when v4 is legit
+  // TODO: Ian 2019-11-11 make modules a required key when PD drops support for v3
   modules?: {
     [moduleId: string]: FileModule,
   },

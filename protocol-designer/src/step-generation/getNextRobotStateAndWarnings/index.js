@@ -69,8 +69,17 @@ function _getNextRobotStateAndWarningsSingleCommand(
         robotStateAndWarnings
       )
       break
-    case 'thermocycler/setTargetTemperature':
-    case 'thermocycler/deactivate':
+    case 'temperatureModule/awaitTemperature':
+    case 'thermocycler/setTargetBlockTemperature':
+    case 'thermocycler/setTargetLidTemperature':
+    case 'thermocycler/awaitBlockTemperature':
+    case 'thermocycler/awaitLidTemperature':
+    case 'thermocycler/deactivateBlock':
+    case 'thermocycler/deactivateLid':
+    case 'thermocycler/closeLid':
+    case 'thermocycler/openLid':
+    case 'thermocycler/runProfile':
+    case 'thermocycler/awaitProfileComplete':
       console.warn(`NOT IMPLEMENTED: ${command.command}`)
       break
 

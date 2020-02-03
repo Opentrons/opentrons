@@ -22,7 +22,7 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
-import { THERMOCYCLER } from '../../../constants'
+import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
 import i18n from '../../../localization'
 import { PDAlert } from '../../alerts/PDAlert'
 import modalStyles from '../modal.css'
@@ -126,7 +126,7 @@ export default function EditModulesModal(props: EditModulesProps) {
           <FormGroup label="Model" className={styles.option_model}>
             <DropdownField
               tabIndex={0}
-              options={[{ name: 'GEN1', value: 'GEN1' }]}
+              options={MODELS_FOR_MODULE_TYPE[moduleType]}
               value={selectedModel}
               onChange={handleModelChange}
             />

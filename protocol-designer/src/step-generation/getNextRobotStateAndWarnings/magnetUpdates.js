@@ -3,7 +3,7 @@ import assert from 'assert'
 import { getModuleState } from '../utils/misc'
 import type {
   EngageMagnetParams,
-  DisengageMagnetParams,
+  ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import { MAGDECK } from '../../constants'
@@ -30,7 +30,7 @@ export function forEngageMagnet(
 }
 
 export function forDisengageMagnet(
-  params: DisengageMagnetParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {

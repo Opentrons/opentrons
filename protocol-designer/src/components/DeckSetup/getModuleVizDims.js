@@ -6,6 +6,9 @@ import {
   STD_SLOT_Y_DIM as SLOT_Y,
   STD_SLOT_DIVIDER_WIDTH as DIVIDER,
   SPAN7_8_10_11_SLOT,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
 } from '../../constants'
 import type { ModuleType } from '@opentrons/shared-data'
 import type { DeckSlot, ModuleOrientation } from '../../types'
@@ -23,7 +26,7 @@ export type ModuleVizDims = {|
 |}
 
 const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
-  magdeck: {
+  [MAGDECK]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.2 + DIVIDER * 2,
@@ -33,7 +36,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childXDimension: SLOT_X,
     childYDimension: SLOT_Y,
   },
-  tempdeck: {
+  [TEMPDECK]: {
     xOffset: -1 * (SLOT_X * 0.4 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.4 + DIVIDER * 2,
@@ -43,7 +46,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childXDimension: SLOT_X,
     childYDimension: SLOT_Y,
   },
-  thermocycler: {
+  [THERMOCYCLER]: {
     xOffset: -8,
     yOffset: 0,
     xDimension: SLOT_X + DIVIDER + 32,
