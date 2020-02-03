@@ -6,6 +6,7 @@ import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
 import { getTiprackVolume } from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
+import type { ModuleTemporalProperties } from '../step-forms'
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
@@ -132,4 +133,16 @@ export function getPipetteWithTipMaxVol(
     return NaN
   }
   return min([tiprackTipVol, pipetteMaxVol])
+}
+
+export function getModuleState(
+  robotState: RobotState,
+  module: string
+): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
+  console.assert(
+    module in robotState.modules,
+    `getModuleState expected module id "${module}"`
+  )
+
+  return robotState.modules[module].moduleState
 }
