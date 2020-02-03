@@ -109,7 +109,8 @@ def _parse_key_from_substring(substring) -> str:
 def _parse_device_information(device_info_string) -> dict:
     '''
     Parse the magnetic module's device information response.
-    Example response from magnetic module: "serial:aa11 model:bb22 version:cc33"
+    Example response from magnetic module:
+    "serial:aa11 model:bb22 version:cc33"
     '''
     error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
         device_info_string)
