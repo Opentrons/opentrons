@@ -101,3 +101,8 @@
 .link {
   @apply --font-body-1-dark;
 }
+
+.collision_tolltip {
+  width: 13rem;
+  line-height: var(--lh-copy);
+}

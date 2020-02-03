@@ -6,6 +6,7 @@ import {
   selectors as stepFormSelectors,
   getCrashablePipetteSelected,
 } from '../../step-forms'
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { THERMOCYCLER } from '../../constants'
 import { CrashInfoBox } from './CrashInfoBox'
@@ -31,10 +32,15 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
+  const moduleRestritionsDisabled = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
   const crashablePipettesSelected = getCrashablePipetteSelected(pipettesByMount)
 
+  const warningsEnabled =
+    Boolean(moduleRestritionsDisabled) && crashablePipettesSelected
   const showCrashInfoBox =
-    crashablePipettesSelected && (modules.magdeck || modules.tempdeck)
+    warningsEnabled && (modules.magdeck || modules.tempdeck)
 
   return (
     <Card title="Modules">
@@ -52,7 +58,7 @@ export function EditModulesCard(props: Props) {
               <ModuleRow
                 type={moduleType}
                 module={moduleData}
-                isCollisionPossible={crashablePipettesSelected}
+                isCollisionPossible={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />
@@ -61,7 +67,6 @@ export function EditModulesCard(props: Props) {
             return (
               <ModuleRow
                 type={moduleType}
-                isCollisionPossible={crashablePipettesSelected}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />
