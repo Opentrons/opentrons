@@ -26,6 +26,7 @@ from .controller import Controller
 from . import modules
 from .util import use_or_initialize_loop
 from .types import Axis, HardwareAPILike, CriticalPoint
+from opentrons.drivers.types import MoveSplit
 
 
 mod_log = logging.getLogger(__name__)
@@ -283,6 +284,10 @@ class API(HardwareAPILike):
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
             back_compat: List[str] = []
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
+            splits: Dict[Axis, Optional[MoveSplit]] = {
+                plunger_axis.name.upper(): None}
             if model:
                 p = Pipette(
                     model,
@@ -299,6 +304,12 @@ class API(HardwareAPILike):
                 home_pos = p.config.home_position
                 max_travel = p.config.max_travel
                 steps_mm = p.config.steps_per_mm
+                if 'needsUnstick' in p.config.quirks:
+                    splits[plunger_axis.name.upper()] = MoveSplit(
+                        split_distance=1,
+                        split_current=1.5,
+                        split_speed=1,
+                        after_time=1800)
 
             if req_instr and not self.is_simulator_sync:
                 if not model:
@@ -318,14 +329,13 @@ class API(HardwareAPILike):
                 max_travel = self._config.default_pipette_configs['maxTravel']
                 steps_mm = self._config.default_pipette_configs['stepsPerMM']
 
-            mount_axis = Axis.by_mount(mount)
-            plunger_axis = Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
             self._backend._smoothie_driver.update_pipette_config(
                 mount_axis.name, {'home': home_pos})
             self._backend._smoothie_driver.update_pipette_config(
                 plunger_axis.name, {'max_travel': max_travel})
+            self._backend._smoothie_driver.configure_splits_for(splits)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 

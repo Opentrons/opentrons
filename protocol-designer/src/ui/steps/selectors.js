@@ -3,6 +3,7 @@ import { createSelector } from 'reselect'
 import last from 'lodash/last'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
+import { getLabwareOnModule } from '../modules/utils'
 import type { StepIdType } from '../../form-types'
 import type { BaseState, Selector } from '../../types'
 import {
@@ -57,7 +58,8 @@ const getHoveredStepId: Selector<?StepIdType> = createSelector(
 const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
-  (allStepArgsAndErrors, hoveredStep) => {
+  stepFormSelectors.getInitialDeckSetup,
+  (allStepArgsAndErrors, hoveredStep, initialDeckState) => {
     const blank = []
     if (!hoveredStep || !allStepArgsAndErrors[hoveredStep]) {
       return blank
@@ -84,6 +86,11 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
     if (stepArgs.commandCreatorFnName === 'mix') {
       // only 1 labware
       return [stepArgs.labware]
+    }
+
+    if (stepArgs.module) {
+      const labware = getLabwareOnModule(initialDeckState, stepArgs.module)
+      return labware ? [labware.id] : []
     }
 
     // step types that have no labware that gets highlighted

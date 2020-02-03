@@ -2,7 +2,7 @@
 import type {
   Command,
   EngageMagnetParams,
-  DisengageMagnetParams,
+  ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 
 import type {
@@ -175,7 +175,7 @@ export type EngageMagnetArgs = {|
 |}
 
 export type DisengageMagnetArgs = {|
-  ...DisengageMagnetParams,
+  ...ModuleOnlyParams,
   module: string | null,
   commandCreatorFnName: 'disengageMagnet',
   message?: string,

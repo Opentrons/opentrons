@@ -260,7 +260,7 @@ async def test_incorrect_modify_pipette_settings(
     assert resp.status == 412
 
 
-async def test_set_log_level(async_client):
+async def test_set_log_level(mock_config, async_client):
     # Check input sanitization
     hardware = async_client.app['com.opentrons.hardware']
     resp = await async_client.post('/settings/log_level/local', json={})
@@ -283,7 +283,7 @@ async def test_set_log_level(async_client):
     assert conf.log_level == 'ERROR'
 
 
-async def test_get_robot_settings(async_client):
+async def test_get_robot_settings(mock_config, async_client):
     resp = await async_client.get('/settings/robot')
     body = await resp.json()
     assert resp.status == 200

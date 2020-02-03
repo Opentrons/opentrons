@@ -4,7 +4,7 @@ from os import environ
 import logging
 from time import sleep
 from threading import Event, RLock
-from typing import Any, Dict, Optional, Union
+from typing import Any, Dict, Optional, Union, List
 
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
@@ -411,6 +411,8 @@ class SmoothieDriver_3_0_0:
         To remove the setting, set None for the specified axis.
         """
         self._move_split_config.update(config)
+        log.info(f"Updated move split config with {config}")
+        self._axes_moved_at.reset_moved(config.keys())
 
     def read_pipette_id(self, mount) -> Optional[str]:
         '''
@@ -1418,6 +1420,9 @@ class SmoothieDriver_3_0_0:
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
             command += ' ' + GCODES['MOVE'] + split_command_string + ' '
+            log.info(
+                f"Splitting {list(split_target.keys())} (have not moved since:"
+                f" {since_moved})")
 
         if split_command_string or (checked_speed != self._combined_speed):
             command += self._build_speed_command(checked_speed) + ' '
@@ -1488,7 +1493,7 @@ class SmoothieDriver_3_0_0:
             if ax not in home_sequence
         ])
         self.dwell_axes(non_moving_axes)
-
+        log.info(f"Homing axes {axis} in sequence {home_sequence}")
         for axes in home_sequence:
             if 'X' in axes:
                 self._home_x()
@@ -1497,13 +1502,11 @@ class SmoothieDriver_3_0_0:
             else:
                 # if we are homing neither the X nor Y axes, simple home
                 self.activate_axes(axes)
+                self._do_relative_splits_for(axes)
 
-                # include the current-setting gcodes within the moving gcode
-                # string to reduce latency, since we're setting current so much
                 command = self._generate_current_command()
                 command += ' ' + GCODES['HOME'] + ''.join(sorted(axes))
                 try:
-                    log.debug("home: {}".format(command))
                     # home commands are executed before ack, use a long ack
                     # timeout and short execute timeout
                     self._send_command(
@@ -1520,7 +1523,6 @@ class SmoothieDriver_3_0_0:
             ax: self.homed_position.get(ax)
             for ax in ''.join(home_sequence)
         }
-        log.info(f'Home before update pos {homed}')
         self.update_position(default=homed)
         for axis in ''.join(home_sequence):
             self.engaged_axes[axis] = True
@@ -1533,9 +1535,56 @@ class SmoothieDriver_3_0_0:
             if ax in axis
         }
         self._homed_position.update(new)
-        log.info(f'Homed position after {new}')
-
+        self._axes_moved_at.mark_moved(axis)
         return self.position
+
+    def _do_relative_splits_for(self, axes: str):
+        """ Handle split moves for unsticking axes before home.
+
+        This is particularly ugly bit of code that flips the motor controller
+        into relative mode since we don't necessarily know where we are.
+
+        It will induce a movement. It should really only be called before a
+        home because it doesn't update the position cache.
+
+        :param axes: A string that is a sequence of axis names.
+        """
+        since_moved = self._axes_moved_at.time_since_moved()
+        split_currents = GCODES['SET_CURRENT']
+        split_moves = ''
+        applicable_speeds: List[float] = []
+        log.debug(f"Finding splits for {axes} with since moved {since_moved}")
+        for axis in axes:
+            msc = self._move_split_config.get(axis)
+            log.debug(f"axis {axis}: msc {msc}")
+            if not msc:
+                continue
+            if since_moved.get(axis) is None\
+               or (since_moved[axis] > msc.after_time):
+                log.debug(f"adding unstick for {axis}")
+                split_currents += f'{axis}{msc.split_current} '
+                split_moves += f'{axis}{msc.split_distance}'
+                applicable_speeds.append(msc.split_speed)
+        if not split_moves:
+            log.debug(f"no unstick needed")
+            # nothing to do
+            return
+
+        command_string =\
+            split_currents + \
+            GCODES['DWELL'] + 'P' + str(CURRENT_CHANGE_DELAY) + ' ' +\
+            self._build_speed_command(min(applicable_speeds)) + ' ' + \
+            GCODES['RELATIVE_COORDS'] + ' ' +\
+            GCODES['MOVE'] + split_moves + ' ' + \
+            GCODES['ABSOLUTE_COORDS'] + ' ' + \
+            self._build_speed_command(self._combined_speed)
+        try:
+            self._send_command(command_string, timeout=DEFAULT_EXECUTE_TIMEOUT)
+        except SmoothieError:
+            # these may cause a hard limit error, since we have no idea where
+            # we are in this context. Hopefully that's ok though because
+            # otherwise we have very little way to get out
+            log.exception("Hard limit in pre-home unstick!")
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall

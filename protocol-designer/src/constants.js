@@ -2,6 +2,7 @@
 import mapValues from 'lodash/mapValues'
 import * as componentLib from '@opentrons/components'
 import { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
+import type { Options } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
@@ -84,9 +85,6 @@ export const MAX_TEMP_MODULE_TEMP = 95
 
 export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
 
-const TEMPMOD: 'temperature module' = 'temperature module'
-const MAGMOD: 'magnetic module' = 'magnetic module'
-
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
   'TEMPERATURE_DEACTIVATED'
@@ -95,17 +93,25 @@ export const TEMPERATURE_AT_TARGET: 'TEMPERATURE_AT_TARGET' =
 export const TEMPERATURE_APPROACHING_TARGET: 'TEMPERATURE_APPROACHING_TARGET' =
   'TEMPERATURE_APPROACHING_TARGET'
 
-// TODO: IL 2019-12-03 migrate the ModuleType '___deck' strings to '___ module' forms.
-// We don't call modules 'deck' anymore, but the old code is entrenched
-export const FILE_MODULE_TYPE_TO_MODULE_TYPE: { [string]: ModuleType } = {
-  [TEMPMOD]: TEMPDECK,
-  [MAGMOD]: MAGDECK,
-  [THERMOCYCLER]: THERMOCYCLER,
-}
-export const MODULE_TYPE_TO_FILE_MODULE_TYPE: { [ModuleType]: string } = {
-  [TEMPDECK]: TEMPMOD,
-  [MAGDECK]: MAGMOD,
-  [THERMOCYCLER]: THERMOCYCLER,
+// NOTE: these MODEL values should match top-level keys in shared-data/module/definitions/2.json
+// (not to be confused with MODULE TYPE)
+export const MAGDECK_MODEL_GEN1: 'magdeck' = 'magdeck'
+export const TEMPDECK_MODEL_GEN1: 'tempdeck' = 'tempdeck'
+export const THERMOCYCLER_MODEL_GEN1: 'thermocycler' = 'thermocycler'
+export const MAGDECK_MODEL_GEN2: 'magdeckGen2' = 'magdeckGen2'
+export const TEMPDECK_MODEL_GEN2: 'tempdeckGen2' = 'tempdeckGen2'
+export const MODELS_FOR_MODULE_TYPE: { [ModuleType]: Options } = {
+  [MAGDECK]: [
+    { name: 'GEN1', value: MAGDECK_MODEL_GEN1 },
+    // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
+    // { name: 'GEN2', value: MAGDECK_MODEL_GEN2 },
+  ],
+  [TEMPDECK]: [
+    { name: 'GEN1', value: TEMPDECK_MODEL_GEN1 },
+    // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
+    // { name: 'GEN2', value: TEMPDECK_MODEL_GEN2 },
+  ],
+  [THERMOCYCLER]: [{ name: 'GEN1', value: THERMOCYCLER_MODEL_GEN1 }],
 }
 
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

@@ -9,6 +9,7 @@ type RadioGroupFieldProps = {|
   ...FocusHandlers,
   name: StepFieldName,
   options: $PropertyType<React.ElementProps<typeof RadioGroup>, 'options'>,
+  className?: string,
 |}
 
 export const RadioGroupField = (props: RadioGroupFieldProps) => {
@@ -18,6 +19,7 @@ export const RadioGroupField = (props: RadioGroupFieldProps) => {
     onFieldBlur,
     focusedField,
     dirtyFields,
+    className,
     ...radioGroupProps
   } = props
   return (
@@ -28,6 +30,7 @@ export const RadioGroupField = (props: RadioGroupFieldProps) => {
       render={({ value, updateValue, errorToShow }) => (
         <RadioGroup
           {...radioGroupProps}
+          className={className}
           value={value ? String(value) : ''}
           error={errorToShow}
           onChange={(e: SyntheticEvent<*>) => {

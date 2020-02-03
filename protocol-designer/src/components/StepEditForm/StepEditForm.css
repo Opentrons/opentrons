@@ -237,3 +237,13 @@
 .select_module_message {
   font-size: var(--fs-body-1);
 }
+
+/*
+TODO (ka 2020-1-30): This is a workaround since component library
+RadioGroup does not support a disabled option. Should revisit if
+and when that is implemented.
+*/
+.disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}

@@ -30,7 +30,11 @@ export const deactivateTemperature: CommandCreator<DeactivateTemperatureArgs> = 
     return {
       commands: [
         {
-          command: 'thermocycler/deactivate',
+          command: 'thermocycler/deactivateLid',
+          params,
+        },
+        {
+          command: 'thermocycler/deactivateBlock',
           params,
         },
       ],

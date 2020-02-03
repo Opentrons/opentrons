@@ -1471,14 +1471,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.3,
+        "value": 0.6,
         "min": 0.01,
         "max": 1.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 15,
+        "value": 11,
         "min": 1,
         "max": 20,
         "units": "mm",
@@ -1514,7 +1514,7 @@
         "type": "float"
       },
       "dropTipCurrent": {
-        "value": 1.0,
+        "value": 1.25,
         "min": 0.01,
         "max": 2.0,
         "units": "amps",
@@ -1607,7 +1607,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": []
+      "quirks": ["needsUnstick"]
     },
     "p50_single_v1": {
       "name": "p50_single",
@@ -3870,14 +3870,14 @@
         "type": "float"
       },
       "pickUpCurrent": {
-        "value": 0.3,
+        "value": 0.8,
         "min": 0.05,
         "max": 2.0,
         "units": "amps",
         "type": "float"
       },
       "pickUpDistance": {
-        "value": 15,
+        "value": 11,
         "min": 1,
         "max": 30,
         "units": "mm",
@@ -3979,14 +3979,14 @@
         "type": "float"
       },
       "dropTipCurrent": {
-        "value": 1.0,
+        "value": 1.25,
         "min": 0.1,
         "max": 1.2,
         "units": "amps",
         "type": "float"
       },
       "dropTipSpeed": {
-        "value": 15,
+        "value": 7.5,
         "min": 0.001,
         "max": 30,
         "units": "mm/s",
@@ -4004,7 +4004,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": []
+      "quirks": ["needsUnstick"]
     },
     "p1000_single_v1": {
       "name": "p1000_single",
@@ -4830,5 +4830,10 @@
     "defaultBlowOutFlowRate",
     "quirks"
   ],
-  "validQuirks": ["pickupTipShake", "dropTipShake", "doubleDropTip"]
+  "validQuirks": [
+    "pickupTipShake",
+    "dropTipShake",
+    "doubleDropTip",
+    "needsUnstick"
+  ]
 }
