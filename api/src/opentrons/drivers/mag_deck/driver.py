@@ -301,14 +301,16 @@ class MagDeck:
             return str(e)
         return ''
 
-    def _recursive_write_and_return(self, cmd, timeout, retries):
+    def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
+        if not tag:
+            tag = f'magdeck {id(self)}'
         try:
             return serial_communication.write_and_return(
                 cmd,
                 MAG_DECK_ACK,
                 self._connection,
                 timeout,
-                tag=f'magdeck {id(self)}')
+                tag=tag)
         except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:
@@ -318,7 +320,7 @@ class MagDeck:
                 self._connection.close()
                 self._connection.open()
             return self._recursive_write_and_return(
-                cmd, timeout, retries)
+                cmd, timeout, retries, tag=tag)
 
     def _wait_for_ack(self):
         '''
@@ -358,7 +360,7 @@ class MagDeck:
             " the Serial port is disabled on this device (OS)"
             raise SerialException(error_msg)
         except TypeError:
-            # This happens if there are no ttyMagDeck devices in /dev
+            # This happens if there are no ot_module_magdeck* devices in /dev
             # For development use ENABLE_VIRTUAL_SMOOTHIE=true
             raise SerialException('No port specified')
 
