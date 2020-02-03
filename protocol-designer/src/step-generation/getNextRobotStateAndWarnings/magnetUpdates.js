@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import { getModuleState } from '../robotStateSelectors'
 import type {
   EngageMagnetParams,
