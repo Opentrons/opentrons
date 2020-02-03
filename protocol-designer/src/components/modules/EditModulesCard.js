@@ -58,7 +58,7 @@ export function EditModulesCard(props: Props) {
               <ModuleRow
                 type={moduleType}
                 module={moduleData}
-                isCollisionPossible={warningsEnabled}
+                showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />

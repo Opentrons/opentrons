@@ -19,35 +19,47 @@ import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
   module?: ModuleOnDeck,
-  isCollisionPossible?: boolean,
+  showCollisionWarnings?: boolean,
   type: ModuleType,
   openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
 }
 
 export function ModuleRow(props: Props) {
-  const { module, openEditModuleModal, isCollisionPossible } = props
+  const { module, openEditModuleModal, showCollisionWarnings } = props
   const type = module?.type || props.type
 
   const model = module?.model
   const slot = module?.slot
 
+  /*
+  TODO (ka 2020-2-3): This logic is very specific to this individual implementation
+  of SlotMap. Kept it here (for now?) because it spells out the different cases.
+  */
   let slotDisplayName = null
   let occupiedSlotsForMap: Array<string> = []
   let collisionSlots: Array<string> = []
-  if (isCollisionPossible && slot === '1') {
+  // Populate warnings are enabled (crashable pipette in protocol + !disable module restrictions)
+  if (showCollisionWarnings && slot === '1') {
     collisionSlots = ['4']
-  } else if (isCollisionPossible && slot === '3') {
+  } else if (showCollisionWarnings && slot === '3') {
     collisionSlots = ['6']
   }
-  if (slot) {
+
+  // If this module is in a deck slot + is not TC spanning Slot
+  // add to occupiedSlots
+  if (slot && slot !== SPAN7_8_10_11_SLOT) {
     slotDisplayName = `Slot ${slot}`
     occupiedSlotsForMap = [slot]
   }
+  // If this Module is a TC deck slot and spanning
+  // populate all 4 slots individually
   if (slot === SPAN7_8_10_11_SLOT) {
     slotDisplayName = 'Slot 7'
     occupiedSlotsForMap = ['7', '8', '10', '11']
   }
 
+  // If collisionSlots are populated, check which slot is occupied
+  // and render module specific crash warning
   let collisionTooltipText = null
   if (collisionSlots && collisionSlots.includes('4')) {
     collisionTooltipText = i18n.t(
