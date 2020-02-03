@@ -76,6 +76,8 @@ export const PipetteSelect = (props: PipetteSelectProps) => {
       defaultValue={defaultValue}
       tabIndex={tabIndex}
       onChange={option => {
+        // TODO(mc, 2020-02-03):  change to `option?.value ?? null`
+        // when we enable that babel functionality
         const value = option && option.value ? option.value : null
         props.onPipetteChange(value)
       }}

@@ -21,6 +21,9 @@ export type SelectKeyProps = {
 
 const UPLOAD_KEY_VALUE = '__uploadWifiKey__'
 const UPLOAD_KEY_LABEL = 'Add new...'
+const UPLOAD_KEY_OPTION_GROUP = {
+  options: [{ value: UPLOAD_KEY_VALUE, label: UPLOAD_KEY_LABEL }],
+}
 
 export class SelectKey extends React.Component<SelectKeyProps> {
   fileInput: ?HTMLInputElement
@@ -33,6 +36,14 @@ export class SelectKey extends React.Component<SelectKeyProps> {
   setFileInputRef = ($el: ?HTMLInputElement) => (this.fileInput = $el)
 
   handleInputLabelClick = () => this.fileInput && this.fileInput.click()
+
+  handleValueChange = (name: string, value: ?string) => {
+    if (value === UPLOAD_KEY_VALUE) {
+      this.handleInputLabelClick()
+    } else {
+      this.props.onValueChange(name, value)
+    }
+  }
 
   upload = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length) {
@@ -56,22 +67,13 @@ export class SelectKey extends React.Component<SelectKeyProps> {
       onLoseFocus,
     } = this.props
     const keyOptions = map(keys, k => ({ value: k.id, label: k.name }))
-    const addNewGroup = {
-      options: [{ value: UPLOAD_KEY_VALUE, label: UPLOAD_KEY_LABEL }],
-    }
 
     return (
       <>
         <SelectOptionField
           {...{ name, label, value, error, required, onLoseFocus }}
-          options={keyOptions.concat(addNewGroup)}
-          onValueChange={(name, value) => {
-            if (value === UPLOAD_KEY_VALUE) {
-              this.handleInputLabelClick()
-            } else {
-              this.props.onValueChange(name, value)
-            }
-          }}
+          options={keyOptions.concat(UPLOAD_KEY_OPTION_GROUP)}
+          onValueChange={this.handleValueChange}
         />
         <input
           type="file"

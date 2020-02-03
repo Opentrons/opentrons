@@ -36,29 +36,7 @@ export const ChangeTip = (props: Props) => {
             value={value ? String(value) : null}
             onValueChange={(name, value) => updateValue(value)}
             formatOptionLabel={({ value }) => (
-              <HoverTooltip
-                positionFixed
-                tooltipComponent={
-                  <div className={styles.tooltip}>
-                    {i18n.t(
-                      `form.step_edit_form.field.change_tip.option_tooltip.${value}`
-                    )}
-                  </div>
-                }
-                placement="bottom"
-                modifiers={{
-                  offset: { offset: `0, 18` },
-                  preventOverflow: { boundariesElement: 'window' },
-                }}
-              >
-                {hoverTooltipHandlers => (
-                  <div {...hoverTooltipHandlers}>
-                    {i18n.t(
-                      `form.step_edit_form.field.change_tip.option.${value}`
-                    )}
-                  </div>
-                )}
-              </HoverTooltip>
+              <ChangeTipOptionLabel value={value} />
             )}
           />
         </FormGroup>
@@ -66,3 +44,25 @@ export const ChangeTip = (props: Props) => {
     />
   )
 }
+
+const ChangeTipOptionLabel = ({ value }: {| value: string |}) => (
+  <HoverTooltip
+    positionFixed
+    tooltipComponent={
+      <div className={styles.tooltip}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
+      </div>
+    }
+    placement="bottom"
+    modifiers={{
+      offset: { offset: `0, 18` },
+      preventOverflow: { boundariesElement: 'window' },
+    }}
+  >
+    {hoverTooltipHandlers => (
+      <div {...hoverTooltipHandlers}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)}
+      </div>
+    )}
+  </HoverTooltip>
+)

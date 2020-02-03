@@ -45,6 +45,7 @@ export const Dropdown = (props: DropdownProps) => {
             name={field.name}
             caption={props.caption}
             value={field.value}
+            options={options}
             onLoseFocus={() => {
               reportFieldEdit({ value: field.value, name: field.name })
               field.onBlur()
@@ -53,7 +54,6 @@ export const Dropdown = (props: DropdownProps) => {
               props.onValueChange ||
               ((name, value) => form.setFieldValue(name, value))
             }
-            options={options}
             formatOptionLabel={({ value, label }) => {
               const option = props.options.find(opt => opt.value === value)
               return option ? <OptionLabel {...option} /> : null

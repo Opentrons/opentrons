@@ -65,6 +65,26 @@ describe('SelectField', () => {
     })
   })
 
+  test('passes disabled to isDisabled when disabled=true', () => {
+    const name = 'name'
+    const options = [{ value: 'foo' }, { value: 'bar' }]
+    const value = 'bar'
+    const disabled = true
+
+    const wrapper = shallow(
+      <SelectField
+        name={name}
+        options={options}
+        value={value}
+        disabled={disabled}
+      />
+    )
+
+    expect(wrapper.find(Select).props()).toMatchObject({
+      isDisabled: disabled,
+    })
+  })
+
   test('handles onChange and onBlur from Select', () => {
     const handleValueChange = jest.fn()
     const handleLoseFocus = jest.fn()

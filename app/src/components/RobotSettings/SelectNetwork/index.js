@@ -62,13 +62,13 @@ type DP = {|
   clearConfigure: () => mixed,
 |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
-type SelectNetworkState = {
+type SelectNetworkState = {|
   ssid: ?string,
   securityType: ?WifiSecurityType,
   modalOpen: boolean,
-}
+|}
 
 const LIST_REFRESH_MS = 15000
 
@@ -112,6 +112,8 @@ class SelectNetwork extends React.Component<Props, SelectNetworkState> {
 
   render() {
     const {
+      // TODO(mc, 2020-02-03): ?WifiNetworkList is not an easy type to work
+      // with here; fix up as part of #4842
       list,
       connectingTo,
       eapOptions,
