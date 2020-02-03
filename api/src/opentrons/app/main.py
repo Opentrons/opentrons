@@ -1,6 +1,6 @@
 from opentrons import __version__
 from fastapi import FastAPI
-from .routers import health, networking, control
+from .routers import health, networking, control, settings
 
 
 app = FastAPI(
@@ -18,3 +18,5 @@ app.include_router(router=networking.router,
                    tags=["networking"])
 app.include_router(router=control.router,
                    tags=["control"])
+app.include_router(router=settings.router,
+                   tags=["settings"])
