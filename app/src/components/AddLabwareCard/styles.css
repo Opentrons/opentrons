@@ -36,3 +36,13 @@
   font-weight: var(--fw-semibold);
   color: var(--c-error-dark);
 }
+
+.flex_bar {
+  display: flex;
+  align-items: center;
+  margin-top: 0.5rem;
+
+  & > :not(:first-child) {
+    margin-left: 1rem;
+  }
+}

@@ -10,7 +10,7 @@ import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
 import { AddLabwareCard } from '..'
 import { ManagePath } from '../ManagePath'
 import { AddLabware } from '../AddLabware'
-import { PortaledAddLabwareFailureModal } from '../AddLabwareFailureModal'
+import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
 
 import type { State } from '../../../types'
 import type { Config } from '../../../config/types'
@@ -62,14 +62,34 @@ describe('AddLabwareCard', () => {
     expect(detail.prop('path')).toEqual(mockLabwarePath)
   })
 
-  test('passes dispatch function to ManagePath', () => {
+  test('passes change path function to ManagePath', () => {
     const wrapper = render()
     const control = wrapper.find(ManagePath)
-    const expectedAction = CustomLabware.changeCustomLabwareDirectory()
+    const expectedChangeAction = CustomLabware.changeCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onChangePath')()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
+    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedChangeAction)
+  })
+
+  test('passes open path function to ManagePath', () => {
+    const wrapper = render()
+    const control = wrapper.find(ManagePath)
+    const expectedOpenAction = CustomLabware.openCustomLabwareDirectory()
+
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    control.invoke('onOpenPath')()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
+  })
+
+  test('passes reset path function to ManagePath', () => {
+    const wrapper = render()
+    const control = wrapper.find(ManagePath)
+    const expectedOpenAction = Cfg.resetConfig('labware.directory')
+
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
+    control.invoke('onResetPath')()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
   test('passes dispatch function to AddLabware', () => {
@@ -89,7 +109,7 @@ describe('AddLabwareCard', () => {
     })
 
     const wrapper = render()
-    const modal = wrapper.find(PortaledAddLabwareFailureModal)
+    const modal = wrapper.find(AddLabwareFailureModal)
 
     expect(modal.props()).toEqual({
       file: CustomLabwareFixtures.mockInvalidLabware,
@@ -106,7 +126,7 @@ describe('AddLabwareCard', () => {
     mockGetAddLabwareFailure.mockReturnValue({ file, errorMessage: null })
 
     const wrapper = render()
-    const modal = wrapper.find(PortaledAddLabwareFailureModal)
+    const modal = wrapper.find(AddLabwareFailureModal)
 
     modal.invoke('onCancel')()
     expect(mockStore.dispatch).toHaveBeenCalledWith(

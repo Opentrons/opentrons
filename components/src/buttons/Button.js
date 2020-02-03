@@ -10,6 +10,8 @@ import styles from './buttons.css'
 export type ButtonProps = {
   /** click handler */
   onClick?: (event: SyntheticMouseEvent<>) => mixed,
+  /** name attribute */
+  name?: string,
   /** title attribute */
   title?: string,
   /** disabled attribute (setting disabled removes onClick) */
@@ -53,7 +55,7 @@ const STRIP_PROPS = [
  * ```
  */
 export default function Button(props: ButtonProps) {
-  const { title, disabled, hover, tabIndex } = props
+  const { name, title, disabled, hover, tabIndex } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
@@ -61,7 +63,7 @@ export default function Button(props: ButtonProps) {
 
   // pass all props if using a custom component
   const buttonProps = !props.Component
-    ? { type, title, disabled, onClick, className, tabIndex }
+    ? { name, type, title, disabled, onClick, className, tabIndex }
     : {
         ...omit(props, STRIP_PROPS),
         className: cx(className, { [styles.disabled]: disabled }),

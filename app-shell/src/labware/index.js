@@ -1,6 +1,6 @@
 // @flow
 import fse from 'fs-extra'
-import { app } from 'electron'
+import { app, shell } from 'electron'
 import { getFullConfig, handleConfigChange } from '../config'
 import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
 import * as Definitions from './definitions'
@@ -14,7 +14,10 @@ import type {
   DuplicateLabwareFile,
   CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/custom-labware/types'
+
 import type { Action, Dispatch } from '../types'
+
+const LABWARE_DIR_CONFIG_PATH = 'labware.directory'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
@@ -86,7 +89,7 @@ const copyLabware = (
 }
 
 export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
-  handleConfigChange('labware.directory', () => {
+  handleConfigChange(LABWARE_DIR_CONFIG_PATH, () => {
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
 
@@ -141,6 +144,12 @@ export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
           dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
         })
 
+        break
+      }
+
+      case CustomLabware.OPEN_CUSTOM_LABWARE_DIRECTORY: {
+        const dir = getFullConfig().labware.directory
+        shell.openItem(dir)
         break
       }
     }

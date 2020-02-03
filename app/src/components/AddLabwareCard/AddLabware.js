@@ -16,6 +16,8 @@ const TO_GENERATE_NEW_LABWARE_DEFINITIONS =
 
 const LABWARE_CREATOR_HREF = 'https://labware.opentrons.com/create'
 
+export const ADD_LABWARE_NAME = 'add-labware'
+
 export type AddLabwareProps = {|
   onAddLabware: () => mixed,
 |}
@@ -26,7 +28,11 @@ export function AddLabware(props: AddLabwareProps) {
   return (
     <LabeledButton
       label={ADD_NEW_LABWARE_DEFINITIONS}
-      buttonProps={{ onClick: onAddLabware, children: ADD_LABWARE }}
+      buttonProps={{
+        name: ADD_LABWARE_NAME,
+        children: ADD_LABWARE,
+        onClick: onAddLabware,
+      }}
     >
       <p>{ADD_LABWARE_DESCRIPTION}</p>
       <p>

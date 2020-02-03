@@ -7,7 +7,12 @@ import remote from '../shell/remote'
 import { getConfig } from './selectors'
 
 import type { Action, ThunkAction } from '../types'
-import type { Config, UpdateConfigAction, DevInternalFlag } from './types'
+import type {
+  Config,
+  UpdateConfigAction,
+  ResetConfigAction,
+  DevInternalFlag,
+} from './types'
 
 export * from './selectors'
 
@@ -17,11 +22,20 @@ export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'enableBundleUpload',
 ]
 
-// trigger a config value update to the app-shell via shell middleware
+// trigger a config value update via the app-shell via shell middleware
 export function updateConfig(path: string, value: any): UpdateConfigAction {
   return {
     type: 'config:UPDATE',
     payload: { path, value },
+    meta: { shell: true },
+  }
+}
+
+// trigger a config value reset via the app-shell via shell middleware
+export function resetConfig(path: string): ResetConfigAction {
+  return {
+    type: 'config:RESET',
+    payload: { path },
     meta: { shell: true },
   }
 }

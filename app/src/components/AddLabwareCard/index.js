@@ -3,8 +3,9 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 
-import { getConfig } from '../../config'
+import { getConfig, resetConfig } from '../../config'
 import {
+  openCustomLabwareDirectory,
   changeCustomLabwareDirectory,
   addCustomLabware,
   clearAddCustomLabwareFailure,
@@ -14,7 +15,7 @@ import {
 import { CardCopy } from '../layout'
 import { ManagePath } from './ManagePath'
 import { AddLabware } from './AddLabware'
-import { PortaledAddLabwareFailureModal } from './AddLabwareFailureModal'
+import { AddLabwareFailureModal } from './AddLabwareFailureModal'
 
 import type { Dispatch } from '../../types'
 
@@ -28,6 +29,8 @@ export function AddLabwareCard() {
   const config = useSelector(getConfig)
   const addFailure = useSelector(getAddLabwareFailure)
   const labwarePath = config.labware.directory
+  const handleOpenPath = () => dispatch(openCustomLabwareDirectory())
+  const handleResetPath = () => dispatch(resetConfig('labware.directory'))
   const handleChangePath = () => dispatch(changeCustomLabwareDirectory())
   const handleAddLabware = () => dispatch(addCustomLabware())
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null
@@ -35,10 +38,15 @@ export function AddLabwareCard() {
   return (
     <Card title={LABWARE_MANAGEMENT}>
       <CardCopy>{MANAGE_CUSTOM_LABWARE_DEFINITIONS}</CardCopy>
-      <ManagePath path={labwarePath} onChangePath={handleChangePath} />
+      <ManagePath
+        path={labwarePath}
+        onOpenPath={handleOpenPath}
+        onResetPath={handleResetPath}
+        onChangePath={handleChangePath}
+      />
       <AddLabware onAddLabware={handleAddLabware} />
       {showAddFailure && (
-        <PortaledAddLabwareFailureModal
+        <AddLabwareFailureModal
           {...addFailure}
           directory={labwarePath}
           onCancel={() => dispatch(clearAddCustomLabwareFailure())}

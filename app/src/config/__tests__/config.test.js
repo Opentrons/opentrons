@@ -1,5 +1,5 @@
 // config tests
-import { updateConfig, configReducer, getConfig } from '..'
+import { updateConfig, resetConfig, configReducer, getConfig } from '..'
 
 jest.mock('../../shell/remote', () => ({ INITIAL_CONFIG: { isConfig: true } }))
 
@@ -23,6 +23,14 @@ describe('config', () => {
       expect(updateConfig('foo.bar', false)).toEqual({
         type: 'config:UPDATE',
         payload: { path: 'foo.bar', value: false },
+        meta: { shell: true },
+      })
+    })
+
+    test('config:RESET', () => {
+      expect(resetConfig('foo.bar')).toEqual({
+        type: 'config:RESET',
+        payload: { path: 'foo.bar' },
         meta: { shell: true },
       })
     })

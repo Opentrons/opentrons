@@ -25,6 +25,12 @@ export const ADD_CUSTOM_LABWARE_FAILURE: 'labware:ADD_CUSTOM_LABWARE_FAILURE' =
 export const CLEAR_ADD_CUSTOM_LABWARE_FAILURE: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' =
   'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE'
 
+export const OPEN_CUSTOM_LABWARE_DIRECTORY: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY' =
+  'labware:OPEN_CUSTOM_LABWARE_DIRECTORY'
+
+export const RESET_CUSTOM_LABWARE_DIRECTORY: 'labware:RESET_CUSTOM_LABWARE_DIRECTORY' =
+  'labware:RESET_CUSTOM_LABWARE_DIRECTORY'
+
 // action meta literals
 
 export const POLL: 'poll' = 'poll'
@@ -81,4 +87,9 @@ export const addCustomLabwareFailure = (
 
 export const clearAddCustomLabwareFailure = (): Types.ClearAddCustomLabwareFailureAction => ({
   type: CLEAR_ADD_CUSTOM_LABWARE_FAILURE,
+})
+
+export const openCustomLabwareDirectory = (): Types.OpenCustomLabwareDirectoryAction => ({
+  type: OPEN_CUSTOM_LABWARE_DIRECTORY,
+  meta: { shell: true },
 })

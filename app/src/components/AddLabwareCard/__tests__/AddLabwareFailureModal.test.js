@@ -5,8 +5,8 @@ import { shallow, mount } from 'enzyme'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../portal'
 import {
-  PortaledAddLabwareFailureModal,
   AddLabwareFailureModal,
+  AddLabwareFailureModalTemplate,
 } from '../AddLabwareFailureModal'
 
 import * as LabwareFixtures from '../../../custom-labware/__fixtures__'
@@ -27,28 +27,22 @@ describe('AddLabwareFailureModal', () => {
     jest.resetAllMocks()
   })
 
-  test('component renders', () => {
-    const wrapper = shallow(<AddLabwareFailureModal {...emptyProps} />)
-
-    expect(wrapper).toMatchSnapshot()
-  })
-
   test('renders inside a Portal', () => {
-    const wrapper = shallow(<PortaledAddLabwareFailureModal {...emptyProps} />)
+    const wrapper = shallow(<AddLabwareFailureModal {...emptyProps} />)
     const portal = wrapper.find(Portal)
-    const modal = portal.find(AddLabwareFailureModal)
+    const modal = portal.find(AddLabwareFailureModalTemplate)
 
     expect(modal.props()).toEqual(emptyProps)
   })
 
   test('renders an AlertModal', () => {
-    const wrapper = shallow(<AddLabwareFailureModal {...emptyProps} />)
+    const wrapper = shallow(<AddLabwareFailureModalTemplate {...emptyProps} />)
 
     expect(wrapper.exists(AlertModal)).toBe(true)
   })
 
   test('renders a cancel button that calls props.onCancel', () => {
-    const wrapper = mount(<AddLabwareFailureModal {...emptyProps} />)
+    const wrapper = mount(<AddLabwareFailureModalTemplate {...emptyProps} />)
     const button = wrapper.findWhere(
       c => c.type() === 'button' && c.text().toLowerCase() === 'cancel'
     )
@@ -59,7 +53,7 @@ describe('AddLabwareFailureModal', () => {
 
   test('renders proper title for error', () => {
     const wrapper = mount(
-      <AddLabwareFailureModal {...emptyProps} errorMessage="AHHH!" />
+      <AddLabwareFailureModalTemplate {...emptyProps} errorMessage="AHHH!" />
     )
     const html = wrapper.html()
 
@@ -72,7 +66,9 @@ describe('AddLabwareFailureModal', () => {
 
   describe('invalid files', () => {
     const render = file => {
-      return mount(<AddLabwareFailureModal {...emptyProps} file={file} />)
+      return mount(
+        <AddLabwareFailureModalTemplate {...emptyProps} file={file} />
+      )
     }
 
     test('renders proper copy for invalid file', () => {

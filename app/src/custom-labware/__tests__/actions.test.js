@@ -131,6 +131,15 @@ describe('custom labware actions', () => {
       args: [],
       expected: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
     },
+    {
+      name: 'openCustomLabwareDirectory',
+      creator: actions.openCustomLabwareDirectory,
+      args: [],
+      expected: {
+        type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY',
+        meta: { shell: true },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {
