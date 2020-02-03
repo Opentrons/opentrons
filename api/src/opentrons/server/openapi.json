@@ -1583,30 +1583,11 @@
                 },
                 "examples": {
                   "updateThermocyclerModule": {
-                    "summary": "Set temperature OK",
+                    "summary": "Module Firmware Update Success OK",
                     "description": "A successful firmware update on Thermocycler",
                     "value": {
                       "message": "Successully updated module TCV012019123456",
                       "returnValue": null
-                    }
-                  }
-                }
-              }
-            }
-          },
-          "400": {
-            "description": "Invalid command",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/v1ErrorMessage"
-                },
-                "examples": {
-                  "mispelledCommand": {
-                    "summary": "Mispelled command",
-                    "description": "Incorrect spelling of set_temperature",
-                    "value": {
-                      "message": "Module does not have command: sort_timecards"
                     }
                   }
                 }
