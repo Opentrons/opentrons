@@ -4,6 +4,7 @@ import { mount } from 'enzyme'
 import { Icon } from '@opentrons/components'
 import { IconCta } from '..'
 
+const NAME = 'some-call-to-action'
 const ICON_NAME = 'flask-outline'
 const TEXT = 'some text'
 
@@ -13,7 +14,12 @@ describe('IconCta', () => {
 
   beforeEach(() => {
     wrapper = mount(
-      <IconCta iconName={ICON_NAME} text={TEXT} onClick={mockHandleClick} />
+      <IconCta
+        name={NAME}
+        iconName={ICON_NAME}
+        text={TEXT}
+        onClick={mockHandleClick}
+      />
     )
   })
 

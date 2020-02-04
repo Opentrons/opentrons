@@ -17,8 +17,6 @@ import type {
 
 import type { Action, Dispatch } from '../types'
 
-const LABWARE_DIR_CONFIG_PATH = 'labware.directory'
-
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
 
 const fetchCustomLabware = (): Promise<Array<UncheckedLabwareFile>> => {
@@ -89,7 +87,7 @@ const copyLabware = (
 }
 
 export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
-  handleConfigChange(LABWARE_DIR_CONFIG_PATH, () => {
+  handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
 

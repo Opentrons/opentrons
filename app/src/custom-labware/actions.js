@@ -1,5 +1,6 @@
 // @flow
 
+import { resetConfig } from '../config'
 import * as Types from './types'
 
 // action type literals
@@ -28,9 +29,6 @@ export const CLEAR_ADD_CUSTOM_LABWARE_FAILURE: 'labware:CLEAR_ADD_CUSTOM_LABWARE
 export const OPEN_CUSTOM_LABWARE_DIRECTORY: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY' =
   'labware:OPEN_CUSTOM_LABWARE_DIRECTORY'
 
-export const RESET_CUSTOM_LABWARE_DIRECTORY: 'labware:RESET_CUSTOM_LABWARE_DIRECTORY' =
-  'labware:RESET_CUSTOM_LABWARE_DIRECTORY'
-
 // action meta literals
 
 export const POLL: 'poll' = 'poll'
@@ -38,6 +36,10 @@ export const INITIAL: 'initial' = 'initial'
 export const ADD_LABWARE: 'addLabware' = 'addLabware'
 export const OVERWRITE_LABWARE: 'overwriteLabware' = 'overwriteLabware'
 export const CHANGE_DIRECTORY: 'changeDirectory' = 'changeDirectory'
+
+// other constants
+
+export const LABWARE_DIRECTORY_CONFIG_PATH = 'labware.directory'
 
 // action creators
 
@@ -93,3 +95,6 @@ export const openCustomLabwareDirectory = (): Types.OpenCustomLabwareDirectoryAc
   type: OPEN_CUSTOM_LABWARE_DIRECTORY,
   meta: { shell: true },
 })
+
+export const resetCustomLabwareDirectory = () =>
+  resetConfig(LABWARE_DIRECTORY_CONFIG_PATH)

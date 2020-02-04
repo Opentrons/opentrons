@@ -3,10 +3,11 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 
-import { getConfig, resetConfig } from '../../config'
 import {
+  getCustomLabwareDirectory,
   openCustomLabwareDirectory,
   changeCustomLabwareDirectory,
+  resetCustomLabwareDirectory,
   addCustomLabware,
   clearAddCustomLabwareFailure,
   getAddLabwareFailure,
@@ -26,11 +27,10 @@ const MANAGE_CUSTOM_LABWARE_DEFINITIONS =
 
 export function AddLabwareCard() {
   const dispatch = useDispatch<Dispatch>()
-  const config = useSelector(getConfig)
+  const labwarePath = useSelector(getCustomLabwareDirectory)
   const addFailure = useSelector(getAddLabwareFailure)
-  const labwarePath = config.labware.directory
   const handleOpenPath = () => dispatch(openCustomLabwareDirectory())
-  const handleResetPath = () => dispatch(resetConfig('labware.directory'))
+  const handleResetPath = () => dispatch(resetCustomLabwareDirectory())
   const handleChangePath = () => dispatch(changeCustomLabwareDirectory())
   const handleAddLabware = () => dispatch(addCustomLabware())
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null

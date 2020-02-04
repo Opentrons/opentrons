@@ -3,8 +3,6 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import * as Cfg from '../../../config'
-
 import * as CustomLabware from '../../../custom-labware'
 import * as CustomLabwareFixtures from '../../../custom-labware/__fixtures__'
 import { AddLabwareCard } from '..'
@@ -13,27 +11,26 @@ import { AddLabware } from '../AddLabware'
 import { AddLabwareFailureModal } from '../AddLabwareFailureModal'
 
 import type { State } from '../../../types'
-import type { Config } from '../../../config/types'
 import type { FailedLabwareFile } from '../../../custom-labware/types'
 
-jest.mock('../../../config')
 jest.mock('../../../custom-labware/selectors')
 
-const mockGetConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
+const mockGetCustomLabwareDirectory: JestMockFn<[State], string> =
+  CustomLabware.getCustomLabwareDirectory
+
 const mockGetAddLabwareFailure: JestMockFn<
   [State],
   {| file: FailedLabwareFile | null, errorMessage: string | null |}
 > = CustomLabware.getAddLabwareFailure
 
 const mockLabwarePath = '/path/to/labware'
-const mockConfig = { labware: { directory: mockLabwarePath } }
 
 describe('AddLabwareCard', () => {
   let mockStore
   let render
 
   beforeEach(() => {
-    mockGetConfig.mockReturnValue(mockConfig)
+    mockGetCustomLabwareDirectory.mockReturnValue(mockLabwarePath)
     mockGetAddLabwareFailure.mockReturnValue({ file: null, errorMessage: null })
 
     mockStore = {
@@ -58,7 +55,7 @@ describe('AddLabwareCard', () => {
     const wrapper = render()
     const detail = wrapper.find(ManagePath)
 
-    expect(mockGetConfig).toHaveBeenCalledWith({ state: true })
+    expect(mockGetCustomLabwareDirectory).toHaveBeenCalledWith({ state: true })
     expect(detail.prop('path')).toEqual(mockLabwarePath)
   })
 
@@ -85,7 +82,7 @@ describe('AddLabwareCard', () => {
   test('passes reset path function to ManagePath', () => {
     const wrapper = render()
     const control = wrapper.find(ManagePath)
-    const expectedOpenAction = Cfg.resetConfig('labware.directory')
+    const expectedOpenAction = CustomLabware.resetCustomLabwareDirectory()
 
     expect(mockStore.dispatch).toHaveBeenCalledTimes(0)
     control.invoke('onResetPath')()
