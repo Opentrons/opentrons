@@ -19,11 +19,16 @@ export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 export const MAGDECK: 'magdeck' = 'magdeck'
 
+// pipette display categories
+export const GEN2: 'GEN2' = 'GEN2'
+export const GEN1: 'GEN1' = 'GEN1'
+
 // NOTE: these are NOT module MODELs, they are `moduleType`s. Should match ENUM in module definition file.
 export const TEMPERATURE_MODULE_TYPE: 'temperatureModuleType' =
   'temperatureModuleType'
 export const MAGNETIC_MODULE_TYPE: 'magneticModuleType' = 'magneticModuleType'
 export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
+
 // offset added to parameters.magneticModuleEngageHeight for displaying reccomended height in PD
 export const ENGAGE_HEIGHT_OFFSET = -4

@@ -6,7 +6,10 @@ import typeof {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  GEN1,
+  GEN2,
 } from './constants'
+
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -256,7 +259,7 @@ export type ModuleDefinition = {|
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteDisplayCategory = 'GEN1' | 'GEN2'
+export type PipetteDisplayCategory = GEN1 | GEN2
 
 export type FlowRateSpec = {|
   value: number,

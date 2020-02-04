@@ -1,60 +1,16 @@
 @import '@opentrons/components';
 
-.dropdown_icon_wrapper {
-  position: absolute;
-  top: 0.25rem;
-  right: 0.25rem;
-  width: 1.25rem;
-  pointer-events: none;
-
-  & > svg {
-    color: var(--c-dark-gray);
-  }
-
-  &.flipped > svg {
-    transform: rotate(180deg);
-  }
-}
-
-.select_control {
-  @apply --font-body-1-dark;
-
-  background-color: #e5e2e2;
-  border: none;
-  padding: 0.25rem 0;
-  outline: none;
-  border-radius: var(--bd-radius-form-field);
-  height: 1.75rem;
-  box-shadow: none;
-
-  &.focus {
-    background-color: var(--c-white);
-    box-shadow: var(--shadow-lvl-1);
-  }
-}
-
-.select_menu {
-  @apply --font-body-1-dark;
-
-  background-color: var(--c-white);
-  border-radius: var(--bd-radius-form-field);
-}
-
-.select_group {
-  &:not(:first-child) {
-    border-top: 1px solid color-mod(var(--c-med-gray) alpha(0.4));
+.select_field.error {
+  & :global(.ot_select__control) {
+    background-color: var(--c-warning-light);
   }
 }
 
 .select_caption {
   font-size: var(--fs-caption);
-}
 
-.error_bg {
-  background-color: var(--c-warning-light);
-}
-
-.error_color {
-  color: var(--c-warning-dark);
-  font-weight: var(--fw-semibold);
+  &.error {
+    color: var(--c-warning-dark);
+    font-weight: var(--fw-semibold);
+  }
 }

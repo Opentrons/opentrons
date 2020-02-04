@@ -7,7 +7,7 @@ import styles from './styles.css'
 
 import type { WifiKeysList } from '../../../http-api-client'
 
-type Props = {
+export type SelectKeyProps = {
   name: string,
   label: string,
   value: ?string,
@@ -21,11 +21,14 @@ type Props = {
 
 const UPLOAD_KEY_VALUE = '__uploadWifiKey__'
 const UPLOAD_KEY_LABEL = 'Add new...'
+const UPLOAD_KEY_OPTION_GROUP = {
+  options: [{ value: UPLOAD_KEY_VALUE, label: UPLOAD_KEY_LABEL }],
+}
 
-export default class SelectKey extends React.Component<Props> {
+export class SelectKey extends React.Component<SelectKeyProps> {
   fileInput: ?HTMLInputElement
 
-  constructor(props: Props) {
+  constructor(props: SelectKeyProps) {
     super(props)
     this.fileInput = null
   }
@@ -33,6 +36,14 @@ export default class SelectKey extends React.Component<Props> {
   setFileInputRef = ($el: ?HTMLInputElement) => (this.fileInput = $el)
 
   handleInputLabelClick = () => this.fileInput && this.fileInput.click()
+
+  handleValueChange = (name: string, value: ?string) => {
+    if (value === UPLOAD_KEY_VALUE) {
+      this.handleInputLabelClick()
+    } else {
+      this.props.onValueChange(name, value)
+    }
+  }
 
   upload = (event: SyntheticInputEvent<HTMLInputElement>) => {
     if (event.target.files && event.target.files.length) {
@@ -42,12 +53,6 @@ export default class SelectKey extends React.Component<Props> {
       this.props.addKey(file).then(success => {
         this.props.onValueChange(this.props.name, success.payload.response.id)
       })
-    }
-  }
-
-  handleValueChange = (name: string, value: ?string) => {
-    if (value !== UPLOAD_KEY_VALUE) {
-      this.props.onValueChange(name, value)
     }
   }
 
@@ -62,25 +67,12 @@ export default class SelectKey extends React.Component<Props> {
       onLoseFocus,
     } = this.props
     const keyOptions = map(keys, k => ({ value: k.id, label: k.name }))
-    const addNewGroup = {
-      label: null,
-      options: [
-        {
-          value: UPLOAD_KEY_VALUE,
-          label: (
-            <div onClick={this.handleInputLabelClick} aria-hidden>
-              {UPLOAD_KEY_LABEL}
-            </div>
-          ),
-        },
-      ],
-    }
 
     return (
-      <React.Fragment>
+      <>
         <SelectOptionField
           {...{ name, label, value, error, required, onLoseFocus }}
-          options={keyOptions.concat(addNewGroup)}
+          options={keyOptions.concat(UPLOAD_KEY_OPTION_GROUP)}
           onValueChange={this.handleValueChange}
         />
         <input
@@ -90,7 +82,7 @@ export default class SelectKey extends React.Component<Props> {
           className={styles.wifi_add_key_input}
           aria-label={UPLOAD_KEY_LABEL}
         />
-      </React.Fragment>
+      </>
     )
   }
 }

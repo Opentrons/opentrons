@@ -1,33 +1,24 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import groupBy from 'lodash/groupBy'
-import map from 'lodash/map'
-import without from 'lodash/without'
-
-import Select, { components } from 'react-select'
 
 import {
-  type PipetteNameSpecs,
   getAllPipetteNames,
   getPipetteNameSpecs,
+  GEN1,
+  GEN2,
 } from '@opentrons/shared-data'
-import { Icon } from '../icons'
+import { Select, CONTEXT_VALUE } from '../forms'
 import styles from './PipetteSelect.css'
 
-// TODO: BC 2019-09-17 This component has a lot of shared guts with SelectField
-// Their shared characteristics can be summed up by their usage of react-select
-// in combination with our Opentrons specific design. Ideally we'd
-// like to have one component in CL that acts as our generic "custom" wrapper
-// of react-select, and SelectField and PipetteSelect should contain instances
-// of that generic component. This will be the first step towards using that
-// generic component across all dropdowns in the JS codebase.
+import type { SelectOption } from '../forms'
+import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
-type Props = {|
+export type PipetteSelectProps = {|
   /** currently selected value, optional in case selecting triggers immediate action */
-  value?: PipetteNameSpecs | null,
+  pipetteName?: string | null,
   /** react-select change handler */
-  onPipetteChange: (option: PipetteNameSpecs | null) => mixed,
+  onPipetteChange: (pipetteName: string | null) => mixed,
   /** list of pipette names to omit */
   nameBlacklist?: Array<string>,
   /** whether or not "None" shows up as the default option */
@@ -38,118 +29,74 @@ type Props = {|
   className?: string,
 |}
 
-type NoneOption = {| value: null |}
-const OPTION_NONE: NoneOption = { value: null }
 // TODO(mc, 2019-10-14): i18n
-const OPTION_NONE_LABEL = 'None'
+const NONE = 'None'
+const OPTION_NONE = { value: '', label: NONE }
 
-const SELECT_STYLES = {
-  input: () => ({ padding: 0 }),
-  groupHeading: () => ({ margin: 0 }),
-  menu: () => ({ margin: 0 }),
-  menuList: () => ({ padding: 0 }),
-  valueContainer: base => ({
-    ...base,
-    padding: '0 0.75rem',
-  }),
-}
+const PIPETTE_SORT = ['maxVolume', 'channels']
+const allPipetteNameSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
+  ...PIPETTE_SORT
+)
+  .map(getPipetteNameSpecs)
+  .filter(Boolean)
 
-const clearStyles = () => null
+const specsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
 
-const PipetteSelect = (props: Props) => {
-  const filteredNames = without(
-    getAllPipetteNames('maxVolume', 'channels'),
-    ...(props.nameBlacklist || [])
-  )
-  const allPipetteNameSpecs = map(filteredNames, getPipetteNameSpecs)
-  const nameSpecsByCategory = groupBy(allPipetteNameSpecs, 'displayCategory')
-  let groupedOptions = map(nameSpecsByCategory, nameSpecs => ({
-    options: nameSpecs,
-  })).reverse()
+const specToOption = ({ name, displayName }: PipetteNameSpecs) => ({
+  value: name,
+  label: displayName,
+})
 
-  if (props.enableNoneOption === true) {
-    groupedOptions = [{ options: [OPTION_NONE] }, ...groupedOptions]
+export const PipetteSelect = (props: PipetteSelectProps) => {
+  const { tabIndex, className, enableNoneOption, nameBlacklist = [] } = props
+  const whitelist = ({ value }: SelectOption) => {
+    return !nameBlacklist.some(n => n === value)
   }
+  const gen2Options = specsByCategory[GEN2].map(specToOption).filter(whitelist)
+  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(whitelist)
+  const groupedOptions = [
+    ...(enableNoneOption ? [OPTION_NONE] : []),
+    ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),
+    ...(gen1Options.length > 0 ? [{ options: gen1Options }] : []),
+  ]
 
-  const handleChange = (option: PipetteNameSpecs | NoneOption) => {
-    const value = option.value === null ? null : option
-    props.onPipetteChange(value)
-  }
+  const defaultValue = enableNoneOption ? OPTION_NONE : null
+  const value =
+    allPipetteNameSpecs
+      .filter(s => s.name === props.pipetteName)
+      .map(specToOption)[0] || defaultValue
 
   return (
     <Select
       isSearchable={false}
       menuPosition="fixed"
-      className={props.className}
-      styles={SELECT_STYLES}
-      components={{
-        Control,
-        DropdownIndicator,
-        Menu,
-        Group,
-        Option,
-        SingleValue,
-        Placeholder: props.enableNoneOption
-          ? NonePlaceholder
-          : components.Placeholder,
-        IndicatorSeparator: null,
-      }}
+      className={className}
       options={groupedOptions}
-      onChange={handleChange}
-      value={props.value}
-      tabIndex={props.tabIndex}
+      value={value}
+      defaultValue={defaultValue}
+      tabIndex={tabIndex}
+      onChange={option => {
+        // TODO(mc, 2020-02-03):  change to `option?.value ?? null`
+        // when we enable that babel functionality
+        const value = option && option.value ? option.value : null
+        props.onPipetteChange(value)
+      }}
+      formatOptionLabel={(option, { context }) => {
+        const { value } = option
+        const label = option.label || value
+        const specs = allPipetteNameSpecs.find(s => s.name === value)
+
+        return context === CONTEXT_VALUE || value === '' || !specs ? (
+          label
+        ) : (
+          <PipetteNameItem {...specs} />
+        )
+      }}
     />
   )
 }
 
-function Control(props: any) {
-  return (
-    <components.Control
-      {...props}
-      getStyles={clearStyles}
-      className={cx(styles.select_control, {
-        [styles.focus]: props.selectProps.menuIsOpen,
-      })}
-    />
-  )
-}
-
-function DropdownIndicator(props: any) {
-  const iconWrapperCx = cx(styles.dropdown_icon_wrapper, {
-    [styles.flipped]: props.selectProps.menuIsOpen,
-  })
-
-  return (
-    components.DropdownIndicator && (
-      <components.DropdownIndicator {...props}>
-        <div className={iconWrapperCx}>
-          <Icon name="menu-down" width="100%" />
-        </div>
-      </components.DropdownIndicator>
-    )
-  )
-}
-// custom Menu (options dropdown) component
-function Menu(props: any) {
-  return (
-    <components.Menu {...props}>
-      <div className={styles.select_menu}>{props.children}</div>
-    </components.Menu>
-  )
-}
-
-// custom option group wrapper component
-function Group(props: any) {
-  return (
-    <components.Group
-      {...props}
-      className={styles.select_group}
-      getStyles={clearStyles}
-    />
-  )
-}
-
-function PipetteNameItem(props: PipetteNameSpecs) {
+const PipetteNameItem = (props: PipetteNameSpecs) => {
   const { channels, displayName, displayCategory } = props
   const volumeClassMaybeMatch = displayName && displayName.match(/P\d+/)
   const volumeClass = volumeClassMaybeMatch ? volumeClassMaybeMatch[0] : ''
@@ -169,39 +116,3 @@ function PipetteNameItem(props: PipetteNameSpecs) {
     </>
   )
 }
-
-function Option(props: any) {
-  const { innerRef, innerProps, data } = props
-
-  return (
-    <div
-      ref={innerRef}
-      className={cx(styles.pipette_option, {
-        [styles.focused]: props.isFocused,
-      })}
-      {...innerProps}
-    >
-      {data.value === null ? (
-        <NonePlaceholder />
-      ) : (
-        <PipetteNameItem {...data} />
-      )}
-    </div>
-  )
-}
-
-function NonePlaceholder() {
-  return OPTION_NONE_LABEL
-}
-
-function SingleValue(props: any) {
-  const { data } = props
-
-  return (
-    <components.SingleValue {...props}>
-      {data.value === null ? <NonePlaceholder /> : data.displayName}
-    </components.SingleValue>
-  )
-}
-
-export default PipetteSelect

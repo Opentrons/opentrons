@@ -3,7 +3,7 @@ import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import { ModalPage } from '@opentrons/components'
-import PipetteSelection from './PipetteSelection'
+import { PipetteSelection } from './PipetteSelection'
 import { InstructionStep } from './InstructionStep'
 import { CheckPipettesButton } from './CheckPipettesButton'
 import styles from './styles.css'
@@ -65,9 +65,7 @@ export function Instructions(props: Props) {
       contentsClassName={styles.modal_contents}
     >
       {!actualPipette && !wantedPipette && (
-        <PipetteSelection
-          onPipetteChange={specs => setWantedName(specs ? specs.name : null)}
-        />
+        <PipetteSelection onPipetteChange={setWantedName} />
       )}
 
       {(actualPipette || wantedPipette) && (

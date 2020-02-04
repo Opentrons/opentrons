@@ -18,7 +18,7 @@ import {
 
 import { BottomButtonBar } from '../../modals'
 import { StringField, PasswordField, SelectOptionField } from './fields'
-import SelectKey from './SelectKey'
+import { SelectKey } from './SelectKey'
 import FormTable from './FormTable'
 
 import type {
@@ -30,7 +30,7 @@ import type {
   WifiConfigureRequest,
 } from '../../../http-api-client'
 
-import type { SelectOption } from '@opentrons/components'
+import type { SelectOptionOrGroup } from '@opentrons/components'
 
 type Props = {
   ssid: ?string,
@@ -86,13 +86,11 @@ const SECURITY_TYPE_FIELD_PROPS: FieldProps = {
   required: true,
 }
 
-const UNKNOWN_SECURITY_OPTIONS: Array<SelectOption> = [
+const UNKNOWN_SECURITY_OPTIONS: Array<SelectOptionOrGroup> = [
   {
-    label: null,
     options: [{ value: NO_SECURITY, label: NO_SECURITY_LABEL }],
   },
   {
-    label: null,
     options: [{ value: WPA_PSK_SECURITY, label: PSK_SECURITY_LABEL }],
   },
 ]
@@ -182,12 +180,12 @@ export default class ConnectForm extends React.Component<Props, State> {
     return this.props.securityType || get(values, SECURITY_TYPE_FIELD)
   }
 
-  getSecurityOptions(): Array<SelectOption> {
+  getSecurityOptions(): Array<SelectOptionOrGroup> {
     const { eapOptions, securityType: knownSecurityType } = this.props
     const opts = !knownSecurityType ? UNKNOWN_SECURITY_OPTIONS : []
 
     return eapOptions && eapOptions.length
-      ? opts.concat({ label: null, options: eapOptions.map(makeEapOpt) })
+      ? opts.concat({ options: eapOptions.map(makeEapOpt) })
       : opts
   }
 
