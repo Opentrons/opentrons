@@ -299,7 +299,8 @@ class MagDeck:
             self._send_command(GCODES['PROGRAMMING_MODE'])
         except (MagDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
-        del mag_locks[self._port]
+        if self._port:
+            del mag_locks[self._port]
         return ''
 
     def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
