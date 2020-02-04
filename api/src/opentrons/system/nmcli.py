@@ -492,6 +492,20 @@ async def configure(ssid: str,
         return False, err.split('\r')[-1]
 
 
+async def wifi_disconnect(ssid: str = None) -> Tuple[bool, str]:
+    """
+    Disconnect from specified wireless network.
+
+    Returns (True, msg) if the network was disconnected from successfully,
+            (False, msg) otherwise
+    """
+    res, err = await _call(['connection', 'down', ssid])
+    if 'successfully deactivated' in res:
+        return True, res
+    else:
+        return False, err
+
+
 async def remove(ssid: str = None, name: str = None) -> Tuple[bool, str]:
     """ Remove a network. Depending on what is known, specify either ssid
     (in which case this function will call ``connection_exists`` to get the

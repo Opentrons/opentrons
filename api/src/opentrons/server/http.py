@@ -28,6 +28,7 @@ class HTTPServer(object):
             '/wifi/keys/{key_uuid}', networking.remove_key)
         self.app.router.add_get(
             '/wifi/eap-options', networking.eap_options)
+        self.app.router.add_post('/wifi/disconnect', networking.disconnect)
         self.app.router.add_post(
             '/identify', control.identify)
         self.app.router.add_get(

@@ -31,6 +31,12 @@ class ConfigureArgsError(Exception):
         super().__init__()
 
 
+class DisconnectArgsError(Exception):
+    def __init__(self, message):
+        self.msg = message
+        super().__init__()
+
+
 async def list_networks(request: web.Request) -> web.Response:
     """
     Get request will return a list of discovered ssids:
@@ -270,6 +276,39 @@ async def configure(request: web.Request) -> web.Response:
         return web.json_response({'message': message,
                                   'ssid': configure_kwargs['ssid']},
                                  status=201)
+    else:
+        return web.json_response({'message': message}, status=401)
+
+
+async def disconnect(request: web.Request) -> web.Response:
+    """
+    Post request should include a json body specifying the ssid to disconnect
+    the robot from.
+    Robot will attempt to disconnect from the specified wifi ssid and
+    will respond with an OK if successful and an error code if unsuccessful.
+
+    """
+    try:
+        body = await request.json()
+    except json.JSONDecodeError as e:
+        log.debug("Error: JSONDecodeError in /wifi/disconnect: {}".format(e))
+        return web.json_response({'message': e.msg}, status=400)
+
+    try:
+        # SSID must always be present
+        if not body.get('ssid') \
+                or not isinstance(body.get('ssid'), str):
+            raise DisconnectArgsError("SSID must be specified as a string")
+    except DisconnectArgsError as e:
+        return web.json_response({'message': e.msg}, status=400)
+
+    try:
+        ok, message = await nmcli.wifi_disconnect(body.get('ssid'))
+    except Exception as excep:
+        return web.json_response({'message': str(excep)}, status=400)
+
+    if ok:
+        return web.json_response({'message': message}, status=201)
     else:
         return web.json_response({'message': message}, status=401)
 
