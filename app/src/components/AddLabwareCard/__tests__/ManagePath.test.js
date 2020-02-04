@@ -3,13 +3,13 @@ import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
-import { OutlineButton } from '@opentrons/components'
-import { IconCta } from '../../IconCta'
-import { ManagePath } from '../ManagePath'
 import { ConfirmResetPathModal } from '../ConfirmResetPathModal'
-
-const RE_CHANGE = /change/i
-const RE_RESET = /reset/i
+import {
+  ManagePath,
+  OPEN_SOURCE_NAME,
+  CHANGE_SOURCE_NAME,
+  RESET_SOURCE_NAME,
+} from '../ManagePath'
 
 describe('ManagePath', () => {
   const mockPath = '/path/to/a/place'
@@ -39,26 +39,22 @@ describe('ManagePath', () => {
 
   test('has a OutlineButton that calls onOpenPath on click', () => {
     expect(mockOnOpenPath).toHaveBeenCalledTimes(0)
-    wrapper.find(OutlineButton).invoke('onClick')()
+    wrapper
+      .find(`OutlineButton[name="${OPEN_SOURCE_NAME}"]`)
+      .invoke('onClick')()
     expect(mockOnOpenPath).toHaveBeenCalledTimes(1)
   })
 
   test('has an IconCta that calls onChangePath on click', () => {
     expect(mockOnChangePath).toHaveBeenCalledTimes(0)
-    wrapper
-      .find(IconCta)
-      .filterWhere(w => RE_CHANGE.test(w.html()))
-      .invoke('onClick')()
+    wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')()
     expect(mockOnChangePath).toHaveBeenCalledTimes(1)
   })
 
   describe('reset source', () => {
     beforeEach(() => {
       act(() => {
-        wrapper
-          .find(IconCta)
-          .filterWhere(w => RE_RESET.test(w.html()))
-          .invoke('onClick')()
+        wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')()
       })
 
       wrapper.update()

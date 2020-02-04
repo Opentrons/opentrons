@@ -7,6 +7,7 @@ import styles from './styles.css'
 import type { IconName } from '@opentrons/components'
 
 export type IconCtaProps = {|
+  name: string,
   iconName: IconName,
   text: string,
   className?: string,
@@ -14,12 +15,18 @@ export type IconCtaProps = {|
 |}
 
 export const IconCta = ({
+  name,
   iconName,
   text,
   className,
   onClick,
 }: IconCtaProps) => (
-  <button onClick={onClick} className={cx(styles.icon_cta, className)}>
+  <button
+    name={name}
+    onClick={onClick}
+    className={cx(styles.icon_cta, className)}
+    type="button"
+  >
     <Icon name={iconName} className={styles.icon_cta_icon} />
     <span>{text}</span>
   </button>

@@ -13,6 +13,11 @@ const CHANGE_SOURCE = 'Change Source'
 const RESET_SOURCE = 'Reset Source'
 const OPEN_SOURCE = 'Open Source'
 
+// button names
+export const OPEN_SOURCE_NAME = 'open-source'
+export const CHANGE_SOURCE_NAME = 'change-source'
+export const RESET_SOURCE_NAME = 'reset-source'
+
 export type ManagePathProps = {|
   path: string,
   onChangePath: () => mixed,
@@ -40,6 +45,7 @@ export function ManagePath(props: ManagePathProps) {
       <LabeledButton
         label={CUSTOM_LABWARE_DEFINITIONS_FOLDER}
         buttonProps={{
+          name: OPEN_SOURCE_NAME,
           onClick: onOpenPath,
           children: OPEN_SOURCE,
         }}
@@ -53,11 +59,13 @@ export function ManagePath(props: ManagePathProps) {
         />
         <div className={styles.flex_bar}>
           <IconCta
+            name={CHANGE_SOURCE_NAME}
             iconName="folder-open"
             text={CHANGE_SOURCE}
             onClick={onChangePath}
           />
           <IconCta
+            name={RESET_SOURCE_NAME}
             iconName="refresh"
             text={RESET_SOURCE}
             onClick={toggleConfirmResetIsOpen}
