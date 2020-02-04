@@ -43,7 +43,7 @@ jobs:
     - stage: test
       name: 'Python API unit tests, build API docs'
       language: python
-      python: 3.7
+      python: 3.6
       before_install:
         - sudo apt-get install -y --no-install-recommends texlive-fonts-recommended texlive-latex-extra texlive-fonts-extra dvipng texlive-latex-recommended libsystemd-dev latexmk texlive-lang-greek
       install:
