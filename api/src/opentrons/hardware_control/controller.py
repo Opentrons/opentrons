@@ -161,7 +161,7 @@ class Controller:
         except Exception:
             MODULE_LOG.exception('Exception in Module registration')
         while can_watch and (not self._module_watcher.closed):
-            self._handle_watch_event(register_modules)
+            await self._handle_watch_event(register_modules)
 
     async def build_module(self,
                            port: str,
