@@ -124,6 +124,31 @@ class Controller:
     def set_pipette_speed(self, val: float):
         self._smoothie_driver.set_speed(val)
 
+    async def _handle_watch_event(self, register_modules: 'RegisterModules'):
+        event = await self._module_watcher.get_event()
+        flags = aionotify.Flags.parse(event.flags)
+        if event is not None and 'ot_module' in event.name:
+            maybe_module_at_port = modules.get_module_at_port(event.name)
+            new_modules = None
+            removed_modules = None
+            if maybe_module_at_port is not None:
+                if aionotify.Flags.DELETE in flags:
+                    removed_modules = [maybe_module_at_port]
+                    MODULE_LOG.info(
+                        f'Module Removed: {maybe_module_at_port}')
+                elif aionotify.Flags.CREATE in flags:
+                    new_modules = [maybe_module_at_port]
+                    MODULE_LOG.info(
+                        f'Module Added: {maybe_module_at_port}')
+                try:
+                    await register_modules(
+                        removed_mods_at_ports=removed_modules,
+                        new_mods_at_ports=new_modules,
+                    )
+                except Exception:
+                    MODULE_LOG.exception(
+                        'Exception in Module registration')
+
     async def watch_modules(self, loop: asyncio.AbstractEventLoop,
                             register_modules: 'RegisterModules'):
         can_watch = aionotify is not None
@@ -136,29 +161,7 @@ class Controller:
         except Exception:
             MODULE_LOG.exception('Exception in Module registration')
         while can_watch and (not self._module_watcher.closed):
-            event = await self._module_watcher.get_event()
-            flags = aionotify.Flags.parse(event.flags)
-            if event is not None and 'ot_module' in event.name:
-                maybe_module_at_port = modules.get_module_at_port(event.name)
-                new_modules = None
-                removed_modules = None
-                if maybe_module_at_port is not None:
-                    if aionotify.Flags.DELETE in flags:
-                        removed_modules = [maybe_module_at_port]
-                        MODULE_LOG.info(
-                            f'Module Removed: {maybe_module_at_port}')
-                    elif aionotify.Flags.CREATE in flags:
-                        new_modules = [maybe_module_at_port]
-                        MODULE_LOG.info(
-                            f'Module Added: {maybe_module_at_port}')
-                    try:
-                        await register_modules(
-                            removed_mods_at_ports=removed_modules,
-                            new_mods_at_ports=new_modules,
-                        )
-                    except Exception:
-                        MODULE_LOG.exception(
-                            'Exception in Module registration')
+            self._handle_watch_event(register_modules)
 
     async def build_module(self,
                            port: str,

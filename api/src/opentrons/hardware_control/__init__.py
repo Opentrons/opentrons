@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Dict, Union, List, Optional, Tuple
+from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
@@ -1380,12 +1380,10 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
-    def _unregister_modules(
-            self,
-            mods_at_ports: List[modules.ModuleAtPort]
-            ) -> List[modules.AbstractModule]:
+    def _unregister_modules(self,
+                            mods_at_ports: List[modules.ModuleAtPort]) -> None:
         removed_modules = []
-        for port, mod in mods_at_ports: # type: ignore
+        for port, mod in mods_at_ports:  # type: ignore
             for attached_mod in self._attached_modules:
                 if attached_mod.port == port:
                     removed_modules.append(attached_mod)
@@ -1397,7 +1395,7 @@ class API(HardwareAPILike):
                                     " found in attached modules")
         for removed_mod in removed_modules:
             self._log.info(f"Module {removed_mod.name()} detached"
-                            f" from port {removed_mod.port}")
+                           f" from port {removed_mod.port}")
             del removed_mod
 
     async def register_modules(
