@@ -31,7 +31,7 @@ type Props = {|
 
 // eyeballed width/height to match designs
 const TAG_HEIGHT = 45
-const TAG_WIDTH = 80
+const TAG_WIDTH = 70
 
 function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
