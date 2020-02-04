@@ -15,6 +15,7 @@
   },
   "actions": {
     "action": "action",
+    "go_to": "go to",
     "engage": "engage",
     "disengage": "disengage"
   }

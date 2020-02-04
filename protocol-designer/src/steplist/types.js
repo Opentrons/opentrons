@@ -110,6 +110,14 @@ export type MagnetSubstepItem = {|
   message?: string,
 |}
 
+export type TemperatureSubstepItem = {|
+  substepType: 'temperature',
+  temperature: number | null,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  message?: string,
+|}
+
 export type PauseSubstepItem = {|
   substepType: 'pause',
   pauseStepArgs: PauseArgs,
@@ -119,6 +127,7 @@ export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseSubstepItem
   | MagnetSubstepItem
+  | TemperatureSubstepItem
 
 export type StepItemData = {
   id: StepIdType,
