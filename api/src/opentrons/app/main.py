@@ -1,6 +1,6 @@
 from opentrons import __version__
 from fastapi import FastAPI
-from .routers import health, networking, control, settings
+from .routers import health, networking, control, settings, deck_calibration
 
 
 app = FastAPI(
@@ -20,3 +20,5 @@ app.include_router(router=control.router,
                    tags=["control"])
 app.include_router(router=settings.router,
                    tags=["settings"])
+app.include_router(router=deck_calibration.router,
+                   tags=["deckCalibration"])
