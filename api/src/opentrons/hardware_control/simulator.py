@@ -194,12 +194,12 @@ class Simulator:
         pass
 
     async def watch_modules(self, register_modules: 'RegisterModules'):
-        new_modules = [
+        new_mods_at_ports = [
             modules.ModuleAtPort(
                 port=f'/dev/ot_module_sim_{mod}{str(idx)}', name=mod)
             for idx, mod
             in enumerate(self._stubbed_attached_modules)]
-        await register_modules(new_modules=new_modules)
+        await register_modules(new_mods_at_ports=new_mods_at_ports)
 
     @contextmanager
     def save_current(self):

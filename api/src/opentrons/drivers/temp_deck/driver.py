@@ -211,6 +211,7 @@ class TempDeck:
             self._send_command(GCODES['PROGRAMMING_MODE'])
         except (TempDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
+        temp_locks.pop(self.port)
         return ''
 
     def _connect_to_port(self, port=None):

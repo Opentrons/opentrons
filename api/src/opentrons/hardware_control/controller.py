@@ -131,7 +131,10 @@ class Controller:
             await self._module_watcher.setup(loop)
 
         initial_modules = modules.discover()
-        await register_modules(new_modules=initial_modules)
+        try:
+            await register_modules(new_mods_at_ports=initial_modules)
+        except Exception:
+            MODULE_LOG.exception('Exception in Module registration')
         while can_watch and (not self._module_watcher.closed):
             event = await self._module_watcher.get_event()
             flags = aionotify.Flags.parse(event.flags)
@@ -148,10 +151,14 @@ class Controller:
                         new_modules = [maybe_module_at_port]
                         MODULE_LOG.info(
                             f'Module Added: {maybe_module_at_port}')
-                    await register_modules(
-                        removed_modules=removed_modules,
-                        new_modules=new_modules,
-                    )
+                    try:
+                        await register_modules(
+                            removed_mods_at_ports=removed_modules,
+                            new_mods_at_ports=new_modules,
+                        )
+                    except Exception:
+                        MODULE_LOG.exception(
+                            'Exception in Module registration')
 
     async def build_module(self,
                            port: str,

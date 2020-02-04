@@ -16,7 +16,7 @@ import contextlib
 import functools
 import inspect
 import logging
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from .simulator import Simulator
@@ -1380,29 +1380,48 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
+    def _unregister_modules(
+            self,
+            mods_at_ports: List[modules.ModuleAtPort]
+            ) -> List[modules.AbstractModule]:
+        removed_modules = []
+        for port, mod in mods_at_ports: # type: ignore
+            for attached_mod in self._attached_modules:
+                if attached_mod.port == port:
+                    removed_modules.append(attached_mod)
+        for removed_mod in removed_modules:
+            try:
+                self._attached_modules.remove(removed_mod)
+            except ValueError:
+                self._log.exception(f"Removed Module {removed_mod} not"
+                                    " found in attached modules")
+        for removed_mod in removed_modules:
+            self._log.info(f"Module {removed_mod.name()} detached"
+                            f" from port {removed_mod.port}")
+            del removed_mod
+
     async def register_modules(
             self,
-            new_modules: List[modules.ModuleAtPort] = None,
-            removed_modules: List[modules.ModuleAtPort] = None
+            new_mods_at_ports: List[modules.ModuleAtPort] = None,
+            removed_mods_at_ports: List[modules.ModuleAtPort] = None
             ) -> None:
-        if new_modules is None:
-            new_modules = []
-        if removed_modules is None:
-            removed_modules = []
-        for port, name in removed_modules:
-            self._attached_modules = [mod for mod in self._attached_modules
-                                      if mod.port != port]
-            self._log.info(f"Module {name} disconnected"
-                           f" from port {port}")
+        if new_mods_at_ports is None:
+            new_mods_at_ports = []
+        if removed_mods_at_ports is None:
+            removed_mods_at_ports = []
 
-        for port, name in new_modules:
+        # destroy removed mods
+        self._unregister_modules(removed_mods_at_ports)
+
+        # build new mods
+        for port, name in new_mods_at_ports:
             new_instance = await self._backend.build_module(
                     port,
                     name,
                     self.pause_with_message)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
-                           f" at port {port}")
+                           f" at port {port}, new_instance: {new_instance}")
 
     async def _do_tp(self, pip, mount) -> top_types.Point:
         """ Execute the work of tip probe.

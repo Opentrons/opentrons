@@ -30,7 +30,6 @@ async def enter_bootloader(driver, model):
     else:
         driver.enter_programming_mode()
 
-    driver.disconnect()
     new_port = ''
     try:
         new_port = await asyncio.wait_for(

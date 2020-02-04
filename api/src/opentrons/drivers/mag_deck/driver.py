@@ -1,4 +1,5 @@
 from os import environ
+import traceback
 import logging
 from threading import Event, Lock
 from time import sleep
@@ -299,6 +300,7 @@ class MagDeck:
             self._send_command(GCODES['PROGRAMMING_MODE'])
         except (MagDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
+        mag_locks.pop(self.port)
         return ''
 
     def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
