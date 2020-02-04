@@ -58,7 +58,7 @@ describe('ModuleStatus', () => {
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
 
-      expect(component.text()).toBe('45°C')
+      expect(component.text()).toBe('45 °C')
     })
 
     test('going to X is shown when target and set temps are different', () => {
@@ -71,7 +71,7 @@ describe('ModuleStatus', () => {
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
 
-      expect(component.text()).toBe('Going to 45°C')
+      expect(component.text()).toBe('Going to 45 °C')
     })
 
     test('unknown status when invalid status', () => {

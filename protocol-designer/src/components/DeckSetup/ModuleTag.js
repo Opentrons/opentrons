@@ -41,11 +41,13 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   }
 
   if (status === TEMPERATURE_AT_TARGET) {
-    return `${targetTemperature}°C`
+    return `${targetTemperature} ${i18n.t('application.units.degrees')}`
   }
 
   if (status === TEMPERATURE_APPROACHING_TARGET) {
-    return `Going to ${targetTemperature}°C`
+    return `Going to ${targetTemperature} ${i18n.t(
+      'application.units.degrees'
+    )}`
   }
 
   return 'Status unknown'
