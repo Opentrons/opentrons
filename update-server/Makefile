@@ -1,4 +1,5 @@
-SHELL := /bin/bash
+# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
+SHELL := bash
 
 PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
