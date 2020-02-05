@@ -1,5 +1,6 @@
 // config tests
-import { updateConfig, resetConfig, configReducer, getConfig } from '..'
+import { updateConfig, resetConfig, getConfig } from '..'
+import { configReducer } from '../reducer'
 
 jest.mock('../../shell/remote', () => ({ INITIAL_CONFIG: { isConfig: true } }))
 

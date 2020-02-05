@@ -11,8 +11,8 @@ import yargsParser from 'yargs-parser'
 
 import pkg from '../package.json'
 import { createLogger } from './log'
+import * as Cfg from '@opentrons/app/src/config'
 
-// TODO(mc, 2018-08-08): figure out type exports from app
 import type { Config } from '@opentrons/app/src/config/types'
 import type { Action, Dispatch } from './types'
 
@@ -105,10 +105,10 @@ const log = () => _log || (_log = createLogger('config'))
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch) {
   return function handleIncomingAction(action: Action) {
-    if (action.type === 'config:UPDATE' || action.type === 'config:RESET') {
+    if (action.type === Cfg.UPDATE || action.type === Cfg.RESET) {
       const { path } = action.payload
       const value =
-        action.type === 'config:UPDATE'
+        action.type === Cfg.UPDATE
           ? action.payload.value
           : getIn(DEFAULTS, path)
 
