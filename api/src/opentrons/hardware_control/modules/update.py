@@ -7,7 +7,7 @@ from typing import Any, Dict, Tuple
 
 log = logging.getLogger(__name__)
 
-PORT_SEARCH_TIMEOUT = 5.5
+PORT_SEARCH_TIMEOUT = 8
 
 
 async def enter_bootloader(driver, model):
@@ -18,7 +18,9 @@ async def enter_bootloader(driver, model):
     upload fw through it.
     """
     if model == 'thermocycler':
+        log.info(f'before enter prog mode {driver}')
         await driver.enter_programming_mode()
+        log.info(f'after enter prog mode {driver}')
     else:
         driver.enter_programming_mode()
 
@@ -27,6 +29,7 @@ async def enter_bootloader(driver, model):
         new_port = await asyncio.wait_for(_find_bootloader_port(), PORT_SEARCH_TIMEOUT)
     except asyncio.TimeoutError:
         pass
+    log.info(f'enter bootloader returned new port {new_port}')
     return new_port
 
 
@@ -34,10 +37,13 @@ async def _find_bootloader_port():
     """
     Checks for the bootloader port
     """
-    for attempt in range(2):
-        bootloader_ports = glob('/dev/ot_module_*_bootloader')
+    for attempt in range(4):
+        bootloader_ports = glob('/dev/ot_module_*_bootloader*')
+        log.info(
+            f'maybe bootloader ports {bootloader_ports}, all ports: {glob("/dev/ot_module_*")}')
         if bootloader_ports:
             if len(bootloader_ports) == 1:
+                log.info(f'bootloader ports found {bootloader_ports}')
                 return bootloader_ports[0]
             elif len(bootloader_ports) > 1:
                 raise OSError('Multiple new bootloader ports'

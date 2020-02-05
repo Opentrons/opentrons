@@ -457,8 +457,12 @@ class Thermocycler:
     async def enter_programming_mode(self):
         trigger_connection = serial.Serial(
             self.port, TC_BOOTLOADER_BAUDRATE, timeout=1)
+        log.info(
+            f'in tc enter prg mode {self.port}, tctc: {trigger_connection}')
         await asyncio.sleep(0.05)
         trigger_connection.close()
+        log.info(
+            f'in tc after enter prg mode {self.port}, tctc: {trigger_connection}')
 
     def __del__(self):
         try:
