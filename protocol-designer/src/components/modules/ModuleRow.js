@@ -59,7 +59,8 @@ export function ModuleRow(props: Props) {
   }
 
   // If collisionSlots are populated, check which slot is occupied
-  // and render module specific crash warning
+  // and render module specific crash warning. This logic assumes
+  // default module slot placement magnet = Slot1 temperature = Slot3
   let collisionTooltipText = null
   if (collisionSlots && collisionSlots.includes('4')) {
     collisionTooltipText = i18n.t(
