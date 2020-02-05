@@ -8,6 +8,7 @@ import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
 import {
+  forAwaitTemperature,
   forSetTemperature,
   forDeactivateTemperature,
 } from './temperatureUpdates'
@@ -70,6 +71,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'temperatureModule/awaitTemperature':
+      forAwaitTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/setTargetBlockTemperature':
     case 'thermocycler/setTargetLidTemperature':
     case 'thermocycler/awaitBlockTemperature':
