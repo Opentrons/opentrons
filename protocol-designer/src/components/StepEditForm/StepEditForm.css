@@ -217,6 +217,7 @@
 }
 
 .magnet_form_group {
+  flex-basis: 0 1 11rem;
   margin: 1rem 4.25rem 1rem 0;
 }
 
@@ -229,8 +230,12 @@
 }
 
 .module_labware_text {
-  font-size: var(--fs-body-1);
+  max-width: 11rem;
   margin-top: 0.5rem;
+  font-size: var(--fs-body-1);
+  overflow: hidden;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 }
 
 .select_module_message {
@@ -249,15 +254,15 @@ and when that is implemented.
 
 .diagram_row {
   display: flex;
-  margin: 0 0 1rem 14.25rem;
+  margin: 1rem 0 2rem 14rem;
 }
 
 .engage_height_diagram {
-  width: 100%;
-  height: 2.5rem;
+  width: 90%;
+  padding-top: calc(40 / 540 * 90%);
   background-image: url('../../images/modules/engage_height_static.png');
   background-repeat: no-repeat;
-  background-size: auto 2.5rem;
+  background-size: cover;
 
   &:hover {
     cursor: pointer;

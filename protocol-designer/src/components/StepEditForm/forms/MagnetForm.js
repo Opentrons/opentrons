@@ -90,9 +90,14 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
           </FormGroup>
         </ConditionalOnField>
       </div>
-      <div className={styles.diagram_row}>
-        <div className={styles.engage_height_diagram} />
-      </div>
+      <ConditionalOnField
+        name={'magnetAction'}
+        condition={val => val === 'engage'}
+      >
+        <div className={styles.diagram_row}>
+          <div className={styles.engage_height_diagram} />
+        </div>
+      </ConditionalOnField>
     </div>
   )
 }
