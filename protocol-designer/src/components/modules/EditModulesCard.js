@@ -32,13 +32,13 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
-  const moduleRestritionsDisabled = useSelector(
-    featureFlagSelectors.getDisableModuleRestrictions
+  const moduleRestritionsDisabled = Boolean(
+    useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
   const crashablePipettesSelected = getCrashablePipetteSelected(pipettesByMount)
 
   const warningsEnabled =
-    Boolean(moduleRestritionsDisabled) && crashablePipettesSelected
+    !moduleRestritionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
     warningsEnabled && (modules.magdeck || modules.tempdeck)
 
