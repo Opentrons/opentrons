@@ -6,41 +6,32 @@ import {
   TEMPERATURE_AT_TARGET,
   TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_DEACTIVATED,
 } from '../../constants'
+import type { RobotState } from '../types'
 
-const temperatureModuleId = 'temperatureModuleId'
-const thermocyclerId = 'thermocyclerId'
-const commandCreatorFnName = 'awaitTemperature'
-
-let invariantContext
-let robotState
-let robotAtTargetTemp
-let robotApproachingTemp
-
-beforeEach(() => {
-  const stateAndContext = getStateAndContextTempMagModules({
-    temperatureModuleId,
-    thermocyclerId,
-  })
-  invariantContext = stateAndContext.invariantContext
-  robotState = stateAndContext.robotState
-
-  robotAtTargetTemp = cloneDeep(robotState)
-  robotAtTargetTemp.modules[temperatureModuleId].moduleState = {
+const robotWithStatus = (
+  robotState: RobotState,
+  temperatureModuleId: string,
+  status:
+    | typeof TEMPERATURE_AT_TARGET
+    | typeof TEMPERATURE_APPROACHING_TARGET
+    | typeof TEMPERATURE_DEACTIVATED
+): RobotState => {
+  const robot = cloneDeep(robotState)
+  robot.modules[temperatureModuleId].moduleState = {
     type: TEMPDECK,
     targetTemperature: 42,
-    status: TEMPERATURE_AT_TARGET,
+    status,
   }
-
-  robotApproachingTemp = cloneDeep(robotState)
-  robotApproachingTemp.modules[temperatureModuleId].moduleState = {
-    type: TEMPDECK,
-    targetTemperature: 42,
-    status: TEMPERATURE_APPROACHING_TARGET,
-  }
-})
+  return robot
+}
 
 describe('awaitTemperature', () => {
+  const temperatureModuleId = 'temperatureModuleId'
+  const thermocyclerId = 'thermocyclerId'
+  const commandCreatorFnName = 'awaitTemperature'
+
   const missingModuleError = {
     errors: [{ message: expect.any(String), type: 'MISSING_MODULE' }],
   }
@@ -48,85 +39,124 @@ describe('awaitTemperature', () => {
     errors: [{ message: expect.any(String), type: 'MISSING_TEMP_STEP' }],
   }
 
-  const testCases = [
-    {
-      testName:
-        'temperature module id exists and temp status is approaching temp',
-      moduleId: temperatureModuleId,
-      previousRobotState: () => robotApproachingTemp,
-      temperature: 20,
-      expected: {
-        commands: [
-          {
-            command: 'temperatureModule/awaitTemperature',
-            params: {
-              module: temperatureModuleId,
-              temperature: 20,
-            },
-          },
-        ],
-      },
-    },
-    {
-      testName: 'no such moduleId',
-      moduleId: 'someNonexistentModuleId',
-      previousRobotState: () => robotState,
-      temperature: 42,
-      expected: missingModuleError,
-    },
-    {
-      testName: 'null moduleId',
-      moduleId: null,
-      previousRobotState: () => robotState,
-      temperature: 42,
-      expected: missingModuleError,
-    },
-    {
-      testName:
-        'temperature module already at target temp and awaiting that same temp',
-      moduleId: temperatureModuleId,
-      temperature: 42,
-      previousRobotState: () => robotAtTargetTemp,
-      expected: {
-        commands: [
-          {
-            command: 'temperatureModule/awaitTemperature',
-            params: {
-              module: temperatureModuleId,
-              temperature: 42,
-            },
-          },
-        ],
-      },
-    },
-    {
-      testName:
-        'temperature module already at target temp and awaiting different temp',
-      moduleId: temperatureModuleId,
-      temperature: 80,
-      previousRobotState: () => robotAtTargetTemp,
-      expected: missingTempStep,
-    },
-    {
-      testName: 'prev temp state is DEACTIVATED',
-      moduleId: temperatureModuleId,
-      temperature: 80,
-      previousRobotState: () => robotState,
-      expected: missingTempStep,
-    },
-  ]
+  let invariantContext
+  let robotState
 
-  testCases.forEach(
-    ({ expected, moduleId, testName, temperature, previousRobotState }) => {
-      test(testName, () => {
-        const args = { module: moduleId, temperature, commandCreatorFnName }
-        const result = awaitTemperature(
-          args,
-          invariantContext,
-          previousRobotState()
-        )
-        expect(result).toEqual(expected)
-      })
+  beforeEach(() => {
+    const stateAndContext = getStateAndContextTempMagModules({
+      temperatureModuleId,
+      thermocyclerId,
+    })
+    invariantContext = stateAndContext.invariantContext
+    robotState = stateAndContext.robotState
+  })
+
+  test('temperature module id exists and temp status is approaching temp', () => {
+    const temperature = 20
+    const args = {
+      module: temperatureModuleId,
+      temperature,
+      commandCreatorFnName,
     }
-  )
+    const previousRobotState = robotWithStatus(
+      robotState,
+      temperatureModuleId,
+      TEMPERATURE_APPROACHING_TARGET
+    )
+
+    const expected = {
+      commands: [
+        {
+          command: 'temperatureModule/awaitTemperature',
+          params: {
+            module: temperatureModuleId,
+            temperature: 20,
+          },
+        },
+      ],
+    }
+    const result = awaitTemperature(args, invariantContext, previousRobotState)
+    expect(result).toEqual(expected)
+  })
+  test('module id does not exist', () => {
+    const temperature = 42
+    const args = {
+      module: 'someNonexistentModuleId',
+      temperature,
+      commandCreatorFnName,
+    }
+
+    const result = awaitTemperature(args, invariantContext, robotState)
+    expect(result).toEqual(missingModuleError)
+  })
+  test('module id is null', () => {
+    const temperature = 42
+    const args = {
+      module: null,
+      temperature,
+      commandCreatorFnName,
+    }
+
+    const result = awaitTemperature(args, invariantContext, robotState)
+    expect(result).toEqual(missingModuleError)
+  })
+  test('temperature module already at target temp and awaiting that same temp', () => {
+    const temperature = 42
+    const args = {
+      module: temperatureModuleId,
+      temperature,
+      commandCreatorFnName,
+    }
+    const previousRobotState = robotWithStatus(
+      robotState,
+      temperatureModuleId,
+      TEMPERATURE_AT_TARGET
+    )
+    const expected = {
+      commands: [
+        {
+          command: 'temperatureModule/awaitTemperature',
+          params: {
+            module: temperatureModuleId,
+            temperature: 42,
+          },
+        },
+      ],
+    }
+    const result = awaitTemperature(args, invariantContext, previousRobotState)
+    expect(result).toEqual(expected)
+  })
+  test('temperature module already at target temp and awaiting different temp', () => {
+    const temperature = 80
+    const args = {
+      module: temperatureModuleId,
+      temperature,
+      commandCreatorFnName,
+    }
+
+    const previousRobotState = robotWithStatus(
+      robotState,
+      temperatureModuleId,
+      TEMPERATURE_AT_TARGET
+    )
+
+    const result = awaitTemperature(args, invariantContext, previousRobotState)
+    expect(result).toEqual(missingTempStep)
+  })
+  test('prev temp state is DEACTIVATED', () => {
+    const temperature = 80
+    const args = {
+      module: temperatureModuleId,
+      temperature,
+      commandCreatorFnName,
+    }
+    const previousRobotState = robotWithStatus(
+      robotState,
+      temperatureModuleId,
+      TEMPERATURE_DEACTIVATED
+    )
+
+    const result = awaitTemperature(args, invariantContext, previousRobotState)
+    expect(result).toEqual(missingTempStep)
+  })
 })
