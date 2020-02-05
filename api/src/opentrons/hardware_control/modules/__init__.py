@@ -92,9 +92,7 @@ async def update_firmware(
         raises an UpdateError with the reason for the failure.
     """
     cls = type(module)
-    log.info(f'\nUPDATE FW module : {module}')
     flash_port = await module.prep_for_update()
-    log.info(f'\nFLASH PORT : {flash_port}')
     kwargs: Dict[str, Any] = {
         'stdout': asyncio.subprocess.PIPE,
         'stderr': asyncio.subprocess.PIPE,

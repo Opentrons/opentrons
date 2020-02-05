@@ -7,43 +7,19 @@ from typing import Any, Dict, Tuple
 
 log = logging.getLogger(__name__)
 
-PORT_SEARCH_TIMEOUT = 8
 
-
-async def enter_bootloader(driver, model):
+async def find_bootloader_port():
     """
-    Using the driver method, enter bootloader mode of the module board.
-    The bootloader mode opens a new port on the uC to upload the firmware file.
-    The new port shows up as 'ot_module_(avrdude|samba)_bootloader' on the pi;
-    upload fw through it.
+    Finds the port of an Opentrons Module that has entered its bootloader.
+    The bootloader port shows up as 'ot_module_(avrdude|samba)_bootloader'
+    on the pi; return found port.
     """
-    if model == 'thermocycler':
-        log.info(f'before enter prog mode {driver}')
-        await driver.enter_programming_mode()
-        log.info(f'after enter prog mode {driver}')
-    else:
-        driver.enter_programming_mode()
 
-    new_port = ''
-    try:
-        new_port = await asyncio.wait_for(_find_bootloader_port(), PORT_SEARCH_TIMEOUT)
-    except asyncio.TimeoutError:
-        pass
-    log.info(f'enter bootloader returned new port {new_port}')
-    return new_port
-
-
-async def _find_bootloader_port():
-    """
-    Checks for the bootloader port
-    """
-    for attempt in range(4):
+    for attempt in range(3):
         bootloader_ports = glob('/dev/ot_module_*_bootloader*')
-        log.info(
-            f'maybe bootloader ports {bootloader_ports}, all ports: {glob("/dev/ot_module_*")}')
         if bootloader_ports:
             if len(bootloader_ports) == 1:
-                log.info(f'bootloader ports found {bootloader_ports}')
+                log.info(f'Found bootloader at port {bootloader_ports[0]}')
                 return bootloader_ports[0]
             elif len(bootloader_ports) > 1:
                 raise OSError('Multiple new bootloader ports'

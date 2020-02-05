@@ -463,6 +463,7 @@ class Thermocycler:
         trigger_connection.close()
         log.info(
             f'in tc after enter prg mode {self.port}, tctc: {trigger_connection}')
+        self.disconnect()
 
     def __del__(self):
         try:

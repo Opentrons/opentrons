@@ -198,6 +198,6 @@ class MagDeck(mod_abc.AbstractModule):
         self._disconnect()
 
     async def prep_for_update(self) -> str:
-        new_port = await update.enter_bootloader(self._driver,
-                                                 self.device_info['model'])
+        self._driver.enter_programming_mode()
+        new_port = await update.find_bootloader_port()
         return new_port or self.port
