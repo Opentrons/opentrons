@@ -1,12 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import {
-  OutlineButton,
-  HoverTooltip,
-  SpinnerModalPage,
-  Icon,
-} from '@opentrons/components'
+import { OutlineButton, HoverTooltip, Icon } from '@opentrons/components'
 import { getConnectedRobotName } from '../../robot/selectors'
 import { updateModule } from '../../modules/actions'
 import type { Dispatch } from '../../types'
