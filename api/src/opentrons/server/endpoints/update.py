@@ -1,4 +1,3 @@
-import tempfile
 import logging
 import asyncio
 from aiohttp.web import json_response

@@ -16,8 +16,8 @@ export function ModulesCardContents(props: Props) {
 
   return (
     <>
-      {modules.map((mod, index) => (
-        <ModuleItem key={index} module={mod} canControl={canControl} />
+      {modules.map(mod => (
+        <ModuleItem key={mod.serial} module={mod} canControl={canControl} />
       ))}
     </>
   )
