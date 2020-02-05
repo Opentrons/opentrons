@@ -18,6 +18,6 @@ if Protocol is not None:
     class RegisterModules(Protocol):
         async def __call__(
             self,
-            new_modules: List[ModuleAtPort] = None,
-            removed_modules: List[ModuleAtPort] = None
+            new_mods_at_ports: List[ModuleAtPort] = None,
+            removed_mods_at_ports: List[ModuleAtPort] = None
         ) -> None: ...

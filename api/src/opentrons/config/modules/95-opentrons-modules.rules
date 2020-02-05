@@ -1,6 +1,0 @@
-KERNEL=="ttyACM[0-9]*", SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee93", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_tempdeck"
-KERNEL=="ttyACM[0-9]*", SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee90", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_magdeck"
-KERNEL=="ttyACM[0-9]*", SUBSYSTEMS=="usb", ATTRS{idProduct}=="ee5a", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_bootloader"
-KERNEL=="ttyACM[0-9]*", SUBSYSTEMS=="usb", ATTRS{idProduct}=="ed8c", ATTRS{idVendor}=="04d8", SYMLINK+="modules/tty%n_thermocycler"
-# adafruit feather m0 board for dev:
-KERNEL=="ttyACM[0-9]*", SUBSYSTEMS=="usb", ATTRS{idProduct}=="800b", ATTRS{idVendor}=="239a", SYMLINK+="modules/tty%n_thermocycler"

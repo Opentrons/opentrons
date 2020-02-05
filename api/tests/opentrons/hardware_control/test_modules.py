@@ -30,25 +30,26 @@ async def test_module_caching():
     found_mods = api.attached_modules
     assert found_mods[0].name() == 'tempdeck'
     await api.register_modules(
-        new_modules=[ModuleAtPort(port='/dev/ot_module_sim_tempdeck1',
-                                  name='magdeck')
-                     ])
-    with_magdeck = api.attached_modules
+        new_mods_at_ports=[ModuleAtPort(port='/dev/ot_module_sim_magdeck1',
+                                        name='magdeck')
+                           ])
+    with_magdeck = api.attached_modules.copy()
     assert len(with_magdeck) == 2
     assert with_magdeck[0] is found_mods[0]
     await api.register_modules(
-        removed_modules=[ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
-                                      name='tempdeck')
-                         ])
-    only_magdeck = api.attached_modules
+        removed_mods_at_ports=[
+            ModuleAtPort(port='/dev/ot_module_sim_tempdeck0',
+                         name='tempdeck')
+        ])
+    only_magdeck = api.attached_modules.copy()
     assert only_magdeck[0] is with_magdeck[1]
 
     # Check that two modules of the same kind on different ports are
     # distinct
     await api.register_modules(
-        new_modules=[ModuleAtPort(port='/dev/ot_module_sim_magdeck2',
-                                  name='magdeck')
-                     ])
+        new_mods_at_ports=[ModuleAtPort(port='/dev/ot_module_sim_magdeck2',
+                                        name='magdeck')
+                           ])
     two_magdecks = api.attached_modules
     assert len(two_magdecks) == 2
     assert two_magdecks[0] is with_magdeck[1]
