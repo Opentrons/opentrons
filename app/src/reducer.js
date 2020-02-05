@@ -32,6 +32,9 @@ import { pipettesReducer } from './pipettes/reducer'
 // modules state
 import { modulesReducer } from './modules/reducer'
 
+// networking state
+import { networkingReducer } from './networking/reducer'
+
 // app shell state
 import { shellReducer } from './shell/reducer'
 
@@ -62,6 +65,7 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   buildroot: buildrootReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,
+  networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,
   labware: customLabwareReducer,

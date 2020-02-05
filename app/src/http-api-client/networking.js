@@ -1,11 +1,9 @@
 // @flow
 // networking http api module
 import { createSelector } from 'reselect'
-import mapValues from 'lodash/mapValues'
 import orderBy from 'lodash/orderBy'
 import partition from 'lodash/partition'
 import uniqBy from 'lodash/uniqBy'
-import { Netmask } from 'netmask'
 
 import {
   apiRequest,
@@ -24,27 +22,12 @@ import type { ViewableRobot } from '../discovery/types'
 import type { ApiCall } from './types'
 import type { ApiAction } from './actions'
 
-type NetworkingStatusPath = 'networking/status'
 type WifiListPath = 'wifi/list'
 type WifiConfigurePath = 'wifi/configure'
 type WifiEapOptionsPath = 'wifi/eap-options'
 type WifiKeysPath = 'wifi/keys'
 
-export type InternetStatus = 'none' | 'portal' | 'limited' | 'full' | 'unknown'
-
 export type WifiSecurityType = 'none' | 'wpa-psk' | 'wpa-eap'
-
-// TODO(mc, 2019-11-5): this does not match the response shape
-// the shape change happens in the selector, but should be happening
-// in the reducer. THis will be fixed when http-api-client is gone
-export type NetworkInterface = {|
-  ipAddress: ?string,
-  subnetMask: ?string,
-  macAddress: string,
-  gatewayAddress: ?string,
-  state: string,
-  type: 'wifi' | 'ethernet',
-|}
 
 export type WifiNetwork = {
   ssid: string,
@@ -57,11 +40,6 @@ export type WifiNetwork = {
 export type WifiNetworkList = Array<WifiNetwork>
 
 export type WifiListResponse = { list: WifiNetworkList }
-
-export type NetworkingStatusResponse = {
-  status: InternetStatus,
-  interfaces: { [device: string]: NetworkInterface },
-}
 
 export type WifiAuthField = {
   name: string,
@@ -112,13 +90,11 @@ export type WifiConfigureResponse = {
 }
 
 export type NetworkingAction =
-  | ApiAction<NetworkingStatusPath, void, NetworkingStatusResponse>
   | ApiAction<WifiListPath, void, WifiListResponse>
   | ApiAction<WifiEapOptionsPath, void, WifiEapOptionsResponse>
   | ApiAction<WifiKeysPath, WifiKeysRequest, WifiKeysResponse>
   | ApiAction<WifiConfigurePath, WifiConfigureRequest, WifiConfigureResponse>
 
-export type FetchNetworkingStatusCall = ApiCall<void, NetworkingStatusResponse>
 export type FetchWifiListCall = ApiCall<void, WifiListResponse>
 export type FetchWifiEapOptionsCall = ApiCall<void, WifiEapOptionsResponse>
 export type FetchWifiKeysCall = ApiCall<WifiKeysRequest, WifiKeysResponse>
@@ -128,14 +104,12 @@ export type ConfigureWifiCall = ApiCall<
 >
 
 export type NetworkingState = {|
-  'networking/list'?: FetchNetworkingStatusCall,
   'wifi/list'?: FetchWifiListCall,
   'wifi/eap-options'?: FetchWifiEapOptionsCall,
   'wifi/keys'?: FetchWifiKeysCall,
   'wifi/configure': ConfigureWifiCall,
 |}
 
-const STATUS: NetworkingStatusPath = 'networking/status'
 const LIST: WifiListPath = 'wifi/list'
 const EAP_OPTIONS: WifiEapOptionsPath = 'wifi/eap-options'
 const KEYS: WifiKeysPath = 'wifi/keys'
@@ -151,7 +125,6 @@ export const SECURITY_TYPE_FIELD = 'securityType'
 export const EAP_CONFIG_FIELD = 'eapConfig'
 export const EAP_TYPE_FIELD = `${EAP_CONFIG_FIELD}.eapType`
 
-export const fetchNetworkingStatus = buildRequestMaker<void>('GET', STATUS)
 export const fetchWifiList = buildRequestMaker<void>('GET', LIST)
 export const fetchWifiEapOptions = buildRequestMaker<void>('GET', EAP_OPTIONS)
 export const fetchWifiKeys = buildRequestMaker<void>('GET', KEYS)
@@ -195,44 +168,10 @@ export function addWifiKey(
   }
 }
 
-type GetNetworkingStatusCall = Sel<State, BaseRobot, FetchNetworkingStatusCall>
 type GetWifiListCall = Sel<State, BaseRobot, FetchWifiListCall>
 type GetWifiEapOptionsCall = Sel<State, BaseRobot, FetchWifiEapOptionsCall>
 type GetWifiKeysCall = Sel<State, BaseRobot, FetchWifiKeysCall>
 type GetConfigureWifiCall = Sel<State, BaseRobot, ConfigureWifiCall>
-
-export const makeGetRobotNetworkingStatus = (): GetNetworkingStatusCall =>
-  createSelector(
-    getRobotApiState,
-    state => {
-      // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
-      const statusCall = state[STATUS] || { inProgress: false }
-      if (!statusCall.response) return statusCall
-
-      return {
-        ...statusCall,
-        response: {
-          ...statusCall.response,
-          interfaces: mapValues(statusCall.response.interfaces, iface => {
-            let ipAddress = null
-            let subnetMask = null
-            if (iface.ipAddress != null) {
-              try {
-                const block = new Netmask(iface.ipAddress)
-                ipAddress = iface.ipAddress.split('/')[0]
-                subnetMask = block.mask
-              } catch (e) {
-                // just use what was passed if unable to parse
-                ipAddress = iface.ipAddress
-              }
-            }
-
-            return { ...iface, ipAddress, subnetMask }
-          }),
-        },
-      }
-    }
-  )
 
 export const makeGetRobotWifiList = (): GetWifiListCall =>
   createSelector(

@@ -2,7 +2,7 @@
 import { robotApiReducer } from '../reducer'
 
 import type { RobotApiState } from '../types'
-import { mockFailedRequest } from '../__fixtures__'
+import { mockFailedRequestState } from '../__fixtures__'
 
 type ReducerSpec = {|
   name: string,
@@ -54,7 +54,7 @@ const SPECS: Array<ReducerSpec> = [
   {
     name: 'handles a dismiss request action',
     state: {
-      abc: mockFailedRequest,
+      abc: mockFailedRequestState,
       def: { status: 'pending' },
     },
     action: {

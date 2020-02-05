@@ -5,7 +5,10 @@ import cx from 'classnames'
 import { CardContentHalf } from '../layout'
 import styles from './styles.css'
 
-import type { InternetStatus, NetworkInterface } from '../../http-api-client'
+import type {
+  InternetStatus,
+  SimpleInterfaceStatus,
+} from '../../networking/types'
 
 type ConnectionStatusProps = { type: string, status: ?InternetStatus }
 
@@ -39,7 +42,7 @@ export function ConnectionStatusMessage(props: ConnectionStatusProps) {
 }
 
 type ConnectionInfoProps = {
-  connection: ?NetworkInterface,
+  connection: SimpleInterfaceStatus | null,
   title: string,
   wired?: boolean,
   children?: React.Node,
@@ -70,7 +73,7 @@ export function ConnectionInfo(props: ConnectionInfoProps) {
 }
 
 type NetworkAddressProps = {
-  connection: ?NetworkInterface,
+  connection: SimpleInterfaceStatus | null,
   wired: ?boolean,
   disabled: ?boolean,
 }
