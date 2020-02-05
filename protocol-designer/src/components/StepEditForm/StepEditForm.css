@@ -213,12 +213,11 @@
 .magnet_section_wrapper {
   display: flex;
   justify-content: flex-start;
-  margin-bottom: 0.5rem;
   min-height: 4rem;
 }
 
 .magnet_form_group {
-  margin: 1rem 4.25rem 2rem 0;
+  margin: 1rem 4.25rem 1rem 0;
 }
 
 .temperature_section_wrapper {
@@ -246,4 +245,22 @@ and when that is implemented.
 .disabled {
   opacity: 0.5;
   pointer-events: none;
+}
+
+.diagram_row {
+  display: flex;
+  margin: 0 0 1rem 14.25rem;
+}
+
+.engage_height_diagram {
+  width: 100%;
+  height: 2.5rem;
+  background-image: url('../../images/modules/engage_height_static.png');
+  background-repeat: no-repeat;
+  background-size: auto 2.5rem;
+
+  &:hover {
+    cursor: pointer;
+    background-image: url('../../images/modules/engage_height_animation.gif');
+  }
 }

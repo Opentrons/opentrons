@@ -112,7 +112,7 @@
         }
       },
       "engageHeight": {
-        "label": "Distance from labware bottom",
+        "label": "Engage height",
         "caption": "Recommended: 4mm"
       },
       "setTemperature": {
