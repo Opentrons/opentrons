@@ -20,11 +20,11 @@ const pauseFormToArgs = (
   const message = formData['pauseMessage'] || ''
 
   switch (formData.pauseForAmountOfTime) {
-    case PAUSE_UNTIL_TEMP: // might be better to add form types and switch on something else
+    case PAUSE_UNTIL_TEMP:
       return {
         commandCreatorFnName: 'awaitTemperature',
         temperature,
-        module: formData.moduleId, // check that this is right
+        module: formData.moduleId,
       }
     case PAUSE_UNTIL_TIME:
       return {
