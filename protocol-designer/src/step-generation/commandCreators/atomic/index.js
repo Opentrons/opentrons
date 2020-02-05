@@ -1,6 +1,6 @@
 // @flow
 import aspirate from './aspirate'
-import { awaitTemperature } from './awaitTemperature';
+import { awaitTemperature } from './awaitTemperature'
 import blowout from './blowout'
 import { deactivateTemperature } from './deactivateTemperature'
 import delay from './delay'

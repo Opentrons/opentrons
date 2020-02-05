@@ -1,13 +1,13 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import { getStateAndContextTempMagModules } from './fixtures'
-import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 import {
   TEMPERATURE_AT_TARGET,
   TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
+import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
+import { getStateAndContextTempMagModules } from './fixtures'
 import type { RobotState } from '../types'
 
 const robotWithStatus = (

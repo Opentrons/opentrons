@@ -1,17 +1,17 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import { makeImmutableStateUpdater } from './utils/makeImmutableStateUpdater'
-import { makeContext, getInitialRobotStateStandard } from './fixtures'
-import {
-  forSetTemperature as _forSetTemperature,
-  forDeactivateTemperature as _forDeactivateTemperature,
-  forAwaitTemperature as _forAwaitTemperature,
-} from '../getNextRobotStateAndWarnings/temperatureUpdates'
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
 } from '../../constants'
+import {
+  forSetTemperature as _forSetTemperature,
+  forDeactivateTemperature as _forDeactivateTemperature,
+  forAwaitTemperature as _forAwaitTemperature,
+} from '../getNextRobotStateAndWarnings/temperatureUpdates'
+import { makeImmutableStateUpdater } from './utils/makeImmutableStateUpdater'
+import { makeContext, getInitialRobotStateStandard } from './fixtures'
 import type { RobotState } from '../types'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)

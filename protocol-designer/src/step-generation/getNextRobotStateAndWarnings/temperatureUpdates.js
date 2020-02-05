@@ -1,12 +1,12 @@
 // @flow
 import assert from 'assert'
-import { getModuleState } from '../utils/misc'
 import {
   TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
 } from '../../constants'
+import { getModuleState } from '../utils/misc'
 import type {
   TemperatureParams,
   ModuleOnlyParams,
