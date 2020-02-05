@@ -1,6 +1,7 @@
 // @flow
 export {
   aspirate,
+  awaitTemperature,
   blowout,
   consolidate,
   distribute,

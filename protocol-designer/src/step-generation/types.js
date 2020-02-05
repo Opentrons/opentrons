@@ -167,6 +167,13 @@ export type PauseArgs = {|
   |},
 |}
 
+export type AwaitTemperatureArgs = {|
+  module: string | null,
+  commandCreatorFnName: 'awaitTemperature',
+  temperature: number,
+  message?: string,
+|}
+
 export type EngageMagnetArgs = {|
   ...EngageMagnetParams,
   module: string | null,
@@ -203,6 +210,7 @@ export type CommandCreatorArgs =
   | EngageMagnetArgs
   | DisengageMagnetArgs
   | SetTemperatureArgs
+  | AwaitTemperatureArgs
   | DeactivateTemperatureArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
@@ -277,6 +285,7 @@ export type ErrorType =
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'TIP_VOLUME_EXCEEDED'
+  | 'MISSING_TEMP_STEP'
 
 export type CommandCreatorError = {|
   message: string,

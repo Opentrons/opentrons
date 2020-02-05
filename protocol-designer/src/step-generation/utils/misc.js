@@ -323,5 +323,5 @@ export function getModuleState(
   robotState: RobotState,
   module: string
 ): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
-  return robotState.modules[module].moduleState
+  return robotState.modules[module]?.moduleState
 }

@@ -58,6 +58,14 @@ export function missingModuleError(): CommandCreatorError {
   }
 }
 
+export function missingTempStep(): CommandCreatorError {
+  return {
+    message:
+      'This module is not changing temperature because it has either been deactivated or is already holding a temperature. In order to pause the protocol and wait for your module to reach a temperature, you must first use a Temperature step to tell the module to start changing to a new temperature',
+    type: 'MISSING_TEMP_STEP',
+  }
+}
+
 export function tipVolumeExceeded(args: {|
   actionName: string,
   volume: string | number,

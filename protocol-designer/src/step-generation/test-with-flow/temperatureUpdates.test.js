@@ -5,10 +5,12 @@ import { makeContext, getInitialRobotStateStandard } from './fixtures'
 import {
   forSetTemperature as _forSetTemperature,
   forDeactivateTemperature as _forDeactivateTemperature,
+  forAwaitTemperature as _forAwaitTemperature,
 } from '../getNextRobotStateAndWarnings/temperatureUpdates'
 import {
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
 } from '../../constants'
 import type { RobotState } from '../types'
 
@@ -16,21 +18,30 @@ const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(
   _forDeactivateTemperature
 )
-
-function createRobotWithTemp(robot: RobotState, temperature: number) {
-  const robotWithTemp = cloneDeep(robot)
-  robotWithTemp.modules[moduleId].moduleState = {
-    type: 'tempdeck',
-    targetTemperature: temperature,
-    status: TEMPERATURE_APPROACHING_TARGET,
-  }
-  return robotWithTemp
-}
+const forAwaitTemperature = makeImmutableStateUpdater(_forAwaitTemperature)
 
 const moduleId = 'temperatureModuleId'
 const slot = '3'
 const temperature = 45
 let invariantContext, deactivatedRobot, robotWithTemp
+
+const createRobotWithTemp = (
+  robot: RobotState,
+  targetTemperature: number,
+  status:
+    | typeof TEMPERATURE_DEACTIVATED
+    | typeof TEMPERATURE_APPROACHING_TARGET
+    | typeof TEMPERATURE_AT_TARGET
+) => {
+  const robotWithTemp = cloneDeep(robot)
+  robotWithTemp.modules[moduleId].moduleState = {
+    type: 'tempdeck',
+    targetTemperature,
+    status,
+  }
+  return robotWithTemp
+}
+
 beforeEach(() => {
   invariantContext = makeContext()
   invariantContext.moduleEntities[moduleId] = {
@@ -48,7 +59,11 @@ beforeEach(() => {
       status: TEMPERATURE_DEACTIVATED,
     },
   }
-  robotWithTemp = createRobotWithTemp(deactivatedRobot, temperature)
+  robotWithTemp = createRobotWithTemp(
+    deactivatedRobot,
+    temperature,
+    TEMPERATURE_APPROACHING_TARGET
+  )
 })
 
 describe('forSetTemperature', () => {
@@ -61,7 +76,11 @@ describe('forSetTemperature', () => {
     const result = forSetTemperature(params, invariantContext, deactivatedRobot)
 
     expect(result).toEqual({
-      robotState: robotWithTemp,
+      robotState: createRobotWithTemp(
+        deactivatedRobot,
+        temperature,
+        TEMPERATURE_APPROACHING_TARGET
+      ),
       warnings: [],
     })
   })
@@ -72,13 +91,24 @@ describe('forSetTemperature', () => {
       module: moduleId,
       temperature: newTemperature,
     }
-    const robotWithNewTemp = createRobotWithTemp(robotWithTemp, newTemperature)
 
-    const result = forSetTemperature(params, invariantContext, robotWithTemp)
+    const result = forSetTemperature(
+      params,
+      invariantContext,
+      createRobotWithTemp(
+        deactivatedRobot,
+        temperature,
+        TEMPERATURE_APPROACHING_TARGET
+      )
+    )
 
     expect(result).toEqual({
       warnings: [],
-      robotState: robotWithNewTemp,
+      robotState: createRobotWithTemp(
+        deactivatedRobot,
+        newTemperature,
+        TEMPERATURE_APPROACHING_TARGET
+      ),
     })
   })
 })
@@ -114,6 +144,52 @@ describe('forDeactivateTemperature', () => {
 
     expect(result).toEqual({
       robotState: deactivatedRobot,
+      warnings: [],
+    })
+  })
+})
+
+describe('forAwaitTemperature', () => {
+  ;[TEMPERATURE_AT_TARGET, TEMPERATURE_APPROACHING_TARGET].forEach(status => {
+    test(`awaited temp equals previous state target temp when previous status is ${status}`, () => {
+      const params = {
+        module: moduleId,
+        temperature: temperature,
+      }
+      const result = forAwaitTemperature(
+        params,
+        invariantContext,
+        createRobotWithTemp(deactivatedRobot, temperature, status)
+      )
+
+      expect(result).toEqual({
+        robotState: createRobotWithTemp(
+          robotWithTemp,
+          temperature,
+          TEMPERATURE_AT_TARGET
+        ),
+        warnings: [],
+      })
+    })
+  })
+
+  test('await non-target temperature when actively approaching target', () => {
+    const params = {
+      module: moduleId,
+      temperature: 55,
+    }
+    const robotAtNonTargetTemp = createRobotWithTemp(
+      deactivatedRobot,
+      temperature,
+      TEMPERATURE_APPROACHING_TARGET
+    )
+    const result = forAwaitTemperature(
+      params,
+      invariantContext,
+      robotAtNonTargetTemp
+    )
+    expect(result).toEqual({
+      robotState: robotAtNonTargetTemp,
       warnings: [],
     })
   })
