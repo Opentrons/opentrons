@@ -28,7 +28,10 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
     return { errors: [errorCreators.missingModuleError()] }
   }
 
-  //
+  //  if the temp mod is already at the target temp
+  //  AND the newly awaited temperature is different than the target temp
+  //  this means the temp mod will not change its temp, since it is already
+  //  at the target temp, so the new await temp will never be reached
   const unreachableTemp =
     tempModState.status === TEMPERATURE_AT_TARGET &&
     tempModState.targetTemperature !== temperature
