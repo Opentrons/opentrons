@@ -8,36 +8,41 @@ import type { Dispatch } from '../../types'
 
 import styles from './styles.css'
 
-const CONNECT_TO_UPDATE = 'Connect to robot to update module'
+const UP_TO_DATE = 'Module Firmware is up to date'
+const CONNECT_TO_UPDATE = 'Connect to Robot to update Module'
 
 type Props = {|
   hasAvailableUpdate: boolean,
+  canControl: boolean,
   moduleId: string,
 |}
 
 export function ModuleUpdate(props: Props) {
-  const { hasAvailableUpdate, moduleId } = props
+  const { hasAvailableUpdate, moduleId, canControl } = props
   const robotName = useSelector(getConnectedRobotName)
   const dispatch = useDispatch<Dispatch>()
   const [updateInProgress, setUpdateInProgress] = React.useState(false)
-  const buttonText = hasAvailableUpdate ? 'update' : 'updated'
+  const buttonText = hasAvailableUpdate ? 'update' : 'up to date'
+  let tooltipText = null
+  if (!canControl) tooltipText = CONNECT_TO_UPDATE
+  if (!hasAvailableUpdate) tooltipText = UP_TO_DATE
 
+  // const [dispatch, requestIds] = useDispatchApiRequest<FetchPipettesAction>()
+  // - loading state and error state off of request status
   return (
     <div className={styles.module_update_wrapper}>
-      <HoverTooltip
-        tooltipComponent={
-          !robotName && hasAvailableUpdate ? CONNECT_TO_UPDATE : null
-        }
-      >
+      <HoverTooltip tooltipComponent={tooltipText}>
         {hoverTooltipHandlers => (
           <div {...hoverTooltipHandlers}>
             <OutlineButton
               className={styles.module_update_button}
               onClick={() => {
                 setUpdateInProgress(true)
-                robotName && dispatch(updateModule(robotName, moduleId))
+                canControl &&
+                  robotName &&
+                  dispatch(updateModule(robotName, moduleId))
               }}
-              disabled={!robotName || !hasAvailableUpdate}
+              disabled={!canControl || !hasAvailableUpdate}
             >
               {updateInProgress ? (
                 <Icon name="ot-spinner" height="1em" spin />

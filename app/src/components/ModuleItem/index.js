@@ -25,6 +25,7 @@ export function ModuleItem(props: Props) {
         <ModuleInfo module={module} />
         <ModuleUpdate
           hasAvailableUpdate={!!module.hasAvailableUpdate}
+          canControl={canControl}
           moduleId={module.serial}
         />
       </div>
