@@ -1,8 +1,8 @@
-from opentrons.hardware_control import modules
-from aiohttp.web import json_response
 import tempfile
 import logging
 import asyncio
+from aiohttp.web import json_response
+from opentrons.hardware_control import modules
 
 
 log = logging.getLogger(__name__)
