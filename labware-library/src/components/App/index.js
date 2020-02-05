@@ -15,7 +15,7 @@ import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
-export function App(props: DefinitionRouteRenderProps) {
+export function AppComponent(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)
@@ -50,8 +50,8 @@ export function App(props: DefinitionRouteRenderProps) {
   )
 }
 
-export function AppWithRouteComponent() {
-  return <DefinitionRoute render={props => <App {...props} />} />
+export function AppWithRoute() {
+  return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
 
-export const AppWithRoute = hot(AppWithRouteComponent)
+export const App = hot(AppWithRoute)
