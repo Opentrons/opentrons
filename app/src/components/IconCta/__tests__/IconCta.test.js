@@ -33,7 +33,7 @@ describe('IconCta', () => {
 
   test('renders an <Icon>', () => {
     const icon = wrapper.find(Icon)
-    expect(icon.prop('name')).toEqual('flask-outline')
+    expect(icon.prop('name')).toEqual(ICON_NAME)
   })
 
   test('renders text', () => {

@@ -7,6 +7,8 @@ import { Portal } from '../../portal'
 import {
   ConfirmResetPathModal,
   ConfirmResetPathModalTemplate,
+  CANCEL_NAME,
+  RESET_SOURCE_NAME,
 } from '../ConfirmResetPathModal'
 
 describe('ConfirmResetPathModal', () => {
@@ -37,15 +39,15 @@ describe('ConfirmResetPathModal', () => {
 
   test('renders a cancel button that calls props.onCancel', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
-    const button = wrapper.find('button[name="cancel"]')
+    const button = wrapper.find(`button[name="${CANCEL_NAME}"]`)
 
     button.invoke('onClick')()
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
-  test('renders a confirm button that calls props.onCancel', () => {
+  test('renders a confirm button that calls props.onConfirm', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
-    const button = wrapper.find('button[name="confirm"]')
+    const button = wrapper.find(`button[name="${RESET_SOURCE_NAME}"]`)
 
     button.invoke('onClick')()
     expect(mockOnConfirm).toHaveBeenCalled()

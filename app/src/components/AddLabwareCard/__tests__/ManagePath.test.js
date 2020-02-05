@@ -53,6 +53,8 @@ describe('ManagePath', () => {
 
   describe('reset source', () => {
     beforeEach(() => {
+      expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
+
       act(() => {
         wrapper.find(`IconCta[name="${RESET_SOURCE_NAME}"]`).invoke('onClick')()
       })
@@ -60,20 +62,21 @@ describe('ManagePath', () => {
       wrapper.update()
     })
 
-    test('has an IconCta that opens a confirmation modal', () => {
+    test('has an IconCta that opens a ConfirmResetPathModal', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(true)
     })
 
-    test('clicking "cancel" on the confirmation modal closes it', () => {
+    test('ConfirmResetPathModal::onCancel closes modal without resetting path', () => {
       act(() => {
         wrapper.find(ConfirmResetPathModal).invoke('onCancel')()
       })
 
       wrapper.update()
+      expect(mockOnResetPath).toHaveBeenCalledTimes(0)
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
     })
 
-    test('clicking "reset source" on the modal calls onResetPath', () => {
+    test('ConfirmResetPathModal::onConfirm calls onResetPath and closes modal', () => {
       expect(mockOnResetPath).toHaveBeenCalledTimes(0)
       act(() => {
         wrapper.find(ConfirmResetPathModal).invoke('onConfirm')()

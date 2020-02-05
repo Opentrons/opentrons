@@ -21,7 +21,7 @@ const LABWARE_FILES_IN_YOUR_CURRENT_DIRECTORY_WILL_NOT_BE_MOVED =
 
 // button names
 export const CANCEL_NAME = 'cancel'
-export const CONFIRM_NAME = 'confirm'
+export const RESET_SOURCE_NAME = 'reset-source'
 
 export type ConfirmResetPathModalProps = {|
   onCancel: () => mixed,
@@ -37,7 +37,7 @@ export const ConfirmResetPathModalTemplate = ({
     heading={RESET_CUSTOM_LABWARE_SOURCE}
     buttons={[
       { name: CANCEL_NAME, children: CANCEL, onClick: onCancel },
-      { name: CONFIRM_NAME, children: RESET_SOURCE, onClick: onConfirm },
+      { name: RESET_SOURCE_NAME, children: RESET_SOURCE, onClick: onConfirm },
     ]}
   >
     <p>{CLICK_RESET_SOURCE_TO_RESET_YOUR_CUSTOM_LABWARE_DIRECTORY}</p>
