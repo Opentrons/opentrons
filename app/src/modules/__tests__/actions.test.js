@@ -111,6 +111,47 @@ describe('robot modules actions', () => {
         meta: { requestId: 'abc' },
       },
     },
+    {
+      name: 'modules:UPDATE_MODULE',
+      creator: Actions.updateModule,
+      args: ['robot-name', 'abc123'],
+      expected: {
+        type: 'modules:UPDATE_MODULE',
+        payload: {
+          robotName: 'robot-name',
+          moduleId: 'abc123',
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'modules:UPDATE_MODULE_SUCCESS',
+      creator: Actions.updateModuleSuccess,
+      args: ['robot-name', 'abc123', 'update complete', { requestId: 'abc' }],
+      expected: {
+        type: 'modules:UPDATE_MODULE_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          moduleId: 'abc123',
+          message: 'update complete',
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'modules:UPDATE_MODULE_FAILURE',
+      creator: Actions.updateModuleFailure,
+      args: ['robot-name', 'abc123', { message: 'AH' }, { requestId: 'abc' }],
+      expected: {
+        type: 'modules:UPDATE_MODULE_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          moduleId: 'abc123',
+          error: { message: 'AH' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
   ]
 
   SPECS.forEach(spec => {
