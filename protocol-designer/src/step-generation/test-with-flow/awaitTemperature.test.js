@@ -35,8 +35,8 @@ describe('awaitTemperature', () => {
   const missingModuleError = {
     errors: [{ message: expect.any(String), type: 'MISSING_MODULE' }],
   }
-  const missingTempStep = {
-    errors: [{ message: expect.any(String), type: 'MISSING_TEMP_STEP' }],
+  const missingTemperatureStep = {
+    errors: [{ message: expect.any(String), type: 'MISSING_TEMPERATURE_STEP' }],
   }
 
   let invariantContext
@@ -141,7 +141,7 @@ describe('awaitTemperature', () => {
     )
 
     const result = awaitTemperature(args, invariantContext, previousRobotState)
-    expect(result).toEqual(missingTempStep)
+    expect(result).toEqual(missingTemperatureStep)
   })
   test('prev temp state is DEACTIVATED', () => {
     const temperature = 80
@@ -157,6 +157,6 @@ describe('awaitTemperature', () => {
     )
 
     const result = awaitTemperature(args, invariantContext, previousRobotState)
-    expect(result).toEqual(missingTempStep)
+    expect(result).toEqual(missingTemperatureStep)
   })
 })

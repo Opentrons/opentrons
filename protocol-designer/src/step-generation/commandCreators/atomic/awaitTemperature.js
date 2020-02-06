@@ -37,7 +37,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
     tempModState.targetTemperature !== temperature
 
   if (unreachableTemp || tempModState.status === TEMPERATURE_DEACTIVATED) {
-    return { errors: [errorCreators.missingTempStep()] }
+    return { errors: [errorCreators.missingTemperatureStep()] }
   }
 
   const moduleType = invariantContext.moduleEntities[module]?.type

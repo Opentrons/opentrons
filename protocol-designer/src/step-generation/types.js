@@ -285,7 +285,7 @@ export type ErrorType =
   | 'PIPETTE_DOES_NOT_EXIST'
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'TIP_VOLUME_EXCEEDED'
-  | 'MISSING_TEMP_STEP'
+  | 'MISSING_TEMPERATURE_STEP'
 
 export type CommandCreatorError = {|
   message: string,
