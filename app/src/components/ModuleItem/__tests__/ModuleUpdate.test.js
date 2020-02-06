@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { shallow, mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
 
-import { OutlineButton, Button } from '@opentrons/components'
+import { Button } from '@opentrons/components'
 import { ModuleUpdate } from '../ModuleUpdate'
 
 const mockStore = configureMockStore([])
