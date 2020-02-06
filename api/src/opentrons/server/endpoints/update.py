@@ -66,7 +66,7 @@ async def update_module_firmware(request):
             res = (f'Bundled fw file not found for module of '
                    f'type: {module.name()}')
             status = 500
-    except modules.UpdateError as e:
+    except modules.types.UpdateError as e:
         res = f'Update error: {e}'
         status = 500
     except asyncio.TimeoutError:

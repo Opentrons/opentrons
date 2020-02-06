@@ -11,3 +11,7 @@ class BundledFirmware(NamedTuple):
 
     def __repr__(self) -> str:
         return f'<BundledFirmware {self.version}, path={self.path}>'
+
+
+class UpdateError(RuntimeError):
+    pass

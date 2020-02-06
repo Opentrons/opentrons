@@ -3,8 +3,7 @@ from threading import Thread, Event
 from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
-from opentrons.hardware_control.modules import UpdateError
-from . import update, mod_abc
+from . import update, mod_abc, types
 
 TEMP_POLL_INTERVAL_SECS = 1
 
@@ -219,9 +218,9 @@ class TempDeck(mod_abc.AbstractModule):
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get('model')
         if model in ('temp_deck_v1', 'temp_deck_v2'):
-            raise UpdateError("Temperature Modules before hardware "
-                              "model v3 do not support firmware updates."
-                              f" this module's model: {model}")
+            raise types.UpdateError("Temperature Modules before hardware "
+                                    "model v3 do not support firmware updates."
+                                    f" this module's model: {model}")
 
         if self._poller:
             self._poller.join()
