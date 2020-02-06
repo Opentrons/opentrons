@@ -67,7 +67,7 @@ async def update_module_firmware(request):
                    f'type: {module.name()}')
             status = 500
     except modules.UpdateError as e:
-        res = f'Bootloader error: {e}'
+        res = f'Update error: {e}'
         status = 500
     except asyncio.TimeoutError:
         res = 'Module not responding'

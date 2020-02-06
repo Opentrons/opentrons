@@ -3,7 +3,8 @@ from threading import Thread, Event
 from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
-from . import update, mod_abc, UpdateError
+from opentrons.hardware_control.modules import UpdateError
+from . import update, mod_abc
 
 TEMP_POLL_INTERVAL_SECS = 1
 
