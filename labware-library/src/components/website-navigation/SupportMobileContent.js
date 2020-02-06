@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
 import map from 'lodash/map'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import styles from './styles.css'
 
 import { supportLinkProps, salesLinkProps } from './nav-data'
 
 type Props = {||}
 
-export default function supportMobileContent(props: Props) {
+export function SupportMobileContent(props: Props) {
   const supportLinks = map(supportLinkProps)
   const salesLinks = map(salesLinkProps)
   return (

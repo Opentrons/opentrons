@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Link } from 'react-router-dom'
 import { getPublicPath } from '../../public-path'
-import LinkOut from './LinkOut'
+import { LinkOut } from './LinkOut'
 import { LINK_CUSTOM_LABWARE_FORM } from '../fields'
 import styles from '../styles.css'
 
@@ -11,7 +11,7 @@ const LINK_CUSTOM_LABWARE_GUIDE =
 
 const LINK_LABWARE_LIBRARY = getPublicPath()
 
-const IntroCopy = () => (
+export const IntroCopy = () => (
   <>
     <LinkOut
       href={LINK_CUSTOM_LABWARE_GUIDE}
@@ -63,5 +63,3 @@ const IntroCopy = () => (
     </div>
   </>
 )
-
-export default IntroCopy

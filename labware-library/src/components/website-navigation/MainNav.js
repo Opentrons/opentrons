@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import Logo from './Logo'
+import { Logo } from './Logo'
 import { NavList } from './NavList'
-import MobileNav from './MobileNav'
+import { MobileNav } from './MobileNav'
 import styles from './styles.css'
 
 export function MainNav() {

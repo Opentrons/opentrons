@@ -2,7 +2,7 @@
 import * as React from 'react'
 import type { LabwareType } from '../fields'
 
-const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
+export const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
   const { labwareType } = props
   const footer = (
     <p>
@@ -45,5 +45,3 @@ const HeightGuidingText = (props: {| labwareType: ?LabwareType |}) => {
     </>
   )
 }
-
-export default HeightGuidingText

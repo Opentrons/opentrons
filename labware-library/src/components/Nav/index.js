@@ -4,9 +4,9 @@ import * as React from 'react'
 import { SubdomainNav, MainNav } from '../website-navigation'
 import styles from './styles.css'
 
-export { default as Breadcrumbs } from './Breadcrumbs'
+export { Breadcrumbs } from './Breadcrumbs'
 
-export default function Nav() {
+export function Nav() {
   return (
     <>
       <nav className={styles.nav}>

@@ -5,7 +5,7 @@ exports[`Sidebar component renders 1`] = `
   className="sidebar"
 >
   <LabwareGuide />
-  <withRouter(FilterManufacturer)
+  <withRouter(FilterManufacturerComponent)
     filters={
       Object {
         "category": "all",

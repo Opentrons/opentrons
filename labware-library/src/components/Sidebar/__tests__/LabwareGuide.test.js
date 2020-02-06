@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import LabwareGuide from '../LabwareGuide'
+import { LabwareGuide } from '../LabwareGuide'
 
 describe('LabwareGuide', () => {
   test('component renders', () => {

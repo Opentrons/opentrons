@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import FilterCategory from '../FilterCategory'
+import { FilterCategory } from '../FilterCategory'
 
 jest.mock('../../../definitions')
 

@@ -15,7 +15,7 @@ export type FilterResetProps = {|
   filters: FilterParams,
 |}
 
-export default function FilterReset(props: FilterResetProps) {
+export function FilterReset(props: FilterResetProps) {
   const { filters } = props
   // TODO (ka 2019-3-09):Should this be moved to Sidebar?
   const { manufacturer, category } = filters

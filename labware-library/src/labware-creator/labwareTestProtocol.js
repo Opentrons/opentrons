@@ -17,7 +17,7 @@ type LabwareTestProtocolArgs = {|
   definition: LabwareDefinition2,
 |}
 
-const labwareTestProtocol = ({
+export const labwareTestProtocol = ({
   pipetteName,
   definition,
 }: LabwareTestProtocolArgs): string => {
@@ -146,5 +146,3 @@ def run(protocol: protocol_api.ProtocolContext):
     pipette.return_tip()
 `
 }
-
-export default labwareTestProtocol

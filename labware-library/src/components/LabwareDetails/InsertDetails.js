@@ -5,7 +5,7 @@ import * as React from 'react'
 import { getUniqueWellProperties } from '../../labwareInference'
 import { getWellLabel, WellProperties, ManufacturerStats } from '../labware-ui'
 import { DetailsBox } from '../ui'
-import WellDimensions from './WellDimensions'
+import { WellDimensions } from './WellDimensions'
 
 import styles from './styles.css'
 
@@ -15,7 +15,7 @@ export type InsertDetailsProps = {|
   definition: LabwareDefinition,
 |}
 
-export default function InsertDetails(props: InsertDetailsProps) {
+export function InsertDetails(props: InsertDetailsProps) {
   const { definition } = props
   const { metadata, parameters } = definition
   const { displayVolumeUnits, displayCategory } = metadata

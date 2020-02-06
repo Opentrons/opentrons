@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import Logo from '../Logo'
+import { Logo } from '../Logo'
 
 describe('Logo', () => {
   test('component renders', () => {

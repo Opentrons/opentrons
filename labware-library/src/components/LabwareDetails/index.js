@@ -3,8 +3,8 @@
 import * as React from 'react'
 
 import { Gallery, Tags, LoadName } from '../labware-ui'
-import LabwareTitle from './LabwareTitle'
-import LabwareDetailsBox from './LabwareDetailsBox'
+import { LabwareTitle } from './LabwareTitle'
+import { LabwareDetailsBox } from './LabwareDetailsBox'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'
@@ -13,7 +13,7 @@ export type LabwareDetailsProps = {|
   definition: LabwareDefinition,
 |}
 
-export default function LabwareDetails(props: LabwareDetailsProps) {
+export function LabwareDetails(props: LabwareDetailsProps) {
   const { definition } = props
   const { loadName } = definition.parameters
 
