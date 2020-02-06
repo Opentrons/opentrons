@@ -218,9 +218,8 @@ class TempDeck(mod_abc.AbstractModule):
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get('model')
         if model in ('temp_deck_v1', 'temp_deck_v2'):
-            raise types.UpdateError("Temperature Modules before hardware "
-                                    "model v3 do not support firmware updates."
-                                    f" this module's model: {model}")
+            raise types.UpdateError("This Temperature Module can't be updated."
+                                    "Please contact Opentrons Support.")
 
         if self._poller:
             self._poller.join()
