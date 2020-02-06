@@ -4,10 +4,10 @@ import { connect } from 'react-redux'
 import { selectors } from '../navigation'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 
-import { ConnectedStepList } from './ConnectedStepList'
-import { IngredientsList } from './IngredientsList'
-import { FileSidebar } from '../components/FileSidebar'
-import { LiquidsSidebar } from '../components/LiquidsSidebar'
+import ConnectedStepList from './ConnectedStepList'
+import IngredientsList from './IngredientsList'
+import FileSidebar from '../components/FileSidebar'
+import LiquidsSidebar from '../components/LiquidsSidebar'
 import { SettingsSidebar } from '../components/SettingsPage'
 
 import type { BaseState } from '../types'
@@ -49,6 +49,4 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedSidebar = connect<Props, {||}, _, _, _, _>(
-  mapStateToProps
-)(Sidebar)
+export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(Sidebar)

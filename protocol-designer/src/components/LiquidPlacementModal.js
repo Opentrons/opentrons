@@ -9,13 +9,13 @@ import {
   wellFillFromWellContents,
   SelectableLabware,
 } from '../components/labware'
-import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
-import { WellSelectionInstructions } from './WellSelectionInstructions'
+import LiquidPlacementForm from '../components/LiquidPlacementForm'
+import WellSelectionInstructions from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../step-forms'
 import * as wellContentsSelectors from '../top-selectors/well-contents'
-import { getSelectedWells } from '../well-selection/selectors'
+import wellSelectionSelectors from '../well-selection/selectors'
 import { selectWells, deselectWells } from '../well-selection/actions'
 
 import styles from './LiquidPlacementModal.css'
@@ -43,7 +43,7 @@ type Props = { ...SP, ...DP }
 
 type State = { highlightedWells: WellGroup }
 
-class LiquidPlacementModalComponent extends React.Component<Props, State> {
+class LiquidPlacementModal extends React.Component<Props, State> {
   state = { highlightedWells: {} }
   constructor(props: Props) {
     super(props)
@@ -92,7 +92,7 @@ class LiquidPlacementModalComponent extends React.Component<Props, State> {
 
 const mapStateToProps = (state: BaseState): SP => {
   const labwareId = selectors.getSelectedLabwareId(state)
-  const selectedWells = getSelectedWells(state)
+  const selectedWells = wellSelectionSelectors.getSelectedWells(state)
   if (labwareId == null) {
     assert(
       false,
@@ -127,7 +127,7 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export const LiquidPlacementModal = connect<Props, {||}, _, _, _, _>(
+export default connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(LiquidPlacementModalComponent)
+)(LiquidPlacementModal)

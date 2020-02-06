@@ -158,7 +158,7 @@ export const substepTimelineMultiChannel = (
   return timeline.timeline
 }
 
-export const substepTimeline = (
+const substepTimeline = (
   commandCreator: CurriedCommandCreator,
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
@@ -179,3 +179,5 @@ export const substepTimeline = (
     )
   }
 }
+
+export default substepTimeline

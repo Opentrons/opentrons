@@ -10,7 +10,7 @@ type Props = {
 type State = { selected: ?string }
 
 /** Keeps track of one selected string identifier in state */
-export class SelectedWrapper extends React.Component<Props, State> {
+export default class SelectedWrapper extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { selected: null }

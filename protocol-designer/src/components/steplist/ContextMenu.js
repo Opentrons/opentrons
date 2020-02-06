@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import type { ThunkDispatch } from '../../types'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import { actions as steplistActions } from '../../steplist'
 import { Portal } from '../portals/TopPortal'
@@ -33,7 +33,7 @@ type State = {
   stepId: ?StepIdType,
 }
 
-class ContextMenuComponent extends React.Component<Props, State> {
+class ContextMenu extends React.Component<Props, State> {
   state = {
     visible: false,
     left: null,
@@ -150,7 +150,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.duplicateStep(stepId)),
 })
 
-export const ContextMenu = connect<Props, OP, {||}, DP, _, _>(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
-)(ContextMenuComponent)
+)(ContextMenu)

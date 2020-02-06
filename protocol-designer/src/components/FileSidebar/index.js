@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { actions, selectors } from '../../navigation'
 import { selectors as fileDataSelectors } from '../../file-data'
 import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
-import { FileSidebar as FileSidebarComponent } from './FileSidebar'
+import FileSidebar from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof FileSidebarComponent>
+type Props = React.ElementProps<typeof FileSidebar>
 
 type SP = {|
   canDownload: boolean,
@@ -20,11 +20,11 @@ type SP = {|
   _hasUnsavedChanges: ?boolean,
 |}
 
-export const FileSidebar = connect<Props, {||}, SP, {||}, _, _>(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(FileSidebarComponent)
+)(FileSidebar)
 
 function mapStateToProps(state: BaseState): SP {
   const protocolName =

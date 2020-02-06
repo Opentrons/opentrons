@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 
-export const PrereleaseModeIndicator = () => {
+const PrereleaseModeIndicator = () => {
   const prereleaseModeEnabled = useSelector(
     featureFlagSelectors.getEnabledPrereleaseMode
   )
@@ -24,3 +24,5 @@ export const PrereleaseModeIndicator = () => {
     </div>
   ) : null
 }
+
+export default PrereleaseModeIndicator

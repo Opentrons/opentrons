@@ -1,5 +1,5 @@
 // @flow
-import { delay } from '../commandCreators/atomic/delay'
+import delay from '../commandCreators/atomic/delay'
 import { getSuccessResult } from './fixtures'
 
 const getRobotInitialState = (): any => {

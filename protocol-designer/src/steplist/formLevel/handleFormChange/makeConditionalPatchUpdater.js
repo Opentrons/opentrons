@@ -11,7 +11,7 @@ export type FieldUpdateMaps = Array<{
 // derived from aspirate_wells + dispense_wells).
 //
 // This style of updater is useful when the previous independent value matters
-export const makeConditionalPatchUpdater = (updateMaps: FieldUpdateMaps) => (
+const makeConditionalPatchUpdater = (updateMaps: FieldUpdateMaps) => (
   prevValue: mixed,
   nextValue: mixed,
   dependentFields: Object
@@ -36,3 +36,5 @@ export const makeConditionalPatchUpdater = (updateMaps: FieldUpdateMaps) => (
       : patchAcc
   }, {})
 }
+
+export default makeConditionalPatchUpdater

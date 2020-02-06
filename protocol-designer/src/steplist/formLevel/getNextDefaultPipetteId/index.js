@@ -10,7 +10,7 @@ import type { StepIdType, FormData } from '../../../form-types'
 
 /** returns the last used pipette or, if no pipette has been used,
  * the 'left' pipette (or 'right' if there is no 'left' ) */
-export function getNextDefaultPipetteId(
+export default function getNextDefaultPipetteId(
   savedForms: { [StepIdType]: FormData },
   orderedStepIds: Array<StepIdType>,
   equippedPipettesById: { [pipetteId: string]: PipetteOnDeck }

@@ -1,7 +1,7 @@
 // @flow
 import { getNextTiprack } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { dropTip } from './dropTip'
+import dropTip from './dropTip'
 import {
   curryCommandCreator,
   reduceCommandCreators,
@@ -35,7 +35,7 @@ type ReplaceTipArgs = {| pipette: string |}
   Expects 96-well format tip naming system on the tiprack.
   If there's already a tip on the pipette, this will drop it before getting a new one
 */
-export const replaceTip: CommandCreator<ReplaceTipArgs> = (
+const replaceTip: CommandCreator<ReplaceTipArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -98,3 +98,5 @@ export const replaceTip: CommandCreator<ReplaceTipArgs> = (
     prevRobotState
   )
 }
+
+export default replaceTip

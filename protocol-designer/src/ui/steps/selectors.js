@@ -18,12 +18,12 @@ import type {
   StepItemData,
 } from '../../steplist/types'
 
-export const rootSelector = (state: BaseState): StepsState => state.ui.steps
+const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
 // ======= Selectors ===============================================
 
 /** fallbacks for selectedItem reducer, when null */
-export const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
+const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
@@ -34,28 +34,28 @@ export const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   }
 )
 
-export const getSelectedStepId: Selector<?StepIdType> = createSelector(
+const getSelectedStepId: Selector<?StepIdType> = createSelector(
   getNonNullSelectedItem,
   item => (item.isStep ? item.id : null)
 )
 
-export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getNonNullSelectedItem,
   item => (!item.isStep ? item.id : null)
 )
 
-export const getHoveredItem: Selector<?SelectableItem> = createSelector(
+const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
 
-export const getHoveredStepId: Selector<?StepIdType> = createSelector(
+const getHoveredStepId: Selector<?StepIdType> = createSelector(
   getHoveredItem,
   item => (item && item.isStep ? item.id : null)
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
+const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,
@@ -105,31 +105,31 @@ export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   }
 )
 
-export const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
+const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getHoveredItem,
   item => (item && !item.isStep ? item.id : null)
 )
 
-export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
+const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredSubstep
 )
 
 // Hovered or selected item. Hovered has priority.
 // Uses fallback of getNonNullSelectedItem if not hovered or selected
-export const getActiveItem: Selector<SelectableItem> = createSelector(
+const getActiveItem: Selector<SelectableItem> = createSelector(
   getNonNullSelectedItem,
   getHoveredItem,
   (selected, hovered) => (hovered != null ? hovered : selected)
 )
 
 // TODO: BC 2018-12-17 refactor as react state
-export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
+const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
 
-export const getSelectedStep: Selector<StepItemData | null> = createSelector(
+const getSelectedStep: Selector<StepItemData | null> = createSelector(
   stepFormSelectors.getAllSteps,
   getSelectedStepId,
   (allSteps, selectedStepId) => {
@@ -143,7 +143,26 @@ export const getSelectedStep: Selector<StepItemData | null> = createSelector(
   }
 )
 
-export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
+const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
+
+// TODO: Ian 2019-12-13 don't use default exports here
+export default {
+  rootSelector,
+
+  getSelectedStep,
+
+  getSelectedStepId,
+  getSelectedTerminalItemId,
+  getHoveredTerminalItemId,
+  getHoveredStepId,
+  getHoveredStepLabware,
+  getActiveItem,
+  getHoveredSubstep,
+  getWellSelectionLabwareKey,
+
+  // NOTE: this is exposed only for substeps/selectors.js
+  getCollapsedSteps,
+}

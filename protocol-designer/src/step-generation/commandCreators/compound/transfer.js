@@ -16,7 +16,7 @@ import type {
   CommandCreator,
 } from '../../types'
 
-export const transfer: CommandCreator<TransferArgs> = (
+const transfer: CommandCreator<TransferArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -261,3 +261,5 @@ export const transfer: CommandCreator<TransferArgs> = (
     prevRobotState
   )
 }
+
+export default transfer

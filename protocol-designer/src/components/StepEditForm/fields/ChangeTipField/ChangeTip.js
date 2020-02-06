@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { FormGroup, HoverTooltip, SelectField } from '@opentrons/components'
-import { i18n } from '../../../../localization'
+import i18n from '../../../../localization'
 import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
 import type { StepFieldName } from '../../../../steplist/fieldLevel'

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { FormGroup } from '@opentrons/components'
-import { i18n } from '../../../../localization'
+import i18n from '../../../../localization'
 import { LabwareField, WellSelectionField } from '../../fields'
 import { AspDispSection } from '../AspDispSection'
 

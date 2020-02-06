@@ -12,11 +12,11 @@ import {
   OutlineButton,
   type Mount,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import { SPAN7_8_10_11_SLOT, THERMOCYCLER } from '../../../constants'
-import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
-import { ModuleFields } from './ModuleFields'
-import { PipetteFields } from './PipetteFields'
+import StepChangesConfirmModal from '../EditPipettesModal/StepChangesConfirmModal'
+import ModuleFields from './ModuleFields'
+import PipetteFields from './PipetteFields'
 import { CrashInfoBox } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'

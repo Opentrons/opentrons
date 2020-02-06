@@ -13,7 +13,7 @@ import type {
   WellIngredientVolumeData,
   WellIngredientNames,
 } from '../../steplist/types'
-import { IngredPill } from './IngredPill'
+import IngredPill from './IngredPill'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { formatVolume, formatPercentage } from './utils'
@@ -82,7 +82,7 @@ export const PillTooltipContents = (props: PillTooltipContentsProps) => {
   )
 }
 
-function SubstepRowComponent(props: SubstepRowProps) {
+function SubstepRow(props: SubstepRowProps) {
   const compactedSourcePreIngreds = props.source
     ? omitBy(
         props.source.preIngreds,
@@ -157,4 +157,4 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow = React.memo<SubstepRowProps>(SubstepRowComponent)
+export default React.memo<SubstepRowProps>(SubstepRow)

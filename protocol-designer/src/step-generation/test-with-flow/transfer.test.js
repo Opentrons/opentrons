@@ -16,7 +16,7 @@ import {
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
-import { transfer } from '../commandCreators/compound/transfer'
+import transfer from '../commandCreators/compound/transfer'
 
 const aspirateHelper = makeAspirateHelper()
 const dispenseHelper = makeDispenseHelper()

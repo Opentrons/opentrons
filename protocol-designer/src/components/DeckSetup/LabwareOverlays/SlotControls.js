@@ -6,7 +6,7 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { BlockedSlot } from './BlockedSlot'
 import {
@@ -41,7 +41,7 @@ type DP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP |}
 
-const SlotControlsComponent = (props: Props) => {
+const SlotControls = (props: Props) => {
   const {
     slot,
     addLabware,
@@ -135,11 +135,7 @@ const collectSlotTarget = (connect, monitor) => ({
   draggedDef: monitor.getItem()?.labwareOnDeck?.def || null,
 })
 
-export const SlotControls = connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
+export default connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
-)(
-  DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(
-    SlotControlsComponent
-  )
-)
+)(DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(SlotControls))

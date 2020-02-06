@@ -10,7 +10,7 @@ import {
 import type { StepType, StepFieldName } from '../../form-types'
 
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
-export function getDefaultsForStepType(
+export default function getDefaultsForStepType(
   stepType: StepType
 ): { [StepFieldName]: any } {
   switch (stepType) {

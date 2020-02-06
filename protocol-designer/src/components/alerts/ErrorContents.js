@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { START_TERMINAL_ITEM_ID } from '../../steplist'
-import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import type { AlertLevel } from './types'
 import { TerminalItemLink } from '../steplist/TerminalItem'
 
@@ -10,7 +10,7 @@ type ErrorContentsProps = {
   errorType: string,
   level: AlertLevel,
 }
-export const ErrorContents = (props: ErrorContentsProps) => {
+const ErrorContents = (props: ErrorContentsProps) => {
   if (props.level === 'timeline') {
     const bodyText = i18n.t(`alert.timeline.error.${props.errorType}.body`, {
       defaultValue: '',
@@ -47,3 +47,5 @@ export const ErrorContents = (props: ErrorContentsProps) => {
     return null
   }
 }
+
+export default ErrorContents

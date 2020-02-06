@@ -4,15 +4,15 @@ import { connect } from 'react-redux'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as labwareIngredActions from '../../labware-ingred/actions'
-import { getSelectedTerminalItemId } from '../../ui/steps'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { InitialDeckSetup } from '../../step-forms'
-import { DeckSetup as DeckSetupComponent } from './DeckSetup'
+import DeckSetup from './DeckSetup'
 
 import type { TerminalItemId } from '../../steplist'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof DeckSetupComponent>
+type Props = React.ElementProps<typeof DeckSetup>
 
 type SP = {|
   selectedTerminalItemId: ?TerminalItemId,
@@ -23,7 +23,7 @@ type SP = {|
 type DP = {| drillUpFromLabware: () => mixed |}
 
 const mapStateToProps = (state: BaseState): SP => ({
-  selectedTerminalItemId: getSelectedTerminalItemId(state),
+  selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
   drilledDown: labwareIngredSelectors.getDrillDownLabwareId(state) != null,
   initialDeckSetup: stepFormSelectors.getInitialDeckSetup(state),
 })
@@ -41,8 +41,8 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   },
 })
 
-export const DeckSetup = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
-)(DeckSetupComponent)
+)(DeckSetup)

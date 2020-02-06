@@ -2,12 +2,10 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
-
 import {
   selectors as stepFormSelectors,
   getCrashablePipetteSelected,
 } from '../../step-forms'
-
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { THERMOCYCLER } from '../../constants'
 import { CrashInfoBox } from './CrashInfoBox'

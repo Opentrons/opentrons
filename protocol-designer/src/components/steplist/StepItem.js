@@ -2,13 +2,13 @@
 import * as React from 'react'
 
 import { PDTitledList } from '../lists'
-import { SourceDestSubstep } from './SourceDestSubstep'
+import SourceDestSubstep from './SourceDestSubstep'
 import styles from './StepItem.css'
-import { AspirateDispenseHeader } from './AspirateDispenseHeader'
-import { MixHeader } from './MixHeader'
-import { PauseStepItems } from './PauseStepItems'
+import AspirateDispenseHeader from './AspirateDispenseHeader'
+import MixHeader from './MixHeader'
+import PauseStepItems from './PauseStepItems'
 import { MagnetStepItems } from './MagnetStepItems'
-import { StepDescription } from '../StepDescription'
+import StepDescription from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
@@ -44,7 +44,7 @@ type StepItemProps = {
   unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
 }
 
-export class StepItem extends React.PureComponent<StepItemProps> {
+class StepItem extends React.PureComponent<StepItemProps> {
   render() {
     const {
       stepType,
@@ -180,3 +180,5 @@ function getStepItemContents(stepItemProps: StepItemProps) {
 
   return result
 }
+
+export default StepItem

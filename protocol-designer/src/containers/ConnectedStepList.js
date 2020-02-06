@@ -32,7 +32,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedStepList = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(StepList)

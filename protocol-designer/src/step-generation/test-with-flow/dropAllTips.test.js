@@ -10,7 +10,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
 } from './fixtures'
-import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
+import dropAllTips from '../commandCreators/atomic/dropAllTips'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 const p300SingleId = DEFAULT_PIPETTE
 const p300MultiId = 'p300MultiId'

@@ -1,5 +1,5 @@
 // @flow
-import { consolidate } from '../commandCreators/compound/consolidate'
+import consolidate from '../commandCreators/compound/consolidate'
 import {
   getInitialRobotStateStandard,
   getRobotStatePickedUpTipStandard,

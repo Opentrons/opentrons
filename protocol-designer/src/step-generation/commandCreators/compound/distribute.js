@@ -13,7 +13,7 @@ import type {
   CurriedCommandCreator,
 } from '../../types'
 
-export const distribute: CommandCreator<DistributeArgs> = (
+const distribute: CommandCreator<DistributeArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -207,3 +207,5 @@ export const distribute: CommandCreator<DistributeArgs> = (
     prevRobotState
   )
 }
+
+export default distribute

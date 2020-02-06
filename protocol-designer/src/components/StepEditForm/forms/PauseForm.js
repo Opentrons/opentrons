@@ -5,7 +5,7 @@ import { useSelector } from 'react-redux'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,

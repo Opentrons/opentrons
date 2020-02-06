@@ -7,7 +7,7 @@ import {
   OutlineButton,
   type ButtonProps,
 } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import modalStyles from '../modal.css'
 import type { LabwareUploadMessage } from '../../../labware-defs'
 
@@ -118,7 +118,7 @@ type Props = {|
   overwriteLabwareDef?: () => mixed,
 |}
 
-export const LabwareUploadMessageModal = (props: Props) => {
+const LabwareUploadMessageModal = (props: Props) => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 
@@ -153,3 +153,5 @@ export const LabwareUploadMessageModal = (props: Props) => {
     </AlertModal>
   )
 }
+
+export default LabwareUploadMessageModal

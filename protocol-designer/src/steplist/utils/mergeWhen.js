@@ -1,7 +1,7 @@
 // @flow
 
 /** Merge 2 adjacent elements of an array when predicate fn is true */
-export function mergeWhen<T>(
+export default function mergeWhen<T>(
   array: Array<T>,
   predicate: (current: T, next: T) => mixed,
   merge: (current: T, next: T) => *,

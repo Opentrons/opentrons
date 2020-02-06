@@ -12,7 +12,7 @@ type Props = {
 }
 
 /** Light wrapper around li for PD-specific styles */
-export function PDListItem(props: Props) {
+export default function PDListItem(props: Props) {
   const { className, border, hoverable, ...passThruProps } = props
   const _className = cx(
     {

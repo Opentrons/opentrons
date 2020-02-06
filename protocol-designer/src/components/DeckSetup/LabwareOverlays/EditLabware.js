@@ -5,8 +5,8 @@ import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { DragSource, DropTarget } from 'react-dnd'
-import { i18n } from '../../../localization'
-import { NameThisLabware } from './NameThisLabware'
+import i18n from '../../../localization'
+import NameThisLabware from './NameThisLabware'
 import { DND_TYPES } from './constants'
 import {
   openIngredientSelector,
@@ -44,7 +44,7 @@ type DNDP = {|
 
 type Props = {| ...OP, ...SP, ...DP, ...DNDP |}
 
-const EditLabwareComponent = (props: Props) => {
+const EditLabware = (props: Props) => {
   const {
     labwareOnDeck,
     isYetUnnamed,
@@ -146,7 +146,7 @@ const DragEditLabware = DragSource(
   DND_TYPES.LABWARE,
   labwareSource,
   collectLabwareSource
-)(EditLabwareComponent)
+)(EditLabware)
 
 const labwareDropTarget = {
   canDrop: (props: { ...OP, ...SP, ...DP }, monitor) => {
@@ -176,7 +176,7 @@ const collectLabwareDropTarget = (connect, monitor) => ({
   isOver: monitor.isOver(),
   draggedLabware: monitor.getItem()?.labwareOnDeck || null,
 })
-const DragDropEditLabware = DropTarget(
+export const DragDropEditLabware = DropTarget(
   DND_TYPES.LABWARE,
   labwareDropTarget,
   collectLabwareDropTarget
@@ -205,7 +205,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
     dispatch(moveDeckItem(sourceSlot, destSlot)),
 })
 
-export const EditLabware = connect<
+export default connect<
   {| ...OP, ...SP, ...DP |},
   OP,
   SP,

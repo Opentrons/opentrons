@@ -26,7 +26,7 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-const LabwareOnDeckComponent = (props: Props) => (
+const LabwareOnDeck = (props: Props) => (
   <g
     transform={`translate(${props.x}, ${props.y})`}
     className={props.className}
@@ -56,6 +56,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareOnDeck = connect<Props, OP, SP, {||}, _, _>(
-  mapStateToProps
-)(LabwareOnDeckComponent)
+export default connect<Props, OP, SP, {||}, _, _>(mapStateToProps)(
+  LabwareOnDeck
+)

@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { FormGroup } from '@opentrons/components'
 import { AspDispSection } from './AspDispSection'
 
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 
 import {
   TextField,

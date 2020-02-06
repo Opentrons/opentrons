@@ -1,7 +1,7 @@
 // @flow
 import { connect } from 'react-redux'
 import * as React from 'react'
-import { TerminalItem } from './TerminalItem'
+import TerminalItem from './TerminalItem'
 import { PDListItem } from '../lists'
 import { START_TERMINAL_TITLE } from '../../constants'
 import type { BaseState } from '../../types'
@@ -14,7 +14,7 @@ type Props = {
 
 type SP = $Exact<Props>
 
-function StartingDeckStateTerminalItemComponent(props: Props) {
+function StartingDeckStateTerminalItem(props: Props) {
   const { showHint } = props
   const hintContents = (
     <PDListItem>
@@ -36,6 +36,6 @@ function mapStateToProps(state: BaseState): SP {
   return { showHint: noLabware }
 }
 
-export const StartingDeckStateTerminalItem = connect<Props, {||}, SP, _, _, _>(
-  mapStateToProps
-)(StartingDeckStateTerminalItemComponent)
+export default connect<Props, {||}, SP, _, _, _>(mapStateToProps)(
+  StartingDeckStateTerminalItem
+)

@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 
-import { i18n } from '../../../../localization'
+import i18n from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   Modal,

@@ -10,7 +10,7 @@ import {
   dropTipHelper,
   DEFAULT_PIPETTE,
 } from './fixtures'
-import { replaceTip } from '../commandCreators/atomic/replaceTip'
+import replaceTip from '../commandCreators/atomic/replaceTip'
 
 const tiprack1Id = 'tiprack1Id'
 const tiprack2Id = 'tiprack2Id'

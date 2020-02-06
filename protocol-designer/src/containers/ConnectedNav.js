@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import { KNOWLEDGEBASE_ROOT_URL } from '../components/KnowledgeBaseLink'
 import { NavTab, TabbedNavBar, OutsideLinkTab } from '@opentrons/components'
-import { i18n } from '../localization'
+import i18n from '../localization'
 import { type Page, actions, selectors } from '../navigation'
 import { selectors as fileSelectors } from '../file-data'
 
@@ -85,7 +85,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedNav = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(Nav)

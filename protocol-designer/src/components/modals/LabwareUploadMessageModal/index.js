@@ -6,11 +6,11 @@ import {
   selectors as labwareDefSelectors,
   actions as labwareDefActions,
 } from '../../../labware-defs'
-import { LabwareUploadMessageModal as LabwareUploadMessageModalComponent } from './LabwareUploadMessageModal'
+import LabwareUploadMessageModal from './LabwareUploadMessageModal'
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../../../types'
 
-type Props = React.ElementProps<typeof LabwareUploadMessageModalComponent>
+type Props = React.ElementProps<typeof LabwareUploadMessageModal>
 
 type SP = {|
   message: $PropertyType<Props, 'message'>,
@@ -53,8 +53,8 @@ function mergeProps(
   }
 }
 
-export const LabwareUploadMessageModal = connect<Props, {||}, SP, _, _, _>(
+export default connect<Props, {||}, SP, _, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(LabwareUploadMessageModalComponent)
+)(LabwareUploadMessageModal)
