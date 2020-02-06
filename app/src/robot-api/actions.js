@@ -1,10 +1,13 @@
 // @flow
 import * as Types from './types'
-import * as Constants from './constants'
+import { DISMISS_REQUEST } from './constants'
 
 export const dismissRequest = (
   requestId: string
-): Types.DismissRequestAction => ({
-  type: Constants.DISMISS_REQUEST,
-  payload: { requestId },
-})
+): Types.DismissRequestAction => {
+  console.log(DISMISS_REQUEST)
+  return {
+    type: DISMISS_REQUEST,
+    payload: { requestId },
+  }
+}

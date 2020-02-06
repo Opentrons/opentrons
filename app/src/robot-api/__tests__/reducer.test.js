@@ -2,6 +2,7 @@
 import { robotApiReducer } from '../reducer'
 
 import type { RobotApiState } from '../types'
+import { mockFailedRequest } from '../__fixtures__'
 
 type ReducerSpec = {|
   name: string,
@@ -47,6 +48,20 @@ const SPECS: Array<ReducerSpec> = [
         response: ({ ok: false }: any),
         error: { message: 'AH' },
       },
+      def: { status: 'pending' },
+    },
+  },
+  {
+    name: 'handles a dismiss request action',
+    state: {
+      abc: mockFailedRequest,
+      def: { status: 'pending' },
+    },
+    action: {
+      type: 'robotApi:DISMISS_REQUEST',
+      payload: { requestId: 'abc' },
+    },
+    expected: {
       def: { status: 'pending' },
     },
   },

@@ -51,10 +51,7 @@ export function ModuleUpdate(props: Props) {
   const latestRequest = useSelector<State, RequestState | null>(state =>
     getRequestById(state, latestRequestId)
   )
-  const requestStatus = latestRequest?.status
-
-  const isPending = requestStatus === PENDING
-  const hasFailed = requestStatus === FAILURE
+  const isPending = latestRequest?.status === PENDING
 
   const buttonText = hasAvailableUpdate ? 'update' : 'up to date'
   let tooltipText = null
@@ -64,8 +61,6 @@ export function ModuleUpdate(props: Props) {
   const handleCloseErrorModal = () => {
     dispatch(dismissRequest(latestRequestId))
   }
-  // const [dispatch, requestIds] = useDispatchApiRequest<FetchPipettesAction>()
-  // - loading state and error state off of request status
   return (
     <div className={styles.module_update_wrapper}>
       <HoverTooltip tooltipComponent={tooltipText}>
@@ -74,7 +69,7 @@ export function ModuleUpdate(props: Props) {
             <OutlineButton
               className={styles.module_update_button}
               onClick={handleClick}
-              disabled={!canControl || !hasAvailableUpdate}
+              disabled={!canControl || !hasAvailableUpdate || isPending}
             >
               {isPending ? (
                 <Icon name="ot-spinner" height="1em" spin />
@@ -85,7 +80,7 @@ export function ModuleUpdate(props: Props) {
           </div>
         )}
       </HoverTooltip>
-      {hasFailed && (
+      {latestRequest?.status == 'failure' && (
         <Portal>
           <AlertModal
             alertOverlay
@@ -93,7 +88,7 @@ export function ModuleUpdate(props: Props) {
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
             <p>An error occurred while attempting to update your robot.</p>
-            <p>{hasFailed && latestRequest?.error?.message}</p>
+            <p>{latestRequest?.error?.message}</p>
           </AlertModal>
         </Portal>
       )}
