@@ -1,4 +1,3 @@
-import pytest
 import asyncio
 from pathlib import Path
 from unittest import mock
@@ -6,9 +5,8 @@ try:
     import aionotify
 except OSError:
     aionotify = None  # type: ignore
-from opentrons.hardware_control.modules import ModuleAtPort, update
+from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import BundledFirmware
-from opentrons.hardware_control import Controller
 
 
 async def test_get_modules_simulating():
@@ -88,13 +86,15 @@ async def test_module_update_integration(monkeypatch, loop):
         return 'ot_module_avrdude_bootloader1'
 
     monkeypatch.setattr(modules.update,
-                        'find_bootloader_port', mock_find_avrdude_bootloader_port)
+                        'find_bootloader_port',
+                        mock_find_avrdude_bootloader_port)
 
     await modules.update_firmware(tempdeck, 'fake_fw_file_path', loop)
-    upload_via_avrdude_mock.assert_called_once_with('ot_module_avrdude_bootloader1',
-                                                    'fake_fw_file_path',
-                                                    bootloader_kwargs
-                                                    )
+    upload_via_avrdude_mock.assert_called_once_with(
+        'ot_module_avrdude_bootloader1',
+        'fake_fw_file_path',
+        bootloader_kwargs
+    )
     upload_via_avrdude_mock.reset_mock()
 
     # test magnetic module update with avrdude bootloader
@@ -105,10 +105,11 @@ async def test_module_update_integration(monkeypatch, loop):
                                   lambda x: None)
 
     await modules.update_firmware(magdeck, 'fake_fw_file_path', loop)
-    upload_via_avrdude_mock.assert_called_once_with('ot_module_avrdude_bootloader1',
-                                                    'fake_fw_file_path',
-                                                    bootloader_kwargs
-                                                    )
+    upload_via_avrdude_mock.assert_called_once_with(
+        'ot_module_avrdude_bootloader1',
+        'fake_fw_file_path',
+        bootloader_kwargs
+    )
 
     # test thermocycler module update with bossa bootloader
 
@@ -127,15 +128,17 @@ async def test_module_update_integration(monkeypatch, loop):
         return 'ot_module_bossa_bootloader1'
 
     monkeypatch.setattr(modules.update,
-                        'find_bootloader_port', mock_find_bossa_bootloader_port)
+                        'find_bootloader_port',
+                        mock_find_bossa_bootloader_port)
 
     await modules.update_firmware(thermocycler,
                                   'fake_fw_file_path',
                                   loop)
-    upload_via_bossa_mock.assert_called_once_with('ot_module_bossa_bootloader1',
-                                                  'fake_fw_file_path',
-                                                  bootloader_kwargs
-                                                  )
+    upload_via_bossa_mock.assert_called_once_with(
+        'ot_module_bossa_bootloader1',
+        'fake_fw_file_path',
+        bootloader_kwargs
+    )
 
 
 async def test_get_bundled_fw(monkeypatch, tmpdir):

@@ -3,12 +3,10 @@
 # TODO: 'Temperature Module' or similar
 
 import pytest
-import asyncio
 from threading import Lock
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers import serial_communication
-from opentrons.hardware_control import modules as hw_modules
 
 
 @pytest.fixture
