@@ -136,7 +136,7 @@ describe('forDeactivateTemperature', () => {
 
 describe('forAwaitTemperature', () => {
   ;[TEMPERATURE_AT_TARGET, TEMPERATURE_APPROACHING_TARGET].forEach(status => {
-    test(`should update state to 'at target' when previous status is ${status} and the given target temp matches the previous target temp`, () => {
+    test(`update status to 'at target' when previous status is ${status} and the given target temp matches the previous target temp`, () => {
       const params = {
         module: temperatureModuleId,
         temperature: temperature,
@@ -149,7 +149,7 @@ describe('forAwaitTemperature', () => {
         temperature
       )
 
-      const expectedRobotState = robotWithStatusAndTemp(
+      const robotAtTargetTemp = robotWithStatusAndTemp(
         robotWithTemp,
         temperatureModuleId,
         TEMPERATURE_AT_TARGET,
@@ -163,13 +163,13 @@ describe('forAwaitTemperature', () => {
       )
 
       expect(result).toEqual({
-        robotState: expectedRobotState,
+        robotState: robotAtTargetTemp,
         warnings: [],
       })
     })
   })
 
-  test('await non-target temperature when actively approaching target', () => {
+  test(`keep status at 'appraoching target temperature' when actively approaching target`, () => {
     const params = {
       module: temperatureModuleId,
       temperature: 55,
