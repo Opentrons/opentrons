@@ -136,7 +136,7 @@ export function getStepItemContents(stepItemProps: StepItemProps) {
     const temperature =
       substeps.temperature === null
         ? 'Deactivated'
-        : `${substeps.temperature} °C`
+        : `${substeps.temperature} ${i18n.t('application.units.degrees')}`
 
     return (
       <ModuleStepItems

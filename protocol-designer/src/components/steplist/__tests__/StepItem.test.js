@@ -9,39 +9,121 @@ function renderWrapper(Component) {
 }
 
 describe('getStepItemContents', () => {
-  test('module component is rendered when substep is magnet', () => {
-    const props = {
-      substeps: {
-        substepType: 'magnet',
-        engage: true,
-        labwareDisplayName: 'magnet display',
-        labwareNickname: 'magnet nickname',
-        message: 'message',
-      },
-      rawForm: {},
+  let props
+  beforeEach(() => {
+    props = {
+      stepId: 'stepId',
+      stepNumber: 1,
+      title: 'test',
+      description: null,
+      hoveredSubstep: null,
+      ingredNames: {},
+      highlightSubstep: jest.fn(),
+      selectStep: jest.fn(),
+      toggleStepCollapsed: jest.fn(),
+      highlightStep: jest.fn(),
     }
-
-    const Component = getStepItemContents(props)
-    const wrapper = renderWrapper(Component)
-
-    expect(wrapper.find(ModuleStepItems)).toHaveLength(1)
   })
 
-  test('module component is rendered when substep is temperature', () => {
-    const props = {
-      substeps: {
-        substepType: 'temperature',
-        engage: true,
-        labwareDisplayName: 'temperature display',
-        labwareNickname: 'temperature nickname',
-        message: 'message',
-      },
-      rawForm: {},
-    }
+  describe('magnet step type', () => {
+    let magnetProps
+    beforeEach(() => {
+      const stepType = 'magnet'
+      magnetProps = {
+        ...props,
+        rawForm: {
+          stepType,
+          id: stepType,
+          StepFieldName: stepType,
+        },
+        substeps: {
+          substepType: stepType,
+          engage: true,
+          labwareDisplayName: 'magnet display',
+          labwareNickname: 'magnet nickname',
+          message: 'message',
+        },
+        stepType: stepType,
+        labwareNicknamesById: {
+          magnetId: 'magnet nickname',
+        },
+        labwareDefDisplayNamesById: {
+          magnetId: 'magnet display',
+        },
+      }
+    })
 
-    const Component = getStepItemContents(props)
-    const wrapper = renderWrapper(Component)
+    test('module rendered with engage when engage is true', () => {
+      const StepItemContents = getStepItemContents(magnetProps)
+      const wrapper = renderWrapper(StepItemContents)
 
-    expect(wrapper.find(ModuleStepItems)).toHaveLength(1)
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+      expect(component.prop('actionText')).toEqual('engage')
+    })
+
+    test('module rendered with disengage when type is disengage', () => {
+      magnetProps.substeps.engage = false
+
+      const StepItemContents = getStepItemContents(magnetProps)
+      const wrapper = renderWrapper(StepItemContents)
+
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+      expect(component.prop('actionText')).toEqual('disengage')
+    })
+  })
+
+  describe('temperature step type', () => {
+    let temperatureProps
+    beforeEach(() => {
+      const stepType = 'temperature'
+      temperatureProps = {
+        ...props,
+        rawForm: {
+          stepType,
+          id: stepType,
+          StepFieldName: stepType,
+        },
+        substeps: {
+          substepType: stepType,
+          temperature: 45,
+          labwareDisplayName: 'temperature display',
+          labwareNickname: 'temperature nickname',
+          message: 'message',
+        },
+        stepType: stepType,
+        labwareNicknamesById: {
+          magnetId: 'temperature nickname',
+        },
+        labwareDefDisplayNamesById: {
+          magnetId: 'temperature display',
+        },
+      }
+    })
+
+    test('module is rendered with temperature when temperature exists', () => {
+      const Component = getStepItemContents(temperatureProps)
+      const wrapper = renderWrapper(Component)
+
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+      expect(component.prop('actionText')).toEqual('45 °C')
+    })
+
+    test('module is rendered with deactivated when temperature is null', () => {
+      // overwrite temperature like this due to flow issue when temperature changes from num to null
+      temperatureProps.substeps = {
+        ...temperatureProps.substeps,
+        temperature: null,
+      }
+
+      const Component = getStepItemContents(temperatureProps)
+      const wrapper = renderWrapper(Component)
+
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+      expect(component.prop('actionText')).toEqual('Deactivated')
+    })
   })
 })
