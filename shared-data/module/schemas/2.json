@@ -26,97 +26,89 @@
       }
     }
   },
-  "description": "Module specifications",
+  "description": "Module specification",
   "type": "object",
-  "$comment": "Example key: 'magdeck'",
-  "required": ["$otSharedSchema"],
+  "required": [
+    "$otSharedSchema",
+    "moduleType",
+    "labwareOffset",
+    "dimensions",
+    "calibrationPoint",
+    "displayName",
+    "loadNames",
+    "quirks",
+    "slotTransforms",
+    "compatibleWith"
+  ],
+  "additionalProperties": false,
   "properties": {
     "$otSharedSchema": {
       "type": "string",
       "description": "The path to a valid Opentrons shared schema relative to the shared-data directory, without its extension. For instance, #/module/schemas/2 is a reference to this schema."
-    }
-  },
-  "patternProperties": {
-    "^[^$].*": {
-      "type": "object",
-      "required": [
-        "moduleType",
-        "labwareOffset",
-        "dimensions",
-        "calibrationPoint",
-        "displayName",
-        "loadNames",
-        "quirks",
-        "slotTransforms",
-        "compatibleWith"
+    },
+    "moduleType": {
+      "enum": [
+        "temperatureModuleType",
+        "magneticModuleType",
+        "thermocyclerModuleType"
       ],
-      "additionalProperties": false,
+      "type": "string"
+    },
+    "labwareOffset": { "$ref": "#/definitions/coordinates" },
+    "dimensions": {
+      "type": "object",
+      "required": ["bareOverallHeight", "overLabwareHeight"],
       "properties": {
-        "moduleType": {
-          "enum": [
-            "temperatureModuleType",
-            "magneticModuleType",
-            "thermocyclerModuleType"
-          ],
-          "type": "string"
-        },
-        "labwareOffset": { "$ref": "#/definitions/coordinates" },
-        "dimensions": {
+        "bareOverallHeight": { "type": "number" },
+        "overLabwareHeight": { "type": "number" },
+        "lidHeight": { "type": "number" }
+      }
+    },
+    "calibrationPoint": { "$ref": "#/definitions/coordinates" },
+    "displayName": { "type": "string" },
+    "loadNames": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A name that can be used to load this module within a protocol. These must be interpreted non-case-sensitively."
+      }
+    },
+    "quirks": {
+      "type": "array",
+      "description": "List of quirks for a given module",
+      "items": {
+        "type": "string"
+      }
+    },
+    "slotTransforms": {
+      "type": "object",
+      "description": "Per-deckmap sets of per-slot transforms, properties should be ids of decks such as \"ot2_standard\". Transforms for a deck not explicitly listed are the identity.",
+      "patternProperties": {
+        ".*": {
           "type": "object",
-          "required": ["bareOverallHeight", "overLabwareHeight"],
-          "properties": {
-            "bareOverallHeight": { "type": "number" },
-            "overLabwareHeight": { "type": "number" },
-            "lidHeight": { "type": "number" }
-          }
-        },
-        "calibrationPoint": { "$ref": "#/definitions/coordinates" },
-        "displayName": { "type": "string" },
-        "loadNames": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "description": "A name that can be used to load this module within a protocol. These must be interpreted non-case-sensitively."
-          }
-        },
-        "quirks": {
-          "type": "array",
-          "description": "List of quirks for a given module",
-          "items": {
-            "type": "string"
-          }
-        },
-        "slotTransforms": {
-          "type": "object",
-          "description": "Per-deckmap sets of per-slot transforms, properties should be ids of decks such as \"ot2_standard\". Transforms for a deck not explicitly listed are the identity.",
-          "patternProperties": {
-            ".*": {
+          "patternProperties:": {
+            "^([1-9]|10|11)$": {
               "type": "object",
-              "patternProperties:": {
-                "^([1-9]|10|11)$": {
+              "description": "Holds 2-D affine transforms that should be applied to top level keys plus the special property $image for applying to images images. If any top level key has no corresponding entry, it is an identity transform. If the transform applies to an entity specifying a 3D position, it should be applied only to the x and y.",
+              "patternProperties": {
+                ".*": {
                   "type": "object",
-                  "description": "Holds 2-D affine transforms that should be applied to top level keys plus the special property $image for applying to images images. If any top level key has no corresponding entry, it is an identity transform. If the transform applies to an entity specifying a 3D position, it should be applied only to the x and y.",
+                  "description": "The keys identify transforms that apply to different sections of the module definition. Most will be top level keys of the module def (for instance, \"labwareOffset\") but there may also be additional meta keys for values that are not in the def",
                   "patternProperties": {
-                    ".*": {
-                      "type": "object",
-                      "description": "The keys identify transforms that apply to different sections of the module definition. Most will be top level keys of the module def (for instance, \"labwareOffset\") but there may also be additional meta keys for values that are not in the def",
-                      "patternProperties": {
-                        ".*": { "$ref": "#/definitions/affineTransform" }
-                      }
-                    }
+                    ".*": { "$ref": "#/definitions/affineTransform" }
                   }
                 }
               }
             }
           }
-        },
-        "compatibleWith": {
-          "type": "array",
-          "items": {
-            "type": "string",
-            "description": "A JSON path to a compatilbe module definition, e.g. one that may be loaded in place of this one with no behavior changes implied"
-          }
         }
+      }
+    },
+    "compatibleWith": {
+      "type": "array",
+      "items": {
+        "type": "string",
+        "description": "A JSON path to a compatilbe module definition, e.g. one that may be loaded in place of this one with no behavior changes implied"
       }
     }
   }

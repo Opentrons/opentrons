@@ -1,6 +1,6 @@
 // @flow
 import type { ModuleModel, ModuleRealType } from './types'
-import moduleSpecs from '../module/definitions/2.json'
+import moduleSpecs from '../module/definitions/1.json'
 
 // The module objects in v2 Module Definitions representing a single module model
 type Coordinates = {|
