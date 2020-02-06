@@ -52,6 +52,19 @@
   }
 }
 
+.module_substep_header {
+  display: flex;
+  margin: 0.5rem 0.5rem 0 0.5rem;
+  font-size: var(--fs-caption);
+  text-transform: uppercase;
+  justify-content: space-between;
+}
+
+.module_substep_value {
+  text-align: right;
+  flex: 0.5;
+}
+
 /* Multi-channel row representing a single channel */
 .step_subitem_channel_row {
   border-top: 0;

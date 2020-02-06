@@ -22,9 +22,8 @@ export const ModuleStepItems = (props: Props) => (
     {props.message && (
       <PDListItem className="step-item-message">{props.message}</PDListItem>
     )}
-    <li className={styles.aspirate_dispense}>
+    <li className={styles.module_substep_header}>
       <span>{i18n.t(`modules.module_long_names.${props.module}`)}</span>
-      <span className={styles.spacer} />
       <span>{props.action}</span>
     </li>
     <PDListItem
@@ -48,8 +47,7 @@ export const ModuleStepItems = (props: Props) => (
           </span>
         )}
       </HoverTooltip>
-      <span className={styles.step_subitem_spacer} />
-      <span className={styles.labware_display_name}>{props.actionText}</span>
+      <span className={styles.module_substep_value}>{props.actionText}</span>
     </PDListItem>
   </>
 )
