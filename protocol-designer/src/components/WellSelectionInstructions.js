@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
-import i18n from '../localization'
+import { i18n } from '../localization'
 import styles from './WellSelectionInstructions.css'
 
 export function WellSelectionInstructions() {

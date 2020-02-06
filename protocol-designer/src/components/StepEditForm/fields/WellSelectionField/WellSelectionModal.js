@@ -9,7 +9,7 @@ import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import { changeFormInput } from '../../../../steplist/actions'
-import WellSelectionInstructions from '../../../WellSelectionInstructions'
+import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
 import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'

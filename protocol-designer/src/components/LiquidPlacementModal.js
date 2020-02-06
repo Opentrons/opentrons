@@ -10,7 +10,7 @@ import {
   SelectableLabware,
 } from '../components/labware'
 import { LiquidPlacementForm } from '../components/LiquidPlacementForm'
-import WellSelectionInstructions from './WellSelectionInstructions'
+import { WellSelectionInstructions } from './WellSelectionInstructions'
 
 import { selectors } from '../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../step-forms'
