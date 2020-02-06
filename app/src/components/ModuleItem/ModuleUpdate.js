@@ -10,17 +10,29 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../portal'
 import { getConnectedRobotName } from '../../robot/selectors'
-import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import { dismissRequest } from '../../robot-api/actions'
-import { updateModule } from '../../modules/actions'
+import {
+  useDispatchApiRequest,
+  getRequestById,
+  PENDING,
+  FAILURE,
+  dismissRequest,
+} from '../../robot-api'
+import { updateModule } from '../../modules'
 import type { UpdateModuleAction } from '../../modules/types'
 import type { State, Dispatch } from '../../types'
 import type { RequestState } from '../../robot-api/types'
 import styles from './styles.css'
 
-const UP_TO_DATE = 'Module Firmware is up to date'
+const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'
 const CONNECT_TO_UPDATE = 'Connect to Robot to update Module'
 const OK_TEXT = 'Ok'
+
+const UPDATE = 'update'
+const UPDATE_TO_DATE = 'up to date'
+
+const FAILED_UPDATE_HEADER = 'Failed to update Module Firmware'
+const FAILED_UPDATE_BODY =
+  'An error occurred while attempting to update your robot.'
 
 type Props = {|
   hasAvailableUpdate: boolean,
@@ -47,13 +59,11 @@ export function ModuleUpdate(props: Props) {
     getRequestById(state, latestRequestId)
   )
   const isPending = latestRequest?.status === PENDING
-  // $FlowFixMe
-  const errorMessage = latestRequest?.error?.message
 
-  const buttonText = hasAvailableUpdate ? 'update' : 'up to date'
+  const buttonText = hasAvailableUpdate ? UPDATE : UPDATE_TO_DATE
   let tooltipText = null
   if (!canControl) tooltipText = CONNECT_TO_UPDATE
-  if (!hasAvailableUpdate) tooltipText = UP_TO_DATE
+  if (!hasAvailableUpdate) tooltipText = FW_IS_UP_TO_DATE
 
   const handleCloseErrorModal = () => {
     dispatch(dismissRequest(latestRequestId))
@@ -77,15 +87,15 @@ export function ModuleUpdate(props: Props) {
           </div>
         )}
       </HoverTooltip>
-      {latestRequest?.status === 'failure' && (
+      {latestRequest && latestRequest.status === FAILURE && (
         <Portal>
           <AlertModal
             alertOverlay
-            heading="Failed to update Module Firmware"
+            heading={FAILED_UPDATE_HEADER}
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
-            <p>An error occurred while attempting to update your robot.</p>
-            <p>{errorMessage}</p>
+            <p>{FAILED_UPDATE_BODY}</p>
+            <p>{latestRequest.error.message}</p>
           </AlertModal>
         </Portal>
       )}
