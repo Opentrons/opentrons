@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
 import forEach from 'lodash/forEach'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import type { ThunkDispatch } from '../../../types'
 import type { LabwareOnDeck } from '../../../step-forms'
 import { drillDownOnLabware } from '../../../labware-ingred/actions'
@@ -48,7 +48,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export default connect<Props, OP, _, DP, _, _>(
+export const BrowseLabware = connect<Props, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
 )(BrowseLabwareOverlay)

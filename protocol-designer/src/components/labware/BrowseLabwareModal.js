@@ -1,12 +1,12 @@
 // @flow
 import assert from 'assert'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 
 import { Modal } from '@opentrons/components'
-import BrowsableLabware from './BrowsableLabware'
+import { BrowsableLabware } from './BrowsableLabware'
 
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
 import { selectors } from '../../labware-ingred/selectors'
@@ -33,7 +33,7 @@ type DP = {|
 
 type Props = {| ...SP, ...DP |}
 
-const BrowseLabwareModal = (props: Props) => {
+const BrowseLabwareModalComponent = (props: Props) => {
   const { drillUp, definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')
@@ -81,7 +81,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   return { drillUp: () => dispatch(labwareIngredsActions.drillUpFromLabware()) }
 }
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const BrowseLabwareModal = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(BrowseLabwareModal)
+)(BrowseLabwareModalComponent)

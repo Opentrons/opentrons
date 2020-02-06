@@ -9,7 +9,7 @@ type Props = {
   leftPipette: ?string,
   rightPipette: ?string,
 }
-export default function PipetteDiagram(props: Props) {
+export function PipetteDiagram(props: Props) {
   const { leftPipette, rightPipette } = props
   const leftSpecs = leftPipette && getPipetteNameSpecs(leftPipette)
   const rightSpecs = rightPipette && getPipetteNameSpecs(rightPipette)

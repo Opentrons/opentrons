@@ -112,7 +112,7 @@ function getMigrationMessage(migrationsRan: Array<string>): ModalContents {
   return genericDidMigrateMessage
 }
 
-export default function getModalContents(
+export function getModalContents(
   uploadResponse: FileUploadMessage
 ): ModalContents {
   if (uploadResponse.isError) {

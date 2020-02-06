@@ -23,7 +23,7 @@ type Props = {|
 |}
 
 /** Link which opens a page on the knowledge base to a new tab/window */
-function KnowledgeBaseLink(props: Props) {
+export function KnowledgeBaseLink(props: Props) {
   return (
     <a
       target="_blank"
@@ -35,5 +35,3 @@ function KnowledgeBaseLink(props: Props) {
     </a>
   )
 }
-
-export default KnowledgeBaseLink

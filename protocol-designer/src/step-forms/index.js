@@ -1,6 +1,6 @@
 // @flow
 import { registerSelectors } from '../utils'
-import rootReducer from './reducers'
+import { rootReducer } from './reducers'
 import type { RootState } from './reducers'
 import * as selectors from './selectors'
 import * as actions from './actions'

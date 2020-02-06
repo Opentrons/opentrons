@@ -2,7 +2,7 @@
 
 import cookie from 'cookie'
 import queryString from 'query-string'
-import i18n from '../localization'
+import { i18n } from '../localization'
 
 export type GateStage =
   | 'loading'

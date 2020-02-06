@@ -1,16 +1,16 @@
 // @flow
-import dependentFieldsUpdateMoveLiquid from './dependentFieldsUpdateMoveLiquid'
-import dependentFieldsUpdateMix from './dependentFieldsUpdateMix'
-import dependentFieldsUpdateMagnet from './dependentFieldsUpdateMagnet'
+import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiquid'
+import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
+import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
-import dependentFieldsUpdateTemperature from './dependentFieldsUpdateTemperature'
+import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
 
-function handleFormChange(
+export function handleFormChange(
   patch: FormPatch,
   rawForm: ?FormData,
   pipetteEntities: PipetteEntities,
@@ -52,5 +52,3 @@ function handleFormChange(
 
   return patch
 }
-
-export default handleFormChange

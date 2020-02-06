@@ -83,8 +83,6 @@ export type RootState = {
   dismissedWarnings: DismissedWarningState,
 }
 
-const rootReducer = combineReducers<_, Action>(_allReducers)
-
-export default rootReducer
+export const rootReducer = combineReducers<_, Action>(_allReducers)
 
 export const rootSelector = (state: BaseState) => state.dismiss

@@ -1,10 +1,10 @@
 // @flow
 import React from 'react'
-import ProtocolEditor from './ProtocolEditor'
+import { ProtocolEditor } from './ProtocolEditor'
 
 import '../css/reset.css'
 
-export default function App() {
+export function App() {
   return (
     <div className="container">
       <ProtocolEditor />

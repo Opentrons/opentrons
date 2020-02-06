@@ -4,7 +4,7 @@ import cx from 'classnames'
 import { Icon, HoverTooltip } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
-import LabwareTooltipContents from './LabwareTooltipContents'
+import { LabwareTooltipContents } from './LabwareTooltipContents'
 import { Portal } from './TooltipPortal'
 
 type AspirateDispenseHeaderProps = {
@@ -14,7 +14,7 @@ type AspirateDispenseHeaderProps = {
   destLabwareDefDisplayName: ?string,
 }
 
-function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
+export function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
   const {
     sourceLabwareNickname,
     sourceLabwareDefDisplayName,
@@ -78,5 +78,3 @@ function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
     </React.Fragment>
   )
 }
-
-export default AspirateDispenseHeader

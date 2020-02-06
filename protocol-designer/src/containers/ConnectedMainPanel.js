@@ -4,17 +4,17 @@ import { connect } from 'react-redux'
 import { Splash } from '@opentrons/components'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../steplist'
 import { Portal as MainPageModalPortal } from '../components/portals/MainPageModalPortal'
-import DeckSetup from '../components/DeckSetup'
-import ConnectedFilePage from '../containers/ConnectedFilePage'
-import SettingsPage from '../components/SettingsPage'
-import LiquidsPage from '../components/LiquidsPage'
-import Hints from '../components/Hints'
-import LiquidPlacementModal from '../components/LiquidPlacementModal.js'
-import LabwareSelectionModal from '../components/LabwareSelectionModal'
-import StepEditForm from '../components/StepEditForm'
-import TimelineAlerts from '../components/alerts/TimelineAlerts'
+import { DeckSetup } from '../components/DeckSetup'
+import { ConnectedFilePage } from '../containers/ConnectedFilePage'
+import { SettingsPage } from '../components/SettingsPage'
+import { LiquidsPage } from '../components/LiquidsPage'
+import { Hints } from '../components/Hints'
+import { LiquidPlacementModal } from '../components/LiquidPlacementModal.js'
+import { LabwareSelectionModal } from '../components/LabwareSelectionModal'
+import { StepEditForm } from '../components/StepEditForm'
+import { TimelineAlerts } from '../components/alerts/TimelineAlerts'
 
-import { selectors as stepsSelectors } from '../ui/steps'
+import { getSelectedTerminalItemId } from '../ui/steps'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors, type Page } from '../navigation'
 import type { BaseState } from '../types'
@@ -25,7 +25,7 @@ type Props = {
   ingredSelectionMode: boolean,
 }
 
-function MainPanel(props: Props) {
+function MainPanelComponent(props: Props) {
   const { page, selectedTerminalItemId, ingredSelectionMode } = props
   switch (page) {
     case 'file-splash':
@@ -60,10 +60,12 @@ function MainPanel(props: Props) {
 function mapStateToProps(state: BaseState): $Exact<Props> {
   return {
     page: selectors.getCurrentPage(state),
-    selectedTerminalItemId: stepsSelectors.getSelectedTerminalItemId(state),
+    selectedTerminalItemId: getSelectedTerminalItemId(state),
     ingredSelectionMode:
       labwareIngredSelectors.getSelectedLabwareId(state) != null,
   }
 }
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(MainPanel)
+export const ConnectedMainPanel = connect<Props, {||}, _, _, _, _>(
+  mapStateToProps
+)(MainPanelComponent)

@@ -9,7 +9,7 @@ import {
 import { connect } from 'react-redux'
 import cx from 'classnames'
 
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { getMaxDisposalVolumeForMultidispense } from '../../../steplist/formLevel/handleFormChange/utils'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'

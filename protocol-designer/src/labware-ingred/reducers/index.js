@@ -335,7 +335,7 @@ export type RootState = {|
 |}
 
 // TODO Ian 2018-01-15 factor into separate files
-const rootReducer = combineReducers<_, Action>({
+export const rootReducer = combineReducers<_, Action>({
   modeLabwareSelection,
   selectedContainerId,
   selectedLiquidGroup,
@@ -345,5 +345,3 @@ const rootReducer = combineReducers<_, Action>({
   ingredients,
   ingredLocations,
 })
-
-export default rootReducer

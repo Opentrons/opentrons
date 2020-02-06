@@ -4,7 +4,7 @@ import clamp from 'lodash/clamp'
 import pick from 'lodash/pick'
 import round from 'lodash/round'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
-import makeConditionalPatchUpdater from './makeConditionalPatchUpdater'
+import { makeConditionalPatchUpdater } from './makeConditionalPatchUpdater'
 import {
   chainPatchUpdaters,
   fieldHasChanged,
@@ -15,7 +15,7 @@ import {
   volumeInCapacityForMulti,
   DISPOSAL_VOL_DIGITS,
 } from './utils'
-import getDefaultsForStepType from '../getDefaultsForStepType'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import { getWellRatio } from '../../utils'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -439,7 +439,7 @@ export function updatePatchBlowoutFields(
   return patch
 }
 
-export default function dependentFieldsUpdateMoveLiquid(
+export function dependentFieldsUpdateMoveLiquid(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,

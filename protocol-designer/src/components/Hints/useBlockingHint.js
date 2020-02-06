@@ -7,7 +7,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { actions, selectors } from '../../tutorial'
 import { ContinueModal, CheckboxField } from '@opentrons/components'
 import { Portal } from '../portals/MainPageModalPortal'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import styles from './hints.css'
 import type { HintKey } from '../../tutorial'
 
@@ -86,5 +86,3 @@ export const useBlockingHint = (args: {|
     />
   )
 }
-
-export default useBlockingHint

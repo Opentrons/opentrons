@@ -1,5 +1,5 @@
 // @flow
-import selectors from '../selectors'
+import { getHoveredStepLabware } from '../selectors'
 import * as utils from '../../modules/utils'
 
 function createArgsForStepId(stepId, stepArgs) {
@@ -31,7 +31,7 @@ describe('getHoveredStepLabware', () => {
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = null
 
-    const result = selectors.getHoveredStepLabware.resultFunc(
+    const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
       initialDeckState
@@ -48,7 +48,7 @@ describe('getHoveredStepLabware', () => {
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
     const hoveredStep = 'another-step'
 
-    const result = selectors.getHoveredStepLabware.resultFunc(
+    const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStep,
       initialDeckState
@@ -61,7 +61,7 @@ describe('getHoveredStepLabware', () => {
     const stepArgs = null
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
-    const result = selectors.getHoveredStepLabware.resultFunc(
+    const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
       initialDeckState
@@ -79,7 +79,7 @@ describe('getHoveredStepLabware', () => {
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
-      const result = selectors.getHoveredStepLabware.resultFunc(
+      const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState
@@ -96,7 +96,7 @@ describe('getHoveredStepLabware', () => {
     }
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
-    const result = selectors.getHoveredStepLabware.resultFunc(
+    const result = getHoveredStepLabware.resultFunc(
       argsByStepId,
       hoveredStepId,
       initialDeckState
@@ -140,7 +140,7 @@ describe('getHoveredStepLabware', () => {
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
-      const result = selectors.getHoveredStepLabware.resultFunc(
+      const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState
@@ -157,7 +157,7 @@ describe('getHoveredStepLabware', () => {
       }
       const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
-      const result = selectors.getHoveredStepLabware.resultFunc(
+      const result = getHoveredStepLabware.resultFunc(
         argsByStepId,
         hoveredStepId,
         initialDeckState

@@ -6,7 +6,7 @@ type LabwareTooltipContentsProps = {
   labwareNickname: ?string,
   labwareDefDisplayName: ?string,
 }
-const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
+export const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
   const { labwareNickname, labwareDefDisplayName } = props
   return (
     <div className={styles.labware_tooltip_contents}>
@@ -20,5 +20,3 @@ const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
     </div>
   )
 }
-
-export default LabwareTooltipContents

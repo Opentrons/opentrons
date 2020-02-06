@@ -4,7 +4,7 @@ import { PAUSE_UNTIL_TIME, PAUSE_UNTIL_TEMP } from '../../../constants'
 import type { FormData } from '../../../form-types'
 import type { PauseArgs } from '../../../step-generation'
 
-const pauseFormToArgs = (formData: FormData): PauseArgs => {
+export const pauseFormToArgs = (formData: FormData): PauseArgs => {
   const hours = parseFloat(formData['pauseHour']) || 0
   const minutes = parseFloat(formData['pauseMinute']) || 0
   const seconds = parseFloat(formData['pauseSecond']) || 0
@@ -33,5 +33,3 @@ const pauseFormToArgs = (formData: FormData): PauseArgs => {
     },
   }
 }
-
-export default pauseFormToArgs

@@ -3,7 +3,7 @@ import * as errorCreators from '../../errorCreators'
 import type { BlowoutParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreatorError, CommandCreator } from '../../types'
 
-const blowout: CommandCreator<BlowoutParams> = (
+export const blowout: CommandCreator<BlowoutParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -54,5 +54,3 @@ const blowout: CommandCreator<BlowoutParams> = (
     commands,
   }
 }
-
-export default blowout
