@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import without from 'lodash/without'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
-import { i18n } from '../localization'
+import i18n from '../localization'
 import { actions as stepsActions } from '../ui/steps'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 import {
@@ -34,7 +34,7 @@ type Props = {|
 
 type State = { expanded?: boolean }
 
-class StepCreationButtonComponent extends React.Component<Props, State> {
+class StepCreationButton extends React.Component<Props, State> {
   state = { expanded: false }
 
   handleExpandClick = (e: SyntheticEvent<>) => {
@@ -131,7 +131,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.addStep({ stepType })),
 })
 
-export const StepCreationButton = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapSTP,
   mapDTP
-)(StepCreationButtonComponent)
+)(StepCreationButton)

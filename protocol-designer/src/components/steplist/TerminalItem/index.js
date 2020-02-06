@@ -5,12 +5,11 @@ import type { BaseState, ThunkDispatch } from '../../../types'
 
 import type { TerminalItemId } from '../../../steplist'
 import {
-  getHoveredTerminalItemId,
-  getSelectedTerminalItemId,
+  selectors as stepsSelectors,
   actions as stepsActions,
 } from '../../../ui/steps'
 import { PDTitledList } from '../../lists'
-export { TerminalItemLink } from './TerminalItemLink'
+export { default as TerminalItemLink } from './TerminalItemLink'
 
 type Props = React.ElementProps<typeof PDTitledList>
 
@@ -27,8 +26,8 @@ type SP = {|
 
 function mapStateToProps(state: BaseState, ownProps: OP): SP {
   const { id } = ownProps
-  const hovered = getHoveredTerminalItemId(state) === id
-  const selected = getSelectedTerminalItemId(state) === id
+  const hovered = stepsSelectors.getHoveredTerminalItemId(state) === id
+  const selected = stepsSelectors.getSelectedTerminalItemId(state) === id
   return {
     hovered,
     selected,
@@ -53,7 +52,7 @@ function mergeProps(
   }
 }
 
-export const TerminalItem = connect<Props, OP, SP, {||}, _, _>(
+export default connect<Props, OP, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

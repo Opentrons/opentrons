@@ -5,7 +5,7 @@ import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
 import { PDTitledList } from '../lists'
-import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
+import StepItem from '../../containers/ConnectedStepItem'
 import {
   stepIconsByType,
   type StepIdType,
@@ -13,7 +13,7 @@ import {
 } from '../../form-types'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState } from '../../types'
-import { ContextMenu } from './ContextMenu'
+import ContextMenu from './ContextMenu'
 import styles from './StepItem.css'
 
 const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
@@ -21,7 +21,7 @@ const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
 }
 
 type DragDropStepItemProps = {|
-  ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
+  ...$Exact<React.ElementProps<typeof StepItem>>,
   connectDragSource: mixed => React.Element<any>,
   connectDropTarget: mixed => React.Element<any>,
   stepId: StepIdType,
@@ -37,7 +37,7 @@ const DragSourceStepItem = (props: DragDropStepItemProps) =>
     props.connectDropTarget(
       <div style={{ opacity: props.isDragging ? 0.3 : 1 }}>
         {/* $FlowFixMe: (mc, 2019-04-18): connected components have exact props, which makes flow complain here */}
-        <ConnectedStepItem {...props} />
+        <StepItem {...props} />
       </div>
     )
   )
@@ -220,8 +220,6 @@ const collectListTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
 })
 
-export const DraggableStepItems = DropTarget(
-  DND_TYPES.STEP_ITEM,
-  listTarget,
-  collectListTarget
-)(StepItems)
+export default DropTarget(DND_TYPES.STEP_ITEM, listTarget, collectListTarget)(
+  StepItems
+)

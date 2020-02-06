@@ -15,7 +15,7 @@ type State = {
   transientValue: ?string,
 }
 
-export class EditableTextField extends React.Component<Props, State> {
+export default class EditableTextField extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {

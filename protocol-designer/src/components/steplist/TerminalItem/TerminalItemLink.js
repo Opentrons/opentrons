@@ -5,14 +5,14 @@ import { connect } from 'react-redux'
 import type { ThunkDispatch } from '../../../types'
 import { actions as stepsActions } from '../../../ui/steps'
 import { type TerminalItemId } from '../../../steplist'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import styles from './styles.css'
 
 type OP = {| terminalId: TerminalItemId |}
 type DP = {| selectTerminalItem: TerminalItemId => mixed |}
 type Props = {| ...OP, ...DP |}
 
-class TerminalItemLinkComponent extends React.Component<Props> {
+class TerminalItemLink extends React.Component<Props> {
   handleClick = () => {
     this.props.selectTerminalItem(this.props.terminalId)
   }
@@ -31,7 +31,7 @@ const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const TerminalItemLink = connect<Props, OP, {||}, DP, _, _>(
+export default connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDTP
-)(TerminalItemLinkComponent)
+)(TerminalItemLink)

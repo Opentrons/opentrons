@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { Icon, type IconName } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './styles.css'
@@ -23,7 +23,7 @@ type Props = {|
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-export function LabwareItem(props: Props) {
+export default function LabwareItem(props: Props) {
   const {
     disabled,
     icon,

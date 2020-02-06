@@ -1,6 +1,6 @@
 // @flow
 import values from 'lodash/values'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import type { ModuleType } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
 import type {

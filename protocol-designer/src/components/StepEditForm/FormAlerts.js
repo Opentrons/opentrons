@@ -1,12 +1,12 @@
 // @flow
 import { connect } from 'react-redux'
-import { Alerts, type Props } from '../alerts/Alerts'
+import Alerts, { type Props } from '../alerts/Alerts'
 import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
 import { getVisibleAlerts } from './utils'
-import { getSelectedStepId } from '../../ui/steps'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../form-types'
@@ -54,7 +54,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
       description: warning.body || null,
       dismissId: warning.type,
     })),
-    stepId: getSelectedStepId(state),
+    stepId: stepsSelectors.getSelectedStepId(state),
   }
 }
 

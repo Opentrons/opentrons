@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { AlertModal, CheckboxField, OutlineButton } from '@opentrons/components'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { actions as stepsActions } from '../../ui/steps'
 import type { TerminalItemId } from '../../steplist'
 import { actions, selectors } from '../../tutorial'
@@ -26,7 +26,7 @@ type State = { rememberDismissal: boolean }
 // (versus calmer non-alert header)
 const HINT_IS_ALERT: Array<HintKey> = ['add_liquids_and_labware']
 
-class HintsComponent extends React.Component<Props, State> {
+class Hints extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { rememberDismissal: false }
@@ -139,7 +139,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(HintsComponent)
+)(Hints)

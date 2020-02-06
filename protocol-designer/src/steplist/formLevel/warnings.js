@@ -7,7 +7,7 @@ import {
   MIN_TEMP_MODULE_TEMP,
   MAX_TEMP_MODULE_TEMP,
 } from '../../constants'
-import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
+import KnowledgeBaseLink from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
  ** Warning Messages **

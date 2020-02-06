@@ -384,10 +384,12 @@ export function updateVersion(fileData: PDProtocolFile): PDProtocolFile {
   }
 }
 
-export const migrateFile = (fileData: PDProtocolFile): PDProtocolFile =>
+const migrateFile = (fileData: PDProtocolFile): PDProtocolFile =>
   flow([
     renameOrderedSteps,
     addInitialDeckSetupStep,
     updateStepFormKeys,
     replaceTCDStepsWithMoveLiquidStep,
   ])(fileData)
+
+export default migrateFile

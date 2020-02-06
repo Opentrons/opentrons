@@ -7,7 +7,7 @@ import {
   getDefaultWells,
   getAllWellsFromPrimaryWells,
 } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import getDefaultsForStepType from '../getDefaultsForStepType'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
@@ -105,7 +105,7 @@ const updatePatchOnPipetteChange = (
   return patch
 }
 
-export function dependentFieldsUpdateMix(
+export default function dependentFieldsUpdateMix(
   originalPatch: FormPatch,
   rawForm: FormData, // raw = NOT hydrated
   pipetteEntities: PipetteEntities,

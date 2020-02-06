@@ -1,6 +1,6 @@
 // @flow
 import { expectTimelineError } from './testMatchers'
-import { aspirate } from '../commandCreators/atomic/aspirate'
+import aspirate from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'

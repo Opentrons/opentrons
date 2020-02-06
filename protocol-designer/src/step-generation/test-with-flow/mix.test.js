@@ -1,6 +1,6 @@
 // @flow
 import flatMap from 'lodash/flatMap'
-import { mix } from '../commandCreators/compound/mix'
+import mix from '../commandCreators/compound/mix'
 import {
   getRobotStateWithTipStandard,
   makeContext,

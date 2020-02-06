@@ -6,7 +6,7 @@ import omit from 'lodash/omit'
 import uniq from 'lodash/uniq'
 import { INITIAL_DECK_SETUP_STEP_ID } from '../../../constants'
 import { uuid } from '../../../utils'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { selectors, actions as navigationActions } from '../../../navigation'
 import {
@@ -16,11 +16,11 @@ import {
 import * as labwareIngredActions from '../../../labware-ingred/actions'
 import { actions as stepFormActions } from '../../../step-forms'
 import { actions as steplistActions } from '../../../steplist'
-import { FilePipettesModal as FilePipettesModalComponent } from '../FilePipettesModal'
+import { FilePipettesModal } from '../FilePipettesModal'
 import type { BaseState, ThunkDispatch } from '../../../types'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 
-type Props = ElementProps<typeof FilePipettesModalComponent>
+type Props = ElementProps<typeof FilePipettesModal>
 
 type OP = {|
   showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
@@ -38,11 +38,11 @@ type DP = {|
   _createNewProtocol: $PropertyType<Props, 'onSave'>,
 |}
 
-export const NewFileModal = connect<Props, OP, SP, DP, _, _>(
+export default connect<Props, OP, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps
-)(FilePipettesModalComponent)
+)(FilePipettesModal)
 
 function mapStateToProps(state: BaseState): SP {
   return {

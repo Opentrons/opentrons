@@ -3,8 +3,8 @@ import flow from 'lodash/flow'
 import takeRightWhile from 'lodash/takeRightWhile'
 import semver from 'semver'
 import type { PDProtocolFile } from '../../file-types'
-import { migrateFile as migrateFileOne } from './1_1_0'
-import { migrateFile as migrateFileThree } from './3_0_0'
+import migrateTo_1_1_0 from './1_1_0'
+import migrateTo_3_0_0 from './3_0_0'
 
 export const OLDEST_MIGRATEABLE_VERSION = '1.0.0'
 
@@ -12,8 +12,8 @@ type Version = string
 type MigrationsByVersion = { [Version]: (Object) => Object }
 
 const allMigrationsByVersion: MigrationsByVersion = {
-  '1.1.0': migrateFileOne,
-  '3.0.0': migrateFileThree,
+  '1.1.0': migrateTo_1_1_0,
+  '3.0.0': migrateTo_3_0_0,
 }
 
 // get all versions to migrate newer than the file's applicationVersion
@@ -27,7 +27,7 @@ export const getMigrationVersionsToRunFromVersion = (
   return takeRightWhile(allSortedVersions, v => semver.gt(v, version))
 }
 
-export const migration = (
+const masterMigration = (
   file: any
 ): {
   file: PDProtocolFile,
@@ -57,3 +57,5 @@ export const migration = (
     migrationsRan: migrationVersionsToRun,
   }
 }
+
+export default masterMigration

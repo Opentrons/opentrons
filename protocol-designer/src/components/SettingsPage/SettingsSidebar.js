@@ -5,7 +5,7 @@ import { connect } from 'react-redux'
 
 import type { BaseState, ThunkDispatch } from '../../types'
 import { actions, selectors, type Page } from '../../navigation'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import { PDTitledList } from '../lists'
 import styles from './SettingsPage.css'
 
@@ -13,7 +13,7 @@ type SP = {| currentPage: Page |}
 type DP = {| makeNavigateToPage: Page => () => mixed |}
 type Props = { ...SP, ...DP }
 
-const SettingsSidebarComponent = (props: Props) => (
+const SettingsSidebar = (props: Props) => (
   <SidePanel title={i18n.t('nav.tab_name.settings')}>
     <PDTitledList
       className={styles.sidebar_item}
@@ -38,7 +38,7 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(actions.navigateToPage(pageName)),
 })
 
-export const SettingsSidebar = connect<Props, {||}, SP, DP, _, _>(
+export default connect<Props, {||}, SP, DP, _, _>(
   STP,
   DTP
-)(SettingsSidebarComponent)
+)(SettingsSidebar)

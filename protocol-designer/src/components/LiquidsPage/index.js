@@ -3,8 +3,8 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import assert from 'assert'
 
-import { LiquidEditForm } from './LiquidEditForm'
-import { LiquidsPageInfo } from './LiquidsPageInfo'
+import LiquidEditForm from './LiquidEditForm'
+import LiquidsPageInfo from './LiquidsPageInfo'
 import * as labwareIngredActions from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 
@@ -90,7 +90,7 @@ function mergeProps(
   }
 }
 
-export const LiquidsPage = connect<WrapperProps, {||}, SP, {||}, _, _>(
+export default connect<WrapperProps, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

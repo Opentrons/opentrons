@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import styles from './LabwareOverlays.css'
 
 type BlockedSlotMessage =

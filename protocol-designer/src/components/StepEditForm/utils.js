@@ -2,7 +2,7 @@
 import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
-import { i18n } from '../../localization'
+import i18n from '../../localization'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,

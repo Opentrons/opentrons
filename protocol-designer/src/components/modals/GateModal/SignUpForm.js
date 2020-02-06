@@ -13,7 +13,7 @@ const SIGNUP_TYPEFORM_URL = isProduction
   ? PROD_TYPEFORM_URL
   : STAGING_TYPEFORM_URL
 
-export class SignUpForm extends React.Component<{}> {
+class SignUpForm extends React.Component<{}> {
   embedElement: React.ElementRef<*>
 
   constructor(props: {}) {
@@ -32,3 +32,5 @@ export class SignUpForm extends React.Component<{}> {
     )
   }
 }
+
+export default SignUpForm

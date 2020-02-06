@@ -6,7 +6,7 @@ import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/s
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Aspirate with given args. Requires tip. */
-export const aspirate: CommandCreator<AspirateParams> = (
+const aspirate: CommandCreator<AspirateParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -92,3 +92,5 @@ export const aspirate: CommandCreator<AspirateParams> = (
     commands,
   }
 }
+
+export default aspirate

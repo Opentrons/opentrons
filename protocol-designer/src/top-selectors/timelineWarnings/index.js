@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { getSelectedStepId } from '../../ui/steps'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as dismissSelectors } from '../../dismiss'
 import type { CommandCreatorWarning } from '../../step-generation'
 import type { Selector } from '../../types'
@@ -12,7 +12,7 @@ export const getTimelineWarningsForSelectedStep: Selector<
 > = createSelector(
   dismissSelectors.getDismissedTimelineWarningTypes,
   fileDataSelectors.timelineWarningsPerStep,
-  getSelectedStepId,
+  stepsSelectors.getSelectedStepId,
   (dismissedWarningTypes, warningsPerStep, stepId) => {
     if (stepId == null) return []
     return (warningsPerStep[stepId] || []).filter(

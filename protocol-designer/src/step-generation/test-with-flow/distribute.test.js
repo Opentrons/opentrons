@@ -18,7 +18,7 @@ import {
   dropTipHelper,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
 } from './fixtures'
-import { distribute } from '../commandCreators/compound/distribute'
+import distribute from '../commandCreators/compound/distribute'
 import type { DistributeArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()

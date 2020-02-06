@@ -2,7 +2,7 @@
 import { connect } from 'react-redux'
 import assert from 'assert'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import { LabwareDetailsCard as LabwareDetailsCardComponent } from './LabwareDetailsCard'
+import LabwareDetailsCard from './LabwareDetailsCard'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../../ui/labware'
 import { selectors as labwareIngredSelectors } from '../../../labware-ingred/selectors'
@@ -10,7 +10,7 @@ import * as labwareIngredActions from '../../../labware-ingred/actions'
 import type { ElementProps } from 'react'
 import type { BaseState, ThunkDispatch } from '../../../types'
 
-type Props = ElementProps<typeof LabwareDetailsCardComponent>
+type Props = ElementProps<typeof LabwareDetailsCard>
 
 type SP = {|
   ...$Diff<$Exact<Props>, {| renameLabware: * |}>,
@@ -69,8 +69,8 @@ function mergeProps(
   }
 }
 
-export const LabwareDetailsCard = connect<Props, {||}, SP, {||}, _, _>(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(LabwareDetailsCardComponent)
+)(LabwareDetailsCard)

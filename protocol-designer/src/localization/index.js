@@ -1,9 +1,9 @@
 // @flow
 
 import i18next from 'i18next'
-import { en } from './en'
+import en from './en'
 
-export const i18n = i18next.init(
+i18next.init(
   {
     lng: 'en',
     debug: true,
@@ -20,3 +20,5 @@ export const i18n = i18next.init(
     }
   }
 )
+
+export default i18next

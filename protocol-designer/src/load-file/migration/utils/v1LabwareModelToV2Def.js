@@ -46,7 +46,9 @@ const v1ModelTov2LoadNameMap = {
     'opentrons_10_tuberack_falcon_4x50ml_6x15ml_conical_acrylic',
 }
 
-export function v1LabwareModelToV2Def(model: string): LabwareDefinition2 {
+export default function v1LabwareModelToV2Def(
+  model: string
+): LabwareDefinition2 {
   const loadName: ?string = v1ModelTov2LoadNameMap[model]
   if (!loadName) {
     throw new Error(`expected a v2 loadName for v1 labware model "${model}"`)

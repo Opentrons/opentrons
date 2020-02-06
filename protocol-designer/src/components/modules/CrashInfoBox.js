@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
-import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import KnowledgeBaseLink from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
 type Props = {|

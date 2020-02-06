@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { SingleLabware } from '../../labware/SingleLabware'
+import SingleLabware from '../../labware/SingleLabware'
 import styles from './FilePipettesModal.css'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -11,7 +11,7 @@ type OP = {| definitionURI: ?string |}
 type SP = {| definition: ?LabwareDefinition2 |}
 type Props = { ...OP, ...SP }
 
-function TiprackDiagramComponent(props: Props) {
+function TiprackDiagram(props: Props) {
   const { definition } = props
   if (!definition) {
     return <div className={styles.tiprack_labware} />
@@ -32,6 +32,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   return { definition }
 }
 
-export const TiprackDiagram = connect<Props, OP, SP, _, BaseState, _>(
-  mapStateToProps
-)(TiprackDiagramComponent)
+export default connect<Props, OP, SP, _, BaseState, _>(mapStateToProps)(
+  TiprackDiagram
+)

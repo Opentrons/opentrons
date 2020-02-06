@@ -1,11 +1,11 @@
 // @flow
 
-import { i18n } from './localization'
+import i18n from './localization'
 import { selectors as loadFileSelectors } from './load-file'
 import { selectors as analyticsSelectors } from './analytics'
 import { initializeFullstory } from './analytics/fullstory'
 
-export const initialize = (store: Object) => {
+const initialize = (store: Object) => {
   if (process.env.NODE_ENV === 'production') {
     window.onbeforeunload = e => {
       // NOTE: the custom text will be ignored in modern browsers
@@ -20,3 +20,5 @@ export const initialize = (store: Object) => {
     }
   }
 }
+
+export default initialize

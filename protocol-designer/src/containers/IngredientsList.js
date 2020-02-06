@@ -7,9 +7,9 @@ import { removeWellsContents } from '../labware-ingred/actions'
 import type { Dispatch } from 'redux'
 import type { BaseState } from '../types'
 
-import { IngredientsList as IngredientsListComponent } from '../components/IngredientsList'
+import IngredientsList from '../components/IngredientsList'
 
-type Props = React.ElementProps<typeof IngredientsListComponent>
+type Props = React.ElementProps<typeof IngredientsList>
 
 type SP = {|
   ...$Diff<$Exact<Props>, {| removeWellsContents: * |}>,
@@ -50,8 +50,8 @@ function mergeProps(
   }
 }
 
-export const IngredientsList = connect<Props, {||}, SP, {||}, _, _>(
+export default connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(IngredientsListComponent)
+)(IngredientsList)

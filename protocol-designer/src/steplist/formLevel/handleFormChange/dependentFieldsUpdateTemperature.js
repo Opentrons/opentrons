@@ -1,7 +1,7 @@
 // @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
-import { getDefaultsForStepType } from '../getDefaultsForStepType'
+import getDefaultsForStepType from '../getDefaultsForStepType'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 
@@ -22,7 +22,7 @@ const updatePatchOnSetTemperatureChange = (
   return patch
 }
 
-export function dependentFieldsUpdateTemperature(
+export default function dependentFieldsUpdateTemperature(
   originalPatch: FormPatch,
   rawForm: FormData // raw = NOT hydrated
 ): FormPatch {

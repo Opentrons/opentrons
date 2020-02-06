@@ -2,7 +2,7 @@ import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixtu
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash'
 
-import { getWellContentsAllLabware } from '../getWellContentsAllLabware'
+import getWellContentsAllLabware from '../getWellContentsAllLabware'
 
 jest.mock('../../../labware-defs/utils')
 

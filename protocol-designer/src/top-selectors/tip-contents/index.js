@@ -8,11 +8,7 @@ import * as StepGeneration from '../../step-generation'
 import { allSubsteps as getAllSubsteps } from '../substeps'
 import { START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import {
-  getActiveItem,
-  getHoveredStepId,
-  getHoveredSubstep,
-} from '../../ui/steps'
+import { selectors as stepsSelectors } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
@@ -102,7 +98,7 @@ export const getMissingTipsByLabwareId: Selector<{
 }> = createSelector(
   stepFormSelectors.getOrderedStepIds,
   fileDataSelectors.getRobotStateTimeline,
-  getActiveItem,
+  stepsSelectors.getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.lastValidRobotState,
   (
@@ -161,12 +157,12 @@ export const getTipsForCurrentStep: GetTipSelector = createSelector(
   stepFormSelectors.getOrderedStepIds,
   stepFormSelectors.getInvariantContext,
   fileDataSelectors.getRobotStateTimeline,
-  getHoveredStepId,
-  getActiveItem,
+  stepsSelectors.getHoveredStepId,
+  stepsSelectors.getActiveItem,
   getInitialTips,
   getLastValidTips,
   getLabwareIdProp,
-  getHoveredSubstep,
+  stepsSelectors.getHoveredSubstep,
   getAllSubsteps,
   (
     orderedStepIds,

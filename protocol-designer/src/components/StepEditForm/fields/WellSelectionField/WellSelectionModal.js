@@ -9,13 +9,13 @@ import { sortWells } from '@opentrons/shared-data'
 
 import { arrayToWellGroup } from '../../../../utils'
 import { changeFormInput } from '../../../../steplist/actions'
-import { WellSelectionInstructions } from '../../../WellSelectionInstructions'
+import WellSelectionInstructions from '../../../WellSelectionInstructions'
 import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getSelectedStepId } from '../../../../ui/steps'
+import { selectors as stepsSelectors } from '../../../../ui/steps'
 
 import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { WellGroup } from '@opentrons/components'
@@ -146,7 +146,7 @@ function mapStateToProps(state: BaseState, ownProps: OP): SP {
     state
   )
 
-  const stepId = getSelectedStepId(state)
+  const stepId = stepsSelectors.getSelectedStepId(state)
   const orderedStepIds = stepFormSelectors.getOrderedStepIds(state)
   const timelineIdx = orderedStepIds.findIndex(id => id === stepId)
   const allWellContentsForStep = allWellContentsForSteps[timelineIdx]

@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../../localization'
+import i18n from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
 import { ModuleDiagram } from '../../modules'
 
@@ -16,7 +16,7 @@ type Props = {|
   onFieldChange: (type: ModuleType, value: boolean) => mixed,
 |}
 
-export function ModuleFields(props: Props) {
+export default function ModuleFields(props: Props) {
   const { onFieldChange, values, thermocyclerEnabled } = props
   const modules = Object.keys(values)
   const handleOnDeckChange = (type: ModuleType) => (

@@ -14,7 +14,7 @@ import { selectors as fileDataSelectors } from '../../file-data'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { timelineFrameBeforeActiveItem } from '../timelineFrames'
-import { getSelectedWells } from '../../well-selection/selectors'
+import wellSelectionSelectors from '../../well-selection/selectors'
 import { getAllWellsForLabware, getMaxVolumes } from '../../constants'
 
 import type { Selector } from '../../types'
@@ -26,7 +26,7 @@ import type {
 
 // TODO Ian 2018-04-19: factor out all these selectors to their own files,
 // and make this index.js just imports and exports.
-import { getWellContentsAllLabware } from './getWellContentsAllLabware'
+import getWellContentsAllLabware from './getWellContentsAllLabware'
 export { getWellContentsAllLabware }
 export type { WellContentsByLabware }
 
@@ -139,7 +139,7 @@ export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = 
 )
 
 export const getSelectedWellsMaxVolume: Selector<number> = createSelector(
-  getSelectedWells,
+  wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   stepFormSelectors.getLabwareEntities,
   (selectedWells, selectedLabwareId, labwareEntities) => {
@@ -163,7 +163,7 @@ type CommonWellValues = { ingredientId: ?string, volume: ?number }
 /** Returns the common single ingredient group of selected wells,
  * or null if there is not a single common ingredient group */
 export const getSelectedWellsCommonValues: Selector<CommonWellValues> = createSelector(
-  getSelectedWells,
+  wellSelectionSelectors.getSelectedWells,
   labwareIngredSelectors.getSelectedLabwareId,
   labwareIngredSelectors.getLiquidsByLabwareId,
   (selectedWells, labwareId, allIngreds) => {

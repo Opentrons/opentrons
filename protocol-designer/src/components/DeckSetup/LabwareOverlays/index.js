@@ -1,4 +1,4 @@
 // @flow
-export { SlotControls } from './SlotControls'
-export { LabwareControls } from './LabwareControls'
-export { DragPreview } from './DragPreview'
+export { default as SlotControls } from './SlotControls'
+export { default as LabwareControls } from './LabwareControls'
+export { default as DragPreview } from './DragPreview'

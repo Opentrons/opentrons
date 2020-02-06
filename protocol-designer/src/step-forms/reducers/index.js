@@ -851,7 +851,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-export const rootReducer = (state: RootState, action: any) => {
+const rootReducer = (state: RootState, action: any) => {
   const prevStateFallback = state || {}
   const nextState = {
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
@@ -884,3 +884,5 @@ export const rootReducer = (state: RootState, action: any) => {
   }
   return nextState
 }
+
+export default rootReducer
