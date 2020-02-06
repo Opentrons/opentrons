@@ -1,36 +1,20 @@
 // @flow
-import cloneDeep from 'lodash/cloneDeep'
 import {
   TEMPERATURE_AT_TARGET,
-  TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
-import { getStateAndContextTempMagModules } from './fixtures'
-import type { RobotState } from '../types'
-
-const robotWithStatus = (
-  robotState: RobotState,
-  temperatureModuleId: string,
-  status:
-    | typeof TEMPERATURE_AT_TARGET
-    | typeof TEMPERATURE_APPROACHING_TARGET
-    | typeof TEMPERATURE_DEACTIVATED
-): RobotState => {
-  const robot = cloneDeep(robotState)
-  robot.modules[temperatureModuleId].moduleState = {
-    type: TEMPDECK,
-    targetTemperature: 42,
-    status,
-  }
-  return robot
-}
+import {
+  getStateAndContextTempMagModules,
+  robotWithStatusAndTemp,
+} from './fixtures'
 
 describe('awaitTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'
   const thermocyclerId = 'thermocyclerId'
   const commandCreatorFnName = 'awaitTemperature'
+  const prevRobotTemp = 42
 
   const missingModuleError = {
     errors: [{ message: expect.any(String), type: 'MISSING_MODULE' }],
@@ -58,10 +42,11 @@ describe('awaitTemperature', () => {
       temperature,
       commandCreatorFnName,
     }
-    const previousRobotState = robotWithStatus(
+    const previousRobotState = robotWithStatusAndTemp(
       robotState,
       temperatureModuleId,
-      TEMPERATURE_APPROACHING_TARGET
+      TEMPERATURE_APPROACHING_TARGET,
+      prevRobotTemp
     )
 
     const expected = {
@@ -107,10 +92,11 @@ describe('awaitTemperature', () => {
       temperature,
       commandCreatorFnName,
     }
-    const previousRobotState = robotWithStatus(
+    const previousRobotState = robotWithStatusAndTemp(
       robotState,
       temperatureModuleId,
-      TEMPERATURE_AT_TARGET
+      TEMPERATURE_AT_TARGET,
+      prevRobotTemp
     )
     const expected = {
       commands: [
@@ -134,10 +120,11 @@ describe('awaitTemperature', () => {
       commandCreatorFnName,
     }
 
-    const previousRobotState = robotWithStatus(
+    const previousRobotState = robotWithStatusAndTemp(
       robotState,
       temperatureModuleId,
-      TEMPERATURE_AT_TARGET
+      TEMPERATURE_AT_TARGET,
+      prevRobotTemp
     )
 
     const result = awaitTemperature(args, invariantContext, previousRobotState)
@@ -150,10 +137,11 @@ describe('awaitTemperature', () => {
       temperature,
       commandCreatorFnName,
     }
-    const previousRobotState = robotWithStatus(
+    const previousRobotState = robotWithStatusAndTemp(
       robotState,
       temperatureModuleId,
-      TEMPERATURE_DEACTIVATED
+      TEMPERATURE_DEACTIVATED,
+      prevRobotTemp
     )
 
     const result = awaitTemperature(args, invariantContext, previousRobotState)
