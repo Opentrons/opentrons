@@ -11,7 +11,6 @@ import type { AwaitTemperatureArgs, PauseArgs } from '../../../step-generation'
 const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | AwaitTemperatureArgs | null => {
-  console.log(formData)
   const hours = parseFloat(formData['pauseHour']) || 0
   const minutes = parseFloat(formData['pauseMinute']) || 0
   const seconds = parseFloat(formData['pauseSecond']) || 0
