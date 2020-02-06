@@ -10,12 +10,7 @@ import {
 } from '@opentrons/components'
 import { Portal } from '../portal'
 import { getConnectedRobotName } from '../../robot/selectors'
-import {
-  useDispatchApiRequest,
-  getRequestById,
-  PENDING,
-  FAILURE,
-} from '../../robot-api'
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import { dismissRequest } from '../../robot-api/actions'
 import { updateModule } from '../../modules/actions'
 import type { UpdateModuleAction } from '../../modules/types'
@@ -52,6 +47,8 @@ export function ModuleUpdate(props: Props) {
     getRequestById(state, latestRequestId)
   )
   const isPending = latestRequest?.status === PENDING
+  // $FlowFixMe
+  const errorMessage = latestRequest?.error?.message
 
   const buttonText = hasAvailableUpdate ? 'update' : 'up to date'
   let tooltipText = null
@@ -80,7 +77,7 @@ export function ModuleUpdate(props: Props) {
           </div>
         )}
       </HoverTooltip>
-      {latestRequest?.status == 'failure' && (
+      {latestRequest?.status === 'failure' && (
         <Portal>
           <AlertModal
             alertOverlay
@@ -88,7 +85,7 @@ export function ModuleUpdate(props: Props) {
             buttons={[{ children: OK_TEXT, onClick: handleCloseErrorModal }]}
           >
             <p>An error occurred while attempting to update your robot.</p>
-            <p>{latestRequest?.error?.message}</p>
+            <p>{errorMessage}</p>
           </AlertModal>
         </Portal>
       )}

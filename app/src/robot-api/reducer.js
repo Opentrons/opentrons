@@ -2,17 +2,16 @@
 // api request state reducer
 // tracks requests by ID
 import omit from 'lodash/omit'
-import { PENDING, SUCCESS, FAILURE } from './constants'
+import { PENDING, SUCCESS, FAILURE, DISMISS_REQUEST } from './constants'
 
 import type { Action } from '../types'
 import type { RobotApiState } from './types'
-import * as Constants from './constants'
 
 export function robotApiReducer(
   state: RobotApiState = {},
   action: Action
 ): RobotApiState {
-  if (action.type === Constants.DISMISS_REQUEST) {
+  if (action.type === DISMISS_REQUEST) {
     return omit(state, action.payload.requestId)
   }
 
