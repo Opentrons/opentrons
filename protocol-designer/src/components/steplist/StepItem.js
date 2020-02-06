@@ -96,7 +96,7 @@ class StepItem extends React.PureComponent<StepItemProps> {
   }
 }
 
-function getStepItemContents(stepItemProps: StepItemProps) {
+export function getStepItemContents(stepItemProps: StepItemProps) {
   const {
     rawForm,
     stepType,

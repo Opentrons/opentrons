@@ -1,0 +1,668 @@
+// @flow
+import { generateSubsteps, getLabwareName } from '../generateSubsteps'
+import * as transferLikeSubsteps from '../transferLikeSubsteps'
+import { makeInitialRobotState } from '../../step-generation/utils'
+import { makeContext } from '../../step-generation/test-with-flow/fixtures'
+
+jest.mock('../transferLikeSubsteps')
+
+describe('generateSubsteps', () => {
+  const stepId = 'step123'
+  const tiprackId = 'tiprack1Id'
+  const pipetteId = 'p300SingleId'
+  const sourcePlateId = 'sourcePlateId'
+  const destPlateId = 'destPlateId'
+
+  let invariantContext, labwareNamesByModuleId, robotState
+  beforeEach(() => {
+    transferLikeSubsteps.transferLikeSubsteps = jest.fn()
+
+    invariantContext = makeContext()
+    labwareNamesByModuleId = {
+      magnet123: {
+        displayName: 'magnet module',
+        nickname: null,
+      },
+      tempId: {
+        displayName: 'temperature module',
+        nickname: null,
+      },
+    }
+    robotState = makeInitialRobotState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
+        sourcePlateId: { slot: '4' },
+        destPlateId: { slot: '5' },
+      },
+      tiprackSetting: { tiprack1Id: false },
+    })
+  })
+
+  test('null is returned when no robotState', () => {
+    robotState = null
+    const stepArgsAndErrors = {
+      stepArgs: {
+        module: 'aaaa',
+        commandCreatorFnName: 'deactivateTemperature',
+        message: 'message',
+      },
+      errors: {},
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toBeNull()
+  })
+  ;[
+    {
+      testName: 'null is returned when no stepArgsAndErrors',
+      args: null,
+    },
+    {
+      testName: 'null is returned when no stepArgs',
+      args: {
+        stepArgs: null,
+        errors: { field: {} },
+      },
+    },
+    {
+      testName: 'null is returned when no errors',
+      args: {
+        stepArgs: {
+          module: 'aaaa',
+          commandCreatorFnName: 'deactivateTemperature',
+          message: 'message',
+        },
+        errors: { field: {} },
+      },
+    },
+  ].forEach(({ testName, args }) => {
+    test(testName, () => {
+      const result = generateSubsteps(
+        args,
+        invariantContext,
+        robotState,
+        stepId,
+        labwareNamesByModuleId
+      )
+
+      expect(result).toBeNull()
+    })
+  })
+
+  test('delay command returns pause substep data', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        commandCreatorFnName: 'delay',
+        message: 'test',
+        wait: true,
+      },
+    }
+    const robotState = makeInitialRobotState({ invariantContext })
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'pause',
+      pauseStepArgs: stepArgsAndErrors.stepArgs,
+    })
+  })
+
+  describe('like substeps', () => {
+    let sharedArgs
+    beforeEach(() => {
+      sharedArgs = {
+        pipette: pipetteId,
+        sourceLabware: sourcePlateId,
+        destLabware: destPlateId,
+        name: 'testing',
+        volume: 50,
+        preWetTip: false,
+        touchTipAfterAspirate: false,
+        touchTipAfterAspirateOffsetMmFromBottom: 10,
+        changeTip: 'once',
+        aspirateFlowRateUlSec: 5,
+        aspirateOffsetFromBottomMm: 3,
+        touchTipAfterDispense: false,
+        touchTipAfterDispenseOffsetMmFromBottom: 10,
+        dispenseFlowRateUlSec: 5,
+        dispenseOffsetFromBottomMm: 10,
+      }
+    })
+    ;[
+      {
+        testName: 'consolidate command returns substep data',
+        stepArgs: {
+          ...sharedArgs,
+          commandCreatorFnName: 'consolidate',
+          sourceWells: ['A1', 'A2'],
+          destWell: 'C1',
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixFirstAspirate: null,
+          mixInDestination: null,
+        },
+        expected: {
+          substepType: 'sourceDest',
+          multichannel: false,
+          commandCreatorFnName: 'consolidate',
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                pipette: pipetteId,
+                labware: tiprackId,
+                well: 'A1',
+              },
+              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              dest: undefined,
+              volume: 50,
+            },
+            {
+              volume: 50,
+              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              activeTips: {
+                pipette: pipetteId,
+                labware: tiprackId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                preIngreds: {},
+                well: 'C1',
+              },
+            },
+          ],
+        },
+      },
+      {
+        testName: 'distribute command returns substep data',
+        stepArgs: {
+          ...sharedArgs,
+          commandCreatorFnName: 'distribute',
+          sourceWell: 'A1',
+          destWells: ['A1', 'A2'],
+          disposalVolume: null,
+          disposalLabware: null,
+          disposalWell: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixBeforeAspirate: null,
+        },
+        expected: {
+          commandCreatorFnName: 'distribute',
+          multichannel: false,
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A1',
+              },
+              source: {
+                postIngreds: {},
+                preIngreds: {},
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+              source: undefined,
+              volume: 50,
+            },
+          ],
+          substepType: 'sourceDest',
+        },
+      },
+      {
+        testName: 'transfer command returns substep data',
+        stepArgs: {
+          ...sharedArgs,
+          commandCreatorFnName: 'transfer',
+          sourceWells: ['A1', 'A2'],
+          destWells: ['A1', 'A2'],
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 10,
+          blowoutOffsetFromTopMm: 5,
+          mixBeforeAspirate: null,
+          mixInDestination: null,
+        },
+        expected: {
+          substepType: 'sourceDest',
+          multichannel: false,
+          commandCreatorFnName: 'transfer',
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                pipette: pipetteId,
+                labware: tiprackId,
+                well: 'A1',
+              },
+              source: { well: 'A1', preIngreds: {}, postIngreds: {} },
+              dest: {
+                well: 'A1',
+                preIngreds: {},
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+              },
+              volume: 50,
+            },
+            {
+              volume: 50,
+              source: { well: 'A2', preIngreds: {}, postIngreds: {} },
+              activeTips: {
+                pipette: pipetteId,
+                labware: tiprackId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+            },
+          ],
+        },
+      },
+      {
+        testName: 'mix command returns substep data',
+        stepArgs: {
+          name: 'testing',
+          commandCreatorFnName: 'mix',
+          labware: sourcePlateId,
+          pipette: pipetteId,
+          wells: ['A1', 'A2'],
+          volume: 50,
+          times: 2,
+          touchTip: false,
+          touchTipMmFromBottom: 5,
+          changeTip: 'always',
+          blowoutLocation: null,
+          blowoutFlowRateUlSec: 3,
+          blowoutOffsetFromTopMm: 3,
+          aspirateOffsetFromBottomMm: 4,
+          dispenseOffsetFromBottomMm: 10,
+          aspirateFlowRateUlSec: 5,
+          dispenseFlowRateUlSec: 5,
+        },
+        expected: {
+          commandCreatorFnName: 'mix',
+          multichannel: false,
+          parentStepId: stepId,
+          rows: [
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A1',
+              },
+              source: {
+                postIngreds: {},
+                preIngreds: {},
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                preIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                well: 'A1',
+              },
+              source: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'A1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 150,
+                  },
+                },
+                preIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                well: 'A1',
+              },
+              source: {
+                postIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                preIngreds: {
+                  __air__: {
+                    volume: 100,
+                  },
+                },
+                well: 'A1',
+              },
+              volume: 50,
+            },
+            {
+              activeTips: {
+                labware: tiprackId,
+                pipette: pipetteId,
+                well: 'B1',
+              },
+              dest: {
+                postIngreds: {
+                  __air__: {
+                    volume: 50,
+                  },
+                },
+                preIngreds: {},
+                well: 'A2',
+              },
+              source: {
+                postIngreds: {},
+                preIngreds: {},
+                well: 'A2',
+              },
+              volume: 50,
+            },
+          ],
+          substepType: 'sourceDest',
+        },
+      },
+    ].forEach(({ testName, stepArgs, expected }) => {
+      test(testName, () => {
+        transferLikeSubsteps.transferLikeSubsteps.mockReturnValue(expected)
+        const stepArgsAndErrors = {
+          errors: {},
+          stepArgs,
+        }
+
+        const result = generateSubsteps(
+          stepArgsAndErrors,
+          invariantContext,
+          robotState,
+          stepId,
+          labwareNamesByModuleId
+        )
+
+        expect(result).toEqual(expected)
+      })
+    })
+  })
+
+  test('engageMagnet returns substep data with engage = true', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'magnet123',
+        commandCreatorFnName: 'engageMagnet',
+        message: null,
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'magnet',
+      engage: true,
+      labwareDisplayName: 'magnet module',
+      labwareNickname: null,
+      message: null,
+    })
+  })
+
+  test('disengageMagnet returns substep data with engage = false', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'magnet123',
+        commandCreatorFnName: 'disengageMagnet',
+        message: null,
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'magnet',
+      engage: false,
+      labwareDisplayName: 'magnet module',
+      labwareNickname: null,
+      message: null,
+    })
+  })
+
+  test('setTemperature returns substep data with temperature', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'tempId',
+        commandCreatorFnName: 'setTemperature',
+        targetTemperature: 45,
+        message: null,
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'temperature',
+      temperature: 45,
+      labwareDisplayName: 'temperature module',
+      labwareNickname: null,
+      message: null,
+    })
+  })
+
+  test('setTemperature returns temperature when 0', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'tempId',
+        commandCreatorFnName: 'setTemperature',
+        targetTemperature: 0,
+        message: null,
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'temperature',
+      temperature: 0,
+      labwareDisplayName: 'temperature module',
+      labwareNickname: null,
+      message: null,
+    })
+  })
+
+  test('deactivateTemperature returns substep data with null temp', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'tempId',
+        commandCreatorFnName: 'deactivateTemperature',
+        message: null,
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+
+    expect(result).toEqual({
+      substepType: 'temperature',
+      temperature: null,
+      labwareDisplayName: 'temperature module',
+      labwareNickname: null,
+      message: null,
+    })
+  })
+
+  test('null is returned when no matching command', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        commandCreatorFnName: 'nonexistentCommand',
+      },
+    }
+
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      {}
+    )
+
+    expect(result).toBeNull()
+  })
+})
+
+describe('getLabwareName', () => {
+  let labwareNameByModuleId
+  beforeEach(() => {
+    labwareNameByModuleId = {
+      moduleId: {
+        nickname: 'module nickname',
+        displayName: 'module display name',
+      },
+    }
+  })
+
+  test('module name is returned when moduleId exists', () => {
+    const moduleId = 'moduleId'
+
+    const result = getLabwareName(labwareNameByModuleId, moduleId)
+
+    expect(result).toEqual({
+      nickname: 'module nickname',
+      displayName: 'module display name',
+    })
+  })
+
+  test('null is returned when no moduleId', () => {
+    const moduleId = null
+
+    const result = getLabwareName(labwareNameByModuleId, moduleId)
+
+    expect(result).toBeNull()
+  })
+})

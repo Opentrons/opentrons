@@ -19,7 +19,9 @@ type Props = {|
 
 export const ModuleStepItems = (props: Props) => (
   <>
-    {props.message && <PDListItem>{props.message}</PDListItem>}
+    {props.message && (
+      <PDListItem className="step-item-message">{props.message}</PDListItem>
+    )}
     <li className={styles.aspirate_dispense}>
       <span>{i18n.t(`modules.module_long_names.${props.module}`)}</span>
       <span className={styles.spacer} />
