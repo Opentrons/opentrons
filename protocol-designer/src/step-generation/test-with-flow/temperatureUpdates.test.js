@@ -136,7 +136,7 @@ describe('forDeactivateTemperature', () => {
 
 describe('forAwaitTemperature', () => {
   ;[TEMPERATURE_AT_TARGET, TEMPERATURE_APPROACHING_TARGET].forEach(status => {
-    test(`awaited temp equals previous state target temp when previous status is ${status}`, () => {
+    test(`should update state to 'at target' when previous status is ${status} and the given target temp matches the previous target temp`, () => {
       const params = {
         module: temperatureModuleId,
         temperature: temperature,
