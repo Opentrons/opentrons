@@ -1,5 +1,6 @@
 from collections import namedtuple
-from typing import Dict, NamedTuple, Callable, Any, Tuple, Awaitable
+from typing import (
+    Dict, NamedTuple, Callable, Any, Tuple, Awaitable, Mapping, Union)
 from pathlib import Path
 
 ThermocyclerStep = Dict[str, float]
@@ -10,6 +11,8 @@ UploadFunction = Callable[[str, str, Dict[str, Any]],
                           Awaitable[Tuple[bool, str]]]
 
 ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
+
+LiveData = Mapping[str, Union[str, Mapping[str, Union[float, str, None]]]]
 
 
 class BundledFirmware(NamedTuple):
@@ -31,3 +34,10 @@ class UnsupportedModuleError(Exception):
 
 class AbsentModuleError(Exception):
     pass
+
+
+class ModuleInfo(NamedTuple):
+    model: str        # A module model such as "magneticModuleV2"
+    fw_version: str   # The version of the firmware
+    hw_revision: str  # the revision of the hardware
+    serial: str       # the serial number

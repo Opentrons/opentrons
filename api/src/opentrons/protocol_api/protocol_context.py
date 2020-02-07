@@ -12,7 +12,10 @@ from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
     LabwareDefinition, Labware, get_labware_definition, load_from_definition)
-from .module_geometry import (ModuleGeometry, load_module)
+from .module_geometry import (
+    ModuleGeometry, load_module, resolve_module_model,
+    resolve_module_type, models_compatible, ModuleType,
+    module_model_from_string)
 from .definitions import MAX_SUPPORTED_VERSION
 from . import geometry
 from .instrument_context import InstrumentContext
@@ -418,28 +421,32 @@ class ProtocolContext(CommandPublisher):
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
         """
-        resolved_name = ModuleGeometry.resolve_module_name(module_name)
+        resolved_model = resolve_module_model(module_name)
+        resolved_type = resolve_module_type(resolved_model)
         resolved_location = self._deck_layout.resolve_module_location(
-                resolved_name, location)
-        geometry = load_module(resolved_name,
-                               self._deck_layout.position_for(
-                                    resolved_location))
+            resolved_type, location)
+        geometry = load_module(
+            resolved_model,
+            self._deck_layout.position_for(
+                resolved_location),
+            self._api_version)
         hc_mod_instance = None
         mod_class = {
-            'magdeck': MagneticModuleContext,
-            'tempdeck': TemperatureModuleContext,
-            'thermocycler': ThermocyclerContext}[resolved_name]
+            ModuleType.MAGNETIC: MagneticModuleContext,
+            ModuleType.TEMPERATURE: TemperatureModuleContext,
+            ModuleType.THERMOCYCLER: ThermocyclerContext}[resolved_type]
         for mod in self._hw_manager.hardware.attached_modules:
-            if mod.name() == resolved_name:
+            if models_compatible(
+                    module_model_from_string(mod.model()), resolved_model):
                 hc_mod_instance = SynchronousAdapter(mod)
                 break
 
-        if self.is_simulating and hc_mod_instance is None:
+        if self.is_simulating() and hc_mod_instance is None:
             mod_type = {
-                'magdeck': modules.magdeck.MagDeck,
-                'tempdeck': modules.tempdeck.TempDeck,
-                'thermocycler': modules.thermocycler.Thermocycler
-                }[resolved_name]
+                ModuleType.MAGNETIC: modules.magdeck.MagDeck,
+                ModuleType.TEMPERATURE: modules.tempdeck.TempDeck,
+                ModuleType.THERMOCYCLER: modules.thermocycler.Thermocycler
+                }[resolved_type]
             hc_mod_instance = SynchronousAdapter(mod_type(
                     port='',
                     simulating=True,
@@ -454,7 +461,7 @@ class ProtocolContext(CommandPublisher):
                                 self._loop)
         else:
             raise RuntimeError(
-                f'Could not find specified module: {resolved_name}')
+                f'Could not find specified module: {module_name}')
         self._modules.add(mod_ctx)
         self._deck_layout[resolved_location] = geometry
         return mod_ctx

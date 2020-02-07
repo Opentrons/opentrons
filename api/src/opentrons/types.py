@@ -38,6 +38,9 @@ class Point(NamedTuple):
         return '({}, {}, {})'.format(self.x, self.y, self.z)
 
 
+LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]
+
+
 class Location(NamedTuple):
     """ A location to target as a motion.
 
@@ -65,7 +68,7 @@ class Location(NamedTuple):
        of each item.
     """
     point: Point
-    labware: 'Union[Labware, Well, str, ModuleGeometry, None]'
+    labware: LocationLabware
 
     def move(self, point: Point) -> 'Location':
         """

@@ -136,12 +136,11 @@ class Thermocycler(mod_abc.AbstractModule):
         return mod
 
     @classmethod
-    def name(cls):
+    def name(cls) -> str:
         return 'thermocycler'
 
-    @classmethod
-    def display_name(cls):
-        return 'Thermocycler'
+    def model(self) -> str:
+        return 'thermocyclerModuleV1'
 
     @classmethod
     def bootloader(cls) -> types.UploadFunction:
