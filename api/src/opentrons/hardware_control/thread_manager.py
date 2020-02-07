@@ -10,22 +10,20 @@ from .types import Axis, HardwareAPILike
 MODULE_LOG = logging.getLogger(__name__)
 
 
-class HardwareThreadManager(HardwareAPILike):
+class ThreadManager(HardwareAPILike):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 
     Example
     -------
     .. code-block::
-    >>> import opentrons.hardware_control as hc
-    >>> from opentrons.hardware_control import thread_manager
-    >>> builder = hc.API.build_hardware_simulator
-    >>> api_single_thread = thread_manager.HardwareThreadManager(builder)
+    >>> from opentrons.hardware_control import API, ThreadManager
+    >>> api_single_thread = ThreadManager(API.build_hardware_simulator)
     >>> await api_single_thread.home()
     """
 
     def __init__(self, builder, *args, **kwargs) -> None:
-        """ Build the HardwareThreadManager.
+        """ Build the ThreadManager.
 
         :param builder: The API function to use
         """
@@ -55,14 +53,14 @@ class HardwareThreadManager(HardwareAPILike):
         loop.close()
 
     def __repr__(self):
-        return '<HardwareThreadManager>'
+        return '<ThreadManager>'
 
     def clean_up(self):
         try:
             self._thread.join()
         except Exception as e:
-            log.exception(f'Exception while cleaning up'
-                          f'Hardware Thread Manager: {e}')
+            MODULE_LOG.exception(f'Exception while cleaning up'
+                                 f'Hardware Thread Manager: {e}')
 
     def __del__(self):
         self.clean_up()

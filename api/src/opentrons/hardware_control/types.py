@@ -2,7 +2,7 @@ import enum
 import asyncio
 import functools
 import logging
-from typing import Tuple
+from typing import Tuple, Union, Dict, Optional
 
 import opentrons.types
 
@@ -96,3 +96,11 @@ class CriticalPoint(enum.Enum):
     The end of the front-most nozzle of a multipipette with a tip attached.
     Only relevant when a multichannel pipette is present.
     """
+
+
+class MustHomeError(RuntimeError):
+    pass
+
+
+class NoTipAttachedError(RuntimeError):
+    pass

@@ -2,7 +2,7 @@ import asyncio
 import logging
 from glob import glob
 import re
-from typing import List, Optional, Dict, Any
+from typing import List, Optional, Dict, Any, Callable
 from collections import namedtuple
 
 from opentrons.config import IS_ROBOT, IS_LINUX
