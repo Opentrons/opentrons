@@ -15,6 +15,7 @@
 /protocol-library-kludge @Opentrons/spddrs
 /update-server @Opentrons/cpx
 /api/src/opentrons @Opentrons/hmg
+/discovery-client @Opentrons/cpx
 
 # subprojects by language - some subprojects are shared by teams but united by a
 # language community (including makefiles and config) so mark them appropriately
