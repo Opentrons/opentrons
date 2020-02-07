@@ -384,6 +384,16 @@ export function generateSubsteps(
     }
   }
 
+  if (stepArgs.commandCreatorFnName === 'awaitTemperature') {
+    return {
+      substepType: 'awaitTemperature',
+      temperature: stepArgs.temperature,
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
+      message: stepArgs.message,
+    }
+  }
+
   console.warn(
     "allSubsteps doesn't support commandCreatorFnName: ",
     stepArgs.commandCreatorFnName,
