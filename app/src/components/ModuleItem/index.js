@@ -23,7 +23,11 @@ export function ModuleItem(props: Props) {
       <div className={styles.module_content}>
         <ModuleImage name={module.name} />
         <ModuleInfo module={module} />
-        <ModuleUpdate availableUpdate={props.availableUpdate} />
+        <ModuleUpdate
+          hasAvailableUpdate={!!module.hasAvailableUpdate}
+          canControl={canControl}
+          moduleId={module.serial}
+        />
       </div>
       {(module.name === THERMOCYCLER || module.name === TEMPDECK) && (
         <ModuleControls module={module} canControl={canControl} />

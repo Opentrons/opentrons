@@ -12,6 +12,7 @@ export const mockTemperatureModule: Types.TemperatureModule = {
   model: 'temp_deck_v4.0',
   fwVersion: 'v2.0.0',
   status: 'idle',
+  hasAvailableUpdate: true,
   data: {
     currentTemp: 25,
     targetTemp: null,
@@ -26,6 +27,7 @@ export const mockMagneticModule: Types.MagneticModule = {
   model: 'mag_deck_v4.0',
   fwVersion: 'v2.0.0',
   status: 'disengaged',
+  hasAvailableUpdate: true,
   data: {
     engaged: false,
     height: 42,
@@ -40,6 +42,7 @@ export const mockThermocycler: Types.ThermocyclerModule = {
   model: 'thermocycler_v4.0',
   fwVersion: 'v2.0.0',
   status: 'idle',
+  hasAvailableUpdate: true,
   data: {
     lid: 'open',
     lidTarget: null,
@@ -114,4 +117,34 @@ export const mockSendModuleCommandFailure = {
   ...mockSendModuleCommandFailureMeta,
   host: mockRobot,
   body: { message: 'AH' },
+}
+
+// update module command fixtures
+
+export const mockUpdateModuleSuccessMeta = {
+  method: 'POST',
+  path: '/modules/abc123/update',
+  ok: true,
+  status: 200,
+}
+
+export const mockUpdateModuleSuccess = {
+  ...mockUpdateModuleSuccessMeta,
+  host: mockRobot,
+  body: {
+    message: 'update successful',
+  },
+}
+
+export const mockUpdateModuleFailureMeta = {
+  method: 'POST',
+  path: '/modules/abc123/update',
+  ok: false,
+  status: 500,
+}
+
+export const mockUpdateModuleFailure = {
+  ...mockUpdateModuleFailureMeta,
+  host: mockRobot,
+  body: { message: 'BAD NEWS BEARS' },
 }

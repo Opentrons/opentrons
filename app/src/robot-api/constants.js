@@ -8,3 +8,6 @@ export const DELETE: 'DELETE' = 'DELETE'
 export const PENDING: 'pending' = 'pending'
 export const SUCCESS: 'success' = 'success'
 export const FAILURE: 'failure' = 'failure'
+
+export const DISMISS_REQUEST: 'robotApi:DISMISS_REQUEST' =
+  'robotApi:DISMISS_REQUEST'

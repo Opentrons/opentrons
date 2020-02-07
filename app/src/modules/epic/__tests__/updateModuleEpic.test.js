@@ -30,14 +30,12 @@ const mockFetchRobotApi: JestMockFn<
 const mockGetRobotByName: JestMockFn<[any, string], mixed> =
   DiscoverySelectors.getRobotByName
 
-describe('sendModuleCommand', () => {
+describe('updateModuleEpic', () => {
   let testScheduler
 
   const meta = { requestId: '1234' }
-  const action: Types.SendModuleCommandAction = {
-    ...Actions.sendModuleCommand(mockRobot.name, 'abc123', 'set_temperature', [
-      42,
-    ]),
+  const action: Types.UpdateModuleAction = {
+    ...Actions.updateModule(mockRobot.name, 'abc123'),
     meta,
   }
 
@@ -53,10 +51,10 @@ describe('sendModuleCommand', () => {
     jest.resetAllMocks()
   })
 
-  test('calls POST /modules/{serial}', () => {
+  test('calls POST /modules/{serial}/update', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockSendModuleCommandSuccess })
+        cold('r', { r: Fixtures.mockUpdateModuleSuccess })
       )
 
       const action$ = hot('--a', { a: action })
@@ -69,11 +67,7 @@ describe('sendModuleCommand', () => {
       expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
       expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
         method: 'POST',
-        path: '/modules/abc123',
-        body: {
-          command_type: 'set_temperature',
-          args: [42],
-        },
+        path: '/modules/abc123/update',
       })
     })
   })
@@ -81,7 +75,7 @@ describe('sendModuleCommand', () => {
   test('maps successful response to SEND_MODULE_COMMAND_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockSendModuleCommandSuccess })
+        cold('r', { r: Fixtures.mockUpdateModuleSuccess })
       )
 
       const action$ = hot('--a', { a: action })
@@ -89,12 +83,11 @@ describe('sendModuleCommand', () => {
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.sendModuleCommandSuccess(
+        a: Actions.updateModuleSuccess(
           mockRobot.name,
           'abc123',
-          'set_temperature',
-          Fixtures.mockSendModuleCommandSuccess.body.returnValue,
-          { ...meta, response: Fixtures.mockSendModuleCommandSuccessMeta }
+          'update successful',
+          { ...meta, response: Fixtures.mockUpdateModuleSuccessMeta }
         ),
       })
     })
@@ -103,7 +96,7 @@ describe('sendModuleCommand', () => {
   test('maps failed response to SEND_MODULE_COMMAND_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockSendModuleCommandFailure })
+        cold('r', { r: Fixtures.mockUpdateModuleFailure })
       )
 
       const action$ = hot('--a', { a: action })
@@ -111,12 +104,11 @@ describe('sendModuleCommand', () => {
       const output$ = modulesEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.sendModuleCommandFailure(
+        a: Actions.updateModuleFailure(
           mockRobot.name,
           'abc123',
-          'set_temperature',
-          { message: 'AH' },
-          { ...meta, response: Fixtures.mockSendModuleCommandFailureMeta }
+          { message: 'BAD NEWS BEARS' },
+          { ...meta, response: Fixtures.mockUpdateModuleFailureMeta }
         ),
       })
     })
