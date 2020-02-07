@@ -16,6 +16,11 @@
 /update-server @Opentrons/cpx
 /api/src/opentrons @Opentrons/hmg
 /discovery-client @Opentrons/cpx
+/shared-data/pipette @Opentrons/hmg
+/shared-data/protocol @Opentrons/spddrs
+/shared-data/module @Opentrons/hmg
+/shared-data/deck @Opentrons/hmg
+/shared-data/labware @Opentrons/hmg
 
 # subprojects by language - some subprojects are shared by teams but united by a
 # language community (including makefiles and config) so mark them appropriately
@@ -23,3 +28,4 @@
 /app-shell @Opentrons/js
 /components @Opentrons/js
 /api @Opentrons/py
+/shared-data/js @Opentrons/js
