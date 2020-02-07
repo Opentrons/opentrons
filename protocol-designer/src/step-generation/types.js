@@ -160,6 +160,7 @@ export type PauseArgs = {|
   commandCreatorFnName: 'delay',
   message?: string,
   wait: number | true,
+  pauseTemperature?: number | null,
   meta: ?{|
     hours?: number,
     minutes?: number,

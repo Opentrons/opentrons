@@ -17,6 +17,7 @@
     "action": "action",
     "go_to": "go to",
     "engage": "engage",
-    "disengage": "disengage"
+    "disengage": "disengage",
+    "await_temperature": "temperature"
   }
 }

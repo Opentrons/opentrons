@@ -123,11 +123,20 @@ export type PauseSubstepItem = {|
   pauseStepArgs: PauseArgs,
 |} // Pause substeps use same data as processed form
 
+export type AwaitTemperatureSubstepItem = {|
+  substepType: 'awaitTemperature',
+  temperature: number,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  message?: string,
+|}
+
 export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseSubstepItem
   | MagnetSubstepItem
   | TemperatureSubstepItem
+  | AwaitTemperatureSubstepItem
 
 export type StepItemData = {
   id: StepIdType,
