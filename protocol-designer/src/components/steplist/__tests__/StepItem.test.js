@@ -56,7 +56,6 @@ describe('getStepItemContents', () => {
     test('module rendered with engage when engage is true', () => {
       const StepItemContents = getStepItemContents(magnetProps)
       const wrapper = renderWrapper(StepItemContents)
-
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('engage')
@@ -64,10 +63,8 @@ describe('getStepItemContents', () => {
 
     test('module rendered with disengage when type is disengage', () => {
       magnetProps.substeps.engage = false
-
       const StepItemContents = getStepItemContents(magnetProps)
       const wrapper = renderWrapper(StepItemContents)
-
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('disengage')
@@ -76,8 +73,9 @@ describe('getStepItemContents', () => {
 
   describe('temperature step type', () => {
     let temperatureProps
+    const stepType: 'temperature' = 'temperature'
+
     beforeEach(() => {
-      const stepType = 'temperature'
       temperatureProps = {
         ...props,
         rawForm: {
@@ -85,45 +83,85 @@ describe('getStepItemContents', () => {
           id: stepType,
           StepFieldName: stepType,
         },
-        substeps: {
-          substepType: stepType,
-          temperature: 45,
-          labwareDisplayName: 'temperature display',
-          labwareNickname: 'temperature nickname',
-          message: 'message',
-        },
+        substeps: null,
         stepType: stepType,
         labwareNicknamesById: {
-          magnetId: 'temperature nickname',
+          temperatureId: 'temperature nickname',
         },
         labwareDefDisplayNamesById: {
-          magnetId: 'temperature display',
+          temperatureId: 'temperature display',
         },
       }
     })
 
     test('module is rendered with temperature when temperature exists', () => {
+      temperatureProps.substeps = {
+        substepType: stepType,
+        temperature: 45,
+        labwareDisplayName: 'temperature display',
+        labwareNickname: 'temperature nickname',
+        message: 'message',
+      }
       const Component = getStepItemContents(temperatureProps)
       const wrapper = renderWrapper(Component)
-
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('45 °C')
     })
 
     test('module is rendered with deactivated when temperature is null', () => {
-      // overwrite temperature like this due to flow issue when temperature changes from num to null
       temperatureProps.substeps = {
-        ...temperatureProps.substeps,
+        substepType: stepType,
         temperature: null,
+        labwareDisplayName: 'temperature display',
+        labwareNickname: 'temperature nickname',
+        message: 'message',
       }
-
       const Component = getStepItemContents(temperatureProps)
       const wrapper = renderWrapper(Component)
-
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('Deactivated')
+    })
+  })
+
+  describe('awaitTemperature step type', () => {
+    let awaitTemperatureProps
+    const stepType: 'awaitTemperature' = 'awaitTemperature'
+
+    beforeEach(() => {
+      awaitTemperatureProps = {
+        ...props,
+        rawForm: {
+          stepType,
+          id: stepType,
+          StepFieldName: stepType,
+        },
+        substeps: null,
+        stepType: stepType,
+        labwareNicknamesById: {
+          temperatureId: 'temperature nickname',
+        },
+        labwareDefDisplayNamesById: {
+          temperatureId: 'temperature display',
+        },
+      }
+    })
+
+    test('module is rendered with temperature', () => {
+      awaitTemperatureProps.substeps = {
+        substepType: stepType,
+        temperature: 45,
+        labwareDisplayName: 'temperature display',
+        labwareNickname: 'temperature nickname',
+        message: 'message',
+      }
+      const Component = getStepItemContents(awaitTemperatureProps)
+      const wrapper = renderWrapper(Component)
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+      expect(component.prop('action')).toEqual('temperature')
+      expect(component.prop('actionText')).toEqual('45 °C')
     })
   })
 })

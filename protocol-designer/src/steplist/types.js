@@ -129,7 +129,7 @@ export type AwaitTemperatureSubstepItem = {|
   labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: string,
-|} // Pause substeps use same data as processed form
+|}
 
 export type SubstepItemData =
   | SourceDestSubstepItem
