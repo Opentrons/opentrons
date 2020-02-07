@@ -100,16 +100,16 @@ async def get_attached_modules(request):
     {
         "modules": [
             {
+                # module model name for lookups in module defs
+                "model": "string"
                 # machine readable identifying name of module
                 "name": "string",
-                # human-presentable name of module
-                "displayName": "string",
                 # module system port pat
                 "port": "string",
                 # unique serial number
                 "serial": "string",
-                # model identifier (i.e. part number)
-                "model": "string",
+                # revision identifier (i.e. part number)
+                "revision": "string",
                 # current firmware version
                 "fwVersion": "string",
                 # human readable status
@@ -128,37 +128,20 @@ async def get_attached_modules(request):
     }
     """
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-        module_data = [
-            {
-                'name': mod.name(),
-                'displayName': mod.display_name(),
-                'port': mod.port,
-                'serial': mod.device_info.get('serial'),
-                'model': mod.device_info.get('model'),
-                'fwVersion': mod.device_info.get('version'),
-                'hasAvailableUpdate': mod.has_available_update(),
-                **mod.live_data
-            }
-            for mod in hw_mods
-        ]
-    else:
-        hw.discover_modules()
-        hw_mods = hw.attached_modules.values()
-        module_data = [
-            {
-                'name': mod.name(),
-                'displayName': mod.display_name(),
-                'port': mod.port,
-                'serial': mod.device_info and mod.device_info.get('serial'),
-                'model': mod.device_info and mod.device_info.get('model'),
-                'fwVersion': mod.device_info
-                and mod.device_info.get('version'),
-                **mod.live_data
-            }
-            for mod in hw_mods
-        ]
+    hw_mods = hw.attached_modules
+    module_data = [
+        {
+            'name': mod.name(),
+            'model': mod.model(),
+            'port': mod.port,
+            'serial': mod.device_info.get('serial'),
+            'revision': mod.device_info.get('model'),
+            'fwVersion': mod.device_info.get('version'),
+            'hasAvailableUpdate': mod.has_available_update(),
+            **mod.live_data
+        }
+        for mod in hw_mods
+    ]
     return web.json_response(data={"modules": module_data},
                              status=200)
 
@@ -171,10 +154,7 @@ async def get_module_data(request):
     requested_serial = request.match_info['serial']
     res = None
 
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-    else:
-        hw_mods = hw.attached_modules.values()
+    hw_mods = hw.attached_modules
 
     for module in hw_mods:
         is_serial_match = module.device_info.get('serial') == requested_serial

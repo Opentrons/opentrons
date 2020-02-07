@@ -13,6 +13,7 @@ import asyncio
 from threading import Lock
 from opentrons.drivers import serial_communication
 from opentrons.drivers.temp_deck import TempDeck
+from opentrons.drivers import utils
 
 
 @pytest.fixture
@@ -208,8 +209,8 @@ def test_fail_get_device_info(monkeypatch, temp_deck):
 
     monkeypatch.setattr(temp_deck, '_send_command', _mock_send_command)
 
-    res = temp_deck.get_device_info()
-    assert 'error' in res
+    with pytest.raises(utils.ParseError):
+        temp_deck.get_device_info()
 
 
 def test_dfu_command(monkeypatch, temp_deck):

@@ -350,50 +350,67 @@ def test_return_tips():
     assert not tiprack.wells()[8].has_tip
 
 
-def test_module_load():
-    module_names = ['tempdeck', 'magdeck']
+@pytest.mark.parametrize(
+    'v1_module_name', ['tempdeck', 'magdeck', 'thermocycler'])
+def test_module_load_v1(v1_module_name):
     module_defs = json.loads(
         load_shared_data('module/definitions/1.json'))
-    for name in module_names:
-        mod = module_geometry.load_module(
-            name, Location(Point(0, 0, 0), 'test'))
-        mod_def = module_defs[name]
-        offset = Point(mod_def['labwareOffset']['x'],
-                       mod_def['labwareOffset']['y'],
-                       mod_def['labwareOffset']['z'])
-        high_z = mod_def['dimensions']['bareOverallHeight']
-        assert mod.highest_z == high_z
-        assert mod.location.point == offset
-        mod = module_geometry.load_module(
-            name, Location(Point(1, 2, 3), 'test'))
-        assert mod.highest_z == high_z + 3
-        assert mod.location.point == (offset + Point(1, 2, 3))
-        mod2 = module_geometry.load_module_from_definition(
-            mod_def, Location(Point(3, 2, 1), 'test2'))
-        assert mod2.highest_z == high_z + 1
-        assert mod2.location.point == (offset + Point(3, 2, 1))
+    model = module_geometry.resolve_module_model(v1_module_name)
+    mod = module_geometry.load_module(
+        model, Location(Point(0, 0, 0), 'test'))
+    mod_def = module_defs[v1_module_name]
+    offset = Point(mod_def['labwareOffset']['x'],
+                   mod_def['labwareOffset']['y'],
+                   mod_def['labwareOffset']['z'])
+    high_z = mod_def['dimensions']['bareOverallHeight']
+    assert mod.highest_z == high_z
+    assert mod.location.point == offset
+    mod = module_geometry.load_module(
+        model, Location(Point(1, 2, 3), 'test'))
+    assert mod.highest_z == high_z + 3
+    assert mod.location.point == (offset + Point(1, 2, 3))
+    mod2 = module_geometry.load_module_from_definition(
+        module_defs[v1_module_name], Location(Point(3, 2, 1), 'test2'))
+    assert mod2.highest_z == high_z + 1
+    assert mod2.location.point == (offset + Point(3, 2, 1))
 
 
-def test_module_load_labware():
-    module_names = ['tempdeck', 'magdeck']
+@pytest.mark.parametrize(
+    'module_model',
+    list(module_geometry.MagneticModuleModel)
+    + list(module_geometry.TemperatureModuleModel)
+    + list(module_geometry.ThermocyclerModuleModel))
+def test_module_load_v2(module_model):
+    mod = module_geometry.load_module(
+        module_model, Location(Point(0, 0, 0), '3'))
+    mod_def = module_geometry._load_module_definition(MAX_SUPPORTED_VERSION,
+                                                      module_model)
+    high_z = mod_def['dimensions']['bareOverallHeight']
+    assert mod.highest_z == high_z
+
+
+@pytest.mark.parametrize(
+    'module_name', [
+        'tempdeck', 'magdeck', 'temperature module', 'magnetic module'])
+def test_module_load_labware(module_name):
     labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
-    for name in module_names:
-        mod = module_geometry.load_module(
-            name, Location(Point(0, 0, 0), 'test'))
-        old_z = mod.highest_z
-        lw = labware.load_from_definition(labware_def, mod.location)
+    model = module_geometry.resolve_module_model(module_name)
+    mod = module_geometry.load_module(
+        model, Location(Point(0, 0, 0), 'test'))
+    old_z = mod.highest_z
+    lw = labware.load_from_definition(labware_def, mod.location)
+    mod.add_labware(lw)
+    assert mod.labware == lw
+    assert mod.highest_z ==\
+        (mod.location.point.z
+         + labware_def['dimensions']['zDimension']
+         + mod._over_labware)
+    with pytest.raises(AssertionError):
         mod.add_labware(lw)
-        assert mod.labware == lw
-        assert mod.highest_z ==\
-            (mod.location.point.z
-             + labware_def['dimensions']['zDimension']
-             + mod._over_labware)
-        with pytest.raises(AssertionError):
-            mod.add_labware(lw)
-        mod.reset_labware()
-        assert mod.labware is None
-        assert mod.highest_z == old_z
+    mod.reset_labware()
+    assert mod.labware is None
+    assert mod.highest_z == old_z
 
 
 def test_tiprack_list():

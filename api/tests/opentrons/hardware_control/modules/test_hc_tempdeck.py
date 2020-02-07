@@ -47,3 +47,15 @@ async def test_poller(monkeypatch):
     assert temp._poller.is_alive()
     await asyncio.sleep(tempdeck.TEMP_POLL_INTERVAL_SECS * 1.1)
     assert hit
+
+
+async def test_revision_model_parsing():
+    mag = await modules.build('', 'tempdeck', True, lambda x: None)
+    mag._device_info['model'] = 'temp_deck_v20'
+    assert mag.model() == 'temperatureModuleV2'
+    mag._device_info['model'] = 'temp_deck_v4.0'
+    assert mag.model() == 'temperatureModuleV1'
+    del mag._device_info['model']
+    assert mag.model() == 'temperatureModuleV1'
+    mag._device_info['model'] = 'temp_deck_v1.1'
+    assert mag.model() == 'temperatureModuleV1'

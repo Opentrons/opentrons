@@ -24,3 +24,13 @@ async def test_sim_state_update():
     assert mag.status == 'engaged'
     mag.deactivate()
     assert mag.status == 'disengaged'
+
+
+async def test_revision_model_parsing():
+    mag = await modules.build('', 'magdeck', True, lambda x: None)
+    mag._device_info['model'] = 'mag_deck_v1.1'
+    assert mag.model() == 'magneticModuleV1'
+    mag._device_info['model'] = 'mag_deck_v20'
+    assert mag.model() == 'magneticModuleV2'
+    del mag._device_info['model']
+    assert mag.model() == 'magneticModuleV1'
