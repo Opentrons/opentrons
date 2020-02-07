@@ -133,6 +133,30 @@ async def test_wifi_configure(
     assert 'message' in body
 
 
+async def test_wifi_disconnect(loop, aiohttp_client, monkeypatch):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
+
+    msg = {'message': 'Connection \'ot_wifi\' successfully deactivated'}
+
+    async def mock_disconnect(ssid):
+        # Command: nmcli connection down ssid
+        return True, msg
+
+    monkeypatch.setattr(nmcli, 'wifi_disconnect', mock_disconnect)
+
+    expected = {'message': 'SSID must be specified as a string'}
+    resp = await cli.post('/wifi/disconnect', json={})
+    body = await resp.json()
+    assert resp.status == 400
+    assert body == expected
+
+    resp = await cli.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
+    body = await resp.json()
+    assert resp.status == 200
+    assert 'message' in body
+
+
 def test_deduce_security():
     with pytest.raises(networking.ConfigureArgsError):
         networking._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})

@@ -308,9 +308,9 @@ async def disconnect(request: web.Request) -> web.Response:
         return web.json_response({'message': str(excep)}, status=400)
 
     if ok:
-        return web.json_response({'message': message}, status=201)
+        return web.json_response({'message': message}, status=200)
     else:
-        return web.json_response({'message': message}, status=401)
+        return web.json_response({'message': message}, status=400)
 
 
 async def status(request: web.Request) -> web.Response:
