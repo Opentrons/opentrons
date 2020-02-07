@@ -144,5 +144,5 @@ export function getModuleState(
     `getModuleState expected module id "${module}"`
   )
 
-  return robotState.modules[module].moduleState
+  return robotState.modules[module]?.moduleState
 }

@@ -44,11 +44,6 @@ export function forAwaitTemperature(
   const { module, temperature } = params
   const moduleState = getModuleState(robotState, module)
 
-  assert(
-    module in robotState.modules,
-    `forSetTemperature expected module id "${module}"`
-  )
-
   if (moduleState.type === TEMPDECK) {
     if (temperature === moduleState.targetTemperature) {
       moduleState.status = TEMPERATURE_AT_TARGET

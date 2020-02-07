@@ -6,7 +6,7 @@ import {
 } from '../../../constants'
 import * as errorCreators from '../../errorCreators'
 import type { CommandCreator, AwaitTemperatureArgs } from '../../types'
-import { getModuleState } from '../../utils/misc'
+import { getModuleState } from '../../robotStateSelectors'
 
 /** Set temperature target for specified module. */
 export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (

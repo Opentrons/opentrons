@@ -35,12 +35,11 @@ describe('ModuleStatus', () => {
   })
 
   describe('temperature module', () => {
-    test('deactivated is shown when no targetTemperature', () => {
+    test('deactivated is shown when module is deactivated', () => {
       const moduleState = {
         type: TEMPDECK,
         status: TEMPERATURE_DEACTIVATED,
         targetTemperature: null,
-        awaitUntilTemperature: null,
       }
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
@@ -48,12 +47,11 @@ describe('ModuleStatus', () => {
       expect(component.text()).toBe('Deactivated')
     })
 
-    test('temperature is shown when set and await temp is same', () => {
+    test('target temperature is shown when module is at target', () => {
       const moduleState = {
         type: TEMPDECK,
         status: TEMPERATURE_AT_TARGET,
         targetTemperature: 45,
-        awaitUntilTemperature: 45,
       }
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
@@ -61,12 +59,11 @@ describe('ModuleStatus', () => {
       expect(component.text()).toBe('45 °C')
     })
 
-    test('going to X is shown when target and set temps are different', () => {
+    test('going to X is shown when temperature is approaching target', () => {
       const moduleState = {
         type: TEMPDECK,
         status: TEMPERATURE_APPROACHING_TARGET,
         targetTemperature: 45,
-        awaitUntilTemperature: 35,
       }
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
@@ -74,12 +71,11 @@ describe('ModuleStatus', () => {
       expect(component.text()).toBe('Going to 45 °C')
     })
 
-    test('unknown status when invalid status', () => {
+    test('unknown status is shown when nonmatching temp status', () => {
       const moduleState = {
         type: TEMPDECK,
         status: 'UNKNOWN_STATUS',
         targetTemperature: 100,
-        awaitUntilTemperature: null,
       }
 
       const component = render(<ModuleStatus moduleState={moduleState} />)

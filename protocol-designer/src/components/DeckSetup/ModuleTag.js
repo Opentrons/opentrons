@@ -13,6 +13,7 @@ import {
   STD_SLOT_Y_DIM,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
@@ -36,25 +37,21 @@ const TAG_WIDTH = 70
 function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
 
-  if (!targetTemperature) {
+  if (status === TEMPERATURE_DEACTIVATED) {
     return 'Deactivated'
   }
 
-  if (status === TEMPERATURE_AT_TARGET) {
+  if (status === TEMPERATURE_AT_TARGET && targetTemperature !== null) {
     return `${targetTemperature} ${i18n.t('application.units.degrees')}`
   }
 
-  if (status === TEMPERATURE_APPROACHING_TARGET) {
+  if (status === TEMPERATURE_APPROACHING_TARGET && targetTemperature !== null) {
     return `Going to ${targetTemperature} ${i18n.t(
       'application.units.degrees'
     )}`
   }
 
   return 'Status unknown'
-}
-
-const StatusWrapper = (props: {| children: React.Node |}) => {
-  return <div className={styles.module_status_line}>{props.children}</div>
 }
 
 export const ModuleStatus = ({
@@ -65,16 +62,16 @@ export const ModuleStatus = ({
   switch (moduleState.type) {
     case MAGDECK:
       return (
-        <StatusWrapper>
+        <div className={styles.module_status_line}>
           {i18n.t(
             `modules.status.${moduleState.engaged ? 'engaged' : 'disengaged'}`
           )}
-        </StatusWrapper>
+        </div>
       )
 
     case TEMPDECK:
       const tempStatus = getTempStatus(moduleState)
-      return <StatusWrapper>{tempStatus}</StatusWrapper>
+      return <div className={styles.module_status_line}>{tempStatus}</div>
 
     default:
       console.warn(
