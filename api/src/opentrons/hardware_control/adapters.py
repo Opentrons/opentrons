@@ -8,7 +8,7 @@ import logging
 from typing import List, Mapping
 
 from .api import API
-from .thread_manager import HardwareThreadManager
+from .thread_manager import ThreadManager
 from .types import Axis, HardwareAPILike
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -43,13 +43,13 @@ class SynchronousAdapter(HardwareAPILike):
                 if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
             api = loop.run_until_complete(
-                thread_manager.HardwareThreadManager(builder, *args, **kwargs)
+                ThreadManager(builder, *args, **kwargs)
             )
             MODULE_LOG.info(
                 f'\nSYNC ADAPTER build async api: {api}\n')
         else:
-            api = thread_manager.HardwareThreadManager(builder, *args,
-                                                       **kwargs)
+            api = ThreadManager(builder, *args,
+                                **kwargs)
             MODULE_LOG.info(
                 f'\nSYNC ADAPTER build api: {api}\n')
         return cls(api)
@@ -93,7 +93,7 @@ class SynchronousAdapter(HardwareAPILike):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
-        MODULE_LOG.info(f'SA __GETATTRIBUTE__= looking for: {attr}')
+        MODULE_LOG.info(f'SA __GETATTRIBUTE__= looking for: {attr_name}')
         try:
             attr = getattr(api, attr_name)
             MODULE_LOG.info(f'SA __GETATTRIBUTE__= found inside: {attr}')
@@ -137,7 +137,7 @@ class SingletonAdapter(HardwareAPILike):
 
     @classmethod
     def build_in_managed_thread(cls) -> 'SingletonAdapter':
-        return HardwareThreadManager(cls)
+        return ThreadManager(cls)
 
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
         MODULE_LOG.info('Singleton ADAPTER: init ')

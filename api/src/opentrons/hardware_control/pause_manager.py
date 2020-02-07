@@ -4,6 +4,7 @@ It centralizes the runtime control of hardware that allows
 atomic actions to be "paused" and subsequently "resumed"
 """
 import asyncio
+import functools
 
 
 class PauseManager():
@@ -18,13 +19,13 @@ class PauseManager():
         else:
             return await self._run_flag.wait()
 
-    def pause():
+    def pause(self):
         self._run_flag.clear()
 
-    def resume():
+    def resume(self):
         self._run_flag.set()
 
-    def is_paused():
+    def is_paused(self):
         self._run_flag.is_set()
 
 

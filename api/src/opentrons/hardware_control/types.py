@@ -3,8 +3,8 @@ import logging
 import asyncio
 import functools
 import logging
-from typing import Tuple
 from opentrons import types as top_types
+from typing import Tuple, Union, Dict, Optional
 
 MODULE_LOG = logging.getLogger(__name__)
 
