@@ -63,6 +63,17 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, previousRobotState)
     expect(result).toEqual(expected)
   })
+  test('returns missing module error when module id does not exist', () => {
+    const temperature = 42
+    const args = {
+      module: 'someNonexistentModuleId',
+      temperature,
+      commandCreatorFnName,
+    }
+
+    const result = awaitTemperature(args, invariantContext, robotState)
+    expect(result).toEqual(missingModuleError)
+  })
   test('returns missing module error when module id is null', () => {
     const temperature = 42
     const args = {

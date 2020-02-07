@@ -139,7 +139,7 @@ export function getModuleState(
   robotState: RobotState,
   module: string
 ): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
-  assert(
+  console.warn(
     module in robotState.modules,
     `getModuleState expected module id "${module}"`
   )
