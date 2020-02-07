@@ -2,6 +2,7 @@
 import dependentFieldsUpdateMoveLiquid from './dependentFieldsUpdateMoveLiquid'
 import dependentFieldsUpdateMix from './dependentFieldsUpdateMix'
 import dependentFieldsUpdateMagnet from './dependentFieldsUpdateMagnet'
+import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
@@ -47,6 +48,10 @@ function handleFormChange(
       patch,
       rawForm
     )
+    return { ...patch, ...dependentFieldsPatch }
+  }
+  if (rawForm.stepType === 'pause') {
+    const dependentFieldsPatch = dependentFieldsUpdatePause(patch, rawForm)
     return { ...patch, ...dependentFieldsPatch }
   }
 
