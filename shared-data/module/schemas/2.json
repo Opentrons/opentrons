@@ -31,6 +31,7 @@
   "required": [
     "$otSharedSchema",
     "moduleType",
+    "model",
     "labwareOffset",
     "dimensions",
     "calibrationPoint",
@@ -54,6 +55,10 @@
       ],
       "type": "string"
     },
+    "model": {
+      "type": "string",
+      "pattern": "^(temperatureModule|magneticModule|thermocyclerModule)V[0-9]+$"
+    },
     "labwareOffset": { "$ref": "#/definitions/coordinates" },
     "dimensions": {
       "type": "object",
@@ -66,13 +71,6 @@
     },
     "calibrationPoint": { "$ref": "#/definitions/coordinates" },
     "displayName": { "type": "string" },
-    "loadNames": {
-      "type": "array",
-      "items": {
-        "type": "string",
-        "description": "A name that can be used to load this module within a protocol. These must be interpreted non-case-sensitively."
-      }
-    },
     "quirks": {
       "type": "array",
       "description": "List of quirks for a given module",
@@ -108,7 +106,7 @@
       "type": "array",
       "items": {
         "type": "string",
-        "description": "A JSON path to a compatilbe module definition, e.g. one that may be loaded in place of this one with no behavior changes implied"
+        "description": "A compatible module model (e.g. temperatureModuleV1)"
       }
     }
   }

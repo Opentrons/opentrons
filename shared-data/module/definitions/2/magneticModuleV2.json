@@ -1,32 +1,32 @@
 {
   "$otSharedSchema": "module/schemas/2",
-  "moduleType": "temperatureModuleType",
+  "moduleType": "magneticModuleType",
+  "model": "magneticModuleV2",
   "labwareOffset": {
-    "x": -1.45,
-    "y": -0.15,
-    "z": 80.09
+    "x": -1.175,
+    "y": -0.125,
+    "z": 82.25
   },
   "dimensions": {
-    "bareOverallHeight": 84,
-    "overLabwareHeight": 0
+    "bareOverallHeight": 110.152,
+    "overLabwareHeight": 4.052
   },
   "calibrationPoint": {
-    "x": 11.7,
-    "y": 8.75
+    "x": 124.875,
+    "y": 2.75
   },
-  "displayName": "Temperature Module GEN2",
-  "loadNames": ["tempdeckGen2", "temperature module gen2"],
+  "displayName": "Magnetic Module GEN2",
   "quirks": [],
   "slotTransforms": {
     "ot2_standard": {
       "3": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        "labwareOffset": [[-1, 0, 0.25], [0, 1, 0], [0, 0, 1]]
       },
       "6": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        "labwareOffset": [[-1, 0, 0.25], [0, 1, 0], [0, 0, 1]]
       },
       "9": {
-        "labwareOffset": [[-1, 0, 0.3], [0, 1, 0], [0, 0, 1]]
+        "labwareOffset": [[-1, 0, 0.25], [0, 1, 0], [0, 0, 1]]
       }
     },
     "ot2_short_trash": {
@@ -41,5 +41,5 @@
       }
     }
   },
-  "compatibleWith": ["temperature module"]
+  "compatibleWith": []
 }

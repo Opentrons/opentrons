@@ -1,6 +1,5 @@
 // @flow
 import type { ModuleModel, ModuleRealType } from './types'
-import moduleSpecs from '../module/definitions/1.json'
 
 // The module objects in v2 Module Definitions representing a single module model
 type Coordinates = {|
@@ -11,6 +10,7 @@ type Coordinates = {|
 type AffineTransform = [number, number, number]
 export type ModuleDef2 = {|
   moduleType: ModuleRealType,
+  moduleModel: ModuleModel,
   labwareOffset: Coordinates,
   dimensions: {|
     bareOverallHeight: number,
@@ -19,7 +19,6 @@ export type ModuleDef2 = {|
   |},
   calibrationPoint: Coordinates,
   displayName: string,
-  loadNames: Array<string>,
   quirks: Array<string>,
   slotTransforms: {|
     [deckDef: string]: {|
@@ -28,11 +27,15 @@ export type ModuleDef2 = {|
       |},
     |},
   |},
-  compatibleWith: Array<string>,
+  compatibleWith: Array<ModuleModel>,
 |}
 
 export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDef2 | null => {
-  return moduleSpecs[moduleModel] || null
+  try {
+    return require(`../module/definitions/2/${moduleModel}.json`)
+  } catch (ex) {
+    return null
+  }
 }
 
 export const getModuleTypeFromModuleModel = (

@@ -42,4 +42,12 @@ describe('validate all module specs with schema', () => {
       })
     })
   })
+  test('validate each module specs model matches its filename', () => {
+    const modulePaths = glob.sync(v2DefinitionsGlobPath)
+    modulePaths.forEach(modulePath => {
+      const filename = path.parse(modulePath).base
+      const moduleDef = require(modulePath)
+      expect(moduleDef.model).toEqual(filename)
+    })
+  })
 })

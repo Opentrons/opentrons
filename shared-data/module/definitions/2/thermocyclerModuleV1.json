@@ -1,6 +1,7 @@
 {
   "$otSharedSchema": "module/schemas/2",
   "moduleType": "thermocyclerModuleType",
+  "model": "thermocyclerModuleV1"
   "labwareOffset": {
     "x": 0,
     "y": 82.56,
@@ -16,7 +17,6 @@
     "y": 64.93
   },
   "displayName": "Thermocycler Module",
-  "loadNames": ["thermocycler", "thermocycler module"],
   "quirks": [],
   "slotTransforms": {},
   "compatibleWith": []
