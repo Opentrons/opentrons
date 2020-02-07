@@ -2,13 +2,13 @@
 import * as Fixtures from '../__fixtures__'
 import * as actions from '../actions'
 
-import type { CustomLabwareAction } from '../types'
+import type { Action } from '../../types'
 
 type ActionSpec = {|
   name: string,
   creator: (...Array<any>) => mixed,
   args?: Array<mixed>,
-  expected: CustomLabwareAction,
+  expected: Action,
 |}
 
 describe('custom labware actions', () => {
@@ -130,6 +130,25 @@ describe('custom labware actions', () => {
       creator: actions.clearAddCustomLabwareFailure,
       args: [],
       expected: { type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE' },
+    },
+    {
+      name: 'openCustomLabwareDirectory',
+      creator: actions.openCustomLabwareDirectory,
+      args: [],
+      expected: {
+        type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY',
+        meta: { shell: true },
+      },
+    },
+    {
+      name: 'resetCustomLabwareDirectory',
+      creator: actions.resetCustomLabwareDirectory,
+      args: [],
+      expected: {
+        type: 'config:RESET',
+        payload: { path: 'labware.directory' },
+        meta: { shell: true },
+      },
     },
   ]
 

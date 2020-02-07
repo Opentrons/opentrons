@@ -106,6 +106,11 @@ export type ClearAddCustomLabwareFailureAction = {|
   type: 'labware:CLEAR_ADD_CUSTOM_LABWARE_FAILURE',
 |}
 
+export type OpenCustomLabwareDirectoryAction = {|
+  type: 'labware:OPEN_CUSTOM_LABWARE_DIRECTORY',
+  meta: {| shell: true |},
+|}
+
 export type CustomLabwareAction =
   | FetchCustomLabwareAction
   | CustomLabwareListAction
@@ -114,3 +119,4 @@ export type CustomLabwareAction =
   | AddCustomLabwareAction
   | AddCustomLabwareFailureAction
   | ClearAddCustomLabwareFailureAction
+  | OpenCustomLabwareDirectoryAction

@@ -1,6 +1,7 @@
 // @flow
 
 import fse from 'fs-extra'
+import electron from 'electron'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
 import * as Defs from '../definitions'
@@ -372,6 +373,14 @@ describe('labware module dispatches', () => {
 
     return flush().then(() => {
       expect(dispatch).toHaveBeenCalledWith(expectedAction)
+    })
+  })
+
+  test('opens custom labware directory on OPEN_CUSTOM_LABWARE_DIRECTORY', () => {
+    handleAction(CustomLabware.openCustomLabwareDirectory())
+
+    return flush().then(() => {
+      expect(electron.shell.openItem).toHaveBeenCalledWith(labwareDir)
     })
   })
 })
