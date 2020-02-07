@@ -21,6 +21,7 @@ import {
   temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
+  pauseTemperatureRangeExceeded,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
@@ -43,7 +44,10 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getErrors: composeErrors(incompatibleLabware),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
   },
-  pause: { getErrors: composeErrors(pauseForTimeOrUntilTold) },
+  pause: {
+    getErrors: composeErrors(pauseForTimeOrUntilTold),
+    getWarnings: composeWarnings(pauseTemperatureRangeExceeded),
+  },
   moveLiquid: {
     getErrors: composeErrors(
       incompatibleAspirateLabware,
