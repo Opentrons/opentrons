@@ -1,0 +1,24 @@
+# catchall: someone in software should be notified for any change in this repo
+* @Opentrons/software
+
+# language expertise verticals - if a PR changes things in multiple projects let's
+# notify those language communities
+*.js @Opentrons/js
+*.py @Opentrons/py
+/flow-typed @Opentrons/js
+/webpack-config @Opentrons/js
+
+# subprojects - those with clear team ownership should have appropriate notifications
+/protocol-designer @Opentrons/spddrs
+/labware-designer @Opentrons/spddrs
+/labware-library @Opentrons/spddrs
+/protocol-library-kludge @Opentrons/spddrs
+/update-server @Opentrons/cpx
+/api/src/opentrons @Opentrons/hmg
+
+# subprojects by language - some subprojects are shared by teams but united by a
+# language community (including makefiles and config) so mark them appropriately
+/app @Opentrons/js
+/app-shell @Opentrons/js
+/components @Opentrons/js
+/api @Opentrons/py
