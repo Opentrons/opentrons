@@ -17,7 +17,7 @@ const ROBOT_NAME = 'robotName'
 
 const SPECS: Array<ReducerSpec> = [
   {
-    name: 'handles networking:FETCH_STATUS_SUCCESS',
+    name: 'handles fetch status success action',
     action: Actions.fetchStatusSuccess(
       ROBOT_NAME,
       Fixtures.mockNetworkingStatus.status,

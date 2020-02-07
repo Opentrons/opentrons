@@ -9,8 +9,6 @@ import {
 
 import type { NetworkingStatusResponse } from '../types'
 
-// Fetch networking status fixtures
-
 export const mockNetworkingStatus: NetworkingStatusResponse = {
   status: 'full',
   interfaces: {
