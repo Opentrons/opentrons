@@ -13,8 +13,8 @@ from opentrons.drivers.rpi_drivers import gpio
 import opentrons.config
 from opentrons.types import Mount
 
+from .pause_manager import PauseManager
 from . import modules
-from .types import PauseManager
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)

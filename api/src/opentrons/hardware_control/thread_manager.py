@@ -5,7 +5,6 @@ import logging
 import asyncio
 import functools
 from time import sleep
-from . import API
 from .types import Axis, HardwareAPILike
 
 MODULE_LOG = logging.getLogger(__name__)

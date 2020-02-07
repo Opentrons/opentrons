@@ -1,10 +1,9 @@
 import asyncio
-from . import types, update, mod_abc
-from ..types import pausable, PauseManager
 from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
+from ..pause_manager import PauseManager, pausable
 from . import types, update, mod_abc
 
 MODULE_LOG = logging.getLogger(__name__)

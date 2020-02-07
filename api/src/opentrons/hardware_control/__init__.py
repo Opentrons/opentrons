@@ -15,7 +15,7 @@ from .api import API
 from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette
-from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError
+from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError, Axis
 from .constants import DROP_TIP_RELEASE_DISTANCE
 
 __all__ = [
