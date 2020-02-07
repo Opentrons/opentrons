@@ -2,7 +2,7 @@
 import {
   mergeSubstepRowsSingleChannel,
   mergeSubstepRowsMultiChannel,
-} from '../transferLikeSubsteps'
+} from '../generateSubsteps'
 
 const ingred1Id = 'ingred1Id'
 const wellNamesForCol = (isMulti: boolean, colNum: string): Array<string> =>

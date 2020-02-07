@@ -7,10 +7,11 @@ import { Portal } from './TooltipPortal'
 import LabwareTooltipContents from './LabwareTooltipContents'
 import styles from './StepItem.css'
 import i18n from '../../localization'
+import { TEMPDECK, MAGDECK } from '../../constants'
 
 type Props = {|
   action: string,
-  module: 'magdeck' | 'tempdeck',
+  module: typeof MAGDECK | typeof TEMPDECK,
   actionText: string,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
