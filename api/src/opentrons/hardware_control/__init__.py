@@ -10,7 +10,7 @@ This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
 
-from .types import Axis, HardwareAPILike, CriticalPoint, GateKeeper
+from .types import Axis, HardwareAPILike, CriticalPoint
 from opentrons.drivers.types import MoveSplit
 from .types import Axis, HardwareAPILike, CriticalPoint
 from .util import use_or_initialize_loop
@@ -27,8 +27,9 @@ from .simulator import Simulator
 from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 from .controller import Controller
+from .pause_manager import PauseManager
 from . import modules
-from .types import Axis, HardwareAPILike, CriticalPoint, PauseManager
+from .types import Axis, HardwareAPILike, CriticalPoint
 
 
 mod_log = logging.getLogger(__name__)
@@ -92,7 +93,10 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
-        self._pause_manager = PauseManager(self._loop, self.is_simulator_sync)
+        self._pause_manager = PauseManager(
+            loop=self._loop,
+            is_simulating=self.is_simulator_sync
+        )
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -461,7 +465,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._loop.call_soon_threadsafe(self.pause_manager.pause)
+        self._loop.call_soon_threadsafe(self.pause_manager.resume)
 
     @_log_call
     def halt(self):

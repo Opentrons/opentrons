@@ -6,11 +6,10 @@ from typing import List, Optional, Dict, Any
 from collections import namedtuple
 
 from opentrons.config import IS_ROBOT, IS_LINUX
+from ..pause_manager import PauseManager
 from .mod_abc import AbstractModule
-# Must import tempdeck and magdeck (and other modules going forward) so they
-# actually create the subclasses
+# NOTE: Must import all modules so they actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
-from ..types import PauseManager
 
 log = logging.getLogger(__name__)
 

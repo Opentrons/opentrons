@@ -10,7 +10,7 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
-from .types import PauseManager
+from .pause_manager import PauseManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
 
