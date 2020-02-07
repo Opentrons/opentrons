@@ -12,6 +12,7 @@ from .util import use_or_initialize_loop, log_call
 from .pipette import Pipette
 from .controller import Controller
 from .simulator import Simulator
+from .pause_manager import PauseManager
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
@@ -24,7 +25,6 @@ mod_log = logging.getLogger(__name__)
 
 
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
-
 
 class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
@@ -54,6 +54,10 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
+        self._pause_manager = PauseManager(
+            loop=self._loop,
+            is_simulating=self.is_simulator_sync
+        )
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -351,6 +355,10 @@ class API(HardwareAPILike):
     def attached_modules(self):
         return self._attached_modules
 
+    @property
+    def pause_manager(self):
+        return self._pause_manager
+
     @log_call
     async def update_firmware(
             self,
@@ -396,7 +404,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._call_on_attached_modules("pause")
+        self._loop.call_soon_threadsafe(self.pause_manager.pause)
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -410,7 +418,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._call_on_attached_modules("resume")
+        self._loop.call_soon_threadsafe(self.pause_manager.resume)
 
     @log_call
     def halt(self):
@@ -991,7 +999,7 @@ class API(HardwareAPILike):
             return
 
         self._backend.set_active_current(
-            Axis.of_plunger(mount), this_pipette.config.plunger_current)
+             Axis.of_plunger(mount), this_pipette.config.plunger_current)
         dist = self._plunger_position(
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
@@ -1391,6 +1399,7 @@ class API(HardwareAPILike):
             new_instance = await self._backend.build_module(
                     port=port,
                     model=name,
+                    pause_manager=self.pause_manager,
                     interrupt_callback=self.pause_with_message)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"

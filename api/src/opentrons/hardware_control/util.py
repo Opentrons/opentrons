@@ -4,7 +4,7 @@ import inspect
 import asyncio
 import logging
 from typing import Dict, Any, Optional, Callable
-from . import types, adapters, API, HardwareAPILike
+from . import types, adapters
 
 mod_log = logging.getLogger(__name__)
 
