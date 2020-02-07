@@ -6,11 +6,22 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import i18n from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import { MAGDECK, STD_SLOT_X_DIM, STD_SLOT_Y_DIM } from '../../constants'
+import {
+  MAGDECK,
+  TEMPDECK,
+  STD_SLOT_X_DIM,
+  STD_SLOT_Y_DIM,
+  TEMPERATURE_AT_TARGET,
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_DEACTIVATED,
+} from '../../constants'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
-import type { ModuleTemporalProperties } from '../../step-forms'
+import type {
+  ModuleTemporalProperties,
+  TemperatureModuleState,
+} from '../../step-forms'
 
 type Props = {|
   x: number,
@@ -21,9 +32,30 @@ type Props = {|
 
 // eyeballed width/height to match designs
 const TAG_HEIGHT = 45
-const TAG_WIDTH = 60
+const TAG_WIDTH = 70
 
-const ModuleStatus = ({
+function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
+  const { targetTemperature, status } = temperatureModuleState
+
+  if (status === TEMPERATURE_DEACTIVATED || targetTemperature === null) {
+    return i18n.t(`modules.status.deactivated`)
+  }
+
+  if (status === TEMPERATURE_AT_TARGET) {
+    return `${targetTemperature} ${i18n.t('application.units.degrees')}`
+  }
+
+  if (status === TEMPERATURE_APPROACHING_TARGET) {
+    return `Going to ${targetTemperature} ${i18n.t(
+      'application.units.degrees'
+    )}`
+  }
+
+  console.warn(`Temperature status ${status} is not implemented`)
+  return ''
+}
+
+export const ModuleStatus = ({
   moduleState,
 }: {|
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
@@ -37,6 +69,10 @@ const ModuleStatus = ({
           )}
         </div>
       )
+
+    case TEMPDECK:
+      const tempStatus = getTempStatus(moduleState)
+      return <div className={styles.module_status_line}>{tempStatus}</div>
 
     default:
       console.warn(

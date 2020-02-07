@@ -9,8 +9,13 @@ import {
   getTiprackTipstate,
   DEFAULT_PIPETTE,
 } from './fixtures'
-import { sortLabwareBySlot, getNextTiprack, _getNextTip } from '../'
-
+import {
+  sortLabwareBySlot,
+  getNextTiprack,
+  _getNextTip,
+  getModuleState,
+} from '../'
+import { MAGDECK } from '../../constants'
 let invariantContext
 
 beforeEach(() => {
@@ -380,5 +385,33 @@ describe('getNextTiprack - 8-channel', () => {
     })
     const result = getNextTiprack('p300MultiId', invariantContext, robotState)
     expect(result).toEqual(null)
+  })
+})
+
+describe('getModuleState', () => {
+  test('returns the state for specified module', () => {
+    const magModuleId = 'magdeck123'
+    const magModuleState = {
+      type: MAGDECK,
+      engaged: true,
+    }
+    const robotState = makeState({
+      invariantContext,
+      pipetteLocations: { p300SingleId: { mount: 'left' } },
+      labwareLocations: {
+        tiprack1Id: { slot: '2' },
+      },
+      tiprackSetting: { tiprack1Id: false },
+      moduleLocations: {
+        [magModuleId]: {
+          slot: '4',
+          moduleState: magModuleState,
+        },
+      },
+    })
+
+    const moduleState = getModuleState(robotState, magModuleId)
+
+    expect(moduleState).toEqual(magModuleState)
   })
 })
