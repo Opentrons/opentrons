@@ -506,6 +506,15 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     Returns (True, msg) if the network was disconnected from successfully,
             (False, msg) otherwise
     """
+    # Verify robot is connected via ethernet before disconnecting from wifi
+    # Warning: Users should make the disconnect request over the wired
+    #          connection. This code doesn't check for that. So the app must
+    #          make sure to check that the request is over a wired conn.
+    _res, _err = await _call(['-g', 'WIRED-PROPERTIES.CARRIER',
+                              'device', 'show', 'eth0'])
+    if 'off' in _res or _err:
+        return False, 'You should be connected to the robot via ethernet ' \
+                      'before disconnecting it from wifi network'
     res, err = await _call(['connection', 'down', ssid])
     if 'successfully deactivated' in res:
         rem_ok, rem_res = await remove(ssid)
