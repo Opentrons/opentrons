@@ -4,7 +4,7 @@ import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
-import { getCrashablePipetteSelected } from '../../../step-forms'
+import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import {
   Modal,
   FormGroup,
@@ -208,7 +208,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
     const showCrashInfoBox =
-      getCrashablePipetteSelected(this.state.pipettesByMount) &&
+      getIsCrashablePipetteSelected(this.state.pipettesByMount) &&
       this.getCrashableModuleSelected(this.state.modulesByType)
 
     const visibleModules = this.props.thermocyclerEnabled

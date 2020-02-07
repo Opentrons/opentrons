@@ -4,7 +4,7 @@ import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 import {
   selectors as stepFormSelectors,
-  getCrashablePipetteSelected,
+  getIsCrashablePipetteSelected,
 } from '../../step-forms'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
@@ -35,7 +35,9 @@ export function EditModulesCard(props: Props) {
   const moduleRestritionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
-  const crashablePipettesSelected = getCrashablePipetteSelected(pipettesByMount)
+  const crashablePipettesSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
 
   const warningsEnabled =
     !moduleRestritionsDisabled && crashablePipettesSelected
