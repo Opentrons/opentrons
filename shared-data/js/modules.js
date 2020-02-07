@@ -10,7 +10,7 @@ type Coordinates = {|
 type AffineTransform = [number, number, number]
 export type ModuleDef2 = {|
   moduleType: ModuleRealType,
-  moduleModel: ModuleModel,
+  model: ModuleModel,
   labwareOffset: Coordinates,
   dimensions: {|
     bareOverallHeight: number,
