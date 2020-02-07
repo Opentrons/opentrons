@@ -35,7 +35,7 @@ test('message is not displayed when no message', () => {
   const wrapper = shallow(<ModuleStepItems {...props} />)
 
   expect(wrapper.find('PDListItem')).toHaveLength(1)
-  expect(wrapper.find('.step-item-message').exists).toBeTruthy()
+  expect(wrapper.find('.step-item-message').exists()).toEqual(false)
 })
 
 test('module name, action, and actionText is displayed', () => {

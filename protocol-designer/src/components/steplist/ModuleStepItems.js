@@ -2,16 +2,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { HoverTooltip } from '@opentrons/components'
+import i18n from '../../localization'
 import { PDListItem } from '../lists'
 import { Portal } from './TooltipPortal'
 import LabwareTooltipContents from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import i18n from '../../localization'
-import { TEMPDECK, MAGDECK } from '../../constants'
+import typeof { TEMPDECK, MAGDECK } from '../../constants'
 
 type Props = {|
   action: string,
-  module: typeof MAGDECK | typeof TEMPDECK,
+  module: MAGDECK | TEMPDECK,
   actionText: string,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
