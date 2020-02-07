@@ -11,7 +11,8 @@
   },
   "status": {
     "engaged": "engaged",
-    "disengaged": "disengaged"
+    "disengaged": "disengaged",
+    "deactivated": "Deactivated"
   },
   "actions": {
     "action": "action",

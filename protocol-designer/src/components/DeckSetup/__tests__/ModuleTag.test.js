@@ -70,17 +70,5 @@ describe('ModuleStatus', () => {
 
       expect(component.text()).toBe('Going to 45 °C')
     })
-
-    test('unknown status is shown when nonmatching temp status', () => {
-      const moduleState = {
-        type: TEMPDECK,
-        status: 'UNKNOWN_STATUS',
-        targetTemperature: 100,
-      }
-
-      const component = render(<ModuleStatus moduleState={moduleState} />)
-
-      expect(component.text()).toBe('Status unknown')
-    })
   })
 })

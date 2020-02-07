@@ -38,7 +38,7 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
 
   if (status === TEMPERATURE_DEACTIVATED || targetTemperature === null) {
-    return 'Deactivated'
+    return i18n.t(`modules.status.deactivated`)
   }
 
   if (status === TEMPERATURE_AT_TARGET) {
@@ -52,7 +52,7 @@ function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   }
 
   console.warn(`Temperature status ${status} is not implemented`)
-  return 'Status unknown'
+  return ''
 }
 
 export const ModuleStatus = ({
