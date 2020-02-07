@@ -37,20 +37,21 @@ const TAG_WIDTH = 70
 function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
 
-  if (status === TEMPERATURE_DEACTIVATED) {
+  if (status === TEMPERATURE_DEACTIVATED || targetTemperature === null) {
     return 'Deactivated'
   }
 
-  if (status === TEMPERATURE_AT_TARGET && targetTemperature !== null) {
+  if (status === TEMPERATURE_AT_TARGET) {
     return `${targetTemperature} ${i18n.t('application.units.degrees')}`
   }
 
-  if (status === TEMPERATURE_APPROACHING_TARGET && targetTemperature !== null) {
+  if (status === TEMPERATURE_APPROACHING_TARGET) {
     return `Going to ${targetTemperature} ${i18n.t(
       'application.units.degrees'
     )}`
   }
 
+  console.warn(`Temperature status ${status} is not implemented`)
   return 'Status unknown'
 }
 
