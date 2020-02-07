@@ -3,7 +3,7 @@ from typing import Union, Callable
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
 from . import update, mod_abc, types
-from ..types import PauseManager
+from ..pause_manager import PauseManager
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position

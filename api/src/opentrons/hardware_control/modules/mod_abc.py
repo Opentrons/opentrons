@@ -6,9 +6,7 @@ from pkg_resources import parse_version
 from typing import Dict, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
-from .types import BundledFirmware, UploadFunction, InterruptCallback
-from ..types import PauseManager
-
+from ..pause_manager import PauseManager
 mod_log = logging.getLogger(__name__)
 
 
