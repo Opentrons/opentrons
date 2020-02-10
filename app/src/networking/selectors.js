@@ -4,6 +4,8 @@ import find from 'lodash/find'
 import map from 'lodash/map'
 import { long2ip } from 'netmask'
 
+import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
+
 import type { State } from '../types'
 import * as Types from './types'
 
@@ -42,8 +44,8 @@ export function getNetworkInterfaces(
     }
   )
 
-  const wifi = find(simpleInterfaces, { type: 'wifi' }) || null
-  const ethernet = find(simpleInterfaces, { type: 'ethernet' }) || null
+  const wifi = find(simpleInterfaces, { type: INTERFACE_WIFI }) || null
+  const ethernet = find(simpleInterfaces, { type: INTERFACE_ETHERNET }) || null
 
   return { wifi, ethernet }
 }
