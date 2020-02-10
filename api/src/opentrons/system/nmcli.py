@@ -506,7 +506,6 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     Returns (True, msg) if the network was disconnected from successfully,
             (False, msg) otherwise
     """
-
     res, err = await _call(['connection', 'down', ssid])
     if 'successfully deactivated' in res:
         rem_ok, rem_res = await remove(ssid)
