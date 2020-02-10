@@ -14,17 +14,21 @@ router = APIRouter()
 
 @router.get("/health",
             response_model=Health,
-            description="Retrieve some useful information about supported API versions, names, and so on",
-            summary="The /health endpoint is a good one to check to see if you're communicating with an OT-2 with a"
-                    " properly booted API server. If it returns OK, all is well. It also can be used to pull"
-                    " information like the robot software version and name.",
+            description="Retrieve some useful information about supported API "
+                        "versions, names, and so on",
+            summary="The /health endpoint is a good one to check to see if "
+                    "you're communicating with an OT-2 with a properly booted "
+                    "API server. If it returns OK, all is well. It also can be"
+                    " used to pull information like the robot software version"
+                    " and name.",
             response_description="OT-2 /health response")
-async def get_health(hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
+async def get_health(
+        hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
     static_paths = ['/logs/serial.log', '/logs/api.log']
     # This conditional handles the case where we have just changed the
     # use protocol api v2 feature flag, so it does not match the type
     # of hardware we're actually using.
-    fw_version = hardware.fw_version
+    fw_version = hardware.fw_version  # type: ignore
     if inspect.iscoroutine(fw_version):
         fw_version = await fw_version
 

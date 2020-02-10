@@ -19,15 +19,18 @@ class Health(BaseModel):
     """A set of information about the name and versions."""
     name: str = \
         Field(...,
-              description="The robot's name. In most cases the same as its mDNS advertisement domain name but "
-                          "this can get out of sync. Mostly useful for user-facing titles.")
+              description="The robot's name. In most cases the same as its "
+                          "mDNS advertisement domain name but this can get out"
+                          " of sync. Mostly useful for user-facing titles.")
     api_version: str = \
         Field(...,
-              description="The SemVer dotted-int version of the API server and by extension robot software.")
+              description="The SemVer dotted-int version of the API server and"
+                          " by extension robot software.")
     fw_version: str = \
         Field(...,
-              description="The version of the firmware flashed to the OT-2's motor controller board. Doesn't follow a "
-                          "pattern, suitable only for display or exact matching.")
+              description="The version of the firmware flashed to the OT-2's "
+                          "motor controller board. Doesn't follow a pattern, "
+                          "suitable only for display or exact matching.")
     logs: typing.List[str] = \
         Field(...,
               description="List of URL paths at which to find logs")
@@ -57,6 +60,3 @@ class Health(BaseModel):
                   }
                 }
         }
-
-
-

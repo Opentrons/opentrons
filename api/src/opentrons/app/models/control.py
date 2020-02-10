@@ -7,50 +7,93 @@ from pydantic import BaseModel, Field
 
 class TemperatureModuleLiveData(BaseModel):
     """Temperature Module live data"""
-    currentTemp: float = Field(..., description="The current temperature of the module")
-    targetTemp: typing.Optional[float] = Field(..., description="The target temperature of the module if any")
+    currentTemp: float = \
+        Field(...,
+              description="The current temperature of the module")
+    targetTemp: typing.Optional[float] = \
+        Field(...,
+              description="The target temperature of the module if any")
 
 
 class MagneticModuleLiveData(BaseModel):
     """Magnetic Module live data"""
-    engaged: bool = Field(..., description="Whether the magnets are raised or lowered")
-    height: float = Field(...,
-                          description="The height of the top of the magnets relative to their home position, in mm")
+    engaged: bool = \
+        Field(...,
+              description="Whether the magnets are raised or lowered")
+    height: float = \
+        Field(...,
+              description="The height of the top of the magnets relative to "
+                          "their home position, in mm")
 
 
 class ThermocyclerModuleLiveData(BaseModel):
     """Thermocycler live data"""
     lid: str = Field(..., description="The current state of the lid")
-    lidTarget: typing.Optional[float] = Field(...,
-                                              description="The target temperature of the lid temperature controller")
-    lidTemp: float = Field(..., description="The current temperature of the lid")
-    currentTemp: float = Field(..., description="The current temperature of the thermocycler block")
-    targetTemp: typing.Optional[float] = Field(..., description="The target temperature of the thermocycler block")
-    holdTime: typing.Optional[float] = Field(...,
-                                             description="The time left in the current hold step, if any (in seconds)")
-    rampRate: typing.Optional[float] = Field(...,
-                                             description="The current ramp rate (in degC/s) for the thermocycler block")
-    currentCycleIndex: typing.Optional[int] = Field(...,
-                                                    description="The index of the current cycle within the current programmed sequence")
-    totalCycleCount: typing.Optional[int] = Field(...,
-                                                  description="The total number of cycles within the current sequence")
-    currentStepIndex: typing.Optional[int] = Field(...,
-                                                   description="The index of the current step within the current programmed cycle")
-    totalStepCount: typing.Optional[int] = Field(..., description="The total number of steps within the current cycle")
+    lidTarget: typing.Optional[float] = \
+        Field(...,
+              description="The target temperature of the lid temperature "
+                          "controller")
+    lidTemp: float = \
+        Field(...,
+              description="The current temperature of the lid")
+    currentTemp: float = \
+        Field(...,
+              description="The current temperature of the thermocycler block")
+    targetTemp: typing.Optional[float] = \
+        Field(...,
+              description="The target temperature of the thermocycler block")
+    holdTime: typing.Optional[float] = \
+        Field(...,
+              description="The time left in the current hold step, if any (in "
+                          "seconds)")
+    rampRate: typing.Optional[float] = \
+        Field(...,
+              description="The current ramp rate (in degC/s) for the "
+                          "thermocycler block")
+    currentCycleIndex: typing.Optional[int] = \
+        Field(...,
+              description="The index of the current cycle within the current "
+                          "programmed sequence")
+    totalCycleCount: typing.Optional[int] = \
+        Field(...,
+              description="The total number of cycles within the current "
+                          "sequence")
+    currentStepIndex: typing.Optional[int] = \
+        Field(...,
+              description="The index of the current step within the current "
+                          "programmed cycle")
+    totalStepCount: typing.Optional[int] = \
+        Field(...,
+              description="The total number of steps within the current cycle")
 
 
-ModuleLiveData = typing.Union[TemperatureModuleLiveData, MagneticModuleLiveData, ThermocyclerModuleLiveData]
+ModuleLiveData = typing.Union[
+    TemperatureModuleLiveData, MagneticModuleLiveData,
+    ThermocyclerModuleLiveData]
 
 
 class Module(BaseModel):
     """An object identifying a module"""
-    name: str = Field(..., description="A machine readable identifying name for a module", )
-    displayName: str = Field(..., description="A human-presentable name of the module", )
-    port: str = Field(..., description="The virtual port to which the module is attached", )
-    serial: str = Field(..., description="The unique serial number of the module", )
-    model: str = Field(..., description="The model identifier (i.e. the part number)", )
-    fwVersion: str = Field(..., description="The current firmware version", )
-    status: str = Field(..., description="A human-readable module-specific status", )
+    name: str = \
+        Field(...,
+              description="A machine readable identifying name for a module", )
+    displayName: str = \
+        Field(...,
+              description="A human-presentable name of the module", )
+    port: str = \
+        Field(...,
+              description="The virtual port to which the module is attached", )
+    serial: str = \
+        Field(...,
+              description="The unique serial number of the module", )
+    model: str = \
+        Field(...,
+              description="The model identifier (i.e. the part number)", )
+    fwVersion: str = \
+        Field(..., description="The current firmware version", )
+    status: str = \
+        Field(...,
+              description="A human-readable module-specific status", )
     data: ModuleLiveData
 
 
@@ -141,20 +184,26 @@ class Modules(BaseModel):
 
 class ModuleSerial(BaseModel):
     """Data from the module"""
-    status: str = Field(..., description="A human-readable module-specific status")
+    status: str = Field(...,
+                        description="A human-readable module-specific status")
     data: ModuleLiveData
 
 
 class SerialCommand(BaseModel):
     """The serialized module call"""
-    command_type: str = Field(..., description="The name of the module function to call")
-    args: typing.List[str] = Field(..., description="The ordered args list for the call")
+    command_type: str = \
+        Field(...,
+              description="The name of the module function to call")
+    args: typing.List[str] = \
+        Field(...,
+              description="The ordered args list for the call")
 
     class Config:
         schema_extra = {"examples": {
             "tempModSetTemp": {
                 "summary": "Set Temperature Module temperature",
-                "description": "Set the temperature of an attached Temperature Module",
+                "description": "Set the temperature of an attached "
+                               "Temperature Module",
                 "value": {
                     "command_type": "set_temperature",
                     "args": [60]
@@ -172,7 +221,8 @@ class SerialCommandResponse(BaseModel):
         schema_extra = {"examples": {
             "tempModSetTemperature": {
                 "summary": "Set temperature OK",
-                "description": "A successful call to set_temperature on a Temperature Module",
+                "description": "A successful call to set_temperature "
+                               "on a Temperature Module",
                 "value": {
                     "message": "Success",
                     "returnValue": None
@@ -183,14 +233,28 @@ class SerialCommandResponse(BaseModel):
 
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
-    model: typing.Optional[str] = Field(...,
-                                        description="The model of the attached pipette. These are snake case as in the Protocol API. This includes the full version string")
-    name: typing.Optional[str] = Field(...,
-                                       description="The name of the attached pipette - the model without the version string")
-    tip_length: typing.Optional[float] = Field(..., description="The default tip length for this pipette, if attached")
-    mount_axis: str = Field(..., description="The axis that moves this pipette up and down")
-    plunger_axis: str = Field(..., description="The axis that moves this pipette's plunger")
-    id: typing.Optional[str] = Field(..., description="The serial number of the attached pipette")
+    model: typing.Optional[str] = \
+        Field(...,
+              description="The model of the attached pipette. These are snake "
+                          "case as in the Protocol API. This includes the full"
+                          " version string")
+    name: typing.Optional[str] = \
+        Field(...,
+              description="The name of the attached pipette - the model "
+                          "without the version string")
+    tip_length: typing.Optional[float] = \
+        Field(...,
+              description="The default tip length for this pipette, if "
+                          "attached")
+    mount_axis: str = \
+        Field(...,
+              description="The axis that moves this pipette up and down")
+    plunger_axis: str = \
+        Field(...,
+              description="The axis that moves this pipette's plunger")
+    id: typing.Optional[str] = \
+        Field(...,
+              description="The serial number of the attached pipette")
 
 
 class Pipette(BaseModel):
@@ -235,13 +299,13 @@ class EngagedMotors(BaseModel):
 
     class Config:
         schema_extra = {"example": {
-                  "x": {"enabled": False},
-                  "y": {"enabled": True},
-                  "z": {"enabled": False},
-                  "a": {"enabled": True},
-                  "b": {"enabled": False},
-                  "c": {"enabled": True}
-                }}
+            "x": {"enabled": False},
+            "y": {"enabled": True},
+            "z": {"enabled": False},
+            "a": {"enabled": True},
+            "b": {"enabled": False},
+            "c": {"enabled": True}
+        }}
 
 
 class MotorName(str, Enum):
@@ -254,7 +318,10 @@ class MotorName(str, Enum):
 
 
 class MotionTarget(str, Enum):
-    """What should be moved. If mount, move the nominal position of the mount; if pipette, move the nozzle of the pipette"""
+    """
+    What should be moved. If mount, move the nominal position of the mount;
+    if pipette, move the nozzle of the pipette
+    """
     pipette = "pipette"
     mount = "mount"
 
@@ -267,7 +334,9 @@ class HomeTarget(str, Enum):
 Point = typing.List[float]
 
 # Commonly used Point type description and constraints
-PointField = partial(Field, ..., description="A point in deck coordinates (x, y, z)", min_items=3, max_items=3)
+PointField = partial(Field, ...,
+                     description="A point in deck coordinates (x, y, z)",
+                     min_items=3, max_items=3)
 
 
 class ChangePipette(BaseModel):
@@ -287,18 +356,18 @@ class RobotPositions(BaseModel):
 
     class Config:
         schema_extra = {"example": {
-                  "positions": {
-                    "change_pipette": {
-                      "target": "mount",
-                      "left": [325, 40, 30],
-                      "right": [65, 40, 30]
-                    },
-                    "attach_tip": {
-                      "target": "pipette",
-                      "point": [200, 90, 150]
-                    }
-                  }
-                }}
+            "positions": {
+                "change_pipette": {
+                    "target": "mount",
+                    "left": [325, 40, 30],
+                    "right": [65, 40, 30]
+                },
+                "attach_tip": {
+                    "target": "pipette",
+                    "point": [200, 90, 150]
+                }
+            }
+        }}
 
 
 class Mount(str, Enum):
@@ -311,60 +380,76 @@ class RobotMoveTarget(BaseModel):
     target: MotionTarget
     point: Point = PointField()
     mount: Mount = Field(..., description="Which mount to move")
-    model: typing.Optional[str] =\
+    model: typing.Optional[str] = \
         Field(None,
-              description="A pipette model that matches the pipette attached to the specified mount. Required "
+              description="A pipette model that matches the pipette attached "
+                          "to the specified mount. Required "
                           "if target is pipette")
 
     class Config:
         schema_extra = {"examples": {
-                "moveLeftMount": {
-                  "description": "Move the left mount, regardless of what is attached to that mount, to a specific position. Since you move the mount, the end of the pipette will be in different places depending on what pipette is attached - but you don't have to know what's attached.",
-                  "summary": "Move left mount",
-                  "value": {
+            "moveLeftMount": {
+                "description": "Move the left mount, regardless of what is "
+                               "attached to that mount, to a specific "
+                               "position. Since you move the mount, the end of"
+                               " the pipette will be in different places "
+                               "depending on what pipette is attached - but "
+                               "you don't have to know what's attached.",
+                "summary": "Move left mount",
+                "value": {
                     "target": "mount",
                     "point": [100, 100, 80],
                     "mount": "left"
-                  }
-                },
-                "moveRightP300Single": {
-                  "summary": "Move P300 Single on right mount",
-                  "description": "Move a P300 Single attached to the right mount to a specific position. You have to specify that it's a P300 Single that you're moving, but as long as you specify the correct model the end of the pipette will always be at the specified position.",
-                  "value": {
+                }
+            },
+            "moveRightP300Single": {
+                "summary": "Move P300 Single on right mount",
+                "description": "Move a P300 Single attached to the right mount"
+                               " to a specific position. You have to specify "
+                               "that it's a P300 Single that you're moving, "
+                               "but as long as you specify the correct model "
+                               "the end of the pipette will always be at the "
+                               "specified position.",
+                "value": {
                     "target": "pipette",
                     "mount": "right",
                     "model": "p300_single",
                     "point": [25, 25, 50]
-                  }
                 }
-              }}
+            }
+        }}
 
 
 class RobotHomeTarget(BaseModel):
     """Parameters for the home"""
-    target: HomeTarget = Field(..., description="What to home. Robot means to home all axes; pipette, only that "
-                                                "pipette's carriage and pipette axes")
-    mount: typing.Optional[Mount] = Field(..., description="Which mount to home, if target is pipette (required "
-                                                           "in that case)")
+    target: HomeTarget = \
+        Field(...,
+              description="What to home. Robot means to home all axes; "
+                          "pipette, only that pipette's carriage and pipette "
+                          "axes")
+    mount: typing.Optional[Mount] = \
+        Field(...,
+              description="Which mount to home, if target is pipette (required"
+                          " in that case)")
 
     class Config:
         schema_extra = {"examples": {
-                "homeGantry": {
-                  "summary": "Home Gantry",
-                  "description": "Home the robot's gantry",
-                  "value": {
+            "homeGantry": {
+                "summary": "Home Gantry",
+                "description": "Home the robot's gantry",
+                "value": {
                     "target": "robot"
-                  }
-                },
-                "homeRight": {
-                  "summary": "Home right pipette",
-                  "description": "Home only the right pipette",
-                  "value": {
+                }
+            },
+            "homeRight": {
+                "summary": "Home right pipette",
+                "description": "Home only the right pipette",
+                "value": {
                     "target": "pipette",
                     "mount": "right"
-                  }
                 }
-              }}
+            }
+        }}
 
 
 class RobotLightState(BaseModel):

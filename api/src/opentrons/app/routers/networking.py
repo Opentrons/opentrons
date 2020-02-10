@@ -1,11 +1,11 @@
 import logging
-import typing
 import subprocess
 
 from fastapi import APIRouter, HTTPException, File, Path
 from opentrons.app.models import V1ErrorMessage
-from opentrons.app.models.networking import NetworkingStatus, WifiNetworks, WifiNetwork, WifiConfiguration, \
-    WifiConfigurationResponse, WifiKeyFiles, WifiKeyFile, EapOptions
+from opentrons.app.models.networking import NetworkingStatus, WifiNetworks, \
+    WifiNetwork, WifiConfiguration, WifiConfigurationResponse, WifiKeyFiles, \
+    WifiKeyFile, EapOptions
 from opentrons.system import nmcli
 
 log = logging.getLogger(__name__)
@@ -16,14 +16,16 @@ router = APIRouter()
 
 @router.get("/networking/status",
             description="Query the current network connectivity state",
-            summary="Gets information about the OT-2's network interfaces including their connectivity, their "
+            summary="Gets information about the OT-2's network interfaces "
+                    "including their connectivity, their "
                     "addresses, and their networking info",
             response_model=NetworkingStatus)
 async def get_networking_status() -> NetworkingStatus:
 
     try:
         connectivity = await nmcli.is_connected()
-        interfaces = {i.value: await nmcli.iface_info(i) for i in nmcli.NETWORK_IFACES}
+        interfaces = {i.value: await nmcli.iface_info(i)
+                      for i in nmcli.NETWORK_IFACES}
         log.debug("Connectivity: %s", connectivity)
         log.debug("Interfaces: %s", interfaces)
         return NetworkingStatus(status=connectivity, interfaces=interfaces)
@@ -34,8 +36,9 @@ async def get_networking_status() -> NetworkingStatus:
 
 @router.get("/wifi/list",
             description="Scan for visible WiFi networks",
-            summary="Scans for beaconing WiFi networks and returns the list of visible ones along with some data about"
-                    " their security and strength",
+            summary="Scans for beaconing WiFi networks and returns the list of"
+                    " visible ones along with some data about their security "
+                    "and strength",
             response_model=WifiNetworks)
 async def get_wifi_networks() -> WifiNetworks:
     networks = await nmcli.available_ssids()
@@ -44,10 +47,12 @@ async def get_wifi_networks() -> WifiNetworks:
 
 @router.post("/wifi/configure",
              description="Configure the OT-2's WiFi",
-             summary="Configures the wireless network interface to connect to a network",
+             summary="Configures the wireless network interface to connect to"
+                     " a network",
              response_model=WifiConfigurationResponse,
              responses={201: {"model": WifiConfigurationResponse}})
-async def post_wifi_configurution(configuration: WifiConfiguration) -> WifiConfigurationResponse:
+async def post_wifi_configurution(configuration: WifiConfiguration)\
+        -> WifiConfigurationResponse:
     raise HTTPException(500, "not implemented")
 
 
@@ -71,13 +76,17 @@ async def post_wifi_key(key: bytes = File(...)) -> WifiKeyFile:
                responses={404: {"model": V1ErrorMessage}},
                response_model=V1ErrorMessage)
 async def delete_wifi_key(
-        key_uuid: str=Path(...,
-                           description="The ID of key to delete, as determined by a previous call to GET /wifi/keys")) -> V1ErrorMessage:
+        key_uuid: str = Path(...,
+                             description="The ID of key to delete, as "
+                                         "determined by a previous call to GET"
+                                         " /wifi/keys"))\
+        -> V1ErrorMessage:
     raise HTTPException(500, "not implemented")
 
 
 @router.get("/wifi/eap-options",
-            description="Get the supported EAP variants and their configuration parameters",
+            description="Get the supported EAP variants and their "
+                        "configuration parameters",
             response_model=EapOptions)
 async def get_eap_options() -> EapOptions:
     raise HTTPException(500, "not implemented")

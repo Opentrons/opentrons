@@ -1,7 +1,8 @@
 from fastapi import APIRouter, HTTPException
 from opentrons.app.models import V1ErrorMessage
-from opentrons.app.models.settings import AdvancedSettings, LogLevel, FactoryResetOptions, FactoryResetCommands, \
-    RobotConfigs, MultiPipetteSettings, PipetteSettings, PipetteSettingsUpdate
+from opentrons.app.models.settings import AdvancedSettings, LogLevel, \
+    FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
+    PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
 
 router = APIRouter()
 
@@ -14,7 +15,8 @@ async def post_settings() -> AdvancedSettings:
 
 
 @router.get("/settings",
-            description="Get a list of available advanced settings (feature flags) and their values",
+            description="Get a list of available advanced settings (feature "
+                        "flags) and their values",
             response_model=AdvancedSettings)
 async def get_settings() -> AdvancedSettings:
     raise HTTPException(500, "not implemented")
@@ -28,14 +30,17 @@ async def post_log_level_local(log_level: LogLevel) -> V1ErrorMessage:
 
 
 @router.post("/settings/log_level/upstream",
-             description="Set the minimum level of logs sent upstream to Opentrons. Only available on a real robot",
+             description="Set the minimum level of logs sent upstream to "
+                         "Opentrons. Only available on a real robot",
              response_model=V1ErrorMessage)
-async def post_log_level_upstream(log_level: LogLevel) -> V1ErrorMessage:
+async def post_log_level_upstream(log_level: LogLevel)\
+        -> V1ErrorMessage:
     raise HTTPException(500, "not implemented")
 
 
 @router.get("/settings/reset/options",
-            description="Get the settings that can be reset as part of factory reset",
+            description="Get the settings that can be reset as part of "
+                        "factory reset",
             response_model=FactoryResetOptions)
 async def get_settings_reset_options() -> FactoryResetOptions:
     raise HTTPException(500, "not implemented")
@@ -43,7 +48,8 @@ async def get_settings_reset_options() -> FactoryResetOptions:
 
 @router.post("/settings/reset",
              description="Perform a factory reset of some robot data")
-async def post_settings_reset_options(factory_reset_commands: FactoryResetCommands):
+async def post_settings_reset_options(
+        factory_reset_commands: FactoryResetCommands):  # type: ignore
     raise HTTPException(500, "not implemented")
 
 
@@ -71,5 +77,8 @@ async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
 @router.patch("/settings/pipettes/{pipetteId}",
               description="Change the settings of a specific pipette",
               response_model=PipetteSettings)
-async def post_pipette_setting(pipette_id: str, settings_update: PipetteSettingsUpdate) -> PipetteSettings:
+async def post_pipette_setting(
+        pipette_id: str,
+        settings_update: PipetteSettingsUpdate) \
+        -> PipetteSettings:
     raise HTTPException(500, "not implemented")

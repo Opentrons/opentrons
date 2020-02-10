@@ -138,7 +138,8 @@ def run(hardware: 'HardwareAPILike',
         path = None
 
     if not ff.use_fast_api():
-        web.run_app(init(hardware=hardware), host=hostname, port=port, path=path)
+        web.run_app(init(hardware=hardware),
+                    host=hostname, port=port, path=path)
     else:
         import opentrons.app
         opentrons.app.run(hostname, port)
