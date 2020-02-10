@@ -47,7 +47,10 @@ describe('robot settings selectors', () => {
       state: {
         networking: {
           robotName: {
-            interfaces: Fixtures.mockNetworkingStatus.interfaces,
+            interfaces: {
+              wlan0: Fixtures.mockWifiInterface,
+              eth0: Fixtures.mockEthernetInterface,
+            },
           },
         },
       },
@@ -56,14 +59,66 @@ describe('robot settings selectors', () => {
         wifi: {
           ipAddress: '192.168.43.97',
           subnetMask: '255.255.255.0',
-          macAddress: 'B8:27:EB:6C:95:CF',
-          type: Constants.INTERFACE_WIFI,
+          macAddress: Fixtures.mockWifiInterface.macAddress,
+          type: Fixtures.mockWifiInterface.type,
         },
         ethernet: {
           ipAddress: '169.254.229.173',
           subnetMask: '255.255.0.0',
-          macAddress: 'B8:27:EB:39:C0:9A',
-          type: Constants.INTERFACE_ETHERNET,
+          macAddress: Fixtures.mockEthernetInterface.macAddress,
+          type: Fixtures.mockEthernetInterface.type,
+        },
+      },
+    },
+    {
+      name: 'getNetworkInterfaces returns null IP and subnet if no IP',
+      selector: Selectors.getNetworkInterfaces,
+      state: {
+        networking: {
+          robotName: {
+            interfaces: {
+              eth0: {
+                ...Fixtures.mockEthernetInterface,
+                ipAddress: null,
+              },
+            },
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: {
+        wifi: null,
+        ethernet: {
+          ipAddress: null,
+          subnetMask: null,
+          macAddress: Fixtures.mockEthernetInterface.macAddress,
+          type: Fixtures.mockEthernetInterface.type,
+        },
+      },
+    },
+    {
+      name: 'getNetworkInterfaces returns null subnet if not parsable from IP',
+      selector: Selectors.getNetworkInterfaces,
+      state: {
+        networking: {
+          robotName: {
+            interfaces: {
+              wlan0: {
+                ...Fixtures.mockWifiInterface,
+                ipAddress: '192.168.1.1',
+              },
+            },
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: {
+        ethernet: null,
+        wifi: {
+          ipAddress: '192.168.1.1',
+          subnetMask: null,
+          macAddress: Fixtures.mockWifiInterface.macAddress,
+          type: Fixtures.mockWifiInterface.type,
         },
       },
     },

@@ -2,7 +2,7 @@
 
 import find from 'lodash/find'
 import map from 'lodash/map'
-import { Netmask } from 'netmask'
+import { long2ip } from 'netmask'
 
 import type { State } from '../types'
 import * as Types from './types'
@@ -24,16 +24,18 @@ export function getNetworkInterfaces(
   const simpleInterfaces = map(
     interfaces,
     (iface: Types.InterfaceStatus): Types.SimpleInterfaceStatus => {
-      const { macAddress, type } = iface
-      let ipAddress = iface.ipAddress
+      const { ipAddress: ipWithMask, macAddress, type } = iface
+      let ipAddress: string | null = null
       let subnetMask: string | null = null
 
-      if (ipAddress != null) {
-        try {
-          const block = new Netmask(ipAddress)
-          subnetMask = block.mask
-          ipAddress = ipAddress.split('/')[0]
-        } catch (e) {}
+      if (ipWithMask != null) {
+        const [ip, mask] = ipWithMask.split('/')
+        const activeMaskBits = mask ? Number(mask) : null
+        ipAddress = ip
+        subnetMask =
+          activeMaskBits && Number.isFinite(activeMaskBits)
+            ? long2ip((0xffffffff << (32 - activeMaskBits)) >>> 0)
+            : null
       }
 
       return { ipAddress, subnetMask, macAddress, type }
