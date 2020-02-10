@@ -26,6 +26,7 @@ mod_log = logging.getLogger(__name__)
 
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 
+
 class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
 
@@ -97,7 +98,6 @@ class API(HardwareAPILike):
         await backend.connect(port)
 
         api_instance = cls(backend, loop=checked_loop, config=config)
-
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
@@ -128,7 +128,7 @@ class API(HardwareAPILike):
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        api_instance = cls(backend, loop=checked_loop, config=config)
+        api_instance = cls(backend, config=config, loop=checked_loop)
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance

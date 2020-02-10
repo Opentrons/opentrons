@@ -4,7 +4,10 @@ It centralizes the runtime control of hardware that allows
 atomic actions to be "paused" and subsequently "resumed"
 """
 import asyncio
+import logging
 import functools
+
+MODULE_LOG = logging.getLogger(__name__)
 
 
 class PauseManager():

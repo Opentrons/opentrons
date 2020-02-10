@@ -1,5 +1,5 @@
 import asyncio
-from typing import Union, Callable
+from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
 from . import update, mod_abc, types
