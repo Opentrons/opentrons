@@ -555,7 +555,7 @@ class Session(object):
         self._hw_iface().set_lights(rails=True)
 
     def turn_off_rail_lights(self):
-        self._hw_ifce().set_lights(rails=False)
+        self._hw_iface().set_lights(rails=False)
 
     def set_state(self, state):
         log.debug("State set to {}".format(state))
