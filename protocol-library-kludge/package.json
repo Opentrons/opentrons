@@ -19,12 +19,13 @@
   "homepage": "https://github.com/Opentrons/opentrons",
   "license": "Apache-2.0",
   "dependencies": {
+    "@hot-loader/react-dom": "16.8.6",
     "@opentrons/components": "3.15.2",
     "@opentrons/shared-data": "3.15.2",
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
-    "react-hot-loader": "^3.0.0-beta.7"
+    "react-hot-loader": "^4.12.19"
   }
 }

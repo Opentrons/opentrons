@@ -12,7 +12,6 @@ const { DEV_MODE, ENABLE_ANALYZER, DEFAULT_PORT } = require('./env')
 module.exports = {
   target: 'web',
 
-  // TODO(mc, 2019-03-12): react-hot-loader@4 no longer needs this entry
   entry: DEV_MODE ? ['react-hot-loader/patch'] : [],
 
   output: {
@@ -43,6 +42,12 @@ module.exports = {
     ENABLE_ANALYZER &&
       new BundleAnalyzerPlugin({ analyzerMode: 'server', openAnalyzer: true }),
   ].filter(Boolean),
+
+  resolve: {
+    alias: {
+      'react-dom': '@hot-loader/react-dom',
+    },
+  },
 
   optimization: {
     minimizer: [

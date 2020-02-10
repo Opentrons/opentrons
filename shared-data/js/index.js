@@ -1,9 +1,4 @@
 // @flow
-// Requires `make build` to have run to create this .json
-import labwareDefinitions from '../build/labware.json'
-
-// Sorted list of all labware
-export const labwareList: Array<string> = Object.keys(labwareDefinitions).sort()
 
 export * from './constants'
 export * from './getLabware'

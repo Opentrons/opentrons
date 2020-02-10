@@ -1,4 +1,6 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
+import { hot } from 'react-hot-loader/root'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 // TODO(mc, 2020-01-06): move typeface import to global CSS once postcss
@@ -18,7 +20,9 @@ import Run from '../pages/Run'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import styles from './App.css'
 
-export function App() {
+const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
+
+export function AppComponent() {
   return (
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />
@@ -39,6 +43,4 @@ export function App() {
   )
 }
 
-function stopEvent(event) {
-  event.preventDefault()
-}
+export const App = hot(AppComponent)
