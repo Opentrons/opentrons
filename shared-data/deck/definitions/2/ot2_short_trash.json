@@ -1,11 +1,11 @@
 {
-  "otId": "ot2_standard",
+  "otId": "ot2_short_trash",
+  "schemaVersion": 2,
   "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
   "dimensions": [624.3, 565.2, 0],
-  "schemaVersion": 1,
   "metadata": {
-    "displayName": "OT-2 Standard Deck",
-    "tags": ["ot2", "12 slots", "standard"]
+    "displayName": "OT-2 Short-Trash Deck",
+    "tags": ["ot2", "12 slots", "short trash"]
   },
   "robot": {
     "model": "OT-2 Standard"
@@ -22,7 +22,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "2",
@@ -34,7 +34,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "3",
@@ -46,7 +46,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "4",
@@ -58,7 +58,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "5",
@@ -70,7 +70,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "6",
@@ -82,7 +82,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "7",
@@ -94,7 +94,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 7",
-        "compatibleModules": ["magdeck", "tempdeck", "thermocycler"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "thermocyclerModuleType"
+        ]
       },
       {
         "id": "8",
@@ -106,7 +110,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "9",
@@ -118,7 +122,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "10",
@@ -130,7 +134,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "11",
@@ -142,7 +146,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "12",
@@ -153,7 +157,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 12",
-        "compatibleModules": []
+        "compatibleModuleTypes": []
       }
     ],
     "calibrationPoints": [
@@ -222,18 +226,18 @@
       {
         "id": "fixedTrash",
         "slot": "12",
-        "labware": "opentrons_1_trash_1100ml_fixed",
+        "labware": "opentrons_1_trash_850ml_fixed",
         "displayName": "Fixed Trash"
       }
     ]
   },
   "layers": {
-    "Fixed_Base": [
+    "fixedBase": [
       {
         "footprint": "M506.326,494.546h-619.653V-65.506h68.503V397c0,2.935,2.388,5.324,5.324,5.324H260c2.935,0,5.324-2.388,5.324-5.324V284.5c0-6.99,5.687-12.676,12.677-12.676h154.5c2.936,0,5.324-2.388,5.324-5.324V-65.506h68.503V494.546z"
       }
     ],
-    "Fixed_Trash": [
+    "fixedTrash": [
       {
         "footprint": "M441.107,289.57v135.86c0,8.368-6.808,15.176-15.176,15.176H283.07c-8.368,0-15.176-6.808-15.176-15.176V289.57c0-8.368,6.808-15.177,15.176-15.177h142.86C434.298,274.394,441.107,281.202,441.107,289.57z"
       },
@@ -241,7 +245,7 @@
         "footprint": "M425.053,434H283.947c-1.24,0-2.484-0.034-3.702-0.287c-2-0.416-3.81-1.446-4.884-3.227c-1.152-1.91-1.289-4.185-1.289-6.359v-88.629c0-2.683,0.259-5.609,2.263-7.612c2.004-2.003,4.928-2.263,7.612-2.263h25.939c1.693,0.006,3.545-0.167,4.807-1.429c1.262-1.262,1.435-3.115,1.429-4.807v-28.94c0-2.124,0.129-4.338,1.209-6.225c1.059-1.851,2.904-2.933,4.954-3.36c1.222-0.255,2.468-0.289,3.712-0.289h99.056c2.124,0,4.339,0.129,6.226,1.209c1.851,1.06,2.933,2.904,3.36,4.954c0.255,1.222,0.289,2.468,0.289,3.712v133.68c0,2.684-0.259,5.607-2.263,7.611C430.661,433.741,427.737,434,425.053,434z"
       }
     ],
-    "Door_Stops": [
+    "doorStops": [
       {
         "footprint": "M-63.6-67.68v2.35h8.06v-2.35H-63.6z"
       },
@@ -252,7 +256,7 @@
         "footprint": "M468.45-45.33H440.5c-1.381,0-2.5-1.119-2.5-2.5v-15c0-1.381,1.119-2.5,2.5-2.5h27.95c1.381,0,2.5,1.119,2.5,2.5v15C470.95-46.449,469.831-45.33,468.45-45.33z"
       }
     ],
-    "Metal_Frame": [
+    "metalFrame": [
       {
         "footprint": "M506.65,443.07v51.05h2v-51.05H506.65z"
       },
@@ -278,12 +282,12 @@
         "footprint": "M506.15-14.53v-51.55h2.5v-2h-50.2v2h12.5v19.25c0,1.323,0.654,2.561,1.748,3.306l23.2,15.8c0.664,0.452,1.449,0.694,2.252,0.694h5v12.5H506.15z"
       }
     ],
-    "Removable_Deck_Outline": [
+    "removableDeckOutline": [
       {
         "footprint": "M-44.5-60.33c0-2.761,2.239-5,5-5h472c2.761,0,5,2.239,5,5V266.5c0,2.761-2.239,5-5,5H278c-7.18,0-13,5.82-13,13v0l0,112.5c0,2.761-2.239,5-5,5H-39.5c-2.761,0-5-2.239-5-5L-44.5-60.33z"
       }
     ],
-    "Slot_Ridges": [
+    "slotRidges": [
       {
         "footprint": "M265,278.75h-4.5v71.5h4.5V278.75z"
       },
@@ -372,7 +376,7 @@
         "footprint": "M0,7.25l0,71.5h-4.5V7.25H0z"
       }
     ],
-    "Slot_Numbers": [
+    "slotNumbers": [
       {
         "footprint": "M327.879,29.245c7.276,0,12.41,1.696,12.41,9.687c0,5.216-2.252,7.894-7.698,8.111c-0.157,0.006-0.301,0.085-0.391,0.214c-0.158,0.227-0.102,0.538,0.125,0.696c3.058,2.129,5.114,3.655,6.89,5.262c0.314,0.284,0.494,0.688,0.494,1.112v4.22c0,0.828-0.672,1.5-1.5,1.5h-16.687c-0.828,0-1.5-0.672-1.5-1.5v-3.428c0-0.828,0.672-1.5,1.5-1.5h7.347c0.137,0,0.268-0.057,0.362-0.156c0.19-0.2,0.181-0.517-0.019-0.707c-0.953-0.901-3.261-2.616-6.8-5.055c-0.406-0.28-0.649-0.742-0.649-1.235v-2.418c0-0.828,0.672-1.5,1.5-1.5h0.732c6.116,0,7.902-0.58,7.902-3.125c0-3.169-1.652-3.616-5.268-3.616c-1.169,0-3.183,0.141-4.79,0.355c-0.026,0.003-0.051,0.006-0.077,0.008c-0.826,0.067-1.549-0.548-1.616-1.374l-0.267-3.31c-0.062-0.773,0.474-1.465,1.238-1.598C323.4,29.49,325.902,29.245,327.879,29.245z"
       },
@@ -428,7 +432,7 @@
         "footprint": "M330.066,236.289c-2.589,0-3.169-0.312-3.169-4.062c0-3.794,0.714-4.33,3.169-4.33c2.679,0,3.259,0.58,3.259,4.33C333.325,235.976,332.477,236.289,330.066,236.289z"
       }
     ],
-    "Calibration_Markings": [
+    "calibrationMarkings": [
       {
         "footprint": "M12.13,352c0.276,0,0.5-0.224,0.5-0.5c0-0.276-0.224-0.5-0.5-0.5s-0.5,0.224-0.5,0.5C11.63,351.776,11.854,352,12.13,352z"
       },
@@ -466,7 +470,7 @@
         "footprint": "M380.87,6.5c0.276,0,0.5-0.224,0.5-0.5s-0.224-0.5-0.5-0.5c-0.276,0-0.5,0.224-0.5,0.5S380.594,6.5,380.87,6.5z"
       }
     ],
-    "Removal_Handle": [
+    "removalHandle": [
       {
         "footprint": "M159-48.915c-7.732,0-14,6.268-14,14c0,7.732,6.268,14,14,14h75c7.732,0,14-6.268,14-14c0-7.732-6.268-14-14-14H159z"
       },
@@ -474,7 +478,7 @@
         "footprint": "M234-47.415c6.904,0,12.5,5.596,12.5,12.5s-5.596,12.5-12.5,12.5h-75c-6.904,0-12.5-5.596-12.5-12.5s5.596-12.5,12.5-12.5H234z"
       }
     ],
-    "Screw_Holes": [
+    "screwHoles": [
       {
         "footprint": "M-31.5,162.21c-3.38,0-6.12,2.74-6.12,6.12c0,3.38,2.74,6.12,6.12,6.12s6.12-2.74,6.12-6.12C-25.38,164.95-28.12,162.21-31.5,162.21z"
       },

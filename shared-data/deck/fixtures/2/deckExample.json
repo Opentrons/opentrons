@@ -2,7 +2,7 @@
   "otId": "ot2_standard",
   "cornerOffsetFromOrigin": [-115.65, -68.03, 0],
   "dimensions": [624.3, 565.2, 0],
-  "schemaVersion": 1,
+  "schemaVersion": 2,
   "metadata": {
     "displayName": "OT-2 Standard Deck",
     "tags": ["ot2", "12 slots", "standard"]
@@ -22,7 +22,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 1",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "2",
@@ -34,7 +34,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 2",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "3",
@@ -46,7 +46,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 3",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "4",
@@ -58,7 +58,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 4",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "5",
@@ -70,7 +70,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 5",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "6",
@@ -82,7 +82,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 6",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "7",
@@ -94,7 +94,11 @@
           "zDimension": 0
         },
         "displayName": "Slot 7",
-        "compatibleModules": ["magdeck", "tempdeck", "thermocycler"]
+        "compatibleModuleTypes": [
+          "magneticModuleType",
+          "temperatureModuleType",
+          "thermocyclerModuleType"
+        ]
       },
       {
         "id": "8",
@@ -106,7 +110,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 8",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "9",
@@ -118,7 +122,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 9",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "10",
@@ -130,7 +134,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 10",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "11",
@@ -142,7 +146,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 11",
-        "compatibleModules": ["magdeck", "tempdeck"]
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       },
       {
         "id": "12",
@@ -153,7 +157,7 @@
           "zDimension": 0
         },
         "displayName": "Slot 12",
-        "compatibleModules": []
+        "compatibleModuleTypes": ["magneticModuleType", "temperatureModuleType"]
       }
     ],
     "calibrationPoints": [
