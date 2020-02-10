@@ -2,6 +2,7 @@
 import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
+import find from 'lodash/find'
 import { getPipetteNameSpecs } from '@opentrons/shared-data'
 import {
   SPAN7_8_10_11_SLOT,
@@ -129,6 +130,13 @@ export const getSlotIsEmpty = (
       ),
     ].length === 0
   )
+}
+
+export const getLabwareOnSlot = (
+  initialDeckSetup: InitialDeckSetup,
+  slot: string
+): LabwareOnDeckType => {
+  return find(initialDeckSetup.labware, labware => labware.slot === slot)
 }
 
 export const getIsCrashablePipetteSelected = (
