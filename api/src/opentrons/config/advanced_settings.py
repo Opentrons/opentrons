@@ -81,7 +81,12 @@ settings = [
                     ' that were used before version 3.7.0. Use this if you'
                     ' need consistency with pre-v3.7.0 results. This only'
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
-    )
+    ),
+    Setting(
+        _id='useFastApi',
+        title='Use fastapi based api server',
+        description="""Run the FastApi server application instead of the legacy aiohttp"""
+    ),
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -165,7 +170,7 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
     settings, version = _migrate(data)
     settings = _ensure(settings)
 
-    if (data.get('_version') != version):
+    if data.get('_version') != version:
         _write_settings_file(settings, version, settings_file)
 
     return settings, version
@@ -271,6 +276,6 @@ def _ensure(data: Mapping[str, Any]) -> SettingsMap:
 def get_setting_with_env_overload(setting_name):
     env_name = 'OT_API_FF_' + setting_name
     if env_name in os.environ:
-        return os.environ[env_name].lower() in ('1', 'true', 'on')
+        return os.environ[env_name].lower() in {'1', 'true', 'on'}
     else:
         return get_adv_setting(setting_name) is True
