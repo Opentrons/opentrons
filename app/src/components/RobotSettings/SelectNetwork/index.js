@@ -9,7 +9,6 @@ import {
   fetchWifiList,
   fetchWifiEapOptions,
   fetchWifiKeys,
-  fetchNetworkingStatus,
   addWifiKey,
   configureWifi,
   makeGetRobotWifiList,
@@ -72,7 +71,10 @@ type SelectNetworkState = {|
 
 const LIST_REFRESH_MS = 15000
 
-class SelectNetwork extends React.Component<Props, SelectNetworkState> {
+class SelectNetworkComponent extends React.Component<
+  Props,
+  SelectNetworkState
+> {
   constructor(props: Props) {
     super(props)
     // prepopulate selected SSID with currently connected network, if any
@@ -206,7 +208,7 @@ function makeMapStateToProps(): (State, OP) => SP {
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   const { robot } = ownProps
-  const refreshActions = [fetchWifiList(robot), fetchNetworkingStatus(robot)]
+  const refreshActions = [fetchWifiList(robot)]
   const configure = params =>
     dispatch(
       chainActions(
@@ -226,7 +228,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   }
 }
 
-export default connect<Props, OP, SP, _, _, _>(
+export const SelectNetwork = connect<Props, OP, SP, _, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
-)(SelectNetwork)
+)(SelectNetworkComponent)

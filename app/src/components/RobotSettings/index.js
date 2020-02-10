@@ -6,7 +6,7 @@ import { CardContainer, CardRow } from '../layout'
 import StatusCard from './StatusCard'
 import InformationCard from './InformationCard'
 import { ControlsCard } from './ControlsCard'
-import ConnectionCard from './ConnectionCard'
+import { ConnectionCard } from './ConnectionCard'
 import AdvancedSettingsCard from './AdvancedSettingsCard'
 import ConnectAlertModal from './ConnectAlertModal'
 

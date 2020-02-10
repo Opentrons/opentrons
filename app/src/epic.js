@@ -10,6 +10,7 @@ import { robotSettingsEpic } from './robot-settings/epic'
 import { buildrootEpic } from './buildroot/epic'
 import { pipettesEpic } from './pipettes/epic'
 import { modulesEpic } from './modules/epic'
+import { networkingEpic } from './networking/epic'
 import { shellEpic } from './shell/epic'
 
 export const rootEpic = combineEpics(
@@ -21,5 +22,6 @@ export const rootEpic = combineEpics(
   buildrootEpic,
   pipettesEpic,
   modulesEpic,
+  networkingEpic,
   shellEpic
 )

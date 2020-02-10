@@ -1,74 +1,55 @@
 // @flow
 // RobotSettings card for wifi status
 import * as React from 'react'
-import { connect } from 'react-redux'
-import find from 'lodash/find'
+import { useSelector, useDispatch } from 'react-redux'
 
-import { makeGetRobotNetworkingStatus } from '../../http-api-client'
+import { Card, useInterval } from '@opentrons/components'
 import { CONNECTABLE } from '../../discovery'
-import { Card } from '@opentrons/components'
-import SelectNetwork from './SelectNetwork'
+import {
+  fetchStatus,
+  getInternetStatus,
+  getNetworkInterfaces,
+} from '../../networking'
+import { SelectNetwork } from './SelectNetwork'
 import { ConnectionStatusMessage, ConnectionInfo } from './connection'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
-import type { InternetStatus, NetworkInterface } from '../../http-api-client'
 
-type OP = {| robot: ViewableRobot |}
+type Props = {| robot: ViewableRobot |}
 
-type SP = {|
-  internetStatus: ?InternetStatus,
-  wifiNetwork: ?NetworkInterface,
-  ethernetNetwork: ?NetworkInterface,
-|}
+const CONNECTIVITY = 'Connectivity'
+const STATUS_REFRESH_MS = 5000
 
-type Props = { ...OP, ...SP }
+export function ConnectionCard(props: Props) {
+  const { robot } = props
+  const { name: robotName, status, local } = robot
+  const dispatch = useDispatch<Dispatch>()
+  const internetStatus = useSelector((state: State) =>
+    getInternetStatus(state, robotName)
+  )
+  const { wifi, ethernet } = useSelector((state: State) =>
+    getNetworkInterfaces(state, robotName)
+  )
+  const disabled = status !== CONNECTABLE
 
-export default connect<Props, OP, SP, _, _, _>(makeMapStateToProps)(
-  ConnectionCard
-)
-
-const TITLE = 'Connectivity'
-function ConnectionCard(props: Props) {
-  const { robot, internetStatus, wifiNetwork, ethernetNetwork } = props
-  const disabled = robot.status !== CONNECTABLE
+  useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
-    <Card title={TITLE} disabled={disabled}>
+    <Card title={CONNECTIVITY} disabled={disabled}>
       <ConnectionStatusMessage
-        type={robot.local ? 'USB' : 'Wi-Fi'}
+        type={local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
       />
-      <ConnectionInfo
-        connection={wifiNetwork}
-        title="Wi-Fi"
-        disabled={disabled}
-      >
+      <ConnectionInfo connection={wifi} title="Wi-Fi" disabled={disabled}>
         <SelectNetwork key={robot.name} robot={robot} />
       </ConnectionInfo>
       <ConnectionInfo
-        connection={ethernetNetwork}
+        connection={ethernet}
         title="USB"
         wired
         disabled={disabled}
       />
     </Card>
   )
-}
-
-function makeMapStateToProps(): (State, OP) => SP {
-  const getNetworkingStatusCall = makeGetRobotNetworkingStatus()
-
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const { response: statusResponse } = getNetworkingStatusCall(state, robot)
-    const internetStatus = statusResponse && statusResponse.status
-    const interfaces = statusResponse && statusResponse.interfaces
-
-    return {
-      internetStatus,
-      wifiNetwork: find(interfaces, { type: 'wifi' }),
-      ethernetNetwork: find(interfaces, { type: 'ethernet' }),
-    }
-  }
 }

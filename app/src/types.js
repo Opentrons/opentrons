@@ -22,6 +22,7 @@ import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { Config as ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
+import type { NetworkingState, NetworkingAction } from './networking/types'
 import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
   CustomLabwareState,
@@ -45,6 +46,7 @@ export type State = $ReadOnly<{|
   modules: ModulesState,
   config: ConfigState,
   discovery: DiscoveryState,
+  networking: NetworkingState,
   labware: CustomLabwareState,
   protocol: ProtocolState,
   shell: ShellState,
@@ -67,6 +69,7 @@ export type Action =
   | DiscoveryAction
   | ProtocolAction
   | CustomLabwareAction
+  | NetworkingAction
 
 export type GetState = () => State
 
