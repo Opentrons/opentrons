@@ -121,7 +121,7 @@ class Thermocycler(mod_abc.AbstractModule):
     async def build(cls,
                     port: str,
                     pause_manager: PauseManager,
-                    interrupt_callback: mod_abc.InterruptCallback,
+                    interrupt_callback: mod_abc.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
         """Build and connect to a Thermocycler

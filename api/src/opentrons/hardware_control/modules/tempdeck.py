@@ -1,6 +1,6 @@
 import asyncio
 from threading import Thread, Event
-from typing import Union, Optional, Callable
+from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
 from ..pause_manager import PauseManager
@@ -88,7 +88,7 @@ class TempDeck(mod_abc.AbstractModule):
     async def build(cls,
                     port: str,
                     pause_manager: PauseManager,
-                    interrupt_callback: Callable,
+                    interrupt_callback: mod_abc.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
 

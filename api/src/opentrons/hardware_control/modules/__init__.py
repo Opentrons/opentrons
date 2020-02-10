@@ -41,7 +41,11 @@ async def build(
         pause_manager: PauseManager,
         interrupt_callback: Callable) -> AbstractModule:
     return await MODULE_TYPES[which].build(
-        port, pause_manager=pause_manager, interrupt_callback=interrupt_callback, simulating=simulating)
+        port,
+        pause_manager=pause_manager,
+        interrupt_callback=interrupt_callback,
+        simulating=simulating
+    )
 
 
 def get_module_at_port(port: str) -> Optional[ModuleAtPort]:

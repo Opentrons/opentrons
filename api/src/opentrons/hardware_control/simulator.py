@@ -1,6 +1,5 @@
 import copy
 import logging
-import asyncio
 from threading import Event
 from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Callable
 from contextlib import contextmanager
@@ -211,7 +210,8 @@ class Simulator:
                            port: str,
                            model: str,
                            pause_manager: PauseManager,
-                           interrupt_callback: Callable) -> modules.AbstractModule:
+                           interrupt_callback: Callable
+                           ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,

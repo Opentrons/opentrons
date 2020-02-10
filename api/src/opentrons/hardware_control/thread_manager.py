@@ -4,8 +4,7 @@ import threading
 import logging
 import asyncio
 import functools
-from time import sleep
-from .types import Axis, HardwareAPILike
+from .types import HardwareAPILike
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -68,7 +67,7 @@ class ThreadManager(HardwareAPILike):
     @staticmethod
     async def call_coroutine_threadsafe(loop, coro, *args, **kwargs):
         MODULE_LOG.info(
-            f'CCTS: loop: {loop}, coro: {coro}, args: {args}, kwargs: {kwargs}')
+            f'CCTS: loop: {loop}, coro: {coro}, args: {args}, kwrgs: {kwargs}')
         fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
         wrapped = asyncio.wrap_future(fut)
         return await wrapped

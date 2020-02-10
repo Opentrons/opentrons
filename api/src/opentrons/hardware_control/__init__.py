@@ -17,10 +17,10 @@ from .simulator import Simulator
 from .pause_manager import PauseManager
 from .pipette import Pipette
 from .thread_manager import ThreadManager
-from .types import Axis, HardwareAPILike, CriticalPoint, NoTipAttachedError
+from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError
 
 __all__ = [
     'API', 'Controller', 'Simulator', 'Pipette', 'PauseManager',
-    'ThreadManager', 'SingletonAdapter', 'SynchronousAdapter'
+    'ThreadManager', 'SingletonAdapter', 'SynchronousAdapter',
     'Axis', 'HardwareAPILike', 'CriticalPoint', 'NoTipAttachedError'
 ]

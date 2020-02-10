@@ -1,8 +1,6 @@
 import enum
-import asyncio
-import functools
 import logging
-from typing import Tuple, Union, Dict, Optional
+from typing import Tuple, Optional
 
 import opentrons.types
 

@@ -2,8 +2,6 @@ from opentrons.drivers.types import MoveSplit
 import asyncio
 from collections import OrderedDict
 import contextlib
-import functools
-import inspect
 import logging
 from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
@@ -29,6 +27,7 @@ mod_log = logging.getLogger(__name__)
 Backend = Union[Controller, Simulator]
 
 Instruments = Dict[top_types.Mount, Optional[Pipette]]
+
 
 class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
@@ -97,15 +96,16 @@ class API(HardwareAPILike):
                      :py:meth:`asyncio.get_event_loop`.
         """
         checked_loop = use_or_initialize_loop(loop)
-        mod_log.info(f'\nBHWC before loop: {loop}, checked_loop: {checked_loop}\n')
+        mod_log.info(f'\nBHWC before loop: {loop},'
+                     f' checked_loop: {checked_loop}\n')
         backend = Controller(config)
         mod_log.info(f'BHWC backend : {backend}')
         await backend.connect(port)
 
-
         api_instance = cls(backend, config=config, loop=checked_loop)
 
-        mod_log.info(f'\nBHWC loop: {loop}, checked_loop: {checked_loop}, backend: {backend}, api_instance: {api_instance}\n')
+        mod_log.info(f'\nBHWC loop: {loop}, checked_loop: {checked_loop}, '
+                     f'backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
@@ -140,7 +140,8 @@ class API(HardwareAPILike):
                             strict_attached_instruments)
         mod_log.info(f'\nBHS backend: {backend}\n')
         api_instance = cls(backend, config=config, loop=checked_loop)
-        mod_log.info(f'\nloop: {loop}, checked_loop: {checked_loop}, backend: {backend}, api_instance: {api_instance}\n')
+        mod_log.info(f'\nloop: {loop}, checked_loop: {checked_loop},'
+                     f' backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance

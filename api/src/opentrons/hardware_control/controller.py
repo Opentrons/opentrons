@@ -169,7 +169,8 @@ class Controller:
                            port: str,
                            model: str,
                            pause_manager: PauseManager,
-                           interrupt_callback: Callable) -> modules.AbstractModule:
+                           interrupt_callback: Callable
+                           ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,

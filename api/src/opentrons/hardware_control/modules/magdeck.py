@@ -1,5 +1,5 @@
 import asyncio
-from typing import Union, Callable
+from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
 from ..pause_manager import PauseManager
@@ -62,7 +62,7 @@ class MagDeck(mod_abc.AbstractModule):
     async def build(cls,
                     port: str,
                     pause_manager: PauseManager,
-                    interrupt_callback: Callable,
+                    interrupt_callback: mod_abc.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
