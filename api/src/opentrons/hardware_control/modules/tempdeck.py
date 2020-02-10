@@ -228,3 +228,14 @@ class TempDeck(mod_abc.AbstractModule):
         self._driver.enter_programming_mode()
         new_port = await update.find_bootloader_port()
         return new_port or self.port
+
+    def has_available_update(self) -> bool:
+        """ Override of abc implementation to suppress update notifications
+        for v1 and v1.1 temperature modules which cannot be updated """
+        if not self._device_info:
+            model = None
+        else:
+            model = self._device_info.get('model')
+        if model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2', None):
+            return False
+        return super().has_available_update()
