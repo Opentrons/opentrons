@@ -492,7 +492,7 @@ async def configure(ssid: str,
         return False, err.split('\r')[-1]
 
 
-async def wifi_disconnect(ssid: str = None) -> Tuple[bool, str]:
+async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     """
     Disconnect from specified wireless network.
     Ideally, user would be allowed to disconnect a robot from wifi only over an
@@ -505,7 +505,6 @@ async def wifi_disconnect(ssid: str = None) -> Tuple[bool, str]:
     Returns (True, msg) if the network was disconnected from successfully,
             (False, msg) otherwise
     """
-
     res, err = await _call(['connection', 'down', ssid])
     if 'successfully deactivated' in res:
         return True, res
