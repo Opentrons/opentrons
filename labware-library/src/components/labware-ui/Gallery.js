@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { LabwareRender, RobotWorkSpace } from '@opentrons/components'
-import labwareImages from './labware-images'
+import { labwareImages } from './labware-images'
 import styles from './styles.css'
 
 import type { LabwareDefinition } from '../../types'

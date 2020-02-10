@@ -96,6 +96,7 @@
 
 .module_form_group {
   width: 30%;
+  margin: 0.5rem;
 
   & img {
     max-width: 6rem;

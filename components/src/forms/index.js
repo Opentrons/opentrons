@@ -4,9 +4,9 @@ import DropdownField from './DropdownField'
 import FormGroup from './FormGroup'
 import InputField from './InputField'
 import RadioGroup from './RadioGroup'
-export { default as SelectField } from './SelectField'
-export type * from './SelectField'
 
 export * from './DropdownField'
+export * from './Select'
+export * from './SelectField'
 
 export { CheckboxField, DropdownField, FormGroup, InputField, RadioGroup }

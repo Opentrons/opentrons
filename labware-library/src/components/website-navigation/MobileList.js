@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import MobileMenu from './MobileMenu'
-import MobileContent from './MobileContent'
-import ProductMobileContent from './ProductMobileContent'
-import ProtocolMobileContent from './ProtocolMobileContent'
-import SupportMobileContent from './SupportMobileContent'
+import { MobileMenu } from './MobileMenu'
+import { MobileContent } from './MobileContent'
+import { ProductMobileContent } from './ProductMobileContent'
+import { ProtocolMobileContent } from './ProtocolMobileContent'
+import { SupportMobileContent } from './SupportMobileContent'
 
 import { aboutLinkProps, applicationLinkProps } from './nav-data'
 
@@ -15,7 +15,7 @@ type State = {| menu: null | MenuName |}
 
 type Props = {||}
 
-export default class MobileList extends React.Component<Props, State> {
+export class MobileList extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { menu: null }

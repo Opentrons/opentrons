@@ -4,7 +4,7 @@ import path from 'path'
 import fs from 'fs'
 import { autoUpdater as updater } from 'electron-updater'
 
-import createLogger from './log'
+import { createLogger } from './log'
 import { getConfig } from './config'
 
 import type { UpdateInfo } from '@opentrons/app/src/shell/types'

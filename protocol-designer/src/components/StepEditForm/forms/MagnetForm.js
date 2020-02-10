@@ -11,6 +11,7 @@ import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers }
+
 export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
@@ -19,6 +20,13 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
+
+  const defaultEngageHeight = useSelector(
+    uiModuleSelectors.getMagnetLabwareEngageHeight
+  )
+  const engageHeightCaption = defaultEngageHeight
+    ? `Recommended: ${defaultEngageHeight}`
+    : null
 
   return (
     <div className={styles.form_wrapper}>
@@ -76,11 +84,20 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
               name="engageHeight"
               className={styles.small_field}
               units={i18n.t('application.units.millimeter')}
+              caption={engageHeightCaption}
               {...focusHandlers}
             />
           </FormGroup>
         </ConditionalOnField>
       </div>
+      <ConditionalOnField
+        name={'magnetAction'}
+        condition={val => val === 'engage'}
+      >
+        <div className={styles.diagram_row}>
+          <div className={styles.engage_height_diagram} />
+        </div>
+      </ConditionalOnField>
     </div>
   )
 }

@@ -36,6 +36,15 @@ export type RobotApiRequestMeta = $Shape<{|
   |},
 |}>
 
+// action types
+
+export type DismissRequestAction = {|
+  type: 'robotApi:DISMISS_REQUEST',
+  payload: {| requestId: string |},
+|}
+
+export type RobotApiAction = DismissRequestAction
+
 // API request tracking state
 
 export type RequestState =

@@ -3,6 +3,8 @@
 import { createSelector } from 'reselect'
 import sortBy from 'lodash/sortBy'
 
+import { getConfig } from '../config'
+
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { State } from '../types'
 import type {
@@ -21,6 +23,11 @@ export const OPENTRONS_LABWARE_FILE: 'OPENTRONS_LABWARE_FILE' =
   'OPENTRONS_LABWARE_FILE'
 
 export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
+
+export const getCustomLabwareDirectory: State => string = createSelector(
+  getConfig,
+  config => config.labware.directory
+)
 
 export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelector(
   state => state.labware.filenames,

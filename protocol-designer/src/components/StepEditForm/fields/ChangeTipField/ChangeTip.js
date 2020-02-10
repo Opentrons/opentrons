@@ -16,36 +16,11 @@ type Props = {
 
 export const ChangeTip = (props: Props) => {
   const { name, disabledOptions } = props
+  const options = props.options.map(value => ({
+    value,
+    isDisabled: disabledOptions ? disabledOptions.has(value) : false,
+  }))
 
-  const options = props.options.map(value => {
-    const tooltip = (
-      <div className={styles.tooltip}>
-        {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
-      </div>
-    )
-
-    const option = i18n.t(
-      `form.step_edit_form.field.change_tip.option.${value}`
-    )
-    const label = (
-      <HoverTooltip
-        positionFixed
-        tooltipComponent={tooltip}
-        placement="bottom"
-        modifiers={{
-          offset: { offset: `0, 18` },
-          preventOverflow: { boundariesElement: 'window' },
-        }}
-      >
-        {hoverTooltipHandlers => <div {...hoverTooltipHandlers}>{option}</div>}
-      </HoverTooltip>
-    )
-    return {
-      value,
-      label,
-      isDisabled: disabledOptions ? disabledOptions.has(value) : false,
-    }
-  })
   return (
     <FieldConnector
       name={name}
@@ -60,9 +35,34 @@ export const ChangeTip = (props: Props) => {
             options={options}
             value={value ? String(value) : null}
             onValueChange={(name, value) => updateValue(value)}
+            formatOptionLabel={({ value }) => (
+              <ChangeTipOptionLabel value={value} />
+            )}
           />
         </FormGroup>
       )}
     />
   )
 }
+
+const ChangeTipOptionLabel = ({ value }: {| value: string |}) => (
+  <HoverTooltip
+    positionFixed
+    tooltipComponent={
+      <div className={styles.tooltip}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
+      </div>
+    }
+    placement="bottom"
+    modifiers={{
+      offset: { offset: `0, 18` },
+      preventOverflow: { boundariesElement: 'window' },
+    }}
+  >
+    {hoverTooltipHandlers => (
+      <div {...hoverTooltipHandlers}>
+        {i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)}
+      </div>
+    )}
+  </HoverTooltip>
+)

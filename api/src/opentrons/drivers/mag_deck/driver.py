@@ -42,8 +42,8 @@ MAG_DECK_BAUDRATE = 115200
 MAG_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 MAG_DECK_ACK = 'ok\r\nok\r\n'
 
-# Number of digits after the decimal point for temperatures being sent
-# to/from Temp-Deck
+# Number of digits after the decimal point for millimeter values
+# being sent to/from magnetic module
 GCODE_ROUNDING_PRECISION = 3
 
 mag_locks: Dict[str, Tuple[Lock, 'MagDeck']] = {}
@@ -77,8 +77,8 @@ def _parse_number_from_substring(substring) -> Optional[float]:
     Returns the number in the expected string "N:12.3", where "N" is the
     key, and "12.3" is a floating point value
 
-    For the temp-deck's temperature response, one expected input is something
-    like "T:none", where "none" should return a None value
+    For the magnetic module's height response like "height:12.34" "
+    "height:none" should return a None value
     '''
     try:
         value = substring.split(':')[1]
@@ -108,8 +108,9 @@ def _parse_key_from_substring(substring) -> str:
 
 def _parse_device_information(device_info_string) -> dict:
     '''
-    Parse the mag-deck's device information response.
-    Example response from temp-deck: "serial:aa11 model:bb22 version:cc33"
+    Parse the magnetic module's device information response.
+    Example response from magnetic module:
+    "serial:aa11 model:bb22 version:cc33"
     '''
     error_msg = 'Unexpected argument to _parse_device_information: {}'.format(
         device_info_string)
@@ -298,16 +299,20 @@ class MagDeck:
             self._send_command(GCODES['PROGRAMMING_MODE'])
         except (MagDeckError, SerialException, SerialNoResponse) as e:
             return str(e)
+        if self._port:
+            del mag_locks[self._port]
         return ''
 
-    def _recursive_write_and_return(self, cmd, timeout, retries):
+    def _recursive_write_and_return(self, cmd, timeout, retries, tag=None):
+        if not tag:
+            tag = f'magdeck {id(self)}'
         try:
             return serial_communication.write_and_return(
                 cmd,
                 MAG_DECK_ACK,
                 self._connection,
                 timeout,
-                tag=f'magdeck {id(self)}')
+                tag=tag)
         except SerialNoResponse as e:
             retries -= 1
             if retries <= 0:
@@ -317,7 +322,7 @@ class MagDeck:
                 self._connection.close()
                 self._connection.open()
             return self._recursive_write_and_return(
-                cmd, timeout, retries)
+                cmd, timeout, retries, tag=tag)
 
     def _wait_for_ack(self):
         '''
@@ -357,7 +362,7 @@ class MagDeck:
             " the Serial port is disabled on this device (OS)"
             raise SerialException(error_msg)
         except TypeError:
-            # This happens if there are no ttyMagDeck devices in /dev
+            # This happens if there are no ot_module_magdeck* devices in /dev
             # For development use ENABLE_VIRTUAL_SMOOTHIE=true
             raise SerialException('No port specified')
 

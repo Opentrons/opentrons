@@ -8,7 +8,7 @@ import type { LabwareFields, Options } from '../fields'
 import fieldStyles from './fieldStyles.css'
 import styles from './Dropdown.css'
 
-type Props = {|
+export type DropdownProps = {|
   name: $Keys<LabwareFields>,
   options: Options,
   caption?: string,
@@ -26,16 +26,16 @@ export const OptionLabel = (props: $ElementType<Options, number>) => (
   </div>
 )
 
-const Dropdown = (props: Props) => {
+export const Dropdown = (props: DropdownProps) => {
   const options = React.useMemo(
     () =>
       props.options.map(o => ({
         value: o.value,
-        label: <OptionLabel {...o} />,
         isDisabled: o.disabled || false,
       })),
     [props.options]
   )
+
   return (
     <div className={fieldStyles.field_wrapper}>
       <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
@@ -45,6 +45,7 @@ const Dropdown = (props: Props) => {
             name={field.name}
             caption={props.caption}
             value={field.value}
+            options={options}
             onLoseFocus={() => {
               reportFieldEdit({ value: field.value, name: field.name })
               field.onBlur()
@@ -53,12 +54,13 @@ const Dropdown = (props: Props) => {
               props.onValueChange ||
               ((name, value) => form.setFieldValue(name, value))
             }
-            options={options}
+            formatOptionLabel={({ value, label }) => {
+              const option = props.options.find(opt => opt.value === value)
+              return option ? <OptionLabel {...option} /> : null
+            }}
           />
         )}
       </Field>
     </div>
   )
 }
-
-export default Dropdown

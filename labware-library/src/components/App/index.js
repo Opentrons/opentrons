@@ -6,16 +6,16 @@ import cx from 'classnames'
 
 import { DefinitionRoute } from '../../definitions'
 import { useFilters } from '../../filters'
-import Nav, { Breadcrumbs } from '../Nav'
-import Sidebar from '../Sidebar'
-import Page from './Page'
-import LabwareList from '../LabwareList'
-import LabwareDetails from '../LabwareDetails'
+import { Nav, Breadcrumbs } from '../Nav'
+import { Sidebar } from '../Sidebar'
+import { Page } from './Page'
+import { LabwareList } from '../LabwareList'
+import { LabwareDetails } from '../LabwareDetails'
 import styles from './styles.css'
 
 import type { DefinitionRouteRenderProps } from '../../definitions'
 
-export function App(props: DefinitionRouteRenderProps) {
+export function AppComponent(props: DefinitionRouteRenderProps) {
   const { definition, location } = props
   const scrollRef = React.useRef<HTMLDivElement | null>(null)
   const filters = useFilters(location)
@@ -51,7 +51,7 @@ export function App(props: DefinitionRouteRenderProps) {
 }
 
 export function AppWithRoute() {
-  return <DefinitionRoute render={props => <App {...props} />} />
+  return <DefinitionRoute render={props => <AppComponent {...props} />} />
 }
 
-export default hot(AppWithRoute)
+export const App = hot(AppWithRoute)

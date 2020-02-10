@@ -854,7 +854,7 @@ def test_api_per_call_checking(monkeypatch):
     ctx = papi.ProtocolContext(api_version=APIVersion(1, 9))
     assert ctx.deck  # 1.9 < 2.0, but api version 1 is excepted from checking
     monkeypatch.setattr(
-        papi.contexts, 'MAX_SUPPORTED_VERSION',
+        papi.protocol_context, 'MAX_SUPPORTED_VERSION',
         APIVersion(2, 1))
     ctx = papi.ProtocolContext(api_version=APIVersion(2, 1))
     # versions > 2.0 are ok

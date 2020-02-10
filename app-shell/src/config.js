@@ -1,17 +1,18 @@
 // @flow
 // app configuration and settings
+// TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
 import path from 'path'
 import { app } from 'electron'
 import Store from 'electron-store'
 import mergeOptions from 'merge-options'
-import { getIn } from '@thi.ng/paths'
+import { getIn, exists } from '@thi.ng/paths'
 import uuid from 'uuid/v4'
 import yargsParser from 'yargs-parser'
 
 import pkg from '../package.json'
-import createLogger from './log'
+import { createLogger } from './log'
+import * as Cfg from '@opentrons/app/src/config'
 
-// TODO(mc, 2018-08-08): figure out type exports from app
 import type { Config } from '@opentrons/app/src/config/types'
 import type { Action, Dispatch } from './types'
 
@@ -104,17 +105,21 @@ const log = () => _log || (_log = createLogger('config'))
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch) {
   return function handleIncomingAction(action: Action) {
-    if (action.type === 'config:UPDATE') {
-      const { payload } = action
+    if (action.type === Cfg.UPDATE || action.type === Cfg.RESET) {
+      const { path } = action.payload
+      const value =
+        action.type === Cfg.UPDATE
+          ? action.payload.value
+          : getIn(DEFAULTS, path)
 
-      log().debug('Handling config:UPDATE', payload)
+      log().debug('Handling config update', { path, value })
 
-      if (getIn(overrides(), payload.path) != null) {
-        log().debug(`${payload.path} in overrides; not updating`)
+      if (exists(overrides(), path)) {
+        log().debug(`${path} in overrides; not updating`)
       } else {
-        log().debug(`Updating "${payload.path}" to ${payload.value}`)
-        store().set(payload.path, payload.value)
-        dispatch({ type: 'config:SET', payload })
+        log().debug(`Updating "${path}" to ${value}`)
+        store().set(path, value)
+        dispatch({ type: 'config:SET', payload: { path, value } })
       }
     }
   }

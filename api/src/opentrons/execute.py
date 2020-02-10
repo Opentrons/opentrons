@@ -45,7 +45,7 @@ def get_protocol_api(
     .. code-block:: python
 
         >>> from opentrons.execute import get_protocol_api
-        >>> protocol = get_protocol_api()
+        >>> protocol = get_protocol_api('2.0')
         >>> instr = protocol.load_instrument('p300_single', 'right')
         >>> instr.home()
 

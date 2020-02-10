@@ -24,7 +24,9 @@ from opentrons.config import robot_configs, pipette_config
 from .pipette import Pipette
 from .controller import Controller
 from . import modules
+from .util import use_or_initialize_loop
 from .types import Axis, HardwareAPILike, CriticalPoint
+from opentrons.drivers.types import MoveSplit
 
 
 mod_log = logging.getLogger(__name__)
@@ -75,8 +77,9 @@ class API(HardwareAPILike):
 
     def __init__(self,
                  backend: _Backend,
-                 config: robot_configs.robot_config = None,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop,
+                 config: robot_configs.robot_config = None
+                 ) -> None:
         """ Initialize an API instance.
 
         This should rarely be explicitly invoked by an external user; instead,
@@ -86,10 +89,7 @@ class API(HardwareAPILike):
         self._log = self.CLS_LOG.getChild(str(id(self)))
         self._config = config or robot_configs.load()
         self._backend = backend
-        if None is loop:
-            self._loop = asyncio.get_event_loop()
-        else:
-            self._loop = loop
+        self._loop = loop
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -124,10 +124,11 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         """
-        checked_loop = loop or asyncio.get_event_loop()
+        checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
+
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
@@ -153,12 +154,12 @@ class API(HardwareAPILike):
 
         if None is attached_modules:
             attached_modules = []
-        checked_loop = loop or asyncio.get_event_loop()
+        checked_loop = use_or_initialize_loop(loop)
         backend = Simulator(attached_instruments,
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance
@@ -283,6 +284,10 @@ class API(HardwareAPILike):
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
             back_compat: List[str] = []
+            mount_axis = Axis.by_mount(mount)
+            plunger_axis = Axis.of_plunger(mount)
+            splits: Dict[Axis, Optional[MoveSplit]] = {
+                plunger_axis.name.upper(): None}
             if model:
                 p = Pipette(
                     model,
@@ -299,6 +304,12 @@ class API(HardwareAPILike):
                 home_pos = p.config.home_position
                 max_travel = p.config.max_travel
                 steps_mm = p.config.steps_per_mm
+                if 'needsUnstick' in p.config.quirks:
+                    splits[plunger_axis.name.upper()] = MoveSplit(
+                        split_distance=1,
+                        split_current=1.5,
+                        split_speed=1,
+                        after_time=1800)
 
             if req_instr and not self.is_simulator_sync:
                 if not model:
@@ -318,14 +329,13 @@ class API(HardwareAPILike):
                 max_travel = self._config.default_pipette_configs['maxTravel']
                 steps_mm = self._config.default_pipette_configs['stepsPerMM']
 
-            mount_axis = Axis.by_mount(mount)
-            plunger_axis = Axis.of_plunger(mount)
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
             self._backend._smoothie_driver.update_pipette_config(
                 mount_axis.name, {'home': home_pos})
             self._backend._smoothie_driver.update_pipette_config(
                 plunger_axis.name, {'max_travel': max_travel})
+            self._backend._smoothie_driver.configure_splits_for(splits)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
@@ -533,8 +543,8 @@ class API(HardwareAPILike):
                 for smoothie_plunger, current in smoothie_plungers.items():
                     self._backend.set_active_current(
                         smoothie_plunger, current)
-                    smoothie_pos.update(
-                        self._backend.home([smoothie_plunger.name.upper()]))
+                    self._backend.home([smoothie_plunger.name.upper()])
+                    smoothie_pos.update(self._backend.update_position())
             self._current_position = self._deck_from_smoothie(smoothie_pos)
 
     async def add_tip(
@@ -1249,6 +1259,8 @@ class API(HardwareAPILike):
                         plunger_ax.name.upper(), safety_margin)
                     self._current_position = self._deck_from_smoothie(
                         smoothie_pos)
+                self._backend.set_active_current(
+                    plunger_ax, instr.config.plunger_current)
                 await self._move_plunger(mount, bottom)
 
         if 'doubleDropTip' in instr.config.quirks:
@@ -1378,31 +1390,46 @@ class API(HardwareAPILike):
                 'blow_out_flow_rate',
                 self._plunger_flowrate(this_pipette, blow_out, 'dispense'))
 
+    def _unregister_modules(self,
+                            mods_at_ports: List[modules.ModuleAtPort]) -> None:
+        removed_modules = []
+        for port, mod in mods_at_ports:  # type: ignore
+            for attached_mod in self._attached_modules:
+                if attached_mod.port == port:
+                    removed_modules.append(attached_mod)
+        for removed_mod in removed_modules:
+            try:
+                self._attached_modules.remove(removed_mod)
+            except ValueError:
+                self._log.exception(f"Removed Module {removed_mod} not"
+                                    " found in attached modules")
+        for removed_mod in removed_modules:
+            self._log.info(f"Module {removed_mod.name()} detached"
+                           f" from port {removed_mod.port}")
+            del removed_mod
+
     async def register_modules(
             self,
-            new_modules: List[modules.ModuleAtPort] = None,
-            removed_modules: List[modules.ModuleAtPort] = None
+            new_mods_at_ports: List[modules.ModuleAtPort] = None,
+            removed_mods_at_ports: List[modules.ModuleAtPort] = None
             ) -> None:
-        if new_modules is None:
-            new_modules = []
-        if removed_modules is None:
-            removed_modules = []
-        for port, name in removed_modules:
-            self._attached_modules = [mod for mod in self._attached_modules
-                                      if mod.port != port]
-            self._log.info(f"Module {name} disconnected"
-                           f" from port {port}")
+        if new_mods_at_ports is None:
+            new_mods_at_ports = []
+        if removed_mods_at_ports is None:
+            removed_mods_at_ports = []
 
-        for port, name in new_modules:
+        # destroy removed mods
+        self._unregister_modules(removed_mods_at_ports)
+
+        # build new mods
+        for port, name in new_mods_at_ports:
             new_instance = await self._backend.build_module(
                     port,
                     name,
                     self.pause_with_message)
-            self._log.info(f"{port}")
-            self._log.info(f"{name}")
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
-                           f" at port {port}")
+                           f" at port {port}, new_instance: {new_instance}")
 
     async def _do_tp(self, pip, mount) -> top_types.Point:
         """ Execute the work of tip probe.

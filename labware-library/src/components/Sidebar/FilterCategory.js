@@ -18,7 +18,7 @@ export type FilterCategoryProps = {|
   filters: FilterParams,
 |}
 
-export default function FilterCategory(props: FilterCategoryProps) {
+export function FilterCategory(props: FilterCategoryProps) {
   const { filters } = props
   const categories = getAllCategories()
 

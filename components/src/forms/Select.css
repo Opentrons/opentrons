@@ -1,0 +1,108 @@
+/* stylelint-disable selector-class-pattern */
+@import "..";
+
+.select {
+  position: relative;
+
+  & :global(.ot_select__control) {
+    @apply --font-body-1-dark;
+
+    display: flex;
+    position: relative;
+    background-color: var(--c-light-gray);
+    border: none;
+    padding: 0.25rem 0;
+    outline: none;
+    border-radius: var(--bd-radius-form-field);
+    height: 1.75rem;
+    box-shadow: none;
+  }
+
+  & :global(.ot_select__control--menu-is-open) {
+    border-bottom-left-radius: 0;
+    border-bottom-right-radius: 0;
+  }
+
+  & :global(.ot_select__control--menu-is-open),
+  & :global(.ot_select__control--is-focused) {
+    background-color: var(--c-white);
+    box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
+  }
+
+  & :global(.ot_select__option) {
+    display: flex;
+    padding: 0.25rem 0.75rem;
+    cursor: default;
+  }
+
+  & :global(.ot_select__option--is-focused) {
+    background-color: var(--c-light-gray);
+  }
+
+  & :global(.ot_select__option--is-disabled) {
+    color: var(--c-font-disabled);
+  }
+
+  & :global(.ot_select__group-heading) {
+    @apply --font-form-caption;
+
+    text-transform: uppercase;
+    margin-left: 0.5rem;
+  }
+
+  & :global(.ot_select__single-value) {
+    display: flex;
+  }
+
+  & :global(.ot_select__group):not(:first-child) {
+    margin-top: 0.25rem;
+    border-top: 1px solid color-mod(var(--c-med-gray) alpha(0.4));
+    padding-top: 0.25rem;
+  }
+}
+
+.dropdown_indicator {
+  position: absolute;
+  top: 0.25rem;
+  right: 0.25rem;
+  width: 1.25rem;
+  pointer-events: none;
+
+  & > svg {
+    color: var(--c-dark-gray);
+  }
+
+  &.flipped > svg {
+    transform: rotate(180deg);
+  }
+}
+
+.dropdown_indicator_icon {
+  width: 100%;
+}
+
+.menu {
+  @apply --font-body-1-dark;
+
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 99;
+  background-color: var(--c-white);
+  box-shadow: 0 0.125rem 0.25rem 0 color-mod(var(--c-black) alpha(0.5));
+  border-bottom-left-radius: var(--bd-radius-form-field);
+  border-bottom-right-radius: var(--bd-radius-form-field);
+  padding-top: 0.25rem;
+  padding-bottom: 0.25rem;
+}
+
+.menu_control_bridge {
+  position: absolute;
+  background-color: var(--c-white);
+  top: calc(100% - 2px);
+  left: 0;
+  right: 0;
+  z-index: 99;
+  height: 4px;
+}

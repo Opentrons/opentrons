@@ -9,13 +9,13 @@ import {
   FormGroup,
   DropdownField,
   HoverTooltip,
+  SlotMap,
 } from '@opentrons/components'
 import {
   selectors as stepFormSelectors,
   actions as stepFormActions,
   getSlotIsEmpty,
   getSlotsBlockedBySpanning,
-  getCrashablePipetteSelected,
 } from '../../../step-forms'
 import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -23,10 +23,9 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../../constants'
+import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
 import i18n from '../../../localization'
 import { PDAlert } from '../../alerts/PDAlert'
-import { CrashInfoBox } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -37,7 +36,7 @@ type EditModulesProps = {
   onCloseClick: () => mixed,
 }
 
-export default function EditModulesModal(props: EditModulesProps) {
+export function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
 
@@ -50,14 +49,6 @@ export default function EditModulesModal(props: EditModulesProps) {
   const [selectedModel, setSelectedModel] = React.useState<string>(
     (module && module.model) || 'GEN1'
   )
-
-  const pipettesByMount = useSelector(
-    stepFormSelectors.getPipettesForEditPipetteForm
-  )
-
-  const showCrashInfoBox =
-    getCrashablePipetteSelected(pipettesByMount) &&
-    (moduleType === MAGDECK || moduleType === TEMPDECK)
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
   const previousModuleSlot = module && module.slot
@@ -73,8 +64,9 @@ export default function EditModulesModal(props: EditModulesProps) {
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const occupiedSlotError =
-    !slotIsEmpty && enableSlotSelection ? 'Selected slot is occupied' : null
+  const occupiedSlotError = !slotIsEmpty
+    ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
+    : null
 
   const dispatch = useDispatch()
 
@@ -128,7 +120,7 @@ export default function EditModulesModal(props: EditModulesProps) {
         <PDAlert
           alertType="warning"
           title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-          description={i18n.t('alert.module_placement.SLOT_OCCUPIED.body')}
+          description={''}
         />
       )}
       <form>
@@ -136,35 +128,44 @@ export default function EditModulesModal(props: EditModulesProps) {
           <FormGroup label="Model" className={styles.option_model}>
             <DropdownField
               tabIndex={0}
-              options={[{ name: 'GEN1', value: 'GEN1' }]}
+              options={MODELS_FOR_MODULE_TYPE[moduleType]}
               value={selectedModel}
               onChange={handleModelChange}
             />
           </FormGroup>
           {showSlotOption && (
-            <HoverTooltip
-              placement="bottom"
-              tooltipComponent={enableSlotSelection ? null : slotOptionTooltip}
-            >
-              {hoverTooltipHandlers => (
-                <div {...hoverTooltipHandlers} className={styles.option_slot}>
-                  <FormGroup label="Position">
-                    <DropdownField
-                      tabIndex={1}
-                      options={getAllModuleSlotsByType(moduleType)}
-                      value={selectedSlot}
-                      disabled={!enableSlotSelection}
-                      onChange={handleSlotChange}
-                      error={occupiedSlotError}
-                    />
-                  </FormGroup>
-                </div>
-              )}
-            </HoverTooltip>
+            <>
+              <HoverTooltip
+                placement="top"
+                tooltipComponent={slotOptionTooltip}
+              >
+                {hoverTooltipHandlers => (
+                  <div {...hoverTooltipHandlers} className={styles.option_slot}>
+                    <FormGroup label="Position">
+                      <DropdownField
+                        tabIndex={1}
+                        options={getAllModuleSlotsByType(moduleType)}
+                        value={selectedSlot}
+                        disabled={!enableSlotSelection}
+                        onChange={handleSlotChange}
+                        error={occupiedSlotError}
+                      />
+                    </FormGroup>
+                  </div>
+                )}
+              </HoverTooltip>
+              <div className={styles.slot_map_container}>
+                {selectedSlot && (
+                  <SlotMap
+                    occupiedSlots={[`${selectedSlot}`]}
+                    isError={Boolean(occupiedSlotError)}
+                  />
+                )}
+              </div>
+            </>
           )}
         </div>
       </form>
-      {showCrashInfoBox && <CrashInfoBox />}
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>

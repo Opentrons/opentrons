@@ -51,7 +51,7 @@ class MalformedProtocolError(Exception):
         super().__init__(message)
 
     def __str__(self):
-        return self._msg + PROTOCOL_MALFORMED
+        return self.message + PROTOCOL_MALFORMED
 
     def __repr__(self):
         return '<{}: {}>'.format(self.__class__.__name__, self.message)

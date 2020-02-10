@@ -26,11 +26,11 @@ let config
 let transports
 let log
 
-export default function initializeLogger(filename) {
+export function createLogger(filename) {
   if (!config) config = getConfig('log')
   if (!transports) initializeTransports()
 
-  return createLogger(filename)
+  return createWinstonLogger(filename)
 }
 
 function initializeTransports() {
@@ -44,7 +44,7 @@ function initializeTransports() {
   }
 
   transports = createTransports()
-  log = createLogger('log')
+  log = createWinstonLogger('log')
 
   if (error) log.error('Could not create log directory', { error })
   log.info(`Level "error" and higher logging to ${ERROR_LOG}`)
@@ -97,7 +97,7 @@ function createTransports() {
   ]
 }
 
-function createLogger(label) {
+function createWinstonLogger(label) {
   log && log.debug(`Creating logger for ${label}`)
 
   const formats = [

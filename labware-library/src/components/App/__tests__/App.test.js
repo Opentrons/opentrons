@@ -3,14 +3,14 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { App } from '..'
+import { AppComponent } from '..'
 
 jest.mock('../../../definitions')
 
 describe('App', () => {
   test('component renders without definition', () => {
     const tree = shallow(
-      <App
+      <AppComponent
         location={({ search: '' }: any)}
         history={({}: any)}
         match={({}: any)}
@@ -23,7 +23,7 @@ describe('App', () => {
 
   test('component renders with definition', () => {
     const tree = shallow(
-      <App
+      <AppComponent
         location={({ search: '' }: any)}
         history={({}: any)}
         match={({}: any)}

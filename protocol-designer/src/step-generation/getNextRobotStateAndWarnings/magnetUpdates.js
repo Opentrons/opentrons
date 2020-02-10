@@ -1,8 +1,8 @@
 // @flow
-import assert from 'assert'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   EngageMagnetParams,
-  DisengageMagnetParams,
+  ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 import { MAGDECK } from '../../constants'
@@ -20,23 +20,19 @@ export function forEngageMagnet(
 ): void {
   const { module } = params
   let { robotState } = robotStateAndWarnings
-  assert(
-    module in robotState.modules,
-    `forEngageMagnet expected module id "${module}"`
-  )
-  _setMagnet(robotState.modules[module].moduleState, true)
+  const moduleState = getModuleState(robotState, module)
+
+  _setMagnet(moduleState, true)
 }
 
 export function forDisengageMagnet(
-  params: DisengageMagnetParams,
+  params: ModuleOnlyParams,
   invariantContext: InvariantContext,
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { module } = params
   const { robotState } = robotStateAndWarnings
-  assert(
-    module in robotState.modules,
-    `forDisengageMagnet expected module id "${module}"`
-  )
-  _setMagnet(robotState.modules[module].moduleState, false)
+  const moduleState = getModuleState(robotState, module)
+
+  _setMagnet(moduleState, false)
 }

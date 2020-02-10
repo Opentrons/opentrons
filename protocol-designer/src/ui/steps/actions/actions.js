@@ -8,6 +8,7 @@ import {
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultMagnetAction,
+  getNextDefaultEngageHeight,
   handleFormChange,
 } from '../../../steplist/formLevel'
 import type { StepIdType, StepType } from '../../../form-types'
@@ -98,12 +99,6 @@ export const selectStep = (
     stepFormSelectors.getInitialDeckSetup(state).pipettes
   )
 
-  const moduleId = getNextDefaultTemperatureModuleId(
-    stepFormSelectors.getSavedStepForms(state),
-    stepFormSelectors.getOrderedStepIds(state),
-    stepFormSelectors.getInitialDeckSetup(state).modules
-  )
-
   // For a pristine step, if there is a `pipette` field in the form
   // (added by upstream `getDefaultsForStepType` fn),
   // then set `pipette` field of new steps to the next default pipette id.
@@ -133,6 +128,11 @@ export const selectStep = (
     (newStepType === 'pause' || newStepType === 'temperature') &&
     formHasModuleIdField
   ) {
+    const moduleId = getNextDefaultTemperatureModuleId(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state),
+      stepFormSelectors.getInitialDeckSetup(state).modules
+    )
     formData = {
       ...formData,
       moduleId,
@@ -146,7 +146,24 @@ export const selectStep = (
       stepFormSelectors.getSavedStepForms(state),
       stepFormSelectors.getOrderedStepIds(state)
     )
-    formData = { ...formData, moduleId, magnetAction }
+
+    const defaultEngageHeight = uiModulesSelectors.getMagnetLabwareEngageHeight(
+      state
+    )
+
+    const stringDefaultEngageHeight = defaultEngageHeight
+      ? defaultEngageHeight.toString()
+      : null
+
+    const prevEngageHeight = getNextDefaultEngageHeight(
+      stepFormSelectors.getSavedStepForms(state),
+      stepFormSelectors.getOrderedStepIds(state)
+    )
+
+    // if no previously saved engageHeight, autopopulate with recommended value
+    // recommended value is null when no labware found on module
+    const engageHeight = prevEngageHeight || stringDefaultEngageHeight
+    formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 
   dispatch({

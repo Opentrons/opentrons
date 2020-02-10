@@ -1,6 +1,7 @@
 # opentrons labware-library makefile
 
-SHELL := /bin/bash
+# using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
+SHELL := bash
 
 # add node_modules/.bin to PATH
 PATH := $(shell cd .. && yarn bin):$(PATH)
@@ -33,6 +34,6 @@ serve: all
 # end to end tests
 .PHONY: test-e2e
 test-e2e:
-	concurrently --no-color --kill-others --names "server,tests" \
+	concurrently --no-color --kill-others --success "first" --names "labware-library,labware-library-tests" \
 		"$(MAKE) dev" \
 		"cypress run --browser chrome"

@@ -34,7 +34,7 @@ const LINKS = [
   },
 ]
 
-export default function LabwareGuide() {
+export function LabwareGuide() {
   return (
     <section className={styles.labware_guide}>
       <div className={styles.labware_guide_container}>

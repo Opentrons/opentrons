@@ -7,6 +7,11 @@ import { forBlowout } from './forBlowout'
 import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
+import {
+  forAwaitTemperature,
+  forSetTemperature,
+  forDeactivateTemperature,
+} from './temperatureUpdates'
 import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   InvariantContext,
@@ -56,9 +61,32 @@ function _getNextRobotStateAndWarningsSingleCommand(
       // these commands don't have any effects on the state
       break
     case 'temperatureModule/setTargetTemperature':
+      forSetTemperature(command.params, invariantContext, robotStateAndWarnings)
+      break
     case 'temperatureModule/deactivate':
-    case 'thermocycler/setTargetTemperature':
-    case 'thermocycler/deactivate':
+      forDeactivateTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'temperatureModule/awaitTemperature':
+      forAwaitTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
+    case 'thermocycler/setTargetBlockTemperature':
+    case 'thermocycler/setTargetLidTemperature':
+    case 'thermocycler/awaitBlockTemperature':
+    case 'thermocycler/awaitLidTemperature':
+    case 'thermocycler/deactivateBlock':
+    case 'thermocycler/deactivateLid':
+    case 'thermocycler/closeLid':
+    case 'thermocycler/openLid':
+    case 'thermocycler/runProfile':
+    case 'thermocycler/awaitProfileComplete':
       console.warn(`NOT IMPLEMENTED: ${command.command}`)
       break
 

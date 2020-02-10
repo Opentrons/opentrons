@@ -1552,6 +1552,79 @@
         }
       }
     },
+    "/modules/{serial}/update": {
+      "parameters": [
+        {
+          "name": "serial",
+          "in": "path",
+          "schema": { "type": "string" },
+          "required": true
+        }
+      ],
+      "post": {
+        "description": "Initiate a firmware update on a specific module",
+        "summary": "Command robot to flash its bundled firmware file for this module's type to this specific module",
+        "operationId": "updateModule",
+        "tags": ["update", "modules"],
+        "responses": {
+          "200": {
+            "description": "Confirm successful update",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": {
+                      "type": "string",
+                      "description": "A human readable string"
+                    }
+                  }
+                },
+                "examples": {
+                  "updateThermocyclerModule": {
+                    "summary": "Module Firmware Update Success OK",
+                    "description": "A successful firmware update on Thermocycler",
+                    "value": {
+                      "message": "Successully updated module TCV012019123456",
+                      "returnValue": null
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Invalid module serial specified",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/v1ErrorMessage"
+                }
+              }
+            },
+            "links": {
+              "move": {
+                "description": "List attached modules",
+                "operationId": "getAttachedModules"
+              }
+            }
+          },
+          "500": {
+            "description": "Something went wrong when attempting module firmware update",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
+                "example": {
+                  "message": "Bootloader error: cannot find SAMBA device on port /dev/ttyACM0"
+                }
+              }
+            }
+          },
+          "502": { "$ref": "#/components/responses/serverDown" }
+        }
+      }
+    },
     "/camera/picture": {
       "post": {
         "operationId": "takePicture",

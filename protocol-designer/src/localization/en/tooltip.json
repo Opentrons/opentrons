@@ -41,7 +41,16 @@
         "$generic": "Incompatible with current path",
         "blowout_checkbox": "Redundant with disposal volume"
       }
+    },
+    "pauseForAmountOfTime": {
+      "disabled": {
+        "wait_until_temp": "There are no temperature or thermocycler modules on the deck"
+      }
     }
+  },
+  "edit_module_card": {
+    "magnetic_module_collision": "When magnetic module is in Slot 1, GEN1 8-Channel pipette cannot access Slot 4.",
+    "temperature_module_collision": "When temperature module is in Slot 3, GEN1 8-Channel pipette cannot access Slot 6. "
   },
   "edit_module_modal": {
     "slot_selection": "To enable non-default/unrestricted positioning, go to Settings > App > Experimental settings."

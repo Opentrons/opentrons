@@ -15,7 +15,7 @@ import i18n from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import styles from './FilePage.css'
 import EditPipettesModal from './modals/EditPipettesModal'
-import EditModulesModal from './modals/EditModulesModal'
+import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
 import formStyles from '../components/forms/forms.css'
 import type { FileMetadataFields } from '../file-data'
@@ -45,7 +45,7 @@ const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
 const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
 
 // TODO: Ian 2019-03-15 use i18n for labels
-class FilePage extends React.Component<Props, State> {
+export class FilePage extends React.Component<Props, State> {
   state = {
     isEditPipetteModalOpen: false,
     isEditModulesModalOpen: false,
@@ -240,5 +240,3 @@ class FilePage extends React.Component<Props, State> {
     )
   }
 }
-
-export default FilePage

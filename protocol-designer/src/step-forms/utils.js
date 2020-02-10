@@ -131,7 +131,7 @@ export const getSlotIsEmpty = (
   )
 }
 
-export const getCrashablePipetteSelected = (
+export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
 ) => {
   const { left, right } = pipettesByMount

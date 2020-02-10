@@ -36,7 +36,7 @@ import { modulesReducer } from './modules/reducer'
 import { shellReducer } from './shell/reducer'
 
 // config state
-import { configReducer } from './config'
+import { configReducer } from './config/reducer'
 
 // discovery state
 import { discoveryReducer } from './discovery/reducer'

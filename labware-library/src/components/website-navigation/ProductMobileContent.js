@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import styles from './styles.css'
 
 import {
@@ -12,7 +12,7 @@ import {
 
 type Props = {||}
 
-export default function ProductMobileContent(props: Props) {
+export function ProductMobileContent(props: Props) {
   return (
     <div className={styles.product_mobile_content}>
       <div className={styles.hardware_group}>

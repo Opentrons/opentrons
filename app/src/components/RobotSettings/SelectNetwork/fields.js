@@ -1,14 +1,11 @@
 // @flow
 import * as React from 'react'
 
-import {
-  InputField,
-  CheckboxField,
-  SelectField,
-  type SelectOption,
-} from '@opentrons/components'
+import { InputField, CheckboxField, SelectField } from '@opentrons/components'
 import { FormTableRow } from './FormTable'
 import styles from './styles.css'
+
+import type { SelectOptionOrGroup } from '@opentrons/components'
 
 type BaseFieldProps = {|
   name: string,
@@ -33,7 +30,7 @@ type PasswordFieldProps = {
 
 type SelectOptionFieldProps = {|
   ...BaseFieldProps,
-  options: Array<SelectOption>,
+  options: Array<SelectOptionOrGroup>,
   placeholder?: string,
   onValueChange: (name: string, value: ?string) => mixed,
   onLoseFocus?: (name: string) => mixed,

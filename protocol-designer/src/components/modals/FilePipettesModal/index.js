@@ -4,7 +4,7 @@ import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
-import { getCrashablePipetteSelected } from '../../../step-forms'
+import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import {
   Modal,
   FormGroup,
@@ -77,7 +77,7 @@ const initialState: State = {
 }
 
 // TODO: Ian 2019-03-15 use i18n for labels
-export default class FilePipettesModal extends React.Component<Props, State> {
+export class FilePipettesModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = {
@@ -208,7 +208,7 @@ export default class FilePipettesModal extends React.Component<Props, State> {
     const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
 
     const showCrashInfoBox =
-      getCrashablePipetteSelected(this.state.pipettesByMount) &&
+      getIsCrashablePipetteSelected(this.state.pipettesByMount) &&
       this.getCrashableModuleSelected(this.state.modulesByType)
 
     const visibleModules = this.props.thermocyclerEnabled
@@ -276,7 +276,13 @@ export default class FilePipettesModal extends React.Component<Props, State> {
                 )}
               </form>
 
-              {showCrashInfoBox && <CrashInfoBox />}
+              {showCrashInfoBox && (
+                <CrashInfoBox
+                  showDiagram
+                  magnetOnDeck={this.state.modulesByType.magdeck.onDeck}
+                  temperatureOnDeck={this.state.modulesByType.tempdeck.onDeck}
+                />
+              )}
 
               <div className={styles.button_row}>
                 <OutlineButton

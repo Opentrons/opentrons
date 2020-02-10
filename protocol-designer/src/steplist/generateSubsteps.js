@@ -349,15 +349,45 @@ export function generateSubsteps(
     })
   }
 
+  const labwareNames = stepArgs.module
+    ? labwareNamesByModuleId[stepArgs.module]
+    : null
+
   if (
     stepArgs.commandCreatorFnName === 'disengageMagnet' ||
     stepArgs.commandCreatorFnName === 'engageMagnet'
   ) {
-    const moduleId = stepArgs.module
-    const labwareNames = moduleId ? labwareNamesByModuleId[moduleId] : null
     return {
       substepType: 'magnet',
       engage: stepArgs.commandCreatorFnName === 'engageMagnet',
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
+      message: stepArgs.message,
+    }
+  }
+
+  if (
+    stepArgs.commandCreatorFnName === 'setTemperature' ||
+    stepArgs.commandCreatorFnName === 'deactivateTemperature'
+  ) {
+    const temperature =
+      stepArgs.commandCreatorFnName === 'setTemperature'
+        ? stepArgs.targetTemperature
+        : null
+
+    return {
+      substepType: 'temperature',
+      temperature: temperature,
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
+      message: stepArgs.message,
+    }
+  }
+
+  if (stepArgs.commandCreatorFnName === 'awaitTemperature') {
+    return {
+      substepType: 'awaitTemperature',
+      temperature: stepArgs.temperature,
       labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,

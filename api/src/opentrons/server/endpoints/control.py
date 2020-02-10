@@ -138,6 +138,7 @@ async def get_attached_modules(request):
                 'serial': mod.device_info.get('serial'),
                 'model': mod.device_info.get('model'),
                 'fwVersion': mod.device_info.get('version'),
+                'hasAvailableUpdate': mod.has_available_update(),
                 **mod.live_data
             }
             for mod in hw_mods
@@ -283,8 +284,8 @@ async def position_info(request):
         'positions': {
             'change_pipette': {
                 'target': 'mount',
-                'left': (325, 40, 30),
-                'right': (65, 40, 30)
+                'left': (300, 40, 30),
+                'right': (95, 40, 30)
             },
             'attach_tip': {
                 'target': 'pipette',

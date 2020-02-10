@@ -19,6 +19,9 @@ type Props = {|
  * both Button _and_ Icon. Use `name` to specify icon name.
  */
 export default function IconButton(props: Props) {
+  // TODO(mc, 2020-02-04): ButtonProps::name conflicts with IconProps::name
+  // this component will need to be redone so underlying `button` can still
+  // receive an HTML name for a11y
   const { name, spin, ...buttonProps } = props
   const iconProps = { name, spin }
   const className = cx(styles.button_icon, props.className, {

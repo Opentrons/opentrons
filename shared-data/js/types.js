@@ -1,5 +1,15 @@
 // @flow
-import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from './constants'
+import typeof {
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  GEN1,
+  GEN2,
+} from './constants'
+
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -145,7 +155,16 @@ export type LabwareDefinition2 = {|
   groups: Array<LabwareWellGroup>,
 |}
 
+// corresponds to `moduleType` key in a module definition. Is NOT model.
+export type ModuleRealType =
+  | MAGNETIC_MODULE_TYPE
+  | TEMPERATURE_MODULE_TYPE
+  | THERMOCYCLER_MODULE_TYPE
+
+// corresponds to top-level keys in shared-data/module/definitions/2
+export type ModuleModel = string
 export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
+// TODO IMMEDIATELY: gradually replace this old 'ModuleType' with ModuleModel.
 
 export type DeckOffset = {|
   x: number,
@@ -240,7 +259,7 @@ export type ModuleDefinition = {|
 
 export type PipetteChannels = 1 | 8
 
-export type PipetteDisplayCategory = 'GEN1' | 'GEN2'
+export type PipetteDisplayCategory = GEN1 | GEN2
 
 export type FlowRateSpec = {|
   value: number,

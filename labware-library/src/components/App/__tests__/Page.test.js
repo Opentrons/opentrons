@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import Page from '../Page'
+import { Page } from '../Page'
 
 jest.mock('../../../definitions')
 

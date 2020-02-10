@@ -5,7 +5,7 @@ import uniq from 'lodash/uniq'
 import { connect } from 'formik'
 import { AlertItem } from '@opentrons/components'
 import { getIsHidden } from '../formSelectors'
-import LinkOut from './LinkOut'
+import { LinkOut } from './LinkOut'
 import styles from './Section.css'
 import {
   IRREGULAR_LABWARE_ERROR,
@@ -22,7 +22,7 @@ type Props = {|
   children?: React.Node,
   headingClassName?: string,
 |}
-const Section = connect((props: Props) => {
+export const Section = connect((props: Props) => {
   const fieldList = props.fieldList || []
   if (props.fieldList != null && fieldList.length > 0) {
     const numFieldsHidden = props.fieldList
@@ -76,5 +76,3 @@ const Section = connect((props: Props) => {
     </div>
   )
 })
-
-export default Section

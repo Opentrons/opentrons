@@ -27,13 +27,10 @@ export const setTemperature: CommandCreator<SetTemperatureArgs> = (
       ],
     }
   } else if (moduleType === THERMOCYCLER) {
+    // TODO: Ian 2019-01-24 implement setting thermocycler temp: block vs lid
+    console.error('Thermocycler set temp not implemented!')
     return {
-      commands: [
-        {
-          command: 'thermocycler/setTargetTemperature',
-          params,
-        },
-      ],
+      commands: [],
     }
   } else {
     console.error(

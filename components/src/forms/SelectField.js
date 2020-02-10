@@ -2,162 +2,77 @@
 import * as React from 'react'
 import cx from 'classnames'
 import find from 'lodash/find'
-import flatMap from 'lodash/flatMap'
 
-import Select, { components } from 'react-select'
-import { Icon } from '../icons'
+import { Select } from './Select'
 import styles from './SelectField.css'
 
-// TODO(mc, 2018-10-23): we use "name", react-select uses "label"; align usage
-export type ValueType = ?string
-export type OptionType = {|
-  value: ValueType,
-  label: React.Node,
-  isDisabled?: boolean,
-|}
-export type GroupType = {| options: Array<OptionType>, label: React.Node |}
-export type SelectOption = OptionType | GroupType
+import type { SelectProps } from './Select'
 
-export type MenuPosition = 'absolute' | 'fixed'
-
-type OptionList = Array<OptionType>
-
-type SelectProps = {
+export type SelectFieldProps = {
   /** optional HTML id for container */
-  id?: string,
+  id?: $PropertyType<SelectProps, 'id'>,
   /** field name */
-  name: string,
-  /** React-Select option, usually label, value */
-  options: Array<SelectOption>,
+  name: $NonMaybeType<$PropertyType<SelectProps, 'name'>>,
+  /** react-Select option, usually label, value */
+  options: $PropertyType<SelectProps, 'options'>,
   /** currently selected value */
-  value: ValueType,
-  /** change handler called with (name, value) */
-  onValueChange: (name: string, value: ValueType) => mixed,
-  /** blur handler called with (name) */
-  onLoseFocus?: (name: string) => mixed,
+  value: $NonMaybeType<$PropertyType<SelectProps, 'id'>> | null,
   /** disable the select */
-  disabled?: boolean,
+  disabled?: $PropertyType<SelectProps, 'isDisabled'>,
   /** optional placeholder  */
-  placeholder?: ?string,
+  placeholder?: $PropertyType<SelectProps, 'placeholder'>,
+  /** menuPosition prop to send to react-select */
+  menuPosition?: $PropertyType<SelectProps, 'menuPosition'>,
+  /** render function for the option label passed to react-select */
+  formatOptionLabel?: $PropertyType<SelectProps, 'formatOptionLabel'>,
   /** optional className */
   className?: string,
   /** optional caption. hidden when `error` is given */
-  caption?: string,
+  caption?: React.Node,
   /** if included, use error style and display error instead of caption */
   error?: ?string,
-  /** menuPosition prop to send to react-select */
-  menuPosition?: ?MenuPosition,
+  /** change handler called with (name, value) */
+  onValueChange?: (name: string, value: string) => mixed,
+  /** blur handler called with (name) */
+  onLoseFocus?: (name: string) => mixed,
 }
 
-const SELECT_STYLES = {
-  input: () => ({ padding: 0 }),
-  groupHeading: () => ({ margin: 0 }),
-}
-
-const clearStyles = () => null
-
-const getOpts = (og: OptionType | GroupType): OptionList => og.options || [og]
-
-export default class SelectField extends React.Component<SelectProps> {
-  handleChange = (option: OptionType) => {
-    const { name, onValueChange } = this.props
-    onValueChange(name, option.value)
-  }
-
-  handleBlur = () => {
-    const { name, onLoseFocus } = this.props
-    if (onLoseFocus) onLoseFocus(name)
-  }
-
-  render() {
-    const {
-      id,
-      name,
-      options,
-      disabled,
-      placeholder,
-      className,
-      error,
-      menuPosition,
-    } = this.props
-    const allOptions = flatMap(options, getOpts)
-    const value = find(allOptions, { value: this.props.value }) || null
-    const caption = error || this.props.caption
-    const captionCx = cx(styles.select_caption, { [styles.error_color]: error })
-
-    return (
-      <div>
-        <Select
-          id={id}
-          name={name}
-          options={options}
-          value={value}
-          error={error}
-          onChange={this.handleChange}
-          onBlur={this.handleBlur}
-          isDisabled={disabled}
-          placeholder={placeholder}
-          styles={SELECT_STYLES}
-          components={{
-            Control,
-            DropdownIndicator,
-            Menu,
-            Group,
-            IndicatorSeparator: null,
-          }}
-          className={className}
-          menuPosition={menuPosition || 'absolute'}
-        />
-        {caption && <p className={captionCx}>{caption}</p>}
-      </div>
-    )
-  }
-}
-
-function Control(props: *) {
-  return (
-    <components.Control
-      {...props}
-      getStyles={clearStyles}
-      className={cx(styles.select_control, {
-        [styles.error_bg]: props.selectProps.error,
-        [styles.focus]: props.isFocused,
-      })}
-    />
-  )
-}
-
-function DropdownIndicator(props: *) {
-  const iconWrapperCx = cx(styles.dropdown_icon_wrapper, {
-    [styles.flipped]: props.selectProps.menuIsOpen,
-  })
+export function SelectField(props: SelectFieldProps) {
+  const {
+    id,
+    name,
+    options,
+    disabled,
+    placeholder,
+    menuPosition,
+    formatOptionLabel,
+    className,
+    error,
+    onValueChange,
+    onLoseFocus,
+  } = props
+  const allOptions = options.flatMap(og => og.options || [og])
+  const value = find(allOptions, { value: props.value }) || null
+  const caption = error || props.caption
+  const captionCx = cx(styles.select_caption, { [styles.error]: error })
+  const fieldCx = cx(styles.select_field, { [styles.error]: error }, className)
 
   return (
-    components.DropdownIndicator && (
-      <components.DropdownIndicator {...props}>
-        <div className={iconWrapperCx}>
-          <Icon name="menu-down" width="100%" />
-        </div>
-      </components.DropdownIndicator>
-    )
-  )
-}
-// custom Menu (options dropdown) component
-function Menu(props: *) {
-  return (
-    <components.Menu {...props}>
-      <div className={styles.select_menu}>{props.children}</div>
-    </components.Menu>
-  )
-}
-
-// custom option group wrapper component
-function Group(props: *) {
-  return (
-    <components.Group
-      {...props}
-      className={styles.select_group}
-      getStyles={clearStyles}
-    />
+    <div>
+      <Select
+        className={fieldCx}
+        id={id}
+        name={name}
+        options={options}
+        value={value}
+        isDisabled={disabled}
+        placeholder={placeholder}
+        menuPosition={menuPosition}
+        formatOptionLabel={formatOptionLabel}
+        onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
+        onBlur={() => onLoseFocus && onLoseFocus(name)}
+      />
+      {caption && <p className={captionCx}>{caption}</p>}
+    </div>
   )
 }

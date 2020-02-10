@@ -12,7 +12,7 @@ export type PipetteSelectionProps = {
   ...React.ElementProps<typeof PipetteSelect>,
 }
 
-export default function PipetteSelection(props: PipetteSelectionProps) {
+export function PipetteSelection(props: PipetteSelectionProps) {
   const config = useSelector(getConfig)
   const nameBlacklist = Boolean(config.devInternal?.enableMultiGEN2)
     ? []
@@ -21,7 +21,7 @@ export default function PipetteSelection(props: PipetteSelectionProps) {
     <label className={styles.pipette_selection}>
       <span className={styles.pipette_selection_label}>{LABEL}</span>
       <PipetteSelect
-        value={props.value}
+        pipetteName={props.pipetteName}
         onPipetteChange={props.onPipetteChange}
         nameBlacklist={nameBlacklist}
       />

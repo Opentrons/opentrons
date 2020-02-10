@@ -4,7 +4,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
 
-import createLogger from '../../logger'
+import { createLogger } from '../../logger'
 
 import {
   CONNECTABLE,

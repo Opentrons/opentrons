@@ -2,14 +2,14 @@ import asyncio
 import logging
 from glob import glob
 import re
-from typing import List, Optional
+from typing import List, Optional, Dict, Any
 from collections import namedtuple
 
 from opentrons.config import IS_ROBOT, IS_LINUX
 from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
-from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
+from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
 
 log = logging.getLogger(__name__)
 
@@ -79,38 +79,22 @@ def discover() -> List[ModuleAtPort]:
     return discovered_modules
 
 
-class UpdateError(RuntimeError):
-    def __init__(self, msg):
-        self.msg = msg
-
-
 async def update_firmware(
         module: AbstractModule,
         firmware_file: str,
-        loop: Optional[asyncio.AbstractEventLoop]) -> AbstractModule:
-    """ Update a module.
+        loop: Optional[asyncio.AbstractEventLoop]):
+    """ Apply update of given firmware file to given module.
 
-    If the update succeeds, a Module instance will be returned.
-
-    Otherwise, raises an UpdateError with the reason for the failure.
+        raises an UpdateError with the reason for the failure.
     """
-    simulating = module.is_simulated
     cls = type(module)
-    old_port = module.port
     flash_port = await module.prep_for_update()
-    callback = module.interrupt_callback
-    del module
-    after_port, results = await update.upload_firmware(
-        port=flash_port,
-        firmware_file_path=firmware_file,
-        upload_function=cls.bootloader(),
-        loop=loop)
-    await asyncio.sleep(1.0)
-    new_port = after_port or old_port
-    if not results[0]:
-        log.debug(f'Bootloader reponse: {results[1]}')
-        raise UpdateError(results[1])
-    return await cls.build(
-        port=new_port,
-        interrupt_callback=callback,
-        simulating=simulating)
+    kwargs: Dict[str, Any] = {
+        'stdout': asyncio.subprocess.PIPE,
+        'stderr': asyncio.subprocess.PIPE,
+        'loop': loop
+    }
+    successful, res = await cls.bootloader()(flash_port, firmware_file, kwargs)
+    if not successful:
+        log.info(f'Bootloader reponse: {res}')
+        raise types.UpdateError(res)

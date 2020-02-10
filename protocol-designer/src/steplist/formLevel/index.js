@@ -21,6 +21,7 @@ import {
   temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
+  pauseTemperatureRangeExceeded,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
@@ -31,6 +32,7 @@ export { default as getDisabledFields } from './getDisabledFields'
 export { default as getNextDefaultPipetteId } from './getNextDefaultPipetteId'
 export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
+export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { default as stepFormToArgs } from './stepFormToArgs'
 
 type FormHelpers = {
@@ -42,7 +44,10 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getErrors: composeErrors(incompatibleLabware),
     getWarnings: composeWarnings(belowPipetteMinimumVolume),
   },
-  pause: { getErrors: composeErrors(pauseForTimeOrUntilTold) },
+  pause: {
+    getErrors: composeErrors(pauseForTimeOrUntilTold),
+    getWarnings: composeWarnings(pauseTemperatureRangeExceeded),
+  },
   moveLiquid: {
     getErrors: composeErrors(
       incompatibleAspirateLabware,

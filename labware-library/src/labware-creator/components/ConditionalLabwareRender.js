@@ -11,8 +11,8 @@ import {
   SLOT_LENGTH_MM as DEFAULT_X_DIMENSION,
   SLOT_WIDTH_MM as DEFAULT_Y_DIMENSION,
 } from '@opentrons/shared-data'
-import labwareFormSchema from '../labwareFormSchema'
-import fieldsToLabware from '../fieldsToLabware'
+import { labwareFormSchema } from '../labwareFormSchema'
+import { fieldsToLabware } from '../fieldsToLabware'
 import type { LabwareFields, ProcessedLabwareFields } from '../fields'
 import styles from './ConditionalLabwareRender.css'
 
@@ -20,7 +20,7 @@ type Props = {|
   values: LabwareFields,
 |}
 
-const ConditionalLabwareRender = (props: Props) => {
+export const ConditionalLabwareRender = (props: Props) => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
 
@@ -95,5 +95,3 @@ const ConditionalLabwareRender = (props: Props) => {
     </RobotWorkSpace>
   )
 }
-
-export default ConditionalLabwareRender

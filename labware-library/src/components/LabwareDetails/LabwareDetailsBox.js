@@ -10,10 +10,10 @@ import {
   ManufacturerStats,
 } from '../labware-ui'
 import { DetailsBox } from '../ui'
-import InsertDetails from './InsertDetails'
-import Dimensions from './Dimensions'
-import WellDimensions from './WellDimensions'
-import WellSpacing from './WellSpacing'
+import { InsertDetails } from './InsertDetails'
+import { Dimensions } from './Dimensions'
+import { WellDimensions } from './WellDimensions'
+import { WellSpacing } from './WellSpacing'
 
 import styles from './styles.css'
 
@@ -24,7 +24,7 @@ export type LabwareDetailsBoxProps = {|
   className?: string,
 |}
 
-export default function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
+export function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
   const { definition, className } = props
   const { metadata, parameters, brand, wells, ordering } = definition
   const { displayVolumeUnits } = metadata

@@ -21,6 +21,8 @@ export type FormWarningType =
   | 'ENGAGE_HEIGHT_MAX_EXCEEDED'
   | 'TEMPERATURE_MIN_EXCEEDED'
   | 'TEMPERATURE_MAX_EXCEEDED'
+  | 'PAUSE_TEMPERATURE_MIN_EXCEEDED'
+  | 'PAUSE_TEMPERATURE_MAX_EXCEEDED'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -70,7 +72,18 @@ const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
     title: 'Specified temperature is above module maximum',
     dependentFields: ['setTemperature', 'targetTemperature'],
   },
+  PAUSE_TEMPERATURE_MIN_EXCEEDED: {
+    type: 'TEMPERATURE_MIN_EXCEEDED',
+    title: 'Specified temperature is below module minimum',
+    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
+  },
+  PAUSE_TEMPERATURE_MAX_EXCEEDED: {
+    type: 'TEMPERATURE_MAX_EXCEEDED',
+    title: 'Specified temperature is above module maximum',
+    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
+  },
 }
+
 export type WarningChecker = mixed => ?FormWarning
 
 // TODO: test these
@@ -139,6 +152,19 @@ export const temperatureRangeExceeded = (
     targetTemperature > MAX_TEMP_MODULE_TEMP
   ) {
     return FORM_WARNINGS.TEMPERATURE_MAX_EXCEEDED
+  }
+  return null
+}
+
+export const pauseTemperatureRangeExceeded = (
+  fields: HydratedFormData
+): ?FormWarning => {
+  const { pauseForAmountOfTime, pauseTemperature } = fields
+  const setTemperature = pauseForAmountOfTime === 'untilTemperature'
+  if (setTemperature && pauseTemperature < MIN_TEMP_MODULE_TEMP) {
+    return FORM_WARNINGS.PAUSE_TEMPERATURE_MIN_EXCEEDED
+  } else if (setTemperature && pauseTemperature > MAX_TEMP_MODULE_TEMP) {
+    return FORM_WARNINGS.PAUSE_TEMPERATURE_MAX_EXCEEDED
   }
   return null
 }

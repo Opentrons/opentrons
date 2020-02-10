@@ -46,11 +46,11 @@
   }
 }
 
-.module_update {
+.module_update_wrapper {
   flex-basis: 20%;
   padding-top: 4.5rem;
+}
 
-  & > button {
-    width: 8rem;
-  }
+.module_update_button {
+  width: 8rem;
 }

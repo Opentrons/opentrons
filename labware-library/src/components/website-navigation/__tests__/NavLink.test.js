@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import NavLink from '../NavLink'
+import { NavLink } from '../NavLink'
 
 const linkProps = {
   name: 'foo',

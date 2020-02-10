@@ -1,6 +1,9 @@
 // @flow
 import { createSelector } from 'reselect'
-import { getLabwareDisplayName } from '@opentrons/shared-data'
+import {
+  getLabwareDisplayName,
+  getLabwareDefaultEngageHeight,
+} from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
 import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -120,5 +123,27 @@ export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
     return getModuleHasLabware(initialDeckSetup, THERMOCYCLER)
+  }
+)
+
+export const getMagnetLabwareEngageHeight: Selector<
+  number | null
+> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  getSingleMagneticModuleId,
+  (initialDeckSetup, magnetModuleId) => {
+    const labware =
+      magnetModuleId && getLabwareOnModule(initialDeckSetup, magnetModuleId)
+    return (labware && getLabwareDefaultEngageHeight(labware.def)) || null
+  }
+)
+
+/** Returns boolean if TC or Temperature Modules are present on deck  */
+export const getTempModuleOrThermocyclerIsOnDeck: Selector<boolean> = createSelector(
+  stepFormSelectors.getInitialDeckSetup,
+  initialDeckSetup => {
+    const tempOnDeck = getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)
+    const tcOnDeck = getModuleOnDeckByType(initialDeckSetup, TEMPDECK)
+    return Boolean(tempOnDeck || tcOnDeck)
   }
 )

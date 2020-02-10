@@ -10,8 +10,8 @@ from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
-from opentrons.config import feature_flags as ff, name, robot_configs, IS_ROBOT
-from opentrons.system import udev
+from opentrons.config import (feature_flags as ff, name,
+                              robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
 from opentrons.util import logging_config
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 
@@ -26,7 +26,6 @@ except ImportError:
 log = logging.getLogger(__name__)
 
 SMOOTHIE_HEX_RE = re.compile('smoothie-(.*).hex')
-ROBOT_FIRMWARE_DIR = Path('/usr/lib/firmware')
 
 
 def _find_smoothie_file():
@@ -36,20 +35,17 @@ def _find_smoothie_file():
     # Search for smoothie files in /usr/lib/firmware first then fall back to
     # value packed in wheel
     if IS_ROBOT:
-        resources.extend([ROBOT_FIRMWARE_DIR / item
-                          for item in os.listdir(ROBOT_FIRMWARE_DIR)])
+        resources.extend(ROBOT_FIRMWARE_DIR.iterdir())
 
     resources_path = Path(HERE) / 'resources'
-    resources.extend([resources_path / item
-                      for item in os.listdir(resources_path)])
+    resources.extend(resources_path.iterdir())
 
-    for fi in resources:
-        matches = SMOOTHIE_HEX_RE.search(str(fi))
+    for path in resources:
+        matches = SMOOTHIE_HEX_RE.search(path.name)
         if matches:
             branch_plus_ref = matches.group(1)
-            return fi, branch_plus_ref
-    raise OSError("Could not find smoothie firmware file in {}"
-                  .format(os.path.join(HERE, 'resources')))
+            return path, branch_plus_ref
+    raise OSError(f"Could not find smoothie firmware file in {resources_path}")
 
 
 async def _do_fw_update(new_fw_path, new_fw_ver):
@@ -154,11 +150,6 @@ def run(hardware, **kwargs):  # noqa(C901)
                 loop.run_until_complete(hardware.home_z())
             else:
                 hardware.home_z()
-        try:
-            udev.setup_rules_file()
-        except Exception:
-            log.exception(
-                "Could not setup udev rules, modules may not be detected")
 
     if kwargs.get('hardware_server'):
         if ff.use_protocol_api_v2():

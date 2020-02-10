@@ -9,7 +9,7 @@
 <PROJECT_ROOT>/update-server/.*
 
 [untyped]
-; TODO(mc, 2019-06-28): upgrade react-select for types that don't fail
+; TODO(mc, 2019-06-28): react-select uses an old version of flow
 ; https://github.com/JedWatson/react-select/issues/3612
 .*/node_modules/react-select/.*
 

@@ -3,6 +3,7 @@ export { transfer, mix, consolidate, distribute } from './compound'
 
 export {
   aspirate,
+  awaitTemperature,
   blowout,
   deactivateTemperature,
   delay,
