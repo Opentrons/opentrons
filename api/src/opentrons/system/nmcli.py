@@ -495,19 +495,17 @@ async def configure(ssid: str,
 async def wifi_disconnect(ssid: str = None) -> Tuple[bool, str]:
     """
     Disconnect from specified wireless network.
+    Ideally, user would be allowed to disconnect a robot from wifi only over an
+    ethernet connection to the robot so that, 1) they get the disconnect
+    response back and 2) their robot isn't left with no connectivity at all
+    However, with robot discovery (over eth0) issues still pending, we will
+    allow the users to disconnect the robot from wifi regardless of whether
+    they are connected via ethernet.
 
     Returns (True, msg) if the network was disconnected from successfully,
             (False, msg) otherwise
     """
-    # Verify robot is connected via ethernet before disconnecting from wifi
-    # Warning: Users should make the disconnect request over the wired
-    #          connection. This code doesn't check for that. So the app must
-    #          make sure to check that the request is over a wired conn.
-    _res, _err = await _call(['-g', 'WIRED-PROPERTIES.CARRIER',
-                              'device', 'show', 'eth0'])
-    if 'off' in _res or _err:
-        return False, 'You should be connected to the robot via ethernet ' \
-                      'before disconnecting it from wifi network'
+
     res, err = await _call(['connection', 'down', ssid])
     if 'successfully deactivated' in res:
         return True, res
