@@ -3,8 +3,7 @@ import functools
 import inspect
 import asyncio
 import logging
-from typing import Dict, Any, Optional, Callable
-from . import types, adapters
+from typing import Dict, Any, Optional
 
 mod_log = logging.getLogger(__name__)
 

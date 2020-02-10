@@ -1,12 +1,6 @@
 import enum
 import logging
-import asyncio
-import functools
-import logging
-from opentrons import types as top_types
-from typing import Tuple, Union, Dict, Optional
-
-MODULE_LOG = logging.getLogger(__name__)
+from typing import Tuple, Optional
 
 MODULE_LOG = logging.getLogger(__name__)
 

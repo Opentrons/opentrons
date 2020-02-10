@@ -3,9 +3,8 @@
 import asyncio
 import copy
 import functools
-import threading
 import logging
-from typing import List, Mapping
+from typing import List
 
 from .api import API
 from .thread_manager import ThreadManager
@@ -136,7 +135,7 @@ class SingletonAdapter(HardwareAPILike):
     """
 
     @classmethod
-    def build_in_managed_thread(cls) -> 'SingletonAdapter':
+    def build_in_managed_thread(cls) -> ThreadManager:
         return ThreadManager(cls)
 
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:

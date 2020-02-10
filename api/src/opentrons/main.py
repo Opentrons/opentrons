@@ -6,7 +6,7 @@ import re
 import opentrons
 from opentrons import HERE
 from opentrons import server
-from opentrons.hardware_control import adapters, thread_manager
+from opentrons.hardware_control import adapters
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
