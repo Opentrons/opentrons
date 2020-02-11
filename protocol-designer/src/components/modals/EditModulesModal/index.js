@@ -26,8 +26,8 @@ import {
 } from '../../../modules'
 import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
 import { i18n } from '../../../localization'
-import { PDAlert } from '../../alerts/PDAlert'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
+import { PDAlert } from '../../alerts/PDAlert'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import type { ModuleType } from '@opentrons/shared-data'
@@ -60,15 +60,15 @@ export function EditModulesModal(props: EditModulesProps) {
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
 
-  let hasError = true
+  let hasSlotOrIncomptatibleError = true
   if (slotIsEmpty) {
-    hasError = false
+    hasSlotOrIncomptatibleError = false
   } else {
     const labwareOnSlot = getLabwareOnSlot(_initialDeckSetup, selectedSlot)
     const labwareIsCompatible =
       labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
 
-    hasError = !labwareIsCompatible
+    hasSlotOrIncomptatibleError = !labwareIsCompatible
   }
 
   const showSlotOption = moduleType !== THERMOCYCLER
@@ -77,7 +77,7 @@ export function EditModulesModal(props: EditModulesProps) {
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const occupiedSlotError = hasError
+  const occupiedSlotError = hasSlotOrIncomptatibleError
     ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
     : null
 
@@ -129,7 +129,7 @@ export function EditModulesModal(props: EditModulesProps) {
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
-      {hasError && (
+      {hasSlotOrIncomptatibleError && (
         <PDAlert
           alertType="warning"
           title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
@@ -182,7 +182,10 @@ export function EditModulesModal(props: EditModulesProps) {
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
-        <OutlineButton disabled={hasError} onClick={onSaveClick}>
+        <OutlineButton
+          disabled={hasSlotOrIncomptatibleError}
+          onClick={onSaveClick}
+        >
           Save
         </OutlineButton>
       </div>
