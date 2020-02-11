@@ -16,7 +16,6 @@
     "y": 8.75
   },
   "displayName": "Temperature Module",
-  "loadNames": ["tempdeck", "temperature module"],
   "quirks": [],
   "slotTransforms": {},
   "compatibleWith": ["temperatureModuleV2"]
