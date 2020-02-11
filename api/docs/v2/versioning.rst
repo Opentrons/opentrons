@@ -97,3 +97,22 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.2     |          3.16.0             |
 +-------------+-----------------------------+
+
+
+Changes in API Versions
+-----------------------
+
+Version 2.1
++++++++++++
+
+- You can now specify a label when loading labware into a module with the ``label`` parameter of
+  :py:meth:`.ModuleContext.load_labware` just like you can when loading labware
+  into your protocol with :py:meth:`.ProtocolContext.load_labware`.
+
+
+Version 2.2
++++++++++++
+
+- You should now specify magnetic module engage height using the
+  ``height_from_base`` parameter, which specifies the height of the top of the
+  magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
