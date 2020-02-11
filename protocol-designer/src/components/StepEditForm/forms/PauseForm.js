@@ -37,7 +37,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   )
 
   const pauseUntilTempTooltip = (
-    <div className={styles.slot_tooltip}>
+    <div>
       {i18n.t(
         `tooltip.step_fields.pauseForAmountOfTime.disabled.wait_until_temp`
       )}

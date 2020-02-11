@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
-import MenuButton from './MenuButton'
-import MobileList from './MobileList'
+import { MenuButton } from './MenuButton'
+import { MobileList } from './MobileList'
 
 type State = {|
   isOpen: boolean,
@@ -9,7 +9,7 @@ type State = {|
 
 type Props = {||}
 
-export default class MobileNav extends React.Component<Props, State> {
+export class MobileNav extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
     this.state = { isOpen: false }

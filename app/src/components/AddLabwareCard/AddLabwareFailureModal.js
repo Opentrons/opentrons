@@ -78,7 +78,9 @@ const renderDetails = file => (
   </>
 )
 
-export function AddLabwareFailureModal(props: AddLabwareFailureModalProps) {
+export function AddLabwareFailureModalTemplate(
+  props: AddLabwareFailureModalProps
+) {
   const { file, errorMessage, directory, onCancel, onOverwrite } = props
   let buttons = [
     { onClick: onCancel, children: CANCEL, className: styles.button },
@@ -140,12 +142,10 @@ export function AddLabwareFailureModal(props: AddLabwareFailureModalProps) {
   )
 }
 
-export function PortaledAddLabwareFailureModal(
-  props: AddLabwareFailureModalProps
-) {
+export function AddLabwareFailureModal(props: AddLabwareFailureModalProps) {
   return (
     <Portal>
-      <AddLabwareFailureModal {...props} />
+      <AddLabwareFailureModalTemplate {...props} />
     </Portal>
   )
 }

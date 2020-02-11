@@ -93,6 +93,16 @@ async def test_get_modules(
     assert len(body['modules']) == 1
     assert sorted(body['modules'][0].keys()) == keys
     assert 'engaged' in body['modules'][0]['data']
+    tempdeck = await hw._backend.build_module('/dev/ot_module_tempdeck1',
+                                              'tempdeck', lambda x: None)
+    monkeypatch.setattr(hw, 'attached_modules', [tempdeck])
+    for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
+        tempdeck._device_info['model'] = model
+        resp = await async_client.get('/modules')
+        body = await resp.json()
+        assert resp.status == 200
+        assert len(body['modules']) == 1
+        assert not body['modules'][0]['hasAvailableUpdate']
 
 
 @pytest.fixture

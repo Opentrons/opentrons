@@ -3,12 +3,10 @@
 # TODO: 'Temperature Module' or similar
 
 import pytest
-import asyncio
 from threading import Lock
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers import serial_communication
-from opentrons.hardware_control import modules as hw_modules
 
 
 @pytest.fixture
@@ -116,131 +114,3 @@ def test_load_correct_engage_height(robot, modules, labware):
     assert test_container.magdeck_engage_height() == 18
     assert md.labware.get_children_list()[1].magdeck_engage_height() == \
         test_container.magdeck_engage_height()
-
-
-@pytest.fixture
-async def old_bootloader_module():
-    module = await hw_modules.build(
-        port='/dev/ot_module_tempdeck0',
-        which='tempdeck',
-        simulating=True,
-        interrupt_callback=lambda x: None)
-    module._device_info = {'model': 'temp_deck_v1'}
-    module._driver = TempDeckDriver()
-    return module
-
-
-@pytest.fixture
-async def new_bootloader_module():
-    module = await hw_modules.build(
-        port='/dev/ot_module_tempdeck0',
-        which='tempdeck',
-        simulating=True,
-        interrupt_callback=lambda x: None)
-    module._device_info = {'model': 'temp_deck_v1.1'}
-    module._driver = TempDeckDriver()
-    return module
-
-
-@pytest.mark.api2_only
-async def test_enter_bootloader(
-        new_bootloader_module, virtual_smoothie_env, monkeypatch):
-
-    async def mock_discover_ports_before_dfu_mode():
-        return '/dev/ot_module_tempdeck0',
-
-    def mock_enter_programming_mode(self):
-        return 'ok\n\rok\n\r'
-
-    async def mock_port_poll(_has_old_bootloader, ports_before_dfu_mode):
-        return '/dev/ot_module_avrdude_bootloader'
-
-    monkeypatch.setattr(
-        TempDeckDriver, 'enter_programming_mode', mock_enter_programming_mode)
-    monkeypatch.setattr(
-        hw_modules.update,
-        '_discover_ports',
-        mock_discover_ports_before_dfu_mode)
-    monkeypatch.setattr(hw_modules.update, '_port_poll', mock_port_poll)
-
-    bootloader_port = await hw_modules.update.enter_bootloader(
-        new_bootloader_module._driver,
-        new_bootloader_module.name())
-
-    assert bootloader_port == '/dev/ot_module_avrdude_bootloader'
-
-
-@pytest.mark.api2_only
-def test_old_bootloader_check(
-        old_bootloader_module, new_bootloader_module, virtual_smoothie_env,
-):
-    assert hw_modules.update._has_old_bootloader(
-        old_bootloader_module._device_info['model'])
-    assert not hw_modules.update._has_old_bootloader(
-        new_bootloader_module._device_info['model'])
-
-
-@pytest.mark.api2_only
-async def test_port_poll(virtual_smoothie_env, monkeypatch):
-    has_old_bootloader = False
-    timeout = 0.1
-    monkeypatch.setattr(hw_modules.update, 'PORT_SEARCH_TIMEOUT', timeout)
-
-    # Case 1: Bootloader port is successfully opened on the module
-    async def mock_discover_ports1():
-        return ['/dev/ot_module_magdeck0',
-                '/dev/ot_module_avrdude_bootloader1']
-    monkeypatch.setattr(hw_modules.update,
-                        '_discover_ports', mock_discover_ports1)
-
-    port_found = await asyncio.wait_for(
-        hw_modules.update._port_poll(has_old_bootloader, None),
-        hw_modules.update.PORT_SEARCH_TIMEOUT)
-    assert port_found == '/dev/ot_module_avrdude_bootloader1'
-
-    # Case 2: Switching to bootloader mode failed
-    async def mock_discover_ports2():
-        return ['/dev/ot_module_magdeck0', '/dev/ot_module_tempdeck1']
-    monkeypatch.setattr(hw_modules.update,
-                        '_discover_ports', mock_discover_ports2)
-
-    with pytest.raises(asyncio.TimeoutError):
-        port_found = await asyncio.wait_for(
-            hw_modules.update._port_poll(has_old_bootloader, None),
-            hw_modules.update.PORT_SEARCH_TIMEOUT)
-        assert not port_found
-
-
-@pytest.mark.api2_only
-async def test_old_bootloader_port_poll(
-        virtual_smoothie_env, monkeypatch):
-
-    ports_before_switch = [
-        '/dev/ot_module_magdeck0', '/dev/ot_module_tempdeck1']
-    has_old_bootloader = True
-    timeout = 0.1
-    monkeypatch.setattr(hw_modules.update, 'PORT_SEARCH_TIMEOUT', timeout)
-
-    # Case 1: Bootloader is opened on same port
-    async def mock_discover_ports():
-        return ['/dev/ot_module_magdeck0', '/dev/ot_module_tempdeck1']
-    monkeypatch.setattr(hw_modules.update,
-                        '_discover_ports', mock_discover_ports)
-
-    with pytest.raises(asyncio.TimeoutError):
-        port_found = await asyncio.wait_for(
-            hw_modules.update._port_poll(
-                has_old_bootloader, ports_before_switch),
-            hw_modules.update.PORT_SEARCH_TIMEOUT)
-        assert not port_found
-
-    # Case 2: Bootloader is opened on a different port
-    async def mock_discover_ports():
-        return ['/dev/ot_module_magdeck2', '/dev/ot_module_tempdeck1']
-    monkeypatch.setattr(hw_modules.update,
-                        '_discover_ports', mock_discover_ports)
-
-    port_found = await asyncio.wait_for(
-        hw_modules.update._port_poll(has_old_bootloader, ports_before_switch),
-        hw_modules.update.PORT_SEARCH_TIMEOUT)
-    assert port_found == '/dev/ot_module_magdeck2'

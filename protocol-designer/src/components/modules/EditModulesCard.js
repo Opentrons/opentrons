@@ -5,9 +5,9 @@ import { Card } from '@opentrons/components'
 
 import {
   selectors as stepFormSelectors,
-  getCrashablePipetteSelected,
+  getIsCrashablePipetteSelected,
 } from '../../step-forms'
-
+import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { THERMOCYCLER } from '../../constants'
 import { CrashInfoBox } from './CrashInfoBox'
@@ -33,9 +33,17 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
+  const moduleRestritionsDisabled = Boolean(
+    useSelector(featureFlagSelectors.getDisableModuleRestrictions)
+  )
+  const crashablePipettesSelected = getIsCrashablePipetteSelected(
+    pipettesByMount
+  )
+
+  const warningsEnabled =
+    !moduleRestritionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
-    getCrashablePipetteSelected(pipettesByMount) &&
-    (modules.magdeck || modules.tempdeck)
+    warningsEnabled && (modules.magdeck || modules.tempdeck)
 
   return (
     <Card title="Modules">
@@ -53,6 +61,7 @@ export function EditModulesCard(props: Props) {
               <ModuleRow
                 type={moduleType}
                 module={moduleData}
+                showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}
               />

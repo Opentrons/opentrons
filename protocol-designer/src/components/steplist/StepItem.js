@@ -3,13 +3,16 @@ import * as React from 'react'
 
 import { PDTitledList } from '../lists'
 import { SourceDestSubstep } from './SourceDestSubstep'
-import styles from './StepItem.css'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
 import { PauseStepItems } from './PauseStepItems'
-import { MagnetStepItems } from './MagnetStepItems'
+import { ModuleStepItems } from './ModuleStepItems'
 import { StepDescription } from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
+import { i18n } from '../../localization'
+import { MAGDECK, TEMPDECK } from '../../constants'
+import styles from './StepItem.css'
+
 import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
   SubstepIdentifier,
@@ -94,7 +97,7 @@ export class StepItem extends React.PureComponent<StepItemProps> {
   }
 }
 
-function getStepItemContents(stepItemProps: StepItemProps) {
+export function getStepItemContents(stepItemProps: StepItemProps) {
   const {
     rawForm,
     stepType,
@@ -117,11 +120,50 @@ function getStepItemContents(stepItemProps: StepItemProps) {
 
   if (substeps && substeps.substepType === 'magnet') {
     return (
-      <MagnetStepItems
-        engage={substeps.engage}
+      <ModuleStepItems
         labwareDisplayName={substeps.labwareDisplayName}
         labwareNickname={substeps.labwareNickname}
         message={substeps.message}
+        action={i18n.t(`modules.actions.action`)}
+        actionText={i18n.t(
+          `modules.actions.${substeps.engage ? 'engage' : 'disengage'}`
+        )}
+        module={MAGDECK}
+      />
+    )
+  }
+
+  if (substeps && substeps.substepType === 'temperature') {
+    const temperature =
+      substeps.temperature === null
+        ? 'Deactivated'
+        : `${substeps.temperature} ${i18n.t('application.units.degrees')}`
+
+    return (
+      <ModuleStepItems
+        labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
+        message={substeps.message}
+        action={i18n.t(`modules.actions.go_to`)}
+        actionText={temperature}
+        module={TEMPDECK}
+      />
+    )
+  }
+
+  if (substeps && substeps.substepType === 'awaitTemperature') {
+    const temperature = `${substeps.temperature} ${i18n.t(
+      'application.units.degrees'
+    )}`
+
+    return (
+      <ModuleStepItems
+        labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
+        message={substeps.message}
+        action={i18n.t(`modules.actions.await_temperature`)}
+        actionText={temperature}
+        module={TEMPDECK}
       />
     )
   }

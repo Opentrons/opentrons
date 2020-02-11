@@ -548,15 +548,6 @@ class Session(object):
             self._broker.set_logger(self._default_logger)
         return self
 
-    def identify(self):
-        self._hw_iface().identify()
-
-    def turn_on_rail_lights(self):
-        self._hw_iface().set_lights(rails=True)
-
-    def turn_off_rail_lights(self):
-        self._hw_ifce().set_lights(rails=False)
-
     def set_state(self, state):
         log.debug("State set to {}".format(state))
         if state not in VALID_STATES:

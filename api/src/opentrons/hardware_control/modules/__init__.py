@@ -9,7 +9,7 @@ from opentrons.config import IS_ROBOT, IS_LINUX
 from .mod_abc import AbstractModule
 # Must import tempdeck and magdeck (and other modules going forward) so they
 # actually create the subclasses
-from . import update, tempdeck, magdeck, thermocycler  # noqa(W0611)
+from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
 
 log = logging.getLogger(__name__)
 
@@ -79,10 +79,6 @@ def discover() -> List[ModuleAtPort]:
     return discovered_modules
 
 
-class UpdateError(RuntimeError):
-    pass
-
-
 async def update_firmware(
         module: AbstractModule,
         firmware_file: str,
@@ -101,4 +97,4 @@ async def update_firmware(
     successful, res = await cls.bootloader()(flash_port, firmware_file, kwargs)
     if not successful:
         log.info(f'Bootloader reponse: {res}')
-        raise UpdateError(res)
+        raise types.UpdateError(res)

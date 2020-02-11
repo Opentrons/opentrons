@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './styles.css'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import {
   hardwareLinks,
   labwareLinks,
@@ -13,7 +13,7 @@ type Props = {|
   active: boolean,
 |}
 
-export default function ProductMenu(props: Props) {
+export function ProductMenu(props: Props) {
   const { active } = props
   return (
     <>

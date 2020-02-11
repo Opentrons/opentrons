@@ -11,7 +11,10 @@ type ToggleProps = {|
 |}
 
 export default function ToggleButton(props: ToggleProps) {
-  const { toggledOn, ...buttonProps } = props
+  // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error
+  // ButtonProps::name conflicts with IconProps::name, and IconButton
+  // has `name` prop to pass to Icon. IconButton will need to be redone
+  const { toggledOn, name, ...buttonProps } = props
   const className = cx(styles.robot_item_icon, props.className, {
     [styles.toggled_on]: toggledOn,
     [styles.toggled_off]: !toggledOn,

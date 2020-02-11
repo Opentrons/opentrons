@@ -8,7 +8,7 @@ type Props = {|
   children?: React.Node,
   onClick?: () => mixed,
 |}
-const LinkOut = (props: Props) => (
+export const LinkOut = (props: Props) => (
   <a
     onClick={props.onClick}
     className={props.className}
@@ -19,5 +19,3 @@ const LinkOut = (props: Props) => (
     {props.children}
   </a>
 )
-
-export default LinkOut

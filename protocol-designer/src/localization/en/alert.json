@@ -46,6 +46,10 @@
       "MISSING_MODULE": {
         "title": "Missing module for step",
         "body": "A step requires a module that does not exist"
+      },
+      "MISSING_TEMPERATURE_STEP": {
+        "title": "Missing Temperature step",
+        "body": "Add a Temperature step prior to this Pause step. The module is not currently changing temperature because it has either been deactivated or is holding a temperature"
       }
     },
     "warning": {

@@ -15,7 +15,7 @@ export type LabwareTitleProps = {|
   className?: string,
 |}
 
-export default function LabwareTitle(props: LabwareTitleProps) {
+export function LabwareTitle(props: LabwareTitleProps) {
   const { definition, className } = props
   const { metadata } = definition
   const { displayCategory } = definition.metadata

@@ -16,23 +16,6 @@ describe('networking', () => {
   describe('selector creators', () => {
     const SPECS = [
       {
-        name: 'makeGetRobotNetworkingStatus',
-        selector: networking.makeGetRobotNetworkingStatus,
-        state: {
-          superDeprecatedRobotApi: {
-            api: {
-              someName: {
-                'networking/status': {
-                  response: { status: 'full', interfaces: {} },
-                },
-              },
-            },
-          },
-        },
-        props: { name: 'someName' },
-        expected: { response: { status: 'full', interfaces: {} } },
-      },
-      {
         name: 'makeGetRobotWifiList',
         selector: networking.makeGetRobotWifiList,
         state: {
@@ -114,15 +97,6 @@ describe('networking', () => {
     })
 
     const SPECS = [
-      {
-        name: 'fetchNetworkingStatus',
-        action: networking.fetchNetworkingStatus,
-        method: 'GET',
-        path: 'networking/status',
-        request: null,
-        success: { status: 'full', interfaces: {} },
-        failure: { name: 'ResponseError', status: '400', message: 'oh no' },
-      },
       {
         name: 'fetchWifiList',
         action: networking.fetchWifiList,

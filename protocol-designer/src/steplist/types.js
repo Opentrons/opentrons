@@ -110,15 +110,33 @@ export type MagnetSubstepItem = {|
   message?: string,
 |}
 
+export type TemperatureSubstepItem = {|
+  substepType: 'temperature',
+  temperature: number | null,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  message?: string,
+|}
+
 export type PauseSubstepItem = {|
   substepType: 'pause',
   pauseStepArgs: PauseArgs,
 |} // Pause substeps use same data as processed form
 
+export type AwaitTemperatureSubstepItem = {|
+  substepType: 'awaitTemperature',
+  temperature: number,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  message?: string,
+|}
+
 export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseSubstepItem
   | MagnetSubstepItem
+  | TemperatureSubstepItem
+  | AwaitTemperatureSubstepItem
 
 export type StepItemData = {
   id: StepIdType,

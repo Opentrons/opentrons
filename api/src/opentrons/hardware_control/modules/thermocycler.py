@@ -396,6 +396,8 @@ class Thermocycler(mod_abc.AbstractModule):
         return self._port
 
     async def prep_for_update(self):
-        new_port = await update.enter_bootloader(self._driver,
-                                                 self.name())
+        await self._driver.enter_programming_mode()
+
+        new_port = await update.find_bootloader_port()
+
         return new_port or self.port

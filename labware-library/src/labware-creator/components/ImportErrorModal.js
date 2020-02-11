@@ -22,7 +22,7 @@ const ERROR_MAP: { [ImportErrorKey]: React.Node } = {
   ),
 }
 
-const ImportErrorModal = (props: {|
+export const ImportErrorModal = (props: {|
   onClose: () => mixed,
   importError: ImportError,
 |}) => {
@@ -47,5 +47,3 @@ const ImportErrorModal = (props: {|
     </AlertModal>
   )
 }
-
-export default ImportErrorModal

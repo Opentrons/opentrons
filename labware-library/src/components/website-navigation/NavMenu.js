@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import styles from './styles.css'
 
 import type { Submenu } from './types'
@@ -10,7 +10,7 @@ type Props = {|
   active: boolean,
 |}
 
-export default function NavMenu(props: Props) {
+export function NavMenu(props: Props) {
   const { name, links, bottomLink, active } = props
   return (
     <>

@@ -30,7 +30,7 @@ const mockFetchRobotApi: JestMockFn<
 const mockGetRobotByName: JestMockFn<[any, string], mixed> =
   DiscoverySelectors.getRobotByName
 
-describe('fetchModulesEpic', () => {
+describe('sendModuleCommand', () => {
   let testScheduler
 
   const meta = { requestId: '1234' }
@@ -53,7 +53,7 @@ describe('fetchModulesEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('calls GET /modules', () => {
+  test('calls POST /modules/{serial}', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockSendModuleCommandSuccess })

@@ -134,6 +134,18 @@ describe('custom labware selectors', () => {
       },
       expected: 'AH',
     },
+    {
+      name: 'getCustomLabwareDirectory',
+      selector: selectors.getCustomLabwareDirectory,
+      state: {
+        config: ({
+          labware: {
+            directory: '/path/to/labware',
+          },
+        }: any),
+      },
+      expected: '/path/to/labware',
+    },
   ]
 
   SPECS.forEach(spec => {

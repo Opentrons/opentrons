@@ -1,4 +1,5 @@
 // @flow
+import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import {
@@ -17,6 +18,8 @@ import {
   SPAN7_8_10_11_SLOT,
   TEMPDECK,
   THERMOCYCLER,
+  TEMPERATURE_APPROACHING_TARGET,
+  TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../../constants'
 import {
@@ -273,4 +276,22 @@ export const getStateAndContextTempMagModules = ({
     },
   }
   return { invariantContext, robotState }
+}
+
+export const robotWithStatusAndTemp = (
+  robotState: RobotState,
+  temperatureModuleId: string,
+  status:
+    | typeof TEMPERATURE_AT_TARGET
+    | typeof TEMPERATURE_APPROACHING_TARGET
+    | typeof TEMPERATURE_DEACTIVATED,
+  targetTemperature: number | null
+): RobotState => {
+  const robot = cloneDeep(robotState)
+  robot.modules[temperatureModuleId].moduleState = {
+    type: TEMPDECK,
+    targetTemperature,
+    status,
+  }
+  return robot
 }

@@ -28,22 +28,22 @@ import {
   MAX_SUGGESTED_Z,
   LINK_CUSTOM_LABWARE_FORM,
 } from './fields'
-import labwareDefToFields from './labwareDefToFields'
-import labwareFormSchema from './labwareFormSchema'
+import { labwareDefToFields } from './labwareDefToFields'
+import { labwareFormSchema } from './labwareFormSchema'
 import { getDefaultDisplayName, getDefaultLoadName } from './formSelectors'
-import labwareTestProtocol, { pipetteNameOptions } from './labwareTestProtocol'
-import fieldsToLabware from './fieldsToLabware'
-import LabwareCreator from './components/LabwareCreator'
-import ConditionalLabwareRender from './components/ConditionalLabwareRender'
+import { labwareTestProtocol, pipetteNameOptions } from './labwareTestProtocol'
+import { fieldsToLabware } from './fieldsToLabware'
+import { LabwareCreator as LabwareCreatorComponent } from './components/LabwareCreator'
+import { ConditionalLabwareRender } from './components/ConditionalLabwareRender'
 import { Dropdown } from './components/Dropdown'
-import IntroCopy from './components/IntroCopy'
-import LinkOut from './components/LinkOut'
-import RadioField from './components/RadioField'
-import Section from './components/Section'
-import TextField from './components/TextField'
-import HeightGuidingText from './components/HeightGuidingText'
-import ImportLabware from './components/ImportLabware'
-import ImportErrorModal from './components/ImportErrorModal'
+import { IntroCopy } from './components/IntroCopy'
+import { LinkOut } from './components/LinkOut'
+import { RadioField } from './components/RadioField'
+import { Section } from './components/Section'
+import { TextField } from './components/TextField'
+import { HeightGuidingText } from './components/HeightGuidingText'
+import { ImportLabware } from './components/ImportLabware'
+import { ImportErrorModal } from './components/ImportErrorModal'
 import {
   wellShapeOptionsWithIcons,
   wellBottomShapeOptionsWithIcons,
@@ -269,7 +269,7 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
-const App = () => {
+export const LabwareCreator = () => {
   const [
     showExportErrorModal,
     _setShowExportErrorModal,
@@ -449,7 +449,7 @@ const App = () => {
   })
 
   return (
-    <LabwareCreator>
+    <LabwareCreatorComponent>
       {importError && (
         <ImportErrorModal
           onClose={() => setImportError(null)}
@@ -1060,8 +1060,6 @@ const App = () => {
           )
         }}
       </Formik>
-    </LabwareCreator>
+    </LabwareCreatorComponent>
   )
 }
-
-export default App

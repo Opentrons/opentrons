@@ -3,9 +3,11 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
 
-import { getConfig } from '../../config'
 import {
+  getCustomLabwareDirectory,
+  openCustomLabwareDirectory,
   changeCustomLabwareDirectory,
+  resetCustomLabwareDirectory,
   addCustomLabware,
   clearAddCustomLabwareFailure,
   getAddLabwareFailure,
@@ -14,7 +16,7 @@ import {
 import { CardCopy } from '../layout'
 import { ManagePath } from './ManagePath'
 import { AddLabware } from './AddLabware'
-import { PortaledAddLabwareFailureModal } from './AddLabwareFailureModal'
+import { AddLabwareFailureModal } from './AddLabwareFailureModal'
 
 import type { Dispatch } from '../../types'
 
@@ -25,9 +27,10 @@ const MANAGE_CUSTOM_LABWARE_DEFINITIONS =
 
 export function AddLabwareCard() {
   const dispatch = useDispatch<Dispatch>()
-  const config = useSelector(getConfig)
+  const labwarePath = useSelector(getCustomLabwareDirectory)
   const addFailure = useSelector(getAddLabwareFailure)
-  const labwarePath = config.labware.directory
+  const handleOpenPath = () => dispatch(openCustomLabwareDirectory())
+  const handleResetPath = () => dispatch(resetCustomLabwareDirectory())
   const handleChangePath = () => dispatch(changeCustomLabwareDirectory())
   const handleAddLabware = () => dispatch(addCustomLabware())
   const showAddFailure = addFailure.file || addFailure.errorMessage !== null
@@ -35,10 +38,15 @@ export function AddLabwareCard() {
   return (
     <Card title={LABWARE_MANAGEMENT}>
       <CardCopy>{MANAGE_CUSTOM_LABWARE_DEFINITIONS}</CardCopy>
-      <ManagePath path={labwarePath} onChangePath={handleChangePath} />
+      <ManagePath
+        path={labwarePath}
+        onOpenPath={handleOpenPath}
+        onResetPath={handleResetPath}
+        onChangePath={handleChangePath}
+      />
       <AddLabware onAddLabware={handleAddLabware} />
       {showAddFailure && (
-        <PortaledAddLabwareFailureModal
+        <AddLabwareFailureModal
           {...addFailure}
           directory={labwarePath}
           onCancel={() => dispatch(clearAddCustomLabwareFailure())}

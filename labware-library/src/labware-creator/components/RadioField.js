@@ -13,7 +13,7 @@ type Props = {|
   labelTextClassName?: ?string,
 |}
 
-const RadioField = (props: Props) => (
+export const RadioField = (props: Props) => (
   <Field name={props.name}>
     {({ form, field }) =>
       getIsHidden(props.name, form.values) ? null : (
@@ -45,5 +45,3 @@ const RadioField = (props: Props) => (
     }
   </Field>
 )
-
-export default RadioField

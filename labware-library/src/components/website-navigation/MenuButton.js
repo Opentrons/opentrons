@@ -5,7 +5,7 @@ import styles from './styles.css'
 
 import type { MobileNavProps } from './types'
 
-export default function MenuButton(props: MobileNavProps) {
+export function MenuButton(props: MobileNavProps) {
   const iconName = props.isMobileOpen ? 'close' : 'menu'
   return (
     <ClickableIcon

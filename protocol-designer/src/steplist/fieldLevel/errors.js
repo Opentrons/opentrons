@@ -18,8 +18,8 @@ const FIELD_ERRORS: { [FieldError]: string } = {
   REQUIRED: 'This field is required',
   UNDER_WELL_MINIMUM: 'or more wells are required',
   NON_ZERO: 'Must be greater than zero',
-  UNDER_RANGE_MINIMUM: 'Must be greater than',
-  OVER_RANGE_MAXIMUM: 'Must be less than',
+  UNDER_RANGE_MINIMUM: 'Min is',
+  OVER_RANGE_MAXIMUM: 'Max is',
 }
 
 // TODO: test these

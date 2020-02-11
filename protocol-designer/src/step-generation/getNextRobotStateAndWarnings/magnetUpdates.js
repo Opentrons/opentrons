@@ -1,6 +1,5 @@
 // @flow
-import assert from 'assert'
-import { getModuleState } from '../utils/misc'
+import { getModuleState } from '../robotStateSelectors'
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,
@@ -22,10 +21,7 @@ export function forEngageMagnet(
   const { module } = params
   let { robotState } = robotStateAndWarnings
   const moduleState = getModuleState(robotState, module)
-  assert(
-    module in robotState.modules,
-    `forEngageMagnet expected module id "${module}"`
-  )
+
   _setMagnet(moduleState, true)
 }
 
@@ -37,9 +33,6 @@ export function forDisengageMagnet(
   const { module } = params
   const { robotState } = robotStateAndWarnings
   const moduleState = getModuleState(robotState, module)
-  assert(
-    module in robotState.modules,
-    `forDisengageMagnet expected module id "${module}"`
-  )
+
   _setMagnet(moduleState, false)
 }

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import NavLink from './NavLink'
+import { NavLink } from './NavLink'
 import styles from './styles.css'
 
 import type { Submenu } from './types'
@@ -9,7 +9,7 @@ type Props = {|
   ...Submenu,
 |}
 
-export default function MobileContent(props: Props) {
+export function MobileContent(props: Props) {
   const { links } = props
   return (
     <ul className={styles.mobile_content}>

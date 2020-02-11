@@ -19,5 +19,6 @@ module.exports = {
 
   shell: {
     moveItemToTrash: jest.fn(),
+    openItem: jest.fn(),
   },
 }

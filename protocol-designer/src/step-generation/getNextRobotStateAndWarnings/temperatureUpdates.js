@@ -1,10 +1,10 @@
 // @flow
-import assert from 'assert'
-import { getModuleState } from '../utils/misc'
+import { getModuleState } from '../robotStateSelectors'
 import {
   TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
+  TEMPERATURE_AT_TARGET,
 } from '../../constants'
 import type {
   TemperatureParams,
@@ -28,16 +28,27 @@ export function forSetTemperature(
   const { module, temperature } = params
   const moduleState = getModuleState(robotState, module)
 
-  assert(
-    module in robotState.modules,
-    `forSetTemperature expected module id "${module}"`
-  )
-
   _setTemperatureAndStatus(
     moduleState,
     temperature,
     TEMPERATURE_APPROACHING_TARGET
   )
+}
+
+export function forAwaitTemperature(
+  params: TemperatureParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void {
+  const { robotState } = robotStateAndWarnings
+  const { module, temperature } = params
+  const moduleState = getModuleState(robotState, module)
+
+  if (moduleState.type === TEMPDECK) {
+    if (temperature === moduleState.targetTemperature) {
+      moduleState.status = TEMPERATURE_AT_TARGET
+    }
+  }
 }
 
 export function forDeactivateTemperature(
@@ -47,13 +58,9 @@ export function forDeactivateTemperature(
 ): void {
   const { robotState } = robotStateAndWarnings
   const { module } = params
+
   const moduleState = getModuleState(robotState, module)
   const temperature = null
-
-  assert(
-    module in robotState.modules,
-    `forDeactivateTemperature expected module id "${module}"`
-  )
 
   _setTemperatureAndStatus(moduleState, temperature, TEMPERATURE_DEACTIVATED)
 }

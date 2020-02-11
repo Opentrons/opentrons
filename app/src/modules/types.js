@@ -11,6 +11,7 @@ type BaseModule = {|
   serial: string,
   fwVersion: string,
   port: string,
+  hasAvailableUpdate: boolean,
 |}
 
 export type TemperatureData = {|
@@ -152,6 +153,38 @@ export type SendModuleCommandDoneAction =
   | SendModuleCommandSuccessAction
   | SendModuleCommandFailureAction
 
+// fetch modules
+
+export type UpdateModuleAction = {|
+  type: 'modules:UPDATE_MODULE',
+  payload: {| robotName: string, moduleId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateModuleSuccessAction = {|
+  type: 'modules:UPDATE_MODULE_SUCCESS',
+  payload: {|
+    robotName: string,
+    moduleId: string,
+    message: string,
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateModuleFailureAction = {|
+  type: 'modules:UPDATE_MODULE_FAILURE',
+  payload: {|
+    robotName: string,
+    moduleId: string,
+    error: {},
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateModuleDoneAction =
+  | UpdateModuleSuccessAction
+  | UpdateModuleFailureAction
+
 // action union
 
 export type ModulesAction =
@@ -161,6 +194,9 @@ export type ModulesAction =
   | SendModuleCommandAction
   | SendModuleCommandSuccessAction
   | SendModuleCommandFailureAction
+  | UpdateModuleAction
+  | UpdateModuleSuccessAction
+  | UpdateModuleFailureAction
 
 // state types
 

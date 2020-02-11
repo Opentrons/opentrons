@@ -5,7 +5,7 @@ import type { Store as ReduxStore, Dispatch as ReduxDispatch } from 'redux'
 import type { RouterState, RouterAction } from 'connected-react-router'
 import type { Observable } from 'rxjs'
 
-import type { RobotApiState } from './robot-api/types'
+import type { RobotApiState, RobotApiAction } from './robot-api/types'
 import type { RobotAdminState, RobotAdminAction } from './robot-admin/types'
 import type {
   RobotControlsState,
@@ -22,6 +22,7 @@ import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
 import type { Config as ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
+import type { NetworkingState, NetworkingAction } from './networking/types'
 import type { ProtocolState, ProtocolAction } from './protocol/types'
 import type {
   CustomLabwareState,
@@ -45,6 +46,7 @@ export type State = $ReadOnly<{|
   modules: ModulesState,
   config: ConfigState,
   discovery: DiscoveryState,
+  networking: NetworkingState,
   labware: CustomLabwareState,
   protocol: ProtocolState,
   shell: ShellState,
@@ -54,6 +56,7 @@ export type State = $ReadOnly<{|
 export type Action =
   | RobotAction
   | SuperDeprecatedRobotApiAction
+  | RobotApiAction
   | RobotAdminAction
   | RobotControlsAction
   | RobotSettingsAction
@@ -66,6 +69,7 @@ export type Action =
   | DiscoveryAction
   | ProtocolAction
   | CustomLabwareAction
+  | NetworkingAction
 
 export type GetState = () => State
 

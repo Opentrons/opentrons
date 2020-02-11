@@ -147,6 +147,11 @@ const commandCreatorFromStepArgs = (
         StepGeneration.deactivateTemperature,
         args
       )
+    case 'awaitTemperature':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.awaitTemperature,
+        args
+      )
   }
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null

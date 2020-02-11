@@ -3,7 +3,7 @@ from threading import Thread, Event
 from typing import Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
-from . import update, mod_abc
+from . import update, mod_abc, types
 
 TEMP_POLL_INTERVAL_SECS = 1
 
@@ -216,10 +216,26 @@ class TempDeck(mod_abc.AbstractModule):
             self._poller.join()
 
     async def prep_for_update(self) -> str:
+        model = self._device_info and self._device_info.get('model')
+        if model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
+            raise types.UpdateError("This Temperature Module can't be updated."
+                                    "Please contact Opentrons Support.")
+
         if self._poller:
             self._poller.join()
         del self._poller
         self._poller = None
-        model = self._device_info and self._device_info.get('model')
-        new_port = await update.enter_bootloader(self._driver, model)
+        self._driver.enter_programming_mode()
+        new_port = await update.find_bootloader_port()
         return new_port or self.port
+
+    def has_available_update(self) -> bool:
+        """ Override of abc implementation to suppress update notifications
+        for v1, v1.1, and v2 temperature modules which cannot be updated """
+        if not self._device_info:
+            model = None
+        else:
+            model = self._device_info.get('model')
+        if model in {'temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2', None}:
+            return False
+        return super().has_available_update()

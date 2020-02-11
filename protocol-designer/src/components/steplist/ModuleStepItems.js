@@ -7,21 +7,25 @@ import { PDListItem } from '../lists'
 import { Portal } from './TooltipPortal'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
+import typeof { TEMPDECK, MAGDECK } from '../../constants'
 
 type Props = {|
-  engage: boolean,
+  action: string,
+  module: MAGDECK | TEMPDECK,
+  actionText: string,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: ?string,
 |}
 
-export const MagnetStepItems = (props: Props) => (
+export const ModuleStepItems = (props: Props) => (
   <>
-    {props.message && <PDListItem>{props.message}</PDListItem>}
-    <li className={styles.aspirate_dispense}>
-      <span>{i18n.t('modules.module_long_names.magdeck')}</span>
-      <span className={styles.spacer} />
-      <span>{i18n.t('modules.actions.action')}</span>
+    {props.message && (
+      <PDListItem className="step-item-message">{props.message}</PDListItem>
+    )}
+    <li className={styles.module_substep_header}>
+      <span>{i18n.t(`modules.module_long_names.${props.module}`)}</span>
+      <span>{props.action}</span>
     </li>
     <PDListItem
       className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}
@@ -44,10 +48,7 @@ export const MagnetStepItems = (props: Props) => (
           </span>
         )}
       </HoverTooltip>
-      <span className={styles.step_subitem_spacer} />
-      <span className={styles.labware_display_name}>
-        {i18n.t(`modules.actions.${props.engage ? 'engage' : 'disengage'}`)}
-      </span>
+      <span className={styles.module_substep_value}>{props.actionText}</span>
     </PDListItem>
   </>
 )

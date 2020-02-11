@@ -2,13 +2,15 @@
 import { dependentFieldsUpdateMoveLiquid } from './dependentFieldsUpdateMoveLiquid'
 import { dependentFieldsUpdateMix } from './dependentFieldsUpdateMix'
 import { dependentFieldsUpdateMagnet } from './dependentFieldsUpdateMagnet'
+import { dependentFieldsUpdatePause } from './dependentFieldsUpdatePause'
+import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
+
 import type { FormData } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 import type {
   LabwareEntities,
   PipetteEntities,
 } from '../../../step-forms/types'
-import { dependentFieldsUpdateTemperature } from './dependentFieldsUpdateTemperature'
 
 export function handleFormChange(
   patch: FormPatch,
@@ -47,6 +49,10 @@ export function handleFormChange(
       patch,
       rawForm
     )
+    return { ...patch, ...dependentFieldsPatch }
+  }
+  if (rawForm.stepType === 'pause') {
+    const dependentFieldsPatch = dependentFieldsUpdatePause(patch, rawForm)
     return { ...patch, ...dependentFieldsPatch }
   }
 

@@ -1,0 +1,15 @@
+@import '@opentrons/components';
+
+.icon_cta {
+  @apply --font-body-1-dark;
+
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+.icon_cta_icon {
+  height: 1rem;
+  margin-right: 0.25rem;
+}

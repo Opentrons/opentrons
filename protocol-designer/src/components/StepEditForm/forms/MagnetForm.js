@@ -11,6 +11,7 @@ import styles from '../StepEditForm.css'
 import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers }
+
 export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
@@ -89,6 +90,14 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
           </FormGroup>
         </ConditionalOnField>
       </div>
+      <ConditionalOnField
+        name={'magnetAction'}
+        condition={val => val === 'engage'}
+      >
+        <div className={styles.diagram_row}>
+          <div className={styles.engage_height_diagram} />
+        </div>
+      </ConditionalOnField>
     </div>
   )
 }

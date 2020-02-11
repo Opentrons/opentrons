@@ -11,7 +11,7 @@ type Props = {|
   onClick: () => mixed,
 |}
 
-export default function MobileMenu(props: Props) {
+export function MobileMenu(props: Props) {
   const { name, active, onClick } = props
   return (
     <>

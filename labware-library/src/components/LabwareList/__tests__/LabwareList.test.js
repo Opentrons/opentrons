@@ -3,9 +3,9 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import LabwareList from '..'
-import LabwareCard from '../LabwareCard'
-import NoResults from '../NoResults'
+import { LabwareList } from '..'
+import { LabwareCard } from '../LabwareCard'
+import { NoResults } from '../NoResults'
 import * as definitions from '../../../definitions'
 
 import type { LabwareList as LabwareListType } from '../../../types'

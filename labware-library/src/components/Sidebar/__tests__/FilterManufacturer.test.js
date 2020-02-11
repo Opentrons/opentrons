@@ -3,7 +3,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { FilterManufacturer } from '../FilterManufacturer'
+import { FilterManufacturerComponent } from '../FilterManufacturer'
 import * as filters from '../../../filters'
 
 jest.mock('../../../filters')
@@ -23,7 +23,7 @@ describe('FilterManufacturer', () => {
 
     const filters = { category: 'all', manufacturer: 'all' }
     const tree = shallow(
-      <FilterManufacturer
+      <FilterManufacturerComponent
         location={({}: any)}
         history={({}: any)}
         match={({}: any)}

@@ -1,14 +1,14 @@
 // @flow
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
-import useAnalyticsOptInOrOut from './useAnalyticsOptInOrOut'
+import { useAnalyticsOptInOrOut } from './useAnalyticsOptInOrOut'
 
 type Props = {|
   className?: string,
   children: React.Node,
 |}
 
-const AnalyticsOptInModal = (props: Props) => {
+export const AnalyticsOptInModal = (props: Props) => {
   const { setAnalyticsOptIn, analyticsState } = useAnalyticsOptInOrOut()
 
   return (
@@ -26,5 +26,3 @@ const AnalyticsOptInModal = (props: Props) => {
     )
   )
 }
-
-export default AnalyticsOptInModal

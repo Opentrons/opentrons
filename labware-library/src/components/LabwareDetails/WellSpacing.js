@@ -42,7 +42,7 @@ export type WellSpacingProps = {|
   className?: string,
 |}
 
-export default function WellSpacing(props: WellSpacingProps) {
+export function WellSpacing(props: WellSpacingProps) {
   const { labelSuffix, wellProperties, className, category, isMultiRow } = props
   const spacing = [
     { label: X_OFFSET, value: toFixed(wellProperties.xOffsetFromLeft) },
