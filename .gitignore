@@ -109,3 +109,4 @@ calibrations/
 
 # local IDE configs
 */.vscode
+.vscode/**

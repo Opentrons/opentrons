@@ -1,7 +1,13 @@
 from opentrons import __version__
-from fastapi import FastAPI
-from .routers import health, networking, control, settings, deck_calibration
+from fastapi import FastAPI, HTTPException
+from fastapi.exceptions import RequestValidationError
+from starlette.responses import JSONResponse
+from starlette.exceptions import HTTPException as StarletteHTTPException
+# https://github.com/encode/starlette/blob/master/starlette/status.py
+from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
+from .routers import health, networking, control, settings, deck_calibration, item
+from .models.json_api.errors import ErrorResponse, transform_to_json_api_errors
 
 app = FastAPI(
     title="Opentrons OT-2 HTTP API Spec",
@@ -13,6 +19,33 @@ app = FastAPI(
     version=__version__
 )
 
+@app.exception_handler(RequestValidationError)
+async def custom_request_validation_exception_handler(request, exception) -> JSONResponse:
+    errors = transform_to_json_api_errors(HTTP_422_UNPROCESSABLE_ENTITY, exception)
+    errors_response = ErrorResponse(**errors)
+    return JSONResponse(
+        status_code=HTTP_422_UNPROCESSABLE_ENTITY,
+        content=errors_response.dict(),
+     )
+
+# @app.exception_handler(HTTPException)
+# async def custom_http_exception_handler(request, exception) -> JSONResponse:
+#     errors = transform_to_json_api_errors(exception.status_code, exception.detail)
+#     errors_response = ErrorResponse(**errors)
+#     return JSONResponse(
+#         status_code=exception.status_code,
+#         content=errors_response.dict(),
+#      )
+
+@app.exception_handler(StarletteHTTPException)
+async def custom_http_exception_handler(request, exception) -> JSONResponse:
+    print('HERE', exception.detail)
+    errors = transform_to_json_api_errors(exception.status_code, exception.detail)
+    errors_response = ErrorResponse(**errors)
+    return JSONResponse(
+        status_code=exception.status_code,
+        content=errors_response.dict(),
+     )
 
 app.include_router(router=health.router,
                    tags=["health"])
@@ -24,3 +57,5 @@ app.include_router(router=settings.router,
                    tags=["settings"])
 app.include_router(router=deck_calibration.router,
                    tags=["deckCalibration"])
+app.include_router(router=item.router,
+                   tags=["item"])
