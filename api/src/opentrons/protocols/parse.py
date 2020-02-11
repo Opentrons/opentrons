@@ -298,6 +298,19 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
 
 def validate_json(protocol_json: Dict[Any, Any]) -> int:
     """ Validates a json protocol and returns its schema version """
+    # Check if this is actually a labware
+    labware_schema_v2 = json.loads(load_shared_data(
+        'labware/schemas/2.json').decode('utf-8'))
+    try:
+        jsonschema.validate(protocol_json, labware_schema_v2)
+    except jsonschema.ValidationError:
+        pass
+    else:
+        MODULE_LOG.error("labware uploaded instead of protocol")
+        raise RuntimeError(
+            'Labware uploaded instead of protocol')
+
+    # this is now either a protocol or something corrupt
     version_num = _get_protocol_schema_version(protocol_json)
     if version_num <= 2:
         raise RuntimeError(
@@ -306,25 +319,29 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'Designer and save it to migrate the protocol to a later '
             'version. This error might mean a labware '
             'definition was specified instead of a protocol.')
+    if version_num > 3:
+        raise RuntimeError(
+            f'JSON protocol version {version_num} is not supported in this '
+            'robot software version.'
+        )
     protocol_schema = _get_schema_for_protocol(version_num)
-    # instruct schema how to resolve all $ref's used in protocol schemas
-    schema_body = load_shared_data(
-        'labware/schemas/2.json').decode('utf-8')
-    labware_schema_v2 = json.loads(schema_body)
 
+    # instruct schema how to resolve all $ref's used in protocol schemas
     resolver = jsonschema.RefResolver(
         protocol_schema.get('$id', ''),
         protocol_schema,
         store={
             "opentronsLabwareSchemaV2": labware_schema_v2
         })
+
     # do the validation
     try:
         jsonschema.validate(protocol_json, protocol_schema, resolver=resolver)
     except jsonschema.ValidationError:
-        MODULE_LOG.exception("Bad protocol uploaded (does not match schema)")
+        MODULE_LOG.exception("JSON protocol validation failed")
         raise RuntimeError(
-            'Could not parse protocol: does not match schema. This error '
-            'might also mean a labware definition was specified instead of '
-            'a protocol.')
-    return version_num
+            'Could not parse protocol: does not match schema. This may be a '
+            'corrupted file or a JSON file that is not an Opentrons JSON '
+            'protocol.')
+    else:
+        return version_num

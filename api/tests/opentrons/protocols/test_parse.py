@@ -179,12 +179,18 @@ def test_get_protocol_schema_version():
         _get_protocol_schema_version({'protocol-schema': '1.2.3'})
 
 
-def test_validate_json(get_json_protocol_fixture):
+def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match='deprecated'):
         validate_json({'protocol-schema': '1.0.0'})
-    with pytest.raises(RuntimeError):
+    with pytest.raises(RuntimeError, match='not supported'):
+        validate_json({'schemaVersion': '4'})
+    labware = get_labware_fixture('fixture_12_trough_v2')
+    with pytest.raises(RuntimeError, match='Labware'):
+        validate_json(labware)
+    with pytest.raises(RuntimeError, match='corrupted'):
         validate_json({'schemaVersion': '3'})
+
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     assert validate_json(v3) == 3
 
