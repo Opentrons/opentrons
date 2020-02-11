@@ -84,6 +84,8 @@ class SynchronousAdapter(HardwareAPILike):
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
+        MODULE_LOG.info(
+            f'SyncAdapt CCS  to_call: {to_call}')
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
         return fut.result()
 
