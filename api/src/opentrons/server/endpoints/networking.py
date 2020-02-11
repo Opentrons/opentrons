@@ -285,7 +285,11 @@ async def disconnect(request: web.Request) -> web.Response:
     Post request should include a json body specifying the ssid to disconnect
     the robot from.
     Robot will attempt to disconnect from the specified wifi ssid and
-    will respond with an OK if successful and an error code if unsuccessful.
+    on successful disconnect, will remove ssid from connection list.
+    It will respond with an OK if it successfully disconnects from wifi
+    and an error code if it is unsuccessful. If it disconnects successfully
+    but fails to delete the ssid from list, it will respond with an OK with
+    error code of 207 for multi-status.
 
     """
     try:
@@ -306,12 +310,16 @@ async def disconnect(request: web.Request) -> web.Response:
     try:
         ok, message = await nmcli.wifi_disconnect(ssid)
     except Exception as excep:
-        return web.json_response({'message': str(excep)}, status=400)
+        return web.json_response({'message': str(excep)}, status=500)
 
+    response = {'message': message}
     if ok:
-        return web.json_response({'message': message}, status=200)
+        if 'successfully deleted' in message:
+            return web.json_response(response, status=200)
+        else:
+            return web.json_response(response, status=207)
     else:
-        return web.json_response({'message': message}, status=400)
+        return web.json_response(response, status=500)
 
 
 async def status(request: web.Request) -> web.Response:

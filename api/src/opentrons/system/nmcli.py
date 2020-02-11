@@ -494,7 +494,8 @@ async def configure(ssid: str,
 
 async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     """
-    Disconnect from specified wireless network.
+    Disconnect from specified wireless network and delete the connection.
+
     Ideally, user would be allowed to disconnect a robot from wifi only over an
     ethernet connection to the robot so that, 1) they get the disconnect
     response back and 2) their robot isn't left with no connectivity at all
@@ -507,6 +508,11 @@ async def wifi_disconnect(ssid: str) -> Tuple[bool, str]:
     """
     res, err = await _call(['connection', 'down', ssid])
     if 'successfully deactivated' in res:
+        rem_ok, rem_res = await remove(ssid)
+        if rem_ok:
+            res = res + '.\n ' + rem_res
+        else:
+            res = res + '.\n Error: Could not remove ssid. ' + rem_res
         return True, res
     else:
         return False, err
