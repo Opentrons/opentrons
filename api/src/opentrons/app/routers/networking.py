@@ -51,7 +51,9 @@ async def get_wifi_networks() -> WifiNetworks:
              summary="Configures the wireless network interface to connect to"
                      " a network",
              response_model=WifiConfigurationResponse,
-             responses={HTTPStatus.CREATED: {"model": WifiConfigurationResponse}})
+             responses={HTTPStatus.CREATED: {
+                 "model": WifiConfigurationResponse
+             }})
 async def post_wifi_configurution(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")

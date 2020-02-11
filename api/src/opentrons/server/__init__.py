@@ -142,4 +142,4 @@ def run(hardware: 'HardwareAPILike',
                     host=hostname, port=port, path=path)
     else:
         import opentrons.app
-        opentrons.app.run(hostname, port)
+        opentrons.app.run(hardware, hostname, port)
