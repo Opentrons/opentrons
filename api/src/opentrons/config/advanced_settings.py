@@ -86,7 +86,8 @@ settings = [
         _id='useFastApi',
         title='Use fastapi based api server',
         description='Run the FastApi server application instead of the legacy '
-                    'aiohttp'
+                    'aiohttp',
+        restart_required=True
     ),
 ]
 
