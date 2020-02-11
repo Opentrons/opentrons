@@ -183,10 +183,10 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match='deprecated'):
         validate_json({'protocol-schema': '1.0.0'})
-    with pytest.raises(RuntimeError, match='not supported'):
+    with pytest.raises(RuntimeError, match='update'):
         validate_json({'schemaVersion': '4'})
     labware = get_labware_fixture('fixture_12_trough_v2')
-    with pytest.raises(RuntimeError, match='Labware'):
+    with pytest.raises(RuntimeError, match='labware'):
         validate_json(labware)
     with pytest.raises(RuntimeError, match='corrupted'):
         validate_json({'schemaVersion': '3'})

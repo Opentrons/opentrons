@@ -308,12 +308,15 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
     else:
         MODULE_LOG.error("labware uploaded instead of protocol")
         raise RuntimeError(
-            'Labware uploaded instead of protocol')
+            'The file you are trying to open is a JSON labware definition, '
+            'and therefore can not be opened here. Please try '
+            'uploading a JSON protocol file instead.')
 
     # this is now either a protocol or something corrupt
     version_num = _get_protocol_schema_version(protocol_json)
     if version_num <= 2:
         raise RuntimeError(
+            'Your protocol could not be opened.\n\n'
             f'JSON protocol version {version_num} is '
             'deprecated. Please upload your protocol into Protocol '
             'Designer and save it to migrate the protocol to a later '
@@ -321,8 +324,11 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'definition was specified instead of a protocol.')
     if version_num > 3:
         raise RuntimeError(
-            f'JSON protocol version {version_num} is not supported in this '
-            'robot software version.'
+            'Your protocol could not be opened.\n\n'
+            f'The protocol you are trying to open is a JSONv{version_num} '
+            'protocol and is not supported by your current robot server '
+            'version. Please update your OT-2 App and robot server to the '
+            'latest version and try again.'
         )
     protocol_schema = _get_schema_for_protocol(version_num)
 
@@ -340,8 +346,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
     except jsonschema.ValidationError:
         MODULE_LOG.exception("JSON protocol validation failed")
         raise RuntimeError(
-            'Could not parse protocol: does not match schema. This may be a '
-            'corrupted file or a JSON file that is not an Opentrons JSON '
-            'protocol.')
+            'Your protocol could not be opened.\n\n'
+            'This may be a corrupted file or a JSON file that is not an '
+            'Opentrons JSON protocol.')
     else:
         return version_num
