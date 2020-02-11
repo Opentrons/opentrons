@@ -116,3 +116,5 @@ Version 2.2
 - You should now specify magnetic module engage height using the
   ``height_from_base`` parameter, which specifies the height of the top of the
   magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
+- Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
+- When using the return tip function, tips are no longer added back into the tip tracker. For more information, see :ref:`pipette-return-tip`.
