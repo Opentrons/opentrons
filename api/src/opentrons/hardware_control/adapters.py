@@ -92,10 +92,12 @@ class SynchronousAdapter(HardwareAPILike):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
-        MODULE_LOG.info(f'SA __GETATTRIBUTE__= looking for: {attr_name}')
+        MODULE_LOG.info(
+            f'SyncAdapt __GETATTRIBUTE__= looking for: {attr_name}')
         try:
             attr = getattr(api, attr_name)
-            MODULE_LOG.info(f'SA __GETATTRIBUTE__= found inside: {attr}')
+            MODULE_LOG.info(
+                f'SyncAdapt __GETATTRIBUTE__= found inside: {attr}')
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)

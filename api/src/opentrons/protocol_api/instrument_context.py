@@ -64,6 +64,7 @@ class InstrumentContext(CommandPublisher):
         self._ctx = ctx
         self._mount = mount
 
+        MODULE_LOG.info(f'Instr Ctx hw_mgr: {hardware_mgr}')
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
@@ -78,6 +79,7 @@ class InstrumentContext(CommandPublisher):
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
         self._log.info("attached")
+
         self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = FlowRates(self)
@@ -1248,6 +1250,7 @@ class InstrumentContext(CommandPublisher):
                  no longer attached (should not happen).
         """
         pipette = self._hw_manager.hardware.attached_instruments[self._mount]
+        MODULE_LOG.info(f'Instr Ctx::hw_pipette pipette: {pipette}, hwmgr.hw: {self._hw_manager.hardware}, ai: {self._hw_manager.hardware.attached_instruments}')
         if pipette is None:
             raise types.PipetteNotAttachedError
         return pipette

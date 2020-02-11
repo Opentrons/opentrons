@@ -259,9 +259,11 @@ class API(HardwareAPILike):
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
-        self._log.info("Updating instrument model cache")
+
+        mod_log.info(f'\nSIM CI require: {require}')
         found = self._backend.get_attached_instruments(require or {})
 
+        mod_log.info(f'\nSIM CI found: {found}')
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
