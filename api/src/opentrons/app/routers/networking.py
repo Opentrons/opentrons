@@ -1,5 +1,6 @@
 import logging
 import subprocess
+from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException, File, Path
 from opentrons.app.models import V1ErrorMessage
@@ -31,7 +32,7 @@ async def get_networking_status() -> NetworkingStatus:
         return NetworkingStatus(status=connectivity, interfaces=interfaces)
     except (subprocess.CalledProcessError, FileNotFoundError) as e:
         log.error("Failed calling nmcli")
-        raise HTTPException(500, str(e))
+        raise HTTPException(HTTPStatus.INTERNAL_SERVER_ERROR, str(e))
 
 
 @router.get("/wifi/list",
@@ -50,30 +51,30 @@ async def get_wifi_networks() -> WifiNetworks:
              summary="Configures the wireless network interface to connect to"
                      " a network",
              response_model=WifiConfigurationResponse,
-             responses={201: {"model": WifiConfigurationResponse}})
+             responses={HTTPStatus.CREATED: {"model": WifiConfigurationResponse}})
 async def post_wifi_configurution(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/wifi/keys",
             description="Get a list of key files known to the system",
             response_model=WifiKeyFiles)
 async def get_wifi_keys() -> WifiKeyFiles:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/wifi/keys",
              description="Send a new key file to the OT-2",
-             responses={201: {"model": WifiKeyFile}},
+             responses={HTTPStatus.CREATED: {"model": WifiKeyFile}},
              response_model=WifiKeyFile)
 async def post_wifi_key(key: bytes = File(...)) -> WifiKeyFile:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.delete("/wifi/keys/{key_uuid}",
                description="Delete a key file from the OT-2",
-               responses={404: {"model": V1ErrorMessage}},
+               responses={HTTPStatus.NOT_FOUND: {"model": V1ErrorMessage}},
                response_model=V1ErrorMessage)
 async def delete_wifi_key(
         key_uuid: str = Path(...,
@@ -81,7 +82,7 @@ async def delete_wifi_key(
                                          "determined by a previous call to GET"
                                          " /wifi/keys"))\
         -> V1ErrorMessage:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/wifi/eap-options",
@@ -89,4 +90,4 @@ async def delete_wifi_key(
                         "configuration parameters",
             response_model=EapOptions)
 async def get_eap_options() -> EapOptions:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")

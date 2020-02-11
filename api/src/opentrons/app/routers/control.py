@@ -1,4 +1,5 @@
 import typing
+from http import HTTPStatus
 from fastapi import APIRouter, Query, HTTPException
 from opentrons.app.models import V1ErrorMessage
 from opentrons.app.models import control
@@ -14,14 +15,14 @@ async def post_identify(
         seconds: int = Query(...,
                              description="Time to blink the lights for")) \
         -> V1ErrorMessage:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/modules",
             description="Describe the modules attached to the OT-2",
             response_model=control.Modules)
 async def get_modules() -> control.Modules:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/modules/{serial}/data",
@@ -30,7 +31,7 @@ async def get_modules() -> control.Modules:
                     "only a specific currently-attached module",
             response_model=control.ModuleSerial)
 async def get_module_serial(serial: str) -> control.ModuleSerial:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/modules/{serial}",
@@ -41,14 +42,14 @@ async def get_module_serial(serial: str) -> control.ModuleSerial:
              response_model=control.SerialCommandResponse)
 async def post_serial_command(serial: str, command: control.SerialCommand)\
         -> control.SerialCommandResponse:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/camera/picture",
              description="Capture an image from the OT-2's onboard camera "
                          "and return it",
              responses={
-                 200: {
+                 HTTPStatus.OK: {
                      "content": {"image/png": {}},
                      "description": "The image"
                  }
@@ -56,7 +57,7 @@ async def post_serial_command(serial: str, command: control.SerialCommand)\
 async def post_picture_capture() -> StreamingResponse:
     return StreamingResponse(
         content=iter([]),
-        status_code=200,
+        status_code=HTTPStatus.OK,
         media_type="image/png"
     )
 
@@ -72,14 +73,14 @@ async def post_picture_capture() -> StreamingResponse:
                     "be done through user intent",
             response_model=control.Pipette)
 async def get_pipettes(refresh: bool) -> control.Pipette:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/motors/engaged",
             description="Query which motors are engaged and holding",
             response_model=control.EngagedMotors)
 async def get_engaged_motors() -> control.EngagedMotors:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/motors/disengage",
@@ -87,14 +88,14 @@ async def get_engaged_motors() -> control.EngagedMotors:
              response_model=V1ErrorMessage)
 async def post_disengage_motors(motors: typing.List[control.MotorName]) \
         -> V1ErrorMessage:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/robot/positions",
             description="Get a list of useful positions",
             response_model=control.RobotPositions)
 async def get_robot_positions() -> control.RobotPositions:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/robot/move",
@@ -103,7 +104,7 @@ async def get_robot_positions() -> control.RobotPositions:
              response_model=V1ErrorMessage)
 async def post_move_robot(robot_move_target: control.RobotMoveTarget)\
         -> V1ErrorMessage:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/robot/home",
@@ -111,14 +112,14 @@ async def post_move_robot(robot_move_target: control.RobotMoveTarget)\
              response_model=V1ErrorMessage)
 async def post_home_robot(robot_home_target: control. RobotHomeTarget) \
         -> V1ErrorMessage:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/robot/lights",
             description="Get the current status of the OT-2's rail lights",
             response_model=control.RobotLightState)
 async def get_robot_light_state() -> control.RobotLightState:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/robot/lights",
@@ -126,4 +127,4 @@ async def get_robot_light_state() -> control.RobotLightState:
              response_model=control.RobotLightState)
 async def post_robot_light_state(robot_light_state: control.RobotLightState) \
         -> control.RobotLightState:
-    raise HTTPException(500, "not implemented")
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
