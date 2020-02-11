@@ -84,9 +84,11 @@ settings = [
     ),
     Setting(
         _id='useFastApi',
-        title='Use fastapi based api server',
-        description='Run the FastApi server application instead of the legacy '
-                    'aiohttp',
+        title='Enable experimental HTTP API v2',
+        description='Tells the OT-2 to run a newer, highly experimental '
+                    'version of its HTTP API based on the FastAPI framework. '
+                    'This is an internal setting for Opentrons engineers; '
+                    'do not enable this setting or you will break your OT-2.',
         restart_required=True
     ),
 ]
