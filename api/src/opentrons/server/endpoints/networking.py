@@ -291,19 +291,20 @@ async def disconnect(request: web.Request) -> web.Response:
     try:
         body = await request.json()
     except json.JSONDecodeError as e:
-        log.debug("Error: JSONDecodeError in /wifi/disconnect: {}".format(e))
+        log.exception("Error: JSONDecodeError in "
+                      "/wifi/disconnect: {}".format(e))
         return web.json_response({'message': e.msg}, status=400)
 
+    ssid = body.get('ssid')
     try:
         # SSID must always be present
-        if not body.get('ssid') \
-                or not isinstance(body.get('ssid'), str):
+        if not ssid or not isinstance(ssid, str):
             raise DisconnectArgsError("SSID must be specified as a string")
     except DisconnectArgsError as e:
         return web.json_response({'message': e.msg}, status=400)
 
     try:
-        ok, message = await nmcli.wifi_disconnect(body.get('ssid'))
+        ok, message = await nmcli.wifi_disconnect(ssid)
     except Exception as excep:
         return web.json_response({'message': str(excep)}, status=400)
 
