@@ -17,7 +17,12 @@ const updatePatchOnPauseTemperatureChange = (
   if (fieldHasChanged(rawForm, patch, 'pauseForAmountOfTime')) {
     return {
       ...patch,
-      ...getDefaultFields('pauseTemperature'),
+      ...getDefaultFields(
+        'pauseTemperature',
+        'pauseHour',
+        'pauseMinute',
+        'pauseSecond'
+      ),
     }
   }
   return patch
