@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
+
+
+### Features
+
+* **api:** add module def schema v2 and v2 defs ([#4805](https://github.com/Opentrons/opentrons/issues/4805)) ([4018254](https://github.com/Opentrons/opentrons/commit/4018254)), closes [#4222](https://github.com/Opentrons/opentrons/issues/4222)
+* **api:** add p10m v1.6 ([#4722](https://github.com/Opentrons/opentrons/issues/4722)) ([c25c887](https://github.com/Opentrons/opentrons/commit/c25c887))
+* **protocol-designer:** add commands for temperature step ([#4770](https://github.com/Opentrons/opentrons/issues/4770)) ([6aff0e8](https://github.com/Opentrons/opentrons/commit/6aff0e8))
+* **protocol-designer:** Populate engageHeight field with previous values ([#4794](https://github.com/Opentrons/opentrons/issues/4794)) ([b68b52d](https://github.com/Opentrons/opentrons/commit/b68b52d)), closes [#4764](https://github.com/Opentrons/opentrons/issues/4764)
+* **protocol-designer:** use immer in step generation ([#4769](https://github.com/Opentrons/opentrons/issues/4769)) ([7915393](https://github.com/Opentrons/opentrons/commit/7915393)), closes [#4697](https://github.com/Opentrons/opentrons/issues/4697)
+* **shared-data:** add 20uL filter tiprack ([#4532](https://github.com/Opentrons/opentrons/issues/4532)) ([423da87](https://github.com/Opentrons/opentrons/commit/423da87))
+* **shared-data:** add new v4 JSON protocol schema ([#4846](https://github.com/Opentrons/opentrons/issues/4846)) ([bd49812](https://github.com/Opentrons/opentrons/commit/bd49812)), closes [#4836](https://github.com/Opentrons/opentrons/issues/4836) [#4897](https://github.com/Opentrons/opentrons/issues/4897)
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 

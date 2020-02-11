@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
+
+
+### Features
+
+* **labware-library:** add decks 1 and 7 to labwareTestProtocol before labware test ([#4647](https://github.com/Opentrons/opentrons/issues/4647)) ([f1e560a](https://github.com/Opentrons/opentrons/commit/f1e560a))
+* **shared-data:** add 20uL filter tiprack ([#4532](https://github.com/Opentrons/opentrons/issues/4532)) ([423da87](https://github.com/Opentrons/opentrons/commit/423da87))
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 ### Features

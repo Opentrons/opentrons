@@ -3,6 +3,45 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
+
+
+### Bug Fixes
+
+* **api:** Add back in useProtocolApi2 feature flag ([#4665](https://github.com/Opentrons/opentrons/issues/4665)) ([5c3fae3](https://github.com/Opentrons/opentrons/commit/5c3fae3))
+* **api:** amend temperature module old bootloader check ([#4942](https://github.com/Opentrons/opentrons/issues/4942)) ([dbc90cb](https://github.com/Opentrons/opentrons/commit/dbc90cb))
+* **api:** apiv2: allow multi to access all 384 wells in transfer ([#4678](https://github.com/Opentrons/opentrons/issues/4678)) ([975915a](https://github.com/Opentrons/opentrons/commit/975915a)), closes [#4669](https://github.com/Opentrons/opentrons/issues/4669)
+* **api:** bug in MalformedProtocolError.__str__ ([28a0eca](https://github.com/Opentrons/opentrons/commit/28a0eca))
+* **api:** Clarify intended use of "Use older pipette calibrations" flag ([#4677](https://github.com/Opentrons/opentrons/issues/4677)) ([0f2d7e3](https://github.com/Opentrons/opentrons/commit/0f2d7e3))
+* **api:** detect old bootloaders, fix tc enter bootloader, remove ununused paths ([#4935](https://github.com/Opentrons/opentrons/issues/4935)) ([cfa5374](https://github.com/Opentrons/opentrons/commit/cfa5374)), closes [#4575](https://github.com/Opentrons/opentrons/issues/4575)
+* **api:** do not pick up returned tips ([#4681](https://github.com/Opentrons/opentrons/issues/4681)) ([5d358f2](https://github.com/Opentrons/opentrons/commit/5d358f2)), closes [#4668](https://github.com/Opentrons/opentrons/issues/4668)
+* **api:** Ensure position is fully updated after a home ([#4915](https://github.com/Opentrons/opentrons/issues/4915)) ([00b8d5b](https://github.com/Opentrons/opentrons/commit/00b8d5b))
+* **api:** Fix simulate file from python shell ([#4660](https://github.com/Opentrons/opentrons/issues/4660)) ([7fc6bbe](https://github.com/Opentrons/opentrons/commit/7fc6bbe))
+* **api:** more specific errors for bad json protocols ([#4967](https://github.com/Opentrons/opentrons/issues/4967)) ([885a6f8](https://github.com/Opentrons/opentrons/commit/885a6f8)), closes [#4735](https://github.com/Opentrons/opentrons/issues/4735) [#4515](https://github.com/Opentrons/opentrons/issues/4515)
+* **api:** properly clean up threads in opentrons_simulate, _execute ([#4694](https://github.com/Opentrons/opentrons/issues/4694)) ([31bd02d](https://github.com/Opentrons/opentrons/commit/31bd02d))
+* **api:** restore plunger current before move to bottom after drop tip ([#4831](https://github.com/Opentrons/opentrons/issues/4831)) ([d07efcb](https://github.com/Opentrons/opentrons/commit/d07efcb))
+* **api:** set default move timeout to 12000 instead of 60 ([#4768](https://github.com/Opentrons/opentrons/issues/4768)) ([6e28b2b](https://github.com/Opentrons/opentrons/commit/6e28b2b)), closes [#4755](https://github.com/Opentrons/opentrons/issues/4755)
+* **api:** smoothie driver: Limit high currents to moving axes ([#4729](https://github.com/Opentrons/opentrons/issues/4729)) ([7e728ea](https://github.com/Opentrons/opentrons/commit/7e728ea)), closes [#4714](https://github.com/Opentrons/opentrons/issues/4714)
+* **api:** split out tc deactivation at driver level ([#4624](https://github.com/Opentrons/opentrons/issues/4624)) ([ae15a7f](https://github.com/Opentrons/opentrons/commit/ae15a7f))
+* **api:** typo in Session.turn_off_rail_lights ([#4948](https://github.com/Opentrons/opentrons/issues/4948)) ([44bf050](https://github.com/Opentrons/opentrons/commit/44bf050))
+* **api:** Use specified port in tools ([#4812](https://github.com/Opentrons/opentrons/issues/4812)) ([5351183](https://github.com/Opentrons/opentrons/commit/5351183))
+* **api:** Utilize return tip height from pipette configs ([#4828](https://github.com/Opentrons/opentrons/issues/4828)) ([b388c4e](https://github.com/Opentrons/opentrons/commit/b388c4e))
+* **app:** home all axes after lw calibration to allow deck access ([#4687](https://github.com/Opentrons/opentrons/issues/4687)) ([6e0ad61](https://github.com/Opentrons/opentrons/commit/6e0ad61)), closes [#4034](https://github.com/Opentrons/opentrons/issues/4034)
+
+
+### Features
+
+* **api:** Add an OpenAPI spec for the HTTP API ([#4691](https://github.com/Opentrons/opentrons/issues/4691)) ([cb195a5](https://github.com/Opentrons/opentrons/commit/cb195a5)), closes [#4635](https://github.com/Opentrons/opentrons/issues/4635)
+* **api:** add p10m v1.6 ([#4722](https://github.com/Opentrons/opentrons/issues/4722)) ([c25c887](https://github.com/Opentrons/opentrons/commit/c25c887))
+* **api:** add perform module fw update endpoint ([#4889](https://github.com/Opentrons/opentrons/issues/4889)) ([5354eff](https://github.com/Opentrons/opentrons/commit/5354eff)), closes [#4576](https://github.com/Opentrons/opentrons/issues/4576)
+* **api:** apiv2: add height_from_base arg to MagneticModuleContext.engage() ([#4707](https://github.com/Opentrons/opentrons/issues/4707)) ([ffaee78](https://github.com/Opentrons/opentrons/commit/ffaee78)), closes [#4213](https://github.com/Opentrons/opentrons/issues/4213)
+* **api:** change attach pipette positions to match leveling blocks ([#4888](https://github.com/Opentrons/opentrons/issues/4888)) ([b10fe2e](https://github.com/Opentrons/opentrons/commit/b10fe2e)), closes [#4679](https://github.com/Opentrons/opentrons/issues/4679)
+* **api:** make modules aware of available fw updates in file system ([#4856](https://github.com/Opentrons/opentrons/issues/4856)) ([4ede522](https://github.com/Opentrons/opentrons/commit/4ede522)), closes [#4575](https://github.com/Opentrons/opentrons/issues/4575)
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 
