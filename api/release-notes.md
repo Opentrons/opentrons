@@ -19,7 +19,10 @@ details, see [the documentation](https://docs.opentrons.com/v2/versioning.html#a
 ## Bug Fixes
 
 - Fixed an issue where setting the axis max speeds or head speed very slow might
-  result in errors during protocols (issue [#4755](https://github.com/opentrons/opentrons/issues/4755))
+  result in errors during protocols (issue
+  [#4755](https://github.com/opentrons/opentrons/issues/4755))
+- Added more specific warnings when uploading a labware definition instead of a
+  JSON protocol (issue [#4515](https://github.com/Opentrons/opentrons/issues/4515))
 
 
 ## Known Issues (Python Protocol API version 1)
