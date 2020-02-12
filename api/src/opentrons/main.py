@@ -130,15 +130,12 @@ def run(hardware, **kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
-    # logging_config.log_init('INFO')
+    if ff.use_protocol_api_v2():
+        robot_conf = loop.run_until_complete(hardware.get_config())
+    else:
+        robot_conf = hardware.config
 
-    log.info("before reading config {}, {}".format(hardware, loop))
-    # if ff.use_protocol_api_v2():
-    #     robot_conf = loop.run_until_complete(hardware.get_config())
-    # else:
-    #     robot_conf = hardware.config
-
-    # logging_config.log_init(robot_conf.log_level)
+    logging_config.log_init(robot_conf.log_level)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
@@ -160,7 +157,6 @@ def run(hardware, **kwargs):  # noqa(C901)
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
-    log.info(f"\nmain run hw {hardware}\n")
     server.run(
         hardware,
         kwargs.get('hostname'),
