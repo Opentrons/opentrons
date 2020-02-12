@@ -11,6 +11,7 @@ import {
   getNextDefaultEngageHeight,
   handleFormChange,
 } from '../../../steplist/formLevel'
+import { maskField } from '../../../steplist/fieldLevel'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
@@ -154,6 +155,10 @@ export const selectStep = (
     const stringDefaultEngageHeight = defaultEngageHeight
       ? defaultEngageHeight.toString()
       : null
+    const defaultHeightToProperDecimal = maskField(
+      'engageHeight',
+      stringDefaultEngageHeight
+    )
 
     const prevEngageHeight = getNextDefaultEngageHeight(
       stepFormSelectors.getSavedStepForms(state),
@@ -162,7 +167,7 @@ export const selectStep = (
 
     // if no previously saved engageHeight, autopopulate with recommended value
     // recommended value is null when no labware found on module
-    const engageHeight = prevEngageHeight || stringDefaultEngageHeight
+    const engageHeight = prevEngageHeight || defaultHeightToProperDecimal
     formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 
