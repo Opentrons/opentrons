@@ -87,6 +87,12 @@ export const FeatureFlagCard = (props: Props) => {
   const userFacingFlagRows = userFacingFlagNames.map(toFlagRow)
   const prereleaseFlagRows = prereleaseFlagNames.map(toFlagRow)
 
+  let flagSwitchDirection: string = 'on'
+
+  if (modalFlagName) {
+    const isFlagOn: ?boolean = props.flags[modalFlagName]
+    flagSwitchDirection = isFlagOn ? 'off' : 'on'
+  }
   return (
     <>
       {modalFlagName && (
@@ -94,7 +100,9 @@ export const FeatureFlagCard = (props: Props) => {
           <ContinueModal
             alertOverlay
             className={modalStyles.modal}
-            heading={i18n.t('modal.experimental_feature_warning.title')}
+            heading={i18n.t(
+              `modal.experimental_feature_warning.${flagSwitchDirection}.title`
+            )}
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
@@ -103,8 +111,16 @@ export const FeatureFlagCard = (props: Props) => {
               setModalFlagName(null)
             }}
           >
-            <p>{i18n.t('modal.experimental_feature_warning.body1')}</p>
-            <p>{i18n.t('modal.experimental_feature_warning.body2')}</p>
+            <p>
+              {i18n.t(
+                `modal.experimental_feature_warning.${flagSwitchDirection}.body1`
+              )}
+            </p>
+            <p>
+              {i18n.t(
+                `modal.experimental_feature_warning.${flagSwitchDirection}.body2`
+              )}
+            </p>
           </ContinueModal>
         </Portal>
       )}
