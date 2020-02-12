@@ -104,15 +104,24 @@ class SynchronousAdapter(HardwareAPILike):
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)
 
+        check = attr
+        if isinstance(attr, functools.partial):
+            check = attr.func
         try:
-            check = attr.__wrapped__
+            check = check.__wrapped__
+            MODULE_LOG.info(
+                f'SyncAdapt __GETATTRIBUTE__= attr: {attr}, is wrapped: {attr.__wrapped__}')
         except AttributeError:
-            check = attr
+            pass
         loop = object.__getattribute__(self, '_loop')
         if asyncio.iscoroutinefunction(check):
+            MODULE_LOG.info(
+                f'SyncAdapt __GETATTRIBUTE__= iscoro func: attr {attr}, check: {check}')
             # Return a synchronized version of the coroutine
             return functools.partial(self.call_coroutine_sync, loop, attr)
         elif asyncio.iscoroutine(check):
+            MODULE_LOG.info(
+                f'SyncAdapt __GETATTRIBUTE__= isjustcoro: attr {attr}, check: {check}')
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, loop)
             return fut.result()
