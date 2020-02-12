@@ -19,8 +19,6 @@ if TYPE_CHECKING:
     from .util import HardwareManager
 
 
-MODULE_LOG = logging.getLogger(__name__)
-
 AdvancedLiquidHandling = Union[
     Well,
     types.Location,
@@ -64,7 +62,6 @@ class InstrumentContext(CommandPublisher):
         self._ctx = ctx
         self._mount = mount
 
-        MODULE_LOG.info(f'Instr Ctx hw_mgr: {hardware_mgr}')
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
@@ -1250,7 +1247,6 @@ class InstrumentContext(CommandPublisher):
                  no longer attached (should not happen).
         """
         pipette = self._hw_manager.hardware.attached_instruments[self._mount]
-        MODULE_LOG.info(f'Instr Ctx::hw_pipette pipette: {pipette}, hwmgr.hw: {self._hw_manager.hardware}, ai: {self._hw_manager.hardware.attached_instruments}')
         if pipette is None:
             raise types.PipetteNotAttachedError
         return pipette
