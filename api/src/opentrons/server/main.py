@@ -52,10 +52,8 @@ def main():
     # in opentrons.main
     if args.patch_old_init is not None:
         import opentrons.main
-        log.info(f'\nSERVER old init HW CALLED\n')
         opentrons.main.run(**vars(args))
     else:
-        log.info(f'\nSERVER MAIN main HW CALLED\n')
         server.run(args.hostname, args.port, args.path)
         arg_parser.exit(message="Stopped\n")
 
