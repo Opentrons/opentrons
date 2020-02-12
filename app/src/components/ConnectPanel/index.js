@@ -43,17 +43,26 @@ export const ConnectPanel = connect<Props, {||}, SP, DP, State, Dispatch>(
 )(ConnectPanelComponent)
 
 function ConnectPanelComponent(props: Props) {
+  const {
+    robots,
+    reachableRobots,
+    unreachableRobots,
+    found,
+    isScanning,
+    onScanClick,
+  } = props
+
   return (
     <SidePanel title="Robots">
-      <ScanStatus {...props} />
+      <ScanStatus {...{ found, isScanning, onScanClick }} />
       <RobotList>
-        {props.robots.map(robot => (
+        {robots.map(robot => (
           <RobotItem key={robot.name} robot={robot} />
         ))}
-        {props.reachableRobots.map(robot => (
+        {reachableRobots.map(robot => (
           <RobotItem key={robot.name} robot={robot} />
         ))}
-        {props.unreachableRobots.map(robot => (
+        {unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />
         ))}
       </RobotList>

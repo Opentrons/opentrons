@@ -46,7 +46,7 @@ type DP = {|
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
 
-export type AdvancedSettingsCardProps = {| ...OP, ...SP, ...DP |}
+type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Advanced Settings'
 
@@ -57,7 +57,7 @@ export const AdvancedSettingsCard = withRouter(
   )(AdvancedSettingsCardComponent)
 )
 
-function AdvancedSettingsCardComponent(props: AdvancedSettingsCardProps) {
+function AdvancedSettingsCardComponent(props: Props) {
   return (
     <>
       <Card title={TITLE}>
@@ -127,7 +127,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP) {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     toggleDevTools: () => dispatch(toggleDevTools()),
     toggleDevInternalFlag: (flag: DevInternalFlag) =>

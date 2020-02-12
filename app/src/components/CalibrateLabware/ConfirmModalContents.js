@@ -16,18 +16,13 @@ type OP = {| labware: Labware, calibrateToBottom: boolean |}
 
 type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
 
-export type ConfirmModalContentsProps = {| ...OP, ...SP, dispatch: Dispatch |}
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export const ConfirmModalContents = connect<
-  ConfirmModalContentsProps,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(mapStateToProps)(ConfirmModalContentsComponent)
+export const ConfirmModalContents = connect<Props, OP, SP, {||}, _, _>(
+  mapStateToProps
+)(ConfirmModalContentsComponent)
 
-function ConfirmModalContentsComponent(props: ConfirmModalContentsProps) {
+function ConfirmModalContentsComponent(props: Props) {
   const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props
   if (!calibrator) return null
 

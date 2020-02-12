@@ -20,9 +20,9 @@ type DP = {|
   removeManualIp: (ip: string) => mixed,
 |}
 
-export type IpListProps = {| ...SP, ...DP |}
+type Props = {| ...SP, ...DP |}
 
-function IpListComponent(props: IpListProps) {
+function IpListComponent(props: Props) {
   const { candidates, removeManualIp, robots } = props
   const candidateList = [].concat(candidates)
 
@@ -57,7 +57,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export const IpList = connect<IpListProps, OP, SP, DP, State, Dispatch>(
+export const IpList = connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
 )(IpListComponent)
