@@ -951,9 +951,11 @@
                 }
               },
               "examples": {
-                "summary": "Disconnect robot from wifi network",
-                "value": {
-                  "ssid": "linksys"
+                "disconnectFromSsid": {
+                  "summary": "Disconnect robot from wifi network",
+                  "value": {
+                    "ssid": "linksys"
+                  }
                 }
               }
             }
@@ -1009,7 +1011,7 @@
                 "example": {"message": "Error: 'linksysss' is not an active connection.\nError: no active connection provided."}
               }
             }
-          },
+          }
         }
       }
     },
