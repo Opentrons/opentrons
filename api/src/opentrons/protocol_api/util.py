@@ -188,7 +188,6 @@ class AxisMaxSpeeds(UserDict):
 
 class HardwareManager:
     def __init__(self, hardware):
-        MODULE_LOG.info(f'hw manager init hw: {hardware}')
         if None is hardware:
             self._is_orig = True
             self._built_own_adapter = True
@@ -208,8 +207,6 @@ class HardwareManager:
         return self._current
 
     def set_hw(self, hardware):
-        MODULE_LOG.info(f'set_hw hardware: {hardware}')
-        MODULE_LOG.info(f'set_hw api: {hardware._api}')
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
             self._built_own_adapter = False
@@ -245,7 +242,7 @@ def clamp_value(
         return max_value
     if input_value < min_value:
         MODULE_LOG.info(
-            f'{log_tag} calmped input {input_value} to {min_value}')
+            f'{log_tag} clamped input {input_value} to {min_value}')
         return min_value
     return input_value
 
