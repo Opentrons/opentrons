@@ -531,19 +531,13 @@ class ProtocolContext(CommandPublisher):
             raise RuntimeError("Instrument already present in {} mount: {}"
                                .format(checked_mount.name.lower(),
                                        instr.name))
-        self._log.info(
-            f"Prot CTX:: loadinstr instrument_name: {instrument_name}, ai: {self._hw_manager.hardware.attached_instruments}")
         attached = {att_mount: instr.get('model', None)
                     for att_mount, instr
                     in self._hw_manager.hardware.attached_instruments.items()}
         attached[checked_mount] = instrument_name
-        self._log.info(
-            f"Prot CTX:: loadinstr cache instrs attached {attached}, ci: {self._hw_manager.hardware.cache_instruments}")
         self._log.debug("cache instruments expectation: {}"
                         .format(attached))
         self._hw_manager.hardware.cache_instruments(attached)
-        self._log.info(
-            f"Prot CTX:: loadinstr post cache instrs ai: {self._hw_manager.hardware.attached_instruments}")
         # If the cache call didn’t raise, the instrument is attached
         new_instr = InstrumentContext(
             ctx=self,
