@@ -1,10 +1,7 @@
-import logging
 from opentrons.broker import Notifications, Broker
 from opentrons.hardware_control import adapters
 from .session import SessionManager, Session
 from .calibration import CalibrationManager
-
-log = logging.getLogger(__name__)
 
 
 class MainRouter:
@@ -13,10 +10,8 @@ class MainRouter:
         self._broker = Broker()
         self._notifications = Notifications(topics, self._broker, loop=loop)
 
-        log.info(f'\n\nMAIN ROUTER INIT HW: {hardware}\n')
         if hardware:
             hardware = adapters.SynchronousAdapter(hardware)
-        log.info(f'\n\nMAIN ROUTER INIT HW wrapped:  {hardware}\n')
         self.session_manager = SessionManager(
             hardware=hardware,
             loop=loop,
