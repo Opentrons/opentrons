@@ -140,7 +140,7 @@ export const selectStep = (
   }
 
   // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
-  if (newStepType === 'magnet') {
+  if (formData && formData.stepType === 'magnet') {
     const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
     const magnetAction = getNextDefaultMagnetAction(
       stepFormSelectors.getSavedStepForms(state),
