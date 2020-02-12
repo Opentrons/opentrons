@@ -163,6 +163,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
 
+        self._running_flag = asyncio.Event(loop=self._loop)
         self._current_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
@@ -170,10 +171,17 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
 
+    def pause(self):
+        self._loop.call_soon_threadsafe(self._running_flag.clear)
+
+    def resume(self):
+        self._loop.call_soon_threadsafe(self._running_flag.set)
+
     def cancel(self):
         if self._current_task:
             self._current_task.cancel()
             self._current_task = None
+        self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     def _clear_cycle_counters(self):
         self._total_cycle_count = None
@@ -226,6 +234,7 @@ class Thermocycler(mod_abc.AbstractModule):
                                   step: types.ThermocyclerStep,
                                   index: int,
                                   volume: float):
+        await self._running_flag.wait()
         self._current_step_index = index + 1  # science starts at 1
         temperature = step.get('temperature')
         hold_time_minutes = step.get('hold_time_minutes', None)
@@ -251,6 +260,7 @@ class Thermocycler(mod_abc.AbstractModule):
                                  steps: List[types.ThermocyclerStep],
                                  repetitions: int,
                                  volume: float = None):
+        self._running_flag.set()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
         cycle_task = self._loop.create_task(self._execute_cycles(steps,
