@@ -12,7 +12,6 @@ from .util import use_or_initialize_loop, log_call
 from .pipette import Pipette
 from .controller import Controller
 from .simulator import Simulator
-from .pause_manager import PauseManager
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
@@ -53,10 +52,6 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
-        self._pause_manager = PauseManager(
-            loop=self._loop,
-            is_simulating=self.is_simulator_sync
-        )
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}

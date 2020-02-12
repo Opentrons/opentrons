@@ -442,7 +442,6 @@ class ProtocolContext(CommandPublisher):
             }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
                 port='',
-                pause_manager=self._hw_manager.hardware.pause_manager,
                 simulating=True,
                 loop=self._loop))
         if hc_mod_instance:

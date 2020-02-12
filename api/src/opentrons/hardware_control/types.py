@@ -1,7 +1,8 @@
 import enum
 import logging
-from typing import Tuple, Optional
+from typing import Tuple, Optional, Dict, Union
 from opentrons import types as top_types
+from .pipette import Pipette
 
 MODULE_LOG = logging.getLogger(__name__)
 

@@ -6,7 +6,6 @@ from typing import List, Optional, Dict, Any, Callable
 from collections import namedtuple
 
 from opentrons.config import IS_ROBOT, IS_LINUX
-from ..pause_manager import PauseManager
 from .mod_abc import AbstractModule
 # NOTE: Must import all modules so they actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
@@ -38,11 +37,9 @@ async def build(
         port: str,
         which: str,
         simulating: bool,
-        pause_manager: PauseManager,
         interrupt_callback: Callable) -> AbstractModule:
     return await MODULE_TYPES[which].build(
         port,
-        pause_manager=pause_manager,
         interrupt_callback=interrupt_callback,
         simulating=simulating
     )
