@@ -4,14 +4,14 @@ import asyncio
 import copy
 import functools
 import logging
-from typing import List
+import threading
+from typing import List, Mapping
 
 from .api import API
-from .thread_manager import ThreadManager
 from .types import Axis, HardwareAPILike
 
 
-class SynchronousAdapter(HardwareAPILike):
+class SynchronousAdapter(HardwareAPILike, threading.Thread):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     synchronous.
 
@@ -26,7 +26,7 @@ class SynchronousAdapter(HardwareAPILike):
     """
 
     @classmethod
-    def build(cls, builder, *args, **kwargs):
+    def build(cls, builder, *args, build_loop=None, **kwargs):
         """ Build a hardware control API and initialize the adapter in one call
 
         :param builder: the builder method to use (e.g.
@@ -34,20 +34,20 @@ class SynchronousAdapter(HardwareAPILike):
         :param args: Args to forward to the builder method
         :param kwargs: Kwargs to forward to the builder method
         """
-
         loop = asyncio.new_event_loop()
+        kwargs['loop'] = loop
         args = [arg for arg in args
                 if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
-            api = loop.run_until_complete(
-                ThreadManager(builder, *args, **kwargs)
-            )
+            checked_loop = build_loop or asyncio.get_event_loop()
+            api = checked_loop.run_until_complete(builder(*args, **kwargs))
         else:
-            api = ThreadManager(builder, *args, **kwargs)
-        return cls(api)
+            api = builder(*args, **kwargs)
+        return cls(api, loop)
 
     def __init__(self,
-                 api: API) -> None:
+                 api: API,
+                 loop: asyncio.AbstractEventLoop = None) -> None:
         """ Build the SynchronousAdapter.
 
         :param api: The API instance to wrap
@@ -58,20 +58,39 @@ class SynchronousAdapter(HardwareAPILike):
                      normal use case) the adapter will start a new event loop
                      for the worker thread.
         """
-        self._loop = api._loop
+        checked_loop = loop or asyncio.new_event_loop()
+        api.set_loop(checked_loop)
+        self._loop = checked_loop
         self._api = api
+        self._call_lock = threading.Lock()
+        self._cached_sync_mods: Mapping[str, SynchronousAdapter] = {}
+        super().__init__(
+            target=self._event_loop_in_thread,
+            name='SynchAdapter thread for {}'.format(repr(api)))
+        super().start()
 
     def __repr__(self):
         return '<SynchronousAdapter>'
 
+    def _event_loop_in_thread(self):
+        loop = object.__getattribute__(self, '_loop')
+        loop.run_forever()
+        loop.close()
+
+    def join(self):
+        thread_loop = object.__getattribute__(self, '_loop')
+        if thread_loop.is_running():
+            thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
+        super().join()
+
     def __del__(self):
         try:
-            loop = object.__getattribute__(self, '_loop')
+            thread_loop = object.__getattribute__(self, '_loop')
         except AttributeError:
             pass
         else:
-            if loop.is_running():
-                loop.call_soon_threadsafe(lambda: loop.stop())
+            if thread_loop.is_running():
+                thread_loop.call_soon_threadsafe(lambda: thread_loop.stop())
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
@@ -84,30 +103,26 @@ class SynchronousAdapter(HardwareAPILike):
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
         try:
-            api_attr = getattr(api, attr_name)
+            attr = getattr(api, attr_name)
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)
 
-        check = api_attr
-        if isinstance(api_attr, functools.partial):
-            # if partial func check passed in func
-            check = api_attr.func
         try:
             # if decorated func check wrapped func
-            check = check.__wrapped__
+            check = attr.__wrapped__
         except AttributeError:
-            pass
+            check = attr
         loop = object.__getattribute__(self, '_loop')
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
-            return functools.partial(self.call_coroutine_sync, loop, api_attr)
+            return functools.partial(self.call_coroutine_sync, loop, attr)
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, loop)
             return fut.result()
 
-        return api_attr
+        return attr
 
 
 class SingletonAdapter(HardwareAPILike):
@@ -127,17 +142,13 @@ class SingletonAdapter(HardwareAPILike):
     :py:class:`.hardware_control.API`.
     """
 
-    @classmethod
-    def build_in_managed_thread(cls) -> ThreadManager:
-        return ThreadManager(cls)
-
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
         self._api = API.build_hardware_simulator(loop=loop)
 
     def __getattr__(self, attr_name):
         return getattr(self._api, attr_name)
 
-    async def connect(self, port: str = None):
+    def connect(self, port: str = None):
         """ Connect to hardware.
 
         :param port: The port to connect to. May be `None`, in which case the
@@ -146,15 +157,16 @@ class SingletonAdapter(HardwareAPILike):
                      with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
         """
         old_api = object.__getattribute__(self, '_api')
-        config = await old_api.config
-        new_api = await API.build_hardware_controller(
-            loop=old_api._loop,
+        loop = old_api._loop
+        config = loop.run_until_complete(old_api.config)
+        new_api = loop.run_until_complete(API.build_hardware_controller(
+            loop=loop,
             port=port,
-            config=copy.copy(config))
-        await new_api.cache_instruments()
+            config=copy.copy(config)))
+        old_api._loop.run_until_complete(new_api.cache_instruments())
         setattr(self, '_api', new_api)
 
-    async def disconnect(self):
+    def disconnect(self):
         """ Disconnect from connected hardware. """
         old_api = object.__getattribute__(self, '_api')
         config = old_api._loop.run_until_complete(old_api.config)
@@ -186,7 +198,7 @@ class SingletonAdapter(HardwareAPILike):
                 'plunger_axis': Axis.of_plunger(mount)
             }
             if data.get('model'):
-                instrs[mount.name.lower()]['tip_length']\
+                instrs[mount.name.lower()]['tip_length'] \
                     = data.get('tip_length', None)
 
         return instrs
