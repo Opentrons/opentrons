@@ -25,7 +25,11 @@ describe('validate deck defs and fixtures', () => {
       const valid = validateV1Schema(fixtureDef)
       const validationErrors = validateV1Schema.errors
       if (validationErrors) {
-        console.log(path.parse(defPath).base + ' ' + JSON.stringify(validationErrors, null, 4))
+        console.log(
+          path.parse(defPath).base +
+            ' ' +
+            JSON.stringify(validationErrors, null, 4)
+        )
       }
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
@@ -38,7 +42,11 @@ describe('validate deck defs and fixtures', () => {
       const valid = validateV2Schema(fixtureDef)
       const validationErrors = validateV2Schema.errors
       if (validationErrors) {
-        console.log(path.parse(defPath).base + ' ' + JSON.stringify(validationErrors, null, 4))
+        console.log(
+          path.parse(defPath).base +
+            ' ' +
+            JSON.stringify(validationErrors, null, 4)
+        )
       }
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
@@ -51,7 +59,11 @@ describe('validate deck defs and fixtures', () => {
       const valid = validateV1Schema(deckDef)
       const validationErrors = validateV1Schema.errors
       if (validationErrors) {
-        console.log(path.parse(defPath).base + ' ' + JSON.stringify(validationErrors, null, 4))
+        console.log(
+          path.parse(defPath).base +
+            ' ' +
+            JSON.stringify(validationErrors, null, 4)
+        )
       }
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
@@ -64,7 +76,11 @@ describe('validate deck defs and fixtures', () => {
       const valid = validateV2Schema(deckDef)
       const validationErrors = validateV2Schema.errors
       if (validationErrors) {
-        console.log(path.parse(defPath).base + ' ' + JSON.stringify(validationErrors, null, 4))
+        console.log(
+          path.parse(defPath).base +
+            ' ' +
+            JSON.stringify(validationErrors, null, 4)
+        )
       }
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)

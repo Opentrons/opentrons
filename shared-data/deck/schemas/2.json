@@ -41,7 +41,12 @@
       "description": "A physical feature of the deck",
       "required": ["footprint"],
       "properties": {
-        "footprint": { "$ref": "#/definitions/pathDValue" }
+        "footprint": { "$ref": "#/definitions/pathDValue" },
+        "correspondingLocation": {
+          "type": "string",
+          "format": "uri-reference",
+          "description": "A path to a location entry that corresponds with this feature"
+        }
       }
     }
   },
