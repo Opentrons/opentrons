@@ -26,15 +26,11 @@ EAP_CONFIG_SHAPE = {
 
 
 class ConfigureArgsError(Exception):
-    def __init__(self, message):
-        self.msg = message
-        super().__init__()
+    pass
 
 
 class DisconnectArgsError(Exception):
-    def __init__(self, message):
-        self.msg = message
-        super().__init__()
+    pass
 
 
 async def list_networks(request: web.Request) -> web.Response:
@@ -260,7 +256,7 @@ async def configure(request: web.Request) -> web.Response:
     try:
         configure_kwargs = _check_configure_args(body)
     except ConfigureArgsError as e:
-        return web.json_response({'message': e.msg}, status=400)
+        return web.json_response({'message': str(e)}, status=400)
 
     try:
         ok, message = await nmcli.configure(**configure_kwargs)
@@ -305,7 +301,7 @@ async def disconnect(request: web.Request) -> web.Response:
         if not ssid or not isinstance(ssid, str):
             raise DisconnectArgsError("SSID must be specified as a string")
     except DisconnectArgsError as e:
-        return web.json_response({'message': e.msg}, status=400)
+        return web.json_response({'message': str(e)}, status=400)
 
     try:
         ok, message = await nmcli.wifi_disconnect(ssid)
