@@ -314,12 +314,10 @@ async def disconnect(request: web.Request) -> web.Response:
 
     response = {'message': message}
     if ok:
-        if 'successfully deleted' in message:
-            return web.json_response(response, status=200)
-        else:
-            return web.json_response(response, status=207)
+        stat = 200 if 'successfully deleted' in message else 207
     else:
-        return web.json_response(response, status=500)
+        stat = 500
+    return web.json_response(response, status=stat)
 
 
 async def status(request: web.Request) -> web.Response:
