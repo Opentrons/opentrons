@@ -2,7 +2,8 @@ import json
 
 import pytest
 
-from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api import (
+    labware, MAX_SUPPORTED_VERSION, module_geometry)
 from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Point, Location
 
@@ -341,7 +342,8 @@ def test_module_load():
     module_defs = json.loads(
         load_shared_data('module/definitions/1.json'))
     for name in module_names:
-        mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
+        mod = module_geometry.load_module(
+            name, Location(Point(0, 0, 0), 'test'))
         mod_def = module_defs[name]
         offset = Point(mod_def['labwareOffset']['x'],
                        mod_def['labwareOffset']['y'],
@@ -349,12 +351,12 @@ def test_module_load():
         high_z = mod_def['dimensions']['bareOverallHeight']
         assert mod.highest_z == high_z
         assert mod.location.point == offset
-        mod = labware.load_module(name, Location(Point(1, 2, 3), 'test'))
+        mod = module_geometry.load_module(
+            name, Location(Point(1, 2, 3), 'test'))
         assert mod.highest_z == high_z + 3
         assert mod.location.point == (offset + Point(1, 2, 3))
-        mod2 = labware.load_module_from_definition(mod_def,
-                                                   Location(Point(3, 2, 1),
-                                                            'test2'))
+        mod2 = module_geometry.load_module_from_definition(
+            mod_def, Location(Point(3, 2, 1), 'test2'))
         assert mod2.highest_z == high_z + 1
         assert mod2.location.point == (offset + Point(3, 2, 1))
 
@@ -364,7 +366,8 @@ def test_module_load_labware():
     labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
     for name in module_names:
-        mod = labware.load_module(name, Location(Point(0, 0, 0), 'test'))
+        mod = module_geometry.load_module(
+            name, Location(Point(0, 0, 0), 'test'))
         old_z = mod.highest_z
         lw = labware.load_from_definition(labware_def, mod.location)
         mod.add_labware(lw)

@@ -9,7 +9,8 @@ from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 
 from .labware import (
-    ModuleGeometry, Labware, load, load_from_definition, ThermocyclerGeometry)
+    Labware, load, load_from_definition)
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 from . import geometry
 from .util import requires_version
 
