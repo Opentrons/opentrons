@@ -1,8 +1,5 @@
 import opentrons.server as server
-import logging
 from argparse import ArgumentParser
-
-log = logging.getLogger(__name__)
 
 
 def build_arg_parser():
