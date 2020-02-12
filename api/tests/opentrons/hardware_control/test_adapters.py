@@ -8,4 +8,3 @@ def test_synch_adapter(loop):
     synch.cache_instruments({Mount.LEFT: 'p10_single'})
     assert synch.attached_instruments[Mount.LEFT]['name']\
                 .startswith('p10_single')
-    # synch.join()
