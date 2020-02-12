@@ -1,12 +1,12 @@
-from opentrons.drivers.types import MoveSplit
 import asyncio
-from collections import OrderedDict
 import contextlib
 import logging
+from collections import OrderedDict
 from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
+from opentrons.drivers.types import MoveSplit
 
 from .util import use_or_initialize_loop, log_call
 from .pipette import Pipette
@@ -17,16 +17,12 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError)
+                    MustHomeError, NoTipAttachedError, Instruments)
 from . import modules
 
 
 mod_log = logging.getLogger(__name__)
 
-
-Backend = Union[Controller, Simulator]
-
-Instruments = Dict[top_types.Mount, Optional[Pipette]]
 
 
 class API(HardwareAPILike):
@@ -43,7 +39,7 @@ class API(HardwareAPILike):
     CLS_LOG = mod_log.getChild('API')
 
     def __init__(self,
-                 backend: Backend,
+                 backend: Union[Controller, Simulator],
                  loop: asyncio.AbstractEventLoop,
                  config: robot_configs.robot_config = None
                  ) -> None:
@@ -96,20 +92,15 @@ class API(HardwareAPILike):
                      :py:meth:`asyncio.get_event_loop`.
         """
         checked_loop = use_or_initialize_loop(loop)
-        mod_log.info(f'\nBHWC before loop: {loop},'
-                     f' checked_loop: {checked_loop}\n')
         backend = Controller(config)
-        mod_log.info(f'BHWC backend : {backend}')
         await backend.connect(port)
 
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
 
-        mod_log.info(f'\nBHWC loop: {loop}, checked_loop: {checked_loop}, '
-                     f'backend: {backend}, api_instance: {api_instance}\n')
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
-                ))
+            ))
         return api_instance
 
     @classmethod
@@ -126,22 +117,17 @@ class API(HardwareAPILike):
         Multiple simulating hardware controllers may be active at one time.
         """
 
-        mod_log.info(f'\nBHS before all\n')
         if None is attached_instruments:
             attached_instruments = {}
 
         if None is attached_modules:
             attached_modules = []
-        mod_log.info(f'\nBHS before loop: {loop}\n')
         checked_loop = use_or_initialize_loop(loop)
         backend = Simulator(attached_instruments,
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        mod_log.info(f'\nBHS backend: {backend}\n')
-        api_instance = cls(backend, config=config, loop=checked_loop)
-        mod_log.info(f'\nloop: {loop}, checked_loop: {checked_loop},'
-                     f' backend: {backend}, api_instance: {api_instance}\n')
+        api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance
@@ -259,11 +245,9 @@ class API(HardwareAPILike):
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
-
-        mod_log.info(f'\nSIM CI require: {require}')
+        self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
 
-        mod_log.info(f'\nSIM CI found: {found}')
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
@@ -370,10 +354,6 @@ class API(HardwareAPILike):
     def attached_modules(self):
         return self._attached_modules
 
-    @property
-    def pause_manager(self):
-        return self._pause_manager
-
     @log_call
     async def update_firmware(
             self,
@@ -419,7 +399,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._loop.call_soon_threadsafe(self.pause_manager.pause)
+        self._call_on_attached_modules("pause")
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -433,7 +413,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._loop.call_soon_threadsafe(self.pause_manager.resume)
+        self._call_on_attached_modules("resume")
 
     @log_call
     def halt(self):
@@ -461,7 +441,7 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        self._loop.call_soon_threadsafe(self.pause_manager.pause)
+        self._call_on_attached_modules("cancel")
         await self.reset()
         await self.home()
 
@@ -1014,7 +994,7 @@ class API(HardwareAPILike):
             return
 
         self._backend.set_active_current(
-             Axis.of_plunger(mount), this_pipette.config.plunger_current)
+            Axis.of_plunger(mount), this_pipette.config.plunger_current)
         dist = self._plunger_position(
                 this_pipette,
                 this_pipette.current_volume + asp_vol,
@@ -1069,7 +1049,7 @@ class API(HardwareAPILike):
             return
 
         self._backend.set_active_current(
-            Axis.of_plunger(mount), this_pipette.config.plunger_current)
+             Axis.of_plunger(mount), this_pipette.config.plunger_current)
         dist = self._plunger_position(
                 this_pipette,
                 this_pipette.current_volume - disp_vol,
@@ -1414,10 +1394,7 @@ class API(HardwareAPILike):
             new_instance = await self._backend.build_module(
                     port=port,
                     model=name,
-                    pause_manager=self.pause_manager,
                     interrupt_callback=self.pause_with_message)
-            self._log.info(f"{port}")
-            self._log.info(f"{name}")
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

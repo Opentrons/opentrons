@@ -1,8 +1,7 @@
 import enum
 import logging
 from typing import Tuple, Optional
-
-import opentrons.types
+from opentrons import types as top_types
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -16,9 +15,9 @@ class Axis(enum.Enum):
     C = 5
 
     @classmethod
-    def by_mount(cls, mount: opentrons.types.Mount):
-        bm = {opentrons.types.Mount.LEFT: cls.Z,
-              opentrons.types.Mount.RIGHT: cls.A}
+    def by_mount(cls, mount: top_types.Mount):
+        bm = {top_types.Mount.LEFT: cls.Z,
+              top_types.Mount.RIGHT: cls.A}
         return bm[mount]
 
     @classmethod
@@ -29,18 +28,18 @@ class Axis(enum.Enum):
         return (cls.X, cls.Y, cls.Z, cls.A)
 
     @classmethod
-    def of_plunger(cls, mount: opentrons.types.Mount):
-        pm = {opentrons.types.Mount.LEFT: cls.B,
-              opentrons.types.Mount.RIGHT: cls.C}
+    def of_plunger(cls, mount: top_types.Mount):
+        pm = {top_types.Mount.LEFT: cls.B,
+              top_types.Mount.RIGHT: cls.C}
         return pm[mount]
 
     @classmethod
     def to_mount(cls, inst: 'Axis'):
         return {
-            cls.Z: opentrons.types.Mount.LEFT,
-            cls.A: opentrons.types.Mount.RIGHT,
-            cls.B: opentrons.types.Mount.LEFT,
-            cls.C: opentrons.types.Mount.RIGHT
+            cls.Z: top_types.Mount.LEFT,
+            cls.A: top_types.Mount.RIGHT,
+            cls.B: top_types.Mount.LEFT,
+            cls.C: top_types.Mount.RIGHT
         }[inst]
 
     def __str__(self):
@@ -102,3 +101,5 @@ class MustHomeError(RuntimeError):
 
 class NoTipAttachedError(RuntimeError):
     pass
+
+Instruments = Dict[top_types.Mount, Optional[Pipette]]

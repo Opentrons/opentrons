@@ -3,7 +3,6 @@
 import asyncio
 import copy
 import functools
-import logging
 import threading
 from typing import List, Mapping
 
