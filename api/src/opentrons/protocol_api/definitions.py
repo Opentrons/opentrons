@@ -19,7 +19,7 @@ class DeckItem(abc.ABC):
 
     @property  # type: ignore
     @abc.abstractmethod
-    def disambiguate_calibration(self) -> bool:
+    def separate_calibration(self) -> bool:
         pass
 
     @property  # type: ignore

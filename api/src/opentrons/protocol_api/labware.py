@@ -328,7 +328,7 @@ class Labware(DeckItem):
         self._highest_z = self._dimensions['zDimension']
 
     @property
-    def disambiguate_calibration(self) -> bool:
+    def separate_calibration(self) -> bool:
         return False
 
     @property  # type: ignore
@@ -801,7 +801,7 @@ class Labware(DeckItem):
 
 def _get_parent_identifier(
         parent: Union[Well, str, DeckItem, None]):
-    if isinstance(parent, DeckItem) and parent.disambiguate_calibration:
+    if isinstance(parent, DeckItem) and parent.separate_calibration:
         # treat a given labware on a given module type as same
         return parent.load_name
     else:

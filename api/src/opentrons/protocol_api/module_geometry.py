@@ -57,7 +57,7 @@ class ModuleGeometry(DeckItem):
         return resolved_name
 
     @property
-    def disambiguate_calibration(self) -> bool:
+    def separate_calibration(self) -> bool:
         # If a module is the parent of a labware it affects calibration
         return True
 
