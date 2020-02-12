@@ -181,7 +181,7 @@ class Thermocycler(mod_abc.AbstractModule):
         if self._current_task:
             self._current_task.cancel()
             self._current_task = None
-        self._loop.call_soon_threadsafe(self._running_flag.clear)
+            self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     def _clear_cycle_counters(self):
         self._total_cycle_count = None

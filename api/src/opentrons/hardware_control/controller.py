@@ -1,8 +1,7 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, \
-    Tuple, TYPE_CHECKING, Callable
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -164,11 +163,12 @@ class Controller:
         while can_watch and (not self._module_watcher.closed):
             await self._handle_watch_event(register_modules)
 
-    async def build_module(self,
-                           port: str,
-                           model: str,
-                           interrupt_callback: Callable
-                           ) -> modules.AbstractModule:
+    async def build_module(
+            self,
+            port: str,
+            model: str,
+            interrupt_callback: modules.mod_abc.InterruptCallback
+            ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
