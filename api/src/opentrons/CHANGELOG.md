@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.16.0-alpha.0...v3.16.0-alpha.1) (2020-02-12)
+
+
+### Bug Fixes
+
+* **api:** swallow hard-halt-related errors and hold lock in session.stop() ([#4980](https://github.com/Opentrons/opentrons/issues/4980)) ([c42d4dc](https://github.com/Opentrons/opentrons/commit/c42d4dc)), closes [#4979](https://github.com/Opentrons/opentrons/issues/4979)
+
+
+
+
+
 # [3.16.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
 
 
