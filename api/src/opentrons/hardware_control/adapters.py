@@ -10,8 +10,6 @@ from .api import API
 from .thread_manager import ThreadManager
 from .types import Axis, HardwareAPILike
 
-MODULE_LOG = logging.getLogger(__name__)
-
 
 class SynchronousAdapter(HardwareAPILike):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
@@ -44,13 +42,8 @@ class SynchronousAdapter(HardwareAPILike):
             api = loop.run_until_complete(
                 ThreadManager(builder, *args, **kwargs)
             )
-            MODULE_LOG.info(
-                f'\nSYNC ADAPTER build async api: {api}\n')
         else:
-            api = ThreadManager(builder, *args,
-                                **kwargs)
-            MODULE_LOG.info(
-                f'\nSYNC ADAPTER build api: {api}\n')
+            api = ThreadManager(builder, *args, **kwargs)
         return cls(api)
 
     def __init__(self,
@@ -65,8 +58,6 @@ class SynchronousAdapter(HardwareAPILike):
                      normal use case) the adapter will start a new event loop
                      for the worker thread.
         """
-        MODULE_LOG.info(
-            f'\nSYNC ADAPTER init loop: api._loop: {api._loop}\n')
         self._loop = api._loop
         self._api = api
 
@@ -84,8 +75,6 @@ class SynchronousAdapter(HardwareAPILike):
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
-        MODULE_LOG.info(
-            f'SyncAdapt CCS  to_call: {to_call}')
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
         return fut.result()
 
@@ -94,39 +83,31 @@ class SynchronousAdapter(HardwareAPILike):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         api = object.__getattribute__(self, '_api')
-        MODULE_LOG.info(
-            f'SyncAdapt __GETATTRIBUTE__= looking for: {attr_name}')
         try:
-            attr = getattr(api, attr_name)
-            MODULE_LOG.info(
-                f'SyncAdapt __GETATTRIBUTE__= found inside: {attr}')
+            api_attr = getattr(api, attr_name)
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)
 
-        check = attr
-        if isinstance(attr, functools.partial):
-            check = attr.func
+        check = api_attr
+        if isinstance(api_attr, functools.partial):
+            # if partial func check passed in func
+            check = api_attr.func
         try:
+            # if decorated func check wrapped func
             check = check.__wrapped__
-            MODULE_LOG.info(
-                f'SyncAdapt __GETATTRIBUTE__= attr: {attr}, is wrapped: {attr.__wrapped__}')
         except AttributeError:
             pass
         loop = object.__getattribute__(self, '_loop')
         if asyncio.iscoroutinefunction(check):
-            MODULE_LOG.info(
-                f'SyncAdapt __GETATTRIBUTE__= iscoro func: attr {attr}, check: {check}')
             # Return a synchronized version of the coroutine
-            return functools.partial(self.call_coroutine_sync, loop, attr)
+            return functools.partial(self.call_coroutine_sync, loop, api_attr)
         elif asyncio.iscoroutine(check):
-            MODULE_LOG.info(
-                f'SyncAdapt __GETATTRIBUTE__= isjustcoro: attr {attr}, check: {check}')
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, loop)
             return fut.result()
 
-        return attr
+        return api_attr
 
 
 class SingletonAdapter(HardwareAPILike):
@@ -148,13 +129,10 @@ class SingletonAdapter(HardwareAPILike):
 
     @classmethod
     def build_in_managed_thread(cls) -> ThreadManager:
-        MODULE_LOG.info('Singleton ADAPTER: builder in thread')
         return ThreadManager(cls)
 
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
-        MODULE_LOG.info('Singleton ADAPTER: init ')
         self._api = API.build_hardware_simulator(loop=loop)
-        MODULE_LOG.info(f'Singleton ADAPTER: init after api: {self._api}')
 
     def __getattr__(self, attr_name):
         return getattr(self._api, attr_name)
@@ -167,21 +145,14 @@ class SingletonAdapter(HardwareAPILike):
                      with the device name `FT232R`; or port name compatible
                      with `serial.Serial<https://pythonhosted.org/pyserial/pyserial_api.html#serial.Serial.__init__>`_.  # noqa(E501)
         """
-        MODULE_LOG.info('Connect CALLEd')
         old_api = object.__getattribute__(self, '_api')
-        MODULE_LOG.info(f'old_api: {old_api}')
         config = await old_api.config
-        MODULE_LOG.info(f'config: {config}')
         new_api = await API.build_hardware_controller(
             loop=old_api._loop,
             port=port,
             config=copy.copy(config))
-        MODULE_LOG.info(f'newapi: {new_api}')
         await new_api.cache_instruments()
-        MODULE_LOG.info(f'after Cache instr: {new_api}')
         setattr(self, '_api', new_api)
-        MODULE_LOG.info(
-            f'after setattr _api: {object.__getattribute__(self, "_api")}')
 
     async def disconnect(self):
         """ Disconnect from connected hardware. """
