@@ -60,15 +60,15 @@ export function EditModulesModal(props: EditModulesProps) {
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
 
-  let hasSlotOrIncomptatibleError = true
+  let hasSlotOrIncompatibleError = true
   if (slotIsEmpty) {
-    hasSlotOrIncomptatibleError = false
+    hasSlotOrIncompatibleError = false
   } else {
     const labwareOnSlot = getLabwareOnSlot(_initialDeckSetup, selectedSlot)
     const labwareIsCompatible =
       labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
 
-    hasSlotOrIncomptatibleError = !labwareIsCompatible
+    hasSlotOrIncompatibleError = !labwareIsCompatible
   }
 
   const showSlotOption = moduleType !== THERMOCYCLER
@@ -77,7 +77,7 @@ export function EditModulesModal(props: EditModulesProps) {
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const occupiedSlotError = hasSlotOrIncomptatibleError
+  const occupiedSlotError = hasSlotOrIncompatibleError
     ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
     : null
 
@@ -129,7 +129,7 @@ export function EditModulesModal(props: EditModulesProps) {
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
-      {hasSlotOrIncomptatibleError && (
+      {hasSlotOrIncompatibleError && (
         <PDAlert
           alertType="warning"
           title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
@@ -183,7 +183,7 @@ export function EditModulesModal(props: EditModulesProps) {
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
         <OutlineButton
-          disabled={hasSlotOrIncomptatibleError}
+          disabled={hasSlotOrIncompatibleError}
           onClick={onSaveClick}
         >
           Save
