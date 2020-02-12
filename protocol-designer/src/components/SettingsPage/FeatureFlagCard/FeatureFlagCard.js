@@ -1,7 +1,7 @@
 // @flow
 import sortBy from 'lodash/sortBy'
 import React, { type Node, useState } from 'react'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
@@ -25,7 +25,7 @@ const scrollToTop = () => {
   if (editPage) editPage.scrollTop = 0
 }
 
-const FeatureFlagCard = (props: Props) => {
+export const FeatureFlagCard = (props: Props) => {
   const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
@@ -121,5 +121,3 @@ const FeatureFlagCard = (props: Props) => {
     </>
   )
 }
-
-export default FeatureFlagCard

@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, DropdownField, type Options } from '@opentrons/components'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import type { StepFieldName } from '../../../steplist/fieldLevel'
 import type { BaseState } from '../../../types'

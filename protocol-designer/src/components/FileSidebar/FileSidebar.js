@@ -8,7 +8,7 @@ import {
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import styles from './FileSidebar.css'
 import modalStyles from '../modals/modal.css'
@@ -32,7 +32,7 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   saveAs(blob, downloadData.fileName)
 }
 
-export default function FileSidebar(props: Props) {
+export function FileSidebar(props: Props) {
   const {
     canDownload,
     downloadData,

@@ -18,7 +18,7 @@ type Props = {
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 }
 
-function IngredPill(props: Props) {
+export function IngredPill(props: Props) {
   const { ingreds, ingredNames, hoverTooltipHandlers } = props
   if (!ingreds || Object.keys(ingreds).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing
@@ -42,5 +42,3 @@ function IngredPill(props: Props) {
     </Pill>
   )
 }
-
-export default IngredPill

@@ -8,7 +8,7 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from './fixtures'
-import dispense from '../commandCreators/atomic/dispense'
+import { dispense } from '../commandCreators/atomic/dispense'
 
 describe('dispense', () => {
   let initialRobotState

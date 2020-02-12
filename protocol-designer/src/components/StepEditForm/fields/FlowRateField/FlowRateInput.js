@@ -7,7 +7,7 @@ import {
   RadioGroup,
   InputField,
 } from '@opentrons/components'
-import i18n from '../../../../localization'
+import { i18n } from '../../../../localization'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import modalStyles from '../../../modals/modal.css'
 import stepFormStyles from '../../StepEditForm.css'

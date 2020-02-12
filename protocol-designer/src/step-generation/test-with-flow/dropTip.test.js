@@ -7,7 +7,7 @@ import {
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
 } from './fixtures'
-import dropTip from '../commandCreators/atomic/dropTip'
+import { dropTip } from '../commandCreators/atomic/dropTip'
 
 describe('dropTip', () => {
   let invariantContext

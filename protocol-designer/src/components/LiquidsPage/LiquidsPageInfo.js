@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Icon } from '@opentrons/components'
 import styles from './LiquidsPageInfo.css'
 
-export default function LiquidsPageInfo() {
+export function LiquidsPageInfo() {
   return (
     <div className={styles.info_wrapper}>
       <h2 className={styles.header}>Define your liquids</h2>

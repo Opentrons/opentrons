@@ -4,7 +4,7 @@ import type { CommandCreator } from '../../types'
 
 type DropTipArgs = {| pipette: string |}
 /** Drop tip if given pipette has a tip. If it has no tip, do nothing. */
-const dropTip: CommandCreator<DropTipArgs> = (
+export const dropTip: CommandCreator<DropTipArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -32,5 +32,3 @@ const dropTip: CommandCreator<DropTipArgs> = (
     commands,
   }
 }
-
-export default dropTip

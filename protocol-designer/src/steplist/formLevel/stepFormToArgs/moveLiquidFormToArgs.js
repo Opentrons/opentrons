@@ -43,7 +43,7 @@ export function getMixData(
 
 type MoveLiquidStepArgs = ConsolidateArgs | DistributeArgs | TransferArgs | null
 
-const moveLiquidFormToArgs = (
+export const moveLiquidFormToArgs = (
   hydratedFormData: HydratedMoveLiquidFormData
 ): MoveLiquidStepArgs => {
   assert(
@@ -234,5 +234,3 @@ const moveLiquidFormToArgs = (
     }
   }
 }
-
-export default moveLiquidFormToArgs

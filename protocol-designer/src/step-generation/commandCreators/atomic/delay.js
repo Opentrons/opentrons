@@ -1,7 +1,7 @@
 // @flow
 import type { PauseArgs, CommandCreator } from '../../types'
 
-const delay: CommandCreator<PauseArgs> = (
+export const delay: CommandCreator<PauseArgs> = (
   args,
   invariantContext,
   prevRobotState
@@ -18,5 +18,3 @@ const delay: CommandCreator<PauseArgs> = (
     ],
   }
 }
-
-export default delay

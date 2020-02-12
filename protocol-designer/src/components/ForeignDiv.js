@@ -10,7 +10,7 @@ type Props = {
   className?: string,
 }
 
-export default function ForeignDiv(props: Props) {
+export function ForeignDiv(props: Props) {
   const {
     children,
     x = 0,

@@ -1,5 +1,5 @@
 // @flow
-import _blowout from '../commandCreators/atomic/blowout'
+import { blowout } from '../commandCreators/atomic/blowout'
 import {
   blowoutUtil,
   SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -45,7 +45,7 @@ describe('blowoutUtil', () => {
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
     })
 
-    expect(curryCommandCreator).toHaveBeenCalledWith(_blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: blowoutArgs.sourceLabwareId,
       well: blowoutArgs.sourceWell,
@@ -60,7 +60,7 @@ describe('blowoutUtil', () => {
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
     })
 
-    expect(curryCommandCreator).toHaveBeenCalledWith(_blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: blowoutArgs.destLabwareId,
       well: blowoutArgs.destWell,
@@ -75,7 +75,7 @@ describe('blowoutUtil', () => {
       blowoutLocation: TROUGH_LABWARE,
     })
 
-    expect(curryCommandCreator).toHaveBeenCalledWith(_blowout, {
+    expect(curryCommandCreator).toHaveBeenCalledWith(blowout, {
       pipette: blowoutArgs.pipette,
       labware: TROUGH_LABWARE,
       well: 'A1',

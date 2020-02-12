@@ -1,7 +1,7 @@
 // @flow
 import { combineReducers } from 'redux'
 
-import stepsReducer, { type StepsState } from './steps/reducers'
+import { rootReducer as stepsReducer, type StepsState } from './steps/reducers'
 import type { Action } from '../types'
 
 export type RootState = {|

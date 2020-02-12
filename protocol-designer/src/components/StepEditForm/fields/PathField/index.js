@@ -1,7 +1,7 @@
 // @flow
 import { connect } from 'react-redux'
 import { Path } from './Path'
-import i18n from '../../../../localization'
+import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
 import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'

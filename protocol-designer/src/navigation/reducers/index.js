@@ -38,8 +38,6 @@ export type RootState = {
   newProtocolModal: boolean,
 }
 
-const rootReducer = combineReducers<_, Action>(_allReducers)
-
-export default rootReducer
+export const rootReducer = combineReducers<_, Action>(_allReducers)
 
 export const rootSelector = (state: BaseState) => state.navigation

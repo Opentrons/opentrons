@@ -3,7 +3,7 @@ import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
 } from '../../../../constants'
-import pauseFormToArgs from '../pauseFormToArgs'
+import { pauseFormToArgs } from '../pauseFormToArgs'
 
 describe('pauseFormToArgs', () => {
   test('returns awaitTemperature command creator when form specifies pause until temp', () => {

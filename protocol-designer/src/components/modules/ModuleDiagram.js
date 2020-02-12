@@ -14,7 +14,7 @@ const MODULE_IMG_BY_TYPE = {
   thermocycler: require('../../images/modules/thermocycler.jpg'),
 }
 
-export default function ModuleDiagram(props: Props) {
+export function ModuleDiagram(props: Props) {
   return (
     <img
       className={styles.module_diagram}

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
 
@@ -10,7 +10,7 @@ import {
   SlotMap,
   HoverTooltip,
 } from '@opentrons/components'
-import ModuleDiagram from './ModuleDiagram'
+import { ModuleDiagram } from './ModuleDiagram'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
 

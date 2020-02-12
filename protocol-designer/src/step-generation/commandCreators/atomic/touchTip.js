@@ -3,7 +3,7 @@ import { noTipOnPipette, pipetteDoesNotExist } from '../../errorCreators'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 import type { TouchTipParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 
-const touchTip: CommandCreator<TouchTipParams> = (
+export const touchTip: CommandCreator<TouchTipParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -44,5 +44,3 @@ const touchTip: CommandCreator<TouchTipParams> = (
     commands,
   }
 }
-
-export default touchTip

@@ -4,10 +4,10 @@ import React from 'react'
 
 import { IconButton, SidePanel, swatchColors } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { PDTitledList, PDListItem } from '../lists'
-import StepDescription from '../StepDescription'
-import LabwareDetailsCard from './LabwareDetailsCard'
+import { StepDescription } from '../StepDescription'
+import { LabwareDetailsCard } from './LabwareDetailsCard'
 import styles from './IngredientsList.css'
 import type { LiquidGroupsById, LiquidGroup } from '../../labware-ingred/types'
 import type { SingleLabwareLiquidState } from '../../step-generation'
@@ -162,7 +162,7 @@ type Props = {
   selectedIngredientGroupId: ?string,
 }
 
-export default function IngredientsList(props: Props) {
+export function IngredientsList(props: Props) {
   const {
     labwareWellContents,
     liquidGroupsById,
