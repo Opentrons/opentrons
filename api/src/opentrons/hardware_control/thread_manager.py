@@ -79,6 +79,8 @@ class ThreadManager(HardwareAPILike):
         loop = object.__getattribute__(self, '_loop')
         try:
             attr = getattr(api, attr_name)
+            MODULE_LOG.info(
+                f'HTM: attr: {attr}, attr_name: {attr_name}')
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)
