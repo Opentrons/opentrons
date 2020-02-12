@@ -2,27 +2,46 @@
 import * as React from 'react'
 
 import { SpinnerModal } from '@opentrons/components'
-import UpdateAppModal from './UpdateAppModal'
-import RestartAppModal from './RestartAppModal'
+import { UpdateAppModal } from './UpdateAppModal'
+import { RestartAppModal } from './RestartAppModal'
 
 import type { ShellUpdateState } from '../../../shell/types'
 
-type Props = {
+export type UpdateAppProps = {|
   update: ShellUpdateState,
   availableVersion: ?string,
-  checkUpdate: () => mixed,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
-}
-export default function UpdateApp(props: Props) {
-  const { downloaded, downloading } = props.update
+|}
+
+export function UpdateApp(props: UpdateAppProps) {
+  const {
+    update,
+    availableVersion,
+    downloadUpdate,
+    applyUpdate,
+    closeModal,
+  } = props
+  const { downloaded, downloading } = update
 
   if (downloaded) {
-    return <RestartAppModal {...props} />
+    return (
+      <RestartAppModal {...{ availableVersion, applyUpdate, closeModal }} />
+    )
   } else if (downloading) {
     return <SpinnerModal message="Download in progress" alertOverlay />
   } else {
-    return <UpdateAppModal {...props} />
+    return (
+      <UpdateAppModal
+        {...{
+          update,
+          availableVersion,
+          downloadUpdate,
+          applyUpdate,
+          closeModal,
+        }}
+      />
+    )
   }
 }

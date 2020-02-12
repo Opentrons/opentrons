@@ -15,10 +15,7 @@ export type RobotApiState = $Shape<{|
 
 type ApiState = { [name: string]: ?RobotApiState }
 
-export default function apiReducer(
-  state: ApiState = {},
-  action: Action
-): ApiState {
+export function apiReducer(state: ApiState = {}, action: Action): ApiState {
   switch (action.type) {
     case 'api:REQUEST': {
       const { request } = action.payload

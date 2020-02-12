@@ -1,11 +1,11 @@
-// @flow //
+// @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { getConfig, addManualIp } from '../../../config'
 import { startDiscovery } from '../../../discovery'
 
 import { Formik, Form, Field } from 'formik'
-import IpField from './IpField'
+import { IpField } from './IpField'
 
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config/types'
@@ -16,9 +16,9 @@ type SP = {| candidates: DiscoveryCandidates |}
 
 type DP = {| addManualIp: (ip: string) => mixed |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-class IpForm extends React.Component<Props> {
+class ManualIpFormComponent extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }
 
   constructor(props: Props) {
@@ -70,7 +70,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export default connect<Props, OP, _, _, _, _>(
+export const ManualIpForm = connect<Props, OP, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(IpForm)
+)(ManualIpFormComponent)

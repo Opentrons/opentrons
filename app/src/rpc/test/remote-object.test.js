@@ -1,5 +1,5 @@
 // RPC remote object tests
-import RemoteObject from '../remote-object'
+import { RemoteObject } from '../remote-object'
 
 describe('rpc remote object factory', () => {
   let context

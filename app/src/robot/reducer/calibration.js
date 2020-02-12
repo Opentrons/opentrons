@@ -77,7 +77,7 @@ const INITIAL_STATE: CalibrationState = {
   calibrationRequest: { type: '', inProgress: false, error: null },
 }
 
-export default function calibrationReducer(
+export function calibrationReducer(
   state: CalibrationState = INITIAL_STATE,
   action: Action
 ): CalibrationState {

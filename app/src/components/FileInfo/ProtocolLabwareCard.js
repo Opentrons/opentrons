@@ -5,23 +5,23 @@ import { connect } from 'react-redux'
 import countBy from 'lodash/countBy'
 
 import { selectors as robotSelectors } from '../../robot'
-import InfoSection from './InfoSection'
-import LabwareTable from './LabwareTable'
+import { InfoSection } from './InfoSection'
+import { LabwareTable } from './LabwareTable'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Labware } from '../../robot'
 
-type Props = {
-  labware: Array<Labware>,
-}
+type SP = {| labware: Array<Labware> |}
+
+type Props = {| ...SP, dispatch: Dispatch |}
 
 const TITLE = 'Required Labware'
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(
-  ProtocolLabwareCard
-)
+export const ProtocolLabwareCard = connect<Props, {||}, _, _, _, _>(
+  mapStateToProps
+)(ProtocolLabwareCardComponent)
 
-function ProtocolLabwareCard(props: Props) {
+function ProtocolLabwareCardComponent(props: Props) {
   const { labware } = props
 
   if (labware.length === 0) return null
@@ -40,7 +40,7 @@ function ProtocolLabwareCard(props: Props) {
     </InfoSection>
   )
 }
-function mapStateToProps(state: State): $Exact<Props> {
+function mapStateToProps(state: State): SP {
   return {
     labware: robotSelectors.getLabware(state),
   }

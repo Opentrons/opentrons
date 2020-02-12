@@ -4,13 +4,13 @@ import omit from 'lodash/omit'
 import { push } from 'connected-react-router'
 
 import { delay } from '../../util'
-import client from '../api-client/client'
-import RpcClient from '../../rpc/client'
+import { client } from '../api-client/client'
+import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import MockSession from './__mocks__/session'
-import MockCalibrationMangager from './__mocks__/calibration-manager'
+import { MockSession } from './__mocks__/session'
+import { MockCalibrationManager } from './__mocks__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
@@ -44,7 +44,7 @@ describe('api client', () => {
     // need to simplify the RPC client
     // mock robot, session, and session manager
     session = MockSession()
-    calibrationManager = MockCalibrationMangager()
+    calibrationManager = MockCalibrationManager()
 
     // mock rpc client
     sessionManager = {

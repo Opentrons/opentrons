@@ -22,13 +22,13 @@ import {
   Icon,
 } from '@opentrons/components'
 
+import { UploadRobotUpdate } from './UploadRobotUpdate'
+
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 import type { RobotSettings } from '../../robot-settings/types'
 
-import UploadRobotUpdate from './UploadRobotUpdate'
-
-type Props = {|
+export type AdvancedSettingsCardProps = {|
   robot: ViewableRobot,
   resetUrl: string,
 |}
@@ -50,7 +50,7 @@ const ROBOT_LOGS_OPTOUT_MESSAGE = (
   </>
 )
 
-export default function AdvancedSettingsCard(props: Props) {
+export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
   const { robot, resetUrl } = props
   const { name, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>

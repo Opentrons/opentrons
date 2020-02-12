@@ -7,10 +7,10 @@ import { getModuleDisplayName } from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../robot'
 import { getAttachedModules } from '../../modules'
 
-import InfoSection from './InfoSection'
+import { InfoSection } from './InfoSection'
 import { SectionContentHalf } from '../layout'
-import InstrumentItem from './InstrumentItem'
-import MissingItemWarning from './MissingItemWarning'
+import { InstrumentItem } from './InstrumentItem'
+import { MissingItemWarning } from './MissingItemWarning'
 
 import type { State, Dispatch } from '../../types'
 import type { SessionModule } from '../../robot/types'
@@ -31,11 +31,11 @@ type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Required Modules'
 
-export default connect<Props, OP, SP, DP, _, _>(mapStateToProps)(
-  ProtocolModulesCard
-)
+export const ProtocolModulesCard = connect<Props, OP, SP, DP, _, _>(
+  mapStateToProps
+)(ProtocolModulesCardComponent)
 
-function ProtocolModulesCard(props: Props) {
+function ProtocolModulesCardComponent(props: Props) {
   const { modules, actualModules, attachModulesUrl } = props
 
   if (modules.length < 1) return null

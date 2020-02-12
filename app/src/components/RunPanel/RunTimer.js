@@ -4,12 +4,12 @@ import moment from 'moment'
 
 import styles from './styles.css'
 
-type TimeProps = {
+export type RunTimerProps = {|
   startTime: ?number,
   runTime: string,
-}
+|}
 
-export default function RunTimer(props: TimeProps) {
+export function RunTimer(props: RunTimerProps) {
   const { startTime, runTime } = props
   let startTimeStamp
   if (typeof startTime === 'number') {

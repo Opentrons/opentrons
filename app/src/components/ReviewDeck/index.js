@@ -14,13 +14,13 @@ import secureTCLatchSrc from '../../img/secure_tc_latch.png'
 import { THERMOCYCLER } from '../../modules'
 
 import { Portal } from '../portal'
-import DeckMap from '../DeckMap'
-import Prompt from './Prompt'
+import { DeckMap } from '../DeckMap'
+import { Prompt } from './Prompt'
 import styles from './styles.css'
 
-type Props = {| slot: ?string |}
+export type ReviewDeckProps = {| slot: ?string |}
 
-function ReviewDeck(props: Props) {
+export function ReviewDeck(props: ReviewDeckProps) {
   const { slot } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -91,5 +91,3 @@ function ReviewDeck(props: Props) {
     </div>
   )
 }
-
-export default ReviewDeck

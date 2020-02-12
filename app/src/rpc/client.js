@@ -4,9 +4,9 @@ import EventEmitter from 'events'
 // import log from 'winston'
 // import uuid from 'uuid/v4'
 
-import WebSocketClient from './websocket-client'
-import RemoteObject from './remote-object'
-import RemoteError from './remote-error'
+import { WebSocketClient } from './websocket-client'
+import { RemoteObject } from './remote-object'
+import { RemoteError } from './remote-error'
 import {
   statuses,
   RESULT,
@@ -267,7 +267,7 @@ class RpcContext extends EventEmitter {
   }
 }
 
-export default function Client(url) {
+export function Client(url) {
   const ws = new WebSocketClient(url)
 
   return new Promise((resolve, reject) => {

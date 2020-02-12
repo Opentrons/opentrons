@@ -9,9 +9,10 @@ import {
 } from '@opentrons/components'
 
 import { THERMOCYCLER, sendModuleCommand } from '../../modules'
-import DeckMap from '../DeckMap'
-import styles from './styles.css'
+import { DeckMap } from '../DeckMap'
 import { Portal } from '../portal'
+import styles from './styles.css'
+
 import type { Dispatch } from '../../types'
 import type { AttachedModule } from '../../modules/types'
 

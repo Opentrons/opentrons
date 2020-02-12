@@ -8,11 +8,11 @@ import { getCalibratePipettesLocations } from '../../nav'
 import { PIPETTE_MOUNTS } from '../../pipettes'
 import { PageTabs } from '@opentrons/components'
 
-type Props = {|
+export type PipetteTabsProps = {|
   currentMount: ?string,
 |}
 
-export default function PipetteTabs(props: Props) {
+export function PipetteTabs(props: PipetteTabsProps) {
   const { currentMount } = props
   const pagesByMount = useSelector(getCalibratePipettesLocations)
 

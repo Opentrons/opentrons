@@ -3,11 +3,11 @@
 import * as React from 'react'
 
 import { Card } from '@opentrons/components'
-import AnalyticsToggle from './AnalyticsToggle'
+import { AnalyticsToggle } from './AnalyticsToggle'
 
 const TITLE = 'Privacy Settings'
 
-export default function AnalyticsSettingsCard() {
+export function AnalyticsSettingsCard() {
   return (
     <Card title={TITLE}>
       <AnalyticsToggle />

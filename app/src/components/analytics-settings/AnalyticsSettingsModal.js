@@ -5,8 +5,8 @@ import { connect } from 'react-redux'
 import { getAnalyticsSeen, setAnalyticsSeen } from '../../analytics'
 
 import { Modal } from '@opentrons/components'
-import ModalButton from './ModalButton'
-import AnalyticsToggle from './AnalyticsToggle'
+import { ModalButton } from './ModalButton'
+import { AnalyticsToggle } from './AnalyticsToggle'
 import { Portal } from '../portal'
 import type { State, Dispatch } from '../../types'
 
@@ -16,17 +16,17 @@ type SP = {| seen: boolean |}
 
 type DP = {| setSeen: () => mixed |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
 const TITLE = 'Privacy Settings'
 const CONTINUE = 'continue'
 
-export default connect<Props, OP, _, _, _, _>(
+export const AnalyticsSettingsModal = connect<Props, OP, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(AnalyticsSettingsModal)
+)(AnalyticsSettingsModalComponent)
 
-function AnalyticsSettingsModal(props: Props) {
+function AnalyticsSettingsModalComponent(props: Props) {
   if (props.seen) return null
 
   const { setSeen } = props

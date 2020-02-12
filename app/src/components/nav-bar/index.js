@@ -7,7 +7,7 @@ import { VerticalNavBar } from '@opentrons/components'
 import { NavButton } from './NavButton'
 import { getNavbarLocations } from '../../nav'
 
-export default function NavBar() {
+export function NavBar() {
   const locations = useSelector(getNavbarLocations)
 
   return (

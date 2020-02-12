@@ -21,11 +21,11 @@ import {
 } from '../../http-api-client'
 
 import { ErrorModal } from '../modals'
-import ClearDeckAlert from './ClearDeckAlert'
-import InUseModal from './InUseModal'
-import NoPipetteModal from './NoPipetteModal'
-import InstructionsModal from './InstructionsModal'
-import ExitAlertModal from './ExitAlertModal'
+import { ClearDeckAlert } from './ClearDeckAlert'
+import { InUseModal } from './InUseModal'
+import { NoPipetteModal } from './NoPipetteModal'
+import { InstructionsModal } from './InstructionsModal'
+import { ExitAlertModal } from './ExitAlertModal'
 
 const log = createLogger(__filename)
 
@@ -34,14 +34,14 @@ const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
 const ERROR_DESCRIPTION =
   'An unexpected error has cleared your deck calibration progress, please try again.'
 
-export default withRouter<_, _>(
+export const CalibrateDeck = withRouter<_, _>(
   connect<CalibrateDeckProps, OP, SP, _, _, _>(
     makeMapStateToProps,
     mapDispatchToProps
-  )(CalibrateDeck)
+  )(CalibrateDeckComponent)
 )
 
-function CalibrateDeck(props: CalibrateDeckProps) {
+function CalibrateDeckComponent(props: CalibrateDeckProps) {
   const {
     startRequest,
     commandRequest,
@@ -133,7 +133,9 @@ function CalibrateDeck(props: CalibrateDeckProps) {
               <InstructionsModal {...startedProps} />
               <Route
                 path={exitUrl}
-                render={() => <ExitAlertModal {...props} />}
+                render={() => (
+                  <ExitAlertModal back={props.back} exit={props.exit} />
+                )}
               />
             </div>
           )

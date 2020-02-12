@@ -7,10 +7,13 @@ import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 
-import Page from '../../components/Page'
-import TipProbe from '../../components/TipProbe'
-import { PipetteTabs, Pipettes } from '../../components/calibrate-pipettes'
-import SessionHeader from '../../components/SessionHeader'
+import { Page } from '../../components/Page'
+import { TipProbe } from '../../components/TipProbe'
+import {
+  PipetteTabs,
+  Pipettes as PipettesContents,
+} from '../../components/calibrate-pipettes'
+import { SessionHeader } from '../../components/SessionHeader'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { Dispatch } from '../../types'
@@ -18,7 +21,7 @@ import type { Mount } from '../../pipettes/types'
 
 type Props = ContextRouter
 
-export default function CalibratePipettesPage(props: Props) {
+export function Pipettes(props: Props) {
   const { mount } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)
@@ -41,7 +44,7 @@ export default function CalibratePipettesPage(props: Props) {
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
       <PipetteTabs currentMount={currentMount} />
-      <Pipettes
+      <PipettesContents
         {...{
           currentMount,
           pipettes,

@@ -3,27 +3,31 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import {
-  selectors as robotSelectors,
-  type Pipette,
-  type Labware,
-} from '../../robot'
+import { selectors as robotSelectors } from '../../robot'
 
-import ConfirmPositionContents from './ConfirmPositionContents'
-import ConfirmPickupContents from './ConfirmPickupContents'
-import InProgressContents from './InProgressContents'
+import { ConfirmPositionContents } from './ConfirmPositionContents'
+import { ConfirmPickupContents } from './ConfirmPickupContents'
+import { InProgressContents } from './InProgressContents'
+
+import type { State, Dispatch } from '../../types'
+import type { Pipette, Labware } from '../../robot/types'
 
 type OP = {| labware: Labware, calibrateToBottom: boolean |}
 
 type SP = {| calibrator: ?Pipette, useCenteredTroughs: boolean |}
 
-type Props = { ...OP, ...SP }
+export type ConfirmModalContentsProps = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export default connect<Props, OP, _, _, _, _>(mapStateToProps)(
-  ConfirmModalContents
-)
+export const ConfirmModalContents = connect<
+  ConfirmModalContentsProps,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(mapStateToProps)(ConfirmModalContentsComponent)
 
-function ConfirmModalContents(props: Props) {
+function ConfirmModalContentsComponent(props: ConfirmModalContentsProps) {
   const { labware, calibrator, calibrateToBottom, useCenteredTroughs } = props
   if (!calibrator) return null
 
@@ -55,7 +59,7 @@ function ConfirmModalContents(props: Props) {
   }
 }
 
-function mapStateToProps(state, ownProps: OP): SP {
+function mapStateToProps(state: State, ownProps: OP): SP {
   const { calibratorMount } = ownProps.labware
   const pipettes = robotSelectors.getPipettes(state)
   const calibrator =

@@ -12,8 +12,9 @@ import set from 'lodash/set'
 import isEmpty from 'lodash/isEmpty'
 
 import { Icon } from '@opentrons/components'
-import FormButtonBar from './FormButtonBar'
-import ConfigFormGroup, {
+import { FormButtonBar } from './FormButtonBar'
+import {
+  ConfigFormGroup,
   FormColumn,
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
@@ -38,7 +39,7 @@ export type DisplayQuirkFieldProps = {|
   displayName: string,
 |}
 
-type Props = {|
+export type ConfigFormProps = {|
   settings: PipetteSettingsFieldsMap,
   updateInProgress: boolean,
   updateSettings: (fields: PipetteSettingsFieldsUpdate) => mixed,
@@ -51,7 +52,7 @@ const POWER_KEYS = ['plungerCurrent', 'pickUpCurrent', 'dropTipCurrent']
 const TIP_KEYS = ['dropTipSpeed', 'pickUpDistance']
 const QUIRK_KEY = 'quirks'
 
-export class ConfigForm extends React.Component<Props> {
+export class ConfigForm extends React.Component<ConfigFormProps> {
   getFieldsByKey(
     keys: Array<string>,
     fields: PipetteSettingsFieldsMap

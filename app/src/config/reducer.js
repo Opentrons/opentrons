@@ -1,7 +1,7 @@
 // @flow
 
 import { setIn } from '@thi.ng/paths'
-import remote from '../shell/remote'
+import { remote } from '../shell/remote'
 
 import type { Action } from '../types'
 import type { Config } from './types'

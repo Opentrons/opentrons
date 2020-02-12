@@ -3,14 +3,15 @@ import * as React from 'react'
 
 import styles from './styles.css'
 import { TitleBar, type TitleBarProps } from '@opentrons/components'
-import PageWrapper from './PageWrapper'
 
-type Props = {
+export { PageWrapper } from './PageWrapper'
+
+export type PageProps = {|
   titleBarProps?: TitleBarProps,
   children: React.Node,
-}
+|}
 
-export default function Page(props: Props) {
+export function Page(props: PageProps) {
   const { titleBarProps, children } = props
   return (
     <main className={styles.task}>
@@ -21,5 +22,3 @@ export default function Page(props: Props) {
     </main>
   )
 }
-
-export { PageWrapper }

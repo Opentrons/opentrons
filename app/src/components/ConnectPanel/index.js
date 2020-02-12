@@ -14,10 +14,10 @@ import {
 import type { State, Dispatch } from '../../types'
 
 import { SidePanel } from '@opentrons/components'
-import RobotList from './RobotList'
-import RobotItem from './RobotItem'
-import ScanStatus from './ScanStatus'
-import UnreachableRobotItem from './UnreachableRobotItem'
+import { RobotList } from './RobotList'
+import { RobotItem } from './RobotItem'
+import { ScanStatus } from './ScanStatus'
+import { UnreachableRobotItem } from './UnreachableRobotItem'
 
 import type {
   Robot,
@@ -35,14 +35,14 @@ type SP = {|
 
 type DP = {| onScanClick: () => mixed |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-export default connect<Props, {||}, SP, DP, State, Dispatch>(
+export const ConnectPanel = connect<Props, {||}, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(ConnectPanel)
+)(ConnectPanelComponent)
 
-function ConnectPanel(props: Props) {
+function ConnectPanelComponent(props: Props) {
   return (
     <SidePanel title="Robots">
       <ScanStatus {...props} />

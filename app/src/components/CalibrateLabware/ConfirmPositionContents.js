@@ -9,7 +9,9 @@ import type { Pipette, Labware } from '../../robot'
 import { actions as robotActions } from '../../robot'
 import { PrimaryButton } from '@opentrons/components'
 import { ConfirmPositionDiagram } from './ConfirmPositionDiagram'
-import JogControls, { type Jog } from '../JogControls'
+import { JogControls } from '../JogControls'
+
+import type { Jog } from '../JogControls'
 
 type OP = {|
   labware: Labware,
@@ -25,12 +27,12 @@ type DP = {|
 
 type Props = {| ...OP, ...DP |}
 
-export default connect<Props, OP, _, _, _, _>(
+export const ConfirmPositionContents = connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
-)(ConfirmPositionContents)
+)(ConfirmPositionContentsComponent)
 
-function ConfirmPositionContents(props: Props) {
+function ConfirmPositionContentsComponent(props: Props) {
   const {
     jog,
     onConfirmClick,

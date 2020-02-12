@@ -21,15 +21,15 @@ export type Jog = (
   step: JogStep
 ) => mixed
 
-type JogButtonProps = {
+type JogButtonProps = {|
   name: string,
   icon: IconName,
   onClick: () => mixed,
-}
+|}
 
-type Props = { jog: Jog }
+export type JogControlsProps = {| jog: Jog |}
 
-type State = { step: JogStep }
+type JogControlsState = {| step: JogStep |}
 
 const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
 
@@ -54,8 +54,11 @@ const JOG_PARAMS_BY_NAME = {
 const STEPS: Array<JogStep> = [0.1, 1, 10]
 const STEP_OPTIONS = STEPS.map(s => ({ name: `${s} mm`, value: `${s}` }))
 
-export default class JogControls extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class JogControls extends React.Component<
+  JogControlsProps,
+  JogControlsState
+> {
+  constructor(props: JogControlsProps) {
     super(props)
     this.state = { step: STEPS[0] }
   }
