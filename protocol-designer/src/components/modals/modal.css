@@ -1,6 +1,10 @@
 .modal {
   z-index: 100;
   align-items: flex-start;
+
+  & p {
+    line-height: 1.5;
+  }
 }
 
 .modal.blocking {
