@@ -6,6 +6,7 @@ import logging
 from time import time, sleep
 from typing import List, Dict, Any
 from uuid import uuid4
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons import robot
 from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
@@ -531,6 +532,8 @@ class Session(object):
                 sleep(0.1)
             self.set_state('finished')
             self._hw_iface().home()
+        except SmoothieAlarm:
+            log.info("Protocol cancelled")
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)

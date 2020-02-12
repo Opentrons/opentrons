@@ -4,6 +4,8 @@ import traceback
 import sys
 from typing import Any, Callable
 
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+
 from .contexts import ProtocolContext
 from . import execute_v3
 
@@ -104,6 +106,9 @@ def _run_python(
     new_globs.update(new_locs)
     try:
         exec('run(context)', new_globs, new_locs)
+    except SmoothieAlarm:
+        # this is a protocol cancel and shouldn't have special logging
+        raise
     except Exception as e:
         exc_type, exc_value, tb = sys.exc_info()
         try:
