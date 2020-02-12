@@ -56,6 +56,11 @@ class SessionManager(object):
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
 
+    def __del__(self):
+        if isinstance(getattr(self, '_hardware', None),
+                      adapters.SynchronousAdapter):
+            self._hardware.join()
+
     def create(
             self,
             name: str,
@@ -491,7 +496,6 @@ class Session(object):
                     self._protocol,
                     loop=self._loop,
                     broker=self._broker,
-                    hardware=self._hardware,
                     bundled_labware=getattr(
                         self._protocol, 'bundled_labware', None),
                     bundled_data=getattr(
