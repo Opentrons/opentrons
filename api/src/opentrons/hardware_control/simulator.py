@@ -146,21 +146,15 @@ class Simulator:
         :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict of mount to either instrument model names or `None`.
         """
-        MODULE_LOG.info(
-            f'SIMULATOR::get_attached_instrs  expected: {expected}')
         to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
         for mount in types.Mount:
 
             expected_instr = expected.get(mount, None)
-            MODULE_LOG.info(
-                f'SIMULATOR::get_attached_instrs  expected: {expected_instr} m : {mount}')
             if expected_instr and expected_instr not in\
                config_models + config_names:
                 raise RuntimeError(
                     f'mount {mount.name}: invalid pipette type'
                     f' {expected_instr}')
-            MODULE_LOG.info(
-                f'SIMULATOR::get_attached_instrs  attached instrs: {self._attached_instruments}')
             init_instr = self._attached_instruments.get(mount, {})
             found_model = init_instr.get('model', '')
             back_compat: List[str] = []
