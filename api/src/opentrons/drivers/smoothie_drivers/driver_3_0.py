@@ -1042,7 +1042,16 @@ class SmoothieDriver_3_0_0:
                 raise SmoothieError(ret_code)
         else:
             if is_alarm or is_error:
-                raise SmoothieError(ret_code)
+                # these two errors happen when we're recovering from a hard
+                # halt. in that case, some try/finallys above us may send
+                # further commands. smoothie responds to those commands with
+                # errors like these. if we raise exceptions here, they
+                # overwrite the original exception and we don't properly
+                #  handle it. This hack to get around this is really bad!
+                if 'alarm lock' not in ret_code.lower()\
+                   and 'after halt you should home' not in ret_code.lower():
+                    log.error(f"alarm/error outside hard halt: {ret_code}")
+                    raise SmoothieError(ret_code)
 
     def _remove_unwanted_characters(self, command: str, response: str) -> str:
         # smoothieware can enter a weird state, where it repeats back
