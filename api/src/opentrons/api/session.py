@@ -443,7 +443,8 @@ class Session(object):
 
     def stop(self):
         self._hw_iface().halt()
-        self._hw_iface().stop()
+        with self._motion_lock:
+            self._hw_iface().stop()
         self.set_state('stopped')
         return self
 
