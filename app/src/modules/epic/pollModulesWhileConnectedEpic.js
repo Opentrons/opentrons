@@ -12,16 +12,12 @@ import {
 import { getConnectedRobotName } from '../../robot/selectors'
 import { fetchModules } from '../actions'
 
-import * as Types from '../types'
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 import type { ConnectResponseAction } from '../../robot/actions'
 
 const POLL_MODULE_INTERVAL_MS = 5000
 
-export const pollModulesWhileConnectedEpic: StrictEpic<Types.FetchModulesAction> = (
-  action$,
-  state$
-) => {
+export const pollModulesWhileConnectedEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType('robot:CONNECT_RESPONSE'),
     filter<ConnectResponseAction>(action => !action.payload?.error),

@@ -57,10 +57,6 @@ export type FetchSettingsFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchSettingsDoneAction =
-  | FetchSettingsSuccessAction
-  | FetchSettingsFailureAction
-
 // update setting
 
 export type UpdateSettingAction = {|
@@ -84,10 +80,6 @@ export type UpdateSettingFailureAction = {|
   payload: {| robotName: string, error: {| message: string |} |},
   meta: RobotApiRequestMeta,
 |}
-
-export type UpdateSettingDoneAction =
-  | UpdateSettingSuccessAction
-  | UpdateSettingFailureAction
 
 // clear restart path
 

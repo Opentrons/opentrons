@@ -3,6 +3,6 @@ import { combineEpics } from 'redux-observable'
 
 import { statusEpic } from './statusEpic'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
-export const networkingEpic: StrictEpic<> = combineEpics(statusEpic)
+export const networkingEpic: Epic = combineEpics(statusEpic)

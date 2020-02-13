@@ -7,14 +7,14 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { UpdateLightsAction, UpdateLightsDoneAction } from '../types'
+import type { UpdateLightsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateLightsAction> = action => ({
   method: POST,
@@ -22,10 +22,10 @@ const mapActionToRequest: ActionToRequestMapper<UpdateLightsAction> = action => 
   body: { on: action.payload.lightsOn },
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  UpdateLightsAction,
-  UpdateLightsDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<UpdateLightsAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -34,10 +34,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.updateLightsFailure(host.name, body, meta)
 }
 
-export const updateLightsEpic: StrictEpic<UpdateLightsDoneAction> = (
-  action$,
-  state$
-) => {
+export const updateLightsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.UPDATE_LIGHTS),
     mapToRobotApiRequest(

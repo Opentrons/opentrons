@@ -5,25 +5,25 @@ import { GET } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
-import * as Types from '../types'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { FetchResetConfigOptionsAction, ResetConfigOption } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<Types.FetchResetConfigOptionsAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<FetchResetConfigOptionsAction> = action => ({
   method: GET,
   path: Constants.RESET_CONFIG_OPTIONS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  Types.FetchResetConfigOptionsAction,
-  Types.FetchResetConfigOptionsDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<FetchResetConfigOptionsAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
-  const options: Array<Types.ResetConfigOption> = body.options
+  const options: Array<ResetConfigOption> = body.options
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
@@ -31,10 +31,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.fetchResetConfigOptionsFailure(host.name, body, meta)
 }
 
-export const fetchResetOptionsEpic: StrictEpic<Types.FetchResetConfigOptionsDoneAction> = (
-  action$,
-  state$
-) => {
+export const fetchResetOptionsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.FETCH_RESET_CONFIG_OPTIONS),
     mapToRobotApiRequest(

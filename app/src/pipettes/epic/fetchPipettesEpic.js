@@ -7,14 +7,14 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchPipettesAction, FetchPipettesDoneAction } from '../types'
+import type { FetchPipettesAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchPipettesAction> = action => ({
   method: GET,
@@ -22,10 +22,10 @@ const mapActionToRequest: ActionToRequestMapper<FetchPipettesAction> = action =>
   query: action.payload.refresh ? { refresh: true } : {},
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  FetchPipettesAction,
-  FetchPipettesDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<FetchPipettesAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -34,10 +34,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.fetchPipettesFailure(host.name, body, meta)
 }
 
-export const fetchPipettesEpic: StrictEpic<FetchPipettesDoneAction> = (
-  action$,
-  state$
-) => {
+export const fetchPipettesEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.FETCH_PIPETTES),
     mapToRobotApiRequest(

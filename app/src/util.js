@@ -1,6 +1,6 @@
 // @flow
 // utility functions
-
+// DEPRECATED(mc, 2020-01-13): do not add to nor import from this file
 import type { Action, ThunkAction, ThunkPromiseAction } from './types'
 import { createLogger } from './logger'
 
@@ -9,10 +9,6 @@ type Chainable = Action | ThunkAction | ThunkPromiseAction
 type ChainAction = Promise<?Action>
 
 const log = createLogger(__filename)
-
-export function delay(ms: number): Promise<void> {
-  return new Promise(resolve => setTimeout(resolve, ms))
-}
 
 // dispatch a chain of actions or thunk actions until an error occurs
 // error means: error in action, error in payload, or promise rejection
