@@ -419,10 +419,10 @@ class ProtocolContext(CommandPublisher):
         """
         resolved_name = ModuleGeometry.resolve_module_name(module_name)
         resolved_location = self._deck_layout.resolve_module_location(
-            resolved_name, location)
+                resolved_name, location)
         geometry = load_module(resolved_name,
                                self._deck_layout.position_for(
-                                   resolved_location))
+                                    resolved_location))
         hc_mod_instance = None
         hw = self._hw_manager.hardware._api._backend
         mod_class = {
@@ -439,11 +439,9 @@ class ProtocolContext(CommandPublisher):
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler
-            }[resolved_name]
+                }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='',
-                simulating=True,
-                loop=self._loop))
+                port='', simulating=True, loop=self._loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

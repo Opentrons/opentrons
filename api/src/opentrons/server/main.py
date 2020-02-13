@@ -4,9 +4,9 @@ from argparse import ArgumentParser
 
 def build_arg_parser():
     arg_parser = ArgumentParser(
-        description="Opentrons application server",
-        prog="opentrons.server.main",
-        add_help=False
+            description="Opentrons application server",
+            prog="opentrons.server.main",
+            add_help=False
     )
     arg_parser.add_argument(
         "-H", "--hostname",

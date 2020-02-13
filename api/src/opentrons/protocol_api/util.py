@@ -31,7 +31,6 @@ def _assert_gzero(val: Any, message: str) -> float:
 
 class FlowRates:
     """ Utility class for rich setters/getters for flow rates """
-
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
@@ -72,7 +71,6 @@ class FlowRates:
 
 class PlungerSpeeds:
     """ Utility class for rich setters/getters for speeds """
-
     def __init__(self,
                  instr: 'InstrumentContext') -> None:
         self._instr = instr
@@ -207,6 +205,8 @@ class HardwareManager:
         return self._current
 
     def set_hw(self, hardware):
+        if self._current and (self._is_orig or self._built_own_adapter):
+            self._current.join()
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
             self._built_own_adapter = False
@@ -221,11 +221,20 @@ class HardwareManager:
         return self._current
 
     def reset_hw(self):
+        if self._is_orig or self._built_own_adapter:
+            self._current.join()
         self._current = adapters.SynchronousAdapter.build(
             API.build_hardware_simulator)
         self._is_orig = True
         self._built_own_adapter = True
         return self._current
+
+    def __del__(self):
+        orig = getattr(self, '_is_orig', False)
+        cur = getattr(self, '_current', None)
+        built_own = getattr(self, '_built_own_adapter')
+        if cur and (orig or built_own):
+            cur.join()
 
     def cleanup(self):
         """ Call to cleanup attached hardware (if it was created locally) """
