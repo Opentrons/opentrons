@@ -17,7 +17,6 @@ from .simulator import Simulator
 from .pipette import Pipette
 from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError, Axis
 from .constants import DROP_TIP_RELEASE_DISTANCE
-from .pause_manager import PauseManager
 from .thread_manager import ThreadManager
 
 __all__ = [
@@ -25,5 +24,5 @@ __all__ = [
     'SingletonAdapter', 'SynchronousAdapter',
     'Axis', 'HardwareAPILike', 'CriticalPoint',
     'NoTipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
-    'PauseManager', 'ThreadManager'
+    'ThreadManager'
 ]
