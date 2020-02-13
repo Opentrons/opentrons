@@ -26,7 +26,7 @@ describe('validate deck defs and fixtures', () => {
       const validationErrors = validateV1Schema.errors
       if (validationErrors) {
         console.log(
-          path.parse(defPath).base +
+          path.parse(fixturePath).base +
             ' ' +
             JSON.stringify(validationErrors, null, 4)
         )
@@ -43,7 +43,7 @@ describe('validate deck defs and fixtures', () => {
       const validationErrors = validateV2Schema.errors
       if (validationErrors) {
         console.log(
-          path.parse(defPath).base +
+          path.parse(fixturePath).base +
             ' ' +
             JSON.stringify(validationErrors, null, 4)
         )
