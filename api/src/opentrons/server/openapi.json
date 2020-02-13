@@ -931,6 +931,90 @@
         }
       }
     },
+    "/wifi/disconnect": {
+      "post": {
+        "operationId": "disconnectWifi",
+        "tags": ["networking"],
+        "description": "Disconnect the OT-2 from WiFi network",
+        "summary": "Deactivates the wifi connection and removes it from known connections",
+        "requestBody": {
+          "description": "SSID of the network to disconnect from",
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "properties": {
+                  "ssid": {
+                    "description": "The SSID to disconnect from.",
+                    "type": "string"
+                  }
+                }
+              },
+              "examples": {
+                "disconnectFromSsid": {
+                  "summary": "Disconnect robot from wifi network",
+                  "value": {
+                    "ssid": "linksys"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The OT-2 successfully disconnected from the specified ssid",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": {
+                      "type": "string", "description": "A human-readable success message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "207": {
+            "description": "The OT-2 successfully disconnected from the specified ssid but connection not deleted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": ["message"],
+                  "properties": {
+                    "message": {
+                      "type": "string", "description": "A human-readable multi-status message"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "A malformed request body of some kind",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/v1ErrorMessage" },
+                "example": {"message": "Error: JSONDecodeError in /wifi/discoonect."}
+              }
+            }
+          },
+          "500": {
+            "description": "The request body was properly formed but the OT-2 could not disconnect from the specified network, likely because the ssid was incorrect or the connection didn't exist",
+            "content": {
+              "application/json": {
+                "schema": {"$ref": "#/components/schemas/v1ErrorMessage"},
+                "example": {"message": "Error: 'linksysss' is not an active connection.\nError: no active connection provided."}
+              }
+            }
+          }
+        }
+      }
+    },
     "/wifi/keys": {
       "description": "Keyfile management for the various kinds of Wifi authentication that require private key data",
       "get": {

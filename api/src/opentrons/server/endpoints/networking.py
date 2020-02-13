@@ -26,9 +26,11 @@ EAP_CONFIG_SHAPE = {
 
 
 class ConfigureArgsError(Exception):
-    def __init__(self, message):
-        self.msg = message
-        super().__init__()
+    pass
+
+
+class DisconnectArgsError(Exception):
+    pass
 
 
 async def list_networks(request: web.Request) -> web.Response:
@@ -254,7 +256,7 @@ async def configure(request: web.Request) -> web.Response:
     try:
         configure_kwargs = _check_configure_args(body)
     except ConfigureArgsError as e:
-        return web.json_response({'message': e.msg}, status=400)
+        return web.json_response({'message': str(e)}, status=400)
 
     try:
         ok, message = await nmcli.configure(**configure_kwargs)
@@ -272,6 +274,46 @@ async def configure(request: web.Request) -> web.Response:
                                  status=201)
     else:
         return web.json_response({'message': message}, status=401)
+
+
+async def disconnect(request: web.Request) -> web.Response:
+    """
+    Post request should include a json body specifying the ssid to disconnect
+    the robot from.
+    Robot will attempt to disconnect from the specified wifi ssid and
+    on successful disconnect, will remove ssid from connection list.
+    It will respond with an OK if it successfully disconnects from wifi
+    and an error code if it is unsuccessful. If it disconnects successfully
+    but fails to delete the ssid from list, it will respond with an OK with
+    error code of 207 for multi-status.
+
+    """
+    try:
+        body = await request.json()
+    except json.JSONDecodeError as e:
+        log.exception("Error: JSONDecodeError in "
+                      "/wifi/disconnect: {}".format(e))
+        return web.json_response({'message': e.msg}, status=400)
+
+    ssid = body.get('ssid')
+    try:
+        # SSID must always be present
+        if not ssid or not isinstance(ssid, str):
+            raise DisconnectArgsError("SSID must be specified as a string")
+    except DisconnectArgsError as e:
+        return web.json_response({'message': str(e)}, status=400)
+
+    try:
+        ok, message = await nmcli.wifi_disconnect(ssid)
+    except Exception as excep:
+        return web.json_response({'message': str(excep)}, status=500)
+
+    response = {'message': message}
+    if ok:
+        stat = 200 if 'successfully deleted' in message else 207
+    else:
+        stat = 500
+    return web.json_response(response, status=stat)
 
 
 async def status(request: web.Request) -> web.Response:
