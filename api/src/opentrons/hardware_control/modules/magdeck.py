@@ -2,7 +2,7 @@ import asyncio
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
-from . import update, mod_abc
+from . import update, mod_abc, types
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
@@ -60,7 +60,7 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback: mod_abc.InterruptCallback = None,
+                    interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
@@ -80,7 +80,7 @@ class MagDeck(mod_abc.AbstractModule):
         return 'Magnetic Deck'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     @staticmethod

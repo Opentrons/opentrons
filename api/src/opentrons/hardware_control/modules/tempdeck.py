@@ -86,7 +86,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback: mod_abc.InterruptCallback = None,
+                    interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
 
@@ -108,7 +108,7 @@ class TempDeck(mod_abc.AbstractModule):
         return 'Temperature Deck'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     @staticmethod

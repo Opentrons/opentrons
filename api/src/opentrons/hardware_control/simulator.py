@@ -209,7 +209,7 @@ class Simulator:
             self,
             port: str,
             model: str,
-            interrupt_callback: modules.mod_abc.InterruptCallback
+            interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,

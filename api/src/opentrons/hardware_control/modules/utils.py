@@ -15,10 +15,10 @@ log = logging.getLogger(__name__)
 # is get all the class objects that are subclasses of an abstract module
 # (strike 1) and call a classmethod on them (strike 2) and actually store
 # the class objects (strike 3). So, type: ignore
-MODULE_TYPES = {cls.name(): cls
+MODULE_HW_BY_NAME = {cls.name(): cls
                 for cls in AbstractModule.__subclasses__()}  # type: ignore
 
-MODULE_PORT_REGEX = re.compile('|'.join(MODULE_TYPES.keys()), re.I)
+MODULE_PORT_REGEX = re.compile('|'.join(MODULE_HW_BY_NAME.keys()), re.I)
 
 
 async def build(
@@ -26,7 +26,7 @@ async def build(
         which: str,
         simulating: bool,
         interrupt_callback: InterruptCallback) -> AbstractModule:
-    return await MODULE_TYPES[which].build(
+    return await MODULE_HW_BY_NAME[which].build(
         port,
         interrupt_callback=interrupt_callback,
         simulating=simulating
@@ -62,7 +62,7 @@ def discover() -> List[ModuleAtPort]:
         match = MODULE_PORT_REGEX.search(port)
         if match:
             name = match.group().lower()
-            if name not in MODULE_TYPES:
+            if name not in MODULE_HW_BY_NAME:
                 log.warning("Unexpected module connected: {} on {}"
                             .format(name, port))
                 continue

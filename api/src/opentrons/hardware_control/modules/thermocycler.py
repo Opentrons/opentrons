@@ -119,7 +119,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback: mod_abc.InterruptCallback = None,
+                    interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
         """Build and connect to a Thermocycler
@@ -141,7 +141,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return 'Thermocycler'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_bossa
 
     @staticmethod
@@ -156,7 +156,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 interrupt_callback: mod_abc.InterruptCallback = None,
+                 interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
