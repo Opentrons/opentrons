@@ -186,7 +186,7 @@ class SingletonAdapter(HardwareAPILike):
                 'plunger_axis': Axis.of_plunger(mount)
             }
             if data.get('model'):
-                instrs[mount.name.lower()]['tip_length']\
+                instrs[mount.name.lower()]['tip_length'] \
                     = data.get('tip_length', None)
 
         return instrs
