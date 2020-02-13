@@ -44,7 +44,7 @@ def get_module_at_port(port: str) -> Optional[ModuleAtPort]:
     return None
 
 
-# TODO: consolidate this functionality with
+# TODO: BC 2020-02-13 consolidate this functionality with
 # hardware_controller.controller.Controller::_handle_watch_event
 # as they do nearly the same thing
 def discover() -> List[ModuleAtPort]:

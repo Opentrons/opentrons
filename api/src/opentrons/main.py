@@ -93,10 +93,10 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-async def initialize_robot(loop, hardware):
+def initialize_robot(loop, hardware):
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     try:
-        await hardware.connect()
+        hardware.connect()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -107,15 +107,16 @@ async def initialize_robot(loop, hardware):
         fw_version = None
     else:
         if ff.use_protocol_api_v2():
-            fw_version = await hardware.fw_version
+            fw_version = loop.run_until_complete(hardware.fw_version)
         else:
             fw_version = hardware.fw_version
     log.info("Smoothie FW version: {}".format(fw_version))
     if fw_version != packed_smoothie_fw_ver:
         log.info("Executing smoothie update: current vers {}, packed vers {}"
                  .format(fw_version, packed_smoothie_fw_ver))
-        await _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver)
-        await hardware.connect()
+        loop.run_until_complete(
+            _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver))
+        hardware.connect()
     else:
         log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
     log.info(f"Name: {name()}")
@@ -130,6 +131,7 @@ def run(hardware, **kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
+
     if ff.use_protocol_api_v2():
         robot_conf = loop.run_until_complete(hardware.get_config())
     else:
@@ -178,7 +180,6 @@ def main():
     This function does not return until the server is brought down.
     """
 
-    logging_config.log_init('INFO')
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])
@@ -194,7 +195,7 @@ def main():
     args = arg_parser.parse_args()
 
     if ff.use_protocol_api_v2():
-        checked_hardware = adapters.SingletonAdapter.build_in_managed_thread()
+        checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
     else:
         checked_hardware = opentrons.robot
     run(checked_hardware, **vars(args))
