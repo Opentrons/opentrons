@@ -1,5 +1,5 @@
 // @flow
-import makeConditionalPatchUpdater from '../makeConditionalPatchUpdater'
+import { makeConditionalPatchUpdater } from '../makeConditionalPatchUpdater'
 
 describe('makeConditionalPatchUpdater', () => {
   const foodUpdateMap = [

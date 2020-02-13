@@ -1,7 +1,7 @@
 // @flow
 import React from 'react'
 import { connect } from 'react-redux'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import {
   Card,
   OutlineButton,
@@ -17,7 +17,7 @@ import {
   selectors as tutorialSelectors,
 } from '../../tutorial'
 import { OLDEST_MIGRATEABLE_VERSION } from '../../load-file/migration'
-import FeatureFlagCard from './FeatureFlagCard'
+import { FeatureFlagCard } from './FeatureFlagCard'
 import styles from './SettingsPage.css'
 import type { BaseState, ThunkDispatch } from '../../types'
 
@@ -33,7 +33,7 @@ type SP = {|
   hasOptedIn: $PropertyType<Props, 'hasOptedIn'>,
 |}
 
-function SettingsApp(props: Props) {
+function SettingsAppComponent(props: Props) {
   const {
     canClearHintDismissals,
     hasOptedIn,
@@ -130,8 +130,8 @@ function mergeProps(
   }
 }
 
-export default connect<Props, {||}, SP, {||}, BaseState, _>(
+export const SettingsApp = connect<Props, {||}, SP, {||}, BaseState, _>(
   mapStateToProps,
   null,
   mergeProps
-)(SettingsApp)
+)(SettingsAppComponent)

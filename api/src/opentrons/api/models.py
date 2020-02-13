@@ -1,4 +1,4 @@
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import module_geometry
 from opentrons.legacy_api.containers import Slot, placeable
 
 
@@ -11,7 +11,7 @@ def _get_parent_slot_legacy(placeable):
 
 
 def _get_parent_slot_and_position(labware_obj):
-    if isinstance(labware_obj.parent, (labware.ModuleGeometry)):
+    if isinstance(labware_obj.parent, (module_geometry.ModuleGeometry)):
         return (labware_obj.parent.parent, labware_obj.parent.labware_offset)
     else:
         return (labware_obj.parent, None)
@@ -75,7 +75,7 @@ class Instrument:
 class Module:
     def __init__(self, module, context=None):
         self.id = id(module)
-        if isinstance(module, labware.ModuleGeometry):
+        if isinstance(module, module_geometry.ModuleGeometry):
             self.name = module.load_name
             self.slot = module.parent
         else:

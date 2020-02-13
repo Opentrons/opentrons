@@ -18,12 +18,12 @@ import type {
   StepItemData,
 } from '../../steplist/types'
 
-const rootSelector = (state: BaseState): StepsState => state.ui.steps
+export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
 // ======= Selectors ===============================================
 
 /** fallbacks for selectedItem reducer, when null */
-const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
+export const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   rootSelector,
   stepFormSelectors.getOrderedStepIds,
   (state, orderedStepIds) => {
@@ -34,28 +34,28 @@ const getNonNullSelectedItem: Selector<SelectableItem> = createSelector(
   }
 )
 
-const getSelectedStepId: Selector<?StepIdType> = createSelector(
+export const getSelectedStepId: Selector<?StepIdType> = createSelector(
   getNonNullSelectedItem,
   item => (item.isStep ? item.id : null)
 )
 
-const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getSelectedTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getNonNullSelectedItem,
   item => (!item.isStep ? item.id : null)
 )
 
-const getHoveredItem: Selector<?SelectableItem> = createSelector(
+export const getHoveredItem: Selector<?SelectableItem> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredItem
 )
 
-const getHoveredStepId: Selector<?StepIdType> = createSelector(
+export const getHoveredStepId: Selector<?StepIdType> = createSelector(
   getHoveredItem,
   item => (item && item.isStep ? item.id : null)
 )
 
 /** Array of labware (labwareId's) involved in hovered Step, or [] */
-const getHoveredStepLabware: Selector<Array<string>> = createSelector(
+export const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   stepFormSelectors.getArgsAndErrorsByStepId,
   getHoveredStepId,
   stepFormSelectors.getInitialDeckSetup,
@@ -105,31 +105,31 @@ const getHoveredStepLabware: Selector<Array<string>> = createSelector(
   }
 )
 
-const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
+export const getHoveredTerminalItemId: Selector<?TerminalItemId> = createSelector(
   getHoveredItem,
   item => (item && !item.isStep ? item.id : null)
 )
 
-const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
+export const getHoveredSubstep: Selector<SubstepIdentifier> = createSelector(
   rootSelector,
   (state: StepsState) => state.hoveredSubstep
 )
 
 // Hovered or selected item. Hovered has priority.
 // Uses fallback of getNonNullSelectedItem if not hovered or selected
-const getActiveItem: Selector<SelectableItem> = createSelector(
+export const getActiveItem: Selector<SelectableItem> = createSelector(
   getNonNullSelectedItem,
   getHoveredItem,
   (selected, hovered) => (hovered != null ? hovered : selected)
 )
 
 // TODO: BC 2018-12-17 refactor as react state
-const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
+export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   rootSelector,
   (state: StepsState) => state.collapsedSteps
 )
 
-const getSelectedStep: Selector<StepItemData | null> = createSelector(
+export const getSelectedStep: Selector<StepItemData | null> = createSelector(
   stepFormSelectors.getAllSteps,
   getSelectedStepId,
   (allSteps, selectedStepId) => {
@@ -143,26 +143,7 @@ const getSelectedStep: Selector<StepItemData | null> = createSelector(
   }
 )
 
-const getWellSelectionLabwareKey: Selector<?string> = createSelector(
+export const getWellSelectionLabwareKey: Selector<?string> = createSelector(
   rootSelector,
   (state: StepsState) => state.wellSelectionLabwareKey
 )
-
-// TODO: Ian 2019-12-13 don't use default exports here
-export default {
-  rootSelector,
-
-  getSelectedStep,
-
-  getSelectedStepId,
-  getSelectedTerminalItemId,
-  getHoveredTerminalItemId,
-  getHoveredStepId,
-  getHoveredStepLabware,
-  getActiveItem,
-  getHoveredSubstep,
-  getWellSelectionLabwareKey,
-
-  // NOTE: this is exposed only for substeps/selectors.js
-  getCollapsedSteps,
-}

@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import styles from './SlotWarning.css'
 import type { ModuleOrientation } from '../../types'
@@ -16,7 +16,7 @@ type Props = {|
 
 const OVERHANG = 60
 
-const SlotWarning = (props: Props) => {
+export const SlotWarning = (props: Props) => {
   const { x, y, xDimension, yDimension, orientation, warningType } = props
   const rectXOffset = orientation === 'left' ? -OVERHANG : 0
   const textXOffset = orientation === 'left' ? -1 * OVERHANG : xDimension
@@ -42,5 +42,3 @@ const SlotWarning = (props: Props) => {
     </g>
   )
 }
-
-export default SlotWarning

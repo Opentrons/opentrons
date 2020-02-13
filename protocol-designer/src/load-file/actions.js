@@ -1,5 +1,5 @@
 // @flow
-import migrateFile from './migration'
+import { migration } from './migration'
 import { selectors as featureFlagSelectors } from '../feature-flags'
 import type { PDProtocolFile } from '../file-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../types'
@@ -28,7 +28,7 @@ export const dismissFileUploadMessage = () => ({
 // expects valid, parsed JSON protocol.
 export const loadFileAction = (payload: PDProtocolFile): LoadFileAction => ({
   type: 'LOAD_FILE',
-  payload: migrateFile(payload),
+  payload: migration(payload),
 })
 
 // load file thunk, handles file loading errors

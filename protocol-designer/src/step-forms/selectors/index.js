@@ -11,7 +11,7 @@ import {
   getLabwareDisplayName,
   getLabwareDefURI,
 } from '@opentrons/shared-data'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   MAGDECK,

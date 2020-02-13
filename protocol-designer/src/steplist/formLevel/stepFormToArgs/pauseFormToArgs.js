@@ -8,7 +8,7 @@ import {
 import type { FormData } from '../../../form-types'
 import type { AwaitTemperatureArgs, PauseArgs } from '../../../step-generation'
 
-const pauseFormToArgs = (
+export const pauseFormToArgs = (
   formData: FormData
 ): PauseArgs | AwaitTemperatureArgs | null => {
   const hours = parseFloat(formData['pauseHour']) || 0
@@ -55,5 +55,3 @@ const pauseFormToArgs = (
       return null
   }
 }
-
-export default pauseFormToArgs

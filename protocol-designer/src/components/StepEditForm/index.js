@@ -15,10 +15,10 @@ import type {
   StepIdType,
 } from '../../form-types'
 import type { BaseState, ThunkDispatch } from '../../types'
-import getDefaultsForStepType from '../../steplist/formLevel/getDefaultsForStepType.js'
+import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
-import MoreOptionsModal from '../modals/MoreOptionsModal'
-import ConfirmDeleteStepModal from '../modals/ConfirmDeleteStepModal'
+import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
 import styles from './StepEditForm.css'
 
 import {
@@ -84,7 +84,7 @@ const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 
-class StepEditForm extends React.Component<Props, StepEditFormState> {
+class StepEditFormComponent extends React.Component<Props, StepEditFormState> {
   constructor(props: Props) {
     super(props)
     const { isNewStep, formData } = props
@@ -198,7 +198,7 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
   deleteStep: (stepId: StepIdType) => dispatch(actions.deleteStep(stepId)),
 })
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const StepEditForm = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(StepEditForm)
+)(StepEditFormComponent)

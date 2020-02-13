@@ -14,13 +14,16 @@ import {
   type LabwareEntity,
 } from '../step-forms'
 import {
-  selectors as stepsSelectors,
+  getCollapsedSteps,
+  getHoveredSubstep,
+  getHoveredStepId,
+  getSelectedStepId,
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
-import StepItem from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
+import { StepItem } from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
 type Props = React.ElementProps<typeof StepItem>
 
@@ -69,11 +72,11 @@ const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
       timelineWarningSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
       dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
 
-    const collapsed = stepsSelectors.getCollapsedSteps(state)[stepId]
+    const collapsed = getCollapsedSteps(state)[stepId]
 
-    const hoveredSubstep = stepsSelectors.getHoveredSubstep(state)
-    const hoveredStep = stepsSelectors.getHoveredStepId(state)
-    const selected = stepsSelectors.getSelectedStepId(state) === stepId
+    const hoveredSubstep = getHoveredSubstep(state)
+    const hoveredStep = getHoveredStepId(state)
+    const selected = getSelectedStepId(state) === stepId
 
     return {
       stepType: step.stepType,
@@ -113,7 +116,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect<Props, OP, SP, DP, _, _>(
+export const ConnectedStepItem = connect<Props, OP, SP, DP, _, _>(
   makeMapStateToProps,
   mapDispatchToProps
 )(StepItem)

@@ -16,6 +16,7 @@ import {
   actions as stepFormActions,
   getSlotIsEmpty,
   getSlotsBlockedBySpanning,
+  getLabwareOnSlot,
 } from '../../../step-forms'
 import { moveDeckItem } from '../../../labware-ingred/actions'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
@@ -24,7 +25,8 @@ import {
   getAllModuleSlotsByType,
 } from '../../../modules'
 import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
+import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
@@ -58,13 +60,24 @@ export function EditModulesModal(props: EditModulesProps) {
     (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
       previousModuleSlot === selectedSlot)
 
+  let hasSlotOrIncompatibleError = true
+  if (slotIsEmpty) {
+    hasSlotOrIncompatibleError = false
+  } else {
+    const labwareOnSlot = getLabwareOnSlot(_initialDeckSetup, selectedSlot)
+    const labwareIsCompatible =
+      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+
+    hasSlotOrIncompatibleError = !labwareIsCompatible
+  }
+
   const showSlotOption = moduleType !== THERMOCYCLER
 
   const enableSlotSelection = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const occupiedSlotError = !slotIsEmpty
+  const occupiedSlotError = hasSlotOrIncompatibleError
     ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
     : null
 
@@ -95,7 +108,7 @@ export function EditModulesModal(props: EditModulesProps) {
             stepFormActions.editModule({ id: module.id, model: selectedModel })
           )
       }
-      // if previous module.slot is different than satate, move deck item
+      // if previous module.slot is different than state, move deck item
       if (selectedSlot && module.slot !== selectedSlot) {
         module.slot && dispatch(moveDeckItem(module.slot, selectedSlot))
       }
@@ -116,7 +129,7 @@ export function EditModulesModal(props: EditModulesProps) {
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
-      {!slotIsEmpty && (
+      {hasSlotOrIncompatibleError && (
         <PDAlert
           alertType="warning"
           title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
@@ -169,7 +182,10 @@ export function EditModulesModal(props: EditModulesProps) {
 
       <div className={styles.button_row}>
         <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
-        <OutlineButton disabled={!slotIsEmpty} onClick={onSaveClick}>
+        <OutlineButton
+          disabled={hasSlotOrIncompatibleError}
+          onClick={onSaveClick}
+        >
           Save
         </OutlineButton>
       </div>

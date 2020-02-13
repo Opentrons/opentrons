@@ -90,8 +90,15 @@
     "check_email": "We've sent a confirmation URL to your email that will take you to the Protocol Designer. Keep an eye out for a follow up email which contains links to resources such as our help documents."
   },
   "experimental_feature_warning": {
-    "title": "Switching on an experimental feature",
-    "body1": "Warning: At this time Opentrons does not provide support for protocols with experimental settings turned on.",
-    "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features. "
+    "on": {
+      "title": "Switching on an experimental feature",
+      "body1": "Warning: At this time Opentrons does not provide support for protocols with experimental settings turned on.",
+      "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features. "
+    },
+    "off": {
+      "title": "Switching off an experimental feature",
+      "body1": "Warning: Any experimental features used in this protocol may cause inconsistent behavior in the Protocol Designer. For example, the Protocol Designer may no longer display all warnings or errors that exist when no experimental features have been used.",
+      "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features."
+    }
   }
 }

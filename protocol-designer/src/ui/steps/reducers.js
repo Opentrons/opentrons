@@ -143,6 +143,4 @@ export const _allReducers = {
   wellSelectionLabwareKey,
 }
 
-const rootReducer = combineReducers<_, Action>(_allReducers)
-
-export default rootReducer
+export const rootReducer = combineReducers<_, Action>(_allReducers)

@@ -60,7 +60,7 @@ export function mixUtil(args: {
   )
 }
 
-const mix: CommandCreator<MixArgs> = (
+export const mix: CommandCreator<MixArgs> = (
   data,
   invariantContext,
   prevRobotState
@@ -169,5 +169,3 @@ const mix: CommandCreator<MixArgs> = (
     prevRobotState
   )
 }
-
-export default mix

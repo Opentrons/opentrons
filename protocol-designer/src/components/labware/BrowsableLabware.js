@@ -3,14 +3,14 @@ import assert from 'assert'
 import * as React from 'react'
 import reduce from 'lodash/reduce'
 
-import SingleLabware from './SingleLabware'
+import { SingleLabware } from './SingleLabware'
 import { wellFillFromWellContents } from './utils'
 import type { ContentsByWell } from '../../labware-ingred/types'
 import type { WellIngredientNames } from '../../steplist/types'
 import type { WellGroup } from '@opentrons/components'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
-import WellTooltip from './WellTooltip'
+import { WellTooltip } from './WellTooltip'
 
 type Props = {|
   definition: ?LabwareDefinition2,
@@ -18,7 +18,7 @@ type Props = {|
   wellContents: ContentsByWell,
 |}
 
-export default function BrowsableLabware(props: Props) {
+export function BrowsableLabware(props: Props) {
   const { definition, ingredNames, wellContents } = props
   if (!definition) {
     assert(definition, 'BrowseLabwareModal expected definition')

@@ -22,7 +22,7 @@ type MakeAlert = (
   key: number | string
 ) => React.Node
 
-const Alerts = (props: Props) => {
+const AlertsComponent = (props: Props) => {
   const makeHandleCloseWarning = (dismissId: ?string) => () => {
     assert(dismissId, 'expected dismissId, Alert cannot dismiss warning')
     if (dismissId) {
@@ -50,4 +50,4 @@ const Alerts = (props: Props) => {
   )
 }
 
-export default React.memo<Props>(Alerts)
+export const Alerts = React.memo<Props>(AlertsComponent)

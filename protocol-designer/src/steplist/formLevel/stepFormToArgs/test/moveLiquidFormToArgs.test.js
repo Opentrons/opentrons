@@ -3,7 +3,8 @@ import { getLabwareDefURI } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
-import moveLiquidFormToArgs, {
+import {
+  moveLiquidFormToArgs,
   getMixData,
   type HydratedMoveLiquidFormData,
 } from '../moveLiquidFormToArgs'

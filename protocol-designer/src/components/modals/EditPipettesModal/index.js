@@ -184,7 +184,7 @@ const mergeProps = (
   }
 }
 
-export default connect<Props, OP, SP, {||}, _, _>(
+export const EditPipettesModal = connect<Props, OP, SP, {||}, _, _>(
   mapSTP,
   null,
   mergeProps

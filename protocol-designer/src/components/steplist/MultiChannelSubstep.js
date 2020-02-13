@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import { Icon } from '@opentrons/components'
 import { PDListItem } from '../lists'
-import SubstepRow from './SubstepRow'
+import { SubstepRow } from './SubstepRow'
 import styles from './StepItem.css'
 import { formatVolume } from './utils'
 
@@ -29,7 +29,7 @@ type MultiChannelSubstepState = {
   collapsed: boolean,
 }
 
-export default class MultiChannelSubstep extends React.PureComponent<
+export class MultiChannelSubstep extends React.PureComponent<
   MultiChannelSubstepProps,
   MultiChannelSubstepState
 > {

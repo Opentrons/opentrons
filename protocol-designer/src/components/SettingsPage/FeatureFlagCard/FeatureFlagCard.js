@@ -1,7 +1,7 @@
 // @flow
 import sortBy from 'lodash/sortBy'
 import React, { type Node, useState } from 'react'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { Portal } from '../../portals/MainPageModalPortal'
 import styles from '../SettingsPage.css'
@@ -25,7 +25,7 @@ const scrollToTop = () => {
   if (editPage) editPage.scrollTop = 0
 }
 
-const FeatureFlagCard = (props: Props) => {
+export const FeatureFlagCard = (props: Props) => {
   const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
@@ -87,6 +87,12 @@ const FeatureFlagCard = (props: Props) => {
   const userFacingFlagRows = userFacingFlagNames.map(toFlagRow)
   const prereleaseFlagRows = prereleaseFlagNames.map(toFlagRow)
 
+  let flagSwitchDirection: string = 'on'
+
+  if (modalFlagName) {
+    const isFlagOn: ?boolean = props.flags[modalFlagName]
+    flagSwitchDirection = isFlagOn ? 'off' : 'on'
+  }
   return (
     <>
       {modalFlagName && (
@@ -94,7 +100,9 @@ const FeatureFlagCard = (props: Props) => {
           <ContinueModal
             alertOverlay
             className={modalStyles.modal}
-            heading={i18n.t('modal.experimental_feature_warning.title')}
+            heading={i18n.t(
+              `modal.experimental_feature_warning.${flagSwitchDirection}.title`
+            )}
             onCancelClick={() => setModalFlagName(null)}
             onContinueClick={() => {
               props.setFeatureFlags({
@@ -103,8 +111,16 @@ const FeatureFlagCard = (props: Props) => {
               setModalFlagName(null)
             }}
           >
-            <p>{i18n.t('modal.experimental_feature_warning.body1')}</p>
-            <p>{i18n.t('modal.experimental_feature_warning.body2')}</p>
+            <p>
+              {i18n.t(
+                `modal.experimental_feature_warning.${flagSwitchDirection}.body1`
+              )}
+            </p>
+            <p>
+              {i18n.t(
+                `modal.experimental_feature_warning.${flagSwitchDirection}.body2`
+              )}
+            </p>
           </ContinueModal>
         </Portal>
       )}
@@ -121,5 +137,3 @@ const FeatureFlagCard = (props: Props) => {
     </>
   )
 }
-
-export default FeatureFlagCard

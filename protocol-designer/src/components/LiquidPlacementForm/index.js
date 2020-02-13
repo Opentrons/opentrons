@@ -9,14 +9,14 @@ import {
 } from '../../labware-ingred/actions'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import * as wellContentsSelectors from '../../top-selectors/well-contents'
-import wellSelectionSelectors from '../../well-selection/selectors'
+import { getSelectedWells } from '../../well-selection/selectors'
 import { deselectAllWells } from '../../well-selection/actions'
-import LiquidPlacementForm from './LiquidPlacementForm'
+import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
 import type { Dispatch } from 'redux'
 import type { ValidFormValues } from './LiquidPlacementForm'
 import type { BaseState } from '../../types'
 
-type Props = React.ElementProps<typeof LiquidPlacementForm>
+type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
 
 type SP = $Rest<
   {|
@@ -33,7 +33,7 @@ type SP = $Rest<
 >
 
 function mapStateToProps(state: BaseState): SP {
-  const selectedWells = wellSelectionSelectors.getSelectedWells(state)
+  const selectedWells = getSelectedWells(state)
 
   const _labwareId = labwareIngredSelectors.getSelectedLabwareId(state)
   const liquidLocations = labwareIngredSelectors.getLiquidsByLabwareId(state)
@@ -131,8 +131,8 @@ function mergeProps(
   }
 }
 
-export default connect<Props, {||}, SP, {||}, _, _>(
+export const LiquidPlacementForm = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(LiquidPlacementForm)
+)(LiquidPlacementFormComponent)

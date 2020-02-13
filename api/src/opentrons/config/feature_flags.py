@@ -23,3 +23,7 @@ def use_protocol_api_v2():
 
 def use_old_aspiration_functions():
     return advs.get_setting_with_env_overload('useOldAspirationFunctions')
+
+
+def use_fast_api() -> bool:
+    return advs.get_setting_with_env_overload('useFastApi')

@@ -5,7 +5,7 @@ import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/s
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
 /** Dispense with given args. Requires tip. */
-const dispense: CommandCreator<DispenseParams> = (
+export const dispense: CommandCreator<DispenseParams> = (
   args,
   invariantContext,
   prevRobotState
@@ -58,5 +58,3 @@ const dispense: CommandCreator<DispenseParams> = (
     commands,
   }
 }
-
-export default dispense
