@@ -6,7 +6,7 @@ import functools
 import threading
 from typing import List, Mapping
 
-from . import API
+from .api import API
 from .types import Axis, HardwareAPILike
 
 
@@ -98,11 +98,8 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
 
     def __getattribute__(self, attr_name):
         """ Retrieve attributes from our API and wrap coroutines """
-        # Almost every attribute retrieved from us will be fore people actually
+        # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
-        if attr_name == 'discover_modules':
-            return object.__getattribute__(self, attr_name)
-
         api = object.__getattribute__(self, '_api')
         try:
             attr = getattr(api, attr_name)
@@ -111,6 +108,7 @@ class SynchronousAdapter(HardwareAPILike, threading.Thread):
             return object.__getattribute__(self, attr_name)
 
         try:
+            # if decorated func check wrapped func
             check = attr.__wrapped__
         except AttributeError:
             check = attr

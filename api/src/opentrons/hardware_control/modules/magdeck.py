@@ -2,7 +2,7 @@ import asyncio
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
-from . import update, mod_abc
+from . import update, mod_abc, types
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
@@ -59,13 +59,15 @@ class MagDeck(mod_abc.AbstractModule):
     """
     @classmethod
     async def build(cls,
-                    port,
-                    interrupt_callback,
+                    port: str,
+                    interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
-        mod = cls(port, simulating, loop)
+        mod = cls(port=port,
+                  simulating=simulating,
+                  loop=loop)
         await mod._connect()
         return mod
 
@@ -78,7 +80,7 @@ class MagDeck(mod_abc.AbstractModule):
         return 'Magnetic Deck'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     @staticmethod
@@ -106,10 +108,6 @@ class MagDeck(mod_abc.AbstractModule):
         self._driver.probe_plate()
         # return if successful or not?
 
-    @property
-    def current_height(self):
-        return self._driver.mag_position
-
     def engage(self, height):
         """
         Move the magnet to a specific height, in mm from home position
@@ -125,6 +123,10 @@ class MagDeck(mod_abc.AbstractModule):
         """
         self._driver.home()
         self.engage(0.0)
+
+    @property
+    def current_height(self):
+        return self._driver.mag_position
 
     @property
     def device_info(self):
