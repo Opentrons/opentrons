@@ -18,6 +18,9 @@ describe('steps actions', () => {
         pipettes: { mount: 'left' },
       })
       formLevel.getNextDefaultPipetteId.mockReturnValue(pipetteId)
+      stepFormSelectors._getStepFormData.mockReturnValue({
+        stepType: 'magnet',
+      })
     })
 
     test('action is created to populate form with default engage height to scale when engage magnet step', () => {
@@ -44,6 +47,7 @@ describe('steps actions', () => {
             moduleId: magnetModule,
             magnetAction: magnetAction,
             engageHeight: '10.9',
+            stepType: 'magnet',
           },
         },
       ])
@@ -73,6 +77,7 @@ describe('steps actions', () => {
             moduleId: magnetModule,
             magnetAction: magnetAction,
             engageHeight: null,
+            stepType: 'magnet',
           },
         },
       ])
