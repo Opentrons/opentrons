@@ -13,7 +13,6 @@ from opentrons.drivers.rpi_drivers import gpio
 import opentrons.config
 from opentrons.types import Mount
 
-from .pause_manager import PauseManager
 from . import modules
 
 if TYPE_CHECKING:
@@ -169,14 +168,12 @@ class Controller:
             self,
             port: str,
             model: str,
-            pause_manager: PauseManager,
             interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
-            pause_manager=pause_manager,
             interrupt_callback=interrupt_callback)
 
     async def connect(self, port: str = None):

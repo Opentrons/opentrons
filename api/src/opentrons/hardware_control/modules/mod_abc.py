@@ -6,7 +6,7 @@ from pkg_resources import parse_version
 from typing import Dict, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
-from ..pause_manager import PauseManager
+from .types import BundledFirmware, UploadFunction, InterruptCallback
 mod_log = logging.getLogger(__name__)
 
 
@@ -17,7 +17,6 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
@@ -69,12 +68,6 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def deactivate(self):
         """ Deactivate the module. """
-        pass
-
-    @property
-    @abc.abstractmethod
-    def pause_manager(self) -> str:
-        """ Return bound instance of PauseManager"""
         pass
 
     @property

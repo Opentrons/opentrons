@@ -3,7 +3,6 @@ from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
 from . import update, mod_abc, types
-from ..pause_manager import PauseManager
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
@@ -61,14 +60,12 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
-                  pause_manager=pause_manager,
                   simulating=simulating,
                   loop=loop)
         await mod._connect()
@@ -96,7 +93,6 @@ class MagDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 pause_manager: PauseManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
@@ -104,7 +100,6 @@ class MagDeck(mod_abc.AbstractModule):
             self._driver = mag_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
-        self._pause_manager = pause_manager
 
     def calibrate(self):
         """
@@ -128,10 +123,6 @@ class MagDeck(mod_abc.AbstractModule):
         """
         self._driver.home()
         self.engage(0.0)
-
-    @property
-    def pause_manager(self):
-        return self._pause_manager
 
     @property
     def current_height(self):
