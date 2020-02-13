@@ -1,4 +1,5 @@
-from typing import Dict, NamedTuple
+from collections import namedtuple
+from typing import Dict, NamedTuple, Callable, Any, Tuple, Awaitable
 from pathlib import Path
 
 ThermocyclerStep = Dict[str, float]

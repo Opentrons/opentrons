@@ -16,7 +16,7 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, Instruments)
+                    MustHomeError, NoTipAttachedError)
 from . import modules
 
 
@@ -24,6 +24,7 @@ mod_log = logging.getLogger(__name__)
 
 
 
+InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
 
@@ -56,7 +57,7 @@ class API(HardwareAPILike):
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
 
-        self._attached_instruments: Instruments = {
+        self._attached_instruments: InstrumentsByMount = {
             top_types.Mount.LEFT: None,
             top_types.Mount.RIGHT: None
         }
