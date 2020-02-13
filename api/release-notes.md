@@ -4,13 +4,17 @@ For more details about this release, please see the full [technical change log][
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
+## New Features
+
+[Pandas](https://pandas.pydata.org/) version 0.25.3 is now available on the OT-2!
+
 ## Module Firmware Updates
 
 After you have updated your OT-2 and Opentrons App to 3.16.0, the next time you
 connect a Temperature Module or Magnetic Module you may be prompted to update
 its firmware. Until you update the module's firmware, it should not be used.
 
-# API Version 2.2
+## API Version 2.2
 
 This release contains a new Python Protocol API version: version 2.2. In version
 2.2, we corrected some behaviors around return tip functionality. For more
