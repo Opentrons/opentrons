@@ -1,4 +1,4 @@
-from .mod_abc import AbstractModule, InterruptCallback
+from .mod_abc import AbstractModule
 from .tempdeck import TempDeck
 from .magdeck import MagDeck
 from .thermocycler import Thermocycler
@@ -9,9 +9,9 @@ from .types import (ThermocyclerStep, InterruptCallback, UploadFunction,
                     AbsentModuleError, ModuleAtPort)
 
 __all__ = [
-    'MODULE_HW_BY_NAME', 'build', 'get_module_at_port', 'discover', 'update_firmware',
-    'ThermocyclerStep', 'AbstractModule', 'TempDeck', 'MagDeck',
-    'Thermocycler', 'InterruptCallback', 'UploadFunction',
-    'BundledFirmware', 'UpdateError', 'UnsupportedModuleError',
-    'AbsentModuleError', 'ModuleAtPort'
+    'MODULE_HW_BY_NAME', 'build', 'get_module_at_port', 'discover',
+    'update_firmware', 'ThermocyclerStep', 'AbstractModule',
+    'TempDeck', 'MagDeck', 'Thermocycler', 'InterruptCallback',
+    'UploadFunction', 'BundledFirmware', 'UpdateError',
+    'UnsupportedModuleError', 'AbsentModuleError', 'ModuleAtPort'
 ]

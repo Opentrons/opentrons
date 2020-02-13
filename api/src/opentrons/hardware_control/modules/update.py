@@ -4,6 +4,7 @@ import os
 from pathlib import Path
 from glob import glob
 from typing import Any, Dict, Tuple, Optional
+from .types import UpdateError
 from .mod_abc import AbstractModule
 
 log = logging.getLogger(__name__)
@@ -27,7 +28,7 @@ async def update_firmware(
     successful, res = await cls.bootloader()(flash_port, firmware_file, kwargs)
     if not successful:
         log.info(f'Bootloader reponse: {res}')
-        raise types.UpdateError(res)
+        raise UpdateError(res)
 
 
 async def find_bootloader_port():

@@ -233,7 +233,7 @@ class Thermocycler(mod_abc.AbstractModule):
     async def _execute_cycle_step(self,
                                   step: types.ThermocyclerStep,
                                   index: int,
-                                  volume: float):
+                                  volume: Optional[float]):
         await self._running_flag.wait()
         self._current_step_index = index + 1  # science starts at 1
         temperature = step.get('temperature')

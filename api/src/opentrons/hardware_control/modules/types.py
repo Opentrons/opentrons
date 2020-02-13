@@ -11,8 +11,9 @@ UploadFunction = Callable[[str, str, Dict[str, Any]],
 
 ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
 
+
 class BundledFirmware(NamedTuple):
-    """ Represents an versioned firmware file, generally bundled into the fs"""
+    """ Represents a versioned firmware file, generally bundled into the fs"""
     version: str
     path: Path
 
@@ -30,4 +31,3 @@ class UnsupportedModuleError(Exception):
 
 class AbsentModuleError(Exception):
     pass
-

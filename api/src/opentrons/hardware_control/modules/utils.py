@@ -17,8 +17,9 @@ log = logging.getLogger(__name__)
 # is get all the class objects that are subclasses of an abstract module
 # (strike 1) and call a classmethod on them (strike 2) and actually store
 # the class objects (strike 3). So, type: ignore
-MODULE_HW_BY_NAME = {cls.name(): cls
-                for cls in AbstractModule.__subclasses__()}  # type: ignore
+MODULE_HW_BY_NAME = {
+    cls.name(): cls for cls in AbstractModule.__subclasses__()  # type: ignore
+}
 
 MODULE_PORT_REGEX = re.compile('|'.join(MODULE_HW_BY_NAME.keys()), re.I)
 
