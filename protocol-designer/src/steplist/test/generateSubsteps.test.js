@@ -1,7 +1,7 @@
 // @flow
 import { generateSubsteps } from '../generateSubsteps'
 import { makeInitialRobotState } from '../../step-generation/utils'
-import { makeContext } from '../../step-generation/test-with-flow/fixtures'
+import { makeContext } from '../../step-generation/__tests__/fixtures'
 
 describe('generateSubsteps', () => {
   const stepId = 'step123'
