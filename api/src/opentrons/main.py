@@ -178,7 +178,6 @@ def main():
     This function does not return until the server is brought down.
     """
 
-    logging_config.log_init('INFO')
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])

@@ -1,7 +1,7 @@
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Callable
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
@@ -9,7 +9,6 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
-from .pause_manager import PauseManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
 
@@ -210,14 +209,12 @@ class Simulator:
             self,
             port: str,
             model: str,
-            pause_manager: PauseManager,
             interrupt_callback: modules.InterruptCallback
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
-            pause_manager=pause_manager,
             interrupt_callback=interrupt_callback)
 
     @property
