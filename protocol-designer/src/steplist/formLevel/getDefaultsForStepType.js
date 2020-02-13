@@ -82,6 +82,7 @@ export function getDefaultsForStepType(
       }
     case 'magnet':
       return {
+        moduleId: null,
         magnetAction: null,
         engageHeight: null,
       }
