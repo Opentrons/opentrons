@@ -26,9 +26,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
     uiModuleSelectors.getMagnetLabwareEngageHeight
   )
 
-  const engageHeightCaption = `Recommended: ${String(
-    maskField('engageHeight', defaultEngageHeight)
-  )}`
+  const engageHeightCaption = defaultEngageHeight
+    ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
+    : null
 
   return (
     <div className={styles.form_wrapper}>

@@ -153,12 +153,8 @@ export const selectStep = (
     )
 
     const stringDefaultEngageHeight = defaultEngageHeight
-      ? defaultEngageHeight.toString()
+      ? maskField('engageHeight', defaultEngageHeight)
       : null
-    const defaultHeightToProperDecimal = maskField(
-      'engageHeight',
-      stringDefaultEngageHeight
-    )
 
     const prevEngageHeight = getNextDefaultEngageHeight(
       stepFormSelectors.getSavedStepForms(state),
@@ -167,7 +163,7 @@ export const selectStep = (
 
     // if no previously saved engageHeight, autopopulate with recommended value
     // recommended value is null when no labware found on module
-    const engageHeight = prevEngageHeight || defaultHeightToProperDecimal
+    const engageHeight = prevEngageHeight || stringDefaultEngageHeight
     formData = { ...formData, moduleId, magnetAction, engageHeight }
   }
 

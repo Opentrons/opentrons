@@ -13,9 +13,16 @@ const mockStore = configureMockStore([thunk])
 describe('steps actions', () => {
   describe('selectStep', () => {
     const pipetteId = 'pipetteId'
-    const magnetModule = 'magnet123'
-    const magnetAction = 'engage'
     beforeEach(() => {
+      stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+        pipettes: { mount: 'left' },
+      })
+      formLevel.getNextDefaultPipetteId.mockReturnValue(pipetteId)
+    })
+
+    test('action is created to populate form with default engage height to scale when engage magnet step', () => {
+      const magnetModule = 'magnet123'
+      const magnetAction = 'engage'
       uiModulesSelectors.getSingleMagneticModuleId = jest
         .fn()
         .mockReturnValue(magnetModule)
@@ -23,17 +30,8 @@ describe('steps actions', () => {
       uiModulesSelectors.getMagnetLabwareEngageHeight = jest
         .fn()
         .mockReturnValue(10.9444)
-
-      stepFormSelectors.getInitialDeckSetup.mockReturnValue({
-        pipettes: { mount: 'left' },
-      })
-
-      formLevel.getNextDefaultPipetteId.mockReturnValue(pipetteId)
       formLevel.getNextDefaultMagnetAction.mockReturnValue(magnetAction)
       formLevel.getNextDefaultEngageHeight.mockReturnValue(null)
-    })
-
-    test('action is created to populate form with default engage height to scale when engage magnet step', () => {
       const store = mockStore({})
 
       store.dispatch(actions.selectStep(magnetModule, 'magnet'))
@@ -46,6 +44,35 @@ describe('steps actions', () => {
             moduleId: magnetModule,
             magnetAction: magnetAction,
             engageHeight: '10.9',
+          },
+        },
+      ])
+    })
+
+    test('action is created to populate form with null default engage height when engage magnet step with labware with no engage height', () => {
+      const magnetModule = 'magnet123'
+      const magnetAction = 'engage'
+      uiModulesSelectors.getSingleMagneticModuleId = jest
+        .fn()
+        .mockReturnValue(magnetModule)
+
+      uiModulesSelectors.getMagnetLabwareEngageHeight = jest
+        .fn()
+        .mockReturnValue(null)
+      formLevel.getNextDefaultMagnetAction.mockReturnValue(magnetAction)
+      formLevel.getNextDefaultEngageHeight.mockReturnValue(null)
+      const store = mockStore({})
+
+      store.dispatch(actions.selectStep(magnetModule, 'magnet'))
+
+      expect(store.getActions()).toEqual([
+        { type: 'SELECT_STEP', payload: magnetModule },
+        {
+          type: 'POPULATE_FORM',
+          payload: {
+            moduleId: magnetModule,
+            magnetAction: magnetAction,
+            engageHeight: null,
           },
         },
       ])
