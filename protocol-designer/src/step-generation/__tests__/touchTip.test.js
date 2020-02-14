@@ -1,5 +1,5 @@
 // @flow
-import { expectTimelineError } from './testMatchers'
+import { expectTimelineError } from './utils/testMatchers'
 import { touchTip } from '../commandCreators/atomic/touchTip'
 import {
   getInitialRobotStateStandard,

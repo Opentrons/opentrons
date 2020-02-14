@@ -32,7 +32,7 @@ module.exports = {
     '!**/test-with-flow/**',
     '!**/scripts/**',
   ],
-  testPathIgnorePatterns: ['cypress/', 'fixtures/'],
+  testPathIgnorePatterns: ['cypress/', 'fixtures', '__tests__/utils/'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
 }

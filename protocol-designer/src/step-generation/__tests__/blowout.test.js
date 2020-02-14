@@ -1,5 +1,5 @@
 // @flow
-import { expectTimelineError } from './testMatchers'
+import { expectTimelineError } from './utils/testMatchers'
 import { blowout } from '../commandCreators/atomic/blowout'
 import {
   makeContext,
