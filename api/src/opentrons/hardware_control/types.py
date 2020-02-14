@@ -1,6 +1,6 @@
 import enum
 import logging
-from typing import Tuple, Optional
+from typing import Tuple
 from opentrons import types as top_types
 
 MODULE_LOG = logging.getLogger(__name__)

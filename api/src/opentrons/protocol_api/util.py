@@ -187,18 +187,12 @@ class AxisMaxSpeeds(UserDict):
 class HardwareManager:
     def __init__(self, hardware):
         if None is hardware:
-            self._is_orig = True
-            self._built_own_adapter = True
             self._current = adapters.SynchronousAdapter.build(
                 API.build_hardware_simulator)
         elif isinstance(hardware, adapters.SynchronousAdapter):
-            self._is_orig = False
             self._current = hardware
-            self._built_own_adapter = False
         else:
-            self._is_orig = False
             self._current = adapters.SynchronousAdapter(hardware)
-            self._built_own_adapter = True
 
     @property
     def hardware(self):
@@ -207,28 +201,18 @@ class HardwareManager:
     def set_hw(self, hardware):
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
-            self._built_own_adapter = False
         elif isinstance(hardware, HardwareAPILike):
             self._current = adapters.SynchronousAdapter(hardware)
-            self._built_own_adapter = True
         else:
             raise TypeError(
                 "hardware should be API or synch adapter but is {}"
                 .format(hardware))
-        self._is_orig = False
         return self._current
 
     def reset_hw(self):
         self._current = adapters.SynchronousAdapter.build(
             API.build_hardware_simulator)
-        self._is_orig = True
-        self._built_own_adapter = True
         return self._current
-
-    def cleanup(self):
-        """ Call to cleanup attached hardware (if it was created locally) """
-        if self._current and (self._is_orig or self._built_own_adapter):
-            self._current.join()
 
 
 def clamp_value(

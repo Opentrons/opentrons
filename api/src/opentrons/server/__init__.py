@@ -100,7 +100,6 @@ def init(hardware: 'HardwareAPILike' = None,
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
-    log.info(f'\n\nSERVER INIT HW {hardware}\n')
     app['com.opentrons.rpc'] = RPCServer(
         app, MainRouter(
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
