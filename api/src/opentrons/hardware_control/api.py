@@ -88,7 +88,9 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         """
+        print(f'\nBHWC:: loop: {loop} \n')
         checked_loop = use_or_initialize_loop(loop)
+        print(f'\nBHWC:: checkedloop: {checked_loop} \n')
         backend = Controller(config)
         await backend.connect(port)
 
@@ -98,6 +100,7 @@ class API(HardwareAPILike):
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
             ))
+        print(f'\nBHWC:: api_instanceloop: {api_instance._loop} \n')
         return api_instance
 
     @classmethod
@@ -237,8 +240,10 @@ class API(HardwareAPILike):
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
+        print(f'\nAPI Cache Instr: {require}\n')
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
+        print(f'\nAPI Cache Instr after found: {found}\n')
 
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')

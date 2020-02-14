@@ -186,6 +186,7 @@ class AxisMaxSpeeds(UserDict):
 
 class HardwareManager:
     def __init__(self, hardware):
+        print(f'\nHM::init hardware: loop {hardware._loop} \n')
         if None is hardware:
             self._current = adapters.SynchronousAdapter.build(
                 API.build_hardware_simulator)
@@ -193,6 +194,7 @@ class HardwareManager:
             self._current = hardware
         else:
             self._current = adapters.SynchronousAdapter(hardware)
+            print(f'\nHM::init expected hardware: {self._current} \n')
 
     @property
     def hardware(self):

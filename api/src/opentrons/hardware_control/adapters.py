@@ -51,6 +51,7 @@ class SynchronousAdapter(HardwareAPILike):
         :param api: The API instance to wrap
         """
         self._api = api
+        print(f'\nSYNC ADAPT INIT api._loop: {api._loop} \n')
 
     def __repr__(self):
         return '<SynchronousAdapter>'
@@ -67,6 +68,7 @@ class SynchronousAdapter(HardwareAPILike):
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
+        print(f'\nCALL CORO SYNC ADAPT : {to_call}, loop: {loop}\n')
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
         return fut.result()
 
@@ -74,6 +76,7 @@ class SynchronousAdapter(HardwareAPILike):
         """ Retrieve attributes from our API and wrap coroutines """
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
+        print(f'\nSYNC ADAPT __GETATTRIBUTE__: {attr_name}\n')
         api = object.__getattribute__(self, '_api')
         try:
             api_attr = getattr(api, attr_name)
@@ -92,7 +95,8 @@ class SynchronousAdapter(HardwareAPILike):
             pass
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
-            return functools.partial(self.call_coroutine_sync,
+            return functools.partial(object.__getattribute__(self,
+                                                             'call_coroutine_sync'),
                                      api._loop, api_attr)
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning

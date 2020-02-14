@@ -22,7 +22,7 @@ from opentrons.protocol_api import (execute as execute_apiv2,
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 _HWCONTROL: Optional[API] = None
@@ -78,26 +78,20 @@ def get_protocol_api(
                           custom labware.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
+    global _HWCONTROL
     if not _HWCONTROL:
         # Build a hardware controller in a worker thread, which is necessary
         # because ipython runs its notebook in asyncio but the notebook
         # is at script/repl scope not function scope and is synchronous so
         # you can't control the loop from inside. If we update to
         # IPython 7 we can avoid this, but for now we can't
-        def _build_hwcontroller():
-            global _HWCONTROL
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-            _HWCONTROL = loop.run_until_complete(
-                API.build_hardware_controller())
-
-        thread = threading.Thread(
-            target=_build_hwcontroller,
-            name='Hardware-controller-builder')
-        thread.start()
-        thread.join()
+        try:
+            outer_loop = asyncio.get_event_loop()
+        except RuntimeError:
+            outer_loop = asyncio.new_event_loop()
+        _HWCONTROL = outer_loop.run_until_complete(
+                ThreadManager(API.build_hardware_controller)
+        )
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
@@ -111,6 +105,7 @@ def get_protocol_api(
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
+    print(f'\nexecute::get_protocol_api hwc: {_HWCONTROL}, loop: {_HWCONTROL._loop} \n')
     context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
                                            bundled_labware=bundled_labware,
                                            bundled_data=bundled_data,
