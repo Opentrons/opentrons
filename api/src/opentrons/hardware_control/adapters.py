@@ -26,39 +26,31 @@ class SynchronousAdapter(HardwareAPILike):
     """
 
     @classmethod
-    def build(cls, builder, *args, **kwargs):
+    def build(cls, builder, *args, **kwargs) -> 'SynchronousAdapter':
         """ Build a hardware control API and initialize the adapter in one call
 
         :param builder: the builder method to use (e.g.
-                        :py:meth:`hardware_control.API.build_hardware_simulator`)
+                :py:meth:`hardware_control.API.build_hardware_simulator`)
         :param args: Args to forward to the builder method
         :param kwargs: Kwargs to forward to the builder method
         """
 
-        loop = asyncio.new_event_loop()
+        outer_loop = asyncio.new_event_loop()
         args = [arg for arg in args
                 if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
-            api = loop.run_until_complete(
+            api = outer_loop.run_until_complete(
                 ThreadManager(builder, *args, **kwargs)
             )
         else:
             api = ThreadManager(builder, *args, **kwargs)
         return cls(api)
 
-    def __init__(self,
-                 api: API) -> None:
+    def __init__(self, api: API) -> None:
         """ Build the SynchronousAdapter.
 
         :param api: The API instance to wrap
-        :param loop: A specific event loop to use. This is for the use of
-                     :py:meth:`build` and should normally not be used; since
-                     this loop will be run in a worker thread it should not
-                     be run elsewhere. If not specified (which should be the
-                     normal use case) the adapter will start a new event loop
-                     for the worker thread.
         """
-        self._loop = api._loop
         self._api = api
 
     def __repr__(self):
@@ -66,12 +58,13 @@ class SynchronousAdapter(HardwareAPILike):
 
     def __del__(self):
         try:
-            loop = object.__getattribute__(self, '_loop')
+            api = object.__getattribute__(self, '_api')
+            inner_loop = api._loop
         except AttributeError:
             pass
         else:
-            if loop.is_running():
-                loop.call_soon_threadsafe(lambda: loop.stop())
+            if inner_loop.is_running():
+                inner_loop.call_soon_threadsafe(lambda: inner_loop.stop())
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
@@ -98,13 +91,12 @@ class SynchronousAdapter(HardwareAPILike):
             check = check.__wrapped__
         except AttributeError:
             pass
-        loop = object.__getattribute__(self, '_loop')
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
-            return functools.partial(self.call_coroutine_sync, loop, api_attr)
+            return functools.partial(self.call_coroutine_sync, api._loop, api_attr)
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning
-            fut = asyncio.run_coroutine_threadsafe(check, loop)
+            fut = asyncio.run_coroutine_threadsafe(check, api._loop)
             return fut.result()
 
         return api_attr
