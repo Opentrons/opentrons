@@ -3,7 +3,6 @@
 import asyncio
 import copy
 import functools
-import logging
 from typing import List
 
 from .api import API
@@ -36,14 +35,14 @@ class SynchronousAdapter(HardwareAPILike):
         """
 
         outer_loop = asyncio.new_event_loop()
-        args = [arg for arg in args
-                if not isinstance(arg, asyncio.AbstractEventLoop)]
+        no_loop_args = [arg for arg in args
+                        if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
             api = outer_loop.run_until_complete(
-                ThreadManager(builder, *args, **kwargs)
+                ThreadManager(builder, *no_loop_args, **kwargs)
             )
         else:
-            api = ThreadManager(builder, *args, **kwargs)
+            api = ThreadManager(builder, *no_loop_args, **kwargs)
         return cls(api)
 
     def __init__(self, api: API) -> None:
@@ -93,7 +92,8 @@ class SynchronousAdapter(HardwareAPILike):
             pass
         if asyncio.iscoroutinefunction(check):
             # Return a synchronized version of the coroutine
-            return functools.partial(self.call_coroutine_sync, api._loop, api_attr)
+            return functools.partial(self.call_coroutine_sync,
+                                     api._loop, api_attr)
         elif asyncio.iscoroutine(check):
             # Catch awaitable properties and reify the future before returning
             fut = asyncio.run_coroutine_threadsafe(check, api._loop)

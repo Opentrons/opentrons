@@ -5,7 +5,7 @@ from typing import (
     Dict, Iterator, List, Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API, Simulator
+from opentrons.hardware_control import adapters, modules, API
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
