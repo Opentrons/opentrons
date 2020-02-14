@@ -424,7 +424,6 @@ class ProtocolContext(CommandPublisher):
                                self._deck_layout.position_for(
                                     resolved_location))
         hc_mod_instance = None
-        hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
@@ -434,7 +433,7 @@ class ProtocolContext(CommandPublisher):
                 hc_mod_instance = adapters.SynchronousAdapter(mod)
                 break
 
-        if isinstance(hw, Simulator) and hc_mod_instance is None:
+        if self.is_simulating and hc_mod_instance is None:
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,

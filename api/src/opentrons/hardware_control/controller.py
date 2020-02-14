@@ -1,8 +1,7 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, \
-    Tuple, TYPE_CHECKING, Callable
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
     import aionotify  # type: ignore
 except OSError:

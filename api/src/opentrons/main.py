@@ -130,6 +130,7 @@ def run(hardware, **kwargs):  # noqa(C901)
     the use of different length args
     """
     loop = asyncio.get_event_loop()
+
     if ff.use_protocol_api_v2():
         robot_conf = loop.run_until_complete(hardware.get_config())
     else:

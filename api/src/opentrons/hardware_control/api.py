@@ -124,7 +124,7 @@ class API(HardwareAPILike):
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
-        api_instance = cls(backend, config=config, loop=checked_loop)
+        api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
             register_modules=api_instance.register_modules))
         return api_instance
@@ -242,7 +242,6 @@ class API(HardwareAPILike):
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
-
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
 
