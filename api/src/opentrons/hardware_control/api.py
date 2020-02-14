@@ -8,7 +8,7 @@ from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
 from opentrons.drivers.types import MoveSplit
 
-from .util import use_or_initialize_loop, log_call
+from .util import use_or_initialize_loop
 from .pipette import Pipette
 from .controller import Controller
 from .simulator import Simulator
@@ -179,7 +179,6 @@ class API(HardwareAPILike):
     fw_version = property(fget=get_fw_version)
 
     # Incidentals (i.e. not motion) API
-    @log_call
     async def set_lights(self, button: bool = None, rails: bool = None):
         """ Control the robot lights.
 
@@ -192,7 +191,6 @@ class API(HardwareAPILike):
         """
         self._backend.set_lights(button, rails)
 
-    @log_call
     async def get_lights(self) -> Dict[str, bool]:
         """ Return the current status of the robot lights.
 
@@ -200,7 +198,6 @@ class API(HardwareAPILike):
         """
         return self._backend.get_lights()
 
-    @log_call
     async def identify(self, duration_s: int = 5):
         """ Blink the button light to identify the robot.
 
@@ -216,13 +213,11 @@ class API(HardwareAPILike):
             await asyncio.sleep(max(0, 0.25 - (now - then)))
         self.set_lights(button=True)
 
-    @log_call
     async def delay(self, duration_s: int):
         """ Delay execution by pausing and sleeping.
         """
         await self._backend.delay(duration_s)
 
-    @log_call
     async def cache_instruments(self,
                                 require:
                                 Dict[top_types.Mount, str] = {}):
@@ -351,7 +346,6 @@ class API(HardwareAPILike):
     def attached_modules(self):
         return self._attached_modules
 
-    @log_call
     async def update_firmware(
             self,
             firmware_file: str,
@@ -382,7 +376,6 @@ class API(HardwareAPILike):
                 maybe_module_method()
 
     # Global actions API
-    @log_call
     def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
@@ -404,7 +397,6 @@ class API(HardwareAPILike):
             cb(message)
         self.pause()
 
-    @log_call
     def resume(self):
         """
         Resume motion after a call to :py:meth:`pause`.
@@ -412,7 +404,6 @@ class API(HardwareAPILike):
         self._backend.resume()
         self._call_on_attached_modules("resume")
 
-    @log_call
     def halt(self):
         """ Immediately stop motion.
 
@@ -442,7 +433,6 @@ class API(HardwareAPILike):
         await self.reset()
         await self.home()
 
-    @log_call
     async def reset(self):
         """ Reset the stored state of the system.
 
@@ -452,7 +442,6 @@ class API(HardwareAPILike):
         await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
-    @log_call
     async def home_z(self, mount: top_types.Mount = None):
         """ Home the two z-axes """
         if not mount:
@@ -461,7 +450,6 @@ class API(HardwareAPILike):
             axes = [Axis.by_mount(mount)]
         await self.home(axes)
 
-    @log_call
     async def home_plunger(self, mount: top_types.Mount):
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -476,7 +464,6 @@ class API(HardwareAPILike):
             await self._move_plunger(mount,
                                      instr.config.bottom)
 
-    @log_call
     async def home(self, axes: List[Axis] = None):
         """ Home the entire robot and initialize current position.
         :param axes: A list of axes to home. Default is `None`, which will
@@ -638,7 +625,6 @@ class API(HardwareAPILike):
                                y=cur_pos[Axis.Y],
                                z=cur_pos[Axis.by_mount(mount)])
 
-    @log_call
     async def move_to(
             self, mount: top_types.Mount, abs_position: top_types.Point,
             speed: float = None,
@@ -700,7 +686,6 @@ class API(HardwareAPILike):
 
         await self._move(target_position, speed=speed, max_speeds=max_speeds)
 
-    @log_call
     async def move_rel(self, mount: top_types.Mount, delta: top_types.Point,
                        speed: float = None,
                        max_speeds: Dict[Axis, float] = None):
@@ -840,7 +825,6 @@ class API(HardwareAPILike):
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
 
-    @log_call
     async def retract(self, mount: top_types.Mount, margin: float = 10):
         """ Pull the specified mount up to its home position.
 
@@ -904,7 +888,6 @@ class API(HardwareAPILike):
         pass
 
     # Pipette action API
-    @log_call
     async def prepare_for_aspirate(
             self, mount: top_types.Mount, rate: float = 1.0):
         """
@@ -938,7 +921,6 @@ class API(HardwareAPILike):
                 speed=(speed*rate))
         this_pipette.ready_to_aspirate = True
 
-    @log_call
     async def aspirate(self, mount: top_types.Mount, volume: float = None,
                        rate: float = 1.0):
         """
@@ -1007,7 +989,6 @@ class API(HardwareAPILike):
         else:
             this_pipette.add_current_volume(asp_vol)
 
-    @log_call
     async def dispense(self, mount: top_types.Mount, volume: float = None,
                        rate: float = 1.0):
         """
@@ -1078,7 +1059,6 @@ class API(HardwareAPILike):
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 
-    @log_call
     async def blow_out(self, mount):
         """
         Force any remaining liquid to dispense. The liquid will be dispensed at
@@ -1103,7 +1083,6 @@ class API(HardwareAPILike):
         finally:
             this_pipette.set_current_volume(0)
 
-    @log_call
     async def pick_up_tip(self,
                           mount,
                           tip_length: float,
@@ -1190,7 +1169,6 @@ class API(HardwareAPILike):
             .format(mount, tip_volume))
         instr.working_volume = tip_volume
 
-    @log_call
     async def drop_tip(self, mount, home_after=True):
         """
         Drop tip at the current location
@@ -1284,7 +1262,6 @@ class API(HardwareAPILike):
         await self.move_rel(mount, up_pos)
 
     # Pipette config api
-    @log_call
     def calibrate_plunger(self,
                           mount: top_types.Mount,
                           top: float = None, bottom: float = None,
@@ -1321,7 +1298,6 @@ class API(HardwareAPILike):
         for key in pos_dict.keys():
             instr.update_config_item(key, pos_dict[key])
 
-    @log_call
     def set_flow_rate(self, mount,
                       aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
@@ -1335,7 +1311,6 @@ class API(HardwareAPILike):
         if blow_out:
             this_pipette.update_config_item('blow_out_flow_rate', blow_out)
 
-    @log_call
     def set_pipette_speed(self, mount,
                           aspirate=None, dispense=None, blow_out=None):
         this_pipette = self._attached_instruments[mount]
@@ -1472,7 +1447,6 @@ class API(HardwareAPILike):
                                new_pos))
         return to_ret
 
-    @log_call
     async def locate_tip_probe_center(
             self, mount, tip_length=None) -> top_types.Point:
         """ Use the specified mount (which should have a tip) to find the
