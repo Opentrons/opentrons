@@ -61,6 +61,50 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'networking:FETCH_WIFI_LIST',
+      creator: Actions.fetchWifiList,
+      args: [mockRobot.name],
+      expected: {
+        type: 'networking:FETCH_WIFI_LIST',
+        payload: { robotName: mockRobot.name },
+        meta: {},
+      },
+    },
+    {
+      name: 'networking:FETCH_WIFI_LIST_SUCCESS',
+      creator: Actions.fetchWifiListSuccess,
+      args: [
+        mockRobot.name,
+        Fixtures.mockWifiListSuccess.body.list,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:FETCH_WIFI_LIST_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          wifiList: Fixtures.mockWifiListSuccess.body.list,
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'networking:FETCH_WIFI_LIST_FAILURE',
+      creator: Actions.fetchWifiListFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockWifiListFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:FETCH_WIFI_LIST_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockWifiListFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

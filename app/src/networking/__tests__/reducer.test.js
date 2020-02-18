@@ -25,12 +25,37 @@ const SPECS: Array<ReducerSpec> = [
       {}
     ),
     state: {
-      [ROBOT_NAME]: {},
+      [ROBOT_NAME]: {
+        wifiList: [],
+      },
     },
     expected: {
       [ROBOT_NAME]: {
         internetStatus: Fixtures.mockNetworkingStatus.status,
         interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [],
+      },
+    },
+  },
+  {
+    name: 'handles fetch wifi list success action',
+    action: Actions.fetchWifiListSuccess(
+      ROBOT_NAME,
+      [Fixtures.mockWifiNetwork],
+      {}
+    ),
+    state: {
+      [ROBOT_NAME]: {
+        internetStatus: Fixtures.mockNetworkingStatus.status,
+        interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [],
+      },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        internetStatus: Fixtures.mockNetworkingStatus.status,
+        interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [Fixtures.mockWifiNetwork],
       },
     },
   },
