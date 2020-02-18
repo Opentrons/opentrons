@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.16.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.16.0-alpha.2...v3.16.0-alpha.3) (2020-02-18)
+
+
+### Bug Fixes
+
+* **api:** make probe failures raise the actual error ([#5015](https://github.com/opentrons/opentrons/issues/5015)) ([bc74517](https://github.com/opentrons/opentrons/commit/bc74517)), closes [#4980](https://github.com/opentrons/opentrons/issues/4980)
+
+
+
+
+
 # [3.16.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.16.0-alpha.1...v3.16.0-alpha.2) (2020-02-13)
 
 **Note:** Version bump only for package opentrons
