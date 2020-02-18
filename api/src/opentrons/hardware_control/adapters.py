@@ -34,10 +34,10 @@ class SynchronousAdapter(HardwareAPILike):
         :param kwargs: Kwargs to forward to the builder method
         """
 
-        outer_loop = asyncio.new_event_loop()
         no_loop_args = [arg for arg in args
                         if not isinstance(arg, asyncio.AbstractEventLoop)]
         if asyncio.iscoroutinefunction(builder):
+            outer_loop = asyncio.new_event_loop()
             api = outer_loop.run_until_complete(
                 ThreadManager(builder, *no_loop_args, **kwargs)
             )
