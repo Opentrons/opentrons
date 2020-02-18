@@ -415,8 +415,6 @@ export const savedStepForms = (
         ) {
           return { ...form, moduleId: null }
         } else {
-          // TODO: Ian 2019-10-24 remove modules from forms that may reference them
-          // via handleFormChange
           return form
         }
       })
