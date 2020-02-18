@@ -5,8 +5,8 @@ import {
   makeState,
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
-} from './fixtures'
-import { makeImmutableStateUpdater } from './utils'
+} from '../__fixtures__'
+import { makeImmutableStateUpdater } from '../__utils__'
 
 import { forDropTip as _forDropTip } from '../getNextRobotStateAndWarnings/forDropTip'
 

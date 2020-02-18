@@ -9,11 +9,11 @@ import {
   forDeactivateTemperature as _forDeactivateTemperature,
   forAwaitTemperature as _forAwaitTemperature,
 } from '../getNextRobotStateAndWarnings/temperatureUpdates'
-import { makeImmutableStateUpdater } from './utils/makeImmutableStateUpdater'
+import { makeImmutableStateUpdater } from '../__utils__/makeImmutableStateUpdater'
 import {
   getStateAndContextTempMagModules,
   robotWithStatusAndTemp,
-} from './fixtures/robotStateFixtures'
+} from '../__fixtures__/robotStateFixtures'
 
 const forSetTemperature = makeImmutableStateUpdater(_forSetTemperature)
 const forDeactivateTemperature = makeImmutableStateUpdater(

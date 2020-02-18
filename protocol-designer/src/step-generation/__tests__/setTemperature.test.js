@@ -1,5 +1,5 @@
 // @flow
-import { getStateAndContextTempMagModules } from './fixtures'
+import { getStateAndContextTempMagModules } from '../__fixtures__'
 import { setTemperature } from '../commandCreators/atomic/setTemperature'
 
 const temperatureModuleId = 'temperatureModuleId'

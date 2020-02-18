@@ -6,7 +6,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
   FIXED_TRASH_ID,
-} from './fixtures'
+} from '../__fixtures__'
 import { dropTip } from '../commandCreators/atomic/dropTip'
 
 describe('dropTip', () => {

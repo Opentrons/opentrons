@@ -17,7 +17,7 @@ import {
   repeatArray,
   makeInitialRobotState,
 } from '../utils/misc'
-import { FIXED_TRASH_ID } from './fixtures'
+import { FIXED_TRASH_ID } from '../__fixtures__'
 
 describe('splitLiquid', () => {
   const singleIngred = {

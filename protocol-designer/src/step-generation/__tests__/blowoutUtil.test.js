@@ -14,7 +14,7 @@ import {
   BLOWOUT_FLOW_RATE,
   BLOWOUT_OFFSET_FROM_TOP_MM,
   makeContext,
-} from './fixtures'
+} from '../__fixtures__'
 
 jest.mock('../utils/curryCommandCreator')
 

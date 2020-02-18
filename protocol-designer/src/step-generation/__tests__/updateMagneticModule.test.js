@@ -1,7 +1,7 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
-import { makeImmutableStateUpdater } from './utils'
-import { makeContext, getInitialRobotStateStandard } from './fixtures'
+import { makeImmutableStateUpdater } from '../__utils__'
+import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import {
   forEngageMagnet as _forEngageMagnet,
   forDisengageMagnet as _forDisengageMagnet,

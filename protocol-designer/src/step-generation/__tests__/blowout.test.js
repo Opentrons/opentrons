@@ -1,5 +1,5 @@
 // @flow
-import { expectTimelineError } from './utils/testMatchers'
+import { expectTimelineError } from '../__utils__/testMatchers'
 import { blowout } from '../commandCreators/atomic/blowout'
 import {
   makeContext,
@@ -9,7 +9,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from './fixtures'
+} from '../__fixtures__'
 
 describe('blowout', () => {
   let invariantContext

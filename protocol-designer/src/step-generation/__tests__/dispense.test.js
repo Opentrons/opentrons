@@ -7,7 +7,7 @@ import {
   getSuccessResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from './fixtures'
+} from '../__fixtures__'
 import { dispense } from '../commandCreators/atomic/dispense'
 
 describe('dispense', () => {

@@ -1,5 +1,5 @@
 // @flow
-import { makeContext, getInitialRobotStateStandard } from './fixtures'
+import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
 
 const moduleId = 'magneticModuleId'

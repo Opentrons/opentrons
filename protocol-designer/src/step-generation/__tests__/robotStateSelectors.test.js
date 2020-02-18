@@ -8,7 +8,7 @@ import {
   getTipColumn,
   getTiprackTipstate,
   DEFAULT_PIPETTE,
-} from './fixtures'
+} from '../__fixtures__'
 import {
   sortLabwareBySlot,
   getNextTiprack,

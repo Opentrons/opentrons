@@ -21,7 +21,7 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
-} from '../../../constants'
+} from '../../constants'
 import {
   DEFAULT_PIPETTE,
   MULTI_PIPETTE,
@@ -30,9 +30,9 @@ import {
   TROUGH_LABWARE,
   FIXED_TRASH_ID,
 } from './commandFixtures'
-import { makeInitialRobotState } from '../../utils'
+import { makeInitialRobotState } from '../utils'
 import { tiprackWellNamesFlat } from './data'
-import type { InvariantContext, RobotState } from '../../'
+import type { InvariantContext, RobotState } from '../'
 
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }

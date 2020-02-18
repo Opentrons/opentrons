@@ -1,13 +1,13 @@
 // @flow
 import { AIR, createTipLiquidState } from '../utils/misc'
-import { makeImmutableStateUpdater } from './utils'
+import { makeImmutableStateUpdater } from '../__utils__'
 import {
   makeContext,
   getInitialRobotStateStandard,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
   TROUGH_LABWARE,
-} from './fixtures'
+} from '../__fixtures__'
 
 import { forAspirate as _forAspirate } from '../getNextRobotStateAndWarnings/forAspirate'
 import * as warningCreators from '../warningCreators'

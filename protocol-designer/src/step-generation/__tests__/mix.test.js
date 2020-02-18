@@ -15,7 +15,7 @@ import {
   makeDispenseHelper,
   blowoutHelper,
   makeTouchTipHelper,
-} from './fixtures'
+} from '../__fixtures__'
 import type { MixArgs } from '../types'
 
 const aspirateHelper = makeAspirateHelper()

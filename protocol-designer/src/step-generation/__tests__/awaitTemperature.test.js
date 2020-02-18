@@ -8,7 +8,7 @@ import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 import {
   getStateAndContextTempMagModules,
   robotWithStatusAndTemp,
-} from './fixtures'
+} from '../__fixtures__'
 
 describe('awaitTemperature', () => {
   const temperatureModuleId = 'temperatureModuleId'

@@ -19,7 +19,7 @@ import {
   dropTipHelper,
   ASPIRATE_OFFSET_FROM_BOTTOM_MM,
   DISPENSE_OFFSET_FROM_BOTTOM_MM,
-} from './fixtures'
+} from '../__fixtures__'
 import type {
   AspirateParams,
   DispenseParams,

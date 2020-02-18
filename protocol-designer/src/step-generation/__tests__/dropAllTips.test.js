@@ -9,7 +9,7 @@ import {
   getInitialRobotStateStandard,
   getSuccessResult,
   DEFAULT_PIPETTE,
-} from './fixtures'
+} from '../__fixtures__'
 import { dropAllTips } from '../commandCreators/atomic/dropAllTips'
 import { getNextRobotStateAndWarnings } from '../getNextRobotStateAndWarnings'
 const p300SingleId = DEFAULT_PIPETTE

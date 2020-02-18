@@ -1,6 +1,6 @@
 // @flow
 import { createEmptyLiquidState } from '../utils'
-import { makeContext, makeState } from './fixtures'
+import { makeContext, makeState } from '../__fixtures__'
 
 describe('snapshot tests', () => {
   test('makeContext', () => {

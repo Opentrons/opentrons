@@ -9,7 +9,7 @@ import {
   pickUpTipHelper,
   dropTipHelper,
   DEFAULT_PIPETTE,
-} from './fixtures'
+} from '../__fixtures__'
 import { replaceTip } from '../commandCreators/atomic/replaceTip'
 
 const tiprack1Id = 'tiprack1Id'

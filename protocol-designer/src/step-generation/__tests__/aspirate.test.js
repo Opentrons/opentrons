@@ -1,5 +1,5 @@
 // @flow
-import { expectTimelineError } from './utils/testMatchers'
+import { expectTimelineError } from '../__utils__/testMatchers'
 import { aspirate } from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
@@ -12,7 +12,7 @@ import {
   getErrorResult,
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
-} from './fixtures'
+} from '../__fixtures__'
 
 describe('aspirate', () => {
   let initialRobotState
