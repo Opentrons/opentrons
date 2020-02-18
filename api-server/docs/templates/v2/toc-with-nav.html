@@ -1,0 +1,20 @@
+<!-- Navbar override for specific styling for the v2 sidebar-->
+<h3>{{ _('Table Of Contents') }}</h3>
+{{ toctree(includehidden=theme_sidebar_showhidden, collapse=theme_sidebar_collapse) }}
+<hr />
+<ul>
+    <li class="toctree-l1"><a href="../v1/index.html">OT-2 Python API v1</a></li>
+    <li class="toctree-l1"><a href="../ot1/index.html">OT-1 Python API</a></li>
+</ul>
+<hr />
+<ul>
+    <li class="toctree-l1"><a href="../OpentronsPythonAPIV2.pdf">Download As PDF</a></li>
+</ul>
+<!-- 'extra_nav_links' in the config dict if any, though there probably shoudln't be -->
+{% if theme_extra_nav_links %}
+<ul>
+    {% for text, uri in theme_extra_nav_links.items() %}
+    <li class="toctree-l1"><a href="{{uri}}">{{ text }}</a></li>
+    {% endfor %}
+</ul>
+{% endif %}
