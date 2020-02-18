@@ -787,4 +787,70 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       }
     )
   })
+
+  describe('delete module -> removes references to module from step forms', () => {
+    const stepId = '_stepId'
+    const action = { type: 'DELETE_MODULE', payload: { id: moduleId } }
+    const getPrevRootStateWithStep = step => ({
+      savedStepForms: {
+        [INITIAL_DECK_SETUP_STEP_ID]: makeDeckSetupStep({
+          moduleLocationUpdate: {
+            [moduleId]: '1',
+            [otherModuleId]: '2',
+          },
+        }),
+        [stepId]: step,
+      },
+    })
+
+    const testCases = [
+      {
+        testName: 'pause -> wait until temperature step',
+        step: {
+          id: stepId,
+          stepType: 'pause',
+          stepName: 'pause until 4C',
+          stepDetails: 'some details',
+          pauseForAmountOfTime: 'untilTemperature',
+          pauseHour: null,
+          pauseMinute: null,
+          pauseSecond: null,
+          pauseMessage: '',
+          moduleId,
+          pauseTemperature: '4',
+        },
+      },
+      {
+        testName: 'set temperature step',
+        step: {
+          id: stepId,
+          stepType: 'temperature',
+          stepName: 'temperature to 4',
+          stepDetails: 'some details',
+          moduleId,
+          setTemperature: 'true',
+          targetTemperature: '4',
+        },
+      },
+      {
+        testName: 'magnet step',
+        step: {
+          id: stepId,
+          stepType: 'magnet',
+          stepName: 'engage magnet',
+          stepDetails: 'some details',
+          moduleId,
+          magnetAction: 'engage',
+          engageHeight: '4',
+        },
+      },
+    ]
+
+    testCases.forEach(({ testName, step }) => {
+      test(testName, () => {
+        const result = savedStepForms(getPrevRootStateWithStep(step), action)
+        expect(result[stepId]).toEqual({ ...step, moduleId: null })
+      })
+    })
+  })
 })
