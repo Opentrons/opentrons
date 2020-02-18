@@ -48,9 +48,10 @@ module.exports = {
     {
       files: [
         '**/test/**.js',
-        '**/test-with-flow/**.js',
         '**/__tests__/**.js',
         '**/__mocks__/**.js',
+        '**/__utils__/**.js',
+        '**/__fixtures__/**.js',
         'scripts/*.js',
       ],
       env: {
