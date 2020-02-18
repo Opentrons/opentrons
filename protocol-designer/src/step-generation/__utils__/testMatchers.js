@@ -1,5 +1,3 @@
-/* eslint-disable no-undef */
-
 // error of type exists somewhere in timeline errors
 export function expectTimelineError(errors, errorType) {
   expect(errors).toEqual(
