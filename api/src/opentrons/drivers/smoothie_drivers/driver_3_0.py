@@ -133,6 +133,20 @@ class SmoothieAlarm(Exception):
         return f'SmoothieAlarm: {self.command} returned {self.ret_code}'
 
 
+class TipProbeError(SmoothieAlarm):
+    def __init__(self, ret_code: str = None, command: str = None) -> None:
+        self.ret_code = ret_code
+        self.command = command
+        super().__init__(ret_code, command)
+
+    def __repr__(self):
+        return f'<TipProbeError: {self.ret_code} from {self.command}'
+
+    def __str__(self):
+        return 'Tip probe could not complete: the switch was never touched. '\
+            'This may be because there is no tip on the pipette.'
+
+
 class ParseError(Exception):
     pass
 
@@ -1698,8 +1712,13 @@ class SmoothieDriver_3_0_0:
             self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             log.debug("probe_axis: {}".format(command))
-            self._send_command(
-                command=command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            try:
+                self._send_command(
+                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            except SmoothieError as se:
+                log.exception("Tip probe failure")
+                if 'probe' in str(se).lower():
+                    raise TipProbeError(se.ret_code, se.command)
             self.update_position(self.position)
             return self.position
         else:
