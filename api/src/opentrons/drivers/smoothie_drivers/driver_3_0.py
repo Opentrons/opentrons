@@ -1715,9 +1715,10 @@ class SmoothieDriver_3_0_0:
             try:
                 self._send_command(
                     command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT)
-            except SmoothieAlarm:
+            except SmoothieError as se:
                 log.exception("Tip probe failure")
-                raise
+                if 'probe' in str(se).lower():
+                    raise TipProbeError(se.ret_code, se.command)
             self.update_position(self.position)
             return self.position
         else:
