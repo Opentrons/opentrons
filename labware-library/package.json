@@ -27,8 +27,8 @@
     "lodash": "^4.17.4",
     "mixpanel-browser": "^2.29.1",
     "query-string": "^6.2.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
     "react-hot-loader": "^4.12.19",
     "react-router-dom": "^5.0.1",
     "yup": "^0.27.0"
