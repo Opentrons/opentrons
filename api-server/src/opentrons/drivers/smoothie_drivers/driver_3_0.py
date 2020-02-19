@@ -1203,7 +1203,7 @@ class SmoothieDriver_3_0_0:
             return
 
         if isinstance(data, str):
-            # Unfortunately update server calls driver._setup() before the
+            # Unfortunately update aiohttp calls driver._setup() before the
             # update can correctly load the robot_config change on disk.
             # Need to account for old command format to avoid this issue.
             self._send_command(data)

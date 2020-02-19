@@ -3,7 +3,7 @@ from opentrons import containers, instruments
 metadata = {
     'protocolName': 'Smoke',
     'author': 'Opentrons <engineering@opentrons.com>',
-    'description': 'Simple protocol to test the server',
+    'description': 'Simple protocol to test the aiohttp',
     'source': 'Opentrons Repository'
 }
 

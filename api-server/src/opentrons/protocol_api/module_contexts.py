@@ -80,7 +80,7 @@ class ModuleContext(CommandPublisher):
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
-                          Opentrons app.
+                          Opentrons fastapi.
         .. versionadded:: 2.1
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
@@ -114,7 +114,7 @@ class ModuleContext(CommandPublisher):
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
-                          Opentrons app.
+                          Opentrons fastapi.
         :returns: The initialized and loaded labware object.
         """
         lw = load_from_definition(

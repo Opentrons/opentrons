@@ -265,7 +265,7 @@ def start_server(folder, filepath):
         ))
     print('\nQuit\t--> CTRL-C\n\n\n')
     try:
-        run_quiet_process('cd {} && python -m http.server'.format(folder))
+        run_quiet_process('cd {} && python -m http.aiohttp'.format(folder))
     except KeyboardInterrupt:
         print()
         pass

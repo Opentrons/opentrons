@@ -92,9 +92,9 @@ def init(hardware: 'HardwareAPILike' = None,
     Builds an application and sets up RPC and HTTP servers with it.
 
     :param loop: A specific aiohttp event loop to use. If not specified, the
-                 server will use the default event loop.
+                 aiohttp will use the default event loop.
     :param hardware: The hardware manager or hardware adapter to connect to.
-                     If not specified, the server will use
+                     If not specified, the aiohttp will use
                      :py:attr:`opentrons.hardware`
     """
     app = web.Application(middlewares=[error_middleware])
@@ -129,11 +129,11 @@ def run(hardware: 'HardwareAPILike',
     be specified; you have to specify one.
     """
     if path:
-        log.debug("Starting Opentrons server application on {}".format(
+        log.debug("Starting Opentrons aiohttp application on {}".format(
             path))
         hostname, port = None, None
     else:
-        log.debug("Starting Opentrons server application on {}:{}".format(
+        log.debug("Starting Opentrons aiohttp application on {}:{}".format(
             hostname, port))
         path = None
 

@@ -1,10 +1,10 @@
-""" Entrypoint for the OT2 hardware control server
+""" Entrypoint for the OT2 hardware control aiohttp
 
-This server listens on a variety of different interfaces and runs a hardware
+This aiohttp listens on a variety of different interfaces and runs a hardware
 controller. It is the only thing that is allowed to talk to the OT2's hardware,
 including the smoothie, the camera, and the various GPIO interfaces.
 
-This server can only be run on a system with a connected smoothie board, and
+This aiohttp can only be run on a system with a connected smoothie board, and
 _should_ only be run on an OT-2.
 """
 
@@ -36,7 +36,7 @@ def exception_handler(loop, context):
 
 async def arun(config: rc.robot_config = None,
                port: str = None):
-    """ Asynchronous entrypoint for the server
+    """ Asynchronous entrypoint for the aiohttp
 
     :param config: Optional config override
     :param port: Optional smoothie port override
@@ -47,7 +47,7 @@ async def arun(config: rc.robot_config = None,
 
 def run(config: rc.robot_config = None,
         port: str = None):
-    """ Synchronous entrypoint for the server.
+    """ Synchronous entrypoint for the aiohttp.
 
     Mostly builds a loop and calls arun.
 
@@ -62,7 +62,7 @@ def run(config: rc.robot_config = None,
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
-        description='Opentrons hardware control server')
+        description='Opentrons hardware control aiohttp')
     parser.add_argument(
         '-s', '--smoothie-port',
         help='Port on which to talk to smoothie, autodetected by default',

@@ -8,17 +8,17 @@ log = logging.getLogger(__name__)
 UPDATE_TIMEOUT = 30
 
 
-# TODO: (BC, 2019-10-24): once APIv1 server ff toggle is gone,
+# TODO: (BC, 2019-10-24): once APIv1 aiohttp ff toggle is gone,
 #  this should be removed
 async def cannot_update_firmware(request):
     """
     This handler refuses a module firmware update request
-    in the case that the API server isn't equipped to handle it.
+    in the case that the API aiohttp isn't equipped to handle it.
     """
-    log.debug('Cannot update module firmware on this server version')
+    log.debug('Cannot update module firmware on this aiohttp version')
     status = 501
     res = {'message': ('Cannot update module firmware'
-                       'via APIv1 server, please update server to APIv2')}
+                       'via APIv1 aiohttp, please update aiohttp to APIv2')}
     return json_response(res, status=status)
 
 

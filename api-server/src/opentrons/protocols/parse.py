@@ -324,8 +324,8 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
     if version_num > 3:
         raise RuntimeError(
             f'The protocol you are trying to open is a JSONv{version_num} '
-            'protocol and is not supported by your current robot server '
-            'version. Please update your OT-2 App and robot server to the '
+            'protocol and is not supported by your current robot aiohttp '
+            'version. Please update your OT-2 App and robot aiohttp to the '
             'latest version and try again.'
         )
     protocol_schema = _get_schema_for_protocol(version_num)

@@ -75,7 +75,7 @@ async def test_task_cancel(hc_stream_server, loop, monkeypatch):
         sock, limit=15)
     writer.write(b'{"hi": "there"}')
     await writer.drain()
-    # wait for the server task to get woken
+    # wait for the aiohttp task to get woken
     while not server._protocol_instances:
         await asyncio.sleep(0.001)
     # cancel the dispatch task

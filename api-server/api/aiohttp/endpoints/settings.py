@@ -77,7 +77,7 @@ def _get_adv_settings_response() -> Dict[
             == setting_dict['show_if'][1]
 
     if _SETTINGS_RESTART_REQUIRED:
-        links = {'restart': '/server/restart'}
+        links = {'restart': '/aiohttp/restart'}
     else:
         links = {}
 
