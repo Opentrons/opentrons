@@ -407,11 +407,14 @@ export const savedStepForms = (
                 labwareSlot === moduleId ? labwareFallbackSlot : labwareSlot
             ),
           }
-        } else if (form.stepType === 'magnet' && form.moduleId === moduleId) {
+        } else if (
+          (form.stepType === 'magnet' ||
+            form.stepType === 'temperature' ||
+            form.stepType === 'pause') &&
+          form.moduleId === moduleId
+        ) {
           return { ...form, moduleId: null }
         } else {
-          // TODO: Ian 2019-10-24 remove modules from forms that may reference them
-          // via handleFormChange
           return form
         }
       })
@@ -851,7 +854,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-const rootReducer = (state: RootState, action: any) => {
+export const rootReducer = (state: RootState, action: any) => {
   const prevStateFallback = state || {}
   const nextState = {
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
@@ -884,5 +887,3 @@ const rootReducer = (state: RootState, action: any) => {
   }
   return nextState
 }
-
-export default rootReducer

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { Card } from '@opentrons/components'
+
 import {
   selectors as stepFormSelectors,
   getIsCrashablePipetteSelected,

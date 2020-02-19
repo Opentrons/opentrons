@@ -25,20 +25,22 @@ import {
 } from './warnings'
 import type { StepType } from '../../form-types'
 
-export { default as handleFormChange } from './handleFormChange'
-export { default as generateNewForm } from './generateNewForm'
-export { default as getDefaultsForStepType } from './getDefaultsForStepType'
-export { default as getDisabledFields } from './getDisabledFields'
-export { default as getNextDefaultPipetteId } from './getNextDefaultPipetteId'
+export { handleFormChange } from './handleFormChange'
+export { generateNewForm } from './generateNewForm'
+export { getDefaultsForStepType } from './getDefaultsForStepType'
+export { getDisabledFields } from './getDisabledFields'
+export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'
 export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
-export { default as stepFormToArgs } from './stepFormToArgs'
+export { stepFormToArgs } from './stepFormToArgs'
+export type { FormError, FormWarning, FormWarningType }
 
-type FormHelpers = {
+type FormHelpers = {|
   getErrors?: mixed => Array<FormError>,
   getWarnings?: mixed => Array<FormWarning>,
-}
+|}
+
 const stepFormHelperMap: { [StepType]: FormHelpers } = {
   mix: {
     getErrors: composeErrors(incompatibleLabware),
@@ -61,17 +63,18 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     ),
   },
   magnet: {
-    getErrors: composeErrors(magnetActionRequired, engageHeightRequired),
+    getErrors: composeErrors(
+      magnetActionRequired,
+      engageHeightRequired,
+      moduleIdRequired
+    ),
     getWarnings: composeWarnings(engageHeightRangeExceeded),
   },
   temperature: {
-    moduleId: composeErrors(moduleIdRequired),
-    getErrors: composeErrors(targetTemperatureRequired),
+    getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
     getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
-
-export type { FormError, FormWarning, FormWarningType }
 
 export const getFormErrors = (
   stepType: StepType,

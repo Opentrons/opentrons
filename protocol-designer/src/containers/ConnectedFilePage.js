@@ -61,7 +61,7 @@ function mergeProps(
   }
 }
 
-export default connect<Props, {||}, SP, {||}, _, _>(
+export const ConnectedFilePage = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps

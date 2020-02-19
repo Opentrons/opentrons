@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import { AlertModal, Icon } from '@opentrons/components'
 import { opentronsWebApi, type GateStage } from '../../../networking'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
 import {
   actions as analyticsActions,
@@ -13,7 +13,7 @@ import {
 import type { BaseState, ThunkDispatch } from '../../../types'
 import settingsStyles from '../../SettingsPage/SettingsPage.css'
 import modalStyles from '../modal.css'
-import SignUpForm from './SignUpForm'
+import { SignUpForm } from './SignUpForm'
 
 type Props = {
   hasOptedIn: boolean | null,
@@ -29,7 +29,7 @@ type DP = $Rest<$Exact<Props>, SP>
 
 type State = { gateStage: GateStage, errorMessage: ?string }
 
-class GateModal extends React.Component<Props, State> {
+class GateModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
     super()
     this.state = { gateStage: 'loading', errorMessage: '' }
@@ -148,7 +148,7 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export default connect<Props, {||}, SP, DP, _, _>(
+export const GateModal = connect<Props, {||}, SP, DP, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(GateModal)
+)(GateModalComponent)

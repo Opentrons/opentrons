@@ -1,11 +1,19 @@
-from typing import Dict, NamedTuple
+from collections import namedtuple
+from typing import Dict, NamedTuple, Callable, Any, Tuple, Awaitable
 from pathlib import Path
 
 ThermocyclerStep = Dict[str, float]
 
+InterruptCallback = Callable[[str], None]
+
+UploadFunction = Callable[[str, str, Dict[str, Any]],
+                          Awaitable[Tuple[bool, str]]]
+
+ModuleAtPort = namedtuple('ModuleAtPort', ('port', 'name'))
+
 
 class BundledFirmware(NamedTuple):
-    """ Represents an versioned firmware file, generally bundled into the fs"""
+    """ Represents a versioned firmware file, generally bundled into the fs"""
     version: str
     path: Path
 
@@ -14,4 +22,12 @@ class BundledFirmware(NamedTuple):
 
 
 class UpdateError(RuntimeError):
+    pass
+
+
+class UnsupportedModuleError(Exception):
+    pass
+
+
+class AbsentModuleError(Exception):
     pass

@@ -30,6 +30,11 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export default connect<Props, OP, SP, _, BaseState, ThunkDispatch<*>>(
-  mapStateToProps
-)(NameOverlay)
+export const LabwareName = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  BaseState,
+  ThunkDispatch<*>
+>(mapStateToProps)(NameOverlay)

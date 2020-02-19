@@ -2,7 +2,7 @@
 // @flow
 import pick from 'lodash/pick'
 import { chainPatchUpdaters, fieldHasChanged } from './utils'
-import getDefaultsForStepType from '../getDefaultsForStepType'
+import { getDefaultsForStepType } from '../getDefaultsForStepType'
 import type { FormData, StepFieldName } from '../../../form-types'
 import type { FormPatch } from '../../actions/types'
 
@@ -17,7 +17,12 @@ const updatePatchOnPauseTemperatureChange = (
   if (fieldHasChanged(rawForm, patch, 'pauseForAmountOfTime')) {
     return {
       ...patch,
-      ...getDefaultFields('pauseTemperature'),
+      ...getDefaultFields(
+        'pauseTemperature',
+        'pauseHour',
+        'pauseMinute',
+        'pauseSecond'
+      ),
     }
   }
   return patch

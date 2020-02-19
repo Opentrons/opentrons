@@ -1,9 +1,9 @@
 import asyncio
-from . import types, update, mod_abc
 from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
+from . import types, update, mod_abc
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -119,13 +119,16 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback: mod_abc.InterruptCallback,
+                    interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
         """Build and connect to a Thermocycler
         """
 
-        mod = cls(port, interrupt_callback, simulating, loop)
+        mod = cls(port=port,
+                  interrupt_callback=interrupt_callback,
+                  simulating=simulating,
+                  loop=loop)
         await mod._connect()
         return mod
 
@@ -138,7 +141,7 @@ class Thermocycler(mod_abc.AbstractModule):
         return 'Thermocycler'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_bossa
 
     @staticmethod
@@ -153,7 +156,7 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 interrupt_callback: mod_abc.InterruptCallback = None,
+                 interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
@@ -227,6 +230,22 @@ class Thermocycler(mod_abc.AbstractModule):
             self._current_task = self._loop.create_task(self.wait_for_temp())
         await self._current_task  # type: ignore
 
+    async def _execute_cycle_step(self,
+                                  step: types.ThermocyclerStep,
+                                  index: int,
+                                  volume: Optional[float]):
+        await self._running_flag.wait()
+        self._current_step_index = index + 1  # science starts at 1
+        temperature = step.get('temperature')
+        hold_time_minutes = step.get('hold_time_minutes', None)
+        hold_time_seconds = step.get('hold_time_seconds', None)
+        ramp_rate = step.get('ramp_rate', None)
+        await self.set_temperature(temperature=temperature,
+                                   hold_time_minutes=hold_time_minutes,
+                                   hold_time_seconds=hold_time_seconds,
+                                   ramp_rate=ramp_rate,
+                                   volume=volume)
+
     async def _execute_cycles(self,
                               steps: List[types.ThermocyclerStep],
                               repetitions: int,
@@ -234,16 +253,7 @@ class Thermocycler(mod_abc.AbstractModule):
         for rep in range(repetitions):
             self._current_cycle_index = rep + 1  # science starts at 1
             for step_idx, step in enumerate(steps):
-                await self._running_flag.wait()
-                self._current_step_index = step_idx + 1  # science starts at 1
-                await self.set_temperature(temperature=step.get('temperature'),
-                                           hold_time_minutes=step.get(
-                                               'hold_time_minutes', None),
-                                           hold_time_seconds=step.get(
-                                               'hold_time_seconds', None),
-                                           ramp_rate=step.get(
-                                               'ramp_rate', None),
-                                           volume=volume)
+                await self._execute_cycle_step(step, step_idx, volume)
                 await self.wait_for_hold()
 
     async def cycle_temperatures(self,

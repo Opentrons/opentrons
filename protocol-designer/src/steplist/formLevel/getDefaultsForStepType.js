@@ -10,7 +10,7 @@ import {
 import type { StepType, StepFieldName } from '../../form-types'
 
 // TODO: Ian 2019-01-17 move this somewhere more central - see #2926
-export default function getDefaultsForStepType(
+export function getDefaultsForStepType(
   stepType: StepType
 ): { [StepFieldName]: any } {
   switch (stepType) {
@@ -82,6 +82,7 @@ export default function getDefaultsForStepType(
       }
     case 'magnet':
       return {
+        moduleId: null,
         magnetAction: null,
         engageHeight: null,
       }

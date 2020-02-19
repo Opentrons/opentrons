@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import type { StepFieldName } from '../../../../steplist/fieldLevel'
-import i18n from '../../../../localization'
+import { i18n } from '../../../../localization'
 
 import type { FocusHandlers } from '../../types'
 

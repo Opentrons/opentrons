@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
@@ -82,7 +82,7 @@ export const ModuleStatus = ({
   }
 }
 
-const ModuleTag = (props: Props) => {
+const ModuleTagComponent = (props: Props) => {
   const timelineFrame = useSelector(timelineFrameBeforeActiveItem)
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
@@ -128,4 +128,4 @@ const ModuleTag = (props: Props) => {
   )
 }
 
-export default React.memo<Props>(ModuleTag)
+export const ModuleTag = React.memo<Props>(ModuleTagComponent)

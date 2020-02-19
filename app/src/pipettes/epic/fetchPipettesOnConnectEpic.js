@@ -6,12 +6,9 @@ import { ofType } from 'redux-observable'
 import { getConnectedRobotName } from '../../robot/selectors'
 import * as Actions from '../actions'
 
-import type { StrictEpic } from '../../types'
-import type { FetchPipettesAction, FetchPipetteSettingsAction } from '../types'
+import type { Epic } from '../../types'
 
-export const fetchPipettesOnConnectEpic: StrictEpic<
-  FetchPipettesAction | FetchPipetteSettingsAction
-> = (action$, state$) => {
+export const fetchPipettesOnConnectEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType('robot:CONNECT_RESPONSE'),
     withLatestFrom(state$, (a, s) => [a, getConnectedRobotName(s)]),

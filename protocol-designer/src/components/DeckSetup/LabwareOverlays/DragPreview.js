@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
-import LabwareOnDeck from '../LabwareOnDeck'
+import { LabwareOnDeck } from '../LabwareOnDeck'
 import { DND_TYPES } from './constants'
 import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
@@ -42,11 +42,9 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
   )
 }
 
-const DragPreview = DragLayer(monitor => ({
+export const DragPreview = DragLayer(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),
   item: monitor.getItem(),
 }))(LabwareDragPreview)
-
-export default DragPreview

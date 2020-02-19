@@ -1,7 +1,7 @@
 // @flow
 import { uuid } from '../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/selectors'
-import stepsSelectors from '../selectors'
+import { getSelectedStepId } from '../selectors'
 import { selectStep } from './actions'
 import { actions as tutorialActions } from '../../../tutorial'
 
@@ -73,7 +73,7 @@ export const reorderSelectedStep = (delta: number) => (
   dispatch: ThunkDispatch<ReorderSelectedStepAction>,
   getState: GetState
 ) => {
-  const stepId = stepsSelectors.getSelectedStepId(getState())
+  const stepId = getSelectedStepId(getState())
 
   if (stepId != null) {
     dispatch({

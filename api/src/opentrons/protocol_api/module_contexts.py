@@ -9,7 +9,8 @@ from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion
 
 from .labware import (
-    ModuleGeometry, Labware, load, load_from_definition, ThermocyclerGeometry)
+    Labware, load, load_from_definition)
+from .module_geometry import ModuleGeometry, ThermocyclerGeometry
 from . import geometry
 from .util import requires_version
 
@@ -454,7 +455,7 @@ class ThermocyclerContext(ModuleContext):
     @cmds.publish.both(command=cmds.thermocycler_execute_profile)
     @requires_version(2, 0)
     def execute_profile(self,
-                        steps: List[modules.types.ThermocyclerStep],
+                        steps: List[modules.ThermocyclerStep],
                         repetitions: int,
                         block_max_volume: float = None):
         """ Execute a Thermocycler Profile defined as a cycle of

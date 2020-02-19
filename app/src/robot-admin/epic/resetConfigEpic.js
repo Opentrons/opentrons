@@ -6,24 +6,24 @@ import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
-import * as Types from '../types'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { ResetConfigAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<Types.ResetConfigAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<ResetConfigAction> = action => ({
   method: POST,
   path: Constants.RESET_CONFIG_PATH,
   body: action.payload.resets,
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  Types.ResetConfigAction,
-  Types.ResetConfigDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<ResetConfigAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -32,10 +32,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.resetConfigFailure(host.name, body, meta)
 }
 
-export const resetConfigEpic: StrictEpic<Types.ResetConfigDoneAction> = (
-  action$,
-  state$
-) => {
+export const resetConfigEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.RESET_CONFIG),
     mapToRobotApiRequest(
@@ -47,10 +44,10 @@ export const resetConfigEpic: StrictEpic<Types.ResetConfigDoneAction> = (
   )
 }
 
-export const restartOnResetConfigEpic: StrictEpic<Types.RestartRobotAction> = action$ => {
+export const restartOnResetConfigEpic: Epic = action$ => {
   return action$.pipe(
     ofType(Constants.RESET_CONFIG_SUCCESS),
-    map<Types.ResetConfigAction, Types.RestartRobotAction>(a => {
+    map<ResetConfigAction, _>(a => {
       return Actions.restartRobot(a.payload.robotName)
     })
   )

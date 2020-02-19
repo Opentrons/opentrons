@@ -2,7 +2,7 @@ import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import Deck, plan_moves
-from opentrons.protocol_api import labware
+from opentrons.protocol_api import labware, module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 
 labware_name = 'corning_96_wellplate_360ul_flat'
@@ -23,7 +23,7 @@ def test_slot_names():
             del d[slot]
             assert slot in d
             assert d[slot] is None
-            mod = labware.load_module('tempdeck', d.position_for(slot))
+            mod = module_geometry.load_module('tempdeck', d.position_for(slot))
             d[slot] = mod
             assert mod == d[slot]
 
@@ -35,7 +35,7 @@ def test_slot_names():
 def test_slot_collisions():
     d = Deck()
     mod_slot = '7'
-    mod = labware.load_module('thermocycler', d.position_for(mod_slot))
+    mod = module_geometry.load_module('thermocycler', d.position_for(mod_slot))
     d[mod_slot] = mod
     with pytest.raises(ValueError):
         d['7'] = 'not this time boyo'
@@ -61,7 +61,7 @@ def test_highest_z():
     assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
     del deck[1]
     assert deck.highest_z == 0
-    mod = labware.load_module('tempdeck', deck.position_for(8))
+    mod = module_geometry.load_module('tempdeck', deck.position_for(8))
     deck[8] = mod
     assert deck.highest_z == mod.highest_z
     lw = labware.load(labware_name, mod.location)

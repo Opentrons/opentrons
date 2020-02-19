@@ -52,6 +52,4 @@ export type RootState = {
   flags: Flags,
 }
 
-const rootReducer = combineReducers<_, Action>(_allReducers)
-
-export default rootReducer
+export const rootReducer = combineReducers<_, Action>(_allReducers)

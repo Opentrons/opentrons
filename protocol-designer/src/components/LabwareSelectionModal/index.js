@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import LabwareSelectionModal from './LabwareSelectionModal'
+import { LabwareSelectionModal as LabwareSelectionModalComponent } from './LabwareSelectionModal'
 // import { selectors as featureFlagSelectors } from '../../feature-flags'
 import {
   closeLabwareSelector,
@@ -18,7 +18,7 @@ import {
 } from '../../step-forms'
 import type { BaseState, ThunkDispatch } from '../../types'
 
-type Props = React.ElementProps<typeof LabwareSelectionModal>
+type Props = React.ElementProps<typeof LabwareSelectionModalComponent>
 
 type SP = {|
   customLabwareDefs: $PropertyType<Props, 'customLabwareDefs'>,
@@ -68,8 +68,8 @@ function mergeProps(
   }
 }
 
-export default connect<Props, {||}, SP, {||}, _, _>(
+export const LabwareSelectionModal = connect<Props, {||}, SP, {||}, _, _>(
   mapStateToProps,
   null,
   mergeProps
-)(LabwareSelectionModal)
+)(LabwareSelectionModalComponent)

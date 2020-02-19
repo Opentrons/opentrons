@@ -1,9 +1,10 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { FormGroup } from '@opentrons/components'
-import i18n from '../../../localization'
+import { selectors as uiModuleSelectors } from '../../../ui/modules'
+import { i18n } from '../../../localization'
+import { maskField } from '../../../steplist/fieldLevel'
 
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
@@ -24,8 +25,9 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const defaultEngageHeight = useSelector(
     uiModuleSelectors.getMagnetLabwareEngageHeight
   )
+
   const engageHeightCaption = defaultEngageHeight
-    ? `Recommended: ${defaultEngageHeight}`
+    ? `Recommended: ${String(maskField('engageHeight', defaultEngageHeight))}`
     : null
 
   return (

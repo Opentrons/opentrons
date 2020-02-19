@@ -6,6 +6,7 @@ import logging
 from time import time, sleep
 from typing import List, Dict, Any
 from uuid import uuid4
+from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons import robot
 from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
@@ -14,7 +15,7 @@ from opentrons.protocols.types import PythonProtocol, APIVersion
 from opentrons.protocols.parse import parse
 from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
-                                    labware)
+                                    labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import adapters, API
 from .models import Container, Instrument, Module
@@ -443,7 +444,8 @@ class Session(object):
 
     def stop(self):
         self._hw_iface().halt()
-        self._hw_iface().stop()
+        with self._motion_lock:
+            self._hw_iface().stop()
         self.set_state('stopped')
         return self
 
@@ -530,6 +532,8 @@ class Session(object):
                 sleep(0.1)
             self.set_state('finished')
             self._hw_iface().home()
+        except SmoothieAlarm:
+            log.info("Protocol cancelled")
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
@@ -628,7 +632,7 @@ def _get_parent_module(placeable):
     if not placeable or isinstance(placeable, (Point, str)):
         res = None
     elif isinstance(placeable,
-                    (ModulePlaceable, labware.ModuleGeometry)):
+                    (ModulePlaceable, module_geometry.ModuleGeometry)):
         res = placeable
     elif isinstance(placeable, List):
         res = _get_parent_module(placeable[0].parent)

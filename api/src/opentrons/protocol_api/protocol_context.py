@@ -10,8 +10,8 @@ from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
-    LabwareDefinition, Labware, get_labware_definition, load_from_definition,
-    ModuleGeometry, load_module)
+    LabwareDefinition, Labware, get_labware_definition, load_from_definition)
+from .module_geometry import (ModuleGeometry, load_module)
 from .definitions import MAX_SUPPORTED_VERSION
 from . import geometry
 from .instrument_context import InstrumentContext

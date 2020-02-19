@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { FormGroup, HoverTooltip } from '@opentrons/components'
-import i18n from '../../../localization'
+import { i18n } from '../../../localization'
 import { getTooltipForField } from '../utils'
 import { TextField } from './TextField'
 import type { StepType } from '../../../form-types'

@@ -20,16 +20,16 @@ import {
   type LabwareDefinition2,
   type ModuleType,
 } from '@opentrons/shared-data'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import { getLabwareIsCompatible as _getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { getOnlyLatestDefs } from '../../labware-defs/utils'
 import { Portal } from '../portals/TopPortal'
 import { PDTitledList } from '../lists'
-import useBlockingHint from '../Hints/useBlockingHint'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
-import LabwareItem from './LabwareItem'
-import LabwarePreview from './LabwarePreview'
+import { useBlockingHint } from '../Hints/useBlockingHint'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
+import { LabwareItem } from './LabwareItem'
+import { LabwarePreview } from './LabwarePreview'
 import styles from './styles.css'
 import type { DeckSlot } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
@@ -76,7 +76,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
   thermocycler: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
-const LabwareSelectionModal = (props: Props) => {
+export const LabwareSelectionModal = (props: Props) => {
   const {
     customLabwareDefs,
     permittedTipracks,
@@ -360,5 +360,3 @@ const LabwareSelectionModal = (props: Props) => {
     </>
   )
 }
-
-export default LabwareSelectionModal

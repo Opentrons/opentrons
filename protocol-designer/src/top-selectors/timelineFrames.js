@@ -5,7 +5,7 @@ import assert from 'assert'
 
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { selectors as stepsSelectors } from '../ui/steps'
+import { getActiveItem } from '../ui/steps'
 import { START_TERMINAL_ITEM_ID } from '../steplist'
 
 import type { Selector } from '../types'
@@ -56,7 +56,7 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
 }
 
 export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState> = createSelector(
-  stepsSelectors.getActiveItem,
+  getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.lastValidRobotState,
@@ -65,7 +65,7 @@ export const timelineFrameBeforeActiveItem: Selector<CommandsAndRobotState> = cr
 )
 
 export const timelineFrameAfterActiveItem: Selector<CommandsAndRobotState> = createSelector(
-  stepsSelectors.getActiveItem,
+  getActiveItem,
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
   fileDataSelectors.lastValidRobotState,

@@ -6,7 +6,9 @@ from typing import Any, List, Optional, Tuple, Dict
 
 from opentrons import types
 from .labware import (Labware, Well,
-                      quirks_from_any_parent, ThermocyclerGeometry, DeckItem)
+                      quirks_from_any_parent)
+from .definitions import DeckItem
+from .module_geometry import ThermocyclerGeometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.system.shared_data import load_shared_data
 

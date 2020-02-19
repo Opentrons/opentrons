@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Icon } from '@opentrons/components'
-import KnowledgeBaseLink from '../KnowledgeBaseLink'
+import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import styles from './styles.css'
 
 type Props = {|
@@ -16,7 +16,7 @@ export function CrashInfoBox(props: Props) {
     <div className={styles.crash_info_container}>
       <div className={styles.crash_info_box}>
         <div className={styles.crash_info_title}>
-          <Icon name="alert-circle" className={styles.alert_icon} />
+          <Icon name="information" className={styles.alert_icon} />
           <strong>Limited access to slots</strong>
         </div>
         <p>

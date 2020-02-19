@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import { PDListItem } from '../lists'
 import type { PauseArgs } from '../../step-generation'
 type Props = {

@@ -3,16 +3,12 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Dict, Callable, Any, Tuple, Awaitable, Optional
+from typing import Dict, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
-from .types import BundledFirmware
+from .types import BundledFirmware, UploadFunction, InterruptCallback
 
 mod_log = logging.getLogger(__name__)
-
-InterruptCallback = Callable[[str], None]
-UploadFunction = Callable[[str, str, Dict[str, Any]],
-                          Awaitable[Tuple[bool, str]]]
 
 
 class AbstractModule(abc.ABC):
@@ -22,7 +18,7 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
-                    interrupt_callback: InterruptCallback,
+                    interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
             -> 'AbstractModule':

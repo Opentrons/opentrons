@@ -142,7 +142,7 @@ export const pauseForTimeOrUntilTold = (
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
   } else if (pauseForAmountOfTime === PAUSE_UNTIL_TEMP) {
     // user selected pause until temperature reached
-    if (!moduleId) {
+    if (moduleId == null) {
       // missing module field (reached by deleting a module from deck)
       return FORM_ERRORS.MODULE_ID_REQUIRED
     }
@@ -191,7 +191,7 @@ export const moduleIdRequired = (
   fields: HydratedFormData
 ): FormError | null => {
   const { moduleId } = fields
-  if (!moduleId) return FORM_ERRORS.MODULE_ID_REQUIRED
+  if (moduleId == null) return FORM_ERRORS.MODULE_ID_REQUIRED
   return null
 }
 

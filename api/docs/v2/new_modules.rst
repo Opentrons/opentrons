@@ -219,6 +219,7 @@ For the purposes of this section, assume we have the following already:
 
 .. versionadded:: 2.0
 
+.. _magnetic-module-engage:
 
 Engage
 ======

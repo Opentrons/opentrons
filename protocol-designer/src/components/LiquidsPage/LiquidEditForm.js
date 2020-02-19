@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { Formik } from 'formik'
 import * as Yup from 'yup'
-import i18n from '../../localization'
+import { i18n } from '../../localization'
 import {
   Card,
   CheckboxField,
@@ -38,7 +38,7 @@ export const liquidEditFormSchema = Yup.object().shape({
   serialize: Yup.boolean(),
 })
 
-export default function LiquidEditForm(props: Props) {
+export function LiquidEditForm(props: Props) {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues = {

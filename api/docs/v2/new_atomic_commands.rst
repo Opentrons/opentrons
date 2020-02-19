@@ -46,7 +46,7 @@ If you have associated a tiprack with your pipette such as in the :ref:`new-pipe
 
     pipette.pick_up_tip()
 
-This will use the next available tip from the list of tipracks passed in to the ``tip_racks`` argument of :py:meth:`.ProtocolContext.load_instrument`.               
+This will use the next available tip from the list of tipracks passed in to the ``tip_racks`` argument of :py:meth:`.ProtocolContext.load_instrument`.
 
 .. versionadded:: 2.0
 
@@ -66,10 +66,12 @@ If no location is specified, the OT-2 will drop the tip in the fixed trash in sl
 
 .. versionadded:: 2.0
 
+.. _pipette-return-tip:
+
 Return Tip
 ===========
 
-To retun the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
+To return the tip to the original location, you can call :py:meth:`.InstrumentContext.return_tip`. The example below will automatically return the tip to ``'A3'`` on the tip rack.
 
 .. code-block:: python
 
@@ -79,7 +81,8 @@ To retun the tip to the original location, you can call :py:meth:`.InstrumentCon
 .. note:
 
     In API Version 2.0 and 2.1, the returned tips are added back into the tip-tracker and thus treated as `unused`. If you make a subsequent call to `pick_up_tip` then the software will treat returned tips as valid locations.
-    In API Version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations. 
+    In API Version 2.2, returned tips are no longer added back into the tip tracker. This means that returned tips are no longer valid locations and the pipette will not attempt to pick up tips from these locations.
+    Also in API Version 2.2, the return tip height was corrected to utilize values determined by hardware testing. This is more in-line with return tip behavior from Python Protocol API Version 1.
 
 In API version 2.2 or above:
 

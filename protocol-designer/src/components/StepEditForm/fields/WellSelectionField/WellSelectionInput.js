@@ -2,12 +2,13 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import { FormGroup, InputField } from '@opentrons/components'
-import i18n from '../../../../localization'
+import { i18n } from '../../../../localization'
 import { WellSelectionModal } from './WellSelectionModal'
 import { Portal } from '../../../portals/MainPageModalPortal'
 import {
   actions as stepsActions,
-  selectors as stepsSelectors,
+  getSelectedStepId,
+  getWellSelectionLabwareKey,
 } from '../../../../ui/steps'
 import styles from '../../StepEditForm.css'
 
@@ -97,8 +98,8 @@ class WellSelectionInputComponent extends React.Component<Props> {
 }
 
 const mapStateToProps = (state: BaseState): SP => ({
-  stepId: stepsSelectors.getSelectedStepId(state),
-  wellSelectionLabwareKey: stepsSelectors.getWellSelectionLabwareKey(state),
+  stepId: getSelectedStepId(state),
+  wellSelectionLabwareKey: getWellSelectionLabwareKey(state),
 })
 const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onOpen: key => dispatch(stepsActions.setWellSelectionLabwareKey(key)),

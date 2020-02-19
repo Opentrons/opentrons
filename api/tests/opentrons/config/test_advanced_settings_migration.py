@@ -10,7 +10,8 @@ good_file_settings = {
     'useOldAspirationFunctions': None,
     'disableLogAggregation': None,
     'enableApi1BackCompat': None,
-    'useProtocolApi2': None
+    'useProtocolApi2': None,
+    'useFastApi': None,
 }
 
 
@@ -39,7 +40,8 @@ def test_migrates_versionless_new_config():
       'useOldAspirationFunctions': True,
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
-      'useProtocolApi2': None
+      'useProtocolApi2': None,
+      'useFastApi': None
     }
 
 
@@ -61,6 +63,7 @@ def test_migrates_versionless_old_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
+      'useFastApi': None
     }
 
 
@@ -161,5 +164,6 @@ def test_ensures_config():
              'disableHomeOnBoot': None,
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
-             'useProtocolApi2': None
+             'useProtocolApi2': None,
+             'useFastApi': None
          }
