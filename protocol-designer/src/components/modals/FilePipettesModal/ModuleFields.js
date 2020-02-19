@@ -1,25 +1,26 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import { i18n } from '../../../localization'
+import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
 import { ModuleDiagram } from '../../modules'
 
 import styles from './FilePipettesModal.css'
 
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 
 type Props = {|
   values: FormModulesByType,
   thermocyclerEnabled: ?boolean,
-  onFieldChange: (type: ModuleType, value: boolean) => mixed,
+  onFieldChange: (type: ModuleRealType, value: boolean) => mixed,
 |}
 
 export function ModuleFields(props: Props) {
   const { onFieldChange, values, thermocyclerEnabled } = props
   const modules = Object.keys(values)
-  const handleOnDeckChange = (type: ModuleType) => (
+  const handleOnDeckChange = (type: ModuleRealType) => (
     e: SyntheticInputEvent<HTMLInputElement>
   ) => onFieldChange(type, e.currentTarget.checked || false)
 
@@ -50,8 +51,13 @@ export function ModuleFields(props: Props) {
                 <FormGroup label="Model">
                   <DropdownField
                     tabIndex={i}
-                    options={[{ name: 'GEN1', value: 'GEN1' }]}
-                    value={'GEN1'}
+                    options={[
+                      {
+                        name: 'GEN1',
+                        value: DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType],
+                      },
+                    ]}
+                    value={DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]}
                     disabled
                     onChange={() => null}
                   />

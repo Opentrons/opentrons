@@ -3,17 +3,19 @@ import type { Mount } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   PipetteNameSpecs,
-  ModuleType,
+  ModuleRealType,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 import typeof {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_APPROACHING_TARGET,
 } from '../constants'
+import typeof {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 export type FormPipette = {| pipetteName: ?string, tiprackDefURI: ?string |}
 export type FormPipettesByMount = {|
@@ -45,30 +47,36 @@ export type PipetteEntities = {
 }
 
 // =========== MODULES ========
-// Note: 'model' is like 'GEN1'/'GEN2' etc
+// Note: in the FORM, 'model' is like 'GEN1'/'GEN2' etc
+// !!! TODO IMMEDIATELY revisit this, should it be a real module MODEL?
 export type FormModule = {| onDeck: boolean, model: string, slot: DeckSlot |}
+
+// !!! TODO IMMEDIATELY can you use typeof here without a syntax error? It's not great to hard-code these, should use constants
 export type FormModulesByType = {|
-  tempdeck: FormModule,
-  magdeck: FormModule,
-  thermocycler: FormModule,
+  magneticModuleType: FormModule,
+  temperatureModuleType: FormModule,
+  thermocyclerModuleType: FormModule,
 |}
 
-export type ModuleEntity = {| id: string, type: ModuleType, model: string |}
+export type ModuleEntity = {| id: string, type: ModuleRealType, model: string |}
 export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'
-export type MagneticModuleState = {| type: MAGDECK, engaged: boolean |}
+export type MagneticModuleState = {|
+  type: MAGNETIC_MODULE_TYPE,
+  engaged: boolean,
+|}
 
 export type TemperatureStatus =
   | TEMPERATURE_DEACTIVATED
   | TEMPERATURE_AT_TARGET
   | TEMPERATURE_APPROACHING_TARGET
 export type TemperatureModuleState = {|
-  type: TEMPDECK,
+  type: TEMPERATURE_MODULE_TYPE,
   status: TemperatureStatus,
   targetTemperature: number | null,
 |}
-export type ThermocyclerModuleState = {| type: THERMOCYCLER |} // TODO IL 2019-11-18 create this state
+export type ThermocyclerModuleState = {| type: THERMOCYCLER_MODULE_TYPE |} // TODO IL 2019-11-18 create this state
 
 export type ModuleTemporalProperties = {|
   slot: DeckSlot,
@@ -81,7 +89,7 @@ export type ModuleTemporalProperties = {|
 export type ModuleOnDeck = {| ...ModuleEntity, ...ModuleTemporalProperties |}
 
 export type ModulesForEditModulesCard = {
-  [type: ModuleType]: ?ModuleOnDeck,
+  [type: ModuleRealType]: ?ModuleOnDeck,
 }
 
 // =========== LABWARE ========

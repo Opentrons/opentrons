@@ -1,7 +1,7 @@
 // @flow
 import values from 'lodash/values'
 import { i18n } from '../../localization'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
 import type {
   ModuleOnDeck,
@@ -11,7 +11,7 @@ import type {
 
 export function getModuleOnDeckByType(
   initialDeckSetup: InitialDeckSetup,
-  type: ModuleType
+  type: ModuleRealType
 ): ?ModuleOnDeck {
   return values(initialDeckSetup.modules).find(
     (module: ModuleOnDeck) => module.type === type
@@ -30,7 +30,7 @@ export function getLabwareOnModule(
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: { [labwareId: string]: string },
-  type: ModuleType
+  type: ModuleRealType
 ): Options {
   const module = getModuleOnDeckByType(initialDeckSetup, type)
   const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
@@ -59,7 +59,7 @@ export function getModuleLabwareOptions(
 
 export function getModuleHasLabware(
   initialDeckSetup: InitialDeckSetup,
-  type: ModuleType
+  type: ModuleRealType
 ): boolean {
   const module = getModuleOnDeckByType(initialDeckSetup, type)
   const labware = module && getLabwareOnModule(initialDeckSetup, module.id)

@@ -9,6 +9,7 @@ import reduce from 'lodash/reduce'
 import {
   getLabwareDefURI,
   getModuleTypeFromModuleModel,
+  MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
@@ -18,7 +19,6 @@ import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
   SPAN7_8_10_11_SLOT,
-  MAGDECK,
 } from '../../constants'
 import { getPDMetadata } from '../../file-types'
 import {
@@ -273,7 +273,7 @@ export const savedStepForms = (
         // to handle the case where users delete and re-add a magnetic module
         if (
           savedForm.stepType === 'magnet' &&
-          action.payload.type === MAGDECK
+          action.payload.type === MAGNETIC_MODULE_TYPE
         ) {
           return { ...savedForm, moduleId }
         }

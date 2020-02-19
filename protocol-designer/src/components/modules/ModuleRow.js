@@ -14,19 +14,19 @@ import { ModuleDiagram } from './ModuleDiagram'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
 
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../step-forms'
 
 type Props = {
   module?: ModuleOnDeck,
   showCollisionWarnings?: boolean,
-  type: ModuleType,
-  openEditModuleModal: (moduleType: ModuleType, moduleId?: string) => mixed,
+  type: ModuleRealType,
+  openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
 }
 
 export function ModuleRow(props: Props) {
   const { module, openEditModuleModal, showCollisionWarnings } = props
-  const type = module?.type || props.type
+  const type: ModuleRealType = module?.type || props.type
 
   const model = module?.model
   const slot = module?.slot
@@ -76,8 +76,10 @@ export function ModuleRow(props: Props) {
     <div className={styles.collision_tolltip}>{collisionTooltipText}</div>
   )
 
-  const setCurrentModule = (moduleType: ModuleType, moduleId?: string) => () =>
-    openEditModuleModal(moduleType, moduleId)
+  const setCurrentModule = (
+    moduleType: ModuleRealType,
+    moduleId?: string
+  ) => () => openEditModuleModal(moduleType, moduleId)
 
   const addRemoveText = module ? 'remove' : 'add'
 

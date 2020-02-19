@@ -1,5 +1,8 @@
 // @flow
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Multi,
@@ -238,8 +241,8 @@ describe('makeInitialRobotState', () => {
         moduleEntities: {
           someTempModuleId: {
             id: 'someTempModuleId',
-            model: 'GEN1',
-            type: 'tempdeck',
+            model: 'someTempModel',
+            type: TEMPERATURE_MODULE_TYPE,
           },
         },
         labwareEntities: {
@@ -275,7 +278,7 @@ describe('makeInitialRobotState', () => {
         someTempModuleId: {
           slot: '3',
           moduleState: {
-            type: 'tempdeck',
+            type: TEMPERATURE_MODULE_TYPE,
             status: TEMPERATURE_DEACTIVATED,
             targetTemperature: null,
           },

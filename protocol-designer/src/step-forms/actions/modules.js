@@ -1,14 +1,14 @@
 // @flow
 import { uuid } from '../../utils'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../types'
 
 export type CreateModuleAction = {|
   type: 'CREATE_MODULE',
   payload: {|
     slot: DeckSlot,
-    type: ModuleType,
-    model: string, // eg 'GEN1',
+    type: ModuleRealType,
+    model: string, // model should match name of module definition,
     id: string,
   |},
 |}

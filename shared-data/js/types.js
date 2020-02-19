@@ -1,8 +1,5 @@
 // @flow
 import typeof {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -164,9 +161,7 @@ export type ModuleRealType =
 // corresponds to top-level keys in shared-data/module/definitions/2
 // TODO IMMEDIATE Change to sum type as soon as callsites are compatible
 export type ModuleModel = string
-
 export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
-// TODO IMMEDIATELY: gradually replace this old 'ModuleType' with ModuleModel.
 
 export type DeckOffset = {|
   x: number,

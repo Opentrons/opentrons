@@ -1,7 +1,11 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
 import mapValues from 'lodash/mapValues'
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP10Multi,
@@ -16,8 +20,6 @@ import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fi
 
 import {
   SPAN7_8_10_11_SLOT,
-  TEMPDECK,
-  THERMOCYCLER,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -246,10 +248,14 @@ export const getStateAndContextTempMagModules = ({
   invariantContext.moduleEntities = {
     [temperatureModuleId]: {
       id: temperatureModuleId,
-      type: TEMPDECK,
+      type: TEMPERATURE_MODULE_TYPE,
       model: 'foo',
     },
-    [thermocyclerId]: { id: thermocyclerId, type: THERMOCYCLER, model: 'foo' },
+    [thermocyclerId]: {
+      id: thermocyclerId,
+      type: THERMOCYCLER_MODULE_TYPE,
+      model: 'foo',
+    },
   }
 
   const robotState = makeState({
@@ -262,7 +268,7 @@ export const getStateAndContextTempMagModules = ({
     [temperatureModuleId]: {
       slot: '3',
       moduleState: {
-        type: TEMPDECK,
+        type: TEMPERATURE_MODULE_TYPE,
         status: TEMPERATURE_DEACTIVATED,
         targetTemperature: null,
       },
@@ -270,7 +276,7 @@ export const getStateAndContextTempMagModules = ({
     [thermocyclerId]: {
       slot: SPAN7_8_10_11_SLOT,
       moduleState: {
-        type: THERMOCYCLER,
+        type: THERMOCYCLER_MODULE_TYPE,
         // TODO IL 2020-01-14 create this state when thermocycler state is implemented
       },
     },
@@ -289,7 +295,7 @@ export const robotWithStatusAndTemp = (
 ): RobotState => {
   const robot = cloneDeep(robotState)
   robot.modules[temperatureModuleId].moduleState = {
-    type: TEMPDECK,
+    type: TEMPERATURE_MODULE_TYPE,
     targetTemperature,
     status,
   }

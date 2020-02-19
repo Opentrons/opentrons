@@ -1,13 +1,13 @@
 {
   "module_display_names": {
-    "tempdeck": "Temperature",
-    "magdeck": "Magnetic",
-    "thermocycler": "Thermocycler"
+    "temperatureModuleType": "Temperature",
+    "magneticModuleType": "Magnetic",
+    "thermocyclerModuleType": "Thermocycler"
   },
   "module_long_names": {
-    "tempdeck": "Temperature module",
-    "magdeck": "Magnetic module",
-    "thermocycler": "Thermocycler module"
+    "temperatureModuleType": "Temperature module",
+    "magneticModuleType": "Magnetic module",
+    "thermocyclerModuleType": "Thermocycler module"
   },
   "status": {
     "engaged": "engaged",

@@ -1,4 +1,5 @@
 // @flow
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import { engageMagnet } from '../commandCreators/atomic/engageMagnet'
 
@@ -13,13 +14,13 @@ describe('engageMagnet', () => {
     invariantContext = makeContext()
     invariantContext.moduleEntities[moduleId] = {
       id: moduleId,
-      type: 'magdeck',
-      model: 'GEN1',
+      type: MAGNETIC_MODULE_TYPE,
+      model: 'someMagModel',
     }
     robotState = getInitialRobotStateStandard(invariantContext)
     robotState.modules[moduleId] = {
       slot: '4',
-      moduleState: { type: 'magdeck', engaged: false },
+      moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
     }
   })
   test('creates engage magnet command', () => {

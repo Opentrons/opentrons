@@ -68,13 +68,27 @@ export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDef2 => {
   }
 }
 
+// DO NOT MERGE! these should immediately be replaced with Seth's constants imported above. These
+// below are redundant.
+
+// NOTE: these MODEL values should match definition names in shared-data/module/definitions/2/
+// (not to be confused with MODULE TYPE)
+// !!! TODO IMMEDIATELY double-check there match Seth's PR. DO NOT MERGE until 4936 is merged.
+export const MAGDECK_MODEL_GEN1: 'magneticModuleV1' = 'magneticModuleV1'
+export const MAGDECK_MODEL_GEN2: 'magneticModuleV2' = 'magneticModuleV2'
+export const TEMPDECK_MODEL_GEN1: 'temperatureModuleV1' = 'temperatureModuleV1'
+export const TEMPDECK_MODEL_GEN2: 'temperatureModuleV2' = 'temperatureModuleV2'
+export const THERMOCYCLER_MODEL_GEN1: 'thermocyclerModuleV1' =
+  'thermocyclerModuleV1'
+
 export const getModuleTypeFromModuleModel = (
   moduleModel: ModuleModel
 ): ModuleRealType => {
   return getModuleDef2(moduleModel).moduleType
 }
 
-// use a name like 'magdeck' or 'magdeckGen2' to get displayName for app
+// use module model (not type!) to get displayName for app
+// !!! TODO IMMEDIATELY: blocked by Seth's PR
 export function getModuleDisplayName(moduleModel: ModuleModel): string {
   return getModuleDef2(moduleModel).displayName
 }
