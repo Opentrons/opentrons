@@ -21,6 +21,10 @@ export type FormPipettesByMount = {|
   right: FormPipette,
 |}
 
+export type PipetteDisplayProperties = {
+  [pipetteId: string]: { id: string, name: string, mount: 'left' | 'right' },
+}
+
 // "entities" have only properties that are time-invariant
 // when they are de-normalized, the definitions they reference are baked in
 // =========== PIPETTES ========

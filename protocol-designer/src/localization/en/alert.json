@@ -74,5 +74,32 @@
       "title": "Cannot place module",
       "body": "Modules can only be placed in slots that are empty"
     }
+  },
+  "export_warnings": {
+    "no_commands": {
+      "heading": "Your protocol has no steps",
+      "body1": "This protocol has no steps in it- there's nothing for the robot to do! Before trying to run this on your robot add at least one step between your Starting Deck State and Final Deck State.",
+      "body2": "Learn more about building steps "
+    },
+    "unused_pipette_and_module": {
+      "heading": "Unused pipette and module",
+      "body1": "In order to run this protocol you will need to attach this pipette as well as power up and connect the module to your robot.",
+      "body2": "If you don't intend to use them, please consider removing them from your protocol."
+    },
+    "unused_pipette": {
+      "heading": "Unused pipette",
+      "body1": "In order to run this protocol you will need to attach this pipette to your robot.",
+      "body2": "If you don't intend to use the pipette, please consider removing it from your protocol."
+    },
+    "unused_module": {
+      "heading": "Unused module",
+      "body1": "In order to run this protocol you will need to power up and connect the module to your robot.",
+      "body2": "If you don't intend to use the module, please consider removing it from your protocol."
+    },
+    "unused_modules": {
+      "heading": "Unused modules",
+      "body1": "In order to run this protocol you will need to power up and connect the modules to your robot.",
+      "body2": "If you don't intend to use these modules, please consider removing them from your protocol."
+    }
   }
 }

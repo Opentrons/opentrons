@@ -2,17 +2,22 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { saveAs } from 'file-saver'
+import _ from 'lodash'
 import {
   PrimaryButton,
   AlertModal,
   OutlineButton,
   SidePanel,
 } from '@opentrons/components'
+import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
-import styles from './FileSidebar.css'
 import modalStyles from '../modals/modal.css'
+import { getUnusedEntities } from './utils'
+import styles from './FileSidebar.css'
+
 import type { PDProtocolFile } from '../../file-types'
+import type { ModuleEntities, PipetteDisplayProperties } from '../../step-forms'
 
 type Props = {
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
@@ -23,6 +28,9 @@ type Props = {
     fileData: PDProtocolFile,
     fileName: string,
   },
+  moduleEntities: ModuleEntities,
+  pipetteEntities: PipetteDisplayProperties,
+  savedStepForms: any,
 }
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
@@ -32,6 +40,100 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   saveAs(blob, downloadData.fileName)
 }
 
+type WarningContent = {
+  content: React.Node,
+  heading: string,
+}
+
+type MissingContent = {
+  noCommands: boolean,
+  pipettesWithoutStep: Array<any>,
+  modulesWithoutStep: Array<any>,
+}
+
+function getWarningContent({
+  noCommands,
+  pipettesWithoutStep,
+  modulesWithoutStep,
+}: MissingContent): WarningContent | null {
+  if (noCommands) {
+    return {
+      content: (
+        <>
+          <p>{i18n.t('alert.export_warnings.no_commands.body1')}</p>
+          <p>
+            {i18n.t('alert.export_warnings.no_commands.body2')}
+            <KnowledgeBaseLink to="protocolSteps">here</KnowledgeBaseLink>.
+          </p>
+        </>
+      ),
+      heading: i18n.t('alert.export_warnings.no_commands.heading'),
+    }
+  }
+
+  const pipettesDetails = pipettesWithoutStep
+    .map(pipette => `${pipette.mount} ${pipette.name}`)
+    .join(' and ')
+  const modulesDetails = modulesWithoutStep
+    .map(module => i18n.t(`modules.module_long_names.${module.type}`))
+    .join(' and ')
+
+  if (pipettesWithoutStep.length && modulesWithoutStep.length) {
+    return {
+      content: (
+        <>
+          <p>
+            The {pipettesDetails} and {modulesDetails} in your protocol are not
+            currently used in any step.{' '}
+            {i18n.t('alert.export_warnings.unused_pipette_and_module.body1')}
+          </p>
+          <p>
+            {i18n.t('alert.export_warnings.unused_pipette_and_module.body2')}
+          </p>
+        </>
+      ),
+      heading: i18n.t(
+        'alert.export_warnings.unused_pipette_and_module.heading'
+      ),
+    }
+  }
+
+  if (pipettesWithoutStep.length) {
+    return {
+      content: (
+        <>
+          <p>
+            The {pipettesDetails} specified in your protocol is currently not
+            used in any step.{' '}
+            {i18n.t('alert.export_warnings.unused_pipette.body1')}
+          </p>
+          <p>{i18n.t('alert.export_warnings.unused_pipette.body2')}</p>
+        </>
+      ),
+      heading: i18n.t('alert.export_warnings.unused_pipette.heading'),
+    }
+  }
+
+  if (modulesWithoutStep.length) {
+    const moduleCase =
+      modulesWithoutStep.length > 1 ? 'unused_modules' : 'unused_module'
+    return {
+      content: (
+        <>
+          <p>
+            The {modulesDetails} specified in your protocol are not currently
+            used in any step.{' '}
+            {i18n.t(`alert.export_warnings.${moduleCase}.body1`)}
+          </p>
+          <p>{i18n.t(`alert.export_warnings.${moduleCase}.body2`)}</p>
+        </>
+      ),
+      heading: i18n.t(`alert.export_warnings.${moduleCase}.heading`),
+    }
+  }
+  return null
+}
+
 export function FileSidebar(props: Props) {
   const {
     canDownload,
@@ -39,20 +141,46 @@ export function FileSidebar(props: Props) {
     loadFile,
     createNewFile,
     onDownload,
+    moduleEntities,
+    pipetteEntities,
+    savedStepForms,
   } = props
-  const [showNoCommandsModal, setShowNoCommandsModal] = React.useState<boolean>(
-    false
-  )
-  const cancelModal = () => setShowNoCommandsModal(false)
+  const [
+    showExportWarningModal,
+    setShowExportWarningModal,
+  ] = React.useState<boolean>(false)
+  const cancelModal = () => setShowExportWarningModal(false)
+
   const noCommands = downloadData && downloadData.fileData.commands.length === 0
+  const pipettesWithoutStep = getUnusedEntities(
+    pipetteEntities,
+    savedStepForms,
+    'pipette'
+  )
+  const modulesWithoutStep = getUnusedEntities(
+    moduleEntities,
+    savedStepForms,
+    'moduleId'
+  )
+
+  const hasWarning =
+    noCommands || modulesWithoutStep.length || pipettesWithoutStep.length
+
+  const warning =
+    hasWarning &&
+    getWarningContent({
+      noCommands,
+      pipettesWithoutStep,
+      modulesWithoutStep,
+    })
 
   return (
     <>
-      {showNoCommandsModal && (
+      {showExportWarningModal && (
         <Portal>
           <AlertModal
             className={modalStyles.modal}
-            heading="Your protocol has no steps"
+            heading={warning && warning.heading}
             onCloseClick={cancelModal}
             buttons={[
               {
@@ -64,20 +192,12 @@ export function FileSidebar(props: Props) {
                 className: modalStyles.long_button,
                 onClick: () => {
                   saveFile(downloadData)
-                  setShowNoCommandsModal(false)
+                  setShowExportWarningModal(false)
                 },
               },
             ]}
           >
-            <p>
-              This protocol has no steps in it- there{"'"}s nothing for the
-              robot to do! Before trying to run this on your robot add at least
-              one step between your Starting Deck State and Final Deck State.
-            </p>
-            <p>
-              Learn more about building steps{' '}
-              <KnowledgeBaseLink to="protocolSteps">here</KnowledgeBaseLink>.
-            </p>
+            {warning && warning.content}
           </AlertModal>
         </Portal>
       )}
@@ -95,8 +215,8 @@ export function FileSidebar(props: Props) {
           <div className={styles.button}>
             <PrimaryButton
               onClick={() => {
-                if (noCommands) {
-                  setShowNoCommandsModal(true)
+                if (hasWarning) {
+                  setShowExportWarningModal(true)
                 } else {
                   saveFile(downloadData)
                   onDownload()
