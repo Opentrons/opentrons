@@ -2,7 +2,7 @@ import typing
 from enum import Enum
 
 from pydantic import BaseModel, Field, create_model
-from opentrons.server.endpoints.settings import _common_settings_reset_options
+from api.aiohttp.endpoints.settings import _common_settings_reset_options
 
 
 class AdvancedSetting(BaseModel):
