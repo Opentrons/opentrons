@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
-from opentrons.app.models import V1ErrorMessage
-from opentrons.app.models.deck_calibration import DeckStart, \
+from api.fastapi.models import V1ErrorMessage
+from api.fastapi.models.deck_calibration import DeckStart, \
     DeckStartResponse, DeckCalibrationDispatch
 
 router = APIRouter()
