@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import Overlay from './Overlay'
-import styles from './modals.css'
 import { RemoveScroll } from 'react-remove-scroll'
 
-type ModalProps = {
+import { Overlay } from './Overlay'
+import styles from './modals.css'
+
+export type ModalProps = {|
   /** handler to close the modal (attached to `Overlay` onClick) */
   onCloseClick?: (event: SyntheticEvent<>) => mixed,
   /** Optional styled heading **/
@@ -21,13 +22,13 @@ type ModalProps = {
   /** restricts scroll outside of Modal when open, true by default */
   restrictOuterScroll?: boolean,
   innerRef?: React.Ref<*>,
-}
+|}
 
 /**
  * Base modal component that fills its nearest `display:relative` ancestor
  * with a dark overlay and displays `children` as its contents in a white box
  */
-export default function Modal(props: ModalProps) {
+export function Modal(props: ModalProps) {
   const {
     contentsClassName,
     alertOverlay,

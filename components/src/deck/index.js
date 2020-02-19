@@ -1,42 +1,27 @@
 // @flow
-import Deck from './Deck'
-import Labware from './Labware'
-import LabwareWrapper from './LabwareWrapper'
-import LabwareOutline from './LabwareOutline'
-import LabwareNameOverlay from './LabwareNameOverlay'
-import LabwareLabels from './LabwareLabels'
-import LabwareRender from './LabwareRender'
-import Well from './Well'
-import Tip from './Tip'
-import type { SingleWell } from './Well'
-import Module from './Module'
-import RobotWorkSpace from './RobotWorkSpace'
-import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
-import RobotCoordsText from './RobotCoordsText'
 
-import { EmptyDeckSlot } from './EmptyDeckSlot'
-import { SlotOverlay } from './SlotOverlay'
+export * from './Deck'
+export * from './Labware'
+export * from './LabwareNameOverlay'
+export * from './LabwareOutline'
+export * from './LabwareRender'
+export * from './Module'
+export * from './RobotCoordsForeignDiv'
+export * from './RobotCoordsText'
+export * from './RobotWorkSpace'
+export * from './Tip'
+export * from './Well'
 
 export * from './constants'
-export * from './Deck'
 export * from './labwareInternals/types'
 export * from './types'
-export {
-  Deck,
-  EmptyDeckSlot,
-  Labware,
-  LabwareWrapper,
-  LabwareNameOverlay,
-  LabwareOutline,
-  LabwareLabels,
-  LabwareRender,
-  Module,
-  SlotOverlay,
-  Well,
-  RobotWorkSpace,
-  RobotCoordsForeignDiv,
-  RobotCoordsText,
-  Tip,
-}
 
-export type { SingleWell }
+// TODO(mc, 2020-02-19): these components appear to no longer be used
+// they should be removed
+export * from './CenteredTextSvg'
+export * from './DeckOutline'
+export * from './EmptyDeckSlot'
+export * from './LabwareLabels'
+export * from './LabwareWrapper'
+export * from './ModuleNameOverlay'
+export * from './SlotOverlay'

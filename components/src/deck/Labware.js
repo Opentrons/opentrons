@@ -9,12 +9,12 @@ import {
 } from '@opentrons/shared-data'
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
 
-import LabwareOutline from './LabwareOutline'
-import FallbackLabware from './FallbackLabware'
-import Tip from './Tip'
-import Well from './Well'
+import { LabwareOutline } from './LabwareOutline'
+import { FallbackLabware } from './FallbackLabware'
+import { Tip } from './Tip'
+import { Well } from './Well'
 
-export type Props = {
+export type LabwareProps = {
   /** labware type, to get legacy definition from shared-data */
   labwareType?: string,
   definition?: ?LabwareDefinition1,
@@ -23,7 +23,7 @@ export type Props = {
 // NOTE: this is a legacy component that is only responsible
 // for visualizing a labware schema v1 definition by def or loadName
 
-class Labware extends React.Component<Props> {
+export class Labware extends React.Component<LabwareProps> {
   render() {
     const { labwareType, definition } = this.props
 
@@ -69,5 +69,3 @@ class Labware extends React.Component<Props> {
     )
   }
 }
-
-export default Labware

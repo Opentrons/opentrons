@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 
-type Props = {
+export type ClickOutsideProps = {|
   onClickOutside: ?(MouseEvent) => mixed,
   children: ({ ref: React.Ref<*> }) => React.Element<*>,
-}
+|}
 
 // TODO: BC: 2019-05-10 this would be much cleaner as a custom hook
-export default class ClickOutside extends React.Component<Props> {
+export class ClickOutside extends React.Component<ClickOutsideProps> {
   // TODO(mc, 2019-04-19): switch to ref object
   wrapperRef: ?Element
 
-  constructor(props: Props) {
+  constructor(props: ClickOutsideProps) {
     super(props)
     this.wrapperRef = null
   }

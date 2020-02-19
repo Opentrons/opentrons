@@ -1,15 +1,16 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon, type IconName } from '../icons'
 
 import styles from './SlotOverlay.css'
 
-type SlotOverlayProps = {
+export type SlotOverlayProps = {|
   text?: string,
   icon?: IconName,
   className?: string,
-}
+|}
 
 export function SlotOverlay(props: SlotOverlayProps) {
   const { icon, text, className } = props

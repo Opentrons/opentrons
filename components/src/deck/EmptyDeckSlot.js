@@ -1,18 +1,23 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
-import { CenteredTextSvg } from '../CenteredTextSvg'
-import LabwareWrapper from './LabwareWrapper'
+import { CenteredTextSvg } from './CenteredTextSvg'
+import { LabwareWrapper } from './LabwareWrapper'
 import styles from './LabwareWrapper.css'
 
-import type { DeckSlotProps } from '../../interfaces/DeckSlot'
+import type { LabwareWrapperProps } from './LabwareWrapper'
 
-// TODO(mc, 2018-07-16): this should be the default export
-export function EmptyDeckSlot(props: DeckSlotProps) {
-  const { slot } = props
+export type EmptyDeckSlotProps = {|
+  ...LabwareWrapperProps,
+  slot: string,
+|}
+
+export function EmptyDeckSlot(props: EmptyDeckSlotProps) {
+  const { slot, ...labwareWrapperProps } = props
 
   return (
-    <LabwareWrapper {...props}>
+    <LabwareWrapper {...labwareWrapperProps}>
       <g className={styles.empty_slot}>
         <rect width="100%" height="100%" />
         <CenteredTextSvg text={slot} />

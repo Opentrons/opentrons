@@ -2,9 +2,12 @@
 import { type ElementRef, useEffect, useRef } from 'react'
 import assert from 'assert'
 
-type Params = { onClickOutside: ?(any) => mixed }
-const useOnClickOutside = (params: Params) => {
-  const { onClickOutside } = params
+export type UseOnClickOutsideOptions = $Shape<{|
+  onClickOutside?: MouseEvent => mixed,
+|}>
+
+export const useOnClickOutside = (options: UseOnClickOutsideOptions) => {
+  const { onClickOutside } = options
   const node: ElementRef<*> = useRef()
 
   useEffect(() => {
@@ -35,5 +38,3 @@ const useOnClickOutside = (params: Params) => {
 
   return node
 }
-
-export default useOnClickOutside

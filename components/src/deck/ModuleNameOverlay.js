@@ -1,17 +1,18 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
 import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
 
 import styles from './Module.css'
 
-type Props = { name: ModuleType }
+export type ModuleNameOverlayProps = {| name: ModuleType |}
 
 // TODO (ka 2019-1-7): eventually add option to override with props
 const HEIGHT = 20
 const PADDING_LEFT = 4
 
-export default function ModuleNameOverlay(props: Props) {
+export function ModuleNameOverlay(props: ModuleNameOverlayProps) {
   const displayName = getModuleDisplayName(props.name)
   return (
     <React.Fragment>

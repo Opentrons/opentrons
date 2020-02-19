@@ -6,7 +6,7 @@ import cx from 'classnames'
 
 import styles from './structure.css'
 
-type Props = {
+export type LabeledValueProps = {|
   /** Label */
   label: React.Node,
   /** Value */
@@ -15,9 +15,9 @@ type Props = {
   className?: string,
   /** Additional value className */
   valueClassName?: string,
-}
+|}
 
-export default function LabeledValue(props: Props) {
+export function LabeledValue(props: LabeledValueProps) {
   const { label, value } = props
   const className = cx(styles.labeled_value, props.className)
 

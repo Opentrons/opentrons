@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '../..';
 
 .labware_detail_group {
   fill: none;

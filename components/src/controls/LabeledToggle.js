@@ -1,18 +1,18 @@
 // @flow
 import * as React from 'react'
 
-import LabeledControl from './LabeledControl'
-import ToggleButton from './ToggleButton'
+import { LabeledControl } from './LabeledControl'
+import { ToggleButton } from './ToggleButton'
 import styles from './styles.css'
 
-type Props = {
+export type LabeledToggleProps = {|
   label: string,
   toggledOn: boolean,
   children?: React.Node,
   onClick: () => mixed,
-}
+|}
 
-export default function LabeledToggle(props: Props) {
+export function LabeledToggle(props: LabeledToggleProps) {
   const { label, toggledOn, onClick } = props
 
   return (

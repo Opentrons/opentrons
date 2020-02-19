@@ -4,23 +4,23 @@ import cx from 'classnames'
 import flatMap from 'lodash/flatMap'
 import map from 'lodash/map'
 import snakeCase from 'lodash/snakeCase'
-import {
-  type DeckDefinition,
-  type DeckLayer,
-  type DeckSlotId,
-  SLOT_RENDER_WIDTH,
-  SLOT_RENDER_HEIGHT,
-} from '@opentrons/shared-data'
+import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
 import {
   SLOTNAME_MATRIX,
   SLOT_SPACING_MM,
   SLOT_OFFSET_MM,
   TRASH_SLOTNAME,
 } from './constants'
-import DeckOutline from './DeckOutline'
+import { DeckOutline } from './DeckOutline'
 import { EmptyDeckSlot } from './EmptyDeckSlot'
 
 import styles from './Deck.css'
+
+import type {
+  DeckDefinition,
+  DeckLayer,
+  DeckSlotId,
+} from '@opentrons/shared-data'
 
 export type LabwareComponentProps = {|
   slot: DeckSlotId,
@@ -30,16 +30,18 @@ export type LabwareComponentProps = {|
 
 export type LabwareComponentType = React.ComponentType<LabwareComponentProps>
 
-type Props = {
+export type DeckProps = {|
   className?: string,
   LabwareComponent?: LabwareComponentType,
   DragPreviewLayer?: any, // TODO: BC 2019-01-03 flow doesn't like portals
-}
+|}
 
 const VIEW_BOX_WIDTH = 427
 const VIEW_BOX_HEIGHT = 390
 
-export default class Deck extends React.Component<Props> {
+// TODO(mc, 2020-02-19): this component is no longer used
+// replace with DeckFromData (see BC's TODO below)
+export class Deck extends React.Component<DeckProps> {
   // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
   // this `parentRef` should be HTMLElement | SVGElement
   parentRef: ?any
@@ -109,7 +111,7 @@ function renderLabware(
         return (
           // $FlowFixMe: (mc, 2019-04-18) don't know why flow doesn't like this, don't care because this is going away
           <g key={slot} transform={transform}>
-            <EmptyDeckSlot {...props} />
+            <EmptyDeckSlot slot={slot} />
             {LabwareComponent && <LabwareComponent {...props} />}
           </g>
         )
@@ -118,11 +120,15 @@ function renderLabware(
   )
 }
 
-type DeckProps = {
+// TODO: BC 2019-05-03 we should migrate to only using the DeckFromData
+// component; once Deck is removed, we should rename it Deck
+
+export type DeckFromDataProps = {
   def: DeckDefinition,
   layerBlacklist: Array<string>,
 }
-export class DeckFromData extends React.PureComponent<DeckProps> {
+
+export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
   render() {
     const { def, layerBlacklist } = this.props
     return (
@@ -146,6 +152,3 @@ export class DeckFromData extends React.PureComponent<DeckProps> {
     )
   }
 }
-
-// TODO:  BC 2019-05-03 we should migrate to only using the above DeckFromData
-// component once Deck is remove, we should probably rename it Deck

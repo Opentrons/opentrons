@@ -8,7 +8,7 @@ import { Button } from '../buttons'
 import { NotificationIcon, type IconName } from '../icons'
 import { HoverTooltip } from '../tooltips'
 
-type NavButtonProps = {
+export type NavButtonProps = {|
   /** optional click event for nav button */
   onClick?: (event: SyntheticEvent<>) => void,
   /** optional url for nav button route */
@@ -29,9 +29,9 @@ type NavButtonProps = {
   selected?: boolean,
   /** contents of the tooltip targeting this button */
   tooltipComponent?: React.Node,
-}
+|}
 
-export default function NavButton(props: NavButtonProps) {
+export function NavButton(props: NavButtonProps) {
   const { url, tooltipComponent } = props
   const className = classnames(props.className, styles.button, {
     [styles.disabled]: props.disabled,

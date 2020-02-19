@@ -1,7 +1,5 @@
 // @flow
 // navigational components
-import TabbedNavBar from './TabbedNavBar'
-import NavTab from './NavTab'
-import OutsideLinkTab from './OutsideLinkTab'
-
-export { TabbedNavBar, NavTab, OutsideLinkTab }
+export * from './TabbedNavBar'
+export * from './NavTab'
+export * from './OutsideLinkTab'

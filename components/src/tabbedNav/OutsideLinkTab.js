@@ -4,9 +4,11 @@ import cx from 'classnames'
 
 import styles from './navbar.css'
 import { Button } from '../buttons'
-import { NotificationIcon, type IconName } from '../icons'
+import { NotificationIcon } from '../icons'
 
-type Props = {
+import type { IconName } from '../icons'
+
+export type OutsideLinkTabProps = {|
   /** optional click event for nav button */
   onClick?: (event: SyntheticEvent<>) => mixed,
   /** link to outside URL */
@@ -25,10 +27,10 @@ type Props = {
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
-}
+|}
 
 /** Very much like NavTab, but used for opening external links in a new tab/window */
-export default function OutsideLinkTab(props: Props) {
+export function OutsideLinkTab(props: OutsideLinkTabProps) {
   const className = cx(props.className, styles.tab, styles.no_link, {
     [styles.disabled]: props.disabled,
     [styles.bottom]: props.isBottom,

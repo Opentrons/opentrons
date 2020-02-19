@@ -1,10 +1,11 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
-type CenteredTextSvgProps = {
+export type CenteredTextSvgProps = {|
   text: React.Node,
   className?: string,
-}
+|}
 
 export function CenteredTextSvg(props: CenteredTextSvgProps) {
   const { text, className } = props

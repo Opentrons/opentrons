@@ -121,7 +121,7 @@ class TipPositionModalComponent extends React.Component<Props, State> {
       value: clamp(valueFloat, minMmFromBottom, maxMmFromBottom),
     })
   }
-  handleInputFieldChange = (e: SyntheticEvent<HTMLSelectElement>) => {
+  handleInputFieldChange = (e: SyntheticEvent<HTMLInputElement>) => {
     this.handleChange(e.currentTarget.value)
   }
   handleIncrementDecrement = (delta: number) => {
