@@ -2,12 +2,12 @@ import inspect
 
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
-from opentrons.app.dependencies import get_hardware
 from opentrons.hardware_control import HardwareAPILike
 from opentrons.protocols.types import APIVersion
-from opentrons.app.models.health import Health, Links
 from opentrons import __version__
 from opentrons.config import feature_flags
+from api.fastapi.models.health import Health, Links
+from api.fastapi.dependencies import get_hardware
 
 router = APIRouter()
 
