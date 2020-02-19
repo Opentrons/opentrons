@@ -3,41 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.16.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.16.0-alpha.2...v3.16.0-alpha.3) (2020-02-18)
-
+# [3.16.0](https://github.com/opentrons/opentrons/compare/v3.15.2...v3.16.0) (2020-02-19)
 
 ### Bug Fixes
 
 * **api:** make probe failures raise the actual error ([#5015](https://github.com/opentrons/opentrons/issues/5015)) ([bc74517](https://github.com/opentrons/opentrons/commit/bc74517)), closes [#4980](https://github.com/opentrons/opentrons/issues/4980)
-
-
-
-
-
-# [3.16.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.16.0-alpha.1...v3.16.0-alpha.2) (2020-02-13)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.16.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.16.0-alpha.0...v3.16.0-alpha.1) (2020-02-12)
-
-
-### Bug Fixes
-
 * **api:** swallow hard-halt-related errors and hold lock in session.stop() ([#4980](https://github.com/opentrons/opentrons/issues/4980)) ([c42d4dc](https://github.com/opentrons/opentrons/commit/c42d4dc)), closes [#4979](https://github.com/opentrons/opentrons/issues/4979)
-
-
-
-
-
-# [3.16.0-alpha.0](https://github.com/opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
-
-
-### Bug Fixes
-
 * **api:** Add back in useProtocolApi2 feature flag ([#4665](https://github.com/opentrons/opentrons/issues/4665)) ([5c3fae3](https://github.com/opentrons/opentrons/commit/5c3fae3))
 * **api:** amend temperature module old bootloader check ([#4942](https://github.com/opentrons/opentrons/issues/4942)) ([dbc90cb](https://github.com/opentrons/opentrons/commit/dbc90cb))
 * **api:** apiv2: allow multi to access all 384 wells in transfer ([#4678](https://github.com/opentrons/opentrons/issues/4678)) ([975915a](https://github.com/opentrons/opentrons/commit/975915a)), closes [#4669](https://github.com/opentrons/opentrons/issues/4669)

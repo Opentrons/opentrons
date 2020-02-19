@@ -26,5 +26,6 @@ easily reset it to its default location.
 
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
-
 [2047]: https://github.com/Opentrons/opentrons/issues/2047
+[2020]: https://github.com/Opentrons/opentrons/issues/2020
+[3872]: https://github.com/Opentrons/opentrons/issues/3872
