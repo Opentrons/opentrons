@@ -12,7 +12,7 @@ from opentrons.config import (CONFIG,
 from opentrons.types import Mount
 from opentrons.deck_calibration import dc_main
 from opentrons.deck_calibration.dc_main import get_calibration_points
-from opentrons.deck_calibration.endpoints import expected_points
+from opentrons.deck_calibration import expected_points
 
 
 @pytest.fixture

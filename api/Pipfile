@@ -22,6 +22,7 @@ twine = "==2.0.0"
 typing-extensions = "*"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
+pytest-aiohttp = "*"
 
 [packages]
 aionotify = "==0.2.0"

@@ -5,9 +5,7 @@ import asyncio
 import re
 import opentrons
 from opentrons import HERE
-from opentrons import server
 from opentrons.hardware_control import adapters
-from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
@@ -159,12 +157,12 @@ def run(hardware, **kwargs):  # noqa(C901)
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
-    server.run(
-        hardware,
-        kwargs.get('hostname'),
-        kwargs.get('port'),
-        kwargs.get('path'),
-        loop)
+    # server.run(
+    #     hardware,
+    #     kwargs.get('hostname'),
+    #     kwargs.get('port'),
+    #     kwargs.get('path'),
+    #     loop)
 
 
 def main():
@@ -181,8 +179,7 @@ def main():
     """
 
     arg_parser = ArgumentParser(
-        description="Opentrons robot software",
-        parents=[build_arg_parser()])
+        description="Opentrons robot software")
     arg_parser.add_argument(
         '--hardware-server', action='store_true',
         help='Run a jsonrpc server allowing rpc to the'
