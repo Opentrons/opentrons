@@ -163,10 +163,12 @@ class Controller:
         while can_watch and (not self._module_watcher.closed):
             await self._handle_watch_event(register_modules)
 
-    async def build_module(self,
-                           port: str,
-                           model: str,
-                           interrupt_callback) -> modules.AbstractModule:
+    async def build_module(
+            self,
+            port: str,
+            model: str,
+            interrupt_callback: modules.InterruptCallback
+            ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,

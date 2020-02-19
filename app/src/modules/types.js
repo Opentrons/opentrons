@@ -110,10 +110,6 @@ export type FetchModulesFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchModulesDoneAction =
-  | FetchModulesSuccessAction
-  | FetchModulesFailureAction
-
 // fetch module data
 
 export type SendModuleCommandAction = {|
@@ -149,10 +145,6 @@ export type SendModuleCommandFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type SendModuleCommandDoneAction =
-  | SendModuleCommandSuccessAction
-  | SendModuleCommandFailureAction
-
 // fetch modules
 
 export type UpdateModuleAction = {|
@@ -180,10 +172,6 @@ export type UpdateModuleFailureAction = {|
   |},
   meta: RobotApiRequestMeta,
 |}
-
-export type UpdateModuleDoneAction =
-  | UpdateModuleSuccessAction
-  | UpdateModuleFailureAction
 
 // action union
 

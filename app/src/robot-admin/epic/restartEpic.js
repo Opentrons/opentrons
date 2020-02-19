@@ -8,18 +8,17 @@ import { getRobotRestartPath } from '../../robot-settings'
 import { startDiscovery } from '../../discovery'
 import * as Constants from '../constants'
 import * as Actions from '../actions'
-import * as Types from '../types'
 
-import type { StrictEpic } from '../../types'
-import type { StartDiscoveryAction } from '../../discovery/types'
+import type { Epic } from '../../types'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
+import type { RestartRobotAction } from '../types'
 
 const RESTART_DISCOVERY_TIMEOUT_MS = 60000
 
-const mapActionToRequest: ActionToRequestMapper<Types.RestartRobotAction> = (
+const mapActionToRequest: ActionToRequestMapper<RestartRobotAction> = (
   action,
   state
 ) => {
@@ -30,10 +29,10 @@ const mapActionToRequest: ActionToRequestMapper<Types.RestartRobotAction> = (
   return { method: POST, path }
 }
 
-const mapResponseToAction: ResponseToActionMapper<
-  Types.RestartRobotAction,
-  Types.RestartRobotDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<RestartRobotAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const { robot: _, ...prevMeta } = originalAction.meta
   const meta = { ...prevMeta, response: responseMeta }
@@ -43,10 +42,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.restartRobotFailure(host.name, body, meta)
 }
 
-export const restartEpic: StrictEpic<Types.RestartRobotDoneAction> = (
-  action$,
-  state$
-) => {
+export const restartEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.RESTART),
     mapToRobotApiRequest(
@@ -58,7 +54,7 @@ export const restartEpic: StrictEpic<Types.RestartRobotDoneAction> = (
   )
 }
 
-export const startDiscoveryOnRestartEpic: StrictEpic<StartDiscoveryAction> = action$ => {
+export const startDiscoveryOnRestartEpic: Epic = action$ => {
   return action$.pipe(
     ofType(Constants.RESTART_SUCCESS),
     mapTo(startDiscovery(RESTART_DISCOVERY_TIMEOUT_MS))

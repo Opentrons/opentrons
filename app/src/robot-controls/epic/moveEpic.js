@@ -10,13 +10,13 @@ import { getAttachedPipettes } from '../../pipettes'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { State, StrictEpic } from '../../types'
+import type { State, Action, Epic } from '../../types'
 import type {
   RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../robot-api/types'
 
-import type { MoveAction, MoveDoneAction, PositionsResponse } from '../types'
+import type { MoveAction, PositionsResponse } from '../types'
 
 const mapActionToRequest = (
   action: MoveAction,
@@ -46,7 +46,7 @@ const mapActionToRequest = (
 const mapResponseToAction = (
   response: RobotApiResponse,
   originalAction: MoveAction
-): MoveDoneAction => {
+): Action => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -67,7 +67,7 @@ const disengageMotorsRequest = {
 // 1. Call GET /robot/positions
 // 2. Call POST /robot/move with result of GET /robot/positions
 // 3. Call POST /motors/disengage if we need to
-export const moveEpic: StrictEpic<MoveDoneAction> = (action$, state$) => {
+export const moveEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.MOVE),
     withRobotHost(state$, a => a.payload.robotName),

@@ -40,10 +40,6 @@ export type RestartRobotFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type RestartRobotDoneAction =
-  | RestartRobotSuccessAction
-  | RestartRobotFailureAction
-
 export type FetchResetConfigOptionsAction = {|
   type: 'robotAdmin:FETCH_RESET_CONFIG_OPTIONS',
   payload: {| robotName: string |},
@@ -62,10 +58,6 @@ export type FetchResetConfigOptionsFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchResetConfigOptionsDoneAction =
-  | FetchResetConfigOptionsSuccessAction
-  | FetchResetConfigOptionsFailureAction
-
 export type ResetConfigAction = {|
   type: 'robotAdmin:RESET_CONFIG',
   payload: {| robotName: string, resets: ResetConfigRequest |},
@@ -83,10 +75,6 @@ export type ResetConfigFailureAction = {|
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
-
-export type ResetConfigDoneAction =
-  | ResetConfigSuccessAction
-  | ResetConfigFailureAction
 
 export type RobotAdminAction =
   | RestartRobotAction

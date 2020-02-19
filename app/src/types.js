@@ -94,13 +94,9 @@ type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
 type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
-// DEPRECATED(mc, 2020-01-09): prefer plain Epic
-// TODO(mc, 2020-01-09): remove StrictEpic and refactor code that relies on it
-export type StrictEpic<R: Action = Action> = (
+export type Epic = (
   action$: Observable<Action>,
   state$: Observable<State>
-) => Observable<R>
-
-export type Epic = StrictEpic<>
+) => Observable<Action>
 
 export type Error = { name: string, message: string }

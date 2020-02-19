@@ -605,7 +605,7 @@
             "required": ["command", "params"],
             "additionalProperties": false,
             "properties": {
-              "command": { "enum": ["thermocycler/closeLid"] },
+              "command": { "enum": ["thermocycler/runProfile"] },
               "params": {
                 "type": "object",
                 "required": ["module", "profile", "volume"],

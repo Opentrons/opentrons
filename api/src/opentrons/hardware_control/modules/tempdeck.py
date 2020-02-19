@@ -85,15 +85,17 @@ class TempDeck(mod_abc.AbstractModule):
     """
     @classmethod
     async def build(cls,
-                    port,
-                    interrupt_callback,
-                    simulating=False,
+                    port: str,
+                    interrupt_callback: types.InterruptCallback = None,
+                    simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
 
         """ Build and connect to a TempDeck"""
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
-        mod = cls(port, simulating, loop)
+        mod = cls(port=port,
+                  simulating=simulating,
+                  loop=loop)
         await mod._connect()
         return mod
 
@@ -106,7 +108,7 @@ class TempDeck(mod_abc.AbstractModule):
         return 'Temperature Deck'
 
     @classmethod
-    def bootloader(cls) -> mod_abc.UploadFunction:
+    def bootloader(cls) -> types.UploadFunction:
         return update.upload_via_avrdude
 
     @staticmethod
@@ -118,8 +120,8 @@ class TempDeck(mod_abc.AbstractModule):
             return TempDeckDriver()
 
     def __init__(self,
-                 port,
-                 simulating,
+                 port: str,
+                 simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port, simulating, loop)
         if temp_locks.get(port):

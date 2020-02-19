@@ -7,24 +7,24 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchSettingsAction, FetchSettingsDoneAction } from '../types'
+import type { FetchSettingsAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<FetchSettingsAction> = () => ({
   method: GET,
   path: Constants.SETTINGS_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  FetchSettingsAction,
-  FetchSettingsDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<FetchSettingsAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
@@ -38,10 +38,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.fetchSettingsFailure(host.name, body, meta)
 }
 
-export const fetchSettingsEpic: StrictEpic<FetchSettingsDoneAction> = (
-  action$,
-  state$
-) => {
+export const fetchSettingsEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.FETCH_SETTINGS),
     mapToRobotApiRequest(

@@ -19,8 +19,6 @@ if TYPE_CHECKING:
     from .util import HardwareManager
 
 
-MODULE_LOG = logging.getLogger(__name__)
-
 AdvancedLiquidHandling = Union[
     Well,
     types.Location,

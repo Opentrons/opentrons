@@ -6,13 +6,13 @@ import { filter, tap, ignoreElements } from 'rxjs/operators'
 import { createLogger } from '../logger'
 import { remote } from './remote'
 
-import type { StrictEpic, Action } from '../types'
+import type { Epic, Action } from '../types'
 
 const { ipcRenderer } = remote
 
 const log = createLogger(__filename)
 
-const sendActionToShellEpic: StrictEpic<> = action$ =>
+const sendActionToShellEpic: Epic = action$ =>
   action$.pipe(
     filter<Action>(a => a.meta != null && a.meta.shell != null && a.meta.shell),
     tap<Action>((shellAction: Action) =>
@@ -21,7 +21,7 @@ const sendActionToShellEpic: StrictEpic<> = action$ =>
     ignoreElements()
   )
 
-const receiveActionFromShellEpic: StrictEpic<> = () =>
+const receiveActionFromShellEpic: Epic = () =>
   // IPC event listener: (IpcRendererEvent, ...args) => void
   // our action is the only argument, so pluck it out from index 1
   fromEvent<Action>(
@@ -36,7 +36,7 @@ const receiveActionFromShellEpic: StrictEpic<> = () =>
     })
   )
 
-export const shellEpic: StrictEpic<> = combineEpics(
+export const shellEpic: Epic = combineEpics(
   sendActionToShellEpic,
   receiveActionFromShellEpic
 )

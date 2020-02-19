@@ -122,6 +122,62 @@ describe('robot settings selectors', () => {
         },
       },
     },
+    {
+      name: 'getWifiList returns [] if unavailable',
+      selector: Selectors.getWifiList,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      expected: [],
+    },
+    {
+      name: 'getWifiList returns wifiList from state',
+      selector: Selectors.getWifiList,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [Fixtures.mockWifiNetwork],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [Fixtures.mockWifiNetwork],
+    },
+    {
+      name: 'getWifiList dedupes duplicate SSIDs',
+      selector: Selectors.getWifiList,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [Fixtures.mockWifiNetwork, Fixtures.mockWifiNetwork],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [Fixtures.mockWifiNetwork],
+    },
+    {
+      name: 'getWifiList sorts by active then ssid',
+      selector: Selectors.getWifiList,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [
+              { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
+              { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
+              { ...Fixtures.mockWifiNetwork, active: true, ssid: 'zzz' },
+            ],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [
+        { ...Fixtures.mockWifiNetwork, active: true, ssid: 'zzz' },
+        { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
+        { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
+      ],
+    },
   ]
 
   SPECS.forEach(spec => {

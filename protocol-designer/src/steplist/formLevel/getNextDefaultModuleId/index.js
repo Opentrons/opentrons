@@ -27,10 +27,6 @@ export function getNextDefaultTemperatureModuleId(
     findKey(equippedModulesById, m => m.type === TEMPDECK) ||
     findKey(equippedModulesById, m => m.type === THERMOCYCLER) ||
     null
-  if (!nextDefaultModule) {
-    console.error('Could not get next default module. Something went wrong.')
-    return null
-  }
 
-  return nextDefaultModule
+  return nextDefaultModule || null
 }

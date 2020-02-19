@@ -7,18 +7,18 @@ import { fetchRobotApi } from './http'
 import * as Types from './types'
 
 import type { Observable } from 'rxjs'
-import type { State } from '../types'
+import type { State, Action } from '../types'
 
-export type ActionToRequestMapper<A> = (
-  A,
+export type ActionToRequestMapper<TriggerAction> = (
+  TriggerAction,
   State
 ) => Types.RobotApiRequestOptions
 
-export type ResponseToActionMapper<A, B> = (
+export type ResponseToActionMapper<TriggerAction> = (
   Types.RobotApiResponse,
-  A,
+  TriggerAction,
   State
-) => B
+) => Action
 
 export function withRobotHost<A>(
   state$: Observable<State>,
@@ -34,12 +34,12 @@ export function withRobotHost<A>(
   )
 }
 
-export function mapToRobotApiRequest<A, B>(
+export function mapToRobotApiRequest<A>(
   state$: Observable<State>,
   getRobotName: A => string,
   mapActionToRequest: ActionToRequestMapper<A>,
-  mapResponseToAction: ResponseToActionMapper<A, B>
-): rxjs$OperatorFunction<A, B> {
+  mapResponseToAction: ResponseToActionMapper<A>
+): rxjs$OperatorFunction<A, Action> {
   return pipe(
     withRobotHost(state$, getRobotName),
     map(([a, s, host]) => [host, mapActionToRequest(a, s), a]),

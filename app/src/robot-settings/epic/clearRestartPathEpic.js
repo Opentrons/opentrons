@@ -5,13 +5,9 @@ import { getRobotAdminStatus, RESTARTING_STATUS } from '../../robot-admin'
 import { clearRestartPath } from '../actions'
 import { getAllRestartRequiredRobots } from '../selectors'
 
-import type { StrictEpic } from '../../types'
-import type { ClearRestartPathAction } from '../types'
+import type { Epic } from '../../types'
 
-export const clearRestartPathEpic: StrictEpic<ClearRestartPathAction> = (
-  action$,
-  state$
-) => {
+export const clearRestartPathEpic: Epic = (action$, state$) => {
   return state$.pipe(
     map(state => {
       return getAllRestartRequiredRobots(state)

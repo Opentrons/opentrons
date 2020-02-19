@@ -407,11 +407,14 @@ export const savedStepForms = (
                 labwareSlot === moduleId ? labwareFallbackSlot : labwareSlot
             ),
           }
-        } else if (form.stepType === 'magnet' && form.moduleId === moduleId) {
+        } else if (
+          (form.stepType === 'magnet' ||
+            form.stepType === 'temperature' ||
+            form.stepType === 'pause') &&
+          form.moduleId === moduleId
+        ) {
           return { ...form, moduleId: null }
         } else {
-          // TODO: Ian 2019-10-24 remove modules from forms that may reference them
-          // via handleFormChange
           return form
         }
       })

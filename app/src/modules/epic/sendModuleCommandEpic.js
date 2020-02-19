@@ -7,17 +7,14 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { StrictEpic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type {
-  SendModuleCommandAction,
-  SendModuleCommandDoneAction,
-} from '../types'
+import type { SendModuleCommandAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<SendModuleCommandAction> = action => ({
   method: POST,
@@ -28,10 +25,10 @@ const mapActionToRequest: ActionToRequestMapper<SendModuleCommandAction> = actio
   },
 })
 
-const mapResponseToAction: ResponseToActionMapper<
-  SendModuleCommandAction,
-  SendModuleCommandDoneAction
-> = (response, originalAction) => {
+const mapResponseToAction: ResponseToActionMapper<SendModuleCommandAction> = (
+  response,
+  originalAction
+) => {
   const { host, body, ...responseMeta } = response
   const { moduleId, command } = originalAction.payload
   const meta = { ...originalAction.meta, response: responseMeta }
@@ -47,10 +44,7 @@ const mapResponseToAction: ResponseToActionMapper<
     : Actions.sendModuleCommandFailure(host.name, moduleId, command, body, meta)
 }
 
-export const sendModuleCommandEpic: StrictEpic<SendModuleCommandDoneAction> = (
-  action$,
-  state$
-) => {
+export const sendModuleCommandEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.SEND_MODULE_COMMAND),
     mapToRobotApiRequest(

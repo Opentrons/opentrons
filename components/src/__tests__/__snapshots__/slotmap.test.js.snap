@@ -2,7 +2,7 @@
 
 exports[`SlotMap renders correctly with collision warning 1`] = `
 <svg
-  viewBox="0,0,99, 92"
+  viewBox="-1,-1,101, 94"
 >
   <g
     transform="translate(0 0)"
@@ -124,7 +124,7 @@ exports[`SlotMap renders correctly with collision warning 1`] = `
 
 exports[`SlotMap renders correctly with error 1`] = `
 <svg
-  viewBox="0,0,99, 92"
+  viewBox="-1,-1,101, 94"
 >
   <g
     transform="translate(0 0)"
@@ -230,7 +230,7 @@ exports[`SlotMap renders correctly with error 1`] = `
 
 exports[`SlotMap renders correctly with error and collision warning 1`] = `
 <svg
-  viewBox="0,0,99, 92"
+  viewBox="-1,-1,101, 94"
 >
   <g
     transform="translate(0 0)"
@@ -352,7 +352,7 @@ exports[`SlotMap renders correctly with error and collision warning 1`] = `
 
 exports[`SlotMap renders correctly without collision warnings or errors 1`] = `
 <svg
-  viewBox="0,0,99, 92"
+  viewBox="-1,-1,101, 94"
 >
   <g
     transform="translate(0 0)"

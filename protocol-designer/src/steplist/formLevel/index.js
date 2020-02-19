@@ -34,11 +34,13 @@ export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
+export type { FormError, FormWarning, FormWarningType }
 
-type FormHelpers = {
+type FormHelpers = {|
   getErrors?: mixed => Array<FormError>,
   getWarnings?: mixed => Array<FormWarning>,
-}
+|}
+
 const stepFormHelperMap: { [StepType]: FormHelpers } = {
   mix: {
     getErrors: composeErrors(incompatibleLabware),
@@ -61,17 +63,18 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     ),
   },
   magnet: {
-    getErrors: composeErrors(magnetActionRequired, engageHeightRequired),
+    getErrors: composeErrors(
+      magnetActionRequired,
+      engageHeightRequired,
+      moduleIdRequired
+    ),
     getWarnings: composeWarnings(engageHeightRangeExceeded),
   },
   temperature: {
-    moduleId: composeErrors(moduleIdRequired),
-    getErrors: composeErrors(targetTemperatureRequired),
+    getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
     getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
-
-export type { FormError, FormWarning, FormWarningType }
 
 export const getFormErrors = (
   stepType: StepType,
