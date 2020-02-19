@@ -893,7 +893,7 @@ class API(HardwareAPILike):
 
         `kwargs` should contain keys of the robot's configuration. For
         instance, `update_config(log_level='debug)` would change the API
-        server log level to :py:attr:`logging.DEBUG`.
+        aiohttp log level to :py:attr:`logging.DEBUG`.
 
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.

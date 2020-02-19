@@ -299,7 +299,7 @@ class ProtocolContext(CommandPublisher):
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
-                          Opentrons app.
+                          Opentrons fastapi.
         """
         parent = self.deck.position_for(location)
         labware_obj = load_from_definition(labware_def, parent, label)
@@ -331,7 +331,7 @@ class ProtocolContext(CommandPublisher):
         :param str label: An optional special name to give the labware. If
                           specified, this is the name the labware will appear
                           as in the run log and the calibration view in the
-                          Opentrons app.
+                          Opentrons fastapi.
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
         :param int version: The version of the labware definition. If
@@ -592,7 +592,7 @@ class ProtocolContext(CommandPublisher):
     def comment(self, msg):
         """
         Add a user-readable comment string that will be echoed to the Opentrons
-        app.
+        fastapi.
         """
         pass
 

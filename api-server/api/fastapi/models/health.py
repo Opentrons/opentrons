@@ -24,7 +24,7 @@ class Health(BaseModel):
                           " of sync. Mostly useful for user-facing titles.")
     api_version: str = \
         Field(...,
-              description="The SemVer dotted-int version of the API server and"
+              description="The SemVer dotted-int version of the API aiohttp and"
                           " by extension robot software.")
     fw_version: str = \
         Field(...,

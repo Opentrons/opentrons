@@ -43,7 +43,7 @@ from opentrons import (robot as rb,
 
 Session = namedtuple(
     'Session',
-    ['server', 'socket', 'token', 'call'])
+    ['aiohttp', 'socket', 'token', 'call'])
 
 Protocol = namedtuple(
     'Protocol',

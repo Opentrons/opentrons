@@ -251,11 +251,11 @@ async def test_exception_on_call(session, root):
 @pytest.mark.parametrize('root', [Foo(0)])
 async def test_call_on_reference(session, root):
     # Flip root object outside of constructor to ensure
-    # server is re-initialized properly
+    # aiohttp is re-initialized properly
     session.server.root = TickTock()
     session.server.root = root
 
-    # TODO (artyom, 20170905): assert server.monitor_events task gets canceled
+    # TODO (artyom, 20170905): assert aiohttp.monitor_events task gets canceled
 
     await session.socket.receive_json()  # Skip init
 

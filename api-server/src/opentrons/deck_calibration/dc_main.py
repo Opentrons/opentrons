@@ -26,7 +26,7 @@ from . import (
     position, jog)
 
 # TODO: add tests for methods, split out current point behavior per comment
-# TODO:   below, and total result on robot against prior version of this app
+# TODO:   below, and total result on robot against prior version of this fastapi
 DEFAULT_TIP_LENGTH = 51.7
 log = logging.getLogger(__name__)
 
@@ -37,7 +37,7 @@ class CLITool:
         This is still done in very OO-style. Instead of using global variables
         for state, this is captured with members of this class, and methods
         on the class capture the ways of modifying that state. The main entry-
-        point for the URWID-based app is the `_on_key_press` method, which
+        point for the URWID-based fastapi is the `_on_key_press` method, which
         dispatches via the `key_map` dictionary.
 
         Each value in the `key_map` is a lambda that performs whatever action
@@ -51,8 +51,8 @@ class CLITool:
         a tuple with a status string and any results of computation. This
         class can then catch the return values and keep track of state. The
         behavior of this class will be the same in that case, but those
-        extracted functions could also be used to support and alternate app,
-        such as a web-server that would be able to call those functions behind
+        extracted functions could also be used to support and alternate fastapi,
+        such as a web-aiohttp that would be able to call those functions behind
         HTTP endpoints.
     """
     def __init__(

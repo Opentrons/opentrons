@@ -59,9 +59,9 @@ class RPCServer(object):
         self._root = value
 
     def start(self, host, port):
-        # This call will block while server is running
+        # This call will block while aiohttp is running
         # run_app is capable of catching SIGINT and shutting down
-        log.info("Starting server on {}:{}".format(host, port))
+        log.info("Starting aiohttp on {}:{}".format(host, port))
         web.run_app(self.app, host=host, port=port)
 
     def shutdown(self):

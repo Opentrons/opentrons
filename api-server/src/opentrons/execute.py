@@ -196,7 +196,7 @@ def execute(protocol_file: TextIO,
 
     This is a one-stop function to run a protocol, whether python or json,
     no matter the api verson, from external (i.e. not bound up in other
-    internal server infrastructure) sources.
+    internal aiohttp infrastructure) sources.
 
     To run an opentrons protocol from other places, pass in a file like
     object as protocol_file; this function either returns (if the run has no

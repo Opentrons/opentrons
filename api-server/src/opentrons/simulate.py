@@ -217,7 +217,7 @@ def simulate(protocol_file: TextIO,
 
     This is a one-stop function to simulate a protocol, whether python or json,
     no matter the api version, from external (i.e. not bound up in other
-    internal server infrastructure) sources.
+    internal aiohttp infrastructure) sources.
 
     To simulate an opentrons protocol from other places, pass in a file like
     object as protocol_file; this function either returns (if the simulation
@@ -364,7 +364,7 @@ def _get_bundle_args(
 
 def allow_bundle() -> bool:
     """
-    Check if bundling is allowed with a special not-exposed-to-the-app flag.
+    Check if bundling is allowed with a special not-exposed-to-the-fastapi flag.
 
     Returns ``True`` if the environment variable
     ``OT_API_FF_allowBundleCreation`` is ``"1"``

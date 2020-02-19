@@ -133,7 +133,7 @@ CONFIG_ELEMENTS = (
                   Path('feature_flags.json'),
                   ConfigElementType.FILE,
                   'The file storing the feature flags accessible via '
-                  'Opentrons app'),
+                  'Opentrons fastapi'),
     ConfigElement('robot_settings_file',
                   'Robot Settings',
                   Path('robot_settings.json'),

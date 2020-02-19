@@ -2,7 +2,7 @@
 opentrons.system.log_control: functions for talking to syslog and journald
 
 This is the implementation of the endpoints in
-:py:mod:`opentrons.server.endpoints.logs` and friends.
+:py:mod:`opentrons.aiohttp.endpoints.logs` and friends.
 """
 import asyncio
 import logging
@@ -53,7 +53,7 @@ async def set_syslog_level(level: str) -> Tuple[int, str, str]:
     This is the function that actually does the work for
     :py:meth:`set_syslog_level_handler`.
 
-    Similar to :py:meth:`opentrons.server.endpoints.settings.set_log_level`,
+    Similar to :py:meth:`opentrons.aiohttp.endpoints.settings.set_log_level`,
     the level should be a python log level like "debug", "info", "warning", or
     "error". If it is null, sets the minimum log level to emergency which we
     do not log at since there's not really a matching level in python logging,

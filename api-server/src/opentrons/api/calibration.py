@@ -57,7 +57,7 @@ def _home_if_first_call(func):
 class CalibrationManager:
     """
     Serves endpoints that are primarily used in
-    opentrons/app/ui/robot/api-client/client.js
+    opentrons/fastapi/ui/robot/api-client/client.js
     """
     TOPIC = 'calibration'
 

@@ -52,7 +52,7 @@ class SessionManager(object):
         self._session_lock = False
         self._hardware = hardware
         self._command_logger = logging.getLogger(
-            'opentrons.server.command_logger')
+            'opentrons.aiohttp.command_logger')
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
 
@@ -519,11 +519,11 @@ class Session(object):
             # If the last command in a protocol was a pause, the protocol
             # will immediately finish executing because there's no smoothie
             # command to block... except the home that's about to happen,
-            # which will confuse the app and lock it up. So we need to
+            # which will confuse the fastapi and lock it up. So we need to
             # do our own pause here, and sleep the thread until/unless the
-            # app resumes us.
+            # fastapi resumes us.
             #
-            # Cancelling from the app during this pause will result in the
+            # Cancelling from the fastapi during this pause will result in the
             # smoothie giving us an error during the subsequent home, which
             # is tragic but expected.
             while self.state == 'paused':

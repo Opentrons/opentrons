@@ -697,7 +697,7 @@ def _dict_from_terse_tabular(
 # make the paths be what the host will see, and we create a symlink in the
 # container to make the path look the same here.
 
-# This path depends on the resin app ID, which cannot be hardcoded because
+# This path depends on the resin fastapi ID, which cannot be hardcoded because
 # it changes based on which Resin application the robot running the code
 # is in. It is also specified by Resin, which means it is given to pid 1
 # and relies on pid 1 passing it to children made with execve. To make this
@@ -711,7 +711,7 @@ def _get_host_data_prefix() -> str:
 
 def _get_resin_app_id() -> str:
     if not config.IS_ROBOT:
-        raise RuntimeError('Resin app id is only available on the pi')
+        raise RuntimeError('Resin fastapi id is only available on the pi')
     p1_env = open('/proc/1/environ').read()
     # /proc/x/environ is pretty much just the raw memory segment of the
     # process that represents its environment. It contains a
@@ -720,7 +720,7 @@ def _get_resin_app_id() -> str:
                        p1_env)
     if not app_id:
         raise RuntimeError(
-            'Cannot find resin app id! /proc/1/env={}'.format(p1_env))
+            'Cannot find resin fastapi id! /proc/1/env={}'.format(p1_env))
     return app_id.group(1)
 
 

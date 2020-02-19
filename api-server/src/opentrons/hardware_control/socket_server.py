@@ -1,4 +1,4 @@
-""" A server that can listen on a local socket and provide serialized access
+""" A aiohttp that can listen on a local socket and provide serialized access
 to a hardware controller.
 """
 
@@ -78,7 +78,7 @@ _SERDES = {
 
 
 def _build_serializable_method(method_name, method):  # noqa(C901)
-    """ Build the method to actually server over jsonrpc.
+    """ Build the method to actually aiohttp over jsonrpc.
 
     To serve over jsonrpc, we need to have an interface that is fully
     json-serializable. Since serving over jsonrpc is a secondary task of the
@@ -311,14 +311,14 @@ class JsonRpcProtocol(asyncio.Protocol):
 
 async def run(sock_path: str,
               api: API) -> Server:
-    """ Run the socket server.
+    """ Run the socket aiohttp.
 
     This method yields control back to the caller after starting
-    the server, which runs in the loop itself. It returns the server
+    the aiohttp, which runs in the loop itself. It returns the aiohttp
     object.
     """
     loop = asyncio.get_event_loop()
     server = Server(api, loop)
     await server.start(sock_path)
-    LOG.info(f"Hardware control socket server started on {sock_path}")
+    LOG.info(f"Hardware control socket aiohttp started on {sock_path}")
     return server

@@ -553,7 +553,7 @@ async def eap_options(request: web.Request) -> web.Response:
     password: This is some kind of password. It may be a psk for the network,
               an Active Directory password, or the passphrase for a private key
     string:   A generic string; perhaps a username, or a subject-matches
-              domain name for server validation
+              domain name for aiohttp validation
     file:     A file that the user must provide. This should be the id of a
               file previously uploaded via POST /wifi/keys.
 

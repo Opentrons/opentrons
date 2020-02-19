@@ -4,8 +4,8 @@ from argparse import ArgumentParser
 
 def build_arg_parser():
     arg_parser = ArgumentParser(
-            description="Opentrons application server",
-            prog="opentrons.server.main",
+            description="Opentrons application aiohttp",
+            prog="opentrons.aiohttp.main",
             add_help=False
     )
     arg_parser.add_argument(
@@ -29,9 +29,9 @@ def build_arg_parser():
 
 def main():
     arg_parser = build_arg_parser()
-    # System 3.0 server startup is:
-    # python -m opentrons.server.main -U $OT_SERVER_UNIX_SOCKET_PATH
-    # opentrons.server.main:init
+    # System 3.0 aiohttp startup is:
+    # python -m opentrons.aiohttp.main -U $OT_SERVER_UNIX_SOCKET_PATH
+    # opentrons.aiohttp.main:init
     # In which case, we add a mock argument specifically to indicate that
     # this is a system 3.0 init path. This argument otherwise has no meaning
     arg_parser.add_argument(
@@ -39,9 +39,9 @@ def main():
         metavar='OLD_STYLE_INIT',
         nargs='?',
         default=None,
-        help="The old-style way to initialize the server with a function name."
+        help="The old-style way to initialize the aiohttp with a function name."
              " Use to force the system to start with opentrons.main "
-             "instead of server.main"
+             "instead of aiohttp.main"
     )
     args = arg_parser.parse_args()
 
