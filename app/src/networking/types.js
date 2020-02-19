@@ -154,6 +154,30 @@ export type FetchEapOptionsFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+// disconnect network
+
+export type PostDisconnectNetworkAction = {|
+  type: 'networking:POST_DISCONNECT_NETWORK',
+  payload: {| robotName: string, ssid: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostDisconnectNetworkSuccessAction = {|
+  type: 'networking:POST_DISCONNECT_NETWORK_SUCCESS',
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostDisconnectNetworkFailureAction = {|
+  type: 'networking:POST_DISCONNECT_NETWORK_FAILURE',
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type NetworkingDisconnectResponse = {|
+  ssid: string,
+|}
+
 // action union
 
 export type NetworkingAction =
@@ -175,6 +199,9 @@ export type NetworkingAction =
   | FetchEapOptionsAction
   | FetchEapOptionsSuccessAction
   | FetchEapOptionsFailureAction
+  | PostDisconnectNetworkAction
+  | PostDisconnectNetworkSuccessAction
+  | PostDisconnectNetworkFailureAction
 
 // state types
 

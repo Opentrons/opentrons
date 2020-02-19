@@ -16,6 +16,8 @@ import {
   EAP_TYPE_FIELD,
 } from '../../../http-api-client'
 
+import { JOIN_OTHER_VALUE } from './constants'
+
 import { BottomButtonBar } from '../../modals'
 import { StringField, PasswordField, SelectOptionField } from './fields'
 import { SelectKey } from './SelectKey'
@@ -200,7 +202,7 @@ export class ConnectForm extends React.Component<
     const securityType = this.getSecurityType(values)
     const fields = []
 
-    if (!knownSsid) fields.push(UNKNOWN_SSID_FIELD_PROPS)
+    if (knownSsid === JOIN_OTHER_VALUE) fields.push(UNKNOWN_SSID_FIELD_PROPS)
 
     if (!knownSecurityType || knownSecurityType === WPA_EAP_SECURITY) {
       fields.push(SECURITY_TYPE_FIELD_PROPS)

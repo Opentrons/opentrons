@@ -8,17 +8,27 @@ import styles from './styles.css'
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
 import type { WifiNetworkList, WifiNetwork } from '../../../http-api-client'
 
-export type SelectSsidProps = {
+export type SelectSsidProps = {|
   list: WifiNetworkList,
   disabled?: boolean,
-  onValueChange: (name: string, ssid: ?string) => mixed,
-}
+  handleOnValueChange: (ssid: string) => mixed,
+|}
 
+const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
+const DISCONNECT_WIFI_LABEL = 'Disconnect from Wifi'
 const JOIN_OTHER_VALUE = '__join-other-network__'
 const JOIN_OTHER_LABEL = 'Join other network...'
-const JOIN_OTHER_GROUP: SelectOptionOrGroup = {
-  options: [{ value: JOIN_OTHER_VALUE }],
+
+const ACTIONS = {
+  [JOIN_OTHER_VALUE.toString()]: JOIN_OTHER_LABEL,
+  [DISCONNECT_WIFI_VALUE.toString()]: DISCONNECT_WIFI_LABEL,
 }
+
+// Type this
+const SELECT_ACTIONS_OPTIONS = [
+  { value: JOIN_OTHER_VALUE },
+  { value: DISCONNECT_WIFI_VALUE },
+]
 
 const FIELD_NAME = 'ssid'
 
@@ -26,8 +36,11 @@ const SIGNAL_LEVEL_LOW = 25
 const SIGNAL_LEVEL_MED = 50
 const SIGNAL_LEVEL_HIGH = 75
 
+const formatOptions = (list: WifiNetworkList): Array<SelectOptionOrGroup> =>
+  list.map(({ ssid }) => ({ value: ssid })).concat(SELECT_ACTIONS_OPTIONS)
+
 export function SelectSsid(props: SelectSsidProps) {
-  const { list, disabled, onValueChange } = props
+  const { list, disabled, handleOnValueChange } = props
   const connected = find(list, 'active')
   const value = connected?.ssid || null
 
@@ -35,27 +48,22 @@ export function SelectSsid(props: SelectSsidProps) {
     <SelectField
       name={FIELD_NAME}
       value={value}
-      options={list
-        .map(({ ssid }) => ({ value: ssid }))
-        .concat(JOIN_OTHER_GROUP)}
+      options={formatOptions(list)}
       placeholder="Select network"
       className={styles.wifi_dropdown}
       disabled={disabled}
-      onValueChange={(name, value) => {
-        // TODO(mc, 2020-02-03): `null` as the trigger to "join another network"
-        // isn't a super reasonable way to do this; revisit when wifi disconnect
-        // is implemented
-        onValueChange(name, value !== JOIN_OTHER_VALUE ? value : null)
+      onValueChange={(_, ssid) => handleOnValueChange(ssid)}
+      formatOptionLabel={({ value, label }) => {
+        return (
+          <>
+            {ACTIONS[value] ? (
+              <p className={styles.wifi_join_other}>{ACTIONS[value]}</p>
+            ) : (
+              renderNetworkLabel(props.list.find(nw => nw.ssid === value))
+            )}
+          </>
+        )
       }}
-      formatOptionLabel={({ value, label }) => (
-        <>
-          {value === JOIN_OTHER_VALUE ? (
-            <p className={styles.wifi_join_other}>{JOIN_OTHER_LABEL}</p>
-          ) : (
-            renderNetworkLabel(props.list.find(nw => nw.ssid === value))
-          )}
-        </>
-      )}
     />
   )
 }

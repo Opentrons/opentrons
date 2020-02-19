@@ -271,6 +271,46 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'can create networking:POST_DISCONNECT_NETWORK',
+      creator: Actions.postDisconnectNetwork,
+      args: [mockRobot.name, Fixtures.mockNetworkingDisconnect.ssid],
+      expected: {
+        type: 'networking:POST_DISCONNECT_NETWORK',
+        payload: {
+          robotName: mockRobot.name,
+          ...Fixtures.mockNetworkingDisconnect,
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'can create networking:POST_DISCONNECT_NETWORK_SUCCESS',
+      creator: Actions.postDisconnectNetworkSuccess,
+      args: [mockRobot.name, mockRequestMeta],
+      expected: {
+        type: 'networking:POST_DISCONNECT_NETWORK_SUCCESS',
+        payload: { robotName: mockRobot.name },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:POST_DISCONNECT_NETWORK_FAILURE',
+      creator: Actions.postDisconnectNetworkFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockNetworkingDisconnectFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:POST_DISCONNECT_NETWORK_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockNetworkingDisconnectFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

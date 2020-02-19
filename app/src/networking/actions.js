@@ -176,3 +176,31 @@ export const fetchEapOptionsFailure = (
   payload: { robotName, error },
   meta,
 })
+
+export const postDisconnectNetwork = (
+  robotName: string,
+  ssid: string
+): Types.PostDisconnectNetworkAction => ({
+  type: Constants.POST_DISCONNECT_NETWORK,
+  payload: { robotName, ssid },
+  meta: {},
+})
+
+export const postDisconnectNetworkSuccess = (
+  robotName: string,
+  meta: RobotApiRequestMeta
+): Types.PostDisconnectNetworkSuccessAction => ({
+  type: Constants.POST_DISCONNECT_NETWORK_SUCCESS,
+  payload: { robotName },
+  meta,
+})
+
+export const postDisconnectNetworkFailure = (
+  robotName: string,
+  error: RobotApiErrorResponse,
+  meta: RobotApiRequestMeta
+): Types.PostDisconnectNetworkFailureAction => ({
+  type: Constants.POST_DISCONNECT_NETWORK_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
