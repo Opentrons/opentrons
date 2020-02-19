@@ -119,9 +119,9 @@ def initialize_robot(loop, hardware):
     log.info(f"Name: {name()}")
 
 
-def create_hardware(hardware_server: bool = False,
-                    hardware_server_socket: str =
-                    "/var/run/opentrons-hardware.sock"):
+async def create_hardware(hardware_server: bool = False,
+                          hardware_server_socket: str =
+                          "/var/run/opentrons-hardware.sock"):
     """
     Create a hardware instance.
 
@@ -138,7 +138,7 @@ def create_hardware(hardware_server: bool = False,
         hardware = opentrons.robot
 
     if ff.use_protocol_api_v2():
-        robot_conf = loop.run_until_complete(hardware.get_config())
+        robot_conf = await hardware.get_config()
     else:
         robot_conf = hardware.config
 
@@ -148,19 +148,17 @@ def create_hardware(hardware_server: bool = False,
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop, hardware)
         if ff.use_protocol_api_v2():
-            loop.run_until_complete(hardware.cache_instruments())
+            await hardware.cache_instruments()
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
             if ff.use_protocol_api_v2():
-                loop.run_until_complete(hardware.home_z())
+                await hardware.home_z()
             else:
                 hardware.home_z()
 
     if hardware_server:
         if ff.use_protocol_api_v2():
-            loop.run_until_complete(
-                install_hardware_server(hardware_server_socket,
-                                        hardware._api))
+            await install_hardware_server(hardware_server_socket, hardware._api)
         else:
             log.warning(
                 "Hardware server requested but apiv1 selected, not starting")
