@@ -3,32 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.16.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.16.0-alpha.2...v3.16.0-alpha.3) (2020-02-18)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-# [3.16.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.16.0-alpha.1...v3.16.0-alpha.2) (2020-02-13)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-# [3.16.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.16.0-alpha.0...v3.16.0-alpha.1) (2020-02-12)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-# [3.16.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0-alpha.0) (2020-02-11)
-
+# [3.16.0](https://github.com/Opentrons/opentrons/compare/v3.16.0-alpha.3...v3.16.0) (2020-02-19)
 
 ### Features
 
