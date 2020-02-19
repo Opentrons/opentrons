@@ -20,7 +20,7 @@ function might look like this:
 def run(ctx):
     ctx.comment('hello, world')
 
-This function is called by the robot when the robot executes the protol.
+This function is called by the robot when the robot executes the protocol.
 This function is not present in the current protocol and must be added.
 """
 
@@ -89,6 +89,7 @@ def _run_python(
         proto: PythonProtocol, context: ProtocolContext):
     new_locs = locals()
     new_globs = globals()
+    print(f'IN PA EXECUTE new_locs: {new_locs}, new_globs: {new_globs}, pc: {proto.contents}')
     exec(proto.contents, new_globs, new_locs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the

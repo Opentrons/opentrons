@@ -48,8 +48,10 @@ def test_execute_function_apiv2(protocol,
         nonlocal entries
         entries.append(entry)
 
+    print(f'BEFORE EXECUTE')
     execute.execute(
         protocol.filelike, 'testosaur_v2.py', emit_runlog=emit_runlog)
+    print(f'AFTER EXECUTE')
     assert [item['payload']['text'] for item in entries
             if item['$'] == 'before'] == [
         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',

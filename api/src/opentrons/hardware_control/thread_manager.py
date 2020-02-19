@@ -64,7 +64,6 @@ class ThreadManager():
         for mname, mobj in inspect.getmembers(self._built_obj, _filter):
             if not mname.startswith('__') :
                 value = mobj
-                print(f'self is : {self}, bo : {self._built_obj}, mname: {mname}')
                 if asyncio.iscoroutinefunction(value):
                     # fix threadsafe version of async function
                     # to execute in managed thread from calling thread
@@ -72,6 +71,8 @@ class ThreadManager():
                                             self._loop,
                                             value)
                 self.__setattr__(mname, value)
+            if mname is 'cache_instruments':
+                print(f'self is : {self}, bo : {self._built_obj._backend}, mname: {mname}, mobj: {mobj}')
 
         self._is_running.set()
         self._loop.run_forever()
