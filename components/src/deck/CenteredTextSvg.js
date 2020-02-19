@@ -7,6 +7,9 @@ export type CenteredTextSvgProps = {|
   className?: string,
 |}
 
+/**
+ * @deprecated Use {@link RobotCoordsText}
+ */
 export function CenteredTextSvg(props: CenteredTextSvgProps) {
   const { text, className } = props
 

@@ -1,7 +1,6 @@
 // @flow
 
 export * from './Deck'
-export * from './Labware'
 export * from './LabwareNameOverlay'
 export * from './LabwareOutline'
 export * from './LabwareRender'
@@ -15,6 +14,10 @@ export * from './Well'
 export * from './constants'
 export * from './labwareInternals/types'
 export * from './types'
+
+// TODO(mc, 2020-02-19): these components are still used but are deprecated
+// we should remove them when we are able
+export * from './Labware'
 
 // TODO(mc, 2020-02-19): these components appear to no longer be used
 // they should be removed

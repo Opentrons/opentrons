@@ -41,6 +41,9 @@ const VIEW_BOX_HEIGHT = 390
 
 // TODO(mc, 2020-02-19): this component is no longer used
 // replace with DeckFromData (see BC's TODO below)
+/**
+ * @deprecated Use {@link RobotWorkSpace}
+ */
 export class Deck extends React.Component<DeckProps> {
   // TODO Ian 2018-02-22 No support in Flow for SVGElement yet: https://github.com/facebook/flow/issues/2332
   // this `parentRef` should be HTMLElement | SVGElement

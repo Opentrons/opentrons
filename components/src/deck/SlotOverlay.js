@@ -12,6 +12,9 @@ export type SlotOverlayProps = {|
   className?: string,
 |}
 
+/**
+ * @deprecated No longer necessary, do not use
+ */
 export function SlotOverlay(props: SlotOverlayProps) {
   const { icon, text, className } = props
   const leftRightPadding = 3 // LR padding as %

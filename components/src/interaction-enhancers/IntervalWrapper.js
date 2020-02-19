@@ -16,6 +16,9 @@ type IntervalWrapperState = {|
   intervalId: ?IntervalID,
 |}
 
+/**
+ * @deprecated Use {@link useInterval} hook instead
+ */
 export class IntervalWrapper extends React.Component<
   IntervalWrapperProps,
   IntervalWrapperState

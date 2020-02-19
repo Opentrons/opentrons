@@ -25,6 +25,8 @@ export type RefreshCardProps = {|
  * Card variant for displaying refreshable data. `props.refresh` will be called
  * on mount, on an update with a change in `props.watch`, or if the user clicks
  * the refresh button. Takes all `Card` props as well as the ones listed here.
+ *
+ * @deprecated Use {@link Card} with {@link useInterval} hook instead
  */
 export class RefreshCard extends React.Component<RefreshCardProps> {
   render() {

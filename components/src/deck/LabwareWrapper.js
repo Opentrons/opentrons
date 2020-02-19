@@ -1,4 +1,5 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import { SLOT_RENDER_HEIGHT, SLOT_RENDER_WIDTH } from '@opentrons/shared-data'
 import styles from './LabwareWrapper.css'
@@ -14,6 +15,9 @@ export type LabwareWrapperProps = {|
   children?: React.Node,
 |}
 
+/**
+ * @deprecated Use {@link RobotWorkSpace}
+ */
 export function LabwareWrapper(props: LabwareWrapperProps) {
   const { x, y, highlighted, children } = props
   const height = props.height || SLOT_RENDER_HEIGHT

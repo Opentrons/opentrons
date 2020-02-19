@@ -19,6 +19,9 @@ const TRASH_OUTLINE_PROPS = {
   rx: '11',
 }
 
+/**
+ * @deprecated Use {@link RobotWorkSpace}
+ */
 export function DeckOutline() {
   return (
     // TODO(mc, 2018-07-16): consolidate transform into path

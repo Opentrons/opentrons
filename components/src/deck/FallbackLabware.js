@@ -7,6 +7,9 @@ import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Labware.css'
 
 // TODO: BC 2019-06-18 remove when old Labware component is no longer used anywhere
+/**
+ * @deprecated No longer necessary, do not use
+ */
 export function FallbackLabware() {
   return (
     <g>
