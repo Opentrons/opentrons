@@ -1,8 +1,13 @@
 // @flow
 import typeof {
   MAGDECK,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
   TEMPDECK,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
   THERMOCYCLER,
+  THERMOCYCLER_MODULE_V1,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
@@ -163,6 +168,7 @@ export type ModuleRealType =
 
 // corresponds to top-level keys in shared-data/module/definitions/2
 export type ModuleModel = string
+
 export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
 // TODO IMMEDIATELY: gradually replace this old 'ModuleType' with ModuleModel.
 

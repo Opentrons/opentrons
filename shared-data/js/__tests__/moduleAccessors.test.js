@@ -1,6 +1,4 @@
 // @flow
-import glob from 'glob'
-import path from 'path'
 
 import {
   getModuleDef2,
@@ -8,18 +6,10 @@ import {
   getModuleDisplayName,
 } from '../modules'
 
-const v2DefinitionsGlobPath = path.join(
-  __dirname,
-  '../../module/definitions/2/*.json'
-)
+import { MODULE_MODELS } from '../constants'
 
 describe('all valid models work', () => {
-  const validDefPaths = glob.sync(v2DefinitionsGlobPath)
-  test('got at least 1 module def (avoid false positive for tests)', () => {
-    expect(validDefPaths.length).toBeGreaterThan(0)
-  })
-  validDefPaths.forEach(defPath => {
-    const model = path.parse(defPath).name
+  MODULE_MODELS.forEach(model => {
     const loadedDef = getModuleDef2(model)
     test('ensure valid models load', () => {
       expect(loadedDef).not.toBeNull()
@@ -27,23 +17,10 @@ describe('all valid models work', () => {
       expect(loadedDef.model).toEqual(model)
     })
     test('valid models have module types', () => {
-      expect(getModuleTypeFromModuleModel(model)).toMatch(/.*/)
+      expect(getModuleTypeFromModuleModel(model)).toEqual(loadedDef.moduleType)
     })
     test('valid modules have display names that arent error', () => {
-      expect(getModuleDisplayName(model)).toMatch(/.*/)
+      expect(getModuleDisplayName(model)).toEqual(loadedDef.displayName)
     })
-  })
-})
-
-describe('invalid models dont explode', () => {
-  const invalidModel = 'aosihdikvhaksjdbnaksjdha'
-  test('invalid models dont raise errors', () => {
-    expect(getModuleDef2(invalidModel)).toBeNull()
-  })
-  test('invalid models have null types', () => {
-    expect(getModuleTypeFromModuleModel(invalidModel)).toBeNull()
-  })
-  test('invalid models have magic display names', () => {
-    expect(getModuleDisplayName(invalidModel)).toMatch('ERROR')
   })
 })
