@@ -427,6 +427,7 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
+        self._call_on_attached_modules("cancel")
 
     async def stop(self):
         """
@@ -438,7 +439,6 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        self._call_on_attached_modules("cancel")
         await self.reset()
         await self.home()
 
