@@ -19,7 +19,7 @@ class SynchronousAdapter(HardwareAPILike):
     .. code-block::
     >>> import opentrons.hardware_control as hc
     >>> import opentrons.hardware_control.adapters as adapts
-    >>> api = hc.API.build_hardware_simulator()
+    >>> api = await hc.API.build_hardware_simulator()
     >>> synch = adapts.SynchronousAdapter(api)
     >>> synch.home()
     """
@@ -36,13 +36,7 @@ class SynchronousAdapter(HardwareAPILike):
 
         no_loop_args = [arg for arg in args
                         if not isinstance(arg, asyncio.AbstractEventLoop)]
-        if asyncio.iscoroutinefunction(builder):
-            outer_loop = asyncio.new_event_loop()
-            api = outer_loop.run_until_complete(
-                ThreadManager(builder, *no_loop_args, **kwargs)
-            )
-        else:
-            api = ThreadManager(builder, *no_loop_args, **kwargs)
+        api = ThreadManager(builder, *no_loop_args, **kwargs)
         return cls(api)
 
     def __init__(self, api: API) -> None:
@@ -128,7 +122,10 @@ class SingletonAdapter(HardwareAPILike):
         return ThreadManager(cls)
 
     def __init__(self, loop: asyncio.AbstractEventLoop = None) -> None:
-        self._api = API.build_hardware_simulator(loop=loop)
+        outer_loop = asyncio.new_event_loop()
+        self._api = outer_loop.run_until_complete(
+            API.build_hardware_simulator(loop=loop)
+        )
 
     def __getattr__(self, attr_name):
         return getattr(self._api, attr_name)
@@ -154,7 +151,7 @@ class SingletonAdapter(HardwareAPILike):
         """ Disconnect from connected hardware. """
         old_api = object.__getattribute__(self, '_api')
         config = old_api._loop.run_until_complete(old_api.config)
-        new_api = API.build_hardware_simulator(
+        new_api = await API.build_hardware_simulator(
             loop=old_api._loop,
             config=copy.copy(config))
         setattr(self, '_api', new_api)

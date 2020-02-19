@@ -82,6 +82,8 @@ class API(HardwareAPILike):
         real robot only one true hardware controller may be active at one
         time.
 
+        NOTE: this is async to ease the transition to an async smoothie driver
+
         :param config: A config to preload. If not specified, load the default.
         :param port: A port to connect to. If not specified, the default port
                      (found by scanning for connected FT232Rs).
@@ -104,7 +106,7 @@ class API(HardwareAPILike):
         return api_instance
 
     @classmethod
-    def build_hardware_simulator(
+    async def build_hardware_simulator(
             cls,
             attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,
@@ -115,6 +117,8 @@ class API(HardwareAPILike):
 
         This method may be used both on a real robot and on dev machines.
         Multiple simulating hardware controllers may be active at one time.
+
+        NOTE: this is async to ease the transition to an async smoothie driver
         """
 
         if None is attached_instruments:

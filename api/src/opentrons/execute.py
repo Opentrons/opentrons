@@ -5,7 +5,6 @@ contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
-
 import argparse
 import asyncio
 import logging
@@ -85,13 +84,7 @@ def get_protocol_api(
         # is at script/repl scope not function scope and is synchronous so
         # you can't control the loop from inside. If we update to
         # IPython 7 we can avoid this, but for now we can't
-        try:
-            outer_loop = asyncio.get_event_loop()
-        except RuntimeError:
-            outer_loop = asyncio.new_event_loop()
-        _HWCONTROL = outer_loop.run_until_complete(
-                ThreadManager(API.build_hardware_controller)
-        )
+        _HWCONTROL = ThreadManager(API.build_hardware_controller)
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
@@ -111,7 +104,9 @@ def get_protocol_api(
                                            bundled_data=bundled_data,
                                            extra_labware=extra_labware,
                                            api_version=checked_version)
+    print(f'\nexecute::get_protocol_api AFTER: {context._hw_manager.hardware}, CI: {context._hw_manager.hardware.cache_instruments}, loop: {context._hw_manager.hardware._loop} \n')
     context._hw_manager.hardware.cache_instruments()
+
     return context
 
 

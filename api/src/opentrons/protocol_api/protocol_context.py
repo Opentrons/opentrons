@@ -98,7 +98,7 @@ class ProtocolContext(CommandPublisher):
         self._last_moved_instrument: Optional[types.Mount] = None
         self._location_cache: Optional[types.Location] = None
 
-        print(f'\nPC::init hardware: {hardware}, loop: {hardware._loop} \n')
+        print(f'\nPC::init hardware: {hardware}\n')
         self._hw_manager = HardwareManager(hardware)
         self._log = MODULE_LOG.getChild(self.__class__.__name__)
         self._commands: List[str] = []

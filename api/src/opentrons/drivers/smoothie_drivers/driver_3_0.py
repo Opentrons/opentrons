@@ -1,4 +1,5 @@
 import asyncio
+import traceback
 import contextlib
 from os import environ
 import logging
@@ -422,6 +423,7 @@ class SmoothieDriver_3_0_0:
         :param mount: string with value 'left' or 'right'
         :return id string, or None
         '''
+        traceback.print_stack()
         res: Optional[str] = None
         if self.simulating:
             res = '1234567890'
