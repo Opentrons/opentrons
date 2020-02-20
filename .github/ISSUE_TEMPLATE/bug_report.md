@@ -1,3 +1,11 @@
+---
+name: Bug report
+about: File a bug
+title: 'bug:'
+labels: 'bug'
+assignees: ''
+---
+
 <!--
   Thanks for taking the time to file an issue! Please make sure you've read the
   "Opening Issues" section of our Contributing Guide:
