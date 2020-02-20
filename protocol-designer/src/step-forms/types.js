@@ -4,6 +4,7 @@ import type {
   LabwareDefinition2,
   PipetteNameSpecs,
   ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 import typeof {
@@ -47,9 +48,11 @@ export type PipetteEntities = {
 }
 
 // =========== MODULES ========
-// Note: in the FORM, 'model' is like 'GEN1'/'GEN2' etc
-// !!! TODO IMMEDIATELY revisit this, should it be a real module MODEL?
-export type FormModule = {| onDeck: boolean, model: string, slot: DeckSlot |}
+export type FormModule = {|
+  onDeck: boolean,
+  model: ModuleModel,
+  slot: DeckSlot,
+|}
 
 // !!! TODO IMMEDIATELY can you use typeof here without a syntax error? It's not great to hard-code these, should use constants
 export type FormModulesByType = {|
@@ -58,7 +61,11 @@ export type FormModulesByType = {|
   thermocyclerModuleType: FormModule,
 |}
 
-export type ModuleEntity = {| id: string, type: ModuleRealType, model: string |}
+export type ModuleEntity = {|
+  id: string,
+  type: ModuleRealType,
+  model: ModuleModel,
+|}
 export type ModuleEntities = { [moduleId: string]: ModuleEntity }
 
 // NOTE: semi-redundant 'type' key in FooModuleState types is required for Flow to disambiguate 'moduleState'

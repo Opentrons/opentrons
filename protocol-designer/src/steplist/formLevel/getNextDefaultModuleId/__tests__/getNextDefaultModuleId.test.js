@@ -3,6 +3,9 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getNextDefaultTemperatureModuleId } from '..'
@@ -16,7 +19,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tempId: {
             id: 'tempId',
             type: TEMPERATURE_MODULE_TYPE,
-            model: 'someTempModel',
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
               type: TEMPERATURE_MODULE_TYPE,
@@ -27,7 +30,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tcId: {
             id: 'tcId',
             type: THERMOCYCLER_MODULE_TYPE,
-            model: 'someThermoModel',
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
             moduleState: { type: THERMOCYCLER_MODULE_TYPE },
           },
@@ -40,7 +43,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tcId: {
             id: 'tcId',
             type: THERMOCYCLER_MODULE_TYPE,
-            model: 'someThermoModel',
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
             moduleState: {
               type: THERMOCYCLER_MODULE_TYPE,
@@ -55,7 +58,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           magId: {
             id: 'magId',
             type: MAGNETIC_MODULE_TYPE,
-            model: 'someMagModel',
+            model: MAGNETIC_MODULE_V1,
             slot: '_span781011',
             moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
           },
@@ -88,7 +91,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tempId: {
             id: 'tempId',
             type: TEMPERATURE_MODULE_TYPE,
-            model: 'someTempModule',
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
               type: TEMPERATURE_MODULE_TYPE,
@@ -99,7 +102,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           tcId: {
             id: 'tcId',
             type: THERMOCYCLER_MODULE_TYPE,
-            model: 'someThermoModel',
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
             moduleState: { type: THERMOCYCLER_MODULE_TYPE },
           },
@@ -127,14 +130,14 @@ describe('getNextDefaultTemperatureModuleId', () => {
           magId: {
             id: 'magId',
             type: MAGNETIC_MODULE_TYPE,
-            model: 'someMagModel',
+            model: MAGNETIC_MODULE_V1,
             slot: '_span781011',
             moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
           },
           tempId: {
             id: 'tempId',
             type: TEMPERATURE_MODULE_TYPE,
-            model: 'someTempModel',
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
               type: TEMPERATURE_MODULE_TYPE,

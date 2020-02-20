@@ -17,7 +17,8 @@ export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 export const MAGDECK: 'magdeck' = 'magdeck'
-// these are the v2 equivalents of the above. They should match the names of definitions
+// these are the Module Def Schema v2 equivalents of the above. They should match the names of JSON definitions
+// in shared-data/module/definitions/2.
 export const MAGNETIC_MODULE_V1: 'magneticModuleV1' = 'magneticModuleV1'
 export const MAGNETIC_MODULE_V2: 'magneticModuleV2' = 'magneticModuleV2'
 export const TEMPERATURE_MODULE_V1: 'temperatureModuleV1' =

@@ -6,17 +6,17 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER,
-  MAGDECK_MODEL_GEN1,
-  // MAGDECK_MODEL_GEN2,
-  TEMPDECK_MODEL_GEN1,
-  // TEMPDECK_MODEL_GEN2,
-  THERMOCYCLER_MODEL_GEN1,
+  MAGNETIC_MODULE_V1,
+  // MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  // TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
-import type { Options } from '@opentrons/components'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
@@ -65,8 +65,6 @@ export const PSEUDO_DECK_SLOTS: { [DeckSlot]: DeckDefSlot } = {
       yDimension: STD_SLOT_Y_DIM * 2 + STD_SLOT_DIVIDER_WIDTH,
       zDimension: 0,
     },
-    // !!! TODO IMMEDIATELY make sure compatibleModules matches update from Seth's PR,
-    // or make separate ticket to update this pseudo-slot
     compatibleModules: [THERMOCYCLER],
   },
 }
@@ -103,26 +101,30 @@ export const TEMPERATURE_AT_TARGET: 'TEMPERATURE_AT_TARGET' =
 export const TEMPERATURE_APPROACHING_TARGET: 'TEMPERATURE_APPROACHING_TARGET' =
   'TEMPERATURE_APPROACHING_TARGET'
 
-export const MODELS_FOR_MODULE_TYPE: { [ModuleRealType]: Options } = {
+export const MODELS_FOR_MODULE_TYPE: {
+  [ModuleRealType]: Array<{|
+    name: string,
+    value: ModuleModel,
+    disabled?: boolean,
+  |}>,
+} = {
   [MAGNETIC_MODULE_TYPE]: [
-    { name: 'GEN1', value: MAGDECK_MODEL_GEN1 },
+    { name: 'GEN1', value: MAGNETIC_MODULE_V1 },
     // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
-    // { name: 'GEN2', value: MAGDECK_MODEL_GEN2 },
+    // { name: 'GEN2', value: MAGNETIC_MODULE_V2 },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
-    { name: 'GEN1', value: TEMPDECK_MODEL_GEN1 },
+    { name: 'GEN1', value: TEMPERATURE_MODULE_V1 },
     // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
-    // { name: 'GEN2', value: TEMPDECK_MODEL_GEN2 },
+    // { name: 'GEN2', value: TEMPERATURE_MODULE_V2 },
   ],
-  [THERMOCYCLER_MODULE_TYPE]: [
-    { name: 'GEN1', value: THERMOCYCLER_MODEL_GEN1 },
-  ],
+  [THERMOCYCLER_MODULE_TYPE]: [{ name: 'GEN1', value: THERMOCYCLER_MODULE_V1 }],
 }
 
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: { [ModuleRealType]: string } = {
-  [MAGNETIC_MODULE_TYPE]: MAGDECK_MODEL_GEN1,
-  [TEMPERATURE_MODULE_TYPE]: TEMPDECK_MODEL_GEN1,
-  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODEL_GEN1,
+  [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
+  [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
+  [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
 }
 
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'

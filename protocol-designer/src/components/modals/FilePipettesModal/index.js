@@ -16,9 +16,9 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MAGDECK_MODEL_GEN1,
-  TEMPDECK_MODEL_GEN1,
-  THERMOCYCLER_MODEL_GEN1,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -84,17 +84,17 @@ const initialState: State = {
   modulesByType: {
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
-      model: MAGDECK_MODEL_GEN1,
+      model: MAGNETIC_MODULE_V1,
       slot: '1',
     },
     [TEMPERATURE_MODULE_TYPE]: {
       onDeck: false,
-      model: TEMPDECK_MODEL_GEN1,
+      model: TEMPERATURE_MODULE_V1,
       slot: '3',
     },
     [THERMOCYCLER_MODULE_TYPE]: {
       onDeck: false,
-      model: THERMOCYCLER_MODEL_GEN1,
+      model: THERMOCYCLER_MODULE_V1,
       slot: SPAN7_8_10_11_SLOT,
     },
   },
