@@ -19,8 +19,8 @@ assignees: ''
 ## overview
 
 <!--
-  Use this section to describe your issue at a high level. Please include the
-  type of issue (bug, or other) as well as any issues you could find that may be related.
+  Use this section to describe your bug at a high level. Please include any
+  issues you can find that may be related.
 -->
 
 ## current behavior
