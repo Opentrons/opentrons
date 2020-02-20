@@ -4,7 +4,12 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = robotName => Actions.fetchWifiList(robotName)
+const makeTriggerAction = (robotName: string) =>
+  Actions.fetchWifiList(robotName)
+
+const meta = { requestId: '1234' }
+const makeTriggerActionDisconnect = robotName =>
+  Actions.postDisconnectNetworkSuccess(robotName, meta)
 
 describe('networking wifiListEpic', () => {
   afterEach(() => {
@@ -70,6 +75,27 @@ describe('networking wifiListEpic', () => {
           Fixtures.mockWifiListFailure.body,
           { ...mocks.meta, response: Fixtures.mockWifiListFailureMeta }
         ),
+      })
+    })
+  })
+
+  test('calls GET /wifi/list if POST_DISCONNECT_NETWORK_SUCCESS action is dispatched', () => {
+    const mocks = setupEpicTestMocks(
+      makeTriggerActionDisconnect,
+      Fixtures.mockNetworkingDisconnectSuccess
+    )
+
+    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
+      const output$ = networkingEpic(action$, state$)
+
+      expectObservable(output$)
+      flush()
+
+      expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+        method: 'GET',
+        path: '/wifi/list',
       })
     })
   })

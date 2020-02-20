@@ -3,7 +3,6 @@ import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
-// import { fetchWifiList } from '../../http-api-client'
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
@@ -32,8 +31,8 @@ const mapResponseToAction: ResponseToActionMapper<PostDisconnectNetworkAction> =
     : Actions.postDisconnectNetworkFailure(host.name, body, meta)
 }
 
-export const disconnectEpic: Epic = (action$, state$) => {
-  return action$.pipe(
+export const disconnectEpic: Epic = (action$, state$) =>
+  action$.pipe(
     ofType(Constants.POST_DISCONNECT_NETWORK),
     mapToRobotApiRequest(
       state$,
@@ -42,4 +41,3 @@ export const disconnectEpic: Epic = (action$, state$) => {
       mapResponseToAction
     )
   )
-}

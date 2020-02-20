@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, useEffect, useRef } from 'react'
+import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import find from 'lodash/find'
 // import last from 'lodash/last'
@@ -10,19 +10,14 @@ import {
   // PENDING,
   // SUCCESS,
 } from '../../../robot-api'
-import { postDisconnectNetwork } from '../../../networking'
+import { postDisconnectNetwork, fetchWifiList } from '../../../networking'
 import {
   NO_SECURITY,
   WPA_EAP_SECURITY,
-  fetchWifiList,
   fetchWifiEapOptions,
   fetchWifiKeys,
   addWifiKey,
   configureWifi,
-  makeGetRobotWifiList,
-  makeGetRobotWifiEapOptions,
-  makeGetRobotWifiKeys,
-  makeGetRobotWifiConfigure,
   clearConfigureWifiResponse,
 } from '../../../http-api-client'
 
@@ -37,16 +32,20 @@ import { ConnectForm } from './ConnectForm'
 import { SelectSsid } from './SelectSsid'
 import { WifiConnectModal } from './WifiConnectModal'
 
-import { DISCONNECT_WIFI_VALUE, JOIN_OTHER_VALUE } from './constants'
+import {
+  DISCONNECT_WIFI_VALUE,
+  JOIN_OTHER_VALUE,
+  DISCONNECT,
+  JOIN,
+} from './constants'
+
+import { useStateRef, stateSelector } from './hooks'
 
 // import type { State } from '../../../types'
 // import type { RequestState } from '../../../robot-api/types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { PostDisconnectNetworkAction } from '../../../networking/types'
 
-const CONNECT = 'connect'
-const DISCONNECT = 'disconnect'
-const JOIN = 'join'
 const LIST_REFRESH_MS = 15000
 
 const hasSecurityType = (securityType: ?string, securityValue: string) =>
@@ -68,33 +67,7 @@ export const SelectNetwork = ({ robot }: Props) => {
     configRequest,
     configResponse,
     configError,
-  } = useSelector(state => {
-    const getListCall = makeGetRobotWifiList()
-    const getEapCall = makeGetRobotWifiEapOptions()
-    const getKeysCall = makeGetRobotWifiKeys()
-    const getConfigureCall = makeGetRobotWifiConfigure()
-
-    const { response: listResponse } = getListCall(state, robot)
-    const { response: eapResponse } = getEapCall(state, robot)
-    const { response: keysResponse } = getKeysCall(state, robot)
-    const {
-      request: cfgRequest,
-      inProgress: cfgInProgress,
-      response: cfgResponse,
-      error: cfgError,
-    } = getConfigureCall(state, robot)
-
-    return {
-      list: listResponse && listResponse.list,
-      eapOptions: eapResponse && eapResponse.options,
-      keys: keysResponse && keysResponse.keys,
-      connectingTo:
-        !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
-      configRequest: cfgRequest,
-      configResponse: cfgResponse,
-      configError: cfgError,
-    }
-  })
+  } = useSelector(state => stateSelector(state, robot))
 
   const [
     dispatchApi,
@@ -108,57 +81,17 @@ export const SelectNetwork = ({ robot }: Props) => {
   // // React.useEffect(() => {
   // //   if (requestStatus === SUCCESS) {}
   // // }, [requestStatus])
+  const dispatchRefresh = () => dispatchApi(fetchWifiList(robot.name))
 
   const dispatch = useDispatch()
-  const dispatchRefresh = () => [fetchWifiList(robot)].forEach(dispatch)
   const dispatchConfigure = params => {
-    const refreshActions = [fetchWifiList(robot)]
     return dispatch(
       chainActions(
         configureWifi(robot, params),
         startDiscovery(),
-        ...refreshActions
+        fetchWifiList(robot.name)
       )
     )
-  }
-
-  const useStateRef = () => {
-    const activeNetwork = find(list, 'active')
-    const ssidValue = activeNetwork && activeNetwork.ssid
-    const [ssid, setSsid] = useState(ssidValue)
-    const [previousSsid, setPreviousSsid] = useState(null)
-    const [networkingType, setNetworkingType] = useState(CONNECT)
-    const [securityType, setSecurityType] = useState(null)
-    const [modalOpen, setModalOpen] = useState(false)
-
-    const ssidRef = useRef(ssid)
-    const previousSsidRef = useRef(previousSsid)
-    const networkingTypeRef = useRef(networkingType)
-    const securityTypeRef = useRef(securityType)
-
-    useEffect(() => {
-      ssidRef.current = ssid
-      previousSsidRef.current = previousSsid
-      networkingTypeRef.current = networkingType
-      securityTypeRef.current = securityType
-    }, [ssid, previousSsid, networkingType, securityType])
-
-    return [
-      ssid,
-      setSsid,
-      ssidRef,
-      previousSsid,
-      setPreviousSsid,
-      previousSsidRef,
-      networkingType,
-      setNetworkingType,
-      networkingTypeRef,
-      securityType,
-      setSecurityType,
-      securityTypeRef,
-      modalOpen,
-      setModalOpen,
-    ]
   }
 
   const [
@@ -176,8 +109,10 @@ export const SelectNetwork = ({ robot }: Props) => {
     securityTypeRef,
     modalOpen,
     setModalOpen,
-  ] = useStateRef()
+  ] = useStateRef(list)
 
+  // This entire handler need to be refactored and tested
+  // this isn't working properly ATM
   const handleOnValueChange = (ssidValue: string) => {
     const previousSsidValue = ssid
     const isJoinOrDisconnect =
@@ -212,7 +147,7 @@ export const SelectNetwork = ({ robot }: Props) => {
   }
 
   const handleDisconnectWifi = () => {
-    const robotName = robot && robot?.displayName
+    const robotName = robot && robot?.name
 
     if (robotName && previousSsid) {
       dispatchApi(postDisconnectNetwork(robotName, previousSsid))

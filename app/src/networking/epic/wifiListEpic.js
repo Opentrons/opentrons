@@ -32,7 +32,10 @@ const mapResponseToAction: ResponseToActionMapper<FetchWifiListAction> = (
 
 export const wifiListEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_WIFI_LIST),
+    ofType(
+      Constants.FETCH_WIFI_LIST,
+      Constants.POST_DISCONNECT_NETWORK_SUCCESS
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
