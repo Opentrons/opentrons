@@ -93,7 +93,7 @@ const INITIAL_STATE: SessionState = {
   apiLevel: [1, 0],
 }
 
-export default function sessionReducer(
+export function sessionReducer(
   state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {

@@ -4,12 +4,12 @@ import React from 'react'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
 
-type Props = {
+export type ConfirmUploadModalProps = {|
   confirm: () => mixed,
   cancel: () => mixed,
-}
+|}
 
-export default function ConfirmUploadModal(props: Props) {
+export function ConfirmUploadModal(props: ConfirmUploadModalProps) {
   return (
     <Portal>
       <AlertModal

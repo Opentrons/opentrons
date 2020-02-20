@@ -7,16 +7,16 @@ import { getRobotApiVersion } from '../../../discovery'
 import { CURRENT_VERSION, getShellUpdateState } from '../../../shell'
 
 import { AlertModal } from '@opentrons/components'
-import UpdateAppMessage from './UpdateAppMessage'
-import VersionList from './VersionList'
-import SkipAppUpdateMessage from './SkipAppUpdateMessage'
-import SyncRobotMessage from './SyncRobotMessage'
+import { UpdateAppMessage } from './UpdateAppMessage'
+import { VersionList } from './VersionList'
+import { SkipAppUpdateMessage } from './SkipAppUpdateMessage'
+import { SyncRobotMessage } from './SyncRobotMessage'
 import styles from './styles.css'
 
 import type { BuildrootUpdateType } from '../../../buildroot/types'
 import type { ViewableRobot } from '../../../discovery/types'
 
-type Props = {|
+export type VersionInfoModalProps = {|
   robot: ViewableRobot,
   robotUpdateType: BuildrootUpdateType | null,
   close: () => mixed,
@@ -27,7 +27,7 @@ const REINSTALL_HEADING = 'Robot is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
-export default function VersionInfoModal(props: Props) {
+export function VersionInfoModal(props: VersionInfoModalProps) {
   const { robot, robotUpdateType, close, proceed } = props
   const appUpdate = useSelector(getShellUpdateState)
   const robotVersion = getRobotApiVersion(robot)

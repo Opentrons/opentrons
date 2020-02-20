@@ -13,14 +13,14 @@ type SP = {| optedIn: boolean |}
 
 type DP = {| toggleOptedIn: () => mixed |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-export default connect<Props, OP, _, _, _, _>(
+export const AnalyticsToggle = connect<Props, OP, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(AnalyticsToggle)
+)(AnalyticsToggleComponent)
 
-function AnalyticsToggle(props: Props) {
+function AnalyticsToggleComponent(props: Props) {
   return (
     <LabeledToggle
       label="Share robot & app analytics with Opentrons"

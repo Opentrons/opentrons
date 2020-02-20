@@ -16,8 +16,8 @@ import { getBuildrootRobot } from '../../buildroot'
 import { getShellUpdateState } from '../../shell'
 
 import { Splash } from '@opentrons/components'
-import Page from '../../components/Page'
-import RobotSettings from './RobotSettings'
+import { Page } from '../../components/Page'
+import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 
 import type { ContextRouter } from 'react-router-dom'
@@ -26,7 +26,7 @@ type Props = {| ...ContextRouter |}
 
 const log = createLogger(__filename)
 
-export function Robots(props: Props) {
+export function RobotsComponent(props: Props) {
   const { path, url, params } = props.match
   const { name } = params
 
@@ -82,4 +82,4 @@ export function Robots(props: Props) {
   )
 }
 
-export default withRouter<_, _>(Robots)
+export const Robots = withRouter<_, _>(RobotsComponent)

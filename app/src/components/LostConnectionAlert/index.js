@@ -12,7 +12,7 @@ import {
 import { getAllRobots } from '../../discovery'
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
-import ModalCopy from './ModalCopy'
+import { ModalCopy } from './ModalCopy'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
@@ -22,14 +22,14 @@ type SP = {| ok: ?boolean |}
 type DP = {| disconnect: () => mixed |}
 type Props = {| ...OP, ...SP, ...DP |}
 
-export default withRouter<_, _>(
+export const LostConnectionAlert = withRouter<_, _>(
   connect<Props, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps
-  )(LostConnectionAlert)
+  )(LostConnectionAlertComponent)
 )
 
-function LostConnectionAlert(props: Props) {
+function LostConnectionAlertComponent(props: Props) {
   const { ok, disconnect } = props
 
   return (

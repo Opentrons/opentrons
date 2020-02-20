@@ -1,14 +1,16 @@
 // @flow
 // robot reducer
-// TODO(mc, 2017-10-05): Split into sub-reducers or different redux modules
 import { combineReducers } from 'redux'
 
-import connectionReducer, { type ConnectionState } from './connection'
-import sessionReducer, { type SessionState } from './session'
-import calibrationReducer, { type CalibrationState } from './calibration'
+import { connectionReducer } from './connection'
+import { sessionReducer } from './session'
+import { calibrationReducer } from './calibration'
 
 import type { Reducer } from 'redux'
 import type { Action } from '../../types'
+import type { ConnectionState } from './connection'
+import type { SessionState } from './session'
+import type { CalibrationState } from './calibration'
 
 export type RobotState = {|
   connection: ConnectionState,

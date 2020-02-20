@@ -6,9 +6,9 @@ import { LEFT, RIGHT } from '../../pipettes'
 import { InstrumentSettings as SettingsContent } from '../../components/InstrumentSettings'
 import { ChangePipette } from '../../components/ChangePipette'
 import { ConfigurePipette } from '../../components/ConfigurePipette'
-import Page from '../../components/Page'
+import { Page } from '../../components/Page'
 
-type Props = {|
+export type InstrumentSettingsProps = {|
   robotName: string,
   robotDisplayName: string,
   url: string,
@@ -18,7 +18,7 @@ type Props = {|
 // used to guarantee mount param in route is left or right
 const RE_MOUNT = `(${LEFT}|${RIGHT})`
 
-export function InstrumentSettings(props: Props) {
+export function InstrumentSettings(props: InstrumentSettingsProps) {
   const { robotName, robotDisplayName, url, path } = props
   const titleBarProps = { title: robotDisplayName }
 

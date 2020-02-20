@@ -3,12 +3,11 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { getConfig, removeManualIp } from '../../../config'
 import { getViewableRobots } from '../../../discovery'
+import { IpItem } from './IpItem'
 
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config/types'
 import type { Robot, ReachableRobot } from '../../../discovery/types'
-
-import IpItem from './IpItem'
 
 type OP = {||}
 
@@ -21,9 +20,9 @@ type DP = {|
   removeManualIp: (ip: string) => mixed,
 |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-function IpList(props: Props) {
+function IpListComponent(props: Props) {
   const { candidates, removeManualIp, robots } = props
   const candidateList = [].concat(candidates)
 
@@ -58,7 +57,7 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
+export const IpList = connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(IpList)
+)(IpListComponent)

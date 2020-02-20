@@ -16,7 +16,7 @@ import {
   CHANGE_PIPETTE,
 } from '../../robot-controls'
 
-import ClearDeckAlertModal from '../ClearDeckAlertModal'
+import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'

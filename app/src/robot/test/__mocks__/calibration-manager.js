@@ -1,6 +1,6 @@
 // mock calibration manager
 // based on api/opentrons/api/calibration.py
-export default function MockCalibrationManager() {
+export function MockCalibrationManager() {
   return {
     pick_up_tip: jest.fn(),
     drop_tip: jest.fn(),

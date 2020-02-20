@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
-import LabwareListItem from './LabwareListItem'
+import { LabwareListItem } from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
@@ -32,15 +32,15 @@ type Props = {|
   setLabware: (labware: Labware) => mixed,
 |}
 
-export default withRouter<_, _>(
+export const TipRackList = withRouter<_, _>(
   connect<Props, OP, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,
     mergeProps
-  )(TipRackList)
+  )(TipRackListComponent)
 )
 
-function TipRackList(props: Props) {
+function TipRackListComponent(props: Props) {
   const { tipracks, disabled, setLabware } = props
 
   return (

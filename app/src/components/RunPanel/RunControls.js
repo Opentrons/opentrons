@@ -9,7 +9,7 @@ import styles from './styles.css'
 const MISSING_MODULES =
   'Please attach all required modules before running this protocol'
 
-type RunProps = {|
+export type RunControlsProps = {|
   disabled: boolean,
   modulesReady: boolean,
   isReadyToRun: boolean,
@@ -21,7 +21,7 @@ type RunProps = {|
   onResetClick: () => mixed,
 |}
 
-export default function RunControls(props: RunProps) {
+export function RunControls(props: RunControlsProps) {
   const {
     disabled,
     modulesReady,

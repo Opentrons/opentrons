@@ -3,12 +3,12 @@
 import * as React from 'react'
 
 import { Icon, HoverTooltip } from '@opentrons/components'
-import RobotLink from './RobotLink'
+import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
 import type { UnreachableRobot } from '../../discovery/types'
 
-export default function UnreachableRobotItem(props: UnreachableRobot) {
+export function UnreachableRobotItem(props: UnreachableRobot) {
   const { displayName } = props
   return (
     <li className={styles.robot_group}>
@@ -20,7 +20,6 @@ export default function UnreachableRobotItem(props: UnreachableRobot) {
           <RobotLink
             url="#"
             className={styles.robot_item}
-            exact
             disabled
             hoverTooltipHandlers={hoverTooltipHandlers}
           >

@@ -3,8 +3,8 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { PrimaryButton } from '@opentrons/components'
-import ClearDeckAlertModal from '../ClearDeckAlertModal'
-import CalibrationInfoContent from '../CalibrationInfoContent'
+import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 
 import { actions as robotActions } from '../../robot'
 
@@ -13,7 +13,7 @@ import { getDeckPopulated } from '../../robot/selectors'
 import type { Dispatch } from '../../types'
 import type { TipProbeProps } from './types'
 
-export default function UnprobedPanel(props: TipProbeProps) {
+export function UnprobedPanel(props: TipProbeProps) {
   const { mount, probed } = props
   const [showClearDeck, setShowClearDeck] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()

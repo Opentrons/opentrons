@@ -2,8 +2,8 @@
 import * as React from 'react'
 
 import { Splash, SpinnerModal, AlertItem } from '@opentrons/components'
-import Page from '../../components/Page'
-import FileInfo from '../../components/FileInfo'
+import { Page } from '../../components/Page'
+import { FileInfo as FileInfoContents } from '../../components/FileInfo'
 
 import type { Robot } from '../../discovery/types'
 
@@ -18,7 +18,7 @@ const ROBOT_DOESNT_SUPPORT_CUSTOM_LABWARE =
 const YOU_HAVE_CUSTOM_LABWARE_BUT_THIS_ROBOT_NEEDS_UPDATE =
   'You have custom labware definitions saved to your app, but this robot needs to be updated before you can use these definitions with Python protocols'
 
-type Props = {|
+export type FileInfoProps = {|
   robot: Robot,
   filename: ?string,
   uploadInProgress: boolean,
@@ -28,7 +28,7 @@ type Props = {|
   showCustomLabwareWarning: boolean,
 |}
 
-export default function FileInfoPage(props: Props) {
+export function FileInfo(props: FileInfoProps) {
   const {
     robot,
     filename,
@@ -53,7 +53,7 @@ export default function FileInfoPage(props: Props) {
         </AlertItem>
       )}
       {filename ? (
-        <FileInfo
+        <FileInfoContents
           robot={robot}
           sessionLoaded={sessionLoaded}
           sessionHasSteps={sessionHasSteps}

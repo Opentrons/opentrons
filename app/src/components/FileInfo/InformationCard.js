@@ -12,28 +12,32 @@ import {
 } from '../../protocol'
 
 import { LabeledValue } from '@opentrons/components'
-import InfoSection from './InfoSection'
+import { InfoSection } from './InfoSection'
 import { SectionContentHalf, CardRow } from '../layout'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 
-type Props = {
+type OP = {||}
+
+type SP = {|
   name: ?string,
   author: ?string,
   lastUpdated: ?number,
   method: ?string,
   description: ?string,
-}
+|}
+
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'DD MMM Y, hh:mmA'
 
-export default connect<Props, {||}, _, {||}, _, _>(mapStateToProps)(
-  InformationCard
-)
+export const InformationCard = connect<Props, OP, SP, _, _, _, _>(
+  mapStateToProps
+)(InformationCardComponent)
 
-function InformationCard(props: Props) {
+function InformationCardComponent(props: Props) {
   const { name, author, method, description } = props
   const lastUpdated = props.lastUpdated
     ? moment(props.lastUpdated).format(DATE_FORMAT)
@@ -68,7 +72,7 @@ function InformationCard(props: Props) {
   )
 }
 
-function mapStateToProps(state: State): $Exact<Props> {
+function mapStateToProps(state: State): SP {
   return {
     name: getProtocolName(state),
     author: getProtocolAuthor(state),

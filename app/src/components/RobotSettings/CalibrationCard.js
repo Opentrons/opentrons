@@ -29,12 +29,12 @@ const TITLE = 'Deck Calibration'
 const CALIBRATION_MESSAGE =
   'Calibrate your robot to initial factory settings to ensure accuracy.'
 
-export default connect<Props, OP, _, _, _, _>(
+export const CalibrationCard = connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
-)(CalibrationCard)
+)(CalibrationCardComponent)
 
-function CalibrationCard(props: Props) {
+function CalibrationCardComponent(props: Props) {
   const { start, robot } = props
   const disabled = robot.status !== CONNECTABLE
 

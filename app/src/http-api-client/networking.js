@@ -13,7 +13,7 @@ import {
   clearApiResponse,
 } from './actions'
 import { getRobotApiState } from './reducer'
-import client from './client'
+import { client } from './client'
 
 import type { OutputSelector as Sel } from 'reselect'
 import type { State, ThunkPromiseAction } from '../types'

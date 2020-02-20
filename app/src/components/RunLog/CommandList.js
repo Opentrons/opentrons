@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { SpinnerModal } from '@opentrons/components'
-import SessionAlert from './SessionAlert'
+import { SessionAlert } from './SessionAlert'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
@@ -16,7 +16,7 @@ export type CommandListProps = {|
   onResetClick: () => mixed,
 |}
 
-export default class CommandList extends React.Component<CommandListProps> {
+export class CommandList extends React.Component<CommandListProps> {
   componentDidUpdate() {
     // TODO(mc, 2018-07-24): use new refs
     if (this.refs.ensureVisible) this.refs.ensureVisible.scrollIntoView(true) // eslint-disable-line react/no-string-refs

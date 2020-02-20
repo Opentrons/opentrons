@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import InstallModalContents from './InstallModalContents'
+import { InstallModalContents } from './InstallModalContents'
 
 import type { ViewableRobot } from '../../../discovery/types'
 import type {
@@ -10,14 +10,14 @@ import type {
   RobotSystemType,
 } from '../../../buildroot/types'
 
-type Props = {|
+export type InstallModalProps = {|
   robot: ViewableRobot,
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
   close: () => mixed,
 |}
 
-export default function InstallModal(props: Props) {
+export function InstallModal(props: InstallModalProps) {
   const { session, close, robotSystemType } = props
   const buttons = []
 

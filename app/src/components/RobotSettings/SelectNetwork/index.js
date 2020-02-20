@@ -23,10 +23,10 @@ import { chainActions } from '../../../util'
 
 import { IntervalWrapper, SpinnerModal } from '@opentrons/components'
 import { Portal } from '../../portal'
-import ConnectModal from './ConnectModal'
-import ConnectForm from './ConnectForm'
+import { ConnectModal } from './ConnectModal'
+import { ConnectForm } from './ConnectForm'
 import { SelectSsid } from './SelectSsid'
-import WifiConnectModal from './WifiConnectModal'
+import { WifiConnectModal } from './WifiConnectModal'
 
 import type { State, Dispatch } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'

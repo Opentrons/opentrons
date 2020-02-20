@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 
 import { PrimaryButton } from '@opentrons/components'
-import CalibrationInfoContent from '../CalibrationInfoContent'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 
 import { actions as robotActions } from '../../robot'
 import removeSingle from '../../img/remove_tip_single.png'
@@ -18,12 +18,12 @@ type DP = {| onConfirmClick: () => void |}
 
 type Props = {| ...OP, ...DP |}
 
-export default connect<Props, OP, {||}, DP, _, _>(
+export const RemoveTipPanel = connect<Props, OP, {||}, DP, _, _>(
   null,
   mapDispatchToProps
-)(RemoveTipPanel)
+)(RemoveTipPanelComponent)
 
-function RemoveTipPanel(props: Props) {
+function RemoveTipPanelComponent(props: Props) {
   const { channels, onConfirmClick } = props
 
   const imgSrc = channels === 1 ? removeSingle : removeMulti

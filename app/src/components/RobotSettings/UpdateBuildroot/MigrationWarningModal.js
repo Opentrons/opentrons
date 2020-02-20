@@ -7,7 +7,7 @@ import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 import type { BuildrootUpdateType } from '../../../buildroot/types'
 
-type Props = {|
+export type MigrationWarningModalProps = {|
   notNowButton: ButtonProps,
   updateType: BuildrootUpdateType | null,
   proceed: () => mixed,
@@ -15,7 +15,7 @@ type Props = {|
 
 const HEADING = 'Robot Operating System Update Available'
 
-export default function MigrationWarningModal(props: Props) {
+export function MigrationWarningModal(props: MigrationWarningModalProps) {
   const { notNowButton, updateType, proceed } = props
 
   const buttons: Array<?ButtonProps> = [

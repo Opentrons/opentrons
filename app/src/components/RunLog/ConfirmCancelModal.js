@@ -11,7 +11,7 @@ const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-export default function ExitAlertModal() {
+export function ConfirmCancelModal() {
   const dispatch = useDispatch<Dispatch>()
   const back = () => {
     // $FlowFixMe(mc, 2019-07-01): RPC robotActions.resume is untyped

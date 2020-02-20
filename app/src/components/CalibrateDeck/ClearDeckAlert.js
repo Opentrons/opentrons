@@ -3,7 +3,7 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { push } from 'connected-react-router'
 import { deckCalibrationCommand as dcCommand } from '../../http-api-client'
-import ClearDeckAlertModal from '../ClearDeckAlertModal'
+import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 
 import type { Dispatch } from '../../types'
 import type { CalibrateDeckProps } from './types'
@@ -15,14 +15,14 @@ type DP = {|
   onCancel: () => mixed,
 |}
 
-type Props = { ...OP, ...DP }
+type Props = {| ...OP, ...DP |}
 
-export default connect<Props, OP, _, DP, _, _>(
+export const ClearDeckAlert = connect<Props, OP, _, DP, _, _>(
   null,
   mapDispatchToProps
-)(ClearDeckAlert)
+)(ClearDeckAlertComponent)
 
-function ClearDeckAlert(props: Props) {
+function ClearDeckAlertComponent(props: Props) {
   return (
     <ClearDeckAlertModal
       parentUrl={props.parentUrl}

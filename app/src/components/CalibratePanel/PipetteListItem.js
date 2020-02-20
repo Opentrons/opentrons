@@ -9,14 +9,14 @@ import type { IconName } from '@opentrons/components'
 import type { Pipette as ProtocolPipette } from '../../robot/types'
 import type { Mount } from '../../pipettes/types'
 
-type Props = {|
+export type PipetteListItemProps = {|
   mount: Mount,
   pipette: ProtocolPipette | null,
   calibrateUrl: string | null,
   disabledReason: string | null,
 |}
 
-export default function PipetteListItem(props: Props) {
+export function PipetteListItem(props: PipetteListItemProps) {
   const { mount, pipette, calibrateUrl, disabledReason } = props
   const confirmed = pipette?.probed
   const displayName = pipette?.modelSpecs?.displayName || 'N/A'

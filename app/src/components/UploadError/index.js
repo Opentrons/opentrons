@@ -7,11 +7,11 @@ import styles from './styles.css'
 
 const UPLOAD_ERROR_MESSAGE = 'Your protocol could not be opened.'
 
-type Props = {
+export type UploadErrorProps = {|
   uploadError: { message: string },
-}
+|}
 
-export default function UploadError(props: Props) {
+export function UploadError(props: UploadErrorProps) {
   const { uploadError } = props
 
   return (

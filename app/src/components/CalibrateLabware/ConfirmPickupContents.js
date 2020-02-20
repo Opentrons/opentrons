@@ -3,7 +3,7 @@
 import { connect } from 'react-redux'
 
 import { actions as robotActions } from '../../robot'
-import ConfirmPickupPrompt from './ConfirmPickupPrompt'
+import { ConfirmPickupPrompt } from './ConfirmPickupPrompt'
 
 import type { Dispatch } from '../../types'
 import type { Labware, Pipette } from '../../robot'
@@ -18,9 +18,9 @@ type DP = {|
   onYesClick: () => void,
 |}
 
-type Props = { ...OP, ...DP }
+type Props = {| ...OP, ...DP |}
 
-export default connect<Props, OP, _, _, _, _>(
+export const ConfirmPickupContents = connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
 )(ConfirmPickupPrompt)

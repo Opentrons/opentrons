@@ -5,7 +5,7 @@ import { PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {|
+export type AttachTipProps = {|
   ...CalibrateDeckStartedProps,
   proceed: () => mixed,
 |}
@@ -23,7 +23,7 @@ const DIAGRAMS: { [step: CalibrationStep]: { [Channels]: string } } = {
   },
 }
 
-export default function AttachTipModal(props: Props) {
+export function AttachTip(props: AttachTipProps) {
   const multi = props.pipette.channels === 8
   const tipLocation = multi ? 'very first channel at front of' : ''
 
@@ -69,7 +69,7 @@ export default function AttachTipModal(props: Props) {
   )
 }
 
-function getDiagramSrc(props: Props): string {
+function getDiagramSrc(props: AttachTipProps): string {
   const { calibrationStep, pipette } = props
   const channelsKey = pipette.channels === 8 ? 'multi' : 'single'
 

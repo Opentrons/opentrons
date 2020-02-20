@@ -3,12 +3,13 @@ import * as React from 'react'
 import { IconButton } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = {
+export type IpFieldProps = {|
   field: any,
   form: any,
   inputRef: { current: null | HTMLInputElement },
-}
-export default function IpField(props: Props) {
+|}
+
+export function IpField(props: IpFieldProps) {
   const {
     field,
     form: { submitForm, dirty },

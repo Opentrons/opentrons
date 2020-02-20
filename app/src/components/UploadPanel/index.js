@@ -6,28 +6,27 @@ import { selectors as robotSelectors } from '../../robot'
 import { openProtocol, getProtocolFilename } from '../../protocol'
 
 import { SidePanel } from '@opentrons/components'
-import Upload from './Upload'
+import { Upload } from './Upload'
 
 import type { State, Dispatch } from '../../types'
 
 type SP = {|
   filename: ?string,
   sessionLoaded: ?boolean,
-  uploadError: ?{ message: string },
 |}
 
 type DP = {|
   createSession: File => mixed,
 |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-export default connect<Props, {||}, _, _, _, _>(
+export const UploadPanel = connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(UploadPanel)
+)(UploadPanelComponent)
 
-function UploadPanel(props: Props) {
+function UploadPanelComponent(props: Props) {
   return (
     <SidePanel title="Protocol File">
       <Upload {...props} />
@@ -39,7 +38,6 @@ function mapStateToProps(state: State): SP {
   return {
     filename: getProtocolFilename(state),
     sessionLoaded: robotSelectors.getSessionIsLoaded(state),
-    uploadError: robotSelectors.getUploadError(state),
   }
 }
 

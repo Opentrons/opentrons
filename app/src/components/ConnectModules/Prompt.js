@@ -6,10 +6,10 @@ import { OutlineButton, AlertItem } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {
+export type PromptProps = {|
   modulesMissing: boolean,
   onClick: () => mixed,
-}
+|}
 
 const missingAlertProps = {
   type: 'warning',
@@ -23,7 +23,7 @@ const connectedAlertProps = {
   className: styles.alert,
 }
 
-export default function Prompt(props: Props) {
+export function Prompt(props: PromptProps) {
   const { modulesMissing, onClick } = props
 
   const alert = modulesMissing ? (

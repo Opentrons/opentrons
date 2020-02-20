@@ -22,19 +22,19 @@ type SP = {| status: string, connectButtonText: string |}
 
 type DP = {| onClick: () => mixed |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Status'
 const STATUS_LABEL = 'This robot is currently'
 const STATUS_VALUE_DISCONNECTED = 'Unknown - connect to view status'
 const STATUS_VALUE_DEFAULT = 'Idle'
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
+export const StatusCard = connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(StatusCard)
+)(StatusCardComponent)
 
-function StatusCard(props: Props) {
+function StatusCardComponent(props: Props) {
   const { robot, status, connectButtonText, onClick } = props
   const disabled = robot.status !== CONNECTABLE
 
