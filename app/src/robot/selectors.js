@@ -249,7 +249,7 @@ export const getPipettes: State => Array<Pipette> = createSelector(
   }
 )
 
-export function getApiLevel(state: State) {
+export function getApiLevel(state: State): [number, number] | null {
   return session(state).apiLevel
 }
 

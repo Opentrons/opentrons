@@ -51,7 +51,7 @@ export type SessionState = {
   remoteTimeCompensation: number | null,
   startTime: ?number,
   runTime: number,
-  apiLevel: [number, number],
+  apiLevel: [number, number] | null,
   capabilities: Array<string>,
 }
 
@@ -90,7 +90,7 @@ const INITIAL_STATE: SessionState = {
   remoteTimeCompensation: null,
   startTime: null,
   runTime: 0,
-  apiLevel: [1, 0],
+  apiLevel: null,
 }
 
 export function sessionReducer(

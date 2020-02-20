@@ -1,15 +1,16 @@
 // @flow
 // functions for parsing protocol files
 import { createLogger } from '../logger'
+import { TYPE_JSON, TYPE_PYTHON, TYPE_ZIP } from './constants'
 
 import type { ProtocolFile, ProtocolData, ProtocolType } from './types'
 
 const log = createLogger(__filename)
 
 export function filenameToType(filename: string): ProtocolType | null {
-  if (filename.endsWith('.json')) return 'json'
-  if (filename.endsWith('.py')) return 'python'
-  if (filename.endsWith('.zip')) return 'zip'
+  if (filename.endsWith('.json')) return TYPE_JSON
+  if (filename.endsWith('.py')) return TYPE_PYTHON
+  if (filename.endsWith('.zip')) return TYPE_ZIP
   return null
 }
 
@@ -44,15 +45,15 @@ export function parseProtocolData(
 }
 
 export function fileIsPython(file: ProtocolFile): boolean {
-  return file.type === 'python' || file.type == null
+  return file.type === TYPE_PYTHON || file.type == null
 }
 
 export function fileIsJson(file: ProtocolFile): boolean {
-  return file.type === 'json'
+  return file.type === TYPE_JSON
 }
 
 export function fileIsBundle(file: ProtocolFile): boolean {
-  return file.type === 'zip'
+  return file.type === TYPE_ZIP
 }
 
 export function fileIsBinary(file: ProtocolFile): boolean {
