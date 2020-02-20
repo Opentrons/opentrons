@@ -8,6 +8,10 @@ python_version = "3.7"
 
 [dev-packages]
 "c445fee" = {editable = true, path = "./../api"}
+pytest = "*"
+openapi-spec-validator = "*"
+pytest-aiohttp = "*"
+pytest-cov = "*"
 
 [packages]
 uvicorn = "==0.11.3"
