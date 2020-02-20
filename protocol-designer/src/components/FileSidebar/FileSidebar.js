@@ -2,7 +2,6 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { saveAs } from 'file-saver'
-import _ from 'lodash'
 import {
   PrimaryButton,
   AlertModal,

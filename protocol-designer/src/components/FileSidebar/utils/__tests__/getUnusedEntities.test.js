@@ -36,23 +36,28 @@ describe('getUnusedEntities', () => {
   })
 
   test('module entities not used in steps are returned', () => {
+    const paramKey = 'moduleId'
     const commands = {
       step123: {
-        moduleId: 'module123',
+        moduleId: 'magnet123',
         id: 'step123',
+        magnetAction: 'engage',
+        engageHeight: '10',
+        stepType: 'magnet',
+        stepName: 'magnet',
+        stepDetails: '',
       },
     }
-    const paramKey = 'pipette'
     const entity = {
-      pipette123: {
-        name: 'pipette 123',
-        id: 'pipette123',
-        mount: 'right',
+      magnet123: {
+        id: 'magnet123',
+        type: 'tempdeck',
+        model: 'GEN1',
       },
-      pipette456: {
-        name: 'pipette 456',
-        id: 'pipette456',
-        mount: 'left',
+      temperature456: {
+        id: 'temperature456',
+        type: 'tempdeck',
+        model: 'GEN1',
       },
     }
 
@@ -60,9 +65,9 @@ describe('getUnusedEntities', () => {
 
     expect(result).toEqual([
       {
-        name: 'pipette 456',
-        id: 'pipette456',
-        mount: 'left',
+        id: 'temperature456',
+        type: 'tempdeck',
+        model: 'GEN1',
       },
     ])
   })

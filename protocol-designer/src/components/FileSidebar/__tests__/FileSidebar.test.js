@@ -8,7 +8,9 @@ import { MAGDECK } from '../../../constants'
 jest.mock('file-saver')
 
 describe('FileSidebar', () => {
-  let props
+  const pipetteLeftId = 'pipetteLeftId'
+  const pipetteRightId = 'pipetteRightId'
+  let props, commands, moduleEntities, pipetteEntities, savedStepForms
   beforeEach(() => {
     fileSaver.saveAs = jest.fn()
 
@@ -28,6 +30,39 @@ describe('FileSidebar', () => {
       pipetteEntities: {},
       moduleEntities: {},
       savedStepForms: {},
+    }
+
+    commands = [
+      {
+        command: 'pickUpTip',
+        params: { pipette: pipetteLeftId, labware: 'well', well: 'A1' },
+      },
+    ]
+
+    pipetteEntities = {
+      pipetteLeftId: {
+        name: 'pipette 300',
+        id: pipetteLeftId,
+        mount: 'left',
+      },
+      pipetteRightId: {
+        name: 'pipette 50',
+        id: pipetteRightId,
+        mount: 'right',
+      },
+    }
+
+    moduleEntities = {
+      magnet123: {
+        type: MAGDECK,
+      },
+    }
+
+    savedStepForms = {
+      step123: {
+        id: 'step123',
+        pipette: pipetteLeftId,
+      },
     }
   })
 
@@ -59,12 +94,7 @@ describe('FileSidebar', () => {
   })
 
   test('export button exports protocol when no errors', () => {
-    props.downloadData.fileData.commands = [
-      {
-        command: 'pickUpTip',
-        params: { pipette: 'p300', labware: 'well', well: 'A1' },
-      },
-    ]
+    props.downloadData.fileData.commands = commands
     const blob = new Blob([JSON.stringify(props.downloadData.fileData)], {
       type: 'application/json',
     })
@@ -88,30 +118,9 @@ describe('FileSidebar', () => {
   })
 
   test('warning modal is shown when export is clicked with unused pipette', () => {
-    props.pipetteEntities = {
-      pipetteLeftId: {
-        name: 'pipette 300',
-        id: 'pipetteLeftId',
-        mount: 'left',
-      },
-      pipetteRightId: {
-        name: 'pipette 50',
-        id: 'pipetteRightId',
-        mount: 'right',
-      },
-    }
-    props.savedStepForms = {
-      step123: {
-        id: 'step123',
-        pipette: 'p300',
-      },
-    }
-    props.downloadData.fileData.commands = [
-      {
-        command: 'pickUpTip',
-        params: { pipette: 'p300', labware: 'well', well: 'A1' },
-      },
-    ]
+    props.downloadData.fileData.commands = commands
+    props.pipetteEntities = pipetteEntities
+    props.savedStepForms = savedStepForms
 
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -120,26 +129,15 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused pipette')
+    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.name)
+    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.mount)
+    expect(alertModal.html()).not.toContain(pipetteEntities.pipetteLeftId.name)
   })
 
   test('warning modal is shown when export is clicked with unused module', () => {
-    props.moduleEntities = {
-      magnet123: {
-        type: MAGDECK,
-      },
-    }
-    props.savedStepForms = {
-      step123: {
-        id: 'step123',
-        pipette: 'p300',
-      },
-    }
-    props.downloadData.fileData.commands = [
-      {
-        command: 'pickUpTip',
-        params: { pipette: 'p300', labware: 'well', well: 'A1' },
-      },
-    ]
+    props.moduleEntities = moduleEntities
+    props.savedStepForms = savedStepForms
+    props.downloadData.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -148,38 +146,14 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused module')
+    expect(alertModal.html()).toContain('Magnetic module')
   })
 
   test('warning modal is shown when export is clicked with unused module and pipette', () => {
-    props.moduleEntities = {
-      magnet123: {
-        type: MAGDECK,
-      },
-    }
-    props.pipetteEntities = {
-      pipetteLeftId: {
-        name: 'pipette 300',
-        id: 'pipetteLeftId',
-        mount: 'left',
-      },
-      pipetteRightId: {
-        name: 'pipette 50',
-        id: 'pipetteRightId',
-        mount: 'right',
-      },
-    }
-    props.savedStepForms = {
-      step123: {
-        id: 'step123',
-        pipette: 'p300',
-      },
-    }
-    props.downloadData.fileData.commands = [
-      {
-        command: 'pickUpTip',
-        params: { pipette: 'p300', labware: 'well', well: 'A1' },
-      },
-    ]
+    props.moduleEntities = moduleEntities
+    props.pipetteEntities = pipetteEntities
+    props.savedStepForms = savedStepForms
+    props.downloadData.fileData.commands = commands
 
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
@@ -188,5 +162,9 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused pipette and module')
+    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.name)
+    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.mount)
+    expect(alertModal.html()).toContain('Magnetic module')
+    expect(alertModal.html()).not.toContain(pipetteEntities.pipetteLeftId.name)
   })
 })

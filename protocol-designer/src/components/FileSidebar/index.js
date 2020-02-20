@@ -36,7 +36,7 @@ function mapStateToProps(state: BaseState): SP {
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
-  console.log(stepFormSelectors.getPipetteDisplayProperties(state))
+
   return {
     canDownload,
     downloadData: {
