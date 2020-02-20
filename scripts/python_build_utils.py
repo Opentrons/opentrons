@@ -16,6 +16,10 @@ PackageEntry = namedtuple("PackageEntry", ("pkg_json", "br_version_prefix"))
 
 HERE = os.path.dirname(__file__)
 
+# current working directory for shell calls. will only be empty if running
+# from script directory.
+CWD = HERE or '.'
+
 
 package_entries = {
     'api': PackageEntry(
@@ -56,7 +60,7 @@ def _ref_from_sha(sha):
     # refs
     allrefs = subprocess.check_output(
         ['git', 'show-ref', '--tags', '--heads'],
-        cwd=HERE).strip().decode().split('\n')
+        cwd=CWD).strip().decode().split('\n')
     # Keep...
     matching = [
         this_ref for this_sha, this_ref in   # the refs
@@ -90,7 +94,7 @@ def dump_br_version(project):
     """
     normalized = get_version(project)
     sha = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD'], cwd=HERE).strip().decode()
+        ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode()
     branch = _ref_from_sha(sha)
     pref = package_entries[project].br_version_prefix
     return json.dumps({pref+'_version': normalized,
