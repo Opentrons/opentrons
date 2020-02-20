@@ -6,7 +6,7 @@ import re
 import opentrons
 from opentrons import HERE
 from opentrons import server
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import adapters, API, ThreadManager
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
@@ -93,10 +93,14 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-async def initialize_robot(loop, hardware):
+async def initialize_robot() -> ThreadManager:
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
+    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        log.info("Initialized robot using virtual Smoothie")
+        return ThreadManager(API.build_hardware_simulator)
+
     try:
-        await hardware.connect()
+        hardware = ThreadManager(API.build_hardware_controller)
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -106,22 +110,21 @@ async def initialize_robot(loop, hardware):
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
     else:
-        if ff.use_protocol_api_v2():
-            fw_version = await hardware.fw_version
-        else:
-            fw_version = hardware.fw_version
-    log.info("Smoothie FW version: {}".format(fw_version))
+        # import pdb; pdb.set_trace()
+        fw_version = await hardware.fw_version
+        hardware.clean_up()
+
+    log.info(f"Smoothie FW version: {fw_version}")
     if fw_version != packed_smoothie_fw_ver:
-        log.info("Executing smoothie update: current vers {}, packed vers {}"
-                 .format(fw_version, packed_smoothie_fw_ver))
+        log.info(f"Executing smoothie update: current vers {fw_version},"
+                 f" packed vers {packed_smoothie_fw_ver}")
         await _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver)
-        await hardware.connect()
     else:
-        log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
-    log.info(f"Name: {name()}")
+        log.info(f"FW version OK: {packed_smoothie_fw_ver}")
+    return ThreadManager(API.build_hardware_controller)
 
 
-def run(hardware, **kwargs):  # noqa(C901)
+def run(**kwargs):  # noqa(C901)
     """
     This function was necessary to separate from main() to accommodate for
     server startup path on system 3.0, which is server.main. In the case where
@@ -129,35 +132,25 @@ def run(hardware, **kwargs):  # noqa(C901)
     an additional argument of 'patch_old_init'. kwargs are hence used to allow
     the use of different length args
     """
-    loop = asyncio.get_event_loop()
 
-    if ff.use_protocol_api_v2():
-        robot_conf = loop.run_until_complete(hardware.get_config())
-    else:
-        robot_conf = hardware.config
-
+    robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
-    log.info("API server version:  {}".format(__version__))
-    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot(loop, hardware)
-        if ff.use_protocol_api_v2():
-            loop.run_until_complete(hardware.cache_instruments())
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            if ff.use_protocol_api_v2():
-                loop.run_until_complete(hardware.home_z())
-            else:
-                hardware.home_z()
+    log.info(f"API server version:  {__version__}")
+    log.info(f"Robot Name: {name()}")
 
-    if kwargs.get('hardware_server'):
-        if ff.use_protocol_api_v2():
-            loop.run_until_complete(
-                install_hardware_server(kwargs['hardware_server_socket'],
-                                        hardware._api))
-        else:
-            log.warning(
-                "Hardware server requested but apiv1 selected, not starting")
+    loop = asyncio.get_event_loop()
+    hardware = loop.run_until_complete(initialize_robot())
+
+    if not ff.disable_home_on_boot():
+        log.info("Homing Z axes")
+        loop.run_until_complete(hardware.home_z())
+
+    # if kwargs.get('hardware_server'):
+    #     loop.run_until_complete(
+    #             install_hardware_server(kwargs['hardware_server_socket'],
+    #             hardware._api))
+
     server.run(
         hardware,
         kwargs.get('hostname'),
@@ -193,11 +186,7 @@ def main():
         help='Override for the hardware server socket')
     args = arg_parser.parse_args()
 
-    if ff.use_protocol_api_v2():
-        checked_hardware = adapters.SingletonAdapter.build_in_managed_thread()
-    else:
-        checked_hardware = opentrons.robot
-    run(checked_hardware, **vars(args))
+    run(**vars(args))
     arg_parser.exit(message="Stopped\n")
 
 

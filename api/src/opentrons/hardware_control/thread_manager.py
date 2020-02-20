@@ -28,23 +28,22 @@ class ThreadManager(HardwareAPILike):
         """
 
         self._loop = None
-        self._api = None
+        self.managed_obj = None
         is_running = threading.Event()
         self._is_running = is_running
-        target = object.__getattribute__(self, '_build_api_and_start_loop')
+        target = object.__getattribute__(self, '_build_and_start_loop')
         thread = threading.Thread(target=target, name='Hardware thread',
                                   args=(builder, *args), kwargs=kwargs)
         self._thread = thread
         thread.start()
         is_running.wait()
 
-    def _build_api_and_start_loop(self, builder, *args, **kwargs):
+    def _build_and_start_loop(self, builder, *args, **kwargs):
         loop = asyncio.new_event_loop()
+        asyncio.set_event_loop(loop)
         self._loop = loop
-        api = builder(*args, loop=loop, **kwargs)
-        self._api = api
-        is_running = object.__getattribute__(self, '_is_running')
-        is_running.set()
+        self.managed_obj = loop.run_until_complete(builder(*args, loop=loop, **kwargs))
+        object.__getattribute__(self, '_is_running').set()
         loop.run_forever()
         loop.close()
 
@@ -53,10 +52,11 @@ class ThreadManager(HardwareAPILike):
 
     def clean_up(self):
         try:
-            self._thread.join()
+            self._loop.call_soon_threadsafe(self._loop.stop)
         except Exception as e:
             MODULE_LOG.exception(f'Exception while cleaning up'
                                  f'Hardware Thread Manager: {e}')
+        self._thread.join()
 
     def __del__(self):
         self.clean_up()
@@ -70,10 +70,11 @@ class ThreadManager(HardwareAPILike):
     def __getattribute__(self, attr_name):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
-        api = object.__getattribute__(self, '_api')
+        managed_obj = object.__getattribute__(self, 'managed_obj')
         loop = object.__getattribute__(self, '_loop')
         try:
-            attr = getattr(api, attr_name)
+            MODULE_LOG.info(f'THREAD MANAGER get attribute: {attr_name}, mo: {managed_obj}')
+            attr = getattr(managed_obj, attr_name)
         except AttributeError:
             # Maybe this actually was for us? Let’s find it
             return object.__getattribute__(self, attr_name)

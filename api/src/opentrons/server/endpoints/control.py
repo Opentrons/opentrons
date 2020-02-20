@@ -71,25 +71,22 @@ async def get_attached_pipettes(request):
     """
     hw = hw_from_req(request)
     if request.url.query.get('refresh') == 'true':
-        if ff.use_protocol_api_v2():
-            await hw.cache_instruments()
-        else:
-            hw.cache_instrument_models()
+        await hw.cache_instruments()
     response = {}
-    if ff.use_protocol_api_v2():
-        attached = await hw.get_attached_pipettes()
-    else:
-        attached = hw.get_attached_pipettes()
+
+    attached = await hw.attached_instruments
     for mount, data in attached.items():
-        response[mount] = {
-            'model': data['model'],
-            'name': data['name'],
-            'mount_axis': str(data['mount_axis']).lower(),
-            'plunger_axis': str(data['plunger_axis']).lower(),
-            'id': data['id']
+        response[mount.name.lower()] = {
+            'model': data.get('model', None),
+            'name': data.get('name', None),
+            'id': data.get('pipette_id', None),
+            'mount_axis': str(Axis.by_mount(mount)).lower(),
+            'plunger_axis': str(Axis.of_plunger(mount)).lower()
         }
-        if 'tip_length' in data:
-            response[mount]['tip_length'] = data.get('tip_length', 0)
+        if data.get('model'):
+            response[mount.name.lower()]['tip_length'] \
+                = data.get('tip_length', 0)
+
     return web.json_response(response, status=200)
 
 
