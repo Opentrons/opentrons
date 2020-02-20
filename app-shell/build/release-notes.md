@@ -1,22 +1,9 @@
-# Opentrons App Changes from 3.15.2 to 3.16.0
+# Opentrons App Changes from 3.16.0 to 3.16.1-beta.0
 
 For more details about this release, please see the full [technical change log][changelog]
 
-**Note for macOS users**: The Opentrons App is no longer compatible with macOS 10.9 Mavericks. If you are using 10.9, please upgrade to a later version of macOS (available for free from Apple) to continue to receive Opentrons updates.
-
-## Custom Labware Folder Customization
-
-You can now click a button to open your custom labware folder directly, and can
-easily reset it to its default location.
-
-## Other Changes
-- The app now displays a spinner when updating pipette settings
-
-## Bug Fixes
-- Fixed an issue where clicking the home button during labware calibration would
-  result in errors 
-- The OT-2 will now home when labware calibration is complete to allow easier
-  access to the deck 
+There are no changes in the Opentrons App between 3.16.0 and 3.16.1-beta.0; it
+exists to support the robot software release which now correctly includes pandas.
 
 ## Known Issues
 

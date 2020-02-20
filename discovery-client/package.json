@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/discovery-client",
-  "version": "3.16.0",
+  "version": "3.16.1-alpha.0",
   "description": "Node.js client for discovering Opentrons robots on the network",
   "main": "src/index.js",
   "bin": {
