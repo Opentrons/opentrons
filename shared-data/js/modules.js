@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import magneticModuleV1 from '../module/definitions/2/magneticModuleV1.json'
 import magneticModuleV2 from '../module/definitions/2/magneticModuleV2.json'
 import temperatureModuleV1 from '../module/definitions/2/temperatureModuleV1.json'
