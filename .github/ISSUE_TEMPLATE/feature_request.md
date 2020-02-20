@@ -16,25 +16,25 @@ assignees: ''
   below to the best of your ability!
 -->
 
-## Overview
+# Overview
 
 <!--
   Use this section to describe your issue at a high level. Please include some context about why you want this feature. What would this feature allow you to accomplish? Are there any workarounds you use to partially achieve your goal? Are there any issues you could find that may be related?
 -->
 
-## Implementation Details
+# Implementation details
 
 <!--
   List any implementation steps, specs, or links to docs here.
 -->
 
-## Design
+# Design
 
 <!--
  Attach design images here or link to applicable Zeplin files.
 -->
 
-## Acceptance Criteria
+# Acceptance criteria
 
 <!--
  A checklist of requirements and/or testing steps that must be complete before this feature is considered complete. This can also be used as a testing plan for associated PRs.

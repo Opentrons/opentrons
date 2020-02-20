@@ -16,21 +16,21 @@ assignees: ''
   below to the best of your ability!
 -->
 
-## overview
+# Overview
 
 <!--
   Use this section to describe your bug at a high level. Please include any
   issues you can find that may be related.
 -->
 
-## current behavior
+# Current behavior
 
 <!--
   Describe how the software currently behaves and how that differs from how you
   think the software should behave.
 -->
 
-## steps to reproduce
+# Steps to reproduce
 
 <!--
   If this is a bug report and there are specific steps we can take to reproduce
@@ -38,7 +38,7 @@ assignees: ''
   software version, hardware version, and operating system.
 -->
 
-## expected behavior
+# Expected behavior
 
 <!--
   Describe how you think the software should behave.
