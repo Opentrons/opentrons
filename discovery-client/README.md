@@ -12,10 +12,10 @@
 ## api
 
 ```js
-const DiscoveryClient = require('@opentrons/discovery-client')
+const { createDiscoveryClient } = require('@opentrons/discovery-client')
 ```
 
-### DiscoveryClientFactory(options?: Options): DiscoveryClient
+### createDiscoveryClient(options?: Options): DiscoveryClient
 
 Creates a new `DiscoveryClient`.
 
@@ -27,7 +27,7 @@ const options = {
   candidates: [{ ip: '[fd00:0:cafe:fefe::1]', port: 31950 }, 'localhost'],
 }
 
-const client = DiscoveryClientFactory(options)
+const client = createDiscoveryClient(options)
 ```
 
 The discovery client is an [Event Emitter][event-emitter]. In addition to the normal `EventEmitter` methods and properties, the client has:
