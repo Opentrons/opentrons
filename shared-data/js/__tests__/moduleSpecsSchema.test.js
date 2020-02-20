@@ -19,7 +19,7 @@ const GLOB_OPTIONS = { cwd: __dirname, absolute: true }
 const MODULE_PATHS = glob.sync(V2_DEFS_GLOB_PATTERN, GLOB_OPTIONS)
 
 beforeAll(() => {
-  assert(MODULE_PATHS.length > 0)
+  expect(MODULE_PATHS).not.toHaveLength(0)
 })
 
 describe('validate all module specs with schema', () => {
@@ -27,9 +27,6 @@ describe('validate all module specs with schema', () => {
     const valid = validateModuleSpecsV1(moduleSpecsV1)
     const validationErrors = validateModuleSpecsV1.errors
 
-    if (validationErrors) {
-      console.log(JSON.stringify(validationErrors, null, 4))
-    }
     expect(validationErrors).toBe(null)
     expect(valid).toBe(true)
   })
@@ -40,9 +37,6 @@ describe('validate all module specs with schema', () => {
     test(`${filename} validates against schema`, () => {
       const valid = validateModuleSpecsV2(moduleDef)
       const validationErrors = validateModuleSpecsV2.errors
-      if (validationErrors) {
-        console.log(JSON.stringify(validationErrors, null, 4))
-      }
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
