@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.16.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.16.0...v3.16.1-alpha.0) (2020-02-20)
+## [3.16.1-beta.0](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1-beta.0) (2020-02-20)
 
 **Note:** Version bump only for package @opentrons/labware-library
 
