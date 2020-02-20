@@ -28,9 +28,9 @@ package_entries = {
     'update-server': PackageEntry(
         os.path.join(HERE, '..', 'update-server', 'otupdate', 'package.json'),
         'update_server'),
-    'opentrons': PackageEntry(
-        os.path.join(HERE, '..', 'pyopentrons', 'src', 'opentrons', 'package.json'),
-        'opentrons')
+    'robot-server': PackageEntry(
+        os.path.join(HERE, '..', 'robot-server', 'robot_server', 'package.json'),
+        'robot-server')
 }
 
 
