@@ -1,5 +1,5 @@
 =============
-Opentrons API
+Opentrons
 =============
 
 .. image:: https://badgen.net/travis/Opentrons/opentrons/edge
@@ -20,13 +20,13 @@ Opentrons API
 Introduction
 ------------
 
-This is the Opentrons API Server, the Python module that runs the Opentrons OT-2. It contains the code that interprets and executes protocols; code that controls the hardware both during and outside of protocols; and all the other small tasks and capabilities that the robot fulfills.
+This is the Opentrons library, the Python module that runs the Opentrons OT-2. It contains the code that interprets and executes protocols; code that controls the hardware both during and outside of protocols; and all the other small tasks and capabilities that the robot fulfills.
 
-This document is about the structure and purpose of the source code. For information on how to use the Opentrons API or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
+This document is about the structure and purpose of the source code. For information on how to use the Opentrons library or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
 
-The Opentrons API Server package has two purposes:
+The Opentrons library allow two purposes:
 
-1. **Control an Opentrons OT-2 robot.**  When controlling a robot, we use the entry point in `opentrons.main <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/main.py>`_. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
+1. **Control an Opentrons OT-2 robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
 2. **Simulate protocols on users’ computers.** When simulating a protocol on a user’s computer, we use the entry point in `opentrons.simulate <https://github.com/Opentrons/opentrons/blob/edge/api/src/opentrons/simulate.py>`_. We set up simulators for the protocol, but do not run any kind of web servers. We are configured by files in the user’s home directory (for more information see configuration_).
 
@@ -43,9 +43,9 @@ The only additional prerequisite concerns building documentation. If you want to
 Updating A Robot
 ----------------
 
-Since the API server runs on a robot, we need to have easy ways of getting newly-built wheels to the robot and interacting with it in general. This is provided by the ``push-api`` target of the top-level makefile. To send an API to the robot, navigate to the top-level ``opentrons`` directory and run ``make push-api host=<robot ip>``. If you forget the ``host=`` part, the makefile will look for a robot connected via USB. Note that the update facility relies on the `update-server <https://github.com/Opentrons/opentrons/tree/edge/update-server>`_ running.
+Since the library is installed on a robot, we need to have easy ways of getting newly-built wheels to the robot. This is provided by the ``push-api`` target of the top-level makefile. To send a library to the robot, navigate to the top-level ``opentrons`` directory and run ``make push-api host=<robot ip>``. If you forget the ``host=`` part, the makefile will look for a robot connected via USB. Note that the update facility relies on the `update-server <https://github.com/Opentrons/opentrons/tree/edge/update-server>`_ running.
 
-The top level makefile (and the API makefile) also have a target called ``term``, which will give you an SSH terminal in the robot. This is just a light skin over invoking SSH with some options that make it more tolerant about frequently-changing IP addresses. It also takes an argument: ``make term host=<robot ip>`` connects to a specific ip, and if you don’t specify ``host=`` the makefile will look for a robot connected via USB. Unlike ``push-api``, this command only needs the robot to be booted to function.
+The top level makefile (and the library makefile) also have a target called ``term``, which will give you an SSH terminal in the robot. This is just a light skin over invoking SSH with some options that make it more tolerant about frequently-changing IP addresses. It also takes an argument: ``make term host=<robot ip>`` connects to a specific ip, and if you don’t specify ``host=`` the makefile will look for a robot connected via USB. Unlike ``push-api``, this command only needs the robot to be booted to function.
 
 
 Tests and Linting
