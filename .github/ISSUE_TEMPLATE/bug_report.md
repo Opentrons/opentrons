@@ -20,8 +20,7 @@ assignees: ''
 
 <!--
   Use this section to describe your issue at a high level. Please include the
-  type of issue (bug, feature request, other) as well as any issues you could
-  find that may be related.
+  type of issue (bug, or other) as well as any issues you could find that may be related.
 -->
 
 ## current behavior

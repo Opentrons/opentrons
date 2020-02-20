@@ -2,7 +2,7 @@
 name: Feature request
 about: Suggest an a new feature or edit
 title: 'feat: '
-labels: 'feature'
+labels: 'feature-request'
 assignees: ''
 ---
 
@@ -19,9 +19,7 @@ assignees: ''
 ## Overview
 
 <!--
-  Use this section to describe your issue at a high level. Please include the
-  type of issue (bug, feature request, other) as well as any issues you could
-  find that may be related.
+  Use this section to describe your issue at a high level. Please include some context about why you want this feature. What would this feature allow you to accomplish? Are there any workarounds you use to partially achieve your goal? Are there any issues you could find that may be related?
 -->
 
 ## Implementation Details
