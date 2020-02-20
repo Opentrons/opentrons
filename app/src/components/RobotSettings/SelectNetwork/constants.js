@@ -1,6 +1,6 @@
 // @flow
 
-export const ACTIVE = 'ACTIVE'
+export const ACTIVE = 'active'
 
 export const CONNECT = 'connect'
 export const DISCONNECT = 'disconnect'

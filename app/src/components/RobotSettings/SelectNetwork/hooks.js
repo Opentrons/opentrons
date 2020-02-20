@@ -1,6 +1,5 @@
 // @flow
-import { useState, useEffect, useRef } from 'react'
-import find from 'lodash/find'
+import { useState, useEffect } from 'react'
 
 import {
   makeGetRobotWifiEapOptions,
@@ -13,45 +12,35 @@ import { getWifiList } from '../../../networking'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { State } from '../../../types'
 
-import { ACTIVE, CONNECT } from './constants'
+import { getActiveSsid, getSecurityType } from './utils'
+import { CONNECT } from './constants'
 
-const getActiveSsid = (list: WifiNetworkList) => {
-  const activeNetwork = find(list, ACTIVE)
-  return activeNetwork && activeNetwork.ssid
-}
+export const useStateSelectNetwork = (list: WifiNetworkList) => {
+  const activeSsid = getActiveSsid(list)
+  const activeNetworkingType = activeSsid ? CONNECT : null
+  const activeSecurityType = getSecurityType(list, activeSsid)
 
-export const useStateRef = (list: WifiNetworkList) => {
-  const [ssid, setSsid] = useState(getActiveSsid(list))
+  const [ssid, setSsid] = useState(null)
   const [previousSsid, setPreviousSsid] = useState(null)
-  const [networkingType, setNetworkingType] = useState(CONNECT)
+  const [networkingType, setNetworkingType] = useState(null)
   const [securityType, setSecurityType] = useState(null)
   const [modalOpen, setModalOpen] = useState(false)
 
-  const ssidRef = useRef(ssid)
-  const previousSsidRef = useRef(previousSsid)
-  const networkingTypeRef = useRef(networkingType)
-  const securityTypeRef = useRef(securityType)
-
   useEffect(() => {
-    ssidRef.current = ssid
-    previousSsidRef.current = previousSsid
-    networkingTypeRef.current = networkingType
-    securityTypeRef.current = securityType
-  }, [ssid, previousSsid, networkingType, securityType])
+    setSsid(activeSsid)
+    setNetworkingType(activeNetworkingType)
+    setSecurityType(activeSecurityType)
+  }, [activeSsid, activeNetworkingType, activeSecurityType])
 
   return [
     ssid,
     setSsid,
-    ssidRef,
     previousSsid,
     setPreviousSsid,
-    previousSsidRef,
     networkingType,
     setNetworkingType,
-    networkingTypeRef,
     securityType,
     setSecurityType,
-    securityTypeRef,
     modalOpen,
     setModalOpen,
   ]
@@ -61,8 +50,8 @@ export const stateSelector = (state: State, robot: ViewableRobot) => {
   const getEapCall = makeGetRobotWifiEapOptions()
   const getKeysCall = makeGetRobotWifiKeys()
   const getConfigureCall = makeGetRobotWifiConfigure()
-
   const list = getWifiList(state, robot.name)
+
   const { response: eapResponse } = getEapCall(state, robot)
   const { response: keysResponse } = getKeysCall(state, robot)
   const {

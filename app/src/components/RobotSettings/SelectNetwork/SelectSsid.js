@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
-import find from 'lodash/find'
 
 import { Icon, SelectField } from '@opentrons/components'
+import { getActiveSsid } from './utils'
 import styles from './styles.css'
 
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
@@ -41,13 +41,11 @@ const formatOptions = (list: WifiNetworkList): Array<SelectOptionOrGroup> =>
 
 export function SelectSsid(props: SelectSsidProps) {
   const { list, disabled, handleOnValueChange } = props
-  const connected = find(list, 'active')
-  const value = connected?.ssid || null
 
   return (
     <SelectField
       name={FIELD_NAME}
-      value={value}
+      value={getActiveSsid(list)}
       options={formatOptions(list)}
       placeholder="Select network"
       className={styles.wifi_dropdown}

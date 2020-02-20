@@ -59,7 +59,7 @@ export const getWifiList: (
   robotName: string
 ) => Array<Types.WifiNetwork> = createSelector(
   (state, robotName) => state.networking[robotName]?.wifiList,
-  (wifiList = []) => orderBy(uniqBy(wifiList, 'ssid'), ...LIST_ORDER)
+  (wifiList = []) => uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
 )
 
 export const getWifiKeys: (

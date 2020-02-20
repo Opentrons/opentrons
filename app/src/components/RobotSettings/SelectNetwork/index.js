@@ -1,7 +1,6 @@
 // @flow
 import React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import find from 'lodash/find'
 // import last from 'lodash/last'
 
 import {
@@ -35,11 +34,13 @@ import { WifiConnectModal } from './WifiConnectModal'
 import {
   DISCONNECT_WIFI_VALUE,
   JOIN_OTHER_VALUE,
+  CONNECT,
   DISCONNECT,
   JOIN,
 } from './constants'
 
-import { useStateRef, stateSelector } from './hooks'
+import { useStateSelectNetwork, stateSelector } from './hooks'
+import { getSecurityType, hasSecurityType } from './utils'
 
 // import type { State } from '../../../types'
 // import type { RequestState } from '../../../robot-api/types'
@@ -47,9 +48,6 @@ import type { ViewableRobot } from '../../../discovery/types'
 import type { PostDisconnectNetworkAction } from '../../../networking/types'
 
 const LIST_REFRESH_MS = 15000
-
-const hasSecurityType = (securityType: ?string, securityValue: string) =>
-  securityType === securityValue
 
 const networkingTypeTable = {
   [DISCONNECT_WIFI_VALUE]: DISCONNECT,
@@ -97,60 +95,49 @@ export const SelectNetwork = ({ robot }: Props) => {
   const [
     ssid,
     setSsid,
-    ssidRef,
     previousSsid,
     setPreviousSsid,
-    previousSsidRef,
     networkingType,
     setNetworkingType,
-    networkingTypeRef,
     securityType,
     setSecurityType,
-    securityTypeRef,
     modalOpen,
     setModalOpen,
-  ] = useStateRef(list)
+  ] = useStateSelectNetwork(list)
 
-  // This entire handler need to be refactored and tested
-  // this isn't working properly ATM
   const handleOnValueChange = (ssidValue: string) => {
-    const previousSsidValue = ssid
     const isJoinOrDisconnect =
       ssidValue === JOIN_OTHER_VALUE || ssidValue === DISCONNECT_WIFI_VALUE
-    const networkingTypeValue = networkingTypeTable[ssidValue] || networkingType
 
-    const network = find(list, { ssidValue })
-    const securityTypeValue = network?.securityType
+    const currentSsid = !isJoinOrDisconnect ? ssidValue : null
+    const currentPreviousSsid = ssid
+    const currentNetworkingType = networkingTypeTable[ssidValue] || CONNECT
+    const currentSecurityType = getSecurityType(list, ssidValue)
+    const currentModalOpen = hasSecurityType(securityType, NO_SECURITY)
 
-    const modalOpenValue = !hasSecurityType(securityType, NO_SECURITY)
     const canFetchEapOptions =
       hasSecurityType(securityType, WPA_EAP_SECURITY) || !securityType
-
-    if (!modalOpenValue) {
+    if (currentModalOpen) {
       dispatch(dispatchConfigure({ ssid: ssidValue }))
     } else if (canFetchEapOptions) {
       dispatch(fetchWifiEapOptions(robot))
       dispatch(fetchWifiKeys(robot))
     }
 
-    setSsid(!isJoinOrDisconnect ? ssidValue : null)
-    setPreviousSsid(previousSsidValue)
-    setSecurityType(securityTypeValue)
-    setNetworkingType(networkingTypeValue)
-    setModalOpen(modalOpenValue)
+    setSsid(currentSsid)
+    setPreviousSsid(currentPreviousSsid)
+    setNetworkingType(currentNetworkingType)
+    setSecurityType(currentSecurityType)
+    setModalOpen(!currentModalOpen)
   }
 
   const handleCancel = () => {
-    setSsid(previousSsid)
-    setPreviousSsid(null)
     setModalOpen(false)
   }
 
   const handleDisconnectWifi = () => {
-    const robotName = robot && robot?.name
-
-    if (robotName && previousSsid) {
-      dispatchApi(postDisconnectNetwork(robotName, previousSsid))
+    if (previousSsid) {
+      dispatchApi(postDisconnectNetwork(robot.name, previousSsid))
       setModalOpen(false)
     }
   }
@@ -171,13 +158,13 @@ export const SelectNetwork = ({ robot }: Props) => {
         )}
         {modalOpen && (
           <ConnectModal
-            ssid={ssidRef.current}
-            previousSsid={previousSsidRef.current}
-            networkingType={networkingTypeRef.current}
-            securityType={securityTypeRef.current}
+            ssid={ssid}
+            previousSsid={previousSsid}
+            networkingType={networkingType}
+            securityType={securityType}
             close={handleCancel}
           >
-            {networkingTypeRef.current === DISCONNECT ? (
+            {networkingType === DISCONNECT ? (
               <BottomButtonBar
                 buttons={[
                   { children: 'Cancel', onClick: handleCancel },
@@ -189,8 +176,8 @@ export const SelectNetwork = ({ robot }: Props) => {
               />
             ) : (
               <ConnectForm
-                ssid={ssidRef.current}
-                securityType={securityTypeRef.current}
+                ssid={ssid}
+                securityType={securityType}
                 eapOptions={eapOptions}
                 keys={keys}
                 configure={dispatchConfigure}
