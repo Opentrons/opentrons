@@ -33,7 +33,7 @@ export default function AttachTipModal(props: Props) {
   if (props.calibrationStep === '1') {
     instructions = (
       <span>
-        <p>Place a GEB tip on the {tipLocation} pipette before continuing.</p>
+        <p>Place an Opentrons tip on the {tipLocation} pipette before continuing.</p>
         <p>Confirm tip is attached to start calibration.</p>
       </span>
     )
@@ -41,7 +41,7 @@ export default function AttachTipModal(props: Props) {
   } else {
     instructions = (
       <span>
-        <p>Remove the GEB tip from the pipette. </p>
+        <p>Remove the Opentrons tip from the pipette.</p>
         <p>
           You must restart your robot to finish the initial robot calibration
           process and have the new settings take effect. It may take several
