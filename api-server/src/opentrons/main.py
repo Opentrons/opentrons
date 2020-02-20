@@ -20,7 +20,7 @@ try:
         import run as install_hardware_server
 except ImportError:
     async def install_hardware_server(sock_path, api):  # type: ignore
-        log.warning("Cannot start hardware aiohttp: missing dependency")
+        log.warning("Cannot start hardware server: missing dependency")
 
 
 log = logging.getLogger(__name__)
@@ -51,21 +51,21 @@ def _find_smoothie_file():
 async def _do_fw_update(new_fw_path, new_fw_ver):
     """ Update the connected smoothie board, with retries
 
-    When the API aiohttp boots, it talks to the motor controller board for the
+    When the API server boots, it talks to the motor controller board for the
     first time. Sometimes the board is in a bad state - it might have the
     wrong firmware version (i.e. this is the first boot after an update), or it
     might just not be communicating correctly. Sometimes, the motor controller
     not communicating correctly in fact means it needs a firmware update; other
     times, it might mean it just needs to be reset.
 
-    This function is called when the API aiohttp boots if either of the above
+    This function is called when the API server boots if either of the above
     cases happens. Its job is to make the motor controller board ready by
     updating its firmware, regardless of the state of the rest of the stack.
 
     To that end, this function uses the smoothie driver directly (so it can
     ignore the rest of the stack) and has a couple retries with different
     hardware line changes in between (so it can catch all failure modes). If
-    this method ultimately fails, it lets the aiohttp boot by telling it to
+    this method ultimately fails, it lets the server boot by telling it to
     consider itself virtual.
 
     After this function has completed, it is always safe to call
@@ -125,8 +125,8 @@ def initialize_robot(loop, hardware):
 def run(hardware, **kwargs):  # noqa(C901)
     """
     This function was necessary to separate from main() to accommodate for
-    aiohttp startup path on system 3.0, which is aiohttp.main. In the case where
-    the api is on system 3.0, aiohttp.main will redirect to this function with
+    server startup path on system 3.0, which is server.main. In the case where
+    the api is on system 3.0, server.main will redirect to this function with
     an additional argument of 'patch_old_init'. kwargs are hence used to allow
     the use of different length args
     """
@@ -139,7 +139,7 @@ def run(hardware, **kwargs):  # noqa(C901)
 
     logging_config.log_init(robot_conf.log_level)
 
-    log.info("API aiohttp version:  {}".format(__version__))
+    log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop, hardware)
         if ff.use_protocol_api_v2():
@@ -158,7 +158,7 @@ def run(hardware, **kwargs):  # noqa(C901)
                                         hardware._api))
         else:
             log.warning(
-                "Hardware aiohttp requested but apiv1 selected, not starting")
+                "Hardware server requested but apiv1 selected, not starting")
     server.run(
         hardware,
         kwargs.get('hostname'),
@@ -168,30 +168,30 @@ def run(hardware, **kwargs):  # noqa(C901)
 
 
 def main():
-    """ The main entrypoint for the Opentrons robot API aiohttp stack.
+    """ The main entrypoint for the Opentrons robot API server stack.
 
     This function
-    - creates and starts the aiohttp for both the RPC routes
-      handled by :py:mod:`opentrons.aiohttp.rpc` and the HTTP routes handled
-      by :py:mod:`opentrons.aiohttp.http`
+    - creates and starts the server for both the RPC routes
+      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
+      by :py:mod:`opentrons.server.http`
     - initializes the hardware interaction handled by either
       :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
 
-    This function does not return until the aiohttp is brought down.
+    This function does not return until the server is brought down.
     """
 
     arg_parser = ArgumentParser(
         description="Opentrons robot software",
         parents=[build_arg_parser()])
     arg_parser.add_argument(
-        '--hardware-aiohttp', action='store_true',
-        help='Run a jsonrpc aiohttp allowing rpc to the'
+        '--hardware-server', action='store_true',
+        help='Run a jsonrpc server allowing rpc to the'
         ' hardware controller. Only works on buildroot '
         'because extra dependencies are required.')
     arg_parser.add_argument(
-        '--hardware-aiohttp-socket', action='store',
+        '--hardware-server-socket', action='store',
         default='/var/run/opentrons-hardware.sock',
-        help='Override for the hardware aiohttp socket')
+        help='Override for the hardware server socket')
     args = arg_parser.parse_args()
 
     if ff.use_protocol_api_v2():

@@ -1,59 +1,123 @@
-import opentrons.server as server
-from argparse import ArgumentParser
+#!/usr/bin/env python
+
+import asyncio
+import logging
+import shutil
+import tempfile
+import threading
+import time
+import traceback
+
+from typing import Optional
+from aiohttp import web
+
+from opentrons.config import CONFIG
+from .rpc import RPCServer
+from .http import HTTPServer
+from opentrons.api.routers import MainRouter
+
+from opentrons.hardware_control.types import HardwareAPILike
+
+log = logging.getLogger(__name__)
 
 
-def build_arg_parser():
-    arg_parser = ArgumentParser(
-            description="Opentrons application aiohttp",
-            prog="opentrons.aiohttp.main",
-            add_help=False
-    )
-    arg_parser.add_argument(
-        "-H", "--hostname",
-        help="TCP/IP hostname to serve on (default: %(default)r)",
-        default="localhost"
-    )
-    arg_parser.add_argument(
-        "-P", "--port",
-        help="TCP/IP port to serve on (default: %(default)r)",
-        type=int,
-        default="8080"
-    )
-    arg_parser.add_argument(
-        "-U", "--path",
-        help="Unix file system path to serve on. Specifying a path will cause "
-             "hostname and port arguments to be ignored.",
-    )
-    return arg_parser
+@web.middleware
+async def error_middleware(request, handler):
+    try:
+        response = await handler(request)
+    except web.HTTPNotFound:
+        log.exception("Exception handler for request {}".format(request))
+        data = {
+            'message': 'File was not found at {}'.format(request)
+        }
+        response = web.json_response(data, status=404)
+    except Exception as e:
+        log.exception("Exception in handler for request {}".format(request))
+        data = {
+            'message': 'An unexpected error occured - {}'.format(e),
+            'traceback': traceback.format_exc()
+        }
+        response = web.json_response(data, status=500)
+
+    return response
 
 
-def main():
-    arg_parser = build_arg_parser()
-    # System 3.0 aiohttp startup is:
-    # python -m opentrons.aiohttp.main -U $OT_SERVER_UNIX_SOCKET_PATH
-    # opentrons.aiohttp.main:init
-    # In which case, we add a mock argument specifically to indicate that
-    # this is a system 3.0 init path. This argument otherwise has no meaning
-    arg_parser.add_argument(
-        'patch_old_init',
-        metavar='OLD_STYLE_INIT',
-        nargs='?',
-        default=None,
-        help="The old-style way to initialize the aiohttp with a function name."
-             " Use to force the system to start with opentrons.main "
-             "instead of aiohttp.main"
-    )
-    args = arg_parser.parse_args()
+class ThreadedAsyncLock:
+    """ A thread-safe async lock
 
-    # If running system 3.0, then redirect to new 3.4 entrypoint
-    # in opentrons.main
-    if args.patch_old_init is not None:
-        import opentrons.main
-        opentrons.main.run(**vars(args))
-    else:
-        server.run(args.hostname, args.port, args.path)
-        arg_parser.exit(message="Stopped\n")
+    This is required to properly lock access to motion calls, which are
+    a) done in async contexts (rpc methods and http methods) and should
+       block as little as possible
+    b) done from several different threads (rpc workers and main thread)
+
+    This is a code wart that needs to be removed. It can be removed by
+    - making smoothie async so we don't need worker threads anymore
+    - removing said threads
+
+    This object can be used as either an asynchronous context manager using
+    ``async with`` or a synchronous context manager using ``with``.
+    """
+
+    def __init__(self):
+        self._thread_lock = threading.RLock()
+
+    async def __aenter__(self):
+        pref = f"[ThreadedAsyncLock tid {threading.get_ident()} " \
+               f"task {asyncio.Task.current_task()}] "
+        log.debug(pref + 'will acquire')
+        then = time.perf_counter()
+        while not self._thread_lock.acquire(blocking=False):
+            await asyncio.sleep(0.1)
+        now = time.perf_counter()
+        log.debug(pref + f'acquired in {now - then}s')
+
+    async def __aexit__(self, exc_type, exc, tb):
+        log.debug(f"[ThreadedAsyncLock tid {threading.get_ident()} "
+                  f"task {asyncio.Task.current_task()}] will release")
+        self._thread_lock.release()
+
+    def __enter__(self):
+        self._thread_lock.acquire()
+
+    def __exit__(self, exc_type, exc, tb):
+        self._thread_lock.release()
 
 
-if __name__ == "__main__":
-    main()
+# Support for running using aiohttp CLI.
+# See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
+def init(hardware: 'HardwareAPILike' = None,
+         loop: asyncio.AbstractEventLoop = None):
+    """
+    Builds an application and sets up RPC and HTTP servers with it.
+
+    :param loop: A specific aiohttp event loop to use. If not specified, the
+                 aiohttp will use the default event loop.
+    :param hardware: The hardware manager or hardware adapter to connect to.
+                     If not specified, the aiohttp will use
+                     :py:attr:`opentrons.hardware`
+    """
+    app = web.Application(middlewares=[error_middleware])
+    app['com.opentrons.hardware'] = hardware
+    app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
+    app['com.opentrons.rpc'] = RPCServer(
+        app, MainRouter(
+            hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
+    app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
+    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+
+    async def dispose_response_file_tempdir(app):
+        temppath = app.get('com.opentrons.response_file_tempdir')
+        if temppath:
+            try:
+                shutil.rmtree(temppath)
+            except Exception:
+                log.exception(f"failed to remove app temp path {temppath}")
+
+    app.on_shutdown.append(dispose_response_file_tempdir)
+    app.on_shutdown.freeze()
+    return app
+
+
+def run(hardware: HardwareAPILike, host: str, port: int, path: Optional[str]):
+    """Start the aiohttp web service"""
+    web.run_app(init(hardware=hardware), host=host, port=port, path=path)
