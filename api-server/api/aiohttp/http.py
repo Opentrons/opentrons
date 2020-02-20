@@ -1,8 +1,7 @@
 import logging
 from . import endpoints as endp
 from opentrons import config
-from .endpoints import (networking, control, settings, update)
-from opentrons.deck_calibration import endpoints as dc_endp
+from .endpoints import (networking, control, settings, update, deck_calibration)
 
 log = logging.getLogger(__name__)
 
@@ -55,9 +54,9 @@ class HTTPServer(object):
                 '/logs', self.log_file_path, show_index=True)
 
         self.app.router.add_post(
-            '/calibration/deck/start', dc_endp.start)
+            '/calibration/deck/start', deck_calibration.start)
         self.app.router.add_post(
-            '/calibration/deck', dc_endp.dispatch)
+            '/calibration/deck', deck_calibration.dispatch)
         self.app.router.add_get(
             '/pipettes', control.get_attached_pipettes)
         self.app.router.add_get(
