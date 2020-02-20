@@ -33,7 +33,9 @@ export default function AttachTipModal(props: Props) {
   if (props.calibrationStep === '1') {
     instructions = (
       <span>
-        <p>Place an Opentrons tip on the {tipLocation} pipette before continuing.</p>
+        <p>
+          Place an Opentrons tip on the {tipLocation} pipette before continuing.
+        </p>
         <p>Confirm tip is attached to start calibration.</p>
       </span>
     )
