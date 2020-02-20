@@ -37,12 +37,7 @@ class SynchronousAdapter(HardwareAPILike):
         outer_loop = asyncio.new_event_loop()
         no_loop_args = [arg for arg in args
                         if not isinstance(arg, asyncio.AbstractEventLoop)]
-        if asyncio.iscoroutinefunction(builder):
-            api = outer_loop.run_until_complete(
-                ThreadManager(builder, *no_loop_args, **kwargs)
-            )
-        else:
-            api = ThreadManager(builder, *no_loop_args, **kwargs)
+        api = ThreadManager(builder, *no_loop_args, **kwargs)
         return cls(api)
 
     def __init__(self, api: API) -> None:

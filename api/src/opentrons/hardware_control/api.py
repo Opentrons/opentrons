@@ -101,7 +101,7 @@ class API(HardwareAPILike):
         return api_instance
 
     @classmethod
-    def build_hardware_simulator(
+    async def build_hardware_simulator(
             cls,
             attached_instruments: Dict[top_types.Mount, Dict[str, Optional[str]]] = None,  # noqa E501
             attached_modules: List[str] = None,

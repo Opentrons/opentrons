@@ -54,8 +54,7 @@ class ThreadManager(HardwareAPILike):
         try:
             self._loop.call_soon_threadsafe(self._loop.stop)
         except Exception as e:
-            MODULE_LOG.exception(f'Exception while cleaning up'
-                                 f'Hardware Thread Manager: {e}')
+            pass
         self._thread.join()
 
     def __del__(self):

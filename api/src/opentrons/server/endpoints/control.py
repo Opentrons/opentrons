@@ -264,7 +264,7 @@ async def disengage_axes(request):
         message = "Invalid axes: {}".format(', '.join(invalid_axes))
         status = 400
     else:
-        await hw.disengage_axes([ax.upper() for ax in axes])
+        await hw.disengage_axes([Axis[ax.upper()] for ax in axes])
         message = "Disengaged axes: {}".format(', '.join(axes))
         status = 200
     return web.json_response({"message": message}, status=status)
