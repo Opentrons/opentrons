@@ -6,6 +6,7 @@ import last from 'lodash/last'
 import {
   useDispatchApiRequest,
   getRequestById,
+  dismissRequest,
   PENDING,
   SUCCESS,
   FAILURE,
@@ -44,8 +45,8 @@ import {
 import { useStateSelectNetwork, stateSelector } from './hooks'
 import { getSecurityType, hasSecurityType, formatLoaderMessage } from './utils'
 
-// import type { State } from '../../../types'
-// import type { RequestState } from '../../../robot-api/types'
+import type { State } from '../../../types'
+import type { RequestState } from '../../../robot-api/types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { PostDisconnectNetworkAction } from '../../../networking/types'
 
@@ -82,31 +83,24 @@ export const SelectNetwork = ({ robot }: Props) => {
     setSecurityType(null)
   }, [setSsid, setPreviousSsid, setNetworkingType, setSecurityType])
 
-  const handleDisconnectWifiFailure = useCallback(() => {
-    console.log('Failed')
-  }, [])
-
   const [
     dispatchApi,
     requestIds,
   ] = useDispatchApiRequest<PostDisconnectNetworkAction>()
-  const disconnectRequestStatus = useSelector<State, RequestState | null>(
-    state => getRequestById(state, last(requestIds))
-  )?.status
-  const pending = disconnectRequestStatus === PENDING
+
+  const latestRequestId = last(requestIds)
+  const disconnectRequest = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, latestRequestId)
+  )
+
+  const { status, error, response } = disconnectRequest || {}
+  const pending = status === PENDING
 
   React.useEffect(() => {
-    if (disconnectRequestStatus === SUCCESS) {
+    if (status === SUCCESS) {
       handleDisconnectWifiSuccess()
     }
-    if (disconnectRequestStatus === FAILURE) {
-      handleDisconnectWifiFailure()
-    }
-  }, [
-    disconnectRequestStatus,
-    handleDisconnectWifiSuccess,
-    handleDisconnectWifiFailure,
-  ])
+  }, [status, handleDisconnectWifiSuccess])
 
   const dispatch = useDispatch()
   const dispatchRefresh = () => dispatch(fetchWifiList(robot.name))
@@ -209,6 +203,14 @@ export const SelectNetwork = ({ robot }: Props) => {
             request={configRequest}
             response={configResponse}
             close={dispatch(clearConfigureWifiResponse(robot))}
+          />
+        )}
+        {status === FAILURE && (
+          <WifiConnectModal
+            error={error}
+            request={{ ssid: previousSsid }}
+            response={response}
+            close={() => dispatch(dismissRequest(latestRequestId))}
           />
         )}
       </Portal>
