@@ -13,6 +13,10 @@
 ; https://github.com/JedWatson/react-select/issues/3612
 .*/node_modules/react-select/.*
 
+[declarations]
+; read type signatures from node_modules but ignore flow errors within
+.*/node_modules/.*
+
 [include]
 
 [libs]
