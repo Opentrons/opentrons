@@ -71,7 +71,11 @@ export function DropdownField(props: DropdownFieldProps) {
           autoFocus={props.autoFocus}
         >
           {options.map(opt => (
-            <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
+            <option
+              key={opt.value}
+              value={opt.value}
+              disabled={opt.disabled && opt.disabled}
+            >
               {opt.name}
             </option>
           ))}
