@@ -17,7 +17,7 @@
   "peerDependencies": {
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
-    "react": "^16.8.6",
+    "react": "16.8.6",
     "react-router-dom": "^5.0.1"
   },
   "dependencies": {
