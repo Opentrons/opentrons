@@ -63,11 +63,10 @@ class SynchronousAdapter(HardwareAPILike):
 
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
-        print(f'CALL RUN CORO SYNC CALLED {asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)}')
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
         print(f'CALL CORO SYNC To CALL {to_call}')
         print(f'CALL CORO SYNC loop {loop}')
-        print(f'CALL CORO SYNC loop {loop.my_id}')
+        # print(f'CALL CORO SYNC loop {loop.my_id}')
         print(f'CALL CORO SYNC . {threading.currentThread().getName()} "')
         return fut.result()
 

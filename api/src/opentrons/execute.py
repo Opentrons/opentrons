@@ -78,28 +78,31 @@ def get_protocol_api(
                           custom labware.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
-    if not _HWCONTROL:
+    global _HWCONTROL
+    if not _HWCONTROL or _HWCONTROL._loop.is_closed():
     # Build a hardware controller in a worker thread, which is necessary
     # because ipython runs its notebook in asyncio but the notebook
     # is at script/repl scope not function scope and is synchronous so
     # you can't control the loop from inside. If we update to
     # IPython 7 we can avoid this, but for now we can't
-        def _build_hwcontroller():
-            global _HWCONTROL
-            loop = asyncio.new_event_loop()
-            asyncio.set_event_loop(loop)
-            loop.my_id = 'MANAGEDLOOP'
-            print(f'EXECUTE BHWC. {threading.currentThread().getName()}')
-            _HWCONTROL = loop.run_until_complete(API.build_hardware_controller(loop=loop))
-            print(f'EXECUTE BHWC AFTER HWC. {threading.currentThread().getName()}')
-            # loop.run_forever()
-            # loop.close()
+        _HWCONTROL = ThreadManager(API.build_hardware_controller)
 
-        thread = threading.Thread(
-            target=_build_hwcontroller,
-            name="ExecuteHWCThread")
-        thread.start()
-        thread.join()
+        # def _build_hwcontroller():
+        #     global _HWCONTROL
+        #     loop = asyncio.new_event_loop()
+        #     asyncio.set_event_loop(loop)
+        #     loop.my_id = 'MANAGEDLOOP'
+        #     print(f'EXECUTE BHWC. {threading.currentThread().getName()}')
+        #     _HWCONTROL = loop.run_until_complete(API.build_hardware_controller(loop=loop))
+        #     print(f'EXECUTE BHWC AFTER HWC. {threading.currentThread().getName()}')
+        #     # loop.run_forever()
+        #     # loop.close()
+
+        # thread = threading.Thread(
+        #     target=_build_hwcontroller,
+        #     name="ExecuteHWCThread")
+        # thread.start()
+        # thread.join()
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
@@ -282,6 +285,7 @@ def execute(protocol_file: TextIO,
                      extra_labware=extra_labware,
                      extra_data=extra_data)
     if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
+        print('DID OLD')
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
         opentrons.robot.discover_modules()
@@ -293,6 +297,7 @@ def execute(protocol_file: TextIO,
             'Internal error: Only Python protocols may be executed in v1'
         exec(protocol.contents, {})
     else:
+        print('DID NEW')
         bundled_data = getattr(protocol, 'bundled_data', {})
         bundled_data.update(extra_data)
         gpa_extras = getattr(protocol, 'extra_labware', None) or None

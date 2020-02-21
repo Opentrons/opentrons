@@ -20,13 +20,13 @@ def backing_hardware(monkeypatch, virtual_smoothie_env):
     # give it instruments
     gai_mock = mock.Mock()
 
-    async def dummy_delay(duration_s):
+    async def dummy_delay(self, duration_s):
         pass
 
-    monkeypatch.setattr(controller,
+    monkeypatch.setattr(controller.Controller,
                         'get_attached_instruments',
                         gai_mock)
-    monkeypatch.setattr(controller, 'delay', dummy_delay)
+    monkeypatch.setattr(controller.Controller, 'delay', dummy_delay)
     gai_mock.return_value = {types.Mount.RIGHT: {'model': None, 'id': None},
                              types.Mount.LEFT: {'model': None, 'id': None}}
     return gai_mock

@@ -5,7 +5,7 @@ import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
-from opentrons.hardware_control import types, adapters, API, HardwareAPILike
+from opentrons.hardware_control import types, adapters, API, HardwareAPILike, ThreadManager
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
@@ -214,6 +214,10 @@ class HardwareManager:
         self._current = adapters.SynchronousAdapter.build(
             API.build_hardware_simulator)
         return self._current
+
+    def __del__(self):
+        if isinstance(self._current._api, ThreadManager):
+            self._current._api.clean_up()
 
 
 def clamp_value(

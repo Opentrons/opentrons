@@ -1111,6 +1111,7 @@ class API(HardwareAPILike):
         their value is taken from the pipette configuration.
         """
         instr = self._attached_instruments[mount]
+        print(f'API PICK UP TIP {instr}, hastip:{instr.has_tip}')
         assert instr
         assert not instr.has_tip, 'Tip already attached'
         instr_ax = Axis.by_mount(mount)
