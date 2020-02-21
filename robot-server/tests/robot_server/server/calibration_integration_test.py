@@ -3,7 +3,7 @@ import numpy as np
 from opentrons import types
 
 from opentrons import deck_calibration as dc
-from opentrons.deck_calibration import endpoints
+from robot_server.aiohttp.endpoints import deck_calibration as endpoints
 from opentrons.hardware_control.types import CriticalPoint
 
 # Note that several values in this file have target/expected values that do not

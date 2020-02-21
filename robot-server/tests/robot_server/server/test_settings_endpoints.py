@@ -3,7 +3,7 @@ import os
 
 import pytest
 
-from opentrons.server import endpoints
+from robot_server.aiohttp import endpoints
 from opentrons.config import pipette_config
 from opentrons import config, types
 

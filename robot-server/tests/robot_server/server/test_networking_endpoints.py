@@ -4,8 +4,8 @@ import random
 import tempfile
 import pytest
 from opentrons.system import nmcli
-from opentrons.server import init
-from opentrons.server.endpoints import networking
+from robot_server.aiohttp.main import init
+from robot_server.aiohttp.endpoints import networking
 
 """
 All mocks in this test suite represent actual output from nmcli commands

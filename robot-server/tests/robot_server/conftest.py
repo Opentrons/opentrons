@@ -27,9 +27,9 @@ from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
-from opentrons.server import rpc
+from robot_server.aiohttp import rpc
 from opentrons import config, types
-from opentrons.server import init
+from robot_server.aiohttp.main import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import adapters, API
@@ -271,7 +271,7 @@ def session(loop, aiohttp_client, request, main_router):
     If not set root will be defaulted to None
     """
     from aiohttp import web
-    from opentrons.server import error_middleware
+    from robot_server.aiohttp.main import error_middleware
     root = None
     try:
         root = request.getfixturevalue('root')

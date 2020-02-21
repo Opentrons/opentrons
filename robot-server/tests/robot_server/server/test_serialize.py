@@ -2,7 +2,7 @@ import json
 import pytest
 
 from collections import OrderedDict
-from opentrons.server import serialize
+from robot_server.aiohttp import serialize
 
 
 @pytest.fixture
