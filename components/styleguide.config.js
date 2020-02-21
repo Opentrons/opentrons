@@ -74,6 +74,9 @@ module.exports = {
 
     return `import {${name}} from '@opentrons/components'`
   },
+  getExampleFilename(componentPath) {
+    return componentPath.replace(/\.js$/, '.md')
+  },
   styles: {
     StyleGuide: {
       '@global body': {

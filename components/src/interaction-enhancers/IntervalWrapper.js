@@ -1,21 +1,29 @@
 // @flow
+// TODO(mc, 2020-02-18): delete this component once last usage is removed in
+// app/src/components/RobotSettings/SelectNetwork/index.js
 import * as React from 'react'
 
-type Props = {
+export type IntervalWrapperProps = {|
   /** Function/Action to call at an interval */
   refresh: () => mixed,
   /** Interval in milliseconds to call refresh */
   interval: number,
   /** Component to wrap in interval */
   children: React.Node,
-}
+|}
 
-type State = {
+type IntervalWrapperState = {|
   intervalId: ?IntervalID,
-}
+|}
 
-export default class IntervalWrapper extends React.Component<Props, State> {
-  constructor(props: Props) {
+/**
+ * @deprecated Use {@link useInterval} hook instead
+ */
+export class IntervalWrapper extends React.Component<
+  IntervalWrapperProps,
+  IntervalWrapperState
+> {
+  constructor(props: IntervalWrapperProps) {
     super(props)
     this.state = {
       intervalId: null,

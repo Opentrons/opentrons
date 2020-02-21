@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 
-type Props = {
+export type RobotCoordsForeignDivProps = {|
   width?: string | number,
   height?: string | number,
   x?: string | number,
@@ -10,9 +10,9 @@ type Props = {
   className?: string,
   innerDivProps?: React.ElementProps<'div'>,
   transformWithSVG?: boolean,
-}
+|}
 
-const RobotCoordsForeignDiv = (props: Props) => {
+export const RobotCoordsForeignDiv = (props: RobotCoordsForeignDivProps) => {
   const {
     children,
     x = 0,
@@ -41,5 +41,3 @@ const RobotCoordsForeignDiv = (props: Props) => {
     </foreignObject>
   )
 }
-
-export default RobotCoordsForeignDiv

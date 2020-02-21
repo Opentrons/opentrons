@@ -2,7 +2,7 @@
 
 import * as React from 'react'
 
-import Tooltip from './Tooltip'
+import { Tooltip } from './Tooltip'
 
 import type { TooltipChildProps, TooltipProps } from './Tooltip'
 
@@ -14,9 +14,9 @@ export type HoverTooltipHandlers = TooltipChildProps<{
   onMouseLeave: (SyntheticMouseEvent<*>) => void,
 }>
 
-type Props = TooltipProps<HoverTooltipHandlers>
+export type HoverTooltipProps = TooltipProps<HoverTooltipHandlers>
 
-type State = { isOpen: boolean }
+type HoverTooltipState = {| isOpen: boolean |}
 
 /**
  * Tooltip component that triggers on `MouseEnter` and `MouseLeave`. See
@@ -31,11 +31,14 @@ type State = { isOpen: boolean }
  * |}
  * ```
  */
-class HoverTooltip extends React.Component<Props, State> {
+export class HoverTooltip extends React.Component<
+  HoverTooltipProps,
+  HoverTooltipState
+> {
   openTimeout: ?TimeoutID
   closeTimeout: ?TimeoutID
 
-  constructor(props: Props) {
+  constructor(props: HoverTooltipProps) {
     super(props)
     this.openTimeout = null
     this.closeTimeout = null
@@ -75,5 +78,3 @@ class HoverTooltip extends React.Component<Props, State> {
     )
   }
 }
-
-export default HoverTooltip

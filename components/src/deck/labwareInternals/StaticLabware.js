@@ -5,11 +5,11 @@ import * as React from 'react'
 import flatMap from 'lodash/flatMap'
 import cx from 'classnames'
 
-import Well from './Well'
-import styles from './staticLabware.css'
+import { LabwareOutline } from '../LabwareOutline'
+import { Well } from './Well'
+import styles from './StaticLabware.css'
 
 import type { LabwareDefinition2, LabwareWell } from '@opentrons/shared-data'
-import LabwareOutline from '../LabwareOutline'
 import type { WellMouseEvent } from './types'
 
 export type StaticLabwareProps = {|
@@ -33,7 +33,7 @@ const TipDecoration = React.memo(function TipDecoration(props: {
   return null
 })
 
-function StaticLabware(props: StaticLabwareProps) {
+function StaticLabwareComponent(props: StaticLabwareProps) {
   const { isTiprack } = props.definition.parameters
 
   return (
@@ -83,4 +83,6 @@ function StaticLabware(props: StaticLabwareProps) {
   )
 }
 
-export default React.memo<StaticLabwareProps>(StaticLabware)
+export const StaticLabware = React.memo<StaticLabwareProps>(
+  StaticLabwareComponent
+)

@@ -1,9 +1,5 @@
 // @flow
 // opentrons components library
-import LabwareWrapperStyles from './deck/LabwareWrapper.css'
-export const allStyles = {
-  LabwareWrapper: LabwareWrapperStyles,
-}
 
 export * from './constants'
 export * from './hooks'
@@ -13,7 +9,6 @@ export * from './utils'
 export * from './alerts'
 export * from './buttons'
 export * from './controls'
-export * from './CenteredTextSvg'
 export * from './deck'
 export * from './forms'
 export * from './icons'

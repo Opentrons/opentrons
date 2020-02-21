@@ -7,8 +7,8 @@ import type {
 } from '@opentrons/shared-data'
 
 import type { Mount } from '../robot-types'
-import InfoItem from './InfoItem.js'
-import InstrumentDiagram from './InstrumentDiagram'
+import { InfoItem } from './InfoItem.js'
+import { InstrumentDiagram } from './InstrumentDiagram'
 
 import styles from './instrument.css'
 
@@ -33,7 +33,7 @@ export type InstrumentInfoProps = {|
   children?: React.Node,
 |}
 
-export default function InstrumentInfo(props: InstrumentInfoProps) {
+export function InstrumentInfo(props: InstrumentInfoProps) {
   const className = cx(
     styles.pipette,
     styles[props.mount],

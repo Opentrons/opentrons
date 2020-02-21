@@ -6,11 +6,11 @@ import styles from './forms.css'
 
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
-type Props = {|
+export type InputFieldProps = {|
   /** field is disabled if value is true */
   disabled?: boolean,
   /** change handler */
-  onChange?: (event: SyntheticInputEvent<*>) => mixed,
+  onChange?: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   /** classes to apply to outer element */
   className?: string,
   /** inline label text. DEPRECATED */
@@ -36,11 +36,11 @@ type Props = {|
   /** optional input type (default "text") */
   type?: 'text' | 'password',
   /** mouse click handler */
-  onClick?: (event: SyntheticMouseEvent<*>) => mixed,
+  onClick?: (event: SyntheticMouseEvent<HTMLInputElement>) => mixed,
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<*>) => mixed,
+  onFocus?: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
+  onBlur?: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
   /** makes input field read-only */
   readOnly?: ?boolean,
   /** html tabindex property */
@@ -49,7 +49,7 @@ type Props = {|
   autoFocus?: boolean,
 |}
 
-export default function InputField(props: Props) {
+export function InputField(props: InputFieldProps) {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,
@@ -80,7 +80,7 @@ export default function InputField(props: Props) {
 }
 
 // TODO(mc, 2018-02-21): maybe simplify further and split out?
-function Input(props: Props) {
+function Input(props: InputFieldProps) {
   const error = props.error != null
 
   return (

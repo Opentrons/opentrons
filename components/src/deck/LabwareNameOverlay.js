@@ -3,13 +3,13 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './LabwareNameOverlay.css'
 
-type Props = {
+export type LabwareNameOverlayProps = {|
   title: string,
   subtitle?: ?string,
   className?: string,
-}
+|}
 
-export default function LabwareNameOverlay(props: Props) {
+export function LabwareNameOverlay(props: LabwareNameOverlayProps) {
   const { title, subtitle, className } = props
 
   return (

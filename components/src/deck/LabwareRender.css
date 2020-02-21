@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '..';
 
 .highlighted_well {
   stroke: var(--c-highlight);
