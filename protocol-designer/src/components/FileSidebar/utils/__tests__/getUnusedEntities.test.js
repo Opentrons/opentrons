@@ -9,12 +9,17 @@ import {
   TEMPDECK,
   TEMPERATURE_DEACTIVATED,
 } from '../../../../constants'
-import { getUnusedPipettes, getUnusedModules } from '../getUnusedEntities'
+import { getUnusedEntities } from '../getUnusedEntities'
+
+const getUnusedModules = (entities, commands) =>
+  getUnusedEntities(entities, commands, 'moduleId')
+const getUnusedPipettes = (entities, commands) =>
+  getUnusedEntities(entities, commands, 'pipette')
 
 describe('getUnusedEntities', () => {
   describe('getUnusedPipettes', () => {
     test('pipette entities not used in steps are returned', () => {
-      const commands = {
+      const stepForms = {
         step123: {
           pipette: 'pipette123',
           id: 'step123',
@@ -40,7 +45,7 @@ describe('getUnusedEntities', () => {
         },
       }
 
-      const result = getUnusedPipettes(pipettesOnDeck, commands)
+      const result = getUnusedPipettes(pipettesOnDeck, stepForms)
 
       expect(result).toEqual([pipettesOnDeck.pipette456])
     })
@@ -48,7 +53,7 @@ describe('getUnusedEntities', () => {
 
   describe('getUnusedModules', () => {
     test('module entities not used in steps are returned', () => {
-      const commands = {
+      const stepForms = {
         step123: {
           moduleId: 'magnet123',
           id: 'step123',
@@ -83,7 +88,7 @@ describe('getUnusedEntities', () => {
         },
       }
 
-      const result = getUnusedModules(modulesOnDeck, commands)
+      const result = getUnusedModules(modulesOnDeck, stepForms)
 
       expect(result).toEqual([modulesOnDeck.temperature456])
     })
