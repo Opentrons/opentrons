@@ -12,7 +12,7 @@ import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from '../modals/modal.css'
-import { getUnusedModules, getUnusedPipettes } from './utils'
+import { getUnusedEntities } from './utils'
 import styles from './FileSidebar.css'
 
 import type { PDProtocolFile } from '../../file-types'
@@ -157,8 +157,16 @@ export function FileSidebar(props: Props) {
   const cancelModal = () => setShowExportWarningModal(false)
 
   const noCommands = downloadData && downloadData.fileData.commands.length === 0
-  const pipettesWithoutStep = getUnusedPipettes(pipettesOnDeck, savedStepForms)
-  const modulesWithoutStep = getUnusedModules(modulesOnDeck, savedStepForms)
+  const pipettesWithoutStep = getUnusedEntities(
+    pipettesOnDeck,
+    savedStepForms,
+    'pipette'
+  )
+  const modulesWithoutStep = getUnusedEntities(
+    modulesOnDeck,
+    savedStepForms,
+    'moduleId'
+  )
 
   const hasWarning =
     noCommands || modulesWithoutStep.length || pipettesWithoutStep.length
