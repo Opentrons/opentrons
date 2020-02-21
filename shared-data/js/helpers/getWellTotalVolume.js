@@ -1,7 +1,7 @@
 // @flow
-import type { LabwareDefinition2 } from '../'
+import type { LabwareDefinition2 } from '../types'
 
-const getWellTotalVolume = (
+export const getWellTotalVolume = (
   labwareDef: LabwareDefinition2,
   wellName: string
 ): ?number => {
@@ -14,5 +14,3 @@ const getWellTotalVolume = (
   }
   return well.totalLiquidVolume
 }
-
-export default getWellTotalVolume
