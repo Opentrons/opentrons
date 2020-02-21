@@ -11,86 +11,77 @@ import {
 } from '../../../../constants'
 import { getUnusedEntities } from '../getUnusedEntities'
 
-const getUnusedModules = (entities, commands) =>
-  getUnusedEntities(entities, commands, 'moduleId')
-const getUnusedPipettes = (entities, commands) =>
-  getUnusedEntities(entities, commands, 'pipette')
-
 describe('getUnusedEntities', () => {
-  describe('getUnusedPipettes', () => {
-    test('pipette entities not used in steps are returned', () => {
-      const stepForms = {
-        step123: {
-          pipette: 'pipette123',
-          id: 'step123',
-          stepType: 'transfer',
-        },
-      }
-      const pipettesOnDeck = {
-        pipette123: {
-          name: 'string',
-          id: 'pipette123',
-          tiprackDefURI: 'test',
-          tiprackLabwareDef: fixture_tiprack_10_ul,
-          spec: fixtureP10Single,
-          mount: 'right',
-        },
-        pipette456: {
-          name: 'string',
-          id: 'pipette456',
-          tiprackDefURI: 'test',
-          tiprackLabwareDef: fixture_tiprack_10_ul,
-          spec: fixtureP300Single,
-          mount: 'left',
-        },
-      }
+  test('pipette entities not used in steps are returned', () => {
+    const stepForms = {
+      step123: {
+        pipette: 'pipette123',
+        id: 'step123',
+        stepType: 'transfer',
+      },
+    }
+    const pipettesOnDeck = {
+      pipette123: {
+        name: 'string',
+        id: 'pipette123',
+        tiprackDefURI: 'test',
+        tiprackLabwareDef: fixture_tiprack_10_ul,
+        spec: fixtureP10Single,
+        mount: 'right',
+      },
+      pipette456: {
+        name: 'string',
+        id: 'pipette456',
+        tiprackDefURI: 'test',
+        tiprackLabwareDef: fixture_tiprack_10_ul,
+        spec: fixtureP300Single,
+        mount: 'left',
+      },
+    }
 
-      const result = getUnusedPipettes(pipettesOnDeck, stepForms)
+    const result = getUnusedEntities(pipettesOnDeck, stepForms, 'pipette')
 
-      expect(result).toEqual([pipettesOnDeck.pipette456])
-    })
+    expect(result).toEqual([pipettesOnDeck.pipette456])
   })
 
-  describe('getUnusedModules', () => {
-    test('module entities not used in steps are returned', () => {
-      const stepForms = {
-        step123: {
-          moduleId: 'magnet123',
-          id: 'step123',
-          magnetAction: 'engage',
-          engageHeight: '10',
-          stepType: 'magnet',
-          stepName: 'magnet',
-          stepDetails: '',
-        },
-      }
-      const modulesOnDeck = {
-        magnet123: {
-          id: 'magnet123',
+  test('module entities not used in steps are returned', () => {
+    const stepForms = {
+      step123: {
+        moduleId: 'magnet123',
+        id: 'step123',
+        magnetAction: 'engage',
+        engageHeight: '10',
+        stepType: 'magnet',
+        stepName: 'magnet',
+        stepDetails: '',
+      },
+    }
+    const modulesOnDeck = {
+      magnet123: {
+        id: 'magnet123',
+        type: MAGDECK,
+        model: 'GEN1',
+        slot: '3',
+        moduleState: {
           type: MAGDECK,
-          model: 'GEN1',
-          slot: '3',
-          moduleState: {
-            type: MAGDECK,
-            engaged: false,
-          },
+          engaged: false,
         },
-        temperature456: {
-          id: 'temperature456',
-          type: 'tempdeck',
-          model: 'GEN1',
-          moduleState: {
-            type: TEMPDECK,
-            status: TEMPERATURE_DEACTIVATED,
-            targetTemperature: null,
-          },
-          slot: '9',
+      },
+      temperature456: {
+        id: 'temperature456',
+        type: TEMPDECK,
+        model: 'GEN1',
+        moduleState: {
+          type: TEMPDECK,
+          status: TEMPERATURE_DEACTIVATED,
+          targetTemperature: null,
         },
-      }
+        slot: '9',
+      },
+    }
 
-      const result = getUnusedModules(modulesOnDeck, stepForms)
+    const result = getUnusedEntities(modulesOnDeck, stepForms, 'moduleId')
 
-      expect(result).toEqual([modulesOnDeck.temperature456])
-    })
+    expect(result).toEqual([modulesOnDeck.temperature456])
   })
 })
