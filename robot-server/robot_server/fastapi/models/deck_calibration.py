@@ -3,7 +3,7 @@ from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, Field
-from api.fastapi.models.control import Mount
+from robot_server.fastapi.models.control import Mount
 
 
 class DeckStart(BaseModel):

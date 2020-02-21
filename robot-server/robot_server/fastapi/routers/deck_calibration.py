@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
-from api.fastapi.models import V1ErrorMessage
-from api.fastapi.models.deck_calibration import DeckStart, \
+from robot_server.fastapi.models import V1ErrorMessage
+from robot_server.fastapi.models.deck_calibration import DeckStart, \
     DeckStartResponse, DeckCalibrationDispatch
 
 router = APIRouter()

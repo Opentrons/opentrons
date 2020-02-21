@@ -9,6 +9,9 @@ SHELL := bash
 PATH := $(shell cd .. && yarn bin):$(PATH)
 SHX := npx shx
 
+# Path of source package
+SRC_PATH = robot_server
+
 # make push wheel file (= rather than := to expand at every use)
 firmware = $(wildcard smoothie/*.hex)
 
@@ -21,7 +24,6 @@ sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
-
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
@@ -62,7 +64,7 @@ ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
 # and the openapi spec
-ot_openapi := src/opentrons/server/openapi.json
+ot_openapi := ${SRC_PATH}/aiohttp/openapi.json
 ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(ot_openapi)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
@@ -99,9 +101,9 @@ test:
 
 .PHONY: lint
 lint: $(ot_py_sources)
-	$(python) -m mypy src/opentrons
-	$(python) -m pylama src/opentrons tests
-	$(python) -m openapi_spec_validator src/opentrons/server/openapi.json
+	$(python) -m mypy $(SRC_PATH)
+	$(python) -m pylama $(SRC_PATH) tests
+	$(python) -m openapi_spec_validator $(ot_openapi)
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@

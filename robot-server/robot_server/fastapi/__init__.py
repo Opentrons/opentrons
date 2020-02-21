@@ -1,3 +1,4 @@
+import typing
 import uvicorn  # type: ignore
 from opentrons.hardware_control import HardwareAPILike
 
@@ -5,7 +6,10 @@ from opentrons.hardware_control import HardwareAPILike
 HARDWARE_APP_KEY = 'hardware'
 
 
-def run(hardware: HardwareAPILike, hostname: str, port: int, path):
+def run(hardware: HardwareAPILike,
+        hostname: str,
+        port: int,
+        path: typing.Optional[str]):
     """Start the fastapi service."""
     # todo Amit 2/11/2020
     #  Ideally we would start the application using uvicorn command line, but

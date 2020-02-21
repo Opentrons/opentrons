@@ -6,8 +6,8 @@ from opentrons.hardware_control import HardwareAPILike
 from opentrons.protocols.types import APIVersion
 from opentrons import __version__
 from opentrons.config import feature_flags
-from api.fastapi.models.health import Health, Links
-from api.fastapi.dependencies import get_hardware
+from robot_server.fastapi.models.health import Health, Links
+from robot_server.fastapi.dependencies import get_hardware
 
 router = APIRouter()
 
@@ -18,9 +18,9 @@ router = APIRouter()
                         "versions, names, and so on",
             summary="The /health endpoint is a good one to check to see if "
                     "you're communicating with an OT-2 with a properly booted "
-                    "API aiohttp. If it returns OK, all is well. It also can be"
-                    " used to pull information like the robot software version"
-                    " and name.",
+                    "API aiohttp. If it returns OK, all is well. It also can "
+                    "be used to pull information like the robot software "
+                    "version and name.",
             response_description="OT-2 /health response")
 async def get_health(
         hardware: HardwareAPILike = Depends(get_hardware)) -> Health:

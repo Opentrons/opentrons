@@ -1,7 +1,8 @@
 import logging
 from . import endpoints as endp
 from opentrons import config
-from .endpoints import (networking, control, settings, update, deck_calibration)
+from .endpoints import (networking, control,
+                        settings, update, deck_calibration)
 
 log = logging.getLogger(__name__)
 
