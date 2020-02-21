@@ -54,7 +54,9 @@ export type FormModule = {|
   slot: DeckSlot,
 |}
 
-// !!! TODO IMMEDIATELY can you use typeof here without a syntax error? It's not great to hard-code these, should use constants
+// TODO: IL 2020-02-21 somehow use the `typeof X_MODULE_TYPE` imports here instead of writing out the strings.
+// It doesn't seem possible with Flow to use these types as keys in an exact object,
+// unless you write them out like this. See https://github.com/facebook/flow/issues/6492
 export type FormModulesByType = {|
   magneticModuleType: FormModule,
   temperatureModuleType: FormModule,
