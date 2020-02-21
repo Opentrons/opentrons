@@ -82,13 +82,14 @@ export class JogControls extends React.Component<
     const { jog } = this.props
     const { step } = this.state
 
-    return JOG_BUTTON_NAMES.reduce(
-      (result, name) => ({
-        ...result,
-        [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step),
-      }),
-      {}
-    )
+    return {
+      left: jog.bind(null, ...JOG_PARAMS_BY_NAME.left, step),
+      right: jog.bind(null, ...JOG_PARAMS_BY_NAME.right, step),
+      back: jog.bind(null, ...JOG_PARAMS_BY_NAME.back, step),
+      forward: jog.bind(null, ...JOG_PARAMS_BY_NAME.forward, step),
+      up: jog.bind(null, ...JOG_PARAMS_BY_NAME.up, step),
+      down: jog.bind(null, ...JOG_PARAMS_BY_NAME.down, step),
+    }
   }
 
   renderJogControls() {
