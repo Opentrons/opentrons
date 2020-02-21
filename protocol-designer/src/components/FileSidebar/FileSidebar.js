@@ -23,7 +23,7 @@ import type {
   PipetteOnDeck,
 } from '../../step-forms'
 
-type Props = {
+type Props = {|
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   createNewFile?: () => mixed,
   canDownload: boolean,
@@ -35,7 +35,7 @@ type Props = {
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
-}
+|}
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   const blob = new Blob([JSON.stringify(downloadData.fileData)], {
@@ -44,16 +44,16 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   saveAs(blob, downloadData.fileName)
 }
 
-type WarningContent = {
+type WarningContent = {|
   content: React.Node,
   heading: string,
-}
+|}
 
-type MissingContent = {
+type MissingContent = {|
   noCommands: boolean,
   pipettesWithoutStep: Array<PipetteOnDeck>,
   modulesWithoutStep: Array<ModuleOnDeck>,
-}
+|}
 
 function getWarningContent({
   noCommands,
