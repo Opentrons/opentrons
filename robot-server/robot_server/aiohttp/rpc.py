@@ -8,7 +8,7 @@ import traceback
 from aiohttp import web
 from aiohttp import WSCloseCode
 from asyncio import Queue
-from api.aiohttp import serialize
+from robot_server.aiohttp import serialize
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 from concurrent.futures import ThreadPoolExecutor
 

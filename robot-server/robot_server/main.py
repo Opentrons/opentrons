@@ -1,13 +1,13 @@
+import typing
 import asyncio
 import logging
 from argparse import ArgumentParser
 
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import adapters, HardwareAPILike
 from opentrons.config import feature_flags as ff
 
 
 log = logging.getLogger(__name__)
-
 
 
 def build_arg_parser():
@@ -42,10 +42,10 @@ def build_arg_parser():
     return arg_parser
 
 
-def run(hardware: 'HardwareAPILike',
-        hostname=None,
-        port=None,
-        path=None):
+def run(hardware: HardwareAPILike,
+        hostname,
+        port,
+        path: typing.Optional[str] = None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
@@ -60,11 +60,11 @@ def run(hardware: 'HardwareAPILike',
         path = None
 
     if not ff.use_fast_api():
-        from api.aiohttp.main import run
-        run(hardware, hostname, port, path)
+        from robot_server.aiohttp.main import run as aiohttp_run
+        aiohttp_run(hardware, hostname, port, path)
     else:
-        from api.fastapi import run
-        run(hardware, hostname, port, path)
+        from robot_server.fastapi import run as fastapi_run
+        fastapi_run(hardware, hostname, port, path)
 
 
 def main():
