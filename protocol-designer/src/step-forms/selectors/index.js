@@ -60,7 +60,6 @@ import type {
   ModulesForEditModulesCard,
   PipetteEntities,
   PipetteOnDeck,
-  PipetteDisplayProperties,
   FormPipettesByMount,
   TemperatureModuleState,
   ThermocyclerModuleState,
@@ -332,29 +331,6 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
         right: { pipetteName: null, tiprackDefURI: null },
       }
     )
-)
-
-export const getPipetteDisplayProperties: Selector<PipetteDisplayProperties> = createSelector(
-  getInitialDeckSetup,
-  initialDeckSetup => {
-    return reduce(
-      initialDeckSetup.pipettes,
-      (
-        acc: PipetteDisplayProperties,
-        pipetteOnDeck: PipetteOnDeck
-      ): PipetteDisplayProperties => {
-        return {
-          ...acc,
-          [pipetteOnDeck.id]: {
-            id: pipetteOnDeck.id,
-            name: pipetteOnDeck.spec.displayName,
-            mount: pipetteOnDeck.mount,
-          },
-        }
-      },
-      {}
-    )
-  }
 )
 
 export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> = createSelector(

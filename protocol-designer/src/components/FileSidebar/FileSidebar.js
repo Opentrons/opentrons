@@ -12,11 +12,16 @@ import { i18n } from '../../localization'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from '../modals/modal.css'
-import { getUnusedEntities } from './utils'
+import { getUnusedModules, getUnusedPipettes } from './utils'
 import styles from './FileSidebar.css'
 
 import type { PDProtocolFile } from '../../file-types'
-import type { ModuleEntities, PipetteDisplayProperties } from '../../step-forms'
+import type {
+  InitialDeckSetup,
+  SavedStepFormState,
+  ModuleOnDeck,
+  PipetteOnDeck,
+} from '../../step-forms'
 
 type Props = {
   loadFile: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
@@ -27,9 +32,9 @@ type Props = {
     fileData: PDProtocolFile,
     fileName: string,
   },
-  moduleEntities: ModuleEntities,
-  pipetteEntities: PipetteDisplayProperties,
-  savedStepForms: any,
+  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
+  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
+  savedStepForms: SavedStepFormState,
 }
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
@@ -46,8 +51,8 @@ type WarningContent = {
 
 type MissingContent = {
   noCommands: boolean,
-  pipettesWithoutStep: Array<any>,
-  modulesWithoutStep: Array<any>,
+  pipettesWithoutStep: Array<PipetteOnDeck>,
+  modulesWithoutStep: Array<ModuleOnDeck>,
 }
 
 function getWarningContent({
@@ -71,7 +76,7 @@ function getWarningContent({
   }
 
   const pipettesDetails = pipettesWithoutStep
-    .map(pipette => `${pipette.mount} ${pipette.name}`)
+    .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
   const modulesDetails = modulesWithoutStep
     .map(module => i18n.t(`modules.module_long_names.${module.type}`))
@@ -82,9 +87,10 @@ function getWarningContent({
       content: (
         <>
           <p>
-            The {pipettesDetails} and {modulesDetails} in your protocol are not
-            currently used in any step.{' '}
-            {i18n.t('alert.export_warnings.unused_pipette_and_module.body1')}
+            {i18n.t('alert.export_warnings.unused_pipette_and_module.body1', {
+              modulesDetails,
+              pipettesDetails,
+            })}
           </p>
           <p>
             {i18n.t('alert.export_warnings.unused_pipette_and_module.body2')}
@@ -102,9 +108,9 @@ function getWarningContent({
       content: (
         <>
           <p>
-            The {pipettesDetails} specified in your protocol is currently not
-            used in any step.{' '}
-            {i18n.t('alert.export_warnings.unused_pipette.body1')}
+            {i18n.t('alert.export_warnings.unused_pipette.body1', {
+              pipettesDetails,
+            })}
           </p>
           <p>{i18n.t('alert.export_warnings.unused_pipette.body2')}</p>
         </>
@@ -120,9 +126,9 @@ function getWarningContent({
       content: (
         <>
           <p>
-            The {modulesDetails} specified in your protocol are not currently
-            used in any step.{' '}
-            {i18n.t(`alert.export_warnings.${moduleCase}.body1`)}
+            {i18n.t(`alert.export_warnings.${moduleCase}.body1`, {
+              modulesDetails,
+            })}
           </p>
           <p>{i18n.t(`alert.export_warnings.${moduleCase}.body2`)}</p>
         </>
@@ -140,8 +146,8 @@ export function FileSidebar(props: Props) {
     loadFile,
     createNewFile,
     onDownload,
-    moduleEntities,
-    pipetteEntities,
+    modulesOnDeck,
+    pipettesOnDeck,
     savedStepForms,
   } = props
   const [
@@ -151,16 +157,8 @@ export function FileSidebar(props: Props) {
   const cancelModal = () => setShowExportWarningModal(false)
 
   const noCommands = downloadData && downloadData.fileData.commands.length === 0
-  const pipettesWithoutStep = getUnusedEntities(
-    pipetteEntities,
-    savedStepForms,
-    'pipette'
-  )
-  const modulesWithoutStep = getUnusedEntities(
-    moduleEntities,
-    savedStepForms,
-    'moduleId'
-  )
+  const pipettesWithoutStep = getUnusedPipettes(pipettesOnDeck, savedStepForms)
+  const modulesWithoutStep = getUnusedModules(modulesOnDeck, savedStepForms)
 
   const hasWarning =
     noCommands || modulesWithoutStep.length || pipettesWithoutStep.length

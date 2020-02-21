@@ -1,24 +1,37 @@
 // @flow
 
-import _ from 'lodash'
+import find from 'lodash/find'
+import map from 'lodash/map'
 import type {
-  PipetteDisplayProperties,
-  ModuleEntities,
+  InitialDeckSetup,
+  SavedStepFormState,
+  ModuleOnDeck,
+  PipetteOnDeck,
 } from '../../../step-forms'
 
-export function getUnusedEntities(
-  entities: PipetteDisplayProperties | ModuleEntities,
-  commands: any,
-  paramKey: string
-): Array<any> {
-  return _(entities)
-    .map((entity, entityId) => {
-      const stepContainingEntry = _.find(
-        commands,
-        command => command[paramKey] === entityId
-      )
-      return !stepContainingEntry ? entity : null
-    })
-    .filter(entryId => entryId)
-    .value()
+// TODO JF 2020-2-21 combine fns and make it more generic for flow type issues
+export function getUnusedModules(
+  entities: $PropertyType<InitialDeckSetup, 'modules'>,
+  commands: SavedStepFormState
+): Array<ModuleOnDeck> {
+  return map(entities, (entity, entityId) => {
+    const stepContainingEntry = find(
+      commands,
+      command => command['moduleId'] === entityId
+    )
+    return !stepContainingEntry ? entity : null
+  }).filter(Boolean)
+}
+
+export function getUnusedPipettes(
+  entities: $PropertyType<InitialDeckSetup, 'pipettes'>,
+  commands: SavedStepFormState
+): Array<PipetteOnDeck> {
+  return map(entities, (entity, entityId) => {
+    const stepContainingEntry = find(
+      commands,
+      command => command['pipette'] === entityId
+    )
+    return !stepContainingEntry ? entity : null
+  }).filter(Boolean)
 }

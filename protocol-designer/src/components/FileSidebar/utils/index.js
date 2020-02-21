@@ -1,5 +1,3 @@
 // @flow
 
-import { getUnusedEntities } from './getUnusedEntities'
-
-export { getUnusedEntities }
+export * from './getUnusedEntities'

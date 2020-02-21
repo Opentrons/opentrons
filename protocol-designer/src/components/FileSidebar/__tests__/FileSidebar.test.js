@@ -2,6 +2,11 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import fileSaver from 'file-saver'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
+import {
+  fixtureP10Single,
+  fixtureP300Single,
+} from '@opentrons/shared-data/pipette/fixtures/name'
+import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { FileSidebar } from '../FileSidebar'
 import { MAGDECK } from '../../../constants'
 
@@ -10,7 +15,7 @@ jest.mock('file-saver')
 describe('FileSidebar', () => {
   const pipetteLeftId = 'pipetteLeftId'
   const pipetteRightId = 'pipetteRightId'
-  let props, commands, moduleEntities, pipetteEntities, savedStepForms
+  let props, commands, modulesOnDeck, pipettesOnDeck, savedStepForms
   beforeEach(() => {
     fileSaver.saveAs = jest.fn()
 
@@ -27,8 +32,8 @@ describe('FileSidebar', () => {
         pipettes: {},
         modules: {},
       },
-      pipetteEntities: {},
-      moduleEntities: {},
+      pipettesOnDeck: {},
+      modulesOnDeck: {},
       savedStepForms: {},
     }
 
@@ -39,20 +44,26 @@ describe('FileSidebar', () => {
       },
     ]
 
-    pipetteEntities = {
+    pipettesOnDeck = {
       pipetteLeftId: {
-        name: 'pipette 300',
+        name: 'string',
         id: pipetteLeftId,
+        tiprackDefURI: 'test',
+        tiprackLabwareDef: fixture_tiprack_10_ul,
+        spec: fixtureP10Single,
         mount: 'left',
       },
       pipetteRightId: {
-        name: 'pipette 50',
+        name: 'string',
         id: pipetteRightId,
+        tiprackDefURI: 'test',
+        tiprackLabwareDef: fixture_tiprack_10_ul,
+        spec: fixtureP300Single,
         mount: 'right',
       },
     }
 
-    moduleEntities = {
+    modulesOnDeck = {
       magnet123: {
         type: MAGDECK,
       },
@@ -119,7 +130,7 @@ describe('FileSidebar', () => {
 
   test('warning modal is shown when export is clicked with unused pipette', () => {
     props.downloadData.fileData.commands = commands
-    props.pipetteEntities = pipetteEntities
+    props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
 
     const wrapper = shallow(<FileSidebar {...props} />)
@@ -129,13 +140,17 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused pipette')
-    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.name)
-    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.mount)
-    expect(alertModal.html()).not.toContain(pipetteEntities.pipetteLeftId.name)
+    expect(alertModal.html()).toContain(
+      pipettesOnDeck.pipetteRightId.spec.displayName
+    )
+    expect(alertModal.html()).toContain(pipettesOnDeck.pipetteRightId.mount)
+    expect(alertModal.html()).not.toContain(
+      pipettesOnDeck.pipetteLeftId.spec.displayName
+    )
   })
 
   test('warning modal is shown when export is clicked with unused module', () => {
-    props.moduleEntities = moduleEntities
+    props.modulesOnDeck = modulesOnDeck
     props.savedStepForms = savedStepForms
     props.downloadData.fileData.commands = commands
 
@@ -150,8 +165,8 @@ describe('FileSidebar', () => {
   })
 
   test('warning modal is shown when export is clicked with unused module and pipette', () => {
-    props.moduleEntities = moduleEntities
-    props.pipetteEntities = pipetteEntities
+    props.modulesOnDeck = modulesOnDeck
+    props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
     props.downloadData.fileData.commands = commands
 
@@ -162,9 +177,13 @@ describe('FileSidebar', () => {
 
     expect(alertModal).toHaveLength(1)
     expect(alertModal.prop('heading')).toEqual('Unused pipette and module')
-    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.name)
-    expect(alertModal.html()).toContain(pipetteEntities.pipetteRightId.mount)
+    expect(alertModal.html()).toContain(
+      pipettesOnDeck.pipetteRightId.spec.displayName
+    )
+    expect(alertModal.html()).toContain(pipettesOnDeck.pipetteRightId.mount)
     expect(alertModal.html()).toContain('Magnetic module')
-    expect(alertModal.html()).not.toContain(pipetteEntities.pipetteLeftId.name)
+    expect(alertModal.html()).not.toContain(
+      pipettesOnDeck.pipetteLeftId.spec.displayName
+    )
   })
 })
