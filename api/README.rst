@@ -24,7 +24,7 @@ This is the Opentrons library, the Python module that runs the Opentrons OT-2. I
 
 This document is about the structure and purpose of the source code. For information on how to use the Opentrons library or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
 
-The Opentrons library allow two purposes:
+The Opentrons library has two purposes:
 
 1. **Control an Opentrons OT-2 robot.**  The API server uses the Opentrons library when controlling a robot. We boot up a server for the robot’s HTTP endpoints, and a server for its WebSockets-based RPC system for control during protocols. We are configured by files in the robot’s filesystem in ``/data``.
 
