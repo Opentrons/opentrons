@@ -13,6 +13,7 @@ LABWARE_LIBRARY_DIR := labware-library
 PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
+ROBOT_SERVER_DIR := robot-server
 
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
@@ -43,6 +44,7 @@ install-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
+	$(MAKE) -C $(ROBOT_SERVER_DIR) install
 
 # front-end dependecies handled by yarn
 .PHONY: install-js
@@ -107,6 +109,7 @@ test-e2e:
 .PHONY: test-py
 test-py:
 	$(MAKE) -C api test
+	$(MAKE) -C robot-server test
 	$(MAKE) -C update-server test tests=tests/buildroot/
 	$(MAKE) -C update-server test tests=tests/migration/
 
@@ -134,6 +137,7 @@ endif
 lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
+	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
 
 # TODO(mc, 2020-01-22): turn on warning logs in CI once this issue is resolved:
 # https://github.com/Opentrons/opentrons/issues/4830
