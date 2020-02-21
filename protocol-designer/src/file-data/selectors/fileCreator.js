@@ -43,6 +43,7 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
+// $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
 export const createFile: BaseState => PDProtocolFile = createSelector(
   getFileMetadata,
   getInitialRobotState,

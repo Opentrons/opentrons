@@ -20,7 +20,7 @@ import type {
   WellIngredientNames,
 } from '../../steplist/types'
 
-type StepItemProps = {
+export type StepItemProps = {
   stepId: StepIdType,
   stepNumber: number,
   stepType: StepType,

@@ -27,6 +27,7 @@ export function generateNewForm(args: NewFormArgs): FormData {
 
   return {
     ...baseForm,
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     ...getDefaultsForStepType(stepType),
     ...additionalFields,
   }

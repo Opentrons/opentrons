@@ -274,6 +274,7 @@ export const ingredLocations = handleActions<LocationsState, *>(
         ...state,
         [labwareId]: {
           ...state[labwareId],
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           ...updatedWells,
         },
       }

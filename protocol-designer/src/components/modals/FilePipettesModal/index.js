@@ -108,6 +108,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     fieldName: $Keys<FormPipette>,
     value: string | null
   ) => {
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     let nextMountState: $Shape<FormPipette> = { [fieldName]: value }
     if (fieldName === 'pipetteName') {
       nextMountState = { ...nextMountState, tiprackDefURI: null }
@@ -116,6 +117,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     this.setState({
       pipettesByMount: {
         ...this.state.pipettesByMount,
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
         [mount]: {
           ...this.state.pipettesByMount[mount],
           ...nextMountState,
@@ -129,6 +131,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     this.setState({
       modulesByType: {
         ...this.state.modulesByType,
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
         [type]: {
           ...this.state.modulesByType[type],
           ...nextMountState,

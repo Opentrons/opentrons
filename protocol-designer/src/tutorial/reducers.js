@@ -47,6 +47,7 @@ const dismissedHints = handleActions(
       action: RemoveHintAction
     ): DismissedHintReducerState => {
       const { hintKey, rememberDismissal } = action.payload
+      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
       return { ...state, [hintKey]: { rememberDismissal } }
     },
     CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,

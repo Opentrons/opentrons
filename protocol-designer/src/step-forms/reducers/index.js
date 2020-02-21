@@ -103,6 +103,7 @@ export const unsavedForm = (
       )
       return {
         ...unsavedFormState,
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
         ...fieldUpdate,
       }
     }
@@ -132,6 +133,7 @@ export const unsavedForm = (
         unsavedFormState.id &&
         stepIdsToUpdate.includes(unsavedFormState.id)
       ) {
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
         return {
           ...unsavedFormState,
           ...handleFormChange(
@@ -232,6 +234,7 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
+            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
             [labwareId]: slot,
           },
         },
@@ -308,11 +311,13 @@ export const savedStepForms = (
             ...savedForm,
             labwareLocationUpdate: {
               ...savedForm.labwareLocationUpdate,
+              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
               ...(sourceLabwareId ? { [sourceLabwareId]: destSlot } : {}),
               ...(destLabwareId ? { [destLabwareId]: sourceSlot } : {}),
             },
             moduleLocationUpdate: {
               ...savedForm.moduleLocationUpdate,
+              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
               ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
               ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
             },
@@ -338,6 +343,7 @@ export const savedStepForms = (
           savedForm,
           (acc, value, fieldName) => {
             if (value === labwareIdToDelete) {
+              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
               return {
                 ...acc,
                 ...handleFormChange(
@@ -355,6 +361,7 @@ export const savedStepForms = (
         )
         return {
           ...savedForm,
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           ...deleteLabwareUpdate,
         }
       })
@@ -372,6 +379,7 @@ export const savedStepForms = (
             ),
           }
         } else if (deletedPipetteIds.includes(form.pipette)) {
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           return {
             ...form,
             ...handleFormChange(
@@ -448,10 +456,12 @@ export const savedStepForms = (
           ...acc,
           [stepId]: {
             ...prevStepForm,
+            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
             ...updatedFields,
           },
         }
       }, {})
+      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
       return { ...savedStepForms, ...savedStepsUpdate }
     }
     case 'CHANGE_SAVED_STEP_FORM': {
@@ -475,6 +485,7 @@ export const savedStepForms = (
       // (eg `wells` arrays should be reset, not appended to)
       return {
         ...savedStepForms,
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
         [stepId]: {
           ...previousForm,
           ...handleFormChange(
@@ -560,10 +571,12 @@ export const savedStepForms = (
           ...acc,
           [stepId]: {
             ...prevStepForm,
+            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
             ...updatedFields,
           },
         }
       }, {})
+      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
       return { ...savedStepForms, ...savedStepsUpdate }
     }
 

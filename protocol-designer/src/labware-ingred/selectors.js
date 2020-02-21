@@ -91,6 +91,7 @@ type IngredGroupFields = {
     ...$Exact<IngredInputs>,
   },
 }
+// $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
 const allIngredientGroupFields: MemoizedSelector<AllIngredGroupFields> = createSelector(
   getLiquidGroupsById,
   ingreds =>

@@ -65,6 +65,7 @@ export const substepTimelineSingleChannel = (
             ...acc.timeline,
             {
               volume,
+              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
               [ingredKey]: wellInfo,
               activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
             },
@@ -135,6 +136,7 @@ export const substepTimelineMultiChannel = (
             ...acc.timeline,
             {
               volume,
+              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
               [ingredKey]: wellInfo,
               activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
             },

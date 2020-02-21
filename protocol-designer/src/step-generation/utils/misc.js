@@ -115,6 +115,7 @@ export function mergeLiquid(
     // include all ingreds exclusive to 'dest'
     ...dest,
 
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     ...reduce(
       source,
       (acc: LocationLiquidState, ingredState: Vol, ingredId: string) => {

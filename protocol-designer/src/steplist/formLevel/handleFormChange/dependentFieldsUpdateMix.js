@@ -29,6 +29,7 @@ const updatePatchOnLabwareChange = (
 
   if (!labwareChanged) return patch
 
+  // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
   const appliedPatch = { ...rawForm, ...patch }
   const pipetteId = appliedPatch.pipette
 
@@ -61,6 +62,7 @@ const updatePatchOnPipetteChannelChange = (
       ? getChannels(patch.pipette, pipetteEntities)
       : null
 
+  // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
   const appliedPatch = { ...rawForm, ...patch }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
@@ -85,6 +87,7 @@ const updatePatchOnPipetteChannelChange = (
       wells: getAllWellsFromPrimaryWells(appliedPatch.wells, labwareDef),
     }
   }
+  // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
   return { ...patch, ...update }
 }
 

@@ -111,6 +111,7 @@ function _updatePatchPathField(
   rawForm: FormData,
   pipetteEntities: LegacyPipetteEntities
 ) {
+  // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
   const appliedPatch = { ...rawForm, ...patch }
   const { path, changeTip } = appliedPatch
 

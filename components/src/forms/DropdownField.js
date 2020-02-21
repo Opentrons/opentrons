@@ -74,7 +74,7 @@ export function DropdownField(props: DropdownFieldProps) {
             <option
               key={opt.value}
               value={opt.value}
-              disabled={opt.disabled && opt.disabled}
+              disabled={Boolean(opt.disabled && opt.disabled)}
             >
               {opt.name}
             </option>

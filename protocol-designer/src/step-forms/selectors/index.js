@@ -294,6 +294,7 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
 
         return {
           ...acc,
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
         }
       },
@@ -323,6 +324,7 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
 
         return {
           ...acc,
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
         }
       },
@@ -345,6 +347,7 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
       ): ModulesForEditModulesCard => {
         return {
           ...acc,
+          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           [moduleOnDeck.type]: moduleOnDeck,
         }
       },

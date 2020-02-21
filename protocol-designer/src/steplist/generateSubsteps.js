@@ -57,6 +57,7 @@ function getCommandCreatorForSubsteps(
       preWetTip: false,
     }
 
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     return curryCommandCreator(transfer, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
@@ -65,6 +66,7 @@ function getCommandCreatorForSubsteps(
       preWetTip: false,
     }
 
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     return curryCommandCreator(distribute, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
@@ -74,6 +76,7 @@ function getCommandCreatorForSubsteps(
       preWetTip: false,
     }
 
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     return curryCommandCreator(consolidate, commandCallArgs)
   } else if (stepArgs.commandCreatorFnName === 'mix') {
     return curryCommandCreator(mix, stepArgs)

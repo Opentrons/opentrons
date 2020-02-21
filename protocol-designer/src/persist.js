@@ -34,10 +34,10 @@ export const _rehydrateAll = (): $PropertyType<
 > => {
   return PERSISTED_PATHS.reduce((acc, path) => {
     const persistedData = _rehydrate(path)
-    if (persistedData === undefined) {
-      return acc
+    if (typeof persistedData !== 'undefined') {
+      acc[path] = persistedData
     }
-    return { ...acc, [path]: persistedData }
+    return acc
   }, {})
 }
 
