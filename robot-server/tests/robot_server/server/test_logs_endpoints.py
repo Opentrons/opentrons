@@ -1,6 +1,6 @@
 import json
 from opentrons import config
-from opentrons.server import init
+from robot_server.aiohttp.main import init
 
 
 async def test_log_endpoints(

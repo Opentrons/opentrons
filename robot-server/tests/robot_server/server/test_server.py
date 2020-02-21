@@ -3,7 +3,7 @@ import pytest
 import sys
 import time
 
-from opentrons.server import rpc
+from robot_server.aiohttp import rpc
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 from threading import Event
 

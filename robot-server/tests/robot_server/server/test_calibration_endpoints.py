@@ -3,7 +3,7 @@ import json
 import numpy as np
 
 from opentrons import deck_calibration as dc
-from opentrons.deck_calibration import endpoints
+from robot_server.aiohttp.endpoints import deck_calibration as endpoints
 from opentrons.config import robot_configs
 from opentrons import types
 
