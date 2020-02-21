@@ -38,7 +38,7 @@ simfile ?=
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
