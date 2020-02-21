@@ -32,6 +32,7 @@ export function ModuleFields(props: Props) {
     <div className={className}>
       {modules.map((moduleType, i) => {
         const label = i18n.t(`modules.module_display_names.${moduleType}`)
+        const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
             <CheckboxField
@@ -43,7 +44,6 @@ export function ModuleFields(props: Props) {
             <ModuleDiagram type={moduleType} />
             {/*
               TODO (ka 2019-10-22): This field is disabled until Gen 2 Modules are available
-              - Until then, 'GEN1' is hardcoded
               - onChange returns null because onChange is required by DropdownFields
             */}
             <div className={styles.module_model}>
@@ -53,11 +53,13 @@ export function ModuleFields(props: Props) {
                     tabIndex={i}
                     options={[
                       {
-                        name: 'GEN1',
-                        value: DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType],
+                        name: i18n.t(
+                          `modules.model_display_name.${defaultModel}`
+                        ),
+                        value: defaultModel,
                       },
                     ]}
-                    value={DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]}
+                    value={defaultModel}
                     disabled
                     onChange={() => null}
                   />

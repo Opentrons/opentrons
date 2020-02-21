@@ -12,6 +12,7 @@ import {
   // TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
+import { i18n } from './localization'
 import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
@@ -109,16 +110,27 @@ export const MODELS_FOR_MODULE_TYPE: {
   |}>,
 } = {
   [MAGNETIC_MODULE_TYPE]: [
-    { name: 'GEN1', value: MAGNETIC_MODULE_V1 },
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
+      value: MAGNETIC_MODULE_V1,
+    },
     // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
-    // { name: 'GEN2', value: MAGNETIC_MODULE_V2 },
+    // { name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`), value: MAGNETIC_MODULE_V2 },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
-    { name: 'GEN1', value: TEMPERATURE_MODULE_V1 },
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
+      value: TEMPERATURE_MODULE_V1,
+    },
     // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
-    // { name: 'GEN2', value: TEMPERATURE_MODULE_V2 },
+    // { name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`, value: TEMPERATURE_MODULE_V2 },
   ],
-  [THERMOCYCLER_MODULE_TYPE]: [{ name: 'GEN1', value: THERMOCYCLER_MODULE_V1 }],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    {
+      name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
+      value: THERMOCYCLER_MODULE_V1,
+    },
+  ],
 }
 
 export const DEFAULT_MODEL_FOR_MODULE_TYPE: { [ModuleRealType]: string } = {

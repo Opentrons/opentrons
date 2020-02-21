@@ -1,15 +1,15 @@
 // @flow
 import * as React from 'react'
-import { i18n } from '../../localization'
-import { useDispatch } from 'react-redux'
-import { actions as stepFormActions } from '../../step-forms'
-
 import {
   LabeledValue,
   OutlineButton,
   SlotMap,
   HoverTooltip,
 } from '@opentrons/components'
+import { i18n } from '../../localization'
+import { useDispatch } from 'react-redux'
+import { actions as stepFormActions } from '../../step-forms'
+
 import { ModuleDiagram } from './ModuleDiagram'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
 import styles from './styles.css'
@@ -101,7 +101,12 @@ export function ModuleRow(props: Props) {
           <ModuleDiagram type={type} />
         </div>
         <div className={styles.module_col}>
-          {model && <LabeledValue label="Model" value={model} />}
+          {model && (
+            <LabeledValue
+              label="Model"
+              value={i18n.t(`modules.model_display_name.${model}`)}
+            />
+          )}
         </div>
         <div className={styles.module_col}>
           {slot && <LabeledValue label="Position" value={slotDisplayName} />}

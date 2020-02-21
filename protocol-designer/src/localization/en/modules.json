@@ -9,6 +9,13 @@
     "magneticModuleType": "Magnetic module",
     "thermocyclerModuleType": "Thermocycler module"
   },
+  "model_display_name": {
+    "temperatureModuleV1": "GEN1",
+    "temperatureModuleV2": "GEN2",
+    "magneticModuleV1": "GEN1",
+    "magneticModuleV2": "GEN2",
+    "thermocyclerModuleV1": "GEN1"
+  },
   "status": {
     "engaged": "engaged",
     "disengaged": "disengaged",
