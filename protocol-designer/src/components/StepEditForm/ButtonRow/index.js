@@ -11,8 +11,8 @@ import { getCurrentFormCanBeSaved } from '../../../step-forms/selectors'
 
 import type { BaseState } from '../../../types'
 
+import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
-const { button_row, form_button, form_wrapper } = styles
 
 const { cancelStepForm } = steplistActions
 const { saveStepForm } = stepFormActions
@@ -29,24 +29,27 @@ export const ButtonRow = ({ onDelete, onClickMoreOptions }: Props) => {
   const dispatch = useDispatch()
 
   return (
-    <div className={cx(button_row, form_wrapper)}>
+    <div className={cx(modalStyles.button_row_divided, styles.form_wrapper)}>
       <div>
-        <OutlineButton className={form_button} onClick={onDelete}>
+        <OutlineButton className={styles.form_button} onClick={onDelete}>
           Delete
         </OutlineButton>
-        <OutlineButton className={form_button} onClick={onClickMoreOptions}>
+        <OutlineButton
+          className={styles.form_button}
+          onClick={onClickMoreOptions}
+        >
           Notes
         </OutlineButton>
       </div>
       <div>
         <PrimaryButton
-          className={form_button}
+          className={styles.form_button}
           onClick={() => dispatch(cancelStepForm())}
         >
           Close
         </PrimaryButton>
         <PrimaryButton
-          className={form_button}
+          className={styles.form_button}
           disabled={!canSave}
           onClick={canSave ? () => dispatch(saveStepForm()) : undefined}
         >
