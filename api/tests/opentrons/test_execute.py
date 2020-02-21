@@ -7,6 +7,7 @@ from unittest import mock
 import pytest
 
 from opentrons import execute, types
+from opentrons.hardware_control import controller
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
@@ -22,10 +23,10 @@ def backing_hardware(monkeypatch, virtual_smoothie_env):
     async def dummy_delay(duration_s):
         pass
 
-    monkeypatch.setattr(execute._HWCONTROL._backend,
+    monkeypatch.setattr(controller,
                         'get_attached_instruments',
                         gai_mock)
-    monkeypatch.setattr(execute._HWCONTROL._backend, 'delay', dummy_delay)
+    monkeypatch.setattr(controller, 'delay', dummy_delay)
     gai_mock.return_value = {types.Mount.RIGHT: {'model': None, 'id': None},
                              types.Mount.LEFT: {'model': None, 'id': None}}
     return gai_mock

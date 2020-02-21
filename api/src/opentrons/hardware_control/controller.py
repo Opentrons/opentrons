@@ -32,6 +32,8 @@ class Controller:
         this is instantiated somewhere other than a robot) then this method
         will raise a RuntimeError.
         """
+        import threading
+        print(f'CONTROLLER INIT. {threading.currentThread().getName()}')
         if not opentrons.config.IS_ROBOT:
             MODULE_LOG.warning(
                 'This is intended to run on a robot, and while it can connect '

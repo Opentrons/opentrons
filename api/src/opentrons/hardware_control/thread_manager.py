@@ -52,10 +52,11 @@ class ThreadManager(HardwareAPILike):
 
     def clean_up(self):
         try:
-            self._loop.call_soon_threadsafe(self._loop.stop)
+            loop = object.__getattribute__(self, '_loop')
+            loop.call_soon_threadsafe(loop.stop)
         except Exception as e:
             pass
-        self._thread.join()
+        object.__getattribute__(self, '_thread').join()
 
     def __del__(self):
         self.clean_up()
