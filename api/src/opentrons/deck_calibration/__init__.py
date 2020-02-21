@@ -61,6 +61,7 @@ x_row = 0
 y_row = 1
 z_row = 2
 
+
 def expected_points():
     slot_1_lower_left,\
         slot_3_lower_right,\

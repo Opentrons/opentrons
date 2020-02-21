@@ -17,7 +17,6 @@ import shutil
 import tempfile
 from collections import namedtuple
 from functools import partial
-from uuid import uuid4 as uuid
 import zipfile
 
 import pytest
@@ -27,7 +26,7 @@ from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
-from opentrons import config, types
+from opentrons import config
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import adapters, API
 from opentrons.protocol_api import ProtocolContext

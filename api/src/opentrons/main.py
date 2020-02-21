@@ -3,7 +3,6 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-import opentrons
 from opentrons import HERE
 from opentrons.hardware_control import adapters
 from opentrons import __version__
@@ -132,35 +131,20 @@ async def create_hardware(hardware_server: bool = False,
     """
     loop = asyncio.get_event_loop()
 
-    if ff.use_protocol_api_v2():
-        hardware = adapters.SingletonAdapter(loop)
-    else:
-        hardware = opentrons.robot
-
-    if ff.use_protocol_api_v2():
-        robot_conf = await hardware.get_config()
-    else:
-        robot_conf = hardware.config
+    hardware = adapters.SingletonAdapter(loop)
+    robot_conf = await hardware.get_config()
 
     logging_config.log_init(robot_conf.log_level)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop, hardware)
-        if ff.use_protocol_api_v2():
-            await hardware.cache_instruments()
+        await hardware.cache_instruments()
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            if ff.use_protocol_api_v2():
-                await hardware.home_z()
-            else:
-                hardware.home_z()
+            await hardware.home_z()
 
     if hardware_server:
-        if ff.use_protocol_api_v2():
-            await install_hardware_server(hardware_server_socket, hardware._api)
-        else:
-            log.warning(
-                "Hardware server requested but apiv1 selected, not starting")
+        await install_hardware_server(hardware_server_socket, hardware._api)
 
     return hardware

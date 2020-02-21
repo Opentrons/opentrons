@@ -61,9 +61,8 @@ ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
 ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
-# and the openapi spec
-ot_openapi := src/opentrons/server/openapi.json
-ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(ot_openapi)
+
+ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -101,7 +100,6 @@ test:
 lint: $(ot_py_sources)
 	$(python) -m mypy src/opentrons
 	$(python) -m pylama src/opentrons tests
-	$(python) -m openapi_spec_validator src/opentrons/server/openapi.json
 
 docs/build/html/v%: docs/v%
 	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
