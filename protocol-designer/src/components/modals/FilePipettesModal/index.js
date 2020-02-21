@@ -284,7 +284,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                 />
               )}
 
-              <div className={styles.button_row}>
+              <div className={modalStyles.button_row}>
                 <OutlineButton
                   onClick={this.props.onCancel}
                   tabIndex={7}

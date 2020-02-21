@@ -49,24 +49,6 @@
   height: 100px;
 }
 
-.button_row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.reset_button {
-  width: 10rem;
-}
-
-.cancel_button {
-  width: 10rem;
-  margin-right: 1rem;
-}
-
-.done_button {
-  width: 10rem;
-}
-
 .wells_image {
   height: 100px;
   width: 100px;

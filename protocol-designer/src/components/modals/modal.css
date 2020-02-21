@@ -77,3 +77,23 @@
   overflow-y: auto;
   margin-bottom: 1rem;
 }
+
+.button_row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* TODO IMMEDIATELY: rename, this is when you have a single button on the left and rest on the right */
+.button_row_divided {
+  display: flex;
+  justify-content: space-between;
+}
+
+.button_right_of_break {
+  margin-right: 1rem;
+}
+
+.button_medium {
+  width: 10rem;
+}

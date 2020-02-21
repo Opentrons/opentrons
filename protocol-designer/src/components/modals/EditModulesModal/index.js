@@ -180,13 +180,16 @@ export function EditModulesModal(props: EditModulesProps) {
         </div>
       </form>
 
-      <div className={styles.button_row}>
-        <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
+      <div className={modalStyles.button_row}>
+        <OutlineButton className={styles.button_margin} onClick={onCloseClick}>
+          {i18n.t('button.cancel')}
+        </OutlineButton>
         <OutlineButton
+          className={styles.button_margin}
           disabled={hasSlotOrIncompatibleError}
           onClick={onSaveClick}
         >
-          Save
+          {i18n.t('button.save')}
         </OutlineButton>
       </div>
     </Modal>
