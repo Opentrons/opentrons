@@ -58,7 +58,7 @@ twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
 # Source discovery
 # For the python sources
-ot_py_sources := $(filter %.py,$(shell $(SHX) find src/opentrons/))
+ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 # And the out of tree shared data
 ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
