@@ -334,14 +334,14 @@ def virtual_smoothie_env(monkeypatch):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-def hardware(request, loop, virtual_smoothie_env):
-    hw_manager = adapters.SingletonAdapter(loop)
+async def hardware(request, loop, virtual_smoothie_env):
+    hw_sim = await API.build_hardware_simulator(loop=loop)
     old_config = config.robot_configs.load()
     try:
-        yield hw_manager
+        yield hw_sim
     finally:
-        asyncio.ensure_future(hw_manager.reset())
-        hw_manager.set_config(old_config)
+        asyncio.ensure_future(hw_sim.reset())
+        hw_sim.set_config(old_config)
 
 
 @pytest.mark.skipif(aionotify is None,
@@ -506,8 +506,8 @@ def cntrlr_mock_connect(monkeypatch):
 
 
 @pytest.fixture
-def hardware_api(loop):
-    hw_api = API.build_hardware_simulator(loop=loop)
+async def hardware_api(loop):
+    hw_api = await API.build_hardware_simulator(loop=loop)
     return hw_api
 
 

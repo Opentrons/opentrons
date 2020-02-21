@@ -12,7 +12,7 @@ from opentrons.hardware_control.modules.types import BundledFirmware
 async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
     mods = ['tempdeck', 'magdeck', 'thermocycler']
-    api = hardware_control.API.build_hardware_simulator(attached_modules=mods)
+    api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)
@@ -21,7 +21,7 @@ async def test_get_modules_simulating():
 async def test_module_caching():
     import opentrons.hardware_control as hardware_control
     mod_names = ['tempdeck']
-    api = hardware_control.API.build_hardware_simulator(
+    api = await hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names)
     await asyncio.sleep(0.05)
 
@@ -161,7 +161,7 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
 
     from opentrons.hardware_control import API
     mods = ['tempdeck', 'magdeck', 'thermocycler']
-    api = API.build_hardware_simulator(attached_modules=mods)
+    api = await API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
     assert api.attached_modules[0].bundled_fw == BundledFirmware(

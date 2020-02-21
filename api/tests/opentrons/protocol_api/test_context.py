@@ -61,7 +61,7 @@ def test_load_instrument(loop):
 
 
 async def test_motion(loop):
-    hardware = API.build_hardware_simulator(loop=loop)
+    hardware = await API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
@@ -77,7 +77,7 @@ async def test_motion(loop):
 
 
 async def test_max_speeds(loop, monkeypatch):
-    hardware = API.build_hardware_simulator(loop=loop)
+    hardware = await API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
@@ -104,8 +104,8 @@ async def test_max_speeds(loop, monkeypatch):
         for args, kwargs in mock_move.call_args_list)
 
 
-def test_location_cache(loop, monkeypatch, get_labware_def):
-    hardware = API.build_hardware_simulator(loop=loop)
+async def test_location_cache(loop, monkeypatch, get_labware_def):
+    hardware = await API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
@@ -140,8 +140,8 @@ def test_location_cache(loop, monkeypatch, get_labware_def):
     assert test_args[0].labware == lw.wells()[0]
 
 
-def test_move_uses_arc(loop, monkeypatch, get_labware_def):
-    hardware = API.build_hardware_simulator(loop=loop)
+async def test_move_uses_arc(loop, monkeypatch, get_labware_def):
+    hardware = await API.build_hardware_simulator(loop=loop)
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
