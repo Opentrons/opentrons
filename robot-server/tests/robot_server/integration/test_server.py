@@ -1,6 +1,6 @@
 import pytest
 import logging
-from opentrons.server import rpc
+from robot_server.aiohttp import rpc
 # TODO: Modify test protocols to get a Well to use the `wells` method
 
 
