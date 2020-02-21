@@ -10,8 +10,8 @@ import { restartRobot } from '../../robot-admin'
 
 import { chainActions } from '../../util'
 import { ModalPage, SpinnerModalPage } from '@opentrons/components'
-import AttachTip from './AttachTip'
-import ConfirmPosition from './ConfirmPosition'
+import { AttachTip } from './AttachTip'
+import { ConfirmPosition } from './ConfirmPosition'
 
 import type { Dispatch } from '../../types'
 import type { CalibrateDeckStartedProps } from './types'
@@ -24,12 +24,12 @@ type Props = {| ...OP, ...DP |}
 
 const TITLE = 'Deck Calibration'
 
-export default connect<Props, OP, _, _, _, _>(
+export const InstructionsModal = connect<Props, OP, _, _, _, _>(
   null,
   mapDispatchToProps
-)(InstructionsModal)
+)(InstructionsModalComponent)
 
-function InstructionsModal(props: Props) {
+function InstructionsModalComponent(props: Props) {
   const { calibrationStep, exitUrl, commandRequest } = props
   const subtitle = `Step ${calibrationStep} of 6`
   const titleBarBase = { title: TITLE, subtitle }

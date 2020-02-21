@@ -15,7 +15,7 @@ import type {
 
 import { chainActions } from '../util'
 import { apiRequest, apiSuccess, apiFailure, clearApiResponse } from './actions'
-import client from './client'
+import { client } from './client'
 
 export type JogAxis = 'x' | 'y' | 'z'
 

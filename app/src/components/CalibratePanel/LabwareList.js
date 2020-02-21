@@ -4,7 +4,7 @@ import { connect } from 'react-redux'
 import { withRouter } from 'react-router-dom'
 
 import { TitledList } from '@opentrons/components'
-import LabwareListItem from './LabwareListItem'
+import { LabwareListItem } from './LabwareListItem'
 
 import {
   selectors as robotSelectors,
@@ -31,15 +31,15 @@ type Props = {|
   setLabware: (labware: Labware) => mixed,
 |}
 
-export default withRouter<{||}, _>(
+export const LabwareList = withRouter<{||}, _>(
   connect<Props, _, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,
     mergeProps
-  )(LabwareList)
+  )(LabwareListComponent)
 )
 
-function LabwareList(props: Props) {
+function LabwareListComponent(props: Props) {
   const { labware, disabled, setLabware, modulesBySlot } = props
 
   return (

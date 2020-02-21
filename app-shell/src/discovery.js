@@ -4,7 +4,8 @@ import { app } from 'electron'
 import Store from 'electron-store'
 import throttle from 'lodash/throttle'
 
-import DiscoveryClient, {
+import {
+  createDiscoveryClient,
   SERVICE_EVENT,
   SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
@@ -33,7 +34,7 @@ export function registerDiscovery(dispatch: Dispatch) {
   config = getConfig('discovery')
   store = new Store({ name: 'discovery', defaults: { services: [] } })
 
-  client = DiscoveryClient({
+  client = createDiscoveryClient({
     pollInterval: SLOW_POLL_INTERVAL_MS,
     logger: log,
     candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),

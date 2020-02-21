@@ -8,7 +8,7 @@ const log = createLogger(__filename)
 
 const shouldProcess = a => a.meta && (a.meta.robot || a.meta.robotCommand)
 
-export default function apiClientMiddleware() {
+export function apiClientMiddleware() {
   const worker = new Worker()
 
   return store => {

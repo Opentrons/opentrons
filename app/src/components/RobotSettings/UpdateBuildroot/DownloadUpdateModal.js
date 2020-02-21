@@ -7,13 +7,13 @@ import { ProgressBar } from './progress'
 import styles from './styles.css'
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {|
+export type DownloadUpdateModalProps = {|
   notNowButton: ButtonProps,
   error: string | null,
   progress: number | null,
 |}
 
-export default function DownloadUpdateModal(props: Props) {
+export function DownloadUpdateModal(props: DownloadUpdateModalProps) {
   const { notNowButton, error, progress } = props
   const heading = error !== null ? 'Downloading Update' : 'Download Error'
 

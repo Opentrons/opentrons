@@ -8,8 +8,8 @@ import {
   actions as robotActions,
 } from '../../robot'
 
-import DeckMap from '../DeckMap'
-import Prompt from './Prompt'
+import { DeckMap } from '../DeckMap'
+import { Prompt } from './Prompt'
 import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
@@ -22,12 +22,12 @@ type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
+export const ConnectModules = connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(ConnectModules)
+)(ConnectModulesComponent)
 
-function ConnectModules(props: Props) {
+function ConnectModulesComponent(props: Props) {
   if (!props.modulesRequired) return null
 
   const { modulesMissing, setReviewed, fetchModules } = props

@@ -162,7 +162,9 @@ export type ModuleRealType =
   | THERMOCYCLER_MODULE_TYPE
 
 // corresponds to top-level keys in shared-data/module/definitions/2
+// TODO IMMEDIATE Change to sum type as soon as callsites are compatible
 export type ModuleModel = string
+
 export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
 // TODO IMMEDIATELY: gradually replace this old 'ModuleType' with ModuleModel.
 

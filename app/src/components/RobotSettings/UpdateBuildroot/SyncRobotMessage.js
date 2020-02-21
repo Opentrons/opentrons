@@ -4,12 +4,12 @@ import styles from './styles.css'
 import { UPGRADE, DOWNGRADE, REINSTALL } from '../../../buildroot'
 import type { BuildrootUpdateType } from '../../../buildroot/types'
 
-type Props = {|
+export type SyncRobotMessageProps = {|
   updateType: BuildrootUpdateType,
   version: string,
 |}
 
-export default function SyncRobotMessage(props: Props) {
+export function SyncRobotMessage(props: SyncRobotMessageProps) {
   const { updateType, version } = props
 
   if (updateType === REINSTALL) return null

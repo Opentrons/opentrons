@@ -8,24 +8,24 @@ import { selectors as robotSelectors } from '../../robot'
 import { getRobotSettings } from '../../robot-settings'
 import { getUnpreparedModules } from '../../modules'
 
-import Page from '../../components/Page'
-import CalibrateLabware from '../../components/CalibrateLabware'
-import SessionHeader from '../../components/SessionHeader'
-import ReviewDeck from '../../components/ReviewDeck'
-import ConfirmModal from '../../components/CalibrateLabware/ConfirmModal'
-import ConnectModules from '../../components/ConnectModules'
+import { Page } from '../../components/Page'
+import { CalibrateLabware } from '../../components/CalibrateLabware'
+import { SessionHeader } from '../../components/SessionHeader'
+import { ReviewDeck } from '../../components/ReviewDeck'
+import { ConfirmModal } from '../../components/CalibrateLabware/ConfirmModal'
+import { ConnectModules } from '../../components/ConnectModules'
 import { PrepareModules } from '../../components/PrepareModules'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
-import type { Labware } from '../../robot/types'
+import type { Labware as RobotLabware } from '../../robot/types'
 import type { AttachedModule } from '../../modules/types'
 
 type OP = ContextRouter
 
 type SP = {|
   deckPopulated: boolean,
-  labware: ?Labware,
+  labware: ?RobotLabware,
   calibrateToBottom: boolean,
   robotName: string | null,
   hasModulesLeftToReview: ?boolean,
@@ -34,11 +34,11 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export default withRouter<_, _>(
-  connect<Props, OP, SP, _, _, _>(mapStateToProps)(SetupDeckPage)
+export const Labware = withRouter<_, _>(
+  connect<Props, OP, SP, _, _, _>(mapStateToProps)(LabwareComponent)
 )
 
-function SetupDeckPage(props: Props) {
+function LabwareComponent(props: Props) {
   const {
     robotName,
     calibrateToBottom,

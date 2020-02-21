@@ -4,14 +4,14 @@ import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../portal'
-import ManualIpForm from './ManualIpForm'
-import IpList from './IpList'
+import { ManualIpForm } from './ManualIpForm'
+import { IpList } from './IpList'
 
-export type AddManualIpProps = {
+export type AddManualIpProps = {|
   backUrl: string,
-}
+|}
 
-export default function AddManualIp(props: AddManualIpProps) {
+export function AddManualIp(props: AddManualIpProps) {
   return (
     <Portal>
       <AlertModal

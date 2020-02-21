@@ -5,6 +5,6 @@ import * as React from 'react'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-export default function InProgressContent() {
+export function InProgressContents() {
   return <Icon className={styles.spinner} name="ot-spinner" spin />
 }

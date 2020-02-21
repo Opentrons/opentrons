@@ -4,13 +4,13 @@ import { Icon, PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {
+export type ScanButtonProps = {|
   isScanning: boolean,
   onScanClick: () => mixed,
   found: boolean,
-}
+|}
 
-export default function ScanButton(props: Props) {
+export function ScanButton(props: ScanButtonProps) {
   const { isScanning, onScanClick, found } = props
   const buttonText = found ? 'Refresh List' : 'Try Again'
 

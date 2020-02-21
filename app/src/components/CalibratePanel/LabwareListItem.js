@@ -13,14 +13,14 @@ import styles from './styles.css'
 import type { Labware } from '../../robot'
 import { THERMOCYCLER } from '../../modules'
 
-type LabwareListItemProps = {|
+export type LabwareListItemProps = {|
   ...Labware,
   moduleName?: ModuleType,
   isDisabled: boolean,
   onClick: () => mixed,
 |}
 
-export default function LabwareListItem(props: LabwareListItemProps) {
+export function LabwareListItem(props: LabwareListItemProps) {
   const {
     name,
     type,

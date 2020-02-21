@@ -1,7 +1,7 @@
 // @flow
 import type { Service } from '../types'
 
-const MOCK_SERVICE: Service = {
+export const MOCK_SERVICE: Service = {
   name: 'opentrons-dev',
   ip: '192.168.1.42',
   port: 31950,
@@ -12,5 +12,3 @@ const MOCK_SERVICE: Service = {
   health: null,
   serverHealth: null,
 }
-
-export default MOCK_SERVICE

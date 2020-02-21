@@ -1,7 +1,6 @@
 // mock http api client
-'use strict'
 
-const client = (module.exports = jest.fn())
+export const client = jest.fn()
 
 client.__setMockResponse = function setMockResponse(...responses) {
   client.mockReset()

@@ -1,5 +1,5 @@
 // tests for generic api reducer
-import apiReducer from '../reducer'
+import { apiReducer } from '../reducer'
 
 describe('apiReducer', () => {
   test('handles api:REQUEST', () => {

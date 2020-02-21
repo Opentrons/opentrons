@@ -18,7 +18,7 @@ function parseMessage(data) {
   return message
 }
 
-export default class WebSocketClient extends EventEmitter {
+export class WebSocketClient extends EventEmitter {
   constructor(url) {
     super()
     this._ws = new WebSocket(url)

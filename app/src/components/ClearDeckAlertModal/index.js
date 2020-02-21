@@ -7,7 +7,7 @@ import { Portal } from '../portal'
 import removeTrashSrc from './img/trash@3x.png'
 import styles from './styles.css'
 
-type Props = {|
+export type ClearDeckAlertModalProps = {|
   onContinueClick?: () => mixed,
   onCancelClick?: () => mixed,
   parentUrl?: string,
@@ -19,7 +19,7 @@ type Props = {|
 
 const HEADING = 'Before continuing, please remove:'
 
-export default function ClearDeckAlertModal(props: Props) {
+export function ClearDeckAlertModal(props: ClearDeckAlertModalProps) {
   const {
     onContinueClick,
     onCancelClick,

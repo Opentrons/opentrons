@@ -7,24 +7,23 @@ import styles from './styles.css'
 
 import type { DisplayFieldProps, DisplayQuirkFieldProps } from './ConfigForm'
 
-type FormColProps = {
+export type FormColumnProps = {|
   children: React.Node,
-  className?: string,
-}
+|}
 
-export function FormColumn(props: FormColProps) {
+export function FormColumn(props: FormColumnProps) {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
 export type FormValues = { [string]: ?(string | boolean) }
 
-type FormGroupProps = {
+export type ConfigFormGroupProps = {|
   groupLabel: string,
   groupError?: ?string,
   formFields: Array<DisplayFieldProps>,
-}
+|}
 
-export default function ConfigFormGroup(props: FormGroupProps) {
+export function ConfigFormGroup(props: ConfigFormGroupProps) {
   const { groupLabel, groupError, formFields } = props
   const formattedError =
     groupError &&
@@ -46,16 +45,16 @@ export default function ConfigFormGroup(props: FormGroupProps) {
   )
 }
 
-type FormRowProps = {
+export type ConfigFormRowProps = {|
   label: string,
   labelFor: string,
   children: React.Node,
-}
+|}
 
 const FIELD_ID_PREFIX = '__PipetteConfig__'
 const makeId = (name: *): string => `${FIELD_ID_PREFIX}.${name}`
 
-export function ConfigFormRow(props: FormRowProps) {
+export function ConfigFormRow(props: ConfigFormRowProps) {
   const { labelFor, label } = props
   return (
     <div className={styles.form_row}>
@@ -67,10 +66,10 @@ export function ConfigFormRow(props: FormRowProps) {
   )
 }
 
-type ConfigInputProps = {
+export type ConfigInputProps = {|
   field: DisplayFieldProps,
   className?: string,
-}
+|}
 
 export function ConfigInput(props: ConfigInputProps) {
   const { field, className } = props
@@ -97,12 +96,12 @@ export function ConfigInput(props: ConfigInputProps) {
   )
 }
 
-type ConfigBooleanProps = {
+export type ConfigCheckboxProps = {|
   field: DisplayQuirkFieldProps,
   className?: string,
-}
+|}
 
-export function ConfigCheckbox(props: ConfigBooleanProps) {
+export function ConfigCheckbox(props: ConfigCheckboxProps) {
   const { field, className } = props
   const { name, displayName } = field
   const id = makeId(name)
@@ -122,12 +121,12 @@ export function ConfigCheckbox(props: ConfigBooleanProps) {
   )
 }
 
-type QuirkGroupProps = {
+export type ConfigQuirkGroupProps = {|
   groupLabel: string,
   quirks: Array<DisplayQuirkFieldProps>,
-}
+|}
 
-export function ConfigQuirkGroup(props: QuirkGroupProps) {
+export function ConfigQuirkGroup(props: ConfigQuirkGroupProps) {
   const { groupLabel, quirks } = props
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>

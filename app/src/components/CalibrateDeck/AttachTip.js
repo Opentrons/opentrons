@@ -5,7 +5,7 @@ import { PrimaryButton } from '@opentrons/components'
 
 import styles from './styles.css'
 
-type Props = {|
+export type AttachTipProps = {|
   ...CalibrateDeckStartedProps,
   proceed: () => mixed,
 |}
@@ -23,7 +23,7 @@ const DIAGRAMS: { [step: CalibrationStep]: { [Channels]: string } } = {
   },
 }
 
-export default function AttachTipModal(props: Props) {
+export function AttachTip(props: AttachTipProps) {
   const multi = props.pipette.channels === 8
   const tipLocation = multi ? 'very first channel at front of' : ''
 
@@ -33,7 +33,9 @@ export default function AttachTipModal(props: Props) {
   if (props.calibrationStep === '1') {
     instructions = (
       <span>
-        <p>Place a GEB tip on the {tipLocation} pipette before continuing.</p>
+        <p>
+          Place an Opentrons tip on the {tipLocation} pipette before continuing.
+        </p>
         <p>Confirm tip is attached to start calibration.</p>
       </span>
     )
@@ -41,7 +43,7 @@ export default function AttachTipModal(props: Props) {
   } else {
     instructions = (
       <span>
-        <p>Remove the GEB tip from the pipette. </p>
+        <p>Remove the Opentrons tip from the pipette.</p>
         <p>
           You must restart your robot to finish the initial robot calibration
           process and have the new settings take effect. It may take several
@@ -67,7 +69,7 @@ export default function AttachTipModal(props: Props) {
   )
 }
 
-function getDiagramSrc(props: Props): string {
+function getDiagramSrc(props: AttachTipProps): string {
   const { calibrationStep, pipette } = props
   const channelsKey = pipette.channels === 8 ? 'multi' : 'single'
 

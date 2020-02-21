@@ -1,6 +1,4 @@
 // @flow
 // instrument setup components
-import PipetteTabs from './PipetteTabs'
-import Pipettes from './Pipettes'
-
-export { PipetteTabs, Pipettes }
+export * from './PipetteTabs'
+export * from './Pipettes'

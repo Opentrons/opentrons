@@ -3,29 +3,29 @@ import * as React from 'react'
 
 import { Portal } from '../../portal'
 import { ScrollableAlertModal } from '../../modals'
-import UpdateAppMessage from './UpdateAppMessage'
-import ReleaseNotes from '../../ReleaseNotes'
+import { UpdateAppMessage } from './UpdateAppMessage'
+import { ReleaseNotes } from '../../ReleaseNotes'
 
 import type { ShellUpdateState } from '../../../shell/types'
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {
+export type UpdateAppModalProps = {|
   update: ShellUpdateState,
   availableVersion: ?string,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
-}
+|}
 
-type UpdateAppState = {
+type UpdateAppModalState = {|
   showReleaseNotes: boolean,
-}
+|}
 
-export default class UpdateAppModal extends React.Component<
-  Props,
-  UpdateAppState
+export class UpdateAppModal extends React.Component<
+  UpdateAppModalProps,
+  UpdateAppModalState
 > {
-  constructor(props: Props) {
+  constructor(props: UpdateAppModalProps) {
     super(props)
     this.state = { showReleaseNotes: false }
   }

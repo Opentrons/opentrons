@@ -8,7 +8,7 @@ import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
 import functionsIn from 'lodash/functionsIn'
 
-import RpcClient from '../../rpc/client'
+import { Client as RpcClient } from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
 import * as constants from '../constants'
 import * as selectors from '../selectors'
@@ -27,7 +27,7 @@ const RE_TIPRACK = /tip ?rack/i
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
   'This robot does not support ZIP protocol bundles. Please update its software to the latest version and upload this protocol again'
 
-export default function client(dispatch) {
+export function client(dispatch) {
   let freshUpload = false
   let rpcClient
   let remote

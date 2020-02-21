@@ -6,13 +6,13 @@ import {
   selectors as robotSelectors,
 } from '../../robot'
 
-import CommandList from './CommandList'
+import { CommandList } from './CommandList'
 
 import type { State, Dispatch } from '../../types'
 import type { SessionStatus } from '../../robot'
 import type { CommandListProps } from './CommandList'
 
-export { default as ConfirmCancelModal } from './ConfirmCancelModal'
+export { ConfirmCancelModal } from './ConfirmCancelModal'
 
 type SP = {|
   commands: Array<any>,
@@ -24,7 +24,7 @@ type DP = {|
   onResetClick: () => mixed,
 |}
 
-export default connect<CommandListProps, {||}, _, _, _, _>(
+export const RunLog = connect<CommandListProps, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
 )(CommandList)

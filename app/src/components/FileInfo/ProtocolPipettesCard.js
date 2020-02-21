@@ -11,22 +11,22 @@ import {
   getProtocolPipettesMatch,
   getSomeProtocolPipettesInexact,
 } from '../../pipettes'
-import InstrumentItem from './InstrumentItem'
+import { InstrumentItem } from './InstrumentItem'
 import { SectionContentHalf } from '../layout'
-import InfoSection from './InfoSection'
-import MissingItemWarning from './MissingItemWarning'
+import { InfoSection } from './InfoSection'
+import { MissingItemWarning } from './MissingItemWarning'
 
 import styles from './styles.css'
 
 import type { State, Dispatch } from '../../types'
 
-type Props = {| robotName: string |}
+export type ProtocolPipettesCardProps = {| robotName: string |}
 
 const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 const TITLE = 'Required Pipettes'
 
-function ProtocolPipettes(props: Props) {
+export function ProtocolPipettesCard(props: ProtocolPipettesCardProps) {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const infoByMount = useSelector((state: State) =>
@@ -100,5 +100,3 @@ function ProtocolPipettes(props: Props) {
     </InfoSection>
   )
 }
-
-export default ProtocolPipettes

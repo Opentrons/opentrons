@@ -4,9 +4,9 @@ import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
-type Props = {
-  onCloseClick: () => *,
-}
+export type ConnectAlertModalProps = {|
+  onCloseClick: () => mixed,
+|}
 
 const HEADING = 'Could not connect to robot'
 
@@ -16,7 +16,7 @@ const TRY_AGAIN_MESSAGE =
 const CONTACT_SUPPORT_MESSAGE =
   "If you're still unable to connect, please contact our support team"
 
-export default function ConnectAlertModal(props: Props) {
+export function ConnectAlertModal(props: ConnectAlertModalProps) {
   const { onCloseClick } = props
 
   return (

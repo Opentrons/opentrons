@@ -18,6 +18,15 @@ export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 export const MAGDECK: 'magdeck' = 'magdeck'
+// these are the v2 equivalents of the above. They should match the names of definitions
+export const MAGNETIC_MODULE_V1: 'magneticModuleV1' = 'magneticModuleV1'
+export const MAGNETIC_MODULE_V2: 'magneticModuleV2' = 'magneticModuleV2'
+export const TEMPERATURE_MODULE_V1: 'temperatureModuleV1' =
+  'temperatureModuleV1'
+export const TEMPERATURE_MODULE_V2: 'temperatureModuleV2' =
+  'temperatureModuleV2'
+export const THERMOCYCLER_MODULE_V1: 'thermocyclerModuleV1' =
+  'thermocyclerModuleV1'
 
 // pipette display categories
 export const GEN2: 'GEN2' = 'GEN2'
@@ -30,5 +39,19 @@ export const MAGNETIC_MODULE_TYPE: 'magneticModuleType' = 'magneticModuleType'
 export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
 
+export const MODULE_MODELS = [
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
+]
+
 // offset added to parameters.magneticModuleEngageHeight for displaying reccomended height in PD
 export const ENGAGE_HEIGHT_OFFSET = -4
+
+export const MODULE_TYPES = [
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+]
