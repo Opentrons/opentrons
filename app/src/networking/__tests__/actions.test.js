@@ -105,6 +105,49 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'networking:POST_WIFI_CONFIGURE',
+      creator: Actions.postWifiConfigure,
+      args: [mockRobot.name, { ssid: 'network-name', psk: 'network-password' }],
+      expected: {
+        type: 'networking:POST_WIFI_CONFIGURE',
+        payload: {
+          robotName: mockRobot.name,
+          options: { ssid: 'network-name', psk: 'network-password' },
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'networking:POST_WIFI_CONFIGURE_SUCCESS',
+      creator: Actions.postWifiConfigureSuccess,
+      args: [mockRobot.name, 'network-name', mockRequestMeta],
+      expected: {
+        type: 'networking:POST_WIFI_CONFIGURE_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          ssid: 'network-name',
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'networking:POST_WIFI_CONFIGURE_FAILURE',
+      creator: Actions.postWifiConfigureFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockWifiConfigureFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:POST_WIFI_CONFIGURE_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockWifiListFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

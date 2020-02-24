@@ -24,7 +24,7 @@ export const fetchStatusSuccess = (
 
 export const fetchStatusFailure = (
   robotName: string,
-  error: {},
+  error: { ... },
   meta: RobotApiRequestMeta
 ): Types.FetchStatusFailureAction => ({
   type: Constants.FETCH_STATUS_FAILURE,
@@ -52,10 +52,39 @@ export const fetchWifiListSuccess = (
 
 export const fetchWifiListFailure = (
   robotName: string,
-  error: {},
+  error: { ... },
   meta: RobotApiRequestMeta
 ): Types.FetchWifiListFailureAction => ({
   type: Constants.FETCH_WIFI_LIST_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
+
+export const postWifiConfigure = (
+  robotName: string,
+  options: Types.WifiConfigureRequest
+): Types.PostWifiConfigureAction => ({
+  type: Constants.POST_WIFI_CONFIGURE,
+  payload: { robotName, options },
+  meta: {},
+})
+
+export const postWifiConfigureSuccess = (
+  robotName: string,
+  ssid: string,
+  meta: RobotApiRequestMeta
+): Types.PostWifiConfigureSuccessAction => ({
+  type: Constants.POST_WIFI_CONFIGURE_SUCCESS,
+  payload: { robotName, ssid },
+  meta,
+})
+
+export const postWifiConfigureFailure = (
+  robotName: string,
+  error: { ... },
+  meta: RobotApiRequestMeta
+): Types.PostWifiConfigureFailureAction => ({
+  type: Constants.POST_WIFI_CONFIGURE_FAILURE,
   payload: { robotName, error },
   meta,
 })
