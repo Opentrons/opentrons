@@ -1,4 +1,4 @@
-# Opentrons App Changes from 3.16.0 to 3.16.1-beta.0
+# Opentrons App Changes from 3.16.0 to 3.16.1
 
 For more details about this release, please see the full [technical change log][changelog]
 
