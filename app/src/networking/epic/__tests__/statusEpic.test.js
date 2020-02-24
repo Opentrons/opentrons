@@ -1,115 +1,87 @@
 // @flow
-import { TestScheduler } from 'rxjs/testing'
-
-import { mockRobot } from '../../../robot-api/__fixtures__'
-import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
+import {
+  setupEpicTestMocks,
+  scheduleEpicTest,
+} from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import * as Types from '../../types'
 import { networkingEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
-
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
-jest.mock('../../selectors')
-
-const mockState = { state: true }
-
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
-
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
-
 describe('networking statusEpic', () => {
-  let testScheduler
+  let mocks
 
   beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
-
-    testScheduler = new TestScheduler((actual, expected) => {
-      expect(actual).toEqual(expected)
-    })
+    mocks = setupEpicTestMocks(robotName => Actions.fetchStatus(robotName))
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  const meta = { requestId: '1234' }
-  const action: Types.FetchStatusAction = {
-    ...Actions.fetchStatus(mockRobot.name),
-    meta,
-  }
+  it('calls GET /networking/status', () => {
+    scheduleEpicTest(
+      mocks,
+      Fixtures.mockNetworkingStatusSuccess,
+      ({ hot, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
+        const output$ = networkingEpic(action$, state$)
 
-  test('calls GET /networking/status', () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingStatusSuccess })
-      )
+        expectObservable(output$)
+        flush()
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
-      const output$ = networkingEpic(action$, state$)
-
-      expectObservable(output$)
-      flush()
-
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
-        method: 'GET',
-        path: '/networking/status',
-      })
-    })
+        expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+          method: 'GET',
+          path: '/networking/status',
+        })
+      }
+    )
   })
 
-  test('maps successful response to FETCH_STATUS_SUCCESS', () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingStatusSuccess })
-      )
+  it('maps successful response to FETCH_STATUS_SUCCESS', () => {
+    scheduleEpicTest(
+      mocks,
+      Fixtures.mockNetworkingStatusSuccess,
+      ({ hot, expectObservable }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
+        const output$ = networkingEpic(action$, state$)
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
-      const output$ = networkingEpic(action$, state$)
-
-      expectObservable(output$).toBe('--a', {
-        a: Actions.fetchStatusSuccess(
-          mockRobot.name,
-          Fixtures.mockNetworkingStatusSuccess.body.status,
-          Fixtures.mockNetworkingStatusSuccess.body.interfaces,
-          { ...meta, response: Fixtures.mockNetworkingStatusSuccessMeta }
-        ),
-      })
-    })
+        expectObservable(output$).toBe('--a', {
+          a: Actions.fetchStatusSuccess(
+            mocks.robot.name,
+            Fixtures.mockNetworkingStatusSuccess.body.status,
+            Fixtures.mockNetworkingStatusSuccess.body.interfaces,
+            {
+              ...mocks.meta,
+              response: Fixtures.mockNetworkingStatusSuccessMeta,
+            }
+          ),
+        })
+      }
+    )
   })
 
-  test('maps failed response to FETCH_STATUS_FAILURE', () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingStatusFailure })
-      )
+  it('maps failed response to FETCH_STATUS_FAILURE', () => {
+    scheduleEpicTest(
+      mocks,
+      Fixtures.mockNetworkingStatusFailure,
+      ({ hot, expectObservable }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
+        const output$ = networkingEpic(action$, state$)
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
-      const output$ = networkingEpic(action$, state$)
-
-      expectObservable(output$).toBe('--a', {
-        a: Actions.fetchStatusFailure(
-          mockRobot.name,
-          Fixtures.mockNetworkingStatusFailure.body,
-          { ...meta, response: Fixtures.mockNetworkingStatusFailureMeta }
-        ),
-      })
-    })
+        expectObservable(output$).toBe('--a', {
+          a: Actions.fetchStatusFailure(
+            mocks.robot.name,
+            Fixtures.mockNetworkingStatusFailure.body,
+            {
+              ...mocks.meta,
+              response: Fixtures.mockNetworkingStatusFailureMeta,
+            }
+          ),
+        })
+      }
+    )
   })
 })

@@ -7,21 +7,21 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-describe('networking wifiListEpic', () => {
+describe('networking fetch wifi keys epic', () => {
   let mocks
 
   beforeEach(() => {
-    mocks = setupEpicTestMocks(robotName => Actions.fetchWifiList(robotName))
+    mocks = setupEpicTestMocks(robotName => Actions.fetchWifiKeys(robotName))
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('calls GET /wifi/list', () => {
+  it('calls GET /wifi/keys', () => {
     scheduleEpicTest(
       mocks,
-      Fixtures.mockWifiListSuccess,
+      Fixtures.mockFetchWifiKeysSuccess,
       ({ hot, expectObservable, flush }) => {
         const action$ = hot('--a', { a: mocks.action })
         const state$ = hot('s-s', { s: mocks.state })
@@ -32,46 +32,46 @@ describe('networking wifiListEpic', () => {
 
         expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
           method: 'GET',
-          path: '/wifi/list',
+          path: '/wifi/keys',
         })
       }
     )
   })
 
-  it('maps successful response to FETCH_WIFI_LIST_SUCCESS', () => {
+  it('maps successful response to FETCH_WIFI_KEYS_SUCCESS', () => {
     scheduleEpicTest(
       mocks,
-      Fixtures.mockWifiListSuccess,
+      Fixtures.mockFetchWifiKeysSuccess,
       ({ hot, expectObservable }) => {
         const action$ = hot('--a', { a: mocks.action })
         const state$ = hot('s-s', { s: mocks.state })
         const output$ = networkingEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchWifiListSuccess(
+          a: Actions.fetchWifiKeysSuccess(
             mocks.robot.name,
-            Fixtures.mockWifiListSuccess.body.list,
-            { ...mocks.meta, response: Fixtures.mockWifiListSuccessMeta }
+            Fixtures.mockFetchWifiKeysSuccess.body.keys,
+            { ...mocks.meta, response: Fixtures.mockFetchWifiKeysSuccessMeta }
           ),
         })
       }
     )
   })
 
-  it('maps failed response to FETCH_WIFI_LIST_FAILURE', () => {
+  it('maps failed response to FETCH_WIFI_KEYS_FAILURE', () => {
     scheduleEpicTest(
       mocks,
-      Fixtures.mockWifiListFailure,
+      Fixtures.mockFetchWifiKeysFailure,
       ({ hot, expectObservable }) => {
         const action$ = hot('--a', { a: mocks.action })
         const state$ = hot('s-s', { s: mocks.state })
         const output$ = networkingEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchWifiListFailure(
+          a: Actions.fetchWifiKeysFailure(
             mocks.robot.name,
-            Fixtures.mockWifiListFailure.body,
-            { ...mocks.meta, response: Fixtures.mockWifiListFailureMeta }
+            Fixtures.mockFetchWifiKeysFailure.body,
+            { ...mocks.meta, response: Fixtures.mockFetchWifiKeysFailureMeta }
           ),
         })
       }

@@ -88,3 +88,31 @@ export const postWifiConfigureFailure = (
   payload: { robotName, error },
   meta,
 })
+
+export const fetchWifiKeys = (
+  robotName: string
+): Types.FetchWifiKeysAction => ({
+  type: Constants.FETCH_WIFI_KEYS,
+  payload: { robotName },
+  meta: {},
+})
+
+export const fetchWifiKeysSuccess = (
+  robotName: string,
+  wifiKeys: Array<Types.WifiKey>,
+  meta: RobotApiRequestMeta
+): Types.FetchWifiKeysSuccessAction => ({
+  type: Constants.FETCH_WIFI_KEYS_SUCCESS,
+  payload: { robotName, wifiKeys },
+  meta,
+})
+
+export const fetchWifiKeysFailure = (
+  robotName: string,
+  error: { ... },
+  meta: RobotApiRequestMeta
+): Types.FetchWifiKeysFailureAction => ({
+  type: Constants.FETCH_WIFI_KEYS_FAILURE,
+  payload: { robotName, error },
+  meta,
+})

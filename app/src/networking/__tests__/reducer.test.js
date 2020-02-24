@@ -59,11 +59,31 @@ const SPECS: Array<ReducerSpec> = [
       },
     },
   },
+  {
+    name: 'handles fetch wifi keys success action',
+    action: Actions.fetchWifiKeysSuccess(
+      ROBOT_NAME,
+      [Fixtures.mockWifiKey],
+      {}
+    ),
+    state: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeys: [],
+      },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeys: [Fixtures.mockWifiKey],
+      },
+    },
+  },
 ]
 
 describe('networkingReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    test(name, () => expect(networkingReducer(state, action)).toEqual(expected))
+    it(name, () => expect(networkingReducer(state, action)).toEqual(expected))
   })
 })
