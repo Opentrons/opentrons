@@ -7,11 +7,11 @@ import { PDListItem } from '../lists'
 import { Portal } from './TooltipPortal'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
 import styles from './StepItem.css'
-import typeof { TEMPDECK, MAGDECK } from '../../constants'
+import type { ModuleRealType } from '@opentrons/shared-data'
 
 type Props = {|
   action: string,
-  module: MAGDECK | TEMPDECK,
+  moduleType: ModuleRealType,
   actionText: string,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
@@ -24,7 +24,7 @@ export const ModuleStepItems = (props: Props) => (
       <PDListItem className="step-item-message">{props.message}</PDListItem>
     )}
     <li className={styles.module_substep_header}>
-      <span>{i18n.t(`modules.module_long_names.${props.module}`)}</span>
+      <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
       <span>{props.action}</span>
     </li>
     <PDListItem

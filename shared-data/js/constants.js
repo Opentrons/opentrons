@@ -13,12 +13,12 @@ export const FIXED_TRASH_RENDER_HEIGHT = 165.86 // along Y axis in SVG coords
 
 export const OPENTRONS_LABWARE_NAMESPACE = 'opentrons'
 
-// TODO: IL 2019-01-31 these 3 are module MODELS. They should be derived from the module definition file.
-// We should ensure we're not using them as if they were types.
+// TODO: IL 2020-02-19 These 3 constants are DEPRECATED because they're ambiguous model vs type.
 export const THERMOCYCLER: 'thermocycler' = 'thermocycler'
 export const TEMPDECK: 'tempdeck' = 'tempdeck'
 export const MAGDECK: 'magdeck' = 'magdeck'
-// these are the v2 equivalents of the above. They should match the names of definitions
+// these are the Module Def Schema v2 equivalents of the above. They should match the names of JSON definitions
+// in shared-data/module/definitions/2.
 export const MAGNETIC_MODULE_V1: 'magneticModuleV1' = 'magneticModuleV1'
 export const MAGNETIC_MODULE_V2: 'magneticModuleV2' = 'magneticModuleV2'
 export const TEMPERATURE_MODULE_V1: 'temperatureModuleV1' =

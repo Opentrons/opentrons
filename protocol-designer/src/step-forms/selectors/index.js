@@ -10,13 +10,13 @@ import {
   getPipetteNameSpecs,
   getLabwareDisplayName,
   getLabwareDefURI,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
@@ -155,16 +155,16 @@ export const getLabwareLocationsForStep = (
 }
 
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
-  type: MAGDECK,
+  type: MAGNETIC_MODULE_TYPE,
   engaged: false,
 }
 const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
-  type: TEMPDECK,
+  type: TEMPERATURE_MODULE_TYPE,
   status: TEMPERATURE_DEACTIVATED,
   targetTemperature: null,
 }
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
-  type: THERMOCYCLER,
+  type: THERMOCYCLER_MODULE_TYPE,
 }
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
@@ -193,19 +193,19 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
         moduleLocations,
         (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
           const module = moduleEntities[moduleId]
-          if (module.type === MAGDECK) {
+          if (module.type === MAGNETIC_MODULE_TYPE) {
             return {
               id: module.id,
               model: module.model,
-              type: MAGDECK,
+              type: MAGNETIC_MODULE_TYPE,
               slot,
               moduleState: MAGNETIC_MODULE_INITIAL_STATE,
             }
-          } else if (module.type === TEMPDECK) {
+          } else if (module.type === TEMPERATURE_MODULE_TYPE) {
             return {
               id: module.id,
               model: module.model,
-              type: TEMPDECK,
+              type: TEMPERATURE_MODULE_TYPE,
               slot,
               moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
             }
@@ -213,7 +213,7 @@ export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
             return {
               id: module.id,
               model: module.model,
-              type: THERMOCYCLER,
+              type: THERMOCYCLER_MODULE_TYPE,
               slot,
               moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
             }
@@ -349,9 +349,9 @@ export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> =
         }
       },
       {
-        magdeck: null,
-        tempdeck: null,
-        thermocycler: null,
+        [MAGNETIC_MODULE_TYPE]: null,
+        [TEMPERATURE_MODULE_TYPE]: null,
+        [THERMOCYCLER_MODULE_TYPE]: null,
       }
     )
 )

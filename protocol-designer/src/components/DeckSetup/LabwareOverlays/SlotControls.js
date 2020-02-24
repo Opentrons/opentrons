@@ -19,7 +19,7 @@ import { DND_TYPES } from './constants'
 import type { DeckSlot, ThunkDispatch } from '../../../types'
 import type {
   DeckSlot as DeckSlotDefinition,
-  ModuleType,
+  ModuleRealType,
   LabwareDefinition2,
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
@@ -31,7 +31,7 @@ type DNDP = {|
 |}
 type OP = {|
   slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
-  moduleType: ModuleType | null,
+  moduleType: ModuleRealType | null,
   selectedTerminalItemId: ?TerminalItemId,
   handleDragHover?: () => mixed,
 |}

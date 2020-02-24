@@ -1,13 +1,18 @@
+// TODO: IL 2020-02-19 add Flow directive (need to figure out how to flow-ignore mocking, or refactor to avoid mocking)
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { OutlineButton, DropdownField } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { selectors as featureSelectors } from '../../../../feature-flags'
 import * as stepFormActions from '../../../../step-forms/actions'
 import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import * as labwareIngredActions from '../../../../labware-ingred/actions'
-import { MAGDECK, TEMPDECK } from '../../../../constants'
 import { PDAlert } from '../../../alerts/PDAlert'
 import { EditModulesModal } from '../'
 // only mock actions and selectors from step-forms
@@ -52,7 +57,7 @@ describe('EditModulesModal', () => {
     })
     labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(false)
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }
@@ -80,7 +85,7 @@ describe('EditModulesModal', () => {
     })
     labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(true)
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }
@@ -95,8 +100,8 @@ describe('EditModulesModal', () => {
     expect(warning).toHaveLength(0)
     expect(stepFormActions.createModule).toHaveBeenCalledWith({
       slot,
-      type: MAGDECK,
-      model: 'GEN1',
+      type: MAGNETIC_MODULE_TYPE,
+      model: DEFAULT_MODEL_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
     })
     expect(props.onCloseClick).toHaveBeenCalled()
   })
@@ -116,7 +121,7 @@ describe('EditModulesModal', () => {
       pipettes: {},
     })
     const props = {
-      moduleType: TEMPDECK,
+      moduleType: TEMPERATURE_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }
@@ -132,8 +137,8 @@ describe('EditModulesModal', () => {
     expect(warning).toHaveLength(0)
     expect(stepFormActions.createModule).toHaveBeenCalledWith({
       slot: newSlot,
-      type: TEMPDECK,
-      model: 'GEN1',
+      type: TEMPERATURE_MODULE_TYPE,
+      model: DEFAULT_MODEL_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
     })
     expect(props.onCloseClick).toHaveBeenCalled()
   })
@@ -156,7 +161,7 @@ describe('EditModulesModal', () => {
     })
     labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(true)
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: 'magnet123',
       onCloseClick: jest.fn(),
     }
@@ -191,7 +196,7 @@ describe('EditModulesModal', () => {
       pipettes: {},
     })
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: 'magnet123',
       onCloseClick: jest.fn(),
     }
@@ -204,7 +209,7 @@ describe('EditModulesModal', () => {
 
   test('cancel calls onCloseClick to close modal', () => {
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }
@@ -226,7 +231,7 @@ describe('EditModulesModal', () => {
       .fn()
       .mockReturnValue(true)
     const props = {
-      moduleType: MAGDECK,
+      moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }

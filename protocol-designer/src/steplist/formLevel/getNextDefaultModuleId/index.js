@@ -1,7 +1,10 @@
 // @flow
 import findKey from 'lodash/findKey'
 import last from 'lodash/last'
-import { TEMPDECK, THERMOCYCLER } from '../../../constants'
+import {
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 import type { ModuleOnDeck } from '../../../step-forms'
 import type { StepIdType, FormData } from '../../../form-types'
@@ -24,8 +27,8 @@ export function getNextDefaultTemperatureModuleId(
   // should we simplify this to only return temperature modules?
   const nextDefaultModule: string | null =
     (isLastStepTemp(lastModuleStep) && lastModuleStep.moduleId) ||
-    findKey(equippedModulesById, m => m.type === TEMPDECK) ||
-    findKey(equippedModulesById, m => m.type === THERMOCYCLER) ||
+    findKey(equippedModulesById, m => m.type === TEMPERATURE_MODULE_TYPE) ||
+    findKey(equippedModulesById, m => m.type === THERMOCYCLER_MODULE_TYPE) ||
     null
 
   return nextDefaultModule || null

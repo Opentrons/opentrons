@@ -1,6 +1,6 @@
 // @flow
 import assert from 'assert'
-import { MAGDECK } from '../../../constants'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 
 import type {
@@ -23,7 +23,7 @@ export const engageMagnet = (
   }
 
   assert(
-    invariantContext.moduleEntities[module]?.type === MAGDECK,
+    invariantContext.moduleEntities[module]?.type === MAGNETIC_MODULE_TYPE,
     `expected module ${module} to be magdeck, got ${invariantContext.moduleEntities[module]?.type}`
   )
 
