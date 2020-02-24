@@ -105,38 +105,10 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 	$(python) -m openapi_spec_validator $(ot_openapi)
 
-docs/build/html/v%: docs/v%
-	$(sphinx_build) -b html -d docs/build/doctrees -n $< $@
-	$(SHX) cp docs/img/lightbulb.jpg $@/_images/ # sphinx wont automatically do this because it's only in a template
-
-docs/build/pdf/OpentronsPythonAPIV%.pdf: docs/v%
-	$(sphinx_build) -b latex -d docs/build/doctrees $< $(@D)
-	$(MAKE) -C $(@D) all-pdf $(if $(CI),>/dev/null,|| $(SHX) echo "latex build failed (pdflatex not installed?)")
-	$(SHX) ls $(@D)/*.pdf $(if $(CI),,|| $(SHX) echo "no pdf produced")
-
-docs/dist/v%: docs/build/html/v% docs/build/pdf/OpentronsPythonAPIV%.pdf
-	$(SHX) mkdir -p $@
-	$(SHX) cp -R $^ $(@D) $(if $(CI),,|| true)
-
-docs/dist/ot1: docs/ot1
-	$(SHX) mkdir -p $@
-	$(SHX) cp -R $< $(@D)
-
-docs/dist/%: docs/root/%
-	$(SHX) mkdir -p $(@D)
-	$(SHX) cp -R docs/root/* docs/dist/
-
-.PHONY: docs
-docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1
-
-.PHONY: docs-clean
-docs-clean:
-	$(SHX) rm -rf docs/dist docs/build
-
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m opentrons.main -P 31950
+	$(python) -m robot_server.main -P 31950
 
 .PHONY: local-shell
 local-shell:
