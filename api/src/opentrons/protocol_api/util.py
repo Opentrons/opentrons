@@ -215,10 +215,6 @@ class HardwareManager:
             API.build_hardware_simulator)
         return self._current
 
-    def __del__(self):
-        if isinstance(self._current._api, ThreadManager):
-            self._current._api.clean_up()
-
 
 def clamp_value(
         input_value: float, max_value: float, min_value: float,

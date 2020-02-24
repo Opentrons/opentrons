@@ -5,7 +5,7 @@ contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
-
+import atexit
 import argparse
 import asyncio
 import logging
@@ -269,7 +269,6 @@ def execute(protocol_file: TextIO,
                      extra_labware=extra_labware,
                      extra_data=extra_data)
     if getattr(protocol, 'api_level', APIVersion(2, 0)) < APIVersion(2, 0):
-        print('DID OLD')
         opentrons.robot.connect()
         opentrons.robot.cache_instrument_models()
         opentrons.robot.discover_modules()
@@ -281,7 +280,6 @@ def execute(protocol_file: TextIO,
             'Internal error: Only Python protocols may be executed in v1'
         exec(protocol.contents, {})
     else:
-        print('DID NEW')
         bundled_data = getattr(protocol, 'bundled_data', {})
         bundled_data.update(extra_data)
         gpa_extras = getattr(protocol, 'extra_labware', None) or None
@@ -355,6 +353,13 @@ def main() -> int:
             log_level=log_level, emit_runlog=printer)
     return 0
 
+@atexit.register
+def _clear_cached_hardware_controller():
+    global _HWCONTROL
+    print('ATEXIT')
+    if _HWCONTROL:
+        _HWCONTROL.clean_up()
+        _HWCONTROL = None
 
 if __name__ == '__main__':
     sys.exit(main())

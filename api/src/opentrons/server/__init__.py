@@ -115,7 +115,8 @@ def init(hardware: 'HardwareAPILike' = None,
                 log.exception(f"failed to remove app temp path {temppath}")
 
     async def shutdown_hardware(app):
-        app['com.opentrons.hardware'].clean_up()
+        if app['com.opentrons.hardware']:
+            app['com.opentrons.hardware'].clean_up()
 
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.append(shutdown_hardware)

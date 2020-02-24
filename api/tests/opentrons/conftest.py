@@ -32,7 +32,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import adapters, API
+from opentrons.hardware_control import adapters, API, ThreadManager
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 from opentrons import (robot as rb,
@@ -335,12 +335,12 @@ def virtual_smoothie_env(monkeypatch):
                     reason="requires inotify (linux only)")
 @pytest.fixture
 async def hardware(request, loop, virtual_smoothie_env):
-    hw_sim = await API.build_hardware_simulator(loop=loop)
+    hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
         yield hw_sim
     finally:
-        asyncio.ensure_future(hw_sim.reset())
+        # await hw_sim.reset()
         hw_sim.set_config(old_config)
 
 

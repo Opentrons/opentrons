@@ -189,6 +189,7 @@ class TemperatureModuleContext(ModuleContext):
                  geometry: ModuleGeometry,
                  at_version: APIVersion,
                  loop: asyncio.AbstractEventLoop) -> None:
+        print(f'TEMP MODULE INIT {hw_module}, loop id: {id(loop)}')
         self._module = hw_module
         self._loop = loop
         super().__init__(ctx, geometry, at_version)

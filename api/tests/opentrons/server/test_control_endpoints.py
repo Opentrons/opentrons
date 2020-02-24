@@ -82,7 +82,8 @@ async def test_get_modules(
     hw = async_server['com.opentrons.hardware']
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
-                                             interrupt_callback=lambda x: None)
+                                             interrupt_callback=lambda x: None,
+                                             loop=loop)
     monkeypatch.setattr(hw, 'attached_modules', [magdeck])
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
                    'displayName', 'status', 'data', 'hasAvailableUpdate'])
@@ -94,7 +95,8 @@ async def test_get_modules(
     assert sorted(body['modules'][0].keys()) == keys
     assert 'engaged' in body['modules'][0]['data']
     tempdeck = await hw._backend.build_module('/dev/ot_module_tempdeck1',
-                                              'tempdeck', lambda x: None)
+                                              'tempdeck', lambda x: None,
+                                              loop=loop)
     monkeypatch.setattr(hw, 'attached_modules', [tempdeck])
     for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
         tempdeck._device_info['model'] = model
@@ -129,7 +131,8 @@ async def test_execute_module_command(
 
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
-                                             interrupt_callback=lambda x: None)
+                                             interrupt_callback=lambda x: None,
+                                             loop=loop)
     monkeypatch.setattr(hw, 'attached_modules', [magdeck])
 
     resp = await async_client.post('/modules/dummySerialMD',

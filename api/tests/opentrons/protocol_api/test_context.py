@@ -60,8 +60,7 @@ def test_load_instrument(loop):
         assert ctx.loaded_instruments[Mount.RIGHT.name.lower()] == loaded
 
 
-async def test_motion(loop):
-    hardware = await API.build_hardware_simulator(loop=loop)
+async def test_motion(loop, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
@@ -76,8 +75,7 @@ async def test_motion(loop):
     assert await hardware.current_position(instr._mount) == old_pos
 
 
-async def test_max_speeds(loop, monkeypatch):
-    hardware = await API.build_hardware_simulator(loop=loop)
+async def test_max_speeds(loop, monkeypatch, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
@@ -104,8 +102,7 @@ async def test_max_speeds(loop, monkeypatch):
         for args, kwargs in mock_move.call_args_list)
 
 
-async def test_location_cache(loop, monkeypatch, get_labware_def):
-    hardware = await API.build_hardware_simulator(loop=loop)
+async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
@@ -140,8 +137,7 @@ async def test_location_cache(loop, monkeypatch, get_labware_def):
     assert test_args[0].labware == lw.wells()[0]
 
 
-async def test_move_uses_arc(loop, monkeypatch, get_labware_def):
-    hardware = await API.build_hardware_simulator(loop=loop)
+async def test_move_uses_arc(loop, monkeypatch, get_labware_def, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     ctx.home()
@@ -355,9 +351,9 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
 
     fake_hw_aspirate = mock.Mock()
     fake_move = mock.Mock()
-    monkeypatch.setattr(ctx._hw_manager.hardware._api,
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt,
                         'aspirate', fake_hw_aspirate)
-    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt, 'move_to', fake_move)
 
     instr.aspirate(2.0, lw.wells()[0].bottom())
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
@@ -384,7 +380,7 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
             max_speeds={})
     assert len(fake_move.call_args_list) == 2
     fake_move.reset_mock()
-    ctx._hw_manager.hardware._api\
+    ctx._hw_manager.hardware._obj_to_adapt\
                             ._attached_instruments[Mount.RIGHT]\
                             ._current_volume = 1
 
@@ -410,9 +406,9 @@ def test_dispense(loop, get_labware_def, monkeypatch):
         nonlocal move_called_with
         move_called_with = (mount, loc, kwargs)
 
-    monkeypatch.setattr(ctx._hw_manager.hardware._api,
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt,
                         'dispense', fake_hw_dispense)
-    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_move)
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt, 'move_to', fake_move)
 
     instr.dispense(2.0, lw.wells()[0].bottom())
     assert 'dispensing' in ','.join([cmd.lower() for cmd in ctx.commands()])
@@ -548,7 +544,7 @@ def test_touch_tip_default_args(loop, monkeypatch):
         total_hw_moves.append((abs_position, speed))
 
     instr.aspirate(10, lw.wells()[0])
-    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', fake_hw_move)
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt, 'move_to', fake_hw_move)
     instr.touch_tip()
     z_offset = Point(0, 0, 1)   # default z offset of 1mm
     speed = 60                  # default speed
@@ -570,7 +566,7 @@ def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
                                 tip_racks=[tiprack])
     instr.pick_up_tip()
     move_mock = mock.Mock()
-    monkeypatch.setattr(ctx._hw_manager.hardware._api, 'move_to', move_mock)
+    monkeypatch.setattr(ctx._hw_manager.hardware._obj_to_adapt, 'move_to', move_mock)
     instr.touch_tip(trough_lw['A1'])
     move_mock.assert_not_called()
 

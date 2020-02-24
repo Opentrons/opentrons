@@ -158,8 +158,8 @@ class ProtocolContext(CommandPublisher):
 
     def cleanup(self):
         """ Finalize and clean up the protocol context. """
-        if self._unsubscribe_commands:
-            self._unsubscribe_commands()
+        # if self._unsubscribe_commands:
+        #     self._unsubscribe_commands()
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
@@ -439,7 +439,7 @@ class ProtocolContext(CommandPublisher):
                 'thermocycler': modules.thermocycler.Thermocycler
                 }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._loop))
+                port='', simulating=True, loop=self._hw_manager.hardware.loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

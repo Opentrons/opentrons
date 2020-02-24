@@ -243,6 +243,7 @@ class API(HardwareAPILike):
         """
         import threading
         print(f'CACHE INSTR . {threading.currentThread().getName()}')
+
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
 
@@ -1373,7 +1374,8 @@ class API(HardwareAPILike):
             new_instance = await self._backend.build_module(
                     port=port,
                     model=name,
-                    interrupt_callback=self.pause_with_message)
+                    interrupt_callback=self.pause_with_message,
+                    loop=self.loop)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

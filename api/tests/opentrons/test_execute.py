@@ -29,116 +29,116 @@ def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
     return gai_mock
 
 
-# @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
-# def test_execute_function_apiv2(protocol,
-#                                 protocol_file,
-#                                 monkeypatch,
-#                                 virtual_smoothie_env,
-#                                 mock_get_attached_instr):
+@pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
+def test_execute_function_apiv2(protocol,
+                                protocol_file,
+                                monkeypatch,
+                                virtual_smoothie_env,
+                                mock_get_attached_instr):
 
-#     mock_get_attached_instr.return_value[types.Mount.LEFT]\
-#         = {'model': 'p10_single_v1.5', 'id': 'testid'}
-#     mock_get_attached_instr.return_value[types.Mount.RIGHT]\
-#         = {'model': 'p300_single_v1.5', 'id': 'testid2'}
-#     entries = []
+    mock_get_attached_instr.return_value[types.Mount.LEFT]\
+        = {'model': 'p10_single_v1.5', 'id': 'testid'}
+    mock_get_attached_instr.return_value[types.Mount.RIGHT]\
+        = {'model': 'p300_single_v1.5', 'id': 'testid2'}
+    entries = []
 
-#     def emit_runlog(entry):
-#         nonlocal entries
-#         entries.append(entry)
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
 
-#     execute.execute(
-#         protocol.filelike, 'testosaur_v2.py', emit_runlog=emit_runlog)
-#     assert [item['payload']['text'] for item in entries
-#             if item['$'] == 'before'] == [
-#         'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
-#         'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
-#         'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
-#         'Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1'
-#         ]
-
-
-# def test_execute_function_json_apiv2(get_json_protocol_fixture,
-#                                      virtual_smoothie_env,
-#                                      mock_get_attached_instr):
-#     jp = get_json_protocol_fixture('3', 'simple', False)
-#     filelike = io.StringIO(jp)
-#     entries = []
-
-#     def emit_runlog(entry):
-#         nonlocal entries
-#         entries.append(entry)
-
-#     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-#         'model': 'p10_single_v1.5', 'id': 'testid'}
-#     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
-#     assert [item['payload']['text'] for item in entries
-#             if item['$'] == 'before'] == [
-#         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
-#         'Aspirating 5.0 uL from A1 of Source Plate on 2 at 1.0 speed',
-#         'Delaying for 0 minutes and 42 seconds',
-#         'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 1.0 speed',
-#         'Touching tip',
-#         'Blowing out at B1 of Dest Plate on 3',
-#         'Dropping tip into A1 of Trash on 12'
-#     ]
+    execute.execute(
+        protocol.filelike, 'testosaur_v2.py', emit_runlog=emit_runlog)
+    assert [item['payload']['text'] for item in entries
+            if item['$'] == 'before'] == [
+        'Picking up tip from A1 of Opentrons 96 Tip Rack 300 µL on 1',
+        'Aspirating 10.0 uL from A1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
+        'Dispensing 10.0 uL into B1 of Corning 96 Well Plate 360 µL Flat on 2 at 1.0 speed',  # noqa(E501),
+        'Dropping tip into H12 of Opentrons 96 Tip Rack 300 µL on 1'
+        ]
 
 
-# def test_execute_function_bundle_apiv2(get_bundle_fixture,
-#                                        virtual_smoothie_env,
-#                                        mock_get_attached_instr):
-#     bundle = get_bundle_fixture('simple_bundle')
-#     entries = []
+def test_execute_function_json_apiv2(get_json_protocol_fixture,
+                                     virtual_smoothie_env,
+                                     mock_get_attached_instr):
+    jp = get_json_protocol_fixture('3', 'simple', False)
+    filelike = io.StringIO(jp)
+    entries = []
 
-#     def emit_runlog(entry):
-#         nonlocal entries
-#         entries.append(entry)
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
 
-#     mock_get_attached_instr.return_value[types.Mount.LEFT] = {
-#         'model': 'p10_single_v1.5', 'id': 'testid'}
-#     execute.execute(
-#         bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
-#     assert [item['payload']['text']
-#             for item in entries if item['$'] == 'before'] == [
-#         'Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
-#         'Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3',
-#         'Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-#         'Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
-#         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
-#         'Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
-#         'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3',
-#         'Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-#         'Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
-#         'Dropping tip into A1 of Opentrons Fixed Trash on 12',
-#         'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
-#         'Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3',
-#         'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
-#         'Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
-#         'Dropping tip into A1 of Opentrons Fixed Trash on 12'
-#         ]
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
+        'model': 'p10_single_v1.5', 'id': 'testid'}
+    execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
+    assert [item['payload']['text'] for item in entries
+            if item['$'] == 'before'] == [
+        'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
+        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 1.0 speed',
+        'Delaying for 0 minutes and 42 seconds',
+        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 1.0 speed',
+        'Touching tip',
+        'Blowing out at B1 of Dest Plate on 3',
+        'Dropping tip into A1 of Trash on 12'
+    ]
 
 
-# @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
-# def test_execute_function_v1(protocol, protocol_file,
-#                              virtual_smoothie_env,
-#                              mock_get_attached_instr):
-#     entries = []
+def test_execute_function_bundle_apiv2(get_bundle_fixture,
+                                       virtual_smoothie_env,
+                                       mock_get_attached_instr):
+    bundle = get_bundle_fixture('simple_bundle')
+    entries = []
 
-#     def emit_runlog(entry):
-#         nonlocal entries
-#         entries.append(entry)
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
 
-#     mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
-#         'model': 'p300_single_v1.5', 'id': 'testid'}
-#     execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
-#     assert [item['payload']['text'] for item in entries
-#             if item['$'] == 'before'] == [
-#         'Picking up tip from well A1 in "5"',
-#         'Aspirating 10.0 uL from well A1 in "8" at 1.0 speed',
-#         'Dispensing 10.0 uL into well H12 in "8" at 1.0 speed',
-#         'Aspirating 10.0 uL from well A1 in "11" at 1.0 speed',
-#         'Dispensing 10.0 uL into well H12 in "11" at 1.0 speed',
-#         'Dropping tip into well A1 in "12"'
-#     ]
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
+        'model': 'p10_single_v1.5', 'id': 'testid'}
+    execute.execute(
+        bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
+    assert [item['payload']['text']
+            for item in entries if item['$'] == 'before'] == [
+        'Transferring 1.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Picking up tip from A1 of Opentrons 96 Tip Rack 10 µL on 3',
+        'Aspirating 1.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
+        'Dispensing 1.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        'Dropping tip into A1 of Opentrons Fixed Trash on 12',
+        'Transferring 2.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 3',
+        'Aspirating 2.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
+        'Dispensing 2.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        'Dropping tip into A1 of Opentrons Fixed Trash on 12',
+        'Transferring 3.0 from A1 of FAKE example labware on 1 to A4 of FAKE example labware on 1',  # noqa(E501)
+        'Picking up tip from C1 of Opentrons 96 Tip Rack 10 µL on 3',
+        'Aspirating 3.0 uL from A1 of FAKE example labware on 1 at 1.0 speed',
+        'Dispensing 3.0 uL into A4 of FAKE example labware on 1 at 1.0 speed',
+        'Dropping tip into A1 of Opentrons Fixed Trash on 12'
+        ]
+
+
+@pytest.mark.parametrize('protocol_file', ['testosaur.py'])
+def test_execute_function_v1(protocol, protocol_file,
+                             virtual_smoothie_env,
+                             mock_get_attached_instr):
+    entries = []
+
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
+
+    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
+        'model': 'p300_single_v1.5', 'id': 'testid'}
+    execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
+    assert [item['payload']['text'] for item in entries
+            if item['$'] == 'before'] == [
+        'Picking up tip from well A1 in "5"',
+        'Aspirating 10.0 uL from well A1 in "8" at 1.0 speed',
+        'Dispensing 10.0 uL into well H12 in "8" at 1.0 speed',
+        'Aspirating 10.0 uL from well A1 in "11" at 1.0 speed',
+        'Dispensing 10.0 uL into well H12 in "11" at 1.0 speed',
+        'Dropping tip into well A1 in "12"'
+    ]
 
 
 @pytest.mark.parametrize('protocol_file', ['python_v2_custom_lw.py'])
