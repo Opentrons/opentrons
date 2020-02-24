@@ -1,14 +1,15 @@
+// @flow
 import React from 'react'
 import { shallow } from 'enzyme'
 import fileSaver from 'file-saver'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import { FileSidebar } from '../FileSidebar'
-import { MAGDECK } from '../../../constants'
 
 jest.mock('file-saver')
 
@@ -26,11 +27,15 @@ describe('FileSidebar', () => {
       onDownload: jest.fn(),
       downloadData: {
         fileData: {
+          labware: {},
+          labwareDefinitions: {},
+          metadata: {},
+          pipettes: {},
+          robot: { model: 'OT-2 Standard' },
+          schemaVersion: 4,
           commands: [],
         },
         fileName: 'protocol.json',
-        pipettes: {},
-        modules: {},
       },
       pipettesOnDeck: {},
       modulesOnDeck: {},
@@ -65,7 +70,7 @@ describe('FileSidebar', () => {
 
     modulesOnDeck = {
       magnet123: {
-        type: MAGDECK,
+        type: MAGNETIC_MODULE_TYPE,
       },
     }
 
