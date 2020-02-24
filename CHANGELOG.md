@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.16.1-alpha.1](https://github.com/opentrons/opentrons/compare/v3.16.1-alpha.0...v3.16.1-alpha.1) (2020-02-24)
+
+
+### Bug Fixes
+
+* **api:** always clean up in script entries on error ([#5064](https://github.com/opentrons/opentrons/issues/5064)) ([e98fdd1](https://github.com/opentrons/opentrons/commit/e98fdd1)), closes [#5061](https://github.com/opentrons/opentrons/issues/5061)
+* **api:** correctly set api level in session sim ([#5063](https://github.com/opentrons/opentrons/issues/5063)) ([9f4cb1d](https://github.com/opentrons/opentrons/commit/9f4cb1d)), closes [#5060](https://github.com/opentrons/opentrons/issues/5060)
+* **api:** do not check used tips after pickup ([#5062](https://github.com/opentrons/opentrons/issues/5062)) ([5c155d9](https://github.com/opentrons/opentrons/commit/5c155d9)), closes [#5059](https://github.com/opentrons/opentrons/issues/5059)
+* **api:** fix a spinlock in pre-home plunger unsticking ([#5072](https://github.com/opentrons/opentrons/issues/5072)) ([8259757](https://github.com/opentrons/opentrons/commit/8259757))
+
+
+
+
+
 ## [3.16.1-alpha.0](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1-alpha.0) (2020-02-20)
 
 **Note:** Version bump only for package opentrons

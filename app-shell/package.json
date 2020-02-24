@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/app-shell",
   "productName": "Opentrons",
-  "version": "3.16.1-alpha.0",
+  "version": "3.16.1-alpha.1",
   "description": "Opentrons desktop application",
   "main": "lib/main.js",
   "scripts": {
@@ -21,9 +21,9 @@
   },
   "homepage": "https://github.com/Opentrons/opentrons",
   "dependencies": {
-    "@opentrons/app": "3.16.1-alpha.0",
-    "@opentrons/discovery-client": "3.16.1-alpha.0",
-    "@opentrons/shared-data": "3.16.1-alpha.0",
+    "@opentrons/app": "3.16.1-alpha.1",
+    "@opentrons/discovery-client": "3.16.1-alpha.1",
+    "@opentrons/shared-data": "3.16.1-alpha.1",
     "@thi.ng/paths": "^1.6.5",
     "ajv": "^6.10.2",
     "dateformat": "^3.0.3",
