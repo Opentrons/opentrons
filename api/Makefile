@@ -129,6 +129,12 @@ docs: docs/dist/index.html docs/dist/v1 docs/dist/v2 docs/dist/ot1
 docs-clean:
 	$(SHX) rm -rf docs/dist docs/build
 
+.PHONY: dev
+dev: export ENABLE_VIRTUAL_SMOOTHIE := true
+dev:
+	@echo "Command is deprecated. Use \"make -C robot-server dev\""
+
+
 .PHONY: local-shell
 local-shell:
 	$(pipenv_envvars) pipenv shell
