@@ -313,14 +313,16 @@ def simulate(protocol_file: TextIO,
             bundled_data=getattr(protocol, 'bundled_data', None),
             extra_labware=gpa_extras)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
-        execute.run_protocol(protocol, context)
-        if isinstance(protocol, PythonProtocol)\
-           and protocol.api_level >= APIVersion(2, 0)\
-           and protocol.bundled_labware is None\
-           and allow_bundle():
-            bundle_contents = bundle_from_sim(
-                protocol, context)
-        context.cleanup()
+        try:
+            execute.run_protocol(protocol, context)
+            if isinstance(protocol, PythonProtocol)\
+               and protocol.api_level >= APIVersion(2, 0)\
+               and protocol.bundled_labware is None\
+               and allow_bundle():
+                bundle_contents = bundle_from_sim(
+                    protocol, context)
+        finally:
+            context.cleanup()
 
     return scraper.commands, bundle_contents
 
