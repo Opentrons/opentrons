@@ -363,16 +363,11 @@ class Session(object):
                      for mod in self._hardware.attached_modules],
                     strict_attached_instruments=False)
                 sim.home()
-                self._simulating_ctx = ProtocolContext(
+                self._simulating_ctx = ProtocolContext.build_using(
+                    self._protocol,
                     loop=self._loop,
                     hardware=sim,
-                    broker=self._broker,
-                    bundled_labware=getattr(
-                        self._protocol, 'bundled_labware', None),
-                    bundled_data=getattr(
-                        self._protocol, 'bundled_data', None),
-                    extra_labware=getattr(
-                        self._protocol, 'extra_labware', {}))
+                    broker=self._broker)
                 run_protocol(self._protocol,
                              context=self._simulating_ctx)
             else:
