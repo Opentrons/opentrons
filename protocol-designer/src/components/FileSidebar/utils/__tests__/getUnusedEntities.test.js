@@ -72,9 +72,9 @@ describe('getUnusedEntities', () => {
       temperature456: {
         id: 'temperature456',
         type: TEMPERATURE_MODULE_TYPE,
-        model: 'GEN1',
+        model: TEMPERATURE_MODULE_V1,
         moduleState: {
-          type: TEMPERATURE_MODULE_V1,
+          type: TEMPERATURE_MODULE_TYPE,
           status: TEMPERATURE_DEACTIVATED,
           targetTemperature: null,
         },
