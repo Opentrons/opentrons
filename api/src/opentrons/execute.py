@@ -79,30 +79,13 @@ def get_protocol_api(
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
     global _HWCONTROL
-    if not _HWCONTROL or _HWCONTROL._loop.is_closed():
+    if not _HWCONTROL:
     # Build a hardware controller in a worker thread, which is necessary
     # because ipython runs its notebook in asyncio but the notebook
     # is at script/repl scope not function scope and is synchronous so
     # you can't control the loop from inside. If we update to
     # IPython 7 we can avoid this, but for now we can't
         _HWCONTROL = ThreadManager(API.build_hardware_controller)
-
-        # def _build_hwcontroller():
-        #     global _HWCONTROL
-        #     loop = asyncio.new_event_loop()
-        #     asyncio.set_event_loop(loop)
-        #     loop.my_id = 'MANAGEDLOOP'
-        #     print(f'EXECUTE BHWC. {threading.currentThread().getName()}')
-        #     _HWCONTROL = loop.run_until_complete(API.build_hardware_controller(loop=loop))
-        #     print(f'EXECUTE BHWC AFTER HWC. {threading.currentThread().getName()}')
-        #     # loop.run_forever()
-        #     # loop.close()
-
-        # thread = threading.Thread(
-        #     target=_build_hwcontroller,
-        #     name="ExecuteHWCThread")
-        # thread.start()
-        # thread.join()
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
