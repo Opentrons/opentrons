@@ -99,11 +99,14 @@ def init(hardware: 'HardwareAPILike' = None,
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
-    app['com.opentrons.rpc'] = RPCServer(
-        app, MainRouter(
-            hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+
+    main_router = MainRouter(hardware, lock=app['com.opentrons.motion_lock'],
+                             loop=loop)
+    app['com.opentrons.rpc'] = RPCServer(
+        app, main_router)
+    app['com.opentrons.main_router'] = main_router
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -113,6 +116,13 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
+    async def kill_router(a):
+        # Try to kill router hardware
+        router = a['com.opentrons.main_router']
+        if router.calibration_manager._hardware:
+            router.calibration_manager._hardware.join()
+
+    app.on_shutdown.append(kill_router)
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.freeze()
     return app
