@@ -65,8 +65,6 @@ class ThreadManager(HardwareAPILike):
 
     @staticmethod
     async def call_coroutine_threadsafe(loop, coro, *args, **kwargs):
-        import traceback
-        traceback.print_stack()
         fut = asyncio.run_coroutine_threadsafe(coro(*args, **kwargs), loop)
         wrapped = asyncio.wrap_future(fut)
         return await wrapped
