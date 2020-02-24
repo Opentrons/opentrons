@@ -47,8 +47,13 @@ const dismissedHints = handleActions(
       action: RemoveHintAction
     ): DismissedHintReducerState => {
       const { hintKey, rememberDismissal } = action.payload
-      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-      return { ...state, [hintKey]: { rememberDismissal } }
+      // TODO(IL 2020-02-24): consider using an immutable type for DismissedHintReducerState
+      // to make this copy-mutate pattern less precarious, see #5073
+      // (Flow won't let you do `return {...state, [hintKey]: spam})`) b/c it no longer
+      // allows Unions as computed properties
+      const nextState = { ...state }
+      nextState[hintKey] = { rememberDismissal }
+      return nextState
     },
     CLEAR_ALL_HINT_DISMISSALS: () => dismissedHintsInitialState,
   },

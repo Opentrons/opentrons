@@ -115,10 +115,9 @@ export function mergeLiquid(
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-    ...reduce(
+    ...reduce<LocationLiquidState, LocationLiquidState>(
       source,
-      (acc: LocationLiquidState, ingredState: Vol, ingredId: string) => {
+      (acc, ingredState: Vol, ingredId: string) => {
         const isCommonIngred = ingredId in dest
         const ingredVolume = isCommonIngred
           ? // sum volumes of ingredients common to 'source' and 'dest'

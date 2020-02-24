@@ -8,11 +8,12 @@ import type { Command } from '@opentrons/shared-data/protocol/flowTypes/schemaV4
 import type { Channels } from '@opentrons/components'
 import type {
   CommandCreatorError,
+  CommandsAndWarnings,
   CurriedCommandCreator,
-  RobotState,
   InvariantContext,
+  RobotState,
 } from '../step-generation/types'
-import type { SubstepTimelineFrame, TipLocation } from './types'
+import type { SubstepTimelineFrame, SourceDestData, TipLocation } from './types'
 
 /** Return last picked up tip in the specified commands, if any */
 export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
@@ -26,6 +27,32 @@ export function _getNewActiveTips(commands: Array<Command>): ?TipLocation {
     null
 
   return newTipParams
+}
+
+const _createNextTimelineFrame = ({
+  command,
+  index,
+  nextFrame,
+  volume,
+  wellInfo,
+}: {
+  command: Command,
+  index: number,
+  nextFrame: CommandsAndWarnings,
+  volume: number,
+  wellInfo: SourceDestData,
+}) => {
+  // TODO(IL, 2020-02-24): is there a cleaner way to create newTimelineFrame
+  // and keep Flow happy about computed properties?
+  const _newTimelineFrameKeys = {
+    volume,
+    activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
+  }
+  const newTimelineFrame =
+    command.command === 'aspirate'
+      ? { ..._newTimelineFrameKeys, source: wellInfo }
+      : { ..._newTimelineFrameKeys, dest: wellInfo }
+  return newTimelineFrame
 }
 
 type SubstepTimelineAcc = {
@@ -42,8 +69,8 @@ export const substepTimelineSingleChannel = (
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
 
-  const timeline = nextFrame.commands.reduce(
-    (acc: SubstepTimelineAcc, command: Command, index: number) => {
+  const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
+    (acc, command: Command, index) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
@@ -58,17 +85,18 @@ export const substepTimelineSingleChannel = (
           preIngreds: acc.prevRobotState.liquidState.labware[labware][well],
           postIngreds: nextRobotState.liquidState.labware[labware][well],
         }
-        const ingredKey = command.command === 'aspirate' ? 'source' : 'dest'
+
         return {
           ...acc,
           timeline: [
             ...acc.timeline,
-            {
+            _createNextTimelineFrame({
               volume,
-              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-              [ingredKey]: wellInfo,
-              activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
-            },
+              index,
+              nextFrame,
+              command,
+              wellInfo,
+            }),
           ],
           prevRobotState: nextRobotState,
         }
@@ -98,8 +126,8 @@ export const substepTimelineMultiChannel = (
 ): Array<SubstepTimelineFrame> => {
   const nextFrame = commandCreator(invariantContext, initialRobotState)
   if (nextFrame.errors) return []
-  const timeline = nextFrame.commands.reduce(
-    (acc: SubstepTimelineAcc, command: Command, index: number) => {
+  const timeline = nextFrame.commands.reduce<SubstepTimelineAcc>(
+    (acc, command: Command, index) => {
       const nextRobotState = getNextRobotStateAndWarningsSingleCommand(
         command,
         invariantContext,
@@ -129,17 +157,17 @@ export const substepTimelineMultiChannel = (
             : {},
         }
 
-        const ingredKey = command.command === 'aspirate' ? 'source' : 'dest'
         return {
           ...acc,
           timeline: [
             ...acc.timeline,
-            {
+            _createNextTimelineFrame({
               volume,
-              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-              [ingredKey]: wellInfo,
-              activeTips: _getNewActiveTips(nextFrame.commands.slice(0, index)),
-            },
+              index,
+              nextFrame,
+              command,
+              wellInfo,
+            }),
           ],
           prevRobotState: nextRobotState,
         }

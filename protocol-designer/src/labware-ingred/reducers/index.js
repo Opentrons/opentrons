@@ -11,6 +11,7 @@ import { getPDMetadata } from '../../file-types'
 import type { Action, DeckSlot } from '../../types'
 import type {
   SingleLabwareLiquidState,
+  LocationLiquidState,
   LabwareLiquidState,
 } from '../../step-generation'
 import type { LiquidGroupsById, DisplayLabware } from '../types'
@@ -224,7 +225,7 @@ export const savedLabware = handleActions<SavedLabwareState, *>(
   {}
 )
 
-type IngredientsState = LiquidGroupsById
+export type IngredientsState = LiquidGroupsById
 export const ingredients = handleActions<IngredientsState, *>(
   {
     EDIT_LIQUID_GROUP: (
@@ -261,9 +262,11 @@ export const ingredLocations = handleActions<LocationsState, *>(
       action: SetWellContentsAction
     ): LocationsState => {
       const { liquidGroupId, labwareId, wells, volume } = action.payload
-      const newWellContents = { [liquidGroupId]: { volume } }
-      const updatedWells = wells.reduce(
-        (acc, wellName): SingleLabwareLiquidState => ({
+      const newWellContents: LocationLiquidState = {
+        [liquidGroupId]: { volume },
+      }
+      const updatedWells = wells.reduce<SingleLabwareLiquidState>(
+        (acc, wellName) => ({
           ...acc,
           [wellName]: newWellContents,
         }),
@@ -274,7 +277,6 @@ export const ingredLocations = handleActions<LocationsState, *>(
         ...state,
         [labwareId]: {
           ...state[labwareId],
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
           ...updatedWells,
         },
       }

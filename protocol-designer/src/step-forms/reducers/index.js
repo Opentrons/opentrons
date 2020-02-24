@@ -103,7 +103,7 @@ export const unsavedForm = (
       )
       return {
         ...unsavedFormState,
-        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         ...fieldUpdate,
       }
     }
@@ -133,7 +133,7 @@ export const unsavedForm = (
         unsavedFormState.id &&
         stepIdsToUpdate.includes(unsavedFormState.id)
       ) {
-        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         return {
           ...unsavedFormState,
           ...handleFormChange(
@@ -187,7 +187,7 @@ type SavedStepFormsActions =
 export const savedStepForms = (
   rootState: RootState,
   action: SavedStepFormsActions
-) => {
+): SavedStepFormState => {
   const savedStepForms = rootState
     ? rootState.savedStepForms
     : initialSavedStepFormsState
@@ -215,7 +215,7 @@ export const savedStepForms = (
       // auto-update initial deck setup state.
       const prevInitialDeckSetupStep =
         savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
-      const labwareId =
+      const labwareId: string =
         action.type === 'CREATE_CONTAINER'
           ? action.payload.id
           : action.payload.duplicateLabwareId
@@ -234,7 +234,6 @@ export const savedStepForms = (
           ...prevInitialDeckSetupStep,
           labwareLocationUpdate: {
             ...prevInitialDeckSetupStep.labwareLocationUpdate,
-            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
             [labwareId]: slot,
           },
         },
@@ -286,7 +285,7 @@ export const savedStepForms = (
     }
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload
-      return mapValues(savedStepForms, (savedForm: FormData) => {
+      return mapValues(savedStepForms, (savedForm: FormData): FormData => {
         if (savedForm.stepType === 'manualIntervention') {
           // swap labware slots from all manualIntervention steps
           const sourceLabwareId = getDeckItemIdInSlot(
@@ -307,20 +306,30 @@ export const savedStepForms = (
             destSlot
           )
 
+          const labwareLocationUpdate: { [labwareId: string]: string } = {
+            ...savedForm.labwareLocationUpdate,
+          }
+          if (sourceLabwareId != null) {
+            labwareLocationUpdate[sourceLabwareId] = destSlot
+          }
+          if (destLabwareId != null) {
+            labwareLocationUpdate[destLabwareId] = sourceSlot
+          }
+
+          const moduleLocationUpdate: { [moduleId: string]: string } = {
+            ...savedForm.moduleLocationUpdate,
+          }
+          if (sourceModuleId != null) {
+            moduleLocationUpdate[sourceModuleId] = destSlot
+          }
+          if (destModuleId != null) {
+            moduleLocationUpdate[destModuleId] = sourceSlot
+          }
+
           return {
             ...savedForm,
-            labwareLocationUpdate: {
-              ...savedForm.labwareLocationUpdate,
-              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-              ...(sourceLabwareId ? { [sourceLabwareId]: destSlot } : {}),
-              ...(destLabwareId ? { [destLabwareId]: sourceSlot } : {}),
-            },
-            moduleLocationUpdate: {
-              ...savedForm.moduleLocationUpdate,
-              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-              ...(sourceModuleId ? { [sourceModuleId]: destSlot } : {}),
-              ...(destModuleId ? { [destModuleId]: sourceSlot } : {}),
-            },
+            labwareLocationUpdate,
+            moduleLocationUpdate,
           }
         }
         return savedForm
@@ -339,11 +348,11 @@ export const savedStepForms = (
             ),
           }
         }
-        const deleteLabwareUpdate = reduce(
+        const deleteLabwareUpdate = reduce<FormData, FormData>(
           savedForm,
           (acc, value, fieldName) => {
             if (value === labwareIdToDelete) {
-              // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+              // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
               return {
                 ...acc,
                 ...handleFormChange(
@@ -361,7 +370,7 @@ export const savedStepForms = (
         )
         return {
           ...savedForm,
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           ...deleteLabwareUpdate,
         }
       })
@@ -369,7 +378,7 @@ export const savedStepForms = (
     case 'DELETE_PIPETTES': {
       // remove references to pipettes that have been deleted
       const deletedPipetteIds = action.payload
-      return mapValues(savedStepForms, (form: FormData) => {
+      return mapValues(savedStepForms, (form: FormData): FormData => {
         if (form.stepType === 'manualIntervention') {
           return {
             ...form,
@@ -379,7 +388,7 @@ export const savedStepForms = (
             ),
           }
         } else if (deletedPipetteIds.includes(form.pipette)) {
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           return {
             ...form,
             ...handleFormChange(
@@ -456,12 +465,12 @@ export const savedStepForms = (
           ...acc,
           [stepId]: {
             ...prevStepForm,
-            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             ...updatedFields,
           },
         }
       }, {})
-      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
     case 'CHANGE_SAVED_STEP_FORM': {
@@ -485,7 +494,7 @@ export const savedStepForms = (
       // (eg `wells` arrays should be reset, not appended to)
       return {
         ...savedStepForms,
-        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         [stepId]: {
           ...previousForm,
           ...handleFormChange(
@@ -524,59 +533,62 @@ export const savedStepForms = (
           action.payload.defURIToOverwrite
       )
 
-      const savedStepsUpdate = stepIds.reduce((acc, stepId) => {
-        const prevStepForm = savedStepForms[stepId]
-        const defaults = getDefaultsForStepType(prevStepForm.stepType)
+      const savedStepsUpdate = stepIds.reduce<SavedStepFormState>(
+        (acc, stepId) => {
+          const prevStepForm = savedStepForms[stepId]
+          const defaults = getDefaultsForStepType(prevStepForm.stepType)
 
-        if (!prevStepForm) {
-          assert(false, `expected stepForm for id ${stepId}`)
-          return acc
-        }
+          if (!prevStepForm) {
+            assert(false, `expected stepForm for id ${stepId}`)
+            return acc
+          }
 
-        let fieldsToUpdate = {}
-        if (prevStepForm.stepType === 'moveLiquid') {
-          if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
+          let fieldsToUpdate = {}
+          if (prevStepForm.stepType === 'moveLiquid') {
+            if (labwareIdsToDeselect.includes(prevStepForm.aspirate_labware)) {
+              fieldsToUpdate = {
+                ...fieldsToUpdate,
+                aspirate_wells: defaults.aspirate_wells,
+              }
+            }
+            if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
+              fieldsToUpdate = {
+                ...fieldsToUpdate,
+                dispense_wells: defaults.dispense_wells,
+              }
+            }
+          } else if (
+            prevStepForm.stepType === 'mix' &&
+            labwareIdsToDeselect.includes(prevStepForm.labware)
+          ) {
             fieldsToUpdate = {
-              ...fieldsToUpdate,
-              aspirate_wells: defaults.aspirate_wells,
+              wells: defaults.wells,
             }
           }
-          if (labwareIdsToDeselect.includes(prevStepForm.dispense_labware)) {
-            fieldsToUpdate = {
-              ...fieldsToUpdate,
-              dispense_wells: defaults.dispense_wells,
-            }
+
+          if (Object.keys(fieldsToUpdate).length === 0) {
+            return acc
           }
-        } else if (
-          prevStepForm.stepType === 'mix' &&
-          labwareIdsToDeselect.includes(prevStepForm.labware)
-        ) {
-          fieldsToUpdate = {
-            wells: defaults.wells,
+
+          const updatedFields = handleFormChange(
+            fieldsToUpdate,
+            prevStepForm,
+            _getPipetteEntitiesRootState(rootState),
+            _getLabwareEntitiesRootState(rootState)
+          )
+
+          return {
+            ...acc,
+            [stepId]: {
+              ...prevStepForm,
+              // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+              ...updatedFields,
+            },
           }
-        }
-
-        if (Object.keys(fieldsToUpdate).length === 0) {
-          return acc
-        }
-
-        const updatedFields = handleFormChange(
-          fieldsToUpdate,
-          prevStepForm,
-          _getPipetteEntitiesRootState(rootState),
-          _getLabwareEntitiesRootState(rootState)
-        )
-
-        return {
-          ...acc,
-          [stepId]: {
-            ...prevStepForm,
-            // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-            ...updatedFields,
-          },
-        }
-      }, {})
-      // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+        },
+        {}
+      )
+      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
 

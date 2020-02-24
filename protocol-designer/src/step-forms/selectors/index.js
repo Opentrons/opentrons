@@ -64,7 +64,7 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type { RootState } from '../reducers'
+import type { RootState, SavedStepFormState } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
@@ -292,11 +292,8 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
           tiprackModel: getLabwareDisplayName(tiprackDef),
         }
 
-        return {
-          ...acc,
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-          [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
-        }
+        acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
+        return acc
       },
       {}
     )
@@ -305,13 +302,9 @@ export const getPipettesForInstrumentGroup: Selector<PipettesForInstrumentGroup>
 export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    reduce(
+    reduce<$PropertyType<InitialDeckSetup, 'pipettes'>, FormPipettesByMount>(
       initialDeckSetup.pipettes,
-      (
-        acc: FormPipettesByMount,
-        pipetteOnDeck: PipetteOnDeck,
-        id
-      ): FormPipettesByMount => {
+      (acc, pipetteOnDeck: PipetteOnDeck, id) => {
         const pipetteSpec = pipetteOnDeck.spec
         const tiprackDef = pipetteOnDeck.tiprackLabwareDef
 
@@ -322,11 +315,8 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
           tiprackDefURI: getLabwareDefURI(tiprackDef),
         }
 
-        return {
-          ...acc,
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-          [pipetteOnDeck.mount]: pipetteForInstrumentGroup,
-        }
+        acc[pipetteOnDeck.mount] = pipetteForInstrumentGroup
+        return acc
       },
       {
         left: { pipetteName: null, tiprackDefURI: null },
@@ -338,18 +328,14 @@ export const getPipettesForEditPipetteForm: Selector<FormPipettesByMount> = crea
 export const getModulesForEditModulesCard: Selector<ModulesForEditModulesCard> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup =>
-    reduce(
+    reduce<
+      $PropertyType<InitialDeckSetup, 'modules'>,
+      ModulesForEditModulesCard
+    >(
       initialDeckSetup.modules,
-      (
-        acc: ModulesForEditModulesCard,
-        moduleOnDeck: ModuleOnDeck,
-        id
-      ): ModulesForEditModulesCard => {
-        return {
-          ...acc,
-          // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-          [moduleOnDeck.type]: moduleOnDeck,
-        }
+      (acc, moduleOnDeck: ModuleOnDeck, id) => {
+        acc[moduleOnDeck.type] = moduleOnDeck
+        return acc
       },
       {
         magdeck: null,
@@ -369,7 +355,7 @@ export const getOrderedStepIds: Selector<Array<StepIdType>> = createSelector(
   state => state.orderedStepIds
 )
 
-export const getSavedStepForms: Selector<*> = createSelector(
+export const getSavedStepForms: Selector<SavedStepFormState> = createSelector(
   rootSelector,
   state => state.savedStepForms
 )

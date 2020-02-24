@@ -88,11 +88,9 @@ export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) {
-  // TODO(mc, 2020-02-21): are id and stepType necessary in output?
-  // tests and code reading seem to indicate the answer is "no"
+): FormPatch {
   const { id, stepType, ...stepData } = rawForm
-  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  const appliedPatch = { ...(stepData: FormPatch), ...patch }
   const { path, changeTip } = appliedPatch
 
   if (!path) {
@@ -140,7 +138,7 @@ const updatePatchOnLabwareChange = (
 
   const { id, stepType, ...stepData } = rawForm
   const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
-  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed
+  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
   const pipetteId: string = appliedPatch.pipette
 
   const sourceLabwarePatch: FormPatch = sourceLabwareChanged
@@ -150,7 +148,7 @@ const updatePatchOnLabwareChange = (
           'aspirate_touchTip_mmFromBottom'
         ),
         aspirate_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
           labwareId: appliedPatch.aspirate_labware,
           pipetteId,
           labwareEntities,
@@ -166,7 +164,7 @@ const updatePatchOnLabwareChange = (
           'dispense_touchTip_mmFromBottom'
         ),
         dispense_wells: getDefaultWells({
-          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
           labwareId: appliedPatch.dispense_labware,
           pipetteId,
           labwareEntities,
@@ -334,18 +332,18 @@ const updatePatchOnPipetteChannelChange = (
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?mixed
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?mixed. Address in #3161
     const pipetteId: string = appliedPatch.pipette
     update = {
       aspirate_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
         labwareId: appliedPatch.aspirate_labware,
         pipetteId,
         labwareEntities,
         pipetteEntities,
       }),
       dispense_wells: getDefaultWells({
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
         labwareId: appliedPatch.dispense_labware,
         pipetteId,
         labwareEntities,
@@ -354,9 +352,9 @@ const updatePatchOnPipetteChannelChange = (
     }
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
     const sourceLabwareId: string = appliedPatch.aspirate_labware
-    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
     const destLabwareId: string = appliedPatch.dispense_labware
 
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
@@ -366,12 +364,12 @@ const updatePatchOnPipetteChannelChange = (
 
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
         appliedPatch.aspirate_wells,
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
-        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
         appliedPatch.dispense_wells,
         destLabwareDef
       ),
@@ -381,8 +379,11 @@ const updatePatchOnPipetteChannelChange = (
   return { ...patch, ...update }
 }
 
-function updatePatchOnWellRatioChange(patch: FormPatch, rawForm: FormData) {
-  // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+function updatePatchOnWellRatioChange(
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch {
+  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const prevWellRatio = getWellRatio(
     rawForm.aspirate_wells,
