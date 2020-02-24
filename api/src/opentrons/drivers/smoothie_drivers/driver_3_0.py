@@ -1532,7 +1532,7 @@ class SmoothieDriver_3_0_0:
                 try:
                     # home commands are executed before ack, use a long ack
                     # timeout and short execute timeout
-                    self._send_command(
+                    self._send_command_unsynchronized(
                         command, ack_timeout=DEFAULT_EXECUTE_TIMEOUT,
                         timeout=DEFAULT_ACK_TIMEOUT)
                     self.update_homed_flags(flags={ax: True for ax in axes})
@@ -1602,7 +1602,9 @@ class SmoothieDriver_3_0_0:
             GCODES['ABSOLUTE_COORDS'] + ' ' + \
             self._build_speed_command(self._combined_speed)
         try:
-            self._send_command(command_string, timeout=DEFAULT_EXECUTE_TIMEOUT)
+            with self._serial_lock():
+                self._send_command_unsynchronized(
+                    command_string, timeout=DEFAULT_EXECUTE_TIMEOUT)
         except SmoothieError:
             # these may cause a hard limit error, since we have no idea where
             # we are in this context. Hopefully that's ok though because
