@@ -30,7 +30,7 @@ package_entries = {
         'update_server'),
     'robot-server': PackageEntry(
         os.path.join(HERE, '..', 'robot-server', 'robot_server', 'package.json'),
-        'robot-server')
+        'robot_server')
 }
 
 
