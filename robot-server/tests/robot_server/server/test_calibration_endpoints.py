@@ -226,7 +226,7 @@ async def test_create_session(async_client, async_server, monkeypatch):
             {types.Mount.LEFT: left_model, types.Mount.RIGHT: right_model})
         resp = await async_client.post('/calibration/deck/start')
         start_result = await resp.json()
-        endpoints.session = None
+        endpoints.session_wrapper.session = None
 
         assert start_result.get('token') == dummy_token
         assert start_result.get('pipette', {}).get('model') == preferred
@@ -266,7 +266,7 @@ async def test_create_session_fail(async_client, monkeypatch):
     text = await resp.text()
     assert json.loads(text) == {'message': 'Error, pipette not recognized'}
     assert resp.status == 403
-    assert endpoints.session is None
+    assert endpoints.session_wrapper.session is None
 
 
 async def test_release(async_client, async_server, monkeypatch, dc_session):
@@ -286,7 +286,7 @@ async def test_release(async_client, async_server, monkeypatch, dc_session):
             'command': 'release'
         })
     assert resp2.status == 200
-    assert endpoints.session is None
+    assert endpoints.session_wrapper.session is None
     await async_server['com.opentrons.hardware'].cache_instruments({
         types.Mount.LEFT:  None,
         types.Mount.RIGHT: 'p300_multi_v1'
@@ -383,7 +383,7 @@ async def test_set_and_jog_integration(
     direction = 1
     step = 3
     # left pipette z carriage motor is smoothie axis "Z", right is "A"
-    sess = endpoints.session
+    sess = endpoints.session_wrapper.session
     sess.adapter.home()
     prior_x, prior_y, prior_z = endpoints.position(
         sess.current_mount, sess.adapter, sess.cp)
@@ -402,3 +402,4 @@ async def test_set_and_jog_integration(
     msg = body.get('message')
 
     assert '{}'.format((prior_x, prior_y, prior_z + step)) in msg
+    endpoints.session_wrapper.session = None
