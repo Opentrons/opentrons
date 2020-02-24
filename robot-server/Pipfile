@@ -13,6 +13,7 @@ openapi-spec-validator = "*"
 pytest-aiohttp = "*"
 pytest-cov = "*"
 mypy = "==0.740"
+atomicwrites = {version="*", sys_platform="== 'win32'"}
 
 [packages]
 uvicorn = "==0.11.3"
