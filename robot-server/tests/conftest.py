@@ -224,9 +224,9 @@ async def dc_session(request, async_server, monkeypatch, loop):
         types.Mount.LEFT: None,
         types.Mount.RIGHT: 'p300_multi_v1'})
     ses = endpoints.SessionManager(hw)
-    endpoints.session = ses
-    monkeypatch.setattr(endpoints, 'session', ses)
+    endpoints.session_wrapper.session = ses
     yield ses
+    endpoints.session_wrapper.session = None
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -365,6 +365,8 @@ def main_router(loop, virtual_smoothie_env, hardware):
         notifications=router.notifications,
         loop=loop)
     yield router
+
+    router.session_manager._hardware.join()
 
 
 async def wait_until(matcher, notifications, timeout=1, loop=None):
