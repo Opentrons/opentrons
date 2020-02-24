@@ -5,10 +5,12 @@ import {
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import {
-  MAGDECK,
-  TEMPDECK,
-  TEMPERATURE_DEACTIVATED,
-} from '../../../../constants'
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+} from '@opentrons/shared-data'
+import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getUnusedEntities } from '../getUnusedEntities'
 
 describe('getUnusedEntities', () => {
@@ -59,20 +61,20 @@ describe('getUnusedEntities', () => {
     const modulesOnDeck = {
       magnet123: {
         id: 'magnet123',
-        type: MAGDECK,
-        model: 'GEN1',
+        type: MAGNETIC_MODULE_TYPE,
+        model: MAGNETIC_MODULE_V1,
         slot: '3',
         moduleState: {
-          type: MAGDECK,
+          type: MAGNETIC_MODULE_TYPE,
           engaged: false,
         },
       },
       temperature456: {
         id: 'temperature456',
-        type: TEMPDECK,
+        type: TEMPERATURE_MODULE_TYPE,
         model: 'GEN1',
         moduleState: {
-          type: TEMPDECK,
+          type: TEMPERATURE_MODULE_V1,
           status: TEMPERATURE_DEACTIVATED,
           targetTemperature: null,
         },
