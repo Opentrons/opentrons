@@ -5,8 +5,8 @@ import { OPENTRONS_LABWARE_NAMESPACE } from '../constants'
 import type { LabwareDefinition2 } from '../types'
 
 export { getWellNamePerMultiTip } from './getWellNamePerMultiTip'
-export { default as getWellTotalVolume } from './getWellTotalVolume'
-export { default as wellIsRect } from './wellIsRect'
+export { getWellTotalVolume } from './getWellTotalVolume'
+export { wellIsRect } from './wellIsRect'
 export * from './volume'
 export * from './wellSets'
 

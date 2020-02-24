@@ -55,7 +55,7 @@ function getDataFromUrl(): ?UrlData {
   }
 }
 
-export default class URLDeck extends React.Component<{}> {
+export class URLDeck extends React.Component<{||}> {
   urlData: ?UrlData
 
   constructor() {

@@ -25,9 +25,7 @@ module.exports = {
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
     'no-extra-boolean-cast': 'off',
-    // TODO(isk, 2019-01-15): change no-default-export to error,
-    // once once all warnings are resolved
-    'import/no-default-export': 'warn',
+    'import/no-default-export': 'error',
   },
 
   globals: {},
