@@ -2,7 +2,6 @@ import numpy as np
 
 from opentrons import types
 
-from opentrons import deck_calibration as dc
 from robot_server.aiohttp.endpoints import deck_calibration as endpoints
 from opentrons.hardware_control.types import CriticalPoint
 
@@ -66,8 +65,8 @@ async def test_transform_from_moves_v2(
     assert np.isclose(position, expected1).all()
 
     # Jog to calculated position for transform
-    x_delta1 = 13.16824337 - dc.endpoints.safe_points()['1'][0]
-    y_delta1 = 8.30855312 - dc.endpoints.safe_points()['1'][1]
+    x_delta1 = 13.16824337 - endpoints.safe_points()['1'][0]
+    y_delta1 = 8.30855312 - endpoints.safe_points()['1'][1]
     jogres = await async_client.post('/calibration/deck', json={
         'token': token,
         'command': 'jog',
@@ -101,8 +100,8 @@ async def test_transform_from_moves_v2(
     assert np.isclose(position, expected2).all()
 
     # Jog to calculated position for transform
-    x_delta2 = 380.50507635 - dc.endpoints.safe_points()['2'][0]
-    y_delta2 = -23.82925545 - dc.endpoints.safe_points()['2'][1]
+    x_delta2 = 380.50507635 - endpoints.safe_points()['2'][0]
+    y_delta2 = -23.82925545 - endpoints.safe_points()['2'][1]
     jogres = await async_client.post('/calibration/deck', json={
         'token': token,
         'command': 'jog',
@@ -135,8 +134,8 @@ async def test_transform_from_moves_v2(
     assert np.isclose(position, expected3).all()
 
     # Jog to calculated position for transform
-    x_delta3 = 34.87002331 - dc.endpoints.safe_points()['3'][0]
-    y_delta3 = 256.36103295 - dc.endpoints.safe_points()['3'][1]
+    x_delta3 = 34.87002331 - endpoints.safe_points()['3'][0]
+    y_delta3 = 256.36103295 - endpoints.safe_points()['3'][1]
     jogres = await async_client.post('/calibration/deck', json={
         'token': token,
         'command': 'jog',

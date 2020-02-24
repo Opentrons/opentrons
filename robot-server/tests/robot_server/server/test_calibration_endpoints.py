@@ -2,7 +2,6 @@ import json
 
 import numpy as np
 
-from opentrons import deck_calibration as dc
 from robot_server.aiohttp.endpoints import deck_calibration as endpoints
 from opentrons.config import robot_configs
 from opentrons import types
@@ -384,9 +383,9 @@ async def test_set_and_jog_integration(
     direction = 1
     step = 3
     # left pipette z carriage motor is smoothie axis "Z", right is "A"
-    sess = dc.endpoints.session
+    sess = endpoints.session
     sess.adapter.home()
-    prior_x, prior_y, prior_z = dc.position(
+    prior_x, prior_y, prior_z = endpoints.position(
         sess.current_mount, sess.adapter, sess.cp)
 
     resp = await async_client.post(
