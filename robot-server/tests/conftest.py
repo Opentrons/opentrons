@@ -27,10 +27,7 @@ from opentrons.legacy_api.instruments.pipette import Pipette
 from opentrons.api.routers import MainRouter
 from opentrons.api import models
 from opentrons.data_storage import database_migration
-from robot_server.aiohttp import rpc
 from opentrons import config, types
-from robot_server.aiohttp.main import init
-from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
 from opentrons.hardware_control import adapters, API
 from opentrons.protocol_api import ProtocolContext
@@ -39,6 +36,9 @@ from opentrons import (robot as rb,
                        instruments as ins,
                        containers as cns,
                        modules as mods)
+from robot_server.aiohttp import rpc
+from robot_server.aiohttp.main import init
+from robot_server.aiohttp.endpoints import deck_calibration as endpoints
 
 
 Session = namedtuple(
