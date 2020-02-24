@@ -6,10 +6,10 @@ import type {
   WifiConfigureRequest,
   WifiConfigureResponse,
   ApiRequestError,
-} from '../../../http-api-client'
+} from '../../../../http-api-client'
 
 import { AlertModal } from '@opentrons/components'
-import { ErrorModal } from '../../modals'
+import { ErrorModal } from '../../../modals'
 
 type WifiConnectModalProps = {|
   close: () => mixed,

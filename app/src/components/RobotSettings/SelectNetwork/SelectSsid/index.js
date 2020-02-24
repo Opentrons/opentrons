@@ -2,11 +2,11 @@
 import * as React from 'react'
 
 import { Icon, SelectField } from '@opentrons/components'
-import { getActiveSsid } from './utils'
+import { getActiveSsid } from '../utils' // try to move this out
 import styles from './styles.css'
 
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
-import type { WifiNetworkList, WifiNetwork } from '../../../http-api-client'
+import type { WifiNetworkList, WifiNetwork } from '../../../../http-api-client'
 
 export type SelectSsidProps = {|
   list: WifiNetworkList,

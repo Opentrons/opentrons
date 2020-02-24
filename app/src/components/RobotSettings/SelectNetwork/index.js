@@ -50,9 +50,9 @@ import type { RequestState } from '../../../robot-api/types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { PostDisconnectNetworkAction } from '../../../networking/types'
 
-type Props = {| robot: ViewableRobot |}
+type SelectNetworkProps = {| robot: ViewableRobot |}
 
-export const SelectNetwork = ({ robot }: Props) => {
+export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   const {
     list,
     eapOptions,
@@ -141,6 +141,11 @@ export const SelectNetwork = ({ robot }: Props) => {
   }
 
   const handleCancel = () => {
+    const currentSecurityType = getSecurityType(list, previousSsid)
+    setSsid(previousSsid)
+    setPreviousSsid(null)
+    setNetworkingType(CONNECT)
+    setSecurityType(currentSecurityType)
     setModalOpen(false)
   }
 

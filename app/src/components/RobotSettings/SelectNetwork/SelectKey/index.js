@@ -2,10 +2,10 @@
 import * as React from 'react'
 import map from 'lodash/map'
 
-import { SelectOptionField } from './fields'
+import { SelectOptionField } from '../fields'
 import styles from './styles.css'
 
-import type { WifiKeysList } from '../../../http-api-client'
+import type { WifiKeysList } from '../../../../http-api-client'
 
 export type SelectKeyProps = {
   name: string,

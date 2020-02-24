@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { InputField, CheckboxField, SelectField } from '@opentrons/components'
-import { FormTableRow } from './FormTable'
+import { FormTableRow } from '../FormTable' // move this
 import styles from './styles.css'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'

@@ -1,0 +1,13 @@
+@import '@opentrons/components';
+
+.wifi_add_key_input {
+  /* copied from components/src/forms/forms.css > .accessibly_hidden */
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+}

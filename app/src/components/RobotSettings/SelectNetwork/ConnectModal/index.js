@@ -5,12 +5,12 @@ import {
   WPA_PSK_SECURITY,
   WPA_EAP_SECURITY,
   NO_SECURITY,
-} from '../../../http-api-client'
-import { ScrollableAlertModal } from '../../modals'
+} from '../../../../http-api-client'
+import { ScrollableAlertModal } from '../../../modals'
 
 import styles from './styles.css'
 
-import type { WifiSecurityType } from '../../../http-api-client'
+import type { WifiSecurityType } from '../../../../http-api-client'
 
 export type ConnectModalProps = {|
   ssid: ?string,
