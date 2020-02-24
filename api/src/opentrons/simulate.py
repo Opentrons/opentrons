@@ -316,7 +316,7 @@ def simulate(protocol_file: TextIO,
         try:
             execute.run_protocol(protocol, context)
             if isinstance(protocol, PythonProtocol)\
-               and print()rotocol.api_level >= APIVersion(2, 0)\
+               and protocol.api_level >= APIVersion(2, 0)\
                and protocol.bundled_labware is None\
                and allow_bundle():
                 bundle_contents = bundle_from_sim(
