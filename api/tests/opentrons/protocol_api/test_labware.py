@@ -5,6 +5,7 @@ import pytest
 from opentrons.protocol_api import labware, MAX_SUPPORTED_VERSION
 from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Point, Location
+from opentrons.protocols.types import APIVersion
 
 test_data = {
     'circular_well_json': {
@@ -289,6 +290,18 @@ def test_select_next_tip():
     assert next_five == well_list[16]
     next_eight = tiprack.next_tip(8)
     assert next_eight == well_list[16]
+
+    # you can reuse tips infinitely on api level 2.2
+    tiprack.use_tips(well_list[0])
+    tiprack.use_tips(well_list[0])
+
+    # you can't on api level 2.1 or previous
+    early_tr = labware.Labware(labware_def,
+                               Location(Point(0, 0, 0), 'Test Slot'),
+                               api_level=APIVersion(2, 1))
+    early_tr.use_tips(well_list[0])
+    with pytest.raises(AssertionError):
+        early_tr.use_tips(well_list[0])
 
 
 def test_previous_tip():
