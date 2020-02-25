@@ -85,7 +85,6 @@ def get_protocol_api(
     # is at script/repl scope not function scope and is synchronous so
     # you can't control the loop from inside. If we update to
     # IPython 7 we can avoid this, but for now we can't
-        print('\nBUILT NEW TM wraping hwc in execute\n')
         _HWCONTROL = ThreadManager(API.build_hardware_controller)
     if isinstance(version, str):
         checked_version = version_from_string(version)
@@ -100,13 +99,11 @@ def get_protocol_api(
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    print(f'\nexecute::get_protocol_api hwc: {_HWCONTROL}, loop: {_HWCONTROL._loop} \n')
     context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
                                            bundled_labware=bundled_labware,
                                            bundled_data=bundled_data,
                                            extra_labware=extra_labware,
                                            api_version=checked_version)
-    print(f'\nexecute::get_protocol_api AFTER: {context._hw_manager.hardware}, CI: {context._hw_manager.hardware.cache_instruments}, loop: {context._hw_manager.hardware._loop} \n')
     context._hw_manager.hardware.cache_instruments()
 
     return context
@@ -356,7 +353,6 @@ def main() -> int:
 @atexit.register
 def _clear_cached_hardware_controller():
     global _HWCONTROL
-    print('ATEXIT')
     if _HWCONTROL:
         _HWCONTROL.clean_up()
         _HWCONTROL = None

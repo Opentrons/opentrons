@@ -193,7 +193,6 @@ class HardwareManager:
             self._current = hardware
         else:
             self._current = adapters.SynchronousAdapter(hardware)
-            print(f'HARDWARW MGR current. {self._current}')
 
     @property
     def hardware(self):

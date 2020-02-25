@@ -43,19 +43,15 @@ class ThreadManager(HardwareAPILike):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self._loop = loop
-        print(f'THREAD MANAGER LOOP id: {id(loop)}')
         self.managed_obj = loop.run_until_complete(builder(*args, loop=loop, **kwargs))
         object.__getattribute__(self, '_is_running').set()
         loop.run_forever()
         loop.close()
-        print('\nFINAL LOOP CLOSE IN TM\n')
 
     def __repr__(self):
         return '<ThreadManager>'
 
     def clean_up(self):
-        print(f'THREAD MGR {id(self)} CLEANUP. calling thread{threading.currentThread().getName()} "')
-        print(f'THREAD MGR CLEANUP. owned thread{object.__getattribute__(self, "_thread").getName()}')
         try:
             loop = object.__getattribute__(self, '_loop')
             loop.call_soon_threadsafe(loop.stop)

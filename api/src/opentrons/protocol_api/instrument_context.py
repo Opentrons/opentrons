@@ -642,7 +642,6 @@ class InstrumentContext(CommandPublisher):
 
         self._hw_manager.hardware.set_current_tiprack_diameter(
             self._mount, target.diameter)
-        print(f'INTR CTX before pick up tip call {self._hw_manager.hardware}')
         self._hw_manager.hardware.pick_up_tip(
             self._mount, self._tip_length_for(tiprack), presses, increment)
         # Note that the hardware API pick_up_tip action includes homing z after
