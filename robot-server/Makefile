@@ -12,9 +12,6 @@ SHX := npx shx
 # Path of source package
 SRC_PATH = robot_server
 
-# make push wheel file (= rather than := to expand at every use)
-firmware = $(wildcard smoothie/*.hex)
-
 # python and pipenv config
 pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 python := $(pipenv_envvars) pipenv run python
@@ -31,9 +28,6 @@ wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py robot-server normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
-# These variables are for simulating python protocols
-sim_log_level ?= info
-simfile ?=
 
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
@@ -42,19 +36,12 @@ simfile ?=
 tests ?= tests/robot_server
 test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
-# These variables must be overridden when make deploy or make deploy-staging is run
-# to set the auth details for pypi
-pypi_username ?=
-pypi_password ?=
-
 # Host key location for buildroot robot
 br_ssh_key ?= ~/.ssh/robot_key
 # Pubkey location for buildroot robot to install with install-key
 br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
 ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
-
-twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
 # Source discovery
 # For the python sources
@@ -80,7 +67,7 @@ install:
 	$(pipenv_envvars) pipenv run pip freeze
 
 .PHONY: clean
-clean: docs-clean
+clean:
 	$(clean_cmd)
 
 .PHONY: uninstall
@@ -114,35 +101,12 @@ dev:
 local-shell:
 	$(pipenv_envvars) pipenv shell
 
-.PHONY: simulate
-simulate:
-	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
-
-.PHONY: deploy-staging
-deploy-staging: wheel
-	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
-                             $(twine_auth_args)\
-                             $(wheel_file)
-
-.PHONY: deploy
-deploy: wheel
-	$(python) -m twine upload $(twine_auth_args)\
-                            $(wheel_file)
-
-.PHONY: push-balena
-push-balena: wheel
-	curl -X POST \
-		-H "Content-Type: multipart/form-data" \
-		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
-		http://$(host):31950/server/update
-
 .PHONY: push
 push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
-systemctl restart jupyter-notebook &&\
-systemctl stop opentrons-api-server &&\
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
+systemctl stop opentrons-robot-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/opentrons-*.whl && cleanup || cleanup"
