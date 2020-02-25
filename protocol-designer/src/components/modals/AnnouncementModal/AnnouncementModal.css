@@ -1,0 +1,19 @@
+@import '@opentrons/components';
+
+.announcement_modal {
+  border-radius: 0;
+}
+
+.modal_contents {
+  border-radius: 0;
+}
+
+.modal_contents > p {
+  margin-bottom: 1rem;
+}
+
+.modules_diagrams_row {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
