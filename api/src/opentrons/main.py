@@ -109,7 +109,6 @@ async def initialize_robot() -> ThreadManager:
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
     else:
-        # import pdb; pdb.set_trace()
         fw_version = await hardware.fw_version
         hardware.clean_up()
 

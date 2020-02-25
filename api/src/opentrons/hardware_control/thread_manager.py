@@ -9,6 +9,13 @@ from .types import HardwareAPILike
 MODULE_LOG = logging.getLogger(__name__)
 
 
+# TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
+# use inspect.getmembers to iterate over appropriate members of adapted
+# instance and setattr on the outer instance with the proper threadsafe
+# resolution logic injected. This approach avoids requiring calls to
+# object.__get_attribute__(self,...) to opt out of the overwritten
+# functionality. It is more readable and protected from
+# unintentional recursion.
 class ThreadManager(HardwareAPILike):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
