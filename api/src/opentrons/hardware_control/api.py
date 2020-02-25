@@ -89,19 +89,16 @@ class API(HardwareAPILike):
                      :py:meth:`asyncio.get_event_loop`.
         """
         import threading
-        print(f'API BHWC. {threading.currentThread().getName()}')
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)
 
         api_instance = cls(backend, loop=checked_loop, config=config)
 
-        print(f'API BHWC AFTER INSTANCE init {threading.currentThread().getName()}')
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
             ))
-        print(f'API BHWC AFTER WATCHER init {threading.currentThread().getName()}')
         return api_instance
 
     @classmethod
@@ -242,7 +239,6 @@ class API(HardwareAPILike):
 
         """
         import threading
-        print(f'CACHE INSTR . {threading.currentThread().getName()}')
 
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
@@ -1112,7 +1108,6 @@ class API(HardwareAPILike):
         their value is taken from the pipette configuration.
         """
         instr = self._attached_instruments[mount]
-        print(f'API PICK UP TIP {instr}, hastip:{instr.has_tip}')
         assert instr
         assert not instr.has_tip, 'Tip already attached'
         instr_ax = Axis.by_mount(mount)

@@ -58,23 +58,9 @@ class SynchronousAdapter(HardwareAPILike):
     def __repr__(self):
         return '<SynchronousAdapter>'
 
-    # def __del__(self):
-        # try:
-        #     api = object.__getattribute__(self, '_obj_to_adapt')
-        #     inner_loop = api._loop
-        # except AttributeError:
-        #     pass
-        # else:
-            # if inner_loop.is_running():
-            #     inner_loop.call_soon_threadsafe(lambda: inner_loop.stop())
-
     @staticmethod
     def call_coroutine_sync(loop, to_call, *args, **kwargs):
         fut = asyncio.run_coroutine_threadsafe(to_call(*args, **kwargs), loop)
-        print(f'CALL CORO SYNC To CALL {to_call}')
-        print(f'CALL CORO SYNC loop {loop}, id: {id(loop)}')
-        # print(f'CALL CORO SYNC loop {loop.my_id}')
-        print(f'CALL CORO SYNC . {threading.currentThread().getName()} "')
         return fut.result()
 
     def __getattribute__(self, attr_name):
@@ -82,7 +68,6 @@ class SynchronousAdapter(HardwareAPILike):
         # Almost every attribute retrieved from us will be for people actually
         # looking for an attribute of the hardware API, so check there first.
         obj_to_adapt = object.__getattribute__(self, '_obj_to_adapt')
-        print(f'SYNC ADAPT getattribute {attr_name}, {obj_to_adapt}')
         try:
             inner_attr = getattr(obj_to_adapt, attr_name)
         except AttributeError:
