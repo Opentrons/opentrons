@@ -5,20 +5,32 @@ import {
   WPA_PSK_SECURITY,
   WPA_EAP_SECURITY,
   NO_SECURITY,
-} from '../../../../http-api-client'
-import { ScrollableAlertModal } from '../../../modals'
+} from '../../../../../http-api-client'
+
+import { ConnectForm } from './ConnectForm'
+import { ScrollableAlertModal, BottomButtonBar } from '../../../../modals'
+
+import { DISCONNECT } from '../../constants'
 
 import styles from './styles.css'
 
-import type { WifiSecurityType } from '../../../../http-api-client'
+import type {
+  WifiSecurityType,
+  WifiEapOptionsList,
+  WifiConfigureRequest,
+} from '../../../../../http-api-client'
 
-export type ConnectModalProps = {|
+export type ConnectDisconnectModalProps = {|
   ssid: ?string,
   previousSsid: ?string,
   networkingType: string, // Fix types once exported
   securityType: ?WifiSecurityType,
-  close: () => mixed,
-  children: React.Node,
+  handleCancel: () => mixed,
+  addKey: () => mixed,
+  handleDisconnectWifi: () => mixed,
+  eapOptions: ?WifiEapOptionsList,
+  keys: ?WifiKeysList,
+  dispatchConfigure: WifiConfigureRequest => mixed,
 |}
 
 const heading = (
@@ -59,23 +71,47 @@ const formatBody = (ssid, previousSsid, networkingType, securityType) => {
   return ssid && securityType && securityTypes(ssid)[securityType]
 }
 
-export const ConnectModal = ({
+export const ConnectDisconnectModal = ({
   ssid,
   previousSsid,
   networkingType,
   securityType,
-  close,
-  children,
-}: ConnectModalProps) => (
+  handleCancel,
+  handleDisconnectWifi,
+  eapOptions,
+  keys,
+  dispatchConfigure,
+  addKey,
+}: ConnectDisconnectModalProps) => (
   <ScrollableAlertModal
     alertOverlay
     heading={heading(ssid, previousSsid, networkingType)}
     iconName="wifi"
-    onCloseClick={close}
+    onCloseClick={handleCancel}
   >
     <p className={styles.connect_modal_copy}>
       {formatBody(ssid, previousSsid, networkingType, securityType)}
     </p>
-    {children}
+    {networkingType === DISCONNECT ? (
+      <BottomButtonBar
+        buttons={[
+          { children: 'Cancel', onClick: handleCancel },
+          {
+            children: 'Disconnect',
+            onClick: handleDisconnectWifi,
+          },
+        ]}
+      />
+    ) : (
+      <ConnectForm
+        ssid={ssid}
+        securityType={securityType}
+        eapOptions={eapOptions}
+        keys={keys}
+        configure={dispatchConfigure}
+        close={handleCancel}
+        addKey={addKey}
+      />
+    )}
   </ScrollableAlertModal>
 )

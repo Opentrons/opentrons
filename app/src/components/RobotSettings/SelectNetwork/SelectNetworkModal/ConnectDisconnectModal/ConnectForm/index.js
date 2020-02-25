@@ -14,14 +14,14 @@ import {
   SECURITY_TYPE_FIELD,
   EAP_CONFIG_FIELD,
   EAP_TYPE_FIELD,
-} from '../../../../http-api-client'
+} from '../../../../../../http-api-client'
 
-import { JOIN_OTHER_VALUE } from '../constants'
+import { JOIN_OTHER_VALUE } from '../../../constants'
 
-import { BottomButtonBar } from '../../../modals'
-import { StringField, PasswordField, SelectOptionField } from '../fields'
-import { SelectKey } from '../SelectKey'
-import { FormTable } from '../FormTable'
+import { BottomButtonBar } from '../../../../../modals'
+import { StringField, PasswordField, SelectOptionField } from '../../../fields'
+import { SelectKey } from '../../../SelectKey'
+import { FormTable } from '../../../FormTable'
 
 import type {
   WifiSecurityType,
@@ -30,7 +30,7 @@ import type {
   WifiAuthField,
   WifiKeysList,
   WifiConfigureRequest,
-} from '../../../../http-api-client'
+} from '../../../../../../http-api-client'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
 

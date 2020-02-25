@@ -17,33 +17,28 @@ import {
   WPA_EAP_SECURITY,
   fetchWifiEapOptions,
   fetchWifiKeys,
-  addWifiKey,
   configureWifi,
+  addWifiKey,
   clearConfigureWifiResponse,
 } from '../../../http-api-client'
 
 import { startDiscovery } from '../../../discovery'
 import { chainActions } from '../../../util'
 
-import { IntervalWrapper, SpinnerModal } from '@opentrons/components'
-import { Portal } from '../../portal'
-import { BottomButtonBar } from '../../modals'
-import { ConnectModal } from './ConnectModal'
-import { ConnectForm } from './ConnectForm'
+import { IntervalWrapper } from '@opentrons/components'
 import { SelectSsid } from './SelectSsid'
-import { WifiConnectModal } from './WifiConnectModal'
+import { SelectNetworkModal } from './SelectNetworkModal'
 
 import {
   LIST_REFRESH_MS,
   DISCONNECT_WIFI_VALUE,
   JOIN_OTHER_VALUE,
   CONNECT,
-  DISCONNECT,
   NETWORKING_TYPE,
 } from './constants'
 
 import { useStateSelectNetwork, stateSelector } from './hooks'
-import { getSecurityType, hasSecurityType, formatLoaderMessage } from './utils'
+import { getSecurityType, hasSecurityType } from './utils'
 
 import type { State } from '../../../types'
 import type { RequestState } from '../../../robot-api/types'
@@ -62,6 +57,8 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     configResponse,
     configError,
   } = useSelector(state => stateSelector(state, robot))
+
+  const showConfig = configRequest && !!(configError || configResponse)
 
   const [
     ssid,
@@ -95,6 +92,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
 
   const { status, error, response } = disconnectRequest || {}
   const pending = status === PENDING
+  const failure = status === FAILURE
 
   React.useEffect(() => {
     if (status === SUCCESS) {
@@ -118,7 +116,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     const isJoinOrDisconnect =
       ssidValue === JOIN_OTHER_VALUE || ssidValue === DISCONNECT_WIFI_VALUE
 
-    const currentSsid = !isJoinOrDisconnect ? ssidValue : null
+    const currentSsid = isJoinOrDisconnect ? null : ssidValue
     const currentPreviousSsid = ssid
     const currentNetworkingType = NETWORKING_TYPE[ssidValue] || CONNECT
     const currentSecurityType = getSecurityType(list, ssidValue)
@@ -163,62 +161,34 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
         disabled={connectingTo != null}
         handleOnValueChange={handleOnValueChange}
       />
-      <Portal>
-        {connectingTo ||
-          (pending && (
-            <SpinnerModal
-              message={formatLoaderMessage(connectingTo, ssid)}
-              alertOverlay
-            />
-          ))}
-        {modalOpen && (
-          <ConnectModal
-            ssid={ssid}
-            previousSsid={previousSsid}
-            networkingType={networkingType}
-            securityType={securityType}
-            close={handleCancel}
-          >
-            {networkingType === DISCONNECT ? (
-              <BottomButtonBar
-                buttons={[
-                  { children: 'Cancel', onClick: handleCancel },
-                  {
-                    children: 'Disconnect',
-                    onClick: handleDisconnectWifi,
-                  },
-                ]}
-              />
-            ) : (
-              <ConnectForm
-                ssid={ssid}
-                securityType={securityType}
-                eapOptions={eapOptions}
-                keys={keys}
-                configure={dispatchConfigure}
-                close={handleCancel}
-                addKey={file => dispatch(addWifiKey(robot, file))}
-              />
-            )}
-          </ConnectModal>
-        )}
-        {configRequest && !!(configError || configResponse) && (
-          <WifiConnectModal
-            error={configError}
-            request={configRequest}
-            response={configResponse}
-            close={dispatch(clearConfigureWifiResponse(robot))}
-          />
-        )}
-        {status === FAILURE && (
-          <WifiConnectModal
-            error={error}
-            request={{ ssid: previousSsid }}
-            response={response}
-            close={() => dispatch(dismissRequest(latestRequestId))}
-          />
-        )}
-      </Portal>
+      <SelectNetworkModal
+        addKey={file => dispatch(addWifiKey(robot, file))}
+        close={
+          showConfig
+            ? dispatch(clearConfigureWifiResponse(robot))
+            : () => dispatch(dismissRequest(latestRequestId))
+        }
+        {...{
+          connectingTo,
+          pending,
+          failure,
+          modalOpen,
+          ssid,
+          previousSsid,
+          networkingType,
+          securityType,
+          handleCancel,
+          handleDisconnectWifi,
+          eapOptions,
+          keys,
+          dispatchConfigure,
+          configRequest,
+          configError,
+          configResponse,
+          response,
+          error,
+        }}
+      />
     </IntervalWrapper>
   )
 }
