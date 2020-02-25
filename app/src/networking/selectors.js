@@ -62,9 +62,14 @@ export const getWifiList: (
   (wifiList = []) => orderBy(uniqBy(wifiList, 'ssid'), ...LIST_ORDER)
 )
 
-export const getWifiKeys = (
+export const getWifiKeys: (
   state: State,
   robotName: string
-): Array<Types.WifiKey> => {
-  return state.networking[robotName]?.wifiKeys ?? []
-}
+) => Array<Types.WifiKey> = createSelector(
+  (state, robotName) => state.networking[robotName]?.wifiKeyIds,
+  (state, robotName) => state.networking[robotName]?.wifiKeysById,
+  (
+    ids: Array<string> = [],
+    keysById: $Shape<{| [string]: Types.WifiKey |}> = {}
+  ) => ids.map(id => keysById[id])
+)

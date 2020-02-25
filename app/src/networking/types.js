@@ -18,6 +18,9 @@ import typeof {
   FETCH_WIFI_KEYS,
   FETCH_WIFI_KEYS_SUCCESS,
   FETCH_WIFI_KEYS_FAILURE,
+  POST_WIFI_KEYS,
+  POST_WIFI_KEYS_SUCCESS,
+  POST_WIFI_KEYS_FAILURE,
 } from './constants'
 
 import * as ApiTypes from './api-types'
@@ -108,6 +111,26 @@ export type FetchWifiKeysFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+// post wifi keys
+
+export type PostWifiKeysAction = {|
+  type: POST_WIFI_KEYS,
+  payload: {| robotName: string, keyFile: File |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysSuccessAction = {|
+  type: POST_WIFI_KEYS_SUCCESS,
+  payload: {| robotName: string, wifiKey: ApiTypes.WifiKey |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysFailureAction = {|
+  type: POST_WIFI_KEYS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
 // action union
 
 export type NetworkingAction =
@@ -123,14 +146,18 @@ export type NetworkingAction =
   | FetchWifiKeysAction
   | FetchWifiKeysSuccessAction
   | FetchWifiKeysFailureAction
+  | PostWifiKeysAction
+  | PostWifiKeysSuccessAction
+  | PostWifiKeysFailureAction
 
 // state types
 
 export type PerRobotNetworkingState = $Shape<{|
-  internetStatus: ApiTypes.InternetStatus,
-  interfaces: ApiTypes.InterfaceStatusMap,
-  wifiList: Array<ApiTypes.WifiNetwork>,
-  wifiKeys: Array<ApiTypes.WifiKey>,
+  internetStatus?: ApiTypes.InternetStatus,
+  interfaces?: ApiTypes.InterfaceStatusMap,
+  wifiList?: Array<ApiTypes.WifiNetwork>,
+  wifiKeyIds?: Array<string>,
+  wifiKeysById?: $Shape<{| [id: string]: ApiTypes.WifiKey |}>,
 |}>
 
 export type NetworkingState = $Shape<{|

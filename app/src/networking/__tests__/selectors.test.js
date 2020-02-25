@@ -194,12 +194,19 @@ describe('robot settings selectors', () => {
       state: {
         networking: {
           robotName: {
-            wifiKeys: [Fixtures.mockWifiKey],
+            wifiKeyIds: ['abc', 'def'],
+            wifiKeysById: {
+              def: { ...Fixtures.mockWifiKey, id: 'def' },
+              abc: { ...Fixtures.mockWifiKey, id: 'abc' },
+            },
           },
         },
       },
       args: ['robotName'],
-      expected: [Fixtures.mockWifiKey],
+      expected: [
+        { ...Fixtures.mockWifiKey, id: 'abc' },
+        { ...Fixtures.mockWifiKey, id: 'def' },
+      ],
     },
   ]
 

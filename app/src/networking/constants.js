@@ -71,3 +71,14 @@ export const FETCH_WIFI_KEYS_SUCCESS: 'networking:FETCH_WIFI_KEYS_SUCCESS' =
 
 export const FETCH_WIFI_KEYS_FAILURE: 'networking:FETCH_WIFI_KEYS_FAILURE' =
   'networking:FETCH_WIFI_KEYS_FAILURE'
+
+// POST /wifi/keys
+
+export const POST_WIFI_KEYS: 'networking:POST_WIFI_KEYS' =
+  'networking:POST_WIFI_KEYS'
+
+export const POST_WIFI_KEYS_SUCCESS: 'networking:POST_WIFI_KEYS_SUCCESS' =
+  'networking:POST_WIFI_KEYS_SUCCESS'
+
+export const POST_WIFI_KEYS_FAILURE: 'networking:POST_WIFI_KEYS_FAILURE' =
+  'networking:POST_WIFI_KEYS_FAILURE'
