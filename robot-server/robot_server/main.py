@@ -4,6 +4,7 @@ import logging
 from argparse import ArgumentParser
 
 from opentrons.hardware_control import adapters, HardwareAPILike
+from opentrons.create_hardware import create_hardware
 from opentrons.config import feature_flags as ff
 
 
@@ -60,7 +61,7 @@ def run(hardware: HardwareAPILike,
         path = None
 
     if not ff.use_fast_api():
-        from robot_server.aiohttp.main import run as aiohttp_run
+        from opentrons.server import run as aiohttp_run
         aiohttp_run(hardware, hostname, port, path)
     else:
         from robot_server.fastapi import run as fastapi_run
@@ -82,7 +83,13 @@ def main():
     arg_parser = build_arg_parser()
     args = arg_parser.parse_args()
 
-    checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
+    # Create the hardware
+    checked_hardware = asyncio.get_event_loop().run_until_complete(
+        create_hardware(
+            hardware_server=args.hardware_server,
+            hardware_server_socket=args.hardware_server_socket
+        )
+    )
 
     run(hardware=checked_hardware,
         hostname=args.hostname,
