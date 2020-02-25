@@ -7,6 +7,6 @@ config BR2_PACKAGE_PYTHON_OPENTRONS_ROBOT_SERVER
   select BR2_PACKAGE_PYTHON_UVICORN # runtime
   select BR2_PACKAGE_PYTHON_MULTIPART # runtime
   help
-    Opentrons API server. Controls an OT2 robot.
+    Opentrons HTTP server. Controls an OT2 robot.
 
     https://opentrons.com
