@@ -1,0 +1,18 @@
+{
+  "name": "@opentrons/robot-server",
+  "version": "3.15.2",
+  "description": "HTTP server for Opentrons robots",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Opentrons/opentrons.git"
+  },
+  "author": {
+    "name": "Opentrons Labworks",
+    "email": "engineering@opentrons.com"
+  },
+  "license": "Apache-2.0",
+  "bugs": {
+    "url": "https://github.com/Opentrons/opentrons/issues"
+  },
+  "homepage": "https://github.com/Opentrons/opentrons"
+}
