@@ -1602,17 +1602,12 @@ class SmoothieDriver_3_0_0:
             GCODES['ABSOLUTE_COORDS'] + ' ' + \
             self._build_speed_command(self._combined_speed)
         try:
-            with self._serial_lock:
-                self._send_command_unsynchronized(
-                    command_string,
-                    ack_timeout=DEFAULT_ACK_TIMEOUT,
-                    execute_timeout=DEFAULT_EXECUTE_TIMEOUT)
+            self._send_command(command_string, timeout=DEFAULT_EXECUTE_TIMEOUT)
         except SmoothieError:
             # these may cause a hard limit error, since we have no idea where
             # we are in this context. Hopefully that's ok though because
             # otherwise we have very little way to get out
             log.exception("Hard limit in pre-home unstick!")
-            self._reset_from_error()
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
