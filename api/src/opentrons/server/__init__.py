@@ -11,7 +11,7 @@ import traceback
 from typing import TYPE_CHECKING, Optional
 from aiohttp import web
 
-from opentrons.config import CONFIG, feature_flags as ff
+from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
@@ -129,6 +129,9 @@ def init(hardware: 'HardwareAPILike' = None,
     return app
 
 
-def run(hardware: 'HardwareAPILike', host: str, port: int, path: Optional[str]):
+def run(hardware: 'HardwareAPILike',
+        host: str,
+        port: int,
+        path: Optional[str]):
     """Start the aiohttp web service"""
     web.run_app(init(hardware=hardware), host=host, port=port, path=path)
