@@ -15,11 +15,11 @@ import { THERMOCYCLER } from '../../modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
-type Props = {|
+export type ProceedToRunProps = {|
   returnTip: () => mixed,
 |}
 
-function ProceedToRun(props: Props) {
+export function ProceedToRun(props: ProceedToRunProps) {
   const { returnTip } = props
   const dispatch = useDispatch<Dispatch>()
   const sessionModules = useSelector(robotSelectors.getModules)
@@ -86,5 +86,3 @@ function ProceedToRun(props: Props) {
     </>
   )
 }
-
-export default ProceedToRun

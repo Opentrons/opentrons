@@ -1,5 +1,3 @@
 // @flow
-import AnalyticsSettingsCard from './AnalyticsSettingsCard'
-import AnalyticsSettingsModal from './AnalyticsSettingsModal'
-
-export { AnalyticsSettingsCard, AnalyticsSettingsModal }
+export * from './AnalyticsSettingsCard'
+export * from './AnalyticsSettingsModal'

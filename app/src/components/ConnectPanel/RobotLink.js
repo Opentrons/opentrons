@@ -7,16 +7,16 @@ import type { HoverTooltipHandlers } from '@opentrons/components'
 import cx from 'classnames'
 import styles from './styles.css'
 
-type LinkProps = {
+export type RobotLinkProps = {|
   children: React.Node,
   url: string,
   className?: string,
   activeClassName?: string,
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
   disabled?: boolean,
-}
+|}
 
-export default function RobotLink(props: LinkProps) {
+export function RobotLink(props: RobotLinkProps) {
   const { url } = props
   const className = cx(styles.robot_link, props.className, {
     [styles.disabled]: props.disabled,

@@ -2,7 +2,7 @@
 import EventEmitter from 'events'
 import { app } from 'electron'
 import Store from 'electron-store'
-import DiscoveryClient from '@opentrons/discovery-client'
+import { createDiscoveryClient } from '@opentrons/discovery-client'
 import { registerDiscovery } from '../discovery'
 import { getConfig, getOverrides } from '../config'
 
@@ -31,7 +31,7 @@ describe('app-shell/discovery', () => {
     getOverrides.mockReturnValue({})
 
     dispatch = jest.fn()
-    DiscoveryClient.mockReturnValue(mockClient)
+    createDiscoveryClient.mockReturnValue(mockClient)
     Store.__mockReset()
     Store.__store.get.mockImplementation(key => {
       if (key === 'services') return []
@@ -46,7 +46,7 @@ describe('app-shell/discovery', () => {
   test('registerDiscovery creates a DiscoveryClient', () => {
     registerDiscovery(dispatch)
 
-    expect(DiscoveryClient).toHaveBeenCalledWith(
+    expect(createDiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
         pollInterval: expect.any(Number),
         // support for legacy IPv6 wired robots
@@ -170,7 +170,7 @@ describe('app-shell/discovery', () => {
     })
 
     registerDiscovery(dispatch)
-    expect(DiscoveryClient).toHaveBeenCalledWith(
+    expect(createDiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
         services: [{ name: 'foo' }],
       })
@@ -181,7 +181,7 @@ describe('app-shell/discovery', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: ['1.2.3.4'] })
     registerDiscovery(dispatch)
 
-    expect(DiscoveryClient).toHaveBeenCalledWith(
+    expect(createDiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
         candidates: expect.arrayContaining(['1.2.3.4']),
       })
@@ -193,7 +193,7 @@ describe('app-shell/discovery', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: '1.2.3.4' })
     registerDiscovery(dispatch)
 
-    expect(DiscoveryClient).toHaveBeenCalledWith(
+    expect(createDiscoveryClient).toHaveBeenCalledWith(
       expect.objectContaining({
         candidates: expect.arrayContaining(['1.2.3.4']),
       })

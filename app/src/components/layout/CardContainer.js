@@ -2,9 +2,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+export type CardContainerProps = {|
   children: React.Node,
-}
-export default function CardContainer(props: Props) {
+|}
+
+export function CardContainer(props: CardContainerProps) {
   return <div className={styles.card_container}>{props.children}</div>
 }

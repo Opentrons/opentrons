@@ -7,16 +7,14 @@ import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { Icon } from '@opentrons/components'
 import styles from './styles.css'
 
-import {
-  selectors as robotSelectors,
-  type Labware,
-  type LabwareType,
-} from '../../robot'
-import InfoBoxButton from './InfoBoxButton'
+import { selectors as robotSelectors } from '../../robot'
+import { InfoBoxButton } from './InfoBoxButton'
 
-type Props = {| labware: ?Labware |}
+import type { Labware, LabwareType } from '../../robot/types'
 
-function InfoBox(props: Props) {
+export type InfoBoxProps = {| labware: ?Labware |}
+
+export function InfoBox(props: InfoBoxProps) {
   const { labware } = props
 
   let title = 'No labware selected'
@@ -50,5 +48,3 @@ function InfoBox(props: Props) {
     </div>
   )
 }
-
-export default InfoBox

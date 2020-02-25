@@ -2,12 +2,12 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+export type InfoSectionProps = {|
   title: string,
   children: React.Node,
-}
+|}
 
-export default function InfoSection(props: Props) {
+export function InfoSection(props: InfoSectionProps) {
   return (
     <section className={styles.info_section}>
       <h3 className={styles.title}>{props.title}</h3>

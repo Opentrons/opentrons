@@ -8,11 +8,11 @@ import styles from './styles.css'
 
 import type { Dispatch } from '../../types'
 
-type Props = {|
+export type UploadRobotUpdateProps = {|
   robotName: string,
 |}
 
-export default function UploadRobotUpdate(props: Props) {
+export function UploadRobotUpdate(props: UploadRobotUpdateProps) {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {

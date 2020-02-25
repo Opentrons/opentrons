@@ -10,14 +10,14 @@ import type { InstrumentInfoProps } from '@opentrons/components'
 import type { Pipette, TiprackByMountMap } from '../../robot/types'
 import type { Mount } from '../../pipettes/types'
 
-type Props = {|
+export type PipettesProps = {|
   currentMount: Mount | null,
   pipettes: Array<Pipette>,
   tipracksByMount: TiprackByMountMap,
   changePipetteUrl: string,
 |}
 
-export default function Pipettes(props: Props) {
+export function Pipettes(props: PipettesProps) {
   const { currentMount, pipettes, tipracksByMount } = props
 
   const infoByMount = PIPETTE_MOUNTS.reduce<

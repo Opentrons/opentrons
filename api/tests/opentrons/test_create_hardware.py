@@ -8,7 +8,7 @@ def test_find_smoothie_file(monkeypatch, tmpdir):
     dummy_file.write_text("hello")
     monkeypatch.setattr(config, 'ROBOT_FIRMWARE_DIR', Path(tmpdir))
 
-    from opentrons import main
+    from opentrons import create_hardware
 
-    monkeypatch.setattr(main, 'IS_ROBOT', True)
-    assert main._find_smoothie_file() == (dummy_file, 'edge-2cac98asda')
+    monkeypatch.setattr(create_hardware, 'IS_ROBOT', True)
+    assert create_hardware._find_smoothie_file() == (dummy_file, 'edge-2cac98asda')

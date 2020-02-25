@@ -21,7 +21,7 @@ import {
   LabeledButton,
 } from '@opentrons/components'
 
-import AddManualIp from './AddManualIp'
+import { AddManualIp } from './AddManualIp'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { DropdownOption } from '@opentrons/components'
@@ -50,16 +50,16 @@ type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Advanced Settings'
 
-export default withRouter(
+export const AdvancedSettingsCard = withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps
-  )(AdvancedSettingsCard)
+  )(AdvancedSettingsCardComponent)
 )
 
-function AdvancedSettingsCard(props: Props) {
+function AdvancedSettingsCardComponent(props: Props) {
   return (
-    <React.Fragment>
+    <>
       <Card title={TITLE}>
         <LabeledSelect
           label="Update Channel"
@@ -112,7 +112,7 @@ function AdvancedSettingsCard(props: Props) {
         path={`${props.match.path}/add-ip`}
         render={() => <AddManualIp backUrl={props.match.url} />}
       />
-    </React.Fragment>
+    </>
   )
 }
 
@@ -127,7 +127,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP) {
+function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
     toggleDevTools: () => dispatch(toggleDevTools()),
     toggleDevInternalFlag: (flag: DevInternalFlag) =>

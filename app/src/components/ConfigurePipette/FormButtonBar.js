@@ -7,26 +7,22 @@ import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 
-type Props = {
+export type FormButtonBarProps = {|
   buttons: Array<?ButtonProps>,
-}
+|}
 
-export default function FormButtonBar(props: Props) {
+export function FormButtonBar(props: FormButtonBarProps) {
   const className = styles.form_button
-  const buttons = props.buttons.map(button => {
-    return {
-      ...button,
-      className,
-    }
-  })
-  const resetMessage = (
-    <p className={styles.reset_message}>
-      * To reset an individual setting, simply clear the field.
-    </p>
-  )
+  const buttons = props.buttons.map(button => ({ ...button, className }))
+
   return (
-    <React.Fragment>
-      <BottomButtonBar buttons={buttons} description={resetMessage} />
-    </React.Fragment>
+    <BottomButtonBar
+      buttons={buttons}
+      description={
+        <p className={styles.reset_message}>
+          * To reset an individual setting, simply clear the field.
+        </p>
+      }
+    />
   )
 }

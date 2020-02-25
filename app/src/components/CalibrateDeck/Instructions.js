@@ -1,14 +1,15 @@
 // @flow
 import * as React from 'react'
-import InstructionStep from '../InstructionStep'
-import type { CalibrationStep } from './types'
-import styles from '../InstructionStep/styles.css'
 
+import { InstructionStep } from '../InstructionStep'
+import styles from '../InstructionStep/styles.css'
 import calibrationTipSrc from './images/initial-calib-tip.svg'
 
-type Props = {
+import type { CalibrationStep } from './types'
+
+export type InstructionsProps = {|
   calibrationStep: CalibrationStep,
-}
+|}
 
 const DIAGRAMS: { [step: CalibrationStep]: ?string } = {
   '2': require('./images/initial-calib-z-5@3x.png'),
@@ -40,7 +41,7 @@ const INSTRUCTIONS: { [step: CalibrationStep]: ?React.Node } = {
   ),
 }
 
-export default function Instructions(props: Props) {
+export function Instructions(props: InstructionsProps) {
   const { calibrationStep } = props
   const diagram = getDiagramSrc(calibrationStep)
   const instructions = getInstructionsByStep(calibrationStep)

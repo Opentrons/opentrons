@@ -3,16 +3,16 @@ import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 
-type Props = {
+export type ExitAlertModalProps = {|
   back: () => mixed,
   exit: () => mixed,
-}
+|}
 
 const HEADING = 'Are you sure you want to exit initial robot calibration?'
 const CANCEL_TEXT = 'cancel'
 const EXIT_TEXT = 'exit calibration'
 
-export default function ExitAlertModal(props: Props) {
+export function ExitAlertModal(props: ExitAlertModalProps) {
   const { back, exit } = props
   return (
     <AlertModal

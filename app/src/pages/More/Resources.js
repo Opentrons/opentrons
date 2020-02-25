@@ -1,12 +1,12 @@
 // @flow
 import React from 'react'
-import Page from '../../components/Page'
-import { Resources } from '../../components/Resources'
+import { Page } from '../../components/Page'
+import { Resources as ResourcesContents } from '../../components/Resources'
 
-export function ResourcesPage() {
+export function Resources() {
   return (
     <Page titleBarProps={{ title: 'Resources' }}>
-      <Resources />
+      <ResourcesContents />
     </Page>
   )
 }

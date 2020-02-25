@@ -12,7 +12,7 @@ const ITEMS = [
   { label: 'Resources', url: '/menu/resources' },
 ]
 
-export default function MenuPanel() {
+export function MenuPanel() {
   return (
     <SidePanel title={MENU}>
       <div className={styles.menu_panel}>

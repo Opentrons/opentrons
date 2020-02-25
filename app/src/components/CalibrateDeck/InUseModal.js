@@ -3,7 +3,7 @@ import * as React from 'react'
 
 import { AlertModal, CheckboxField } from '@opentrons/components'
 
-type Props = {|
+export type InUseModalProps = {|
   close: () => mixed,
   forceStart: () => mixed,
 |}
@@ -16,8 +16,8 @@ type State = {|
 
 const HEADING = 'Robot is currently in use'
 
-export default class InUseModal extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class InUseModal extends React.Component<InUseModalProps, State> {
+  constructor(props: InUseModalProps) {
     super(props)
 
     this.state = {

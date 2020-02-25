@@ -2,9 +2,9 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 
-import VersionInfoModal from './VersionInfoModal'
-import ViewUpdateModal from './ViewUpdateModal'
-import InstallModal from './InstallModal'
+import { VersionInfoModal } from './VersionInfoModal'
+import { ViewUpdateModal } from './ViewUpdateModal'
+import { InstallModal } from './InstallModal'
 import {
   startBuildrootUpdate,
   setBuildrootUpdateSeen,
@@ -15,20 +15,20 @@ import {
   getBuildrootUpdateAvailable,
 } from '../../../buildroot'
 
-import type { Dispatch } from '../../../types'
+import type { State, Dispatch } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 
-type Props = {|
+export type UpdateBuildrootProps = {|
   robot: ViewableRobot,
   close: () => mixed,
 |}
 
-export default function UpdateBuildroot(props: Props) {
+export function UpdateBuildroot(props: UpdateBuildrootProps) {
   const { robot, close } = props
   const robotName = robot.name
   const [viewUpdateInfo, setViewUpdateInfo] = React.useState(false)
   const session = useSelector(getBuildrootSession)
-  const robotUpdateType = useSelector(state =>
+  const robotUpdateType = useSelector((state: State) =>
     getBuildrootUpdateAvailable(state, robot)
   )
   const dispatch = useDispatch<Dispatch>()

@@ -13,6 +13,15 @@ import typeof {
   INTERFACE_UNAVAILABLE,
   INTERFACE_WIFI,
   INTERFACE_ETHERNET,
+  SECURITY_NONE,
+  SECURITY_WPA_PSK,
+  SECURITY_WPA_EAP,
+  FETCH_STATUS,
+  FETCH_STATUS_SUCCESS,
+  FETCH_STATUS_FAILURE,
+  FETCH_WIFI_LIST,
+  FETCH_WIFI_LIST_SUCCESS,
+  FETCH_WIFI_LIST_FAILURE,
 } from './constants'
 
 // response types
@@ -51,18 +60,37 @@ export type NetworkingStatusResponse = {|
   interfaces: InterfaceStatusMap,
 |}
 
+// GET /wifi/list
+
+export type WifiSecurityType =
+  | SECURITY_NONE
+  | SECURITY_WPA_PSK
+  | SECURITY_WPA_EAP
+
+export type WifiNetwork = {|
+  ssid: string,
+  signal: number,
+  active: boolean,
+  security: string,
+  securityType: WifiSecurityType,
+|}
+
+export type WifiListResponse = {|
+  list: Array<WifiNetwork>,
+|}
+
 // action types
 
 // fetch status
 
 export type FetchStatusAction = {|
-  type: 'networking:FETCH_STATUS',
+  type: FETCH_STATUS,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type FetchStatusSuccessAction = {|
-  type: 'networking:FETCH_STATUS_SUCCESS',
+  type: FETCH_STATUS_SUCCESS,
   payload: {|
     robotName: string,
     internetStatus: InternetStatus,
@@ -72,7 +100,27 @@ export type FetchStatusSuccessAction = {|
 |}
 
 export type FetchStatusFailureAction = {|
-  type: 'networking:FETCH_STATUS_FAILURE',
+  type: FETCH_STATUS_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+// fetch wifi list
+
+export type FetchWifiListAction = {|
+  type: FETCH_WIFI_LIST,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiListSuccessAction = {|
+  type: FETCH_WIFI_LIST_SUCCESS,
+  payload: {| robotName: string, wifiList: Array<WifiNetwork> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiListFailureAction = {|
+  type: FETCH_WIFI_LIST_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
@@ -83,12 +131,16 @@ export type NetworkingAction =
   | FetchStatusAction
   | FetchStatusSuccessAction
   | FetchStatusFailureAction
+  | FetchWifiListAction
+  | FetchWifiListSuccessAction
+  | FetchWifiListFailureAction
 
 // state types
 
 export type PerRobotNetworkingState = $Shape<{|
   internetStatus: InternetStatus,
   interfaces: InterfaceStatusMap,
+  wifiList: Array<WifiNetwork>,
 |}>
 
 export type NetworkingState = $Shape<{|

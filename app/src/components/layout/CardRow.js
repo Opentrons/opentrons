@@ -2,9 +2,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+export type CardRowProps = {|
   children: React.Node,
-}
-export default function CardRow(props: Props) {
+|}
+
+export function CardRow(props: CardRowProps) {
   return <div className={styles.row}>{props.children}</div>
 }

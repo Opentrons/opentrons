@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
@@ -6,17 +7,19 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import 'typeface-open-sans'
 import './App.global.css'
 
-import NavBar from './nav-bar'
+import { NavBar } from './nav-bar'
 
 import { PageWrapper } from '../components/Page'
-import SidePanel from '../pages/SidePanel'
-import Robots from '../pages/Robots'
+import { SidePanel } from '../pages/SidePanel'
+import { Robots } from '../pages/Robots'
 import { More } from '../pages/More'
-import Upload from '../pages/Upload'
-import Calibrate from '../pages/Calibrate'
-import Run from '../pages/Run'
+import { Upload } from '../pages/Upload'
+import { Calibrate } from '../pages/Calibrate'
+import { Run } from '../pages/Run'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import styles from './App.css'
+
+const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
 
 export function App() {
   return (
@@ -37,8 +40,4 @@ export function App() {
       </PageWrapper>
     </div>
   )
-}
-
-function stopEvent(event) {
-  event.preventDefault()
 }

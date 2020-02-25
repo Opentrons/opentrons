@@ -9,10 +9,10 @@ import { CardContentHalf } from '../layout'
 
 import styles from './styles.css'
 
-type Props = {
+export type AppInfoCardProps = {|
   availableVersion: ?string,
   checkUpdate: () => mixed,
-}
+|}
 
 const TITLE = 'Information'
 const VERSION_LABEL = 'Software Version'
@@ -20,7 +20,7 @@ const VERSION_LABEL = 'Software Version'
 const UPDATE_AVAILABLE = 'view available update'
 const UPDATE_NOT_AVAILABLE = 'up to date'
 
-export default function AppInfoCard(props: Props) {
+export function AppInfoCard(props: AppInfoCardProps) {
   const { checkUpdate, availableVersion } = props
 
   return (

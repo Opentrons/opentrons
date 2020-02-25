@@ -2,12 +2,12 @@
 import * as React from 'react'
 import styles from './calibration-info.css'
 
-type Props = {
+export type CalibrationInfoContentProps = {|
   leftChildren?: React.Node,
   rightChildren?: React.Node,
-}
+|}
 
-export default function CalibrationInfoContent(props: Props) {
+export function CalibrationInfoContent(props: CalibrationInfoContentProps) {
   const { leftChildren, rightChildren } = props
 
   return (

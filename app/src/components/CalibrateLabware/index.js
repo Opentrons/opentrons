@@ -2,16 +2,19 @@
 // info panel and controls for labware calibration page
 import * as React from 'react'
 import { withRouter } from 'react-router-dom'
-import type { Labware } from '../../robot'
-import DeckMap from '../DeckMap'
-import InfoBox from './InfoBox'
+
+import { DeckMap } from '../DeckMap'
+import { InfoBox } from './InfoBox'
 import styles from './styles.css'
 
-type Props = { labware: ?Labware }
+import type { ContextRouter } from 'react-router-dom'
+import type { Labware } from '../../robot/types'
 
-export default withRouter<$Exact<Props>, _>(CalibrateLabware)
+type Props = {| ...ContextRouter, labware: ?Labware |}
 
-function CalibrateLabware(props: Props) {
+export const CalibrateLabware = withRouter<Props, _>(CalibrateLabwareComponent)
+
+function CalibrateLabwareComponent(props: Props) {
   return (
     <div className={styles.calibrate_labware_wrapper}>
       <InfoBox labware={props.labware} />

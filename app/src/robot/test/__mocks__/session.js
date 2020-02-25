@@ -1,6 +1,6 @@
 // mock rpc session
 // based on api/opentrons/api/session.py
-export default function MockSession() {
+export function MockSession() {
   return {
     name: 'MOCK SESSION',
     protocol_text: '# mock protocol text',

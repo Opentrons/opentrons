@@ -2,11 +2,11 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+export type LabwareTableProps = {|
   children: React.Node,
-}
+|}
 
-export default function LabwareTable(props: Props) {
+export function LabwareTable(props: LabwareTableProps) {
   return (
     <table className={styles.labware_table}>
       <tbody>

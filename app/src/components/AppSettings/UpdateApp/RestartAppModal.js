@@ -3,14 +3,15 @@ import * as React from 'react'
 
 import { Portal } from '../../portal'
 import { ScrollableAlertModal } from '../../modals'
-import UpdateAppMessage from './UpdateAppMessage'
+import { UpdateAppMessage } from './UpdateAppMessage'
 
-type Props = {
+export type RestartAppModalProps = {|
   availableVersion: ?string,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
-}
-export default function RestartAppModal(props: Props) {
+|}
+
+export function RestartAppModal(props: RestartAppModalProps) {
   const { availableVersion, applyUpdate, closeModal } = props
   return (
     <Portal>

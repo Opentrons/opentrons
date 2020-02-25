@@ -3,9 +3,9 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+type UpdateAppMessageProps = {|
   downloaded?: boolean,
-}
+|}
 
 const UPDATE_MESSAGE = (
   <p className={styles.update_message}>
@@ -21,7 +21,7 @@ const RESTART_MESSAGE = (
   </p>
 )
 
-export default function UpdateAppMessage(props: Props) {
+export function UpdateAppMessage(props: UpdateAppMessageProps) {
   const message = props.downloaded ? RESTART_MESSAGE : UPDATE_MESSAGE
   return (
     <React.Fragment>
