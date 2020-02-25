@@ -119,6 +119,11 @@ export const getModuleEntities: Selector<ModuleEntities> = createSelector(
   rs => rs.moduleInvariantProperties
 )
 
+export const getIsV4Protocol: Selector<boolean> = createSelector(
+  getModuleEntities,
+  moduleEntities => !isEmpty(moduleEntities)
+)
+
 export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
   state => rootSelector(state).pipetteInvariantProperties,
   labwareDefSelectors.getLabwareDefsByURI,

@@ -27,6 +27,10 @@
     "module_without_labware": {
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
+    },
+    "export_v4_protocol": {
+      "title": "Robot requirements for running module inclusive JSON protocols",
+      "body": "This protocol utilizes modules and can only run on app and robot server version 3.17 or higher. Please ensure your OT-2 is updated to the correct version. Learn more here."
     }
   },
   "timeline": {

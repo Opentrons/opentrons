@@ -40,6 +40,7 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
+      isV4Protocol: false,
     }
 
     commands = [

@@ -9,6 +9,7 @@ import {
   SidePanel,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
+import { useBlockingHint } from '../Hints/useBlockingHint'
 import { KnowledgeBaseLink } from '../KnowledgeBaseLink'
 import { Portal } from '../portals/MainPageModalPortal'
 import modalStyles from '../modals/modal.css'
@@ -35,6 +36,7 @@ type Props = {|
   pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
   modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
   savedStepForms: SavedStepFormState,
+  isV4Protocol: boolean,
 |}
 
 const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
@@ -149,11 +151,17 @@ export function FileSidebar(props: Props) {
     modulesOnDeck,
     pipettesOnDeck,
     savedStepForms,
+    isV4Protocol,
   } = props
   const [
     showExportWarningModal,
     setShowExportWarningModal,
   ] = React.useState<boolean>(false)
+
+  const [showV4ExportWarning, setShowV4ExportWarning] = React.useState<boolean>(
+    false
+  )
+
   const cancelModal = () => setShowExportWarningModal(false)
 
   const noCommands = downloadData && downloadData.fileData.commands.length === 0
@@ -179,8 +187,19 @@ export function FileSidebar(props: Props) {
       modulesWithoutStep,
     })
 
+  const blockingV4ExportHint = useBlockingHint({
+    enabled: isV4Protocol && showV4ExportWarning,
+    hintKey: 'export_v4_protocol',
+    handleCancel: () => setShowV4ExportWarning(false),
+    handleContinue: () => {
+      setShowV4ExportWarning(false)
+      // saveFile(downloadData)
+    },
+  })
+
   return (
     <>
+      {blockingV4ExportHint}
       {showExportWarningModal && (
         <Portal>
           <AlertModal
@@ -196,8 +215,13 @@ export function FileSidebar(props: Props) {
                 children: 'CONTINUE WITH EXPORT',
                 className: modalStyles.long_button,
                 onClick: () => {
-                  saveFile(downloadData)
-                  setShowExportWarningModal(false)
+                  if (isV4Protocol) {
+                    setShowExportWarningModal(false)
+                    setShowV4ExportWarning(true)
+                  } else {
+                    saveFile(downloadData)
+                    setShowExportWarningModal(false)
+                  }
                 },
               },
             ]}
@@ -222,6 +246,8 @@ export function FileSidebar(props: Props) {
               onClick={() => {
                 if (hasWarning) {
                   setShowExportWarningModal(true)
+                } else if (isV4Protocol) {
+                  setShowV4ExportWarning(true)
                 } else {
                   saveFile(downloadData)
                   onDownload()
