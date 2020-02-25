@@ -73,8 +73,8 @@ def main():
 
     This function
     - creates and starts the server for both the RPC routes
-      handled by :py:mod:`robot_server.aiohttp.rpc` and the HTTP routes handled
-      by :py:mod:`robot_server.aiohttp.http`
+      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
+      by :py:mod:`opentrons.server.http`
     - initializes the hardware interaction handled by either
       :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
 
