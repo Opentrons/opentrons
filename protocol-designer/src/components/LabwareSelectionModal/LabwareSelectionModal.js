@@ -104,9 +104,15 @@ export const LabwareSelectionModal = (props: Props) => {
     hintKey: 'custom_labware_with_modules',
     handleCancel: () => setEnqueuedLabwareType(null),
     handleContinue: () => {
-      if (enqueuedLabwareType) {
-        setEnqueuedLabwareType(null)
+      setEnqueuedLabwareType(null)
+      if (enqueuedLabwareType !== null) {
+        // NOTE: this needs to be wrapped for Flow, IRL we know enqueuedLabwareType is not null
+        // because `enabled` prop above ensures it's !== null.
         selectLabware(enqueuedLabwareType)
+      } else {
+        console.error(
+          'could not select labware because enqueuedLabwareType is null. This should not happen'
+        )
       }
     },
   })
