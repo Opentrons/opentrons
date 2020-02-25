@@ -158,8 +158,8 @@ class ProtocolContext(CommandPublisher):
 
     def cleanup(self):
         """ Finalize and clean up the protocol context. """
-        # if self._unsubscribe_commands:
-        #     self._unsubscribe_commands()
+        if self._unsubscribe_commands:
+            self._unsubscribe_commands()
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):

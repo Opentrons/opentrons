@@ -340,7 +340,6 @@ async def hardware(request, loop, virtual_smoothie_env):
     try:
         yield hw_sim
     finally:
-        # await hw_sim.reset()
         hw_sim.set_config(old_config)
 
 

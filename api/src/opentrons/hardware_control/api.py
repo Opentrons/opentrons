@@ -88,7 +88,6 @@ class API(HardwareAPILike):
         :param loop: An event loop to use. If not specified, use the result of
                      :py:meth:`asyncio.get_event_loop`.
         """
-        import threading
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.connect(port)

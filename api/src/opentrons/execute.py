@@ -105,7 +105,6 @@ def get_protocol_api(
                                            extra_labware=extra_labware,
                                            api_version=checked_version)
     context._hw_manager.hardware.cache_instruments()
-
     return context
 
 

@@ -146,10 +146,11 @@ def run(**kwargs):  # noqa(C901)
         log.info("Homing Z axes")
         loop.run_until_complete(hardware.home_z())
 
-    # if kwargs.get('hardware_server'):
-    #     loop.run_until_complete(
-    #             install_hardware_server(kwargs['hardware_server_socket'],
-    #             hardware._api))
+    if kwargs.get('hardware_server'):
+    #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
+        loop.run_until_complete(
+                install_hardware_server(kwargs['hardware_server_socket'],
+                hardware))
 
     server.run(
         hardware,

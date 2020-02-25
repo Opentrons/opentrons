@@ -70,7 +70,7 @@ class ThreadManager(HardwareAPILike):
 
     def __getattribute__(self, attr_name):
         # Almost every attribute retrieved from us will be for people actually
-        # looking for an attribute of the hardware API, so check there first.
+        # looking for an attribute of the managed object, so check there first.
         managed_obj = object.__getattribute__(self, 'managed_obj')
         loop = object.__getattribute__(self, '_loop')
         try:
