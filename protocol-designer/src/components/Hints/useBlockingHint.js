@@ -73,10 +73,15 @@ export const useBlockingHint = (args: {|
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 
   if (isDismissed) {
-    handleContinue()
+    if (enabled) {
+      handleContinue()
+    }
+    return null
   }
 
-  if (!enabled || isDismissed) return null
+  if (!enabled) {
+    return null
+  }
 
   return (
     <BlockingHint

@@ -193,7 +193,7 @@ export function FileSidebar(props: Props) {
     handleCancel: () => setShowV4ExportWarning(false),
     handleContinue: () => {
       setShowV4ExportWarning(false)
-      // saveFile(downloadData)
+      saveFile(downloadData)
     },
   })
 
