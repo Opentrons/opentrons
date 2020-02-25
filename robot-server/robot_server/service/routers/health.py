@@ -18,7 +18,7 @@ router = APIRouter()
                         "versions, names, and so on",
             summary="The /health endpoint is a good one to check to see if "
                     "you're communicating with an OT-2 with a properly booted "
-                    "API aiohttp. If it returns OK, all is well. It also can "
+                    "API server. If it returns OK, all is well. It also can "
                     "be used to pull information like the robot software "
                     "version and name.",
             response_description="OT-2 /health response")
