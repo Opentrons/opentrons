@@ -8,7 +8,7 @@ import threading
 import time
 import traceback
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Optional
 from aiohttp import web
 
 from opentrons.config import CONFIG, feature_flags as ff
@@ -64,7 +64,7 @@ class ThreadedAsyncLock:
 
     async def __aenter__(self):
         pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
-            f"task {asyncio.Task.current_task()}] "
+               f"task {asyncio.Task.current_task()}] "
         log.debug(pref + 'will acquire')
         then = time.perf_counter()
         while not self._thread_lock.acquire(blocking=False):
@@ -100,11 +100,14 @@ def init(hardware: 'HardwareAPILike' = None,
     app = web.Application(middlewares=[error_middleware])
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
-    app['com.opentrons.rpc'] = RPCServer(
-        app, MainRouter(
-            hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+
+    main_router = MainRouter(hardware, lock=app['com.opentrons.motion_lock'],
+                             loop=loop)
+    app['com.opentrons.rpc'] = RPCServer(
+        app, main_router)
+    app['com.opentrons.main_router'] = main_router
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -114,32 +117,18 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
+    async def kill_router(a):
+        # Try to kill router hardware
+        router = a['com.opentrons.main_router']
+        if router.calibration_manager._hardware:
+            router.calibration_manager._hardware.join()
+
+    app.on_shutdown.append(kill_router)
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.freeze()
     return app
 
 
-def run(hardware: 'HardwareAPILike',
-        hostname=None,
-        port=None,
-        path=None,
-        loop=None):
-    """
-    The arguments are not all optional. Either a path or hostname+port should
-    be specified; you have to specify one.
-    """
-    if path:
-        log.debug("Starting Opentrons server application on {}".format(
-            path))
-        hostname, port = None, None
-    else:
-        log.debug("Starting Opentrons server application on {}:{}".format(
-            hostname, port))
-        path = None
-
-    if not ff.use_fast_api():
-        web.run_app(init(hardware=hardware),
-                    host=hostname, port=port, path=path)
-    else:
-        import opentrons.app
-        opentrons.app.run(hardware, hostname, port)
+def run(hardware: 'HardwareAPILike', host: str, port: int, path: Optional[str]):
+    """Start the aiohttp web service"""
+    web.run_app(init(hardware=hardware), host=host, port=port, path=path)
