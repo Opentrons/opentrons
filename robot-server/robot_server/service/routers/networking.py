@@ -4,8 +4,8 @@ from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException, File, Path
 from opentrons.system import nmcli
-from robot_server.fastapi.models import V1ErrorMessage
-from robot_server.fastapi.models.networking import NetworkingStatus, \
+from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models.networking import NetworkingStatus, \
     WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
     WifiKeyFiles, WifiKeyFile, EapOptions
 

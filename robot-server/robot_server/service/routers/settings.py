@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
-from robot_server.fastapi.models import V1ErrorMessage
-from robot_server.fastapi.models.settings import AdvancedSettings, LogLevel, \
+from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
 

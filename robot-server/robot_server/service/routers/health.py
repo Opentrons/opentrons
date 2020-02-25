@@ -6,8 +6,8 @@ from opentrons.hardware_control import HardwareAPILike
 from opentrons.protocols.types import APIVersion
 from opentrons import __version__
 from opentrons.config import feature_flags
-from robot_server.fastapi.models.health import Health, Links
-from robot_server.fastapi.dependencies import get_hardware
+from robot_server.service.models.health import Health, Links
+from robot_server.service.dependencies import get_hardware
 
 router = APIRouter()
 
