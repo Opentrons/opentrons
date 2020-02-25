@@ -20,7 +20,6 @@ pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
 python := $(pipenv_envvars) pipenv run python
 pip := $(pipenv_envvars) pipenv run pip
 pytest := $(pipenv_envvars) pipenv run py.test
-sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
@@ -63,9 +62,7 @@ ot_py_sources := $(filter %.py,$(shell $(SHX) find $(SRC_PATH)))
 ot_shared_data_sources := $(filter %.json,$(shell $(SHX) find ../shared-data/))
 # And the arbitrary stuff in resources
 ot_resources := $(filter %,$(shell $(SHX) find src/opentrons/resources))
-# and the openapi spec
-ot_openapi := ${SRC_PATH}/aiohttp/openapi.json
-ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(ot_openapi)
+ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources)
 
 # Defined separately than the clean target so the wheel file doesn’t have to
 # depend on a PHONY target
@@ -103,7 +100,6 @@ test:
 lint: $(ot_py_sources)
 	$(python) -m mypy $(SRC_PATH)
 	$(python) -m pylama $(SRC_PATH) tests
-	$(python) -m openapi_spec_validator $(ot_openapi)
 
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
