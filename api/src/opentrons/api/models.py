@@ -76,7 +76,7 @@ class Module:
     def __init__(self, module, context=None):
         self.id = id(module)
         if isinstance(module, module_geometry.ModuleGeometry):
-            self.name = module.load_name
+            self.name = module.model.value
             self.slot = module.parent
         else:
             self.name = module.get_name()

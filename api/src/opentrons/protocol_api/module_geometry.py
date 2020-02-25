@@ -145,7 +145,6 @@ class ModuleGeometry(DeckItem):
         self._parent = parent
         self._display_name = "{} on {}".format(
             display_name, str(parent.labware))
-        self._load_name = model.value
         self._model = model
         self._offset = offset
         self._height = overall_height + self._parent.point.z
@@ -169,12 +168,12 @@ class ModuleGeometry(DeckItem):
         self._labware = None
 
     @property
-    def load_name(self) -> str:
-        return self._load_name
-
-    @property
     def model(self) -> ModuleModel:
         return self._model
+
+    @property
+    def load_name(self) -> str:
+        return self.model.value
 
     @property
     def parent(self) -> LocationLabware:

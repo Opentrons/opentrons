@@ -13,7 +13,8 @@ from .labware import (
     LabwareDefinition, Labware, get_labware_definition, load_from_definition)
 from .module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
-    resolve_module_type, models_compatible, ModuleType)
+    resolve_module_type, models_compatible, ModuleType,
+    module_model_from_string)
 from .definitions import MAX_SUPPORTED_VERSION
 from . import geometry
 from .instrument_context import InstrumentContext
@@ -435,7 +436,8 @@ class ProtocolContext(CommandPublisher):
             ModuleType.TEMPERATURE: TemperatureModuleContext,
             ModuleType.THERMOCYCLER: ThermocyclerContext}[resolved_type]
         for mod in self._hw_manager.hardware.attached_modules:
-            if models_compatible(mod.model(), resolved_model):
+            if models_compatible(
+                    module_model_from_string(mod.model()), resolved_model):
                 hc_mod_instance = adapters.SynchronousAdapter(mod)
                 break
 

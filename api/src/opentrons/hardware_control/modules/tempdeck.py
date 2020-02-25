@@ -11,6 +11,24 @@ log = logging.getLogger(__name__)
 TEMP_POLL_INTERVAL_SECS = 1
 
 
+def _model_from_revision(revision: Optional[str]) -> str:
+    """ Defines the revision -> model mapping"""
+    if not revision or 'v' not in revision:
+        log.error(f'bad revision: {revision}')
+        return 'temperatureModuleV1'
+    try:
+        revision_num = float(revision.split('v')[-1])  # type: ignore
+    except (ValueError, TypeError):
+        # none or corrupt
+        log.exception('no revision')
+        return 'temperatureModuleV1'
+
+    if revision_num < 20:
+        return 'temperatureModuleV1'
+    else:
+        return 'temperatureModuleV2'
+
+
 class MissingDevicePortError(Exception):
     pass
 
@@ -105,24 +123,6 @@ class TempDeck(mod_abc.AbstractModule):
         return 'tempdeck'
 
     def model(self) -> str:
-        def _model_from_revision(revision: Optional[str]) -> str:
-            log.info(f"model from revision {revision}")
-            if not revision or 'v' not in revision:
-                log.error(f'bad revision: {revision}')
-                return 'temperatureModuleV1'
-            try:
-                revision_num = float(revision.split('v')[-1])  # type: ignore
-            except (ValueError, TypeError):
-                # none or corrupt
-                log.exception('no revision')
-                return 'temperatureModuleV1'
-
-            log.info(f"revision num {revision_num}")
-            if revision_num < 20:
-                return 'temperatureModuleV1'
-            else:
-                return 'temperatureModuleV2'
-
         return _model_from_revision(self._device_info.get('model'))
 
     @classmethod

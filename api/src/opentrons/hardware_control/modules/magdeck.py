@@ -12,6 +12,22 @@ MAX_ENGAGE_HEIGHT = 45  # mm from home position
 OFFSET_TO_LABWARE_BOTTOM = 5
 
 
+def _model_from_revision(revision: Optional[str]) -> str:
+    """ Defines the revision -> model mapping """
+    if not revision or 'v' not in revision:
+        log.error(f'bad revision: {revision}')
+        return 'magneticModuleV1'
+    try:
+        revision_num = float(revision.split('v')[-1])  # type: ignore
+    except (ValueError, TypeError):
+        log.exception('bad revision: {revision}')
+        return 'magneticModuleV1'
+    if revision_num < 20:
+        return 'magneticModuleV1'
+    else:
+        return 'magneticModuleV2'
+
+
 class MissingDevicePortError(Exception):
     pass
 
@@ -79,19 +95,6 @@ class MagDeck(mod_abc.AbstractModule):
         return 'magdeck'
 
     def model(self) -> str:
-        def _model_from_revision(revision: Optional[str]) -> str:
-            if not revision or 'v' not in revision:
-                log.error(f'bad revision: {revision}')
-                return 'magneticModuleV1'
-            try:
-                revision_num = float(revision.split('v')[-1])  # type: ignore
-            except (ValueError, TypeError):
-                log.exception('bad revision: {revision}')
-                return 'magneticModuleV1'
-            if revision_num < 20:
-                return 'magneticModuleV1'
-            else:
-                return 'magneticModuleV2'
         return _model_from_revision(self._device_info.get('model'))
 
     @classmethod
