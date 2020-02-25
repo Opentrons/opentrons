@@ -85,6 +85,8 @@ describe('FileSidebar', () => {
 
   test('create new button creates new protocol', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
+      .dive()
+      .dive()
     const createButton = wrapper.find(OutlineButton).at(0)
     createButton.simulate('click')
 
