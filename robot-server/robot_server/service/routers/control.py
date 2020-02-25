@@ -2,8 +2,8 @@ import typing
 from http import HTTPStatus
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, Query, HTTPException
-from robot_server.fastapi.models import V1ErrorMessage
-from robot_server.fastapi.models import control
+from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models import control
 
 router = APIRouter()
 

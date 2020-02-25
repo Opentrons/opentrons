@@ -3,7 +3,7 @@ import asyncio
 import logging
 from argparse import ArgumentParser
 
-from opentrons.hardware_control import adapters, HardwareAPILike
+from opentrons.hardware_control import HardwareAPILike
 from opentrons.create_hardware import create_hardware
 from opentrons.config import feature_flags as ff
 
@@ -64,7 +64,7 @@ def run(hardware: HardwareAPILike,
         from opentrons.server import run as aiohttp_run
         aiohttp_run(hardware, hostname, port, path)
     else:
-        from robot_server.fastapi import run as fastapi_run
+        from robot_server.service import run as fastapi_run
         fastapi_run(hardware, hostname, port, path)
 
 
