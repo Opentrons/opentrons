@@ -73,3 +73,10 @@ export const getWifiKeys: (
     keysById: $Shape<{| [string]: Types.WifiKey |}> = {}
   ) => ids.map(id => keysById[id])
 )
+
+export const getEapOptions = (
+  state: State,
+  robotName: string
+): Array<Types.EapOption> => {
+  return state.networking[robotName]?.eapOptions ?? []
+}

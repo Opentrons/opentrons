@@ -68,6 +68,16 @@ export function networkingReducer(
         [robotName]: { ...robotState, wifiKeyIds, wifiKeysById },
       }
     }
+
+    case Constants.FETCH_EAP_OPTIONS_SUCCESS: {
+      const { robotName, eapOptions } = action.payload
+      const robotState = getRobotState(state, robotName)
+
+      return {
+        ...state,
+        [robotName]: { ...robotState, eapOptions },
+      }
+    }
   }
 
   return state

@@ -231,6 +231,46 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS',
+      creator: Actions.fetchEapOptions,
+      args: [mockRobot.name],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS',
+        payload: { robotName: mockRobot.name },
+        meta: {},
+      },
+    },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS_SUCCESS',
+      creator: Actions.fetchEapOptionsSuccess,
+      args: [mockRobot.name, [Fixtures.mockEapOption], mockRequestMeta],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          eapOptions: [Fixtures.mockEapOption],
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS_FAILURE',
+      creator: Actions.fetchEapOptionsFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockFetchEapOptionsFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockFetchEapOptionsFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

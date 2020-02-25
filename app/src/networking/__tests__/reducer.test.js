@@ -182,6 +182,24 @@ const SPECS: Array<ReducerSpec> = [
       },
     },
   },
+  {
+    name: 'handles fetch eap options success action',
+    action: Actions.fetchEapOptionsSuccess(
+      ROBOT_NAME,
+      [Fixtures.mockEapOption],
+      {}
+    ),
+    state: {
+      [ROBOT_NAME]: { wifiKeyIds: [], wifiKeysById: {}, eapOptions: [] },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        wifiKeyIds: [],
+        wifiKeysById: {},
+        eapOptions: [Fixtures.mockEapOption],
+      },
+    },
+  },
 ]
 
 describe('networkingReducer', () => {

@@ -21,6 +21,9 @@ import typeof {
   POST_WIFI_KEYS,
   POST_WIFI_KEYS_SUCCESS,
   POST_WIFI_KEYS_FAILURE,
+  FETCH_EAP_OPTIONS,
+  FETCH_EAP_OPTIONS_SUCCESS,
+  FETCH_EAP_OPTIONS_FAILURE,
 } from './constants'
 
 import * as ApiTypes from './api-types'
@@ -131,6 +134,26 @@ export type PostWifiKeysFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+// fetch eap options
+
+export type FetchEapOptionsAction = {|
+  type: FETCH_EAP_OPTIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsSuccessAction = {|
+  type: FETCH_EAP_OPTIONS_SUCCESS,
+  payload: {| robotName: string, eapOptions: Array<ApiTypes.EapOption> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsFailureAction = {|
+  type: FETCH_EAP_OPTIONS_FAILURE,
+  payload: {| robotName: string, error: { ... } |},
+  meta: RobotApiRequestMeta,
+|}
+
 // action union
 
 export type NetworkingAction =
@@ -149,6 +172,9 @@ export type NetworkingAction =
   | PostWifiKeysAction
   | PostWifiKeysSuccessAction
   | PostWifiKeysFailureAction
+  | FetchEapOptionsAction
+  | FetchEapOptionsSuccessAction
+  | FetchEapOptionsFailureAction
 
 // state types
 
@@ -158,6 +184,7 @@ export type PerRobotNetworkingState = $Shape<{|
   wifiList?: Array<ApiTypes.WifiNetwork>,
   wifiKeyIds?: Array<string>,
   wifiKeysById?: $Shape<{| [id: string]: ApiTypes.WifiKey |}>,
+  eapOptions?: Array<ApiTypes.EapOption>,
 |}>
 
 export type NetworkingState = $Shape<{|

@@ -208,6 +208,29 @@ describe('robot settings selectors', () => {
         { ...Fixtures.mockWifiKey, id: 'def' },
       ],
     },
+    {
+      name: 'getEapOptions returns [] if unavailable',
+      selector: Selectors.getEapOptions,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      expected: [],
+    },
+
+    {
+      name: 'getEapOptions returns options from state',
+      selector: Selectors.getEapOptions,
+      state: {
+        networking: {
+          robotName: {
+            eapOptions: [Fixtures.mockEapOption],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [Fixtures.mockEapOption],
+    },
   ]
 
   SPECS.forEach(spec => {

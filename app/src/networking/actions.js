@@ -148,3 +148,31 @@ export const postWifiKeysFailure = (
   payload: { robotName, error },
   meta,
 })
+
+export const fetchEapOptions = (
+  robotName: string
+): Types.FetchEapOptionsAction => ({
+  type: Constants.FETCH_EAP_OPTIONS,
+  payload: { robotName },
+  meta: {},
+})
+
+export const fetchEapOptionsSuccess = (
+  robotName: string,
+  eapOptions: Array<Types.EapOption>,
+  meta: RobotApiRequestMeta
+): Types.FetchEapOptionsSuccessAction => ({
+  type: Constants.FETCH_EAP_OPTIONS_SUCCESS,
+  payload: { robotName, eapOptions },
+  meta,
+})
+
+export const fetchEapOptionsFailure = (
+  robotName: string,
+  error: { ... },
+  meta: RobotApiRequestMeta
+): Types.FetchEapOptionsFailureAction => ({
+  type: Constants.FETCH_EAP_OPTIONS_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
