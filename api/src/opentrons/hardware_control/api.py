@@ -237,8 +237,6 @@ class API(HardwareAPILike):
         :raises RuntimeError: If an instrument is expected but not found.
 
         """
-        import threading
-
         self._log.info("Updating instrument model cache")
         found = self._backend.get_attached_instruments(require or {})
 

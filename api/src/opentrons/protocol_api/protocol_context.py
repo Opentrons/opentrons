@@ -5,7 +5,7 @@ from typing import (
     Dict, Iterator, List, Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API
+from opentrons.hardware_control import adapters, modules, API, HardwareAPILike
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -49,7 +49,7 @@ class ProtocolContext(CommandPublisher):
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: API = None,
+                 hardware: HardwareAPILike = None,
                  broker=None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,

@@ -12,7 +12,8 @@ from opentrons.hardware_control.modules.types import BundledFirmware
 async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
     mods = ['tempdeck', 'magdeck', 'thermocycler']
-    api = await hardware_control.API.build_hardware_simulator(attached_modules=mods)
+    api = await hardware_control.API.build_hardware_simulator(
+                        attached_modules=mods)
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)

@@ -43,7 +43,9 @@ class ThreadManager(HardwareAPILike):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self._loop = loop
-        self.managed_obj = loop.run_until_complete(builder(*args, loop=loop, **kwargs))
+        self.managed_obj = loop.run_until_complete(builder(*args,
+                                                           loop=loop,
+                                                           **kwargs))
         object.__getattribute__(self, '_is_running').set()
         loop.run_forever()
         loop.close()
@@ -55,7 +57,7 @@ class ThreadManager(HardwareAPILike):
         try:
             loop = object.__getattribute__(self, '_loop')
             loop.call_soon_threadsafe(loop.stop)
-        except Exception as e:
+        except Exception:
             pass
         object.__getattribute__(self, '_thread').join()
 
@@ -74,7 +76,6 @@ class ThreadManager(HardwareAPILike):
         managed_obj = object.__getattribute__(self, 'managed_obj')
         loop = object.__getattribute__(self, '_loop')
         try:
-            MODULE_LOG.info(f'THREAD MANAGER get attribute: {attr_name}, mo: {managed_obj}')
             attr = getattr(managed_obj, attr_name)
         except AttributeError:
             # Maybe this actually was for us? Let’s find it

@@ -5,7 +5,7 @@ import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
-from opentrons.hardware_control import types, adapters, API, HardwareAPILike, ThreadManager
+from opentrons.hardware_control import types, adapters, API, HardwareAPILike
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext

@@ -1,20 +1,19 @@
 """ Adapters for the :py:class:`.hardware_control.API` instances.
 """
 import asyncio
-import copy
 import functools
-import threading
-from typing import List, Any
+from typing import Any
 
-from .api import API
 from .thread_manager import ThreadManager
-from .types import Axis, HardwareAPILike
+from .types import HardwareAPILike
+
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
-# use inspect.getmembers to iterate over appropriate members of adapted instance
-# and setattr on the outer instance with the proper async resolution logic injected
-# this approach avoids requiring calls to object.__get_attribute__(self,...) to opt
-# out of the overwritten functionality. It is more readable and protected from
+# use inspect.getmembers to iterate over appropriate members of adapted
+# instance and setattr on the outer instance with the proper async resolution
+# logic injected this approach avoids requiring calls to
+# object.__get_attribute__(self,...) to opt out of the overwritten
+# functionality. It is more readable and protected from
 # unintentional recursion.
 class SynchronousAdapter(HardwareAPILike):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
@@ -48,7 +47,6 @@ class SynchronousAdapter(HardwareAPILike):
         :param kwargs: Kwargs to forward to the builder method
         """
 
-        outer_loop = asyncio.new_event_loop()
         no_loop_args = [arg for arg in args
                         if not isinstance(arg, asyncio.AbstractEventLoop)]
         managed_obj = ThreadManager(builder, *no_loop_args, **kwargs)

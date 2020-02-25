@@ -3,10 +3,9 @@ from pathlib import Path
 import logging
 import asyncio
 import re
-import opentrons
 from opentrons import HERE
 from opentrons import server
-from opentrons.hardware_control import adapters, API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager
 from opentrons.server.main import build_arg_parser
 from argparse import ArgumentParser
 from opentrons import __version__
@@ -147,17 +146,16 @@ def run(**kwargs):  # noqa(C901)
         loop.run_until_complete(hardware.home_z())
 
     if kwargs.get('hardware_server'):
-    #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
+        #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
         loop.run_until_complete(
                 install_hardware_server(kwargs['hardware_server_socket'],
-                hardware))
+                                        hardware))
 
-    server.run(
-        hardware,
-        kwargs.get('hostname'),
-        kwargs.get('port'),
-        kwargs.get('path'),
-        loop)
+    server.run(hardware,
+               kwargs.get('hostname'),
+               kwargs.get('port'),
+               kwargs.get('path'),
+               loop)
 
 
 def main():
