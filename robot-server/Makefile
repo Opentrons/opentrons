@@ -38,7 +38,7 @@ simfile ?=
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
-tests ?= tests/robot_server
+tests ?= tests
 test_opts ?=  --cov=$(SRC_PATH) --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # These variables must be overridden when make deploy or make deploy-staging is run
