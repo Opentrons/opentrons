@@ -174,24 +174,30 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
         version='0.1.2', path=dummy_tc_file)
 
 
-@pytest.mark.parametrize('revision,model',
-                         [('mag_deck_v1.1', 'magneticModuleV1'),
-                          ('mag_deck_v20', 'magneticModuleV2'),
-                          ('', 'magneticModuleV1'),
-                          ('asdasdadvasdasd', 'magneticModuleV1'),
-                          (None, 'magneticModuleV1')])
+@pytest.mark.parametrize(
+    'revision,model',
+    [
+        ('mag_deck_v1.1', 'magneticModuleV1'),
+        ('mag_deck_v20', 'magneticModuleV2'),
+        ('', 'magneticModuleV1'),
+        ('asdasdadvasdasd', 'magneticModuleV1'),
+        (None, 'magneticModuleV1')
+    ])
 def test_magnetic_module_revision_parsing(revision, model):
     assert magdeck._model_from_revision(revision) == model
 
 
-@pytest.mark.parametrize('revision,model',
-[('temp_deck_v1.1', 'temperatureModuleV1'),
- ('temp_deck_v3.0', 'temperatureModuleV1'),
- ('temp_deck_v4.0', 'temperatureModuleV1'),
- ('temp_deck_v15', 'temperatureModuleV1'),
- ('temp_deck_v20', 'temperatureModuleV2'),
- ('', 'temperatureModuleV1'),
- ('v', 'temperatureModuleV1'),
- (None, 'temperatureModuleV1')])
+@pytest.mark.parametrize(
+    'revision,model',
+    [
+        ('temp_deck_v1.1', 'temperatureModuleV1'),
+        ('temp_deck_v3.0', 'temperatureModuleV1'),
+        ('temp_deck_v4.0', 'temperatureModuleV1'),
+        ('temp_deck_v15', 'temperatureModuleV1'),
+        ('temp_deck_v20', 'temperatureModuleV2'),
+        ('', 'temperatureModuleV1'),
+        ('v', 'temperatureModuleV1'),
+        (None, 'temperatureModuleV1')
+    ])
 def test_temperature_module_revision_parsing(revision, model):
     assert tempdeck._model_from_revision(revision) == model
