@@ -718,8 +718,17 @@ class Labware(DeckItem):
         num_tips = min(len(target_column) - well_idx, num_channels)
         target_wells = target_column[well_idx: well_idx + num_tips]
 
-        assert all([well.has_tip for well in target_wells]),\
-            '{} is out of tips'.format(str(self))
+        # In API version 2.2, we no longer reset the tip tracker when a tip
+        # is dropped back into a tiprack well. This fixes a behavior where
+        # subsequent transfers would reuse the dirty tip. However, sometimes
+        # the user explicitly wants to use a dirty tip, and this check would
+        # raise an exception if they tried to do so.
+        # An extension of work here is to have separate tip trackers for
+        # dirty tips and non-present tips; but until then, we can avoid the
+        # exception.
+        if self._api_version < APIVersion(2, 2):
+            assert all([well.has_tip for well in target_wells]),\
+                '{} is out of tips'.format(str(self))
 
         for well in target_wells:
             well.has_tip = False
