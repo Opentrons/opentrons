@@ -12,7 +12,9 @@ import styles from './AnnouncementModal.css'
 export const localStorageKey = 'announcementVersion'
 
 export const AnnouncementModal = () => {
-  const { version, message } = announcements[announcements.length - 1]
+  const { version, message, heading, image } = announcements[
+    announcements.length - 1
+  ]
 
   const userHasNotSeenAnnouncement =
     getLocalStorageItem(localStorageKey) !== version
@@ -33,11 +35,21 @@ export const AnnouncementModal = () => {
           className={cx(modalStyles.modal, styles.announcement_modal)}
           contentsClassName={styles.modal_contents}
         >
-          {message}
-          <div className={modalStyles.button_row}>
-            <OutlineButton onClick={handleClick}>
-              {i18n.t('button.got_it')}
-            </OutlineButton>
+          {image && (
+            <>
+              {image}
+              <hr className={styles.separator} />
+            </>
+          )}
+
+          <div className={styles.announcement_message}>
+            <h3 className={styles.announcement_heading}>{heading}</h3>
+            {message}
+            <div className={modalStyles.button_row}>
+              <OutlineButton onClick={handleClick}>
+                {i18n.t('button.got_it')}
+              </OutlineButton>
+            </div>
           </div>
         </Modal>
       )}

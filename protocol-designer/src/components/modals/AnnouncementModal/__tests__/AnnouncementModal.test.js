@@ -19,10 +19,15 @@ describe('AnnouncementModal', () => {
     announcements: Array<Announcement>,
   } = announcements
 
-  test('modal is not shown when announcement has been shown before', () => {
+  beforeEach(() => {
     getLocalStorageItemMock.mockReturnValue(appVersion)
+  })
+
+  test('modal is not shown when announcement has been shown before', () => {
     announcementsMock.announcements = [
       {
+        image: null,
+        heading: 'a test header',
         message: 'test',
         version: appVersion,
       },
@@ -34,9 +39,10 @@ describe('AnnouncementModal', () => {
   })
 
   test('announcement is shown when user has not seen it before', () => {
-    getLocalStorageItemMock.mockReturnValue(appVersion)
     announcementsMock.announcements = [
       {
+        image: null,
+        heading: 'a test header',
         message: 'brand new spanking feature',
         version: '1.1.0',
       },
@@ -50,13 +56,16 @@ describe('AnnouncementModal', () => {
   })
 
   test('latest announcement is always shown', () => {
-    getLocalStorageItemMock.mockReturnValue(appVersion)
     announcementsMock.announcements = [
       {
+        image: null,
+        heading: 'a first header',
         message: 'first announcement',
         version: appVersion,
       },
       {
+        image: null,
+        heading: 'a second header',
         message: 'second announcement',
         version: '1.1.0',
       },
@@ -69,10 +78,27 @@ describe('AnnouncementModal', () => {
     expect(modal.html()).toContain('second announcement')
   })
 
-  test('button click saves announcement version to localStorage and closes modal', () => {
-    getLocalStorageItemMock.mockReturnValue(appVersion)
+  test('optional image component is displayed when exists', () => {
     announcementsMock.announcements = [
       {
+        image: <img src="test.jpg" />,
+        heading: 'a test header',
+        message: 'brand new spanking feature',
+        version: '1.1.0',
+      },
+    ]
+
+    const wrapper = shallow(<AnnouncementModal />)
+    const image = wrapper.find('img')
+
+    expect(image).toHaveLength(1)
+  })
+
+  test('button click saves announcement version to localStorage and closes modal', () => {
+    announcementsMock.announcements = [
+      {
+        image: null,
+        heading: 'a test header',
         message: 'brand new spanking feature',
         version: '1.1.0',
       },

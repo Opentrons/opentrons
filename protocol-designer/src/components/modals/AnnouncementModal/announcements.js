@@ -10,19 +10,23 @@ import styles from './AnnouncementModal.css'
 
 export type Announcement = {|
   version: string,
+  image: React.Node | null,
+  heading: string,
   message: React.Node,
 |}
 
 export const announcements: Array<Announcement> = [
   {
     version: '3.17.0',
+    image: (
+      <div className={styles.modules_diagrams_row}>
+        <ModuleDiagram type={MAGNETIC_MODULE_TYPE} />
+        <ModuleDiagram type={TEMPERATURE_MODULE_TYPE} />
+      </div>
+    ),
+    heading: "We've updated the Protocol Designer",
     message: (
       <>
-        <div className={styles.modules_diagrams_row}>
-          <ModuleDiagram type={MAGNETIC_MODULE_TYPE} />
-          <ModuleDiagram type={TEMPERATURE_MODULE_TYPE} />
-        </div>
-
         <p>
           Protocol Designer BETA now supports Temperature and Magnetic modules.
         </p>
