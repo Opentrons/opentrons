@@ -1,5 +1,9 @@
 // @flow
 import cloneDeep from 'lodash/cloneDeep'
+import {
+  MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+} from '@opentrons/shared-data'
 import { makeImmutableStateUpdater } from '../__utils__'
 import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import {
@@ -18,17 +22,17 @@ beforeEach(() => {
   invariantContext = makeContext()
   invariantContext.moduleEntities[moduleId] = {
     id: moduleId,
-    type: 'magdeck',
-    model: 'GEN1',
+    type: MAGNETIC_MODULE_TYPE,
+    model: MAGNETIC_MODULE_V1,
   }
   disengagedRobotState = getInitialRobotStateStandard(invariantContext)
   disengagedRobotState.modules[moduleId] = {
     slot: '4',
-    moduleState: { type: 'magdeck', engaged: false },
+    moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
   }
   engagedRobotState = cloneDeep(disengagedRobotState)
   engagedRobotState.modules[moduleId].moduleState = {
-    type: 'magdeck',
+    type: MAGNETIC_MODULE_TYPE,
     engaged: true,
   }
 })

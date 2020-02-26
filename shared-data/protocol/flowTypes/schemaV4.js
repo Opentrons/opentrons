@@ -1,5 +1,5 @@
 // @flow
-import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
 import type {
   ProtocolFile as V3ProtocolFile,
   _AspDispAirgapParams,
@@ -13,7 +13,7 @@ export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 
 export type FileModule = {|
   slot: DeckSlotId,
-  model: string, // matches key in shared-data/module/definitions/2
+  model: ModuleModel,
 |}
 
 export type EngageMagnetParams = {|

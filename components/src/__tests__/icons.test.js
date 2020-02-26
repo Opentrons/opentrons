@@ -4,9 +4,9 @@ import Renderer from 'react-test-renderer'
 
 import { Icon, NotificationIcon } from '..'
 
-import IconData from '../icons/icon-data'
+import { ICON_DATA_BY_NAME } from '../icons/icon-data'
 
-const icons = Object.keys(IconData)
+const icons = Object.keys(ICON_DATA_BY_NAME)
 
 describe('icons', () => {
   icons.forEach(icon =>

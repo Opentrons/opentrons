@@ -1,5 +1,5 @@
 // @flow
-export { default as StaticLabware } from './StaticLabware'
-export { default as StyledWells } from './StyledWells'
-export { default as WellLabels } from './WellLabels'
-export { default as FilledWells } from './FilledWells'
+export * from './StaticLabware'
+export * from './StyledWells'
+export * from './WellLabels'
+export * from './FilledWells'

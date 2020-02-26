@@ -300,8 +300,10 @@ def execute(protocol_file: TextIO,
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
-        execute_apiv2.run_protocol(protocol, context)
-        context.cleanup()
+        try:
+            execute_apiv2.run_protocol(protocol, context)
+        finally:
+            context.cleanup()
 
 
 def make_runlog_cb():

@@ -5,14 +5,14 @@ import cx from 'classnames'
 import type { WellDefinition } from '@opentrons/shared-data'
 import styles from './Well.css'
 
-type Props = {
+export type TipProps = {|
   wellDef: WellDefinition,
   tipVolume: ?number,
   empty?: ?boolean,
   highlighted?: ?boolean,
-}
+|}
 
-export default function Tip(props: Props) {
+export function Tip(props: TipProps) {
   const { wellDef, empty, highlighted, tipVolume } = props
   const circleProps = {
     cx: wellDef.x,

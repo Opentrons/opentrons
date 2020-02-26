@@ -16,7 +16,6 @@ if os.name == 'posix':
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
-
 def get_version():
     with open(os.path.join(HERE, 'robot_server', 'package.json')) as pkg:
         package_json = json.load(pkg)
@@ -49,7 +48,6 @@ INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
     'fastapi==0.49.0',
     'python-multipart==0.0.5',
-
 ]
 
 
@@ -80,5 +78,4 @@ if __name__ == "__main__":
         zip_safe=False,
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
-        include_package_data=True
     )

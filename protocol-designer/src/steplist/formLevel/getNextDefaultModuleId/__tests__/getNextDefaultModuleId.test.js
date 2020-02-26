@@ -1,10 +1,13 @@
 // @flow
 import {
-  TEMPERATURE_DEACTIVATED,
-  MAGDECK,
-  THERMOCYCLER,
-  TEMPDECK,
-} from '../../../../constants'
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
+import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getNextDefaultTemperatureModuleId } from '..'
 
 describe('getNextDefaultTemperatureModuleId', () => {
@@ -15,21 +18,21 @@ describe('getNextDefaultTemperatureModuleId', () => {
         equippedModulesById: {
           tempId: {
             id: 'tempId',
-            type: 'tempdeck',
-            model: 'GEN1',
+            type: TEMPERATURE_MODULE_TYPE,
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
-              type: TEMPDECK,
+              type: TEMPERATURE_MODULE_TYPE,
               status: TEMPERATURE_DEACTIVATED,
               targetTemperature: null,
             },
           },
           tcId: {
             id: 'tcId',
-            type: THERMOCYCLER,
-            model: 'GEN1',
+            type: THERMOCYCLER_MODULE_TYPE,
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
-            moduleState: { type: THERMOCYCLER },
+            moduleState: { type: THERMOCYCLER_MODULE_TYPE },
           },
         },
         expected: 'tempId',
@@ -39,11 +42,11 @@ describe('getNextDefaultTemperatureModuleId', () => {
         equippedModulesById: {
           tcId: {
             id: 'tcId',
-            type: THERMOCYCLER,
-            model: 'GEN1',
+            type: THERMOCYCLER_MODULE_TYPE,
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
             moduleState: {
-              type: THERMOCYCLER,
+              type: THERMOCYCLER_MODULE_TYPE,
             },
           },
         },
@@ -54,10 +57,10 @@ describe('getNextDefaultTemperatureModuleId', () => {
         equippedModulesById: {
           magId: {
             id: 'magId',
-            type: MAGDECK,
-            model: 'GEN1',
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
             slot: '_span781011',
-            moduleState: { type: MAGDECK, engaged: false },
+            moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
           },
         },
         expected: null,
@@ -87,21 +90,21 @@ describe('getNextDefaultTemperatureModuleId', () => {
         equippedModulesById: {
           tempId: {
             id: 'tempId',
-            type: 'tempdeck',
-            model: 'GEN1',
+            type: TEMPERATURE_MODULE_TYPE,
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
-              type: TEMPDECK,
+              type: TEMPERATURE_MODULE_TYPE,
               status: TEMPERATURE_DEACTIVATED,
               targetTemperature: null,
             },
           },
           tcId: {
             id: 'tcId',
-            type: THERMOCYCLER,
-            model: 'GEN1',
+            type: THERMOCYCLER_MODULE_TYPE,
+            model: THERMOCYCLER_MODULE_V1,
             slot: '_span781011',
-            moduleState: { type: THERMOCYCLER },
+            moduleState: { type: THERMOCYCLER_MODULE_TYPE },
           },
         },
         savedForms: {
@@ -113,8 +116,8 @@ describe('getNextDefaultTemperatureModuleId', () => {
           },
           tcStepId: {
             id: 'tcStepId',
-            stepType: THERMOCYCLER,
-            stepName: THERMOCYCLER,
+            stepType: THERMOCYCLER_MODULE_TYPE,
+            stepName: THERMOCYCLER_MODULE_TYPE,
             moduleId: 'tcId',
           },
         },
@@ -126,18 +129,18 @@ describe('getNextDefaultTemperatureModuleId', () => {
         equippedModulesById: {
           magId: {
             id: 'magId',
-            type: MAGDECK,
-            model: 'GEN1',
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
             slot: '_span781011',
-            moduleState: { type: MAGDECK, engaged: false },
+            moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
           },
           tempId: {
             id: 'tempId',
-            type: 'tempdeck',
-            model: 'GEN1',
+            type: TEMPERATURE_MODULE_TYPE,
+            model: TEMPERATURE_MODULE_V1,
             slot: '3',
             moduleState: {
-              type: TEMPDECK,
+              type: TEMPERATURE_MODULE_TYPE,
               status: TEMPERATURE_DEACTIVATED,
               targetTemperature: null,
             },

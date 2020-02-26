@@ -27,7 +27,6 @@ wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py robot-server normalize_version)-py2.py3-none-any.whl
 wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
 
-
 # These variables can be overriden when make is invoked to customize the
 # behavior of pytest. For instance,
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the

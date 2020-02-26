@@ -1,22 +1,22 @@
 // @flow
 import * as React from 'react'
 
-type KeypressEvent = SyntheticKeyboardEvent<*>
+type KeypressEvent = SyntheticKeyboardEvent<HTMLElement>
 
-type KeypressHandler = {
+export type KeypressHandler = {|
   key: string,
   shiftKey?: ?boolean,
   onPress: () => mixed,
-}
+|}
 
-type Props = {
+export type HandleKeypressProps = {|
   /** array of keypress handlers to attach to the window */
   handlers: Array<KeypressHandler>,
   /** optionally call event.preventDefault if keypress is handled */
   preventDefault?: ?boolean,
   /** wrapped children */
   children?: React.Node,
-}
+|}
 
 const matchHandler = e => h =>
   h.key === e.key && (h.shiftKey == null || h.shiftKey === e.shiftKey)
@@ -27,7 +27,7 @@ const matchHandler = e => h =>
  * `keyup` event. `event.preventDefault` will be called if a key is handled
  * and `props.preventDefault` is true.
  */
-export default class HandleKeypress extends React.Component<Props> {
+export class HandleKeypress extends React.Component<HandleKeypressProps> {
   handlePressIfKey = (event: KeypressEvent) => {
     this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
   }
@@ -53,6 +53,6 @@ export default class HandleKeypress extends React.Component<Props> {
   }
 
   render() {
-    return <React.Fragment>{this.props.children}</React.Fragment>
+    return <>{this.props.children}</>
   }
 }

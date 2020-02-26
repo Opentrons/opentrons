@@ -1,15 +1,19 @@
 // @flow
 import typeof {
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  // MAGNETIC_MODULE_V1,
+  // MAGNETIC_MODULE_V2,
+  // TEMPERATURE_MODULE_V1,
+  // TEMPERATURE_MODULE_V2,
+  // THERMOCYCLER_MODULE_V1,
   GEN1,
   GEN2,
+  MAGDECK,
+  TEMPDECK,
+  THERMOCYCLER,
 } from './constants'
-
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
   diameter?: number, // NOTE: presence of diameter indicates a circular well
@@ -155,18 +159,23 @@ export type LabwareDefinition2 = {|
   groups: Array<LabwareWellGroup>,
 |}
 
-// corresponds to `moduleType` key in a module definition. Is NOT model.
+// Module Type corresponds to `moduleType` key in a module definition. Is NOT model.
+// TODO: IL 2020-02-20 ModuleType is DEPRECATED. Replace all instances with ModuleRealType
+// (then finally rename ModuleRealType -> ModuleType)
+export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
 export type ModuleRealType =
   | MAGNETIC_MODULE_TYPE
   | TEMPERATURE_MODULE_TYPE
   | THERMOCYCLER_MODULE_TYPE
 
-// corresponds to top-level keys in shared-data/module/definitions/2
-// TODO IMMEDIATE Change to sum type as soon as callsites are compatible
-export type ModuleModel = string
-
-export type ModuleType = MAGDECK | TEMPDECK | THERMOCYCLER
-// TODO IMMEDIATELY: gradually replace this old 'ModuleType' with ModuleModel.
+// ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
+export type ModuleModel = string // TODO: IL 2020-02-20 Change to enum type below as soon as callsites are compatible
+// export type ModuleModel =
+//   | MAGNETIC_MODULE_V1
+//   | MAGNETIC_MODULE_V2
+//   | TEMPERATURE_MODULE_V1
+//   | TEMPERATURE_MODULE_V2
+//   | THERMOCYCLER_MODULE_V1
 
 export type DeckOffset = {|
   x: number,

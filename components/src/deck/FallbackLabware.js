@@ -1,12 +1,16 @@
 // @flow
 import * as React from 'react'
 import { SLOT_RENDER_WIDTH, SLOT_RENDER_HEIGHT } from '@opentrons/shared-data'
-import LabwareOutline from './LabwareOutline'
+import { LabwareOutline } from './LabwareOutline'
+import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
+
 import styles from './Labware.css'
-import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
 
 // TODO: BC 2019-06-18 remove when old Labware component is no longer used anywhere
-export default function FallbackLabware() {
+/**
+ * @deprecated No longer necessary, do not use
+ */
+export function FallbackLabware() {
   return (
     <g>
       <LabwareOutline width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT} />

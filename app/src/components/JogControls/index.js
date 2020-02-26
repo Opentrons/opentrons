@@ -125,7 +125,6 @@ export class JogControls extends React.Component<
             value={`${step}`}
             options={STEP_OPTIONS}
             onChange={this.handleStepSelect}
-            disableKeypress
           />
         </span>
       </HandleKeypress>

@@ -130,8 +130,8 @@ def init(hardware: 'HardwareAPILike' = None,
 
 
 def run(hardware: 'HardwareAPILike',
-        host: str,
-        port: int,
+        host: Optional[str],
+        port: Optional[int],
         path: Optional[str]):
     """Start the aiohttp web service"""
     web.run_app(init(hardware=hardware), host=host, port=port, path=path)

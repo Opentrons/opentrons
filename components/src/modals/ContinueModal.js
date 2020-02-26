@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react'
 
-import AlertModal from './AlertModal'
+import { AlertModal } from './AlertModal'
 
-type AlertModalProps = React.ElementProps<typeof AlertModal>
-type ContinueModalProps = {|
-  ...$Diff<$Exact<AlertModalProps>, { buttons: any }>,
+import type { AlertModalProps } from './AlertModal'
+
+export type ContinueModalProps = {|
+  ...$Diff<AlertModalProps, { buttons: mixed }>,
   onCancelClick: () => mixed,
   onContinueClick: () => mixed,
 |}
@@ -16,7 +17,7 @@ const CONTINUE = 'Continue'
 /**
  * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
-export default function ContinueModal(props: ContinueModalProps) {
+export function ContinueModal(props: ContinueModalProps) {
   const { onCancelClick, onContinueClick, ...passThruProps } = props
   const buttons = [
     { title: CANCEL, children: CANCEL, onClick: onCancelClick },

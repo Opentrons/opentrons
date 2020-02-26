@@ -36,14 +36,8 @@
   font-size: var(--fs-caption);
 }
 
-.button_row {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-
-  & button {
-    margin-left: 1rem;
-  }
+.button_margin {
+  margin-left: 1rem;
 }
 
 .slot_map_container {

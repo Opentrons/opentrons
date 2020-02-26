@@ -1,14 +1,14 @@
 // @flow
 import { getModuleState } from '../robotStateSelectors'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import type {
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
-import { MAGDECK } from '../../constants'
 
 function _setMagnet(moduleState, engaged) {
-  if (moduleState.type === MAGDECK) {
+  if (moduleState.type === MAGNETIC_MODULE_TYPE) {
     moduleState.engaged = engaged
   }
 }

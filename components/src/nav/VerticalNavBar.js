@@ -3,12 +3,12 @@ import * as React from 'react'
 import classnames from 'classnames'
 import styles from './navbar.css'
 
-type NavProps = {
+export type VerticalNavBarProps = {|
   className?: string,
   children: React.Node,
-}
+|}
 
-export default function VerticalNavBar(props: NavProps) {
+export function VerticalNavBar(props: VerticalNavBarProps) {
   const className = classnames(styles.navbar, props.className)
   return <nav className={className}>{props.children}</nav>
 }

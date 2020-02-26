@@ -9,7 +9,6 @@ robot-server/**
 
 # flow
 **/flow-typed/**
-**/interfaces/**
 
 # compiled
 app-shell/lib/**

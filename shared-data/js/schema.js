@@ -11,7 +11,10 @@ const PositiveNumber = {
 const LabwareFormats = ['96-standard', '384-standard', 'trough', 'irregular']
 
 // TODO IMMEDIATELY move to labware/flowTypes/
-const schema = {
+// TODO(mc, 2020-02-21) move to labware/schemas/1.json? delete?
+// this only appears to be used in a single test file
+// shared-data/js/__tests__/labwareDefSchemaV1.test.js
+export const labwareSchemaV1 = {
   type: 'object',
   required: ['metadata', 'ordering', 'wells'],
   additionalProperties: false,
@@ -63,5 +66,3 @@ const schema = {
     },
   },
 }
-
-export default schema

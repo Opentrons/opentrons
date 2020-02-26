@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '..';
 
 .name_overlay {
   width: 100%;

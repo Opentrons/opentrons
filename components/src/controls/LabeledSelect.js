@@ -2,15 +2,18 @@
 import * as React from 'react'
 
 import { DropdownField } from '../forms'
-import LabeledControl from './LabeledControl'
+import { LabeledControl } from './LabeledControl'
 import styles from './styles.css'
 
-type Props = React.ElementProps<typeof DropdownField> & {
+import type { DropdownFieldProps } from '../forms'
+
+export type LabeledSelectProps = {|
+  ...DropdownFieldProps,
   label: string,
   children: React.Node,
-}
+|}
 
-export default function LabeledSelect(props: Props) {
+export function LabeledSelect(props: LabeledSelectProps) {
   const { label, value, options, onChange } = props
 
   return (

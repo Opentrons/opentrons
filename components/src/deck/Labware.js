@@ -1,4 +1,5 @@
 // @flow
+// TODO(mc, 2020-02-19): still used but deprecated; remove when able
 import * as React from 'react'
 import map from 'lodash/map'
 import assert from 'assert'
@@ -9,21 +10,24 @@ import {
 } from '@opentrons/shared-data'
 import type { LabwareDefinition1 } from '@opentrons/shared-data'
 
-import LabwareOutline from './LabwareOutline'
-import FallbackLabware from './FallbackLabware'
-import Tip from './Tip'
-import Well from './Well'
+import { LabwareOutline } from './LabwareOutline'
+import { FallbackLabware } from './FallbackLabware'
+import { Tip } from './Tip'
+import { Well } from './Well'
 
-export type Props = {
+export type LabwareProps = {
   /** labware type, to get legacy definition from shared-data */
   labwareType?: string,
   definition?: ?LabwareDefinition1,
 }
 
-// NOTE: this is a legacy component that is only responsible
-// for visualizing a labware schema v1 definition by def or loadName
-
-class Labware extends React.Component<Props> {
+/**
+ * This is a legacy component that is only responsible
+ * for visualizing a labware schema v1 definition by def or loadName
+ *
+ * @deprecated Use {@link LabwareRender instead}
+ */
+export class Labware extends React.Component<LabwareProps> {
   render() {
     const { labwareType, definition } = this.props
 
@@ -69,5 +73,3 @@ class Labware extends React.Component<Props> {
     )
   }
 }
-
-export default Labware

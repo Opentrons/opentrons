@@ -1,13 +1,10 @@
 import path from 'path'
 import glob from 'glob'
 import Ajv from 'ajv'
-import schema from '../schema'
+import { labwareSchemaV1 } from '../schema'
 
-const definitionsGlobPath = path.join(
-  __dirname,
-  '../../labware/definitions/1/*.json'
-)
-
+const DEFINITIONS_GLOB_PATTERN = '../../labware/definitions/1/*.json'
+const GLOB_OPTIONS = { absolute: true, cwd: __dirname }
 // JSON Schema defintion & setup
 
 const ajv = new Ajv({
@@ -15,7 +12,7 @@ const ajv = new Ajv({
   jsonPointers: true,
 })
 
-const validate = ajv.compile(schema)
+const validate = ajv.compile(labwareSchemaV1)
 
 describe('test the schema against a minimalist fixture', () => {
   test('...', () => {
@@ -64,7 +61,7 @@ describe('test the schema against a minimalist fixture', () => {
 })
 
 describe('test schemas of all definitions', () => {
-  const labwarePaths = glob.sync(definitionsGlobPath)
+  const labwarePaths = glob.sync(DEFINITIONS_GLOB_PATTERN, GLOB_OPTIONS)
 
   test('got at least 1 labware definition file', () => {
     // Make sure definitions path didn't break, which would give you false positives

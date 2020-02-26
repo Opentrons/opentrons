@@ -1,27 +1,29 @@
 // @flow
+import { SPAN7_8_10_11_SLOT } from '../constants'
 import {
-  SPAN7_8_10_11_SLOT,
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
-} from '../constants'
-import type { ModuleType } from '@opentrons/shared-data'
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DropdownOption } from '@opentrons/components'
 
-export const SUPPORTED_MODULE_TYPES: Array<ModuleType> = [
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
+export const SUPPORTED_MODULE_TYPES: Array<ModuleRealType> = [
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 ]
 
 type SupportedSlotMap = {
-  [type: ModuleType]: Array<DropdownOption>,
+  [type: ModuleRealType]: Array<DropdownOption>,
 }
 
 export const SUPPORTED_MODULE_SLOTS: SupportedSlotMap = {
-  magdeck: [{ name: 'Slot 1 (supported)', value: '1' }],
-  tempdeck: [{ name: 'Slot 3 (supported)', value: '3' }],
-  thermocycler: [{ name: 'Thermocycler slots', value: SPAN7_8_10_11_SLOT }],
+  [MAGNETIC_MODULE_TYPE]: [{ name: 'Slot 1 (supported)', value: '1' }],
+  [TEMPERATURE_MODULE_TYPE]: [{ name: 'Slot 3 (supported)', value: '3' }],
+  [THERMOCYCLER_MODULE_TYPE]: [
+    { name: 'Thermocycler slots', value: SPAN7_8_10_11_SLOT },
+  ],
 }
 
 export const ALL_MODULE_SLOTS: Array<DropdownOption> = [
@@ -35,10 +37,10 @@ export const ALL_MODULE_SLOTS: Array<DropdownOption> = [
 ]
 
 export function getAllModuleSlotsByType(
-  moduleType: ModuleType
+  moduleType: ModuleRealType
 ): Array<DropdownOption> {
   const supportedSlotOption = SUPPORTED_MODULE_SLOTS[moduleType]
-  if (moduleType === THERMOCYCLER) {
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
     return supportedSlotOption
   }
   const allOtherSlots = ALL_MODULE_SLOTS.filter(

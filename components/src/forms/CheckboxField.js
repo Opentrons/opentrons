@@ -6,9 +6,9 @@ import type { HoverTooltipHandlers } from '../tooltips'
 
 import styles from './forms.css'
 
-type Props = {
+export type CheckboxFieldProps = {|
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   /** checkbox is checked if value is true */
   value?: boolean,
   /** classes to apply */
@@ -23,11 +23,13 @@ type Props = {
   error?: ?string,
   /** checkbox is disabled if value is true */
   disabled?: boolean,
+  /** html tabindex property */
+  tabIndex?: number,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
-}
+|}
 
-export default function CheckboxField(props: Props) {
+export function CheckboxField(props: CheckboxFieldProps) {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,
@@ -53,6 +55,7 @@ export default function CheckboxField(props: Props) {
         checked={props.value || false}
         disabled={props.disabled}
         onChange={props.onChange}
+        tabIndex={props.tabIndex}
       />
       <div
         {...props.hoverTooltipHandlers}

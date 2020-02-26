@@ -14,7 +14,7 @@ export type TooltipChildProps<ChildProps: {}> = {|
   ref: React.Ref<*>,
 |}
 
-export type TooltipProps<ChildProps: {}> = {
+export type TooltipProps<ChildProps: {}> = {|
   /** show or hide the tooltip */
   open?: boolean,
   /** contents of the tooltip */
@@ -31,7 +31,7 @@ export type TooltipProps<ChildProps: {}> = {
   children: (props?: TooltipChildProps<ChildProps>) => React.Node,
   /** extra props to pass to the children render function */
   childProps?: ChildProps,
-}
+|}
 
 /**
  *  Basic, fully controlled Tooltip component.
@@ -45,9 +45,7 @@ export type TooltipProps<ChildProps: {}> = {
  *
  * `props.childProps` can be used to add extra fields to the child props object
  */
-export default function Tooltip<ChildProps: {}>(
-  props: TooltipProps<ChildProps>
-) {
+export function Tooltip<ChildProps: {}>(props: TooltipProps<ChildProps>) {
   if (!props.tooltipComponent) return props.children()
 
   return (

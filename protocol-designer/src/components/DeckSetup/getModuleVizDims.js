@@ -6,11 +6,13 @@ import {
   STD_SLOT_Y_DIM as SLOT_Y,
   STD_SLOT_DIVIDER_WIDTH as DIVIDER,
   SPAN7_8_10_11_SLOT,
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
 } from '../../constants'
-import type { ModuleType } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DeckSlot, ModuleOrientation } from '../../types'
 
 // NOTE: all dims are in 'left' orientation. Rotate & transform to obtain 'right' orientation.
@@ -25,8 +27,8 @@ export type ModuleVizDims = {|
   childYDimension: number,
 |}
 
-const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
-  [MAGDECK]: {
+const MODULE_VIZ_DIMS: { [ModuleRealType]: ModuleVizDims } = {
+  [MAGNETIC_MODULE_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.2 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.2 + DIVIDER * 2,
@@ -36,7 +38,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childXDimension: SLOT_X,
     childYDimension: SLOT_Y,
   },
-  [TEMPDECK]: {
+  [TEMPERATURE_MODULE_TYPE]: {
     xOffset: -1 * (SLOT_X * 0.4 + DIVIDER),
     yOffset: -1 * DIVIDER,
     xDimension: SLOT_X * 1.4 + DIVIDER * 2,
@@ -46,7 +48,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
     childXDimension: SLOT_X,
     childYDimension: SLOT_Y,
   },
-  [THERMOCYCLER]: {
+  [THERMOCYCLER_MODULE_TYPE]: {
     xOffset: -8,
     yOffset: 0,
     xDimension: SLOT_X + DIVIDER + 32,
@@ -60,7 +62,7 @@ const MODULE_VIZ_DIMS: { [ModuleType]: ModuleVizDims } = {
 
 export const getModuleVizDims = (
   orientation: ModuleOrientation,
-  moduleType: ModuleType
+  moduleType: ModuleRealType
 ): ModuleVizDims => {
   const dims = MODULE_VIZ_DIMS[moduleType]
   if (orientation === 'left') return dims

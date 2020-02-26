@@ -12,8 +12,16 @@ import {
   OutlineButton,
   type Mount,
 } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_V1,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
-import { SPAN7_8_10_11_SLOT, THERMOCYCLER } from '../../../constants'
+import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { ModuleFields } from './ModuleFields'
 import { PipetteFields } from './PipetteFields'
@@ -21,7 +29,7 @@ import { CrashInfoBox } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../../../types'
 import type { NewProtocolFields } from '../../../load-file'
 import type {
@@ -37,7 +45,11 @@ type PipetteFieldsData = $Diff<
   {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
 >
 
-type ModuleCreationArgs = {| type: ModuleType, model: string, slot: DeckSlot |}
+type ModuleCreationArgs = {|
+  type: ModuleRealType,
+  model: string,
+  slot: DeckSlot,
+|}
 
 type State = {|
   fields: NewProtocolFields,
@@ -70,9 +82,21 @@ const initialState: State = {
     right: { pipetteName: '', tiprackDefURI: null },
   },
   modulesByType: {
-    magdeck: { onDeck: false, model: 'GEN1', slot: '1' },
-    tempdeck: { onDeck: false, model: 'GEN1', slot: '3' },
-    thermocycler: { onDeck: false, model: 'GEN1', slot: SPAN7_8_10_11_SLOT },
+    [MAGNETIC_MODULE_TYPE]: {
+      onDeck: false,
+      model: MAGNETIC_MODULE_V1,
+      slot: '1',
+    },
+    [TEMPERATURE_MODULE_TYPE]: {
+      onDeck: false,
+      model: TEMPERATURE_MODULE_V1,
+      slot: '3',
+    },
+    [THERMOCYCLER_MODULE_TYPE]: {
+      onDeck: false,
+      model: THERMOCYCLER_MODULE_V1,
+      slot: SPAN7_8_10_11_SLOT,
+    },
   },
 }
 
@@ -100,7 +124,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
   }
 
   getCrashableModuleSelected = (modules: FormModulesByType) => {
-    return modules.magdeck.onDeck || modules.tempdeck.onDeck
+    return (
+      modules[MAGNETIC_MODULE_TYPE].onDeck ||
+      modules[TEMPERATURE_MODULE_TYPE].onDeck
+    )
   }
 
   handlePipetteFieldsChange = (
@@ -124,7 +151,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     })
   }
 
-  handleModuleOnDeckChange = (type: ModuleType, value: boolean) => {
+  handleModuleOnDeckChange = (type: ModuleRealType, value: boolean) => {
     let nextMountState: $Shape<FormModule> = { onDeck: value }
     this.setState({
       modulesByType: {
@@ -164,8 +191,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
     )
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
-    // with enum-typed key like `{[ModuleType]: ___}`
-    const moduleTypes: Array<ModuleType> = Object.keys(this.state.modulesByType)
+    // with enum-typed key like `{[ModuleRealType]: ___}`
+    const moduleTypes: Array<ModuleRealType> = Object.keys(
+      this.state.modulesByType
+    )
     const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
       (acc, moduleType) => {
         const module = this.state.modulesByType[moduleType]
@@ -213,7 +242,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
     const visibleModules = this.props.thermocyclerEnabled
       ? this.state.modulesByType
-      : omit(this.state.modulesByType, THERMOCYCLER)
+      : omit(this.state.modulesByType, THERMOCYCLER_MODULE_TYPE)
 
     return (
       <React.Fragment>
@@ -279,12 +308,16 @@ export class FilePipettesModal extends React.Component<Props, State> {
               {showCrashInfoBox && (
                 <CrashInfoBox
                   showDiagram
-                  magnetOnDeck={this.state.modulesByType.magdeck.onDeck}
-                  temperatureOnDeck={this.state.modulesByType.tempdeck.onDeck}
+                  magnetOnDeck={
+                    this.state.modulesByType[MAGNETIC_MODULE_TYPE].onDeck
+                  }
+                  temperatureOnDeck={
+                    this.state.modulesByType[TEMPERATURE_MODULE_TYPE].onDeck
+                  }
                 />
               )}
 
-              <div className={styles.button_row}>
+              <div className={modalStyles.button_row}>
                 <OutlineButton
                   onClick={this.props.onCancel}
                   tabIndex={7}
