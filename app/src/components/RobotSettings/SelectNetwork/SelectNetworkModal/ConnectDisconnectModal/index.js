@@ -2,10 +2,10 @@
 import * as React from 'react'
 
 import {
-  WPA_PSK_SECURITY,
-  WPA_EAP_SECURITY,
-  NO_SECURITY,
-} from '../../../../../http-api-client'
+  SECURITY_WPA_PSK,
+  SECURITY_WPA_EAP,
+  SECURITY_NONE,
+} from '../../../../../networking'
 
 import { ConnectForm } from './ConnectForm'
 import { ScrollableAlertModal, BottomButtonBar } from '../../../../modals'
@@ -17,6 +17,10 @@ import type {
   WifiKeysList,
 } from '../../../../../http-api-client'
 
+import type { NetworkingType } from '../../types'
+
+import { formatHeading, formatBody } from './utils'
+
 import { DISCONNECT } from '../../constants'
 
 import styles from './styles.css'
@@ -24,7 +28,7 @@ import styles from './styles.css'
 export type ConnectDisconnectModalProps = {|
   ssid: ?string,
   previousSsid: ?string,
-  networkingType: string, // Fix types once exported
+  networkingType: ?NetworkingType,
   securityType: ?WifiSecurityType,
   handleCancel: () => mixed,
   addKey: () => mixed,
@@ -33,44 +37,6 @@ export type ConnectDisconnectModalProps = {|
   keys: ?WifiKeysList,
   dispatchConfigure: WifiConfigureRequest => mixed,
 |}
-
-const heading = (
-  ssid: ?string,
-  previousSsid: ?string,
-  networkingType: string
-): ?string => {
-  if (networkingType === 'join') {
-    return 'Find and join a Wi-Fi network'
-  }
-
-  if (previousSsid && networkingType === 'disconnect') {
-    return `Disconnect from ${previousSsid}`
-  }
-
-  if (ssid) {
-    return `Connect to ${ssid}`
-  }
-}
-
-// add return type
-const securityTypes = (ssid: string): Object => ({
-  [WPA_PSK_SECURITY]: `Wi-Fi network ${ssid} requires a WPA2 password.`,
-  [WPA_EAP_SECURITY]: `Wi-Fi network ${ssid} requires 802.1X authentication.`,
-  [NO_SECURITY]: `Please select the security type for Wi-Fi network ${ssid}.`,
-})
-
-// type this
-const formatBody = (ssid, previousSsid, networkingType, securityType) => {
-  if (networkingType === 'join') {
-    return 'Enter the name and security type of the network you want to join.'
-  }
-
-  if (previousSsid && networkingType === 'disconnect') {
-    return `Are you sure you want to disconnect from ${previousSsid}?`
-  }
-
-  return ssid && securityType && securityTypes(ssid)[securityType]
-}
 
 export const ConnectDisconnectModal = ({
   ssid,
@@ -86,7 +52,7 @@ export const ConnectDisconnectModal = ({
 }: ConnectDisconnectModalProps) => (
   <ScrollableAlertModal
     alertOverlay
-    heading={heading(ssid, previousSsid, networkingType)}
+    heading={formatHeading(ssid, previousSsid, networkingType)}
     iconName="wifi"
     onCloseClick={handleCancel}
   >
