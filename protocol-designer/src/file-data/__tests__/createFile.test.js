@@ -32,7 +32,6 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      modulesEnabled,
     } = noModulesProtocolFixture
 
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
@@ -49,8 +48,7 @@ describe('createFile selector', () => {
       moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
-      labwareDefsByURI,
-      modulesEnabled
+      labwareDefsByURI
     )
 
     const valid = validateProtocolV3(result)
@@ -86,7 +84,6 @@ describe('createFile selector', () => {
       pipetteEntities,
       labwareNicknamesById,
       labwareDefsByURI,
-      modulesEnabled,
     } = engageMagnetProtocolFixture
 
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
@@ -103,8 +100,7 @@ describe('createFile selector', () => {
       moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
-      labwareDefsByURI,
-      modulesEnabled
+      labwareDefsByURI
     )
 
     const valid = validateProtocolV4(result)

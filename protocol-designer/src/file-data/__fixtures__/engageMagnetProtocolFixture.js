@@ -4,6 +4,9 @@ import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_trash from '@opentrons/shared-data/labware/fixtures/2/fixture_trash.json'
 
+// TODO IMMEDIATELY shrink this fixture (create liquid & tip state via some fn),
+// extract common parts of the 2 fixtures (eg metadata)
+
 // Named arguments to createFile selector. This data would be the result of several selectors.
 // Copied from live PD runtime and modified to use fixture defs
 export const engageMagnetProtocolFixture = {
@@ -791,5 +794,4 @@ export const engageMagnetProtocolFixture = {
     'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture_96_plate,
     'opentrons/opentrons_1_trash_1100ml_fixed/1': fixture_trash,
   },
-  modulesEnabled: true,
 }

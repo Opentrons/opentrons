@@ -1,13 +1,12 @@
 // @flow
 import { createSelector } from 'reselect'
-import flatten from 'lodash/flatten'
+import flatMap from 'lodash/flatMap'
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import uniq from 'lodash/uniq'
 import { getFileMetadata } from './fileFields'
 import { getInitialRobotState, getRobotStateTimeline } from './commands'
 import { selectors as dismissSelectors } from '../../dismiss'
-import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as ingredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -19,18 +18,16 @@ import {
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
 
+import type { Command as CommandV3 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   FilePipette,
   FileLabware,
   FileModule,
-  Command,
+  Command as CommandV4,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
-
-// TODO: Ian 2019-11-11 remove the `any` and bump to 4 when v4 is released
-const protocolSchemaVersion: any = 3
 
 // TODO: BC: 2018-02-21 uncomment this assert, causes test failures
 // assert(!isEmpty(process.env.OT_PD_VERSION), 'Could not find application version!')
@@ -43,7 +40,29 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
-// $FlowFixMe: TODO IL 2020-02-24 type as 'schemaV3 | schemaV4' in #4919
+/** V3 commands are a subset of V4. Given commands array that may
+ ** contain V4 commands, return only V3-compatible commands. */
+const filterV3Commands = (commands: Array<CommandV4>): Array<CommandV3> => {
+  return commands.reduce<Array<CommandV3>>((acc, command) => {
+    if (
+      command.command === 'aspirate' ||
+      command.command === 'dispense' ||
+      command.command === 'airGap' ||
+      command.command === 'blowout' ||
+      command.command === 'touchTip' ||
+      command.command === 'pickUpTip' ||
+      command.command === 'dropTip' ||
+      command.command === 'moveToSlot' ||
+      command.command === 'delay'
+    ) {
+      return [...acc, command]
+    } else {
+      console.warn('Stripped out non-V3 command', command)
+      return acc
+    }
+  }, [])
+}
+
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
@@ -58,7 +77,6 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  featureFlagSelectors.getEnableModules,
   (
     fileMetadata,
     initialRobotState,
@@ -72,12 +90,15 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI,
-    modulesEnabled
+    labwareDefsByURI
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
+
+    // export as V4 schema protocol if protocol has modules, otherwise as V3
+    // TODO IMMEDIATELY is there another selector for "exportAsV4" that the export warning modal uses???
+    const exportAsV4 = !isEmpty(moduleEntities)
 
     const pipettes = mapValues(
       initialRobotState.pipettes,
@@ -131,9 +152,12 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       {}
     )
 
-    return {
-      schemaVersion: protocolSchemaVersion,
+    const commands: Array<CommandV4> = flatMap(
+      robotStateTimeline.timeline,
+      timelineFrame => timelineFrame.commands
+    )
 
+    const protocolFile = {
       metadata: {
         protocolName: name,
         author,
@@ -180,12 +204,22 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       pipettes,
       labware,
       labwareDefinitions,
+    }
 
-      commands: flatten<Command, Command>(
-        robotStateTimeline.timeline.map(timelineFrame => timelineFrame.commands)
-      ),
-
-      ...(modulesEnabled ? { modules } : {}),
+    if (exportAsV4) {
+      return {
+        ...protocolFile,
+        $otSharedSchema: '#/protocol/schemas/4',
+        schemaVersion: 4,
+        modules,
+        commands,
+      }
+    } else {
+      return {
+        ...protocolFile,
+        schemaVersion: 3,
+        commands: filterV3Commands(commands),
+      }
     }
   }
 )

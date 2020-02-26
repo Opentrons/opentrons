@@ -900,7 +900,12 @@ export const noModulesProtocolFixture = {
         '911ce1f0-5818-11ea-aa14-bf80ae41e7fc:opentrons/opentrons_96_tiprack_10ul/1',
       def: fixture_tiprack_10_ul,
     },
-    '94d52f00-5818-11ea-aa14-bf80ae41e7fc:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture_96_plate,
+    '94d52f00-5818-11ea-aa14-bf80ae41e7fc:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': {
+      labwareDefURI: 'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+      id:
+        '94d52f00-5818-11ea-aa14-bf80ae41e7fc:opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1',
+      def: fixture_96_plate,
+    },
   },
   moduleEntities: {},
   pipetteEntities: {
@@ -920,9 +925,8 @@ export const noModulesProtocolFixture = {
       'NEST 96 Well Plate 100 µL PCR Full Skirt',
   },
   labwareDefsByURI: {
-    'opentrons_96_tiprack_10ul/1': 'TODO',
-    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': 'TODO',
+    'opentrons/opentrons_96_tiprack_10ul/1': fixture_tiprack_10_ul,
+    'opentrons/nest_96_wellplate_100ul_pcr_full_skirt/1': fixture_96_plate,
+    'opentrons/opentrons_1_trash_1100ml_fixed/1': fixture_trash,
   },
-  // NOTE: modules are enabled, but we don't use them here
-  modulesEnabled: true,
 }
