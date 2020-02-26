@@ -1,5 +1,5 @@
 from opentrons.types import Mount
-from opentrons.hardware_control import adapters, API
+from opentrons.hardware_control import adapters, API, ThreadManager
 
 
 async def test_synch_adapter():

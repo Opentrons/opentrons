@@ -1,7 +1,7 @@
 import pytest
 
 from opentrons.protocol_api.util import HardwareManager, AxisMaxSpeeds
-from opentrons.hardware_control import API, adapters, types
+from opentrons.hardware_control import API, adapters, types, ThreadManager
 
 
 def test_hw_manager(loop):

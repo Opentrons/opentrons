@@ -1,7 +1,7 @@
 import opentrons
 import optparse
 import sys
-from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control import ThreadManager, API
 
 
 def connect_to_port(hardware):
