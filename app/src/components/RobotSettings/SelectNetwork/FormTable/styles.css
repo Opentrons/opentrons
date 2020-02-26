@@ -11,28 +11,3 @@
     font-size: var(--fs-body-1);
   }
 }
-
-.form_table_row {
-  display: table-row;
-}
-
-.form_table_input,
-.form_table_label {
-  display: table-cell;
-}
-
-.form_table_input {
-  padding-bottom: 0.75rem;
-}
-
-.form_table_input_no_label {
-  margin-top: -0.325rem;
-  padding-bottom: 0.5rem;
-}
-
-.form_table_label {
-  padding-right: 1rem;
-  font-weight: var(--fw-semibold);
-  text-align: right;
-}
-
