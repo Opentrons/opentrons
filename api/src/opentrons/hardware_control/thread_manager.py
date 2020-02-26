@@ -115,7 +115,7 @@ class ThreadManager(HardwareAPILike):
                                      loop,
                                      attr)
         elif asyncio.iscoroutine(attr):
-            # Return awaitable of coroutine properties run in managed thread/loop
+            # Return awaitable coroutine properties run in managed thread/loop
             fut = asyncio.run_coroutine_threadsafe(attr, loop)
             wrapped = asyncio.wrap_future(fut, loop=asyncio.get_event_loop())
             return wrapped

@@ -12,9 +12,8 @@ import logging
 from typing import Tuple
 from numpy.linalg import inv  # type: ignore
 from numpy import dot, array  # type: ignore
-import opentrons
 from opentrons import types
-from opentrons.hardware_control import adapters, API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import robot_configs, SystemArchitecture, ARCHITECTURE
 from opentrons.util.linal import (solve, add_z, apply_transform,

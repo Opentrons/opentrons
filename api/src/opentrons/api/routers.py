@@ -1,5 +1,4 @@
 from opentrons.broker import Notifications, Broker
-from opentrons.hardware_control import adapters
 from .session import SessionManager, Session
 from .calibration import CalibrationManager
 

@@ -32,7 +32,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import adapters, API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 from opentrons import (robot as rb,

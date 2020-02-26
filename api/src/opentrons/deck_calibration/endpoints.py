@@ -10,7 +10,6 @@ try:
 except ImportError:
     pass
 from opentrons.config import pipette_config, robot_configs, feature_flags
-from opentrons import hardware_control
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import CriticalPoint
 from . import jog, position, dots_set, z_pos

@@ -17,7 +17,7 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
-from opentrons.hardware_control import adapters, API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -351,11 +351,13 @@ class Session(object):
                     if pip:
                         instrs[mount] = {'model': pip['model'],
                                          'id': pip.get('pipette_id', '')}
-                sync_sim = ThreadManager(API.build_hardware_simulator,
-                              instrs,
-                              [mod.name()
-                              for mod in self._hardware.attached_modules],
-                              strict_attached_instruments=False).sync
+                sync_sim = ThreadManager(
+                        API.build_hardware_simulator,
+                        instrs,
+                        [mod.name()
+                            for mod in self._hardware.attached_modules],
+                        strict_attached_instruments=False
+                        ).sync
                 sync_sim.home()
                 self._simulating_ctx = ProtocolContext.build_using(
                     self._protocol,
