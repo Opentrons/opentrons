@@ -7,8 +7,8 @@ HARDWARE_APP_KEY = 'hardware'
 
 
 def run(hardware: HardwareAPILike,
-        hostname: str,
-        port: int,
+        hostname: typing.Optional[str],
+        port: typing.Optional[int],
         path: typing.Optional[str]):
     """Start the fastapi service."""
     # todo Amit 2/11/2020

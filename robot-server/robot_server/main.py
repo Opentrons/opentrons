@@ -24,7 +24,7 @@ def build_arg_parser():
         "-P", "--port",
         help="TCP/IP port to serve on (default: %(default)r)",
         type=int,
-        default="8080"
+        default="31950"
     )
     arg_parser.add_argument(
         "-U", "--path",
@@ -44,9 +44,9 @@ def build_arg_parser():
 
 
 def run(hardware: HardwareAPILike,
-        hostname,
-        port,
-        path: typing.Optional[str] = None):
+        hostname: typing.Optional[str],
+        port: typing.Optional[int],
+        path: str = None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
