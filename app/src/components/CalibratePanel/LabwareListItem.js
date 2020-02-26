@@ -5,17 +5,18 @@ import cx from 'classnames'
 import {
   getLabwareDisplayName,
   getModuleDisplayName,
-  type ModuleType,
+  getModuleType,
+  THERMOCYCLER_MODULE_TYPE,
+  type ModuleModel,
 } from '@opentrons/shared-data'
 import { ListItem, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
 import type { Labware } from '../../robot'
-import { THERMOCYCLER } from '../../modules'
 
 export type LabwareListItemProps = {|
   ...Labware,
-  moduleName?: ModuleType,
+  moduleModel?: ModuleModel,
   isDisabled: boolean,
   onClick: () => mixed,
 |}
@@ -31,17 +32,17 @@ export function LabwareListItem(props: LabwareListItemProps) {
     isDisabled,
     onClick,
     definition,
-    moduleName,
+    moduleModel,
   } = props
 
   const url = `/calibrate/labware/${slot}`
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'
   const displayName = definition ? getLabwareDisplayName(definition) : type
   let displaySlot = `Slot ${slot}`
-  if (moduleName === THERMOCYCLER) {
+  if (moduleModel && getModuleType(moduleModel) === THERMOCYCLER_MODULE_TYPE) {
     displaySlot = 'Slots 7, 8, 10, & 11'
   }
-  const moduleDisplayName = moduleName && getModuleDisplayName(moduleName)
+  const moduleDisplayName = moduleModel && getModuleDisplayName(moduleModel)
 
   return (
     <ListItem
@@ -72,7 +73,7 @@ export function LabwareListItem(props: LabwareListItemProps) {
               </span>
             )}
             <div className={styles.slot_contents_names}>
-              {moduleName && (
+              {moduleModel && (
                 <span className={styles.module_name}>{moduleDisplayName}</span>
               )}
               <span className={styles.labware_item_name}>{displayName}</span>

@@ -16,7 +16,7 @@ type Props = {|
 
 export const MagDeckCard = ({ module, isCardExpanded, toggleCard }: Props) => (
   <StatusCard
-    title={getModuleDisplayName(module.name)}
+    title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
   >

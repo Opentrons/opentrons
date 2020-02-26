@@ -11,7 +11,7 @@ import {
   selectors as robotSelectors,
 } from '../../robot'
 import secureTCLatchSrc from '../../img/secure_tc_latch.png'
-import { THERMOCYCLER } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
 
 import { Portal } from '../portal'
 import { DeckMap } from '../DeckMap'
@@ -32,7 +32,7 @@ export function ReviewDeck(props: ReviewDeckProps) {
 
   const mustPrepNestedLabware = some(
     sessionModules,
-    mod => mod.name === THERMOCYCLER
+    mod => getModuleType(mod.model) === THERMOCYCLER_MODULE_TYPE
   )
 
   const currentLabware = allLabware.find(lw => lw.slot === slot)

@@ -361,7 +361,7 @@ export const getLabware: OutputSelector<
             (key === slot ||
               (!isTiprack &&
                 type === lwBySlot[key].type &&
-                modulesBySlot[key]?.name === modulesBySlot[slot]?.name))
+                modulesBySlot[key]?.model === modulesBySlot[slot]?.model))
         )
 
         let calibration: LabwareCalibrationStatus = 'unconfirmed'

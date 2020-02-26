@@ -3,7 +3,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import {
+  getModuleDisplayName,
+  checkModuleCompatibility,
+} from '@opentrons/shared-data'
 import { selectors as robotSelectors } from '../../robot'
 import { getAttachedModules } from '../../modules'
 
@@ -41,8 +44,10 @@ function ProtocolModulesCardComponent(props: Props) {
   if (modules.length < 1) return null
 
   const moduleInfo = modules.map(module => {
-    const displayName = getModuleDisplayName(module.name)
-    const modulesMatch = actualModules.some(m => m.name === module.name)
+    const displayName = getModuleDisplayName(module.model)
+    const modulesMatch = actualModules.some(m =>
+      checkModuleCompatibility(m.model, module.model)
+    )
 
     return { ...module, displayName, modulesMatch }
   })
