@@ -24,6 +24,7 @@ export const SECURITY_WPA_EAP: 'wpa-eap' = 'wpa-eap'
 
 export const STATUS_PATH: '/networking/status' = '/networking/status'
 export const WIFI_LIST_PATH: '/wifi/list' = '/wifi/list'
+export const WIFI_CONFIGURE_PATH: '/wifi/configure' = '/wifi/configure'
 
 // action type strings
 
@@ -47,3 +48,14 @@ export const FETCH_WIFI_LIST_SUCCESS: 'networking:FETCH_WIFI_LIST_SUCCESS' =
 
 export const FETCH_WIFI_LIST_FAILURE: 'networking:FETCH_WIFI_LIST_FAILURE' =
   'networking:FETCH_WIFI_LIST_FAILURE'
+
+// POST /wifi/configure
+
+export const POST_WIFI_CONFIGURE: 'networking:POST_WIFI_CONFIGURE' =
+  'networking:POST_WIFI_CONFIGURE'
+
+export const POST_WIFI_CONFIGURE_SUCCESS: 'networking:POST_WIFI_CONFIGURE_SUCCESS' =
+  'networking:POST_WIFI_CONFIGURE_SUCCESS'
+
+export const POST_WIFI_CONFIGURE_FAILURE: 'networking:POST_WIFI_CONFIGURE_FAILURE' =
+  'networking:POST_WIFI_CONFIGURE_FAILURE'
