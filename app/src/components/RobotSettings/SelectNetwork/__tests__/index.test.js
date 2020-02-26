@@ -7,49 +7,16 @@ import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
 import * as Networking from '../../../../networking'
-import { CONNECTABLE } from '../../../../discovery'
+// import { configureWifi } from '../../../../http-api-client'
 
 import { SelectNetwork } from '..'
 import { SelectSsid } from '../SelectSsid'
 import { SelectNetworkModal } from '../SelectNetworkModal'
 
-import type { State } from '../../../types'
+// import type { State } from '../../../../types'
 import type { ViewableRobot } from '../../../../discovery/types'
 
-const mockRobot: ViewableRobot = ({
-  name: 'robot-name',
-  connected: true,
-  status: CONNECTABLE,
-}: any)
-
-const wifiList = [
-  {
-    ssid: 'Test',
-    signal: 100,
-    active: true,
-    security: 'WPA2',
-    securityType: 'wpa-psk',
-  },
-  {
-    ssid: 'Opentrons',
-    signal: 100,
-    active: false,
-    security: 'WPA2',
-    securityType: 'wpa-psk',
-  },
-]
-
-const mockState = {
-  networking: {
-    'robot-name': {
-      wifiList,
-    },
-  },
-  superDeprecatedRobotApi: {
-    api: { 'robot-name': {} },
-  },
-  robotApi: {},
-}
+import { mockRobot, wifiList, mockState } from '../__fixtures__'
 
 describe('<SelectNetwork />', () => {
   let dispatch
@@ -61,7 +28,7 @@ describe('<SelectNetwork />', () => {
     mockStore = {
       dispatch,
       subscribe: () => {},
-      getState: () => ({ ...mockState }: State),
+      getState: () => ({ ...mockState }),
     }
 
     render = (robot: ViewableRobot = mockRobot) =>
@@ -72,7 +39,6 @@ describe('<SelectNetwork />', () => {
   })
 
   afterEach(() => {
-    jest.resetAllMocks()
     jest.clearAllMocks()
   })
 
@@ -88,30 +54,59 @@ describe('<SelectNetwork />', () => {
     expect(selectSsid.prop('disabled')).toEqual(false)
   })
 
-  describe('SelectNetworkModal modal', () => {
-    const newSsid = 'Opentrons'
+  // revisit after rebase
+  test.skip('on mount dispatches configure', () => {})
+
+  describe('<SelectNetworkModal />', () => {
+    const newSsid = wifiList[2].ssid
+    // const ssidSecurityNone = wifiList[1].ssid
     let wrapper
-    let modal
+    let selectSsid
 
     beforeEach(() => {
       wrapper = render()
-      const selectSsid = wrapper.find(SelectSsid)
+      selectSsid = wrapper.find(SelectSsid)
+    })
+
+    describe('handleOnValueChange function', () => {
+      test('updates state correctly', () => {
+        act(() => {
+          selectSsid.props().handleOnValueChange(newSsid)
+        })
+        wrapper.update()
+        const modal = wrapper.find(SelectNetworkModal)
+
+        expect(modal.prop('ssid')).toEqual(newSsid)
+        expect(modal.prop('previousSsid')).toEqual(wifiList[0].ssid)
+        expect(modal.prop('networkingType')).toEqual('connect')
+        expect(modal.prop('securityType')).toEqual(wifiList[2].securityType)
+        expect(modal.prop('modalOpen')).toEqual(true)
+      })
+
+      // revisit after rebase
+      test.skip('when security type is none dispatches configure correctly', () => {
+        // act(() => {
+        //   selectSsid.props().handleOnValueChange(ssidSecurityNone)
+        // })
+        // wrapper.update()
+        // const modal = wrapper.find(SelectNetworkModal)
+        // const ssid = modal.prop('ssid')
+        // const expected = configureWifi(mockRobot, { ssid })
+      })
+
+      // revisit after additional refactors
+      test.skip('when has WPA or EAP security type dispatches fetchWifiEapOptions correctly', () => {})
+      test.skip('when has WPA or EAP security type dispatches fetchWifiKeys correctly', () => {})
+    })
+
+    test('handleCancel function updates state correctly', () => {
       act(() => {
         selectSsid.props().handleOnValueChange(newSsid)
       })
+
       wrapper.update()
-      modal = wrapper.find(SelectNetworkModal)
-    })
+      let modal = wrapper.find(SelectNetworkModal)
 
-    test('handleOnValueChange function updates state correctly', () => {
-      expect(modal.prop('ssid')).toEqual(newSsid)
-      expect(modal.prop('previousSsid')).toEqual(wifiList[0].ssid)
-      expect(modal.prop('networkingType')).toEqual('connect')
-      expect(modal.prop('securityType')).toEqual(wifiList[1].securityType)
-      expect(modal.prop('modalOpen')).toEqual(true)
-    })
-
-    test('onClick handleCancel function updates state correctly', () => {
       act(() => {
         modal.props().handleCancel()
       })

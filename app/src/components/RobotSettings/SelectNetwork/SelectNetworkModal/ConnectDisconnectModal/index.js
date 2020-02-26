@@ -10,15 +10,16 @@ import {
 import { ConnectForm } from './ConnectForm'
 import { ScrollableAlertModal, BottomButtonBar } from '../../../../modals'
 
-import { DISCONNECT } from '../../constants'
-
-import styles from './styles.css'
-
 import type {
   WifiSecurityType,
   WifiEapOptionsList,
   WifiConfigureRequest,
+  WifiKeysList,
 } from '../../../../../http-api-client'
+
+import { DISCONNECT } from '../../constants'
+
+import styles from './styles.css'
 
 export type ConnectDisconnectModalProps = {|
   ssid: ?string,

@@ -6,7 +6,7 @@ import { getActiveSsid } from '../utils' // try to move this out
 import styles from './styles.css'
 
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
-import type { WifiNetworkList, WifiNetwork } from '../../../../http-api-client'
+import type { WifiNetworkList, WifiNetwork } from '../../../../networking'
 
 export type SelectSsidProps = {|
   list: WifiNetworkList,

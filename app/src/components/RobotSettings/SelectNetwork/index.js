@@ -86,11 +86,20 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   ] = useDispatchApiRequest<PostDisconnectNetworkAction>()
 
   const latestRequestId = last(requestIds)
-  const disconnectRequest = useSelector<State, RequestState | null>(state =>
-    getRequestById(state, latestRequestId)
-  )
 
-  const { status, error, response } = disconnectRequest || {}
+  const disconnectRequest: RequestState | null = useSelector<
+    State,
+    RequestState | null
+  >(state => getRequestById(state, latestRequestId))
+
+  const status = disconnectRequest && disconnectRequest.status
+  const error =
+    disconnectRequest && disconnectRequest.error && disconnectRequest.error
+  const response =
+    disconnectRequest &&
+    disconnectRequest.response &&
+    disconnectRequest.response
+
   const pending = status === PENDING
   const failure = status === FAILURE
 
@@ -120,7 +129,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     const currentPreviousSsid = ssid
     const currentNetworkingType = NETWORKING_TYPE[ssidValue] || CONNECT
     const currentSecurityType = getSecurityType(list, ssidValue)
-    const currentModalOpen = hasSecurityType(securityType, NO_SECURITY)
+    const currentModalOpen = hasSecurityType(currentSecurityType, NO_SECURITY)
 
     const canFetchEapOptions =
       hasSecurityType(securityType, WPA_EAP_SECURITY) || !securityType

@@ -6,25 +6,27 @@ import {
   makeGetRobotWifiKeys,
   makeGetRobotWifiConfigure,
 } from '../../../http-api-client'
-import type { WifiNetworkList } from '../../../http-api-client'
 import { getWifiList } from '../../../networking'
 
+import type { WifiNetworkList, WifiSecurityType } from '../../../networking'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { State } from '../../../types'
 
 import { getActiveSsid, getSecurityType } from './utils'
 import { CONNECT } from './constants'
 
+type NetworkingType = 'connect' | 'disconnect' | 'join'
+
 export const useStateSelectNetwork = (list: WifiNetworkList) => {
   const activeSsid = getActiveSsid(list)
   const activeNetworkingType = activeSsid ? CONNECT : null
   const activeSecurityType = getSecurityType(list, activeSsid)
 
-  const [ssid, setSsid] = useState(null)
-  const [previousSsid, setPreviousSsid] = useState(null)
-  const [networkingType, setNetworkingType] = useState(null)
-  const [securityType, setSecurityType] = useState(null)
-  const [modalOpen, setModalOpen] = useState(false)
+  const [ssid, setSsid] = useState<?string>(null)
+  const [previousSsid, setPreviousSsid] = useState<?string>(null)
+  const [networkingType, setNetworkingType] = useState<?NetworkingType>(null)
+  const [securityType, setSecurityType] = useState<?WifiSecurityType>(null)
+  const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   useEffect(() => {
     setSsid(activeSsid)
