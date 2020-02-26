@@ -25,9 +25,10 @@ const mockGetRobotByName: JestMockFn<
   RobotHost
 > = (DiscoverySelectors.getRobotByName: any)
 
-export type EpicTestMocks<A> = {|
+export type EpicTestMocks<A, R> = {|
   state: State,
   action: A,
+  response: R | void,
   robot: RobotHost,
   meta: typeof mockRequestMeta,
   getRobotByName: typeof mockGetRobotByName,
@@ -41,9 +42,13 @@ export type EpicTestMocks<A> = {|
  *
  * @returns {EpicTestMocks}
  */
-export const setupEpicTestMocks = <A: { meta: { requestId: string } }>(
-  makeTriggerAction: (robotName: string) => A
-): EpicTestMocks<A> => {
+export const setupEpicTestMocks = <
+  A: { meta: { requestId: string } },
+  R: RobotApiResponse
+>(
+  makeTriggerAction: (robotName: string) => A,
+  mockResponse?: R
+): EpicTestMocks<A, R> => {
   const mockState: State = ({ state: true, mock: true }: any)
   const mockAction = {
     ...makeTriggerAction(mockRobot.name),
@@ -64,6 +69,7 @@ export const setupEpicTestMocks = <A: { meta: { requestId: string } }>(
   return {
     state: mockState,
     action: mockAction,
+    response: mockResponse,
     robot: mockRobot,
     meta: mockRequestMeta,
     getRobotByName: mockGetRobotByName,
@@ -72,16 +78,19 @@ export const setupEpicTestMocks = <A: { meta: { requestId: string } }>(
   }
 }
 
-export const scheduleEpicTest = <A, R: RobotApiResponse>(
-  epicMocks: EpicTestMocks<A>,
-  response: R,
+export const runEpicTest = <A, R: RobotApiResponse>(
+  epicMocks: EpicTestMocks<A, R>,
   run: (schedularArgs: any) => mixed
 ) => {
-  const { testScheduler, fetchRobotApi } = epicMocks
+  const { testScheduler, fetchRobotApi, response } = epicMocks
 
   testScheduler.run(schedulerArgs => {
     const { cold } = schedulerArgs
-    fetchRobotApi.mockReturnValue(cold('r', { r: response }))
+
+    if (response) {
+      fetchRobotApi.mockReturnValue(cold('r', { r: response }))
+    }
+
     run(schedulerArgs)
   })
 }
