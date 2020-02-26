@@ -93,7 +93,7 @@ class API(HardwareAPILike):
         await backend.connect(port)
 
         api_instance = cls(backend, loop=checked_loop, config=config)
-
+        await api_instance.cache_instruments()
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
