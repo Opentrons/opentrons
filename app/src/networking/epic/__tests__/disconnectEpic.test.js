@@ -1,117 +1,95 @@
 // @flow
-import { TestScheduler } from 'rxjs/testing'
-
-import { mockRobot } from '../../../robot-api/__fixtures__'
-import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
-import * as Constants from '../../constants'
-import * as Types from '../../types'
 import { networkingEpic } from '..'
 
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
-
-jest.mock('../../../robot-api/http')
-jest.mock('../../../discovery/selectors')
-jest.mock('../../selectors')
-
-const mockState = { state: true }
-
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
-
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
+const makeTriggerAction = (robotName: string) =>
+  Actions.postDisconnectNetwork(robotName, 'network-name')
 
 describe('networking disconnectEpic', () => {
-  let testScheduler
-
-  beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
-
-    testScheduler = new TestScheduler((actual, expected) => {
-      expect(actual).toEqual(expected)
-    })
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  const meta = { requestId: '1234' }
-  const action: Types.PostDisconnectNetworkAction = {
-    ...Actions.postDisconnectNetwork(
-      mockRobot.name,
-      Fixtures.mockNetworkingDisconnect.ssid
-    ),
-    meta,
-  }
+  it('calls POST /wifi/disconnect', () => {
+    const mocks = setupEpicTestMocks(
+      makeTriggerAction,
+      Fixtures.mockNetworkingDisconnectSuccess
+    )
 
-  test(`calls POST ${Constants.DISCONNECT_PATH}`, () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingDisconnectSuccess })
-      )
-
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: mockState })
+    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$)
       flush()
 
-      expect(mockGetRobotByName).toHaveBeenCalledWith(mockState, mockRobot.name)
-      expect(mockFetchRobotApi).toHaveBeenCalledWith(mockRobot, {
+      expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
         method: 'POST',
-        path: Constants.DISCONNECT_PATH,
+        path: '/wifi/disconnect',
         body: Fixtures.mockNetworkingDisconnect,
       })
     })
   })
 
-  test(`maps successful response to ${Constants.POST_DISCONNECT_NETWORK_SUCCESS}`, () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingDisconnectSuccess })
-      )
+  it('maps successful response to Constants.POST_DISCONNECT_NETWORK_SUCCESS', () => {
+    const mocks = setupEpicTestMocks(
+      makeTriggerAction,
+      Fixtures.mockNetworkingDisconnectSuccess
+    )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+    runEpicTest(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.postDisconnectNetworkSuccess(mockRobot.name, {
-          ...meta,
+        a: Actions.postDisconnectNetworkSuccess(mocks.robot.name, {
+          ...mocks.meta,
           response: Fixtures.mockNetworkingDisconnectSuccessMeta,
         }),
       })
     })
   })
 
-  test(`maps failed response to ${Constants.POST_DISCONNECT_NETWORK_FAILURE}`, () => {
-    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-      mockFetchRobotApi.mockReturnValue(
-        cold('r', { r: Fixtures.mockNetworkingDisconnectFailure })
-      )
+  it('maps failed response to POST_DISCONNECT_NETWORK_FAILURE', () => {
+    const mocks = setupEpicTestMocks(
+      makeTriggerAction,
+      Fixtures.mockNetworkingDisconnectFailure
+    )
 
-      const action$ = hot('--a', { a: action })
-      const state$ = hot('a-a', { a: {} })
+    runEpicTest(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
         a: Actions.postDisconnectNetworkFailure(
-          mockRobot.name,
+          mocks.robot.name,
           Fixtures.mockNetworkingDisconnectFailure.body,
-          { ...meta, response: Fixtures.mockNetworkingDisconnectFailureMeta }
+          {
+            ...mocks.meta,
+            response: Fixtures.mockNetworkingDisconnectFailureMeta,
+          }
         ),
+      })
+    })
+  })
+
+  it('dispatches FETCH_WIFI_LIST on POST_DISCONNECT_NETWORK_SUCCESS', () => {
+    const mocks = setupEpicTestMocks(robotName =>
+      Actions.postDisconnectNetworkSuccess(robotName, {})
+    )
+
+    runEpicTest(mocks, ({ hot, expectObservable }) => {
+      const action$ = hot('--a', { a: mocks.action })
+      const state$ = hot('s-s', { s: mocks.state })
+      const output$ = networkingEpic(action$, state$)
+
+      expectObservable(output$).toBe('--a', {
+        a: Actions.fetchWifiList(mocks.robot.name),
       })
     })
   })

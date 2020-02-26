@@ -10,7 +10,7 @@ import {
 import type { NetworkingDisconnectResponse } from '../types'
 
 export const mockNetworkingDisconnect: NetworkingDisconnectResponse = {
-  ssid: 'Opentrons',
+  ssid: 'network-name',
 }
 
 const { successMeta, failureMeta, success, failure } = makeResponseFixtures<

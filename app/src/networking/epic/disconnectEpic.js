@@ -1,5 +1,7 @@
 // @flow
-import { ofType } from 'redux-observable'
+import { of } from 'rxjs'
+import { ofType, combineEpics } from 'redux-observable'
+import { mergeMap } from 'rxjs/operators'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -31,7 +33,7 @@ const mapResponseToAction: ResponseToActionMapper<PostDisconnectNetworkAction> =
     : Actions.postDisconnectNetworkFailure(host.name, body, meta)
 }
 
-export const disconnectEpic: Epic = (action$, state$) =>
+const postDisconnectEpic: Epic = (action$, state$) =>
   action$.pipe(
     ofType(Constants.POST_DISCONNECT_NETWORK),
     mapToRobotApiRequest(
@@ -41,3 +43,15 @@ export const disconnectEpic: Epic = (action$, state$) =>
       mapResponseToAction
     )
   )
+
+const handlePostDisconnectNetworkSuccessEpic: Epic = action$ => {
+  return action$.pipe(
+    ofType(Constants.POST_DISCONNECT_NETWORK_SUCCESS),
+    mergeMap(action => of(Actions.fetchWifiList(action.payload.robotName)))
+  )
+}
+
+export const disconnectEpic: Epic = combineEpics(
+  postDisconnectEpic,
+  handlePostDisconnectNetworkSuccessEpic
+)
