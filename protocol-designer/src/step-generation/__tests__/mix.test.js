@@ -217,7 +217,7 @@ describe('mix: advanced options', () => {
 })
 
 describe('mix: errors', () => {
-  let errorArgs = {}
+  let errorArgs
   beforeEach(() => {
     errorArgs = {
       ...mixinArgs,

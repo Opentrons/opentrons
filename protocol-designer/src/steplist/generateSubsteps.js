@@ -52,6 +52,15 @@ function getCommandCreatorForSubsteps(
   if (stepArgs.commandCreatorFnName === 'transfer') {
     const commandCallArgs = {
       ...stepArgs,
+      // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
+      // spread `...stepArgs` above, so for now, they have to be redundantly explicit
+      blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
+      blowoutLocation: stepArgs.blowoutLocation,
+      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
+      commandCreatorFnName: stepArgs.commandCreatorFnName,
+      destWells: stepArgs.destWells,
+      sourceWells: stepArgs.sourceWells,
+      // set special values for substeps
       mixBeforeAspirate: null,
       mixInDestination: null,
       preWetTip: false,
@@ -61,6 +70,17 @@ function getCommandCreatorForSubsteps(
   } else if (stepArgs.commandCreatorFnName === 'distribute') {
     const commandCallArgs = {
       ...stepArgs,
+      // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
+      // spread `...stepArgs` above, so for now, they have to be redundantly explicit
+      blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
+      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
+      commandCreatorFnName: stepArgs.commandCreatorFnName,
+      destWells: stepArgs.destWells,
+      disposalLabware: stepArgs.disposalLabware,
+      disposalVolume: stepArgs.disposalVolume,
+      disposalWell: stepArgs.disposalWell,
+      sourceWell: stepArgs.sourceWell,
+      // set special values for substeps
       mixBeforeAspirate: null,
       preWetTip: false,
     }
@@ -69,6 +89,15 @@ function getCommandCreatorForSubsteps(
   } else if (stepArgs.commandCreatorFnName === 'consolidate') {
     const commandCallArgs = {
       ...stepArgs,
+      // TODO(IL, 2020-02-24): Flow is refusing to infer these when we
+      // spread `...stepArgs` above, so for now, they have to be redundantly explicit
+      blowoutFlowRateUlSec: stepArgs.blowoutFlowRateUlSec,
+      blowoutLocation: stepArgs.blowoutLocation,
+      blowoutOffsetFromTopMm: stepArgs.blowoutOffsetFromTopMm,
+      commandCreatorFnName: stepArgs.commandCreatorFnName,
+      destWell: stepArgs.destWell,
+      sourceWells: stepArgs.sourceWells,
+      // set special values for substeps
       mixFirstAspirate: null,
       mixInDestination: null,
       preWetTip: false,

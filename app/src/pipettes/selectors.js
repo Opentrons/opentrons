@@ -29,9 +29,11 @@ export const getAttachedPipettes: (
             ? getPipetteModelSpecs(attached.model)
             : null
 
-        return attached && attached.model && modelSpecs
-          ? { ...result, [mount]: { ...attached, modelSpecs } }
-          : result
+        if (attached && attached.model && modelSpecs) {
+          result[mount] = { ...attached, modelSpecs }
+        }
+
+        return result
       },
       { left: null, right: null }
     )
@@ -52,7 +54,8 @@ export const getAttachedPipetteSettings: (
         const settings = attached ? settingsById?.[attached.id] : null
         const fields = settings?.fields || null
 
-        return fields ? { ...result, [mount]: fields } : result
+        if (fields) result[mount] = fields
+        return result
       },
       { left: null, right: null }
     )
@@ -112,26 +115,25 @@ export const getProtocolPipettesInfo: (
           compatibility = Constants.INEXACT_MATCH
         }
 
-        return {
-          ...result,
-          [mount]: {
-            compatibility,
-            protocol: protocolPipette
+        result[mount] = {
+          compatibility,
+          protocol: protocolPipette
+            ? {
+                ...protocolPipette,
+                displayName: requestedDisplayName || protocolPipette.name,
+              }
+            : null,
+          actual:
+            actualPipette && actualModelSpecs
               ? {
-                  ...protocolPipette,
-                  displayName: requestedDisplayName || protocolPipette.name,
+                  ...actualPipette,
+                  modelSpecs: actualModelSpecs,
+                  displayName: actualModelSpecs.displayName,
                 }
               : null,
-            actual:
-              actualPipette && actualModelSpecs
-                ? {
-                    ...actualPipette,
-                    modelSpecs: actualModelSpecs,
-                    displayName: actualModelSpecs.displayName,
-                  }
-                : null,
-          },
         }
+
+        return result
       },
       { [Constants.LEFT]: EMPTY_INFO, [Constants.RIGHT]: EMPTY_INFO }
     )

@@ -8,7 +8,7 @@ import type { RobotApiRequestMeta } from '../robot-api/types'
 
 export type Mount = 'left' | 'right'
 
-export type AttachedPipette = $ReadOnly<{|
+export type AttachedPipette = {|
   id: string,
   name: string,
   model: string,
@@ -16,12 +16,12 @@ export type AttachedPipette = $ReadOnly<{|
   mount_axis: string,
   plunger_axis: string,
   modelSpecs: PipetteModelSpecs,
-|}>
+|}
 
-export type AttachedPipettesByMount = $ReadOnly<{|
+export type AttachedPipettesByMount = {|
   left: null | AttachedPipette,
   right: null | AttachedPipette,
-|}>
+|}
 
 export type PipetteSettingsField = {|
   value: ?number,
@@ -52,10 +52,10 @@ export type PipetteSettingsFieldsUpdate = $Shape<{|
 
 export type PipetteSettingsById = $Shape<{| [id: string]: PipetteSettings |}>
 
-export type PipetteSettingsByMount = $ReadOnly<{|
+export type PipetteSettingsByMount = {|
   left: PipetteSettingsFieldsMap | null,
   right: PipetteSettingsFieldsMap | null,
-|}>
+|}
 
 export type PipetteCompatibility = 'match' | 'inexact_match' | 'incompatible'
 

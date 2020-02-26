@@ -278,10 +278,9 @@ function handleConfirmProbed(
   state: CalibrationState,
   action: ConfirmProbedAction
 ): CalibrationState {
-  return {
-    ...state,
-    probedByMount: { ...state.probedByMount, [action.payload]: true },
-  }
+  const nextProbedByMount = { ...state.probedByMount }
+  nextProbedByMount[action.payload] = true
+  return { ...state, probedByMount: nextProbedByMount }
 }
 
 function handleMoveTo(
@@ -370,23 +369,23 @@ function handlePickupAndHomeSuccess(
   state: CalibrationState,
   action: CalibrationSuccessAction
 ): CalibrationState {
-  const {
-    calibrationRequest: { mount, slot },
-  } = state
+  const { calibrationRequest, tipOnByMount } = state
+  const { mount, slot } = calibrationRequest
   if (!slot || !mount) return state
+
+  // assume that only one tip can be on at a time
+  const nextTipOnByMount = mapValues(tipOnByMount, () => false)
+  nextTipOnByMount[mount] = true
 
   return {
     ...state,
     calibrationRequest: {
-      ...state.calibrationRequest,
+      ...calibrationRequest,
       inProgress: false,
       error: null,
     },
-    // assume that only one tip can be on at a time
-    tipOnByMount: {
-      ...mapValues(state.tipOnByMount, (value: boolean, key: Mount) => false),
-      [mount]: true,
-    },
+
+    tipOnByMount: nextTipOnByMount,
   }
 }
 
@@ -435,22 +434,23 @@ function handleDropTipAndHomeSuccess(
   state: CalibrationState,
   action: CalibrationSuccessAction
 ): CalibrationState {
-  const {
-    calibrationRequest: { mount, slot },
-  } = state
+  const { calibrationRequest, tipOnByMount } = state
+  const { mount, slot } = calibrationRequest
   if (!slot || !mount) return state
+
+  // assume that only one tip can be on at a time
+  const nextTipOnByMount = { ...tipOnByMount }
+  nextTipOnByMount[mount] = false
 
   return {
     ...state,
     calibrationRequest: {
-      ...state.calibrationRequest,
+      ...calibrationRequest,
       inProgress: false,
       error: null,
     },
-    tipOnByMount: {
-      ...state.tipOnByMount,
-      [mount]: false,
-    },
+
+    tipOnByMount: nextTipOnByMount,
   }
 }
 
@@ -499,28 +499,26 @@ function handleConfirmTiprackSuccess(
   state: CalibrationState,
   action: CalibrationSuccessAction
 ): CalibrationState {
-  const {
-    calibrationRequest: { mount, slot },
-  } = state
+  const { calibrationRequest, tipOnByMount, confirmedBySlot } = state
+  const { mount, slot } = calibrationRequest
   if (!slot || !mount) return state
 
   const tipOn = action.payload.tipOn || false
+  const nextTipOnByMount = { ...tipOnByMount }
+  const nextConfirmedBySlot = { ...confirmedBySlot }
+
+  nextTipOnByMount[mount] = tipOn
+  nextConfirmedBySlot[slot] = true
 
   return {
     ...state,
     calibrationRequest: {
-      ...state.calibrationRequest,
+      ...calibrationRequest,
       inProgress: false,
       error: null,
     },
-    tipOnByMount: {
-      ...state.tipOnByMount,
-      [mount]: tipOn,
-    },
-    confirmedBySlot: {
-      ...state.confirmedBySlot,
-      [slot]: true,
-    },
+    tipOnByMount: nextTipOnByMount,
+    confirmedBySlot: nextConfirmedBySlot,
   }
 }
 
@@ -620,22 +618,21 @@ function handleUpdateOffsetSuccess(
   state: CalibrationState,
   action: CalibrationSuccessAction
 ): CalibrationState {
-  const {
-    calibrationRequest: { mount, slot },
-  } = state
-  if (!mount || !slot) return state
+  const { calibrationRequest, confirmedBySlot } = state
+  const { mount, slot } = calibrationRequest
+  if (!slot || !mount) return state
+
+  const nextConfirmBySlot = { ...confirmedBySlot }
+  nextConfirmBySlot[slot] = true
 
   return {
     ...state,
     calibrationRequest: {
-      ...state.calibrationRequest,
+      ...calibrationRequest,
       inProgress: false,
       error: null,
     },
-    confirmedBySlot: {
-      ...state.confirmedBySlot,
-      [slot]: true,
-    },
+    confirmedBySlot: nextConfirmBySlot,
   }
 }
 
@@ -698,21 +695,20 @@ function handleReturnTipResponse(
   state: CalibrationState,
   action: ReturnTipResponseAction
 ): CalibrationState {
-  const {
-    calibrationRequest: { mount },
-  } = state
+  const { calibrationRequest, tipOnByMount } = state
+  const { mount } = calibrationRequest
   if (!mount) return state
+
+  const nextTipOnByMount = { ...tipOnByMount }
+  nextTipOnByMount[mount] = false
 
   return {
     ...state,
     calibrationRequest: {
-      ...state.calibrationRequest,
+      ...calibrationRequest,
       inProgress: false,
       error: null,
     },
-    tipOnByMount: {
-      ...state.tipOnByMount,
-      [mount]: false,
-    },
+    tipOnByMount: nextTipOnByMount,
   }
 }

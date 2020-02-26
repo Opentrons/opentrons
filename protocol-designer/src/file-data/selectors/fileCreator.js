@@ -26,7 +26,7 @@ import type {
   Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ModuleEntity } from '../../step-forms'
-import type { BaseState } from '../../types'
+import type { Selector } from '../../types'
 import type { PDProtocolFile } from '../../file-types'
 
 // TODO: Ian 2019-11-11 remove the `any` and bump to 4 when v4 is released
@@ -43,7 +43,8 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
-export const createFile: BaseState => PDProtocolFile = createSelector(
+// $FlowFixMe: TODO IL 2020-02-24 type as 'schemaV3 | schemaV4' in #4919
+export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
   getRobotStateTimeline,
