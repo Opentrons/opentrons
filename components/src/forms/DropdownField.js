@@ -42,12 +42,14 @@ export type DropdownFieldProps = {|
   autoFocus?: boolean,
 |}
 
+const BLANK_OPTION: DropdownOption = { name: '', value: '' }
+
 export function DropdownField(props: DropdownFieldProps) {
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
   const options =
     props.value || props.options.some(opt => opt.value === '')
       ? props.options
-      : [{ name: '', value: '' }, ...props.options]
+      : [BLANK_OPTION, ...props.options]
 
   const error = props.error != null
   const className = cx(props.className, {
@@ -71,7 +73,11 @@ export function DropdownField(props: DropdownFieldProps) {
           autoFocus={props.autoFocus}
         >
           {options.map(opt => (
-            <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
+            <option
+              key={opt.value}
+              value={opt.value}
+              disabled={Boolean(opt.disabled)}
+            >
               {opt.name}
             </option>
           ))}

@@ -135,33 +135,34 @@ export class FilePipettesModal extends React.Component<Props, State> {
     fieldName: $Keys<FormPipette>,
     value: string | null
   ) => {
-    let nextMountState: $Shape<FormPipette> = { [fieldName]: value }
+    let nextMountState: $Shape<FormPipette> = {}
+    nextMountState[fieldName] = value
     if (fieldName === 'pipetteName') {
-      nextMountState = { ...nextMountState, tiprackDefURI: null }
+      nextMountState.tiprackDefURI = null
     }
 
-    this.setState({
-      pipettesByMount: {
-        ...this.state.pipettesByMount,
-        [mount]: {
-          ...this.state.pipettesByMount[mount],
-          ...nextMountState,
-        },
-      },
-    })
+    // TODO(IL, 2020-02-24): consider using an immutable type to this.state
+    // to make this less precarious, see #5073
+    const stateUpdate = { pipettesByMount: { ...this.state.pipettesByMount } }
+    stateUpdate.pipettesByMount[mount] = {
+      ...this.state.pipettesByMount[mount],
+      ...nextMountState,
+    }
+
+    this.setState(stateUpdate)
   }
 
   handleModuleOnDeckChange = (type: ModuleRealType, value: boolean) => {
     let nextMountState: $Shape<FormModule> = { onDeck: value }
-    this.setState({
-      modulesByType: {
-        ...this.state.modulesByType,
-        [type]: {
-          ...this.state.modulesByType[type],
-          ...nextMountState,
-        },
-      },
-    })
+
+    // TODO(IL, 2020-02-24): consider using an immutable type to this.state
+    // to make this less precarious, see #5073
+    const stateUpdate = { modulesByType: { ...this.state.modulesByType } }
+    stateUpdate.modulesByType[type] = {
+      ...this.state.modulesByType[type],
+      ...nextMountState,
+    }
+    this.setState(stateUpdate)
   }
 
   handleNameChange = (e: SyntheticInputEvent<*>) =>

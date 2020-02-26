@@ -74,7 +74,7 @@ describe('ensure bad protocol data fails validation', () => {
       },
     }
 
-    Object.keys(badPipettes).forEach(pipetteId => {
+    Object.keys(badPipettes).forEach((pipetteId: string) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,
@@ -98,7 +98,7 @@ describe('ensure bad protocol data fails validation', () => {
       },
     }
 
-    Object.keys(badLabware).forEach(labwareId => {
+    Object.keys(badLabware).forEach((labwareId: string) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,
@@ -123,7 +123,7 @@ describe('ensure bad protocol data fails validation', () => {
       },
     }
 
-    Object.keys(badModules).forEach(moduleId => {
+    Object.keys(badModules).forEach((moduleId: string) => {
       expect(
         validateProtocol({
           ...simpleV4Fixture,

@@ -39,8 +39,11 @@ import type { InvariantContext, RobotState } from '../'
 // Eg {A1: true, B1: true, ...}
 type WellTipState = { [wellName: string]: boolean }
 export function getTiprackTipstate(filled: ?boolean): WellTipState {
-  return tiprackWellNamesFlat.reduce(
-    (acc, wellName) => ({ ...acc, [wellName]: Boolean(filled) }),
+  return tiprackWellNamesFlat.reduce<WellTipState>(
+    (acc, wellName: string) => ({
+      ...acc,
+      [wellName]: Boolean(filled),
+    }),
     {}
   )
 }

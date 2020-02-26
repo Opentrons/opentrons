@@ -4,6 +4,8 @@ import { shallow } from 'enzyme'
 import { getStepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
 
+import type { StepItemProps } from '../StepItem'
+
 function renderWrapper(Component) {
   return shallow(<div>{Component}</div>)
 }
@@ -72,7 +74,7 @@ describe('getStepItemContents', () => {
   })
 
   describe('temperature step type', () => {
-    let temperatureProps
+    let temperatureProps: StepItemProps
     const stepType: 'temperature' = 'temperature'
 
     beforeEach(() => {
@@ -126,7 +128,7 @@ describe('getStepItemContents', () => {
   })
 
   describe('awaitTemperature step type', () => {
-    let awaitTemperatureProps
+    let awaitTemperatureProps: StepItemProps
     const stepType: 'awaitTemperature' = 'awaitTemperature'
 
     beforeEach(() => {
