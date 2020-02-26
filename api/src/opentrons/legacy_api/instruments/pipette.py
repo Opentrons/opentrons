@@ -1127,6 +1127,7 @@ class Pipette(CommandPublisher):
             if 'rack' in location.get_parent().get_type():
                 half_tip_length = self._tip_length * self._return_tip_height
                 location = location.top(-half_tip_length)
+                print(f'v1 location: {location}')
             elif 'trash' in location.get_parent().get_type():
                 loc, coords = location.top()
                 location = (loc, coords + (0, self.model_offset[1], 0))
