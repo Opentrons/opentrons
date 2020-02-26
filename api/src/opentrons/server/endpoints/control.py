@@ -131,9 +131,11 @@ async def get_attached_modules(request):
     hw_mods = hw.attached_modules
     module_data = [
         {
-            'name': mod.name(),
-            'model': mod.model(),
-            'port': mod.port,
+            'name': mod.name(),  # TODO: legacy, remove
+            'displayName': mod.name(),  # TODO: legacy, remove
+            'model': mod.device_info.get('revision'),  # TODO legacy, remove
+            'moduleModel': mod.model(),
+            'port': mod.port,  # /dev/ttyS0
             'serial': mod.device_info.get('serial'),
             'revision': mod.device_info.get('model'),
             'fwVersion': mod.device_info.get('version'),

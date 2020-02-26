@@ -85,7 +85,8 @@ async def test_get_modules(
                                              interrupt_callback=lambda x: None)
     monkeypatch.setattr(hw, 'attached_modules', [magdeck])
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
-                   'status', 'data', 'hasAvailableUpdate', 'revision'])
+                   'status', 'data', 'hasAvailableUpdate', 'revision',
+                   'moduleModel', 'displayName'])
     resp = await async_client.get('/modules')
     body = await resp.json()
     assert resp.status == 200

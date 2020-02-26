@@ -107,6 +107,7 @@ class ModuleGeometry(DeckItem):
     def __init__(self,
                  display_name: str,
                  model: ModuleModel,
+                 module_type: ModuleType,
                  offset: Point,
                  overall_height: float,
                  height_over_labware: float,
@@ -143,6 +144,7 @@ class ModuleGeometry(DeckItem):
         """
         self._api_version = api_level
         self._parent = parent
+        self._module_type = module_type
         self._display_name = "{} on {}".format(
             display_name, str(parent.labware))
         self._model = model
@@ -174,6 +176,11 @@ class ModuleGeometry(DeckItem):
     @property
     def load_name(self) -> str:
         return self.model.value
+
+    @property
+    def module_type(self) -> ModuleType:
+        """ The Moduletype """
+        return self._module_type
 
     @property
     def parent(self) -> LocationLabware:
@@ -214,6 +221,7 @@ class ThermocyclerGeometry(ModuleGeometry):
     def __init__(self,
                  display_name: str,
                  model: ModuleModel,
+                 module_type: ModuleType,
                  offset: Point,
                  overall_height: float,
                  height_over_labware: float,
@@ -250,7 +258,7 @@ class ThermocyclerGeometry(ModuleGeometry):
                                      conform to this level.
         """
         super().__init__(
-            display_name, model, offset, overall_height,
+            display_name, model, module_type, offset, overall_height,
             height_over_labware, parent, api_level)
         self._lid_height = lid_height
         self._lid_status = 'open'   # Needs to reflect true status
@@ -309,6 +317,11 @@ def _load_from_v1(definition: Dict[str, Any],
         'thermocycler': ThermocyclerModuleModel.THERMOCYCLER_V1,
         'magdeck': MagneticModuleModel.MAGNETIC_V1,
         'tempdeck': TemperatureModuleModel.TEMPERATURE_V1}
+    type_lookup = {
+        'thermocycler': ModuleType.THERMOCYCLER,
+        'tempdeck': ModuleType.TEMPERATURE,
+        'magdeck': ModuleType.MAGNETIC
+    }
     model = model_lookup[mod_name]
     offset = Point(definition["labwareOffset"]["x"],
                    definition["labwareOffset"]["y"],
@@ -322,6 +335,7 @@ def _load_from_v1(definition: Dict[str, Any],
         mod: ModuleGeometry = \
             ThermocyclerGeometry(definition["displayName"],
                                  model,
+                                 type_lookup[mod_name],
                                  offset,
                                  overall_height,
                                  height_over_labware,
@@ -331,6 +345,7 @@ def _load_from_v1(definition: Dict[str, Any],
     else:
         mod = ModuleGeometry(definition['displayName'],
                              model,
+                             type_lookup[mod_name],
                              offset,
                              overall_height,
                              height_over_labware,
@@ -370,6 +385,7 @@ def _load_from_v2(definition: Dict[str, Any],
         'overall_height': definition['dimensions']['bareOverallHeight'],
         'height_over_labware': definition['dimensions']['overLabwareHeight'],
         'model': module_model_from_string(definition['model']),
+        'module_type': ModuleType.from_str(definition['moduleType']),
         'display_name': definition['displayName']
     }
     if definition['moduleType'] in {

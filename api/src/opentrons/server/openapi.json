@@ -1293,14 +1293,26 @@
                       "items": {
                         "description": "An object identifying a module",
                         "type": "object",
-                        "required": ["model", "name", "port", "serial", "revision", "fwVersion", "status", "data"],
+                        "required": ["model", "moduleModel", "name", "displayName", "port", "serial", "revision", "fwVersion", "status", "data", "hasAvailableUpdate"],
                         "properties": {
+                          "hasAvailableUpdate": {
+                            "description": "if set, a module update is available",
+                            "type": "boolean"
+                          },
                           "name": {
-                            "description": "A machine readable identifying name for a module. Provided for backup compatibility. Prefer use of model",
+                            "description": "A machine readable identifying name for a module. Provided for backcompatibility. Prefer use of moduleModel",
+                            "type": "string"
+                          },
+                          "moduleModel": {
+                            "description": "The model of the module, suitable for looking up the definition (e.g. magneticModuleV1)",
+                            "type": "string"
+                          },
+                          "displayName": {
+                            "description": "A human readable description of the module. Provided for backcompatibility. Prefer looking up the display name in the module definition",
                             "type": "string"
                           },
                           "model": {
-                            "description": "The name of the module model (e.g. magneticModuleV1) suitable for looking up the module definition",
+                            "description": "The old name of the module hardware revision (e.g. temp_deck_v4.0). Provided for backcompatibility. Prefer use of revision",
                             "type": "string"
                           },
                           "port": {
@@ -1341,12 +1353,15 @@
                     "value": {
                       "modules": [
                         {
-                          "model": "magneticModuleV1",
+                          "model": "mag_deck_v4.0",
                           "name": "magdeck",
+                          "moduleModel": "magneticModuleV1",
+                          "displayName": "magdeck",
                           "port": "tty01_magdeck",
                           "serial": "MDV2313121",
-                          "revision": "V23",
+                          "revision": "mag_deck_v4.0",
                           "fwVersion": "2.1.3",
+                          "hasAvailableUpdate": true,
                           "status": "engaged",
                           "data": {
                             "engaged": true,
@@ -1361,13 +1376,16 @@
                     "value": {
                       "modules": [
                         {
-                          "model": "temperatureModuleV2",
+                          "moduleModel": "temperatureModuleV2",
+                          "model": "temp_deck_v20",
                           "name": "tempdeck",
+                          "displayName": "tempdeck",
                           "port": "tty2_tempdeck",
                           "serial": "TDV20231231",
-                          "revision": "V20",
+                          "revision": "temp_deck_v20",
                           "fwVersion": "1.2.0",
                           "status": "cooling",
+                          "hasAvailableUpdate": false,
                           "data": {
                             "currentTemp": 25,
                             "targetTemp": 10
@@ -1381,12 +1399,15 @@
                     "value": {
                       "modules": [
                         {
-                          "model": "thermocyclerModuleV1",
+                          "model": "thermocycler_v10",
+                          "moduleModel": "thermocyclerModuleV1",
+                          "displayName": "thermocycler",
                           "name": "thermocycler",
                           "port": "tty3_thermocycler",
                           "serial": "TCV1006052018",
-                          "model": "V10",
+                          "model": "thermocycler_v10",
                           "fwVersion": "1.0.0",
+                          "hasAvailableUpdate": false,
                           "status": "cooling",
                           "data": {
                             "lid": "closed",
