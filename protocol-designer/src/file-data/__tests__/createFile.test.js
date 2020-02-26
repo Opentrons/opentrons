@@ -1,115 +1,99 @@
 // @flow
 import Ajv from 'ajv'
+import isEmpty from 'lodash/isEmpty'
 import protocolV3Schema from '@opentrons/shared-data/protocol/schemas/3.json'
 import protocolV4Schema from '@opentrons/shared-data/protocol/schemas/4.json'
 import labwareV2Schema from '@opentrons/shared-data/labware/schemas/2.json'
-
 import { createFile } from '../selectors'
-import { engageMagnetProtocolFixture } from '../__fixtures__/engageMagnetProtocolFixture'
-import { noModulesProtocolFixture } from '../__fixtures__/noModulesProtocolFixture'
+import {
+  fileMetadata,
+  dismissedWarnings,
+  ingredients,
+  ingredLocations,
+  labwareEntities,
+  labwareNicknamesById,
+  labwareDefsByURI,
+  pipetteEntities,
+} from '../__fixtures__/createFile/commonFields'
+import * as engageMagnet from '../__fixtures__/createFile/engageMagnet'
+import * as noModules from '../__fixtures__/createFile/noModules'
+
+const getAjvValidator = _protocolSchema => {
+  const ajv = new Ajv({
+    allErrors: true,
+    jsonPointers: true,
+  })
+  // v3 and v4 protocol schema contain reference to v2 labware schema, so give AJV access to it
+  ajv.addSchema(labwareV2Schema)
+  const validateProtocol = ajv.compile(_protocolSchema)
+  return validateProtocol
+}
+
+const expectResultToMatchSchema = (result, _protocolSchema): void => {
+  const validate = getAjvValidator(_protocolSchema)
+  const valid = validate(result)
+  const validationErrors = validate.errors
+
+  if (validationErrors) {
+    console.log(JSON.stringify(validationErrors, null, 4))
+  }
+  expect(valid).toBe(true)
+  expect(validationErrors).toBe(null)
+}
 
 describe('createFile selector', () => {
   it('should return a schema-valid JSON V3 protocol, if the protocol has NO modules', () => {
-    const ajv = new Ajv({
-      allErrors: true,
-      jsonPointers: true,
-    })
-    // v4 protocol schema contains reference to v2 labware schema, so give AJV access to it
-    ajv.addSchema(labwareV2Schema)
-    const validateProtocolV3 = ajv.compile(protocolV3Schema)
-
-    const {
-      fileMetadata,
-      initialRobotState,
-      robotStateTimeline,
-      dismissedWarnings,
-      ingredients,
-      ingredLocations,
-      savedStepForms,
-      orderedStepIds,
-      labwareEntities,
-      moduleEntities,
-      pipetteEntities,
-      labwareNicknamesById,
-      labwareDefsByURI,
-    } = noModulesProtocolFixture
-
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     const result = createFile.resultFunc(
       fileMetadata,
-      initialRobotState,
-      robotStateTimeline,
+      noModules.initialRobotState,
+      noModules.robotStateTimeline,
       dismissedWarnings,
       ingredients,
       ingredLocations,
-      savedStepForms,
-      orderedStepIds,
+      noModules.savedStepForms,
+      noModules.orderedStepIds,
       labwareEntities,
-      moduleEntities,
+      noModules.moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
-      labwareDefsByURI
+      labwareDefsByURI,
+      false // isV4Protocol
     )
 
-    const valid = validateProtocolV3(result)
-    const validationErrors = validateProtocolV3.errors
+    expectResultToMatchSchema(result, protocolV3Schema)
 
-    if (validationErrors) {
-      console.log(JSON.stringify(validationErrors, null, 4))
-    }
-    expect(valid).toBe(true)
-    expect(validationErrors).toBe(null)
+    // check for false positives: if the output is lacking these entities, we don't
+    // have the opportunity to validate their part of the schema
+    expect(!isEmpty(result.labware)).toBe(true)
+    expect(!isEmpty(result.pipettes)).toBe(true)
   })
 
   it('should return a schema-valid JSON V4 protocol, if the protocol does have modules', () => {
-    const ajv = new Ajv({
-      allErrors: true,
-      jsonPointers: true,
-    })
-    // v4 protocol schema contains reference to v2 labware schema, so give AJV access to it
-    ajv.addSchema(labwareV2Schema)
-    const validateProtocolV4 = ajv.compile(protocolV4Schema)
-
-    const {
-      fileMetadata,
-      initialRobotState,
-      robotStateTimeline,
-      dismissedWarnings,
-      ingredients,
-      ingredLocations,
-      savedStepForms,
-      orderedStepIds,
-      labwareEntities,
-      moduleEntities,
-      pipetteEntities,
-      labwareNicknamesById,
-      labwareDefsByURI,
-    } = engageMagnetProtocolFixture
-
     // $FlowFixMe TODO(IL, 2020-02-25): Flow doesn't have type for resultFunc
     const result = createFile.resultFunc(
       fileMetadata,
-      initialRobotState,
-      robotStateTimeline,
+      engageMagnet.initialRobotState,
+      engageMagnet.robotStateTimeline,
       dismissedWarnings,
       ingredients,
       ingredLocations,
-      savedStepForms,
-      orderedStepIds,
+      engageMagnet.savedStepForms,
+      engageMagnet.orderedStepIds,
       labwareEntities,
-      moduleEntities,
+      engageMagnet.moduleEntities,
       pipetteEntities,
       labwareNicknamesById,
-      labwareDefsByURI
+      labwareDefsByURI,
+      true // isV4Protocol
     )
 
-    const valid = validateProtocolV4(result)
-    const validationErrors = validateProtocolV4.errors
+    expectResultToMatchSchema(result, protocolV4Schema)
 
-    if (validationErrors) {
-      console.log(JSON.stringify(validationErrors, null, 4))
-    }
-    expect(valid).toBe(true)
-    expect(validationErrors).toBe(null)
+    // check for false positives: if the output is lacking these entities, we don't
+    // have the opportunity to validate their part of the schema
+    expect(!isEmpty(result.modules)).toBe(true)
+    expect(!isEmpty(result.labware)).toBe(true)
+    expect(!isEmpty(result.pipettes)).toBe(true)
   })
 })

@@ -77,6 +77,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
+  stepFormSelectors.getIsV4Protocol,
   (
     fileMetadata,
     initialRobotState,
@@ -90,15 +91,12 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
     moduleEntities,
     pipetteEntities,
     labwareNicknamesById,
-    labwareDefsByURI
+    labwareDefsByURI,
+    isV4Protocol
   ) => {
     const { author, description, created } = fileMetadata
     const name = fileMetadata.protocolName || 'untitled'
     const lastModified = fileMetadata.lastModified
-
-    // export as V4 schema protocol if protocol has modules, otherwise as V3
-    // TODO IMMEDIATELY is there another selector for "exportAsV4" that the export warning modal uses???
-    const exportAsV4 = !isEmpty(moduleEntities)
 
     const pipettes = mapValues(
       initialRobotState.pipettes,
@@ -206,7 +204,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       labwareDefinitions,
     }
 
-    if (exportAsV4) {
+    if (isV4Protocol) {
       return {
         ...protocolFile,
         $otSharedSchema: '#/protocol/schemas/4',

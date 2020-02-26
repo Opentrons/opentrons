@@ -119,6 +119,7 @@ export const getModuleEntities: Selector<ModuleEntities> = createSelector(
   rs => rs.moduleInvariantProperties
 )
 
+/** If there are any modules, export as a v4 protocol. Otherwise, export as v3. */
 export const getIsV4Protocol: Selector<boolean> = createSelector(
   getModuleEntities,
   moduleEntities => !isEmpty(moduleEntities)
