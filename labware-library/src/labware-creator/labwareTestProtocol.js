@@ -2,14 +2,39 @@
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Options } from './fields'
 
-const tiprackForPipette = {
-  P10_Single: 'opentrons_96_tiprack_10ul',
-  P300_Single: 'opentrons_96_tiprack_300ul',
-  P1000_Single: 'opentrons_96_tiprack_1000ul',
+const pipettes = {
+  'P20 Single GEN2': {
+    loadName: 'p20_single_gen2',
+    tiprack: 'opentrons_96_tiprack_10ul',
+  },
+  'P300 Single GEN2': {
+    loadName: 'p300_single_gen2',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  'P1000 Single GEN2': {
+    loadName: 'p1000_single_gen2',
+    tiprack: 'opentrons_96_tiprack_1000ul',
+  },
+  'P10 Single GEN1': {
+    loadName: 'p10_single',
+    tiprack: 'opentrons_96_tiprack_10ul',
+  },
+  'P50 Single GEN1': {
+    loadName: 'p50_single',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  'P300 Single GEN1': {
+    loadName: 'p300_single',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  'P1000 Single GEN1': {
+    loadName: 'p1000_single',
+    tiprack: 'opentrons_96_tiprack_1000ul',
+  },
 }
 
-export const pipetteNameOptions: Options = Object.keys(tiprackForPipette).map(
-  pipetteName => ({ name: pipetteName.replace(/_/g, ' '), value: pipetteName })
+export const pipetteNameOptions: Options = Object.keys(pipettes).map(
+  pipetteName => ({ name: pipetteName, value: pipetteName })
 )
 
 type LabwareTestProtocolArgs = {|
@@ -21,8 +46,8 @@ export const labwareTestProtocol = ({
   pipetteName,
   definition,
 }: LabwareTestProtocolArgs): string => {
-  const instrumentName = pipetteName.toLowerCase()
-  const tiprackLoadName = tiprackForPipette[pipetteName]
+  const instrumentName = pipettes[pipetteName].loadName
+  const tiprackLoadName = pipettes[pipetteName].tiprack
   const mount = 'right' // NOTE: for now, we'll ONLY use right so that mount-offset issues are reduced
 
   return `import json
