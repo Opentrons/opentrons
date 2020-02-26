@@ -43,7 +43,7 @@ import { getSecurityType, hasSecurityType } from './utils'
 import type { State } from '../../../types'
 import type { RequestState } from '../../../robot-api/types'
 import type { ViewableRobot } from '../../../discovery/types'
-import type { PostDisconnectNetworkAction } from '../../../networking/types'
+import type { PostDisconnectNetworkAction } from '../../../networking'
 
 type SelectNetworkProps = {| robot: ViewableRobot |}
 
@@ -171,7 +171,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
         handleOnValueChange={handleOnValueChange}
       />
       <SelectNetworkModal
-        addKey={file => dispatch(addWifiKey(robot, file))}
+        addKey={(file: File) => dispatch(addWifiKey(robot, file))}
         close={
           showConfig
             ? dispatch(clearConfigureWifiResponse(robot))

@@ -11,11 +11,10 @@ import { getWifiList } from '../../../networking'
 import type { WifiNetworkList, WifiSecurityType } from '../../../networking'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { State } from '../../../types'
+import type { NetworkingType } from './types'
 
 import { getActiveSsid, getSecurityType } from './utils'
 import { CONNECT } from './constants'
-
-type NetworkingType = 'connect' | 'disconnect' | 'join'
 
 export const useStateSelectNetwork = (list: WifiNetworkList) => {
   const activeSsid = getActiveSsid(list)
