@@ -1,51 +1,35 @@
 import pytest
 
 from opentrons.protocol_api.util import HardwareManager, AxisMaxSpeeds
-from opentrons.hardware_control import API, adapters, types
+from opentrons.hardware_control import API, adapters, types, ThreadManager
 
 
 def test_hw_manager(loop):
     # When built without an input it should build its own adapter
     mgr = HardwareManager(None)
-    assert mgr._is_orig
-    assert mgr._built_own_adapter
     adapter = mgr.hardware
     # When "disconnecting" from its own simulator, the adapter should
     # be stopped and a new one created
-    assert adapter.is_alive()
     new = mgr.reset_hw()
     assert new is not adapter
-    assert not adapter.is_alive()
     # When deleted, the self-created adapter should be stopped
     del mgr
-    assert not new.is_alive()
 
     # When built with a hardware API input it should wrap it with a new
     # synchronous adapter and not build its own API
     mgr = HardwareManager(
         API.build_hardware_simulator(loop=loop))
     assert isinstance(mgr.hardware, adapters.SynchronousAdapter)
-    assert not mgr._is_orig
-    assert mgr._built_own_adapter
     passed = mgr.hardware
     # When disconnecting from a real external adapter, it should create
-    # its own simulator and should stop the old hardware thread
+    # its own simulator and should
     new = mgr.reset_hw()
     assert new is not passed
-    assert mgr._is_orig
-    assert mgr._built_own_adapter
-    assert not passed.is_alive()
 
-    sa = adapters.SynchronousAdapter.build(API.build_hardware_simulator)
+    sa = ThreadManager(API.build_hardware_simulator).sync
     # When connecting to an adapter it shouldn’t rewrap it
     assert mgr.set_hw(sa) is sa
-    # And should kill its old one
-    assert not new.is_alive()
-    # it should know it didn't build its own adapter
-    assert not mgr._built_own_adapter
     del mgr
-    # but not its new one, even if deleted
-    assert sa.is_alive()
 
 
 def test_max_speeds_userdict():

@@ -167,13 +167,15 @@ class Controller:
             self,
             port: str,
             model: str,
-            interrupt_callback: modules.InterruptCallback
+            interrupt_callback: modules.InterruptCallback,
+            loop: asyncio.AbstractEventLoop
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
-            interrupt_callback=interrupt_callback)
+            interrupt_callback=interrupt_callback,
+            loop=loop)
 
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)

@@ -75,7 +75,6 @@ class InstrumentContext(CommandPublisher):
         self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
         self._log = log_parent.getChild(repr(self))
-        self._log.info("attached")
         self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = FlowRates(self)
