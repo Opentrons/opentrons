@@ -6,7 +6,7 @@ import { Portal } from '../../../portal'
 
 import { ConnectDisconnectModal } from './ConnectDisconnectModal'
 import { SpinnerModal } from '@opentrons/components'
-import { WifiConnectModal } from './WifiConnectModal'
+import { NetworkAlertModal } from './NetworkAlertModal'
 
 // import type { NetworkingType } from '../types'
 
@@ -36,7 +36,7 @@ export const SelectNetworkModal = ({
 }: Object) => {
   const showSpinner = connectingTo || pending
   const showConfig = configRequest && !!(configError || configResponse)
-  const showWifiConnect = showConfig || failure
+  const showAlert = showConfig || failure
 
   return (
     <Portal>
@@ -60,8 +60,8 @@ export const SelectNetworkModal = ({
           dispatchConfigure={dispatchConfigure}
         />
       )}
-      {showWifiConnect && (
-        <WifiConnectModal
+      {showAlert && (
+        <NetworkAlertModal
           error={showConfig ? configError : error}
           request={showConfig ? configRequest : { ssid: previousSsid }}
           response={showConfig ? configResponse : response}

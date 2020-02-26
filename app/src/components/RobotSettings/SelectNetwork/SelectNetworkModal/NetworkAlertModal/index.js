@@ -29,7 +29,7 @@ const failure = ssid =>
 
 const ERROR_MESSAGE_RE = /Error: (.*)$/
 
-export function WifiConnectModal(props: WifiConnectModalProps) {
+export function NetworkAlertModal(props: WifiConnectModalProps) {
   const { request, response, error, close } = props
   const { ssid } = request
 
