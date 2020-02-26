@@ -85,12 +85,8 @@ class SessionManager:
         self.z_value = None
         self.cp = None
         self.pipette_id = None
-        self.adapter = hardware
+        self.adapter = hardware.sync
         self.current_transform = identity_deck_transform()
-
-        if feature_flags.use_protocol_api_v2():
-            self.adapter = hardware_control.adapters.SynchronousAdapter(
-                hardware)
 
         robot_configs.backup_configuration(self.adapter.config)
         # Start from fresh identity matrix every calibration session

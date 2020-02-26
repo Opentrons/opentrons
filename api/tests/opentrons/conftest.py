@@ -347,8 +347,7 @@ async def hardware(request, loop, virtual_smoothie_env):
                     reason="requires inotify (linux only)")
 @pytest.fixture
 def sync_hardware(request, loop, virtual_smoothie_env):
-    hardware = adapters.SynchronousAdapter.build(
-        API.build_hardware_controller)
+    hardware = ThreadManager(API.build_hardware_controller).sync
     try:
         yield hardware
     finally:

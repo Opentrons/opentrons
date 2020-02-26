@@ -4,6 +4,7 @@ import threading
 import logging
 import asyncio
 import functools
+from .adapters import SynchronousAdapter
 from .types import HardwareAPILike
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -20,12 +21,20 @@ class ThreadManager(HardwareAPILike):
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 
+    This class spawns a worker thread and starts an event loop within.
+    It then calls the async builder parameter within that worker thread's
+    event loop passing thru all args and kwargs and injecting the worker
+    thread's loop as a kwarg to the builder. The resulting built object
+    is stored as a member of the class, and a synchronous interface to
+    the managed object's members is also exposed for convenience.
+
     Example
     -------
     .. code-block::
     >>> from opentrons.hardware_control import API, ThreadManager
     >>> api_single_thread = ThreadManager(API.build_hardware_simulator)
-    >>> await api_single_thread.home()
+    >>> await api_single_thread.home() # call as awaitable async
+    >>> api_single_thread.sync.home() # call as blocking sync
     """
 
     def __init__(self, builder, *args, **kwargs) -> None:
@@ -36,6 +45,7 @@ class ThreadManager(HardwareAPILike):
 
         self._loop = None
         self.managed_obj = None
+        self._sync_managed_obj = None
         is_running = threading.Event()
         self._is_running = is_running
         target = object.__getattribute__(self, '_build_and_start_loop')
@@ -51,15 +61,21 @@ class ThreadManager(HardwareAPILike):
         asyncio.set_event_loop(loop)
         self._loop = loop
         try:
-            self.managed_obj = loop.run_until_complete(builder(*args,
-                                                            loop=loop,
-                                                            **kwargs))
+            managed_obj = loop.run_until_complete(builder(*args,
+                                                          loop=loop,
+                                                          **kwargs))
+            self.managed_obj = managed_obj
+            self._sync_managed_obj = SynchronousAdapter(managed_obj)
         except Exception:
             MODULE_LOG.exception('Exception in Thread Manager build')
         finally:
             object.__getattribute__(self, '_is_running').set()
             loop.run_forever()
             loop.close()
+
+    @property
+    def sync(self):
+        return self._sync_managed_obj
 
     def __repr__(self):
         return '<ThreadManager>'
@@ -101,7 +117,7 @@ class ThreadManager(HardwareAPILike):
         elif asyncio.iscoroutine(attr):
             # Return awaitable of coroutine properties run in managed thread/loop
             fut = asyncio.run_coroutine_threadsafe(attr, loop)
-            wrapped = asyncio.wrap_future(fut)
+            wrapped = asyncio.wrap_future(fut, loop=asyncio.get_event_loop())
             return wrapped
 
         return attr

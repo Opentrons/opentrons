@@ -4,7 +4,6 @@ import asyncio
 import functools
 from typing import Any
 
-from .thread_manager import ThreadManager
 from .types import HardwareAPILike
 
 
@@ -23,9 +22,10 @@ class SynchronousAdapter(HardwareAPILike):
     and event loop (obj._loop). Attempting to instantiate a SynchronousAdapter
     in the main thread within it's event loop will hang unless the adapted
     async object is running on its own thread and contained loop.
-    In these Cases, it is often helpful to pass in an instance of
-    :py:class:`opentrons.hardware_control.ThreadManager` or use the
-    :py:meth:`SynchronousAdapter.build` factory to create one for you.
+    In these Cases, it is often helpful to instantiate the API via the
+    :py:class:`opentrons.hardware_control.ThreadManager` to ensure that
+    all API coroutines are resolved in a thread/loop other than the
+    main thread/loop.
 
     Example
     -------
@@ -33,24 +33,9 @@ class SynchronousAdapter(HardwareAPILike):
     >>> import opentrons.hardware_control as hc
     >>> import opentrons.hardware_control.adapters as adapts
     >>> api = hc.API.build_hardware_simulator()
-    >>> synch = adapts.SynchronousAdapter(api)
-    >>> synch.home()
+    >>> sync_api = adapts.SynchronousAdapter(api)
+    >>> sync_api.home()
     """
-
-    @classmethod
-    def build(cls, builder, *args, **kwargs) -> 'SynchronousAdapter':
-        """ Build a hardware control API and initialize the adapter in one call
-
-        :param builder: the builder method to use (e.g.
-                :py:meth:`hardware_control.API.build_hardware_simulator`)
-        :param args: Args to forward to the builder method
-        :param kwargs: Kwargs to forward to the builder method
-        """
-
-        no_loop_args = [arg for arg in args
-                        if not isinstance(arg, asyncio.AbstractEventLoop)]
-        managed_obj = ThreadManager(builder, *no_loop_args, **kwargs)
-        return cls(managed_obj)
 
     def __init__(self, asynchronous_instance: Any) -> None:
         """ Build the SynchronousAdapter.

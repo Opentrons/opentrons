@@ -14,7 +14,7 @@ from numpy.linalg import inv  # type: ignore
 from numpy import dot, array  # type: ignore
 import opentrons
 from opentrons import types
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import adapters, API, ThreadManager
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.config import robot_configs, SystemArchitecture, ARCHITECTURE
 from opentrons.util.linal import (solve, add_z, apply_transform,
@@ -643,17 +643,15 @@ def main(loop=None):
         default='info')
     args = parser.parse_args()
 
-    api = opentrons.hardware_control.API
-    hardware = adapters.SynchronousAdapter.build(
-        api.build_hardware_controller)
-    hardware.set_lights(rails=True)
+    sync_hardware = ThreadManager(API.build_hardware_controller).sync
+    sync_hardware.set_lights(rails=True)
     # Register hook to reboot the robot after exiting this tool (regardless of
     # whether this process exits normally or not)
     atexit.register(notify_and_restart)
-    backup_configuration_and_reload(hardware)
+    backup_configuration_and_reload(sync_hardware)
     cli = CLITool(
         point_set=get_calibration_points(),
-        hardware=hardware,
+        hardware=sync_hardware,
         pickup_tip=args.pickupTip,
         loop=loop,
         log_level=args.log_level)

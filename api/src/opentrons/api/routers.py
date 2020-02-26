@@ -10,14 +10,15 @@ class MainRouter:
         self._broker = Broker()
         self._notifications = Notifications(topics, self._broker, loop=loop)
 
+        checked_hw = None
         if hardware:
-            hardware = adapters.SynchronousAdapter(hardware)
+            checked_hw = hardware.sync
         self.session_manager = SessionManager(
-            hardware=hardware,
+            hardware=checked_hw,
             loop=loop,
             broker=self._broker,
             lock=lock)
-        self.calibration_manager = CalibrationManager(hardware=hardware,
+        self.calibration_manager = CalibrationManager(hardware=checked_hw,
                                                       loop=loop,
                                                       broker=self._broker,
                                                       lock=lock)

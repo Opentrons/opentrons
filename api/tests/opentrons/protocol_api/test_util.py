@@ -26,11 +26,9 @@ def test_hw_manager(loop):
     new = mgr.reset_hw()
     assert new is not passed
 
-    sa = adapters.SynchronousAdapter.build(API.build_hardware_simulator)
+    sa = ThreadManager(API.build_hardware_simulator).sync
     # When connecting to an adapter it shouldn’t rewrap it
     assert mgr.set_hw(sa) is sa
-    # And should kill its old one
-    # it should know it didn't build its own adapter
     del mgr
 
 

@@ -5,7 +5,8 @@ import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
-from opentrons.hardware_control import types, adapters, API, HardwareAPILike
+from opentrons.hardware_control import (types, adapters, API,
+                                        HardwareAPILike, ThreadManager)
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
@@ -186,11 +187,12 @@ class AxisMaxSpeeds(UserDict):
 
 class HardwareManager:
     def __init__(self, hardware):
-        if None is hardware:
-            self._current = adapters.SynchronousAdapter.build(
-                API.build_hardware_simulator)
+        if hardware is None:
+            self._current = ThreadManager(API.build_hardware_simulator).sync
         elif isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
+        elif isinstance(hardware, ThreadManager):
+            self._current = adapters.SynchronousAdapter(hardware.managed_obj)
         else:
             self._current = adapters.SynchronousAdapter(hardware)
 
@@ -201,6 +203,8 @@ class HardwareManager:
     def set_hw(self, hardware):
         if isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
+        elif isinstance(hardware, ThreadManager):
+            self._current = hardware.sync
         elif isinstance(hardware, HardwareAPILike):
             self._current = adapters.SynchronousAdapter(hardware)
         else:
@@ -210,8 +214,7 @@ class HardwareManager:
         return self._current
 
     def reset_hw(self):
-        self._current = adapters.SynchronousAdapter.build(
-            API.build_hardware_simulator)
+        self._current = ThreadManager(API.build_hardware_simulator).sync
         return self._current
 
 
