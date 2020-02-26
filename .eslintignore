@@ -1,5 +1,6 @@
 api/**
 update-server/**
+robot-server/**
 **/node_modules/**
 **/coverage/**
 **/dist/**
