@@ -50,12 +50,16 @@ class ThreadManager(HardwareAPILike):
         loop = asyncio.new_event_loop()
         asyncio.set_event_loop(loop)
         self._loop = loop
-        self.managed_obj = loop.run_until_complete(builder(*args,
-                                                           loop=loop,
-                                                           **kwargs))
-        object.__getattribute__(self, '_is_running').set()
-        loop.run_forever()
-        loop.close()
+        try:
+            self.managed_obj = loop.run_until_complete(builder(*args,
+                                                            loop=loop,
+                                                            **kwargs))
+        except Exception:
+            MODULE_LOG.exception('Exception in Thread Manager build')
+        finally:
+            object.__getattribute__(self, '_is_running').set()
+            loop.run_forever()
+            loop.close()
 
     def __repr__(self):
         return '<ThreadManager>'
