@@ -141,6 +141,14 @@ function getWarningContent({
   return null
 }
 
+// TODO (ka 2020-2-26): Update this knowledgebase link when available
+export const v4WarningContent = (
+  <p>
+    {i18n.t(`alert.hint.export_v4_protocol.body`)} <br />
+    <KnowledgeBaseLink to="protocolSteps">Learn more here.</KnowledgeBaseLink>
+  </p>
+)
+
 export function FileSidebar(props: Props) {
   const {
     canDownload,
@@ -190,6 +198,7 @@ export function FileSidebar(props: Props) {
   const blockingV4ExportHint = useBlockingHint({
     enabled: isV4Protocol && showV4ExportWarning,
     hintKey: 'export_v4_protocol',
+    content: v4WarningContent,
     handleCancel: () => setShowV4ExportWarning(false),
     handleContinue: () => {
       setShowV4ExportWarning(false)

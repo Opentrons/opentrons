@@ -11,14 +11,15 @@ import { i18n } from '../../localization'
 import styles from './hints.css'
 import type { HintKey } from '../../tutorial'
 
-type Props = {|
+export type HintProps = {|
   hintKey: HintKey,
   handleCancel: () => mixed,
   handleContinue: () => mixed,
+  content: Node,
 |}
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
-const BlockingHint = (props: Props) => {
+const BlockingHint = (props: HintProps) => {
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
 
@@ -46,7 +47,7 @@ const BlockingHint = (props: Props) => {
         onCancelClick={onCancelClick}
         onContinueClick={onContinueClick}
       >
-        {i18n.t(`alert.hint.${hintKey}.body`)}
+        <div className={styles.hint_contents}>{props.content}</div>
         <div>
           <CheckboxField
             className={styles.dont_show_again}
@@ -60,16 +61,19 @@ const BlockingHint = (props: Props) => {
   )
 }
 
-export const useBlockingHint = (args: {|
+export type HintArgs = {|
   /** `enabled` should be a condition that the parent uses to toggle whether the hint should be active or not.
    * If the hint is enabled but has been dismissed, it will automatically call `handleContinue` when enabled.
    * useBlockingHint expects the parent to disable the hint on cancel/continue */
   enabled: boolean,
   hintKey: HintKey,
+  content: Node,
   handleCancel: () => mixed,
   handleContinue: () => mixed,
-|}): ?Node => {
-  const { enabled, hintKey, handleCancel, handleContinue } = args
+|}
+
+export const useBlockingHint = (args: HintArgs): ?Node => {
+  const { enabled, hintKey, handleCancel, handleContinue, content } = args
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 
   if (isDismissed) {
@@ -88,6 +92,7 @@ export const useBlockingHint = (args: {|
       hintKey={hintKey}
       handleCancel={handleCancel}
       handleContinue={handleContinue}
+      content={content}
     />
   )
 }

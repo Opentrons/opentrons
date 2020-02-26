@@ -102,6 +102,7 @@ export const LabwareSelectionModal = (props: Props) => {
   const blockingCustomLabwareHint = useBlockingHint({
     enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
+    content: <p>{i18n.t(`alert.hint.custom_labware_with_modules.body`)}</p>,
     handleCancel: () => setEnqueuedLabwareType(null),
     handleContinue: () => {
       setEnqueuedLabwareType(null)
