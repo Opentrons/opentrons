@@ -1,6 +1,9 @@
 // @flow
 
-import type { RobotApiRequestMeta } from '../robot-api/types'
+import type {
+  RobotApiRequestMeta,
+  RobotApiErrorResponse,
+} from '../robot-api/types'
 
 import typeof {
   FETCH_STATUS,
@@ -12,6 +15,9 @@ import typeof {
   POST_WIFI_CONFIGURE,
   POST_WIFI_CONFIGURE_SUCCESS,
   POST_WIFI_CONFIGURE_FAILURE,
+  FETCH_WIFI_KEYS,
+  FETCH_WIFI_KEYS_SUCCESS,
+  FETCH_WIFI_KEYS_FAILURE,
 } from './constants'
 
 import * as ApiTypes from './api-types'
@@ -58,7 +64,7 @@ export type FetchWifiListSuccessAction = {|
 
 export type FetchWifiListFailureAction = {|
   type: FETCH_WIFI_LIST_FAILURE,
-  payload: {| robotName: string, error: { ... } |},
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -78,7 +84,27 @@ export type PostWifiConfigureSuccessAction = {|
 
 export type PostWifiConfigureFailureAction = {|
   type: POST_WIFI_CONFIGURE_FAILURE,
-  payload: {| robotName: string, error: { ... } |},
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// fetch wifi keys
+
+export type FetchWifiKeysAction = {|
+  type: FETCH_WIFI_KEYS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiKeysSuccessAction = {|
+  type: FETCH_WIFI_KEYS_SUCCESS,
+  payload: {| robotName: string, wifiKeys: Array<ApiTypes.WifiKey> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiKeysFailureAction = {|
+  type: FETCH_WIFI_KEYS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -94,6 +120,9 @@ export type NetworkingAction =
   | PostWifiConfigureAction
   | PostWifiConfigureSuccessAction
   | PostWifiConfigureFailureAction
+  | FetchWifiKeysAction
+  | FetchWifiKeysSuccessAction
+  | FetchWifiKeysFailureAction
 
 // state types
 
@@ -101,6 +130,7 @@ export type PerRobotNetworkingState = $Shape<{|
   internetStatus: ApiTypes.InternetStatus,
   interfaces: ApiTypes.InterfaceStatusMap,
   wifiList: Array<ApiTypes.WifiNetwork>,
+  wifiKeys: Array<ApiTypes.WifiKey>,
 |}>
 
 export type NetworkingState = $Shape<{|
