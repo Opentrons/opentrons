@@ -32,6 +32,7 @@ class ConfigureArgsError(Exception):
 class DisconnectArgsError(Exception):
     pass
 
+
 async def list_networks(request: web.Request) -> web.Response:
     """
     Get request will return a list of discovered ssids:
