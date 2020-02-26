@@ -3,7 +3,10 @@
 import * as Constants from './constants'
 import * as Types from './types'
 
-import type { RobotApiRequestMeta } from '../robot-api/types'
+import type {
+  RobotApiRequestMeta,
+  RobotApiErrorResponse,
+} from '../robot-api/types'
 
 export const fetchStatus = (robotName: string): Types.FetchStatusAction => ({
   type: Constants.FETCH_STATUS,
@@ -24,7 +27,7 @@ export const fetchStatusSuccess = (
 
 export const fetchStatusFailure = (
   robotName: string,
-  error: { ... },
+  error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchStatusFailureAction => ({
   type: Constants.FETCH_STATUS_FAILURE,
@@ -52,7 +55,7 @@ export const fetchWifiListSuccess = (
 
 export const fetchWifiListFailure = (
   robotName: string,
-  error: { ... },
+  error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchWifiListFailureAction => ({
   type: Constants.FETCH_WIFI_LIST_FAILURE,
@@ -81,7 +84,7 @@ export const postWifiConfigureSuccess = (
 
 export const postWifiConfigureFailure = (
   robotName: string,
-  error: { ... },
+  error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
 ): Types.PostWifiConfigureFailureAction => ({
   type: Constants.POST_WIFI_CONFIGURE_FAILURE,
@@ -109,7 +112,7 @@ export const fetchWifiKeysSuccess = (
 
 export const fetchWifiKeysFailure = (
   robotName: string,
-  error: { ... },
+  error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchWifiKeysFailureAction => ({
   type: Constants.FETCH_WIFI_KEYS_FAILURE,
