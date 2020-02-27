@@ -2,6 +2,7 @@
 import React, { useCallback } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
+import semver from 'semver'
 
 import {
   useDispatchApiRequest,
@@ -23,7 +24,7 @@ import {
 } from '../../../http-api-client'
 import { getConfig } from '../../../config'
 
-import { startDiscovery } from '../../../discovery'
+import { getRobotApiVersion, startDiscovery } from '../../../discovery'
 import { chainActions } from '../../../util'
 
 import { IntervalWrapper } from '@opentrons/components'
@@ -48,6 +49,8 @@ import type { PostWifiDisconnectAction } from '../../../networking/types'
 
 type SelectNetworkProps = {| robot: ViewableRobot |}
 
+const API_MIN_VERSION = '3.17.0'
+
 export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   const {
     list,
@@ -57,12 +60,17 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     configRequest,
     configResponse,
     configError,
-  } = useSelector(state => stateSelector(state, robot))
+  } = useSelector((state: State) => stateSelector(state, robot))
 
-  // TODO(isk, 2/27/20): remove this feature flag
+  // TODO(isk, 2/27/20): remove this feature flag and version check
   const enableWifiDisconnect = useSelector((state: State) =>
     Boolean(getConfig(state).devInternal?.enableWifiDisconnect)
   )
+  const hasCorrectVersion = semver.gte(
+    getRobotApiVersion(robot),
+    API_MIN_VERSION
+  )
+  const showWifiDisconnect = enableWifiDisconnect || hasCorrectVersion
 
   const showConfig = configRequest && !!(configError || configResponse)
 
@@ -177,7 +185,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
         value={getActiveSsid(list)}
         disabled={connectingTo != null}
         onValueChange={handleValueChange}
-        enableWifiDisconnect={enableWifiDisconnect}
+        showWifiDisconnect={showWifiDisconnect}
       />
       <SelectNetworkModal
         addKey={(file: File) => dispatch(addWifiKey(robot, file))}
