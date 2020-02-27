@@ -97,6 +97,8 @@ async def initialize_robot() -> ThreadManager:
 
     try:
         hardware = ThreadManager(API.build_hardware_controller)
+        fw_version = await hardware.fw_version
+        hardware.clean_up()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -105,9 +107,6 @@ async def initialize_robot() -> ThreadManager:
         # manipulations that _put_ it in programming mode
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
-    else:
-        fw_version = await hardware.fw_version
-        hardware.clean_up()
 
     log.info(f"Smoothie FW version: {fw_version}")
     if fw_version != packed_smoothie_fw_ver:
