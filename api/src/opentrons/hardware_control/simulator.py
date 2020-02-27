@@ -10,6 +10,7 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
+from .pause_manager import PauseManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
 
@@ -212,13 +213,15 @@ class Simulator:
             model: str,
             interrupt_callback: modules.InterruptCallback,
             loop: asyncio.AbstractEventLoop
+            pause_manager: PauseManager,
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
             interrupt_callback=interrupt_callback,
-            loop=loop)
+            loop=loop
+            pause_manager=pause_manager)
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

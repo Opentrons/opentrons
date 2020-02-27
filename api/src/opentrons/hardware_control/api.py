@@ -15,6 +15,7 @@ from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
+from .pause_manager import PauseManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
 from . import modules
@@ -54,6 +55,7 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
+        self._pause_manager = PauseManager(loop=loop)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -389,7 +391,8 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._call_on_attached_modules("pause")
+        self._pause_manager.pause()
+        # self._call_on_attached_modules("pause")
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -402,7 +405,8 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._call_on_attached_modules("resume")
+        self._pause_manager.resume()
+        # self._call_on_attached_modules("resume")
 
     def halt(self):
         """ Immediately stop motion.
@@ -1367,7 +1371,8 @@ class API(HardwareAPILike):
                     port=port,
                     model=name,
                     interrupt_callback=self.pause_with_message,
-                    loop=self.loop)
+                    loop=self.loop,
+                    pause_manager=self._pause_manager)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

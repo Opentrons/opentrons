@@ -13,6 +13,7 @@ import opentrons.config
 from opentrons.types import Mount
 
 from . import modules
+from .pause_manager import PauseManager
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -168,14 +169,15 @@ class Controller:
             port: str,
             model: str,
             interrupt_callback: modules.InterruptCallback,
-            loop: asyncio.AbstractEventLoop
-            ) -> modules.AbstractModule:
+            loop: asyncio.AbstractEventLoop,
+            pause_manager: PauseManager) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=False,
             interrupt_callback=interrupt_callback,
-            loop=loop)
+            loop=loop
+            pause_manager=pause_manager)
 
     async def connect(self, port: str = None):
         self._smoothie_driver.connect(port)

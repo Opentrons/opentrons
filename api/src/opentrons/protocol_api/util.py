@@ -181,6 +181,18 @@ class AxisMaxSpeeds(UserDict):
         return ((k.name, v) for k, v in self.data.items())
 
 
+# TODO: This class's utility as a utility class is drying up.
+# It's only job is to ensure that the hardware a given
+# ProtocolContext references, is synchronously callable.
+# All internal calls to ProtocolContext __init__
+# or build_using, either pass a ThreadManaged API instance
+# or pass None and expect HardwareManager to create one
+# for them. It seems as though we could replace this
+# with a single if else that covers just those two cases.
+# If that were the case, perhaps it would be clearer to move
+# this logic back into the ProtocolContext definition
+# and hold onto a sync hardware api directly instead of
+# through the ._hw_manager.hardware indirection.
 class HardwareManager:
     def __init__(self, hardware):
         if hardware is None:
@@ -188,7 +200,7 @@ class HardwareManager:
         elif isinstance(hardware, adapters.SynchronousAdapter):
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
-            self._current = adapters.SynchronousAdapter(hardware.managed_obj)
+            self._current = hardware.sync
         else:
             self._current = adapters.SynchronousAdapter(hardware)
 
