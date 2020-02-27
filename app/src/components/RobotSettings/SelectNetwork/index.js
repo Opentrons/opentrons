@@ -21,6 +21,7 @@ import {
   addWifiKey,
   clearConfigureWifiResponse,
 } from '../../../http-api-client'
+import { getConfig } from '../../../config'
 
 import { startDiscovery } from '../../../discovery'
 import { chainActions } from '../../../util'
@@ -57,6 +58,11 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     configResponse,
     configError,
   } = useSelector(state => stateSelector(state, robot))
+
+  // TODO(isk, 2/27/20): remove this feature flag
+  const enableWifiDisconnect = useSelector((state: State) =>
+    Boolean(getConfig(state).devInternal?.enableWifiDisconnect)
+  )
 
   const showConfig = configRequest && !!(configError || configResponse)
 
@@ -171,6 +177,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
         value={getActiveSsid(list)}
         disabled={connectingTo != null}
         onValueChange={handleValueChange}
+        enableWifiDisconnect={enableWifiDisconnect}
       />
       <SelectNetworkModal
         addKey={(file: File) => dispatch(addWifiKey(robot, file))}

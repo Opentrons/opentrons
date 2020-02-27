@@ -12,6 +12,7 @@ export type SelectSsidProps = {|
   value: string | null,
   disabled?: boolean,
   onValueChange: (ssid: string) => mixed,
+  enableWifiDisconnect: boolean,
 |}
 
 const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
@@ -24,7 +25,6 @@ const ACTIONS = {
   [DISCONNECT_WIFI_VALUE]: DISCONNECT_WIFI_LABEL,
 }
 
-// Type this
 const SELECT_ACTIONS_OPTIONS = [
   { value: JOIN_OTHER_VALUE },
   { value: DISCONNECT_WIFI_VALUE },
@@ -36,17 +36,28 @@ const SIGNAL_LEVEL_LOW = 25
 const SIGNAL_LEVEL_MED = 50
 const SIGNAL_LEVEL_HIGH = 75
 
-const formatOptions = (list: Array<WifiNetwork>): Array<SelectOptionOrGroup> =>
-  list.map(({ ssid }) => ({ value: ssid })).concat(SELECT_ACTIONS_OPTIONS)
+const formatOptions = (
+  list: Array<WifiNetwork>,
+  enableWifiDisconnect: boolean
+): Array<SelectOptionOrGroup> => {
+  if (enableWifiDisconnect) {
+    return list
+      .map(({ ssid }) => ({ value: ssid }))
+      .concat(SELECT_ACTIONS_OPTIONS)
+  }
+  return list
+    .map(({ ssid }) => ({ value: ssid }))
+    .concat(SELECT_ACTIONS_OPTIONS[0])
+}
 
 export function SelectSsid(props: SelectSsidProps) {
-  const { list, value, disabled, onValueChange } = props
+  const { list, value, disabled, onValueChange, enableWifiDisconnect } = props
 
   return (
     <SelectField
       name={FIELD_NAME}
       value={value}
-      options={formatOptions(list)}
+      options={formatOptions(list, enableWifiDisconnect)}
       placeholder="Select network"
       className={styles.wifi_dropdown}
       disabled={disabled}
