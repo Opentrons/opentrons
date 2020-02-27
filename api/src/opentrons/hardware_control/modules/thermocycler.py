@@ -225,6 +225,7 @@ class Thermocycler(mod_abc.AbstractModule):
                               hold_time_minutes: float = None,
                               ramp_rate: float = None,
                               volume: float = None):
+        await self.wait_for_is_running()
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
