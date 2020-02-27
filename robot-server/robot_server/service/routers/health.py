@@ -28,8 +28,8 @@ async def get_health(
     # This conditional handles the case where we have just changed the
     # use protocol api v2 feature flag, so it does not match the type
     # of hardware we're actually using.
-    fw_version = hardware.fw_version  # type: ignore
-    if inspect.iscoroutine(fw_version):
+    fw_version = await hardware.fw_version  # type: ignore
+    if inspect.isawaitable(fw_version):
         fw_version = await fw_version
 
     if feature_flags.use_protocol_api_v2():
