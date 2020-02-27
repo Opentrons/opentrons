@@ -32,6 +32,7 @@ import { SelectSsid } from './SelectSsid'
 import { SelectNetworkModal } from './SelectNetworkModal'
 
 import {
+  API_MIN_VERSION,
   LIST_REFRESH_MS,
   DISCONNECT_WIFI_VALUE,
   JOIN_OTHER_VALUE,
@@ -48,8 +49,6 @@ import type { ViewableRobot } from '../../../discovery/types'
 import type { PostWifiDisconnectAction } from '../../../networking/types'
 
 type SelectNetworkProps = {| robot: ViewableRobot |}
-
-const API_MIN_VERSION = '3.17.0'
 
 export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   const {

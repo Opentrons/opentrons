@@ -2,6 +2,7 @@
 import * as React from 'react'
 
 import { Icon, SelectField } from '@opentrons/components'
+import * as Constants from './constants'
 import styles from './styles.css'
 
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
@@ -15,27 +16,6 @@ export type SelectSsidProps = {|
   showWifiDisconnect: boolean,
 |}
 
-const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
-const DISCONNECT_WIFI_LABEL = 'Disconnect from Wifi'
-const JOIN_OTHER_VALUE = '__join-other-network__'
-const JOIN_OTHER_LABEL = 'Join other network...'
-
-const ACTIONS = {
-  [JOIN_OTHER_VALUE]: JOIN_OTHER_LABEL,
-  [DISCONNECT_WIFI_VALUE]: DISCONNECT_WIFI_LABEL,
-}
-
-const SELECT_ACTIONS_OPTIONS = [
-  { value: JOIN_OTHER_VALUE },
-  { value: DISCONNECT_WIFI_VALUE },
-]
-
-const FIELD_NAME = 'ssid'
-
-const SIGNAL_LEVEL_LOW = 25
-const SIGNAL_LEVEL_MED = 50
-const SIGNAL_LEVEL_HIGH = 75
-
 const formatOptions = (
   list: Array<WifiNetwork>,
   showWifiDisconnect: boolean
@@ -43,11 +23,11 @@ const formatOptions = (
   if (showWifiDisconnect) {
     return list
       .map(({ ssid }) => ({ value: ssid }))
-      .concat(SELECT_ACTIONS_OPTIONS)
+      .concat(Constants.SELECT_ADDITIONAL_ACTIONS)
   }
   return list
     .map(({ ssid }) => ({ value: ssid }))
-    .concat(SELECT_ACTIONS_OPTIONS[0])
+    .concat(Constants.SELECT_JOIN_ACTIONS_OPTIONS)
 }
 
 export function SelectSsid(props: SelectSsidProps) {
@@ -55,7 +35,7 @@ export function SelectSsid(props: SelectSsidProps) {
 
   return (
     <SelectField
-      name={FIELD_NAME}
+      name={Constants.FIELD_NAME}
       value={value}
       options={formatOptions(list, showWifiDisconnect)}
       placeholder="Select network"
@@ -63,8 +43,10 @@ export function SelectSsid(props: SelectSsidProps) {
       disabled={disabled}
       onValueChange={(_, ssid) => onValueChange(ssid)}
       formatOptionLabel={({ value, label }) =>
-        ACTIONS[value] ? (
-          <p className={styles.wifi_join_other}>{ACTIONS[value]}</p>
+        Constants.ACTIONS[value] ? (
+          <span className={styles.wifi_additional_actions}>
+            {Constants.ACTIONS[value]}
+          </span>
         ) : (
           renderNetworkLabel(list.find(nw => nw.ssid === value))
         )
@@ -105,11 +87,11 @@ const renderSecuredIcon = (network: WifiNetwork | void) => (
 const renderSignalIcon = (network: WifiNetwork | void) => {
   const signal = network?.signal || 0
   let signalIconName: IconName
-  if (signal <= SIGNAL_LEVEL_LOW) {
+  if (signal <= Constants.SIGNAL_LEVEL_LOW) {
     signalIconName = 'ot-wifi-0'
-  } else if (signal <= SIGNAL_LEVEL_MED) {
+  } else if (signal <= Constants.SIGNAL_LEVEL_MED) {
     signalIconName = 'ot-wifi-1'
-  } else if (signal <= SIGNAL_LEVEL_HIGH) {
+  } else if (signal <= Constants.SIGNAL_LEVEL_HIGH) {
     signalIconName = 'ot-wifi-2'
   } else {
     signalIconName = 'ot-wifi-3'

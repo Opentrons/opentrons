@@ -12,7 +12,7 @@
 }
 
 .wifi_name,
-.wifi_join_other {
+.wifi_additional_actions {
   flex-basis: 100%;
   white-space: nowrap;
   overflow: hidden;
@@ -34,6 +34,6 @@
   padding-left: 0.25rem;
 }
 
-.wifi_join_other {
+.wifi_additional_actions {
   padding-left: 1rem;
 }
