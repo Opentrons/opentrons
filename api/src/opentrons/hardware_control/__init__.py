@@ -18,10 +18,11 @@ from .pipette import Pipette
 from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
+from .pause_manager import PauseManager
 
 __all__ = [
     'API', 'Controller', 'Simulator', 'Pipette',
     'SynchronousAdapter', 'HardwareAPILike', 'CriticalPoint',
     'NoTipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
-    'ThreadManager'
+    'ThreadManager', 'PauseManager'
 ]

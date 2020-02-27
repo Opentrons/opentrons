@@ -95,7 +95,9 @@ class MagDeck(mod_abc.AbstractModule):
                  port: str,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop)
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:

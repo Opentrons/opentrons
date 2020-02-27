@@ -5,7 +5,8 @@ from typing import (
     Dict, Iterator, List, Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API, HardwareAPILike
+from opentrons.hardware_control import (adapters, modules, API,
+                                        HardwareAPILike, PauseManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -439,7 +440,11 @@ class ProtocolContext(CommandPublisher):
                 'thermocycler': modules.thermocycler.Thermocycler
                 }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._hw_manager.hardware.loop))
+                    port='',
+                    simulating=True,
+                    loop=self._hw_manager.hardware.loop,
+                    pause_manager=PauseManager(
+                        loop=self._hw_manager.hardware.loop)))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

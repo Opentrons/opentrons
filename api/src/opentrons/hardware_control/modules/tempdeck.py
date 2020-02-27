@@ -123,7 +123,9 @@ class TempDeck(mod_abc.AbstractModule):
                  port: str,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop)
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
