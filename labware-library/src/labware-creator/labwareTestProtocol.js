@@ -33,6 +33,7 @@ const pipettes = {
   },
 }
 
+// Relying on insertion order == enumeration order.
 export const pipetteNameOptions: Options = Object.keys(pipettes).map(
   loadName => ({ name: pipettes[loadName].displayName, value: loadName })
 )
