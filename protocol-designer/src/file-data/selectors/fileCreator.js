@@ -50,8 +50,13 @@ const _isV3Command = (command: Command): boolean =>
   command.command === 'moveToSlot' ||
   command.command === 'delay'
 
-/** If there are any module entities or and v4-specific commands, export as a v4 protocol.
- ** Otherwise, export as v3. */
+/** If there are any module entities or and v4-specific commands,
+ ** export as a v4 protocol. Otherwise, export as v3.
+ **
+ ** NOTE: In real life, you shouldn't be able to have v4 atomic commands
+ ** without having module entities b/c this will produce "no module for this step"
+ ** form/timeline errors. Checking for v4 commands should be redundant,
+ ** we do it just in case non-V3 commands somehow sneak in despite having no modules. */
 export const getIsV4Protocol: Selector<boolean> = createSelector(
   getRobotStateTimeline,
   stepFormSelectors.getModuleEntities,
