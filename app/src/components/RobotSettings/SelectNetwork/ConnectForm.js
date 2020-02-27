@@ -133,6 +133,9 @@ export class ConnectForm extends React.Component<
     const securityType = this.getSecurityType(values)
     const hidden = !knownSsid
 
+    // TODO(mc, 2020-02-21): This configure form needs to be redone as part
+    // of the configure endpoint client-side refactor
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     configure({ ...values, ssid, securityType, hidden })
     close()
   }

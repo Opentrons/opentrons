@@ -178,12 +178,35 @@ describe('robot settings selectors', () => {
         { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
       ],
     },
+    {
+      name: 'getWifiKeys returns [] if unavailable',
+      selector: Selectors.getWifiKeys,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      expected: [],
+    },
+
+    {
+      name: 'getWifiKeys returns keys from state',
+      selector: Selectors.getWifiKeys,
+      state: {
+        networking: {
+          robotName: {
+            wifiKeys: [Fixtures.mockWifiKey],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [Fixtures.mockWifiKey],
+    },
   ]
 
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       const result = selector(state, ...args)
       expect(result).toEqual(expected)
     })

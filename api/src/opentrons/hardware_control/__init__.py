@@ -10,17 +10,18 @@ This module is not for use outside the opentrons api module. Higher-level
 functions are available elsewhere.
 """
 
-from .adapters import SingletonAdapter, SynchronousAdapter
+from .adapters import SynchronousAdapter
 from .api import API
 from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette
 from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError
 from .constants import DROP_TIP_RELEASE_DISTANCE
+from .thread_manager import ThreadManager
 
 __all__ = [
     'API', 'Controller', 'Simulator', 'Pipette',
-    'SingletonAdapter', 'SynchronousAdapter',
-    'Axis', 'HardwareAPILike', 'CriticalPoint',
-    'NoTipAttachedError', 'DROP_TIP_RELEASE_DISTANCE'
+    'SynchronousAdapter', 'HardwareAPILike', 'CriticalPoint',
+    'NoTipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
+    'ThreadManager'
 ]

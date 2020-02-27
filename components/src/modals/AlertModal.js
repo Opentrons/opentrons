@@ -74,9 +74,9 @@ export function AlertModal(props: AlertModalProps) {
         <div className={styles.alert_modal_buttons}>
           {buttons.filter(Boolean).map((button, index) => (
             <OutlineButton
-              key={index}
               {...button}
               className={cx(styles.alert_button, button.className)}
+              key={index}
             />
           ))}
         </div>

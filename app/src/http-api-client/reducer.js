@@ -120,7 +120,6 @@ function getUpdateInfo(state: ApiState, action: any): any {
     robot: { name },
   } = action.payload
   const stateByName = state[name] || {}
-  // $FlowFixMe: type RobotApiState properly
   const stateByPath = stateByName[path] || {}
 
   return { name, path, stateByName, stateByPath }

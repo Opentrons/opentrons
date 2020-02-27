@@ -30,11 +30,11 @@ export const RobotCoordsForeignDiv = (props: RobotCoordsForeignDivProps) => {
       transform={transformWithSVG ? 'scale(1, -1)' : null}
     >
       <div
+        {...innerDivProps}
         style={{
           transform: transformWithSVG ? 'none' : 'scale(1, -1)',
         }}
         xmlns="http://www.w3.org/1999/xhtml"
-        {...innerDivProps}
       >
         {children}
       </div>

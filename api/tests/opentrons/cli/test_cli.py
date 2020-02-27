@@ -37,7 +37,7 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
                     'model': model1[0],
                     'id': 'fakeid2'}}
         monkeypatch.setattr(
-            sync_hardware._api._backend,
+            sync_hardware._obj_to_adapt._backend,
             'get_attached_instruments',
             fake_gai)
     elif model2:
@@ -48,7 +48,7 @@ def hw_with_pipettes(monkeypatch, sync_hardware, model1, model2):
                 Mount.RIGHT: {'model': model2[0], 'id': 'fakeid2'}}
 
         monkeypatch.setattr(
-            sync_hardware._api._backend,
+            sync_hardware._obj_to_adapt._backend,
             'get_attached_instruments',
             fake_gai)
 
@@ -169,7 +169,7 @@ def test_mount_offset(mock_config, hw_with_pipettes, loop, monkeypatch):
     def fake_position(something):
         return [-22.87, 8, 0]
     monkeypatch.setattr(
-        hw_with_pipettes._api, '_config', mock_config)
+        hw_with_pipettes._obj_to_adapt, '_config', mock_config)
 
     hw_with_pipettes.home()
     tool = dc_main.CLITool(
@@ -222,7 +222,7 @@ def test_try_pickup_tip(
 
     hw_with_pipettes.home()
     monkeypatch.setattr(
-        hw_with_pipettes._api, '_config', mock_config)
+        hw_with_pipettes._obj_to_adapt, '_config', mock_config)
 
     tool = dc_main.CLITool(
         get_calibration_points(),

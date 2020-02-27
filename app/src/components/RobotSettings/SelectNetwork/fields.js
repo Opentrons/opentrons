@@ -93,7 +93,7 @@ export function SelectOptionField(props: SelectOptionFieldProps) {
         {...{
           id,
           name,
-          value: props.value,
+          value: props.value ?? null,
           options: props.options,
           error: props.error,
           placeholder: props.placeholder,

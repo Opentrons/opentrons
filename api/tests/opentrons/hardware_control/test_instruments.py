@@ -58,7 +58,7 @@ instrument_keys = sorted([
 
 
 async def test_cache_instruments(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
         loop=loop)
     await hw_api.cache_instruments()
@@ -68,7 +68,7 @@ async def test_cache_instruments(dummy_instruments, loop):
 
 
 async def test_mismatch_fails(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
         loop=loop)
     requested_instr = {
@@ -78,7 +78,7 @@ async def test_mismatch_fails(dummy_instruments, loop):
 
 
 async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_backwards_compatibility,
         loop=loop)
     requested_instr = {
@@ -145,7 +145,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     def fake_func2(mount, value):
         return mount, value
 
-    sim = hc.API.build_hardware_simulator(loop=loop)
+    sim = await hc.API.build_hardware_simulator(loop=loop)
     # With nothing specified at init or expected, we should have nothing
     sim._backend._smoothie_driver.update_steps_per_mm = mock.Mock(fake_func1)
     sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
@@ -197,7 +197,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         == 'p300_single'
     # If we specify instruments at init time, we should get them without
     # passing an expectation
-    sim = hc.API.build_hardware_simulator(
+    sim = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments)
     await sim.cache_instruments()
     attached = await sim.attached_instruments
@@ -211,7 +211,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
     # Unless we specifically told the simulator to not strictly enforce
     # correspondence between expectations and preconfiguration
-    sim = hc.API.build_hardware_simulator(
+    sim = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments,
         loop=loop, strict_attached_instruments=False)
     await sim.cache_instruments({types.Mount.LEFT: 'p300_multi'})
@@ -225,7 +225,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
 
 
 async def test_prep_aspirate(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -244,7 +244,7 @@ async def test_prep_aspirate(dummy_instruments, loop):
 
 
 async def test_aspirate_new(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -262,7 +262,7 @@ async def test_aspirate_new(dummy_instruments, loop):
 
 
 async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
     await hw_api.cache_instruments()
@@ -280,7 +280,7 @@ async def test_aspirate_old(dummy_instruments, loop, old_aspiration):
 
 
 async def test_dispense(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.home()
 
@@ -307,7 +307,7 @@ async def test_dispense(dummy_instruments, loop):
 
 
 async def test_no_pipette(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     await hw_api.cache_instruments()
     aspirate_ul = 3.0
@@ -318,7 +318,7 @@ async def test_no_pipette(dummy_instruments, loop):
 
 
 async def test_pick_up_tip(dummy_instruments, loop):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT
     await hw_api.home()
@@ -343,7 +343,7 @@ async def test_pick_up_tip(dummy_instruments, loop):
 
 
 async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT
     await hw_api.home()
@@ -415,7 +415,7 @@ async def test_aspirate_flow_rate(dummy_instruments, loop, monkeypatch):
 
 
 async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT
     await hw_api.home()
@@ -483,7 +483,7 @@ async def test_dispense_flow_rate(dummy_instruments, loop, monkeypatch):
 
 
 async def test_blowout_flow_rate(dummy_instruments, loop, monkeypatch):
-    hw_api = hc.API.build_hardware_simulator(
+    hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT
     await hw_api.home()

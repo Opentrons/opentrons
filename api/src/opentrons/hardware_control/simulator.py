@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import logging
 from threading import Event
@@ -209,13 +210,15 @@ class Simulator:
             self,
             port: str,
             model: str,
-            interrupt_callback: modules.InterruptCallback
+            interrupt_callback: modules.InterruptCallback,
+            loop: asyncio.AbstractEventLoop
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
-            interrupt_callback=interrupt_callback)
+            interrupt_callback=interrupt_callback,
+            loop=loop)
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

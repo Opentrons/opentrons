@@ -117,14 +117,12 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
-    async def kill_router(a):
-        # Try to kill router hardware
-        router = a['com.opentrons.main_router']
-        if router.calibration_manager._hardware:
-            router.calibration_manager._hardware.join()
+    async def shutdown_hardware(app):
+        if app['com.opentrons.hardware']:
+            app['com.opentrons.hardware'].clean_up()
 
-    app.on_shutdown.append(kill_router)
     app.on_shutdown.append(dispose_response_file_tempdir)
+    app.on_shutdown.append(shutdown_hardware)
     app.on_shutdown.freeze()
     return app
 
