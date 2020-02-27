@@ -4,10 +4,7 @@ import logging
 import asyncio
 import re
 from opentrons import HERE
-from opentrons import server
 from opentrons.hardware_control import API, ThreadManager
-from opentrons.server.main import build_arg_parser
-from argparse import ArgumentParser
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
@@ -122,15 +119,18 @@ async def initialize_robot() -> ThreadManager:
     return ThreadManager(API.build_hardware_controller)
 
 
-def run(**kwargs):  # noqa(C901)
+def initialize(
+        hardware_server: bool = False,
+        hardware_server_socket: str = "/var/run/opentrons-hardware.sock") \
+        -> ThreadManager:
     """
-    This function was necessary to separate from main() to accommodate for
-    server startup path on system 3.0, which is server.main. In the case where
-    the api is on system 3.0, server.main will redirect to this function with
-    an additional argument of 'patch_old_init'. kwargs are hence used to allow
-    the use of different length args
-    """
+    Initialize the Opentrons hardware returning a hardware instance.
 
+    :param hardware_server: Run a jsonrpc server allowing rpc to the  hardware
+     controller. Only works on buildroot because extra dependencies are
+     required.
+    :param hardware_server_socket: Override for the hardware server socket
+    """
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
@@ -144,49 +144,10 @@ def run(**kwargs):  # noqa(C901)
         log.info("Homing Z axes")
         loop.run_until_complete(hardware.home_z())
 
-    if kwargs.get('hardware_server'):
+    if hardware_server:
         #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
         loop.run_until_complete(
-                install_hardware_server(kwargs['hardware_server_socket'],
+                install_hardware_server(hardware_server_socket,
                                         hardware))
 
-    server.run(hardware,
-               kwargs.get('hostname'),
-               kwargs.get('port'),
-               kwargs.get('path'),
-               loop)
-
-
-def main():
-    """ The main entrypoint for the Opentrons robot API server stack.
-
-    This function
-    - creates and starts the server for both the RPC routes
-      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
-      by :py:mod:`opentrons.server.http`
-    - initializes the hardware interaction handled by either
-      :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
-
-    This function does not return until the server is brought down.
-    """
-
-    arg_parser = ArgumentParser(
-        description="Opentrons robot software",
-        parents=[build_arg_parser()])
-    arg_parser.add_argument(
-        '--hardware-server', action='store_true',
-        help='Run a jsonrpc server allowing rpc to the'
-        ' hardware controller. Only works on buildroot '
-        'because extra dependencies are required.')
-    arg_parser.add_argument(
-        '--hardware-server-socket', action='store',
-        default='/var/run/opentrons-hardware.sock',
-        help='Override for the hardware server socket')
-    args = arg_parser.parse_args()
-
-    run(**vars(args))
-    arg_parser.exit(message="Stopped\n")
-
-
-if __name__ == "__main__":
-    main()
+    return hardware
