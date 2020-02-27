@@ -42,7 +42,7 @@ export function ConnectionCard(props: Props) {
         status={internetStatus}
       />
       <ConnectionInfo connection={wifi} title="Wi-Fi" disabled={disabled}>
-        <SelectNetwork robot={robot} />
+        <SelectNetwork key={robot.name} robot={robot} />
       </ConnectionInfo>
       <ConnectionInfo
         connection={ethernet}

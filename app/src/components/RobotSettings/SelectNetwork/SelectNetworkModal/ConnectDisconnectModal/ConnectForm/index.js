@@ -21,7 +21,6 @@ import { JOIN_OTHER_VALUE } from '../../../constants'
 import { BottomButtonBar } from '../../../../../modals'
 import { StringField, PasswordField, SelectOptionField } from '../../../fields'
 import { SelectKey } from '../../../SelectKey'
-import { FormTable } from '../../../FormTable'
 
 import type {
   WifiSecurityType,
@@ -33,6 +32,8 @@ import type {
 } from '../../../../../../http-api-client'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
+
+import styles from './styles.css'
 
 type ConnectFormProps = {|
   ssid: ?string,
@@ -266,7 +267,7 @@ export class ConnectForm extends React.Component<
 
           return (
             <form onSubmit={handleSubmit}>
-              <FormTable>
+              <div className={styles.form_table}>
                 {this.getFields(values).map(field => {
                   const { type, name, label, required } = field
                   const value = this.getFieldValue(field.name, values)
@@ -337,7 +338,7 @@ export class ConnectForm extends React.Component<
 
                   return null
                 })}
-              </FormTable>
+              </div>
               <BottomButtonBar
                 buttons={[
                   { children: 'Cancel', onClick: close },
