@@ -10,6 +10,10 @@ from .types import HardwareAPILike
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class ThreadManagerException(Exception):
+    pass
+
+
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
 # use inspect.getmembers to iterate over appropriate members of adapted
 # instance and setattr on the outer instance with the proper threadsafe
@@ -55,6 +59,9 @@ class ThreadManager(HardwareAPILike):
         self._thread = thread
         thread.start()
         is_running.wait()
+        # Thread initialization is done.
+        if not self.managed_obj:
+            raise ThreadManagerException("Failed to create Managed Object")
 
     def _build_and_start_loop(self, builder, *args, **kwargs):
         loop = asyncio.new_event_loop()
