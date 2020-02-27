@@ -17,13 +17,11 @@ import {
   DEFAULT_MM_TOUCH_TIP_OFFSET_FROM_TOP,
   DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP,
 } from '../../constants'
-
-import type { Command as CommandV3 } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type {
   FilePipette,
   FileLabware,
   FileModule,
-  Command as CommandV4,
+  Command,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { ModuleEntity } from '../../step-forms'
 import type { Selector } from '../../types'
@@ -40,28 +38,32 @@ const applicationVersion: string = process.env.OT_PD_VERSION || ''
 // when we look at saved protocols (without requiring us to trace thru git logs)
 const _internalAppBuildDate = process.env.OT_PD_BUILD_DATE
 
-/** V3 commands are a subset of V4. Given commands array that may
- ** contain V4 commands, return only V3-compatible commands. */
-const filterV3Commands = (commands: Array<CommandV4>): Array<CommandV3> => {
-  return commands.reduce<Array<CommandV3>>((acc, command) => {
-    if (
-      command.command === 'aspirate' ||
-      command.command === 'dispense' ||
-      command.command === 'airGap' ||
-      command.command === 'blowout' ||
-      command.command === 'touchTip' ||
-      command.command === 'pickUpTip' ||
-      command.command === 'dropTip' ||
-      command.command === 'moveToSlot' ||
-      command.command === 'delay'
-    ) {
-      return [...acc, command]
-    } else {
-      console.warn('Stripped out non-V3 command', command)
-      return acc
-    }
-  }, [])
-}
+// NOTE: V3 commands are a subset of V4 commands.
+const _isV3Command = (command: Command): boolean =>
+  command.command === 'aspirate' ||
+  command.command === 'dispense' ||
+  command.command === 'airGap' ||
+  command.command === 'blowout' ||
+  command.command === 'touchTip' ||
+  command.command === 'pickUpTip' ||
+  command.command === 'dropTip' ||
+  command.command === 'moveToSlot' ||
+  command.command === 'delay'
+
+/** If there are any module entities or and v4-specific commands, export as a v4 protocol.
+ ** Otherwise, export as v3. */
+export const getIsV4Protocol: Selector<boolean> = createSelector(
+  getRobotStateTimeline,
+  stepFormSelectors.getModuleEntities,
+  (robotStateTimeline, moduleEntities) => {
+    const noModules = isEmpty(moduleEntities)
+    const hasOnlyV3Commands = robotStateTimeline.timeline.every(timelineFrame =>
+      timelineFrame.commands.every(command => _isV3Command(command))
+    )
+    const isV3 = noModules && hasOnlyV3Commands
+    return !isV3
+  }
+)
 
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
@@ -77,7 +79,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
   stepFormSelectors.getPipetteEntities,
   uiLabwareSelectors.getLabwareNicknamesById,
   labwareDefSelectors.getLabwareDefsByURI,
-  stepFormSelectors.getIsV4Protocol,
+  getIsV4Protocol,
   (
     fileMetadata,
     initialRobotState,
@@ -150,7 +152,7 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       {}
     )
 
-    const commands: Array<CommandV4> = flatMap(
+    const commands: Array<Command> = flatMap(
       robotStateTimeline.timeline,
       timelineFrame => timelineFrame.commands
     )
@@ -216,7 +218,8 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       return {
         ...protocolFile,
         schemaVersion: 3,
-        commands: filterV3Commands(commands),
+        // $FlowFixMe: presence of non-v3 commands should make 'isV4Protocol' true
+        commands,
       }
     }
   }
