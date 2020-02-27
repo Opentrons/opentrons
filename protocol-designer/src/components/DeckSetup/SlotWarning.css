@@ -13,5 +13,5 @@
   font-size: 0.52rem;
   font-weight: var(--fw-semibold);
   color: var(--c-med-gray);
-  line-height: 0.7rem;
+  line-height: var(--lh-title);
 }
