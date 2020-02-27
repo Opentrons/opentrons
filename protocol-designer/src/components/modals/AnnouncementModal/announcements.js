@@ -17,7 +17,7 @@ export type Announcement = {|
 
 export const announcements: Array<Announcement> = [
   {
-    version: '3.17.0',
+    version: '4.0.0',
     image: (
       <div className={styles.modules_diagrams_row}>
         <ModuleDiagram type={MAGNETIC_MODULE_TYPE} />
