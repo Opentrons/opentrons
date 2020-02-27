@@ -170,17 +170,10 @@ class Thermocycler(mod_abc.AbstractModule):
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
 
-        self._current_task: Optional[asyncio.Task] = None
-
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
 
     def _clear_cycle_counters(self):
         self._total_cycle_count = None
@@ -230,10 +223,9 @@ class Thermocycler(mod_abc.AbstractModule):
                                            ramp_rate=ramp_rate,
                                            volume=volume)
         if hold_time:
-            self._current_task = self._loop.create_task(self.wait_for_hold())
+            await self._loop.create_task(self.wait_for_hold())
         else:
-            self._current_task = self._loop.create_task(self.wait_for_temp())
-        await self._current_task  # type: ignore
+            await self._loop.create_task(self.wait_for_temp())
 
     async def _execute_cycle_step(self,
                                   step: types.ThermocyclerStep,
@@ -268,19 +260,15 @@ class Thermocycler(mod_abc.AbstractModule):
         await self.wait_for_is_running()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
-        cycle_task = self._loop.create_task(self._execute_cycles(steps,
-                                                                 repetitions,
-                                                                 volume))
-        self._current_task = cycle_task
-        await cycle_task
+        await self._loop.create_task(self._execute_cycles(steps,
+                                                          repetitions,
+                                                          volume))
 
     async def set_lid_temperature(self, temperature: float):
         """ Set the lid temperature in deg Celsius """
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-        wait_for_lid_task = self._loop.create_task(self.wait_for_lid_temp())
-        self._current_task = wait_for_lid_task
-        await wait_for_lid_task
+        await self._loop.create_task(self.wait_for_lid_temp())
 
     async def wait_for_lid_temp(self):
         """
