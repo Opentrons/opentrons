@@ -5,7 +5,7 @@ import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
 const makeTriggerAction = (robotName: string) =>
-  Actions.postDisconnectNetwork(robotName, 'network-name')
+  Actions.postWifiDisconnect(robotName, 'network-name')
 
 describe('networking disconnectEpic', () => {
   afterEach(() => {
@@ -34,7 +34,7 @@ describe('networking disconnectEpic', () => {
     })
   })
 
-  it('maps successful response to Constants.POST_DISCONNECT_NETWORK_SUCCESS', () => {
+  it('maps successful response to POST_DISCONNECT_NETWORK_SUCCESS', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
       Fixtures.mockNetworkingDisconnectSuccess
@@ -46,7 +46,7 @@ describe('networking disconnectEpic', () => {
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.postDisconnectNetworkSuccess(mocks.robot.name, {
+        a: Actions.postWifiDisconnectSuccess(mocks.robot.name, {
           ...mocks.meta,
           response: Fixtures.mockNetworkingDisconnectSuccessMeta,
         }),
@@ -66,7 +66,7 @@ describe('networking disconnectEpic', () => {
       const output$ = networkingEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.postDisconnectNetworkFailure(
+        a: Actions.postWifiDisconnectFailure(
           mocks.robot.name,
           Fixtures.mockNetworkingDisconnectFailure.body,
           {
@@ -78,9 +78,9 @@ describe('networking disconnectEpic', () => {
     })
   })
 
-  it('dispatches FETCH_WIFI_LIST on POST_DISCONNECT_NETWORK_SUCCESS', () => {
+  it('dispatches FETCH_WIFI_LIST on POST_WIFI_DISCONNECT_SUCCESS', () => {
     const mocks = setupEpicTestMocks(robotName =>
-      Actions.postDisconnectNetworkSuccess(robotName, {})
+      Actions.postWifiDisconnectSuccess(robotName, {})
     )
 
     runEpicTest(mocks, ({ hot, expectObservable }) => {

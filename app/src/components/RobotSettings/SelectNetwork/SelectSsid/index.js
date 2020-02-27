@@ -2,16 +2,16 @@
 import * as React from 'react'
 
 import { Icon, SelectField } from '@opentrons/components'
-import { getActiveSsid } from '../utils' // try to move this out
 import styles from './styles.css'
 
 import type { IconName, SelectOptionOrGroup } from '@opentrons/components'
-import type { WifiNetworkList, WifiNetwork } from '../../../../networking'
+import type { WifiNetwork } from '../../../../networking/types'
 
 export type SelectSsidProps = {|
-  list: WifiNetworkList,
+  list: Array<WifiNetwork>,
+  value: string | null,
   disabled?: boolean,
-  handleOnValueChange: (ssid: string) => mixed,
+  onValueChange: (ssid: string) => mixed,
 |}
 
 const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
@@ -20,8 +20,8 @@ const JOIN_OTHER_VALUE = '__join-other-network__'
 const JOIN_OTHER_LABEL = 'Join other network...'
 
 const ACTIONS = {
-  [JOIN_OTHER_VALUE.toString()]: JOIN_OTHER_LABEL,
-  [DISCONNECT_WIFI_VALUE.toString()]: DISCONNECT_WIFI_LABEL,
+  [JOIN_OTHER_VALUE]: JOIN_OTHER_LABEL,
+  [DISCONNECT_WIFI_VALUE]: DISCONNECT_WIFI_LABEL,
 }
 
 // Type this
@@ -36,32 +36,28 @@ const SIGNAL_LEVEL_LOW = 25
 const SIGNAL_LEVEL_MED = 50
 const SIGNAL_LEVEL_HIGH = 75
 
-const formatOptions = (list: WifiNetworkList): Array<SelectOptionOrGroup> =>
+const formatOptions = (list: Array<WifiNetwork>): Array<SelectOptionOrGroup> =>
   list.map(({ ssid }) => ({ value: ssid })).concat(SELECT_ACTIONS_OPTIONS)
 
 export function SelectSsid(props: SelectSsidProps) {
-  const { list, disabled, handleOnValueChange } = props
+  const { list, value, disabled, onValueChange } = props
 
   return (
     <SelectField
       name={FIELD_NAME}
-      value={getActiveSsid(list)}
+      value={value}
       options={formatOptions(list)}
       placeholder="Select network"
       className={styles.wifi_dropdown}
       disabled={disabled}
-      onValueChange={(_, ssid) => handleOnValueChange(ssid)}
-      formatOptionLabel={({ value, label }) => {
-        return (
-          <>
-            {ACTIONS[value] ? (
-              <p className={styles.wifi_join_other}>{ACTIONS[value]}</p>
-            ) : (
-              renderNetworkLabel(props.list.find(nw => nw.ssid === value))
-            )}
-          </>
+      onValueChange={(_, ssid) => onValueChange(ssid)}
+      formatOptionLabel={({ value, label }) =>
+        ACTIONS[value] ? (
+          <p className={styles.wifi_join_other}>{ACTIONS[value]}</p>
+        ) : (
+          renderNetworkLabel(list.find(nw => nw.ssid === value))
         )
-      }}
+      }
     />
   )
 }

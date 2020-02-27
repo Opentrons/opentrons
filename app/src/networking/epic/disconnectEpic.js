@@ -1,7 +1,7 @@
 // @flow
-import { of } from 'rxjs'
+
 import { ofType, combineEpics } from 'redux-observable'
-import { mergeMap } from 'rxjs/operators'
+import { map } from 'rxjs/operators'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -13,15 +13,15 @@ import * as Actions from '../actions'
 import * as Constants from '../constants'
 
 import type { Epic } from '../../types'
-import type { PostDisconnectNetworkAction } from '../types'
+import type { PostWifiDisconnectAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<PostDisconnectNetworkAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<PostWifiDisconnectAction> = action => ({
   method: POST,
-  path: Constants.DISCONNECT_PATH,
+  path: Constants.WIFI_DISCONNECT_PATH,
   body: { ssid: action.payload.ssid },
 })
 
-const mapResponseToAction: ResponseToActionMapper<PostDisconnectNetworkAction> = (
+const mapResponseToAction: ResponseToActionMapper<PostWifiDisconnectAction> = (
   response,
   originalAction
 ) => {
@@ -29,13 +29,13 @@ const mapResponseToAction: ResponseToActionMapper<PostDisconnectNetworkAction> =
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.postDisconnectNetworkSuccess(host.name, meta)
-    : Actions.postDisconnectNetworkFailure(host.name, body, meta)
+    ? Actions.postWifiDisconnectSuccess(host.name, meta)
+    : Actions.postWifiDisconnectFailure(host.name, body, meta)
 }
 
 const postDisconnectEpic: Epic = (action$, state$) =>
   action$.pipe(
-    ofType(Constants.POST_DISCONNECT_NETWORK),
+    ofType(Constants.POST_WIFI_DISCONNECT),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
@@ -46,8 +46,8 @@ const postDisconnectEpic: Epic = (action$, state$) =>
 
 const handlePostDisconnectNetworkSuccessEpic: Epic = action$ => {
   return action$.pipe(
-    ofType(Constants.POST_DISCONNECT_NETWORK_SUCCESS),
-    mergeMap(action => of(Actions.fetchWifiList(action.payload.robotName)))
+    ofType(Constants.POST_WIFI_DISCONNECT_SUCCESS),
+    map(action => Actions.fetchWifiList(action.payload.robotName))
   )
 }
 

@@ -272,11 +272,11 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'can create networking:POST_DISCONNECT_NETWORK',
-      creator: Actions.postDisconnectNetwork,
+      name: 'can create networking:POST_WIFI_DISCONNECT',
+      creator: Actions.postWifiDisconnect,
       args: [mockRobot.name, Fixtures.mockNetworkingDisconnect.ssid],
       expected: {
-        type: 'networking:POST_DISCONNECT_NETWORK',
+        type: 'networking:POST_WIFI_DISCONNECT',
         payload: {
           robotName: mockRobot.name,
           ...Fixtures.mockNetworkingDisconnect,
@@ -285,25 +285,25 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'can create networking:POST_DISCONNECT_NETWORK_SUCCESS',
-      creator: Actions.postDisconnectNetworkSuccess,
+      name: 'can create networking:POST_WIFI_DISCONNECT_SUCCESS',
+      creator: Actions.postWifiDisconnectSuccess,
       args: [mockRobot.name, mockRequestMeta],
       expected: {
-        type: 'networking:POST_DISCONNECT_NETWORK_SUCCESS',
+        type: 'networking:POST_WIFI_DISCONNECT_SUCCESS',
         payload: { robotName: mockRobot.name },
         meta: mockRequestMeta,
       },
     },
     {
-      name: 'can create networking:POST_DISCONNECT_NETWORK_FAILURE',
-      creator: Actions.postDisconnectNetworkFailure,
+      name: 'can create networking:POST_WIFI_DISCONNECT_FAILURE',
+      creator: Actions.postWifiDisconnectFailure,
       args: [
         mockRobot.name,
         Fixtures.mockNetworkingDisconnectFailure.body,
         mockRequestMeta,
       ],
       expected: {
-        type: 'networking:POST_DISCONNECT_NETWORK_FAILURE',
+        type: 'networking:POST_WIFI_DISCONNECT_FAILURE',
         payload: {
           robotName: mockRobot.name,
           error: Fixtures.mockNetworkingDisconnectFailure.body,

@@ -1,11 +1,11 @@
 // @flow
 
+// TODO: (isk: 2/27/20): Move next to selectors
 import { CONNECTABLE } from '../../../../discovery'
 import { NO_SECURITY, WPA_EAP_SECURITY } from '../../../../http-api-client'
 
 import type { ViewableRobot } from '../../../../discovery/types'
-import type { WifiNetwork } from '../../../../networking'
-// import type { State } from '../../../../types'
+import type { WifiNetwork } from '../../../../networking/types'
 
 export const mockRobot: ViewableRobot = ({
   name: 'robot-name',

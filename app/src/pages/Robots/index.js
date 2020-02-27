@@ -74,12 +74,12 @@ export function RobotsComponent(props: Props) {
           )}
         />
       )}
-      {robot && (
+      {
         <Route
           path={path}
           render={() => <RobotSettings robot={robot} appUpdate={appUpdate} />}
         />
-      )}
+      }
     </Switch>
   )
 }

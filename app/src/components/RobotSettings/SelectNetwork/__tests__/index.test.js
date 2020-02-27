@@ -7,16 +7,23 @@ import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 
 import * as Networking from '../../../../networking'
-// import { configureWifi } from '../../../../http-api-client'
 
 import { SelectNetwork } from '..'
 import { SelectSsid } from '../SelectSsid'
 import { SelectNetworkModal } from '../SelectNetworkModal'
 
-// import type { State } from '../../../../types'
+import type { State } from '../../../../types'
 import type { ViewableRobot } from '../../../../discovery/types'
 
-import { mockRobot, wifiList, mockState } from '../__fixtures__'
+// TODO: (isk: 2/27/20): Remove mockState when hooks selectors are refactored
+import { mockState, mockRobot, wifiList } from '../__fixtures__'
+
+jest.mock('../../../../networking/selectors')
+
+const mockGetWifiList: JestMockFn<
+  [State, string],
+  $Call<typeof Networking.getWifiList, State, string>
+> = Networking.getWifiList
 
 describe('<SelectNetwork />', () => {
   let dispatch
@@ -28,14 +35,21 @@ describe('<SelectNetwork />', () => {
     mockStore = {
       dispatch,
       subscribe: () => {},
-      getState: () => ({ ...mockState }),
+      getState: () => mockState,
     }
 
-    render = (robot: ViewableRobot = mockRobot) =>
-      mount(<SelectNetwork robot={robot} />, {
+    render = (robot: ViewableRobot = mockRobot) => {
+      mockGetWifiList.mockImplementation((state, robotName) => {
+        expect(state).toEqual(mockState)
+        expect(robotName).toEqual(robot.name)
+        return wifiList
+      })
+
+      return mount(<SelectNetwork robot={robot} />, {
         wrappingComponent: Provider,
         wrappingComponentProps: { store: mockStore },
       })
+    }
   })
 
   afterEach(() => {
@@ -54,12 +68,11 @@ describe('<SelectNetwork />', () => {
     expect(selectSsid.prop('disabled')).toEqual(false)
   })
 
-  // revisit after rebase
-  test.skip('on mount dispatches configure', () => {})
+  // revisit after networking refactors
+  test.todo('on mount dispatches configure')
 
   describe('<SelectNetworkModal />', () => {
     const newSsid = wifiList[2].ssid
-    // const ssidSecurityNone = wifiList[1].ssid
     let wrapper
     let selectSsid
 
@@ -83,20 +96,15 @@ describe('<SelectNetwork />', () => {
         expect(modal.prop('modalOpen')).toEqual(true)
       })
 
-      // revisit after rebase
-      test.skip('when security type is none dispatches configure correctly', () => {
-        // act(() => {
-        //   selectSsid.props().handleOnValueChange(ssidSecurityNone)
-        // })
-        // wrapper.update()
-        // const modal = wrapper.find(SelectNetworkModal)
-        // const ssid = modal.prop('ssid')
-        // const expected = configureWifi(mockRobot, { ssid })
-      })
+      // revisit after additional networking refactors
+      test.todo('when security type is none dispatches configure correctly')
 
-      // revisit after additional refactors
-      test.skip('when has WPA or EAP security type dispatches fetchWifiEapOptions correctly', () => {})
-      test.skip('when has WPA or EAP security type dispatches fetchWifiKeys correctly', () => {})
+      test.todo(
+        'when has WPA or EAP security type dispatches fetchWifiEapOptions correctly'
+      )
+      test.todo(
+        'when has WPA or EAP security type dispatches fetchWifiKeys correctly'
+      )
     })
 
     test('handleCancel function updates state correctly', () => {
@@ -132,8 +140,9 @@ describe('<SelectNetwork />', () => {
       wrapper.update()
       let modal = wrapper.find(SelectNetworkModal)
 
+      // TODO: (isk: 2/27/20): Potentially move into utils mock
       const expected = {
-        ...Networking.postDisconnectNetwork(
+        ...Networking.postWifiDisconnect(
           mockRobot.name,
           modal.prop('previousSsid')
         ),

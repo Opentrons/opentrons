@@ -1,21 +1,25 @@
 // @flow
-import find from 'lodash/find'
-import type { WifiNetworkList } from '../../../networking'
-import { ACTIVE } from './constants'
 
-export const getActiveSsid = (list: WifiNetworkList) => {
-  const network = find(list, ACTIVE)
+import type { WifiNetwork } from '../../../networking/types'
+
+export const getActiveSsid = (list: Array<WifiNetwork>) => {
+  const network = list.find(nw => nw.active)
   return network?.ssid || null
 }
 
-export const getSecurityType = (list: WifiNetworkList, ssid: ?string) => {
+export const getSecurityType = (
+  list: Array<WifiNetwork>,
+  ssid: string | null
+) => {
   if (!ssid) {
     return null
   }
 
-  const network = find(list, { ssid })
+  const network = list.find(nw => nw.ssid === ssid)
   return network?.securityType || null
 }
 
-export const hasSecurityType = (securityType: ?string, securityValue: string) =>
-  securityType === securityValue
+export const hasSecurityType = (
+  securityType: string | null,
+  securityValue: string
+) => securityType === securityValue

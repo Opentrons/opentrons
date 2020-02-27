@@ -8,10 +8,9 @@ import { ConnectDisconnectModal } from './ConnectDisconnectModal'
 import { SpinnerModal } from '@opentrons/components'
 import { NetworkAlertModal } from './NetworkAlertModal'
 
-// import type { NetworkingType } from '../types'
-
 import { formatLoaderMessage } from './utils'
 
+// TODO: (isk: 2/27/20): type this component and split up
 export const SelectNetworkModal = ({
   addKey,
   close,
@@ -23,8 +22,8 @@ export const SelectNetworkModal = ({
   previousSsid,
   networkingType,
   securityType,
-  handleCancel,
-  handleDisconnectWifi,
+  onCancel,
+  onDisconnectWifi,
   eapOptions,
   keys,
   dispatchConfigure,
@@ -33,7 +32,7 @@ export const SelectNetworkModal = ({
   configResponse,
   response,
   error,
-}: Object) => {
+}: any) => {
   const showSpinner = connectingTo || pending
   const showConfig = configRequest && !!(configError || configResponse)
   const showAlert = showConfig || failure
@@ -52,9 +51,9 @@ export const SelectNetworkModal = ({
           previousSsid={previousSsid}
           networkingType={networkingType}
           securityType={securityType}
-          handleCancel={handleCancel}
+          onCancel={onCancel}
           addKey={addKey}
-          handleDisconnectWifi={handleDisconnectWifi}
+          onDisconnectWifi={onDisconnectWifi}
           eapOptions={eapOptions}
           keys={keys}
           dispatchConfigure={dispatchConfigure}

@@ -1,12 +1,6 @@
 // @flow
 import * as React from 'react'
 
-import {
-  SECURITY_WPA_PSK,
-  SECURITY_WPA_EAP,
-  SECURITY_NONE,
-} from '../../../../../networking'
-
 import { ConnectForm } from './ConnectForm'
 import { ScrollableAlertModal, BottomButtonBar } from '../../../../modals'
 
@@ -26,15 +20,15 @@ import { DISCONNECT } from '../../constants'
 import styles from './styles.css'
 
 export type ConnectDisconnectModalProps = {|
-  ssid: ?string,
-  previousSsid: ?string,
-  networkingType: ?NetworkingType,
-  securityType: ?WifiSecurityType,
-  handleCancel: () => mixed,
+  ssid: string | null,
+  previousSsid: string | null,
+  networkingType: NetworkingType | null,
+  securityType: WifiSecurityType | null,
+  onCancel: () => mixed,
   addKey: () => mixed,
-  handleDisconnectWifi: () => mixed,
-  eapOptions: ?WifiEapOptionsList,
-  keys: ?WifiKeysList,
+  onDisconnectWifi: () => mixed,
+  eapOptions: WifiEapOptionsList | null,
+  keys: WifiKeysList | null,
   dispatchConfigure: WifiConfigureRequest => mixed,
 |}
 
@@ -43,8 +37,8 @@ export const ConnectDisconnectModal = ({
   previousSsid,
   networkingType,
   securityType,
-  handleCancel,
-  handleDisconnectWifi,
+  onCancel,
+  onDisconnectWifi,
   eapOptions,
   keys,
   dispatchConfigure,
@@ -54,7 +48,7 @@ export const ConnectDisconnectModal = ({
     alertOverlay
     heading={formatHeading(ssid, previousSsid, networkingType)}
     iconName="wifi"
-    onCloseClick={handleCancel}
+    onCloseClick={onCancel}
   >
     <p className={styles.connect_modal_copy}>
       {formatBody(ssid, previousSsid, networkingType, securityType)}
@@ -62,10 +56,10 @@ export const ConnectDisconnectModal = ({
     {networkingType === DISCONNECT ? (
       <BottomButtonBar
         buttons={[
-          { children: 'Cancel', onClick: handleCancel },
+          { children: 'Cancel', onClick: onCancel },
           {
             children: 'Disconnect',
-            onClick: handleDisconnectWifi,
+            onClick: onDisconnectWifi,
           },
         ]}
       />
@@ -76,7 +70,7 @@ export const ConnectDisconnectModal = ({
         eapOptions={eapOptions}
         keys={keys}
         configure={dispatchConfigure}
-        close={handleCancel}
+        close={onCancel}
         addKey={addKey}
       />
     )}

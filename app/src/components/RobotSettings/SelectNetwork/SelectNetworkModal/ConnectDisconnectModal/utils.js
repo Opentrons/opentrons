@@ -6,45 +6,45 @@ import {
   SECURITY_NONE,
 } from '../../../../../networking'
 
-import type { WifiSecurityType } from '../../../../../networking'
+import type { WifiSecurityType } from '../../../../../networking/types'
 import type { NetworkingType } from '../../types'
 
+const JOIN = 'Find and join a Wi-Fi network'
+const DISCONNECT = (previousSsid: string) => `Disconnect from ${previousSsid}`
+const CONNECT = (ssid: string) => `Connect to ${ssid}`
+
 export const formatHeading = (
-  ssid: ?string,
-  previousSsid: ?string,
-  networkingType: ?NetworkingType
-): ?string => {
+  ssid: string | null,
+  previousSsid: string | null,
+  networkingType: NetworkingType | null
+): string | null => {
   if (networkingType === 'join') {
-    return 'Find and join a Wi-Fi network'
+    return JOIN
   }
 
   if (previousSsid && networkingType === 'disconnect') {
-    return `Disconnect from ${previousSsid}`
+    return DISCONNECT(previousSsid)
   }
 
-  if (ssid) {
-    return `Connect to ${ssid}`
+  if (ssid !== null) {
+    return CONNECT(ssid)
   }
+
+  return null
 }
 
-type SecurityTypes = {|
-  'wpa-psk': string,
-  'wpa-eap': string,
-  none: string,
-|}
-
-const securityTypes = (ssid: string): SecurityTypes => ({
+const securityTypes = (ssid: string) => ({
   [SECURITY_WPA_PSK]: `Wi-Fi network ${ssid} requires a WPA2 password.`,
   [SECURITY_WPA_EAP]: `Wi-Fi network ${ssid} requires 802.1X authentication.`,
   [SECURITY_NONE]: `Please select the security type for Wi-Fi network ${ssid}.`,
 })
 
 export const formatBody = (
-  ssid: ?string,
-  previousSsid: ?string,
-  networkingType: ?NetworkingType,
-  securityType: ?WifiSecurityType
-): ?string => {
+  ssid: string | null,
+  previousSsid: string | null,
+  networkingType: NetworkingType | null,
+  securityType: WifiSecurityType | null
+): string | null => {
   if (networkingType === 'join') {
     return 'Enter the name and security type of the network you want to join.'
   }

@@ -1,5 +1,5 @@
 // @flow
-// fixtures for /networking/status
+// fixtures for /wifi/disconnect
 
 import { POST } from '../../robot-api'
 import {

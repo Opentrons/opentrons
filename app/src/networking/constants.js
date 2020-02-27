@@ -31,7 +31,7 @@ export const WIFI_LIST_PATH: '/wifi/list' = '/wifi/list'
 export const WIFI_CONFIGURE_PATH: '/wifi/configure' = '/wifi/configure'
 export const WIFI_KEYS_PATH: '/wifi/keys' = '/wifi/keys'
 export const EAP_OPTIONS_PATH: '/wifi/eap-options' = '/wifi/eap-options'
-export const DISCONNECT_PATH: '/wifi/disconnect' = '/wifi/disconnect'
+export const WIFI_DISCONNECT_PATH: '/wifi/disconnect' = '/wifi/disconnect'
 
 // action type strings
 
@@ -102,11 +102,11 @@ export const FETCH_EAP_OPTIONS_FAILURE: 'networking:FETCH_EAP_OPTIONS_FAILURE' =
 
 // POST /wifi/disconnect
 
-export const POST_DISCONNECT_NETWORK: 'networking:POST_DISCONNECT_NETWORK' =
-  'networking:POST_DISCONNECT_NETWORK'
+export const POST_WIFI_DISCONNECT: 'networking:POST_WIFI_DISCONNECT' =
+  'networking:POST_WIFI_DISCONNECT'
 
-export const POST_DISCONNECT_NETWORK_SUCCESS: 'networking:POST_DISCONNECT_NETWORK_SUCCESS' =
-  'networking:POST_DISCONNECT_NETWORK_SUCCESS'
+export const POST_WIFI_DISCONNECT_SUCCESS: 'networking:POST_WIFI_DISCONNECT_SUCCESS' =
+  'networking:POST_WIFI_DISCONNECT_SUCCESS'
 
-export const POST_DISCONNECT_NETWORK_FAILURE: 'networking:POST_DISCONNECT_NETWORK_FAILURE' =
-  'networking:POST_DISCONNECT_NETWORK_FAILURE'
+export const POST_WIFI_DISCONNECT_FAILURE: 'networking:POST_WIFI_DISCONNECT_FAILURE' =
+  'networking:POST_WIFI_DISCONNECT_FAILURE'

@@ -179,6 +179,26 @@ describe('robot settings selectors', () => {
       ],
     },
     {
+      name: 'getWifiList sorts by active then ssid then dedupes',
+      selector: Selectors.getWifiList,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [
+              { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
+              { ...Fixtures.mockWifiNetwork, ssid: 'aaa' },
+              { ...Fixtures.mockWifiNetwork, active: true, ssid: 'aaa' },
+            ],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [
+        { ...Fixtures.mockWifiNetwork, active: true, ssid: 'aaa' },
+        { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
+      ],
+    },
+    {
       name: 'getWifiKeys returns [] if unavailable',
       selector: Selectors.getWifiKeys,
       state: {

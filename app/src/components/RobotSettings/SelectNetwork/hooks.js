@@ -8,7 +8,7 @@ import {
 } from '../../../http-api-client'
 import { getWifiList } from '../../../networking'
 
-import type { WifiNetworkList, WifiSecurityType } from '../../../networking'
+import type { WifiNetwork, WifiSecurityType } from '../../../networking/types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { State } from '../../../types'
 import type { NetworkingType } from './types'
@@ -16,15 +16,19 @@ import type { NetworkingType } from './types'
 import { getActiveSsid, getSecurityType } from './utils'
 import { CONNECT } from './constants'
 
-export const useStateSelectNetwork = (list: WifiNetworkList) => {
+export const useStateSelectNetwork = (list: Array<WifiNetwork>) => {
   const activeSsid = getActiveSsid(list)
   const activeNetworkingType = activeSsid ? CONNECT : null
   const activeSecurityType = getSecurityType(list, activeSsid)
 
-  const [ssid, setSsid] = useState<?string>(null)
-  const [previousSsid, setPreviousSsid] = useState<?string>(null)
-  const [networkingType, setNetworkingType] = useState<?NetworkingType>(null)
-  const [securityType, setSecurityType] = useState<?WifiSecurityType>(null)
+  const [ssid, setSsid] = useState<string | null>(null)
+  const [previousSsid, setPreviousSsid] = useState<string | null>(null)
+  const [networkingType, setNetworkingType] = useState<NetworkingType | null>(
+    null
+  )
+  const [securityType, setSecurityType] = useState<WifiSecurityType | null>(
+    null
+  )
   const [modalOpen, setModalOpen] = useState<boolean>(false)
 
   useEffect(() => {

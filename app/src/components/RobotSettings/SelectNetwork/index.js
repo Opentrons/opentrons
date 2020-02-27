@@ -11,7 +11,7 @@ import {
   SUCCESS,
   FAILURE,
 } from '../../../robot-api'
-import { postDisconnectNetwork, fetchWifiList } from '../../../networking'
+import { postWifiDisconnect, fetchWifiList } from '../../../networking'
 import {
   NO_SECURITY,
   WPA_EAP_SECURITY,
@@ -38,12 +38,12 @@ import {
 } from './constants'
 
 import { useStateSelectNetwork, stateSelector } from './hooks'
-import { getSecurityType, hasSecurityType } from './utils'
+import { getActiveSsid, getSecurityType, hasSecurityType } from './utils'
 
 import type { State } from '../../../types'
 import type { RequestState } from '../../../robot-api/types'
 import type { ViewableRobot } from '../../../discovery/types'
-import type { PostDisconnectNetworkAction } from '../../../networking'
+import type { PostWifiDisconnectAction } from '../../../networking/types'
 
 type SelectNetworkProps = {| robot: ViewableRobot |}
 
@@ -83,7 +83,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   const [
     dispatchApi,
     requestIds,
-  ] = useDispatchApiRequest<PostDisconnectNetworkAction>()
+  ] = useDispatchApiRequest<PostWifiDisconnectAction>()
 
   const latestRequestId = last(requestIds)
 
@@ -121,7 +121,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     )
   }
 
-  const handleOnValueChange = (ssidValue: string) => {
+  const handleValueChange = (ssidValue: string) => {
     const isJoinOrDisconnect =
       ssidValue === JOIN_OTHER_VALUE || ssidValue === DISCONNECT_WIFI_VALUE
 
@@ -158,17 +158,19 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
 
   const handleDisconnectWifi = () => {
     if (previousSsid) {
-      dispatchApi(postDisconnectNetwork(robot.name, previousSsid))
+      dispatchApi(postWifiDisconnect(robot.name, previousSsid))
       setModalOpen(false)
     }
   }
 
+  // TODO: (isk: 2/27/20): Refactor this SelectNetworkModal and handlers
   return (
     <IntervalWrapper refresh={dispatchRefresh} interval={LIST_REFRESH_MS}>
       <SelectSsid
         list={list || []}
+        value={getActiveSsid(list)}
         disabled={connectingTo != null}
-        handleOnValueChange={handleOnValueChange}
+        onValueChange={handleValueChange}
       />
       <SelectNetworkModal
         addKey={(file: File) => dispatch(addWifiKey(robot, file))}
@@ -177,6 +179,8 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
             ? dispatch(clearConfigureWifiResponse(robot))
             : () => dispatch(dismissRequest(latestRequestId))
         }
+        onDisconnectWifi={handleDisconnectWifi}
+        onCancel={handleCancel}
         {...{
           connectingTo,
           pending,
@@ -186,8 +190,6 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
           previousSsid,
           networkingType,
           securityType,
-          handleCancel,
-          handleDisconnectWifi,
           eapOptions,
           keys,
           dispatchConfigure,
