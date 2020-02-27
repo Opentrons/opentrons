@@ -176,7 +176,7 @@ class Controller:
             which=model,
             simulating=False,
             interrupt_callback=interrupt_callback,
-            loop=loop
+            loop=loop,
             pause_manager=pause_manager)
 
     async def connect(self, port: str = None):

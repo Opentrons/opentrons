@@ -212,15 +212,15 @@ class Simulator:
             port: str,
             model: str,
             interrupt_callback: modules.InterruptCallback,
-            loop: asyncio.AbstractEventLoop
-            pause_manager: PauseManager,
+            loop: asyncio.AbstractEventLoop,
+            pause_manager: PauseManager
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
             interrupt_callback=interrupt_callback,
-            loop=loop
+            loop=loop,
             pause_manager=pause_manager)
 
     @property
