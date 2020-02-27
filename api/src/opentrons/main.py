@@ -3,8 +3,12 @@ from pathlib import Path
 import logging
 import asyncio
 import re
+import opentrons
 from opentrons import HERE
+from opentrons import server
 from opentrons.hardware_control import adapters
+from opentrons.server.main import build_arg_parser
+from argparse import ArgumentParser
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
@@ -118,33 +122,85 @@ def initialize_robot(loop, hardware):
     log.info(f"Name: {name()}")
 
 
-async def create_hardware(hardware_server: bool = False,
-                          hardware_server_socket: str =
-                          "/var/run/opentrons-hardware.sock"):
+def run(hardware, **kwargs):  # noqa(C901)
     """
-    Create a hardware instance.
-
-    :param hardware_server: Run a jsonrpc server allowing rpc to the  hardware
-     controller. Only works on buildroot because extra dependencies are
-     required.
-    :param hardware_server_socket: Override for the hardware server socket
+    This function was necessary to separate from main() to accommodate for
+    server startup path on system 3.0, which is server.main. In the case where
+    the api is on system 3.0, server.main will redirect to this function with
+    an additional argument of 'patch_old_init'. kwargs are hence used to allow
+    the use of different length args
     """
     loop = asyncio.get_event_loop()
 
-    hardware = adapters.SingletonAdapter(loop)
-    robot_conf = await hardware.get_config()
+    if ff.use_protocol_api_v2():
+        robot_conf = loop.run_until_complete(hardware.get_config())
+    else:
+        robot_conf = hardware.config
 
     logging_config.log_init(robot_conf.log_level)
 
     log.info("API server version:  {}".format(__version__))
     if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
         initialize_robot(loop, hardware)
-        await hardware.cache_instruments()
+        if ff.use_protocol_api_v2():
+            loop.run_until_complete(hardware.cache_instruments())
         if not ff.disable_home_on_boot():
             log.info("Homing Z axes")
-            await hardware.home_z()
+            if ff.use_protocol_api_v2():
+                loop.run_until_complete(hardware.home_z())
+            else:
+                hardware.home_z()
 
-    if hardware_server:
-        await install_hardware_server(hardware_server_socket, hardware._api)
+    if kwargs.get('hardware_server'):
+        if ff.use_protocol_api_v2():
+            loop.run_until_complete(
+                install_hardware_server(kwargs['hardware_server_socket'],
+                                        hardware._api))
+        else:
+            log.warning(
+                "Hardware server requested but apiv1 selected, not starting")
+    server.run(
+        hardware,
+        kwargs.get('hostname'),
+        kwargs.get('port'),
+        kwargs.get('path'),
+        loop)
 
-    return hardware
+
+def main():
+    """ The main entrypoint for the Opentrons robot API server stack.
+
+    This function
+    - creates and starts the server for both the RPC routes
+      handled by :py:mod:`opentrons.server.rpc` and the HTTP routes handled
+      by :py:mod:`opentrons.server.http`
+    - initializes the hardware interaction handled by either
+      :py:mod:`opentrons.legacy_api` or :py:mod:`opentrons.hardware_control`
+
+    This function does not return until the server is brought down.
+    """
+
+    arg_parser = ArgumentParser(
+        description="Opentrons robot software",
+        parents=[build_arg_parser()])
+    arg_parser.add_argument(
+        '--hardware-server', action='store_true',
+        help='Run a jsonrpc server allowing rpc to the'
+        ' hardware controller. Only works on buildroot '
+        'because extra dependencies are required.')
+    arg_parser.add_argument(
+        '--hardware-server-socket', action='store',
+        default='/var/run/opentrons-hardware.sock',
+        help='Override for the hardware server socket')
+    args = arg_parser.parse_args()
+
+    if ff.use_protocol_api_v2():
+        checked_hardware = adapters.SingletonAdapter(asyncio.get_event_loop())
+    else:
+        checked_hardware = opentrons.robot
+    run(checked_hardware, **vars(args))
+    arg_parser.exit(message="Stopped\n")
+
+
+if __name__ == "__main__":
+    main()
