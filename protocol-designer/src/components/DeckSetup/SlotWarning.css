@@ -10,7 +10,8 @@
 
 .warning_text {
   padding: 1.3rem 0.5rem 0 0.5rem;
-  font-size: var(--fs-caption);
-  font-weight: var(--fw-regular);
+  font-size: 0.52rem;
+  font-weight: var(--fw-semibold);
   color: var(--c-med-gray);
+  line-height: 0.7rem;
 }
