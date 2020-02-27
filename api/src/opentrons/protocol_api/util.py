@@ -140,12 +140,8 @@ class AxisMaxSpeeds(UserDict):
     """
 
     def __getitem__(self, key: Union[str, types.Axis]):
-        if key in types.Axis:
-            return self.data[key]
-        elif isinstance(key, str):
-            return self.data[types.Axis[key.upper()]]
-        else:
-            raise KeyError(key)
+        checked_key = AxisMaxSpeeds._verify_key(key)
+        return self.data[checked_key]
 
     @staticmethod
     def _verify_key(key: Any) -> types.Axis:
