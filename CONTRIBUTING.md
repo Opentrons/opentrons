@@ -145,7 +145,7 @@ Your computer will need the following tools installed to be able to develop with
 - If you wish to use `pyenv` but are experiencing issues with macOS Mojave please see the [common build problems section](https://github.com/pyenv/pyenv/wiki/Common-build-problems) of `pyenv` documentation.
 
   ```shell
-  pyenv install 3.7.4
+  pyenv install 3.7.6
   ```
 
 - Node v12 - [nvm][] is optional, but recommended
