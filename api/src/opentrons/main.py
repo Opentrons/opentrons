@@ -148,6 +148,6 @@ def initialize(
         #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
         loop.run_until_complete(
                 install_hardware_server(hardware_server_socket,
-                                        hardware))
+                                        hardware))  # type: ignore
 
     return hardware
