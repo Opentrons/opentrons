@@ -476,7 +476,7 @@ describe('consolidate single-channel', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
-  test.skip('air gap', () => {}) // TODO Ian 2018-04-05 determine air gap behavior
+  test.todo('air gap') // TODO Ian 2018-04-05 determine air gap behavior
 })
 
 describe('consolidate multi-channel', () => {
@@ -534,7 +534,7 @@ describe('consolidate multi-channel', () => {
   })
 
   // TODO Ian 2018-03-14: address different multi-channel layouts of plates
-  test.skip('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12', () => {})
+  test.todo('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12')
 
-  test.skip('multi-channel trough A1 A2 A3 A4 to 96-plate A12', () => {})
+  test.todo('multi-channel trough A1 A2 A3 A4 to 96-plate A12')
 })
