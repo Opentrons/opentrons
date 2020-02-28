@@ -107,6 +107,11 @@ class InstrumentContext(CommandPublisher):
         self.starting_tip = None
 
     @property  # type: ignore
+    @requires_version(2, 3)
+    def _plunger_position(self):
+        return self._hw_manager.hardware.plunger_position(self._mount)
+
+    @property  # type: ignore
     @requires_version(2, 0)
     def default_speed(self) -> float:
         """ The speed at which the robot's gantry moves.
@@ -194,7 +199,9 @@ class InstrumentContext(CommandPublisher):
             # Make sure we're at the top of the labware and clear of any
             # liquid to prepare the pipette for aspiration
             if isinstance(dest.labware, Well):
-                self.move_to(dest.labware.top())
+                if self._api_version < APIVersion(2, 3) or \
+                        self._plunger_position < self.hw_pipette['bottom']:
+                    self.move_to(dest.labware.top())
             else:
                 # TODO(seth,2019/7/29): This should be a warning exposed via
                 # rpc to the runapp
