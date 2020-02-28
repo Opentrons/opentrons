@@ -5,7 +5,7 @@ import type { Options } from './fields'
 const pipettes = {
   p20_single_gen2: {
     displayName: 'P20 Single GEN2',
-    tiprack: 'opentrons_96_tiprack_10ul',
+    tiprack: 'opentrons_96_tiprack_20ul',
   },
   p300_single_gen2: {
     displayName: 'P300 Single GEN2',
@@ -17,7 +17,7 @@ const pipettes = {
   },
   p10_single: {
     displayName: 'P10 Single GEN1',
-    tiprack: 'opentrons_96_tiprack_10ul',
+    tiprack: 'opentrons_96_tiprack_20ul',
   },
   p50_single: {
     displayName: 'P50 Single GEN1',
