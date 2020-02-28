@@ -5,11 +5,11 @@ import { Icon } from '../icons'
 
 import styles from './forms.css'
 
-type Props = {
+export type RadioGroupProps = {|
   /** blur handler */
-  onBlur?: (event: SyntheticInputEvent<*>) => mixed,
+  onBlur?: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
   /** value that is checked */
   value?: string,
   /** Array of {name, value} data with optional children */
@@ -28,9 +28,9 @@ type Props = {
   error?: ?string,
   /** 'name' attr of input */
   name?: string,
-}
+|}
 
-export default function RadioGroup(props: Props) {
+export function RadioGroup(props: RadioGroupProps) {
   const error = props.error != null
 
   const outerClassName = cx({

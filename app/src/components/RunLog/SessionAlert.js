@@ -5,13 +5,13 @@ import { AlertItem } from '@opentrons/components'
 import { getSessionError } from '../../robot/selectors'
 import type { SessionStatus } from '../../robot'
 
-type Props = {
+export type SessionAlertProps = {|
   sessionStatus: SessionStatus,
   className?: string,
   onResetClick: () => mixed,
-}
+|}
 
-export default function SessionAlert(props: Props) {
+export function SessionAlert(props: SessionAlertProps) {
   const { sessionStatus, className, onResetClick } = props
   const sessionError = useSelector(getSessionError)
 

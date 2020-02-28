@@ -2,7 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
-import { getModuleDisplayName } from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import {
   Modal,
   OutlineButton,
@@ -24,16 +24,20 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
-import { MODELS_FOR_MODULE_TYPE, THERMOCYCLER } from '../../../constants'
+import {
+  MODELS_FOR_MODULE_TYPE,
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+} from '../../../constants'
 import { i18n } from '../../../localization'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
-  moduleType: ModuleType,
+  moduleType: ModuleRealType,
+  /** if moduleId is not specified, we're creating a new module of the given type */
   moduleId: ?string,
   onCloseClick: () => mixed,
 }
@@ -42,14 +46,16 @@ export function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
 
-  const module = props.moduleId && _initialDeckSetup.modules[props.moduleId]
+  const module = props.moduleId
+    ? _initialDeckSetup.modules[props.moduleId]
+    : null
 
   const [selectedSlot, setSelectedSlot] = React.useState<string>(
-    (module && module.slot) || SUPPORTED_MODULE_SLOTS[moduleType][0].value
+    module?.slot || SUPPORTED_MODULE_SLOTS[moduleType][0].value
   )
 
   const [selectedModel, setSelectedModel] = React.useState<string>(
-    (module && module.model) || 'GEN1'
+    module?.model || DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
   )
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
@@ -71,7 +77,7 @@ export function EditModulesModal(props: EditModulesProps) {
     hasSlotOrIncompatibleError = !labwareIsCompatible
   }
 
-  const showSlotOption = moduleType !== THERMOCYCLER
+  const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
 
   const enableSlotSelection = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
@@ -115,8 +121,7 @@ export function EditModulesModal(props: EditModulesProps) {
       onCloseClick()
     }
   }
-
-  const heading = getModuleDisplayName(moduleType)
+  const heading = i18n.t(`modules.module_long_names.${moduleType}`)
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
@@ -180,13 +185,16 @@ export function EditModulesModal(props: EditModulesProps) {
         </div>
       </form>
 
-      <div className={styles.button_row}>
-        <OutlineButton onClick={onCloseClick}>Cancel</OutlineButton>
+      <div className={modalStyles.button_row}>
+        <OutlineButton className={styles.button_margin} onClick={onCloseClick}>
+          {i18n.t('button.cancel')}
+        </OutlineButton>
         <OutlineButton
+          className={styles.button_margin}
           disabled={hasSlotOrIncompatibleError}
           onClick={onSaveClick}
         >
-          Save
+          {i18n.t('button.save')}
         </OutlineButton>
       </div>
     </Modal>

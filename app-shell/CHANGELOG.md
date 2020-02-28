@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
+
+**Note:** Version bump only for package @opentrons/app-shell
+
+
+
+
+
+# [3.16.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0) (2020-02-19)
+
+### Features
+
+* **app:** allow custom labware dir to be opened and reset to default ([#4918](https://github.com/Opentrons/opentrons/issues/4918)) ([03c438a](https://github.com/Opentrons/opentrons/commit/03c438a)), closes [#4878](https://github.com/Opentrons/opentrons/issues/4878) [#4879](https://github.com/Opentrons/opentrons/issues/4879)
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 **Note:** Version bump only for package @opentrons/app-shell

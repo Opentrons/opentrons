@@ -1,16 +1,18 @@
 // @flow
 import * as React from 'react'
-import type { CalibrateDeckStartedProps } from './types'
-import { PrimaryButton } from '@opentrons/components'
-import JogControls from '../JogControls'
-import Instructions from './Instructions'
 
-type Props = {|
+import { PrimaryButton } from '@opentrons/components'
+import { JogControls } from '../JogControls'
+import { Instructions } from './Instructions'
+
+import type { CalibrateDeckStartedProps } from './types'
+
+export type ConfirmPositionProps = {|
   ...CalibrateDeckStartedProps,
   proceed: () => mixed,
 |}
 
-export default function ConfirmPosition(props: Props) {
+export function ConfirmPosition(props: ConfirmPositionProps) {
   return (
     <div>
       <Instructions calibrationStep={props.calibrationStep} />

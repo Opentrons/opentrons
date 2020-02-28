@@ -21,15 +21,15 @@ export type Jog = (
   step: JogStep
 ) => mixed
 
-type JogButtonProps = {
+type JogButtonProps = {|
   name: string,
   icon: IconName,
   onClick: () => mixed,
-}
+|}
 
-type Props = { jog: Jog }
+export type JogControlsProps = {| jog: Jog |}
 
-type State = { step: JogStep }
+type JogControlsState = {| step: JogStep |}
 
 const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
 
@@ -54,8 +54,11 @@ const JOG_PARAMS_BY_NAME = {
 const STEPS: Array<JogStep> = [0.1, 1, 10]
 const STEP_OPTIONS = STEPS.map(s => ({ name: `${s} mm`, value: `${s}` }))
 
-export default class JogControls extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class JogControls extends React.Component<
+  JogControlsProps,
+  JogControlsState
+> {
+  constructor(props: JogControlsProps) {
     super(props)
     this.state = { step: STEPS[0] }
   }
@@ -79,13 +82,14 @@ export default class JogControls extends React.Component<Props, State> {
     const { jog } = this.props
     const { step } = this.state
 
-    return JOG_BUTTON_NAMES.reduce(
-      (result, name) => ({
-        ...result,
-        [name]: jog.bind(null, ...JOG_PARAMS_BY_NAME[name], step),
-      }),
-      {}
-    )
+    return {
+      left: jog.bind(null, ...JOG_PARAMS_BY_NAME.left, step),
+      right: jog.bind(null, ...JOG_PARAMS_BY_NAME.right, step),
+      back: jog.bind(null, ...JOG_PARAMS_BY_NAME.back, step),
+      forward: jog.bind(null, ...JOG_PARAMS_BY_NAME.forward, step),
+      up: jog.bind(null, ...JOG_PARAMS_BY_NAME.up, step),
+      down: jog.bind(null, ...JOG_PARAMS_BY_NAME.down, step),
+    }
   }
 
   renderJogControls() {
@@ -122,7 +126,6 @@ export default class JogControls extends React.Component<Props, State> {
             value={`${step}`}
             options={STEP_OPTIONS}
             onChange={this.handleStepSelect}
-            disableKeypress
           />
         </span>
       </HandleKeypress>

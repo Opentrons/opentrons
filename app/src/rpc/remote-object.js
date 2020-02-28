@@ -6,7 +6,7 @@ function isRemoteObject(source) {
   return source != null && typeof source === 'object' && source.i && source.t
 }
 
-export default function RemoteObject(context, source, options, seen) {
+export function RemoteObject(context, source, options, seen) {
   options = options || { methods: true }
   seen = seen || new Map()
 

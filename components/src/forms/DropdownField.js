@@ -13,14 +13,13 @@ export type DropdownOption = {|
 
 export type Options = Array<DropdownOption>
 
-// TODO(mc, 2018-02-22): disabled prop
-type Props = {
+export type DropdownFieldProps = {|
   /** change handler */
-  onChange: (event: SyntheticInputEvent<*>) => mixed,
+  onChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
   /** focus handler */
-  onFocus?: (event: SyntheticFocusEvent<*>) => mixed,
+  onFocus?: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
   /** blur handler */
-  onBlur?: (event: SyntheticFocusEvent<*>) => mixed,
+  onBlur?: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
   /** value that is selected */
   value?: ?string,
   /** optional id for the <select> element */
@@ -41,14 +40,16 @@ type Props = {
   tabIndex?: number,
   /** automatically focus field on render */
   autoFocus?: boolean,
-}
+|}
 
-export default function DropdownField(props: Props) {
+const BLANK_OPTION: DropdownOption = { name: '', value: '' }
+
+export function DropdownField(props: DropdownFieldProps) {
   // add in "blank" option if there is no `value`, unless `options` already has a blank option
   const options =
     props.value || props.options.some(opt => opt.value === '')
       ? props.options
-      : [{ name: '', value: '' }, ...props.options]
+      : [BLANK_OPTION, ...props.options]
 
   const error = props.error != null
   const className = cx(props.className, {
@@ -72,7 +73,11 @@ export default function DropdownField(props: Props) {
           autoFocus={props.autoFocus}
         >
           {options.map(opt => (
-            <option key={opt.value} value={opt.value} disabled={!!opt.disabled}>
+            <option
+              key={opt.value}
+              value={opt.value}
+              disabled={Boolean(opt.disabled)}
+            >
               {opt.name}
             </option>
           ))}

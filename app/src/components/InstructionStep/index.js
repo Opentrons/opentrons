@@ -2,13 +2,13 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-export type StepProps = {
+export type InstructionStepProps = {|
   step: 'one' | 'two',
   children: React.Node,
   diagram: string,
-}
+|}
 
-export default function InstructionStep(props: StepProps) {
+export function InstructionStep(props: InstructionStepProps) {
   return (
     <fieldset className={styles.step}>
       <legend className={styles.step_legend}>Step {props.step}</legend>

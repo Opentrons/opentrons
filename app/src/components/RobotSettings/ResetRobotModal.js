@@ -22,14 +22,14 @@ import { Portal } from '../portal'
 import type { State, Dispatch } from '../../types'
 import type { ResetConfigRequest } from '../../robot-admin/types'
 
-type Props = {|
+export type ResetRobotModalProps = {|
   robotName: string,
   closeModal: () => mixed,
 |}
 
 const TITLE = 'Robot Configuration Reset'
 
-export default function ResetRobotModal(props: Props) {
+export function ResetRobotModal(props: ResetRobotModalProps) {
   const { robotName, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()

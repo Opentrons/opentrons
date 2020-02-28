@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { Icon } from '../icons'
 
-type ListProps = {|
+export type CollapsibleItemProps = {|
   /** text of title */
   title: string,
   /** children nodes */
@@ -22,7 +22,7 @@ type ListProps = {|
 /**
  * A list item with title, and collapsible children.
  */
-export default function CollapsibleItem(props: ListProps) {
+export function CollapsibleItem(props: CollapsibleItemProps) {
   const { onCollapseToggle } = props
   const collapsible = onCollapseToggle != null
 

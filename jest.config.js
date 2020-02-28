@@ -28,11 +28,11 @@ module.exports = {
     '!**/__mocks__/**',
     '!**/__tests__/**',
     '!**/__fixtures__/**',
+    '!**/__utils__/**',
     '!**/test/**',
-    '!**/test-with-flow/**',
     '!**/scripts/**',
   ],
-  testPathIgnorePatterns: ['cypress/'],
+  testPathIgnorePatterns: ['cypress/', '/node_modules/'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
 }

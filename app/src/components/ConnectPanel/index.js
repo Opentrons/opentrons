@@ -14,10 +14,10 @@ import {
 import type { State, Dispatch } from '../../types'
 
 import { SidePanel } from '@opentrons/components'
-import RobotList from './RobotList'
-import RobotItem from './RobotItem'
-import ScanStatus from './ScanStatus'
-import UnreachableRobotItem from './UnreachableRobotItem'
+import { RobotList } from './RobotList'
+import { RobotItem } from './RobotItem'
+import { ScanStatus } from './ScanStatus'
+import { UnreachableRobotItem } from './UnreachableRobotItem'
 
 import type {
   Robot,
@@ -35,25 +35,34 @@ type SP = {|
 
 type DP = {| onScanClick: () => mixed |}
 
-type Props = { ...SP, ...DP }
+type Props = {| ...SP, ...DP |}
 
-export default connect<Props, {||}, SP, DP, State, Dispatch>(
+export const ConnectPanel = connect<Props, {||}, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(ConnectPanel)
+)(ConnectPanelComponent)
 
-function ConnectPanel(props: Props) {
+function ConnectPanelComponent(props: Props) {
+  const {
+    robots,
+    reachableRobots,
+    unreachableRobots,
+    found,
+    isScanning,
+    onScanClick,
+  } = props
+
   return (
     <SidePanel title="Robots">
-      <ScanStatus {...props} />
+      <ScanStatus {...{ found, isScanning, onScanClick }} />
       <RobotList>
-        {props.robots.map(robot => (
+        {robots.map(robot => (
           <RobotItem key={robot.name} robot={robot} />
         ))}
-        {props.reachableRobots.map(robot => (
+        {reachableRobots.map(robot => (
           <RobotItem key={robot.name} robot={robot} />
         ))}
-        {props.unreachableRobots.map(robot => (
+        {unreachableRobots.map(robot => (
           <UnreachableRobotItem key={robot.name} {...robot} />
         ))}
       </RobotList>

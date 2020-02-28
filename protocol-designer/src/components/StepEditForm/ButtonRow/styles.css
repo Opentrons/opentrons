@@ -15,8 +15,3 @@
 .form_button:not(:last-child) {
   margin-right: var(--form-button-margin);
 }
-
-.button_row {
-  display: flex;
-  justify-content: space-between;
-}

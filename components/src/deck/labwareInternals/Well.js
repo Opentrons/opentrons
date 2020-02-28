@@ -23,7 +23,7 @@ export type WellProps = {|
   onMouseLeaveWell?: WellMouseEvent => mixed,
 |}
 
-function Well(props: WellProps) {
+function WellComponent(props: WellProps) {
   const { well, wellName, fill, onMouseEnterWell, onMouseLeaveWell } = props
   assert(well, `expected 'well' prop for well "${wellName}"`)
   if (!well) return null
@@ -76,4 +76,4 @@ function Well(props: WellProps) {
   return null
 }
 
-export default React.memo<WellProps>(Well)
+export const Well = React.memo<WellProps>(WellComponent)

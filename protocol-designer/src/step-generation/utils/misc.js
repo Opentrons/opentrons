@@ -115,9 +115,9 @@ export function mergeLiquid(
     // include all ingreds exclusive to 'dest'
     ...dest,
 
-    ...reduce(
+    ...reduce<LocationLiquidState, LocationLiquidState>(
       source,
-      (acc: LocationLiquidState, ingredState: Vol, ingredId: string) => {
+      (acc, ingredState: Vol, ingredId: string) => {
         const isCommonIngred = ingredId in dest
         const ingredVolume = isCommonIngred
           ? // sum volumes of ingredients common to 'source' and 'dest'

@@ -15,11 +15,11 @@ import styles from './styles.css'
 import type { Mount, Labware } from '../../robot'
 import type { Dispatch } from '../../types'
 
-import ProceedToRun from './ProceedToRun'
+import { ProceedToRun } from './ProceedToRun'
 
-type Props = {| labware: ?Labware |}
+export type InfoBoxButtonProps = {| labware: ?Labware |}
 
-function InfoBoxButton(props: Props) {
+export function InfoBoxButton(props: InfoBoxButtonProps) {
   const { labware } = props
   const dispatch = useDispatch<Dispatch>()
 
@@ -61,5 +61,3 @@ function InfoBoxButton(props: Props) {
     )
   }
 }
-
-export default InfoBoxButton

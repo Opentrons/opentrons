@@ -11,6 +11,7 @@ import {
   getNextDefaultEngageHeight,
   handleFormChange,
 } from '../../../steplist/formLevel'
+import { maskField } from '../../../steplist/fieldLevel'
 import type { StepIdType, StepType } from '../../../form-types'
 import type { GetState, ThunkAction, ThunkDispatch } from '../../../types'
 import type { TerminalItemId, SubstepIdentifier } from '../../../steplist/types'
@@ -116,6 +117,7 @@ export const selectStep = (
 
     formData = {
       ...formData,
+      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       ...updatedFields,
     }
   }
@@ -140,7 +142,7 @@ export const selectStep = (
   }
 
   // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
-  if (newStepType === 'magnet') {
+  if (formData && formData.stepType === 'magnet') {
     const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
     const magnetAction = getNextDefaultMagnetAction(
       stepFormSelectors.getSavedStepForms(state),
@@ -152,7 +154,7 @@ export const selectStep = (
     )
 
     const stringDefaultEngageHeight = defaultEngageHeight
-      ? defaultEngageHeight.toString()
+      ? maskField('engageHeight', defaultEngageHeight)
       : null
 
     const prevEngageHeight = getNextDefaultEngageHeight(

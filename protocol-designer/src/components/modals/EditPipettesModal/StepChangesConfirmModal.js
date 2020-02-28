@@ -66,7 +66,7 @@ export const StepChangesConfirmModal = (props: Props) => {
         </li>
       </ul>
 
-      <div className={styles.button_row}>
+      <div className={modalStyles.button_row}>
         <OutlineButton onClick={onCancel}>
           {i18n.t('button.cancel')}
         </OutlineButton>

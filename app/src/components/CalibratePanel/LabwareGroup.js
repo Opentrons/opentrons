@@ -7,9 +7,9 @@ import { selectors as robotSelectors } from '../../robot'
 
 const TITLE = 'Labware Calibration'
 
-type Props = {| children: React.Node |}
+export type LabwareGroupProps = {| children: React.Node |}
 
-export default function LabwareGroup(props: Props) {
+export function LabwareGroup(props: LabwareGroupProps) {
   const isRunning = useSelector(robotSelectors.getIsRunning)
 
   return (

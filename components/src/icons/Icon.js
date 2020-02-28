@@ -2,8 +2,10 @@
 import * as React from 'react'
 import classnames from 'classnames'
 
-import ICON_DATA_BY_NAME, { type IconName } from './icon-data'
+import { ICON_DATA_BY_NAME } from './icon-data'
 import styles from './icons.css'
+
+export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
 
 export type IconProps = {|
   /** name constant of the icon to display */
@@ -34,7 +36,7 @@ export type IconProps = {|
  * import {type IconName} from '@opentrons/components'
  * ```
  */
-export default function Icon(props: IconProps) {
+export function Icon(props: IconProps) {
   const { name, x, y, height, width, style } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

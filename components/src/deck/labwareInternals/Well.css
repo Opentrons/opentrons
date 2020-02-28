@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '../..';
 
 .default_well {
   fill: var(--c-white);

@@ -25,12 +25,57 @@ const SPECS: Array<ReducerSpec> = [
       {}
     ),
     state: {
-      [ROBOT_NAME]: {},
+      [ROBOT_NAME]: {
+        wifiList: [],
+      },
     },
     expected: {
       [ROBOT_NAME]: {
         internetStatus: Fixtures.mockNetworkingStatus.status,
         interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [],
+      },
+    },
+  },
+  {
+    name: 'handles fetch wifi list success action',
+    action: Actions.fetchWifiListSuccess(
+      ROBOT_NAME,
+      [Fixtures.mockWifiNetwork],
+      {}
+    ),
+    state: {
+      [ROBOT_NAME]: {
+        internetStatus: Fixtures.mockNetworkingStatus.status,
+        interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [],
+      },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        internetStatus: Fixtures.mockNetworkingStatus.status,
+        interfaces: Fixtures.mockNetworkingStatus.interfaces,
+        wifiList: [Fixtures.mockWifiNetwork],
+      },
+    },
+  },
+  {
+    name: 'handles fetch wifi keys success action',
+    action: Actions.fetchWifiKeysSuccess(
+      ROBOT_NAME,
+      [Fixtures.mockWifiKey],
+      {}
+    ),
+    state: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeys: [],
+      },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeys: [Fixtures.mockWifiKey],
       },
     },
   },
@@ -39,6 +84,6 @@ const SPECS: Array<ReducerSpec> = [
 describe('networkingReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    test(name, () => expect(networkingReducer(state, action)).toEqual(expected))
+    it(name, () => expect(networkingReducer(state, action)).toEqual(expected))
   })
 })

@@ -8,7 +8,7 @@ import {
   MULTI_PIPETTE,
   SOURCE_LABWARE,
   DEST_LABWARE,
-} from '../../step-generation/test-with-flow/fixtures'
+} from '../../step-generation/__fixtures__'
 
 import { getLabwareLiquidState, getRobotStateTimeline } from '../selectors'
 jest.mock('../../labware-defs/utils')

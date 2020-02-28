@@ -5,7 +5,7 @@ import { Icon, type IconProps } from '../icons'
 import { IconButton } from '../buttons'
 import styles from './alerts.css'
 
-export type AlertProps = {
+export type AlertItemProps = {|
   /** name constant of the icon to display */
   type: 'success' | 'warning' | 'error' | 'info',
   /** title/main message of colored alert bar */
@@ -18,7 +18,7 @@ export type AlertProps = {
   onCloseClick?: () => mixed,
   /** Override the default Alert Icon */
   icon?: IconProps,
-}
+|}
 
 /**
  * Alert overlay,
@@ -46,7 +46,7 @@ const ALERT_PROPS_BY_TYPE = {
 
 export type AlertType = $Keys<typeof ALERT_PROPS_BY_TYPE>
 
-export default function AlertItem(props: AlertProps) {
+export function AlertItem(props: AlertItemProps) {
   const alertProps = ALERT_PROPS_BY_TYPE[props.type]
   const icon = props.icon ? props.icon : alertProps.icon
   const className = cx(styles.alert, alertProps.className, props.className)

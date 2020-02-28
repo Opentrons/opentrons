@@ -34,7 +34,7 @@ export function FetchError(error: Error): ApiRequestError {
 
 const JSON_CONTENT_TYPE = 'application/json'
 
-export default function client<T, U>(
+export function client<T, U>(
   robot: RobotService,
   method: Method,
   path: string,

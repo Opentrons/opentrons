@@ -52,12 +52,6 @@
   margin: 1rem 0;
 }
 
-.button_row {
-  margin-top: 1rem;
-  display: flex;
-  justify-content: flex-end;
-}
-
 .button {
   margin: 0 0 0 1rem;
 }

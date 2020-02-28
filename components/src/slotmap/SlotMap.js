@@ -29,7 +29,9 @@ const numCols = 3
 export function SlotMap(props: SlotMapProps) {
   const { collisionSlots, occupiedSlots, isError } = props
   return (
-    <svg viewBox={`0,0,${slotWidth * numCols}, ${slotHeight * numRows}`}>
+    <svg
+      viewBox={`-1,-1,${slotWidth * numCols + 2}, ${slotHeight * numRows + 2}`}
+    >
       {SLOT_MAP_SLOTS.flatMap((row, rowIndex) =>
         row.map((slot, colIndex) => {
           const isCollisionSlot =

@@ -1,5 +1,5 @@
 // remote call error object
-export default class RemoteError extends Error {
+export class RemoteError extends Error {
   constructor(message, methodName, args, traceback) {
     super(message)
     this.name = 'RemoteError'

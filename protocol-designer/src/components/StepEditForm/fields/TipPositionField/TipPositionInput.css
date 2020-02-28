@@ -71,21 +71,3 @@
   position: relative;
   left: 9px;
 }
-
-.button_row {
-  display: flex;
-  justify-content: space-between;
-}
-
-.reset_button {
-  width: 10rem;
-}
-
-.cancel_button {
-  width: 10rem;
-  margin-right: 1rem;
-}
-
-.done_button {
-  width: 10rem;
-}

@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
+
+**Note:** Version bump only for package @opentrons/app
+
+
+
+
+
+# [3.16.0](https://github.com/Opentrons/opentrons/compare/v3.15.2...v3.16.0) (2020-02-19)
+
+### Bug Fixes
+
+* **app:** add spinner to "Save" button in Pipette Settings ([#4685](https://github.com/Opentrons/opentrons/issues/4685)) ([b8a9aac](https://github.com/Opentrons/opentrons/commit/b8a9aac)), closes [#4583](https://github.com/Opentrons/opentrons/issues/4583)
+* **app:** clear lw calibration state if top level home is called ([#4703](https://github.com/Opentrons/opentrons/issues/4703)) ([8fe7120](https://github.com/Opentrons/opentrons/commit/8fe7120))
+* **app:** home all axes after lw calibration to allow deck access ([#4687](https://github.com/Opentrons/opentrons/issues/4687)) ([6e0ad61](https://github.com/Opentrons/opentrons/commit/6e0ad61)), closes [#4034](https://github.com/Opentrons/opentrons/issues/4034)
+
+
+### Features
+
+* **app:** allow custom labware dir to be opened and reset to default ([#4918](https://github.com/Opentrons/opentrons/issues/4918)) ([03c438a](https://github.com/Opentrons/opentrons/commit/03c438a)), closes [#4878](https://github.com/Opentrons/opentrons/issues/4878) [#4879](https://github.com/Opentrons/opentrons/issues/4879)
+* **app:** enable module firmware update button when update available ([#4923](https://github.com/Opentrons/opentrons/issues/4923)) ([1edc587](https://github.com/Opentrons/opentrons/commit/1edc587)), closes [#4575](https://github.com/Opentrons/opentrons/issues/4575)
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 

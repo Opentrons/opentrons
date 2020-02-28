@@ -4,12 +4,12 @@ import * as React from 'react'
 import { connect } from 'react-redux'
 import { Switch, Route, Redirect, type Match } from 'react-router-dom'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { Pipette, Labware } from '../../robot'
 
 import { selectors as robotSelectors } from '../../robot'
-import CalibratePipettes from './Pipettes'
-import CalibrateLabware from './Labware'
+import { Pipettes as CalibratePipettes } from './Pipettes'
+import { Labware as CalibrateLabware } from './Labware'
 
 type OP = {| match: Match |}
 
@@ -20,11 +20,13 @@ type SP = {|
   isTipsProbed: boolean,
 |}
 
-type Props = { ...OP, ...SP }
+type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export default connect<Props, OP, SP, _, _, _>(mapStateToProps)(Calibrate)
+export const Calibrate = connect<Props, OP, SP, _, _, _>(mapStateToProps)(
+  CalibrateComponent
+)
 
-function Calibrate(props: Props) {
+function CalibrateComponent(props: Props) {
   const { path } = props.match
 
   return (

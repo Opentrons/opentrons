@@ -1,0 +1,16 @@
+@import '..';
+
+.highlighted_well {
+  stroke: var(--c-highlight);
+  fill: color-mod(var(--c-highlight) alpha(20%));
+}
+
+.selected_well {
+  stroke: var(--c-highlight);
+  fill: transparent;
+}
+
+.missing_tip {
+  stroke: var(--c-near-black);
+  fill: var(--c-light-gray);
+}

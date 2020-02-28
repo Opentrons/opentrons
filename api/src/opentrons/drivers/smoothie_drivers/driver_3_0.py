@@ -133,6 +133,20 @@ class SmoothieAlarm(Exception):
         return f'SmoothieAlarm: {self.command} returned {self.ret_code}'
 
 
+class TipProbeError(SmoothieAlarm):
+    def __init__(self, ret_code: str = None, command: str = None) -> None:
+        self.ret_code = ret_code
+        self.command = command
+        super().__init__(ret_code, command)
+
+    def __repr__(self):
+        return f'<TipProbeError: {self.ret_code} from {self.command}'
+
+    def __str__(self):
+        return 'Tip probe could not complete: the switch was never touched. '\
+            'This may be because there is no tip on the pipette.'
+
+
 class ParseError(Exception):
     pass
 
@@ -1042,7 +1056,16 @@ class SmoothieDriver_3_0_0:
                 raise SmoothieError(ret_code)
         else:
             if is_alarm or is_error:
-                raise SmoothieError(ret_code)
+                # these two errors happen when we're recovering from a hard
+                # halt. in that case, some try/finallys above us may send
+                # further commands. smoothie responds to those commands with
+                # errors like these. if we raise exceptions here, they
+                # overwrite the original exception and we don't properly
+                #  handle it. This hack to get around this is really bad!
+                if 'alarm lock' not in ret_code.lower()\
+                   and 'after halt you should home' not in ret_code.lower():
+                    log.error(f"alarm/error outside hard halt: {ret_code}")
+                    raise SmoothieError(ret_code)
 
     def _remove_unwanted_characters(self, command: str, response: str) -> str:
         # smoothieware can enter a weird state, where it repeats back
@@ -1689,8 +1712,13 @@ class SmoothieDriver_3_0_0:
             self.engaged_axes[axis] = True
             command = GCODES['PROBE'] + axis.upper() + str(probing_distance)
             log.debug("probe_axis: {}".format(command))
-            self._send_command(
-                command=command, timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            try:
+                self._send_command(
+                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT)
+            except SmoothieError as se:
+                log.exception("Tip probe failure")
+                if 'probe' in str(se).lower():
+                    raise TipProbeError(se.ret_code, se.command)
             self.update_position(self.position)
             return self.position
         else:

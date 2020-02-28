@@ -1,4 +1,5 @@
 // @flow
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 import { getHoveredStepLabware } from '../selectors'
 import * as utils from '../../modules/utils'
 
@@ -106,7 +107,7 @@ describe('getHoveredStepLabware', () => {
   })
 
   describe('modules', () => {
-    const type = 'tempdeck'
+    const type = TEMPERATURE_MODULE_TYPE
     const setTempCommand = 'setTemperature'
     beforeEach(() => {
       initialDeckState = {
@@ -120,7 +121,7 @@ describe('getHoveredStepLabware', () => {
           abc123: {
             id: 'abc123',
             type,
-            model: 'GEN1',
+            model: 'someTempModel',
             slot: '1',
             moduleState: {
               type,

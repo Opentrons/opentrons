@@ -77,3 +77,24 @@
   overflow-y: auto;
   margin-bottom: 1rem;
 }
+
+.button_row {
+  margin-top: 1rem;
+  display: flex;
+  justify-content: flex-end;
+}
+
+/* usually used when there is a single button on the left and rest on the right */
+.button_row_divided {
+  display: flex;
+  justify-content: space-between;
+}
+
+/* used with .button_row_divided to define the division */
+.button_right_of_break {
+  margin-right: 1rem;
+}
+
+.button_medium {
+  width: 10rem;
+}

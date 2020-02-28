@@ -1,11 +1,5 @@
 @import '@opentrons/components';
 
-.button_row {
-  display: flex;
-  justify-content: flex-end;
-  margin-top: 2rem;
-}
-
 .continue_button {
   margin-left: 1rem;
 }

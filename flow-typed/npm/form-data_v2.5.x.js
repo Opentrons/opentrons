@@ -17,7 +17,7 @@ import ReadableStream from 'stream'
 
 declare module 'form-data' {
   declare class _FormData extends FormData {
-    append(name: string, data: ReadableStream): void;
+    append(name: string, data: ReadableStream, filename?: string): void;
   }
 
   declare export default typeof _FormData

@@ -7,7 +7,7 @@ import { getCalibrateLocation } from '../../nav'
 import { PrimaryButton, HoverTooltip } from '@opentrons/components'
 import styles from './styles.css'
 
-export default function Continue() {
+export function Continue() {
   const { path, disabledReason } = useSelector(getCalibrateLocation)
 
   // TODO(mc, 2019-11-26): tooltip positioning is all messed up with this component

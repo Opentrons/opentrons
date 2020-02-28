@@ -13,13 +13,13 @@ import singleGEN2Src from './pipetteGEN2Single.png'
 import multiGEN2Src from './pipetteGEN2Multi.png'
 import styles from './instrument.css'
 
-type Props = {
-  pipetteSpecs?: ?PipetteNameSpecs | ?PipetteModelSpecs,
+export type InstrumentDiagramProps = {|
+  pipetteSpecs?: PipetteNameSpecs | PipetteModelSpecs | null,
   className?: string,
   mount: Mount,
-}
+|}
 
-export default function InstrumentDiagram(props: Props) {
+export function InstrumentDiagram(props: InstrumentDiagramProps) {
   const { pipetteSpecs, mount } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 

@@ -6,15 +6,14 @@ from opentrons.config import robot_configs
 from opentrons.protocol_api import labware
 from opentrons.api import models
 from opentrons.types import Point, Location, Mount
-from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control import CriticalPoint, API
 
 state = partial(state, 'calibration')
 
 
 @pytest.mark.api2_only  # noqa(C901)
 async def test_tip_probe_v2(main_router, model, monkeypatch):
-
-    def fake_update(mount, new_offset=None, from_tip_probe=None):
+    def fake_update(self, mount, new_offset=None, from_tip_probe=None):
         assert mount == Mount[model.instrument.mount.upper()]
         if new_offset:
             assert new_offset == Point(0, 0, 0)
@@ -26,8 +25,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
     def fake_move(instrument):
         assert instrument == model.instrument
 
-    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
-                        'update_instrument_offset', fake_update)
+    monkeypatch.setattr(API, 'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
                         'move_to_front', fake_move)
 
@@ -38,21 +36,19 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
                          [model.instrument._instrument],
                          model.instrument._context)]
 
-    def new_fake_locate(mount, tip_length):
+    def new_fake_locate(self, mount, tip_length):
         assert tip_length == pytest.approx(59.3-7.47)
         return Point(0, 0, 0)
 
-    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
-                        'locate_tip_probe_center', new_fake_locate)
+    monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate)
     main_router.calibration_manager.tip_probe(model.instrument)
     await main_router.wait_until(state('ready'))
 
-    def new_fake_locate2(mount, tip_length):
+    def new_fake_locate2(self, mount, tip_length):
         assert tip_length == pytest.approx(59.3-7.47)
         return Point(0, 0, 0)
 
-    monkeypatch.setattr(main_router.calibration_manager._hardware._api,
-                        'locate_tip_probe_center', new_fake_locate2)
+    monkeypatch.setattr(API, 'locate_tip_probe_center', new_fake_locate2)
     main_router.calibration_manager.tip_probe(model.instrument)
 
 
@@ -138,8 +134,7 @@ async def test_correct_hotspots():
 @pytest.mark.api2_only
 async def test_move_to_front_api2(main_router, model):
     main_router.calibration_manager._hardware.home()
-    with mock.patch.object(main_router.calibration_manager._hardware._api,
-                           'move_to') as patch:
+    with mock.patch.object(API, 'move_to') as patch:
         main_router.calibration_manager.move_to_front(model.instrument)
         patch.assert_called_with(Mount.RIGHT, Point(132.5, 90.5, 150),
                                  critical_point=CriticalPoint.NOZZLE)
@@ -254,8 +249,7 @@ async def test_move_to_top(main_router, model):
 @pytest.mark.api2_only
 async def test_jog_api2(main_router, model):
     main_router.calibration_manager.home(model.instrument)
-    with mock.patch.object(
-            main_router.calibration_manager._hardware._api, 'move_rel') as jog:
+    with mock.patch.object(API, 'move_rel') as jog:
         for distance, axis in zip((1, 2, 3), 'xyz'):
             main_router.calibration_manager.jog(
                 model.instrument,
@@ -302,7 +296,7 @@ async def test_jog_api1(main_router, model):
 async def test_update_container_offset_v2(main_router, model):
     with mock.patch(
             'opentrons.protocol_api.labware.save_calibration') as call,\
-            mock.patch.object(main_router.calibration_manager._hardware._api,
+            mock.patch.object(API,
                               'gantry_position') as gp:
         gp.return_value = Point(0, 0, 0)
         main_router.calibration_manager.update_container_offset(

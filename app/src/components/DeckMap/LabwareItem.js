@@ -22,16 +22,16 @@ import { getLegacyLabwareDef } from '../../getLabware'
 
 import styles from './styles.css'
 
-export type LabwareItemProps = {
+export type LabwareItemProps = {|
   highlighted?: boolean | null,
   areTipracksConfirmed?: boolean,
   handleClick?: () => void,
   labware: $Exact<Labware>,
   x: number,
   y: number,
-}
+|}
 
-export default function LabwareItem(props: LabwareItemProps) {
+export function LabwareItem(props: LabwareItemProps) {
   const { labware, highlighted, areTipracksConfirmed, handleClick } = props
   const { isTiprack, confirmed, name, type, slot, definition } = labware
 

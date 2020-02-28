@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import Well from './Well'
+import { Well } from './Well'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { WellGroup } from './types'
 
@@ -10,18 +10,20 @@ export type StyledWellProps = {|
   wells: WellGroup,
 |}
 
-function StyledWell(props: StyledWellProps) {
+function StyledWellsComponent(props: StyledWellProps) {
   const { className, definition, wells } = props
-  return Object.keys(wells).map<*, *, React.Node>((wellName: string) => {
-    return (
-      <Well
-        key={wellName}
-        wellName={wellName}
-        well={definition.wells[wellName]}
-        className={className}
-      />
-    )
-  })
+  return (
+    <>
+      {Object.keys(wells).map((wellName: string) => (
+        <Well
+          key={wellName}
+          wellName={wellName}
+          well={definition.wells[wellName]}
+          className={className}
+        />
+      ))}
+    </>
+  )
 }
 
-export default React.memo<StyledWellProps>(StyledWell)
+export const StyledWells = React.memo<StyledWellProps>(StyledWellsComponent)

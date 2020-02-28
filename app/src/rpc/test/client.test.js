@@ -4,8 +4,8 @@ import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'
 
-import Client from '../client'
-import RemoteObject from '../remote-object'
+import { Client } from '../client'
+import { RemoteObject } from '../remote-object'
 import {
   statuses,
   RESULT,

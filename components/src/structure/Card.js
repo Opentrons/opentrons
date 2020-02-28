@@ -6,7 +6,7 @@ import cx from 'classnames'
 
 import styles from './structure.css'
 
-type Props = {|
+export type CardProps = {|
   /** Title for card, all cards should receive a title. */
   title?: React.Node,
   /** Card contents */
@@ -22,7 +22,7 @@ type Props = {|
  *
  * Titles and other children handle their own styles and layout.
  */
-export default function Card(props: Props) {
+export function Card(props: CardProps) {
   const { title, children } = props
 
   const style = cx(styles.card, props.className, {

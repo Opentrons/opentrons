@@ -1,10 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import type { HoverTooltipHandlers } from '../tooltips'
+
 import styles from './Pill.css'
 
-type Props = {
+import type { HoverTooltipHandlers } from '../tooltips'
+
+export type PillProps = {|
   /** background color of pill (any CSS color string) */
   color?: ?string,
   /** text black, instead of default white */
@@ -15,16 +17,17 @@ type Props = {
   children?: React.Node,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
-}
+|}
 
 /**
  * Colored Pill containing text or other contents
  */
-function Pill(props: Props) {
+export function Pill(props: PillProps) {
   const className = cx(styles.pill, props.className, {
     [styles.invert_text]: props.invertTextColor,
   })
   const { color, children, hoverTooltipHandlers } = props
+
   return (
     <span
       style={{ backgroundColor: color }}
@@ -35,5 +38,3 @@ function Pill(props: Props) {
     </span>
   )
 }
-
-export default Pill

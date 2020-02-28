@@ -7,7 +7,7 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 
 
 async def test_controller_home(loop):
-    c = hc.API.build_hardware_simulator(
+    c = await hc.API.build_hardware_simulator(
         loop=loop,
         config=robot_configs.build_config({}, {}))
     await c.home()
@@ -226,7 +226,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
         nonlocal called_with
         called_with = position
 
-    hardware_api = hc.API.build_hardware_simulator(loop=loop)
+    hardware_api = await hc.API.build_hardware_simulator(loop=loop)
     monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
     old_config = await hardware_api.config
     hardware_api._config = old_config._replace(

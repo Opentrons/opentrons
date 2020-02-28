@@ -3,7 +3,7 @@ import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 import { take } from 'rxjs/operators'
 
-import mockRemote from '../remote'
+import { remote as mockRemote } from '../remote'
 import { shellEpic } from '../epic'
 
 const { ipcRenderer: mockIpc } = mockRemote

@@ -6,20 +6,20 @@ import type { DeckDefinition } from '@opentrons/shared-data'
 import styles from './RobotWorkSpace.css'
 import type { RobotWorkSpaceRenderProps } from './types'
 
-type Props = {
+export type RobotWorkSpaceProps = {|
   deckDef?: DeckDefinition,
   viewBox?: string,
   className?: string,
   children?: RobotWorkSpaceRenderProps => Node,
   deckLayerBlacklist?: Array<string>,
-}
+|}
 
 type GetRobotCoordsFromDOMCoords = $PropertyType<
   RobotWorkSpaceRenderProps,
   'getRobotCoordsFromDOMCoords'
 >
 
-function RobotWorkSpace(props: Props) {
+export function RobotWorkSpace(props: RobotWorkSpaceProps) {
   const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
   const wrapperRef: ElementRef<*> = useRef(null)
 
@@ -66,5 +66,3 @@ function RobotWorkSpace(props: Props) {
     </svg>
   )
 }
-
-export default RobotWorkSpace

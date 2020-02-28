@@ -6,7 +6,7 @@ import {
   FilledWells,
   StaticLabware,
 } from './labwareInternals'
-import styles from './labwareRender.css'
+import styles from './LabwareRender.css'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type {
@@ -32,7 +32,7 @@ export type LabwareRenderProps = {|
   selectableWellClass?: string,
 |}
 
-export default function LabwareRender(props: LabwareRenderProps) {
+export function LabwareRender(props: LabwareRenderProps) {
   const cornerOffsetFromSlot = props.definition.cornerOffsetFromSlot
   return (
     <g

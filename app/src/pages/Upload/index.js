@@ -9,7 +9,7 @@ import { getProtocolFilename } from '../../protocol'
 import { getConnectedRobot } from '../../discovery'
 import { getCustomLabware } from '../../custom-labware'
 
-import FileInfo from './FileInfo'
+import { FileInfo } from './FileInfo'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
@@ -29,8 +29,8 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export default withRouter<_, _>(
-  connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadPage)
+export const Upload = withRouter<_, _>(
+  connect<Props, OP, SP, _, _, _>(mapStateToProps)(UploadComponent)
 )
 
 function mapStateToProps(state: State): SP {
@@ -49,7 +49,7 @@ function mapStateToProps(state: State): SP {
   }
 }
 
-function UploadPage(props: Props) {
+function UploadComponent(props: Props) {
   const {
     robot,
     filename,

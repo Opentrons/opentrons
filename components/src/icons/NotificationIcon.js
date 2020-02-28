@@ -1,10 +1,12 @@
 // @flow
 import * as React from 'react'
 
-import Icon, { type IconProps } from './Icon'
-import iconData, { type IconName } from './icon-data'
+import { Icon } from './Icon'
+import { ICON_DATA_BY_NAME } from './icon-data'
 
-type Props = {|
+import type { IconProps, IconName } from './Icon'
+
+export type NotificationIconProps = {|
   ...IconProps,
   /** name constant of the optional notifcation icon to display */
   childName: ?IconName,
@@ -24,13 +26,9 @@ const SCALE_FACTOR = 3
  * ```
  */
 
-export default function NotificationIcon(props: Props) {
+export function NotificationIcon(props: NotificationIconProps) {
   const { childName, childClassName, ...iconProps } = props
-  if (!(iconProps.name in iconData)) {
-    console.error(`"${iconProps.name}" is not a valid Icon name`)
-    return null
-  }
-  const { viewBox } = iconData[iconProps.name]
+  const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)
   const scaledWidth = width / SCALE_FACTOR
   const scaledHeight = height / SCALE_FACTOR

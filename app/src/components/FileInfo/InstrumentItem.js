@@ -5,14 +5,14 @@ import styles from './styles.css'
 
 import type { PipetteCompatibility } from '../../pipettes/types'
 
-type Props = {|
+export type InstrumentItemProps = {|
   compatibility?: PipetteCompatibility,
   mount?: string,
   children: React.Node,
   hidden?: boolean,
 |}
 
-export default function InstrumentItem(props: Props) {
+export function InstrumentItem(props: InstrumentItemProps) {
   if (props.hidden) return null
   return (
     <div className={styles.instrument_item}>

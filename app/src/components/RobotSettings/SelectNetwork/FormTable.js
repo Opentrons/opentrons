@@ -3,17 +3,17 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type FormTableProps = {
+export type FormTableProps = {|
   children: React.Node,
-}
+|}
 
-type FormRowProps = {
+export type FormRowProps = {|
   label?: string,
   labelFor?: string,
   children: React.Node,
-}
+|}
 
-export default function FormTable(props: FormTableProps) {
+export function FormTable(props: FormTableProps) {
   return <div className={styles.form_table}>{props.children}</div>
 }
 

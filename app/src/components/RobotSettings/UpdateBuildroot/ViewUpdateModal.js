@@ -8,16 +8,16 @@ import {
   getBuildrootDownloadError,
 } from '../../../buildroot'
 
-import MigrationWarningModal from './MigrationWarningModal'
-import DownloadUpdateModal from './DownloadUpdateModal'
-import ReleaseNotesModal from './ReleaseNotesModal'
+import { MigrationWarningModal } from './MigrationWarningModal'
+import { DownloadUpdateModal } from './DownloadUpdateModal'
+import { ReleaseNotesModal } from './ReleaseNotesModal'
 
 import type {
   BuildrootUpdateType,
   RobotSystemType,
 } from '../../../buildroot/types'
 
-type Props = {|
+export type ViewUpdateModalProps = {|
   robotName: string,
   robotUpdateType: BuildrootUpdateType | null,
   robotSystemType: RobotSystemType | null,
@@ -25,7 +25,7 @@ type Props = {|
   proceed: () => mixed,
 |}
 
-export default function ViewUpdateModal(props: Props) {
+export function ViewUpdateModal(props: ViewUpdateModalProps) {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)

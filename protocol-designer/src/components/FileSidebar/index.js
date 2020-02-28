@@ -4,12 +4,14 @@ import { connect } from 'react-redux'
 import { i18n } from '../../localization'
 import { actions, selectors } from '../../navigation'
 import { selectors as fileDataSelectors } from '../../file-data'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   actions as loadFileActions,
   selectors as loadFileSelectors,
 } from '../../load-file'
 import { FileSidebar as FileSidebarComponent } from './FileSidebar'
 import type { BaseState, ThunkDispatch } from '../../types'
+import type { SavedStepFormState, InitialDeckSetup } from '../../step-forms'
 
 type Props = React.ElementProps<typeof FileSidebarComponent>
 
@@ -18,6 +20,9 @@ type SP = {|
   downloadData: $PropertyType<Props, 'downloadData'>,
   _canCreateNew: ?boolean,
   _hasUnsavedChanges: ?boolean,
+  pipettesOnDeck: $PropertyType<InitialDeckSetup, 'pipettes'>,
+  modulesOnDeck: $PropertyType<InitialDeckSetup, 'modules'>,
+  savedStepForms: SavedStepFormState,
 |}
 
 export const FileSidebar = connect<Props, {||}, SP, {||}, _, _>(
@@ -31,6 +36,7 @@ function mapStateToProps(state: BaseState): SP {
     fileDataSelectors.getFileMetadata(state).protocolName || 'untitled'
   const fileData = fileDataSelectors.createFile(state)
   const canDownload = selectors.getCurrentPage(state) !== 'file-splash'
+  const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
 
   return {
     canDownload,
@@ -38,6 +44,9 @@ function mapStateToProps(state: BaseState): SP {
       fileData,
       fileName: protocolName + '.json',
     },
+    pipettesOnDeck: initialDeckSetup.pipettes,
+    modulesOnDeck: initialDeckSetup.modules,
+    savedStepForms: stepFormSelectors.getSavedStepForms(state),
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
@@ -53,6 +62,9 @@ function mergeProps(
     _hasUnsavedChanges,
     canDownload,
     downloadData,
+    pipettesOnDeck,
+    modulesOnDeck,
+    savedStepForms,
   } = stateProps
   const { dispatch } = dispatchProps
   return {
@@ -70,5 +82,8 @@ function mergeProps(
       : undefined,
     onDownload: () => dispatch(loadFileActions.saveProtocolFile()),
     downloadData,
+    pipettesOnDeck,
+    modulesOnDeck,
+    savedStepForms,
   }
 }

@@ -5,13 +5,11 @@ contexts for running protocols during interactive sessions like Jupyter or just
 regular python shells. It also provides a console entrypoint for running a
 protocol from the command line.
 """
-
+import atexit
 import argparse
-import asyncio
 import logging
 import os
 import sys
-import threading
 from typing import Any, Callable, Dict, List, Optional, TextIO, Union
 
 import opentrons
@@ -22,10 +20,10 @@ from opentrons.protocol_api import (execute as execute_apiv2,
 from opentrons import commands
 from opentrons.protocols.parse import parse, version_from_string
 from opentrons.protocols.types import APIVersion, PythonProtocol
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
-_HWCONTROL: Optional[API] = None
+_THREAD_MANAGED_HW: Optional[ThreadManager] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
 
@@ -78,26 +76,14 @@ def get_protocol_api(
                           custom labware.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
-    if not _HWCONTROL:
+    global _THREAD_MANAGED_HW
+    if not _THREAD_MANAGED_HW:
         # Build a hardware controller in a worker thread, which is necessary
         # because ipython runs its notebook in asyncio but the notebook
         # is at script/repl scope not function scope and is synchronous so
         # you can't control the loop from inside. If we update to
         # IPython 7 we can avoid this, but for now we can't
-        def _build_hwcontroller():
-            global _HWCONTROL
-            try:
-                loop = asyncio.get_event_loop()
-            except RuntimeError:
-                loop = asyncio.new_event_loop()
-            _HWCONTROL = loop.run_until_complete(
-                API.build_hardware_controller())
-
-        thread = threading.Thread(
-            target=_build_hwcontroller,
-            name='Hardware-controller-builder')
-        thread.start()
-        thread.join()
+        _THREAD_MANAGED_HW = ThreadManager(API.build_hardware_controller)
     if isinstance(version, str):
         checked_version = version_from_string(version)
     elif not isinstance(version, APIVersion):
@@ -111,7 +97,7 @@ def get_protocol_api(
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
 
-    context = protocol_api.ProtocolContext(hardware=_HWCONTROL,
+    context = protocol_api.ProtocolContext(hardware=_THREAD_MANAGED_HW,
                                            bundled_labware=bundled_labware,
                                            bundled_data=bundled_data,
                                            extra_labware=extra_labware,
@@ -300,8 +286,10 @@ def execute(protocol_file: TextIO,
             context.broker.subscribe(
                 commands.command_types.COMMAND, emit_runlog)
         context.home()
-        execute_apiv2.run_protocol(protocol, context)
-        context.cleanup()
+        try:
+            execute_apiv2.run_protocol(protocol, context)
+        finally:
+            context.cleanup()
 
 
 def make_runlog_cb():
@@ -358,6 +346,14 @@ def main() -> int:
     execute(args.protocol, args.protocol.name,
             log_level=log_level, emit_runlog=printer)
     return 0
+
+
+@atexit.register
+def _clear_cached_hardware_controller():
+    global _THREAD_MANAGED_HW
+    if _THREAD_MANAGED_HW:
+        _THREAD_MANAGED_HW.clean_up()
+        _THREAD_MANAGED_HW = None
 
 
 if __name__ == '__main__':

@@ -183,7 +183,7 @@ def test_thermocycler_temp(loop, monkeypatch):
 
     set_temp_hw_mock = mock.Mock()
     monkeypatch.setattr(
-        mod._module._api, 'set_temperature', set_temp_hw_mock)
+        mod._module._obj_to_adapt, 'set_temperature', set_temp_hw_mock)
 
     # Test volume param
     mod.set_block_temperature(80.5, block_max_volume=45)
@@ -237,9 +237,9 @@ def test_thermocycler_profile(loop, monkeypatch):
     assert mod.lid_temperature == 80
 
     set_temp_hw_mock = mock.Mock(
-        side_effect=mod._module._api.set_temperature)
+        side_effect=mod._module._obj_to_adapt.set_temperature)
     monkeypatch.setattr(
-        mod._module._api, 'set_temperature', set_temp_hw_mock)
+        mod._module._obj_to_adapt, 'set_temperature', set_temp_hw_mock)
 
     # Test volume param
     mod.execute_profile(steps=[{'temperature': 30, 'hold_time_seconds': 20},

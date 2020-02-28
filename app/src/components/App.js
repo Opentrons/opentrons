@@ -1,4 +1,6 @@
-import React from 'react'
+// @flow
+import * as React from 'react'
+import { hot } from 'react-hot-loader/root'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 // TODO(mc, 2020-01-06): move typeface import to global CSS once postcss
@@ -6,19 +8,21 @@ import { Switch, Route, Redirect } from 'react-router-dom'
 import 'typeface-open-sans'
 import './App.global.css'
 
-import NavBar from './nav-bar'
+import { NavBar } from './nav-bar'
 
 import { PageWrapper } from '../components/Page'
-import SidePanel from '../pages/SidePanel'
-import Robots from '../pages/Robots'
+import { SidePanel } from '../pages/SidePanel'
+import { Robots } from '../pages/Robots'
 import { More } from '../pages/More'
-import Upload from '../pages/Upload'
-import Calibrate from '../pages/Calibrate'
-import Run from '../pages/Run'
+import { Upload } from '../pages/Upload'
+import { Calibrate } from '../pages/Calibrate'
+import { Run } from '../pages/Run'
 import { PortalRoot as ModalPortalRoot } from './portal'
 import styles from './App.css'
 
-export function App() {
+const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
+
+export function AppComponent() {
   return (
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />
@@ -39,6 +43,4 @@ export function App() {
   )
 }
 
-function stopEvent(event) {
-  event.preventDefault()
-}
+export const App = hot(AppComponent)

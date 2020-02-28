@@ -1,25 +1,26 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { i18n } from '../../../localization'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
+import { i18n } from '../../../localization'
+import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
 import { ModuleDiagram } from '../../modules'
 
 import styles from './FilePipettesModal.css'
 
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 
 type Props = {|
   values: FormModulesByType,
   thermocyclerEnabled: ?boolean,
-  onFieldChange: (type: ModuleType, value: boolean) => mixed,
+  onFieldChange: (type: ModuleRealType, value: boolean) => mixed,
 |}
 
 export function ModuleFields(props: Props) {
   const { onFieldChange, values, thermocyclerEnabled } = props
   const modules = Object.keys(values)
-  const handleOnDeckChange = (type: ModuleType) => (
+  const handleOnDeckChange = (type: ModuleRealType) => (
     e: SyntheticInputEvent<HTMLInputElement>
   ) => onFieldChange(type, e.currentTarget.checked || false)
 
@@ -31,6 +32,7 @@ export function ModuleFields(props: Props) {
     <div className={className}>
       {modules.map((moduleType, i) => {
         const label = i18n.t(`modules.module_display_names.${moduleType}`)
+        const defaultModel = DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
         return (
           <div className={styles.module_form_group} key={`${moduleType}`}>
             <CheckboxField
@@ -42,7 +44,6 @@ export function ModuleFields(props: Props) {
             <ModuleDiagram type={moduleType} />
             {/*
               TODO (ka 2019-10-22): This field is disabled until Gen 2 Modules are available
-              - Until then, 'GEN1' is hardcoded
               - onChange returns null because onChange is required by DropdownFields
             */}
             <div className={styles.module_model}>
@@ -50,8 +51,15 @@ export function ModuleFields(props: Props) {
                 <FormGroup label="Model">
                   <DropdownField
                     tabIndex={i}
-                    options={[{ name: 'GEN1', value: 'GEN1' }]}
-                    value={'GEN1'}
+                    options={[
+                      {
+                        name: i18n.t(
+                          `modules.model_display_name.${defaultModel}`
+                        ),
+                        value: defaultModel,
+                      },
+                    ]}
+                    value={defaultModel}
                     disabled
                     onChange={() => null}
                   />

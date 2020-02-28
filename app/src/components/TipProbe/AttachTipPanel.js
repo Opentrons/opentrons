@@ -3,7 +3,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 
-import CalibrationInfoContent from '../CalibrationInfoContent'
+import { CalibrationInfoContent } from '../CalibrationInfoContent'
 import { PrimaryButton } from '@opentrons/components'
 
 import {
@@ -19,7 +19,7 @@ import type { TipProbeProps } from './types'
 
 type Props = TipProbeProps
 
-export default function AttachTipPanel(props: Props) {
+export function AttachTipPanel(props: Props) {
   const { mount, channels } = props
   const dispatch = useDispatch<Dispatch>()
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)

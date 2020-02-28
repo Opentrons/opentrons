@@ -3,6 +3,105 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
+
+### Bug Fixes
+
+* **api:** always clean up in script entries on error ([#5064](https://github.com/opentrons/opentrons/issues/5064)) ([e98fdd1](https://github.com/opentrons/opentrons/commit/e98fdd1)), closes [#5061](https://github.com/opentrons/opentrons/issues/5061)
+* **api:** correctly set api level in session sim ([#5063](https://github.com/opentrons/opentrons/issues/5063)) ([9f4cb1d](https://github.com/opentrons/opentrons/commit/9f4cb1d)), closes [#5060](https://github.com/opentrons/opentrons/issues/5060)
+* **api:** do not check used tips after pickup ([#5062](https://github.com/opentrons/opentrons/issues/5062)) ([5c155d9](https://github.com/opentrons/opentrons/commit/5c155d9)), closes [#5059](https://github.com/opentrons/opentrons/issues/5059)
+
+
+
+
+
+# [3.16.0](https://github.com/opentrons/opentrons/compare/v3.15.2...v3.16.0) (2020-02-19)
+
+### Bug Fixes
+
+* **api:** make probe failures raise the actual error ([#5015](https://github.com/opentrons/opentrons/issues/5015)) ([bc74517](https://github.com/opentrons/opentrons/commit/bc74517)), closes [#4980](https://github.com/opentrons/opentrons/issues/4980)
+* **api:** swallow hard-halt-related errors and hold lock in session.stop() ([#4980](https://github.com/opentrons/opentrons/issues/4980)) ([c42d4dc](https://github.com/opentrons/opentrons/commit/c42d4dc)), closes [#4979](https://github.com/opentrons/opentrons/issues/4979)
+* **api:** Add back in useProtocolApi2 feature flag ([#4665](https://github.com/opentrons/opentrons/issues/4665)) ([5c3fae3](https://github.com/opentrons/opentrons/commit/5c3fae3))
+* **api:** amend temperature module old bootloader check ([#4942](https://github.com/opentrons/opentrons/issues/4942)) ([dbc90cb](https://github.com/opentrons/opentrons/commit/dbc90cb))
+* **api:** apiv2: allow multi to access all 384 wells in transfer ([#4678](https://github.com/opentrons/opentrons/issues/4678)) ([975915a](https://github.com/opentrons/opentrons/commit/975915a)), closes [#4669](https://github.com/opentrons/opentrons/issues/4669)
+* **api:** bug in MalformedProtocolError.__str__ ([28a0eca](https://github.com/opentrons/opentrons/commit/28a0eca))
+* **api:** Clarify intended use of "Use older pipette calibrations" flag ([#4677](https://github.com/opentrons/opentrons/issues/4677)) ([0f2d7e3](https://github.com/opentrons/opentrons/commit/0f2d7e3))
+* **api:** detect old bootloaders, fix tc enter bootloader, remove ununused paths ([#4935](https://github.com/opentrons/opentrons/issues/4935)) ([cfa5374](https://github.com/opentrons/opentrons/commit/cfa5374)), closes [#4575](https://github.com/opentrons/opentrons/issues/4575)
+* **api:** do not pick up returned tips ([#4681](https://github.com/opentrons/opentrons/issues/4681)) ([5d358f2](https://github.com/opentrons/opentrons/commit/5d358f2)), closes [#4668](https://github.com/opentrons/opentrons/issues/4668)
+* **api:** Ensure position is fully updated after a home ([#4915](https://github.com/opentrons/opentrons/issues/4915)) ([00b8d5b](https://github.com/opentrons/opentrons/commit/00b8d5b))
+* **api:** Fix simulate file from python shell ([#4660](https://github.com/opentrons/opentrons/issues/4660)) ([7fc6bbe](https://github.com/opentrons/opentrons/commit/7fc6bbe))
+* **api:** more specific errors for bad json protocols ([#4967](https://github.com/opentrons/opentrons/issues/4967)) ([885a6f8](https://github.com/opentrons/opentrons/commit/885a6f8)), closes [#4735](https://github.com/opentrons/opentrons/issues/4735) [#4515](https://github.com/opentrons/opentrons/issues/4515)
+* **api:** properly clean up threads in opentrons_simulate, _execute ([#4694](https://github.com/opentrons/opentrons/issues/4694)) ([31bd02d](https://github.com/opentrons/opentrons/commit/31bd02d))
+* **api:** restore plunger current before move to bottom after drop tip ([#4831](https://github.com/opentrons/opentrons/issues/4831)) ([d07efcb](https://github.com/opentrons/opentrons/commit/d07efcb))
+* **api:** set default move timeout to 12000 instead of 60 ([#4768](https://github.com/opentrons/opentrons/issues/4768)) ([6e28b2b](https://github.com/opentrons/opentrons/commit/6e28b2b)), closes [#4755](https://github.com/opentrons/opentrons/issues/4755)
+* **api:** smoothie driver: Limit high currents to moving axes ([#4729](https://github.com/opentrons/opentrons/issues/4729)) ([7e728ea](https://github.com/opentrons/opentrons/commit/7e728ea)), closes [#4714](https://github.com/opentrons/opentrons/issues/4714)
+* **api:** split out tc deactivation at driver level ([#4624](https://github.com/opentrons/opentrons/issues/4624)) ([ae15a7f](https://github.com/opentrons/opentrons/commit/ae15a7f))
+* **api:** typo in Session.turn_off_rail_lights ([#4948](https://github.com/opentrons/opentrons/issues/4948)) ([44bf050](https://github.com/opentrons/opentrons/commit/44bf050))
+* **api:** Use specified port in tools ([#4812](https://github.com/opentrons/opentrons/issues/4812)) ([5351183](https://github.com/opentrons/opentrons/commit/5351183))
+* **api:** Utilize return tip height from pipette configs ([#4828](https://github.com/opentrons/opentrons/issues/4828)) ([b388c4e](https://github.com/opentrons/opentrons/commit/b388c4e))
+* **app:** add spinner to "Save" button in Pipette Settings ([#4685](https://github.com/opentrons/opentrons/issues/4685)) ([b8a9aac](https://github.com/opentrons/opentrons/commit/b8a9aac)), closes [#4583](https://github.com/opentrons/opentrons/issues/4583)
+* **app:** clear lw calibration state if top level home is called ([#4703](https://github.com/opentrons/opentrons/issues/4703)) ([8fe7120](https://github.com/opentrons/opentrons/commit/8fe7120))
+* **app:** home all axes after lw calibration to allow deck access ([#4687](https://github.com/opentrons/opentrons/issues/4687)) ([6e0ad61](https://github.com/opentrons/opentrons/commit/6e0ad61)), closes [#4034](https://github.com/opentrons/opentrons/issues/4034)
+* **protocol-designer:** fix warnings not displaying during timeline creation process ([#4840](https://github.com/opentrons/opentrons/issues/4840)) ([111f36b](https://github.com/opentrons/opentrons/commit/111f36b)), closes [#4829](https://github.com/opentrons/opentrons/issues/4829)
+* **protocol-designer:** Update magnetic module recommended labware ([#4827](https://github.com/opentrons/opentrons/issues/4827)) ([42ec004](https://github.com/opentrons/opentrons/commit/42ec004)), closes [#4825](https://github.com/opentrons/opentrons/issues/4825)
+* **protocol-designer:** Update maskToNumber to allow for negatives and 0 ([#4709](https://github.com/opentrons/opentrons/issues/4709)) ([79c7818](https://github.com/opentrons/opentrons/commit/79c7818)), closes [#4305](https://github.com/opentrons/opentrons/issues/4305)
+* **protocol-designer:** when adding new module only update mag steps … ([#4839](https://github.com/opentrons/opentrons/issues/4839)) ([ea014fc](https://github.com/opentrons/opentrons/commit/ea014fc)), closes [#4823](https://github.com/opentrons/opentrons/issues/4823) [#4823](https://github.com/opentrons/opentrons/issues/4823)
+
+
+### Features
+
+* **api:** Add an OpenAPI spec for the HTTP API ([#4691](https://github.com/opentrons/opentrons/issues/4691)) ([cb195a5](https://github.com/opentrons/opentrons/commit/cb195a5)), closes [#4635](https://github.com/opentrons/opentrons/issues/4635)
+* **api:** add module def schema v2 and v2 defs ([#4805](https://github.com/opentrons/opentrons/issues/4805)) ([4018254](https://github.com/opentrons/opentrons/commit/4018254)), closes [#4222](https://github.com/opentrons/opentrons/issues/4222)
+* **api:** add p10m v1.6 ([#4722](https://github.com/opentrons/opentrons/issues/4722)) ([c25c887](https://github.com/opentrons/opentrons/commit/c25c887))
+* **api:** add perform module fw update endpoint ([#4889](https://github.com/opentrons/opentrons/issues/4889)) ([5354eff](https://github.com/opentrons/opentrons/commit/5354eff)), closes [#4576](https://github.com/opentrons/opentrons/issues/4576)
+* **api:** apiv2: add height_from_base arg to MagneticModuleContext.engage() ([#4707](https://github.com/opentrons/opentrons/issues/4707)) ([ffaee78](https://github.com/opentrons/opentrons/commit/ffaee78)), closes [#4213](https://github.com/opentrons/opentrons/issues/4213)
+* **api:** change attach pipette positions to match leveling blocks ([#4888](https://github.com/opentrons/opentrons/issues/4888)) ([b10fe2e](https://github.com/opentrons/opentrons/commit/b10fe2e)), closes [#4679](https://github.com/opentrons/opentrons/issues/4679)
+* **api:** make modules aware of available fw updates in file system ([#4856](https://github.com/opentrons/opentrons/issues/4856)) ([4ede522](https://github.com/opentrons/opentrons/commit/4ede522)), closes [#4575](https://github.com/opentrons/opentrons/issues/4575)
+* **app:** allow custom labware dir to be opened and reset to default ([#4918](https://github.com/opentrons/opentrons/issues/4918)) ([03c438a](https://github.com/opentrons/opentrons/commit/03c438a)), closes [#4878](https://github.com/opentrons/opentrons/issues/4878) [#4879](https://github.com/opentrons/opentrons/issues/4879)
+* **app:** enable module firmware update button when update available ([#4923](https://github.com/opentrons/opentrons/issues/4923)) ([1edc587](https://github.com/opentrons/opentrons/commit/1edc587)), closes [#4575](https://github.com/opentrons/opentrons/issues/4575)
+* **components:** Add mini slot map to shared components ([#4890](https://github.com/opentrons/opentrons/issues/4890)) ([8b2904c](https://github.com/opentrons/opentrons/commit/8b2904c))
+* **labware-library:** add decks 1 and 7 to labwareTestProtocol before labware test ([#4647](https://github.com/opentrons/opentrons/issues/4647)) ([f1e560a](https://github.com/opentrons/opentrons/commit/f1e560a))
+* **protocol-designer:** Add awaitTemperature substep items ([#4945](https://github.com/opentrons/opentrons/issues/4945)) ([d576961](https://github.com/opentrons/opentrons/commit/d576961)), closes [#4863](https://github.com/opentrons/opentrons/issues/4863)
+* **protocol-designer:** Add clarity around engage height ([#4921](https://github.com/opentrons/opentrons/issues/4921)) ([8f84e34](https://github.com/opentrons/opentrons/commit/8f84e34)), closes [#4727](https://github.com/opentrons/opentrons/issues/4727)
+* **protocol-designer:** add commands for temperature step ([#4770](https://github.com/opentrons/opentrons/issues/4770)) ([6aff0e8](https://github.com/opentrons/opentrons/commit/6aff0e8))
+* **protocol-designer:** add field and form level validation for pause temperature ([#4944](https://github.com/opentrons/opentrons/issues/4944)) ([ec6c1dd](https://github.com/opentrons/opentrons/commit/ec6c1dd)), closes [#4937](https://github.com/opentrons/opentrons/issues/4937)
+* **protocol-designer:** add labware hover highlighting to modules ([#4843](https://github.com/opentrons/opentrons/issues/4843)) ([dfe9bda](https://github.com/opentrons/opentrons/commit/dfe9bda)), closes [#4696](https://github.com/opentrons/opentrons/issues/4696)
+* **protocol-designer:** Add missing labware hint to magnet step ([#4592](https://github.com/opentrons/opentrons/issues/4592)) ([a947a14](https://github.com/opentrons/opentrons/commit/a947a14)), closes [#4303](https://github.com/opentrons/opentrons/issues/4303)
+* **protocol-designer:** Add module missing labware hint to temperature step ([#4644](https://github.com/opentrons/opentrons/issues/4644)) ([f142e1c](https://github.com/opentrons/opentrons/commit/f142e1c)), closes [#4643](https://github.com/opentrons/opentrons/issues/4643)
+* **protocol-designer:** Add module slot placement guidance ([#4916](https://github.com/opentrons/opentrons/issues/4916)) ([ae06796](https://github.com/opentrons/opentrons/commit/ae06796)), closes [#4815](https://github.com/opentrons/opentrons/issues/4815)
+* **protocol-designer:** add temperature step form validation ([#4593](https://github.com/opentrons/opentrons/issues/4593)) ([f869c4c](https://github.com/opentrons/opentrons/commit/f869c4c)), closes [#4592](https://github.com/opentrons/opentrons/issues/4592)
+* **protocol-designer:** allow temperature deck to be updated ([#4865](https://github.com/opentrons/opentrons/issues/4865)) ([c392d68](https://github.com/opentrons/opentrons/commit/c392d68)), closes [#4693](https://github.com/opentrons/opentrons/issues/4693)
+* **protocol-designer:** Auto-select module in set temperature form ([#4661](https://github.com/opentrons/opentrons/issues/4661)) ([ce9d4ce](https://github.com/opentrons/opentrons/commit/ce9d4ce)), closes [#4642](https://github.com/opentrons/opentrons/issues/4642)
+* **protocol-designer:** Autoselect !previous magnet action ([#4662](https://github.com/opentrons/opentrons/issues/4662)) ([d4375dd](https://github.com/opentrons/opentrons/commit/d4375dd)), closes [#4449](https://github.com/opentrons/opentrons/issues/4449)
+* **protocol-designer:** change volume label to volume per well ([#4645](https://github.com/opentrons/opentrons/issues/4645)) ([f808a59](https://github.com/opentrons/opentrons/commit/f808a59)), closes [#4015](https://github.com/opentrons/opentrons/issues/4015)
+* **protocol-designer:** Conditionally disabled pause until temp ([#4885](https://github.com/opentrons/opentrons/issues/4885)) ([d83646d](https://github.com/opentrons/opentrons/commit/d83646d)), closes [#4867](https://github.com/opentrons/opentrons/issues/4867)
+* **protocol-designer:** Hide incompatible labware ([#4753](https://github.com/opentrons/opentrons/issues/4753)) ([9d55c56](https://github.com/opentrons/opentrons/commit/9d55c56)), closes [#4728](https://github.com/opentrons/opentrons/issues/4728)
+* **protocol-designer:** Hide thermocycler functionality behind flag ([#4704](https://github.com/opentrons/opentrons/issues/4704)) ([053d9f0](https://github.com/opentrons/opentrons/commit/053d9f0)), closes [#4695](https://github.com/opentrons/opentrons/issues/4695)
+* **protocol-designer:** hook up wait for temp in PD ([#4926](https://github.com/opentrons/opentrons/issues/4926)) ([710cffa](https://github.com/opentrons/opentrons/commit/710cffa)), closes [#4732](https://github.com/opentrons/opentrons/issues/4732)
+* **protocol-designer:** hookup magnet step ([#4628](https://github.com/opentrons/opentrons/issues/4628)) ([33177a1](https://github.com/opentrons/opentrons/commit/33177a1)), closes [#4450](https://github.com/opentrons/opentrons/issues/4450)
+* **protocol-designer:** Make moduleId field required for temperature step ([#4716](https://github.com/opentrons/opentrons/issues/4716)) ([d25b9d4](https://github.com/opentrons/opentrons/commit/d25b9d4))
+* **protocol-designer:** Pause until temperature reached ([#4745](https://github.com/opentrons/opentrons/issues/4745)) ([fbbcac1](https://github.com/opentrons/opentrons/commit/fbbcac1)), closes [#4306](https://github.com/opentrons/opentrons/issues/4306)
+* **protocol-designer:** Populate engageHeight field with previous values ([#4794](https://github.com/opentrons/opentrons/issues/4794)) ([b68b52d](https://github.com/opentrons/opentrons/commit/b68b52d)), closes [#4764](https://github.com/opentrons/opentrons/issues/4764)
+* **protocol-designer:** render substep section in timeline for set temperature step ([#4932](https://github.com/opentrons/opentrons/issues/4932)) ([69938be](https://github.com/opentrons/opentrons/commit/69938be)), closes [#4862](https://github.com/opentrons/opentrons/issues/4862)
+* **protocol-designer:** show magnetic module status in substeps and on deck ([#4724](https://github.com/opentrons/opentrons/issues/4724)) ([8b71b4a](https://github.com/opentrons/opentrons/commit/8b71b4a)), closes [#4304](https://github.com/opentrons/opentrons/issues/4304)
+* **protocol-designer:** use immer in step generation ([#4769](https://github.com/opentrons/opentrons/issues/4769)) ([7915393](https://github.com/opentrons/opentrons/commit/7915393)), closes [#4697](https://github.com/opentrons/opentrons/issues/4697)
+* **shared-data:** add 20uL filter tiprack ([#4532](https://github.com/opentrons/opentrons/issues/4532)) ([423da87](https://github.com/opentrons/opentrons/commit/423da87))
+* **shared-data:** add new v4 JSON protocol schema ([#4846](https://github.com/opentrons/opentrons/issues/4846)) ([bd49812](https://github.com/opentrons/opentrons/commit/bd49812)), closes [#4836](https://github.com/opentrons/opentrons/issues/4836) [#4897](https://github.com/opentrons/opentrons/issues/4897)
+
+
+### Performance Improvements
+
+* **protocol-designer:** improve timeline generation performance ([#4701](https://github.com/opentrons/opentrons/issues/4701)) ([ee63163](https://github.com/opentrons/opentrons/commit/ee63163))
+
+
+### Reverts
+
+* **protocol-designer:** Revert change default exports to named exports ([#4938](https://github.com/opentrons/opentrons/issues/4938)) ([49d81c9](https://github.com/opentrons/opentrons/commit/49d81c9))
+
+
+
+
+
 ## [3.15.2](https://github.com/opentrons/opentrons/compare/v3.15.1...v3.15.2) (2019-12-17)
 
 

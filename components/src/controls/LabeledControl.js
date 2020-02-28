@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
 
-import ControlInfo from './ControlInfo'
+import { ControlInfo } from './ControlInfo'
 import styles from './styles.css'
 
-type Props = {
+export type LabeledControlProps = {|
   label: string,
   control: React.Node,
   children?: React.Node,
-}
+|}
 
-export default function LabeledControl(props: Props) {
+export function LabeledControl(props: LabeledControlProps) {
   const { label, control, children } = props
 
   return (

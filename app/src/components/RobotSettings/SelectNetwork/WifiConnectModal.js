@@ -11,12 +11,12 @@ import type {
 import { AlertModal } from '@opentrons/components'
 import { ErrorModal } from '../../modals'
 
-type Props = {
+type WifiConnectModalProps = {|
   close: () => mixed,
   request: WifiConfigureRequest,
   response: ?WifiConfigureResponse,
   error: ?ApiRequestError,
-}
+|}
 
 const SUCCESS_TITLE = 'Successfully connected to Wi-Fi'
 const FAILURE_TITLE = 'Unable to connect to Wi-Fi'
@@ -29,7 +29,7 @@ const failure = ssid =>
 
 const ERROR_MESSAGE_RE = /Error: (.*)$/
 
-export default function WifiConnectModal(props: Props) {
+export function WifiConnectModal(props: WifiConnectModalProps) {
   const { request, response, error, close } = props
   const { ssid } = request
 

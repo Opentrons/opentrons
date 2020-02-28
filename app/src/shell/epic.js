@@ -4,7 +4,7 @@ import { fromEvent } from 'rxjs'
 import { filter, tap, ignoreElements } from 'rxjs/operators'
 
 import { createLogger } from '../logger'
-import remote from './remote'
+import { remote } from './remote'
 
 import type { Epic, Action } from '../types'
 

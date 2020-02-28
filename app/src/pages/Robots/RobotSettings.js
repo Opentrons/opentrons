@@ -27,16 +27,17 @@ import { getRobotRestartRequired } from '../../robot-settings'
 
 import { SpinnerModalPage } from '@opentrons/components'
 import { ErrorModal } from '../../components/modals'
-import Page from '../../components/Page'
-import RobotSettings, {
+import { Page } from '../../components/Page'
+import {
+  RobotSettings as RobotSettingsContents,
   ConnectAlertModal,
 } from '../../components/RobotSettings'
-import UpdateBuildroot from '../../components/RobotSettings/UpdateBuildroot'
-import CalibrateDeck from '../../components/CalibrateDeck'
-import ConnectBanner from '../../components/RobotSettings/ConnectBanner'
-import ReachableRobotBanner from '../../components/RobotSettings/ReachableRobotBanner'
-import RestartRequiredBanner from '../../components/RobotSettings/RestartRequiredBanner'
-import ResetRobotModal from '../../components/RobotSettings/ResetRobotModal'
+import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
+import { CalibrateDeck } from '../../components/CalibrateDeck'
+import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
+import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
+import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
+import { ResetRobotModal } from '../../components/RobotSettings/ResetRobotModal'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
@@ -66,18 +67,18 @@ type DP = {|
 
 type Props = {| ...OP, ...DP, ...SP |}
 
-export default withRouter<_, _>(
+export const RobotSettings = withRouter<_, _>(
   connect<Props, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps
-  )(RobotSettingsPage)
+  )(RobotSettingsComponent)
 )
 
 const UPDATE_FRAGMENT = 'update'
 const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
 const RESET_FRAGMENT = 'reset'
 
-function RobotSettingsPage(props: Props) {
+function RobotSettingsComponent(props: Props) {
   const {
     robot,
     homeInProgress,
@@ -116,7 +117,7 @@ function RobotSettingsPage(props: Props) {
           </>
         )}
 
-        <RobotSettings
+        <RobotSettingsContents
           robot={robot}
           updateUrl={updateUrl}
           calibrateDeckUrl={calibrateDeckUrl}

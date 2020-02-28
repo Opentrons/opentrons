@@ -7,16 +7,16 @@ import type { Labware } from '../../robot'
 
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { ModalPage } from '@opentrons/components'
-import ConfirmModalContents from './ConfirmModalContents'
+import { ConfirmModalContents } from './ConfirmModalContents'
 import styles from './styles.css'
 
-type Props = {
+export type ConfirmModalProps = {|
   labware: Labware,
   calibrateToBottom: boolean,
   onBackClick: () => mixed,
-}
+|}
 
-export default function ConfirmModal(props: Props) {
+export function ConfirmModal(props: ConfirmModalProps) {
   const { labware, onBackClick, calibrateToBottom } = props
 
   // disable back click if we're moving or if we've loaded up with tips

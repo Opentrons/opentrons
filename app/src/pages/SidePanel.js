@@ -3,13 +3,13 @@
 import React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
-import ConnectPanel from '../components/ConnectPanel'
-import UploadPanel from '../components/UploadPanel'
-import CalibratePanel from '../components/CalibratePanel'
-import MenuPanel from '../components/MenuPanel'
-import RunPanel from '../components/RunPanel'
+import { ConnectPanel } from '../components/ConnectPanel'
+import { UploadPanel } from '../components/UploadPanel'
+import { CalibratePanel } from '../components/CalibratePanel'
+import { MenuPanel } from '../components/MenuPanel'
+import { RunPanel } from '../components/RunPanel'
 
-export default function NavPanel() {
+export function SidePanel() {
   return (
     <Switch>
       <Route path="/robots/:name?" component={ConnectPanel} />

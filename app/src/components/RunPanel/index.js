@@ -9,8 +9,8 @@ import {
 import { getMissingModules } from '../../modules'
 
 import { SidePanel, SidePanelGroup } from '@opentrons/components'
-import RunTimer from './RunTimer'
-import RunControls from './RunControls'
+import { RunTimer } from './RunTimer'
+import { RunControls } from './RunControls'
 import { ModuleLiveStatusCards } from '../ModuleLiveStatusCards'
 
 import type { State, Dispatch } from '../../types'
@@ -57,7 +57,7 @@ const mapDispatchToProps = (dispatch: Dispatch): DP => ({
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })
 
-function RunPanel(props: Props) {
+function RunPanelComponent(props: Props) {
   return (
     <SidePanel title="Execute Run">
       <SidePanelGroup>
@@ -79,7 +79,7 @@ function RunPanel(props: Props) {
   )
 }
 
-export default connect<Props, {||}, _, _, _, _>(
+export const RunPanel = connect<Props, {||}, _, _, _, _>(
   mapStateToProps,
   mapDispatchToProps
-)(RunPanel)
+)(RunPanelComponent)
