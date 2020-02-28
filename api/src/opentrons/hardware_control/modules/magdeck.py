@@ -132,7 +132,7 @@ class MagDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         self._driver.home()
-        self.engage(0.0)
+        await self.engage(0.0)
 
     @property
     def current_height(self):

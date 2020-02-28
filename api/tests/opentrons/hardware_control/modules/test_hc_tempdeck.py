@@ -1,17 +1,25 @@
 import asyncio
-from opentrons.hardware_control import modules
+from opentrons.hardware_control import modules, PauseManager
 from opentrons.hardware_control.modules import tempdeck
 
 
 async def test_sim_initialization(loop):
-    temp = await modules.build('', 'tempdeck', True,
-                               lambda x: None, loop=loop)
+    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               which='tempdeck',
+                               simulating=True,
+                               interrupt_callback=lambda x: None,
+                               loop=loop,
+                               pause_manager=PauseManager(loop=loop))
     assert isinstance(temp, modules.AbstractModule)
 
 
 async def test_sim_state(loop):
-    temp = await modules.build('', 'tempdeck', True,
-                               lambda x: None, loop=loop)
+    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               which='tempdeck',
+                               simulating=True,
+                               interrupt_callback=lambda x: None,
+                               loop=loop,
+                               pause_manager=PauseManager(loop=loop))
     assert temp.temperature == 0
     assert temp.target is None
     assert temp.status == 'idle'
@@ -25,20 +33,27 @@ async def test_sim_state(loop):
 
 
 async def test_sim_update(loop):
-    temp = await modules.build('', 'tempdeck', True,
-                               lambda x: None, loop=loop)
+    temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
+                               which='tempdeck',
+                               simulating=True,
+                               interrupt_callback=lambda x: None,
+                               loop=loop,
+                               pause_manager=PauseManager(loop=loop))
     await asyncio.wait_for(temp.set_temperature(10), 0.2)
     assert temp.temperature == 10
     assert temp.target == 10
     assert temp.status == 'holding at target'
-    temp.deactivate()
+    await temp.deactivate()
     assert temp.temperature == 0
     assert temp.target is None
     assert temp.status == 'idle'
 
 
-async def test_poller(monkeypatch):
-    temp = modules.tempdeck.TempDeck('', True)
+async def test_poller(monkeypatch, loop):
+    temp = modules.tempdeck.TempDeck(port='/dev/ot_module_sim_tempdeck0',
+                                     pause_manager=PauseManager(loop=loop),
+                                     simulating=True,
+                                     loop=loop)
     hit = False
 
     def update_called():

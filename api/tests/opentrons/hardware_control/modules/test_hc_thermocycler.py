@@ -1,18 +1,26 @@
 import asyncio
 from unittest import mock
-from opentrons.hardware_control import modules
+from opentrons.hardware_control import modules, PauseManager
 
 
 async def test_sim_initialization(loop):
-    therm = await modules.build('', 'thermocycler', True,
-                                lambda x: None, loop=loop)
+    therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                which='thermocycler',
+                                simulating=True,
+                                interrupt_callback=lambda x: None,
+                                loop=loop,
+                                pause_manager=PauseManager(loop=loop))
 
     assert isinstance(therm, modules.AbstractModule)
 
 
 async def test_lid(loop):
-    therm = await modules.build('', 'thermocycler', True,
-                                lambda x: None, loop=loop)
+    therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                which='thermocycler',
+                                simulating=True,
+                                interrupt_callback=lambda x: None,
+                                loop=loop,
+                                pause_manager=PauseManager(loop=loop))
 
     assert therm.lid_status == 'open'
 
@@ -30,8 +38,12 @@ async def test_lid(loop):
 
 
 async def test_sim_state(loop):
-    therm = await modules.build('', 'thermocycler', True,
-                                lambda x: None, loop=loop)
+    therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                which='thermocycler',
+                                simulating=True,
+                                interrupt_callback=lambda x: None,
+                                loop=loop,
+                                pause_manager=PauseManager(loop=loop))
 
     assert therm.temperature is None
     assert therm.target is None
@@ -46,8 +58,12 @@ async def test_sim_state(loop):
 
 
 async def test_sim_update(loop):
-    therm = await modules.build('', 'thermocycler', True,
-                                lambda x: None, loop=loop)
+    therm = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                which='thermocycler',
+                                simulating=True,
+                                interrupt_callback=lambda x: None,
+                                loop=loop,
+                                pause_manager=PauseManager(loop=loop))
 
     await therm.set_temperature(temperature=10,
                                 hold_time_seconds=None,
@@ -87,8 +103,12 @@ async def test_sim_update(loop):
 
 
 async def test_set_temperature(monkeypatch, loop):
-    hw_tc = await modules.build('', 'thermocycler', True,
-                                lambda x: None, loop=loop)
+    hw_tc = await modules.build(port='/dev/ot_module_sim_thermocycler0',
+                                which='thermocycler',
+                                simulating=True,
+                                interrupt_callback=lambda x: None,
+                                loop=loop,
+                                pause_manager=PauseManager(loop=loop))
 
     def async_return(result):
         f = asyncio.Future()
