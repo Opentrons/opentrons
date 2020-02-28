@@ -10,6 +10,7 @@ type HintKey =
   | 'module_without_labware'
   // blocking hints
   | 'custom_labware_with_modules'
+  | 'export_v4_protocol'
 
 export { actions, rootReducer, selectors }
 
