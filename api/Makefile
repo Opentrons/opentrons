@@ -134,11 +134,22 @@ docs-clean:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	@echo "Command is deprecated. Use \"make -C robot-server dev\""
+	$(python) -m robot_server.main -P 31950
 
 .PHONY: local-shell
 local-shell:
 	$(pipenv_envvars) pipenv shell
+
+.PHONY: push
+push: wheel
+	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
+systemctl restart jupyter-notebook &&\
+systemctl stop opentrons-robot-server &&\
+mount -o remount,rw / &&\
+cd /usr/lib/python3.7/site-packages &&\
+unzip -o /data/opentrons-*.whl && cleanup || cleanup"
 
 .PHONY: simulate
 simulate:
