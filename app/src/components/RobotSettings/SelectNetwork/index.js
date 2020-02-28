@@ -76,8 +76,9 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
 
   // TODO(isk, 2/27/20): remove the feature flag and version check
   const enableWifiDisconnect = useSelector((state: State) =>
-    Boolean(getConfig(state).devInternal?.enableWifiDisconnect)
+    Boolean(getConfig(state)?.devInternal?.enableWifiDisconnect)
   )
+
   const hasCorrectVersion = Networking.getRobotSuportsDisconnect(robot)
   const showWifiDisconnect =
     Boolean(ssid) && (enableWifiDisconnect || hasCorrectVersion)

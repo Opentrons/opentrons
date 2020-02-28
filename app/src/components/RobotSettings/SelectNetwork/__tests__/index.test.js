@@ -81,10 +81,10 @@ describe('<SelectNetwork />', () => {
       selectSsid = wrapper.find(SelectSsid)
     })
 
-    describe('handleOnValueChange function', () => {
+    describe('onValueChange function', () => {
       test('updates state correctly', () => {
         act(() => {
-          selectSsid.props().handleOnValueChange(newSsid)
+          selectSsid.props().onValueChange(newSsid)
         })
         wrapper.update()
         const modal = wrapper.find(SelectNetworkModal)
@@ -107,16 +107,16 @@ describe('<SelectNetwork />', () => {
       )
     })
 
-    test('handleCancel function updates state correctly', () => {
+    test('onCancel function updates state correctly', () => {
       act(() => {
-        selectSsid.props().handleOnValueChange(newSsid)
+        selectSsid.props().onValueChange(newSsid)
       })
 
       wrapper.update()
       let modal = wrapper.find(SelectNetworkModal)
 
       act(() => {
-        modal.props().handleCancel()
+        modal.props().onCancel()
       })
       wrapper.update()
       modal = wrapper.find(SelectNetworkModal)
@@ -129,13 +129,13 @@ describe('<SelectNetwork />', () => {
     })
   })
 
-  describe('handleDisconnectWifi function', () => {
+  describe('onDisconnectWifi function', () => {
     test('dispatches postDisconnectNetwork and closes modal when previousSsid is present', () => {
       const wrapper = render()
       const newSsid = 'Opentrons'
       const selectSsid = wrapper.find(SelectSsid)
       act(() => {
-        selectSsid.props().handleOnValueChange(newSsid)
+        selectSsid.props().onValueChange(newSsid)
       })
       wrapper.update()
       let modal = wrapper.find(SelectNetworkModal)
@@ -154,7 +154,7 @@ describe('<SelectNetwork />', () => {
       expect(modal.prop('modalOpen')).toEqual(true)
 
       act(() => {
-        modal.props().handleDisconnectWifi()
+        modal.props().onDisconnectWifi()
       })
 
       wrapper.update()
@@ -173,7 +173,7 @@ describe('<SelectNetwork />', () => {
       expect(modal.prop('modalOpen')).toEqual(false)
 
       act(() => {
-        modal.props().handleDisconnectWifi()
+        modal.props().onDisconnectWifi()
       })
 
       wrapper.update()

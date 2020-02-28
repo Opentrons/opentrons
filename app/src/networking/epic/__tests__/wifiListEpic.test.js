@@ -4,8 +4,7 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { networkingEpic } from '..'
 
-const makeTriggerAction = (robotName: string) =>
-  Actions.fetchWifiList(robotName)
+const makeTriggerAction = robotName => Actions.fetchWifiList(robotName)
 
 describe('networking wifiListEpic', () => {
   afterEach(() => {
