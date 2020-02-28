@@ -1,15 +1,10 @@
 // @flow
 
 import * as React from 'react'
-import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import { ModuleDiagram } from '../../modules'
 import styles from './AnnouncementModal.css'
 
 export type Announcement = {|
-  version: string,
+  announcementKey: string,
   image: React.Node | null,
   heading: string,
   message: React.Node,
@@ -17,11 +12,13 @@ export type Announcement = {|
 
 export const announcements: Array<Announcement> = [
   {
-    version: '4.0.0',
+    announcementKey: 'modulesRequireRunAppUpdate',
     image: (
       <div className={styles.modules_diagrams_row}>
-        <ModuleDiagram type={MAGNETIC_MODULE_TYPE} />
-        <ModuleDiagram type={TEMPERATURE_MODULE_TYPE} />
+        <img
+          className={styles.modules_diagram}
+          src={require('../../../images/modules/magdeck_tempdeck_combined.png')}
+        />
       </div>
     ),
     heading: "We've updated the Protocol Designer",

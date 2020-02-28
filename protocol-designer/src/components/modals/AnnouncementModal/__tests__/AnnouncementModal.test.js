@@ -11,7 +11,7 @@ import type { Announcement } from '../announcements'
 jest.mock('../../../../persist.js')
 
 describe('AnnouncementModal', () => {
-  const appVersion = '1.0.0'
+  const announcementKey = 'newType'
   const getLocalStorageItemMock: JestMockFn<[string], mixed> =
     persist.getLocalStorageItem
 
@@ -20,7 +20,7 @@ describe('AnnouncementModal', () => {
   } = announcements
 
   beforeEach(() => {
-    getLocalStorageItemMock.mockReturnValue(appVersion)
+    getLocalStorageItemMock.mockReturnValue(announcementKey)
   })
 
   test('modal is not shown when announcement has been shown before', () => {
@@ -29,7 +29,7 @@ describe('AnnouncementModal', () => {
         image: null,
         heading: 'a test header',
         message: 'test',
-        version: appVersion,
+        announcementKey,
       },
     ]
 
@@ -44,7 +44,7 @@ describe('AnnouncementModal', () => {
         image: null,
         heading: 'a test header',
         message: 'brand new spanking feature',
-        version: '1.1.0',
+        announcementKey: 'newPipette',
       },
     ]
 
@@ -61,13 +61,13 @@ describe('AnnouncementModal', () => {
         image: null,
         heading: 'a first header',
         message: 'first announcement',
-        version: appVersion,
+        announcementKey,
       },
       {
         image: null,
         heading: 'a second header',
         message: 'second announcement',
-        version: '1.1.0',
+        announcementKey: 'newPipette',
       },
     ]
 
@@ -84,23 +84,23 @@ describe('AnnouncementModal', () => {
         image: <img src="test.jpg" />,
         heading: 'a test header',
         message: 'brand new spanking feature',
-        version: '1.1.0',
+        announcementKey: 'newFeature',
       },
     ]
 
     const wrapper = shallow(<AnnouncementModal />)
     const image = wrapper.find('img')
-
     expect(image).toHaveLength(1)
   })
 
-  test('button click saves announcement version to localStorage and closes modal', () => {
+  test('button click saves announcement announcementKey to localStorage and closes modal', () => {
+    const newAnnouncementKey = 'newFeature'
     announcementsMock.announcements = [
       {
         image: null,
         heading: 'a test header',
         message: 'brand new spanking feature',
-        version: '1.1.0',
+        announcementKey: newAnnouncementKey,
       },
     ]
 
@@ -110,7 +110,7 @@ describe('AnnouncementModal', () => {
 
     expect(persist.setLocalStorageItem).toHaveBeenCalledWith(
       localStorageKey,
-      '1.1.0'
+      newAnnouncementKey
     )
     expect(wrapper.find(Modal)).toHaveLength(0)
   })

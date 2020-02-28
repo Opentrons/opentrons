@@ -9,22 +9,22 @@ import modalStyles from '../modal.css'
 import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
 
-export const localStorageKey = 'announcementVersion'
+export const localStorageKey = 'announcementKey'
 
 export const AnnouncementModal = () => {
-  const { version, message, heading, image } = announcements[
+  const { announcementKey, message, heading, image } = announcements[
     announcements.length - 1
   ]
 
   const userHasNotSeenAnnouncement =
-    getLocalStorageItem(localStorageKey) !== version
+    getLocalStorageItem(localStorageKey) !== announcementKey
 
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     userHasNotSeenAnnouncement
   )
 
   const handleClick = () => {
-    setLocalStorageItem(localStorageKey, version)
+    setLocalStorageItem(localStorageKey, announcementKey)
     setShowAnnouncementModal(false)
   }
 
@@ -42,9 +42,10 @@ export const AnnouncementModal = () => {
             </>
           )}
 
-          <div className={styles.announcement_message}>
+          <div className={styles.announcement_body}>
             <h3 className={styles.announcement_heading}>{heading}</h3>
-            {message}
+            <div className={styles.announcement_message}>{message}</div>
+
             <div className={modalStyles.button_row}>
               <OutlineButton onClick={handleClick}>
                 {i18n.t('button.got_it')}

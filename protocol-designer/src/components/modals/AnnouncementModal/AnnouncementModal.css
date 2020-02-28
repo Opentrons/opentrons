@@ -5,7 +5,10 @@
 }
 
 .modal_contents {
+  @apply --font-body-2-dark;
+
   border-radius: 0;
+  padding: 0;
 }
 
 .modal_contents p {
@@ -16,18 +19,30 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  margin-top: 1rem;
-  margin-bottom: 1.5rem;
+
+  /*
+    Keep image height at a specific ratio by shrinking the available space the
+    image has to take up
+  */
+  padding-left: 19.294%;
+  padding-right: 19.294%;
+}
+
+.modules_diagram {
+  width: 100%;
+  height: 100%;
 }
 
 .separator {
   color: var(--c-light-gray);
-  margin-left: -1rem;
-  margin-right: -1rem;
+}
+
+.announcement_body {
+  padding: 2.5rem 1.5rem 1.5rem 1.5rem;
 }
 
 .announcement_message {
-  padding: 2.5rem 1.5rem 1rem 1.5rem;
+  margin-bottom: 2.5rem;
 }
 
 .announcement_heading {
