@@ -136,7 +136,6 @@ class TempDeck(mod_abc.AbstractModule):
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._current_task: Optional[asyncio.Task] = None
         self._poller = None
 
     async def set_temperature(self, celsius):
@@ -147,13 +146,14 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        self._current_task = self._loop.create_task(
+        await self.wait_for_is_running()
+        return await self._loop.create_task(
             self._driver.set_temperature(celsius)
         )
-        return await self._current_task
 
-    def deactivate(self):
+    async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
+        await self.wait_for_is_running()
         self._driver.deactivate()
 
     @property
@@ -200,11 +200,6 @@ class TempDeck(mod_abc.AbstractModule):
 
     def set_loop(self, loop):
         self._loop = loop
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
 
     async def _connect(self):
         """

@@ -2,6 +2,7 @@ import asyncio
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
+from ..pause_manager import PauseManager
 from . import update, mod_abc, types
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
@@ -60,6 +61,7 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    pause_manager: PauseManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -67,7 +69,8 @@ class MagDeck(mod_abc.AbstractModule):
         # passed on
         mod = cls(port=port,
                   simulating=simulating,
-                  loop=loop)
+                  loop=loop,
+                  pause_manager=pause_manager)
         await mod._connect()
         return mod
 
@@ -93,36 +96,41 @@ class MagDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 pause_manager: PauseManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
-                         loop=loop)
+                         loop=loop,
+                         pause_manager=pause_manager)
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-    def calibrate(self):
+    async def calibrate(self):
         """
         Calibration involves probing for top plate to get the plate height
         """
+        await self.wait_for_is_running()
         self._driver.probe_plate()
         # return if successful or not?
 
-    def engage(self, height):
+    async def engage(self, height):
         """
         Move the magnet to a specific height, in mm from home position
         """
+        await self.wait_for_is_running()
         if height > MAX_ENGAGE_HEIGHT or height < 0:
             raise ValueError('Invalid engage height. Should be 0 to {}'.format(
                 MAX_ENGAGE_HEIGHT))
         self._driver.move(height)
 
-    def deactivate(self):
+    async def deactivate(self):
         """
         Home the magnet
         """
+        await self.wait_for_is_running()
         self._driver.home()
         self.engage(0.0)
 

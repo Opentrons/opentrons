@@ -2,9 +2,12 @@
 """
 import asyncio
 import functools
-from typing import Any
+from typing import Any, TYPE_CHECKING
 
 from .types import HardwareAPILike
+
+if TYPE_CHECKING:
+    from .dev_types import HasLoop # noqa (F501)
 
 
 # TODO: BC 2020-02-25 instead of overwriting __get_attribute__ in this class
@@ -37,7 +40,7 @@ class SynchronousAdapter(HardwareAPILike):
     >>> sync_api.home()
     """
 
-    def __init__(self, asynchronous_instance: Any) -> None:
+    def __init__(self, asynchronous_instance: 'HasLoop') -> None:
         """ Build the SynchronousAdapter.
 
         :param asynchronous_instance: The asynchronous class instance to wrap

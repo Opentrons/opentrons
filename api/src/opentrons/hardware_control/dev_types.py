@@ -1,3 +1,4 @@
+import asyncio
 from typing import List
 from .modules import ModuleAtPort
 try:
@@ -21,3 +22,8 @@ if Protocol is not None:
             new_mods_at_ports: List[ModuleAtPort] = None,
             removed_mods_at_ports: List[ModuleAtPort] = None
         ) -> None: ...
+
+    class HasLoop(Protocol):
+        @property
+        def loop(self) -> asyncio.AbstractEventLoop:
+            ...

@@ -371,12 +371,6 @@ class API(HardwareAPILike):
                                                    checked_loop,
                                                    explicit_modeset)
 
-    def _call_on_attached_modules(self, method: str):
-        for module in self.attached_modules:
-            maybe_module_method = getattr(module, method, None)
-            if callable(maybe_module_method):
-                maybe_module_method()
-
     # Global actions API
     def pause(self):
         """
@@ -392,7 +386,6 @@ class API(HardwareAPILike):
         """
         self._backend.pause()
         self._pause_manager.pause()
-        # self._call_on_attached_modules("pause")
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -406,7 +399,6 @@ class API(HardwareAPILike):
         """
         self._backend.resume()
         self._pause_manager.resume()
-        # self._call_on_attached_modules("resume")
 
     def halt(self):
         """ Immediately stop motion.
@@ -422,7 +414,9 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        self._call_on_attached_modules("cancel")
+        tasks = [t for t in asyncio.all_tasks() if t is not
+                 asyncio.current_task()]
+        [task.cancel() for task in tasks]
 
     async def stop(self):
         """
