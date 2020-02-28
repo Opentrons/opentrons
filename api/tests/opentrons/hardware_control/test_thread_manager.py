@@ -12,4 +12,3 @@ def test_build_fail_raises_exception():
         raise Exception()
     with pytest.raises(ThreadManagerException):
         ThreadManager(f)
-
