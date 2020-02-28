@@ -18,6 +18,12 @@ import typeof {
   FETCH_WIFI_KEYS,
   FETCH_WIFI_KEYS_SUCCESS,
   FETCH_WIFI_KEYS_FAILURE,
+  POST_WIFI_KEYS,
+  POST_WIFI_KEYS_SUCCESS,
+  POST_WIFI_KEYS_FAILURE,
+  FETCH_EAP_OPTIONS,
+  FETCH_EAP_OPTIONS_SUCCESS,
+  FETCH_EAP_OPTIONS_FAILURE,
 } from './constants'
 
 import * as ApiTypes from './api-types'
@@ -108,6 +114,46 @@ export type FetchWifiKeysFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+// post wifi keys
+
+export type PostWifiKeysAction = {|
+  type: POST_WIFI_KEYS,
+  payload: {| robotName: string, keyFile: File |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysSuccessAction = {|
+  type: POST_WIFI_KEYS_SUCCESS,
+  payload: {| robotName: string, wifiKey: ApiTypes.WifiKey |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysFailureAction = {|
+  type: POST_WIFI_KEYS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// fetch eap options
+
+export type FetchEapOptionsAction = {|
+  type: FETCH_EAP_OPTIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsSuccessAction = {|
+  type: FETCH_EAP_OPTIONS_SUCCESS,
+  payload: {| robotName: string, eapOptions: Array<ApiTypes.EapOption> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsFailureAction = {|
+  type: FETCH_EAP_OPTIONS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
 // action union
 
 export type NetworkingAction =
@@ -123,14 +169,22 @@ export type NetworkingAction =
   | FetchWifiKeysAction
   | FetchWifiKeysSuccessAction
   | FetchWifiKeysFailureAction
+  | PostWifiKeysAction
+  | PostWifiKeysSuccessAction
+  | PostWifiKeysFailureAction
+  | FetchEapOptionsAction
+  | FetchEapOptionsSuccessAction
+  | FetchEapOptionsFailureAction
 
 // state types
 
 export type PerRobotNetworkingState = $Shape<{|
-  internetStatus: ApiTypes.InternetStatus,
-  interfaces: ApiTypes.InterfaceStatusMap,
-  wifiList: Array<ApiTypes.WifiNetwork>,
-  wifiKeys: Array<ApiTypes.WifiKey>,
+  internetStatus?: ApiTypes.InternetStatus,
+  interfaces?: ApiTypes.InterfaceStatusMap,
+  wifiList?: Array<ApiTypes.WifiNetwork>,
+  wifiKeyIds?: Array<string>,
+  wifiKeysById?: $Shape<{| [id: string]: ApiTypes.WifiKey |}>,
+  eapOptions?: Array<ApiTypes.EapOption>,
 |}>
 
 export type NetworkingState = $Shape<{|
