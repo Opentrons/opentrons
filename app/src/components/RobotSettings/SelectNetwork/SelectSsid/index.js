@@ -20,14 +20,15 @@ const formatOptions = (
   list: Array<WifiNetwork>,
   showWifiDisconnect: boolean
 ): Array<SelectOptionOrGroup> => {
+  const ssidOptionsList = { options: list.map(({ ssid }) => ({ value: ssid })) }
   if (showWifiDisconnect) {
-    return list
-      .map(({ ssid }) => ({ value: ssid }))
-      .concat(Constants.SELECT_ADDITIONAL_ACTIONS)
+    return [
+      Constants.SELECT_DISCONNECT_ACTION,
+      ssidOptionsList,
+      Constants.SELECT_JOIN_ACTION,
+    ]
   }
-  return list
-    .map(({ ssid }) => ({ value: ssid }))
-    .concat(Constants.SELECT_JOIN_ACTIONS_OPTIONS)
+  return [ssidOptionsList, Constants.SELECT_JOIN_ACTION]
 }
 
 export function SelectSsid(props: SelectSsidProps) {
@@ -38,7 +39,7 @@ export function SelectSsid(props: SelectSsidProps) {
       name={Constants.FIELD_NAME}
       value={value}
       options={formatOptions(list, showWifiDisconnect)}
-      placeholder="Select network"
+      placeholder={Constants.PLACEHOLDER}
       className={styles.wifi_dropdown}
       disabled={disabled}
       onValueChange={(_, ssid) => onValueChange(ssid)}
