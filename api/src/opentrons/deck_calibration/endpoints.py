@@ -32,9 +32,6 @@ class SessionWrapper:
     @session.setter
     def session(self, s: Optional['SessionManager']):
         """Update the session manager"""
-        if self._session:
-            # Clean up previous one
-            self._session.adapter.join()
         self._session = s
 
 
