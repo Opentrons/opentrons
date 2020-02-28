@@ -69,4 +69,4 @@ Once installed, launch Jupyter Notebook, and install the Opentrons API by doing 
 
 .. note::
 
-    Be sure to download the **Python 3.6 version** if Anaconda, and Python 2.7 will not work with the Opentrons API.
+    Be sure to download the **Python 3.7 version** if Anaconda, and Python 2.7 will not work with the Opentrons API.
