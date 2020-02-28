@@ -1,4 +1,5 @@
 // robot selectors test
+import { format } from 'date-fns'
 import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
@@ -199,11 +200,18 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getStartTime', () => {
+  test('getStartTime with no start time returns null', () => {
     const state = makeState({
-      session: { startTime: 48, remoteTimeCompensation: -6 },
+      session: { startTime: null },
     })
-    expect(getStartTime(state)).toBe(42)
+    expect(getStartTime(state)).toBe(null)
+  })
+
+  test('getStartTime returns local formatted time', () => {
+    const state = makeState({
+      session: { startTime: 1582926000, remoteTimeCompensation: -6000 },
+    })
+    expect(getStartTime(state)).toBe(format(1582920000, 'pp'))
   })
 
   test('getRunTime with no startTime', () => {

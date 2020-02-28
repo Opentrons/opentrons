@@ -3,6 +3,7 @@
 import padStart from 'lodash/padStart'
 import some from 'lodash/some'
 import { createSelector } from 'reselect'
+import { format } from 'date-fns'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import { getLatestLabwareDef } from '../getLabware'
@@ -187,17 +188,26 @@ export const getSessionError: State => string | null = createSelector(
   }
 )
 
-export function getStartTime(state: State): number | null {
+const getStartTimeMs = (state: State): number | null => {
   const { startTime, remoteTimeCompensation } = session(state)
 
-  return startTime != null && remoteTimeCompensation !== null
-    ? startTime + remoteTimeCompensation
-    : null
+  if (startTime == null || remoteTimeCompensation === null) {
+    return null
+  }
+
+  return startTime + remoteTimeCompensation
 }
+
+export const getStartTime: (state: State) => string | null = createSelector(
+  getStartTimeMs,
+  startTimeMs => {
+    return startTimeMs !== null ? format(startTimeMs, 'pp') : null
+  }
+)
 
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getRunSeconds = createSelector(
-  getStartTime,
+  getStartTimeMs,
   (state: State) => session(state).runTime,
   (startTime: ?number, runTime: ?number): number => {
     return runTime && startTime && runTime > startTime
