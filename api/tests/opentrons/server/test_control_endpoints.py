@@ -5,7 +5,7 @@ import pytest
 
 from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, PauseManager
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.config import pipette_config
@@ -84,6 +84,7 @@ async def test_get_modules(
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
                                              interrupt_callback=lambda x: None,
+                                             pause_manager=PauseManager(loop=loop),
                                              loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
@@ -97,6 +98,7 @@ async def test_get_modules(
     assert 'engaged' in body['modules'][0]['data']
     tempdeck = await hw._backend.build_module('/dev/ot_module_tempdeck1',
                                               'tempdeck', lambda x: None,
+                                              pause_manager=PauseManager(loop=loop),
                                               loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [tempdeck])
     for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
@@ -133,6 +135,7 @@ async def test_execute_module_command(
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
                                              interrupt_callback=lambda x: None,
+                                             pause_manager=PauseManager(loop=loop),
                                              loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
 
