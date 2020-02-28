@@ -1,6 +1,5 @@
 // @flow
 
-export const API_MIN_VERSION = '3.17.0'
 export const LIST_REFRESH_MS = 15000
 export const ACTIVE = 'active'
 

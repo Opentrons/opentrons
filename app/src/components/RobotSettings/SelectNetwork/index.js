@@ -1,8 +1,7 @@
 // @flow
-import React, { useCallback } from 'react'
+import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import last from 'lodash/last'
-import semver from 'semver'
 
 import {
   useDispatchApiRequest,
@@ -12,7 +11,7 @@ import {
   SUCCESS,
   FAILURE,
 } from '../../../robot-api'
-import { postWifiDisconnect, fetchWifiList } from '../../../networking'
+import * as Networking from '../../../networking'
 import {
   NO_SECURITY,
   WPA_EAP_SECURITY,
@@ -24,7 +23,7 @@ import {
 } from '../../../http-api-client'
 import { getConfig } from '../../../config'
 
-import { getRobotApiVersion, startDiscovery } from '../../../discovery'
+import { startDiscovery } from '../../../discovery'
 import { chainActions } from '../../../util'
 
 import { IntervalWrapper } from '@opentrons/components'
@@ -32,7 +31,6 @@ import { SelectSsid } from './SelectSsid'
 import { SelectNetworkModal } from './SelectNetworkModal'
 
 import {
-  API_MIN_VERSION,
   LIST_REFRESH_MS,
   DISCONNECT_WIFI_VALUE,
   JOIN_OTHER_VALUE,
@@ -61,16 +59,6 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     configError,
   } = useSelector((state: State) => stateSelector(state, robot))
 
-  // TODO(isk, 2/27/20): remove this feature flag and version check
-  const enableWifiDisconnect = useSelector((state: State) =>
-    Boolean(getConfig(state).devInternal?.enableWifiDisconnect)
-  )
-  const hasCorrectVersion = semver.gte(
-    getRobotApiVersion(robot),
-    API_MIN_VERSION
-  )
-  const showWifiDisconnect = enableWifiDisconnect || hasCorrectVersion
-
   const showConfig = configRequest && !!(configError || configResponse)
 
   const [
@@ -86,7 +74,15 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     setModalOpen,
   ] = useStateSelectNetwork(list)
 
-  const handleDisconnectWifiSuccess = useCallback(() => {
+  // TODO(isk, 2/27/20): remove the feature flag and version check
+  const enableWifiDisconnect = useSelector((state: State) =>
+    Boolean(getConfig(state).devInternal?.enableWifiDisconnect)
+  )
+  const hasCorrectVersion = Networking.getRobotSuportsDisconnect(robot)
+  const showWifiDisconnect =
+    Boolean(ssid) && (enableWifiDisconnect || hasCorrectVersion)
+
+  const handleDisconnectWifiSuccess = React.useCallback(() => {
     setSsid(null)
     setPreviousSsid(null)
     setNetworkingType(CONNECT)
@@ -123,13 +119,13 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
   }, [status, handleDisconnectWifiSuccess])
 
   const dispatch = useDispatch()
-  const dispatchRefresh = () => dispatch(fetchWifiList(robot.name))
+  const dispatchRefresh = () => dispatch(Networking.fetchWifiList(robot.name))
   const dispatchConfigure = params => {
     return dispatch(
       chainActions(
         configureWifi(robot, params),
         startDiscovery(),
-        fetchWifiList(robot.name)
+        Networking.fetchWifiList(robot.name)
       )
     )
   }
@@ -147,7 +143,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
     const canFetchEapOptions =
       hasSecurityType(securityType, WPA_EAP_SECURITY) || !securityType
     if (currentModalOpen) {
-      dispatch(dispatchConfigure({ ssid: ssidValue }))
+      dispatchConfigure({ ssid: ssidValue })
     } else if (canFetchEapOptions) {
       dispatch(fetchWifiEapOptions(robot))
       dispatch(fetchWifiKeys(robot))
@@ -171,7 +167,7 @@ export const SelectNetwork = ({ robot }: SelectNetworkProps) => {
 
   const handleDisconnectWifi = () => {
     if (previousSsid) {
-      dispatchApi(postWifiDisconnect(robot.name, previousSsid))
+      dispatchApi(Networking.postWifiDisconnect(robot.name, previousSsid))
       setModalOpen(false)
     }
   }
