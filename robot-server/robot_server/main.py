@@ -1,5 +1,4 @@
 import typing
-import asyncio
 import logging
 from argparse import ArgumentParser
 
