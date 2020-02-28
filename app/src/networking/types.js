@@ -150,7 +150,7 @@ export type FetchEapOptionsSuccessAction = {|
 
 export type FetchEapOptionsFailureAction = {|
   type: FETCH_EAP_OPTIONS_FAILURE,
-  payload: {| robotName: string, error: { ... } |},
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
 |}
 

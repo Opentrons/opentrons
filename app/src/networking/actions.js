@@ -169,7 +169,7 @@ export const fetchEapOptionsSuccess = (
 
 export const fetchEapOptionsFailure = (
   robotName: string,
-  error: { ... },
+  error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchEapOptionsFailureAction => ({
   type: Constants.FETCH_EAP_OPTIONS_FAILURE,
