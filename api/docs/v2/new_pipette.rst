@@ -20,7 +20,7 @@ Pipettes are specified in a protocol using the method :py:meth:`.ProtocolContext
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         # Load a P50 multi on the left slot
@@ -98,7 +98,7 @@ For instance, in this protocol you can see the effects of specifying tipracks:
 
    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '2.0'}
+   metadata = {'apiLevel': '2.2'}
 
    def run(protocol: protocol_api.ProtocolContext):
        tiprack_left = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -162,7 +162,7 @@ Each of these attributes can be altered without affecting the others.
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -232,7 +232,7 @@ executed as part of a transfer.
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('opentrons_96_tiprack_300ul', '1')
@@ -279,7 +279,7 @@ the overall speed of the gantry. Its default is 400 mm/s.
 
     from opentrons import protocol_api, types
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         pipette = protocol.load_instrument('p300_single', 'right')
@@ -306,7 +306,7 @@ resets that axis's limit to the default:
 
 .. code-block:: python
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol):
         protocol.max_speeds['X'] = 50  # limit x axis to 50 mm/s
