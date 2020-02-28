@@ -2,7 +2,7 @@
 """
 import asyncio
 import functools
-from typing import Any, TYPE_CHECKING
+from typing import TYPE_CHECKING
 
 from .types import HardwareAPILike
 

@@ -84,7 +84,8 @@ async def test_get_modules(
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
                                              interrupt_callback=lambda x: None,
-                                             pause_manager=PauseManager(loop=loop),
+                                             pause_manager=PauseManager(
+                                                    loop=loop),
                                              loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
@@ -98,7 +99,8 @@ async def test_get_modules(
     assert 'engaged' in body['modules'][0]['data']
     tempdeck = await hw._backend.build_module('/dev/ot_module_tempdeck1',
                                               'tempdeck', lambda x: None,
-                                              pause_manager=PauseManager(loop=loop),
+                                              pause_manager=PauseManager(
+                                                    loop=loop),
                                               loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [tempdeck])
     for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
@@ -135,7 +137,8 @@ async def test_execute_module_command(
     magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
                                              model='magdeck',
                                              interrupt_callback=lambda x: None,
-                                             pause_manager=PauseManager(loop=loop),
+                                             pause_manager=PauseManager(
+                                                    loop=loop),
                                              loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
 
