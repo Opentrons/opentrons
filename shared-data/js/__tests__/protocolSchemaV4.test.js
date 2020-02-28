@@ -107,7 +107,7 @@ describe('ensure bad protocol data fails validation', () => {
             [labwareId]: badLabware[labwareId],
           },
         })
-      )
+      ).toBe(false)
     })
   })
 
@@ -132,7 +132,7 @@ describe('ensure bad protocol data fails validation', () => {
             [moduleId]: badModules[moduleId],
           },
         })
-      )
+      ).toBe(false)
     })
   })
 })
