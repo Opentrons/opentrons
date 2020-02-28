@@ -3,15 +3,16 @@
 module.exports = {
   env: {
     production: {
-      plugins: ['babel-plugin-unassert'],
+      plugins: ['babel-plugin-styled-components', 'babel-plugin-unassert'],
     },
     development: {
-      plugins: ['react-hot-loader/babel'],
+      plugins: ['babel-plugin-styled-components', 'react-hot-loader/babel'],
     },
     test: {
       plugins: [
         '@babel/plugin-transform-modules-commonjs',
         'babel-plugin-dynamic-import-node',
+        'babel-plugin-styled-components',
       ],
     },
   },

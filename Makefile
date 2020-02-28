@@ -145,7 +145,7 @@ lint-json:
 
 .PHONY: lint-css
 lint-css:
-	stylelint "**/*.css"
+	stylelint "**/*.css" "**/*.js"
 
 .PHONY: check-js
 check-js:
