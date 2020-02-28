@@ -24,8 +24,8 @@ wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py robot-server normalize_version)-py2.py3-none-any.whl
-wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
+wheel_file = dist/robotserver-$(shell $(python) ../scripts/python_build_utils.py robot-server normalize_version)-py2.py3-none-any.whl
+wheel_pattern := dist/robotserver-%-py2.py3-none-any.whl
 
 
 # These variables can be overriden when make is invoked to customize the
@@ -97,11 +97,11 @@ local-shell:
 push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
+"function cleanup () { rm -f /data/robotserver*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
 systemctl stop opentrons-robot-server &&\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
-unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+unzip -o /data/robotserver*.whl && cleanup || cleanup"
 
 .PHONY: install-key
 install-key:
