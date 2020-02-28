@@ -14,7 +14,7 @@ async def health(request: web.Request) -> web.Response:
     # use protocol api v2 feature flag, so it does not match the type
     # of hardware we're actually using.
     fw_version = request.app['com.opentrons.hardware'].fw_version
-    if inspect.iscoroutine(fw_version):
+    if inspect.isawaitable(fw_version):
         fw_version = await fw_version
 
     if config.feature_flags.use_protocol_api_v2():
