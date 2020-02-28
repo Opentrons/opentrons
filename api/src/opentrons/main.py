@@ -4,7 +4,7 @@ import logging
 import asyncio
 import re
 from opentrons import HERE
-from opentrons.hardware_control import adapters
+from opentrons.hardware_control import API, ThreadManager
 from opentrons import __version__
 from opentrons.config import (feature_flags as ff, name,
                               robot_configs, IS_ROBOT, ROBOT_FIRMWARE_DIR)
@@ -89,10 +89,14 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-def initialize_robot(loop, hardware):
+async def initialize_robot() -> ThreadManager:
     packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
+    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        log.info("Initialized robot using virtual Smoothie")
+        return ThreadManager(API.build_hardware_simulator)
+
     try:
-        hardware.connect()
+        hardware = ThreadManager(API.build_hardware_controller)
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -102,49 +106,48 @@ def initialize_robot(loop, hardware):
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
     else:
-        if ff.use_protocol_api_v2():
-            fw_version = loop.run_until_complete(hardware.fw_version)
-        else:
-            fw_version = hardware.fw_version
-    log.info("Smoothie FW version: {}".format(fw_version))
+        fw_version = await hardware.fw_version
+        hardware.clean_up()
+
+    log.info(f"Smoothie FW version: {fw_version}")
     if fw_version != packed_smoothie_fw_ver:
-        log.info("Executing smoothie update: current vers {}, packed vers {}"
-                 .format(fw_version, packed_smoothie_fw_ver))
-        loop.run_until_complete(
-            _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver))
-        hardware.connect()
+        log.info(f"Executing smoothie update: current vers {fw_version},"
+                 f" packed vers {packed_smoothie_fw_ver}")
+        await _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver)
     else:
-        log.info("FW version OK: {}".format(packed_smoothie_fw_ver))
-    log.info(f"Name: {name()}")
+        log.info(f"FW version OK: {packed_smoothie_fw_ver}")
+    return ThreadManager(API.build_hardware_controller)
 
 
-async def create_hardware(hardware_server: bool = False,
-                          hardware_server_socket: str =
-                          "/var/run/opentrons-hardware.sock"):
+def initialize(
+        hardware_server: bool = False,
+        hardware_server_socket: str = "/var/run/opentrons-hardware.sock") \
+        -> ThreadManager:
     """
-    Create a hardware instance.
+    Initialize the Opentrons hardware returning a hardware instance.
 
     :param hardware_server: Run a jsonrpc server allowing rpc to the  hardware
      controller. Only works on buildroot because extra dependencies are
      required.
     :param hardware_server_socket: Override for the hardware server socket
     """
-    loop = asyncio.get_event_loop()
-
-    hardware = adapters.SingletonAdapter(loop)
-    robot_conf = await hardware.get_config()
-
+    robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
-    log.info("API server version:  {}".format(__version__))
-    if not os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        initialize_robot(loop, hardware)
-        await hardware.cache_instruments()
-        if not ff.disable_home_on_boot():
-            log.info("Homing Z axes")
-            await hardware.home_z()
+    log.info(f"API server version:  {__version__}")
+    log.info(f"Robot Name: {name()}")
+
+    loop = asyncio.get_event_loop()
+    hardware = loop.run_until_complete(initialize_robot())
+
+    if not ff.disable_home_on_boot():
+        log.info("Homing Z axes")
+        loop.run_until_complete(hardware.home_z())
 
     if hardware_server:
-        await install_hardware_server(hardware_server_socket, hardware._api)
+        #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
+        loop.run_until_complete(
+                install_hardware_server(hardware_server_socket,
+                                        hardware))  # type: ignore
 
     return hardware

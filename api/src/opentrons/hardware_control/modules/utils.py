@@ -1,3 +1,4 @@
+import asyncio
 import logging
 from glob import glob
 import re
@@ -28,11 +29,13 @@ async def build(
         port: str,
         which: str,
         simulating: bool,
-        interrupt_callback: InterruptCallback) -> AbstractModule:
+        interrupt_callback: InterruptCallback,
+        loop: asyncio.AbstractEventLoop) -> AbstractModule:
     return await MODULE_HW_BY_NAME[which].build(
         port,
         interrupt_callback=interrupt_callback,
-        simulating=simulating
+        simulating=simulating,
+        loop=loop
     )
 
 

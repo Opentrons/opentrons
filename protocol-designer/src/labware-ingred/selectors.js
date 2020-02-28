@@ -10,6 +10,7 @@ import type {
   RootState,
   ContainersState,
   DrillDownLabwareId,
+  IngredientsState,
   SelectedContainerId,
   SelectedLiquidGroupState,
 } from './reducers'
@@ -32,7 +33,7 @@ const getLabwareNameInfo: MemoizedSelector<ContainersState> = createSelector(
   s => s.containers
 )
 
-const getLiquidGroupsById = (state: RootSlice) =>
+const getLiquidGroupsById = (state: RootSlice): IngredientsState =>
   rootSelector(state).ingredients
 const getLiquidsByLabwareId = (state: RootSlice) =>
   rootSelector(state).ingredLocations
@@ -84,23 +85,16 @@ const getDrillDownLabwareId: MemoizedSelector<DrillDownLabwareId> = createSelect
   rootState => rootState.drillDownLabwareId
 )
 
-// TODO Ian 2018-07-06 consolidate into types.js
-type IngredGroupFields = {
-  [ingredGroupId: string]: {
-    groupId: string,
-    ...$Exact<IngredInputs>,
-  },
-}
 const allIngredientGroupFields: MemoizedSelector<AllIngredGroupFields> = createSelector(
   getLiquidGroupsById,
   ingreds =>
-    reduce(
+    reduce<IngredientsState, AllIngredGroupFields>(
       ingreds,
       (
-        acc: IngredGroupFields,
-        ingredGroup: IngredGroupFields,
-        ingredGroupId: string
-      ) => ({
+        acc,
+        ingredGroup: IngredInputs,
+        ingredGroupId
+      ): AllIngredGroupFields => ({
         ...acc,
         [ingredGroupId]: ingredGroup,
       }),

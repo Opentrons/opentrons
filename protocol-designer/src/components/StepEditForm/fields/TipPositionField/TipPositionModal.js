@@ -254,7 +254,9 @@ const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   return {
     updateValue: value => {
       dispatch(
-        actions.changeFormInput({ update: { [ownProps.fieldName]: value } })
+        actions.changeFormInput({
+          update: { [(ownProps.fieldName: string)]: value },
+        })
       )
     },
   }

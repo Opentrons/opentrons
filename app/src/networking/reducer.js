@@ -37,6 +37,16 @@ export function networkingReducer(
         [robotName]: { ...robotState, wifiList },
       }
     }
+
+    case Constants.FETCH_WIFI_KEYS_SUCCESS: {
+      const { robotName, wifiKeys } = action.payload
+      const robotState = getRobotState(state, robotName)
+
+      return {
+        ...state,
+        [robotName]: { ...robotState, wifiKeys },
+      }
+    }
   }
 
   return state

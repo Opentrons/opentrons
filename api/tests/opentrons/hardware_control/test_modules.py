@@ -12,7 +12,8 @@ from opentrons.hardware_control.modules.types import BundledFirmware
 async def test_get_modules_simulating():
     import opentrons.hardware_control as hardware_control
     mods = ['tempdeck', 'magdeck', 'thermocycler']
-    api = hardware_control.API.build_hardware_simulator(attached_modules=mods)
+    api = await hardware_control.API.build_hardware_simulator(
+                        attached_modules=mods)
     await asyncio.sleep(0.05)
     from_api = api.attached_modules
     assert sorted([mod.name() for mod in from_api]) == sorted(mods)
@@ -21,7 +22,7 @@ async def test_get_modules_simulating():
 async def test_module_caching():
     import opentrons.hardware_control as hardware_control
     mod_names = ['tempdeck']
-    api = hardware_control.API.build_hardware_simulator(
+    api = await hardware_control.API.build_hardware_simulator(
         attached_modules=mod_names)
     await asyncio.sleep(0.05)
 
@@ -74,7 +75,8 @@ async def test_module_update_integration(monkeypatch, loop):
     tempdeck = await modules.build('/dev/ot_module_sim_tempdeck0',
                                    'tempdeck',
                                    True,
-                                   lambda x: None)
+                                   lambda x: None,
+                                   loop=loop)
 
     upload_via_avrdude_mock = mock.Mock(
         return_value=(async_return((True, 'avrdude bootloader worked'))))
@@ -102,7 +104,8 @@ async def test_module_update_integration(monkeypatch, loop):
     magdeck = await modules.build('/dev/ot_module_sim_magdeck0',
                                   'magdeck',
                                   True,
-                                  lambda x: None)
+                                  lambda x: None,
+                                  loop=loop)
 
     await modules.update_firmware(magdeck, 'fake_fw_file_path', loop)
     upload_via_avrdude_mock.assert_called_once_with(
@@ -116,7 +119,8 @@ async def test_module_update_integration(monkeypatch, loop):
     thermocycler = await modules.build('/dev/ot_module_sim_thermocycler0',
                                        'thermocycler',
                                        True,
-                                       lambda x: None)
+                                       lambda x: None,
+                                       loop=loop)
 
     upload_via_bossa_mock = mock.Mock(
         return_value=(async_return((True, 'bossa bootloader worked'))))
@@ -161,7 +165,7 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
 
     from opentrons.hardware_control import API
     mods = ['tempdeck', 'magdeck', 'thermocycler']
-    api = API.build_hardware_simulator(attached_modules=mods)
+    api = await API.build_hardware_simulator(attached_modules=mods)
     await asyncio.sleep(0.05)
 
     assert api.attached_modules[0].bundled_fw == BundledFirmware(

@@ -142,13 +142,14 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     }
   } else {
     const allLabware = robotSelectors.getLabware(state)
-    const labwareBySlot = allLabware.reduce(
-      (acc, labware) => ({
-        ...acc,
-        [labware.slot]: [...(acc[labware.slot] || []), labware],
-      }),
-      {}
-    )
+    const labwareBySlot = allLabware.reduce((slotMap, labware) => {
+      const { slot } = labware
+      const slotContents = slotMap[slot] ?? []
+
+      slotMap[slot] = [...slotContents, labware]
+      return slotMap
+    }, {})
+
     if (ownProps.enableLabwareSelection !== true) {
       return {
         labwareBySlot,

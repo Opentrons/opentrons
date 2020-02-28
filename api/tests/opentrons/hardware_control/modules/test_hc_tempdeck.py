@@ -3,13 +3,15 @@ from opentrons.hardware_control import modules
 from opentrons.hardware_control.modules import tempdeck
 
 
-async def test_sim_initialization():
-    temp = await modules.build('', 'tempdeck', True, lambda x: None)
+async def test_sim_initialization(loop):
+    temp = await modules.build('', 'tempdeck', True,
+                               lambda x: None, loop=loop)
     assert isinstance(temp, modules.AbstractModule)
 
 
-async def test_sim_state():
-    temp = await modules.build('', 'tempdeck', True, lambda x: None)
+async def test_sim_state(loop):
+    temp = await modules.build('', 'tempdeck', True,
+                               lambda x: None, loop=loop)
     assert temp.temperature == 0
     assert temp.target is None
     assert temp.status == 'idle'
@@ -22,8 +24,9 @@ async def test_sim_state():
     assert status['version'] == 'dummyVersionTD'
 
 
-async def test_sim_update():
-    temp = await modules.build('', 'tempdeck', True, lambda x: None)
+async def test_sim_update(loop):
+    temp = await modules.build('', 'tempdeck', True,
+                               lambda x: None, loop=loop)
     await asyncio.wait_for(temp.set_temperature(10), 0.2)
     assert temp.temperature == 10
     assert temp.target == 10

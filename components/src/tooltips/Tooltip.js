@@ -51,7 +51,11 @@ export function Tooltip<ChildProps: {}>(props: TooltipProps<ChildProps>) {
   return (
     <Manager>
       <Reference>
-        {({ ref }) => props.children({ ...props.childProps, ref })}
+        {// TODO(mc, 2020-02-21): this is pretty hard to type as is, ref
+        // should probably be a whole separate argument to children
+        // this may become a moot point if we switch tooltips to hooks
+        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
+        ({ ref }) => props.children({ ...props.childProps, ref })}
       </Reference>
       {props.open && (
         <Popper
