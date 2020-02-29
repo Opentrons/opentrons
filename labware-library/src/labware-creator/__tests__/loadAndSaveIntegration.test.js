@@ -9,7 +9,7 @@ import fixture12Trough from '@opentrons/shared-data/labware/fixtures/2/fixture_1
 jest.mock('../../definitions')
 
 describe('load and immediately save integrity test', () => {
-  const pipetteName = 'P10_Single'
+  const pipetteName = 'p10_single'
   const fakeDisplayName = 'Fake Display Name'
   const fakeLoadName = 'fake_load_name'
 
