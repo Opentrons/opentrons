@@ -17,6 +17,8 @@ import {
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
+import * as uiSelectors from '../../ui/steps'
+import { getLabwareOnModule } from '../../ui/modules/utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
@@ -93,6 +95,14 @@ const ModuleTagComponent = (props: Props) => {
     timelineFrame.robotState.modules[props.id]?.moduleState
   const moduleType: ?* = moduleEntity?.type
 
+  const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
+  const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const moduleLabware = getLabwareOnModule(initialDeck, props.id)
+
+  const isHoveredModuleStep = moduleLabware
+    ? hoveredLabwares[0] === moduleLabware.id
+    : false
+
   if (moduleType == null || moduleState == null) {
     // this should never happen, but better to have an empty tag than to whitescreen
     console.error(
@@ -117,7 +127,9 @@ const ModuleTagComponent = (props: Props) => {
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
       innerDivProps={{
-        className: styles.module_info_tag,
+        className: cx(styles.module_info_tag, {
+          [styles.highlighted_border_div]: isHoveredModuleStep,
+        }),
       }}
     >
       <div className={cx(styles.module_info_type, styles.module_info_line)}>
