@@ -24,7 +24,7 @@ Modules are loaded using the function :py:meth:`.ProtocolContext.load_module`:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Module Name', slot)
@@ -65,7 +65,7 @@ Like specifying labware that will be present on the deck of the OT-2, you must s
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.1'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Temperature Module', slot)
@@ -86,7 +86,7 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
 
 .. note::
 
-    In API version 2.0, :py:meth:`.ModuleContext.load_labware` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) you can now specify a label, version, and namespace (though most of the time you won't have to).
+    In API version 2.0, :py:meth:`.ModuleContext.load_labware` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
 
 
 Checking The Status Of Your Module
@@ -98,7 +98,7 @@ All modules have the ability to check what state they are currently in:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
          module = protocol.load_module('Module Name', slot)
@@ -128,7 +128,7 @@ section, assume we have the following already:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         temp_mod = protocol.load_module('temperature module', '1')
@@ -210,7 +210,7 @@ For the purposes of this section, assume we have the following already:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         mag_mod = protocol.load_module('magnetic module', '1')
@@ -301,7 +301,7 @@ For the purposes of this section, assume we have the following already:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tc_mod = protocol.load_module('Thermocycler Module')
