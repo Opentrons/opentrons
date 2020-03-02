@@ -341,18 +341,21 @@ async def hardware(request, loop, virtual_smoothie_env):
         yield hw_sim
     finally:
         hw_sim.set_config(old_config)
+        hw_sim.clean_up()
 
 
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
 def sync_hardware(request, loop, virtual_smoothie_env):
-    hardware = ThreadManager(API.build_hardware_controller).sync
+    thread_manager = ThreadManager(API.build_hardware_controller)
+    hardware = thread_manager.sync
     try:
         yield hardware
     finally:
         hardware.reset()
         hardware.set_config(config.robot_configs.load())
+        thread_manager.clean_up()
 
 
 @pytest.fixture

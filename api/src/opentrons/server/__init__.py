@@ -127,8 +127,7 @@ def init(hardware: 'HardwareAPILike' = None,
 def run(hardware: 'HardwareAPILike',
         hostname=None,
         port=None,
-        path=None,
-        loop=None):
+        path=None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
