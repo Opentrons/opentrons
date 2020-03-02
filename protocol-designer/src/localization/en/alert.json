@@ -17,7 +17,7 @@
     "deck_setup_explanation": {
       "title": "Setting up your protocol",
       "body1": "If you look to your left you will see the Protocol Timeline, and that the \"Starting Deck State\" step is blue. The blue means that this is the step you are currently working on.",
-      "body2": "Before you can build a protocol that tell the robot how to move liquid around, you'll need to tell the Protocol Designer where all of your labware is on the deck, and which liquids start in which wells. As you add steps to your protocol the Protocol Designer will move liquid from the starting positions you defined in the Starting Deck State to new positions.",
+      "body2": "Before you can build a protocol that tells the robot how to move liquid around, you'll need to tell the Protocol Designer where all of your labware is on the deck, and which liquids start in which wells. As you add steps to your protocol the Protocol Designer will move liquid from the starting positions you defined in the Starting Deck State to new positions.",
       "body3": "Hover on empty slots in the deck to add labware. Hover on labware to add liquid to the wells."
     },
     "custom_labware_with_modules": {
