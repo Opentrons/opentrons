@@ -13,7 +13,7 @@ module.exports = {
     'prettier/standard',
   ],
 
-  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier'],
+  plugins: ['flowtype', 'react', 'react-hooks', 'json', 'prettier', 'jest'],
 
   rules: {
     camelcase: 'off',
@@ -21,6 +21,7 @@ module.exports = {
     // so disabling globally; enable locally if working on fresh code
     // 'flowtype/require-exact-type': 'warn',
     // 'flowtype/spread-exact-type': 'warn',
+
     'react/display-name': 'off',
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'warn',
@@ -54,6 +55,12 @@ module.exports = {
       ],
       env: {
         jest: true,
+      },
+      extends: ['plugin:jest/recommended'],
+      rules: {
+        'jest/expect-expect': 'off',
+        'jest/no-standalone-expect': 'off',
+        'jest/no-disabled-tests': 'error',
       },
     },
     {

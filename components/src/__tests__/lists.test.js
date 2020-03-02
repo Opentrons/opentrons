@@ -128,17 +128,7 @@ describe('ListItem', () => {
 
     expect(tree).toMatchSnapshot()
   })
-})
 
-describe('ListAlert', () => {
-  test('list alert renders correctly', () => {
-    const tree = Renderer.create(<ListAlert>alert alert</ListAlert>).toJSON()
-
-    expect(tree).toMatchSnapshot()
-  })
-})
-
-describe('ListItem', () => {
   test('Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
       <SidePanelGroup title="title" iconName="flask-outline">
@@ -155,6 +145,14 @@ describe('ListItem', () => {
         children
       </SidePanelGroup>
     ).toJSON()
+
+    expect(tree).toMatchSnapshot()
+  })
+})
+
+describe('ListAlert', () => {
+  test('list alert renders correctly', () => {
+    const tree = Renderer.create(<ListAlert>alert alert</ListAlert>).toJSON()
 
     expect(tree).toMatchSnapshot()
   })

@@ -510,7 +510,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test.skip('air gap => ???', () => {}) // TODO determine behavior
+    test.todo('air gap => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {

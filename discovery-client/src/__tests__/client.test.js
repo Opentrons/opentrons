@@ -449,15 +449,17 @@ describe('discovery client', () => {
     client.remove('opentrons-dev')
   }, 10)
 
-  test('passes along mdns errors', done => {
-    const mockError = new Error('AH')
-    const client = createDiscoveryClient().once('error', error => {
-      expect(error).toEqual(mockError)
-      done()
-    })
+  test('passes along mdns errors', () => {
+    return new Promise(resolve => {
+      const mockError = new Error('AH')
+      const client = createDiscoveryClient().once('error', error => {
+        expect(error).toEqual(mockError)
+        resolve()
+      })
 
-    client.start()
-    mdns.__mockBrowser.emit('error', mockError)
+      client.start()
+      mdns.__mockBrowser.emit('error', mockError)
+    })
   })
 
   test('can filter services by name', () => {
@@ -556,7 +558,5 @@ describe('discovery client', () => {
     )
   })
 
-  test.skip('periodically refreshes mDNS discovery', () => {
-    // TODO(mc, 2018-10-08): write this test
-  })
+  test.todo('periodically refreshes mDNS discovery')
 })
