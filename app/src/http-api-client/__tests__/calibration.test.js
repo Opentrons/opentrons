@@ -201,14 +201,14 @@ describe('/calibration/**', () => {
 
       // TODO(mc, 2019-04-23): these tests (and the module they test) are
       // brittle; rewrite tests when HTTP request state is redone
-      describe.skip(`reducer with /calibration/${path}`, () => {
+      describe(`reducer with /calibration/${path}`, () => {
         test('handles api:REQUEST', () => {
           const action = {
             type: 'api:REQUEST',
             payload: { path, robot, request },
           }
 
-          expect(reducer(state, action).calibration).toEqual({
+          expect(reducer(state, action).calibration).toMatchObject({
             [NAME]: {
               [path]: {
                 request,
