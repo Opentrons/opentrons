@@ -26,10 +26,12 @@ def test_hw_manager(loop):
     new = mgr.reset_hw()
     assert new is not passed
 
-    sa = ThreadManager(API.build_hardware_simulator).sync
+    thread_manager = ThreadManager(API.build_hardware_simulator)
+    sa = thread_manager.sync
     # When connecting to an adapter it shouldn’t rewrap it
     assert mgr.set_hw(sa) is sa
     del mgr
+    thread_manager.clean_up()
 
 
 def test_max_speeds_userdict():

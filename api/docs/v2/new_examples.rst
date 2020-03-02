@@ -18,7 +18,7 @@ Moving 100 µL from one well to another:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -34,7 +34,7 @@ This accomplishes the same thing as the following basic commands:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -58,7 +58,7 @@ Loops in Python allow your protocol to perform many actions, or act upon many we
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -85,7 +85,7 @@ The OT-2 pipettes can do some things that a human cannot do with a pipette, like
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -113,7 +113,7 @@ This example first spreads a diluent to all wells of a plate. It then dilutes 8 
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
@@ -150,7 +150,7 @@ This example deposits various volumes of liquids into the same plate of wells an
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
         plate = protocol.load_labware('corning_96_wellplate_360ul_flat', 1)
