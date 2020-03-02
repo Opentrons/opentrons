@@ -37,7 +37,7 @@ describe('FileSidebar', () => {
           metadata: {},
           pipettes: {},
           robot: { model: 'OT-2 Standard' },
-          schemaVersion: 4,
+          schemaVersion: 3,
           commands: [],
         },
         fileName: 'protocol.json',

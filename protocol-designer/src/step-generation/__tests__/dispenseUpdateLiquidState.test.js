@@ -268,8 +268,10 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  describe.skip('handle air in pipette tips', () => {
-    // TODO Ian 2018-03-16 deal with air (especially regarding air gap)
+  describe('handle air in pipette tips', () => {
+    test.todo(
+      'TODO(IL 2018-03-16): deal with air (especially regarding air gap)'
+    )
   })
 })
 
