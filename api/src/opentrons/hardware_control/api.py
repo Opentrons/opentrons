@@ -72,7 +72,7 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
-        self._protected_tasks: Set[asyncio.Task] = set([])
+        self._protected_tasks: Set[asyncio.Task] = set()
 
     @classmethod
     async def build_hardware_controller(

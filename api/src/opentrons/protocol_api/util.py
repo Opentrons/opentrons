@@ -5,11 +5,13 @@ import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
-from opentrons.hardware_control import (types, adapters, API,
+from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
+    from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -181,6 +183,11 @@ class AxisMaxSpeeds(UserDict):
         return ((k.name, v) for k, v in self.data.items())
 
 
+HardwareToManage = Union[ThreadManager,
+                         SynchronousAdapter,
+                         'HasLoop']
+
+
 # TODO: BC 2020-03-02 This class's utility as a utility class is drying up.
 # It's only job is to ensure that the hardware a given
 # ProtocolContext references, is synchronously callable.
@@ -194,27 +201,27 @@ class AxisMaxSpeeds(UserDict):
 # and hold onto a sync hardware api directly instead of
 # through the ._hw_manager.hardware indirection.
 class HardwareManager:
-    def __init__(self, hardware):
+    def __init__(self, hardware: Optional[HardwareToManage]):
         if hardware is None:
             self._current = ThreadManager(API.build_hardware_simulator).sync
-        elif isinstance(hardware, adapters.SynchronousAdapter):
+        elif isinstance(hardware, SynchronousAdapter):
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
             self._current = hardware.sync
         else:
-            self._current = adapters.SynchronousAdapter(hardware)
+            self._current = SynchronousAdapter(hardware)
 
     @property
     def hardware(self):
         return self._current
 
     def set_hw(self, hardware):
-        if isinstance(hardware, adapters.SynchronousAdapter):
+        if isinstance(hardware, SynchronousAdapter):
             self._current = hardware
         elif isinstance(hardware, ThreadManager):
             self._current = hardware.sync
         elif isinstance(hardware, HardwareAPILike):
-            self._current = adapters.SynchronousAdapter(hardware)
+            self._current = SynchronousAdapter(hardware)
         else:
             raise TypeError(
                 "hardware should be API or synch adapter but is {}"
