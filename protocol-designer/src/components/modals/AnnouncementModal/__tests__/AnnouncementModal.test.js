@@ -4,7 +4,7 @@ import React from 'react'
 import { shallow } from 'enzyme'
 import { Modal, OutlineButton } from '@opentrons/components'
 import * as persist from '../../../../persist'
-import { AnnouncementModal, localStorageKey } from '../'
+import { AnnouncementModal } from '../'
 import * as announcements from '../announcements'
 import type { Announcement } from '../announcements'
 
@@ -109,7 +109,7 @@ describe('AnnouncementModal', () => {
     button.simulate('click')
 
     expect(persist.setLocalStorageItem).toHaveBeenCalledWith(
-      localStorageKey,
+      persist.localStorageAnnouncementKey,
       newAnnouncementKey
     )
     expect(wrapper.find(Modal)).toHaveLength(0)

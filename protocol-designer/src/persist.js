@@ -53,6 +53,8 @@ function _addStoragePrefix(path: string): string {
   return `root.${path}`
 }
 
+export const localStorageAnnouncementKey = 'announcementKey'
+
 // paths from Redux root to all persisted reducers
 const PERSISTED_PATHS = [
   'analytics.hasOptedIn',

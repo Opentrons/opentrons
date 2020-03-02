@@ -4,12 +4,14 @@ import React, { useState } from 'react'
 import cx from 'classnames'
 import { Modal, OutlineButton } from '@opentrons/components'
 import { i18n } from '../../../localization'
-import { setLocalStorageItem, getLocalStorageItem } from '../../../persist'
+import {
+  setLocalStorageItem,
+  getLocalStorageItem,
+  localStorageAnnouncementKey,
+} from '../../../persist'
 import modalStyles from '../modal.css'
 import { announcements } from './announcements'
 import styles from './AnnouncementModal.css'
-
-export const localStorageKey = 'announcementKey'
 
 export const AnnouncementModal = () => {
   const { announcementKey, message, heading, image } = announcements[
@@ -17,14 +19,14 @@ export const AnnouncementModal = () => {
   ]
 
   const userHasNotSeenAnnouncement =
-    getLocalStorageItem(localStorageKey) !== announcementKey
+    getLocalStorageItem(localStorageAnnouncementKey) !== announcementKey
 
   const [showAnnouncementModal, setShowAnnouncementModal] = useState<boolean>(
     userHasNotSeenAnnouncement
   )
 
   const handleClick = () => {
-    setLocalStorageItem(localStorageKey, announcementKey)
+    setLocalStorageItem(localStorageAnnouncementKey, announcementKey)
     setShowAnnouncementModal(false)
   }
 
