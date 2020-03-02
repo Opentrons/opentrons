@@ -97,9 +97,9 @@ export type Command =
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|
   ...V3ProtocolFile<DesignerApplicationData>,
+  $otSharedSchema: '#/protocol/schemas/4',
   schemaVersion: 4,
-  // TODO: Ian 2019-11-11 make modules a required key when PD drops support for v3
-  modules?: {
+  modules: {
     [moduleId: string]: FileModule,
   },
   commands: Array<Command>,
