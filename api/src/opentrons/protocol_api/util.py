@@ -181,7 +181,7 @@ class AxisMaxSpeeds(UserDict):
         return ((k.name, v) for k, v in self.data.items())
 
 
-# TODO: This class's utility as a utility class is drying up.
+# TODO: BC 2020-03-02 This class's utility as a utility class is drying up.
 # It's only job is to ensure that the hardware a given
 # ProtocolContext references, is synchronously callable.
 # All internal calls to ProtocolContext __init__

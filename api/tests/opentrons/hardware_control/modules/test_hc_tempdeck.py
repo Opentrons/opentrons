@@ -34,7 +34,7 @@ async def test_sim_state(loop):
 
 async def test_sim_update(loop):
     temp = await modules.build(port='/dev/ot_module_sim_tempdeck0',
-                               model='tempdeck',
+                               which='tempdeck',
                                simulating=True,
                                interrupt_callback=lambda x: None,
                                loop=loop,
