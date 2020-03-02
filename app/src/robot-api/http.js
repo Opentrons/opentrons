@@ -32,12 +32,15 @@ export function fetchRobotApi(
   host: RobotHost,
   request: RobotApiRequestOptions
 ): Observable<RobotApiResponse> {
-  const { path, method, body: reqBody } = request
+  const { path, method, body: reqBody, form: reqForm } = request
   const url = robotApiUrl(host, request)
   const options: RequestOptions = { method }
 
   if (reqBody != null) {
-    if (typeof reqBody === 'object') options.body = JSON.stringify(reqBody)
+    options.headers = { 'Content-Type': 'application/json' }
+    options.body = JSON.stringify(reqBody)
+  } else if (reqForm != null) {
+    options.body = reqForm
   }
 
   return from(fetch(url, options)).pipe(

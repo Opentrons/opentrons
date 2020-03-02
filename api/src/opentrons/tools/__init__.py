@@ -1,6 +1,7 @@
 import opentrons
 import optparse
 import sys
+from opentrons.hardware_control import ThreadManager, API
 
 
 def connect_to_port(hardware):
@@ -27,8 +28,7 @@ try:
         port = options.port
     else:
         port = None
-    hardware = adapter.SynchronousAdapter.build(
-        api.build_hardware_controller, port=port)
+    hardware = ThreadManager(API.build_hardware_controller).sync
     driver = hardware._backend._smoothie_driver
 except AttributeError:
     hardware = None  # type: ignore

@@ -1,6 +1,6 @@
 // @flow
-import React from 'react'
-import { shallow } from 'enzyme'
+import * as React from 'react'
+import { shallow, mount } from 'enzyme'
 import fileSaver from 'file-saver'
 import { PrimaryButton, AlertModal, OutlineButton } from '@opentrons/components'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
@@ -9,9 +9,14 @@ import {
   fixtureP300Single,
 } from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
-import { FileSidebar } from '../FileSidebar'
+import { FileSidebar, v4WarningContent } from '../FileSidebar'
+import { useBlockingHint } from '../../Hints/useBlockingHint'
+import type { HintArgs } from '../../Hints/useBlockingHint'
 
 jest.mock('file-saver')
+jest.mock('../../Hints/useBlockingHint')
+
+const mockUseBlockingHint: JestMockFn<[HintArgs], ?React.Node> = useBlockingHint
 
 describe('FileSidebar', () => {
   const pipetteLeftId = 'pipetteLeftId'
@@ -40,6 +45,7 @@ describe('FileSidebar', () => {
       pipettesOnDeck: {},
       modulesOnDeck: {},
       savedStepForms: {},
+      isV4Protocol: false,
     }
 
     commands = [
@@ -190,5 +196,50 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).not.toContain(
       pipettesOnDeck.pipetteLeftId.spec.displayName
     )
+  })
+
+  test('blocking hint is shown when protocol contains modules', () => {
+    props.downloadData.fileData.commands = commands
+    props.pipettesOnDeck = {
+      pipetteLeftId: {
+        name: 'string',
+        id: pipetteLeftId,
+        tiprackDefURI: 'test',
+        tiprackLabwareDef: fixture_tiprack_10_ul,
+        spec: fixtureP10Single,
+        mount: 'left',
+      },
+    }
+    props.savedStepForms = savedStepForms
+
+    const MockHintComponent = () => {
+      return <div></div>
+    }
+
+    mockUseBlockingHint.mockReturnValue(<MockHintComponent />)
+
+    const wrapper = mount(<FileSidebar {...props} isV4Protocol={true} />)
+
+    expect(wrapper.exists(MockHintComponent)).toEqual(true)
+    // Before save button is clicked, enabled should be false
+    expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
+      enabled: false,
+      hintKey: 'export_v4_protocol',
+      content: v4WarningContent,
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+    })
+
+    const downloadButton = wrapper.find(PrimaryButton).at(0)
+    downloadButton.simulate('click')
+
+    // After save button is clicked, enabled should be true
+    expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
+      enabled: true,
+      hintKey: 'export_v4_protocol',
+      content: v4WarningContent,
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+    })
   })
 })

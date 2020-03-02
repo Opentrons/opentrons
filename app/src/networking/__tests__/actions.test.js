@@ -16,7 +16,7 @@ type ActionSpec = {|
 describe('networking actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
-      name: 'networking:FETCH_STATUS',
+      name: 'can create networking:FETCH_STATUS',
       creator: Actions.fetchStatus,
       args: [mockRobot.name],
       expected: {
@@ -26,7 +26,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:FETCH_STATUS_SUCCESS',
+      name: 'can create networking:FETCH_STATUS_SUCCESS',
       creator: Actions.fetchStatusSuccess,
       args: [
         mockRobot.name,
@@ -45,7 +45,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:FETCH_STATUS_FAILURE',
+      name: 'can create networking:FETCH_STATUS_FAILURE',
       creator: Actions.fetchStatusFailure,
       args: [
         mockRobot.name,
@@ -62,7 +62,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:FETCH_WIFI_LIST',
+      name: 'can create networking:FETCH_WIFI_LIST',
       creator: Actions.fetchWifiList,
       args: [mockRobot.name],
       expected: {
@@ -72,7 +72,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:FETCH_WIFI_LIST_SUCCESS',
+      name: 'can create networking:FETCH_WIFI_LIST_SUCCESS',
       creator: Actions.fetchWifiListSuccess,
       args: [
         mockRobot.name,
@@ -89,7 +89,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:FETCH_WIFI_LIST_FAILURE',
+      name: 'can create networking:FETCH_WIFI_LIST_FAILURE',
       creator: Actions.fetchWifiListFailure,
       args: [
         mockRobot.name,
@@ -106,7 +106,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:POST_WIFI_CONFIGURE',
+      name: 'can create networking:POST_WIFI_CONFIGURE',
       creator: Actions.postWifiConfigure,
       args: [mockRobot.name, { ssid: 'network-name', psk: 'network-password' }],
       expected: {
@@ -119,7 +119,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:POST_WIFI_CONFIGURE_SUCCESS',
+      name: 'can create networking:POST_WIFI_CONFIGURE_SUCCESS',
       creator: Actions.postWifiConfigureSuccess,
       args: [mockRobot.name, 'network-name', mockRequestMeta],
       expected: {
@@ -132,7 +132,7 @@ describe('networking actions', () => {
       },
     },
     {
-      name: 'networking:POST_WIFI_CONFIGURE_FAILURE',
+      name: 'can create networking:POST_WIFI_CONFIGURE_FAILURE',
       creator: Actions.postWifiConfigureFailure,
       args: [
         mockRobot.name,
@@ -148,10 +148,133 @@ describe('networking actions', () => {
         meta: mockRequestMeta,
       },
     },
+    {
+      name: 'can create networking:FETCH_WIFI_KEYS',
+      creator: Actions.fetchWifiKeys,
+      args: [mockRobot.name],
+      expected: {
+        type: 'networking:FETCH_WIFI_KEYS',
+        payload: { robotName: mockRobot.name },
+        meta: {},
+      },
+    },
+    {
+      name: 'can create networking:FETCH_WIFI_KEYS_SUCCESS',
+      creator: Actions.fetchWifiKeysSuccess,
+      args: [mockRobot.name, [Fixtures.mockWifiKey], mockRequestMeta],
+      expected: {
+        type: 'networking:FETCH_WIFI_KEYS_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          wifiKeys: [Fixtures.mockWifiKey],
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:FETCH_WIFI_KEYS_FAILURE',
+      creator: Actions.fetchWifiKeysFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockFetchWifiKeysFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:FETCH_WIFI_KEYS_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockFetchWifiKeysFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:POST_WIFI_KEYS',
+      creator: Actions.postWifiKeys,
+      args: [mockRobot.name, (({ name: 'key.crt' }: any): File)],
+      expected: {
+        type: 'networking:POST_WIFI_KEYS',
+        payload: {
+          robotName: mockRobot.name,
+          keyFile: (({ name: 'key.crt' }: any): File),
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'can create networking:POST_WIFI_KEYS_SUCCESS',
+      creator: Actions.postWifiKeysSuccess,
+      args: [mockRobot.name, Fixtures.mockWifiKey, mockRequestMeta],
+      expected: {
+        type: 'networking:POST_WIFI_KEYS_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          wifiKey: Fixtures.mockWifiKey,
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:POST_WIFI_KEYS_FAILURE',
+      creator: Actions.postWifiKeysFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockFetchWifiKeysFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:POST_WIFI_KEYS_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockPostWifiKeysFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS',
+      creator: Actions.fetchEapOptions,
+      args: [mockRobot.name],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS',
+        payload: { robotName: mockRobot.name },
+        meta: {},
+      },
+    },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS_SUCCESS',
+      creator: Actions.fetchEapOptionsSuccess,
+      args: [mockRobot.name, [Fixtures.mockEapOption], mockRequestMeta],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS_SUCCESS',
+        payload: {
+          robotName: mockRobot.name,
+          eapOptions: [Fixtures.mockEapOption],
+        },
+        meta: mockRequestMeta,
+      },
+    },
+    {
+      name: 'can create networking:FETCH_EAP_OPTIONS_FAILURE',
+      creator: Actions.fetchEapOptionsFailure,
+      args: [
+        mockRobot.name,
+        Fixtures.mockFetchEapOptionsFailure.body,
+        mockRequestMeta,
+      ],
+      expected: {
+        type: 'networking:FETCH_EAP_OPTIONS_FAILURE',
+        payload: {
+          robotName: mockRobot.name,
+          error: Fixtures.mockFetchEapOptionsFailure.body,
+        },
+        meta: mockRequestMeta,
+      },
+    },
   ]
 
   SPECS.forEach(spec => {
     const { name, creator, args, expected } = spec
-    test(name, () => expect(creator(...args)).toEqual(expected))
+    it(name, () => expect(creator(...args)).toEqual(expected))
   })
 })

@@ -62,7 +62,7 @@ If we were to rewrite this with the Python Protocol API, it would look like the 
         'protocolName': 'My Protocol',
         'author': 'Name <email@address.com>',
         'description': 'Simple protocol to get started using OT2',
-        'apiLevel': '2.0'
+        'apiLevel': '2.2'
     }
 
     # protocol run function. the part after the colon lets your editor know
@@ -114,7 +114,7 @@ Protocols are structured around a function called ``run(protocol)``, defined in 
 
    from opentrons import protocol_api
 
-   metadata = {'apiLevel': '2.0'}
+   metadata = {'apiLevel': '2.2'}
 
    def run(protocol: protocol_api.ProtocolContext):
        pass

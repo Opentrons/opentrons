@@ -267,43 +267,44 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  test.skip('pre-wet tip', () => {
-    // TODO Ian 2018-05-04 pre-wet volume is TBD.
-    const distributeArgs: DistributeArgs = {
-      ...mixinArgs,
-      sourceWell: 'A1',
-      destWells: ['A2', 'A3', 'A4', 'A5'],
-      changeTip: 'never',
-      volume: 150,
-      preWetTip: true,
-    }
-    const result = distribute(
-      distributeArgs,
-      invariantContext,
-      robotStateWithTip
-    )
-    const res = getSuccessResult(result)
+  // TODO(IL, 2020-02-28): pre-wet volume is not implemented for distribute! #5122
+  test.todo('pre-wet tip')
+  // (() => {
+  //   const distributeArgs: DistributeArgs = {
+  //     ...mixinArgs,
+  //     sourceWell: 'A1',
+  //     destWells: ['A2', 'A3', 'A4', 'A5'],
+  //     changeTip: 'never',
+  //     volume: 150,
+  //     preWetTip: true,
+  //   }
+  //   const result = distribute(
+  //     distributeArgs,
+  //     invariantContext,
+  //     robotStateWithTip
+  //   )
+  //   const res = getSuccessResult(result)
 
-    const preWetVolume = 42 // TODO what is pre-wet volume?
+  //   const preWetVolume = 42 // TODO what is pre-wet volume?
 
-    const preWetTipCommands = [
-      aspirateHelper('A1', preWetVolume),
-      dispenseHelper('A1', preWetVolume, { labware: SOURCE_LABWARE }),
-    ]
+  //   const preWetTipCommands = [
+  //     aspirateHelper('A1', preWetVolume),
+  //     dispenseHelper('A1', preWetVolume, { labware: SOURCE_LABWARE }),
+  //   ]
 
-    expect(res.commands).toEqual([
-      ...preWetTipCommands,
-      aspirateHelper('A1', 300),
-      dispenseHelper('A2', 150),
-      dispenseHelper('A3', 150),
-      blowoutSingleToTrash,
-      ...preWetTipCommands,
-      aspirateHelper('A1', 300),
-      dispenseHelper('A4', 150),
-      dispenseHelper('A5', 150),
-      blowoutSingleToTrash,
-    ])
-  })
+  //   expect(res.commands).toEqual([
+  //     ...preWetTipCommands,
+  //     aspirateHelper('A1', 300),
+  //     dispenseHelper('A2', 150),
+  //     dispenseHelper('A3', 150),
+  //     blowoutSingleToTrash,
+  //     ...preWetTipCommands,
+  //     aspirateHelper('A1', 300),
+  //     dispenseHelper('A4', 150),
+  //     dispenseHelper('A5', 150),
+  //     blowoutSingleToTrash,
+  //   ])
+  // })
 
   test('touch tip after aspirate', () => {
     const distributeArgs: DistributeArgs = {
