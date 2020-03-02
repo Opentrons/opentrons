@@ -51,7 +51,7 @@ function mapStateToProps(state: BaseState): SP {
     // Ignore clicking 'CREATE NEW' button in these cases
     _canCreateNew: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
-    isV4Protocol: stepFormSelectors.getIsV4Protocol(state),
+    isV4Protocol: fileDataSelectors.getIsV4Protocol(state),
   }
 }
 

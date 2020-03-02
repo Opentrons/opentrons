@@ -364,5 +364,5 @@ describe('8-channel trough', () => {
       })
   )
 
-  test.skip('aspirate from 384 plate starting from B row', () => {}) // TODO
+  test.todo('aspirate from 384 plate starting from B row') // TODO
 })

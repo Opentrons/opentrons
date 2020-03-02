@@ -144,11 +144,10 @@ describe('splitLiquid', () => {
   })
 
   // TODO Ian 2018-03-19 figure out what to do with air warning reporting
-  test.skip('splitting with air in source should throw error', () => {
-    expect(() =>
-      splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
-    ).toThrow(/source cannot contain air/)
-  })
+  test.todo('splitting with air in source should do something (throw error???)')
+  // expect(() =>
+  // splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
+  // ).toThrow(/source cannot contain air/)
 })
 
 describe('mergeLiquid', () => {

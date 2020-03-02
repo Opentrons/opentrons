@@ -9,12 +9,12 @@
 // getWellsForTips,
 
 // TODO IMMEDIATELY: way to do this using mocks? Or just don't integration test this, too brittle
-// describe('transferLikeSubsteps integration tests', () => {
+// exampleDescribe('transferLikeSubsteps integration tests', () => {
 //   const testCases = [
 //     { testName: '', input: {}, expected: [] }
 //   ]
 //   testCases.forEach(({ testName, input, expected }) =>
-//     test(testName, () => {
+//     exampleTest(testName, () => {
 //       expect(foo).toEqual(expected)
 //     })
 //   )
