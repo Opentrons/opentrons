@@ -1,3 +1,3 @@
 [paths]
 source =
-    src/opentrons
+    robot_server
