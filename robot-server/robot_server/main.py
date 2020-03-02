@@ -1,10 +1,9 @@
 import typing
-import asyncio
 import logging
 from argparse import ArgumentParser
 
 from opentrons.hardware_control import HardwareAPILike
-from opentrons.create_hardware import create_hardware
+from opentrons.main import initialize as initialize_api
 from opentrons.config import feature_flags as ff
 
 
@@ -84,11 +83,9 @@ def main():
     args = arg_parser.parse_args()
 
     # Create the hardware
-    checked_hardware = asyncio.get_event_loop().run_until_complete(
-        create_hardware(
+    checked_hardware = initialize_api(
             hardware_server=args.hardware_server,
             hardware_server_socket=args.hardware_server_socket
-        )
     )
 
     run(hardware=checked_hardware,
