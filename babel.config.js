@@ -2,6 +2,8 @@
 
 module.exports = {
   env: {
+    // Note(isk: 3/2/20): Must have babel-plugin-styled-components in each env,
+    // see here for further details: s https://styled-components.com/docs/tooling#babel-plugin
     production: {
       plugins: ['babel-plugin-styled-components', 'babel-plugin-unassert'],
     },
@@ -10,9 +12,9 @@ module.exports = {
     },
     test: {
       plugins: [
+        'babel-plugin-styled-components',
         '@babel/plugin-transform-modules-commonjs',
         'babel-plugin-dynamic-import-node',
-        'babel-plugin-styled-components',
       ],
     },
   },
