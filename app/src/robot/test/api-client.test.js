@@ -8,8 +8,8 @@ import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession } from './__mocks__/session'
-import { MockCalibrationManager } from './__mocks__/calibration-manager'
+import { MockSession } from './__fixtures__/session'
+import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'

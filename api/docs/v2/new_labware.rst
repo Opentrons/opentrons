@@ -77,7 +77,7 @@ The ending well will be in the bottom right, see the diagram below for further e
     '''
     Examples in this section expect the following
     '''
-    metadata = {'apiLevel': '2.0'}
+    metadata = {'apiLevel': '2.2'}
 
     def run(protocol):
 
@@ -308,7 +308,7 @@ To move a location, you create a :py:class:`.types.Point` representing a
 
    from opentrons import types
 
-   metadata = {'apiLevel': '2.0'}
+   metadata = {'apiLevel': '2.2'}
 
    def run(protocol):
         plate = protocol.load_labware(

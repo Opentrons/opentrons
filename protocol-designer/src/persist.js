@@ -13,12 +13,7 @@ export type RehydratePersistedAction = {|
   },
 |}
 
-// The `path` should match where the reducer lives in the Redux state tree
-export const _rehydrate = (path: string): any => {
-  assert(
-    PERSISTED_PATHS.includes(path),
-    `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`
-  )
+export const getLocalStorageItem = (path: string): mixed => {
   try {
     const persisted = global.localStorage.getItem(_addStoragePrefix(path))
     return persisted ? JSON.parse(persisted) : undefined
@@ -26,6 +21,15 @@ export const _rehydrate = (path: string): any => {
     console.error('Could not rehydrate:', e)
   }
   return undefined
+}
+
+// The `path` should match where the reducer lives in the Redux state tree
+export const _rehydrate = (path: string): any => {
+  assert(
+    PERSISTED_PATHS.includes(path),
+    `Path "${path}" is missing from PERSISTED_PATHS! The changes to this reducer will not be persisted.`
+  )
+  return getLocalStorageItem(path)
 }
 
 export const _rehydrateAll = (): $PropertyType<
@@ -49,6 +53,8 @@ function _addStoragePrefix(path: string): string {
   return `root.${path}`
 }
 
+export const localStorageAnnouncementKey = 'announcementKey'
+
 // paths from Redux root to all persisted reducers
 const PERSISTED_PATHS = [
   'analytics.hasOptedIn',
@@ -65,6 +71,17 @@ function transformBeforePersist(path: string, reducerState: any) {
   }
 }
 
+export const setLocalStorageItem = (path: string, value: any) => {
+  try {
+    global.localStorage.setItem(
+      _addStoragePrefix(path),
+      JSON.stringify(transformBeforePersist(path, value))
+    )
+  } catch (e) {
+    console.error(`error attempting to persist ${path}:`, e)
+  }
+}
+
 /** Subscribe this fn to the Redux store to persist selected substates */
 type PersistSubscriber = () => void
 export const makePersistSubscriber = (
@@ -76,14 +93,7 @@ export const makePersistSubscriber = (
     PERSISTED_PATHS.forEach(path => {
       const nextReducerState = get(state, path)
       if (prevReducerStates[path] !== nextReducerState) {
-        try {
-          global.localStorage.setItem(
-            _addStoragePrefix(path),
-            JSON.stringify(transformBeforePersist(path, nextReducerState))
-          )
-        } catch (e) {
-          console.error(`error attempting to persist ${path}:`, e)
-        }
+        setLocalStorageItem(path, nextReducerState)
         prevReducerStates[path] = nextReducerState
       }
     })
