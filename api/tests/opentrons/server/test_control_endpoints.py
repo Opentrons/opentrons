@@ -100,7 +100,7 @@ async def test_get_modules(
     assert 'engaged' in body['modules'][0]['data']
     tempdeck = await hw._backend.build_module(
             port='/dev/ot_module_tempdeck1',
-            which='tempdeck',
+            model='tempdeck',
             interrupt_callback=lambda x: None,
             execution_manager=ExecutionManager(
                     loop=loop),
