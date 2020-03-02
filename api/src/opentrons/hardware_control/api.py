@@ -14,7 +14,8 @@ from .controller import Controller
 from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
-                        DROP_TIP_RELEASE_DISTANCE)
+                        DROP_TIP_RELEASE_DISTANCE,
+                        MODULE_WATCHER_TASK_NAME)
 from .pause_manager import PauseManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
@@ -99,7 +100,8 @@ class API(HardwareAPILike):
         checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules,
-            ))
+            ),
+            name=MODULE_WATCHER_TASK_NAME)
         return api_instance
 
     @classmethod
@@ -128,7 +130,8 @@ class API(HardwareAPILike):
                             strict_attached_instruments)
         api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
-            register_modules=api_instance.register_modules))
+                    register_modules=api_instance.register_modules),
+                name=MODULE_WATCHER_TASK_NAME)
         return api_instance
 
     def __repr__(self):
@@ -414,9 +417,7 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        tasks = [t for t in asyncio.all_tasks() if t is not
-                 asyncio.current_task()]
-        [task.cancel() for task in tasks]
+        self._pause_manager.cancel()
 
     async def stop(self):
         """

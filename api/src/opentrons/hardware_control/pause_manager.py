@@ -1,4 +1,5 @@
 import asyncio
+from .constants import MODULE_WATCHER_TASK_NAME
 
 
 class PauseManager():
@@ -15,6 +16,13 @@ class PauseManager():
 
     def resume(self):
         self._is_running.set()
+
+    def cancel(self):
+        self._is_running.clear()
+        tasks_to_cancel = [t for t in asyncio.all_tasks() if t is not
+                           asyncio.current_task() and t.get_name() is not
+                           MODULE_WATCHER_TASK_NAME]
+        [task.cancel() for task in tasks_to_cancel]
 
     @property
     def is_running(self):
