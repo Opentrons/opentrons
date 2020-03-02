@@ -3,18 +3,19 @@ import * as React from 'react'
 import cx from 'classnames'
 import { DragDropContext } from 'react-dnd'
 import MouseBackEnd from 'react-dnd-mouse-backend'
-import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
 import { ConnectedNav } from '../containers/ConnectedNav'
 import { ConnectedSidebar } from '../containers/ConnectedSidebar'
 import { ConnectedTitleBar } from '../containers/ConnectedTitleBar'
 import { ConnectedMainPanel } from '../containers/ConnectedMainPanel'
+import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
+import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps'
+import { PrereleaseModeIndicator } from './PrereleaseModeIndicator'
+import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
 import { NewFileModal } from './modals/NewFileModal'
 import { FileUploadMessageModal } from './modals/FileUploadMessageModal'
 import { LabwareUploadMessageModal } from './modals/LabwareUploadMessageModal'
 import { GateModal } from './modals/GateModal'
-import { PortalRoot as MainPageModalPortalRoot } from '../components/portals/MainPageModalPortal'
-import { PortalRoot as TopPortalRoot } from './portals/TopPortal'
-import { MAIN_CONTENT_FORCED_SCROLL_CLASSNAME } from '../ui/steps'
+import { AnnouncementModal } from './modals/AnnouncementModal'
 import styles from './ProtocolEditor.css'
 
 const showGateModal =
@@ -39,6 +40,7 @@ function ProtocolEditorComponent() {
               MAIN_CONTENT_FORCED_SCROLL_CLASSNAME
             )}
           >
+            <AnnouncementModal />
             <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
             <LabwareUploadMessageModal />
