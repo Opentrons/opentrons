@@ -50,10 +50,11 @@ async def test_sim_update(loop):
 
 
 async def test_poller(monkeypatch, loop):
-    temp = modules.tempdeck.TempDeck(port='/dev/ot_module_sim_tempdeck0',
-                                     execution_manager=ExecutionManager(loop=loop),
-                                     simulating=True,
-                                     loop=loop)
+    temp = modules.tempdeck.TempDeck(
+            port='/dev/ot_module_sim_tempdeck0',
+            execution_manager=ExecutionManager(loop=loop),
+            simulating=True,
+            loop=loop)
     hit = False
 
     def update_called():
