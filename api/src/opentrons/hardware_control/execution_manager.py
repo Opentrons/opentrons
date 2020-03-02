@@ -1,5 +1,5 @@
 import asyncio
-from .constants import MODULE_WATCHER_TASK_NAME
+from typing import Set
 
 
 class ExecutionManager():
@@ -17,11 +17,10 @@ class ExecutionManager():
     def resume(self):
         self._is_running.set()
 
-    def cancel(self):
+    def cancel(self, protected_tasks: Set[asyncio.Task]):
         self._is_running.clear()
         tasks_to_cancel = [t for t in asyncio.all_tasks() if t is not
-                           asyncio.current_task() and t.get_name() is not
-                           MODULE_WATCHER_TASK_NAME]
+                           asyncio.current_task() and t not in protected_tasks]
         [task.cancel() for task in tasks_to_cancel]
 
     @property

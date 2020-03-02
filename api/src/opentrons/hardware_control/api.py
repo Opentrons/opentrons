@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import logging
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Set
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -14,8 +14,7 @@ from .controller import Controller
 from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
-                        DROP_TIP_RELEASE_DISTANCE,
-                        MODULE_WATCHER_TASK_NAME)
+                        DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
@@ -73,6 +72,7 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._protected_tasks: Set[asyncio.Task] = set([])
 
     @classmethod
     async def build_hardware_controller(
@@ -97,11 +97,10 @@ class API(HardwareAPILike):
 
         api_instance = cls(backend, loop=checked_loop, config=config)
         await api_instance.cache_instruments()
-        checked_loop.create_task(backend.watch_modules(
+        mod_watch_task = checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
-                register_modules=api_instance.register_modules,
-            ),
-            name=MODULE_WATCHER_TASK_NAME)
+                register_modules=api_instance.register_modules))
+        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     @classmethod
@@ -129,9 +128,9 @@ class API(HardwareAPILike):
                             config, checked_loop,
                             strict_attached_instruments)
         api_instance = cls(backend, loop=checked_loop, config=config)
-        checked_loop.create_task(backend.watch_modules(
-                    register_modules=api_instance.register_modules),
-                name=MODULE_WATCHER_TASK_NAME)
+        mod_watch_task = checked_loop.create_task(backend.watch_modules(
+                register_modules=api_instance.register_modules))
+        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     def __repr__(self):
@@ -156,6 +155,9 @@ class API(HardwareAPILike):
     @property
     def is_simulator_sync(self):
         return isinstance(self._backend, Simulator)
+
+    def add_protected_task(self, task: asyncio.Task):
+        self._protected_tasks.add(task)
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -417,7 +419,7 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        self._execution_manager.cancel()
+        self._execution_manager.cancel(protected_tasks=self._protected_tasks)
 
     async def stop(self):
         """
