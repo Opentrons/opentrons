@@ -1,5 +1,5 @@
 import asyncio
-from opentrons.hardware_control import modules, PauseManager
+from opentrons.hardware_control import modules, ExecutionManager
 from opentrons.hardware_control.modules import tempdeck
 
 
@@ -9,7 +9,7 @@ async def test_sim_initialization(loop):
                                simulating=True,
                                interrupt_callback=lambda x: None,
                                loop=loop,
-                               pause_manager=PauseManager(loop=loop))
+                               execution_manager=ExecutionManager(loop=loop))
     assert isinstance(temp, modules.AbstractModule)
 
 
@@ -19,7 +19,7 @@ async def test_sim_state(loop):
                                simulating=True,
                                interrupt_callback=lambda x: None,
                                loop=loop,
-                               pause_manager=PauseManager(loop=loop))
+                               execution_manager=ExecutionManager(loop=loop))
     assert temp.temperature == 0
     assert temp.target is None
     assert temp.status == 'idle'
@@ -38,7 +38,7 @@ async def test_sim_update(loop):
                                simulating=True,
                                interrupt_callback=lambda x: None,
                                loop=loop,
-                               pause_manager=PauseManager(loop=loop))
+                               execution_manager=ExecutionManager(loop=loop))
     await asyncio.wait_for(temp.set_temperature(10), 0.2)
     assert temp.temperature == 10
     assert temp.target == 10
@@ -51,7 +51,7 @@ async def test_sim_update(loop):
 
 async def test_poller(monkeypatch, loop):
     temp = modules.tempdeck.TempDeck(port='/dev/ot_module_sim_tempdeck0',
-                                     pause_manager=PauseManager(loop=loop),
+                                     execution_manager=ExecutionManager(loop=loop),
                                      simulating=True,
                                      loop=loop)
     hit = False

@@ -8,7 +8,7 @@ from opentrons.config import IS_ROBOT, IS_LINUX
 # NOTE: Must import all modules so they actually create the subclasses
 from . import update, tempdeck, magdeck, thermocycler, types  # noqa(W0611)
 from .mod_abc import AbstractModule
-from ..pause_manager import PauseManager
+from ..execution_manager import ExecutionManager
 from .types import InterruptCallback, ModuleAtPort
 
 
@@ -32,13 +32,13 @@ async def build(
         simulating: bool,
         interrupt_callback: InterruptCallback,
         loop: asyncio.AbstractEventLoop,
-        pause_manager: PauseManager) -> AbstractModule:
+        execution_manager: ExecutionManager) -> AbstractModule:
     return await MODULE_HW_BY_NAME[which].build(
         port,
         interrupt_callback=interrupt_callback,
         simulating=simulating,
         loop=loop,
-        pause_manager=pause_manager
+        execution_manager=execution_manager
     )
 
 

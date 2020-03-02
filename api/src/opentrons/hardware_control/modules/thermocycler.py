@@ -3,7 +3,7 @@ from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
-from ..pause_manager import PauseManager
+from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -120,7 +120,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -131,7 +131,7 @@ class Thermocycler(mod_abc.AbstractModule):
                   interrupt_callback=interrupt_callback,
                   simulating=simulating,
                   loop=loop,
-                  pause_manager=pause_manager)
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -159,14 +159,14 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 pause_manager: PauseManager,
+                 execution_manager: ExecutionManager,
                  interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
-                         pause_manager=pause_manager)
+                         execution_manager=execution_manager)
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
 

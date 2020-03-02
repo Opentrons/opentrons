@@ -6,7 +6,7 @@ from pkg_resources import parse_version
 from typing import Dict, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
-from ..pause_manager import PauseManager
+from ..execution_manager import ExecutionManager
 from .types import BundledFirmware, UploadFunction, InterruptCallback
 
 mod_log = logging.getLogger(__name__)
@@ -19,7 +19,7 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
@@ -34,12 +34,12 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def __init__(self,
                  port: str,
-                 pause_manager: PauseManager,
+                 execution_manager: ExecutionManager,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._port = port
         self._loop = use_or_initialize_loop(loop)
-        self._pause_manager = pause_manager
+        self._execution_manager = execution_manager
         self._device_info = None
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
@@ -72,7 +72,7 @@ class AbstractModule(abc.ABC):
 
     async def wait_for_is_running(self):
         if not self.is_simulated:
-            await self._pause_manager.wait_for_is_running()
+            await self._execution_manager.wait_for_is_running()
 
     @abc.abstractmethod
     def deactivate(self):

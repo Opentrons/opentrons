@@ -2,7 +2,7 @@ import asyncio
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
-from ..pause_manager import PauseManager
+from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
 LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
@@ -61,7 +61,7 @@ class MagDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -70,7 +70,7 @@ class MagDeck(mod_abc.AbstractModule):
         mod = cls(port=port,
                   simulating=simulating,
                   loop=loop,
-                  pause_manager=pause_manager)
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -96,13 +96,13 @@ class MagDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 pause_manager: PauseManager,
+                 execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
-                         pause_manager=pause_manager)
+                         execution_manager=execution_manager)
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:

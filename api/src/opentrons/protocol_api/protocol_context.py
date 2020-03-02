@@ -6,7 +6,7 @@ from typing import (
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import (adapters, modules, API,
-                                        HardwareAPILike, PauseManager)
+                                        HardwareAPILike, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -443,7 +443,7 @@ class ProtocolContext(CommandPublisher):
                     port='',
                     simulating=True,
                     loop=self._hw_manager.hardware.loop,
-                    pause_manager=PauseManager(
+                    execution_manager=ExecutionManager(
                         loop=self._hw_manager.hardware.loop)))
         if hc_mod_instance:
             mod_ctx = mod_class(self,

@@ -1,6 +1,6 @@
 import asyncio
 from unittest import mock
-from opentrons.hardware_control import modules, PauseManager
+from opentrons.hardware_control import modules, ExecutionManager
 
 
 async def test_sim_initialization(loop):
@@ -9,7 +9,7 @@ async def test_sim_initialization(loop):
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
                                 loop=loop,
-                                pause_manager=PauseManager(loop=loop))
+                                execution_manager=ExecutionManager(loop=loop))
 
     assert isinstance(therm, modules.AbstractModule)
 
@@ -20,7 +20,7 @@ async def test_lid(loop):
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
                                 loop=loop,
-                                pause_manager=PauseManager(loop=loop))
+                                execution_manager=ExecutionManager(loop=loop))
 
     assert therm.lid_status == 'open'
 
@@ -43,7 +43,7 @@ async def test_sim_state(loop):
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
                                 loop=loop,
-                                pause_manager=PauseManager(loop=loop))
+                                execution_manager=ExecutionManager(loop=loop))
 
     assert therm.temperature is None
     assert therm.target is None
@@ -63,7 +63,7 @@ async def test_sim_update(loop):
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
                                 loop=loop,
-                                pause_manager=PauseManager(loop=loop))
+                                execution_manager=ExecutionManager(loop=loop))
 
     await therm.set_temperature(temperature=10,
                                 hold_time_seconds=None,
@@ -108,7 +108,7 @@ async def test_set_temperature(monkeypatch, loop):
                                 simulating=True,
                                 interrupt_callback=lambda x: None,
                                 loop=loop,
-                                pause_manager=PauseManager(loop=loop))
+                                execution_manager=ExecutionManager(loop=loop))
 
     def async_return(result):
         f = asyncio.Future()

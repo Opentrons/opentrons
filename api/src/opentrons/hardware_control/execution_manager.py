@@ -2,7 +2,7 @@ import asyncio
 from .constants import MODULE_WATCHER_TASK_NAME
 
 
-class PauseManager():
+class ExecutionManager():
     """ This class holds onto a flag that is up/set while the hardware
     hardware controller is running and down/cleared when the hardware
     controller is "paused".

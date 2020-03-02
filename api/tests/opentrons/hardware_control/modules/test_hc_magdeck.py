@@ -1,4 +1,4 @@
-from opentrons.hardware_control import modules, PauseManager
+from opentrons.hardware_control import modules, ExecutionManager
 
 
 async def test_sim_initialization(loop):
@@ -7,7 +7,7 @@ async def test_sim_initialization(loop):
                               simulating=True,
                               interrupt_callback=lambda x: None,
                               loop=loop,
-                              pause_manager=PauseManager(loop=loop))
+                              execution_manager=ExecutionManager(loop=loop))
     assert isinstance(mag, modules.AbstractModule)
 
 
@@ -17,7 +17,7 @@ async def test_sim_data(loop):
                               simulating=True,
                               interrupt_callback=lambda x: None,
                               loop=loop,
-                              pause_manager=PauseManager(loop=loop))
+                              execution_manager=ExecutionManager(loop=loop))
     assert mag.status == 'disengaged'
     assert mag.device_info['serial'] == 'dummySerialMD'
     assert mag.device_info['model'] == 'dummyModelMD'
@@ -32,7 +32,7 @@ async def test_sim_state_update(loop):
                               simulating=True,
                               interrupt_callback=lambda x: None,
                               loop=loop,
-                              pause_manager=PauseManager(loop=loop))
+                              execution_manager=ExecutionManager(loop=loop))
     await mag.calibrate()
     assert mag.status == 'disengaged'
     await mag.engage(2)

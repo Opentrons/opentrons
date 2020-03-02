@@ -3,7 +3,7 @@ from threading import Thread, Event
 from typing import Union
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
-from ..pause_manager import PauseManager
+from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
 TEMP_POLL_INTERVAL_SECS = 1
@@ -87,7 +87,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
-                    pause_manager: PauseManager,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -98,7 +98,7 @@ class TempDeck(mod_abc.AbstractModule):
         mod = cls(port=port,
                   simulating=simulating,
                   loop=loop,
-                  pause_manager=pause_manager)
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -124,13 +124,13 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
-                 pause_manager: PauseManager,
+                 execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
-                         pause_manager=pause_manager)
+                         execution_manager=execution_manager)
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
