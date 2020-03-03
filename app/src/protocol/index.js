@@ -15,6 +15,7 @@ import type {
   InvalidProtocolFileAction,
 } from './types'
 
+export * from './constants'
 export * from './selectors'
 
 const BUNDLE_UPLOAD_DISABLED =
