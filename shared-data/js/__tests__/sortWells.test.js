@@ -2,7 +2,7 @@
 import { sortWells } from '../helpers'
 
 describe('sortWells', () => {
-  test('single letters', () => {
+  it('single letters', () => {
     const input = ['A12', 'A2', 'B1', 'B12', 'A1']
     const expected = ['A1', 'B1', 'A2', 'A12', 'B12']
     const result = [...input].sort(sortWells)
@@ -10,7 +10,7 @@ describe('sortWells', () => {
   })
 
   // just in case we get a 1536-well plate
-  test('double letters', () => {
+  it('double letters', () => {
     const input = [
       'AB12',
       'A12',

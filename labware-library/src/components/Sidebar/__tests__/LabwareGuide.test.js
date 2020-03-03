@@ -6,7 +6,7 @@ import { shallow } from 'enzyme'
 import { LabwareGuide } from '../LabwareGuide'
 
 describe('LabwareGuide', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<LabwareGuide />)
 
     expect(tree).toMatchSnapshot()

@@ -431,6 +431,6 @@ describe('discovery selectors', () => {
 
   SPECS.forEach(spec => {
     const { name, selector, state, expected } = spec
-    test(name, () => expect(selector(state)).toEqual(expected))
+    it(name, () => expect(selector(state)).toEqual(expected))
   })
 })

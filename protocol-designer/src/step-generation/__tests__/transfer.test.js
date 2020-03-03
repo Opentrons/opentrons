@@ -68,7 +68,7 @@ describe('pick up tip if no tip on pipette', () => {
   const changeTipOptions = ['once', 'always']
 
   changeTipOptions.forEach(changeTip => {
-    test(`...${changeTip}`, () => {
+    it(`...${changeTip}`, () => {
       noTipArgs = {
         ...noTipArgs,
         changeTip,
@@ -81,7 +81,7 @@ describe('pick up tip if no tip on pipette', () => {
     })
   })
 
-  test('...never (should not pick up tip, and fail)', () => {
+  it('...never (should not pick up tip, and fail)', () => {
     noTipArgs = {
       ...noTipArgs,
       changeTip: 'never',
@@ -199,7 +199,7 @@ describe('single transfer exceeding pipette max', () => {
     }
   })
 
-  test('changeTip="once"', () => {
+  it('changeTip="once"', () => {
     transferArgs = {
       ...transferArgs,
       changeTip: 'once',
@@ -220,7 +220,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  test('changeTip="always"', () => {
+  it('changeTip="always"', () => {
     transferArgs = {
       ...transferArgs,
       changeTip: 'always',
@@ -257,7 +257,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  test('changeTip="perSource"', () => {
+  it('changeTip="perSource"', () => {
     transferArgs = {
       ...transferArgs,
       sourceWells: ['A1', 'A1', 'A2'],
@@ -295,7 +295,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  test('changeTip="perDest"', () => {
+  it('changeTip="perDest"', () => {
     // NOTE: same wells as perSource test
     transferArgs = {
       ...transferArgs,
@@ -335,7 +335,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  test('changeTip="never"', () => {
+  it('changeTip="never"', () => {
     transferArgs = {
       ...transferArgs,
       changeTip: 'never',
@@ -361,7 +361,7 @@ describe('single transfer exceeding pipette max', () => {
     ])
   })
 
-  test('split up volume without going below pipette min', () => {
+  it('split up volume without going below pipette min', () => {
     transferArgs = {
       ...transferArgs,
       volume: 629,
@@ -405,7 +405,7 @@ describe('advanced options', () => {
     }
   })
   describe('...aspirate options', () => {
-    test('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
+    it('pre-wet tip should aspirate and dispense transfer volume from source well of each subtransfer', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -431,7 +431,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
+    it('touchTip after aspirate should touchTip on each source well, for every aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -451,7 +451,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
+    it('touchTip after dispense should touchTip on each dest well, for every dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -471,7 +471,7 @@ describe('advanced options', () => {
       ])
     })
 
-    test('mix before aspirate', () => {
+    it('mix before aspirate', () => {
       advArgs = {
         ...advArgs,
         volume: 350,
@@ -510,11 +510,11 @@ describe('advanced options', () => {
       ])
     })
 
-    test.todo('air gap => ???') // TODO determine behavior
+    it.todo('air gap => ???') // TODO determine behavior
   })
 
   describe('...dispense options', () => {
-    test('mix after dispense', () => {
+    it('mix after dispense', () => {
       advArgs = {
         ...advArgs,
         volume: 350,

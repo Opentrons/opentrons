@@ -33,7 +33,7 @@ describe('clearRestartPathEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('dispatches CLEAR_RESTART_PATH on robot restart', () => {
+  it('dispatches CLEAR_RESTART_PATH on robot restart', () => {
     mockGetAllRestartRequiredRobots.mockReturnValue(['a', 'b'])
     mockGetRobotAdminStatus.mockReturnValue('restarting')
 

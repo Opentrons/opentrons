@@ -88,7 +88,7 @@ describe('FileSidebar', () => {
     }
   })
 
-  test('create new button creates new protocol', () => {
+  it('create new button creates new protocol', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
     const createButton = wrapper.find(OutlineButton).at(0)
     createButton.simulate('click')
@@ -96,7 +96,7 @@ describe('FileSidebar', () => {
     expect(props.createNewFile).toHaveBeenCalled()
   })
 
-  test('import button imports saved protocol', () => {
+  it('import button imports saved protocol', () => {
     const event = { files: ['test.json'] }
 
     const wrapper = shallow(<FileSidebar {...props} />)
@@ -106,7 +106,7 @@ describe('FileSidebar', () => {
     expect(props.loadFile).toHaveBeenCalledWith(event)
   })
 
-  test('export button is disabled when canDownload is false', () => {
+  it('export button is disabled when canDownload is false', () => {
     props.canDownload = false
 
     const wrapper = shallow(<FileSidebar {...props} />)
@@ -115,7 +115,7 @@ describe('FileSidebar', () => {
     expect(downloadButton.prop('disabled')).toEqual(true)
   })
 
-  test('export button exports protocol when no errors', () => {
+  it('export button exports protocol when no errors', () => {
     props.downloadData.fileData.commands = commands
     const blob = new Blob([JSON.stringify(props.downloadData.fileData)], {
       type: 'application/json',
@@ -129,7 +129,7 @@ describe('FileSidebar', () => {
     expect(fileSaver.saveAs).toHaveBeenCalledWith(blob, 'protocol.json')
   })
 
-  test('warning modal is shown when export is clicked with no command', () => {
+  it('warning modal is shown when export is clicked with no command', () => {
     const wrapper = shallow(<FileSidebar {...props} />)
     const downloadButton = wrapper.find(PrimaryButton).at(0)
     downloadButton.simulate('click')
@@ -139,7 +139,7 @@ describe('FileSidebar', () => {
     expect(alertModal.prop('heading')).toEqual('Your protocol has no steps')
   })
 
-  test('warning modal is shown when export is clicked with unused pipette', () => {
+  it('warning modal is shown when export is clicked with unused pipette', () => {
     props.downloadData.fileData.commands = commands
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
@@ -160,7 +160,7 @@ describe('FileSidebar', () => {
     )
   })
 
-  test('warning modal is shown when export is clicked with unused module', () => {
+  it('warning modal is shown when export is clicked with unused module', () => {
     props.modulesOnDeck = modulesOnDeck
     props.savedStepForms = savedStepForms
     props.downloadData.fileData.commands = commands
@@ -175,7 +175,7 @@ describe('FileSidebar', () => {
     expect(alertModal.html()).toContain('Magnetic module')
   })
 
-  test('warning modal is shown when export is clicked with unused module and pipette', () => {
+  it('warning modal is shown when export is clicked with unused module and pipette', () => {
     props.modulesOnDeck = modulesOnDeck
     props.pipettesOnDeck = pipettesOnDeck
     props.savedStepForms = savedStepForms
@@ -198,7 +198,7 @@ describe('FileSidebar', () => {
     )
   })
 
-  test('blocking hint is shown when protocol contains modules', () => {
+  it('blocking hint is shown when protocol contains modules', () => {
     props.downloadData.fileData.commands = commands
     props.pipettesOnDeck = {
       pipetteLeftId: {

@@ -33,7 +33,7 @@ describe('dispense', () => {
         flowRate: 6,
       }
     })
-    test('dispense normally (with tip)', () => {
+    it('dispense normally (with tip)', () => {
       const result = dispense(params, invariantContext, robotStateWithTip)
 
       expect(getSuccessResult(result).commands).toEqual([
@@ -44,7 +44,7 @@ describe('dispense', () => {
       ])
     })
 
-    test('dispensing without tip should throw error', () => {
+    it('dispensing without tip should throw error', () => {
       const result = dispense(params, invariantContext, initialRobotState)
 
       const res = getErrorResult(result)
@@ -54,7 +54,7 @@ describe('dispense', () => {
       })
     })
 
-    test('dispense to nonexistent labware should throw error', () => {
+    it('dispense to nonexistent labware should throw error', () => {
       const result = dispense(
         {
           ...params,

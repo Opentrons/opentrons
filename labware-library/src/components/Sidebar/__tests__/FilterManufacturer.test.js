@@ -18,7 +18,7 @@ describe('FilterManufacturer', () => {
     jest.clearAllMocks()
   })
 
-  test('component renders', () => {
+  it('component renders', () => {
     getAllManufacturers.mockReturnValue(['all', 'foo', 'bar', 'baz'])
 
     const filters = { category: 'all', manufacturer: 'all' }

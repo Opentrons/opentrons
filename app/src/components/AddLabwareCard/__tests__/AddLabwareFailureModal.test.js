@@ -27,7 +27,7 @@ describe('AddLabwareFailureModal', () => {
     jest.resetAllMocks()
   })
 
-  test('renders inside a Portal', () => {
+  it('renders inside a Portal', () => {
     const wrapper = shallow(<AddLabwareFailureModal {...emptyProps} />)
     const portal = wrapper.find(Portal)
     const modal = portal.find(AddLabwareFailureModalTemplate)
@@ -35,13 +35,13 @@ describe('AddLabwareFailureModal', () => {
     expect(modal.props()).toEqual(emptyProps)
   })
 
-  test('renders an AlertModal', () => {
+  it('renders an AlertModal', () => {
     const wrapper = shallow(<AddLabwareFailureModalTemplate {...emptyProps} />)
 
     expect(wrapper.exists(AlertModal)).toBe(true)
   })
 
-  test('renders a cancel button that calls props.onCancel', () => {
+  it('renders a cancel button that calls props.onCancel', () => {
     const wrapper = mount(<AddLabwareFailureModalTemplate {...emptyProps} />)
     const button = wrapper.findWhere(
       c => c.type() === 'button' && c.text().toLowerCase() === 'cancel'
@@ -51,7 +51,7 @@ describe('AddLabwareFailureModal', () => {
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
-  test('renders proper title for error', () => {
+  it('renders proper title for error', () => {
     const wrapper = mount(
       <AddLabwareFailureModalTemplate {...emptyProps} errorMessage="AHHH!" />
     )
@@ -71,7 +71,7 @@ describe('AddLabwareFailureModal', () => {
       )
     }
 
-    test('renders proper copy for invalid file', () => {
+    it('renders proper copy for invalid file', () => {
       const file = LabwareFixtures.mockInvalidLabware
       const wrapper = render(file)
       const html = wrapper.html()
@@ -83,7 +83,7 @@ describe('AddLabwareFailureModal', () => {
       expect(html).toContain(file.filename)
     })
 
-    test('renders proper copy for an Opentrons conflicting file', () => {
+    it('renders proper copy for an Opentrons conflicting file', () => {
       const file = LabwareFixtures.mockOpentronsLabware
       const wrapper = render(file)
       const html = wrapper.html()
@@ -99,7 +99,7 @@ describe('AddLabwareFailureModal', () => {
       expect(html).toContain(file.filename)
     })
 
-    test('renders proper copy for an duplicate file', () => {
+    it('renders proper copy for an duplicate file', () => {
       const file = LabwareFixtures.mockDuplicateLabware
       const wrapper = render(file)
       const html = wrapper.html()
@@ -113,7 +113,7 @@ describe('AddLabwareFailureModal', () => {
       expect(html).toContain(file.filename)
     })
 
-    test('duplicate file adds overwrite button', () => {
+    it('duplicate file adds overwrite button', () => {
       const file = LabwareFixtures.mockDuplicateLabware
       const wrapper = render(file)
       const button = wrapper.findWhere(

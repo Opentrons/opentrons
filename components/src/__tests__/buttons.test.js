@@ -13,7 +13,7 @@ import {
 describe('buttons', () => {
   const onClick = () => {}
 
-  test('creates a button with props', () => {
+  it('creates a button with props', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
       <Button
@@ -33,7 +33,7 @@ describe('buttons', () => {
     expect(onClick).toHaveBeenCalled()
   })
 
-  test('disabled sets onClick to undefined', () => {
+  it('disabled sets onClick to undefined', () => {
     const onClick = () => {}
     const button = Renderer.create(
       <Button onClick={onClick} disabled />
@@ -43,7 +43,7 @@ describe('buttons', () => {
     expect(button.props.onClick).toBe(undefined)
   })
 
-  test('Button renders correctly', () => {
+  it('Button renders correctly', () => {
     const tree = Renderer.create(
       <Button onClick={onClick} title="t" className="c">
         children
@@ -53,7 +53,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Button with iconName renders correctly', () => {
+  it('Button with iconName renders correctly', () => {
     const tree = Renderer.create(
       <Button
         onClick={onClick}
@@ -68,7 +68,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('PrimaryButton renders correctly', () => {
+  it('PrimaryButton renders correctly', () => {
     const tree = Renderer.create(
       <PrimaryButton onClick={onClick} title="t" className="c">
         children
@@ -78,7 +78,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('PrimaryButton with iconName renders correctly', () => {
+  it('PrimaryButton with iconName renders correctly', () => {
     const tree = Renderer.create(
       <PrimaryButton
         onClick={onClick}
@@ -93,7 +93,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('FlatButton renders correctly', () => {
+  it('FlatButton renders correctly', () => {
     const tree = Renderer.create(
       <FlatButton onClick={onClick} title="t" className="c">
         children
@@ -103,7 +103,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('FlatButton with iconName renders correctly', () => {
+  it('FlatButton with iconName renders correctly', () => {
     const tree = Renderer.create(
       <FlatButton
         onClick={onClick}
@@ -118,7 +118,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('OutlineButton renders correctly', () => {
+  it('OutlineButton renders correctly', () => {
     const tree = Renderer.create(
       <OutlineButton onClick={onClick} title="t" className="c">
         children
@@ -128,7 +128,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Inverted OutlineButton renders correctly', () => {
+  it('Inverted OutlineButton renders correctly', () => {
     const tree = Renderer.create(
       <OutlineButton onClick={onClick} title="t" className="c" inverted>
         children
@@ -138,7 +138,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('OutlineButton with iconName renders correctly', () => {
+  it('OutlineButton with iconName renders correctly', () => {
     const tree = Renderer.create(
       <OutlineButton
         onClick={onClick}
@@ -153,7 +153,7 @@ describe('buttons', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('IconButton renders correctly', () => {
+  it('IconButton renders correctly', () => {
     const tree = Renderer.create(
       <IconButton
         onClick={onClick}

@@ -37,7 +37,7 @@ const fixtures = [
 
 // TODO(IL, 2020-02-28): restore these tests, maybe as e2e. See #5123
 describe('snapshot integration test: JSON protocol fixture to procedures', () => {
-  test.todo('TODO')
+  it.todo('TODO')
   fixtures.forEach(({ testName, inputFile, expectedProcedure }) => {
     // test.todo(testName, () => {
     //   const store = configureStore()

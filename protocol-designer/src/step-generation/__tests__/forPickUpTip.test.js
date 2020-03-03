@@ -32,7 +32,7 @@ beforeEach(() => {
 })
 
 describe('tip tracking', () => {
-  test('single-channel', () => {
+  it('single-channel', () => {
     const params = { pipette: p300SingleId, labware: tiprack1Id, well: 'A1' }
 
     const result = forPickUpTip(params, invariantContext, initialRobotState)
@@ -54,7 +54,7 @@ describe('tip tracking', () => {
     )
   })
 
-  test('multi-channel', () => {
+  it('multi-channel', () => {
     const params = {
       pipette: p300MultiId,
       labware: 'tiprack1Id',
@@ -78,5 +78,5 @@ describe('tip tracking', () => {
   })
 
   // TODO: Ian 2019-11-20 eventually should generate warning (or error?)
-  test.todo('multi-channel, missing tip in specified row')
+  it.todo('multi-channel, missing tip in specified row')
 })

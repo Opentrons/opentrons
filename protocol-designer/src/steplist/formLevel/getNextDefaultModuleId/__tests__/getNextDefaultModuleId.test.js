@@ -68,7 +68,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
     ]
 
     testCases.forEach(({ testMsg, equippedModulesById, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
 
@@ -173,7 +173,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
         orderedStepIds = [],
         expected,
       }) => {
-        test(testMsg, () => {
+        it(testMsg, () => {
           const result = getNextDefaultTemperatureModuleId(
             savedForms,
             orderedStepIds,

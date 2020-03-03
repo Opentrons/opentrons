@@ -39,7 +39,7 @@ describe('blowoutUtil', () => {
     curryCommandCreator.mockReturnValue('return value from blowout')
   })
 
-  test('blowoutUtil curries blowout with source well params', () => {
+  it('blowoutUtil curries blowout with source well params', () => {
     blowoutUtil({
       ...blowoutArgs,
       blowoutLocation: SOURCE_WELL_BLOWOUT_DESTINATION,
@@ -54,7 +54,7 @@ describe('blowoutUtil', () => {
     })
   })
 
-  test('blowoutUtil curries blowout with dest plate params', () => {
+  it('blowoutUtil curries blowout with dest plate params', () => {
     blowoutUtil({
       ...blowoutArgs,
       blowoutLocation: DEST_WELL_BLOWOUT_DESTINATION,
@@ -69,7 +69,7 @@ describe('blowoutUtil', () => {
     })
   })
 
-  test('blowoutUtil curries blowout with an arbitrary labware Id', () => {
+  it('blowoutUtil curries blowout with an arbitrary labware Id', () => {
     blowoutUtil({
       ...blowoutArgs,
       blowoutLocation: TROUGH_LABWARE,
@@ -84,7 +84,7 @@ describe('blowoutUtil', () => {
     })
   })
 
-  test('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
+  it('blowoutUtil returns an empty array if not given a blowoutLocation', () => {
     const result = blowoutUtil({ ...blowoutArgs, blowoutLocation: null })
     expect(curryCommandCreator).not.toHaveBeenCalled()
     expect(result).toEqual([])

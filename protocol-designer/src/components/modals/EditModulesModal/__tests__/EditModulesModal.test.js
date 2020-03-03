@@ -44,7 +44,7 @@ describe('EditModulesModal', () => {
       .mockReturnValue(true)
   })
 
-  test('displays warning and disabled save button when slot is occupied by incompatible labware', () => {
+  it('displays warning and disabled save button when slot is occupied by incompatible labware', () => {
     const slot = '1'
     stepFormSelectors.getInitialDeckSetup.mockReturnValue({
       labware: {
@@ -72,7 +72,7 @@ describe('EditModulesModal', () => {
     expect(saveButton.prop('disabled')).toBe(true)
   })
 
-  test('save button is clickable and saves when slot is occupied by compatible labware', () => {
+  it('save button is clickable and saves when slot is occupied by compatible labware', () => {
     const slot = '1'
     stepFormSelectors.getInitialDeckSetup.mockReturnValue({
       labware: {
@@ -106,7 +106,7 @@ describe('EditModulesModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  test('save button saves when adding module to empty slot', () => {
+  it('save button saves when adding module to empty slot', () => {
     stepFormSelectors.getInitialDeckSetup.mockReturnValue({
       labware: {
         well: {
@@ -143,7 +143,7 @@ describe('EditModulesModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  test('move deck item when moving module to a different slot', () => {
+  it('move deck item when moving module to a different slot', () => {
     const currentSlot = '1'
     const targetSlot = '10'
     stepFormSelectors.getInitialDeckSetup.mockReturnValue({
@@ -181,7 +181,7 @@ describe('EditModulesModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  test('no warning when slot is occupied by same module', () => {
+  it('no warning when slot is occupied by same module', () => {
     stepFormSelectors.getInitialDeckSetup.mockReturnValue({
       labware: {
         well: {
@@ -207,7 +207,7 @@ describe('EditModulesModal', () => {
     expect(warning).toHaveLength(0)
   })
 
-  test('cancel calls onCloseClick to close modal', () => {
+  it('cancel calls onCloseClick to close modal', () => {
     const props = {
       moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
@@ -226,7 +226,7 @@ describe('EditModulesModal', () => {
     expect(props.onCloseClick).toHaveBeenCalled()
   })
 
-  test('slot dropdown is disabled when module restrictions are disabled', () => {
+  it('slot dropdown is disabled when module restrictions are disabled', () => {
     featureSelectors.getDisableModuleRestrictions = jest
       .fn()
       .mockReturnValue(true)

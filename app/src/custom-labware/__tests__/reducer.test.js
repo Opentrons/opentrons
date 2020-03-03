@@ -120,7 +120,7 @@ describe('customLabwareReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       const result = customLabwareReducer(state, action)
       expect(result).toEqual(expected)
       // check for new reference

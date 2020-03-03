@@ -39,7 +39,7 @@ describe('modules hooks', () => {
       jest.resetAllMocks()
     })
 
-    test('returns noop function if no connected robot', () => {
+    it('returns noop function if no connected robot', () => {
       mockGetConnectedRobotName.mockReturnValue(null)
 
       mount(
@@ -52,7 +52,7 @@ describe('modules hooks', () => {
       expect(store.getActions()).toEqual([])
     })
 
-    test('returns dispatch function if no connected robot', () => {
+    it('returns dispatch function if no connected robot', () => {
       mockGetConnectedRobotName.mockReturnValue('robot-name')
 
       mount(

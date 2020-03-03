@@ -197,6 +197,6 @@ describe('buildroot selectors', () => {
     const { name, selector, state, expected, setup } = spec
     const args = spec.args || []
     if (typeof setup === 'function') setup()
-    test(name, () => expect(selector(state, ...args)).toEqual(expected))
+    it(name, () => expect(selector(state, ...args)).toEqual(expected))
   })
 })

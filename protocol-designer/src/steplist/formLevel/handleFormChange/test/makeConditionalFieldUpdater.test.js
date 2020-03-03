@@ -13,16 +13,16 @@ describe('makeConditionalPatchUpdater', () => {
     },
   ]
   const updateForFood = makeConditionalPatchUpdater(foodUpdateMap)
-  test('unhandled key field values case', () => {
+  it('unhandled key field values case', () => {
     expect(updateForFood('blorg', 'zvvvvvvargh', { spam: 'blah' })).toEqual({})
   })
-  test('no dependent fields cases', () => {
+  it('no dependent fields cases', () => {
     expect(updateForFood('apple', 'banana', {})).toEqual({})
     expect(
       updateForFood('apple', 'banana', { nonUpdatedField: 'foo' })
     ).toEqual({})
   })
-  test('avoid updating fields that should not get updated', () => {
+  it('avoid updating fields that should not get updated', () => {
     // all values in update don't need secondary update
     expect(
       updateForFood('apple', 'banana', {
@@ -40,7 +40,7 @@ describe('makeConditionalPatchUpdater', () => {
       })
     ).toEqual({ color: 'yellow' })
   })
-  test('update multiple fields together correctly', () => {
+  it('update multiple fields together correctly', () => {
     expect(
       updateForFood('apple', 'banana', {
         color: 'red',

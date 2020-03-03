@@ -6,13 +6,13 @@ import { shallow } from 'enzyme'
 import { Logo } from '../Logo'
 
 describe('Logo', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<Logo />)
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders an <img>', () => {
+  it('renders an <img>', () => {
     const tree = shallow(<Logo />)
 
     expect(tree.find('img')).toHaveLength(1)
