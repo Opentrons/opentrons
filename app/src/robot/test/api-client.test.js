@@ -513,6 +513,79 @@ describe('api client', () => {
       )
     })
 
+    test('reconciles reported tiprack / pipette usage', () => {
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          pipettesByMount: {
+            left: {
+              _id: 123,
+              mount: 'left',
+              name: 'p200',
+              channels: 1,
+              tipRacks: [789],
+              requestedAs: 'bar',
+            },
+            right: {
+              _id: 456,
+              mount: 'right',
+              name: 'p50',
+              channels: 8,
+              tipRacks: [789],
+              requestedAs: 'foo',
+            },
+          },
+          labwareBySlot: {
+            1: {
+              _id: 789,
+              slot: '1',
+              name: 'a',
+              type: 'tiprack',
+              isTiprack: true,
+              calibratorMount: 'left',
+            },
+          },
+        }),
+        false
+      )
+
+      session.instruments = [
+        {
+          _id: 456,
+          mount: 'right',
+          name: 'p50',
+          channels: 8,
+          tip_racks: [],
+          requested_as: 'foo',
+        },
+        {
+          _id: 123,
+          mount: 'left',
+          name: 'p200',
+          channels: 1,
+          tip_racks: [],
+          requested_as: 'bar',
+        },
+      ]
+
+      session.containers = [
+        {
+          _id: 789,
+          slot: '1',
+          name: 'a',
+          type: 'tiprack',
+          instruments: [
+            { mount: 'left', channels: 1 },
+            { mount: 'right', channels: 8 },
+          ],
+        },
+      ]
+
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
+    })
+
     test('maps api modules to modules by slot', () => {
       const expected = actions.sessionResponse(
         null,
