@@ -1,4 +1,5 @@
 from os import environ
+import asyncio
 import logging
 from threading import Event, Lock
 from time import sleep
@@ -46,7 +47,7 @@ MAG_DECK_ACK = 'ok\r\nok\r\n'
 # being sent to/from magnetic module
 GCODE_ROUNDING_PRECISION = 3
 
-mag_locks: Dict[str, Tuple[Lock, 'MagDeck']] = {}
+mag_locks: Dict[str, Tuple[Lock, 'MagDeck', Optional[asyncio.AbstractEventLoop]]] = {}
 
 
 class MagDeckError(Exception):
@@ -157,12 +158,14 @@ class MagDeck:
         self._connection = None
         self._config = config
 
+        log.info(f'\n\nMAGDECK INIT CALLED self._connection: {self._connection}')
+
         self._plate_height = None
         self._mag_position = None
         self._port = None
         self._lock = None
 
-    def connect(self, port=None) -> str:
+    def connect(self, port=None, loop=None) -> str:
         '''
         :param port: '/dev/ot_module_magdeck[#]'
         NOTE: Using the symlink above to connect makes sure that the robot
@@ -176,9 +179,11 @@ class MagDeck:
             self._connect_to_port(port)
             if mag_locks.get(port):
                 self._lock = mag_locks[port][0]
+                log.info(f'\n\nMAGDECK CONNECT CALLED had lock: {self._lock}')
             else:
                 self._lock = Lock()
-                mag_locks[port] = (self._lock, self)
+                log.info(f'\n\nMAGDECK CONNECT CALLED did not havelock: {self._lock}')
+                mag_locks[port] = (self._lock, self, loop)
             self._wait_for_ack()    # verify the device is there
             self._port = port
 
@@ -192,6 +197,9 @@ class MagDeck:
             del mag_locks[port]
         elif self.is_connected():
             self._connection.close()
+        import traceback
+        log.info(f'TRACE {traceback.format_stack()}')
+        log.info(f'\n\nMAGDECK DISCONNECT CALLED port: {port}, self._connection: {self._connection}')
         self._connection = None
 
     def is_connected(self) -> bool:
