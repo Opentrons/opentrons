@@ -48,7 +48,7 @@ const SERVER_MESSAGE = (
   </div>
 )
 
-export default class ReachableRobotBanner extends React.Component<
+export class ReachableRobotBanner extends React.Component<
   ReachableRobot,
   State
 > {

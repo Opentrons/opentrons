@@ -3,14 +3,16 @@ import assert from 'assert'
 import reduce from 'lodash/reduce'
 import values from 'lodash/values'
 import find from 'lodash/find'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import {
+  getPipetteNameSpecs,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import {
   SPAN7_8_10_11_SLOT,
   TC_SPAN_SLOTS,
   GEN_ONE_MULTI_PIPETTES,
-  THERMOCYCLER,
 } from '../constants'
-import type { DeckSlotId, ModuleType } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
 import type { DeckSlot } from '../types'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type {
@@ -95,7 +97,8 @@ export const getSlotsBlockedBySpanning = (
   if (
     values(initialDeckSetup.modules).some(
       (module: ModuleOnDeck) =>
-        module.type === THERMOCYCLER && module.slot === SPAN7_8_10_11_SLOT
+        module.type === THERMOCYCLER_MODULE_TYPE &&
+        module.slot === SPAN7_8_10_11_SLOT
     )
   ) {
     return ['7', '8', '10', '11']
@@ -141,7 +144,7 @@ export const getLabwareOnSlot = (
 
 export const getIsCrashablePipetteSelected = (
   pipettesByMount: FormPipettesByMount
-) => {
+): boolean => {
   const { left, right } = pipettesByMount
   return [left, right].some(
     (formPipette: ?FormPipette) =>
@@ -151,7 +154,7 @@ export const getIsCrashablePipetteSelected = (
 
 export const getHasGen1MultiChannelPipette = (
   pipettes: $PropertyType<InitialDeckSetup, 'pipettes'>
-) => {
+): boolean => {
   const pipetteIds = Object.keys(pipettes)
   return pipetteIds.some(pipetteId =>
     GEN_ONE_MULTI_PIPETTES.includes(pipettes[pipetteId]?.name)
@@ -160,8 +163,8 @@ export const getHasGen1MultiChannelPipette = (
 
 export const getIsModuleOnDeck = (
   modules: $PropertyType<InitialDeckSetup, 'modules'>,
-  moduleType: ModuleType
-) => {
+  moduleType: ModuleRealType
+): boolean => {
   const moduleIds = Object.keys(modules)
   return moduleIds.some(moduleId => modules[moduleId]?.type === moduleType)
 }

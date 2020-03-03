@@ -1,6 +1,6 @@
 // @flow
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 import {
-  TEMPDECK,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
 } from '../../../constants'
@@ -21,9 +21,9 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
     return { errors: [errorCreators.missingModuleError()] }
   }
 
-  if (tempModState.type !== TEMPDECK) {
+  if (tempModState.type !== TEMPERATURE_MODULE_TYPE) {
     console.error(
-      `expected module to be ${TEMPDECK} but got ${tempModState.type}`
+      `expected module to be ${TEMPERATURE_MODULE_TYPE} but got ${tempModState.type}`
     )
     return { errors: [errorCreators.missingModuleError()] }
   }
@@ -43,7 +43,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
   const moduleType = invariantContext.moduleEntities[module]?.type
   const params = { module, temperature }
   switch (moduleType) {
-    case TEMPDECK:
+    case TEMPERATURE_MODULE_TYPE:
       return {
         commands: [
           {
@@ -55,7 +55,7 @@ export const awaitTemperature: CommandCreator<AwaitTemperatureArgs> = (
 
     default:
       console.error(
-        `awaitTemperature expected module ${module} to be ${TEMPDECK}, got ${moduleType}`
+        `awaitTemperature expected module ${module} to be ${TEMPERATURE_MODULE_TYPE}, got ${moduleType}`
       )
       return { errors: [errorCreators.missingModuleError()] }
   }

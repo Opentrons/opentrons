@@ -1,7 +1,7 @@
 // @flow
+import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
 import { getModuleState } from '../robotStateSelectors'
 import {
-  TEMPDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_DEACTIVATED,
   TEMPERATURE_AT_TARGET,
@@ -13,7 +13,7 @@ import type {
 import type { InvariantContext, RobotStateAndWarnings } from '../types'
 
 function _setTemperatureAndStatus(moduleState, temperature, status) {
-  if (moduleState.type === TEMPDECK) {
+  if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
     moduleState.targetTemperature = temperature
     moduleState.status = status
   }
@@ -44,7 +44,7 @@ export function forAwaitTemperature(
   const { module, temperature } = params
   const moduleState = getModuleState(robotState, module)
 
-  if (moduleState.type === TEMPDECK) {
+  if (moduleState.type === TEMPERATURE_MODULE_TYPE) {
     if (temperature === moduleState.targetTemperature) {
       moduleState.status = TEMPERATURE_AT_TARGET
     }

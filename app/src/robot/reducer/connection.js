@@ -31,7 +31,7 @@ const INITIAL_STATE: ConnectionState = {
   unexpectedDisconnect: false,
 }
 
-export default function connectionReducer(
+export function connectionReducer(
   state?: ConnectionState,
   action: Action
 ): ConnectionState {

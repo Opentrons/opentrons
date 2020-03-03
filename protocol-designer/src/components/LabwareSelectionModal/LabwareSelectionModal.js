@@ -17,8 +17,11 @@ import {
 import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   type LabwareDefinition2,
-  type ModuleType,
+  type ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../constants'
@@ -44,7 +47,7 @@ type Props = {|
   /** if adding to a module, the slot of the parent (for display) */
   parentSlot: ?DeckSlot,
   /** if adding to a module, the module's type */
-  moduleType: ?ModuleType,
+  moduleType: ?ModuleRealType,
   /** tipracks that may be added to deck (depends on pipette<>tiprack assignment) */
   permittedTipracks: Array<string>,
 |}
@@ -61,8 +64,8 @@ const orderedCategories: Array<string> = [
   // 'trash', // NOTE: trash intentionally hidden
 ]
 
-const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
-  tempdeck: [
+const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
+  [TEMPERATURE_MODULE_TYPE]: [
     'opentrons_24_aluminumblock_generic_2ml_screwcap',
     'opentrons_96_aluminumblock_biorad_wellplate_200ul',
     'opentrons_96_aluminumblock_generic_pcr_strip_200ul',
@@ -72,8 +75,8 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleType]: Array<string> } = {
     'opentrons_24_aluminumblock_nest_2ml_snapcap',
     'opentrons_24_aluminumblock_nest_0.5ml_screwcap',
   ],
-  magdeck: ['nest_96_wellplate_100ul_pcr_full_skirt'],
-  thermocycler: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [MAGNETIC_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
+  [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
 export const LabwareSelectionModal = (props: Props) => {
@@ -99,11 +102,18 @@ export const LabwareSelectionModal = (props: Props) => {
   const blockingCustomLabwareHint = useBlockingHint({
     enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
+    content: <p>{i18n.t(`alert.hint.custom_labware_with_modules.body`)}</p>,
     handleCancel: () => setEnqueuedLabwareType(null),
     handleContinue: () => {
-      if (enqueuedLabwareType) {
-        setEnqueuedLabwareType(null)
+      setEnqueuedLabwareType(null)
+      if (enqueuedLabwareType !== null) {
+        // NOTE: this needs to be wrapped for Flow, IRL we know enqueuedLabwareType is not null
+        // because `enabled` prop above ensures it's !== null.
         selectLabware(enqueuedLabwareType)
+      } else {
+        console.error(
+          'could not select labware because enqueuedLabwareType is null. This should not happen'
+        )
       }
     },
   })

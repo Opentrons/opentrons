@@ -4,9 +4,9 @@ import remark from 'remark'
 import reactRenderer from 'remark-react'
 import styles from './styles.css'
 
-type Props = {
+export type ReleaseNotesProps = {|
   source: ?string,
-}
+|}
 
 const renderer = remark().use(reactRenderer, {
   remarkReactComponents: {
@@ -17,7 +17,7 @@ const renderer = remark().use(reactRenderer, {
 
 const DEFAULT_RELEASE_NOTES = 'We recommend upgrading to the latest version.'
 
-export default function ReleaseNotes(props: Props) {
+export function ReleaseNotes(props: ReleaseNotesProps) {
   const { source } = props
 
   return (

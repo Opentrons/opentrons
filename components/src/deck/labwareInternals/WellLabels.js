@@ -1,8 +1,8 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import RobotCoordsText from '../RobotCoordsText'
-import styles from './wellLabels.css'
+import { RobotCoordsText } from '../RobotCoordsText'
+import styles from './WellLabels.css'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 
 // magic layout numbers to make the letters close to the edges of the labware
@@ -42,7 +42,7 @@ const Labels = (props: {
   </>
 )
 
-function WellLabels(props: WellLabelsProps) {
+function WellLabelsComponent(props: WellLabelsProps) {
   const { definition } = props
   const letterColumn = definition.ordering[0]
   const numberRow = definition.ordering.map(wellCol => wellCol[0])
@@ -55,4 +55,4 @@ function WellLabels(props: WellLabelsProps) {
   )
 }
 
-export default React.memo<WellLabelsProps>(WellLabels)
+export const WellLabels = React.memo<WellLabelsProps>(WellLabelsComponent)

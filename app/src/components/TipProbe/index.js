@@ -8,12 +8,12 @@ import { actions as robotActions } from '../../robot'
 import { getCalibrationRequest } from '../../robot/selectors'
 
 import { ErrorModal } from '../modals'
-import CalibrationInfoBox from '../CalibrationInfoBox'
-import UnprobedPanel from './UnprobedPanel'
-import InstrumentMovingPanel from './InstrumentMovingPanel'
-import AttachTipPanel from './AttachTipPanel'
-import RemoveTipPanel from './RemoveTipPanel'
-import ContinuePanel from './ContinuePanel'
+import { CalibrationInfoBox } from '../CalibrationInfoBox'
+import { UnprobedPanel } from './UnprobedPanel'
+import { InstrumentMovingPanel } from './InstrumentMovingPanel'
+import { AttachTipPanel } from './AttachTipPanel'
+import { RemoveTipPanel } from './RemoveTipPanel'
+import { ContinuePanel } from './ContinuePanel'
 
 import type { Dispatch } from '../../types'
 import type { TipProbeProps, TipProbeState } from './types'
@@ -33,7 +33,7 @@ const PANEL_BY_CALIBRATION: {
   done: ContinuePanel,
 }
 
-export default function TipProbe(props: TipProbeProps) {
+export function TipProbe(props: TipProbeProps) {
   const { mount, probed } = props
   const dispatch = useDispatch<Dispatch>()
   const [probeState, setProbeState] = React.useState<TipProbeState>('unprobed')

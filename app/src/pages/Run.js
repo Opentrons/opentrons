@@ -2,17 +2,17 @@
 // run task component
 import * as React from 'react'
 import { Route } from 'react-router-dom'
-import Page from '../components/Page'
-import SessionHeader from '../components/SessionHeader'
-import RunLog, { ConfirmCancelModal } from '../components/RunLog'
+import { Page } from '../components/Page'
+import { SessionHeader } from '../components/SessionHeader'
+import { RunLog, ConfirmCancelModal } from '../components/RunLog'
 
-export default function RunPage() {
+export function Run() {
   return (
-    <React.Fragment>
+    <>
       <Page titleBarProps={{ title: <SessionHeader /> }}>
         <RunLog />
       </Page>
       <Route path="/run/cancel" component={ConfirmCancelModal} />
-    </React.Fragment>
+    </>
   )
 }

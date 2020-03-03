@@ -1,5 +1,5 @@
 import * as serviceList from '../service-list'
-import MOCK_SERVICE from '../__fixtures__/service'
+import { MOCK_SERVICE } from '../__fixtures__/service'
 
 describe('serviceList', () => {
   describe('createServiceList', () => {

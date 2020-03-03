@@ -7,14 +7,14 @@ import styles from './styles.css'
 
 import type { WifiSecurityType } from '../../../http-api-client'
 
-type Props = {
+export type ConnectModalProps = {|
   ssid: ?string,
   securityType: ?WifiSecurityType,
   close: () => mixed,
   children: React.Node,
-}
+|}
 
-export default function ConnectModal(props: Props) {
+export function ConnectModal(props: ConnectModalProps) {
   const { ssid, securityType, close, children } = props
   const heading = ssid ? `Connect to ${ssid}` : 'Find and join a Wi-Fi network'
   let body = ''

@@ -5,17 +5,21 @@ import { Link } from 'react-router-dom'
 
 import { getProtocolFilename } from '../../protocol'
 
-import type { State } from '../../types'
+import type { State, Dispatch } from '../../types'
 
-type Props = { sessionName: ?string }
+type SP = {| sessionName: ?string |}
 
-export default connect<Props, {||}, _, _, _, _>(mapStateToProps)(SessionHeader)
+type Props = {| ...SP, dispatch: Dispatch |}
 
-function SessionHeader(props: Props) {
+export const SessionHeader = connect<Props, {||}, _, _, _, _>(mapStateToProps)(
+  SessionHeaderComponent
+)
+
+function SessionHeaderComponent(props: Props) {
   return <Link to="/upload">{props.sessionName}</Link>
 }
 
-function mapStateToProps(state: State): $Exact<Props> {
+function mapStateToProps(state: State): SP {
   return {
     sessionName: getProtocolFilename(state),
   }

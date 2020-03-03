@@ -5,16 +5,16 @@ import classnames from 'classnames'
 import { IconButton } from '../buttons'
 import styles from './SidePanel.css'
 
-type SidePanelProps = {
+export type SidePanelProps = {|
   title: string,
   children: React.Node,
   isClosed?: boolean,
   onCloseClick?: (event: SyntheticMouseEvent<>) => mixed,
   onMouseEnter?: (event: SyntheticMouseEvent<>) => mixed,
   onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
-}
+|}
 
-export default function SidePanel(props: SidePanelProps) {
+export function SidePanel(props: SidePanelProps) {
   const open = !props.isClosed || props.onCloseClick == null
   const closeButton = props.onCloseClick && (
     <IconButton

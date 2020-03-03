@@ -1,5 +1,9 @@
 // @flow
-import { GEN_ONE_MULTI_PIPETTES, TEMPDECK, MAGDECK } from '../../constants'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import { GEN_ONE_MULTI_PIPETTES } from '../../constants'
 import type { InvariantContext, RobotState } from '../types'
 
 // HACK Ian 2019-11-12: this is a temporary solution to pass PD runtime feature flags
@@ -50,7 +54,10 @@ export const modulePipetteCollision = (args: {|
     moduleId => {
       const moduleSlot: ?* = prevRobotState.modules[moduleId]?.slot
       const moduleType: ?* = invariantContext.moduleEntities[moduleId]?.type
-      const hasNorthSouthProblem = [TEMPDECK, MAGDECK].includes(moduleType)
+      const hasNorthSouthProblem = [
+        MAGNETIC_MODULE_TYPE,
+        TEMPERATURE_MODULE_TYPE,
+      ].includes(moduleType)
       const labwareInNorthSlot =
         (moduleSlot === '1' && labwareSlot === '4') ||
         (moduleSlot === '3' && labwareSlot === '6')

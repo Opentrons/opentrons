@@ -4,14 +4,14 @@ import { useDispatch } from 'react-redux'
 
 import { buildrootChangelogSeen } from '../../../buildroot'
 import { ScrollableAlertModal } from '../../modals'
-import ReleaseNotes from '../../ReleaseNotes'
+import { ReleaseNotes } from '../../ReleaseNotes'
 import styles from './styles.css'
 
 import type { ButtonProps } from '@opentrons/components'
 import type { Dispatch } from '../../../types'
 import type { RobotSystemType } from '../../../buildroot/types'
 
-type Props = {|
+export type ReleaseNotesModalProps = {|
   robotName: string,
   notNowButton: ButtonProps,
   releaseNotes: string,
@@ -19,7 +19,7 @@ type Props = {|
   proceed: () => mixed,
 |}
 
-export default function ReleaseNotesModal(props: Props) {
+export function ReleaseNotesModal(props: ReleaseNotesModalProps) {
   const { robotName, notNowButton, releaseNotes, systemType, proceed } = props
   const dispatch = useDispatch<Dispatch>()
 

@@ -7,14 +7,14 @@ import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS } from '../../pipettes'
 import { getCalibratePipettesLocations } from '../../nav'
 import { TitledList } from '@opentrons/components'
-import PipetteListItem from './PipetteListItem'
+import { PipetteListItem } from './PipetteListItem'
 
 // TODO(mc, 2019-12-10): i18n
 const PIPETTE_CALIBRATION = 'Pipette Calibration'
 
-export default withRouter(PipetteList)
+export const PipetteList = withRouter(PipetteListComponent)
 
-function PipetteList() {
+function PipetteListComponent() {
   const pipettes = useSelector(robotSelectors.getPipettes)
   const urlsByMount = useSelector(getCalibratePipettesLocations)
 

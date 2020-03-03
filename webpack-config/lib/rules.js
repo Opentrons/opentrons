@@ -95,6 +95,9 @@ module.exports = {
       options: {
         // [hash] is file-loader specific contenthash
         name: DEV_MODE ? '[path][name].[ext]' : 'fonts/[name].[hash].[ext]',
+        // TODO(mc, 2020-02-20): enable esModule option (defaults to true)
+        // this will changing any require statements to `require(...).default`
+        esModule: false,
       },
     },
   },
@@ -107,6 +110,9 @@ module.exports = {
       options: {
         name: '[name].[hash].[ext]',
         outputPath: 'images',
+        // TODO(mc, 2020-02-20): enable esModule option (defaults to true)
+        // this will changing any require statements to `require(...).default`
+        esModule: false,
       },
     },
   },

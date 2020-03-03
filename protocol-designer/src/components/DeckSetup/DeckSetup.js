@@ -11,7 +11,7 @@ import {
 import {
   getLabwareHasQuirk,
   type DeckSlot as DeckDefSlot,
-  type ModuleType,
+  type ModuleRealType,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
@@ -113,9 +113,9 @@ const getSwapBlocked = (args: {
     return false
   }
 
-  const sourceModuleType: ?ModuleType =
+  const sourceModuleType: ?ModuleRealType =
     modulesById[draggedLabware.slot]?.type || null
-  const destModuleType: ?ModuleType =
+  const destModuleType: ?ModuleRealType =
     modulesById[hoveredLabware.slot]?.type || null
 
   const labwareSourceToDestBlocked = sourceModuleType

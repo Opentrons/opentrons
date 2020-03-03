@@ -20,10 +20,9 @@ import {
 
 import { getMissingModules } from '../../modules'
 
-import LabwareItem from './LabwareItem'
+import { LabwareItem } from './LabwareItem'
 
-export { LabwareItem }
-export type { LabwareItemProps } from './LabwareItem'
+export * from './LabwareItem'
 
 type OP = {|
   ...ContextRouter,
@@ -33,10 +32,12 @@ type OP = {|
 |}
 
 type DP = {| dispatch: Dispatch |}
+
 type DisplayModule = {|
   ...$Exact<SessionModule>,
   mode?: $PropertyType<ElementProps<typeof ModuleItem>, 'mode'>,
 |}
+
 type SP = {|
   labwareBySlot?: { [DeckSlotId]: Array<Labware> },
   modulesBySlot?: {
@@ -58,7 +59,7 @@ const deckSetupLayerBlacklist = [
   'screwHoles',
 ]
 
-function DeckMap(props: Props) {
+function DeckMapComponent(props: Props) {
   const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   const {
     modulesBySlot,
@@ -141,13 +142,14 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     }
   } else {
     const allLabware = robotSelectors.getLabware(state)
-    const labwareBySlot = allLabware.reduce(
-      (acc, labware) => ({
-        ...acc,
-        [labware.slot]: [...(acc[labware.slot] || []), labware],
-      }),
-      {}
-    )
+    const labwareBySlot = allLabware.reduce((slotMap, labware) => {
+      const { slot } = labware
+      const slotContents = slotMap[slot] ?? []
+
+      slotMap[slot] = [...slotContents, labware]
+      return slotMap
+    }, {})
+
     if (ownProps.enableLabwareSelection !== true) {
       return {
         labwareBySlot,
@@ -165,6 +167,6 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   }
 }
 
-export default withRouter<_, _>(
-  connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMap)
+export const DeckMap = withRouter<_, _>(
+  connect<Props, OP, SP, DP, State, Dispatch>(mapStateToProps)(DeckMapComponent)
 )

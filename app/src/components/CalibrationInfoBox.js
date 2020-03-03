@@ -4,14 +4,14 @@ import classnames from 'classnames'
 import { Icon } from '@opentrons/components'
 import styles from './calibration-info.css'
 
-type Props = {|
+export type CalibrationInfoBoxProps = {|
   title: string,
   confirmed: boolean,
   className?: string,
   children: React.Node,
 |}
 
-export default function CalibrationInfoBox(props: Props) {
+export function CalibrationInfoBox(props: CalibrationInfoBoxProps) {
   const { className, confirmed, title, children } = props
 
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'

@@ -3,11 +3,12 @@ import * as React from 'react'
 import cx from 'classnames'
 import styles from './styles.css'
 
-type Props = {
+export type SectionContentFullProps = {|
   children: React.Node,
   className?: string,
-}
-export default function CardContentHalf(props: Props) {
+|}
+
+export function SectionContentFull(props: SectionContentFullProps) {
   return (
     <div className={cx(styles.section_content_full, props.className)}>
       {props.children}

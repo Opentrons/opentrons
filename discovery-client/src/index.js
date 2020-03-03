@@ -8,7 +8,7 @@ import toRegex from 'to-regex'
 import differenceBy from 'lodash/differenceBy'
 import xorBy from 'lodash/xorBy'
 
-import MdnsBrowser, { getKnownIps } from './mdns-browser'
+import { createMdnsBrowser, getKnownIps } from './mdns-browser'
 import { poll, stop, type PollRequest } from './poller'
 import {
   createServiceList,
@@ -57,7 +57,7 @@ const santizeRe = (patterns: ?Array<string | RegExp>) => {
   return patterns.map(p => (typeof p === 'string' ? escape(p) : p))
 }
 
-export default function DiscoveryClientFactory(options?: Options) {
+export function createDiscoveryClient(options?: Options) {
   return new DiscoveryClient(options || {})
 }
 
@@ -200,7 +200,7 @@ export class DiscoveryClient extends EventEmitter {
   _startBrowser(): void {
     this._stopBrowser()
 
-    const browser = MdnsBrowser()
+    const browser = createMdnsBrowser()
       .once('ready', () => browser.discover())
       .on('update', service => this._handleUp(service))
       .on('error', error => this.emit('error', error))

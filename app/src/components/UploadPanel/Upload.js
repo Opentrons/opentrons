@@ -1,21 +1,21 @@
 // @flow
 import * as React from 'react'
-import UploadInput from './UploadInput'
-import ConfirmUploadModal from './ConfirmUploadModal'
-import UploadMenu from './UploadMenu'
+import { UploadInput } from './UploadInput'
+import { ConfirmUploadModal } from './ConfirmUploadModal'
+import { UploadMenu } from './UploadMenu'
 
-type Props = {
+export type UploadProps = {|
   filename: ?string,
   sessionLoaded: ?boolean,
   createSession: (file: File) => mixed,
-}
+|}
 
-type State = {
+type UploadState = {|
   uploadedFile: ?File,
-}
+|}
 
-export default class Upload extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class Upload extends React.Component<UploadProps, UploadState> {
+  constructor(props: UploadProps) {
     super(props)
     this.state = { uploadedFile: null }
   }
@@ -57,7 +57,7 @@ export default class Upload extends React.Component<Props, State> {
     const { filename } = this.props
 
     return (
-      <React.Fragment>
+      <>
         {filename && <UploadMenu />}
         <UploadInput onUpload={this.onUpload} isButton />
         <UploadInput onUpload={this.onUpload} />
@@ -68,7 +68,7 @@ export default class Upload extends React.Component<Props, State> {
             cancel={this.forgetUpload}
           />
         )}
-      </React.Fragment>
+      </>
     )
   }
 }

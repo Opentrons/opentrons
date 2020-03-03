@@ -2,12 +2,13 @@
 import * as React from 'react'
 import { AlertModal } from '@opentrons/components'
 
-type Props = {|
+export type NoPipetteModalProps = {|
   close: () => mixed,
 |}
 
 const HEADING = 'No pipette attached'
-export default function NoPipetteModal(props: Props) {
+
+export function NoPipetteModal(props: NoPipetteModalProps) {
   return (
     <AlertModal
       heading={HEADING}

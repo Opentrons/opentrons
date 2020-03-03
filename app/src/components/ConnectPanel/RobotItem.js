@@ -16,9 +16,9 @@ type SP = {| upgradable: boolean, selected: boolean |}
 
 type DP = {| connect: () => mixed, disconnect: () => mixed |}
 
-export type RobotItemProps = { ...OP, ...SP, ...DP }
+export type RobotItemProps = {| ...OP, ...SP, ...DP |}
 
-export default withRouter<_, _>(
+export const RobotItem = withRouter<_, _>(
   connect<RobotItemProps, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps

@@ -2,7 +2,7 @@
 import { setIn } from '@thi.ng/paths'
 
 import * as service from '../service'
-import MOCK_BROWSER_SERVICE from '../__fixtures__/mdns-browser-service'
+import { MOCK_BROWSER_SERVICE } from '../__fixtures__/mdns-browser-service'
 
 describe('service utils', () => {
   describe('makeService', () => {

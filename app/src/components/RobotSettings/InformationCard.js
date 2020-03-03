@@ -24,10 +24,10 @@ import {
 
 import { CardRow, CardContentThird } from '../layout'
 
-import type { Dispatch } from '../../types'
+import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
-type Props = {|
+export type InformationCardProps = {|
   robot: ViewableRobot,
   updateUrl: string,
 |}
@@ -49,9 +49,9 @@ const DEFAULT_MAX_API_VERSION = '1.0'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
-export default function InformationCard(props: Props) {
+export function InformationCard(props: InformationCardProps) {
   const { robot, updateUrl } = props
-  const updateType = useSelector(state =>
+  const updateType = useSelector((state: State) =>
     getBuildrootUpdateAvailable(state, robot)
   )
   const dispatch = useDispatch<Dispatch>()

@@ -3,16 +3,16 @@
 import * as React from 'react'
 
 import { AnalyticsSettingsCard } from '../analytics-settings'
-import AdvancedSettingsCard from './AdvancedSettingsCard'
-import AppInfoCard from './AppInfoCard'
+import { AdvancedSettingsCard } from './AdvancedSettingsCard'
+import { AppInfoCard } from './AppInfoCard'
 import { CardContainer, CardRow } from '../layout'
 
-type Props = {
+export type AppSettingsProps = {|
   availableVersion: ?string,
   checkUpdate: () => mixed,
-}
+|}
 
-export default function AppSettings(props: Props) {
+export function AppSettings(props: AppSettingsProps) {
   return (
     <CardContainer>
       <CardRow>

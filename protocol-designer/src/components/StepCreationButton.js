@@ -4,6 +4,11 @@ import { connect } from 'react-redux'
 import cx from 'classnames'
 import without from 'lodash/without'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { actions as stepsActions } from '../ui/steps'
 import { selectors as featureFlagSelectors } from '../feature-flags'
@@ -13,7 +18,6 @@ import {
 } from '../step-forms'
 import { stepIconsByType, type StepType } from '../form-types'
 import type { BaseState, ThunkDispatch } from '../types'
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../constants'
 import styles from './listButtons.css'
 
 type SP = {|
@@ -117,11 +121,11 @@ const mapSTP = (state: BaseState): SP => {
       moveLiquid: true,
       mix: true,
       pause: true,
-      magnet: getIsModuleOnDeck(modules, MAGDECK),
+      magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
       temperature:
-        getIsModuleOnDeck(modules, TEMPDECK) ||
-        getIsModuleOnDeck(modules, THERMOCYCLER),
-      thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER),
+        getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE) ||
+        getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
+      thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     },
   }
 }

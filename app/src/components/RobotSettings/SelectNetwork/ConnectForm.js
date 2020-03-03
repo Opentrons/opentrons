@@ -19,7 +19,7 @@ import {
 import { BottomButtonBar } from '../../modals'
 import { StringField, PasswordField, SelectOptionField } from './fields'
 import { SelectKey } from './SelectKey'
-import FormTable from './FormTable'
+import { FormTable } from './FormTable'
 
 import type {
   WifiSecurityType,
@@ -32,7 +32,7 @@ import type {
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
 
-type Props = {
+type ConnectFormProps = {|
   ssid: ?string,
   securityType: ?WifiSecurityType,
   eapOptions: ?WifiEapOptionsList,
@@ -40,9 +40,9 @@ type Props = {
   configure: WifiConfigureRequest => mixed,
   addKey: File => mixed,
   close: () => mixed,
-}
+|}
 
-type State = {|
+type ConnectFormState = {|
   showPassword: { [name: string]: boolean },
 |}
 
@@ -118,8 +118,11 @@ const getEapFields = (
   return options.map(makeEapField)
 }
 
-export default class ConnectForm extends React.Component<Props, State> {
-  constructor(props: Props) {
+export class ConnectForm extends React.Component<
+  ConnectFormProps,
+  ConnectFormState
+> {
+  constructor(props: ConnectFormProps) {
     super(props)
     this.state = { showPassword: {} }
   }
@@ -130,6 +133,9 @@ export default class ConnectForm extends React.Component<Props, State> {
     const securityType = this.getSecurityType(values)
     const hidden = !knownSsid
 
+    // TODO(mc, 2020-02-21): This configure form needs to be redone as part
+    // of the configure endpoint client-side refactor
+    // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
     configure({ ...values, ssid, securityType, hidden })
     close()
   }

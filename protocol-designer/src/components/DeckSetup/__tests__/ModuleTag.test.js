@@ -1,9 +1,12 @@
+// @flow
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import React from 'react'
 import { render } from 'enzyme'
 import { ModuleStatus } from '../ModuleTag'
 import {
-  TEMPDECK,
-  MAGDECK,
   TEMPERATURE_APPROACHING_TARGET,
   TEMPERATURE_AT_TARGET,
   TEMPERATURE_DEACTIVATED,
@@ -14,7 +17,7 @@ describe('ModuleStatus', () => {
     test('displays engaged when magent is engaged', () => {
       const props = {
         engaged: true,
-        type: MAGDECK,
+        type: MAGNETIC_MODULE_TYPE,
       }
 
       const component = render(<ModuleStatus moduleState={props} />)
@@ -25,7 +28,7 @@ describe('ModuleStatus', () => {
     test('displays disengaged when magnet is not engaged', () => {
       const moduleState = {
         engaged: false,
-        type: MAGDECK,
+        type: MAGNETIC_MODULE_TYPE,
       }
 
       const component = render(<ModuleStatus moduleState={moduleState} />)
@@ -37,7 +40,7 @@ describe('ModuleStatus', () => {
   describe('temperature module', () => {
     test('deactivated is shown when module is deactivated', () => {
       const moduleState = {
-        type: TEMPDECK,
+        type: TEMPERATURE_MODULE_TYPE,
         status: TEMPERATURE_DEACTIVATED,
         targetTemperature: null,
       }
@@ -49,7 +52,7 @@ describe('ModuleStatus', () => {
 
     test('target temperature is shown when module is at target', () => {
       const moduleState = {
-        type: TEMPDECK,
+        type: TEMPERATURE_MODULE_TYPE,
         status: TEMPERATURE_AT_TARGET,
         targetTemperature: 45,
       }
@@ -61,7 +64,7 @@ describe('ModuleStatus', () => {
 
     test('going to X is shown when temperature is approaching target', () => {
       const moduleState = {
-        type: TEMPDECK,
+        type: TEMPERATURE_MODULE_TYPE,
         status: TEMPERATURE_APPROACHING_TARGET,
         targetTemperature: 45,
       }

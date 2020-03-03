@@ -3,23 +3,23 @@
 import * as React from 'react'
 
 import { CardContainer, CardRow } from '../layout'
-import StatusCard from './StatusCard'
-import InformationCard from './InformationCard'
+import { StatusCard } from './StatusCard'
+import { InformationCard } from './InformationCard'
 import { ControlsCard } from './ControlsCard'
 import { ConnectionCard } from './ConnectionCard'
-import AdvancedSettingsCard from './AdvancedSettingsCard'
-import ConnectAlertModal from './ConnectAlertModal'
-
+import { AdvancedSettingsCard } from './AdvancedSettingsCard'
 import type { ViewableRobot } from '../../discovery/types'
 
-type Props = {
+export { ConnectAlertModal } from './ConnectAlertModal'
+
+export type RobotSettingsProps = {|
   robot: ViewableRobot,
   updateUrl: string,
   calibrateDeckUrl: string,
   resetUrl: string,
-}
+|}
 
-export default function RobotSettings(props: Props) {
+export function RobotSettings(props: RobotSettingsProps) {
   const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
@@ -42,5 +42,3 @@ export default function RobotSettings(props: Props) {
     </CardContainer>
   )
 }
-
-export { ConnectAlertModal }

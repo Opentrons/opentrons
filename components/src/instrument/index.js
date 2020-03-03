@@ -1,11 +1,7 @@
 // @flow
-import InstrumentDiagram from './InstrumentDiagram'
-import InstrumentGroup from './InstrumentGroup'
-import InstrumentInfo from './InstrumentInfo'
-import type { InstrumentInfoProps } from './InstrumentInfo'
-import InfoItem from './InfoItem'
+
+export * from './InfoItem'
+export * from './InstrumentDiagram'
+export * from './InstrumentGroup'
+export * from './InstrumentInfo'
 export * from './PipetteSelect'
-
-export { InstrumentDiagram, InstrumentGroup, InstrumentInfo, InfoItem }
-
-export type { InstrumentInfoProps }

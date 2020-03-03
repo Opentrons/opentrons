@@ -2,7 +2,6 @@
 import React from 'react'
 import ReactDom from 'react-dom'
 import { Provider } from 'react-redux'
-import { AppContainer } from 'react-hot-loader'
 import { createStore, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 
@@ -44,22 +43,6 @@ const store = createStore(rootReducer, composeEnhancers(middleware))
 
 epicMiddleware.run(rootEpic)
 
-const renderApp = () =>
-  ReactDom.render(
-    <AppContainer>
-      <Provider store={store}>
-        <ConnectedRouter history={history}>
-          <App />
-        </ConnectedRouter>
-      </Provider>
-    </AppContainer>,
-    document.getElementById('root')
-  )
-
-if (module.hot) {
-  module.hot.accept('./components/App', renderApp)
-}
-
 const { config } = store.getState()
 
 // attach store to window if devtools are on
@@ -76,4 +59,12 @@ store.dispatch(checkShellUpdate())
 store.dispatch(startDiscovery())
 
 log.info('Rendering app UI')
-renderApp()
+
+ReactDom.render(
+  <Provider store={store}>
+    <ConnectedRouter history={history}>
+      <App />
+    </ConnectedRouter>
+  </Provider>,
+  document.getElementById('root')
+)

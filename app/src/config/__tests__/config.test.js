@@ -2,7 +2,9 @@
 import { updateConfig, resetConfig, getConfig } from '..'
 import { configReducer } from '../reducer'
 
-jest.mock('../../shell/remote', () => ({ INITIAL_CONFIG: { isConfig: true } }))
+jest.mock('../../shell/remote', () => ({
+  remote: { INITIAL_CONFIG: { isConfig: true } },
+}))
 
 describe('config', () => {
   let state

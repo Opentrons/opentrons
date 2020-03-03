@@ -1,12 +1,14 @@
 // @flow
-// TitledList component
+// SidePanelGroup component
 import * as React from 'react'
 import cx from 'classnames'
 
 import styles from './lists.css'
-import { type IconName, Icon } from '../icons'
+import { Icon } from '../icons'
 
-type GroupProps = {|
+import type { IconName } from '../icons'
+
+export type SidePanelGroupProps = {|
   /** text of title */
   title?: string,
   /** optional icon left of the title */
@@ -22,7 +24,7 @@ type GroupProps = {|
 /**
  * A component for grouping and titling multiple lists
  */
-export default function SidePanelGroup(props: GroupProps) {
+export function SidePanelGroup(props: SidePanelGroupProps) {
   const { iconName, disabled } = props
 
   const className = cx(styles.panel_group, props.className, {

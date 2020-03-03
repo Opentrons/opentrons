@@ -4,8 +4,8 @@ import EventEmitter from 'events'
 import portfinder from 'portfinder'
 import WS from 'ws'
 
-import Client from '../client'
-import RemoteObject from '../remote-object'
+import { Client } from '../client'
+import { RemoteObject } from '../remote-object'
 import {
   statuses,
   RESULT,
@@ -193,9 +193,9 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(makeNackResponse(token, 'You done messed up')))
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/NACK.+You done messed up/),
       })
     })
@@ -227,9 +227,9 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
       })
     })
@@ -243,9 +243,9 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
       })
     })
@@ -327,24 +327,26 @@ describe('rpc client', () => {
     })
   })
 
-  test('emits notification data wrapped in RemoteObjects', done => {
+  test('emits notification data wrapped in RemoteObjects', () => {
     const INSTANCE = { i: 32, t: 30, v: { foo: 'bar', baz: 'qux' } }
     const notification = { $: { type: NOTIFICATION }, data: INSTANCE }
     const mockRemote = { foo: 'bar', baz: 'qux' }
 
-    sendControlAndResolveRemote()
-    RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
+    return new Promise(resolve => {
+      sendControlAndResolveRemote()
+      RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
 
-    Client(url).then(client => {
-      addListener(client, 'notification', message => {
-        expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE, {
-          methods: false,
+      Client(url).then(client => {
+        addListener(client, 'notification', message => {
+          expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE, {
+            methods: false,
+          })
+          expect(message).toEqual(mockRemote)
+          resolve()
         })
-        expect(message).toEqual(mockRemote)
-        done()
-      })
 
-      setTimeout(() => ws.send(notification), 10)
+        setTimeout(() => ws.send(notification), 10)
+      })
     })
   })
 

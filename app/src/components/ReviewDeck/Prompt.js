@@ -8,12 +8,12 @@ import { selectors as robotSelectors, type Labware } from '../../robot'
 
 import styles from './styles.css'
 
-type Props = {|
+export type PromptProps = {|
   ...Labware,
   onClick: () => void,
 |}
 
-export default function Prompt(props: Props) {
+export function Prompt(props: PromptProps) {
   const { onClick, ...labware } = props
   const { name, definition, slot } = labware
   const labwareType = robotSelectors.labwareType(labware)

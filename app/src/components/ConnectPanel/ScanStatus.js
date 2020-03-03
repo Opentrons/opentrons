@@ -1,17 +1,17 @@
 // @flow
 import * as React from 'react'
 
-import ScanButton from './ScanButton'
+import { ScanButton } from './ScanButton'
 
 import styles from './styles.css'
 
-type Props = {
+export type ScanStatusProps = {|
   onScanClick: () => mixed,
   isScanning: boolean,
   found: boolean,
-}
+|}
 
-export default function ScanStatus(props: Props) {
+export function ScanStatus(props: ScanStatusProps) {
   const { found, isScanning } = props
 
   const notFoundMessage = !isScanning && !found && (

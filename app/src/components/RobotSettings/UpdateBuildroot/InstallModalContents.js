@@ -10,12 +10,12 @@ import type {
   RobotSystemType,
 } from '../../../buildroot/types'
 
-type Props = {|
+export type InstallModalContentsProps = {|
   robotSystemType: RobotSystemType | null,
   session: BuildrootUpdateSession,
 |}
 
-export default function InstallModalContents(props: Props) {
+export function InstallModalContents(props: InstallModalContentsProps) {
   const { robotSystemType, session } = props
   const { step: updateStep, progress, error } = session
   const prevStep = usePrevious(updateStep)

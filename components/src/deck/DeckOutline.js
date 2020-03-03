@@ -1,5 +1,6 @@
 // @flow
 // deck outline path
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import styles from './Deck.css'
 
@@ -18,7 +19,10 @@ const TRASH_OUTLINE_PROPS = {
   rx: '11',
 }
 
-export default function DeckOutline() {
+/**
+ * @deprecated Use {@link RobotWorkSpace}
+ */
+export function DeckOutline() {
   return (
     // TODO(mc, 2018-07-16): consolidate transform into path
     <g className={styles.deck_outline} transform="scale(0.666)">

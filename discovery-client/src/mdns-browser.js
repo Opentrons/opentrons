@@ -7,7 +7,7 @@ import flatMap from 'lodash/flatMap'
 
 monkeyPatchThrowers()
 
-export default function MdnsBrowser(): Browser {
+export function createMdnsBrowser(): Browser {
   return mdns.createBrowser(mdns.tcp('http'))
 }
 

@@ -1,14 +1,14 @@
 // @flow
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import React from 'react'
 import { render, shallow, mount } from 'enzyme'
 import { ModuleStepItems } from '../ModuleStepItems'
-import { MAGDECK } from '../../../constants'
 
 let props
 beforeEach(() => {
   props = {
     action: 'action',
-    module: MAGDECK,
+    moduleType: MAGNETIC_MODULE_TYPE,
     actionText: 'engage',
     labwareDisplayName: 'magnet module',
     labwareNickname: 'maggie',

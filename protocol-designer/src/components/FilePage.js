@@ -17,10 +17,11 @@ import { EditPipettesModal } from './modals/EditPipettesModal'
 import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
 import styles from './FilePage.css'
+import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
-import type { ModuleType } from '@opentrons/shared-data'
+import type { ModuleRealType } from '@opentrons/shared-data'
 export type Props = {|
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
@@ -36,7 +37,7 @@ type State = {|
   isEditPipetteModalOpen: boolean,
   isEditModulesModalOpen: boolean,
   currentModule: {|
-    moduleType: ?ModuleType,
+    moduleType: ?ModuleRealType,
     moduleId: ?string,
   |},
 |}
@@ -69,7 +70,7 @@ export class FilePage extends React.Component<Props, State> {
   }
   closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule = (moduleType: ModuleType, moduleId?: string) => {
+  handleEditModule = (moduleType: ModuleRealType, moduleId?: string) => {
     this.scrollToTop()
     this.setState({
       isEditModulesModalOpen: true,
@@ -169,7 +170,7 @@ export class FilePage extends React.Component<Props, State> {
                     onChange={handleChange}
                   />
                 </FormGroup>
-                <div className={styles.button_row}>
+                <div className={modalStyles.button_row}>
                   <OutlineButton
                     type="submit"
                     className={styles.update_button}
@@ -212,7 +213,7 @@ export class FilePage extends React.Component<Props, State> {
           />
         )}
 
-        <div className={styles.button_row}>
+        <div className={modalStyles.button_row}>
           <PrimaryButton
             onClick={goToNextPage}
             className={styles.continue_button}

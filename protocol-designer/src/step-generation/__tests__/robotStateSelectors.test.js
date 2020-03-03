@@ -1,7 +1,6 @@
 // @flow
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import { getLabwareDefURI, MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
-
 import {
   makeContext,
   makeState,
@@ -15,7 +14,6 @@ import {
   _getNextTip,
   getModuleState,
 } from '../'
-import { MAGDECK } from '../../constants'
 let invariantContext
 
 beforeEach(() => {
@@ -392,7 +390,7 @@ describe('getModuleState', () => {
   test('returns the state for specified module', () => {
     const magModuleId = 'magdeck123'
     const magModuleState = {
-      type: MAGDECK,
+      type: MAGNETIC_MODULE_TYPE,
       engaged: true,
     }
     const robotState = makeState({

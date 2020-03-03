@@ -2,11 +2,13 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { Icon, type IconProps } from '../icons'
-import type { ButtonProps } from './Button'
-import FlatButton from './FlatButton'
+import { Icon } from '../icons'
+import { FlatButton } from './FlatButton'
 
 import styles from './buttons.css'
+
+import type { IconProps } from '../icons'
+import type { ButtonProps } from './Button'
 
 type Props = {|
   ...$Exact<ButtonProps>,
@@ -18,7 +20,7 @@ type Props = {|
  * FlatButton variant for a button that is a single icon. Takes props of
  * both Button _and_ Icon. Use `name` to specify icon name.
  */
-export default function IconButton(props: Props) {
+export function IconButton(props: Props) {
   // TODO(mc, 2020-02-04): ButtonProps::name conflicts with IconProps::name
   // this component will need to be redone so underlying `button` can still
   // receive an HTML name for a11y

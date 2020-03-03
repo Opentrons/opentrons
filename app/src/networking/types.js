@@ -1,85 +1,34 @@
 // @flow
 
-import type { RobotApiRequestMeta } from '../robot-api/types'
+import type {
+  RobotApiRequestMeta,
+  RobotApiErrorResponse,
+} from '../robot-api/types'
+
 import typeof {
-  STATUS_NONE,
-  STATUS_PORTAL,
-  STATUS_LIMITED,
-  STATUS_FULL,
-  STATUS_UNKNOWN,
-  INTERFACE_CONNECTED,
-  INTERFACE_CONNECTING,
-  INTERFACE_DISCONNECTED,
-  INTERFACE_UNAVAILABLE,
-  INTERFACE_WIFI,
-  INTERFACE_ETHERNET,
-  SECURITY_NONE,
-  SECURITY_WPA_PSK,
-  SECURITY_WPA_EAP,
   FETCH_STATUS,
   FETCH_STATUS_SUCCESS,
   FETCH_STATUS_FAILURE,
   FETCH_WIFI_LIST,
   FETCH_WIFI_LIST_SUCCESS,
   FETCH_WIFI_LIST_FAILURE,
+  POST_WIFI_CONFIGURE,
+  POST_WIFI_CONFIGURE_SUCCESS,
+  POST_WIFI_CONFIGURE_FAILURE,
+  FETCH_WIFI_KEYS,
+  FETCH_WIFI_KEYS_SUCCESS,
+  FETCH_WIFI_KEYS_FAILURE,
+  POST_WIFI_KEYS,
+  POST_WIFI_KEYS_SUCCESS,
+  POST_WIFI_KEYS_FAILURE,
+  FETCH_EAP_OPTIONS,
+  FETCH_EAP_OPTIONS_SUCCESS,
+  FETCH_EAP_OPTIONS_FAILURE,
 } from './constants'
 
-// response types
+import * as ApiTypes from './api-types'
 
-// GET /networking/status
-
-export type InternetStatus =
-  | STATUS_NONE
-  | STATUS_PORTAL
-  | STATUS_LIMITED
-  | STATUS_FULL
-  | STATUS_UNKNOWN
-
-export type InterfaceState =
-  | INTERFACE_CONNECTED
-  | INTERFACE_CONNECTING
-  | INTERFACE_DISCONNECTED
-  | INTERFACE_UNAVAILABLE
-
-export type InterfaceType = INTERFACE_WIFI | INTERFACE_ETHERNET
-
-export type InterfaceStatus = {|
-  ipAddress: string | null,
-  macAddress: string,
-  gatewayAddress: string | null,
-  state: InterfaceState,
-  type: InterfaceType,
-|}
-
-export type InterfaceStatusMap = $Shape<{|
-  [device: string]: InterfaceStatus,
-|}>
-
-export type NetworkingStatusResponse = {|
-  status: InternetStatus,
-  interfaces: InterfaceStatusMap,
-|}
-
-// GET /wifi/list
-
-export type WifiSecurityType =
-  | SECURITY_NONE
-  | SECURITY_WPA_PSK
-  | SECURITY_WPA_EAP
-
-export type WifiNetwork = {|
-  ssid: string,
-  signal: number,
-  active: boolean,
-  security: string,
-  securityType: WifiSecurityType,
-|}
-
-export type WifiListResponse = {|
-  list: Array<WifiNetwork>,
-|}
-
-// action types
+export * from './api-types'
 
 // fetch status
 
@@ -93,15 +42,15 @@ export type FetchStatusSuccessAction = {|
   type: FETCH_STATUS_SUCCESS,
   payload: {|
     robotName: string,
-    internetStatus: InternetStatus,
-    interfaces: InterfaceStatusMap,
+    internetStatus: ApiTypes.InternetStatus,
+    interfaces: ApiTypes.InterfaceStatusMap,
   |},
   meta: RobotApiRequestMeta,
 |}
 
 export type FetchStatusFailureAction = {|
   type: FETCH_STATUS_FAILURE,
-  payload: {| robotName: string, error: {} |},
+  payload: {| robotName: string, error: { ... } |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -115,13 +64,93 @@ export type FetchWifiListAction = {|
 
 export type FetchWifiListSuccessAction = {|
   type: FETCH_WIFI_LIST_SUCCESS,
-  payload: {| robotName: string, wifiList: Array<WifiNetwork> |},
+  payload: {| robotName: string, wifiList: Array<ApiTypes.WifiNetwork> |},
   meta: RobotApiRequestMeta,
 |}
 
 export type FetchWifiListFailureAction = {|
   type: FETCH_WIFI_LIST_FAILURE,
-  payload: {| robotName: string, error: {} |},
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// connect to new network
+
+export type PostWifiConfigureAction = {|
+  type: POST_WIFI_CONFIGURE,
+  payload: {| robotName: string, options: ApiTypes.WifiConfigureRequest |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiConfigureSuccessAction = {|
+  type: POST_WIFI_CONFIGURE_SUCCESS,
+  payload: {| robotName: string, ssid: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiConfigureFailureAction = {|
+  type: POST_WIFI_CONFIGURE_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// fetch wifi keys
+
+export type FetchWifiKeysAction = {|
+  type: FETCH_WIFI_KEYS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiKeysSuccessAction = {|
+  type: FETCH_WIFI_KEYS_SUCCESS,
+  payload: {| robotName: string, wifiKeys: Array<ApiTypes.WifiKey> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchWifiKeysFailureAction = {|
+  type: FETCH_WIFI_KEYS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// post wifi keys
+
+export type PostWifiKeysAction = {|
+  type: POST_WIFI_KEYS,
+  payload: {| robotName: string, keyFile: File |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysSuccessAction = {|
+  type: POST_WIFI_KEYS_SUCCESS,
+  payload: {| robotName: string, wifiKey: ApiTypes.WifiKey |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type PostWifiKeysFailureAction = {|
+  type: POST_WIFI_KEYS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+// fetch eap options
+
+export type FetchEapOptionsAction = {|
+  type: FETCH_EAP_OPTIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsSuccessAction = {|
+  type: FETCH_EAP_OPTIONS_SUCCESS,
+  payload: {| robotName: string, eapOptions: Array<ApiTypes.EapOption> |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchEapOptionsFailureAction = {|
+  type: FETCH_EAP_OPTIONS_FAILURE,
+  payload: {| robotName: string, error: RobotApiErrorResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -134,13 +163,28 @@ export type NetworkingAction =
   | FetchWifiListAction
   | FetchWifiListSuccessAction
   | FetchWifiListFailureAction
+  | PostWifiConfigureAction
+  | PostWifiConfigureSuccessAction
+  | PostWifiConfigureFailureAction
+  | FetchWifiKeysAction
+  | FetchWifiKeysSuccessAction
+  | FetchWifiKeysFailureAction
+  | PostWifiKeysAction
+  | PostWifiKeysSuccessAction
+  | PostWifiKeysFailureAction
+  | FetchEapOptionsAction
+  | FetchEapOptionsSuccessAction
+  | FetchEapOptionsFailureAction
 
 // state types
 
 export type PerRobotNetworkingState = $Shape<{|
-  internetStatus: InternetStatus,
-  interfaces: InterfaceStatusMap,
-  wifiList: Array<WifiNetwork>,
+  internetStatus?: ApiTypes.InternetStatus,
+  interfaces?: ApiTypes.InterfaceStatusMap,
+  wifiList?: Array<ApiTypes.WifiNetwork>,
+  wifiKeyIds?: Array<string>,
+  wifiKeysById?: $Shape<{| [id: string]: ApiTypes.WifiKey |}>,
+  eapOptions?: Array<ApiTypes.EapOption>,
 |}>
 
 export type NetworkingState = $Shape<{|
@@ -153,7 +197,7 @@ export type SimpleInterfaceStatus = {|
   ipAddress: string | null,
   subnetMask: string | null,
   macAddress: string,
-  type: InterfaceType,
+  type: ApiTypes.InterfaceType,
 |}
 
 export type InterfaceStatusByType = {|

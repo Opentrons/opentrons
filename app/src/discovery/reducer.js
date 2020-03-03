@@ -1,7 +1,7 @@
 // @flow
 // robot discovery state
 import groupBy from 'lodash/groupBy'
-import remote from '../shell/remote'
+import { remote } from '../shell/remote'
 import * as actions from './actions'
 
 import type { Action } from '../types'

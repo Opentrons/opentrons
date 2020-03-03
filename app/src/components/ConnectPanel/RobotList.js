@@ -3,10 +3,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type ListProps = {
+export type RobotListProps = {|
   children: React.Node,
-}
+|}
 
-export default function RobotList(props: ListProps) {
+export function RobotList(props: RobotListProps) {
   return <ol className={styles.robot_list}>{props.children}</ol>
 }

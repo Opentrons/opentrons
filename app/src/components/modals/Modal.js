@@ -4,7 +4,7 @@
 import * as React from 'react'
 
 import { Overlay, TitleBar } from '@opentrons/components'
-import SessionHeader from '../SessionHeader'
+import { SessionHeader } from '../SessionHeader'
 
 import styles from './styles.css'
 

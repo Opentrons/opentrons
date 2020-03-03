@@ -2,10 +2,12 @@
 import { discoveryReducer } from '../reducer'
 
 jest.mock('../../shell/remote', () => ({
-  INITIAL_ROBOTS: [
-    { name: 'foo', ip: '192.168.1.1', port: 31950 },
-    { name: 'bar', ip: '192.168.1.2', port: 31950 },
-  ],
+  remote: {
+    INITIAL_ROBOTS: [
+      { name: 'foo', ip: '192.168.1.1', port: 31950 },
+      { name: 'bar', ip: '192.168.1.2', port: 31950 },
+    ],
+  },
 }))
 
 describe('discoveryReducer', () => {

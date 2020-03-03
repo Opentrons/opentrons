@@ -2,10 +2,10 @@
 import * as React from 'react'
 import styles from './styles.css'
 
-type Props = {
+export type CardColumnProps = {|
   children: React.Node,
-}
+|}
 
-export default function CardColumn(props: Props) {
+export function CardColumn(props: CardColumnProps) {
   return <div className={styles.column_50}>{props.children}</div>
 }

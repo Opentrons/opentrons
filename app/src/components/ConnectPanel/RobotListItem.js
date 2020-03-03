@@ -4,7 +4,7 @@ import * as React from 'react'
 import { NotificationIcon, Icon, ToggleButton } from '@opentrons/components'
 
 import { CONNECTABLE } from '../../discovery'
-import RobotLink from './RobotLink'
+import { RobotLink } from './RobotLink'
 import styles from './styles.css'
 
 // circular type dependency, thanks flow

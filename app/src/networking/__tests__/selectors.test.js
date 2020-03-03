@@ -178,12 +178,65 @@ describe('robot settings selectors', () => {
         { ...Fixtures.mockWifiNetwork, ssid: 'bbb' },
       ],
     },
+    {
+      name: 'getWifiKeys returns [] if unavailable',
+      selector: Selectors.getWifiKeys,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      expected: [],
+    },
+
+    {
+      name: 'getWifiKeys returns keys from state',
+      selector: Selectors.getWifiKeys,
+      state: {
+        networking: {
+          robotName: {
+            wifiKeyIds: ['abc', 'def'],
+            wifiKeysById: {
+              def: { ...Fixtures.mockWifiKey, id: 'def' },
+              abc: { ...Fixtures.mockWifiKey, id: 'abc' },
+            },
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [
+        { ...Fixtures.mockWifiKey, id: 'abc' },
+        { ...Fixtures.mockWifiKey, id: 'def' },
+      ],
+    },
+    {
+      name: 'getEapOptions returns [] if unavailable',
+      selector: Selectors.getEapOptions,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      expected: [],
+    },
+
+    {
+      name: 'getEapOptions returns options from state',
+      selector: Selectors.getEapOptions,
+      state: {
+        networking: {
+          robotName: {
+            eapOptions: [Fixtures.mockEapOption],
+          },
+        },
+      },
+      args: ['robotName'],
+      expected: [Fixtures.mockEapOption],
+    },
   ]
 
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       const result = selector(state, ...args)
       expect(result).toEqual(expected)
     })

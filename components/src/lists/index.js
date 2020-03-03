@@ -1,9 +1,7 @@
 // @flow
 // list and list item components
-import SidePanelGroup from './SidePanelGroup'
-import TitledList from './TitledList'
-import ListItem from './ListItem'
-import CollapsibleItem from './CollapsibleItem'
-import ListAlert from './ListAlert'
-
-export { SidePanelGroup, TitledList, ListItem, CollapsibleItem, ListAlert }
+export * from './SidePanelGroup'
+export * from './TitledList'
+export * from './ListItem'
+export * from './CollapsibleItem'
+export * from './ListAlert'

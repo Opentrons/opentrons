@@ -14,9 +14,9 @@ import {
   setShellUpdateSeen,
 } from '../../shell'
 
-import Page from '../../components/Page'
-import AppSettings from '../../components/AppSettings'
-import UpdateApp from '../../components/AppSettings/UpdateApp'
+import { Page } from '../../components/Page'
+import { AppSettings as AppSettingsContents } from '../../components/AppSettings'
+import { UpdateApp } from '../../components/AppSettings/UpdateApp'
 import { ErrorModal } from '../../components/modals'
 
 import type { State, Dispatch } from '../../types'
@@ -36,26 +36,29 @@ type DP = {|
   closeModal: () => mixed,
 |}
 
-type Props = { ...OP, ...SP, ...DP }
+type Props = {| ...OP, ...SP, ...DP |}
 
-export default connect<Props, OP, SP, DP, State, Dispatch>(
+export const AppSettings = connect<Props, OP, SP, DP, State, Dispatch>(
   mapStateToProps,
   mapDispatchToProps
-)(AppSettingsPage)
+)(AppSettingsComponent)
 
-function AppSettingsPage(props: Props) {
+function AppSettingsComponent(props: Props) {
   const {
     availableVersion,
     checkUpdate,
+    downloadUpdate,
+    applyUpdate,
     closeModal,
-    update: { available, seen, error },
-    match: { path },
+    update,
   } = props
+  const { available, seen, error } = update
+  const { path } = props.match
 
   return (
-    <React.Fragment>
+    <>
       <Page titleBarProps={{ title: 'App' }}>
-        <AppSettings
+        <AppSettingsContents
           availableVersion={availableVersion}
           checkUpdate={checkUpdate}
         />
@@ -65,7 +68,15 @@ function AppSettingsPage(props: Props) {
           path={`${path}/update`}
           render={() =>
             !error ? (
-              <UpdateApp {...props} />
+              <UpdateApp
+                {...{
+                  update,
+                  availableVersion,
+                  downloadUpdate,
+                  applyUpdate,
+                  closeModal,
+                }}
+              />
             ) : (
               <ErrorModal
                 heading="Update Error"
@@ -82,7 +93,7 @@ function AppSettingsPage(props: Props) {
           }
         />
       </Switch>
-    </React.Fragment>
+    </>
   )
 }
 

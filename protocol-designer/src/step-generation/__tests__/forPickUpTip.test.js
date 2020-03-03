@@ -78,5 +78,5 @@ describe('tip tracking', () => {
   })
 
   // TODO: Ian 2019-11-20 eventually should generate warning (or error?)
-  test.skip('multi-channel, missing tip in specified row', () => {})
+  test.todo('multi-channel, missing tip in specified row')
 })

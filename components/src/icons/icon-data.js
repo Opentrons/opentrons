@@ -1,6 +1,6 @@
 // @flow
 // icon data
-const ICON_DATA_BY_NAME = {
+export const ICON_DATA_BY_NAME = {
   alert: {
     viewBox: '0 0 24 24',
     path: 'M1 21h22L12 2 1 21zm12-3h-2v-2h2v2zm0-4h-2v-4h2v4z',
@@ -354,7 +354,3 @@ const ICON_DATA_BY_NAME = {
       'M19,20H4C2.89,20 2,19.1 2,18V6C2,4.89 2.89,4 4,4H10L12,6H19A2,2 0 0,1 21,8H21L4,8V18L6.14,10H23.21L20.93,18.5C20.7,19.37 19.92,20 19,20Z',
   },
 }
-
-export type IconName = $Keys<typeof ICON_DATA_BY_NAME>
-
-export default ICON_DATA_BY_NAME

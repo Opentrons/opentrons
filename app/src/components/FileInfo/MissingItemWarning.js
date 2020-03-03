@@ -7,13 +7,13 @@ import { OutlineButton } from '@opentrons/components'
 import styles from './styles.css'
 import { SectionContentHalf } from '../layout'
 
-type Props = {
+export type MissingItemWarningProps = {|
   instrumentType: string,
   url: string,
   isBlocking?: boolean,
-}
+|}
 
-export default function MissingItemWarning(props: Props) {
+export function MissingItemWarning(props: MissingItemWarningProps) {
   const { instrumentType, url, isBlocking = false } = props
   return (
     <SectionContentHalf className={styles.align_center}>

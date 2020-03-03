@@ -3,18 +3,19 @@ import React from 'react'
 
 import styles from './instrument.css'
 
-type Props = {
+export type InfoItemProps = {|
   title: string,
   value: string,
   className?: string,
-}
+|}
 
 /**
  * Used by `InstrumentInfo` for its titled values.
  * But if you're using this, you probably want `LabeledValue` instead.
  */
-export default function InfoItem(props: Props) {
+export function InfoItem(props: InfoItemProps) {
   const { title, value, className } = props
+
   return (
     <div className={className}>
       <h2 className={styles.title}>{title}</h2>

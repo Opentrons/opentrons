@@ -15,17 +15,17 @@ export type SingleWell = {|
   fillColor?: ?string,
 |}
 
-type Props = {
+export type WellProps = {|
   ...SingleWell,
   selectable?: boolean,
   wellDef: WellDefinition,
   onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
   onMouseMove?: (e: SyntheticMouseEvent<*>) => mixed,
-}
+|}
 
-class Well extends React.Component<Props> {
-  shouldComponentUpdate(nextProps: Props) {
+export class Well extends React.Component<WellProps> {
+  shouldComponentUpdate(nextProps: WellProps) {
     return (
       this.props.highlighted !== nextProps.highlighted ||
       this.props.selected !== nextProps.selected ||
@@ -118,5 +118,3 @@ class Well extends React.Component<Props> {
     return null
   }
 }
-
-export default Well

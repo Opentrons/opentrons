@@ -135,11 +135,9 @@ lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 
-# TODO(mc, 2020-01-22): turn on warning logs in CI once this issue is resolved:
-# https://github.com/Opentrons/opentrons/issues/4830
 .PHONY: lint-js
 lint-js:
-	eslint $(and $(CI),--quiet) ".*.js" "**/*.js"
+	eslint ".*.js" "**/*.js"
 
 .PHONY: lint-json
 lint-json:

@@ -2,18 +2,18 @@
 // pickup confirmation prompt component for ConfirmPickupContents
 import * as React from 'react'
 
-import type { Pipette } from '../../robot'
-
 import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-type Props = {
+import type { Pipette } from '../../robot/types'
+
+export type ConfirmPickupPromptProps = {
   calibrator: Pipette,
   onNoClick: () => void,
   onYesClick: () => void,
 }
 
-export default function ConfirmPickedUpPrompt(props: Props) {
+export function ConfirmPickupPrompt(props: ConfirmPickupPromptProps) {
   const {
     onNoClick,
     onYesClick,

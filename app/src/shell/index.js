@@ -1,7 +1,7 @@
 // @flow
 // desktop shell module
 
-import remote from './remote'
+import { remote } from './remote'
 
 const { CURRENT_VERSION, CURRENT_RELEASE_NOTES } = remote
 

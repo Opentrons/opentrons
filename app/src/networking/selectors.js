@@ -15,9 +15,7 @@ export function getInternetStatus(
   state: State,
   robotName: string
 ): Types.InternetStatus | null {
-  const status = state.networking[robotName]?.internetStatus
-
-  return status != null ? status : null
+  return state.networking[robotName]?.internetStatus ?? null
 }
 
 export const getNetworkInterfaces: (
@@ -47,8 +45,8 @@ export const getNetworkInterfaces: (
       }
     )
 
-    const wifi = find(simpleIfaces, { type: INTERFACE_WIFI }) || null
-    const ethernet = find(simpleIfaces, { type: INTERFACE_ETHERNET }) || null
+    const wifi = find(simpleIfaces, { type: INTERFACE_WIFI }) ?? null
+    const ethernet = find(simpleIfaces, { type: INTERFACE_ETHERNET }) ?? null
 
     return { wifi, ethernet }
   }
@@ -63,3 +61,22 @@ export const getWifiList: (
   (state, robotName) => state.networking[robotName]?.wifiList,
   (wifiList = []) => orderBy(uniqBy(wifiList, 'ssid'), ...LIST_ORDER)
 )
+
+export const getWifiKeys: (
+  state: State,
+  robotName: string
+) => Array<Types.WifiKey> = createSelector(
+  (state, robotName) => state.networking[robotName]?.wifiKeyIds,
+  (state, robotName) => state.networking[robotName]?.wifiKeysById,
+  (
+    ids: Array<string> = [],
+    keysById: $Shape<{| [string]: Types.WifiKey |}> = {}
+  ) => ids.map(id => keysById[id])
+)
+
+export const getEapOptions = (
+  state: State,
+  robotName: string
+): Array<Types.EapOption> => {
+  return state.networking[robotName]?.eapOptions ?? []
+}

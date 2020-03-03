@@ -1,5 +1,5 @@
 // @flow
-import DiscoveryClient from '.'
+import { createDiscoveryClient } from '.'
 import { version } from '../package.json'
 
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
@@ -71,7 +71,7 @@ require('yargs')
   .parse()
 
 function browse(argv) {
-  DiscoveryClient(argv)
+  createDiscoveryClient(argv)
     .on('service', s => argv.logger.info('services added or updated:', s))
     .on('serviceRemoved', s => argv.logger.info('services removed:', s))
     .once('error', argv.handleError)
@@ -86,7 +86,7 @@ function find(argv) {
     argv.timeout
   )
 
-  DiscoveryClient(argv)
+  createDiscoveryClient(argv)
     .on('service', updatedServices => {
       updatedServices
         .filter(s => !argv.name || s.name === argv.name)
