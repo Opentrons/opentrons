@@ -4,7 +4,7 @@
   width: 100%;
   background-color: var(--c-plate-bg);
   color: var(--c-font-dark);
-  padding: 0.3rem 0.113rem 0 0.113rem;
+  padding: 0.3rem 0.1rem 0 0.1rem;
   border: 3px solid transparent;
 }
 
@@ -22,6 +22,20 @@
   text-transform: capitalize;
 }
 
-.highlighted_border_div {
-  border: 3px solid var(--c-highlight);
+.highlighted_border_left_none {
+  border-top: 3px;
+  border-bottom: 3px;
+  border-right: 3px;
+  border-left: 0;
+  border-style: solid;
+  border-color: var(--c-highlight);
+}
+
+.highlighted_border_right_none {
+  border-top: 3px;
+  border-bottom: 3px;
+  border-left: 3px;
+  border-right: 0;
+  border-style: solid;
+  border-color: var(--c-highlight);
 }

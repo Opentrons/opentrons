@@ -103,6 +103,10 @@ const ModuleTagComponent = (props: Props) => {
     moduleLabware && hoveredLabwares.length
       ? hoveredLabwares[0] === moduleLabware.id
       : false
+  const highlightedBorderClass =
+    isHoveredModuleStep && props.orientation === 'left'
+      ? 'highlighted_border_right_none'
+      : 'highlighted_border_left_none'
 
   if (moduleType == null || moduleState == null) {
     // this should never happen, but better to have an empty tag than to whitescreen
@@ -127,9 +131,13 @@ const ModuleTagComponent = (props: Props) => {
       y={props.y + childYOffset + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
+      className={styles.highlight}
       innerDivProps={{
         className: cx(styles.module_info_tag, {
-          [styles.highlighted_border_div]: isHoveredModuleStep,
+          [styles.highlighted_border_right_none]:
+            isHoveredModuleStep && props.orientation === 'left',
+          [styles.highlighted_border_left_none]:
+            isHoveredModuleStep && props.orientation === 'right',
         }),
       }}
     >
