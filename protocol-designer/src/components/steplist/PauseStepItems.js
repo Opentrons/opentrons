@@ -22,7 +22,7 @@ export function PauseStepItems(props: Props) {
           <li className={styles.substep_header}>
             <span>Pause for Time</span>
           </li>
-          <li className={styles.pause_content}>
+          <li className={styles.substep_content}>
             <span>
               {hours} {i18n.t('application.units.hours')}
             </span>
@@ -42,7 +42,7 @@ export function PauseStepItems(props: Props) {
         </>
       )}
       {message && (
-        <li className={styles.pause_content}>&quot;{message}&quot;</li>
+        <li className={styles.substep_content}>&quot;{message}&quot;</li>
       )}
     </>
   )

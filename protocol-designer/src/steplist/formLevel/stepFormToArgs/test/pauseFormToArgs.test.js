@@ -12,11 +12,13 @@ describe('pauseFormToArgs', () => {
       id: 'test_id',
       pauseForAmountOfTime: PAUSE_UNTIL_TEMP,
       pauseTemperature: '20',
+      pauseMessage: 'pause message',
       moduleId: 'some_id',
     }
     const expected = {
       commandCreatorFnName: 'awaitTemperature',
       temperature: 20,
+      message: 'pause message',
       module: 'some_id',
     }
     expect(pauseFormToArgs(formData)).toEqual(expected)

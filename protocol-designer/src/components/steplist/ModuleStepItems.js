@@ -20,15 +20,12 @@ type Props = {|
 
 export const ModuleStepItems = (props: Props) => (
   <>
-    {props.message && (
-      <PDListItem className="step-item-message">{props.message}</PDListItem>
-    )}
     <li className={styles.substep_header}>
       <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
       <span>{props.action}</span>
     </li>
     <PDListItem
-      className={cx(styles.step_subitem_column_header, styles.emphasized_cell)}
+      className={cx(styles.step_subitem_column_header, styles.substep_content)}
     >
       <HoverTooltip
         portal={Portal}
@@ -50,5 +47,10 @@ export const ModuleStepItems = (props: Props) => (
       </HoverTooltip>
       <span className={styles.module_substep_value}>{props.actionText}</span>
     </PDListItem>
+    {props.message && (
+      <PDListItem className={cx(styles.substep_content, 'step-item-message')}>
+        &quot;{props.message}&quot;
+      </PDListItem>
+    )}
   </>
 )
