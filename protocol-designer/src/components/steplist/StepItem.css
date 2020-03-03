@@ -52,12 +52,30 @@
   }
 }
 
-.module_substep_header {
+.substep_header {
   display: flex;
   margin: 0.5rem 0.5rem 0 0.5rem;
   font-size: var(--fs-caption);
   text-transform: uppercase;
   justify-content: space-between;
+}
+
+.pause_content {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+  padding: 0.5rem;
+  padding-bottom: 0;
+  font-size: var(--fs-body-1);
+  font-weight: var(--fw-semibold);
+
+  & span {
+    margin-right: 0.5rem;
+  }
+
+  &:last-child {
+    padding-bottom: 1.25rem;
+  }
 }
 
 .module_substep_value {

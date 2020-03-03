@@ -23,7 +23,7 @@ export const ModuleStepItems = (props: Props) => (
     {props.message && (
       <PDListItem className="step-item-message">{props.message}</PDListItem>
     )}
-    <li className={styles.module_substep_header}>
+    <li className={styles.substep_header}>
       <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
       <span>{props.action}</span>
     </li>
