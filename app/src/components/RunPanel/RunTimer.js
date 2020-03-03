@@ -1,20 +1,17 @@
 // @flow
 import * as React from 'react'
-import moment from 'moment'
 
 import styles from './styles.css'
 
 export type RunTimerProps = {|
-  startTime: ?number,
+  startTime: string | null,
   runTime: string,
 |}
 
 export function RunTimer(props: RunTimerProps) {
   const { startTime, runTime } = props
-  let startTimeStamp
-  if (typeof startTime === 'number') {
-    startTimeStamp = `${moment(startTime).format('hh:mm:ss a')}`
-  }
+  const startTimeStamp = startTime ?? ''
+
   return (
     <div>
       <div className={styles.run_time}>
