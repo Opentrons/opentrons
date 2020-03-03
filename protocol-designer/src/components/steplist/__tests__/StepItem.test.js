@@ -162,7 +162,7 @@ describe('getStepItemContents', () => {
       const wrapper = renderWrapper(Component)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
-      expect(component.prop('action')).toEqual('temperature')
+      expect(component.prop('action')).toEqual('pause until')
       expect(component.prop('actionText')).toEqual('45 °C')
     })
   })

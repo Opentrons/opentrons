@@ -26,6 +26,6 @@
     "go_to": "go to",
     "engage": "engage",
     "disengage": "disengage",
-    "await_temperature": "temperature"
+    "await_temperature": "pause until"
   }
 }
