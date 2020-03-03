@@ -12,7 +12,7 @@ log = logging.getLogger(__name__)
 
 def build_arg_parser():
     arg_parser = ArgumentParser(
-            description="Opentrons application"
+            description="Robot Server"
     )
     arg_parser.add_argument(
         "-H", "--hostname",
@@ -59,12 +59,12 @@ def run(hardware: HardwareAPILike,
             hostname, port))
         path = None
 
-    if not ff.use_fast_api():
-        from opentrons.server import run as aiohttp_run
-        aiohttp_run(hardware, hostname, port, path)
-    else:
+    if ff.use_fast_api():
         from robot_server.service import run as fastapi_run
         fastapi_run(hardware, hostname, port, path)
+    else:
+        from opentrons.server import run as aiohttp_run
+        aiohttp_run(hardware, hostname, port, path)
 
 
 def main():
