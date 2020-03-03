@@ -197,7 +197,7 @@ describe('ModuleTag', () => {
 
       expect(
         wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
-      ).toContain('highlighted_border_div')
+      ).toContain('highlighted_border_right_none')
     })
 
     it('does not add a border when the step is not a module step', () => {
@@ -205,7 +205,7 @@ describe('ModuleTag', () => {
 
       expect(
         wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
-      ).not.toContain('highlighted_border_div')
+      ).not.toContain('highlighted_border_right_none')
     })
 
     it('does not add a border when no labware on module', () => {
@@ -215,7 +215,7 @@ describe('ModuleTag', () => {
 
       expect(
         wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
-      ).not.toContain('highlighted_border_div')
+      ).not.toContain('highlighted_border_right_none')
     })
   })
 })

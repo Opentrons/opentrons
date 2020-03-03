@@ -103,10 +103,6 @@ const ModuleTagComponent = (props: Props) => {
     moduleLabware && hoveredLabwares.length
       ? hoveredLabwares[0] === moduleLabware.id
       : false
-  const highlightedBorderClass =
-    isHoveredModuleStep && props.orientation === 'left'
-      ? 'highlighted_border_right_none'
-      : 'highlighted_border_left_none'
 
   if (moduleType == null || moduleState == null) {
     // this should never happen, but better to have an empty tag than to whitescreen
