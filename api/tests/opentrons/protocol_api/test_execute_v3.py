@@ -1,6 +1,7 @@
 from opentrons.types import Point
-from opentrons.protocol_api import execute_v3, ProtocolContext, execute
+from opentrons.protocol_api import execute_v3, ProtocolContext, InstrumentContext, execute
 from opentrons.protocols.parse import parse
+from unittest import mock
 
 
 def test_load_labware_v2(loop, get_labware_fixture):
@@ -34,82 +35,27 @@ def test_load_labware_v2(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
-class MockPipette(object):
-    def __init__(self, command_log):
-        self.log = command_log
-
-    def _make_logger(self, name):
-        def log_fn(*args, **kwargs):
-            if kwargs:
-                self.log.append((name, args, kwargs))
-            else:
-                self.log.append((name, args))
-        return log_fn
-
-    def _make_operation_setter(self, name):
-        class Setter:
-            def __init__(self, name, log):
-                self._name = name
-                self._log = log
-                self._aspirate = 0
-                self._blow_out = 0
-                self._dispense = 0
-
-            @property
-            def aspirate(self):
-                return self._aspirate
-
-            @aspirate.setter
-            def aspirate(self, new_val):
-                self._log.append(('set: ' + name + '.aspirate', (new_val,)))
-                self._aspirate = new_val
-
-            @property
-            def dispense(self):
-                return self._dispense
-
-            @dispense.setter
-            def dispense(self, new_val):
-                self._log.append(('set: ' + name + '.dispense', (new_val,)))
-                self._dispense = new_val
-
-            @property
-            def blow_out(self):
-                return self._blow_out
-
-            @blow_out.setter
-            def blow_out(self, new_val):
-                self._log.append(('set: ' + name + '.blow_out', (new_val,)))
-                self._blow_out = new_val
-        return Setter(name, self.log)
-
-    def __getattr__(self, name):
-        if name == 'log':
-            return self.log
-        elif name == 'flow_rate':
-            return self._make_operation_setter(name)
-        else:
-            return self._make_logger(name)
-
-    def __setattr__(self, name, value):
-        if name == 'log':
-            super(MockPipette, self).__setattr__(name, value)
-        else:
-            self.log.append(("set: {}".format(name), value))
-
-
 def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture('3', 'simple')
-    command_log = []
-    mock_pipette = MockPipette(command_log)
+    mock_everything = mock.Mock()
+
+    # nest calls under 'pipetteId' fake method of mock_everything
+    mock_pipette = mock.create_autospec(InstrumentContext)
+    mock_pipette.flow_rate.aspirate.setter = mock.Mock()
+    mock_everything.pipetteId = mock_pipette
     insts = {"pipetteId": mock_pipette}
 
+    mock_pipette.flow_rate.aspirate = 123
+    # this should work, so that we can test the flow rates below
+    assert mock_pipette.mock_calls == [mock.call(123)]
+
+    # monkeypatch ProtocolContext methods we need to spy on using the mock
     ctx = ProtocolContext(loop=loop)
+    monkeypatch.setattr(ctx, 'pause', mock_everything.pause)
+    monkeypatch.setattr(ctx, 'delay', mock_everything.delay)
 
-    def mock_delay(seconds=0, minutes=0, msg=None):
-        command_log.append(("delay", seconds + minutes * 60))
-
-    monkeypatch.setattr(ctx, 'delay', mock_delay)
+    mock_pipette.foo = 123  # TODO this should make the test fail
+    # mock_pipette.no_such_method_woop(333)
 
     source_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '1')
@@ -127,27 +73,30 @@ def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
     execute_v3.dispatch_json(
         ctx, protocol_data, insts, loaded_labware)
 
-    assert command_log == [
-        ("pick_up_tip", (tiprack['B1'],)),
-        ("set: flow_rate.aspirate", (3,)),
-        ("set: flow_rate.dispense", (3,)),
-        ("set: flow_rate.blow_out", (3,)),
-        ("aspirate", (5, source_plate['A1'].bottom(2),)),
-        ("delay", 42),
-        ("set: flow_rate.aspirate", (2.5,)),
-        ("set: flow_rate.dispense", (2.5,)),
-        ("set: flow_rate.blow_out", (2.5,)),
-        ("dispense", (4.5, dest_plate['B1'].bottom(1),)),
-        ("touch_tip", (dest_plate['B1'],),
-            {"v_offset": 0.33000000000000007}),
-        ("set: flow_rate.aspirate", (2,)),
-        ("set: flow_rate.dispense", (2,)),
-        ("set: flow_rate.blow_out", (2,)),
-        ("blow_out", (dest_plate['B1'],)),
-        ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),
-            {"force_direct": None, "minimum_z_height": None}),
-        ("drop_tip", (ctx.fixed_trash['A1'],))
+    calls = [
+        mock.call.pipetteId.pick_up_tip(tiprack['B1']),
+        # ("set: flow_rate.aspirate", (3,)),
+        # ("set: flow_rate.dispense", (3,)),
+        # ("set: flow_rate.blow_out", (3,)),
+        mock.call.pipetteId.aspirate(5, source_plate['A1'].bottom(2)),
+        mock.call.delay(msg=None, seconds=42),
+        # ("set: flow_rate.aspirate", (2.5,)),
+        # ("set: flow_rate.dispense", (2.5,)),
+        # ("set: flow_rate.blow_out", (2.5,)),
+        mock.call.pipetteId.dispense(4.5, dest_plate['B1'].bottom(1)),
+        mock.call.pipetteId.touch_tip(
+            dest_plate['B1'], v_offset=0.33000000000000007),
+        # ("set: flow_rate.aspirate", (2,)),
+        # ("set: flow_rate.dispense", (2,)),
+        # ("set: flow_rate.blow_out", (2,)),
+        mock.call.pipetteId.blow_out(dest_plate['B1']),
+        mock.call.pipetteId.move_to(ctx.deck.position_for('5').move(Point(x=1, y=2, z=3)),
+                                    force_direct=None, minimum_z_height=None),
+        mock.call.pipetteId.drop_tip(ctx.fixed_trash['A1'],)
     ]
+
+    # mock_everything.assert_has_calls(calls)
+    mock_everything.mock_calls == calls
 
 
 def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):

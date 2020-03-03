@@ -151,7 +151,7 @@ def _move_to_slot(
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
-    if slot not in [str(s+1) for s in range(12)]:
+    if slot not in [str(s + 1) for s in range(12)]:
         raise ValueError('Invalid "slot" for "moveToSlot": {}'
                          .format(slot))
     slot_obj = context.deck.position_for(slot)
