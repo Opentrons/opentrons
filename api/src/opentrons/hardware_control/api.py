@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import logging
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Set
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -15,6 +15,7 @@ from .simulator import Simulator
 from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         SHAKE_OFF_TIPS_PICKUP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
+from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
 from . import modules
@@ -54,6 +55,7 @@ class API(HardwareAPILike):
         self._config = config or robot_configs.load()
         self._backend = backend
         self._loop = loop
+        self._execution_manager = ExecutionManager(loop=loop)
         self._callbacks: set = set()
         # {'X': 0.0, 'Y': 0.0, 'Z': 0.0, 'A': 0.0, 'B': 0.0, 'C': 0.0}
         self._current_position: Dict[Axis, float] = {}
@@ -70,6 +72,7 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._protected_tasks: Set[asyncio.Task] = set()
 
     @classmethod
     async def build_hardware_controller(
@@ -94,10 +97,10 @@ class API(HardwareAPILike):
 
         api_instance = cls(backend, loop=checked_loop, config=config)
         await api_instance.cache_instruments()
-        checked_loop.create_task(backend.watch_modules(
+        mod_watch_task = checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
-                register_modules=api_instance.register_modules,
-            ))
+                register_modules=api_instance.register_modules))
+        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     @classmethod
@@ -125,8 +128,9 @@ class API(HardwareAPILike):
                             config, checked_loop,
                             strict_attached_instruments)
         api_instance = cls(backend, loop=checked_loop, config=config)
-        checked_loop.create_task(backend.watch_modules(
-            register_modules=api_instance.register_modules))
+        mod_watch_task = checked_loop.create_task(backend.watch_modules(
+                register_modules=api_instance.register_modules))
+        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     def __repr__(self):
@@ -151,6 +155,9 @@ class API(HardwareAPILike):
     @property
     def is_simulator_sync(self):
         return isinstance(self._backend, Simulator)
+
+    def add_protected_task(self, task: asyncio.Task):
+        self._protected_tasks.add(task)
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -369,12 +376,6 @@ class API(HardwareAPILike):
                                                    checked_loop,
                                                    explicit_modeset)
 
-    def _call_on_attached_modules(self, method: str):
-        for module in self.attached_modules:
-            maybe_module_method = getattr(module, method, None)
-            if callable(maybe_module_method):
-                maybe_module_method()
-
     # Global actions API
     def pause(self):
         """
@@ -389,7 +390,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._backend.pause()
-        self._call_on_attached_modules("pause")
+        self._execution_manager.pause()
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -402,7 +403,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._call_on_attached_modules("resume")
+        self._execution_manager.resume()
 
     def halt(self):
         """ Immediately stop motion.
@@ -418,7 +419,7 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        self._call_on_attached_modules("cancel")
+        self._execution_manager.cancel(protected_tasks=self._protected_tasks)
 
     async def stop(self):
         """
@@ -1367,7 +1368,8 @@ class API(HardwareAPILike):
                     port=port,
                     model=name,
                     interrupt_callback=self.pause_with_message,
-                    loop=self.loop)
+                    loop=self.loop,
+                    execution_manager=self._execution_manager)
             self._attached_modules.append(new_instance)
             self._log.info(f"Module {name} discovered and attached"
                            f" at port {port}, new_instance: {new_instance}")

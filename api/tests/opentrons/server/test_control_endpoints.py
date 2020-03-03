@@ -5,7 +5,7 @@ import pytest
 
 from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
-from opentrons.hardware_control import API
+from opentrons.hardware_control import API, ExecutionManager
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.config import pipette_config
@@ -81,10 +81,13 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
 async def test_get_modules(
         async_server, loop, async_client, monkeypatch):
     hw = async_server['com.opentrons.hardware']
-    magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
-                                             model='magdeck',
-                                             interrupt_callback=lambda x: None,
-                                             loop=loop)
+    magdeck = await hw._backend.build_module(
+            port='/dev/ot_module_magdeck1',
+            model='magdeck',
+            interrupt_callback=lambda x: None,
+            execution_manager=ExecutionManager(
+                loop=loop),
+            loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
     keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
                    'displayName', 'status', 'data', 'hasAvailableUpdate'])
@@ -95,9 +98,13 @@ async def test_get_modules(
     assert len(body['modules']) == 1
     assert sorted(body['modules'][0].keys()) == keys
     assert 'engaged' in body['modules'][0]['data']
-    tempdeck = await hw._backend.build_module('/dev/ot_module_tempdeck1',
-                                              'tempdeck', lambda x: None,
-                                              loop=loop)
+    tempdeck = await hw._backend.build_module(
+            port='/dev/ot_module_tempdeck1',
+            model='tempdeck',
+            interrupt_callback=lambda x: None,
+            execution_manager=ExecutionManager(
+                    loop=loop),
+            loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [tempdeck])
     for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
         tempdeck._device_info['model'] = model
@@ -130,10 +137,13 @@ async def test_execute_module_command(
     def dummy_get_attached_modules():
         return []
 
-    magdeck = await hw._backend.build_module(port='/dev/ot_module_magdeck1',
-                                             model='magdeck',
-                                             interrupt_callback=lambda x: None,
-                                             loop=loop)
+    magdeck = await hw._backend.build_module(
+            port='/dev/ot_module_magdeck1',
+            model='magdeck',
+            interrupt_callback=lambda x: None,
+            execution_manager=ExecutionManager(
+                loop=loop),
+            loop=loop)
     monkeypatch.setattr(API, 'attached_modules', [magdeck])
 
     resp = await async_client.post('/modules/dummySerialMD',

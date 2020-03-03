@@ -1,8 +1,9 @@
 import asyncio
 from threading import Thread, Event
-from typing import Union, Optional
+from typing import Union
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
+from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
 TEMP_POLL_INTERVAL_SECS = 1
@@ -86,6 +87,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -95,7 +97,8 @@ class TempDeck(mod_abc.AbstractModule):
         # passed on
         mod = cls(port=port,
                   simulating=simulating,
-                  loop=loop)
+                  loop=loop,
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -121,15 +124,18 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop,
+                         execution_manager=execution_manager)
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._current_task: Optional[asyncio.Task] = None
         self._poller = None
 
     async def set_temperature(self, celsius):
@@ -140,13 +146,14 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        self._current_task = self._loop.create_task(
+        await self.wait_for_is_running()
+        return await self._loop.create_task(
             self._driver.set_temperature(celsius)
         )
-        return await self._current_task
 
-    def deactivate(self):
+    async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
+        await self.wait_for_is_running()
         self._driver.deactivate()
 
     @property
@@ -193,11 +200,6 @@ class TempDeck(mod_abc.AbstractModule):
 
     def set_loop(self, loop):
         self._loop = loop
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
 
     async def _connect(self):
         """

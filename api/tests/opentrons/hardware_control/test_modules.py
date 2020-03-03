@@ -5,6 +5,7 @@ try:
     import aionotify
 except OSError:
     aionotify = None  # type: ignore
+from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import BundledFirmware
 
@@ -72,11 +73,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test temperature module update with avrdude bootloader
 
-    tempdeck = await modules.build('/dev/ot_module_sim_tempdeck0',
-                                   'tempdeck',
-                                   True,
-                                   lambda x: None,
-                                   loop=loop)
+    tempdeck = await modules.build(
+            port='/dev/ot_module_sim_tempdeck0',
+            which='tempdeck',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     upload_via_avrdude_mock = mock.Mock(
         return_value=(async_return((True, 'avrdude bootloader worked'))))
@@ -101,11 +104,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test magnetic module update with avrdude bootloader
 
-    magdeck = await modules.build('/dev/ot_module_sim_magdeck0',
-                                  'magdeck',
-                                  True,
-                                  lambda x: None,
-                                  loop=loop)
+    magdeck = await modules.build(
+            port='/dev/ot_module_sim_magdeck0',
+            which='magdeck',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     await modules.update_firmware(magdeck, 'fake_fw_file_path', loop)
     upload_via_avrdude_mock.assert_called_once_with(
@@ -116,11 +121,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test thermocycler module update with bossa bootloader
 
-    thermocycler = await modules.build('/dev/ot_module_sim_thermocycler0',
-                                       'thermocycler',
-                                       True,
-                                       lambda x: None,
-                                       loop=loop)
+    thermocycler = await modules.build(
+            port='/dev/ot_module_sim_thermocycler0',
+            which='thermocycler',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     upload_via_bossa_mock = mock.Mock(
         return_value=(async_return((True, 'bossa bootloader worked'))))

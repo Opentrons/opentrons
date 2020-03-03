@@ -1,11 +1,12 @@
 import asyncio
 import contextlib
 import logging
-from typing import (
-    Dict, Iterator, List, Optional, Set, Tuple, Union)
+from typing import (Dict, Iterator, List,
+                    Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API, HardwareAPILike
+from opentrons.hardware_control import (SynchronousAdapter, modules,
+                                        API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -18,7 +19,8 @@ from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
-from .util import AxisMaxSpeeds, HardwareManager, requires_version
+from .util import (AxisMaxSpeeds, HardwareManager,
+                   requires_version, HardwareToManage)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -49,7 +51,7 @@ class ProtocolContext(CommandPublisher):
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: HardwareAPILike = None,
+                 hardware: HardwareToManage = None,
                  broker=None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,
@@ -429,7 +431,7 @@ class ProtocolContext(CommandPublisher):
             'thermocycler': ThermocyclerContext}[resolved_name]
         for mod in self._hw_manager.hardware.attached_modules:
             if mod.name() == resolved_name:
-                hc_mod_instance = adapters.SynchronousAdapter(mod)
+                hc_mod_instance = SynchronousAdapter(mod)
                 break
 
         if self.is_simulating and hc_mod_instance is None:
@@ -438,8 +440,12 @@ class ProtocolContext(CommandPublisher):
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler
                 }[resolved_name]
-            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._hw_manager.hardware.loop))
+            hc_mod_instance = SynchronousAdapter(mod_type(
+                    port='',
+                    simulating=True,
+                    loop=self._hw_manager.hardware.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self._hw_manager.hardware.loop)))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,
