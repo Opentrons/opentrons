@@ -23,19 +23,19 @@
 }
 
 .highlighted_border_left_none {
-  border-top: 3px;
-  border-bottom: 3px;
   border-right: 3px;
-  border-left: 0;
-  border-style: solid;
-  border-color: var(--c-highlight);
+  border-left: 3px transparent;
 }
 
 .highlighted_border_right_none {
+  border-left: 3px;
+  border-right: 3px transparent;
+}
+
+.highlighted_border_left_none,
+.highlighted_border_right_none {
   border-top: 3px;
   border-bottom: 3px;
-  border-left: 3px;
-  border-right: 0;
   border-style: solid;
   border-color: var(--c-highlight);
 }
