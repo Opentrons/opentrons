@@ -17,5 +17,6 @@
   "save": "save",
   "swap": "swap",
   "yes": "yes",
-  "upload_custom_labware": "Upload custom labware"
+  "upload_custom_labware": "Upload custom labware",
+  "got_it": "Got It!"
 }
