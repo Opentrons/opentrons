@@ -17,6 +17,9 @@ import type { ViewableRobot } from '../../../../discovery/types'
 
 // TODO: (isk: 2/27/20): Remove mockState when hooks selectors are refactored
 import { mockState, mockRobot, wifiList } from '../__fixtures__'
+import { ConnectModal } from '../ConnectModal'
+import { DisconnectModal } from '../DisconnectModal'
+import { JoinOtherModal } from '../JoinOtherModal'
 
 jest.mock('../../../../networking/selectors')
 
@@ -56,131 +59,172 @@ describe('<SelectNetwork />', () => {
     jest.clearAllMocks()
   })
 
-  test('renders component correctly', () => {
+  it('dispatches fetchWifiList, fetchEapOptions, fetchWifiKeys on mount', () => {})
+
+  it('renders component correctly', () => {
     const wrapper = render()
     expect(wrapper.prop('robot')).toEqual(mockRobot)
   })
 
-  test('renders <SelectSsid /> correctly', () => {
+  it('renders <SelectSsid /> correctly', () => {
     const wrapper = render()
     const selectSsid = wrapper.find(SelectSsid)
     expect(selectSsid.prop('list')).toEqual(wifiList)
     expect(selectSsid.prop('disabled')).toEqual(false)
   })
 
+  it('renders a DisconnectModal on SelectSsid::onDisconnect', () => {
+    const wrapper = render()
+    const selectSsid = wrapper.find(SelectSsid)
+
+    act(() => {
+      selectSsid.invoke('onDisconnect')()
+    })
+    wrapper.update()
+
+    const disconnectModal = wrapper.find(DisconnectModal)
+    expect(disconnectModal).toHaveLength(1)
+  })
+
+  it('renders a JoinOtherModal on SelectSsid::onJoinOther', () => {
+    const wrapper = render()
+    const selectSsid = wrapper.find(SelectSsid)
+
+    act(() => {
+      selectSsid.invoke('onJoinOther')()
+    })
+    wrapper.update()
+
+    const joinOtherModal = wrapper.find(JoinOtherModal)
+    expect(joinOtherModal).toHaveLength(1)
+  })
+
+  it('renders a ConnectModal on SelectSsid::onSelect', () => {
+    const wrapper = render()
+    const selectSsid = wrapper.find(SelectSsid)
+
+    act(() => {
+      selectSsid.invoke('onConnect')('mock-ssid')
+    })
+    wrapper.update()
+
+    const connectModal = wrapper.find(ConnectModal)
+    expect(connectModal).toHaveLength(1)
+  })
+
   // revisit after networking refactors
   test.todo('on mount dispatches configure')
 
-  describe('<SelectNetworkModal />', () => {
-    const newSsid = wifiList[2].ssid
-    let wrapper
-    let selectSsid
+  // describe('<SelectNetworkModal />', () => {
+  //   const newSsid = wifiList[2].ssid
+  //   let wrapper
+  //   let selectSsid
 
-    beforeEach(() => {
-      wrapper = render()
-      selectSsid = wrapper.find(SelectSsid)
-    })
+  //   beforeEach(() => {
+  //     wrapper = render()
+  //     selectSsid = wrapper.find(SelectSsid)
+  //   })
 
-    describe('onValueChange function', () => {
-      test('updates state correctly', () => {
-        act(() => {
-          selectSsid.props().onValueChange(newSsid)
-        })
-        wrapper.update()
-        const modal = wrapper.find(SelectNetworkModal)
+  //   describe('onValueChange function', () => {
+  //     test('updates state correctly', () => {
+  //       act(() => {
+  //         selectSsid.props().onValueChange(newSsid)
+  //       })
+  //       wrapper.update()
+  //       const modal = wrapper.find(SelectNetworkModal)
 
-        expect(modal.prop('ssid')).toEqual(newSsid)
-        expect(modal.prop('previousSsid')).toEqual(wifiList[0].ssid)
-        expect(modal.prop('networkingType')).toEqual('connect')
-        expect(modal.prop('securityType')).toEqual(wifiList[2].securityType)
-        expect(modal.prop('modalOpen')).toEqual(true)
-      })
+  //       expect(modal.prop('ssid')).toEqual(newSsid)
+  //       expect(modal.prop('previousSsid')).toEqual(wifiList[0].ssid)
+  //       expect(modal.prop('networkingType')).toEqual('connect')
+  //       expect(modal.prop('securityType')).toEqual(wifiList[2].securityType)
+  //       expect(modal.prop('modalOpen')).toEqual(true)
+  //     })
 
-      // revisit after additional networking refactors
-      test.todo('when security type is none dispatches configure correctly')
+  //     // revisit after additional networking refactors
+  //     test.todo('when security type is none dispatches configure correctly')
 
-      test.todo(
-        'when has WPA or EAP security type dispatches fetchWifiEapOptions correctly'
-      )
-      test.todo(
-        'when has WPA or EAP security type dispatches fetchWifiKeys correctly'
-      )
-    })
+  //     test.todo(
+  //       'when has WPA or EAP security type dispatches fetchWifiEapOptions correctly'
+  //     )
+  //     test.todo(
+  //       'when has WPA or EAP security type dispatches fetchWifiKeys correctly'
+  //     )
+  //   })
 
-    test('onCancel function updates state correctly', () => {
-      act(() => {
-        selectSsid.props().onValueChange(newSsid)
-      })
+  //   test('onCancel function updates state correctly', () => {
+  //     act(() => {
+  //       selectSsid.props().onValueChange(newSsid)
+  //     })
 
-      wrapper.update()
-      let modal = wrapper.find(SelectNetworkModal)
+  //     wrapper.update()
+  //     let modal = wrapper.find(SelectNetworkModal)
 
-      act(() => {
-        modal.props().onCancel()
-      })
-      wrapper.update()
-      modal = wrapper.find(SelectNetworkModal)
+  //     act(() => {
+  //       modal.props().onCancel()
+  //     })
+  //     wrapper.update()
+  //     modal = wrapper.find(SelectNetworkModal)
 
-      expect(modal.prop('ssid')).toEqual(wifiList[0].ssid)
-      expect(modal.prop('previousSsid')).toEqual(null)
-      expect(modal.prop('networkingType')).toEqual('connect')
-      expect(modal.prop('securityType')).toEqual(wifiList[0].securityType)
-      expect(modal.prop('modalOpen')).toEqual(false)
-    })
-  })
+  //     expect(modal.prop('ssid')).toEqual(wifiList[0].ssid)
+  //     expect(modal.prop('previousSsid')).toEqual(null)
+  //     expect(modal.prop('networkingType')).toEqual('connect')
+  //     expect(modal.prop('securityType')).toEqual(wifiList[0].securityType)
+  //     expect(modal.prop('modalOpen')).toEqual(false)
+  //   })
+  // })
 
-  describe('onDisconnectWifi function', () => {
-    test('dispatches postDisconnectNetwork and closes modal when previousSsid is present', () => {
-      const wrapper = render()
-      const newSsid = 'Opentrons'
-      const selectSsid = wrapper.find(SelectSsid)
-      act(() => {
-        selectSsid.props().onValueChange(newSsid)
-      })
-      wrapper.update()
-      let modal = wrapper.find(SelectNetworkModal)
+  // describe('onDisconnectWifi function', () => {
+  //   test('dispatches postDisconnectNetwork and closes modal when previousSsid is present', () => {
+  //     const wrapper = render()
+  //     const newSsid = 'Opentrons'
+  //     const selectSsid = wrapper.find(SelectSsid)
+  //     act(() => {
+  //       selectSsid.props().onValueChange(newSsid)
+  //     })
+  //     wrapper.update()
+  //     let modal = wrapper.find(SelectNetworkModal)
 
-      // TODO: (isk: 2/27/20): Potentially move into utils mock
-      const expected = {
-        ...Networking.postWifiDisconnect(
-          mockRobot.name,
-          modal.prop('previousSsid')
-        ),
-        meta: { requestId: 'robotApi_request_1' },
-      }
+  //     // TODO: (isk: 2/27/20): Potentially move into utils mock
+  //     const expected = {
+  //       ...Networking.postWifiDisconnect(
+  //         mockRobot.name,
+  //         modal.prop('previousSsid')
+  //       ),
+  //       meta: { requestId: 'robotApi_request_1' },
+  //     }
 
-      jest.clearAllMocks()
+  //     jest.clearAllMocks()
 
-      expect(modal.prop('modalOpen')).toEqual(true)
+  //     expect(modal.prop('modalOpen')).toEqual(true)
 
-      act(() => {
-        modal.props().onDisconnectWifi()
-      })
+  //     act(() => {
+  //       modal.props().onDisconnectWifi()
+  //     })
 
-      wrapper.update()
-      modal = wrapper.find(SelectNetworkModal)
+  //     wrapper.update()
+  //     modal = wrapper.find(SelectNetworkModal)
 
-      expect(dispatch).toHaveBeenCalledWith(expected)
-      expect(modal.prop('modalOpen')).toEqual(false)
-    })
+  //     expect(dispatch).toHaveBeenCalledWith(expected)
+  //     expect(modal.prop('modalOpen')).toEqual(false)
+  //   })
 
-    test('does not dispatch postDisconnectNetwork and modal remains open when previousSsid is not present', () => {
-      const wrapper = render()
-      let modal = wrapper.find(SelectNetworkModal)
+  //   test('does not dispatch postDisconnectNetwork and modal remains open when previousSsid is not present', () => {
+  //     const wrapper = render()
+  //     let modal = wrapper.find(SelectNetworkModal)
 
-      jest.clearAllMocks()
+  //     jest.clearAllMocks()
 
-      expect(modal.prop('modalOpen')).toEqual(false)
+  //     expect(modal.prop('modalOpen')).toEqual(false)
 
-      act(() => {
-        modal.props().onDisconnectWifi()
-      })
+  //     act(() => {
+  //       modal.props().onDisconnectWifi()
+  //     })
 
-      wrapper.update()
-      modal = wrapper.find(SelectNetworkModal)
+  //     wrapper.update()
+  //     modal = wrapper.find(SelectNetworkModal)
 
-      expect(dispatch).not.toHaveBeenCalled()
-      expect(modal.prop('modalOpen')).toEqual(false)
-    })
-  })
+  //     expect(dispatch).not.toHaveBeenCalled()
+  //     expect(modal.prop('modalOpen')).toEqual(false)
+  //   })
+  // })
 })

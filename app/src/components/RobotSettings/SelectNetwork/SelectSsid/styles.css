@@ -3,37 +3,3 @@
 .wifi_dropdown {
   max-width: 16.875rem;
 }
-
-.wifi_option {
-  @apply --font-body-1-dark;
-
-  width: 100%;
-  display: flex;
-}
-
-.wifi_name,
-.wifi_additional_actions {
-  flex-basis: 100%;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.wifi_option_icon,
-.wifi_option_icon_right {
-  flex: none;
-  height: 1rem;
-  width: 1rem;
-}
-
-.wifi_option_icon {
-  padding-right: 0.25rem;
-}
-
-.wifi_option_icon_right {
-  padding-left: 0.25rem;
-}
-
-.wifi_additional_actions {
-  padding-left: 1rem;
-}

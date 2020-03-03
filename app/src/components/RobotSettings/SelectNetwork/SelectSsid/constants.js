@@ -10,12 +10,12 @@ export const ACTIONS = {
   [DISCONNECT_WIFI_VALUE]: DISCONNECT_WIFI_LABEL,
 }
 
-export const SELECT_DISCONNECT_ACTION = {
-  options: [{ value: DISCONNECT_WIFI_VALUE }],
+export const SELECT_DISCONNECT_GROUP = {
+  options: [{ value: DISCONNECT_WIFI_VALUE, label: DISCONNECT_WIFI_LABEL }],
 }
 
-export const SELECT_JOIN_ACTION = {
-  options: [{ value: JOIN_OTHER_VALUE }],
+export const SELECT_JOIN_OTHER_GROUP = {
+  options: [{ value: JOIN_OTHER_VALUE, label: JOIN_OTHER_LABEL }],
 }
 
 export const FIELD_NAME = 'ssid'
