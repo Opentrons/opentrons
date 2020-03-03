@@ -5,7 +5,7 @@ from typing import (
     Dict, Iterator, List, Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API, Simulator
+from opentrons.hardware_control import adapters, modules, API, HardwareAPILike
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -49,7 +49,7 @@ class ProtocolContext(CommandPublisher):
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: API = None,
+                 hardware: HardwareAPILike = None,
                  broker=None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,
@@ -160,7 +160,6 @@ class ProtocolContext(CommandPublisher):
         """ Finalize and clean up the protocol context. """
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
-        self._hw_manager.cleanup()
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
@@ -424,7 +423,6 @@ class ProtocolContext(CommandPublisher):
                                self._deck_layout.position_for(
                                     resolved_location))
         hc_mod_instance = None
-        hw = self._hw_manager.hardware._api._backend
         mod_class = {
             'magdeck': MagneticModuleContext,
             'tempdeck': TemperatureModuleContext,
@@ -434,14 +432,14 @@ class ProtocolContext(CommandPublisher):
                 hc_mod_instance = adapters.SynchronousAdapter(mod)
                 break
 
-        if isinstance(hw, Simulator) and hc_mod_instance is None:
+        if self.is_simulating and hc_mod_instance is None:
             mod_type = {
                 'magdeck': modules.magdeck.MagDeck,
                 'tempdeck': modules.tempdeck.TempDeck,
                 'thermocycler': modules.thermocycler.Thermocycler
                 }[resolved_name]
             hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._loop))
+                port='', simulating=True, loop=self._hw_manager.hardware.loop))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

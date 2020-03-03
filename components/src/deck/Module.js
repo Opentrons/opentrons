@@ -12,17 +12,17 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import { Icon } from '../icons'
-import RobotCoordsForeignDiv from './RobotCoordsForeignDiv'
+import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
-export type Props = {
+export type ModuleProps = {|
   /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
   name: ModuleType,
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info',
-}
+|}
 
-export default function Module(props: Props) {
+export function Module(props: ModuleProps) {
   // TODO: BC 2019-7-23 get these from shared data, once absolute
   // dimensions are added to data
   const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
@@ -71,7 +71,7 @@ export default function Module(props: Props) {
   )
 }
 
-function ModuleItemContents(props: Props) {
+function ModuleItemContents(props: ModuleProps) {
   // TODO(mc, 2018-07-23): displayName?
   const { mode, name } = props
   const displayName = getModuleDisplayName(name)
@@ -109,7 +109,7 @@ function ModuleItemContents(props: Props) {
   }
 
   return (
-    <React.Fragment>
+    <>
       <Icon
         className={iconClassName}
         x="8"
@@ -118,6 +118,6 @@ function ModuleItemContents(props: Props) {
         name={iconNameByMode[mode] || 'usb'}
       />
       <div className={styles.module_text_wrapper}>{message}</div>
-    </React.Fragment>
+    </>
   )
 }

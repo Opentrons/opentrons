@@ -4,10 +4,10 @@ import cx from 'classnames'
 
 import { OutlineButton, type ButtonProps } from '../buttons'
 import { Icon, type IconName } from '../icons'
-import Modal from './Modal'
+import { Modal } from './Modal'
 import styles from './modals.css'
 
-type Props = {|
+export type AlertModalProps = {|
   /** optional handler for overlay click */
   onCloseClick?: () => mixed,
   /** optional modal heading */
@@ -31,7 +31,7 @@ type Props = {|
 /**
  * Generic alert modal with a heading and a set of buttons at the bottom
  */
-export default function AlertModal(props: Props) {
+export function AlertModal(props: AlertModalProps) {
   const {
     heading,
     buttons,
@@ -74,9 +74,9 @@ export default function AlertModal(props: Props) {
         <div className={styles.alert_modal_buttons}>
           {buttons.filter(Boolean).map((button, index) => (
             <OutlineButton
-              key={index}
               {...button}
               className={cx(styles.alert_button, button.className)}
+              key={index}
             />
           ))}
         </div>

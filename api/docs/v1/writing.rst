@@ -66,9 +66,9 @@ To install the Opentrons package, you must install it from Python’s package ma
 Non-Jupyter Installation
 ^^^^^^^^^^^^^^^^^^^^^^^^
 
-First, install Python 3.6 (`Windows x64 <https://www.python.org/ftp/python/3.6.4/python-3.6.4-amd64.exe>`_, `Windows x86 <https://www.python.org/ftp/python/3.6.4/python-3.6.4.exe>`_, `OS X <https://www.python.org/ftp/python/3.6.4/python-3.6.4-macosx10.6.pkg>`_) on your local computer.
+First, install Python 3.7 (`Windows x64 <https://www.python.org/ftp/python/3.7.6/python-3.7.6-amd64.exe>`_, `Windows x86 <https://www.python.org/ftp/python/3.7.6/python-3.7.6.exe>`_, `OS X <https://www.python.org/ftp/python/3.7.6/python-3.7.6-macosx10.6.pkg>`_) on your local computer.
 
-Once the installer is done, make sure that Python is properly installed by opening a terminal and doing ``python --version``. If this is not 3.6.4, you have another version of Python installed; this happens frequently on OS X and sometimes on windows. We recommend using a tool like `pyenv <https://github.com/pyenv/pyenv>`_ to manage multiple Python versions. This is particularly useful on OS X, whch has a built in install of Python 2.7 that should not be removed.
+Once the installer is done, make sure that Python is properly installed by opening a terminal and doing ``python --version``. If this is not 3.7.6, you have another version of Python installed; this happens frequently on OS X and sometimes on windows. We recommend using a tool like `pyenv <https://github.com/pyenv/pyenv>`_ to manage multiple Python versions. This is particularly useful on OS X, whch has a built in install of Python 2.7 that should not be removed.
 
 Once python is installed, install the `opentrons package <https://pypi.org/project/opentrons/>`_ using ``pip``:
 

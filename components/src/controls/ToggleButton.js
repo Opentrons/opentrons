@@ -2,15 +2,17 @@
 // reusable toggle button with on off styling for connect to robot and opt in/out
 import * as React from 'react'
 import cx from 'classnames'
-import { IconButton, type ButtonProps } from '@opentrons/components'
+import { IconButton } from '../buttons'
 import styles from './styles.css'
 
-type ToggleProps = {|
+import type { ButtonProps } from '../buttons'
+
+export type ToggleButtonProps = {|
   ...$Exact<ButtonProps>,
   toggledOn: boolean,
 |}
 
-export default function ToggleButton(props: ToggleProps) {
+export function ToggleButton(props: ToggleButtonProps) {
   // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error
   // ButtonProps::name conflicts with IconProps::name, and IconButton
   // has `name` prop to pass to Icon. IconButton will need to be redone

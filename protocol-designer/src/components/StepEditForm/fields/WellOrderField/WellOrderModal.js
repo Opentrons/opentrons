@@ -172,22 +172,25 @@ class WellOrderModalComponent extends React.Component<Props, State> {
               />
             </FormGroup>
           </div>
-          <div className={styles.button_row}>
+          <div className={modalStyles.button_row_divided}>
             <OutlineButton
-              className={styles.reset_button}
+              className={modalStyles.button_medium}
               onClick={this.handleReset}
             >
               {i18n.t('button.reset')}
             </OutlineButton>
             <div>
               <PrimaryButton
-                className={styles.cancel_button}
+                className={cx(
+                  modalStyles.button_medium,
+                  modalStyles.button_right_of_break
+                )}
                 onClick={this.handleCancel}
               >
                 {i18n.t('button.cancel')}
               </PrimaryButton>
               <PrimaryButton
-                className={styles.done_button}
+                className={modalStyles.button_medium}
                 onClick={this.handleDone}
               >
                 {i18n.t('button.done')}

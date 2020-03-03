@@ -88,8 +88,9 @@ export function updatePatchPathField(
   patch: FormPatch,
   rawForm: FormData,
   pipetteEntities: PipetteEntities
-) {
-  const appliedPatch = { ...rawForm, ...patch }
+): FormPatch {
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch }
   const { path, changeTip } = appliedPatch
 
   if (!path) {
@@ -100,7 +101,7 @@ export function updatePatchPathField(
   let pipetteCapacityExceeded = false
   if (
     appliedPatch.volume &&
-    appliedPatch.pipette &&
+    typeof appliedPatch.pipette === 'string' &&
     appliedPatch.pipette in pipetteEntities
   ) {
     pipetteCapacityExceeded = !volumeInCapacityForMulti(
@@ -135,16 +136,19 @@ const updatePatchOnLabwareChange = (
 
   if (!sourceLabwareChanged && !destLabwareChanged) return patch
 
-  const appliedPatch = { ...rawForm, ...patch }
-  const pipetteId = appliedPatch.pipette
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
+  // $FlowFixMe(mc, 2020-02-19): appliedPatch.pipette is type ?mixed. Address in #3161
+  const pipetteId: string = appliedPatch.pipette
 
-  const sourceLabwarePatch = sourceLabwareChanged
+  const sourceLabwarePatch: FormPatch = sourceLabwareChanged
     ? {
         ...getDefaultFields(
           'aspirate_mmFromBottom',
           'aspirate_touchTip_mmFromBottom'
         ),
         aspirate_wells: getDefaultWells({
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
           labwareId: appliedPatch.aspirate_labware,
           pipetteId,
           labwareEntities,
@@ -153,13 +157,14 @@ const updatePatchOnLabwareChange = (
       }
     : {}
 
-  const destLabwarePatch = destLabwareChanged
+  const destLabwarePatch: FormPatch = destLabwareChanged
     ? {
         ...getDefaultFields(
           'dispense_mmFromBottom',
           'dispense_touchTip_mmFromBottom'
         ),
         dispense_wells: getDefaultWells({
+          // $FlowFixMe(mc, 2020-02-19): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
           labwareId: appliedPatch.dispense_labware,
           pipetteId,
           labwareEntities,
@@ -209,7 +214,8 @@ const updatePatchDisposalVolumeFields = (
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ) => {
-  const appliedPatch = { ...rawForm, ...patch }
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
 
   const pathChangedFromMultiDispense =
     patch.path &&
@@ -228,7 +234,10 @@ const updatePatchDisposalVolumeFields = (
     (patch.path === 'multiDispense' && rawForm.path !== 'multiDispense') ||
     (patch.pipette && patch.pipette !== rawForm.pipette) ||
     patch.disposalVolume_checkbox
-  if (shouldReinitializeDisposalVolume) {
+  if (
+    shouldReinitializeDisposalVolume &&
+    typeof appliedPatch.pipette === 'string'
+  ) {
     const pipetteEntity = pipetteEntities[appliedPatch.pipette]
     const pipetteSpec = getPipetteNameSpecs(pipetteEntity.name)
     const recommendedMinimumDisposalVol =
@@ -251,7 +260,8 @@ const clampDisposalVolume = (
   rawForm: FormData,
   pipetteEntities: PipetteEntities
 ) => {
-  const appliedPatch = { ...rawForm, ...patch }
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
   const isDecimalString = appliedPatch.disposalVolume_volume === '.'
   if (appliedPatch.path !== 'multiDispense' || isDecimalString) return patch
 
@@ -307,7 +317,7 @@ const updatePatchOnPipetteChannelChange = (
   pipetteEntities: PipetteEntities
 ) => {
   if (patch.pipette === undefined) return patch
-  let update = {}
+  let update: FormPatch = {}
 
   const prevChannels = getChannels(rawForm.pipette, pipetteEntities)
   const nextChannels =
@@ -315,21 +325,25 @@ const updatePatchOnPipetteChannelChange = (
       ? getChannels(patch.pipette, pipetteEntities)
       : null
 
-  const appliedPatch = { ...rawForm, ...patch }
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
   const singleToMulti = prevChannels === 1 && nextChannels === 8
   const multiToSingle = prevChannels === 8 && nextChannels === 1
 
   if (patch.pipette === null || singleToMulti) {
     // reset all well selection
-    const pipetteId = appliedPatch.pipette
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.pipette is type ?mixed. Address in #3161
+    const pipetteId: string = appliedPatch.pipette
     update = {
       aspirate_wells: getDefaultWells({
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
         labwareId: appliedPatch.aspirate_labware,
         pipetteId,
         labwareEntities,
         pipetteEntities,
       }),
       dispense_wells: getDefaultWells({
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
         labwareId: appliedPatch.dispense_labware,
         pipetteId,
         labwareEntities,
@@ -338,8 +352,10 @@ const updatePatchOnPipetteChannelChange = (
     }
   } else if (multiToSingle) {
     // multi-channel to single-channel: convert primary wells to all wells
-    const sourceLabwareId = appliedPatch.aspirate_labware
-    const destLabwareId = appliedPatch.dispense_labware
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_labware is type ?mixed. Address in #3161
+    const sourceLabwareId: string = appliedPatch.aspirate_labware
+    // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_labware is type ?mixed. Address in #3161
+    const destLabwareId: string = appliedPatch.dispense_labware
 
     const sourceLabware = sourceLabwareId && labwareEntities[sourceLabwareId]
     const sourceLabwareDef = sourceLabware && sourceLabware.def
@@ -348,19 +364,26 @@ const updatePatchOnPipetteChannelChange = (
 
     update = {
       aspirate_wells: getAllWellsFromPrimaryWells(
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
         appliedPatch.aspirate_wells,
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
+        // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
         appliedPatch.dispense_wells,
         destLabwareDef
       ),
     }
   }
+
   return { ...patch, ...update }
 }
 
-function updatePatchOnWellRatioChange(patch: FormPatch, rawForm: FormData) {
+function updatePatchOnWellRatioChange(
+  patch: FormPatch,
+  rawForm: FormData
+): FormPatch {
+  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   const appliedPatch = { ...rawForm, ...patch }
   const prevWellRatio = getWellRatio(
     rawForm.aspirate_wells,
@@ -384,7 +407,11 @@ function updatePatchOnWellRatioChange(patch: FormPatch, rawForm: FormData) {
 
   return {
     ...patch,
-    ...wellRatioUpdater(prevWellRatio, nextWellRatio, appliedPatch),
+    ...(wellRatioUpdater(
+      prevWellRatio,
+      nextWellRatio,
+      appliedPatch
+    ): FormPatch),
   }
 }
 
@@ -418,7 +445,8 @@ export function updatePatchBlowoutFields(
   patch: FormPatch,
   rawForm: FormData
 ): FormPatch {
-  const appliedPatch = { ...rawForm, ...patch }
+  const { id, stepType, ...stepData } = rawForm
+  const appliedPatch = { ...(stepData: FormPatch), ...patch, id, stepType }
 
   if (fieldHasChanged(rawForm, patch, 'path')) {
     const { path, blowout_location } = appliedPatch

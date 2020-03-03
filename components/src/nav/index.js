@@ -1,8 +1,6 @@
 // @flow
 // navigational components
-import VerticalNavBar from './VerticalNavBar'
-import NavButton from './NavButton'
-import OutsideLinkButton from './OutsideLinkButton'
-import SidePanel from './SidePanel'
-
-export { VerticalNavBar, NavButton, OutsideLinkButton, SidePanel }
+export * from './VerticalNavBar'
+export * from './NavButton'
+export * from './OutsideLinkButton'
+export * from './SidePanel'

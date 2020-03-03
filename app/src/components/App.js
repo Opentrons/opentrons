@@ -1,5 +1,6 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
+import { hot } from 'react-hot-loader/root'
 import { Switch, Route, Redirect } from 'react-router-dom'
 
 // TODO(mc, 2020-01-06): move typeface import to global CSS once postcss
@@ -21,7 +22,7 @@ import styles from './App.css'
 
 const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
 
-export function App() {
+export function AppComponent() {
   return (
     <div className={styles.wrapper} onDragOver={stopEvent} onDrop={stopEvent}>
       <NavBar />
@@ -41,3 +42,5 @@ export function App() {
     </div>
   )
 }
+
+export const App = hot(AppComponent)

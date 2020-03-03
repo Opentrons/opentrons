@@ -18,11 +18,6 @@
   margin: 1rem 2.5rem;
 }
 
-.button_row {
-  display: flex;
-  justify-content: flex-end;
-}
-
 .pipette_button_row {
   display: flex;
   justify-content: center;

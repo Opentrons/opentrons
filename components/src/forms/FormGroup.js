@@ -5,7 +5,7 @@ import { Icon } from '../icons'
 import styles from './forms.css'
 import type { HoverTooltipHandlers } from '../tooltips'
 
-type Props = {
+export type FormGroupProps = {|
   /** text label */
   label?: string,
   /** form content */
@@ -18,9 +18,9 @@ type Props = {
   disabled?: ?boolean,
   /** handlers for HoverTooltipComponent */
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
-}
+|}
 
-export default function FormGroup(props: Props) {
+export function FormGroup(props: FormGroupProps) {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

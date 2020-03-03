@@ -100,9 +100,9 @@
       "touchTip": { "label": "touch tip" },
       "moduleActionLabware": { "label": "module" },
       "moduleLabwarePrefix": {
-        "magdeck": "MAG",
-        "tempdeck": "TEMP",
-        "thermocycler": "THERMO"
+        "magneticModuleType": "MAG",
+        "temperatureModuleType": "TEMP",
+        "thermocyclerModuleType": "THERMO"
       },
       "magnetAction": {
         "label": "Magnet action",

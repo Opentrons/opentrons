@@ -26,7 +26,7 @@ You must specify the API version you are targeting at the top of your Python pro
    from opentrons import protocol_api
 
    metadata = {
-       'apiLevel': '2.0',
+       'apiLevel': '2.2',
        'author': 'A. Biologist'}
 
    def run(protocol: protocol_api.ProtocolContext):

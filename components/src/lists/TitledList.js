@@ -6,7 +6,7 @@ import cx from 'classnames'
 import styles from './lists.css'
 import { type IconName, Icon } from '../icons'
 
-type ListProps = {|
+export type TitledListProps = {|
   /** text of title */
   title: string,
   /** optional icon left of the title */
@@ -45,7 +45,7 @@ type ListProps = {|
 /**
  * An ordered list with optional title, icon, and description.
  */
-export default function TitledList(props: ListProps) {
+export function TitledList(props: TitledListProps) {
   const {
     iconName,
     disabled,

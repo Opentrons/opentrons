@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/labware-library",
   "productName": "Labware Library",
-  "version": "3.16.0",
+  "version": "3.16.1",
   "description": "Opentrons standard labware library",
   "main": "src/index.js",
   "repository": {
@@ -15,7 +15,8 @@
   },
   "license": "Apache-2.0",
   "dependencies": {
-    "@opentrons/components": "3.16.0",
+    "@hot-loader/react-dom": "16.8.6",
+    "@opentrons/components": "3.16.1",
     "ajv": "^6.2.1",
     "classnames": "^2.2.5",
     "cookie": "^0.4.0",
@@ -26,13 +27,10 @@
     "lodash": "^4.17.4",
     "mixpanel-browser": "^2.29.1",
     "query-string": "^6.2.0",
-    "react": "^16.8.6",
-    "react-dom": "^16.8.6",
-    "react-hot-loader": "^4.8.0",
+    "react": "16.8.6",
+    "react-dom": "16.8.6",
+    "react-hot-loader": "^4.12.19",
     "react-router-dom": "^5.0.1",
     "yup": "^0.27.0"
-  },
-  "devDependencies": {
-    "react-snap": "^1.23.0"
   }
 }

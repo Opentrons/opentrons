@@ -2,14 +2,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import Button, { type ButtonProps } from './Button'
+import { Button } from './Button'
 import styles from './buttons.css'
+
+import type { ButtonProps } from './Button'
 
 /**
  * Primary application button. Fills its container and has a dark
  * background with white text
  */
-export default function PrimaryButton(props: ButtonProps) {
+export function PrimaryButton(props: ButtonProps) {
   const className = cx(styles.button_primary, props.className, {
     [styles.inverted]: props.inverted,
   })

@@ -8,7 +8,7 @@ import styles from './SelectField.css'
 
 import type { SelectProps } from './Select'
 
-export type SelectFieldProps = {
+export type SelectFieldProps = {|
   /** optional HTML id for container */
   id?: $PropertyType<SelectProps, 'id'>,
   /** field name */
@@ -35,7 +35,7 @@ export type SelectFieldProps = {
   onValueChange?: (name: string, value: string) => mixed,
   /** blur handler called with (name) */
   onLoseFocus?: (name: string) => mixed,
-}
+|}
 
 export function SelectField(props: SelectFieldProps) {
   const {

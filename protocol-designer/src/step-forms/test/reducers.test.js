@@ -1,5 +1,10 @@
 // @flow
 import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+import {
   legacySteps as steps,
   orderedStepIds,
   labwareInvariantProperties,
@@ -7,13 +12,7 @@ import {
   savedStepForms,
 } from '../reducers'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import {
-  INITIAL_DECK_SETUP_STEP_ID,
-  SPAN7_8_10_11_SLOT,
-  TEMPDECK,
-  MAGDECK,
-  THERMOCYCLER,
-} from '../../constants'
+import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
@@ -195,8 +194,8 @@ describe('moduleInvariantProperties reducer', () => {
       [existingModuleId]: {
         id: existingModuleId,
         slot: '1',
-        type: 'magdeck',
-        model: 'GEN1',
+        type: MAGNETIC_MODULE_TYPE,
+        model: 'someMagModel',
       },
     }
   })
@@ -205,8 +204,8 @@ describe('moduleInvariantProperties reducer', () => {
     const newModuleData = {
       id: newId,
       slot: '3',
-      type: 'tempdeck',
-      model: 'GEN1',
+      type: TEMPERATURE_MODULE_TYPE,
+      model: 'someTempModel',
     }
     const result = moduleInvariantProperties(prevState, {
       type: 'CREATE_MODULE',
@@ -223,7 +222,7 @@ describe('moduleInvariantProperties reducer', () => {
   })
 
   test('edit module (change its model)', () => {
-    const newModel = 'GEN2'
+    const newModel = 'someDifferentModel'
     const result = moduleInvariantProperties(prevState, {
       type: 'EDIT_MODULE',
       payload: { id: existingModuleId, model: newModel },
@@ -645,8 +644,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
               payload: {
                 id: moduleId,
                 slot: destSlot,
-                type: 'tempdeck',
-                model: 'GEN1',
+                type: TEMPERATURE_MODULE_TYPE,
+                model: 'someTempModel',
               },
             }
             const prevRootState = makePrevRootState(makeStateArgs)
@@ -684,8 +683,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             payload: {
               id: 'newMagdeckId',
               slot: '1',
-              type: MAGDECK,
-              model: 'GEN1',
+              type: MAGNETIC_MODULE_TYPE,
+              model: 'someMagModel',
             },
           },
           expectedModuleId: 'newMagdeckId',
@@ -697,8 +696,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             payload: {
               id: 'tempdeckId',
               slot: '1',
-              type: TEMPDECK,
-              model: 'GEN1',
+              type: TEMPERATURE_MODULE_TYPE,
+              model: 'someTempModel',
             },
           },
           expectedModuleId: 'magdeckId',
@@ -710,8 +709,8 @@ describe('savedStepForms reducer: initial deck setup step', () => {
             payload: {
               id: 'ThermocyclerId',
               slot: '1',
-              type: THERMOCYCLER,
-              model: 'GEN1',
+              type: THERMOCYCLER_MODULE_TYPE,
+              model: 'someThermoModel',
             },
           },
           expectedModuleId: 'magdeckId',

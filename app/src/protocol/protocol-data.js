@@ -7,10 +7,14 @@ import type { ProtocolFile, ProtocolData, ProtocolType } from './types'
 
 const log = createLogger(__filename)
 
+const RE_JSON_EXT = /\.json$/i
+const RE_PY_EXT = /\.py$/i
+const RE_ZIP_EXT = /\.zip$/i
+
 export function filenameToType(filename: string): ProtocolType | null {
-  if (filename.endsWith('.json')) return TYPE_JSON
-  if (filename.endsWith('.py')) return TYPE_PYTHON
-  if (filename.endsWith('.zip')) return TYPE_ZIP
+  if (RE_JSON_EXT.test(filename)) return TYPE_JSON
+  if (RE_PY_EXT.test(filename)) return TYPE_PYTHON
+  if (RE_ZIP_EXT.test(filename)) return TYPE_ZIP
   return null
 }
 

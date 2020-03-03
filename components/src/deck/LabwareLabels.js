@@ -1,4 +1,5 @@
 // @flow
+// TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 import cx from 'classnames'
 import uniq from 'lodash/uniq'
@@ -10,11 +11,15 @@ import {
 import { wellNameSplit } from '../utils'
 import styles from './LabwareLabels.css'
 
-type Props = { labwareType: string }
+export type LabwareLabelsProps = {| labwareType: string |}
+
 const ROW_OFFSET = -4
 const COLUMN_OFFSET = -4
 
-export default function LabwareLabels(props: Props) {
+/**
+ * @deprecated No longer necessary, do not use
+ */
+export function LabwareLabels(props: LabwareLabelsProps) {
   const { labwareType } = props
   const labwareDef = getLabwareV1Def(labwareType)
   if (!labwareDef) {

@@ -17,7 +17,7 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
-from opentrons.hardware_control import adapters, API
+from opentrons.hardware_control import API, ThreadManager
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -56,11 +56,6 @@ class SessionManager(object):
             'opentrons.server.command_logger')
         self._broker.set_logger(self._command_logger)
         self._motion_lock = lock
-
-    def __del__(self):
-        if isinstance(getattr(self, '_hardware', None),
-                      adapters.SynchronousAdapter):
-            self._hardware.join()
 
     def create(
             self,
@@ -356,23 +351,20 @@ class Session(object):
                     if pip:
                         instrs[mount] = {'model': pip['model'],
                                          'id': pip.get('pipette_id', '')}
-                sim = adapters.SynchronousAdapter.build(
-                    API.build_hardware_simulator,
-                    instrs,
-                    [mod.name()
-                     for mod in self._hardware.attached_modules],
-                    strict_attached_instruments=False)
-                sim.home()
-                self._simulating_ctx = ProtocolContext(
+                sync_sim = ThreadManager(
+                        API.build_hardware_simulator,
+                        instrs,
+                        [mod.name()
+                            for mod in self._hardware.attached_modules],
+                        strict_attached_instruments=False
+                        ).sync
+                sync_sim.home()
+                self._simulating_ctx = ProtocolContext.build_using(
+                    self._protocol,
                     loop=self._loop,
-                    hardware=sim,
+                    hardware=sync_sim,
                     broker=self._broker,
-                    bundled_labware=getattr(
-                        self._protocol, 'bundled_labware', None),
-                    bundled_data=getattr(
-                        self._protocol, 'bundled_data', None),
-                    extra_labware=getattr(
-                        self._protocol, 'extra_labware', {}))
+                    extra_labware=getattr(self._protocol, 'extra_labware', {}))
                 run_protocol(self._protocol,
                              context=self._simulating_ctx)
             else:
@@ -498,10 +490,6 @@ class Session(object):
                     self._protocol,
                     loop=self._loop,
                     broker=self._broker,
-                    bundled_labware=getattr(
-                        self._protocol, 'bundled_labware', None),
-                    bundled_data=getattr(
-                        self._protocol, 'bundled_data', None),
                     extra_labware=getattr(self._protocol, 'extra_labware', {}))
                 ctx.connect(self._hardware)
                 ctx.home()

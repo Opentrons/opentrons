@@ -1,7 +1,7 @@
 // @flow
 // tests for main navbar link list
 import * as React from 'react'
-import { shallow } from 'enzyme'
+import { shallow, mount } from 'enzyme'
 
 import { NavList } from '..'
 
@@ -20,10 +20,13 @@ describe('NavList', () => {
     expect(tree.state().menu).toEqual('foo')
   })
 
-  test('component applies active class based on state', () => {
-    const tree = shallow(<NavList />)
+  test('component applies active class to nav links based on state', () => {
+    const wrapper = mount(<NavList />)
 
-    tree.setState({ menu: 'foo' })
-    expect(tree.someWhere(n => n.hasClass('active')))
+    // when state.menu is null, all nav links are active
+    expect(wrapper.find('.nav_link').every('.active')).toBe(true)
+    wrapper.setState({ menu: 'About' })
+    // setting menu to a valid value activates just the one link
+    expect(wrapper.find('.active.nav_link')).toHaveLength(1)
   })
 })

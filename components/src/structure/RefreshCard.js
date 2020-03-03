@@ -1,14 +1,18 @@
 // @flow
 // refreshable card component
 // DO NOT USE THIS COMPONENT; prefer useInterval hook
+// TODO(mc, 2020-02-19): remove when last usage is removed
+// app/src/components/AppSettings/AppInfoCard.js
 import * as React from 'react'
 
 import { IconButton } from '../buttons'
-import Card from './Card'
+import { Card } from './Card'
 import styles from './structure.css'
 
-type Props = {|
-  ...React.ElementProps<typeof Card>,
+import type { CardProps } from './Card'
+
+export type RefreshCardProps = {|
+  ...CardProps,
   /** a change in the watch prop will trigger a refresh */
   watch?: string,
   /** refreshing flag */
@@ -21,8 +25,10 @@ type Props = {|
  * Card variant for displaying refreshable data. `props.refresh` will be called
  * on mount, on an update with a change in `props.watch`, or if the user clicks
  * the refresh button. Takes all `Card` props as well as the ones listed here.
+ *
+ * @deprecated Use {@link Card} with {@link useInterval} hook instead
  */
-export default class RefreshCard extends React.Component<Props> {
+export class RefreshCard extends React.Component<RefreshCardProps> {
   render() {
     const { watch, refresh, refreshing, children, ...cardProps } = this.props
 
@@ -46,7 +52,7 @@ export default class RefreshCard extends React.Component<Props> {
     this.props.refresh()
   }
 
-  componentDidUpdate(prevProps: Props) {
+  componentDidUpdate(prevProps: RefreshCardProps) {
     if (prevProps.watch !== this.props.watch) {
       this.props.refresh()
     }

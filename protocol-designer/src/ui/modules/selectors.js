@@ -3,9 +3,11 @@ import { createSelector } from 'reselect'
 import {
   getLabwareDisplayName,
   getLabwareDefaultEngageHeight,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
-import { MAGDECK, TEMPDECK, THERMOCYCLER } from '../../constants'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getLabwareNicknamesById } from '../labware/selectors'
 import {
@@ -39,7 +41,11 @@ export const getMagneticLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) => {
-    return getModuleLabwareOptions(initialDeckSetup, nicknamesById, MAGDECK)
+    return getModuleLabwareOptions(
+      initialDeckSetup,
+      nicknamesById,
+      MAGNETIC_MODULE_TYPE
+    )
   }
 )
 
@@ -51,12 +57,12 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
     const temperatureModuleOptions = getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      TEMPDECK
+      TEMPERATURE_MODULE_TYPE
     )
     const thermocyclerModuleOptions = getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      THERMOCYCLER
+      THERMOCYCLER_MODULE_TYPE
     )
     return temperatureModuleOptions.concat(thermocyclerModuleOptions)
   }
@@ -70,7 +76,7 @@ export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
     return getModuleLabwareOptions(
       initialDeckSetup,
       nicknamesById,
-      THERMOCYCLER
+      THERMOCYCLER_MODULE_TYPE
     )
   }
 )
@@ -81,7 +87,7 @@ export const getSingleMagneticModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, MAGDECK)?.id || null
+    getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
 )
 
 /** Get single temperature module (assumes no multiples) */
@@ -90,7 +96,7 @@ export const getSingleTemperatureModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, TEMPDECK)?.id || null
+    getModuleOnDeckByType(initialDeckSetup, TEMPERATURE_MODULE_TYPE)?.id || null
 )
 
 /** Get single temperature module (assumes no multiples) */
@@ -99,14 +105,15 @@ export const getSingleThermocyclerModuleId: Selector<
 > = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup =>
-    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)?.id || null
+    getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)?.id ||
+    null
 )
 
 /** Returns boolean if magnetic module has labware */
 export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, MAGDECK)
+    return getModuleHasLabware(initialDeckSetup, MAGNETIC_MODULE_TYPE)
   }
 )
 
@@ -114,7 +121,7 @@ export const getMagnetModuleHasLabware: Selector<boolean> = createSelector(
 export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, TEMPDECK)
+    return getModuleHasLabware(initialDeckSetup, TEMPERATURE_MODULE_TYPE)
   }
 )
 
@@ -122,7 +129,7 @@ export const getTemperatureModuleHasLabware: Selector<boolean> = createSelector(
 export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    return getModuleHasLabware(initialDeckSetup, THERMOCYCLER)
+    return getModuleHasLabware(initialDeckSetup, THERMOCYCLER_MODULE_TYPE)
   }
 )
 
@@ -142,8 +149,14 @@ export const getMagnetLabwareEngageHeight: Selector<
 export const getTempModuleOrThermocyclerIsOnDeck: Selector<boolean> = createSelector(
   stepFormSelectors.getInitialDeckSetup,
   initialDeckSetup => {
-    const tempOnDeck = getModuleOnDeckByType(initialDeckSetup, THERMOCYCLER)
-    const tcOnDeck = getModuleOnDeckByType(initialDeckSetup, TEMPDECK)
+    const tempOnDeck = getModuleOnDeckByType(
+      initialDeckSetup,
+      THERMOCYCLER_MODULE_TYPE
+    )
+    const tcOnDeck = getModuleOnDeckByType(
+      initialDeckSetup,
+      TEMPERATURE_MODULE_TYPE
+    )
     return Boolean(tempOnDeck || tcOnDeck)
   }
 )

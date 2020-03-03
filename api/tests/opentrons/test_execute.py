@@ -7,25 +7,23 @@ from unittest import mock
 import pytest
 
 from opentrons import execute, types
+from opentrons.hardware_control import controller
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
 
 
 @pytest.fixture
-def backing_hardware(monkeypatch, virtual_smoothie_env):
-    # make sure the backing hardware controller is up
-    execute.get_protocol_api('2.0')
-    # give it instruments
+def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
     gai_mock = mock.Mock()
 
-    async def dummy_delay(duration_s):
+    async def dummy_delay(self, duration_s):
         pass
 
-    monkeypatch.setattr(execute._HWCONTROL._backend,
+    monkeypatch.setattr(controller.Controller,
                         'get_attached_instruments',
                         gai_mock)
-    monkeypatch.setattr(execute._HWCONTROL._backend, 'delay', dummy_delay)
+    monkeypatch.setattr(controller.Controller, 'delay', dummy_delay)
     gai_mock.return_value = {types.Mount.RIGHT: {'model': None, 'id': None},
                              types.Mount.LEFT: {'model': None, 'id': None}}
     return gai_mock
@@ -36,11 +34,11 @@ def test_execute_function_apiv2(protocol,
                                 protocol_file,
                                 monkeypatch,
                                 virtual_smoothie_env,
-                                backing_hardware):
+                                mock_get_attached_instr):
 
-    backing_hardware.return_value[types.Mount.LEFT]\
+    mock_get_attached_instr.return_value[types.Mount.LEFT]\
         = {'model': 'p10_single_v1.5', 'id': 'testid'}
-    backing_hardware.return_value[types.Mount.RIGHT]\
+    mock_get_attached_instr.return_value[types.Mount.RIGHT]\
         = {'model': 'p300_single_v1.5', 'id': 'testid2'}
     entries = []
 
@@ -61,7 +59,7 @@ def test_execute_function_apiv2(protocol,
 
 def test_execute_function_json_apiv2(get_json_protocol_fixture,
                                      virtual_smoothie_env,
-                                     backing_hardware):
+                                     mock_get_attached_instr):
     jp = get_json_protocol_fixture('3', 'simple', False)
     filelike = io.StringIO(jp)
     entries = []
@@ -70,7 +68,7 @@ def test_execute_function_json_apiv2(get_json_protocol_fixture,
         nonlocal entries
         entries.append(entry)
 
-    backing_hardware.return_value[types.Mount.LEFT] = {
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         'model': 'p10_single_v1.5', 'id': 'testid'}
     execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
@@ -87,7 +85,7 @@ def test_execute_function_json_apiv2(get_json_protocol_fixture,
 
 def test_execute_function_bundle_apiv2(get_bundle_fixture,
                                        virtual_smoothie_env,
-                                       backing_hardware):
+                                       mock_get_attached_instr):
     bundle = get_bundle_fixture('simple_bundle')
     entries = []
 
@@ -95,7 +93,7 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
         nonlocal entries
         entries.append(entry)
 
-    backing_hardware.return_value[types.Mount.LEFT] = {
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
         'model': 'p10_single_v1.5', 'id': 'testid'}
     execute.execute(
         bundle['filelike'], 'simple_bundle.zip', emit_runlog=emit_runlog)
@@ -122,14 +120,14 @@ def test_execute_function_bundle_apiv2(get_bundle_fixture,
 @pytest.mark.parametrize('protocol_file', ['testosaur.py'])
 def test_execute_function_v1(protocol, protocol_file,
                              virtual_smoothie_env,
-                             backing_hardware):
+                             mock_get_attached_instr):
     entries = []
 
     def emit_runlog(entry):
         nonlocal entries
         entries.append(entry)
 
-    backing_hardware.return_value[types.Mount.RIGHT] = {
+    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
         'model': 'p300_single_v1.5', 'id': 'testid'}
     execute.execute(protocol.filelike, 'testosaur.py', emit_runlog=emit_runlog)
     assert [item['payload']['text'] for item in entries
@@ -145,7 +143,7 @@ def test_execute_function_v1(protocol, protocol_file,
 
 @pytest.mark.parametrize('protocol_file', ['python_v2_custom_lw.py'])
 def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
-                               virtual_smoothie_env, backing_hardware):
+                               virtual_smoothie_env, mock_get_attached_instr):
     fixturedir = HERE / '..' / '..' / '..' /\
         'shared-data' / 'labware' / 'fixtures' / '2'
     entries = []
@@ -154,7 +152,7 @@ def test_execute_extra_labware(protocol, protocol_file, monkeypatch,
         nonlocal entries
         entries.append(entry)
 
-    backing_hardware.return_value[types.Mount.RIGHT] = {
+    mock_get_attached_instr.return_value[types.Mount.RIGHT] = {
         'model': 'p300_single_v2.0', 'id': 'testid'}
     # make sure we can load labware explicitly
     # make sure we don't have an exception from not finding the labware

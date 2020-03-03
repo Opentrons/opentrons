@@ -54,7 +54,7 @@ const STRIP_PROPS = [
  * import {type ButtonProps} from '@opentrons/components'
  * ```
  */
-export default function Button(props: ButtonProps) {
+export function Button(props: ButtonProps) {
   const { name, title, disabled, hover, tabIndex } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined

@@ -1,11 +1,12 @@
 // @flow
 import * as React from 'react'
 
-import InstrumentInfo, { type InstrumentInfoProps } from './InstrumentInfo'
-
+import { InstrumentInfo } from './InstrumentInfo'
 import styles from './instrument.css'
 
-type Props = $Shape<{|
+import type { InstrumentInfoProps } from './InstrumentInfo'
+
+export type InstrumentGroupProps = $Shape<{|
   showMountLabel: ?boolean,
   left: ?InstrumentInfoProps,
   right: ?InstrumentInfoProps,
@@ -21,7 +22,7 @@ const EMPTY_INSTRUMENT_PROPS = {
  * Renders a left and right pipette diagram & info.
  * Takes child `InstrumentInfo` props in `right` and `left` props.
  */
-export default function InstrumentGroup(props: Props) {
+export function InstrumentGroup(props: InstrumentGroupProps) {
   const { left, right, showMountLabel } = props
 
   const leftProps = left || { ...EMPTY_INSTRUMENT_PROPS, mount: 'left' }

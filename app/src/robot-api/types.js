@@ -13,8 +13,9 @@ export type RobotHost = {
 export type RobotApiRequestOptions = {|
   method: Method,
   path: string,
-  body?: mixed,
+  body?: { ... },
   query?: { [param: string]: string | boolean | number },
+  form?: FormData,
 |}
 
 export type RobotApiResponse = {|
@@ -35,6 +36,11 @@ export type RobotApiRequestMeta = $Shape<{|
     ok: boolean,
   |},
 |}>
+
+export type RobotApiErrorResponse = {
+  message: string,
+  ...
+}
 
 // action types
 

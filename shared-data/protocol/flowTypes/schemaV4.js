@@ -1,5 +1,5 @@
 // @flow
-import type { DeckSlotId } from '@opentrons/shared-data'
+import type { DeckSlotId, ModuleModel } from '@opentrons/shared-data'
 import type {
   ProtocolFile as V3ProtocolFile,
   _AspDispAirgapParams,
@@ -13,7 +13,7 @@ export type { BlowoutParams, FilePipette, FileLabware } from './schemaV3'
 
 export type FileModule = {|
   slot: DeckSlotId,
-  model: string, // matches key in shared-data/module/definitions/2
+  model: ModuleModel,
 |}
 
 export type EngageMagnetParams = {|
@@ -97,9 +97,9 @@ export type Command =
 // NOTE: must be kept in sync with '../schemas/4.json'
 export type ProtocolFile<DesignerApplicationData> = {|
   ...V3ProtocolFile<DesignerApplicationData>,
+  $otSharedSchema: '#/protocol/schemas/4',
   schemaVersion: 4,
-  // TODO: Ian 2019-11-11 make modules a required key when PD drops support for v3
-  modules?: {
+  modules: {
     [moduleId: string]: FileModule,
   },
   commands: Array<Command>,

@@ -2,25 +2,23 @@
 
 module.exports = {
   env: {
+    // Note(isk: 3/2/20): Must have babel-plugin-styled-components in each env,
+    // see here for further details: s https://styled-components.com/docs/tooling#babel-plugin
     production: {
-      plugins: ['babel-plugin-unassert'],
+      plugins: ['babel-plugin-styled-components', 'babel-plugin-unassert'],
     },
     development: {
-      plugins: ['react-hot-loader/babel'],
+      plugins: ['babel-plugin-styled-components', 'react-hot-loader/babel'],
     },
     test: {
       plugins: [
+        'babel-plugin-styled-components',
         '@babel/plugin-transform-modules-commonjs',
         'babel-plugin-dynamic-import-node',
       ],
     },
   },
-  plugins: [
-    '@babel/plugin-proposal-object-rest-spread',
-    '@babel/plugin-proposal-class-properties',
-    '@babel/plugin-proposal-optional-chaining',
-    '@babel/plugin-syntax-dynamic-import',
-  ],
+  plugins: ['@babel/plugin-proposal-class-properties'],
   presets: [
     '@babel/preset-flow',
     '@babel/preset-react',

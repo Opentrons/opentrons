@@ -40,16 +40,15 @@ export function Pipettes(props: PipettesProps) {
           pipetteSpecs: pipetteConfig,
         }
 
-    return {
-      ...result,
-      [mount]: {
-        mount,
-        isDisabled,
-        className: cx(styles.instrument, styles[mount]),
-        infoClassName: styles.instrument_info,
-        ...details,
-      },
+    result[mount] = {
+      mount,
+      isDisabled,
+      className: cx(styles.instrument, styles[mount]),
+      infoClassName: styles.instrument_info,
+      ...details,
     }
+
+    return result
   }, {})
 
   return <InstrumentGroup {...infoByMount} />

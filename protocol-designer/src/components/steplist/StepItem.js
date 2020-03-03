@@ -1,6 +1,9 @@
 // @flow
 import * as React from 'react'
-
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { PDTitledList } from '../lists'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -10,7 +13,6 @@ import { ModuleStepItems } from './ModuleStepItems'
 import { StepDescription } from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
 import { i18n } from '../../localization'
-import { MAGDECK, TEMPDECK } from '../../constants'
 import styles from './StepItem.css'
 
 import type { FormData, StepIdType, StepType } from '../../form-types'
@@ -20,7 +22,7 @@ import type {
   WellIngredientNames,
 } from '../../steplist/types'
 
-type StepItemProps = {
+export type StepItemProps = {
   stepId: StepIdType,
   stepNumber: number,
   stepType: StepType,
@@ -128,7 +130,7 @@ export function getStepItemContents(stepItemProps: StepItemProps) {
         actionText={i18n.t(
           `modules.actions.${substeps.engage ? 'engage' : 'disengage'}`
         )}
-        module={MAGDECK}
+        moduleType={MAGNETIC_MODULE_TYPE}
       />
     )
   }
@@ -146,7 +148,7 @@ export function getStepItemContents(stepItemProps: StepItemProps) {
         message={substeps.message}
         action={i18n.t(`modules.actions.go_to`)}
         actionText={temperature}
-        module={TEMPDECK}
+        moduleType={TEMPERATURE_MODULE_TYPE}
       />
     )
   }
@@ -163,7 +165,7 @@ export function getStepItemContents(stepItemProps: StepItemProps) {
         message={substeps.message}
         action={i18n.t(`modules.actions.await_temperature`)}
         actionText={temperature}
-        module={TEMPDECK}
+        moduleType={TEMPERATURE_MODULE_TYPE}
       />
     )
   }

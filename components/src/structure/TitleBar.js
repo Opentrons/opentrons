@@ -4,8 +4,10 @@
 import * as React from 'react'
 import cx from 'classnames'
 
-import { FlatButton, type ButtonProps } from '../buttons'
+import { FlatButton } from '../buttons'
 import styles from './structure.css'
+
+import type { ButtonProps } from '../buttons'
 
 export type TitleBarProps = {|
   title: React.Node,
@@ -19,7 +21,7 @@ export type TitleBarProps = {|
   backButtonLabel?: string,
 |}
 
-export default function TitleBar(props: TitleBarProps) {
+export function TitleBar(props: TitleBarProps) {
   const {
     title,
     subtitle,

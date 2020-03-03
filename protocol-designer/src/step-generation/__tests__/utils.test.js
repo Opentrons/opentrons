@@ -1,5 +1,9 @@
 // @flow
-import { getLabwareDefURI } from '@opentrons/shared-data'
+import {
+  getLabwareDefURI,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
+} from '@opentrons/shared-data'
 import {
   fixtureP10Single,
   fixtureP300Multi,
@@ -140,11 +144,10 @@ describe('splitLiquid', () => {
   })
 
   // TODO Ian 2018-03-19 figure out what to do with air warning reporting
-  test.skip('splitting with air in source should throw error', () => {
-    expect(() =>
-      splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
-    ).toThrow(/source cannot contain air/)
-  })
+  test.todo('splitting with air in source should do something (throw error???)')
+  // expect(() =>
+  // splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
+  // ).toThrow(/source cannot contain air/)
 })
 
 describe('mergeLiquid', () => {
@@ -238,8 +241,8 @@ describe('makeInitialRobotState', () => {
         moduleEntities: {
           someTempModuleId: {
             id: 'someTempModuleId',
-            model: 'GEN1',
-            type: 'tempdeck',
+            model: TEMPERATURE_MODULE_V1,
+            type: TEMPERATURE_MODULE_TYPE,
           },
         },
         labwareEntities: {
@@ -275,7 +278,7 @@ describe('makeInitialRobotState', () => {
         someTempModuleId: {
           slot: '3',
           moduleState: {
-            type: 'tempdeck',
+            type: TEMPERATURE_MODULE_TYPE,
             status: TEMPERATURE_DEACTIVATED,
             targetTemperature: null,
           },

@@ -205,11 +205,6 @@
   margin-bottom: 1rem;
 }
 
-.button_row {
-  display: flex;
-  justify-content: space-between;
-}
-
 .magnet_section_wrapper {
   display: flex;
   justify-content: flex-start;

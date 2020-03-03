@@ -58,7 +58,7 @@ describe('dropTip', () => {
     })
 
     // TODO: IL 2019-11-20
-    test.skip('no tip on pipette', () => {})
+    test.todo('no tip on pipette')
   })
 
   describe('Multi-channel dropTip', () => {

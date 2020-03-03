@@ -26,7 +26,7 @@ async def hc_stream_server(loop):
     # because the path length limit for sockets is 100-ish characters
     with tempfile.TemporaryDirectory() as td:
         sock = os.path.join(td, 'tst')
-        api = hc.API.build_hardware_simulator(loop=loop)
+        api = await hc.API.build_hardware_simulator(loop=loop)
         server = await sockserv.run(sock, api)
         yield sock, server
     await server.stop()

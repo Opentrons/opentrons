@@ -1,4 +1,4 @@
-@import '@opentrons/components';
+@import '..';
 
 .fallback_plate_text {
   height: 100%;

@@ -74,7 +74,7 @@ export const getModuleTypeFromModuleModel = (
   return getModuleDef2(moduleModel).moduleType
 }
 
-// use a name like 'magdeck' or 'magdeckGen2' to get displayName for app
+// use module model (not type!) to get model-specific displayName for UI
 export function getModuleDisplayName(moduleModel: ModuleModel): string {
   return getModuleDef2(moduleModel).displayName
 }

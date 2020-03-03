@@ -5,9 +5,11 @@ import classnames from 'classnames'
 
 import styles from './navbar.css'
 import { Button } from '../buttons'
-import { NotificationIcon, type IconName } from '../icons'
+import { NotificationIcon } from '../icons'
 
-type NavTabProps = {
+import type { IconName } from '../icons'
+
+export type NavTabProps = {|
   /** optional click event for nav button */
   onClick?: (event: SyntheticEvent<>) => void,
   /** optional url for nav button route */
@@ -26,9 +28,9 @@ type NavTabProps = {
   notification?: boolean,
   /** selected styling (can also use react-router & `activeClassName`) */
   selected?: boolean,
-}
+|}
 
-export default function NavTab(props: NavTabProps) {
+export function NavTab(props: NavTabProps) {
   const { url } = props
   const className = classnames(props.className, styles.tab, {
     [styles.disabled]: props.disabled,

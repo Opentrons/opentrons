@@ -3,12 +3,14 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import cx from 'classnames'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
+import {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import {
-  MAGDECK,
-  TEMPDECK,
   STD_SLOT_X_DIM,
   STD_SLOT_Y_DIM,
   TEMPERATURE_AT_TARGET,
@@ -61,7 +63,7 @@ export const ModuleStatus = ({
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
 |}) => {
   switch (moduleState.type) {
-    case MAGDECK:
+    case MAGNETIC_MODULE_TYPE:
       return (
         <div className={styles.module_status_line}>
           {i18n.t(
@@ -70,7 +72,7 @@ export const ModuleStatus = ({
         </div>
       )
 
-    case TEMPDECK:
+    case TEMPERATURE_MODULE_TYPE:
       const tempStatus = getTempStatus(moduleState)
       return <div className={styles.module_status_line}>{tempStatus}</div>
 

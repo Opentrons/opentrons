@@ -217,7 +217,7 @@ describe('mix: advanced options', () => {
 })
 
 describe('mix: errors', () => {
-  let errorArgs = {}
+  let errorArgs
   beforeEach(() => {
     errorArgs = {
       ...mixinArgs,
@@ -254,6 +254,6 @@ describe('mix: errors', () => {
   })
 
   // TODO Ian 2018-05-08
-  test.skip('"times" arg non-integer', () => {})
-  test.skip('"times" arg negative', () => {})
+  test.todo('"times" arg non-integer')
+  test.todo('"times" arg negative')
 })
