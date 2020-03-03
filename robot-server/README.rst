@@ -14,16 +14,13 @@ Opentrons OT-2 HTTP API
    :target: https://pypi.org/project/opentrons/
    :alt: Download From PyPI
 
-.. _Full API Documentation: http://docs.opentrons.com
-
 
 Introduction
 ------------
 
 This is the Opentrons HTTP Server, the webservice that runs the Opentrons OT-2. It contains endpoints for executing protocols, controlling the hardware, and various other small tasks and capabilities that the robot fulfills.
 
-This document is about the structure and purpose of the source code of the HTTP Server. For information on how to use the Opentrons API or the robot in general, please refer to our  `Full API Documentation`_ for detailed instructions.
-
+This document is about the structure and purpose of the source code of the HTTP Server.
 
 Setting Up For Development
 --------------------------

@@ -29,7 +29,7 @@ DISTNAME = 'robotserver'
 LICENSE = 'Apache 2.0'
 AUTHOR = "Opentrons"
 EMAIL = "engineering@opentrons.com"
-URL = "https://github.com/OpenTrons/opentrons"
+URL = "https://github.com/Opentrons/opentrons"
 DOWNLOAD_URL = ''
 CLASSIFIERS = [
     'Development Status :: 5 - Production/Stable',
@@ -75,7 +75,7 @@ if __name__ == "__main__":
         maintainer=AUTHOR,
         maintainer_email=EMAIL,
         keywords=KEYWORDS,
-        long_description=read("README.rst"),
+        long_description=__doc__,
         packages=PACKAGES,
         zip_safe=False,
         classifiers=CLASSIFIERS,
