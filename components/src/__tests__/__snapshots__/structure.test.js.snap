@@ -2,10 +2,10 @@
 
 exports[`Card renders Card correctly 1`] = `
 <section
-  className="card"
+  className="Card__Section-sc-1ltsa6e-0 fUnCuR"
 >
   <h3
-    className="card_title"
+    className="Card__Title-sc-1ltsa6e-1 cONCT"
   >
     title
   </h3>
@@ -87,7 +87,7 @@ exports[`Pill renders Pill correctly with inverted text 1`] = `
 
 exports[`RefreshCard renders correctly 1`] = `
 <section
-  className="card"
+  className="Card__Section-sc-1ltsa6e-0 fUnCuR"
 >
   <button
     className="button_flat button_icon refresh_card_icon"
