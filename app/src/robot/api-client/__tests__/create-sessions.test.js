@@ -6,7 +6,7 @@ import { actions as RobotActions } from '../../actions'
 import * as ProtocolSelectors from '../../../protocol/selectors'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
-import { MockSession } from '../../test/__mocks__/session'
+import { MockSession } from '../../test/__fixtures__/session'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../../protocol/selectors')

@@ -1,9 +1,9 @@
 // strip 'procedure' from PD JSON protocol file and expect it to be output
 // exactly the same, given everything else in the protocol file
 import path from 'path'
-import configureStore from '../../configureStore'
-import { selectors as fileDataSelectors } from '../../file-data'
-import { actions as loadFileActions } from '../index'
+// import { configureStore } from '../../configureStore'
+// import { selectors as fileDataSelectors } from '../../file-data'
+// import { actions as loadFileActions } from '../index'
 
 jest.mock('../../labware-defs/utils')
 
@@ -35,14 +35,15 @@ const fixtures = [
   },
 ]
 
-// TODO #2917: restore these tests
-describe.skip('snapshot integration test: JSON protocol fixture to procedures', () => {
+// TODO(IL, 2020-02-28): restore these tests, maybe as e2e. See #5123
+describe('snapshot integration test: JSON protocol fixture to procedures', () => {
+  test.todo('TODO')
   fixtures.forEach(({ testName, inputFile, expectedProcedure }) => {
-    test(testName, () => {
-      const store = configureStore()
-      store.dispatch(loadFileActions.loadFileAction(inputFile))
-      const outputFile = fileDataSelectors.createFile(store.getState())
-      expect(outputFile.procedure).toEqual(expectedProcedure)
-    })
+    // test.todo(testName, () => {
+    //   const store = configureStore()
+    //   store.dispatch(loadFileActions.loadFileAction(inputFile))
+    //   const outputFile = fileDataSelectors.createFile(store.getState())
+    //   expect(outputFile.procedure).toEqual(expectedProcedure)
+    // })
   })
 })
