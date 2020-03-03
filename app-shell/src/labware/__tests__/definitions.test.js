@@ -39,7 +39,7 @@ describe('labware directory utilities', () => {
       ).rejects.toThrow(/no such file/)
     })
 
-    test('returns paths to JSON files in directory', () => {
+    test('returns paths to *.json files in directory', () => {
       const dir = makeEmptyDir()
 
       return Promise.all([
@@ -75,6 +75,22 @@ describe('labware directory utilities', () => {
             path.join(nested, 'a.json'),
           ])
         })
+    })
+
+    test('returns paths to *.JSON files in directory', () => {
+      const dir = makeEmptyDir()
+
+      return Promise.all([
+        fs.writeJson(path.join(dir, 'a.JSON'), { name: 'a' }),
+        fs.writeJson(path.join(dir, 'b.JSON'), { name: 'b' }),
+        fs.writeJson(path.join(dir, 'c.JSON'), { name: 'c' }),
+      ]).then(() => {
+        return expect(readLabwareDirectory(dir)).resolves.toEqual([
+          path.join(dir, 'a.JSON'),
+          path.join(dir, 'b.JSON'),
+          path.join(dir, 'c.JSON'),
+        ])
+      })
     })
   })
 

@@ -6,6 +6,8 @@ import { shell } from 'electron'
 import type { Dirent } from '../types'
 import type { UncheckedLabwareFile } from '@opentrons/app/src/custom-labware/types'
 
+const JSON_EXT_RE = /\.json$/i
+
 export function readLabwareDirectory(dir: string): Promise<Array<string>> {
   const absoluteName = e => path.join(dir, e.name)
 
@@ -13,7 +15,7 @@ export function readLabwareDirectory(dir: string): Promise<Array<string>> {
     .readdir(dir, { withFileTypes: true })
     .then((entries: Array<Dirent>) => {
       const jsonFiles = entries
-        .filter(e => e.isFile() && e.name.endsWith('.json'))
+        .filter(e => e.isFile() && JSON_EXT_RE.test(e.name))
         .map(absoluteName)
 
       const getNestedFiles = Promise.all(
