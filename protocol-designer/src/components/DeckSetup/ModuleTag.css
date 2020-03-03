@@ -4,7 +4,8 @@
   width: 100%;
   background-color: var(--c-plate-bg);
   color: var(--c-font-dark);
-  padding: 0.3rem 0.3rem 0 0.3rem;
+  padding: 0.3rem 0.113rem 0 0.113rem;
+  border: 3px solid transparent;
 }
 
 .module_info_line {
@@ -22,5 +23,5 @@
 }
 
 .highlighted_border_div {
-  box-shadow: inset 0 0 0 3px var(--c-highlight);
+  border: 3px solid var(--c-highlight);
 }

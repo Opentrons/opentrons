@@ -99,9 +99,10 @@ const ModuleTagComponent = (props: Props) => {
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
   const moduleLabware = getLabwareOnModule(initialDeck, props.id)
 
-  const isHoveredModuleStep = moduleLabware
-    ? hoveredLabwares[0] === moduleLabware.id
-    : false
+  const isHoveredModuleStep =
+    moduleLabware && hoveredLabwares.length
+      ? hoveredLabwares[0] === moduleLabware.id
+      : false
 
   if (moduleType == null || moduleState == null) {
     // this should never happen, but better to have an empty tag than to whitescreen

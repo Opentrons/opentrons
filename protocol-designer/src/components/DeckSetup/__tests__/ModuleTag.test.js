@@ -2,6 +2,7 @@
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 import React from 'react'
 import { Provider } from 'react-redux'
@@ -106,13 +107,14 @@ describe('ModuleTag', () => {
   })
 
   describe('ModuleTagComponent', () => {
+    const moduleId = 'abcdef'
     let store, props
     beforeEach(() => {
       props = {
         x: 1,
         y: 2,
         orientation: 'left',
-        id: 'abcdef',
+        id: moduleId,
       }
 
       store = {
@@ -147,44 +149,13 @@ describe('ModuleTag', () => {
         },
         warnings: [],
       })
-
       getModuleEntitiesMock.mockReturnValue({
         abcdef: {
-          id: 'abcdef',
-          type: 'temperatureModuleType',
-          model: 'GEN1',
+          id: moduleId,
+          type: TEMPERATURE_MODULE_TYPE,
+          model: TEMPERATURE_MODULE_V1,
         },
       })
-
-      getHoveredStepLabwareMock.mockReturnValue(['labwareId'])
-    })
-
-    it('adds a border when the step is is a module step type', () => {
-      getInitialDeckSetup.mockReturnValue({
-        labware: {
-          labwareId: {
-            id: 'labwareId',
-            slot: 'abcdef',
-            labwareDefURI: 'url',
-            def: fixture_tiprack_10_ul,
-          },
-        },
-        pipettes: {},
-        modules: {},
-      })
-
-      const wrapper = mount(
-        <Provider store={store}>
-          <ModuleTag {...props} />
-        </Provider>
-      )
-
-      expect(
-        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
-      ).toContain('highlighted_border_div')
-    })
-
-    it('does not add a border when the step is not a module step and labware is not on the module', () => {
       getInitialDeckSetup.mockReturnValue({
         labware: {
           labwareId: {
@@ -197,12 +168,50 @@ describe('ModuleTag', () => {
         pipettes: {},
         modules: {},
       })
+      getHoveredStepLabwareMock.mockReturnValue(['labwareId'])
+    })
 
-      const wrapper = mount(
+    function render() {
+      return mount(
         <Provider store={store}>
           <ModuleTag {...props} />
         </Provider>
       )
+    }
+
+    it('adds a border when the step is is a module step type', () => {
+      getInitialDeckSetup.mockReturnValue({
+        labware: {
+          labwareId: {
+            id: 'labwareId',
+            slot: moduleId,
+            labwareDefURI: 'url',
+            def: fixture_tiprack_10_ul,
+          },
+        },
+        pipettes: {},
+        modules: {},
+      })
+
+      const wrapper = render()
+
+      expect(
+        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+      ).toContain('highlighted_border_div')
+    })
+
+    it('does not add a border when the step is not a module step', () => {
+      const wrapper = render()
+
+      expect(
+        wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
+      ).not.toContain('highlighted_border_div')
+    })
+
+    it('does not add a border when no labware on module', () => {
+      getHoveredStepLabwareMock.mockReturnValue([])
+
+      const wrapper = render()
 
       expect(
         wrapper.find('RobotCoordsForeignDiv').prop('innerDivProps').className
