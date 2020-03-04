@@ -116,7 +116,7 @@ def init(hardware: 'HardwareAPILike' = None,
 
     async def shutdown_hardware(app):
         if app['com.opentrons.hardware']:
-            app['com.opentrons.hardware'].clean_up_managed_thread()
+            app['com.opentrons.hardware'].clean_up()
 
     app.on_shutdown.append(dispose_response_file_tempdir)
     app.on_shutdown.append(shutdown_hardware)
