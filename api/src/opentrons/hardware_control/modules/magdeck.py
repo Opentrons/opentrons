@@ -1,5 +1,4 @@
 import asyncio
-import logging
 from typing import Union
 from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
 from opentrons.drivers.mag_deck.driver import mag_locks
@@ -10,7 +9,6 @@ LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
 MAX_ENGAGE_HEIGHT = 45  # mm from home position
 OFFSET_TO_LABWARE_BOTTOM = 5
 
-MODULE_LOG = logging.getLogger(__name__)
 
 class MissingDevicePortError(Exception):
     pass
@@ -105,13 +103,10 @@ class MagDeck(mod_abc.AbstractModule):
                          simulating=simulating,
                          loop=loop,
                          execution_manager=execution_manager)
-        MODULE_LOG.info(f'MAGDECK CLASS INIT CALLED id: {id(self)}')
-        if mag_locks.get(port) and mag_locks[port][2] and mag_locks[port][2].is_running():
+        if mag_locks.get(port):
             self._driver = mag_locks[port][1]
-            MODULE_LOG.info(f'MAGDECK CLASS INIT CALLED found lock : {id(self)} driver: {id(self._driver)}')
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
-            MODULE_LOG.info(f'MAGDECK CLASS INIT CALLED found NOOOOO lock : {id(self)} driver: {id(self._driver)}')
 
     async def calibrate(self):
         """
@@ -201,7 +196,7 @@ class MagDeck(mod_abc.AbstractModule):
         Connect to the serial port
         """
         if not self._driver.is_connected():
-            self._driver.connect(self._port, self._loop)
+            self._driver.connect(self._port)
         self._device_info = self._driver.get_device_info()
 
     def _disconnect(self):
@@ -212,7 +207,6 @@ class MagDeck(mod_abc.AbstractModule):
             self._driver.disconnect(port=self._port)
 
     def __del__(self):
-        MODULE_LOG.info(f'MAGDECK CLASS DEL CALLED id: {id(self)}')
         self._disconnect()
 
     async def prep_for_update(self) -> str:
