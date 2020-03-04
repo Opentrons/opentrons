@@ -4,7 +4,6 @@ import os
 import json
 import logging
 from aiohttp import web
-from threading import Thread
 
 try:
     from opentrons import instruments
@@ -487,10 +486,7 @@ async def home(request):
 async def identify(request):
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
-    if ff.use_protocol_api_v2():
-        asyncio.ensure_future(hw.identify(blink_time))
-    else:
-        Thread(target=lambda: hw.identify(blink_time)).start()
+    asyncio.ensure_future(hw.identify(blink_time))
     return web.json_response({"message": "identifying"})
 
 

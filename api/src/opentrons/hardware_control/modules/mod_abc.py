@@ -3,16 +3,18 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Dict, Optional
+from typing import Dict, Optional, TYPE_CHECKING
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
+if TYPE_CHECKING:
+    from ..dev_types import HasLoop  # noqa (F501)
 from ..execution_manager import ExecutionManager
 from .types import BundledFirmware, UploadFunction, InterruptCallback
 
 mod_log = logging.getLogger(__name__)
 
 
-class AbstractModule(abc.ABC):
+class AbstractModule(abc.ABC, 'HasLoop'):
     """ Defines the common methods of a module. """
 
     @classmethod
@@ -126,6 +128,10 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def interrupt_callback(self) -> InterruptCallback:
         pass
+
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        return self._loop
 
     @property
     def bundled_fw(self):

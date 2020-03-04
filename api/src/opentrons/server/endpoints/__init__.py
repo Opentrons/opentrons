@@ -2,6 +2,7 @@ import inspect
 import json
 import logging
 import pkgutil
+from concurrent.futures._base import CancelledError
 from aiohttp import web
 from opentrons import __version__, config, protocol_api, protocols
 
@@ -13,9 +14,11 @@ async def health(request: web.Request) -> web.Response:
     # This conditional handles the case where we have just changed the
     # use protocol api v2 feature flag, so it does not match the type
     # of hardware we're actually using.
-    fw_version = request.app['com.opentrons.hardware'].fw_version
-    if inspect.isawaitable(fw_version):
-        fw_version = await fw_version
+    try:
+        fw_version_coro = request.app['com.opentrons.hardware'].fw_version
+        fw_version = await fw_version_coro
+    except CancelledError:
+        log.exception(fw_version_coro.exception())
 
     if config.feature_flags.use_protocol_api_v2():
         max_supported = protocol_api.MAX_SUPPORTED_VERSION

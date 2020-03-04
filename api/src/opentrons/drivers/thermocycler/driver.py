@@ -9,8 +9,11 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Optional, Mapping
+from typing import Optional, Mapping, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
+
+if TYPE_CHECKING:
+    from opentrons.hardware_control.dev_types import HasLoop  # noqa (F501)
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
 
@@ -75,9 +78,9 @@ class ThermocyclerError(Exception):
     pass
 
 
-class TCPoller(threading.Thread):
+class TCPoller():
     def __init__(self, port, interrupt_callback, temp_status_callback,
-                 lid_status_callback, lid_temp_status_callback):
+                 lid_status_callback, lid_temp_status_callback, loop):
         if not select:
             raise RuntimeError("Cannot connect to a Thermocycler from Windows")
         self._port = port
@@ -111,16 +114,14 @@ class TCPoller(threading.Thread):
         self._poller.register(self._halt_read_file, select.POLLIN)
         self._poller.register(self._connection, select.POLLIN)
 
-        serial_thread_name = 'tc_serial_poller_{}'.format(hash(self))
-        super().__init__(target=self._serial_poller, name=serial_thread_name)
-        log.info("Starting TC thread {}".format(serial_thread_name))
-        super().start()
+        loop.create_task(self._serial_poller())
+        log.info("Starting TC Poller Task{}".format(serial_thread_name))
 
     @property
     def port(self):
         return self._port
 
-    def _serial_poller(self):
+    async def _serial_poller(self):
         """ Priority-sorted list of checks
 
         Highest priority is the 'halt' channel, which is used to kill the
@@ -228,8 +229,10 @@ class TCPoller(threading.Thread):
             pass
 
 
-class Thermocycler:
-    def __init__(self, interrupt_callback):
+class Thermocycler('HasLoop'):
+    def __init__(self, interrupt_callback, loop):
+        self._interrupt_cb = interrupt_callback
+        self._loop = loop
         self._poller = None
         self._update_thread = None
         self._current_temp = None
@@ -237,7 +240,6 @@ class Thermocycler:
         self._ramp_rate = None
         self._hold_time = None
         self._lid_status = None
-        self._interrupt_cb = interrupt_callback
         self._lid_target = None
         self._lid_temp = None
 
@@ -247,7 +249,8 @@ class Thermocycler:
             port, self._interrupt_callback,
             self._temp_status_update_callback,
             self._lid_status_update_callback,
-            self._lid_temp_status_callback)
+            self._lid_temp_status_callback,
+            self.loop)
 
         # Check initial device lid state
         _lid_status_res = await self._write_and_wait(GCODES['GET_LID_STATUS'])
@@ -259,7 +262,6 @@ class Thermocycler:
     def disconnect(self) -> 'Thermocycler':
         if self.is_connected():
             self._poller.close()
-            self._poller.join()
         self._poller = None
         return self
 

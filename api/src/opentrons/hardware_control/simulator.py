@@ -257,12 +257,6 @@ class Simulator:
     async def identify(self):
         pass
 
-    def pause(self):
-        self._run_flag.clear()
-
-    def resume(self):
-        self._run_flag.set()
-
     def halt(self):
         self._run_flag.set()
 
