@@ -35,27 +35,41 @@ def test_load_labware_v2(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
+def make_setter_mock(mockInstance):
+    def setter_mock(*args, **kwargs):
+        if args:
+            # if no args, it's not a setter
+            mockInstance(*args, **kwargs)
+    return setter_mock
+
+
 def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
     protocol_data = get_json_protocol_fixture('3', 'simple')
+    # a single mock tracks the sequence of all calls we care about
     mock_everything = mock.Mock()
 
     # nest calls under 'pipetteId' fake method of mock_everything
     mock_pipette = mock.create_autospec(InstrumentContext)
-    mock_pipette.flow_rate.aspirate.setter = mock.Mock()
     mock_everything.pipetteId = mock_pipette
+
+    # add fake setter methods for `call` and set up flow_rate setter spies :(
+    mock_pipette._mock_set_aspirate_flow_rate = mock.Mock()
+    mock_pipette._mock_set_dispense_flow_rate = mock.Mock()
+    mock_pipette._mock_set_blow_out_flow_rate = mock.Mock()
+    type(mock_pipette.flow_rate).aspirate = mock.PropertyMock(
+        side_effect=make_setter_mock(mock_pipette._mock_set_aspirate_flow_rate))
+    type(mock_pipette.flow_rate).dispense = mock.PropertyMock(
+        side_effect=make_setter_mock(mock_pipette._mock_set_dispense_flow_rate))
+    type(mock_pipette.flow_rate).blow_out = mock.PropertyMock(
+        side_effect=make_setter_mock(mock_pipette._mock_set_blow_out_flow_rate))
+
     insts = {"pipetteId": mock_pipette}
 
-    mock_pipette.flow_rate.aspirate = 123
-    # this should work, so that we can test the flow rates below
-    assert mock_pipette.mock_calls == [mock.call(123)]
-
     # monkeypatch ProtocolContext methods we need to spy on using the mock
+    # next calls under 'ctx' fake method of mock_everything
     ctx = ProtocolContext(loop=loop)
-    monkeypatch.setattr(ctx, 'pause', mock_everything.pause)
-    monkeypatch.setattr(ctx, 'delay', mock_everything.delay)
-
-    mock_pipette.foo = 123  # TODO this should make the test fail
-    # mock_pipette.no_such_method_woop(333)
+    monkeypatch.setattr(ctx, 'pause', mock_everything.ctx.pause)
+    monkeypatch.setattr(ctx, 'delay', mock_everything.ctx.delay)
 
     source_plate = ctx.load_labware(
         'corning_96_wellplate_360ul_flat', '1')
@@ -75,28 +89,27 @@ def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
 
     calls = [
         mock.call.pipetteId.pick_up_tip(tiprack['B1']),
-        # ("set: flow_rate.aspirate", (3,)),
-        # ("set: flow_rate.dispense", (3,)),
-        # ("set: flow_rate.blow_out", (3,)),
+        mock.call.pipetteId._mock_set_aspirate_flow_rate(3),
+        mock.call.pipetteId._mock_set_dispense_flow_rate(3),
+        mock.call.pipetteId._mock_set_blow_out_flow_rate(3),
         mock.call.pipetteId.aspirate(5, source_plate['A1'].bottom(2)),
-        mock.call.delay(msg=None, seconds=42),
-        # ("set: flow_rate.aspirate", (2.5,)),
-        # ("set: flow_rate.dispense", (2.5,)),
-        # ("set: flow_rate.blow_out", (2.5,)),
+        mock.call.ctx.delay(msg=None, seconds=42),
+        mock.call.pipetteId._mock_set_aspirate_flow_rate(2.5),
+        mock.call.pipetteId._mock_set_dispense_flow_rate(2.5),
+        mock.call.pipetteId._mock_set_blow_out_flow_rate(2.5),
         mock.call.pipetteId.dispense(4.5, dest_plate['B1'].bottom(1)),
         mock.call.pipetteId.touch_tip(
             dest_plate['B1'], v_offset=0.33000000000000007),
-        # ("set: flow_rate.aspirate", (2,)),
-        # ("set: flow_rate.dispense", (2,)),
-        # ("set: flow_rate.blow_out", (2,)),
+        mock.call.pipetteId._mock_set_aspirate_flow_rate(2),
+        mock.call.pipetteId._mock_set_dispense_flow_rate(2),
+        mock.call.pipetteId._mock_set_blow_out_flow_rate(2),
         mock.call.pipetteId.blow_out(dest_plate['B1']),
         mock.call.pipetteId.move_to(ctx.deck.position_for('5').move(Point(x=1, y=2, z=3)),
                                     force_direct=None, minimum_z_height=None),
         mock.call.pipetteId.drop_tip(ctx.fixed_trash['A1'],)
     ]
 
-    # mock_everything.assert_has_calls(calls)
-    mock_everything.mock_calls == calls
+    assert mock_everything.mock_calls == calls
 
 
 def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):
