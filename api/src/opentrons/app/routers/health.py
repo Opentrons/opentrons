@@ -26,7 +26,7 @@ async def get_health(
         hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
     return Health(name=config.name(),
                   api_version=__version__,
-                  fw_version=fw_version,
+                  fw_version=hardware.fw_version,
                   logs=['/logs/serial.log', '/logs/api.log'],
                   system_version=config.OT_SYSTEM_VERSION,
                   protocol_api_version=[protocol_api.MAX_SUPPORTED_VERSION],

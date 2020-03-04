@@ -443,11 +443,6 @@ class API(HardwareAPILike):
         """
         await self.cache_instruments()
 
-    async def _wait_for_is_running(self):
-        if not self.is_simulator:
-            await self._execution_manager.wait_for_is_running()
-
-
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: top_types.Mount = None):
         """ Home the two z-axes """
@@ -476,7 +471,6 @@ class API(HardwareAPILike):
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
         """
-        await self._wait_for_is_running()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
@@ -759,7 +753,6 @@ class API(HardwareAPILike):
         at most one of a ZA or BC components. The frame in which to move
         is identified by the presence of (ZA) or (BC).
         """
-        await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
         to_transform = tuple((tp
@@ -841,7 +834,6 @@ class API(HardwareAPILike):
 
         Works regardless of critical point or home status.
         """
-        await self._wait_for_is_running()
         smoothie_ax = Axis.by_mount(mount).name.upper()
         async with self._motion_lock:
             smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
