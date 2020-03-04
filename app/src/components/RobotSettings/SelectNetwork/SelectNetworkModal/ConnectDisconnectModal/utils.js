@@ -9,7 +9,7 @@ import {
 import { DISCONNECT, JOIN_OTHER } from '../../constants'
 
 import type { WifiSecurityType } from '../../../../../networking/types'
-import type { NetworkingActionType } from '../../types'
+import type { NetworkChangeType } from '../../types'
 
 const FIND_AND_JOIN = 'Find and join a Wi-Fi network'
 const DISCONNECT_FROM_SSID = (previousSsid: string) =>
@@ -19,7 +19,7 @@ const CONNECT_TO_SSID = (ssid: string) => `Connect to ${ssid}`
 export const formatHeading = (
   ssid: string | null,
   previousSsid: string | null,
-  networkingType: NetworkingActionType
+  networkingType: NetworkChangeType
 ): string | null => {
   if (networkingType === JOIN_OTHER) {
     return FIND_AND_JOIN
@@ -45,7 +45,7 @@ const securityTypes = (ssid: string) => ({
 export const formatBody = (
   ssid: string | null,
   previousSsid: string | null,
-  networkingType: NetworkingActionType,
+  networkingType: NetworkChangeType,
   securityType: WifiSecurityType | null
 ): string | null => {
   if (networkingType === JOIN_OTHER) {

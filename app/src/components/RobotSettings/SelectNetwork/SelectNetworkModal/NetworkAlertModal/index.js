@@ -42,17 +42,12 @@ export function NetworkAlertModal(props: WifiConnectModalProps) {
       errorMessage = messageMatch ? messageMatch[1] : error.message
     }
 
-    const modalError = {
-      name: (error && error.name) || 'UnknownError',
-      message: errorMessage,
-    }
-
     return (
       <ErrorModal
         heading={FAILURE_TITLE}
         description={failure(ssid)}
         close={close}
-        error={modalError}
+        error={{ message: errorMessage }}
       />
     )
   }

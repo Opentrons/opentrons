@@ -17,8 +17,9 @@ import * as Fixtures from '../../../../networking/__fixtures__'
 import * as Constants from '../constants'
 import { ConnectModal } from '../ConnectModal'
 import { DisconnectModal } from '../DisconnectModal'
-import { JoinOtherModal } from '../JoinOtherModal'
 import { InProgressModal } from '../InProgressModal'
+import { SuccessModal } from '../SuccessModal'
+import { FailureModal } from '../FailureModal'
 
 import type { State } from '../../../../types'
 
@@ -35,10 +36,28 @@ const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'baz' },
 ]
 
+const mockWifiKeys = [
+  { ...Fixtures.mockWifiKey, id: 'abc' },
+  { ...Fixtures.mockWifiKey, id: 'def' },
+  { ...Fixtures.mockWifiKey, id: 'ghi' },
+]
+
+const mockEapOptions = [Fixtures.mockEapOption]
+
 const mockGetWifiList: JestMockFn<
   [State, string],
   $Call<typeof Networking.getWifiList, State, string>
 > = Networking.getWifiList
+
+const mockGetWifiKeys: JestMockFn<
+  [State, string],
+  $Call<typeof Networking.getWifiKeys, State, string>
+> = Networking.getWifiKeys
+
+const mockGetEapOptions: JestMockFn<
+  [State, string],
+  $Call<typeof Networking.getEapOptions, State, string>
+> = Networking.getEapOptions
 
 const mockGetCanDisconnect: JestMockFn<
   [State, string],
@@ -63,8 +82,31 @@ describe('<SelectNetwork />', () => {
       getState: () => mockState,
     }
 
-    mockGetWifiList.mockReturnValue(mockWifiList)
-    mockGetCanDisconnect.mockReturnValue(true)
+    jest.useFakeTimers()
+
+    mockGetWifiList.mockImplementation((state, robotName) => {
+      expect(state).toEqual(mockState)
+      expect(robotName).toEqual(mockRobotName)
+      return mockWifiList
+    })
+
+    mockGetWifiKeys.mockImplementation((state, robotName) => {
+      expect(state).toEqual(mockState)
+      expect(robotName).toEqual(mockRobotName)
+      return mockWifiKeys
+    })
+
+    mockGetEapOptions.mockImplementation((state, robotName) => {
+      expect(state).toEqual(mockState)
+      expect(robotName).toEqual(mockRobotName)
+      return mockEapOptions
+    })
+
+    mockGetCanDisconnect.mockImplementation((state, robotName) => {
+      expect(state).toEqual(mockState)
+      expect(robotName).toEqual(mockRobotName)
+      return true
+    })
 
     render = () => {
       return mount(<SelectNetwork robotName={mockRobotName} />, {
@@ -76,23 +118,30 @@ describe('<SelectNetwork />', () => {
 
   afterEach(() => {
     jest.clearAllMocks()
+    jest.clearAllTimers()
+    jest.useRealTimers()
   })
 
-  it.todo('dispatches fetchWifiList, fetchEapOptions, fetchWifiKeys on mount')
+  it('dispatches fetchEapOptions, fetchWifiKeys on mount and fetchWifiList on an interval', () => {
+    const expectedFetchList = Networking.fetchWifiList(mockRobotName)
+
+    render()
+    expect(dispatch).toHaveBeenNthCalledWith(1, expectedFetchList)
+    expect(dispatch).toHaveBeenNthCalledWith(
+      2,
+      Networking.fetchEapOptions(mockRobotName)
+    )
+    expect(dispatch).toHaveBeenNthCalledWith(
+      3,
+      Networking.fetchWifiKeys(mockRobotName)
+    )
+    expect(dispatch).toHaveBeenCalledTimes(3)
+    jest.advanceTimersByTime(20000)
+    expect(dispatch).toHaveBeenNthCalledWith(4, expectedFetchList)
+    expect(dispatch).toHaveBeenNthCalledWith(5, expectedFetchList)
+  })
 
   it('renders an <SelectSsid /> child with props from state', () => {
-    mockGetWifiList.mockImplementation((state, robotName) => {
-      expect(state).toEqual(mockState)
-      expect(robotName).toEqual(mockRobotName)
-      return mockWifiList
-    })
-
-    mockGetCanDisconnect.mockImplementation((state, robotName) => {
-      expect(state).toEqual(mockState)
-      expect(robotName).toEqual(mockRobotName)
-      return true
-    })
-
     const wrapper = render()
     const selectSsid = wrapper.find(SelectSsid)
     expect(selectSsid.prop('list')).toEqual(mockWifiList)
@@ -141,75 +190,110 @@ describe('<SelectNetwork />', () => {
       expect(wrapper.find(DisconnectModal)).toHaveLength(0)
     })
 
-    it('passes an onDisconnect prop that dispatches networking:POST_WIFI_DISCONNECT', () => {
-      act(() => {
-        disconnectModal.invoke('onDisconnect')()
-      })
-      wrapper.update()
+    describe('dispatching the request', () => {
+      let requestId
 
-      expect(dispatch).toHaveBeenCalledWith(
-        expect.objectContaining({
-          ...Networking.postWifiDisconnect(mockRobotName, mockWifiList[0].ssid),
-          meta: { requestId: expect.any(String) },
+      const disconnectAndSetMockRequestState = (requestState = null) => {
+        act(() => {
+          disconnectModal.invoke('onDisconnect')()
+          const actionCall = dispatch.mock.calls.find(
+            call => call[0].type === Networking.POST_WIFI_DISCONNECT
+          )
+          requestId = actionCall?.[0].meta.requestId
+
+          mockGetRequestById.mockImplementation((state, reqId) => {
+            expect(state).toEqual(mockState)
+            return reqId === requestId ? requestState : null
+          })
         })
-      )
-    })
+        wrapper.update()
+      }
 
-    it('closes modal and shows a spinner while disconnect is in progress', () => {
-      act(() => {
-        disconnectModal.invoke('onDisconnect')()
-        const actionCall = dispatch.mock.calls.find(
-          call => call[0].type === Networking.POST_WIFI_DISCONNECT
+      it('passes an onDisconnect prop that dispatches networking:POST_WIFI_DISCONNECT', () => {
+        disconnectAndSetMockRequestState()
+
+        expect(dispatch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...Networking.postWifiDisconnect(
+              mockRobotName,
+              mockWifiList[0].ssid
+            ),
+            meta: { requestId: expect.any(String) },
+          })
         )
-        const requestId = actionCall?.[0].meta.requestId
+      })
 
-        mockGetRequestById.mockImplementation((state, reqId) => {
-          expect(state).toEqual(mockState)
-          return reqId === requestId ? { status: RobotApi.PENDING } : null
+      it('closes modal and shows a spinner while disconnect is in progress', () => {
+        disconnectAndSetMockRequestState({ status: RobotApi.PENDING })
+
+        expect(wrapper.find(DisconnectModal)).toHaveLength(0)
+        const inProgressModal = wrapper.find(InProgressModal)
+        expect(inProgressModal).toHaveLength(1)
+        expect(inProgressModal.props()).toEqual({
+          type: Constants.DISCONNECT,
+          ssid: mockWifiList[0].ssid,
         })
       })
-      wrapper.update()
 
-      expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-      const inProgressModal = wrapper.find(InProgressModal)
-      expect(inProgressModal).toHaveLength(1)
-      expect(inProgressModal.props()).toEqual({
-        type: Constants.DISCONNECT,
-        ssid: mockWifiList[0].ssid,
+      it('closes spinner and shows success when disconnect succeeds', () => {
+        disconnectAndSetMockRequestState({
+          status: RobotApi.SUCCESS,
+          response: ({}: any),
+        })
+
+        expect(wrapper.find(DisconnectModal)).toHaveLength(0)
+        expect(wrapper.find(InProgressModal)).toHaveLength(0)
+        const successModal = wrapper.find(SuccessModal)
+        expect(successModal).toHaveLength(1)
+        expect(successModal.props()).toEqual({
+          type: Constants.DISCONNECT,
+          ssid: mockWifiList[0].ssid,
+          onClose: expect.any(Function),
+        })
+
+        act(() => {
+          successModal.invoke('onClose')()
+        })
+        wrapper.update()
+
+        expect(wrapper.find(SuccessModal)).toHaveLength(0)
+        expect(dispatch).toHaveBeenCalledWith(
+          RobotApi.dismissRequest(((requestId: any): string))
+        )
+      })
+
+      it('closes spinner and shows failure if disconnect fails', () => {
+        disconnectAndSetMockRequestState({
+          status: RobotApi.FAILURE,
+          response: ({}: any),
+          error: { message: 'oh no!' },
+        })
+
+        expect(wrapper.find(DisconnectModal)).toHaveLength(0)
+        expect(wrapper.find(InProgressModal)).toHaveLength(0)
+        const failureModal = wrapper.find(FailureModal)
+        expect(failureModal).toHaveLength(1)
+        expect(failureModal.props()).toEqual({
+          type: Constants.DISCONNECT,
+          ssid: mockWifiList[0].ssid,
+          error: { message: 'oh no!' },
+          onClose: expect.any(Function),
+        })
+
+        act(() => {
+          failureModal.invoke('onClose')()
+        })
+        wrapper.update()
+
+        expect(wrapper.find(FailureModal)).toHaveLength(0)
+        expect(dispatch).toHaveBeenCalledWith(
+          RobotApi.dismissRequest(((requestId: any): string))
+        )
       })
     })
   })
 
-  describe('joining an unknown network', () => {
-    let wrapper
-    let joinOtherModal
-
-    beforeEach(() => {
-      wrapper = render()
-      const selectSsid = wrapper.find(SelectSsid)
-
-      act(() => {
-        selectSsid.invoke('onJoinOther')()
-      })
-      wrapper.update()
-      joinOtherModal = wrapper.find(JoinOtherModal)
-    })
-
-    it('renders a JoinOtherModal on SelectSsid::onJoinOther', () => {
-      expect(joinOtherModal).toHaveLength(1)
-    })
-
-    it('passes onCancel prop that closes the modal', () => {
-      act(() => {
-        joinOtherModal.invoke('onCancel')()
-      })
-      wrapper.update()
-
-      expect(wrapper.find(JoinOtherModal)).toHaveLength(0)
-    })
-  })
-
-  describe('joining a new, known network', () => {
+  describe('joining a network', () => {
     let wrapper
     let connectModal
 
@@ -227,7 +311,33 @@ describe('<SelectNetwork />', () => {
 
     it('renders a ConnectModal on SelectSsid::onSelect', () => {
       expect(connectModal).toHaveLength(1)
-      expect(connectModal.prop('network')).toEqual(mockWifiList[1])
+      expect(connectModal.props()).toEqual({
+        network: mockWifiList[1],
+        wifiKeys: mockWifiKeys,
+        eapOptions: mockEapOptions,
+        onConnect: expect.any(Function),
+        onCancel: expect.any(Function),
+      })
+    })
+
+    it('renders a ConnectModal with network={null} on SelectSsid::onJoinOther', () => {
+      wrapper = render()
+      const selectSsid = wrapper.find(SelectSsid)
+
+      act(() => {
+        selectSsid.invoke('onJoinOther')()
+      })
+      wrapper.update()
+      connectModal = wrapper.find(ConnectModal)
+
+      expect(connectModal).toHaveLength(1)
+      expect(connectModal.props()).toEqual({
+        network: null,
+        wifiKeys: mockWifiKeys,
+        eapOptions: mockEapOptions,
+        onConnect: expect.any(Function),
+        onCancel: expect.any(Function),
+      })
     })
 
     it('passes onCancel prop that closes the modal', () => {
@@ -238,121 +348,105 @@ describe('<SelectNetwork />', () => {
 
       expect(wrapper.find(ConnectModal)).toHaveLength(0)
     })
+
+    describe('dispatching the request', () => {
+      const mockConfigure = { ssid: mockWifiList[1].ssid, psk: 'password' }
+      let requestId
+
+      const connectAndSetMockRequestState = (requestState = null) => {
+        act(() => {
+          connectModal.invoke('onConnect')(mockConfigure)
+          const actionCall = dispatch.mock.calls.find(
+            call => call[0].type === Networking.POST_WIFI_CONFIGURE
+          )
+          requestId = actionCall?.[0].meta.requestId
+
+          mockGetRequestById.mockImplementation((state, reqId) => {
+            expect(state).toEqual(mockState)
+            return reqId === requestId ? requestState : null
+          })
+        })
+        wrapper.update()
+      }
+
+      it('passes an onConnect prop that dispatches networking:POST_WIFI_CONFIGURE', () => {
+        connectAndSetMockRequestState()
+
+        expect(dispatch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...Networking.postWifiConfigure(mockRobotName, mockConfigure),
+            meta: { requestId: expect.any(String) },
+          })
+        )
+      })
+
+      it('closes modal and shows a spinner while disconnect is in progress', () => {
+        connectAndSetMockRequestState({ status: RobotApi.PENDING })
+
+        expect(wrapper.find(ConnectModal)).toHaveLength(0)
+        const inProgressModal = wrapper.find(InProgressModal)
+        expect(inProgressModal).toHaveLength(1)
+        expect(inProgressModal.props()).toEqual({
+          type: Constants.CONNECT,
+          ssid: mockConfigure.ssid,
+        })
+      })
+
+      it('closes spinner and shows success if connect succeeds', () => {
+        connectAndSetMockRequestState({
+          status: RobotApi.SUCCESS,
+          response: ({}: any),
+        })
+
+        expect(wrapper.find(ConnectModal)).toHaveLength(0)
+        expect(wrapper.find(InProgressModal)).toHaveLength(0)
+        const successModal = wrapper.find(SuccessModal)
+        expect(successModal).toHaveLength(1)
+        expect(successModal.props()).toEqual({
+          type: Constants.CONNECT,
+          ssid: mockConfigure.ssid,
+          onClose: expect.any(Function),
+        })
+
+        act(() => {
+          successModal.invoke('onClose')()
+        })
+        wrapper.update()
+
+        expect(wrapper.find(SuccessModal)).toHaveLength(0)
+        expect(dispatch).toHaveBeenCalledWith(
+          RobotApi.dismissRequest(((requestId: any): string))
+        )
+      })
+
+      it('closes spinner and shows failure if connect fails', () => {
+        connectAndSetMockRequestState({
+          status: RobotApi.FAILURE,
+          response: ({}: any),
+          error: { message: 'oh no!' },
+        })
+
+        expect(wrapper.find(ConnectModal)).toHaveLength(0)
+        expect(wrapper.find(InProgressModal)).toHaveLength(0)
+        const failureModal = wrapper.find(FailureModal)
+        expect(failureModal).toHaveLength(1)
+        expect(failureModal.props()).toEqual({
+          type: Constants.CONNECT,
+          ssid: mockConfigure.ssid,
+          error: { message: 'oh no!' },
+          onClose: expect.any(Function),
+        })
+
+        act(() => {
+          failureModal.invoke('onClose')()
+        })
+        wrapper.update()
+
+        expect(wrapper.find(FailureModal)).toHaveLength(0)
+        expect(dispatch).toHaveBeenCalledWith(
+          RobotApi.dismissRequest(((requestId: any): string))
+        )
+      })
+    })
   })
-
-  // revisit after networking refactors
-  test.todo('on mount dispatches configure')
-
-  // describe('<SelectNetworkModal />', () => {
-  //   const newSsid = wifiList[2].ssid
-  //   let wrapper
-  //   let selectSsid
-
-  //   beforeEach(() => {
-  //     wrapper = render()
-  //     selectSsid = wrapper.find(SelectSsid)
-  //   })
-
-  //   describe('onValueChange function', () => {
-  //     test('updates state correctly', () => {
-  //       act(() => {
-  //         selectSsid.props().onValueChange(newSsid)
-  //       })
-  //       wrapper.update()
-  //       const modal = wrapper.find(SelectNetworkModal)
-
-  //       expect(modal.prop('ssid')).toEqual(newSsid)
-  //       expect(modal.prop('previousSsid')).toEqual(wifiList[0].ssid)
-  //       expect(modal.prop('networkingType')).toEqual('connect')
-  //       expect(modal.prop('securityType')).toEqual(wifiList[2].securityType)
-  //       expect(modal.prop('modalOpen')).toEqual(true)
-  //     })
-
-  //     // revisit after additional networking refactors
-  //     test.todo('when security type is none dispatches configure correctly')
-
-  //     test.todo(
-  //       'when has WPA or EAP security type dispatches fetchWifiEapOptions correctly'
-  //     )
-  //     test.todo(
-  //       'when has WPA or EAP security type dispatches fetchWifiKeys correctly'
-  //     )
-  //   })
-
-  //   test('onCancel function updates state correctly', () => {
-  //     act(() => {
-  //       selectSsid.props().onValueChange(newSsid)
-  //     })
-
-  //     wrapper.update()
-  //     let modal = wrapper.find(SelectNetworkModal)
-
-  //     act(() => {
-  //       modal.props().onCancel()
-  //     })
-  //     wrapper.update()
-  //     modal = wrapper.find(SelectNetworkModal)
-
-  //     expect(modal.prop('ssid')).toEqual(wifiList[0].ssid)
-  //     expect(modal.prop('previousSsid')).toEqual(null)
-  //     expect(modal.prop('networkingType')).toEqual('connect')
-  //     expect(modal.prop('securityType')).toEqual(wifiList[0].securityType)
-  //     expect(modal.prop('modalOpen')).toEqual(false)
-  //   })
-  // })
-
-  // describe('onDisconnectWifi function', () => {
-  //   test('dispatches postDisconnectNetwork and closes modal when previousSsid is present', () => {
-  //     const wrapper = render()
-  //     const newSsid = 'Opentrons'
-  //     const selectSsid = wrapper.find(SelectSsid)
-  //     act(() => {
-  //       selectSsid.props().onValueChange(newSsid)
-  //     })
-  //     wrapper.update()
-  //     let modal = wrapper.find(SelectNetworkModal)
-
-  //     // TODO: (isk: 2/27/20): Potentially move into utils mock
-  //     const expected = {
-  //       ...Networking.postWifiDisconnect(
-  //         mockRobot.name,
-  //         modal.prop('previousSsid')
-  //       ),
-  //       meta: { requestId: 'robotApi_request_1' },
-  //     }
-
-  //     jest.clearAllMocks()
-
-  //     expect(modal.prop('modalOpen')).toEqual(true)
-
-  //     act(() => {
-  //       modal.props().onDisconnectWifi()
-  //     })
-
-  //     wrapper.update()
-  //     modal = wrapper.find(SelectNetworkModal)
-
-  //     expect(dispatch).toHaveBeenCalledWith(expected)
-  //     expect(modal.prop('modalOpen')).toEqual(false)
-  //   })
-
-  //   test('does not dispatch postDisconnectNetwork and modal remains open when previousSsid is not present', () => {
-  //     const wrapper = render()
-  //     let modal = wrapper.find(SelectNetworkModal)
-
-  //     jest.clearAllMocks()
-
-  //     expect(modal.prop('modalOpen')).toEqual(false)
-
-  //     act(() => {
-  //       modal.props().onDisconnectWifi()
-  //     })
-
-  //     wrapper.update()
-  //     modal = wrapper.find(SelectNetworkModal)
-
-  //     expect(dispatch).not.toHaveBeenCalled()
-  //     expect(modal.prop('modalOpen')).toEqual(false)
-  //   })
-  // })
 })

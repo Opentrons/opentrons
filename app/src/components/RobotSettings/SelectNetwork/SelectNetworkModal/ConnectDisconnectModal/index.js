@@ -11,7 +11,7 @@ import type {
   WifiKeysList,
 } from '../../../../../http-api-client'
 
-import type { NetworkingActionType } from '../../types'
+import type { NetworkChangeType } from '../../types'
 
 import { formatHeading, formatBody } from './utils'
 
@@ -22,7 +22,7 @@ import styles from './styles.css'
 export type ConnectDisconnectModalProps = {|
   ssid: string | null,
   previousSsid: string | null,
-  networkingType: NetworkingActionType,
+  networkingType: NetworkChangeType,
   securityType: WifiSecurityType | null,
   onCancel: () => mixed,
   addKey: () => mixed,
