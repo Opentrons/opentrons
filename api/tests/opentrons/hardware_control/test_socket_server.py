@@ -213,7 +213,7 @@ async def test_complex_method(hc_stream_server, loop, monkeypatch):
     gai_resp = await decoder.read_object()
     assert gai_resp['id'] == 2
     assert 'result' in gai_resp
-    attached = await server._api.attached_instruments
+    attached = server._api.attached_instruments
     assert gai_resp['result']['LEFT']\
         == attached[Mount.LEFT]
 

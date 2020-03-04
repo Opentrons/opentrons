@@ -309,7 +309,7 @@ class API(HardwareAPILike):
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
 
-    async def get_attached_instruments(self) -> Dict[top_types.Mount,
+    def get_attached_instruments(self) -> Dict[top_types.Mount,
                                                      Pipette.DictType]:
         """ Get the status dicts of the cached attached instruments.
 
@@ -351,7 +351,9 @@ class API(HardwareAPILike):
             instruments[mount]['ready_to_aspirate'] = instr.ready_to_aspirate
         return instruments
 
-    attached_instruments = property(fget=get_attached_instruments)
+    @property
+    def attached_instruments(self):
+        return self.get_attached_instruments()
 
     @property
     def attached_modules(self):
@@ -513,7 +515,7 @@ class API(HardwareAPILike):
             mount: top_types.Mount,
             tip_length: float):
         instr = self._attached_instruments[mount]
-        attached = await self.attached_instruments
+        attached = self.attached_instruments
         instr_dict = attached[mount]
         if instr and not instr.has_tip:
             instr.add_tip(tip_length=tip_length)
@@ -524,7 +526,7 @@ class API(HardwareAPILike):
 
     async def remove_tip(self, mount: top_types.Mount):
         instr = self._attached_instruments[mount]
-        attached = await self.attached_instruments
+        attached = self.attached_instruments
         instr_dict = attached[mount]
         if instr and instr.has_tip:
             instr.remove_tip()
@@ -825,12 +827,14 @@ class API(HardwareAPILike):
             else:
                 self._current_position.update(target_position)
 
-    async def get_engaged_axes(self) -> Dict[Axis, bool]:
+    def get_engaged_axes(self) -> Dict[Axis, bool]:
         """ Which axes are engaged and holding. """
         return {Axis[ax]: eng
                 for ax, eng in self._backend.engaged_axes().items()}
 
-    engaged_axes = property(fget=get_engaged_axes)
+    @property
+    def engaged_axes(self):
+        return self.get_engaged_axes()
 
     async def disengage_axes(self, which: List[Axis]):
         self._backend.disengage_axes([ax.name for ax in which])
