@@ -326,7 +326,7 @@ class API(HardwareAPILike):
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model', 'blow_out_flow_rate',
-                   'working_volume', 'tip_overlap']
+                   'working_volume', 'tip_overlap', 'available_volume']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -345,6 +345,7 @@ class API(HardwareAPILike):
                 instr, instr.config.dispense_flow_rate, 'dispense')
             instruments[mount]['blow_out_speed'] = self._plunger_speed(
                 instr, instr.config.blow_out_flow_rate, 'dispense')
+            instruments[mount]['ready_to_aspirate'] = instr.ready_to_aspirate
         return instruments
 
     attached_instruments = property(fget=get_attached_instruments)
@@ -958,7 +959,6 @@ class API(HardwareAPILike):
         if this_pipette.current_volume == 0\
            and not this_pipette.ready_to_aspirate:
             raise RuntimeError('Pipette not ready to aspirate')
-        this_pipette.ready_to_aspirate = False
 
         if volume is None:
             asp_vol = this_pipette.available_volume
@@ -1083,6 +1083,7 @@ class API(HardwareAPILike):
             raise
         finally:
             this_pipette.set_current_volume(0)
+            this_pipette.ready_to_aspirate = False
 
     async def pick_up_tip(self,
                           mount,

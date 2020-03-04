@@ -217,6 +217,7 @@ class Pipette:
     def as_dict(self) -> 'Pipette.DictType':
         config_dict = self.config._asdict()
         config_dict.update({'current_volume': self.current_volume,
+                            'available_volume': self.available_volume,
                             'name': self.name,
                             'model': self.model,
                             'pipette_id': self.pipette_id,
