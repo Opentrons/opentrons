@@ -464,10 +464,7 @@ async def identify(request):
 
 async def get_rail_lights(request):
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        on = await hw.get_lights()
-    else:
-        on = hw.get_lights()
+    on = hw.get_lights()
     return web.json_response({'on': on['rails']})
 
 
