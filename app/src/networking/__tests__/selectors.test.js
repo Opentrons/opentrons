@@ -1,18 +1,40 @@
 // @flow
+import noop from 'lodash/noop'
+import * as Config from '../../config'
+import * as Discovery from '../../discovery'
 import * as Selectors from '../selectors'
 import * as Constants from '../constants'
 import * as Fixtures from '../__fixtures__'
+
 import type { State } from '../../types'
+
+jest.mock('../../config/selectors')
+jest.mock('../../discovery/selectors')
+
+const getRobotApiVersionByName: JestMockFn<
+  [State, string],
+  $Call<typeof Discovery.getRobotApiVersionByName, State, string>
+> = Discovery.getRobotApiVersionByName
+
+const getFeatureFlags: JestMockFn<
+  [State],
+  $Call<typeof Config.getFeatureFlags, State>
+> = Config.getFeatureFlags
 
 type SelectorSpec = {|
   name: string,
   selector: ($Shape<State>, ...Array<any>) => mixed,
   state: $Shape<State>,
   args?: Array<any>,
+  before?: (spec: SelectorSpec) => mixed,
   expected: mixed,
 |}
 
 describe('robot settings selectors', () => {
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   const SPECS: Array<SelectorSpec> = [
     {
       name: 'getInternetStatus returns null if unavailable',
@@ -237,7 +259,6 @@ describe('robot settings selectors', () => {
       args: ['robotName'],
       expected: [],
     },
-
     {
       name: 'getEapOptions returns options from state',
       selector: Selectors.getEapOptions,
@@ -251,12 +272,121 @@ describe('robot settings selectors', () => {
       args: ['robotName'],
       expected: [Fixtures.mockEapOption],
     },
+    {
+      // TODO(mc, 2020-03-03): remove disconnect feature flag
+      name:
+        'getCanDisconnect returns true if active network, robot >= 3.17, FF on',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
+          },
+        },
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockImplementation(state => {
+          expect(state).toEqual(mockState)
+          return { enableWifiDisconnect: true }
+        })
+        getRobotApiVersionByName.mockImplementation((state, robotName) => {
+          expect(state).toEqual(mockState)
+          expect(robotName).toEqual('robotName')
+          return '3.17.0'
+        })
+      },
+      expected: true,
+    },
+    {
+      name: 'getCanDisconnect returns false if no list in state',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {},
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockReturnValue({ enableWifiDisconnect: true })
+        getRobotApiVersionByName.mockReturnValue('3.17.0')
+      },
+      expected: false,
+    },
+    {
+      name: 'getCanDisconnect returns false if no active network',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [{ ...Fixtures.mockWifiNetwork, active: false }],
+          },
+        },
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockReturnValue({ enableWifiDisconnect: true })
+        getRobotApiVersionByName.mockReturnValue('3.17.0')
+      },
+      expected: false,
+    },
+    {
+      name: 'getCanDisconnect returns false if less than 3.17.0',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
+          },
+        },
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockReturnValue({ enableWifiDisconnect: true })
+        getRobotApiVersionByName.mockReturnValue('3.16.999')
+      },
+      expected: false,
+    },
+    {
+      name: 'getCanDisconnect returns false if robot API version not found',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
+          },
+        },
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockReturnValue({ enableWifiDisconnect: true })
+        getRobotApiVersionByName.mockReturnValue(null)
+      },
+      expected: false,
+    },
+    {
+      // TODO(mc, 2020-03-03): remove disconnect feature flag
+      name: 'getCanDisconnect returns false if FF off',
+      selector: Selectors.getCanDisconnect,
+      state: {
+        networking: {
+          robotName: {
+            wifiList: [{ ...Fixtures.mockWifiNetwork, active: true }],
+          },
+        },
+      },
+      args: ['robotName'],
+      before: ({ state: mockState }) => {
+        getFeatureFlags.mockReturnValue({})
+        getRobotApiVersionByName.mockReturnValue('3.17.0')
+      },
+      expected: false,
+    },
   ]
 
   SPECS.forEach(spec => {
-    const { name, selector, state, args = [], expected } = spec
+    const { name, selector, state, args = [], before = noop, expected } = spec
 
     it(name, () => {
+      before(spec)
       const result = selector(state, ...args)
       expect(result).toEqual(expected)
     })

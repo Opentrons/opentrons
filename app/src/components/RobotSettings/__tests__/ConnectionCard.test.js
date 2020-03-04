@@ -150,6 +150,6 @@ describe('ConnectionCard', () => {
     const wrapper = render()
     const select = wrapper.find(SelectNetwork)
 
-    expect(select.prop('robot')).toEqual(mockRobot)
+    expect(select.prop('robotName')).toEqual(mockRobot.name)
   })
 })

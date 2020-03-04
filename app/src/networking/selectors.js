@@ -5,13 +5,13 @@ import map from 'lodash/map'
 import orderBy from 'lodash/orderBy'
 import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
-import semver from 'semver'
+import Semver from 'semver'
 
-import { getRobotApiVersion } from '../discovery'
+import { getFeatureFlags } from '../config'
+import { getRobotApiVersionByName } from '../discovery'
 
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
-import type { ViewableRobot } from '../discovery/types'
 import type { State } from '../types'
 import * as Types from './types'
 
@@ -85,6 +85,23 @@ export const getEapOptions = (
   return state.networking[robotName]?.eapOptions ?? []
 }
 
-const API_MIN_VERSION = '3.17.0'
-export const getRobotSuportsDisconnect = (robot: ViewableRobot) =>
-  semver.gte(getRobotApiVersion(robot), API_MIN_VERSION)
+const API_MIN_DISCONNECT_VERSION = '3.17.0'
+
+export const getCanDisconnect: (
+  state: State,
+  robotName: string
+) => boolean = createSelector(
+  getWifiList,
+  getRobotApiVersionByName,
+  getFeatureFlags,
+  (list, apiVersion, featureFlags) => {
+    const active = list.some(nw => nw.active)
+    const supportsDisconnect = Semver.valid(apiVersion)
+      ? Semver.gte(apiVersion, API_MIN_DISCONNECT_VERSION)
+      : false
+    // TODO(mc, 2020-03-03): remove disconnect feature flag
+    const ffEnabled = featureFlags.enableWifiDisconnect
+
+    return Boolean(active && supportsDisconnect && ffEnabled)
+  }
+)

@@ -11,7 +11,7 @@ import { getWifiList } from '../../../networking'
 import type { WifiNetwork, WifiSecurityType } from '../../../networking/types'
 import type { ViewableRobot } from '../../../discovery/types'
 import type { State } from '../../../types'
-import type { NetworkingType } from './types'
+import type { NetworkingActionType } from './types'
 
 import { getActiveSsid, getSecurityType } from './utils'
 import { CONNECT } from './constants'
@@ -23,7 +23,7 @@ export const useStateSelectNetwork = (list: Array<WifiNetwork>) => {
 
   const [ssid, setSsid] = useState<string | null>(null)
   const [previousSsid, setPreviousSsid] = useState<string | null>(null)
-  const [networkingType, setNetworkingType] = useState<NetworkingType | null>(
+  const [networkingType, setNetworkingType] = useState<NetworkingActionType>(
     null
   )
   const [securityType, setSecurityType] = useState<WifiSecurityType | null>(

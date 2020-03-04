@@ -324,6 +324,27 @@ describe('discovery selectors', () => {
       ],
     },
     {
+      name: 'getViewableRobots returns connectable and reachable robots',
+      selector: discovery.getViewableRobots,
+      state: {
+        discovery: {
+          robotsByName: {
+            foo: [makeConnectable('foo', '10.0.0.1')],
+            bar: [makeFullyUp('bar', '10.0.0.2')],
+            baz: [makeServerUp('baz', '10.0.0.3', false)],
+            qux: [makeAdvertising('qux', '10.0.0.4')],
+          },
+        },
+        robot: { connection: { connectedTo: 'bar' } },
+      },
+      expected: [
+        makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
+        makeFullyUp('bar', '10.0.0.2', 'connectable', true, 'bar'),
+        makeServerUp('baz', '10.0.0.3', false, 'reachable', 'baz'),
+        makeAdvertising('qux', '10.0.0.4', 'reachable', 'qux'),
+      ],
+    },
+    {
       name: 'getConnectedRobot returns connected robot',
       selector: discovery.getConnectedRobot,
       state: {
@@ -365,7 +386,7 @@ describe('discovery selectors', () => {
       expected: null,
     },
     {
-      name: 'getRobotApiVersion returns serverHleath if API health invalid',
+      name: 'getRobotApiVersion returns serverHealth if API health invalid',
       // TODO(mc, 2018-10-11): state is a misnomer here, maybe rename it "input"
       state: {
         serverHealth: { apiServerVersion: '4.5.6' },
@@ -427,10 +448,82 @@ describe('discovery selectors', () => {
       selector: discovery.getRobotProtocolApiVersion,
       expected: null,
     },
+    {
+      name: 'getRobotByName returns connectable robot by name',
+      selector: discovery.getRobotByName,
+      state: {
+        discovery: {
+          robotsByName: {
+            foo: [makeConnectable('foo', '10.0.0.1')],
+            bar: [makeFullyUp('bar', '10.0.0.2')],
+            baz: [makeServerUp('baz', '10.0.0.3', false)],
+            qux: [makeAdvertising('qux', '10.0.0.4')],
+          },
+        },
+        robot: { connection: { connectedTo: null } },
+      },
+      args: ['foo'],
+      expected: makeConnectable('foo', '10.0.0.1', 'connectable', false, 'foo'),
+    },
+    {
+      name: 'getRobotByName returns reachable robot by name',
+      selector: discovery.getRobotByName,
+      state: {
+        discovery: {
+          robotsByName: {
+            foo: [makeConnectable('foo', '10.0.0.1')],
+            bar: [makeFullyUp('bar', '10.0.0.2')],
+            baz: [makeServerUp('baz', '10.0.0.3', false)],
+            qux: [makeAdvertising('qux', '10.0.0.4')],
+          },
+        },
+        robot: { connection: { connectedTo: null } },
+      },
+      args: ['baz'],
+      expected: makeServerUp('baz', '10.0.0.3', false, 'reachable', 'baz'),
+    },
+    {
+      name: 'getRobotApiVersionByName returns API version of connectable robot',
+      selector: discovery.getRobotApiVersionByName,
+      state: {
+        discovery: {
+          robotsByName: {
+            foo: [
+              {
+                ...makeConnectable('foo', '10.0.0.1'),
+                health: { api_version: '4.5.6' },
+              },
+            ],
+          },
+        },
+        robot: { connection: { connectedTo: null } },
+      },
+      args: ['foo'],
+      expected: '4.5.6',
+    },
+    {
+      name: 'getRobotApiVersionByName returns API version of reachable robot',
+      selector: discovery.getRobotApiVersionByName,
+      state: {
+        discovery: {
+          robotsByName: {
+            baz: [
+              {
+                ...makeServerUp('baz', '10.0.0.3', false),
+                serverHealth: { apiServerVersion: '1.2.3' },
+              },
+            ],
+          },
+        },
+        robot: { connection: { connectedTo: null } },
+      },
+      args: ['baz'],
+      expected: '1.2.3',
+    },
   ]
 
   SPECS.forEach(spec => {
-    const { name, selector, state, expected } = spec
-    test(name, () => expect(selector(state)).toEqual(expected))
+    const { name, selector, state, args = [], expected } = spec
+    test(name, () => expect(selector(state, ...args)).toEqual(expected))
   })
 })

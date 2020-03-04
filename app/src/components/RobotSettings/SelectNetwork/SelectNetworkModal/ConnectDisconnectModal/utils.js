@@ -6,28 +6,31 @@ import {
   SECURITY_NONE,
 } from '../../../../../networking'
 
-import type { WifiSecurityType } from '../../../../../networking/types'
-import type { NetworkingType } from '../../types'
+import { DISCONNECT, JOIN_OTHER } from '../../constants'
 
-const JOIN = 'Find and join a Wi-Fi network'
-const DISCONNECT = (previousSsid: string) => `Disconnect from ${previousSsid}`
-const CONNECT = (ssid: string) => `Connect to ${ssid}`
+import type { WifiSecurityType } from '../../../../../networking/types'
+import type { NetworkingActionType } from '../../types'
+
+const FIND_AND_JOIN = 'Find and join a Wi-Fi network'
+const DISCONNECT_FROM_SSID = (previousSsid: string) =>
+  `Disconnect from ${previousSsid}`
+const CONNECT_TO_SSID = (ssid: string) => `Connect to ${ssid}`
 
 export const formatHeading = (
   ssid: string | null,
   previousSsid: string | null,
-  networkingType: NetworkingType | null
+  networkingType: NetworkingActionType
 ): string | null => {
-  if (networkingType === 'join') {
-    return JOIN
+  if (networkingType === JOIN_OTHER) {
+    return FIND_AND_JOIN
   }
 
-  if (previousSsid && networkingType === 'disconnect') {
-    return DISCONNECT(previousSsid)
+  if (previousSsid && networkingType === DISCONNECT) {
+    return DISCONNECT_FROM_SSID(previousSsid)
   }
 
   if (ssid !== null) {
-    return CONNECT(ssid)
+    return CONNECT_TO_SSID(ssid)
   }
 
   return null
@@ -42,14 +45,14 @@ const securityTypes = (ssid: string) => ({
 export const formatBody = (
   ssid: string | null,
   previousSsid: string | null,
-  networkingType: NetworkingType | null,
+  networkingType: NetworkingActionType,
   securityType: WifiSecurityType | null
 ): string | null => {
-  if (networkingType === 'join') {
+  if (networkingType === JOIN_OTHER) {
     return 'Enter the name and security type of the network you want to join.'
   }
 
-  if (previousSsid && networkingType === 'disconnect') {
+  if (previousSsid && networkingType === DISCONNECT) {
     return `Are you sure you want to disconnect from ${previousSsid}?`
   }
 

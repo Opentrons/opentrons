@@ -12,11 +12,10 @@ import type { WifiNetwork } from '../../../../networking/types'
 export type SelectSsidProps = {|
   list: Array<WifiNetwork>,
   value: string | null,
-  disabled?: boolean,
+  showWifiDisconnect: boolean,
   onConnect: (ssid: string) => mixed,
   onJoinOther: () => mixed,
   onDisconnect: () => mixed,
-  showWifiDisconnect: boolean,
 |}
 
 const formatOptions = (
@@ -37,7 +36,6 @@ export function SelectSsid(props: SelectSsidProps) {
   const {
     list,
     value,
-    disabled,
     onConnect,
     onJoinOther,
     onDisconnect,
@@ -69,7 +67,6 @@ export function SelectSsid(props: SelectSsidProps) {
       options={formatOptions(list, showWifiDisconnect)}
       placeholder={Constants.PLACEHOLDER}
       className={styles.wifi_dropdown}
-      disabled={disabled}
       onValueChange={handleValueChange}
       formatOptionLabel={formatOptionLabel}
     />

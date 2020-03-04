@@ -143,15 +143,25 @@ export const getRobotByName = (
   return getViewableRobots(state).find(r => r.name === robotName) || null
 }
 
-export const getRobotApiVersion = (robot: AnyRobot): ?string =>
-  (robot.health && semver.valid(robot.health.api_version)) ||
-  (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion))
+export const getRobotApiVersion = (robot: AnyRobot): string | null =>
+  (robot.health && semver.valid(robot.health.api_version)) ??
+  (robot.serverHealth && semver.valid(robot.serverHealth.apiServerVersion)) ??
+  null
 
-export const getRobotFirmwareVersion = (robot: AnyRobot): ?string =>
-  (robot.health && robot.health.fw_version) ||
-  (robot.serverHealth && robot.serverHealth.smoothieVersion)
+export const getRobotFirmwareVersion = (robot: AnyRobot): string | null =>
+  (robot.health && robot.health.fw_version) ??
+  (robot.serverHealth && robot.serverHealth.smoothieVersion) ??
+  null
 
 export const getRobotProtocolApiVersion = (robot: AnyRobot): string | null => {
   const maxApiVersion = robot.health?.protocol_api_version
   return maxApiVersion ? maxApiVersion.join('.') : null
+}
+
+export const getRobotApiVersionByName = (
+  state: State,
+  robotName: string
+): string | null => {
+  const robot = getRobotByName(state, robotName)
+  return robot ? getRobotApiVersion(robot) : null
 }
