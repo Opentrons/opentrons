@@ -1,0 +1,11 @@
+config BR2_PACKAGE_PYTHON_OPENTRONS_ROBOT_SERVER
+  bool "python-opentrons-robot-server"
+  depends on BR2_PACKAGE_PYTHON3
+  select BR2_PACKAGE_PYTHON_OPENTRONS_API # runtime
+  select BR2_PACKAGE_PYTHON_FASTAPI # runtime
+  select BR2_PACKAGE_PYTHON_UVICORN # runtime
+  select BR2_PACKAGE_PYTHON_MULTIPART # runtime
+  help
+    Opentrons HTTP server. Controls an OT2 robot.
+
+    https://opentrons.com
