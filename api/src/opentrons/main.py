@@ -154,10 +154,10 @@ def initialize(
     hardware = loop.run_until_complete(initialize_robot())
 
     if hardware_server:
-        # TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
-        loop.run_until_complete(install_hardware_server(
-                hardware_server_socket,
-                hardware))  # type: ignore
+        #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
+        loop.run_until_complete(
+                install_hardware_server(hardware_server_socket,
+                                        hardware))  # type: ignore
 
     return hardware
 

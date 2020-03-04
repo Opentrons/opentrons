@@ -156,7 +156,6 @@ class Controller:
         if can_watch:
             await self._module_watcher.setup(loop)
 
-        MODULE_LOG.info(f'WATCH MODULES initial discovery {id(self)}')
         initial_modules = modules.discover()
         try:
             await register_modules(new_mods_at_ports=initial_modules)

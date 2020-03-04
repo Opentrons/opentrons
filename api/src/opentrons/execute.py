@@ -352,7 +352,7 @@ def main() -> int:
 def _clear_cached_hardware_controller():
     global _THREAD_MANAGED_HW
     if _THREAD_MANAGED_HW:
-        _THREAD_MANAGED_HW.clean_up_managed_thread()
+        _THREAD_MANAGED_HW.clean_up()
         _THREAD_MANAGED_HW = None
 
 
