@@ -155,7 +155,7 @@ class Thermocycler(mod_abc.AbstractModule):
         if simulating:
             return SimulatingDriver()
         else:
-            return ThermocyclerDriver(interrupt_cb, loop)
+            return ThermocyclerDriver(interrupt_cb)
 
     def __init__(self,
                  port: str,
