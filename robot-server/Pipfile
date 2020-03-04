@@ -14,6 +14,7 @@ pytest-cov = "*"
 mypy = "==0.740"
 atomicwrites = {version="*", sys_platform="== 'win32'"}
 pylama = "*"
+requests = "*"
 
 [packages]
 uvicorn = "==0.11.3"
