@@ -22,6 +22,7 @@ import {
   inferModuleOrientationFromSlot,
 } from './getModuleVizDims'
 
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
@@ -36,6 +37,7 @@ import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
@@ -106,8 +108,9 @@ const getSwapBlocked = (args: {
   hoveredLabware: ?LabwareOnDeckType,
   draggedLabware: ?LabwareOnDeckType,
   modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
+  customLabwares: LabwareDefByDefURI,
 }): boolean => {
-  const { hoveredLabware, draggedLabware, modulesById } = args
+  const { hoveredLabware, draggedLabware, modulesById, customLabwares } = args
 
   if (!hoveredLabware || !draggedLabware) {
     return false
@@ -118,11 +121,16 @@ const getSwapBlocked = (args: {
   const destModuleType: ?ModuleRealType =
     modulesById[hoveredLabware.slot]?.type || null
 
+  const draggedLabwareIsCustom = customLabwares[draggedLabware.labwareDefURI]
+  const hoveredLabwareIsCustom = customLabwares[hoveredLabware.labwareDefURI]
+  // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
-    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType)
+    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
+      !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
-    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType)
+    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
+      !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -145,12 +153,18 @@ const DeckSetupContents = (props: ContentsProps) => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
+
   const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
   const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
+
+  const customLabwares = useSelector(
+    labwareDefSelectors.getCustomLabwareDefsByURI
+  )
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
     modulesById: initialDeckSetup.modules,
+    customLabwares,
   })
   const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
 

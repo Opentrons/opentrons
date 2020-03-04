@@ -16,18 +16,21 @@ import {
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import { DND_TYPES } from './constants'
 
-import type { DeckSlot, ThunkDispatch } from '../../../types'
+import { selectors as labwareDefSelectors } from '../../../labware-defs'
+
+import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
+import type { LabwareDefByDefURI } from '../../../labware-defs'
+import type { LabwareOnDeck } from '../../../step-forms'
 import type {
   DeckSlot as DeckSlotDefinition,
   ModuleRealType,
-  LabwareDefinition2,
 } from '@opentrons/shared-data'
 import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
   connectDropTarget: Node => mixed,
-  draggedDef: ?LabwareDefinition2,
+  draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
 |}
 type OP = {|
   slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
@@ -39,7 +42,10 @@ type DP = {|
   addLabware: (e: SyntheticEvent<*>) => mixed,
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,
 |}
-type Props = {| ...OP, ...DP, ...DNDP |}
+type SP = {|
+  customLabwares: LabwareDefByDefURI,
+|}
+type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
 const SlotControlsComponent = (props: Props) => {
   const {
@@ -49,16 +55,21 @@ const SlotControlsComponent = (props: Props) => {
     isOver,
     connectDropTarget,
     moduleType,
-    draggedDef,
+    draggedItem,
+    customLabwares,
   } = props
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
+
+  const draggedDef = draggedItem?.labwareOnDeck?.def
+  const isCustomLabware =
+    draggedItem && customLabwares[draggedItem.labwareOnDeck.labwareDefURI]
 
   let slotBlocked: string | null = null
   if (
     isOver &&
     moduleType != null &&
     draggedDef != null &&
-    !getLabwareIsCompatible(draggedDef, moduleType)
+    (!getLabwareIsCompatible(draggedDef, moduleType) && !isCustomLabware)
   ) {
     slotBlocked = 'Labware incompatible with this module'
   }
@@ -98,6 +109,12 @@ const SlotControlsComponent = (props: Props) => {
   )
 }
 
+const mapStateToProps = (state: BaseState): SP => {
+  return {
+    customLabwares: labwareDefSelectors.getCustomLabwareDefsByURI(state),
+  }
+}
+
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   addLabware: () => dispatch(openAddLabwareModal({ slot: ownProps.slot.id })),
   moveDeckItem: (sourceSlot, destSlot) =>
@@ -124,7 +141,10 @@ const slotTarget = {
 
     if (moduleType != null && draggedDef != null) {
       // this is a module slot, prevent drop if the dragged labware is not compatible
-      return getLabwareIsCompatible(draggedDef, moduleType)
+      const isCustomLabware =
+        props.customLabwares[draggedItem.labwareOnDeck.labwareDefURI]
+
+      return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
     }
     return true
   },
@@ -132,11 +152,11 @@ const slotTarget = {
 const collectSlotTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
-  draggedDef: monitor.getItem()?.labwareOnDeck?.def || null,
+  draggedItem: monitor.getItem(),
 })
 
-export const SlotControls = connect<{| ...OP, ...DP |}, OP, _, DP, _, _>(
-  null,
+export const SlotControls = connect<{| ...OP, ...DP, ...SP |}, OP, _, DP, _, _>(
+  mapStateToProps,
   mapDispatchToProps
 )(
   DropTarget(DND_TYPES.LABWARE, slotTarget, collectSlotTarget)(
