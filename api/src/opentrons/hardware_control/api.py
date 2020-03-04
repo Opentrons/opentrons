@@ -146,14 +146,9 @@ class API(HardwareAPILike):
         self._loop = loop
         self._motion_lock = asyncio.Lock(loop=loop)
 
-    async def get_is_simulator(self) -> bool:
-        """ `True` if this is a simulator; `False` otherwise. """
-        return self.is_simulator_sync
-
-    is_simulator = property(fget=get_is_simulator)
-
     @property
-    def is_simulator_sync(self):
+    def is_simulator(self):
+        """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
 
     def add_protected_task(self, task: asyncio.Task):
@@ -281,7 +276,7 @@ class API(HardwareAPILike):
                         split_speed=1,
                         after_time=1800)
 
-            if req_instr and not self.is_simulator_sync:
+            if req_instr and not self.is_simulator:
                 if not model:
                     raise RuntimeError(
                         f'mount {mount}: instrument {req_instr} was'
@@ -447,7 +442,7 @@ class API(HardwareAPILike):
         await self.cache_instruments()
 
     async def _wait_for_is_running(self):
-        if not self.is_simulator_sync:
+        if not self.is_simulator:
             await self._execution_manager.wait_for_is_running()
 
 
@@ -874,7 +869,7 @@ class API(HardwareAPILike):
             return top_types.Point(0, 0, 0)
 
     # Gantry/frame (i.e. not pipette) config API
-    async def get_config(self) -> robot_configs.robot_config:
+    def get_config(self) -> robot_configs.robot_config:
         """ Get the robot's configuration object.
 
         :returns .robot_config: The object.
