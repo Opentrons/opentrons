@@ -225,6 +225,12 @@ class Controller:
         return {'button': gpio.get_button_light()[2],
                 'rails': gpio.get_rail_lights()}
 
+    def pause(self):
+        self._smoothie_driver.pause()
+
+    def resume(self):
+        self._smoothie_driver.resume()
+
     def halt(self):
         self._smoothie_driver.kill()
 

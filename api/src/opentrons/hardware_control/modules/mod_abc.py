@@ -128,10 +128,6 @@ class AbstractModule(abc.ABC):
         pass
 
     @property
-    def loop(self) -> asyncio.AbstractEventLoop:
-        return self._loop
-
-    @property
     def bundled_fw(self):
         return self._bundled_fw
 

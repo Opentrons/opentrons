@@ -2,7 +2,6 @@ import inspect
 import json
 import logging
 import pkgutil
-from concurrent.futures._base import CancelledError
 from aiohttp import web
 from opentrons import __version__, config, protocol_api, protocols
 

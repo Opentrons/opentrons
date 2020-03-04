@@ -391,6 +391,7 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
         self._execution_manager.pause()
+        self._backend.pause()
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -402,6 +403,7 @@ class API(HardwareAPILike):
         """
         Resume motion after a call to :py:meth:`pause`.
         """
+        self._backend.resume()
         self._execution_manager.resume()
 
     def halt(self):
