@@ -78,7 +78,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
 
 
 def _delay(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     wait = params['wait']
     message = params.get('message')
     if wait is None or wait is False:
@@ -91,7 +91,7 @@ def _delay(
 
 
 def _blowout(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -100,7 +100,7 @@ def _blowout(
 
 
 def _pick_up_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -108,7 +108,7 @@ def _pick_up_tip(
 
 
 def _drop_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -116,7 +116,7 @@ def _drop_tip(
 
 
 def _aspirate(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -126,7 +126,7 @@ def _aspirate(
 
 
 def _dispense(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -136,7 +136,7 @@ def _dispense(
 
 
 def _touch_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -147,7 +147,7 @@ def _touch_tip(
 
 
 def _move_to_slot(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+        context, instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
@@ -194,4 +194,4 @@ def dispatch_json(context: ProtocolContext,
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
         dispatcher_map[command_type](
-            context, protocol_data, instruments, loaded_labware, params)
+            context, instruments, loaded_labware, params)

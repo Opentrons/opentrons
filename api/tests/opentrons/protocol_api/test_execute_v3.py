@@ -113,7 +113,7 @@ def test_get_location_with_offset_fixed_trash():
     ])
 def test_delay(params, expected):
     mock_context = mock.MagicMock()
-    _delay(mock_context, None, None, None, params)
+    _delay(mock_context, None, None, params)
 
     assert mock_context.mock_calls == expected
 
@@ -131,8 +131,7 @@ def test_blowout():
 
     with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate',
                     new=m.mock_set_flow_rate):
-        _blowout(None, None,
-                 instruments, loaded_labware, params)
+        _blowout(None, instruments, loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_set_flow_rate(m.pipette_mock, params),
@@ -148,8 +147,7 @@ def test_pick_up_tip():
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
 
-    _pick_up_tip(None, None,
-                 instruments, loaded_labware, params)
+    _pick_up_tip(None, instruments, loaded_labware, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.pick_up_tip(well)
@@ -164,8 +162,7 @@ def test_drop_tip():
     instruments = {'somePipetteId': pipette_mock}
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
-    _drop_tip(None, None,
-              instruments, loaded_labware, params)
+    _drop_tip(None, instruments, loaded_labware, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.drop_tip(well)
@@ -189,8 +186,7 @@ def test_aspirate():
         with mock.patch(
                 'opentrons.protocol_api.execute_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
-            _aspirate(None, None,
-                      instruments, mock.sentinel.loaded_labware, params)
+            _aspirate(None, instruments, mock.sentinel.loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_get_location_with_offset(
@@ -217,8 +213,7 @@ def test_dispense():
         with mock.patch(
             'opentrons.protocol_api.execute_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
-            _dispense(None, None,
-                      instruments, mock.sentinel.loaded_labware, params)
+            _dispense(None, instruments, mock.sentinel.loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_get_location_with_offset(
@@ -263,7 +258,7 @@ def test_touch_tip():
             with mock.patch(
                 'opentrons.protocol_api.execute_v3._set_flow_rate',
                     new=mock_set_flow_rate):
-                _touch_tip(None, None,
+                _touch_tip(None,
                            instruments, mock.sentinel.loaded_labware, params)
 
     # note: for this fn, order of calls doesn't matter b/c
@@ -288,7 +283,7 @@ def test_move_to_slot():
               'forceDirect': mock.sentinel.force_direct,
               'minimumZHeight': mock.sentinel.minimum_z_height}
 
-    _move_to_slot(mock_context, None, instruments, None, params)
+    _move_to_slot(mock_context, instruments, None, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.move_to(
@@ -312,9 +307,9 @@ def test_dispatch_json():
             None, protocol_data, instruments, loaded_labware)
 
         assert m.mock_calls == [
-            mock.call.a(None, protocol_data, instruments,
+            mock.call.a(None, instruments,
                         loaded_labware, 'a_params'),
-            mock.call.b(None, protocol_data, instruments,
+            mock.call.b(None, instruments,
                         loaded_labware, 'b_params')
         ]
 
