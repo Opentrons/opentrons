@@ -605,21 +605,6 @@ class API(HardwareAPILike):
                 plunger_ax: self._current_position[plunger_ax]
             }
 
-    async def plunger_position(
-            self,
-            mount: top_types.Mount,
-            refresh: bool = False) -> float:
-        """ Return the current position of the plunger
-
-        This ignores the gantry position and returns a float
-
-        `refresh` if set to True, update the cached position using the
-        smoothie driver (see :py:meth:`current_position`).
-        """
-        cur_pos = await self.current_position(mount, refresh=refresh)
-        plunger_ax = Axis.of_plunger(mount)
-        return cur_pos[plunger_ax]
-
     async def gantry_position(
             self,
             mount: top_types.Mount,

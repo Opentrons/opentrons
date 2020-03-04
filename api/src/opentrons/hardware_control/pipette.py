@@ -34,7 +34,6 @@ class Pipette:
         self._current_tiprack_diameter = 0.0
         self._fallback_tip_length = self._config.tip_length
         self._tip_overlap_map = self._config.tip_overlap
-        self._bottom = self._config.bottom
         self._has_tip = False
         self._pipette_id = pipette_id
         pip_type = 'multi' if self._config.channels > 1 else 'single'
