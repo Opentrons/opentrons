@@ -168,21 +168,24 @@ def _move_to_slot(
         minimum_z_height=params.get('minimumZHeight'))
 
 
+dispatcher_map = {
+    "delay": _delay,
+    "blowout": _blowout,
+    "pickUpTip": _pick_up_tip,
+    "dropTip": _drop_tip,
+    "aspirate": _aspirate,
+    "dispense": _dispense,
+    "touchTip": _touch_tip,
+    "moveToSlot": _move_to_slot
+}
+
+
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Dict[str, InstrumentContext],
                   loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
-    dispatcher_map = {
-        "delay": _delay,
-        "blowout": _blowout,
-        "pickUpTip": _pick_up_tip,
-        "dropTip": _drop_tip,
-        "aspirate": _aspirate,
-        "dispense": _dispense,
-        "touchTip": _touch_tip,
-        "moveToSlot": _move_to_slot
-    }
+
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
