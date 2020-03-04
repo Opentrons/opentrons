@@ -10,27 +10,13 @@ log = logging.getLogger(__name__)
 
 
 async def health(request: web.Request) -> web.Response:
-    static_paths = ['/logs/serial.log', '/logs/api.log']
-    # This conditional handles the case where we have just changed the
-    # use protocol api v2 feature flag, so it does not match the type
-    # of hardware we're actually using.
-    try:
-        fw_version_coro = request.app['com.opentrons.hardware'].fw_version
-        fw_version = await fw_version_coro
-    except CancelledError:
-        log.exception(fw_version_coro.exception())
-
-    if config.feature_flags.use_protocol_api_v2():
-        max_supported = protocol_api.MAX_SUPPORTED_VERSION
-    else:
-        max_supported = protocols.types.APIVersion(1, 0)
     res = {
         'name': config.name(),
         'api_version': __version__,
-        'fw_version': fw_version,
-        'logs': static_paths,
+        'fw_version': request.app['com.opentrons.hardware'].fw_version,
+        'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': config.OT_SYSTEM_VERSION,
-        'protocol_api_version': list(max_supported),
+        'protocol_api_version': list(protocol_api.MAX_SUPPORTED_VERSION),
         'links': {
             'apiLog': '/logs/api.log',
             'serialLog': '/logs/serial.log',

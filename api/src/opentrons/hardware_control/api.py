@@ -170,7 +170,7 @@ class API(HardwareAPILike):
 
         return unregister
 
-    async def get_fw_version(self) -> str:
+    def get_fw_version(self) -> str:
         """
         Return the firmware version of the connected hardware.
 
@@ -183,7 +183,10 @@ class API(HardwareAPILike):
         else:
             return from_backend
 
-    fw_version = property(fget=get_fw_version)
+    @property
+    def fw_version(self) -> Optional[str]:
+        return self.get_fw_version()
+
 
     # Incidentals (i.e. not motion) API
     async def set_lights(self, button: bool = None, rails: bool = None):
