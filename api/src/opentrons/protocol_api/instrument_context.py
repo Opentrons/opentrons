@@ -212,11 +212,13 @@ class InstrumentContext(CommandPublisher):
         elif dest != self._ctx.location_cache:
             self.move_to(dest)
 
+        c_vol = self.hw_pipette['available_volume'] if not volume else volume
+
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'before', None, None, self, volume, dest, rate)
+                        'before', None, None, self, c_vol, dest, rate)
         self._hw_manager.hardware.aspirate(self._mount, volume, rate)
         cmds.do_publish(self.broker, cmds.aspirate, self.aspirate,
-                        'after', self, None, self, volume, dest, rate)
+                        'after', self, None, self, c_vol, dest, rate)
         return self
 
     @requires_version(2, 0)
@@ -293,14 +295,16 @@ class InstrumentContext(CommandPublisher):
                 " method that moves to a location (such as move_to or "
                 "aspirate) must previously have been called so the robot "
                 "knows where it is.")
+
+        c_vol = self.hw_pipette['current_volume'] if not volume else volume
+
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'before', None, None, self, volume, loc, rate)
+                        'before', None, None, self, c_vol, loc, rate)
         self._hw_manager.hardware.dispense(self._mount, volume, rate)
         cmds.do_publish(self.broker, cmds.dispense, self.dispense,
-                        'after', self, None, self, volume, loc, rate)
+                        'after', self, None, self, c_vol, loc, rate)
         return self
 
-    @cmds.publish.both(command=cmds.mix)
     @requires_version(2, 0)
     def mix(self,
             repetitions: int = 1,
@@ -346,12 +350,20 @@ class InstrumentContext(CommandPublisher):
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip. Aborting mix()')
 
+        c_vol = self.hw_pipette['available_volume'] if not volume else volume
+
+        cmds.do_publish(self.broker, cmds.mix, self.mix,
+                        'before', None, None,
+                        self, repetitions, c_vol, location)
         self.aspirate(volume, location, rate)
         while repetitions - 1 > 0:
             self.dispense(volume, rate=rate)
             self.aspirate(volume, rate=rate)
             repetitions -= 1
         self.dispense(volume, rate=rate)
+        cmds.do_publish(self.broker, cmds.mix, self.mix,
+                        'after', None, None,
+                        self, repetitions, c_vol, location)
         return self
 
     @cmds.publish.both(command=cmds.blow_out)
