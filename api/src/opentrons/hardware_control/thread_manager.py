@@ -86,7 +86,7 @@ class ThreadManager():
     def __repr__(self):
         return '<ThreadManager>'
 
-    def clean_up(self):
+    def clean_up_managed_thread(self):
         try:
             loop = object.__getattribute__(self, '_loop')
             loop.call_soon_threadsafe(loop.stop)
@@ -95,7 +95,7 @@ class ThreadManager():
         object.__getattribute__(self, '_thread').join()
 
     def __del__(self):
-        self.clean_up()
+        self.clean_up_managed_thread()
 
     @staticmethod
     async def call_coroutine_threadsafe(loop, coro, *args, **kwargs):
