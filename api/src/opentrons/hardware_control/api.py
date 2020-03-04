@@ -390,8 +390,8 @@ class API(HardwareAPILike):
         is paused will not proceed until the system is resumed with
         :py:meth:`resume`.
         """
-        self._execution_manager.pause()
         self._backend.pause()
+        self._execution_manager.pause()
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
