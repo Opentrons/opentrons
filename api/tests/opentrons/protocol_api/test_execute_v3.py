@@ -1,15 +1,15 @@
-from opentrons.types import Point
-from opentrons.protocol_api import ProtocolContext, InstrumentContext, execute, labware, MAX_SUPPORTED_VERSION
-from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
-    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, _move_to_slot, \
-    load_labware_from_json_defs, _get_well, _set_flow_rate, \
-    _get_location_with_offset, load_pipettes_from_json
-from opentrons.protocols.parse import parse
-from opentrons.types import Location, Point
-import pytest
-from copy import deepcopy
-from unittest import mock
 from .test_accessor_fn import minimalLabwareDef2
+from unittest import mock
+from copy import deepcopy
+import pytest
+from opentrons.types import Location, Point
+from opentrons.protocols.parse import parse
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, \
+    execute, labware, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
+    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, \
+    _move_to_slot, load_labware_from_json_defs, _get_well, _set_flow_rate, \
+    _get_location_with_offset, load_pipettes_from_json
 
 
 def test_load_pipettes_from_json():
@@ -129,7 +129,8 @@ def test_blowout():
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
 
-    with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate', new=m.mock_set_flow_rate):
+    with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate',
+                    new=m.mock_set_flow_rate):
         _blowout(None, None,
                  instruments, loaded_labware, params)
 
@@ -182,8 +183,12 @@ def test_aspirate():
               'labware': 'someLabwareId', 'well': 'someWell'}
     instruments = {'somePipetteId': m.pipette_mock}
 
-    with mock.patch('opentrons.protocol_api.execute_v3._get_location_with_offset', new=m.mock_get_location_with_offset):
-        with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate', new=m.mock_set_flow_rate):
+    with mock.patch(
+            'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=m.mock_get_location_with_offset):
+        with mock.patch(
+                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                new=m.mock_set_flow_rate):
             _aspirate(None, None,
                       instruments, mock.sentinel.loaded_labware, params)
 
@@ -206,8 +211,12 @@ def test_dispense():
               'labware': 'someLabwareId', 'well': 'someWell'}
     instruments = {'somePipetteId': m.pipette_mock}
 
-    with mock.patch('opentrons.protocol_api.execute_v3._get_location_with_offset', new=m.mock_get_location_with_offset):
-        with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate', new=m.mock_set_flow_rate):
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=m.mock_get_location_with_offset):
+        with mock.patch(
+            'opentrons.protocol_api.execute_v3._set_flow_rate',
+                new=m.mock_set_flow_rate):
             _dispense(None, None,
                       instruments, mock.sentinel.loaded_labware, params)
 
@@ -228,8 +237,11 @@ def test_touch_tip():
         'diameter': 30,
         'x': 40,
         'y': 50,
-        'z': 3
-    }, parent=Location(Point(10, 20, 30), 1), has_tip=False, display_name='some well', api_level=MAX_SUPPORTED_VERSION)
+        'z': 3},
+        parent=Location(Point(10, 20, 30), 1),
+        has_tip=False,
+        display_name='some well',
+        api_level=MAX_SUPPORTED_VERSION)
 
     pipette_mock = mock.create_autospec(InstrumentContext, name='pipette_mock')
     mock_get_location_with_offset = mock.MagicMock(
@@ -242,13 +254,20 @@ def test_touch_tip():
               'labware': 'someLabwareId', 'well': 'someWell'}
     instruments = {'somePipetteId': pipette_mock}
 
-    with mock.patch('opentrons.protocol_api.execute_v3._get_location_with_offset', new=mock_get_location_with_offset):
-        with mock.patch('opentrons.protocol_api.execute_v3._get_well', new=mock_get_well):
-            with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate', new=mock_set_flow_rate):
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=mock_get_location_with_offset):
+        with mock.patch(
+            'opentrons.protocol_api.execute_v3._get_well',
+                new=mock_get_well):
+            with mock.patch(
+                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                    new=mock_set_flow_rate):
                 _touch_tip(None, None,
                            instruments, mock.sentinel.loaded_labware, params)
 
-    # note: for this fn, order of calls doesn't matter b/c we don't have stateful stuff like flow_rate
+    # note: for this fn, order of calls doesn't matter b/c
+    # we don't have stateful stuff like flow_rate
     mock_get_location_with_offset.assert_called_once_with(
         mock.sentinel.loaded_labware, params)
     mock_get_well.assert_called_once_with(mock.sentinel.loaded_labware, params)
@@ -280,7 +299,9 @@ def test_move_to_slot():
 
 def test_dispatch_json():
     m = mock.MagicMock()
-    with mock.patch('opentrons.protocol_api.execute_v3.dispatcher_map', new={'a': m.a, 'b': m.b}):
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3.dispatcher_map',
+            new={'a': m.a, 'b': m.b}):
         protocol_data = {'commands': [
             {'command': 'a', 'params': 'a_params'},
             {'command': 'b', 'params': 'b_params'}
@@ -300,7 +321,8 @@ def test_dispatch_json():
 
 def test_dispatch_json_invalid_command():
     # no commands in mocked dispatcher map
-    with mock.patch('opentrons.protocol_api.execute_v3.dispatcher_map', new={}):
+    with mock.patch(
+            'opentrons.protocol_api.execute_v3.dispatcher_map', new={}):
         protocol_data = {'commands': [
             {'command': 'no_such_command', 'params': 'foo'},
         ]}
