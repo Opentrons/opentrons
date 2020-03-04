@@ -297,6 +297,9 @@ def _parse_homing_status_values(raw_homing_status_values):
 
 class SmoothieDriver_3_0_0:
     def __init__(self, config, handle_locks=True):
+        self.run_flag = Event()
+        self.run_flag.set()
+
         self._position = HOMED_POSITION.copy()
         self.log = []
 
@@ -1345,6 +1348,8 @@ class SmoothieDriver_3_0_0:
         - the actual move, plus a bit extra to give room to preload backlash
         - if we preload backlash we then issue a third move to preload backlash
         '''
+        self.run_flag.wait()
+
         def valid_movement(axis: str, coord: float) -> bool:
             """ True if the axis is not disabled and the coord is different
             from the current position cache
@@ -1476,6 +1481,9 @@ class SmoothieDriver_3_0_0:
     def home(self,
              axis: str = AXES,
              disabled: str = DISABLE_AXES) -> Dict[str, float]:
+
+        self.run_flag.wait()
+
         axis = axis.upper()
 
         # If Y is requested make sure we home X first
@@ -1679,6 +1687,14 @@ class SmoothieDriver_3_0_0:
         finally:
             self.pop_active_current()
             self.pop_axis_max_speed()
+
+    def pause(self):
+        if not self.simulating:
+            self.run_flag.clear()
+
+    def resume(self):
+        if not self.simulating:
+            self.run_flag.set()
 
     def delay(self, seconds: float):
         # per http://smoothieware.org/supported-g-codes:
