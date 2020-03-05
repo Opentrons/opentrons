@@ -127,7 +127,6 @@ const ModuleTagComponent = (props: Props) => {
       y={props.y + childYOffset + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
-      className={styles.highlight}
       innerDivProps={{
         className: cx(styles.module_info_tag, {
           [styles.highlighted_border_right_none]:
