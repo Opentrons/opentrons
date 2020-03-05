@@ -17,7 +17,7 @@ def test_is_running(loop):
     assert exec_mgr.is_running
 
     exec_mgr.cancel()
-    assert not exec_mgr.is_running
+    assert exec_mgr.is_running
 
 
 def test_cancel_tasks(loop):
