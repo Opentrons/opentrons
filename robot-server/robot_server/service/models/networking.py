@@ -1,7 +1,7 @@
 import typing
 from enum import Enum
 
-from pydantic import BaseModel, Field, SecretStr, validator
+from pydantic import BaseModel, Field, SecretStr, validator, root_validator
 
 
 class ConnectivityStatus(str, Enum):
@@ -88,10 +88,14 @@ class NetworkingSecurityType(str, Enum):
 
 
 class WifiNetwork(BaseModel):
-    """A visible Network"""
+    """"""
     ssid: str = \
         Field(...,
               description="The network's SSID")
+
+
+class WifiNetworkFull(WifiNetwork):
+    """A visible Network"""
     signal: int =\
         Field(...,
               description="A unitless signal strength; a higher number is a "
@@ -108,7 +112,7 @@ class WifiNetwork(BaseModel):
 
 class WifiNetworks(BaseModel):
     """The list of networks"""
-    list: typing.List[WifiNetwork]
+    list: typing.List[WifiNetworkFull]
 
     class Config:
         schema_extra = {
@@ -135,6 +139,7 @@ class WifiConfiguration(BaseModel):
                           "ssid). False (default if key is not "
                           "present) otherwise")
     securityType: typing.Optional[NetworkingSecurityType]
+
     psk: SecretStr = \
         Field(None,
               description="If this is a PSK-secured network (securityType is "
@@ -159,6 +164,19 @@ class WifiConfiguration(BaseModel):
         if v and not v.get("eapType"):
             raise ValueError("eapType must be defined")
         return v
+
+    @root_validator
+    def security_type_validate(cls, values):
+        security_type = values.get('securityType')
+        if security_type == NetworkingSecurityType.wpa_psk and not\
+                values.get("psk"):
+            raise ValueError("If securityType is wpa-psk, psk "
+                             "must be specified")
+        elif security_type == NetworkingSecurityType.wpa_eap and not \
+                values.get("eapConfig"):
+            raise ValueError("If securityType is wpa-eap,"
+                             " eapConfig must be specified")
+        return values
 
     class Config:
         schema_extra = {"examples": {

@@ -45,6 +45,15 @@ async def post_serial_command(serial: str, command: control.SerialCommand)\
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
+@router.post("/modules/{serial}/update",
+             description="Initiate a firmware update on a specific module",
+             summary="Command robot to flash its bundled firmware file for "
+                     "this module's type to this specific module",
+             response_model=V1ErrorMessage)
+async def post_serial_update(serial: str) -> V1ErrorMessage:
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+
 @router.post("/camera/picture",
              description="Capture an image from the OT-2's onboard camera "
                          "and return it",
