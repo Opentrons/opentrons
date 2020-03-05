@@ -88,7 +88,7 @@ class NetworkingSecurityType(str, Enum):
 
 
 class WifiNetwork(BaseModel):
-    """"""
+    """Identifier of a wifi network"""
     ssid: str = \
         Field(...,
               description="The network's SSID")

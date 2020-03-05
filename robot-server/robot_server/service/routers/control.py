@@ -1,7 +1,7 @@
 import typing
 from http import HTTPStatus
 from starlette.responses import StreamingResponse
-from fastapi import APIRouter, Query, HTTPException
+from fastapi import APIRouter, Query, HTTPException, Path
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models import control
 
@@ -30,7 +30,10 @@ async def get_modules() -> control.Modules:
             summary="This is similar to the values in GET /modules, but for "
                     "only a specific currently-attached module",
             response_model=control.ModuleSerial)
-async def get_module_serial(serial: str) -> control.ModuleSerial:
+async def get_module_serial(
+        serial: str = Path(...,
+                           description="Serial number of the module")) \
+        -> control.ModuleSerial:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
@@ -40,7 +43,10 @@ async def get_module_serial(serial: str) -> control.ModuleSerial:
                      " on the specific module attached, which is the model "
                      "value from GET /modules/{serial}/data or GET /modules",
              response_model=control.SerialCommandResponse)
-async def post_serial_command(serial: str, command: control.SerialCommand)\
+async def post_serial_command(
+        command: control.SerialCommand,
+        serial: str = Path(...,
+                           description="Serial number of the module")) \
         -> control.SerialCommandResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
@@ -50,7 +56,10 @@ async def post_serial_command(serial: str, command: control.SerialCommand)\
              summary="Command robot to flash its bundled firmware file for "
                      "this module's type to this specific module",
              response_model=V1ErrorMessage)
-async def post_serial_update(serial: str) -> V1ErrorMessage:
+async def post_serial_update(
+        serial: str = Path(...,
+                           description="Serial number of the module"))\
+        -> V1ErrorMessage:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
