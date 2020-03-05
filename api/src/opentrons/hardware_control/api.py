@@ -425,7 +425,8 @@ class API(HardwareAPILike):
         self._log.info("Halting")
         self._backend.hard_halt()
         self._loop.call_soon_threadsafe(
-            lambda: self._execution_manager.cancel(protected_tasks=self._protected_tasks))
+            lambda: self._execution_manager.cancel(
+                    protected_tasks=self._protected_tasks))
 
     async def stop(self):
         """
