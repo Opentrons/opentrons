@@ -2788,26 +2788,23 @@
     "@thi.ng/checks" "^1.5.13"
     "@thi.ng/errors" "^0.1.11"
 
-"@typeform/embed@^0.12.1":
-  version "0.12.1"
-  resolved "https://registry.yarnpkg.com/@typeform/embed/-/embed-0.12.1.tgz#05307cca0b762fe50d81ee0a5945a86d401b57ac"
-  integrity sha512-zaQ/bZahbdOexDeOyxKh4L1+pdWQhV5tu2NHl7xA2sR+bRA71hqzwFG920I0aLStOcD8oAO0JSFPVjvBcjCYlg==
+"@typeform/embed@0.16.0":
+  version "0.16.0"
+  resolved "https://registry.yarnpkg.com/@typeform/embed/-/embed-0.16.0.tgz#9cab5dc0d36a2df6e0ecc30e2cf70b6047648b2a"
+  integrity sha512-BW6UvJniu6KK6ksTYxDABJKizzcNnYqI5RSr7qJSyJ+In/Y6VjxFUECiu3jQx5Ybvsnaz7EdDZfvlYy9hADdow==
   dependencies:
     classnames "^2.2.5"
-    core-js "^3.0.1"
+    core-js "^3.6.4"
     create-emotion "^9.0.2"
     create-emotion-styled "^9.0.1"
     custom-event "^1.0.1"
-    fetch-jsonp "^1.0.6"
     is-url "^1.2.2"
     preact "^8.2.7"
     preact-compat "^3.15.0"
-    prop-types "^15.5.10"
+    prop-types "^15.7.2"
     scrollbar-width "^3.1.1"
     spin.js "^2.3.2"
-    tinycolor2 "^1.4.1"
-    url-parse "^1.1.7"
-    webfontloader "^1.6.27"
+    url-parse "^1.4.5"
 
 "@types/babel__core@^7.1.0":
   version "7.1.2"
@@ -8144,10 +8141,6 @@ fd-slicer@~1.1.0:
 fecha@^2.3.3:
   version "2.3.3"
   resolved "https://registry.npmjs.org/fecha/-/fecha-2.3.3.tgz#948e74157df1a32fd1b12c3a3c3cdcb6ec9d96cd"
-
-fetch-jsonp@^1.0.6:
-  version "1.1.3"
-  resolved "https://registry.yarnpkg.com/fetch-jsonp/-/fetch-jsonp-1.1.3.tgz#9eb9e585ba08aaf700563538d17bbebbcd5a3db2"
 
 figgy-pudding@^3.4.1, figgy-pudding@^3.5.1:
   version "3.5.1"
@@ -14944,18 +14937,18 @@ prop-types-exact@^1.2.0:
     object.assign "^4.1.0"
     reflect.ownkeys "^0.2.0"
 
-prop-types@^15.5.10, prop-types@^15.6.0:
-  version "15.6.0"
-  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
-  dependencies:
-    fbjs "^0.8.16"
-    loose-envify "^1.3.1"
-    object-assign "^4.1.1"
-
 prop-types@^15.5.8, prop-types@^15.6.1:
   version "15.6.2"
   resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.2.tgz#05d5ca77b4453e985d60fc7ff8c859094a497102"
   dependencies:
+    loose-envify "^1.3.1"
+    object-assign "^4.1.1"
+
+prop-types@^15.6.0:
+  version "15.6.0"
+  resolved "https://registry.yarnpkg.com/prop-types/-/prop-types-15.6.0.tgz#ceaf083022fc46b4a35f69e13ef75aed0d639856"
+  dependencies:
+    fbjs "^0.8.16"
     loose-envify "^1.3.1"
     object-assign "^4.1.1"
 
@@ -18909,14 +18902,7 @@ url-parse-lax@^3.0.0:
   dependencies:
     prepend-http "^2.0.0"
 
-url-parse@^1.1.7:
-  version "1.4.4"
-  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.4.tgz#cac1556e95faa0303691fec5cf9d5a1bc34648f8"
-  dependencies:
-    querystringify "^2.0.0"
-    requires-port "^1.0.0"
-
-url-parse@^1.1.8:
+url-parse@^1.1.8, url-parse@^1.4.5:
   version "1.4.7"
   resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.7.tgz#a8a83535e8c00a316e403a5db4ac1b9b853ae278"
   integrity sha512-d3uaVyzDB9tQoSXFvuSUNFibTd9zxd2bkVrDRvF5TmvWWQwqE4lgYJ5m+x1DbecWkw+LK4RNl2CU1hHuOKPVlg==
@@ -19264,10 +19250,6 @@ web-namespaces@^1.1.2:
   version "1.1.3"
   resolved "https://registry.yarnpkg.com/web-namespaces/-/web-namespaces-1.1.3.tgz#9bbf5c99ff0908d2da031f1d732492a96571a83f"
   integrity sha512-r8sAtNmgR0WKOKOxzuSgk09JsHlpKlB+uHi937qypOu3PZ17UxPrierFKDye/uNHjNTTEshu5PId8rojIPj/tA==
-
-webfontloader@^1.6.27:
-  version "1.6.28"
-  resolved "https://registry.yarnpkg.com/webfontloader/-/webfontloader-1.6.28.tgz#db786129253cb6e8eae54c2fb05f870af6675bae"
 
 webidl-conversions@^4.0.2:
   version "4.0.2"
