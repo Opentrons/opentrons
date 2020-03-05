@@ -424,7 +424,8 @@ class API(HardwareAPILike):
         """
         self._log.info("Halting")
         self._backend.hard_halt()
-        self._execution_manager.cancel(protected_tasks=self._protected_tasks)
+        self._loop.run_coroutine_threadsafe(
+            lambda: self._execution_manager.cancel(protected_tasks=self._protected_tasks))
 
     async def stop(self):
         """
