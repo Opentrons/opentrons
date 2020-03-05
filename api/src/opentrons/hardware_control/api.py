@@ -182,8 +182,8 @@ class API(HardwareAPILike):
     def fw_version(self) -> Optional[str]:
         return self.get_fw_version()
 
-
     # Incidentals (i.e. not motion) API
+
     async def set_lights(self, button: bool = None, rails: bool = None):
         """ Control the robot lights.
 
@@ -305,7 +305,7 @@ class API(HardwareAPILike):
             self._attached_instruments))
 
     def get_attached_instruments(self) -> Dict[top_types.Mount,
-                                                     Pipette.DictType]:
+                                               Pipette.DictType]:
         """ Get the status dicts of the cached attached instruments.
 
         Also available as :py:meth:`get_attached_instruments`.

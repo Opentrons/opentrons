@@ -1,9 +1,8 @@
-import inspect
 import json
 import logging
 import pkgutil
 from aiohttp import web
-from opentrons import __version__, config, protocol_api, protocols
+from opentrons import __version__, config, protocol_api
 
 log = logging.getLogger(__name__)
 

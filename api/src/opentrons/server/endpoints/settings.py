@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
-                              feature_flags as ff,
                               pipette_config as pc,
                               IS_ROBOT,
                               ARCHITECTURE,

@@ -184,7 +184,7 @@ async def test_basic_method(hc_stream_server, loop, monkeypatch):
     assert passed_modeset is False
 
 
-@pytest.mark.skip('relies on hw api properties being async, not currently true')
+@pytest.mark.skip('relies on api properties being async, not currently true')
 async def test_complex_method(hc_stream_server, loop, monkeypatch):
     """ Test methods with arguments and returns that need serialization """
     sock, server = hc_stream_server

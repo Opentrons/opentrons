@@ -1,13 +1,8 @@
-import inspect
-
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
 from opentrons.app.dependencies import get_hardware
-from opentrons.hardware_control import HardwareAPILike
-from opentrons.protocols.types import APIVersion
 from opentrons.app.models.health import Health, Links
 from opentrons import __version__
-from opentrons.config import feature_flags
 
 router = APIRouter()
 
@@ -23,7 +18,7 @@ router = APIRouter()
                     " and name.",
             response_description="OT-2 /health response")
 async def get_health(
-        hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
+        hardware=Depends(get_hardware)) -> Health:
     return Health(name=config.name(),
                   api_version=__version__,
                   fw_version=hardware.fw_version,
