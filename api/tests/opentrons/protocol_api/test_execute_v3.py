@@ -113,7 +113,7 @@ def test_get_location_with_offset_fixed_trash():
     ])
 def test_delay(params, expected):
     mock_context = mock.MagicMock()
-    _delay(mock_context, None, None, params)
+    _delay(mock_context, params)
 
     assert mock_context.mock_calls == expected
 
@@ -131,7 +131,7 @@ def test_blowout():
 
     with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate',
                     new=m.mock_set_flow_rate):
-        _blowout(None, instruments, loaded_labware, params)
+        _blowout(instruments, loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_set_flow_rate(m.pipette_mock, params),
@@ -147,7 +147,7 @@ def test_pick_up_tip():
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
 
-    _pick_up_tip(None, instruments, loaded_labware, params)
+    _pick_up_tip(instruments, loaded_labware, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.pick_up_tip(well)
@@ -162,7 +162,7 @@ def test_drop_tip():
     instruments = {'somePipetteId': pipette_mock}
     well = 'theWell'
     loaded_labware = {'someLabwareId': {'someWell': well}}
-    _drop_tip(None, instruments, loaded_labware, params)
+    _drop_tip(instruments, loaded_labware, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.drop_tip(well)
@@ -186,7 +186,7 @@ def test_aspirate():
         with mock.patch(
                 'opentrons.protocol_api.execute_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
-            _aspirate(None, instruments, mock.sentinel.loaded_labware, params)
+            _aspirate(instruments, mock.sentinel.loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_get_location_with_offset(
@@ -213,7 +213,7 @@ def test_dispense():
         with mock.patch(
             'opentrons.protocol_api.execute_v3._set_flow_rate',
                 new=m.mock_set_flow_rate):
-            _dispense(None, instruments, mock.sentinel.loaded_labware, params)
+            _dispense(instruments, mock.sentinel.loaded_labware, params)
 
     assert m.mock_calls == [
         mock.call.mock_get_location_with_offset(
@@ -258,8 +258,7 @@ def test_touch_tip():
             with mock.patch(
                 'opentrons.protocol_api.execute_v3._set_flow_rate',
                     new=mock_set_flow_rate):
-                _touch_tip(None,
-                           instruments, mock.sentinel.loaded_labware, params)
+                _touch_tip(instruments, mock.sentinel.loaded_labware, params)
 
     # note: for this fn, order of calls doesn't matter b/c
     # we don't have stateful stuff like flow_rate
@@ -283,7 +282,7 @@ def test_move_to_slot():
               'forceDirect': mock.sentinel.force_direct,
               'minimumZHeight': mock.sentinel.minimum_z_height}
 
-    _move_to_slot(mock_context, instruments, None, params)
+    _move_to_slot(mock_context, instruments, params)
 
     assert pipette_mock.mock_calls == [
         mock.call.move_to(
@@ -294,36 +293,60 @@ def test_move_to_slot():
 
 def test_dispatch_json():
     m = mock.MagicMock()
+    mock_dispatcher_map = {
+        "delay": m._delay,
+        "blowout": m._blowout,
+        "pickUpTip": m._pick_up_tip,
+        "dropTip": m._drop_tip,
+        "aspirate": m._aspirate,
+        "dispense": m._dispense,
+        "touchTip": m._touch_tip,
+        "moveToSlot": m._move_to_slot
+    }
+
     with mock.patch(
         'opentrons.protocol_api.execute_v3.dispatcher_map',
-            new={'a': m.a, 'b': m.b}):
+            new=mock_dispatcher_map):
         protocol_data = {'commands': [
-            {'command': 'a', 'params': 'a_params'},
-            {'command': 'b', 'params': 'b_params'}
+            {'command': 'delay', 'params': 'delay_params'},
+            {'command': 'blowout', 'params': 'blowout_params'},
+            {'command': 'pickUpTip', 'params': 'pickUpTip_params'},
+            {'command': 'dropTip', 'params': 'dropTip_params'},
+            {'command': 'aspirate', 'params': 'aspirate_params'},
+            {'command': 'dispense', 'params': 'dispense_params'},
+            {'command': 'touchTip', 'params': 'touchTip_params'},
+            {'command': 'moveToSlot', 'params': 'moveToSlot_params'},
         ]}
+        context = mock.sentinel.context
         instruments = mock.sentinel.instruments
         loaded_labware = mock.sentinel.loaded_labware
         dispatch_json(
-            None, protocol_data, instruments, loaded_labware)
+            context, protocol_data, instruments, loaded_labware)
 
         assert m.mock_calls == [
-            mock.call.a(None, instruments,
-                        loaded_labware, 'a_params'),
-            mock.call.b(None, instruments,
-                        loaded_labware, 'b_params')
+            mock.call._delay(context, 'delay_params'),
+            mock.call._blowout(instruments, loaded_labware, 'blowout_params'),
+            mock.call._pick_up_tip(
+                instruments, loaded_labware, 'pickUpTip_params'),
+            mock.call._drop_tip(instruments, loaded_labware, 'dropTip_params'),
+            mock.call._aspirate(
+                instruments, loaded_labware, 'aspirate_params'),
+            mock.call._dispense(
+                instruments, loaded_labware, 'dispense_params'),
+            mock.call._touch_tip(
+                instruments, loaded_labware, 'touchTip_params'),
+            mock.call._move_to_slot(context, instruments, 'moveToSlot_params')
         ]
 
 
 def test_dispatch_json_invalid_command():
-    # no commands in mocked dispatcher map
-    with mock.patch(
-            'opentrons.protocol_api.execute_v3.dispatcher_map', new={}):
-        protocol_data = {'commands': [
-            {'command': 'no_such_command', 'params': 'foo'},
-        ]}
-        with pytest.raises(RuntimeError):
-            dispatch_json(
-                None, protocol_data, instruments=None, loaded_labware=None)
+    protocol_data = {'commands': [
+        {'command': 'no_such_command', 'params': 'foo'},
+    ]}
+    with pytest.raises(RuntimeError):
+        dispatch_json(
+            context=None, protocol_data=protocol_data, instruments=None,
+            loaded_labware=None)
 
 
 def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):
