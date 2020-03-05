@@ -9,6 +9,20 @@ from .execute_v3 import _delay, _blowout, _pick_up_tip, _drop_tip, _aspirate, \
 MODULE_LOG = logging.getLogger(__name__)
 
 
+def load_modules_from_json(
+        ctx: ProtocolContext,
+        protocol: Dict[Any, Any]) -> Dict[str, ModuleContext]:
+    module_data = protocol['modules']
+    modules_by_id = {}
+    for module_id, props in module_data.items():
+        model = props['model']
+        slot = props['slot']
+        instr = ctx.load_module(model, slot)
+        modules_by_id[module_id] = instr
+
+    return modules_by_id
+
+
 def _engage_magnet(modules, params) -> None:
     module_id = params['module']
     module = modules[module_id]

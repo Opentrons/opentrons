@@ -1,11 +1,25 @@
 from unittest import mock
 import pytest
 from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
-    _disengage_magnet, _temperature_module_set_temp, \
+    _disengage_magnet, _temperature_module_set_temp, load_modules_from_json, \
     _temperature_module_deactivate, \
     _temperature_module_await_temp
 from opentrons.protocol_api import MagneticModuleContext, \
-    TemperatureModuleContext
+    TemperatureModuleContext, ProtocolContext
+
+
+def test_load_modules_from_json():
+    def fake_module(model, slot):
+        return (model, slot)
+    ctx = mock.create_autospec(ProtocolContext)
+    ctx.load_module = fake_module
+    protocol = {'modules': {
+        'aID': {'slot': '1', 'model': 'magneticModuleV1'},
+        'bID': {'slot': '4', 'model': 'temperatureModuleV2'}}}
+    result = load_modules_from_json(ctx, protocol)
+
+    assert result == {'aID': ('magneticModuleV1', '1'),
+                      'bID': ('temperatureModuleV2', '4')}
 
 
 def test_engage_magnet():

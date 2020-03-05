@@ -8,6 +8,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
 from .contexts import ProtocolContext
 from . import execute_v3
+from . import execute_v4
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 
@@ -140,6 +141,18 @@ def run_protocol(protocol: Protocol,
             lw = execute_v3.load_labware_from_json_defs(
                 context, protocol.contents)
             execute_v3.dispatch_json(context, protocol.contents, ins, lw)
+        elif protocol.schema_version == 4:
+            # reuse the v3 fns for loading labware and pipettes
+            # b/c the v4 protocol has no changes for these keys
+            ins = execute_v3.load_pipettes_from_json(
+                context, protocol.contents)
+            lw = execute_v3.load_labware_from_json_defs(
+                context, protocol.contents)
+
+            modules = execute_v4.load_modules_from_json(
+                context, protocol.contents)
+            execute_v4.dispatch_json(
+                context, protocol.contents, ins, lw, modules)
         else:
             raise RuntimeError(
                 f'Unsupported JSON protocol schema: {protocol.schema_version}')
