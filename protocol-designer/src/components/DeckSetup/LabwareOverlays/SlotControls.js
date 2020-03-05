@@ -29,7 +29,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
-  connectDropTarget: Node => mixed,
+  connectDropTarget: Node => Node | null,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
 |}
 type OP = {|
@@ -47,7 +47,7 @@ type SP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
-const SlotControlsComponent = (props: Props) => {
+export const SlotControlsComponent = (props: Props) => {
   const {
     slot,
     addLabware,
