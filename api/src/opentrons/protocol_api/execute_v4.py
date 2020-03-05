@@ -9,24 +9,36 @@ from .execute_v3 import _delay, _blowout, _pick_up_tip, _drop_tip, _aspirate, \
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def _engage_magnet(modules, params):
-    pass
+def _engage_magnet(modules, params) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    engage_height = params['engageHeight']
+    module.engage(height_from_base=engage_height)
 
 
-def _disengage_magnet(modules, params):
-    pass
+def _disengage_magnet(modules, params) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    module.disengage()
 
 
-def _temperature_module_set_temp(modules, params):
-    pass
+def _temperature_module_set_temp(modules, params) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    temperature = params['temperature']
+    module.start_set_temperature(temperature)
 
 
-def _temperature_module_deactivate(modules, params):
-    pass
+def _temperature_module_deactivate(modules, params) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    module.deactivate()
 
 
-def _temperature_module_await_temp(modules, params):
-    pass
+def _temperature_module_await_temp(modules, params) -> None:
+    # module_id = params['module']
+    # module = modules[module_id]
+    raise NotImplementedError()
 
 
 dispatcher_map: Dict[Any, Any] = {

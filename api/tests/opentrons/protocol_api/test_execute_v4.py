@@ -1,6 +1,70 @@
 from unittest import mock
 import pytest
-from opentrons.protocol_api.execute_v4 import dispatch_json
+from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
+    _disengage_magnet, _temperature_module_set_temp, \
+    _temperature_module_deactivate, \
+    _temperature_module_await_temp
+from opentrons.protocol_api import MagneticModuleContext, \
+    TemperatureModuleContext
+
+
+def test_engage_magnet():
+    module_mock = mock.create_autospec(MagneticModuleContext)
+    modules = {'someModuleId': module_mock}
+
+    params = {'module': 'someModuleId', 'engageHeight': 4.2, }
+    _engage_magnet(modules, params)
+
+    assert module_mock.mock_calls == [
+        mock.call.engage(height_from_base=4.2)
+    ]
+
+
+def test_disengage_magnet():
+    module_mock = mock.create_autospec(MagneticModuleContext)
+    modules = {'someModuleId': module_mock}
+
+    params = {'module': 'someModuleId'}
+    _disengage_magnet(modules, params)
+
+    assert module_mock.mock_calls == [
+        mock.call.disengage()
+    ]
+
+
+def test_temperature_module_set_temp():
+    module_mock = mock.create_autospec(TemperatureModuleContext)
+    modules = {'someModuleId': module_mock}
+
+    params = {'module': 'someModuleId', 'temperature': 42.5}
+    _temperature_module_set_temp(modules, params)
+
+    assert module_mock.mock_calls == [
+        mock.call.start_set_temperature(42.5)
+    ]
+
+
+def test_temperature_module_deactivate():
+    module_mock = mock.create_autospec(TemperatureModuleContext)
+    modules = {'someModuleId': module_mock}
+
+    params = {'module': 'someModuleId'}
+    _temperature_module_deactivate(modules, params)
+
+    assert module_mock.mock_calls == [
+        mock.call.deactivate()
+    ]
+
+
+def test_temperature_module_await_temp():
+    module_mock = mock.create_autospec(TemperatureModuleContext)
+    modules = {'someModuleId': module_mock}
+
+    params = {'module': 'someModuleId', 'temperature': 12.3}
+    _temperature_module_await_temp(modules, params)
+
+    # TODO IMMEDIATELY must be implemented in executor
+    assert False
 
 
 def test_dispatch_json():
@@ -39,11 +103,11 @@ def test_dispatch_json():
             {'command': 'magneticModule/disengageMagnet',
                 'params': 'disengageMagnet_params'},
             {'command': 'temperatureModule/setTargetTemperature',
-                'params': 'temperature_set_temp_params'},
+                'params': 'temperature_module_set_temp_params'},
             {'command': 'temperatureModule/deactivate',
-                'params': 'temperatue_deactivate_params'},
+                'params': 'temperature_module_deactivate_params'},
             {'command': 'temperatureModule/awaitTemperature',
-                'params': 'temperature_await_temp_params'},
+                'params': 'temperature_module_await_temp_params'},
         ]}
         context = mock.sentinel.context
         instruments = mock.sentinel.instruments
@@ -68,11 +132,11 @@ def test_dispatch_json():
             mock.call._engage_magnet(modules, 'engageMagnet_params'),
             mock.call._disengage_magnet(modules, 'disengageMagnet_params'),
             mock.call._temperature_module_set_temp(
-                modules, 'temperature_set_temp_params'),
+                modules, 'temperature_module_set_temp_params'),
             mock.call._temperature_module_deactivate(
-                modules, 'temperatue_deactivate_params'),
+                modules, 'temperature_module_deactivate_params'),
             mock.call._temperature_module_await_temp(
-                modules, 'temperature_await_temp_params')
+                modules, 'temperature_module_await_temp_params')
         ]
 
 
