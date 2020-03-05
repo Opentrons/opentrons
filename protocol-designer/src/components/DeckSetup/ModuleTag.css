@@ -4,7 +4,8 @@
   width: 100%;
   background-color: var(--c-plate-bg);
   color: var(--c-font-dark);
-  padding: 0.3rem 0.3rem 0 0.3rem;
+  padding: 0.3rem 0.1rem 0 0.1rem;
+  border: 3px solid transparent;
 }
 
 .module_info_line {
@@ -19,4 +20,22 @@
 
 .module_status_line {
   text-transform: capitalize;
+}
+
+.highlighted_border_left_none {
+  border-right: 3px;
+  border-left: 3px transparent;
+}
+
+.highlighted_border_right_none {
+  border-left: 3px;
+  border-right: 3px transparent;
+}
+
+.highlighted_border_left_none,
+.highlighted_border_right_none {
+  border-top: 3px;
+  border-bottom: 3px;
+  border-style: solid;
+  border-color: var(--c-highlight);
 }
