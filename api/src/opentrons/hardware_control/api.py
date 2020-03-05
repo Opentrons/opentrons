@@ -1,5 +1,6 @@
 import asyncio
 import contextlib
+import functools
 import logging
 from collections import OrderedDict
 from typing import Dict, Union, List, Optional, Set
@@ -25,6 +26,13 @@ mod_log = logging.getLogger(__name__)
 
 
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
+
+
+def shield(crf):
+    @functools.wraps(crf)
+    async def shielded(*args, **kwargs):
+        return await asyncio.shield(crf(*args, **kwargs))
+    return shielded
 
 
 class API(HardwareAPILike):
@@ -422,12 +430,11 @@ class API(HardwareAPILike):
         After this call, the smoothie will be in a bad state until a call to
         :py:meth:`stop`.
         """
-        self._log.info("Halting")
         self._backend.hard_halt()
         self._loop.call_soon_threadsafe(
-            lambda: self._execution_manager.cancel(
-                    protected_tasks=self._protected_tasks))
+            self._execution_manager.cancel, self._protected_tasks)
 
+    @shield
     async def stop(self):
         """
         Stop motion as soon as possible, reset, and home.
