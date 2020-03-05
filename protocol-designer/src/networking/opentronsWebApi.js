@@ -31,7 +31,7 @@ const headers = {
   'Content-Type': 'application/json',
 }
 
-const writeIdentityCookie = payload => {
+const writeIdentityCookie = (payload: {| name: string, email: string |}) => {
   const domain =
     process.env.NODE_ENV === 'production' ? 'opentrons.com' : undefined
   global.document.cookie = cookie.serialize('ot_name', payload.name, {
@@ -43,6 +43,13 @@ const writeIdentityCookie = payload => {
     maxAge: 10 * 365 * 24 * 60 * 60, // 10 years
   })
 }
+
+// bypass gating Typeform modal by writing fake cookie
+export const writeFakeIdentityCookie = () =>
+  writeIdentityCookie({
+    name: '_skipped_signup',
+    email: 'nobody@email.com',
+  })
 
 const getStageFromIdentityCookie = (
   token: ?string,
