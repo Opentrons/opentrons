@@ -174,7 +174,9 @@ describe('ModuleTag', () => {
     function render() {
       return mount(
         <Provider store={store}>
-          <ModuleTag {...props} />
+          <svg>
+            <ModuleTag {...props} />
+          </svg>
         </Provider>
       )
     }
