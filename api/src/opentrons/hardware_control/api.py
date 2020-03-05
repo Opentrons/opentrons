@@ -390,8 +390,12 @@ class API(HardwareAPILike):
         is paused will not proceed until the system is resumed with
         :py:meth:`resume`.
         """
-        self._backend.pause()
-        self._execution_manager.pause()
+
+        def _chained_calls():
+            self._execution_manager.pause()
+            self._backend.pause()
+
+        self._loop.call_soon_threadsafe(_chained_calls)
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -404,7 +408,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._execution_manager.resume()
+        self._loop.call_soon_threadsafe(self._execution_manager.resume)
 
     def halt(self):
         """ Immediately stop motion.
