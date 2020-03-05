@@ -28,18 +28,18 @@ describe('labware directory utilities', () => {
   })
 
   describe('readLabwareDirectory', () => {
-    test('resolves empty array for empty directory', () => {
+    it('resolves empty array for empty directory', () => {
       const dir = makeEmptyDir()
       return expect(readLabwareDirectory(dir)).resolves.toEqual([])
     })
 
-    test('rejects if directory is not found', () => {
+    it('rejects if directory is not found', () => {
       return expect(
         readLabwareDirectory('__not_a_directory__')
       ).rejects.toThrow(/no such file/)
     })
 
-    test('returns paths to *.json files in directory', () => {
+    it('returns paths to *.json files in directory', () => {
       const dir = makeEmptyDir()
 
       return Promise.all([
@@ -55,7 +55,7 @@ describe('labware directory utilities', () => {
       })
     })
 
-    test('returns paths to nested JSON files in directory', () => {
+    it('returns paths to nested JSON files in directory', () => {
       const dir = makeEmptyDir()
       const nested = path.join(dir, 'nested')
 
@@ -77,7 +77,7 @@ describe('labware directory utilities', () => {
         })
     })
 
-    test('returns paths to *.JSON files in directory', () => {
+    it('returns paths to *.JSON files in directory', () => {
       const dir = makeEmptyDir()
 
       return Promise.all([
@@ -95,7 +95,7 @@ describe('labware directory utilities', () => {
   })
 
   describe('parseLabwareFiles', () => {
-    test('reads and parses JSON files', () => {
+    it('reads and parses JSON files', () => {
       const dir = makeEmptyDir()
       const files = [
         path.join(dir, 'a.json'),
@@ -128,7 +128,7 @@ describe('labware directory utilities', () => {
       })
     })
 
-    test('surfaces parse errors as null data', () => {
+    it('surfaces parse errors as null data', () => {
       const dir = makeEmptyDir()
       const files = [
         path.join(dir, 'a.json'),
@@ -159,7 +159,7 @@ describe('labware directory utilities', () => {
   })
 
   describe('addLabwareFile', () => {
-    test('writes a labware file to the directory', () => {
+    it('writes a labware file to the directory', () => {
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.json')
@@ -181,7 +181,7 @@ describe('labware directory utilities', () => {
         })
     })
 
-    test('increments filename to avoid collisions', () => {
+    it('increments filename to avoid collisions', () => {
       const sourceDir = makeEmptyDir()
       const destDir = makeEmptyDir()
       const sourceName = path.join(sourceDir, 'source.json')
@@ -210,7 +210,7 @@ describe('labware directory utilities', () => {
   })
 
   describe('remove labware file', () => {
-    test('calls Electron.shell.moveItemToTrash', () => {
+    it('calls Electron.shell.moveItemToTrash', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
 
@@ -221,7 +221,7 @@ describe('labware directory utilities', () => {
       })
     })
 
-    test('deletes the file if Electron fails to trash it', () => {
+    it('deletes the file if Electron fails to trash it', () => {
       const dir = makeEmptyDir()
       const filename = path.join(dir, 'foo.json')
       const setup = fs.writeJson(filename, { name: 'a' })
