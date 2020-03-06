@@ -22,7 +22,7 @@ describe('config', () => {
 
   describe('actions', () => {
     // updateConfig triggers an update call to app-shell
-    test('config:UPDATE', () => {
+    it('config:UPDATE', () => {
       expect(updateConfig('foo.bar', false)).toEqual({
         type: 'config:UPDATE',
         payload: { path: 'foo.bar', value: false },
@@ -30,7 +30,7 @@ describe('config', () => {
       })
     })
 
-    test('config:RESET', () => {
+    it('config:RESET', () => {
       expect(resetConfig('foo.bar')).toEqual({
         type: 'config:RESET',
         payload: { path: 'foo.bar' },
@@ -44,11 +44,11 @@ describe('config', () => {
       state = state.config
     })
 
-    test('gets store and overrides from remote for initial state', () => {
+    it('gets store and overrides from remote for initial state', () => {
       expect(configReducer(null, {})).toEqual({ isConfig: true })
     })
 
-    test('handles config:SET', () => {
+    it('handles config:SET', () => {
       const action = {
         type: 'config:SET',
         payload: { path: 'foo.bar', value: 'xyz' },
@@ -62,7 +62,7 @@ describe('config', () => {
   })
 
   describe('selectors', () => {
-    test('getConfig', () => {
+    it('getConfig', () => {
       expect(getConfig(state)).toEqual(state.config)
     })
   })

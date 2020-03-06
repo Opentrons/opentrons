@@ -148,7 +148,7 @@ beforeEach(() => {
 })
 
 describe('reduceCommandCreators', () => {
-  test('basic command creators', () => {
+  it('basic command creators', () => {
     const initialState: any = { count: 0 }
     const result: any = reduceCommandCreators(
       [
@@ -168,7 +168,7 @@ describe('reduceCommandCreators', () => {
     })
   })
 
-  test('error in a command short-circuits the command creation pipeline', () => {
+  it('error in a command short-circuits the command creation pipeline', () => {
     const initialState: any = { count: 5 }
     const result = reduceCommandCreators(
       [
@@ -190,7 +190,7 @@ describe('reduceCommandCreators', () => {
     })
   })
 
-  test('warnings accumulate in a flat array across the command chain', () => {
+  it('warnings accumulate in a flat array across the command chain', () => {
     const initialState: any = { count: 5 }
     const result = reduceCommandCreators(
       [
@@ -217,7 +217,7 @@ describe('reduceCommandCreators', () => {
 })
 
 describe('commandCreatorsTimeline', () => {
-  test('any errors short-circuit the timeline chain', () => {
+  it('any errors short-circuit the timeline chain', () => {
     const initialState: any = { count: 5 }
     const result = commandCreatorsTimeline(
       [
@@ -255,7 +255,7 @@ describe('commandCreatorsTimeline', () => {
     })
   })
 
-  test('warnings are indexed in an indexed command chain', () => {
+  it('warnings are indexed in an indexed command chain', () => {
     const initialState: any = { count: 5 }
 
     const result = commandCreatorsTimeline(

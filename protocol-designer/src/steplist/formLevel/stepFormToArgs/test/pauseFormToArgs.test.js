@@ -6,7 +6,7 @@ import {
 import { pauseFormToArgs } from '../pauseFormToArgs'
 
 describe('pauseFormToArgs', () => {
-  test('returns awaitTemperature command creator when form specifies pause until temp', () => {
+  it('returns awaitTemperature command creator when form specifies pause until temp', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',
@@ -23,7 +23,7 @@ describe('pauseFormToArgs', () => {
     }
     expect(pauseFormToArgs(formData)).toEqual(expected)
   })
-  test('returns delay command creator when form specifies pause until resume', () => {
+  it('returns delay command creator when form specifies pause until resume', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',
@@ -46,7 +46,7 @@ describe('pauseFormToArgs', () => {
     expect(pauseFormToArgs(formData)).toEqual(expected)
   })
 
-  test('returns delay command creator when form specifies pause until time', () => {
+  it('returns delay command creator when form specifies pause until time', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',

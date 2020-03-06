@@ -25,7 +25,7 @@ describe('ModuleUpdate', () => {
     jest.resetAllMocks()
   })
 
-  test('component renders', () => {
+  it('component renders', () => {
     const treeAvailableCanControl = shallow(
       <Provider store={store}>
         <ModuleUpdate
@@ -68,7 +68,7 @@ describe('ModuleUpdate', () => {
     expect(treeNotAvailableNoControl).toMatchSnapshot()
   })
 
-  test('displays a Warning for invalid files', () => {
+  it('displays a Warning for invalid files', () => {
     const SPECS = [
       {
         canControl: true,

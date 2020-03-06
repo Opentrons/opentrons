@@ -27,7 +27,7 @@ const validateProtocol = ajv.compile(protocolSchema)
 
 describe('validate v4 protocol fixtures under JSON schema', () => {
   protocolFixtures.forEach(protocolPath => {
-    test(path.basename(protocolPath), () => {
+    it(path.basename(protocolPath), () => {
       const protocol = require(protocolPath)
       const valid = validateProtocol(protocol)
       const validationErrors = validateProtocol.errors
@@ -42,7 +42,7 @@ describe('validate v4 protocol fixtures under JSON schema', () => {
 })
 
 describe('ensure bad protocol data fails validation', () => {
-  test('$otSharedSchema is required to be "#/protocol/schemas/4"', () => {
+  it('$otSharedSchema is required to be "#/protocol/schemas/4"', () => {
     expect(validateProtocol(omit(simpleV4Fixture, '$otSharedSchema'))).toBe(
       false
     )
@@ -54,14 +54,14 @@ describe('ensure bad protocol data fails validation', () => {
     ).toBe(false)
   })
 
-  test('schemaVersion is required to be 4', () => {
+  it('schemaVersion is required to be 4', () => {
     expect(validateProtocol(omit(simpleV4Fixture, 'schemaVersion'))).toBe(false)
     expect(validateProtocol({ ...simpleV4Fixture, schemaVersion: 3 })).toBe(
       false
     )
   })
 
-  test('reject bad values in "pipettes" objects', () => {
+  it('reject bad values in "pipettes" objects', () => {
     const badPipettes = {
       missingKeys: {},
       missingName: { mount: 'left' },
@@ -87,7 +87,7 @@ describe('ensure bad protocol data fails validation', () => {
     })
   })
 
-  test('reject bad values in "labware" objects', () => {
+  it('reject bad values in "labware" objects', () => {
     const badLabware = {
       noSlot: { definitionId: 'defId' },
       noDefId: { slot: '1' },
@@ -111,7 +111,7 @@ describe('ensure bad protocol data fails validation', () => {
     })
   })
 
-  test('reject bad values in "modules" objects', () => {
+  it('reject bad values in "modules" objects', () => {
     const badModules = {
       badModuleType: { slot: '1', moduleType: 'fake' },
       noSlot: { moduleType: 'thermocycler' },

@@ -56,7 +56,7 @@ describe('mix: change tip', () => {
     wells: ['A1', 'B1', 'C1'],
     changeTip,
   })
-  test('changeTip="always"', () => {
+  it('changeTip="always"', () => {
     const args = makeArgs('always')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
@@ -73,7 +73,7 @@ describe('mix: change tip', () => {
     )
   })
 
-  test('changeTip="once"', () => {
+  it('changeTip="once"', () => {
     const args = makeArgs('once')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
@@ -89,7 +89,7 @@ describe('mix: change tip', () => {
     ])
   })
 
-  test('changeTip="never"', () => {
+  it('changeTip="never"', () => {
     const args = makeArgs('never')
     const result = mix(args, invariantContext, robotStateWithTip)
     const res = getSuccessResult(result)
@@ -110,7 +110,7 @@ describe('mix: advanced options', () => {
   const times = 2
   const blowoutLabwareId = DEST_LABWARE
 
-  test('flow rate', () => {
+  it('flow rate', () => {
     const args = {
       ...mixinArgs,
       volume,
@@ -131,7 +131,7 @@ describe('mix: advanced options', () => {
     ])
   })
 
-  test('touch tip (after each dispense)', () => {
+  it('touch tip (after each dispense)', () => {
     const args: MixArgs = {
       ...mixinArgs,
       volume,
@@ -157,7 +157,7 @@ describe('mix: advanced options', () => {
     )
   })
 
-  test('blowout', () => {
+  it('blowout', () => {
     const args: MixArgs = {
       ...mixinArgs,
       volume,
@@ -185,7 +185,7 @@ describe('mix: advanced options', () => {
     )
   })
 
-  test('touch tip after blowout', () => {
+  it('touch tip after blowout', () => {
     const args: MixArgs = {
       ...mixinArgs,
       volume,
@@ -227,7 +227,7 @@ describe('mix: errors', () => {
       wells: ['A1', 'A2'],
     }
   })
-  test('invalid labware', () => {
+  it('invalid labware', () => {
     const args: MixArgs = {
       ...errorArgs,
       labware: 'invalidLabwareId',
@@ -240,7 +240,7 @@ describe('mix: errors', () => {
     })
   })
 
-  test('invalid pipette', () => {
+  it('invalid pipette', () => {
     const args: MixArgs = {
       ...errorArgs,
       pipette: 'invalidPipetteId',
@@ -254,6 +254,6 @@ describe('mix: errors', () => {
   })
 
   // TODO Ian 2018-05-08
-  test.todo('"times" arg non-integer')
-  test.todo('"times" arg negative')
+  it.todo('"times" arg non-integer')
+  it.todo('"times" arg negative')
 })

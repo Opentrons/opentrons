@@ -74,7 +74,7 @@ describe('ControlsCard', () => {
     jest.resetAllMocks()
   })
 
-  test('calls fetchLights on mount', () => {
+  it('calls fetchLights on mount', () => {
     mount(
       <Provider store={mockStore}>
         <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
@@ -86,7 +86,7 @@ describe('ControlsCard', () => {
     )
   })
 
-  test('calls updateLights with toggle on button click', () => {
+  it('calls updateLights with toggle on button click', () => {
     mockGetLightsOn.mockReturnValue(true)
 
     const wrapper = mount(
@@ -102,7 +102,7 @@ describe('ControlsCard', () => {
     )
   })
 
-  test('calls restartRobot on button click', () => {
+  it('calls restartRobot on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
@@ -116,7 +116,7 @@ describe('ControlsCard', () => {
     )
   })
 
-  test('calls home on button click', () => {
+  it('calls home on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
@@ -130,7 +130,7 @@ describe('ControlsCard', () => {
     )
   })
 
-  test('DC, home, and restart buttons enabled if connected and not running', () => {
+  it('DC, home, and restart buttons enabled if connected and not running', () => {
     mockGetIsRunning.mockReturnValue(false)
 
     const wrapper = mount(
@@ -147,7 +147,7 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  test('DC, home, and restart buttons disabled if not connectable', () => {
+  it('DC, home, and restart buttons disabled if not connectable', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <ControlsCard
@@ -162,7 +162,7 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  test('DC, home, and restart buttons disabled if not connected', () => {
+  it('DC, home, and restart buttons disabled if not connected', () => {
     const mockRobot: ViewableRobot = ({
       name: 'robot-name',
       connected: false,
@@ -180,7 +180,7 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  test('DC, home, and restart buttons disabled if protocol running', () => {
+  it('DC, home, and restart buttons disabled if protocol running', () => {
     mockGetIsRunning.mockReturnValue(true)
 
     const wrapper = mount(

@@ -2,7 +2,7 @@
 import { apiReducer } from '../reducer'
 
 describe('apiReducer', () => {
-  test('handles api:REQUEST', () => {
+  it('handles api:REQUEST', () => {
     const emptyState = {}
     const oldRequestState = {
       name: {
@@ -44,7 +44,7 @@ describe('apiReducer', () => {
     })
   })
 
-  test('handles api:SUCCESS', () => {
+  it('handles api:SUCCESS', () => {
     const emptyState = {}
     const oldRequestState = {
       name: {
@@ -86,7 +86,7 @@ describe('apiReducer', () => {
     })
   })
 
-  test('handles api:FAILURE', () => {
+  it('handles api:FAILURE', () => {
     const state = {
       name: {
         otherPath: { inProgress: false },
@@ -121,7 +121,7 @@ describe('apiReducer', () => {
     })
   })
 
-  test('api:FAILURE noops if no inProgress state', () => {
+  it('api:FAILURE noops if no inProgress state', () => {
     const state = { name: { path: { inProgress: false } } }
 
     const action = {
@@ -136,7 +136,7 @@ describe('apiReducer', () => {
     expect(apiReducer(state, action)).toEqual(state)
   })
 
-  test('clears state for unhealthy robots on discovery:UPDATE_LIST', () => {
+  it('clears state for unhealthy robots on discovery:UPDATE_LIST', () => {
     const robots = [
       { name: 'offline', ok: false, serverOk: false, advertising: false },
       { name: 'advertising', ok: false, serverOk: false, advertising: true },

@@ -101,12 +101,12 @@ describe('labware module dispatches', () => {
     jest.resetAllMocks()
   })
 
-  test('ensures labware directory exists on FETCH_CUSTOM_LABWARE', () => {
+  it('ensures labware directory exists on FETCH_CUSTOM_LABWARE', () => {
     handleAction(CustomLabware.fetchCustomLabware())
     expect(ensureDir).toHaveBeenCalledWith(labwareDir)
   })
 
-  test('reads labware directory on FETCH_CUSTOM_LABWARE', () => {
+  it('reads labware directory on FETCH_CUSTOM_LABWARE', () => {
     handleAction(CustomLabware.fetchCustomLabware())
 
     return flush().then(() =>
@@ -115,7 +115,7 @@ describe('labware module dispatches', () => {
   })
 
   // TODO(mc, 2019-11-25): refactor this action to be shell:INITIALIZE
-  test('reads labware directory on shell:CHECK_UPDATE', () => {
+  it('reads labware directory on shell:CHECK_UPDATE', () => {
     handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
 
     return flush().then(() =>
@@ -123,7 +123,7 @@ describe('labware module dispatches', () => {
     )
   })
 
-  test('reads and parses definition files', () => {
+  it('reads and parses definition files', () => {
     const mockDirectoryListing = ['a.json', 'b.json', 'c.json', 'd.json']
     const mockParsedFiles = [
       { filename: 'a.json', created: 0, data: {} },
@@ -143,7 +143,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches CUSTOM_LABWARE_LIST with labware files', () => {
+  it('dispatches CUSTOM_LABWARE_LIST with labware files', () => {
     const mockValidatedFiles = [
       CustomLabwareFixtures.mockInvalidLabware,
       CustomLabwareFixtures.mockDuplicateLabware,
@@ -161,7 +161,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches CUSTOM_LABWARE_LIST_FAILURE if read fails', () => {
+  it('dispatches CUSTOM_LABWARE_LIST_FAILURE if read fails', () => {
     readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
 
     handleAction(CustomLabware.fetchCustomLabware())
@@ -173,7 +173,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('opens file picker on CHANGE_CUSTOM_LABWARE_DIRECTORY', () => {
+  it('opens file picker on CHANGE_CUSTOM_LABWARE_DIRECTORY', () => {
     handleAction(CustomLabware.changeCustomLabwareDirectory())
 
     return flush().then(() => {
@@ -184,7 +184,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches config:UPDATE on labware dir selection', () => {
+  it('dispatches config:UPDATE on labware dir selection', () => {
     showOpenDirectoryDialog.mockResolvedValue(['/path/to/labware'])
 
     handleAction(CustomLabware.changeCustomLabwareDirectory())
@@ -198,7 +198,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('reads labware directory on config change', () => {
+  it('reads labware directory on config change', () => {
     expect(handleConfigChange).toHaveBeenCalledWith(
       'labware.directory',
       expect.any(Function)
@@ -215,7 +215,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches labware directory list error on config change', () => {
+  it('dispatches labware directory list error on config change', () => {
     const changeHandler = handleConfigChange.mock.calls[0][1]
 
     readLabwareDirectory.mockRejectedValue((new Error('AH'): any))
@@ -229,7 +229,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('opens file picker on ADD_CUSTOM_LABWARE', () => {
+  it('opens file picker on ADD_CUSTOM_LABWARE', () => {
     handleAction(CustomLabware.addCustomLabware())
 
     return flush().then(() => {
@@ -241,7 +241,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('reads labware directory and new file and compares', () => {
+  it('reads labware directory and new file and compares', () => {
     const mockValidatedFiles = [CustomLabwareFixtures.mockInvalidLabware]
 
     const mockNewUncheckedFile = {
@@ -270,7 +270,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches ADD_CUSTOM_LABWARE_FAILURE if checked file is invalid', () => {
+  it('dispatches ADD_CUSTOM_LABWARE_FAILURE if checked file is invalid', () => {
     const mockInvalidFile = CustomLabwareFixtures.mockInvalidLabware
     const expectedAction = CustomLabware.addCustomLabwareFailure(
       mockInvalidFile
@@ -286,7 +286,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('adds file and triggers a re-scan if valid', () => {
+  it('adds file and triggers a re-scan if valid', () => {
     const mockValidFile = CustomLabwareFixtures.mockValidLabware
     const expectedAction = CustomLabware.customLabwareList(
       [mockValidFile],
@@ -312,7 +312,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('dispatches ADD_CUSTOM_LABWARE_FAILURE if something rejects', () => {
+  it('dispatches ADD_CUSTOM_LABWARE_FAILURE if something rejects', () => {
     const mockValidFile = CustomLabwareFixtures.mockValidLabware
     const expectedAction = CustomLabware.addCustomLabwareFailure(null, 'AH')
 
@@ -328,7 +328,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('skips file picker on ADD_CUSTOM_LABWARE with overwrite', () => {
+  it('skips file picker on ADD_CUSTOM_LABWARE with overwrite', () => {
     const duplicate = CustomLabwareFixtures.mockDuplicateLabware
     const mockExisting = [
       ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
@@ -358,7 +358,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('sends ADD_CUSTOM_LABWARE_FAILURE if a something rejects', () => {
+  it('sends ADD_CUSTOM_LABWARE_FAILURE if a something rejects', () => {
     const duplicate = CustomLabwareFixtures.mockDuplicateLabware
     const mockExisting = [
       ({ ...duplicate, filename: '/duplicate1.json' }: DuplicateLabwareFile),
@@ -376,7 +376,7 @@ describe('labware module dispatches', () => {
     })
   })
 
-  test('opens custom labware directory on OPEN_CUSTOM_LABWARE_DIRECTORY', () => {
+  it('opens custom labware directory on OPEN_CUSTOM_LABWARE_DIRECTORY', () => {
     handleAction(CustomLabware.openCustomLabwareDirectory())
 
     return flush().then(() => {

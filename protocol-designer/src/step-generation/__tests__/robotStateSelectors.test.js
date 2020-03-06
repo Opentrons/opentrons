@@ -21,7 +21,7 @@ beforeEach(() => {
 })
 
 describe('sortLabwareBySlot', () => {
-  test('sorts all labware by slot', () => {
+  it('sorts all labware by slot', () => {
     const labwareState = {
       six: {
         slot: '6',
@@ -44,7 +44,7 @@ describe('sortLabwareBySlot', () => {
     ])
   })
 
-  test('with no labware, return empty array', () => {
+  it('with no labware, return empty array', () => {
     const labwareState = {}
     expect(sortLabwareBySlot(labwareState)).toEqual([])
   })
@@ -80,7 +80,7 @@ describe('_getNextTip', () => {
       robotState,
     })
   }
-  test('empty tiprack should return null', () => {
+  it('empty tiprack should return null', () => {
     const channels = [1, 8]
     channels.forEach(channel => {
       const result = getNextTipHelper(channel, { ...getTiprackTipstate(false) })
@@ -88,12 +88,12 @@ describe('_getNextTip', () => {
     })
   })
 
-  test('full tiprack should start at A1', () => {
+  it('full tiprack should start at A1', () => {
     const result = getNextTipHelper(1, { ...getTiprackTipstate(true) })
     expect(result).toEqual('A1')
   })
 
-  test('missing A1, go to B1', () => {
+  it('missing A1, go to B1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       A1: false,
@@ -101,7 +101,7 @@ describe('_getNextTip', () => {
     expect(result).toEqual('B1')
   })
 
-  test('missing A1 and B1, go to C1', () => {
+  it('missing A1 and B1, go to C1', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       A1: false,
@@ -110,7 +110,7 @@ describe('_getNextTip', () => {
     expect(result).toEqual('C1')
   })
 
-  test('missing first column, go to A2', () => {
+  it('missing first column, go to A2', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
@@ -118,7 +118,7 @@ describe('_getNextTip', () => {
     expect(result).toEqual('A2')
   })
 
-  test('missing a few random tips, go to lowest col, then lowest row', () => {
+  it('missing a few random tips, go to lowest col, then lowest row', () => {
     const result = getNextTipHelper(1, {
       ...getTiprackTipstate(true),
       ...getTipColumn(1, false),
@@ -130,7 +130,7 @@ describe('_getNextTip', () => {
 })
 
 describe('getNextTiprack - single-channel', () => {
-  test('single tiprack, missing A1', () => {
+  it('single tiprack, missing A1', () => {
     const robotState = makeState({
       invariantContext,
       labwareLocations: {
@@ -149,7 +149,7 @@ describe('getNextTiprack - single-channel', () => {
     expect(result && result.well).toEqual('B1')
   })
 
-  test('single tiprack, empty, should return null', () => {
+  it('single tiprack, empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -161,7 +161,7 @@ describe('getNextTiprack - single-channel', () => {
     expect(result).toEqual(null)
   })
 
-  test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
+  it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -177,7 +177,7 @@ describe('getNextTiprack - single-channel', () => {
     expect(result && result.well).toEqual('A1')
   })
 
-  test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
+  it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -196,7 +196,7 @@ describe('getNextTiprack - single-channel', () => {
     expect(result && result.well).toEqual('B1')
   })
 
-  test('multiple tipracks, all empty, should return null', () => {
+  it('multiple tipracks, all empty, should return null', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -213,7 +213,7 @@ describe('getNextTiprack - single-channel', () => {
 })
 
 describe('getNextTiprack - 8-channel', () => {
-  test('single tiprack, totally full', () => {
+  it('single tiprack, totally full', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -229,7 +229,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result && result.well).toEqual('A1')
   })
 
-  test('single tiprack, partially full', () => {
+  it('single tiprack, partially full', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -250,7 +250,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result && result.well).toEqual('A3')
   })
 
-  test('single tiprack, empty, should return null', () => {
+  it('single tiprack, empty, should return null', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -264,7 +264,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result).toEqual(null)
   })
 
-  test('single tiprack, a well missing from each column, should return null', () => {
+  it('single tiprack, a well missing from each column, should return null', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -294,7 +294,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result).toEqual(null)
   })
 
-  test('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
+  it('multiple tipracks, all full, should return the filled tiprack in the lowest slot', () => {
     const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -311,7 +311,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result && result.well).toEqual('A1')
   })
 
-  test('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
+  it('multiple tipracks, some partially full, should return the filled tiprack in the lowest slot', () => {
     let robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -366,7 +366,7 @@ describe('getNextTiprack - 8-channel', () => {
     expect(result && result.well).toEqual('A2')
   })
 
-  test('multiple tipracks, all empty, should return null', () => {
+  it('multiple tipracks, all empty, should return null', () => {
     const robotState = makeState({
       invariantContext,
       pipetteLocations: { p300SingleId: { mount: 'left' } },
@@ -387,7 +387,7 @@ describe('getNextTiprack - 8-channel', () => {
 })
 
 describe('getModuleState', () => {
-  test('returns the state for specified module', () => {
+  it('returns the state for specified module', () => {
     const magModuleId = 'magdeck123'
     const magModuleState = {
       type: MAGNETIC_MODULE_TYPE,

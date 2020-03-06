@@ -51,7 +51,7 @@ describe('updateModuleEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('calls POST /modules/{serial}/update', () => {
+  it('calls POST /modules/{serial}/update', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateModuleSuccess })
@@ -72,7 +72,7 @@ describe('updateModuleEpic', () => {
     })
   })
 
-  test('maps successful response to SEND_MODULE_COMMAND_SUCCESS', () => {
+  it('maps successful response to SEND_MODULE_COMMAND_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateModuleSuccess })
@@ -93,7 +93,7 @@ describe('updateModuleEpic', () => {
     })
   })
 
-  test('maps failed response to SEND_MODULE_COMMAND_FAILURE', () => {
+  it('maps failed response to SEND_MODULE_COMMAND_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateModuleFailure })

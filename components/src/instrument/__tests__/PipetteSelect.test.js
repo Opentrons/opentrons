@@ -14,13 +14,13 @@ import { Select } from '../../forms'
 import type { PipetteNameSpecs } from '@opentrons/shared-data'
 
 describe('PipetteSelect', () => {
-  test('renders a Select', () => {
+  it('renders a Select', () => {
     const wrapper = shallow(<PipetteSelect onPipetteChange={jest.fn()} />)
 
     expect(wrapper.find(Select)).toHaveLength(1)
   })
 
-  test('passes props to Select', () => {
+  it('passes props to Select', () => {
     const tabIndex = 3
     const className = 'class'
 
@@ -40,7 +40,7 @@ describe('PipetteSelect', () => {
     })
   })
 
-  test('passes pipettes as grouped options to Select', () => {
+  it('passes pipettes as grouped options to Select', () => {
     const wrapper = shallow(<PipetteSelect onPipetteChange={jest.fn()} />)
     const pipetteSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
       'maxVolume',
@@ -62,7 +62,7 @@ describe('PipetteSelect', () => {
     ])
   })
 
-  test('can blacklist pipettes by name', () => {
+  it('can blacklist pipettes by name', () => {
     const pipetteSpecs: Array<PipetteNameSpecs> = getAllPipetteNames(
       'maxVolume',
       'channels'
@@ -89,7 +89,7 @@ describe('PipetteSelect', () => {
     ])
   })
 
-  test('maps pipetteName prop to Select value', () => {
+  it('maps pipetteName prop to Select value', () => {
     const pipetteName = 'p300_single_gen2'
     const pipetteSpecs = getPipetteNameSpecs(pipetteName)
     const expectedOption = {
@@ -107,7 +107,7 @@ describe('PipetteSelect', () => {
     expect(wrapper.find(Select).prop('value')).toEqual(expectedOption)
   })
 
-  test('allows "None" as an option', () => {
+  it('allows "None" as an option', () => {
     const expectedNone = { value: '', label: 'None' }
     const selectWrapper = shallow(
       <PipetteSelect onPipetteChange={jest.fn()} enableNoneOption />

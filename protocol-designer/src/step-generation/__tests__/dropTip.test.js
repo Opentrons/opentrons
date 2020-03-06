@@ -32,7 +32,7 @@ describe('dropTip', () => {
   }
 
   describe('replaceTip: single channel', () => {
-    test('drop tip if there is a tip', () => {
+    it('drop tip if there is a tip', () => {
       const result = dropTip(
         { pipette: DEFAULT_PIPETTE },
         invariantContext,
@@ -51,7 +51,7 @@ describe('dropTip', () => {
       ])
     })
 
-    test('no tip on pipette, ignore dropTip', () => {
+    it('no tip on pipette, ignore dropTip', () => {
       const initialRobotState = makeRobotState({
         singleHasTips: false,
         multiHasTips: true,
@@ -67,7 +67,7 @@ describe('dropTip', () => {
   })
 
   describe('Multi-channel dropTip', () => {
-    test('drop tip if there is a tip', () => {
+    it('drop tip if there is a tip', () => {
       const result = dropTip(
         { pipette: 'p300MultiId' },
         invariantContext,
@@ -86,7 +86,7 @@ describe('dropTip', () => {
       ])
     })
 
-    test('no tip on pipette, ignore dropTip', () => {
+    it('no tip on pipette, ignore dropTip', () => {
       const initialRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: false,

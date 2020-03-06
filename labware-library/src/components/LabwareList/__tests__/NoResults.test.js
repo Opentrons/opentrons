@@ -6,7 +6,7 @@ import { shallow } from 'enzyme'
 import { NoResults } from '../NoResults'
 
 describe('NoResults', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     expect(shallow(<NoResults />)).toMatchSnapshot()
   })
 })

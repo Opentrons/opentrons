@@ -35,7 +35,7 @@ describe('fetchPipettesOnConnectEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
+  it('dispatches nothing robot:CONNECT_RESPONSE failure', () => {
     const action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: { error: { message: 'AH' } },
@@ -52,7 +52,7 @@ describe('fetchPipettesOnConnectEpic', () => {
     })
   })
 
-  test('dispatches FETCH_PIPETTES and FETCH_PIPETTE_SETTINGS on robot:CONNECT_RESPONSE success', () => {
+  it('dispatches FETCH_PIPETTES and FETCH_PIPETTE_SETTINGS on robot:CONNECT_RESPONSE success', () => {
     const action = {
       type: 'robot:CONNECT_RESPONSE',
       payload: {},

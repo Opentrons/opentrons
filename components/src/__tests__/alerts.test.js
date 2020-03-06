@@ -7,7 +7,7 @@ import { AlertItem } from '..'
 describe('alerts', () => {
   const onCloseClick = () => {}
 
-  test('creates an alert with close button', () => {
+  it('creates an alert with close button', () => {
     const onCloseClick = jest.fn()
     const button = Renderer.create(
       <AlertItem
@@ -22,7 +22,7 @@ describe('alerts', () => {
     expect(onCloseClick).toHaveBeenCalled()
   })
 
-  test('success alert renders correctly', () => {
+  it('success alert renders correctly', () => {
     const tree = Renderer.create(
       <AlertItem type={'success'} title={'good job!'} />
     ).toJSON()
@@ -30,7 +30,7 @@ describe('alerts', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('warning alert renders correctly', () => {
+  it('warning alert renders correctly', () => {
     const tree = Renderer.create(
       <AlertItem type={'warning'} title={'warning'} />
     ).toJSON()
@@ -38,7 +38,7 @@ describe('alerts', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('warning alert onCloseClick renders correctly', () => {
+  it('warning alert onCloseClick renders correctly', () => {
     const tree = Renderer.create(
       <AlertItem
         type={'warning'}
@@ -50,7 +50,7 @@ describe('alerts', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('warning alert with message body renders correctly', () => {
+  it('warning alert with message body renders correctly', () => {
     const tree = Renderer.create(
       <AlertItem type={'warning'} title={'warning'} onCloseClick={onCloseClick}>
         <h3>Title</h3>

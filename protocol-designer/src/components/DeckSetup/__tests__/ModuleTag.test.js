@@ -44,7 +44,7 @@ const getInitialDeckSetup: JestMockFn<[BaseState], InitialDeckSetup> =
 describe('ModuleTag', () => {
   describe('ModuleStatus', () => {
     describe('magnet module', () => {
-      test('displays engaged when magent is engaged', () => {
+      it('displays engaged when magent is engaged', () => {
         const props = {
           engaged: true,
           type: MAGNETIC_MODULE_TYPE,
@@ -55,7 +55,7 @@ describe('ModuleTag', () => {
         expect(component.text()).toBe('engaged')
       })
 
-      test('displays disengaged when magnet is not engaged', () => {
+      it('displays disengaged when magnet is not engaged', () => {
         const moduleState = {
           engaged: false,
           type: MAGNETIC_MODULE_TYPE,
@@ -68,7 +68,7 @@ describe('ModuleTag', () => {
     })
 
     describe('temperature module', () => {
-      test('deactivated is shown when module is deactivated', () => {
+      it('deactivated is shown when module is deactivated', () => {
         const moduleState = {
           type: TEMPERATURE_MODULE_TYPE,
           status: TEMPERATURE_DEACTIVATED,
@@ -80,7 +80,7 @@ describe('ModuleTag', () => {
         expect(component.text()).toBe('Deactivated')
       })
 
-      test('target temperature is shown when module is at target', () => {
+      it('target temperature is shown when module is at target', () => {
         const moduleState = {
           type: TEMPERATURE_MODULE_TYPE,
           status: TEMPERATURE_AT_TARGET,
@@ -92,7 +92,7 @@ describe('ModuleTag', () => {
         expect(component.text()).toBe('45 °C')
       })
 
-      test('going to X is shown when temperature is approaching target', () => {
+      it('going to X is shown when temperature is approaching target', () => {
         const moduleState = {
           type: TEMPERATURE_MODULE_TYPE,
           status: TEMPERATURE_APPROACHING_TARGET,

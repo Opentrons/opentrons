@@ -34,7 +34,7 @@ describe('pollModulesWhileConnectedEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('does nothing if connect fails', () => {
+  it('does nothing if connect fails', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action = RobotActions.connectResponse(new Error('AH'))
 
@@ -46,7 +46,7 @@ describe('pollModulesWhileConnectedEpic', () => {
     })
   })
 
-  test('polls connected robot until no longer connected', () => {
+  it('polls connected robot until no longer connected', () => {
     testScheduler.run(({ hot, expectObservable, expectSubscriptions }) => {
       const action = RobotActions.connectResponse(null, ['create'])
 

@@ -13,7 +13,7 @@ const validateNameSpecs = ajv.compile(nameSpecsSchema)
 const validateModelSpecs = ajv.compile(modelSpecsSchema)
 
 describe('validate pipette specs with JSON schemas', () => {
-  test('ensure all pipette *NAME* specs match name JSON schema', () => {
+  it('ensure all pipette *NAME* specs match name JSON schema', () => {
     const valid = validateNameSpecs(pipetteNameSpecs)
     const validationErrors = validateNameSpecs.errors
 
@@ -25,7 +25,7 @@ describe('validate pipette specs with JSON schemas', () => {
     expect(valid).toBe(true)
   })
 
-  test('ensure all pipette *MODEL* specs match model JSON schema', () => {
+  it('ensure all pipette *MODEL* specs match model JSON schema', () => {
     const valid = validateModelSpecs(pipetteModelSpecs)
     const validationErrors = validateModelSpecs.errors
 
@@ -39,7 +39,7 @@ describe('validate pipette specs with JSON schemas', () => {
 })
 
 describe('model -> name referencing', () => {
-  test('ensure all pipette model specs reference a valid pipette name', () => {
+  it('ensure all pipette model specs reference a valid pipette name', () => {
     const modelKeys = Object.keys(pipetteModelSpecs.config)
     const nameKeys = Object.keys(pipetteNameSpecs)
 

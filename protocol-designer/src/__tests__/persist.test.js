@@ -16,7 +16,7 @@ describe('persist', () => {
       jest.clearAllMocks()
     })
 
-    test('retrieves localStorage data by key and parses data when it exists', () => {
+    it('retrieves localStorage data by key and parses data when it exists', () => {
       const value = { test: 'some value' }
       getItemMock.mockReturnValue(JSON.stringify(value))
 
@@ -25,7 +25,7 @@ describe('persist', () => {
       expect(result).toEqual(value)
     })
 
-    test('returns undefined when localStorage could not be retrieved for key given', () => {
+    it('returns undefined when localStorage could not be retrieved for key given', () => {
       getItemMock.mockImplementation(() => {
         throw new Error('something went wrong!')
       })
@@ -50,7 +50,7 @@ describe('persist', () => {
       jest.clearAllMocks()
     })
 
-    test('adds prefix to key sets localStorage item by key', () => {
+    it('adds prefix to key sets localStorage item by key', () => {
       const value = { a: 'a', b: 'b' }
       setItemMock.mockReturnValue(undefined)
 

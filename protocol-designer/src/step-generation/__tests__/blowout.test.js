@@ -31,7 +31,7 @@ describe('blowout', () => {
     }
   })
 
-  test('blowout with tip', () => {
+  it('blowout with tip', () => {
     const result = blowout(params, invariantContext, robotStateWithTip)
 
     const res = getSuccessResult(result)
@@ -43,7 +43,7 @@ describe('blowout', () => {
     ])
   })
 
-  test('blowout with invalid pipette ID should throw error', () => {
+  it('blowout with invalid pipette ID should throw error', () => {
     const result = blowout(
       {
         ...params,
@@ -56,7 +56,7 @@ describe('blowout', () => {
     expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
-  test('blowout with invalid labware ID should throw error', () => {
+  it('blowout with invalid labware ID should throw error', () => {
     const result = blowout(
       {
         ...params,
@@ -73,7 +73,7 @@ describe('blowout', () => {
     })
   })
 
-  test('blowout with no tip should throw error', () => {
+  it('blowout with no tip should throw error', () => {
     const result = blowout(params, invariantContext, initialRobotState)
 
     const res = getErrorResult(result)

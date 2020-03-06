@@ -3,10 +3,10 @@ import { createEmptyLiquidState } from '../utils'
 import { makeContext, makeState } from '../__fixtures__'
 
 describe('snapshot tests', () => {
-  test('makeContext', () => {
+  it('makeContext', () => {
     expect(makeContext()).toMatchSnapshot()
   })
-  test('makeState', () => {
+  it('makeState', () => {
     expect(
       makeState({
         invariantContext: makeContext(),
@@ -21,7 +21,7 @@ describe('snapshot tests', () => {
       })
     ).toMatchSnapshot()
   })
-  test('createEmptyLiquidState', () => {
+  it('createEmptyLiquidState', () => {
     expect(createEmptyLiquidState(makeContext())).toMatchSnapshot()
   })
 })

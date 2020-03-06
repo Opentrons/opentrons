@@ -10,7 +10,7 @@ const icons = Object.keys(ICON_DATA_BY_NAME)
 
 describe('icons', () => {
   icons.forEach(icon =>
-    test(`${icon} renders correctly`, () => {
+    it(`${icon} renders correctly`, () => {
       const tree = Renderer.create(
         <Icon name={`${icon}`} className="foo" />
       ).toJSON()
@@ -21,7 +21,7 @@ describe('icons', () => {
 })
 
 describe('Notification Icon', () => {
-  test('NotificationIcon renders correctly', () => {
+  it('NotificationIcon renders correctly', () => {
     const tree = Renderer.create(
       <NotificationIcon
         name="flask-outline"

@@ -272,7 +272,7 @@ describe('protocol pipettes comparison selectors', () => {
       after = noop,
     } = spec
 
-    test(name, () => {
+    it(name, () => {
       before()
       expect(selector(state, 'robotName')).toEqual(expected)
       after()

@@ -49,7 +49,7 @@ describe('protocol actions', () => {
       lastModified: 456,
     }
 
-    test('dispatches a protocol:OPEN', () => {
+    it('dispatches a protocol:OPEN', () => {
       const result = store.dispatch(openProtocol(pythonFile))
       const expected = {
         type: 'protocol:OPEN',
@@ -60,13 +60,13 @@ describe('protocol actions', () => {
       expect(store.getActions()).toEqual([expected])
     })
 
-    test('reads a file', () => {
+    it('reads a file', () => {
       store.dispatch(openProtocol(pythonFile))
       expect(mockReader.readAsText).toHaveBeenCalledWith(pythonFile)
       expect(mockReader.onload).toEqual(expect.any(Function))
     })
 
-    test('dispatches protocol:UPLOAD on python read completion', () => {
+    it('dispatches protocol:UPLOAD on python read completion', () => {
       store.dispatch(openProtocol(pythonFile))
       mockReader.result = 'file contents'
       mockReader.onload()
@@ -80,7 +80,7 @@ describe('protocol actions', () => {
       })
     })
 
-    test('dispatches protocol:UPLOAD on JSON read completion', () => {
+    it('dispatches protocol:UPLOAD on JSON read completion', () => {
       const protocol = { metadata: {} }
 
       store.dispatch(openProtocol(jsonFile))
@@ -98,7 +98,7 @@ describe('protocol actions', () => {
     })
 
     describe('bundle upload', () => {
-      test('dispatches a protocol:OPEN', () => {
+      it('dispatches a protocol:OPEN', () => {
         ConfigSelectors.getFeatureFlags.mockReturnValue({
           enableBundleUpload: true,
         })
@@ -112,7 +112,7 @@ describe('protocol actions', () => {
         expect(store.getActions()).toEqual([expected])
       })
 
-      test('dispatches a protocol:INVALID_FILE without bundles enabled', () => {
+      it('dispatches a protocol:INVALID_FILE without bundles enabled', () => {
         const result = store.dispatch(openProtocol(bundleFile))
         const expected = {
           type: 'protocol:INVALID_FILE',
@@ -128,7 +128,7 @@ describe('protocol actions', () => {
         expect(store.getActions()).toEqual([expected])
       })
 
-      test('dispatches protocol:UPLOAD on bundle read completion', () => {
+      it('dispatches protocol:UPLOAD on bundle read completion', () => {
         const arrayBuff = new ArrayBuffer(3)
         const uint8array = new Uint8Array(arrayBuff)
         uint8array[0] = 57

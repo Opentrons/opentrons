@@ -21,21 +21,21 @@ describe('useTimeouthook', () => {
     return <span />
   }
 
-  test('delay `null` results in no calls', () => {
+  it('delay `null` results in no calls', () => {
     mount(<TestUseTimeout delay={null} />)
     jest.runTimersToTime(10000)
 
     expect(callback).toHaveBeenCalledTimes(0)
   })
 
-  test('delay sets a timeout', () => {
+  it('delay sets a timeout', () => {
     mount(<TestUseTimeout delay={2} />)
     jest.runTimersToTime(3)
 
     expect(callback).toHaveBeenCalledTimes(1)
   })
 
-  test('re-rendering with delay={null} clears the interval', () => {
+  it('re-rendering with delay={null} clears the interval', () => {
     const wrapper = mount(<TestUseTimeout delay={4} />)
 
     jest.runTimersToTime(2)

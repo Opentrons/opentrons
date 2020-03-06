@@ -51,7 +51,7 @@ describe('fetchModulesEpic', () => {
     jest.resetAllMocks()
   })
 
-  test('calls GET /modules', () => {
+  it('calls GET /modules', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchModulesSuccess })
@@ -72,7 +72,7 @@ describe('fetchModulesEpic', () => {
     })
   })
 
-  test('maps successful response to FETCH_MODULES_SUCCESS', () => {
+  it('maps successful response to FETCH_MODULES_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchModulesSuccess })
@@ -92,7 +92,7 @@ describe('fetchModulesEpic', () => {
     })
   })
 
-  test('maps failed response to FETCH_MODULES_FAILURE', () => {
+  it('maps failed response to FETCH_MODULES_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchModulesFailure })

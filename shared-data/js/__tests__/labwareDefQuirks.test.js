@@ -20,7 +20,7 @@ describe('check quirks for all labware defs', () => {
   })
   labwarePaths.forEach(labwarePath => {
     const defname = path.basename(path.dirname(labwarePath))
-    test(`${defname} has valid quirks`, () => {
+    it(`${defname} has valid quirks`, () => {
       const labwareDef = require(labwarePath)
       const quirks = labwareDef.parameters.quirks || []
       // we want to test that the quirks in the def are a subset of validQuirks,

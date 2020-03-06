@@ -6,13 +6,13 @@ import { SlotMap } from '../SlotMap'
 import { Icon } from '../../icons'
 
 describe('SlotMap', () => {
-  test('component renders 11 slots', () => {
+  it('component renders 11 slots', () => {
     const wrapper = shallow(<SlotMap occupiedSlots={['1']} />)
 
     expect(wrapper.find('rect')).toHaveLength(11)
   })
 
-  test('component renders crash info icon when collision slots present', () => {
+  it('component renders crash info icon when collision slots present', () => {
     const wrapper = shallow(
       <SlotMap occupiedSlots={['1']} collisionSlots={['4']} />
     )
@@ -20,7 +20,7 @@ describe('SlotMap', () => {
     expect(wrapper.find(Icon)).toHaveLength(1)
   })
 
-  test('component applies occupied and error styles', () => {
+  it('component applies occupied and error styles', () => {
     const wrapperDefault = shallow(<SlotMap occupiedSlots={['1']} />)
     const wrapperWithError = shallow(
       <SlotMap occupiedSlots={['1']} isError={true} />

@@ -11,7 +11,7 @@ describe('AddLabware', () => {
     jest.resetAllMocks()
   })
 
-  test('has a button that calls onAddLabware on click', () => {
+  it('has a button that calls onAddLabware on click', () => {
     const wrapper = mount(<AddLabware onAddLabware={mockOnAddLabware} />)
 
     expect(mockOnAddLabware).toHaveBeenCalledTimes(0)
