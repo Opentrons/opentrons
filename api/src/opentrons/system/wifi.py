@@ -15,6 +15,20 @@ class ConfigureArgsError(Exception):
     pass
 
 
+EAP_CONFIG_SHAPE = {
+    'options': [
+        {'name': method.qualified_name(),
+         'displayName': method.display_name(),
+         'options': [{k: v for k, v in arg.items()
+                      if k in ['name',
+                               'displayName',
+                               'required',
+                               'type']}
+                     for arg in method.args()]}
+        for method in nmcli.EAP_TYPES]
+}
+
+
 @dataclass(frozen=True)
 class Key:
     directory: str
@@ -94,29 +108,20 @@ def remove_key(requested_hash: str) -> Optional[str]:
     return name
 
 
-def get_key_file(arg: str) -> str:
+def get_key_file(key: str) -> str:
+    """
+    Get the full path of a key file
+
+    :param key: The key to look for
+    :return: the path
+    """
     keys_dir = CONFIG['wifi_keys_dir']
     available_keys = os.listdir(keys_dir)
-    if arg not in available_keys:
-        raise ConfigureArgsError('Key ID {} is not valid on the system'
-                                 .format(arg))
-    files_in_dir = os.listdir(os.path.join(keys_dir, arg))
+    if key not in available_keys:
+        raise ConfigureArgsError(f'Key ID {key} is not valid on the system')
+    files_in_dir = os.listdir(os.path.join(keys_dir, key))
     if len(files_in_dir) > 1:
         raise OSError(
-            'Key ID {} has multiple files, try deleting and reuploading'
-            .format(arg))
-    return os.path.join(keys_dir, arg, files_in_dir[0])
-
-
-EAP_CONFIG_SHAPE = {
-    'options': [
-        {'name': method.qualified_name(),
-         'displayName': method.display_name(),
-         'options': [{k: v for k, v in arg.items()
-                      if k in ['name',
-                               'displayName',
-                               'required',
-                               'type']}
-                     for arg in method.args()]}
-        for method in nmcli.EAP_TYPES]
-}
+            f'Key ID {key} has multiple files, try deleting and reuploading'
+        )
+    return os.path.join(keys_dir, key, files_in_dir[0])

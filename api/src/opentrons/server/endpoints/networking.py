@@ -4,7 +4,6 @@ import os
 import subprocess
 from typing import Dict, Any
 from aiohttp import web
-from opentrons.config import CONFIG
 from opentrons.system import nmcli, wifi
 
 log = logging.getLogger(__name__)
@@ -452,7 +451,7 @@ async def remove_key(request: web.Request) -> web.Response:
     deleted_file = wifi.remove_key(requested_hash)
     if not deleted_file:
         return web.json_response(
-            {'message': f"No such key file {deleted_file}"}, status=404)
+            {'message': f"No such key file {requested_hash}"}, status=404)
     return web.json_response(
         {'message': f'Key file {deleted_file} deleted'},
         status=200)
