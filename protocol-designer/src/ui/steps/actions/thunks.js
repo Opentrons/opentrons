@@ -129,9 +129,6 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
   payload: form,
 })
 
-export const _isChangeToTempForm = (form: FormData): boolean =>
-  form?.stepType === 'temperature' && form?.setTemperature === 'true'
-
 /** take unsavedForm state and put it into the payload */
 export const saveStepForm = () => (
   dispatch: ThunkDispatch<*>,
