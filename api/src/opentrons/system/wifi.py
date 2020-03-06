@@ -2,7 +2,7 @@ import hashlib
 import logging
 import os
 import shutil
-from typing import Generator, Optional
+from typing import Generator, Optional, Dict, Any
 from dataclasses import dataclass
 
 from opentrons.config import CONFIG
@@ -122,6 +122,79 @@ def get_key_file(key: str) -> str:
     files_in_dir = os.listdir(os.path.join(keys_dir, key))
     if len(files_in_dir) > 1:
         raise OSError(
-            f'Key ID {key} has multiple files, try deleting and reuploading'
+            f'Key ID {key} has multiple files, try deleting and re-uploading'
         )
     return os.path.join(keys_dir, key, files_in_dir[0])
+
+
+def _eap_check_no_extra_args(
+        config: Dict[str, Any], options: Any):
+    # options is an Any because the type annotation for EAP_CONFIG_SHAPE itself
+    # can’t quite express the type properly because of the inference from the
+    # dict annotation.
+    """Check for args that are not required for this method (to aid debugging)
+    ``config`` should be the user config.
+    ``options`` should be the options sub-member for the eap method.
+
+    Before this method is called, the validity of the 'eapType' key should be
+    established.
+    """
+    arg_names = [k for k in config.keys() if k != 'eapType']
+    valid_names = [o['name'] for o in options]
+    for an in arg_names:
+        if an not in valid_names:
+            raise ConfigureArgsError(
+                'Option {} is not valid for EAP method {}'
+                .format(an, config['eapType']))
+
+
+def _eap_check_option_ok(opt: Dict[str, str], config: Dict[str, Any]):
+    """
+    Check that a given EAP option is in the user config (if required)
+    and, if specified, is the right type.
+
+    ``opt`` should be an options dict from EAP_CONFIG_SHAPE.
+    ``config`` should be the user config dict.
+
+    Before this method is called, the validity of the eapType key should be
+    established.
+    """
+    if opt['name'] not in config:
+        if opt['required']:
+            raise ConfigureArgsError(
+                'Required argument {} for eap method {} not present'
+                .format(opt['displayName'], config['eapType']))
+        else:
+            return
+    name = opt['name']
+    o_type = opt['type']
+    arg = config[name]
+    if name in config:
+        if o_type in ('string', 'password') and not isinstance(arg, str):
+            raise ConfigureArgsError('Option {} should be a str'
+                                     .format(name))
+        elif o_type == 'file' and not isinstance(arg, str):
+            raise ConfigureArgsError('Option {} must be a str'
+                                     .format(name))
+
+
+def eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
+    """Check the eap specific args, and replace values where needed."""
+    eap_type = eap_config.get('eapType')
+    for method in EAP_CONFIG_SHAPE['options']:
+        if method['name'] == eap_type:
+            options = method['options']
+            break
+    else:
+        raise ConfigureArgsError('EAP method {} is not valid'.format(eap_type))
+
+    _eap_check_no_extra_args(eap_config, options)
+
+    for opt in options:  # type: ignore
+        # Ignoring most types to do with EAP_CONFIG_SHAPE because of issues
+        # wth type inference for dict comprehensions
+        _eap_check_option_ok(opt, eap_config)
+        if opt['type'] == 'file' and opt['name'] in eap_config:
+            # Special work for file: rewrite from key id to path
+            eap_config[opt['name']] = get_key_file(eap_config[opt['name']])
+    return eap_config
