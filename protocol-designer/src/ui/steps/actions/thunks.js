@@ -2,7 +2,7 @@
 import assert from 'assert'
 import {
   getUnsavedForm,
-  getSavedStepForms,
+  getUnsavedFormIsPristineSetTempForm,
 } from '../../../step-forms/selectors'
 import { changeFormInput } from '../../../steplist/actions/actions'
 
@@ -132,56 +132,87 @@ export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
 export const _isChangeToTempForm = (form: FormData): boolean =>
   form?.stepType === 'temperature' && form?.setTemperature === 'true'
 
+/** take unsavedForm state and put it into the payload */
 export const saveStepForm = () => (
   dispatch: ThunkDispatch<*>,
   getState: GetState
-) => {
+): void => {
   const initialState = getState()
   const unsavedForm = getUnsavedForm(initialState)
 
+  // this check is only for Flow. At this point, unsavedForm should always be populated
   if (!unsavedForm) {
-    // this is for Flow
     assert(
       false,
       'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
     )
     return
   }
-  const { id } = unsavedForm
-  const isPristineForm = !(id in getSavedStepForms(initialState))
-  const isPristineChangeToTempForm =
-    isPristineForm && _isChangeToTempForm(unsavedForm)
 
   // save the form
   dispatch(_saveStepForm(unsavedForm))
+}
 
-  // TODO IMMEDIATELY: make this a different action that is gated by a modal
-  if (isPristineChangeToTempForm) {
-    const setTemperatureForm = unsavedForm
-    const temperature = setTemperatureForm?.targetTemperature
+/** "power action", mimicking saving the never-saved "set temperature X" step,
+ ** then creating and saving a "pause until temp X" step */
+export const saveSetTempFormWithAddedPauseUntilTemp = () => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+): void => {
+  const initialState = getState()
+  const unsavedSetTemperatureForm = getUnsavedForm(initialState)
+  const isPristineSetTempForm = getUnsavedFormIsPristineSetTempForm(
+    initialState
+  )
+
+  // this check is only for Flow. At this point, unsavedForm should always be populated
+  if (!unsavedSetTemperatureForm) {
     assert(
-      temperature != null && temperature !== '',
-      `tried to auto-add a pause until temp, but targetTemperature was ${temperature}`
+      false,
+      'Tried to saveSetTempFormWithAddedPauseUntilTemp with falsey unsavedForm. This should never be able to happen.'
     )
-    addStep({ stepType: 'pause' })(dispatch, getState)
-    // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
-    // contingent on other inputs (eg changing the pauseForAmountOfTime radio button may clear the pauseTemperature).
-    dispatch(
-      changeFormInput({
-        update: {
-          pauseForAmountOfTime: 'untilTemperature',
-        },
-      })
-    )
-    dispatch(changeFormInput({ update: { pauseTemperature: temperature } }))
-    // finally save the new pause form
-    const unsavedPauseForm = getUnsavedForm(getState())
+    return
+  }
+  const { id } = unsavedSetTemperatureForm
 
-    // this conditional is for Flow, the unsaved form should always exist
-    if (unsavedPauseForm != null) {
-      dispatch(_saveStepForm(unsavedPauseForm))
-    } else {
-      assert(false, 'could not auto-save pause form, getUnsavedForm returned')
-    }
+  if (!isPristineSetTempForm) {
+    // this check should happen upstream (before dispatching saveSetTempFormWithAddedPauseUntilTemp in the first place)
+    assert(
+      false,
+      `tried to saveSetTempFormWithAddedPauseUntilTemp but form ${id} is not a pristine set temp form`
+    )
+    return
+  }
+
+  const temperature = unsavedSetTemperatureForm?.targetTemperature
+  assert(
+    temperature != null && temperature !== '',
+    `tried to auto-add a pause until temp, but targetTemperature is missing: ${temperature}`
+  )
+  // save the set temperature step form that is currently open
+  dispatch(_saveStepForm(unsavedSetTemperatureForm))
+
+  // add a new pause step form
+  addStep({ stepType: 'pause' })(dispatch, getState)
+
+  // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
+  // contingent on other inputs (eg changing the pauseForAmountOfTime radio button may clear the pauseTemperature).
+  dispatch(
+    changeFormInput({
+      update: {
+        pauseForAmountOfTime: 'untilTemperature',
+      },
+    })
+  )
+  dispatch(changeFormInput({ update: { pauseTemperature: temperature } }))
+
+  // finally save the new pause form
+  const unsavedPauseForm = getUnsavedForm(getState())
+
+  // this conditional is for Flow, the unsaved form should always exist
+  if (unsavedPauseForm != null) {
+    dispatch(_saveStepForm(unsavedPauseForm))
+  } else {
+    assert(false, 'could not auto-save pause form, getUnsavedForm returned')
   }
 }
