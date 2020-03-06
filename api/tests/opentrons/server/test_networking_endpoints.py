@@ -9,10 +9,6 @@ from opentrons.system import nmcli, wifi
 from opentrons.server import init
 from opentrons.server.endpoints import networking
 
-"""
-All mocks in this test suite represent actual output from nmcli commands
-"""
-
 
 async def test_networking_status(
         virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
