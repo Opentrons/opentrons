@@ -121,6 +121,18 @@ class TempDeck:
             await asyncio.sleep(0.1)
         return ''
 
+    def start_set_temperature(self, celsius) -> str:
+        self.run_flag.wait()
+        celsius = round(float(celsius),
+                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        try:
+            self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
+        except (TempDeckError, SerialException, SerialNoResponse) as e:
+            return str(e)
+        self._temperature.update({'target': celsius})
+        return ''
+
     # NOTE: only present to support apiV1 non-blocking by default behavior
     def legacy_set_temperature(self, celsius) -> str:
         self.run_flag.wait()
