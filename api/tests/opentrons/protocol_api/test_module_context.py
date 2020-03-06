@@ -62,13 +62,29 @@ def test_incorrect_module_error(loop):
         assert ctx.load_module('the cool module', 1)
 
 
-def test_load_simulating_module(loop):
+@pytest.mark.parametrize(
+    'loadname,klass,model',
+    [('tempdeck', papi.TemperatureModuleContext, 'temperatureModuleV1'),
+     ('temperature module',
+      papi.TemperatureModuleContext,
+      'temperatureModuleV1'),
+     ('temperature module gen2',
+      papi.TemperatureModuleContext,
+      'temperatureModuleV2'),
+     ('magdeck', papi.MagneticModuleContext, 'magneticModuleV1'),
+     ('magnetic module', papi.MagneticModuleContext, 'magneticModuleV1'),
+     ('magnetic module gen2', papi.MagneticModuleContext, 'magneticModuleV2'),
+     ('thermocycler', papi.ThermocyclerContext, 'thermocyclerModuleV1'),
+     ('thermocycler module', papi.ThermocyclerContext, 'thermocyclerModuleV1')]
+)
+def test_load_simulating_module(loop, loadname, klass, model):
     # Check that a known module will not throw an error if
     # in simulation mode
     ctx = papi.ProtocolContext(loop)
     ctx.home()
-    mod = ctx.load_module('tempdeck', 1)
-    assert isinstance(mod, papi.TemperatureModuleContext)
+    mod = ctx.load_module(loadname, 7)
+    assert isinstance(mod, klass)
+    assert mod.geometry.model.value == model
 
 
 def test_tempdeck(loop):
@@ -369,3 +385,33 @@ def test_magdeck_labware_props(loop):
     assert mod._module._driver.plate_height == 2
     mod.engage(height_from_base=2)
     assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
+
+
+def test_module_compatibility(get_module_fixture, monkeypatch):
+
+    def load_fixtures(version, model):
+        return get_module_fixture(model.value)
+
+    monkeypatch.setattr(
+        papi.module_geometry, '_load_module_definition', load_fixtures)
+
+    class DummyEnum:
+        def __init__(self, value: str):
+            self.value = value
+
+        def __eq__(self, other: 'DummyEnum') -> bool:
+            return self.value == other.value
+
+    assert not papi.module_geometry.models_compatible(
+        DummyEnum('incompatibleGenerationV1'),
+        DummyEnum('incompatibleGenerationV2'))
+    assert papi.module_geometry.models_compatible(
+        DummyEnum('incompatibleGenerationV2'),
+        DummyEnum('incompatibleGenerationV2'))
+    assert papi.module_geometry.models_compatible(
+        DummyEnum('compatibleGenerationV1'),
+        DummyEnum('compatibleGenerationV1'))
+    assert not papi.module_geometry.models_compatible(
+        DummyEnum('compatibleGenerationV1'),
+        DummyEnum('incompatibleGenerationV1')
+    )

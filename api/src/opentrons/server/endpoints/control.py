@@ -96,16 +96,16 @@ async def get_attached_modules(request):
     {
         "modules": [
             {
+                # module model name for lookups in module defs
+                "model": "string"
                 # machine readable identifying name of module
                 "name": "string",
-                # human-presentable name of module
-                "displayName": "string",
                 # module system port pat
                 "port": "string",
                 # unique serial number
                 "serial": "string",
-                # model identifier (i.e. part number)
-                "model": "string",
+                # revision identifier (i.e. part number)
+                "revision": "string",
                 # current firmware version
                 "fwVersion": "string",
                 # human readable status
@@ -127,11 +127,13 @@ async def get_attached_modules(request):
     hw_mods = hw.attached_modules
     module_data = [
         {
-            'name': mod.name(),
-            'displayName': mod.display_name(),
-            'port': mod.port,
+            'name': mod.name(),  # TODO: legacy, remove
+            'displayName': mod.name(),  # TODO: legacy, remove
+            'model': mod.device_info.get('model'),  # TODO legacy, remove
+            'moduleModel': mod.model(),
+            'port': mod.port,  # /dev/ttyS0
             'serial': mod.device_info.get('serial'),
-            'model': mod.device_info.get('model'),
+            'revision': mod.device_info.get('model'),
             'fwVersion': mod.device_info.get('version'),
             'hasAvailableUpdate': mod.has_available_update(),
             **mod.live_data

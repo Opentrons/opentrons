@@ -539,6 +539,16 @@ def get_json_protocol_fixture():
 
 
 @pytest.fixture
+def get_module_fixture():
+    def _get_module_fixture(fixture_name):
+        with open(pathlib.Path(__file__).parent
+                  / '..' / '..' / '..' / 'shared-data' / 'module' / 'fixtures'
+                  / '2' / f'{fixture_name}.json', 'rb') as f:
+            return json.loads(f.read().decode('utf-8'))
+    return _get_module_fixture
+
+
+@pytest.fixture
 def get_bundle_fixture():
     def get_std_labware(loadName, version=1):
         with open(
