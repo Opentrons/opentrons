@@ -3,7 +3,7 @@ import React, { useCallback, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import { OutlineButton, PrimaryButton } from '@opentrons/components'
-
+import { AutoAddPauseUntilTempStepModal } from '../../modals/AutoAddPauseUntilTempStepModal'
 import { actions as steplistActions } from '../../../steplist'
 import { actions as stepsActions } from '../../../ui/steps'
 
@@ -52,29 +52,19 @@ export const ButtonRow = ({ onDelete, onClickMoreOptions }: Props) => {
   return (
     <>
       {showAddPauseUntilTempStepModal && (
-        <div>
-          <p>
-            Pause until module is {unsavedForm?.targetTemperature} DegReeSSS?
-          </p>
-          <button
-            onClick={() => {
-              setShowAddPauseUntilTempStepModal(false)
-              // save normally
-              dispatch(stepsActions.saveStepForm())
-            }}
-          >
-            I WILL BUILD A PAUSE LATER
-          </button>
-          <button
-            onClick={() => {
-              setShowAddPauseUntilTempStepModal(false)
-              // save this form and add a subsequent pause
-              dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
-            }}
-          >
-            PAUSE PROTOCOL NOW
-          </button>
-        </div>
+        <AutoAddPauseUntilTempStepModal
+          displayTemperature={unsavedForm?.targetTemperature ?? '?'}
+          handleCancelClick={() => {
+            setShowAddPauseUntilTempStepModal(false)
+            // save normally
+            dispatch(stepsActions.saveStepForm())
+          }}
+          handleContinueClick={() => {
+            setShowAddPauseUntilTempStepModal(false)
+            // save this form and add a subsequent pause
+            dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+          }}
+        />
       )}
       <div className={cx(modalStyles.button_row_divided, styles.form_wrapper)}>
         <div>
