@@ -1,13 +1,12 @@
-import hashlib
 import json
 import logging
 import os
-import shutil
 import subprocess
-from typing import Dict, Any, List
+from typing import Dict, Any
 from aiohttp import web
-from opentrons.system import nmcli
 from opentrons.config import CONFIG
+from opentrons.system import nmcli
+from opentrons.system.wifi import _do_add_key, _do_list_keys, _do_remove_key
 
 log = logging.getLogger(__name__)
 
@@ -418,7 +417,6 @@ async def add_key(request: web.Request) -> web.Response:
     }
     ```
     """
-    keys_dir = CONFIG['wifi_keys_dir']
     if not request.can_read_body:
         return web.json_response({'message': "Must upload key file"},
                                  status=400)
@@ -427,34 +425,19 @@ async def add_key(request: web.Request) -> web.Response:
     if not keyfile:
         return web.json_response(
             {'message': "No key 'key' in request"}, status=400)
-    hasher = hashlib.sha256()
-    key_contents = keyfile.file.read()
-    hasher.update(key_contents)
-    key_hash = hasher.hexdigest()
-    if key_hash in os.listdir(keys_dir):
-        files = os.listdir(os.path.join(keys_dir, key_hash))
-        if files:
-            return web.json_response(
-                {'message': 'Key file already present',
-                 'uri': '/wifi/keys/{}'.format(key_hash),
-                 'id': key_hash,
-                 'name': files[0]},
-                status=200)
-        else:
-            log.warning(
-                "Key directory with nothing in it: {}"
-                .format(key_hash))
-            os.rmdir(os.path.join(keys_dir, key_hash))
-    key_hash_path = os.path.join(keys_dir, key_hash)
-    os.mkdir(key_hash_path)
-    with open(os.path.join(key_hash_path,
-                           os.path.basename(keyfile.filename)), 'wb') as f:
-        f.write(key_contents)
-    return web.json_response(
-        {'uri': '/wifi/keys/{}'.format(key_hash),
-         'id': key_hash,
-         'name': os.path.basename(keyfile.filename)},
-        status=201)
+
+    add_key_result = _do_add_key(keyfile.filename, keyfile.file.read())
+
+    response_body = {
+        'uri': '/wifi/keys/{}'.format(add_key_result.key.directory),
+        'id': add_key_result.key.directory,
+        'name': os.path.basename(add_key_result.key.file)
+    }
+    if add_key_result.created:
+        return web.json_response(response_body, status=201)
+    else:
+        response_body['message'] = 'Key file already present'
+        return web.json_response(response_body, status=200)
 
 
 async def list_keys(request: web.Request) -> web.Response:
@@ -475,21 +458,11 @@ async def list_keys(request: web.Request) -> web.Response:
     }
     ```
     """
-    keys_dir = CONFIG['wifi_keys_dir']
-    keys: List[Dict[str, str]] = []
-    # TODO(mc, 2018-10-24): add last modified info to keys for sort purposes
-    for path in os.listdir(keys_dir):
-        full_path = os.path.join(keys_dir, path)
-        if os.path.isdir(full_path):
-            in_path = os.listdir(full_path)
-            if len(in_path) > 1:
-                log.warning("Garbage in key dir for key {}".format(path))
-            keys.append(
-                {'uri': '/wifi/keys/{}'.format(path),
-                 'id': path,
-                 'name': os.path.basename(in_path[0])})
-        else:
-            log.warning("Garbage in wifi keys dir: {}".format(full_path))
+    keys = [
+        {'uri': '/wifi/keys/{}'.format(key.directory),
+         'id': key.directory,
+         'name': os.path.basename(key.file)} for key in _do_list_keys()
+    ]
     return web.json_response({'keys': keys}, status=200)
 
 
@@ -503,19 +476,13 @@ async def remove_key(request: web.Request) -> web.Response:
     {message: 'Removed key keyfile.pem'}
     ```
     """
-    keys_dir = CONFIG['wifi_keys_dir']
-    available_keys = os.listdir(keys_dir)
     requested_hash = request.match_info['key_uuid']
-    if requested_hash not in available_keys:
+    deleted_file = _do_remove_key(requested_hash)
+    if not deleted_file:
         return web.json_response(
-            {'message': 'No such key file {}'
-             .format(requested_hash)},
-            status=404)
-    key_path = os.path.join(keys_dir, requested_hash)
-    name = os.listdir(key_path)[0]
-    shutil.rmtree(key_path)
+            {'message': f"No such key file {deleted_file}"}, status=404)
     return web.json_response(
-        {'message': 'Key file {} deleted'.format(name)},
+        {'message': f'Key file {deleted_file} deleted'},
         status=200)
 
 
