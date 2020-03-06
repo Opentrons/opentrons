@@ -9,10 +9,6 @@ from opentrons.system import nmcli, wifi
 log = logging.getLogger(__name__)
 
 
-class ConfigureArgsError(Exception):
-    pass
-
-
 class DisconnectArgsError(Exception):
     pass
 
@@ -49,81 +45,6 @@ async def list_networks(request: web.Request) -> web.Response:
         return web.json_response({'list': networks}, status=200)
 
 
-def _eap_check_no_extra_args(
-        config: Dict[str, Any], options: Any):
-    # options is an Any because the type annotation for EAP_CONFIG_SHAPE itself
-    # can’t quite express the type properly because of the inference from the
-    # dict annotation.
-    """Check for args that are not required for this method (to aid debugging)
-    ``config`` should be the user config.
-    ``options`` should be the options submember for the eap method.
-
-    Before this method is called, the validity of the 'eapType' key should be
-    established.
-    """
-    arg_names = [k for k in config.keys() if k != 'eapType']
-    valid_names = [o['name'] for o in options]
-    for an in arg_names:
-        if an not in valid_names:
-            raise ConfigureArgsError(
-                'Option {} is not valid for EAP method {}'
-                .format(an, config['eapType']))
-
-
-def _eap_check_option_ok(opt: Dict[str, str], config: Dict[str, Any]):
-    """ Check that a given EAP option is in the user config (if required)
-     and, if specified, is the right type.
-
-    ``opt`` should be an options dict from EAP_CONFIG_SHAPE.
-    ``config`` should be the user config dict.
-
-    Before this method is called, the validity of the eapType key should be
-    established.
-    """
-    if opt['name'] not in config:
-        if opt['required']:
-            raise ConfigureArgsError(
-                'Required argument {} for eap method {} not present'
-                .format(opt['displayName'], config['eapType']))
-        else:
-            return
-    name = opt['name']
-    o_type = opt['type']
-    arg = config[name]
-    if name in config:
-        if o_type in ('string', 'password') and not isinstance(arg, str):
-            raise ConfigureArgsError('Option {} should be a str'
-                                     .format(name))
-        elif o_type == 'file' and not isinstance(arg, str):
-            raise ConfigureArgsError('Option {} must be a str'
-                                     .format(name))
-
-
-def _eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
-    """ Check the eap specific args, and replace values where needed.
-
-    Similar to _check_configure_args but for only EAP.
-    """
-    eap_type = eap_config.get('eapType')
-    for method in wifi.EAP_CONFIG_SHAPE['options']:
-        if method['name'] == eap_type:
-            options = method['options']
-            break
-    else:
-        raise ConfigureArgsError('EAP method {} is not valid'.format(eap_type))
-
-    _eap_check_no_extra_args(eap_config, options)
-
-    for opt in options:  # type: ignore
-        # Ignoring most types to do with EAP_CONFIG_SHAPE because of issues
-        # wth type inference for dict comprehensions
-        _eap_check_option_ok(opt, eap_config)
-        if opt['type'] == 'file' and opt['name'] in eap_config:
-            # Special work for file: rewrite from key id to path
-            eap_config[opt['name']] = wifi.get_key_file(eap_config[opt['name']])
-    return eap_config
-
-
 def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
     """ Make sure that the security_type is known, or throw. """
     # Security should be one of our valid strings
@@ -134,7 +55,7 @@ def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
     }
     if not kwargs.get('securityType'):
         if kwargs.get('psk') and kwargs.get('eapConfig'):
-            raise ConfigureArgsError(
+            raise wifi.ConfigureArgsError(
                 'Cannot deduce security type: psk and eap both passed')
         elif kwargs.get('psk'):
             kwargs['securityType'] = 'wpa-psk'
@@ -145,8 +66,9 @@ def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
     try:
         return sec_translation[kwargs['securityType']]
     except KeyError:
-        raise ConfigureArgsError('securityType must be one of {}'
-                                 .format(','.join(sec_translation.keys())))
+        raise wifi.ConfigureArgsError(
+            'securityType must be one of {}'
+                .format(','.join(sec_translation.keys())))
 
 
 def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
@@ -158,19 +80,19 @@ def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
     # SSID must always be present
     if not configure_args.get('ssid')\
        or not isinstance(configure_args['ssid'], str):
-        raise ConfigureArgsError("SSID must be specified")
+        raise wifi.ConfigureArgsError("SSID must be specified")
     # If specified, hidden must be a bool
     if not configure_args.get('hidden'):
         configure_args['hidden'] = False
     elif not isinstance(configure_args['hidden'], bool):
-        raise ConfigureArgsError('If specified, hidden must be a bool')
+        raise wifi.ConfigureArgsError('If specified, hidden must be a bool')
 
     configure_args['securityType'] = _deduce_security(configure_args)
 
     # If we have wpa2-personal, we need a psk
     if configure_args['securityType'] == nmcli.SECURITY_TYPES.WPA_PSK:
         if not configure_args.get('psk'):
-            raise ConfigureArgsError(
+            raise wifi.ConfigureArgsError(
                 'If securityType is wpa-psk, psk must be specified')
         return configure_args
 
@@ -178,10 +100,10 @@ def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
     # it
     if configure_args['securityType'] == nmcli.SECURITY_TYPES.WPA_EAP:
         if not configure_args.get('eapConfig'):
-            raise ConfigureArgsError(
+            raise wifi.ConfigureArgsError(
                 'If securityType is wpa-eap, eapConfig must be specified')
         configure_args['eapConfig']\
-            = _eap_check_config(configure_args['eapConfig'])
+            = wifi.eap_check_config(configure_args['eapConfig'])
         return configure_args
 
     # If we’re still here we have no security and we’re done
@@ -225,7 +147,7 @@ async def configure(request: web.Request) -> web.Response:
 
     try:
         configure_kwargs = _check_configure_args(body)
-    except ConfigureArgsError as e:
+    except wifi.ConfigureArgsError as e:
         return web.json_response({'message': str(e)}, status=400)
 
     try:
@@ -520,5 +442,4 @@ async def eap_options(request: web.Request) -> web.Response:
     }
     ```
     """
-
     return web.json_response(wifi.EAP_CONFIG_SHAPE, status=200)
