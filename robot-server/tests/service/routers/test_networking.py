@@ -7,11 +7,9 @@ from unittest.mock import patch
 import pytest
 from opentrons.system import nmcli, wifi
 from opentrons.server import init
-from opentrons.server.endpoints import networking
 
 
-def test_networking_status(
-        api_client, monkeypatch):
+def test_networking_status(api_client, monkeypatch):
 
     async def mock_is_connected():
         return 'full'
@@ -60,11 +58,7 @@ def test_networking_status(
     assert resp.status_code == 500
 
 
-async def test_wifi_list(
-        virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-
+async def test_wifi_list(api_client, monkeypatch):
     expected_res = [
         {'ssid': 'Opentrons', 'signal': 81, 'active': True},
         {'ssid': 'Big Duck', 'signal': 47, 'active': False},
@@ -81,17 +75,13 @@ async def test_wifi_list(
         'list': expected_res
     })
 
-    resp = await cli.get('/wifi/list')
-    text = await resp.text()
-    assert resp.status == 200
+    resp = api_client.get('/wifi/list')
+    text = resp.text()
+    assert resp.status_code == 200
     assert text == expected
 
 
-async def test_wifi_configure(
-        virtual_smoothie_env, loop, aiohttp_client, monkeypatch):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-
+async def test_wifi_configure(api_client, monkeypatch):
     msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
     async def mock_configure(ssid, securityType=None, psk=None, hidden=False):
@@ -102,22 +92,20 @@ async def test_wifi_configure(
 
     expected = {'ssid': 'Opentrons', 'message': msg}
 
-    resp = await cli.post(
+    resp = api_client.post(
         '/wifi/configure', json={'ssid': 'Opentrons', 'psk': 'scrt sqrl'})
-    body = await resp.json()
-    assert resp.status == 201
+    body = resp.json()
+    assert resp.status_code == 201
     assert body == expected
 
-    resp = await cli.post(
+    resp = api_client.post(
         '/wifi/configure', json={'ssid': 'asasd', 'foo': 'bar'})
-    assert resp.status == 400
-    body = await resp.json()
+    assert resp.status_code == 400
+    body = resp.json()
     assert 'message' in body
 
 
-async def test_wifi_disconnect(loop, aiohttp_client, monkeypatch):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
+async def test_wifi_disconnect(api_client, monkeypatch):
 
     msg1 = 'Connection \'ot_wifi\' successfully deactivated. ' \
            'Connection \'ot_wifi\' (fa7ed807-23ef-41f0-ab3e-34' \
@@ -130,14 +118,14 @@ async def test_wifi_disconnect(loop, aiohttp_client, monkeypatch):
     monkeypatch.setattr(nmcli, 'wifi_disconnect', mock_disconnect)
 
     expected = {'message': 'SSID must be specified as a string'}
-    resp = await cli.post('/wifi/disconnect', json={})
-    body = await resp.json()
-    assert resp.status == 400
+    resp = api_client.post('/wifi/disconnect', json={})
+    body = resp.json()
+    assert resp.status_code == 400
     assert body == expected
 
-    resp = await cli.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
-    body = await resp.json()
-    assert resp.status == 200
+    resp = api_client.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
+    body = resp.json()
+    assert resp.status_code == 200
     assert 'message' in body
 
     msg2 = 'Connection \'ot_wifi\' successfully deactivated. \n' \
@@ -149,51 +137,37 @@ async def test_wifi_disconnect(loop, aiohttp_client, monkeypatch):
 
     monkeypatch.setattr(nmcli, 'wifi_disconnect', mock_bad_disconnect)
 
-    resp = await cli.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
-    body = await resp.json()
-    assert resp.status == 207
+    resp = api_client.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
+    body = resp.json()
+    assert resp.status_code == 207
     assert 'message' in body
 
 
-def test_deduce_security():
-    with pytest.raises(wifi.ConfigureArgsError):
-        networking._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})
-    assert networking._deduce_security({'psk': 'test-psk'})\
-        == nmcli.SECURITY_TYPES.WPA_PSK
-    assert networking._deduce_security({'eapConfig': {'hi': 'this is bad'}})\
-        == nmcli.SECURITY_TYPES.WPA_EAP
-    assert networking._deduce_security({}) == nmcli.SECURITY_TYPES.NONE
-    with pytest.raises(wifi.ConfigureArgsError):
-        networking._deduce_security(
-            {'securityType': 'this is invalid you fool'})
+@patch("opentrons.system.wifi.list_keys")
+def test_list_keys_no_keys(list_key_patch, api_client):
+    list_key_patch.return_value = ()
 
-
-async def test_list_keys(loop, aiohttp_client, wifi_keys_tempdir):
-    dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-    empty_resp = await cli.get('/wifi/keys')
-    assert empty_resp.status == 200
-    empty_body = await empty_resp.json()
+    empty_resp = api_client.get('/wifi/keys')
+    assert empty_resp.status_code == 200
+    empty_body = empty_resp.json()
     assert empty_body == {'keys': []}
 
-    for dn in dummy_names:
-        os.mkdir(os.path.join(wifi_keys_tempdir, dn))
-        open(os.path.join(wifi_keys_tempdir, dn, 'test.pem'), 'w').write('hi')
 
-    resp = await cli.get('/wifi/keys')
-    assert resp.status == 200
-    body = await resp.json()
-    keys = body['keys']
-    assert len(keys) == 3
-    for dn in dummy_names:
-        for keyfile in keys:
-            if keyfile['id'] == dn:
-                assert keyfile['name'] == 'test.pem'
-                assert keyfile['uri'] == '/wifi/keys/{}'.format(dn)
-                break
-        else:
-            raise KeyError(dn)
+@patch("opentrons.system.wifi.list_keys")
+def test_list_keys(list_key_patch, api_client):
+    def gen():
+        dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
+        for n in dummy_names:
+            yield wifi.Key(directory=n, file=f"{n[:3]}.pem")
+
+    list_key_patch.side_effect = gen
+
+    empty_resp = api_client.get('/wifi/keys')
+    assert empty_resp.status_code == 200
+    empty_body = empty_resp.json()
+    assert empty_body == {'keys': [
+
+    ]}
 
 
 async def test_add_key_call(loop, aiohttp_client, wifi_keys_tempdir):

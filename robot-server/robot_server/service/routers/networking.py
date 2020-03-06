@@ -65,7 +65,6 @@ async def post_wifi_configurution(configuration: WifiConfiguration)\
             description="Get a list of key files known to the system",
             response_model=WifiKeyFiles)
 async def get_wifi_keys() -> WifiKeyFiles:
-
     keys = [
         WifiKeyFile(uri=f'/wifi/keys/{key.directory}',
                     id=key.directory,
