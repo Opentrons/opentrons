@@ -94,6 +94,7 @@ class CriticalPoint(enum.Enum):
     Only relevant when a multichannel pipette is present.
     """
 
+
 class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
     PAUSED = enum.auto()
@@ -101,6 +102,7 @@ class ExecutionState(enum.Enum):
 
     def __str__(self):
         return self.name
+
 
 class ExecutionCancelledError(RuntimeError):
     pass

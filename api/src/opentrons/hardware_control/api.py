@@ -416,7 +416,8 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.resume(), self._loop)
+        asyncio.run_coroutine_threadsafe(self._execution_manager.resume(),
+                                         self._loop)
 
     def halt(self):
         """ Immediately stop motion.
@@ -431,7 +432,8 @@ class API(HardwareAPILike):
         :py:meth:`stop`.
         """
         self._backend.hard_halt()
-        cancel_tasks = functools.partial(self._execution_manager.cancel, self._protected_tasks)
+        cancel_tasks = functools.partial(self._execution_manager.cancel,
+                                         self._protected_tasks)
         asyncio.run_coroutine_threadsafe(cancel_tasks(), self._loop)
 
     @shield

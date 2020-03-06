@@ -1,10 +1,6 @@
 import asyncio
-import logging
 from typing import Set
 from .types import ExecutionState, ExecutionCancelledError
-
-
-MODULE_LOG = logging.getLogger(__name__)
 
 
 class ExecutionManager():
@@ -50,9 +46,9 @@ class ExecutionManager():
             self._state = ExecutionState.RUNNING
             self._condition.notify_all()
 
-    async def is_running(self):
+    async def get_state(self) -> ExecutionState:
         async with self._condition:
-            return self._state is ExecutionState.RUNNING
+            return self._state
 
     async def wait_for_is_running(self):
         async with self._condition:
