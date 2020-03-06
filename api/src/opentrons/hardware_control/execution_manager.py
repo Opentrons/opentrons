@@ -22,12 +22,15 @@ class ExecutionManager():
 
     def cancel(self, protected_tasks: Set[asyncio.Task] = None):
         self._is_running.clear()
-        running_task = asyncio.current_task(self._loop)
-        for t in asyncio.all_tasks(self._loop):
-            if t is not running_task \
-                    and protected_tasks \
-                    and t not in protected_tasks:
-                t.cancel()
+        try:
+            running_task = asyncio.current_task(self._loop)
+            for t in asyncio.all_tasks(self._loop):
+                if t is not running_task \
+                        and protected_tasks \
+                        and t not in protected_tasks:
+                    t.cancel()
+        finally:
+            self._is_running.set()
 
     @property
     def is_running(self):

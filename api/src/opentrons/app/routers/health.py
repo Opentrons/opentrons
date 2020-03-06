@@ -1,13 +1,8 @@
-import inspect
-
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
 from opentrons.app.dependencies import get_hardware
-from opentrons.hardware_control import HardwareAPILike
-from opentrons.protocols.types import APIVersion
 from opentrons.app.models.health import Health, Links
 from opentrons import __version__
-from opentrons.config import feature_flags
 
 router = APIRouter()
 
@@ -23,26 +18,13 @@ router = APIRouter()
                     " and name.",
             response_description="OT-2 /health response")
 async def get_health(
-        hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
-    static_paths = ['/logs/serial.log', '/logs/api.log']
-    # This conditional handles the case where we have just changed the
-    # use protocol api v2 feature flag, so it does not match the type
-    # of hardware we're actually using.
-    fw_version = hardware.fw_version  # type: ignore
-    if inspect.iscoroutine(fw_version):
-        fw_version = await fw_version
-
-    if feature_flags.use_protocol_api_v2():
-        max_supported = protocol_api.MAX_SUPPORTED_VERSION
-    else:
-        max_supported = APIVersion(1, 0)
-
+        hardware=Depends(get_hardware)) -> Health:
     return Health(name=config.name(),
                   api_version=__version__,
-                  fw_version=fw_version,
-                  logs=static_paths,
+                  fw_version=hardware.fw_version,
+                  logs=['/logs/serial.log', '/logs/api.log'],
                   system_version=config.OT_SYSTEM_VERSION,
-                  protocol_api_version=list(max_supported),
+                  protocol_api_version=[protocol_api.MAX_SUPPORTED_VERSION],
                   links=Links(
                       apiLog='/logs/api.log',
                       serialLog='/logs/serial.log',

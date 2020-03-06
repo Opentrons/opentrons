@@ -279,7 +279,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
-        return self._hw_manager.hardware.get_is_simulator()
+        return self._hw_manager.hardware.is_simulator
 
     @requires_version(2, 0)
     def load_labware_from_definition(
