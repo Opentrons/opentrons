@@ -7,16 +7,18 @@ import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
 import { i18n } from '../../../localization'
-import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../../utils/labwareModuleCompatibility'
 import { BlockedSlot } from './BlockedSlot'
 import {
   openAddLabwareModal,
   moveDeckItem,
 } from '../../../labware-ingred/actions'
+import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import { DND_TYPES } from './constants'
-
-import { selectors as labwareDefSelectors } from '../../../labware-defs'
 
 import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'
@@ -29,7 +31,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
-  connectDropTarget: Node => Node | null,
+  connectDropTarget: Node => Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
 |}
 type OP = {|
@@ -61,8 +63,9 @@ export const SlotControlsComponent = (props: Props) => {
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
-  const isCustomLabware =
-    draggedItem && customLabwares[draggedItem.labwareOnDeck.labwareDefURI]
+  const isCustomLabware = draggedItem
+    ? getLabwareIsCustom(customLabwares, draggedItem.labwareOnDeck)
+    : false
 
   let slotBlocked: string | null = null
   if (
@@ -141,8 +144,10 @@ const slotTarget = {
 
     if (moduleType != null && draggedDef != null) {
       // this is a module slot, prevent drop if the dragged labware is not compatible
-      const isCustomLabware =
-        props.customLabwares[draggedItem.labwareOnDeck.labwareDefURI]
+      const isCustomLabware = getLabwareIsCustom(
+        props.customLabwares,
+        draggedItem.labwareOnDeck
+      )
 
       return getLabwareIsCompatible(draggedDef, moduleType) || isCustomLabware
     }

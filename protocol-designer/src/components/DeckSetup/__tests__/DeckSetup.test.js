@@ -2,16 +2,8 @@
 
 import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
 import fixture_24_tuberack_def from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack.json'
-import { getSwapBlocked } from '../DeckSetup'
 import * as labwareModuleCompatibility from '../../../utils/labwareModuleCompatibility'
-import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
-
-jest.mock('../../../utils/labwareModuleCompatibility')
-
-const getLabwareIsCompatibleMock: JestMockFn<
-  [LabwareDefinition2, ModuleRealType],
-  boolean
-> = labwareModuleCompatibility.getLabwareIsCompatible
+import { getSwapBlocked } from '../DeckSetup'
 
 describe('DeckSetup', () => {
   describe('getSwapBlocked', () => {
@@ -27,6 +19,18 @@ describe('DeckSetup', () => {
       slot: '4',
       def: fixture_24_tuberack_def,
     }
+
+    let getLabwareIsCompatibleSpy
+    beforeEach(() => {
+      getLabwareIsCompatibleSpy = jest.spyOn(
+        labwareModuleCompatibility,
+        'getLabwareIsCompatible'
+      )
+    })
+
+    afterEach(() => {
+      getLabwareIsCompatibleSpy.mockClear()
+    })
 
     it('is not blocked when there is no labware in slot', () => {
       const args = {
@@ -56,7 +60,7 @@ describe('DeckSetup', () => {
 
     it('is not blocked when dragged labware to swap on module is custom', () => {
       fixture_24_tuberack.slot = 'magnet123'
-      getLabwareIsCompatibleMock.mockReturnValue(false)
+      getLabwareIsCompatibleSpy.mockReturnValue(false)
       const args = {
         hoveredLabware: fixture_24_tuberack,
         draggedLabware: fixture_96_plate,
@@ -84,7 +88,7 @@ describe('DeckSetup', () => {
 
     it('is blocked when dragged labware to swap is not custom and not compatible', () => {
       fixture_24_tuberack.slot = 'magnet123'
-      getLabwareIsCompatibleMock.mockReturnValue(false)
+      getLabwareIsCompatibleSpy.mockReturnValue(false)
       const args = {
         hoveredLabware: fixture_24_tuberack,
         draggedLabware: fixture_96_plate,
@@ -110,7 +114,7 @@ describe('DeckSetup', () => {
 
     it('is not blocked when both labwares are compatible', () => {
       fixture_24_tuberack.slot = 'magnet123'
-      getLabwareIsCompatibleMock.mockReturnValue(true)
+      getLabwareIsCompatibleSpy.mockReturnValue(true)
       const args = {
         hoveredLabware: fixture_24_tuberack,
         draggedLabware: fixture_96_plate,

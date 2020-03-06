@@ -16,13 +16,16 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
 import type { TerminalItemId } from '../../steplist'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../utils/labwareModuleCompatibility'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import {
   getModuleVizDims,
   inferModuleOrientationFromSlot,
 } from './getModuleVizDims'
 
-import { selectors as labwareDefSelectors } from '../../labware-defs'
 import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { getSlotsBlockedBySpanning, getSlotIsEmpty } from '../../step-forms'
 import { BrowseLabwareModal } from '../labware'
@@ -121,8 +124,14 @@ export const getSwapBlocked = (args: {
   const destModuleType: ?ModuleRealType =
     modulesById[hoveredLabware.slot]?.type || null
 
-  const draggedLabwareIsCustom = customLabwares[draggedLabware.labwareDefURI]
-  const hoveredLabwareIsCustom = customLabwares[hoveredLabware.labwareDefURI]
+  const draggedLabwareIsCustom = getLabwareIsCustom(
+    customLabwares,
+    draggedLabware
+  )
+  const hoveredLabwareIsCustom = getLabwareIsCustom(
+    customLabwares,
+    hoveredLabware
+  )
 
   // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
@@ -139,7 +148,7 @@ export const getSwapBlocked = (args: {
 
 // TODO IL 2020-01-12: to support dynamic labware/module movement during a protocol,
 // don't use initialDeckSetup here. Use some version of timelineFrameForActiveItem
-export const DeckSetupContents = (props: ContentsProps) => {
+const DeckSetupContents = (props: ContentsProps) => {
   const {
     initialDeckSetup,
     deckSlotsById,
@@ -154,7 +163,6 @@ export const DeckSetupContents = (props: ContentsProps) => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-
   const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
   const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
 
