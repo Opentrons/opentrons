@@ -5,23 +5,9 @@ import subprocess
 from typing import Dict, Any
 from aiohttp import web
 from opentrons.config import CONFIG
-from opentrons.system import nmcli
-from opentrons.system.wifi import _do_add_key, _do_list_keys, _do_remove_key
+from opentrons.system import nmcli, wifi
 
 log = logging.getLogger(__name__)
-
-EAP_CONFIG_SHAPE = {
-    'options': [
-        {'name': method.qualified_name(),
-         'displayName': method.display_name(),
-         'options': [{k: v for k, v in arg.items()
-                      if k in ['name',
-                               'displayName',
-                               'required',
-                               'type']}
-                     for arg in method.args()]}
-        for method in nmcli.EAP_TYPES]
-}
 
 
 class ConfigureArgsError(Exception):
@@ -62,20 +48,6 @@ async def list_networks(request: web.Request) -> web.Response:
         return web.json_response({'message': ' '.join(e.args)}, status=500)
     else:
         return web.json_response({'list': networks}, status=200)
-
-
-def _get_key_file(arg: str) -> str:
-    keys_dir = CONFIG['wifi_keys_dir']
-    available_keys = os.listdir(keys_dir)
-    if arg not in available_keys:
-        raise ConfigureArgsError('Key ID {} is not valid on the system'
-                                 .format(arg))
-    files_in_dir = os.listdir(os.path.join(keys_dir, arg))
-    if len(files_in_dir) > 1:
-        raise OSError(
-            'Key ID {} has multiple files, try deleting and reuploading'
-            .format(arg))
-    return os.path.join(keys_dir, arg, files_in_dir[0])
 
 
 def _eap_check_no_extra_args(
@@ -134,7 +106,7 @@ def _eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
     Similar to _check_configure_args but for only EAP.
     """
     eap_type = eap_config.get('eapType')
-    for method in EAP_CONFIG_SHAPE['options']:
+    for method in wifi.EAP_CONFIG_SHAPE['options']:
         if method['name'] == eap_type:
             options = method['options']
             break
@@ -149,7 +121,7 @@ def _eap_check_config(eap_config: Dict[str, Any]) -> Dict[str, Any]:
         _eap_check_option_ok(opt, eap_config)
         if opt['type'] == 'file' and opt['name'] in eap_config:
             # Special work for file: rewrite from key id to path
-            eap_config[opt['name']] = _get_key_file(eap_config[opt['name']])
+            eap_config[opt['name']] = wifi.get_key_file(eap_config[opt['name']])
     return eap_config
 
 
@@ -426,7 +398,7 @@ async def add_key(request: web.Request) -> web.Response:
         return web.json_response(
             {'message': "No key 'key' in request"}, status=400)
 
-    add_key_result = _do_add_key(keyfile.filename, keyfile.file.read())
+    add_key_result = wifi.add_key(keyfile.filename, keyfile.file.read())
 
     response_body = {
         'uri': '/wifi/keys/{}'.format(add_key_result.key.directory),
@@ -461,7 +433,7 @@ async def list_keys(request: web.Request) -> web.Response:
     keys = [
         {'uri': '/wifi/keys/{}'.format(key.directory),
          'id': key.directory,
-         'name': os.path.basename(key.file)} for key in _do_list_keys()
+         'name': os.path.basename(key.file)} for key in wifi.list_keys()
     ]
     return web.json_response({'keys': keys}, status=200)
 
@@ -477,7 +449,7 @@ async def remove_key(request: web.Request) -> web.Response:
     ```
     """
     requested_hash = request.match_info['key_uuid']
-    deleted_file = _do_remove_key(requested_hash)
+    deleted_file = wifi.remove_key(requested_hash)
     if not deleted_file:
         return web.json_response(
             {'message': f"No such key file {deleted_file}"}, status=404)
@@ -550,4 +522,4 @@ async def eap_options(request: web.Request) -> web.Response:
     ```
     """
 
-    return web.json_response(EAP_CONFIG_SHAPE, status=200)
+    return web.json_response(wifi.EAP_CONFIG_SHAPE, status=200)

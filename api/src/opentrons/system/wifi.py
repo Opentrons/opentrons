@@ -6,6 +6,7 @@ from typing import Generator, Optional
 from dataclasses import dataclass
 
 from opentrons.config import CONFIG
+from opentrons.system import nmcli
 
 log = logging.getLogger(__name__)
 
@@ -26,7 +27,7 @@ class AddKeyResult:
     key: Key
 
 
-def _do_add_key(key_file_name: str, key_contents: bytes) -> AddKeyResult:
+def add_key(key_file_name: str, key_contents: bytes) -> AddKeyResult:
     """
     Add a key file (for later use in EAP config) to the system.
     """
@@ -56,7 +57,7 @@ def _do_add_key(key_file_name: str, key_contents: bytes) -> AddKeyResult:
                                 file=key_file_name))
 
 
-def _do_list_keys() -> Generator[Key, None, None]:
+def list_keys() -> Generator[Key, None, None]:
     """
     List wifi keys known to the system.
 
@@ -76,7 +77,7 @@ def _do_list_keys() -> Generator[Key, None, None]:
             log.warning("Garbage in wifi keys dir: {}".format(full_path))
 
 
-def _do_remove_key(requested_hash: str) -> Optional[str]:
+def remove_key(requested_hash: str) -> Optional[str]:
     """
     Try to delete key file
 
@@ -93,7 +94,7 @@ def _do_remove_key(requested_hash: str) -> Optional[str]:
     return name
 
 
-def _get_key_file(arg: str) -> str:
+def get_key_file(arg: str) -> str:
     keys_dir = CONFIG['wifi_keys_dir']
     available_keys = os.listdir(keys_dir)
     if arg not in available_keys:
@@ -105,3 +106,17 @@ def _get_key_file(arg: str) -> str:
             'Key ID {} has multiple files, try deleting and reuploading'
             .format(arg))
     return os.path.join(keys_dir, arg, files_in_dir[0])
+
+
+EAP_CONFIG_SHAPE = {
+    'options': [
+        {'name': method.qualified_name(),
+         'displayName': method.display_name(),
+         'options': [{k: v for k, v in arg.items()
+                      if k in ['name',
+                               'displayName',
+                               'required',
+                               'type']}
+                     for arg in method.args()]}
+        for method in nmcli.EAP_TYPES]
+}
