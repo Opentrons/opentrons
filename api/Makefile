@@ -134,7 +134,8 @@ docs-clean:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m robot_server.main -P 31950
+	echo "Command will be deprecated. Use \"make -C robot-server dev\""
+	$(MAKE) -C ../robot-server dev
 
 .PHONY: local-shell
 local-shell:
