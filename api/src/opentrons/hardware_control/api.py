@@ -386,7 +386,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
-    def pause(self):
+    async def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 
@@ -399,11 +399,11 @@ class API(HardwareAPILike):
         :py:meth:`resume`.
         """
 
-        def _chained_calls():
-            self._execution_manager.pause()
+        async def _chained_calls():
+            await self._execution_manager.pause()
             self._backend.pause()
 
-        self._loop.call_soon_threadsafe(_chained_calls)
+        asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     def pause_with_message(self, message):
         self._log.warning('Pause with message: {}'.format(message))
@@ -416,7 +416,7 @@ class API(HardwareAPILike):
         Resume motion after a call to :py:meth:`pause`.
         """
         self._backend.resume()
-        self._loop.call_soon_threadsafe(self._execution_manager.resume)
+        asyncio.run_coroutine_threadsafe(self._execution_manager.resume(), self._loop)
 
     def halt(self):
         """ Immediately stop motion.
@@ -431,8 +431,8 @@ class API(HardwareAPILike):
         :py:meth:`stop`.
         """
         self._backend.hard_halt()
-        self._loop.call_soon_threadsafe(
-            self._execution_manager.cancel, self._protected_tasks)
+        cancel_tasks = functools.partial(self._execution_manager.cancel, self._protected_tasks)
+        asyncio.run_coroutine_threadsafe(cancel_tasks(), self._loop)
 
     @shield
     async def stop(self):
@@ -448,13 +448,21 @@ class API(HardwareAPILike):
         await self.reset()
         await self.home()
 
+    async def _wait_for_is_running(self):
+        if not self.is_simulator:
+            await self._execution_manager.wait_for_is_running()
+
     async def reset(self):
         """ Reset the stored state of the system.
 
         This will re-scan instruments and models, clearing any cached
         information about their presence or state.
         """
-        await self.cache_instruments()
+        async def _chained_calls():
+            await self._execution_manager.reset()
+            await self.cache_instruments()
+
+        asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
 
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: top_types.Mount = None):
@@ -484,7 +492,7 @@ class API(HardwareAPILike):
         :param axes: A list of axes to home. Default is `None`, which will
                      home everything.
         """
-        await self._execution_manager.wait_for_is_running()
+        await self._wait_for_is_running()
         # Initialize/update current_position
         checked_axes = axes or [ax for ax in Axis]
         gantry = [ax for ax in checked_axes if ax in Axis.gantry_axes()]
@@ -767,7 +775,7 @@ class API(HardwareAPILike):
         at most one of a ZA or BC components. The frame in which to move
         is identified by the presence of (ZA) or (BC).
         """
-        await self._execution_manager.wait_for_is_running()
+        await self._wait_for_is_running()
         # Transform only the x, y, and (z or a) axes specified since this could
         # get the b or c axes as well
         to_transform = tuple((tp
@@ -849,7 +857,7 @@ class API(HardwareAPILike):
 
         Works regardless of critical point or home status.
         """
-        await self._execution_manager.wait_for_is_running()
+        await self._wait_for_is_running()
         smoothie_ax = Axis.by_mount(mount).name.upper()
         async with self._motion_lock:
             smoothie_pos = self._backend.fast_home(smoothie_ax, margin)
