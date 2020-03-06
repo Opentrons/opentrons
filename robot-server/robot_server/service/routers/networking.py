@@ -1,15 +1,15 @@
 import logging
+import os
 import subprocess
 from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException, File, Path
-from opentrons.system import nmcli
+from opentrons.system import nmcli, wifi
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models.networking import NetworkingStatus, \
-    WifiNetworks, WifiNetworkFull, WifiConfiguration, \
-    WifiConfigurationResponse, WifiKeyFiles, WifiKeyFile, EapOptions, \
-    WifiNetwork
-
+    WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
+    WifiKeyFiles, WifiKeyFile, EapOptions, EapVariant, EapConfigOption, \
+    EapConfigOptionType, WifiNetworkFull
 
 log = logging.getLogger(__name__)
 
@@ -65,7 +65,14 @@ async def post_wifi_configurution(configuration: WifiConfiguration)\
             description="Get a list of key files known to the system",
             response_model=WifiKeyFiles)
 async def get_wifi_keys() -> WifiKeyFiles:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+    keys = [
+        WifiKeyFile(uri=f'/wifi/keys/{key.directory}',
+                    id=key.directory,
+                    name=os.path.basename(key.file))
+        for key in wifi.list_keys()
+    ]
+    return WifiKeyFiles(keys=keys)
 
 
 @router.post("/wifi/keys",
@@ -86,7 +93,14 @@ async def delete_wifi_key(
                                          "determined by a previous call to GET"
                                          " /wifi/keys"))\
         -> V1ErrorMessage:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+    deleted_file = wifi.remove_key(key_uuid)
+    if not deleted_file:
+        raise HTTPException(HTTPStatus.NOT_FOUND,
+                            V1ErrorMessage(
+                                message=f"No such key file {key_uuid}")
+                            )
+    return V1ErrorMessage(message=f'Key file {deleted_file} deleted')
 
 
 @router.get("/wifi/eap-options",
@@ -94,7 +108,19 @@ async def delete_wifi_key(
                         "configuration parameters",
             response_model=EapOptions)
 async def get_eap_options() -> EapOptions:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+    options = [
+        EapVariant(name=m.qualified_name(),
+                   displayName=m.display_name(),
+                   options=[EapConfigOption(
+                       name=o.get('name'),
+                       displayName=o.get('displayName'),
+                       required=o.get('required'),
+                       type=EapConfigOptionType(o.get('type'))
+                   ) for o in m.args()])
+        for m in nmcli.EAP_TYPES
+    ]
+    result = EapOptions(options=options)
+    return result
 
 
 @router.post("/wifi/disconnect",
