@@ -1,4 +1,11 @@
 // @flow
+import assert from 'assert'
+import {
+  getUnsavedForm,
+  getSavedStepForms,
+} from '../../../step-forms/selectors'
+import { changeFormInput } from '../../../steplist/actions/actions'
+
 import { uuid } from '../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/selectors'
 import { getSelectedStepId } from '../selectors'
@@ -8,15 +15,16 @@ import { actions as tutorialActions } from '../../../tutorial'
 import * as uiModuleSelectors from '../../../ui/modules/selectors'
 import type { DuplicateStepAction } from './types'
 
-import type { StepType, StepIdType } from '../../../form-types'
+import type { StepType, StepIdType, FormData } from '../../../form-types'
 import type { GetState, ThunkDispatch } from '../../../types'
 
 // addStep thunk adds an incremental integer ID for Step reducers.
+// NOTE: if this is an "add step" directly performed by the user,
+// addAndSelectStepWithHints is probably what you want
 export const addStep = (payload: { stepType: StepType }) => (
   dispatch: ThunkDispatch<*>,
   getState: GetState
 ) => {
-  const state = getState()
   const stepId = uuid()
   const { stepType } = payload
   dispatch({
@@ -26,6 +34,16 @@ export const addStep = (payload: { stepType: StepType }) => (
       id: stepId,
     },
   })
+
+  dispatch(selectStep(stepId, stepType))
+}
+
+export const addAndSelectStepWithHints = (payload: { stepType: StepType }) => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
+  dispatch(addStep(payload))
+  const state = getState()
   const deckHasLiquid = labwareIngredsSelectors.getDeckHasLiquid(state)
   const magnetModuleHasLabware = uiModuleSelectors.getMagnetModuleHasLabware(
     state
@@ -58,7 +76,6 @@ export const addStep = (payload: { stepType: StepType }) => (
   if (stepModuleMissingLabware) {
     dispatch(tutorialActions.addHint('module_without_labware'))
   }
-  dispatch(selectStep(stepId, stepType))
 }
 
 export type ReorderSelectedStepAction = {
@@ -97,5 +114,74 @@ export const duplicateStep = (stepId: StepIdType) => (
       type: 'DUPLICATE_STEP',
       payload: { stepId, duplicateStepId },
     })
+  }
+}
+
+export const SAVE_STEP_FORM: 'SAVE_STEP_FORM' = 'SAVE_STEP_FORM'
+
+export type SaveStepFormAction = {|
+  type: typeof SAVE_STEP_FORM,
+  payload: FormData,
+|}
+
+export const _saveStepForm = (form: FormData): SaveStepFormAction => ({
+  type: SAVE_STEP_FORM,
+  payload: form,
+})
+
+export const _isChangeToTempForm = (form: FormData): boolean =>
+  form?.stepType === 'temperature' && form?.setTemperature === 'true'
+
+export const saveStepForm = () => (
+  dispatch: ThunkDispatch<*>,
+  getState: GetState
+) => {
+  const initialState = getState()
+  const unsavedForm = getUnsavedForm(initialState)
+
+  if (!unsavedForm) {
+    // this is for Flow
+    assert(
+      false,
+      'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
+    )
+    return
+  }
+  const { id } = unsavedForm
+  const isPristineForm = !(id in getSavedStepForms(initialState))
+  const isPristineChangeToTempForm =
+    isPristineForm && _isChangeToTempForm(unsavedForm)
+
+  // save the form
+  dispatch(_saveStepForm(unsavedForm))
+
+  // TODO IMMEDIATELY: make this a different action that is gated by a modal
+  if (isPristineChangeToTempForm) {
+    const setTemperatureForm = unsavedForm
+    const temperature = setTemperatureForm?.targetTemperature
+    assert(
+      temperature != null && temperature !== '',
+      `tried to auto-add a pause until temp, but targetTemperature was ${temperature}`
+    )
+    addStep({ stepType: 'pause' })(dispatch, getState)
+    // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
+    // contingent on other inputs (eg changing the pauseForAmountOfTime radio button may clear the pauseTemperature).
+    dispatch(
+      changeFormInput({
+        update: {
+          pauseForAmountOfTime: 'untilTemperature',
+        },
+      })
+    )
+    dispatch(changeFormInput({ update: { pauseTemperature: temperature } }))
+    // finally save the new pause form
+    const unsavedPauseForm = getUnsavedForm(getState())
+
+    // this conditional is for Flow, the unsaved form should always exist
+    if (unsavedPauseForm != null) {
+      dispatch(_saveStepForm(unsavedPauseForm))
+    } else {
+      assert(false, 'could not auto-save pause form, getUnsavedForm returned')
+    }
   }
 }

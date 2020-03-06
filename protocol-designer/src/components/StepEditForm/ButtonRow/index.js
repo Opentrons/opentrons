@@ -5,7 +5,7 @@ import cx from 'classnames'
 import { OutlineButton, PrimaryButton } from '@opentrons/components'
 
 import { actions as steplistActions } from '../../../steplist'
-import { actions as stepFormActions } from '../../../step-forms'
+import { actions as stepsActions } from '../../../ui/steps'
 
 import { getCurrentFormCanBeSaved } from '../../../step-forms/selectors'
 
@@ -13,9 +13,6 @@ import type { BaseState } from '../../../types'
 
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
-
-const { cancelStepForm } = steplistActions
-const { saveStepForm } = stepFormActions
 
 type Props = {|
   onClickMoreOptions: (event: SyntheticEvent<>) => mixed,
@@ -44,14 +41,16 @@ export const ButtonRow = ({ onDelete, onClickMoreOptions }: Props) => {
       <div>
         <PrimaryButton
           className={styles.form_button}
-          onClick={() => dispatch(cancelStepForm())}
+          onClick={() => dispatch(steplistActions.cancelStepForm())}
         >
           Close
         </PrimaryButton>
         <PrimaryButton
           className={styles.form_button}
           disabled={!canSave}
-          onClick={canSave ? () => dispatch(saveStepForm()) : undefined}
+          onClick={
+            canSave ? () => dispatch(stepsActions.saveStepForm()) : undefined
+          }
         >
           Save
         </PrimaryButton>

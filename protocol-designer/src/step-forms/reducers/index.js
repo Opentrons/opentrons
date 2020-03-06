@@ -58,7 +58,8 @@ import type {
 import type {
   DuplicateStepAction,
   ReorderSelectedStepAction,
-} from '../../ui/steps'
+} from '../../ui/steps/actions/types'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,
@@ -73,7 +74,6 @@ import type {
   CreateModuleAction,
   EditModuleAction,
   DeleteModuleAction,
-  SaveStepFormAction,
 } from '../actions'
 
 type FormState = FormData | null
