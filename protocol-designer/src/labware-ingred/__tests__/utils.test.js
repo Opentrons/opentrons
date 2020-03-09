@@ -59,7 +59,7 @@ describe('getNextNickname', () => {
   ]
 
   testCases.forEach(({ desc, allNicknames, proposed, expected }) => {
-    test(desc, () => {
+    it(desc, () => {
       const result = getNextNickname(allNicknames, proposed)
       expect(result).toEqual(expected)
     })

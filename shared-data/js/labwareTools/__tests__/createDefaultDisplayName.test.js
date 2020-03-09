@@ -96,7 +96,7 @@ describe('createDefaultDisplayName', () => {
   ]
 
   testCases.forEach(({ testName, args, expected }) => {
-    test(testName, () => {
+    it(testName, () => {
       expect(createDefaultDisplayName(args)).toEqual(expected)
     })
   })

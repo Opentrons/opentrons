@@ -70,17 +70,17 @@ describe('networking', () => {
     SPECS.forEach(spec => {
       const { name, selector, state, props, expected } = spec
 
-      test(`${name} with known robot`, () =>
+      it(`${name} with known robot`, () =>
         expect(selector()(state, props)).toEqual(expected))
 
-      test(`${name} with unknown robot`, () =>
+      it(`${name} with unknown robot`, () =>
         expect(selector()(state, { name: 'foo' })).toEqual({
           inProgress: false,
         }))
     })
   })
 
-  test('clearConfigureWifiResponse action creator', () => {
+  it('clearConfigureWifiResponse action creator', () => {
     expect(networking.clearConfigureWifiResponse({ name: 'foo' })).toEqual({
       type: 'api:CLEAR_RESPONSE',
       payload: { robot: { name: 'foo' }, path: 'wifi/configure' },
@@ -120,7 +120,7 @@ describe('networking', () => {
     SPECS.forEach(spec => {
       const { name, action, method, path, request, success, failure } = spec
 
-      test(`${name} makes HTTP call`, () => {
+      it(`${name} makes HTTP call`, () => {
         client.__setMockResponse(success)
         return store
           .dispatch(action(robot, request))
@@ -129,7 +129,7 @@ describe('networking', () => {
           )
       })
 
-      test(`${name} handles success`, () => {
+      it(`${name} handles success`, () => {
         const expectedActions = [
           { type: 'api:REQUEST', payload: { robot, path, request } },
           { type: 'api:SUCCESS', payload: { robot, path, response: success } },
@@ -142,7 +142,7 @@ describe('networking', () => {
           .then(() => expect(store.getActions()).toEqual(expectedActions))
       })
 
-      test(`${name} handles failure`, () => {
+      it(`${name} handles failure`, () => {
         const expectedActions = [
           { type: 'api:REQUEST', payload: { robot, path, request } },
           { type: 'api:FAILURE', payload: { robot, path, error: failure } },

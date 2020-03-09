@@ -5,7 +5,6 @@ import logging
 import asyncio
 import functools
 from .adapters import SynchronousAdapter
-from .types import HardwareAPILike
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -21,7 +20,7 @@ class ThreadManagerException(Exception):
 # object.__get_attribute__(self,...) to opt out of the overwritten
 # functionality. It is more readable and protected from
 # unintentional recursion.
-class ThreadManager(HardwareAPILike):
+class ThreadManager():
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 

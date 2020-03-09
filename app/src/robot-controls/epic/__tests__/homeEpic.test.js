@@ -50,7 +50,7 @@ describe('homeEpic', () => {
     meta,
   }
 
-  test('calls POST /robot/home with target: robot', () => {
+  it('calls POST /robot/home with target: robot', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockHomeSuccess })
@@ -72,7 +72,7 @@ describe('homeEpic', () => {
     })
   })
 
-  test('calls POST /robot/home with target: pipette', () => {
+  it('calls POST /robot/home with target: pipette', () => {
     const action: Types.HomeAction = {
       ...Actions.home(mockRobot.name, 'pipette', 'right'),
       meta,
@@ -98,7 +98,7 @@ describe('homeEpic', () => {
     })
   })
 
-  test('maps successful response to HOME_SUCCESS', () => {
+  it('maps successful response to HOME_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockHomeSuccess })
@@ -117,7 +117,7 @@ describe('homeEpic', () => {
     })
   })
 
-  test('maps failed response to HOME_FAILURE', () => {
+  it('maps failed response to HOME_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockHomeFailure })

@@ -47,7 +47,7 @@ def _find_smoothie_file():
     raise OSError(f"Could not find smoothie firmware file in {resources_path}")
 
 
-async def _do_fw_update(new_fw_path, new_fw_ver):
+async def _do_fw_update(driver, new_fw_path, new_fw_ver):
     """ Update the connected smoothie board, with retries
 
     When the API server boots, it talks to the motor controller board for the
@@ -71,7 +71,6 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
     hardware.connect() - it just might be virtual
     """
     explicit_modeset = False
-    driver = SmoothieDriver_3_0_0(robot_configs.load())
     for attempts in range(3):
         try:
             await driver.update_firmware(
@@ -92,14 +91,11 @@ async def _do_fw_update(new_fw_path, new_fw_ver):
         os.environ['ENABLE_VIRTUAL_SMOOTHIE'] = 'true'
 
 
-async def initialize_robot() -> ThreadManager:
-    packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
-    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
-        log.info("Initialized robot using virtual Smoothie")
-        return ThreadManager(API.build_hardware_simulator)
-
+async def check_for_smoothie_update():
+    driver = SmoothieDriver_3_0_0(robot_configs.load())
+    driver.connect()
     try:
-        hardware = ThreadManager(API.build_hardware_controller)
+        fw_version = driver.get_fw_version()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -108,18 +104,32 @@ async def initialize_robot() -> ThreadManager:
         # manipulations that _put_ it in programming mode
         log.exception("Error while connecting to motor driver: {}".format(e))
         fw_version = None
-    else:
-        fw_version = await hardware.fw_version
-        hardware.clean_up()
 
     log.info(f"Smoothie FW version: {fw_version}")
+    packed_smoothie_fw_file, packed_smoothie_fw_ver = _find_smoothie_file()
     if fw_version != packed_smoothie_fw_ver:
         log.info(f"Executing smoothie update: current vers {fw_version},"
                  f" packed vers {packed_smoothie_fw_ver}")
-        await _do_fw_update(packed_smoothie_fw_file, packed_smoothie_fw_ver)
+        await _do_fw_update(driver, packed_smoothie_fw_file,
+                            packed_smoothie_fw_ver)
     else:
         log.info(f"FW version OK: {packed_smoothie_fw_ver}")
-    return ThreadManager(API.build_hardware_controller)
+
+
+async def initialize_robot() -> ThreadManager:
+    if os.environ.get("ENABLE_VIRTUAL_SMOOTHIE"):
+        log.info("Initialized robot using virtual Smoothie")
+        return ThreadManager(API.build_hardware_simulator)
+
+    await check_for_smoothie_update()
+
+    hardware = ThreadManager(API.build_hardware_controller)
+
+    if not ff.disable_home_on_boot():
+        log.info("Homing Z axes")
+        await hardware.home_z()
+
+    return hardware
 
 
 def initialize(
@@ -142,10 +152,6 @@ def initialize(
 
     loop = asyncio.get_event_loop()
     hardware = loop.run_until_complete(initialize_robot())
-
-    if not ff.disable_home_on_boot():
-        log.info("Homing Z axes")
-        loop.run_until_complete(hardware.home_z())
 
     if hardware_server:
         #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager

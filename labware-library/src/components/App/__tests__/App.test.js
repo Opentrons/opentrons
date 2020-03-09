@@ -8,7 +8,7 @@ import { AppComponent } from '..'
 jest.mock('../../../definitions')
 
 describe('App', () => {
-  test('component renders without definition', () => {
+  it('component renders without definition', () => {
     const tree = shallow(
       <AppComponent
         location={({ search: '' }: any)}
@@ -21,7 +21,7 @@ describe('App', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('component renders with definition', () => {
+  it('component renders with definition', () => {
     const tree = shallow(
       <AppComponent
         location={({ search: '' }: any)}

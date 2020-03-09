@@ -260,7 +260,7 @@ describe('buildroot reducer', () => {
 
   SPECS.forEach(spec => {
     const { name, action, initialState, expected } = spec
-    test(name, () =>
+    it(name, () =>
       expect(buildrootReducer(initialState, action)).toEqual(expected)
     )
   })

@@ -19,7 +19,7 @@ describe('LabwareList', () => {
     errorMessage: null,
   }
 
-  test('component renders', () => {
+  it('component renders', () => {
     const treeEmpty = shallow(<LabwareList {...emptyProps} />)
     const treeError = shallow(<LabwareList {...errorProps} />)
     const treeList = shallow(<LabwareList {...listProps} />)
@@ -29,14 +29,14 @@ describe('LabwareList', () => {
     expect(treeList).toMatchSnapshot()
   })
 
-  test('renders empty list copy without a <ul> if no labware', () => {
+  it('renders empty list copy without a <ul> if no labware', () => {
     const tree = mount(<LabwareList {...emptyProps} />)
 
     expect(tree.find('ul')).toHaveLength(0)
     expect(tree.html()).toMatch(/No labware definitions found/)
   })
 
-  test('renders error message without a <ul> if error message', () => {
+  it('renders error message without a <ul> if error message', () => {
     const tree = mount(<LabwareList {...errorProps} />)
 
     expect(tree.find('ul')).toHaveLength(0)
@@ -44,7 +44,7 @@ describe('LabwareList', () => {
     expect(tree.html()).toContain('AH!!!')
   })
 
-  test('renders labware children in a <ul>', () => {
+  it('renders labware children in a <ul>', () => {
     const tree = shallow(<LabwareList {...listProps} />)
     const list = tree.find('ul')
     const items = tree.find(LabwareItem)

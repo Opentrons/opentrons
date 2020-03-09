@@ -26,7 +26,7 @@ describe('replaceTip', () => {
   })
 
   describe('replaceTip: single channel', () => {
-    test('Single-channel: first tip', () => {
+    it('Single-channel: first tip', () => {
       const result = replaceTip(
         { pipette: p300SingleId },
         invariantContext,
@@ -37,7 +37,7 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([pickUpTipHelper(0)])
     })
 
-    test('Single-channel: second tip B1', () => {
+    it('Single-channel: second tip B1', () => {
       const result = replaceTip(
         { pipette: p300SingleId },
         invariantContext,
@@ -59,7 +59,7 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([pickUpTipHelper(1)])
     })
 
-    test('Single-channel: ninth tip (next column)', () => {
+    it('Single-channel: ninth tip (next column)', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
@@ -81,7 +81,7 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([pickUpTipHelper('A2')])
     })
 
-    test('Single-channel: pipette already has tip, so tip will be replaced.', () => {
+    it('Single-channel: pipette already has tip, so tip will be replaced.', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
@@ -105,7 +105,7 @@ describe('replaceTip', () => {
       expect(res.commands).toEqual([dropTipHelper('A1'), pickUpTipHelper('B1')])
     })
 
-    test('Single-channel: used all tips in first rack, move to second rack', () => {
+    it('Single-channel: used all tips in first rack, move to second rack', () => {
       const initialTestRobotState = merge({}, initialRobotState, {
         tipState: {
           tipracks: {
@@ -130,7 +130,7 @@ describe('replaceTip', () => {
   })
 
   describe('replaceTip: multi-channel', () => {
-    test('multi-channel, all tipracks have tips', () => {
+    it('multi-channel, all tipracks have tips', () => {
       const result = replaceTip(
         { pipette: p300MultiId },
         invariantContext,
@@ -143,7 +143,7 @@ describe('replaceTip', () => {
       ])
     })
 
-    test('multi-channel, missing tip in first row', () => {
+    it('multi-channel, missing tip in first row', () => {
       const robotStateWithTipA1Missing = {
         ...initialRobotState,
         tipState: {
@@ -166,7 +166,7 @@ describe('replaceTip', () => {
       ])
     })
 
-    test('Multi-channel: pipette already has tip, so tip will be replaced.', () => {
+    it('Multi-channel: pipette already has tip, so tip will be replaced.', () => {
       const robotStateWithTipsOnMulti = {
         ...initialRobotState,
         tipState: {

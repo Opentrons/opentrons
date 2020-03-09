@@ -34,7 +34,7 @@ describe('shell/update', () => {
 
     SPECS.forEach(spec => {
       const { name, creator, args, expected } = spec
-      test(name, () => expect(creator(...args)).toEqual(expected))
+      it(name, () => expect(creator(...args)).toEqual(expected))
     })
   })
 
@@ -110,7 +110,7 @@ describe('shell/update', () => {
 
     SPECS.forEach(spec => {
       const { name, action, initialState, expected } = spec
-      test(name, () =>
+      it(name, () =>
         expect(shellUpdateReducer(initialState, action)).toEqual(expected)
       )
     })
@@ -138,7 +138,7 @@ describe('shell/update', () => {
 
     SPECS.forEach(spec => {
       const { name, selector, state, expected } = spec
-      test(name, () => expect(selector(state)).toEqual(expected))
+      it(name, () => expect(selector(state)).toEqual(expected))
     })
   })
 })

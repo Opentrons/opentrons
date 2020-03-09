@@ -4,7 +4,7 @@ import { makeMaskToDecimal, maskToInteger, maskLoadName } from '../fieldMasks'
 // TODO(Ian, 2019-07-23): some fancy util could make these tests much less verbose
 
 describe('makeMaskToDecimal', () => {
-  test('1 decimal', () => {
+  it('1 decimal', () => {
     const maskTo1Decimal = makeMaskToDecimal(1)
     expect(maskTo1Decimal('', '1')).toEqual('1')
     expect(maskTo1Decimal('1', '1.')).toEqual('1.')
@@ -23,7 +23,7 @@ describe('makeMaskToDecimal', () => {
     expect(maskTo1Decimal('.1', '.12')).toEqual('.1')
   })
 
-  test('2 decimal', () => {
+  it('2 decimal', () => {
     const maskTo2Decimal = makeMaskToDecimal(2)
     expect(maskTo2Decimal('', '1')).toEqual('1')
     expect(maskTo2Decimal('1', '1.')).toEqual('1.')
@@ -47,40 +47,40 @@ describe('makeMaskToDecimal', () => {
 })
 
 describe('maskToInteger', () => {
-  test('ignores bad chars', () => {
+  it('ignores bad chars', () => {
     expect(maskToInteger('', 'x')).toEqual('')
     expect(maskToInteger('1', 'x')).toEqual('1')
     expect(maskToInteger('1', ' ')).toEqual('1')
     expect(maskToInteger('1', '1.')).toEqual('1')
   })
 
-  test('allows [0-9]', () => {
+  it('allows [0-9]', () => {
     expect(maskToInteger('', '0')).toEqual('0')
     expect(maskToInteger('', '5')).toEqual('5')
     expect(maskToInteger('1', '12')).toEqual('12')
     expect(maskToInteger('12', '123')).toEqual('123')
   })
 
-  test('allows delete', () => {
+  it('allows delete', () => {
     expect(maskToInteger('1', '')).toEqual('')
   })
 })
 
 describe('maskLoadName', () => {
-  test('lowercases capital letters', () => {
+  it('lowercases capital letters', () => {
     expect(maskLoadName('', 'X')).toEqual('x')
     expect(maskLoadName('la', 'laB')).toEqual('lab')
   })
-  test('allows accepted chars', () => {
+  it('allows accepted chars', () => {
     expect(maskLoadName('', 'a')).toEqual('a')
     expect(maskLoadName('la', 'la_')).toEqual('la_')
     expect(maskLoadName('la', 'la.')).toEqual('la.')
   })
-  test('ignores bad chars', () => {
+  it('ignores bad chars', () => {
     expect(maskLoadName('', '-')).toEqual('')
     expect(maskLoadName('a', 'a-')).toEqual('a')
   })
-  test('allows delete', () => {
+  it('allows delete', () => {
     expect(maskLoadName('a', '')).toEqual('')
   })
 })

@@ -43,7 +43,7 @@ describe('app-shell/discovery', () => {
     jest.clearAllMocks()
   })
 
-  test('registerDiscovery creates a DiscoveryClient', () => {
+  it('registerDiscovery creates a DiscoveryClient', () => {
     registerDiscovery(dispatch)
 
     expect(createDiscoveryClient).toHaveBeenCalledWith(
@@ -56,17 +56,17 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  test('calls client.start on discovery registration', () => {
+  it('calls client.start on discovery registration', () => {
     registerDiscovery(dispatch)
     expect(mockClient.start).toHaveBeenCalled()
   })
 
-  test('calls client.start on "discovery:START"', () => {
+  it('calls client.start on "discovery:START"', () => {
     registerDiscovery(dispatch)({ type: 'discovery:START' })
     expect(mockClient.start).toHaveBeenCalledTimes(2)
   })
 
-  test('calls client.stop when electron app emits "will-quit"', () => {
+  it('calls client.stop when electron app emits "will-quit"', () => {
     expect(app.once).toHaveBeenCalledTimes(0)
 
     registerDiscovery(dispatch)
@@ -82,7 +82,7 @@ describe('app-shell/discovery', () => {
     expect(mockClient.stop).toHaveBeenCalledTimes(1)
   })
 
-  test('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
+  it('sets poll speed on "discovery:START" and "discovery:FINISH"', () => {
     const handleAction = registerDiscovery(dispatch)
 
     handleAction({ type: 'discovery:START' })
@@ -100,7 +100,7 @@ describe('app-shell/discovery', () => {
     expect(fastPoll).toBeLessThan(slowPoll)
   })
 
-  test('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
+  it('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {
     const expected = [
       { name: 'opentrons-dev', ip: '192.168.1.42', port: 31950, ok: true },
     ]
@@ -126,7 +126,7 @@ describe('app-shell/discovery', () => {
     ]
 
     SPECS.forEach(spec =>
-      test(spec.name, () => {
+      it(spec.name, () => {
         mockClient.services = spec.services
 
         mockClient.emit('service')
@@ -138,7 +138,7 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  test('stores services to file on service events', () => {
+  it('stores services to file on service events', () => {
     registerDiscovery(dispatch)
     expect(Store).toHaveBeenCalledWith({
       name: 'discovery',
@@ -153,7 +153,7 @@ describe('app-shell/discovery', () => {
     ])
   })
 
-  test('stores services to file on serviceRemoved events', () => {
+  it('stores services to file on serviceRemoved events', () => {
     registerDiscovery(dispatch)
 
     mockClient.services = [{ name: 'foo' }]
@@ -163,7 +163,7 @@ describe('app-shell/discovery', () => {
     ])
   })
 
-  test('loads services from file on client initialization', () => {
+  it('loads services from file on client initialization', () => {
     Store.__store.get.mockImplementation(key => {
       if (key === 'services') return [{ name: 'foo' }]
       return null
@@ -177,7 +177,7 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  test('loads candidates from config on client initialization', () => {
+  it('loads candidates from config on client initialization', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: ['1.2.3.4'] })
     registerDiscovery(dispatch)
 
@@ -189,7 +189,7 @@ describe('app-shell/discovery', () => {
   })
 
   // ensures config override works with only one candidate specified
-  test('candidates in config can be single value', () => {
+  it('candidates in config can be single value', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: '1.2.3.4' })
     registerDiscovery(dispatch)
 
@@ -200,7 +200,7 @@ describe('app-shell/discovery', () => {
     )
   })
 
-  test('services from overridden candidates are not persisted', () => {
+  it('services from overridden candidates are not persisted', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: 'localhost' })
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return ['1.2.3.4', '5.6.7.8']
@@ -216,7 +216,7 @@ describe('app-shell/discovery', () => {
     ])
   })
 
-  test('service from overridden single candidate is not persisted', () => {
+  it('service from overridden single candidate is not persisted', () => {
     getConfig.mockReturnValue({ enabled: true, candidates: 'localhost' })
     getOverrides.mockImplementation(key => {
       if (key === 'discovery.candidates') return '1.2.3.4'
@@ -232,7 +232,7 @@ describe('app-shell/discovery', () => {
     ])
   })
 
-  test('calls client.remove on discovery:REMOVE', () => {
+  it('calls client.remove on discovery:REMOVE', () => {
     const handleAction = registerDiscovery(dispatch)
     handleAction({
       type: 'discovery:REMOVE',

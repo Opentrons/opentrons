@@ -85,7 +85,7 @@ describe('serviceList', () => {
     SPECS.forEach(spec => {
       const { name, input, expected } = spec
       const result = serviceList.createServiceList.call(null, input)
-      test(name, () => expect(result).toEqual(expected))
+      it(name, () => expect(result).toEqual(expected))
     })
   })
 
@@ -147,7 +147,7 @@ describe('serviceList', () => {
     SPECS.forEach(spec => {
       const { name, list, upsert, expected } = spec
       const result = serviceList.upsertServiceList.call(null, list, upsert)
-      test(name, () => expect(result).toEqual(expected))
+      it(name, () => expect(result).toEqual(expected))
     })
   })
 })

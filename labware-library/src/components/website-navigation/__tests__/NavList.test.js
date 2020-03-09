@@ -6,13 +6,13 @@ import { shallow, mount } from 'enzyme'
 import { NavList } from '..'
 
 describe('NavList', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<NavList />)
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('component handles state changes', () => {
+  it('component handles state changes', () => {
     const tree = shallow(<NavList />)
 
     expect(tree.state().menu).toEqual(null)
@@ -20,7 +20,7 @@ describe('NavList', () => {
     expect(tree.state().menu).toEqual('foo')
   })
 
-  test('component applies active class to nav links based on state', () => {
+  it('component applies active class to nav links based on state', () => {
     const wrapper = mount(<NavList />)
 
     // when state.menu is null, all nav links are active

@@ -68,6 +68,6 @@ const SPECS: Array<SelectorSpec> = [
 describe('robot api selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
-    test(name, () => expect(selector(state, ...args)).toEqual(expected))
+    it(name, () => expect(selector(state, ...args)).toEqual(expected))
   })
 })

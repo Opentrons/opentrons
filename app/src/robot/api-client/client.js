@@ -3,10 +3,11 @@
 // TODO(mc, 2018-01-26): typecheck with flow
 import { push } from 'connected-react-router'
 import find from 'lodash/find'
+import functionsIn from 'lodash/functionsIn'
 import kebabCase from 'lodash/kebabCase'
 import mapKeys from 'lodash/mapKeys'
 import pick from 'lodash/pick'
-import functionsIn from 'lodash/functionsIn'
+import union from 'lodash/union'
 
 import { Client as RpcClient } from '../../rpc/client'
 import { actions, actionTypes } from '../actions'
@@ -26,6 +27,12 @@ const RE_TIPRACK = /tip ?rack/i
 
 const THIS_ROBOT_DOES_NOT_SUPPORT_BUNDLES =
   'This robot does not support ZIP protocol bundles. Please update its software to the latest version and upload this protocol again'
+
+const containerIsTiprack = apiContainer => {
+  return apiContainer.is_tiprack != null
+    ? apiContainer.is_tiprack
+    : RE_TIPRACK.test(apiContainer.type)
+}
 
 export function client(dispatch) {
   let freshUpload = false
@@ -565,12 +572,23 @@ export function client(dispatch) {
         tip_racks,
       } = apiInstrument
 
+      const containers = apiSession.containers ?? []
+      const tipRacksFromInstrument = tip_racks.map(t => t._id)
+      const tipRacksFromContainers = containers
+        .filter(c => {
+          return (
+            containerIsTiprack(c) &&
+            c.instruments.some(inst => inst.mount === mount)
+          )
+        })
+        .map(t => t._id)
+
       update.pipettesByMount[mount] = {
         _id,
         mount,
         name,
         channels,
-        tipRacks: tip_racks.map(t => t._id),
+        tipRacks: union(tipRacksFromInstrument, tipRacksFromContainers),
         requestedAs: requested_as,
       }
     }
@@ -584,11 +602,7 @@ export function client(dispatch) {
         position,
         is_legacy: isLegacy,
       } = apiContainer
-      const isTiprack =
-        apiContainer.is_tiprack != null
-          ? apiContainer.is_tiprack
-          : RE_TIPRACK.test(type)
-
+      const isTiprack = containerIsTiprack(apiContainer)
       const labware = { _id, name, slot, position, type, isTiprack, isLegacy }
 
       if (isTiprack && apiContainer.instruments.length > 0) {

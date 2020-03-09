@@ -160,6 +160,6 @@ describe('robot pipettes actions', () => {
 
   SPECS.forEach(spec => {
     const { name, creator, args, expected } = spec
-    test(name, () => expect(creator(...args)).toEqual(expected))
+    it(name, () => expect(creator(...args)).toEqual(expected))
   })
 })

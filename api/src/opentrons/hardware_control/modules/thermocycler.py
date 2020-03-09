@@ -3,6 +3,7 @@ from typing import Union, Optional, List, Callable
 from opentrons.drivers.thermocycler.driver import (
     Thermocycler as ThermocyclerDriver)
 import logging
+from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -119,6 +120,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -128,17 +130,17 @@ class Thermocycler(mod_abc.AbstractModule):
         mod = cls(port=port,
                   interrupt_callback=interrupt_callback,
                   simulating=simulating,
-                  loop=loop)
+                  loop=loop,
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
     @classmethod
-    def name(cls):
+    def name(cls) -> str:
         return 'thermocycler'
 
-    @classmethod
-    def display_name(cls):
-        return 'Thermocycler'
+    def model(self) -> str:
+        return 'thermocyclerModuleV1'
 
     @classmethod
     def bootloader(cls) -> types.UploadFunction:
@@ -156,32 +158,21 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 execution_manager: ExecutionManager,
                  interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop,
+                         execution_manager=execution_manager)
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(simulating, interrupt_callback)
-
-        self._running_flag = asyncio.Event(loop=self._loop)
-        self._current_task: Optional[asyncio.Task] = None
 
         self._total_cycle_count: Optional[int] = None
         self._current_cycle_index: Optional[int] = None
         self._total_step_count: Optional[int] = None
         self._current_step_index: Optional[int] = None
-
-    def pause(self):
-        self._loop.call_soon_threadsafe(self._running_flag.clear)
-
-    def resume(self):
-        self._loop.call_soon_threadsafe(self._running_flag.set)
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
-            self._loop.call_soon_threadsafe(self._running_flag.clear)
 
     def _clear_cycle_counters(self):
         self._total_cycle_count = None
@@ -191,24 +182,29 @@ class Thermocycler(mod_abc.AbstractModule):
 
     async def deactivate_lid(self):
         """ Deactivate the lid heating pad"""
+        await self.wait_for_is_running()
         return await self._driver.deactivate_lid()
 
     async def deactivate_block(self):
         """ Deactivate the block peltiers"""
+        await self.wait_for_is_running()
         self._clear_cycle_counters()
         return await self._driver.deactivate_block()
 
     async def deactivate(self):
         """ Deactivate the block peltiers and lid heating pad"""
+        await self.wait_for_is_running()
         self._clear_cycle_counters()
         return await self._driver.deactivate_all()
 
     async def open(self) -> str:
         """ Open the lid if it is closed"""
+        await self.wait_for_is_running()
         return await self._driver.open()
 
     async def close(self) -> str:
         """ Close the lid if it is open"""
+        await self.wait_for_is_running()
         return await self._driver.close()
 
     async def set_temperature(self, temperature,
@@ -216,6 +212,7 @@ class Thermocycler(mod_abc.AbstractModule):
                               hold_time_minutes: float = None,
                               ramp_rate: float = None,
                               volume: float = None):
+        await self.wait_for_is_running()
         seconds = hold_time_seconds if hold_time_seconds is not None else 0
         minutes = hold_time_minutes if hold_time_minutes is not None else 0
         total_seconds = seconds + (minutes * 60)
@@ -225,16 +222,15 @@ class Thermocycler(mod_abc.AbstractModule):
                                            ramp_rate=ramp_rate,
                                            volume=volume)
         if hold_time:
-            self._current_task = self._loop.create_task(self.wait_for_hold())
+            await self._loop.create_task(self.wait_for_hold())
         else:
-            self._current_task = self._loop.create_task(self.wait_for_temp())
-        await self._current_task  # type: ignore
+            await self._loop.create_task(self.wait_for_temp())
 
     async def _execute_cycle_step(self,
                                   step: types.ThermocyclerStep,
                                   index: int,
                                   volume: Optional[float]):
-        await self._running_flag.wait()
+        await self.wait_for_is_running()
         self._current_step_index = index + 1  # science starts at 1
         temperature = step.get('temperature')
         hold_time_minutes = step.get('hold_time_minutes', None)
@@ -260,21 +256,18 @@ class Thermocycler(mod_abc.AbstractModule):
                                  steps: List[types.ThermocyclerStep],
                                  repetitions: int,
                                  volume: float = None):
-        self._running_flag.set()
+        await self.wait_for_is_running()
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
-        cycle_task = self._loop.create_task(self._execute_cycles(steps,
-                                                                 repetitions,
-                                                                 volume))
-        self._current_task = cycle_task
-        await cycle_task
+        await self._loop.create_task(self._execute_cycles(steps,
+                                                          repetitions,
+                                                          volume))
 
     async def set_lid_temperature(self, temperature: float):
         """ Set the lid temperature in deg Celsius """
+        await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-        wait_for_lid_task = self._loop.create_task(self.wait_for_lid_temp())
-        self._current_task = wait_for_lid_task
-        await wait_for_lid_task
+        await self._loop.create_task(self.wait_for_lid_temp())
 
     async def wait_for_lid_temp(self):
         """
@@ -395,7 +388,6 @@ class Thermocycler(mod_abc.AbstractModule):
 
     def set_loop(self, newLoop):
         self._loop = newLoop
-        self._running_flag = asyncio.Event(loop=self._loop)
 
     async def _connect(self):
         await self._driver.connect(self._port)

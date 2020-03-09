@@ -55,7 +55,7 @@ describe('getStepItemContents', () => {
       }
     })
 
-    test('module rendered with engage when engage is true', () => {
+    it('module rendered with engage when engage is true', () => {
       const StepItemContents = getStepItemContents(magnetProps)
       const wrapper = renderWrapper(StepItemContents)
       const component = wrapper.find(ModuleStepItems)
@@ -63,7 +63,7 @@ describe('getStepItemContents', () => {
       expect(component.prop('actionText')).toEqual('engage')
     })
 
-    test('module rendered with disengage when type is disengage', () => {
+    it('module rendered with disengage when type is disengage', () => {
       magnetProps.substeps.engage = false
       const StepItemContents = getStepItemContents(magnetProps)
       const wrapper = renderWrapper(StepItemContents)
@@ -96,7 +96,7 @@ describe('getStepItemContents', () => {
       }
     })
 
-    test('module is rendered with temperature when temperature exists', () => {
+    it('module is rendered with temperature when temperature exists', () => {
       temperatureProps.substeps = {
         substepType: stepType,
         temperature: 45,
@@ -111,7 +111,7 @@ describe('getStepItemContents', () => {
       expect(component.prop('actionText')).toEqual('45 °C')
     })
 
-    test('module is rendered with deactivated when temperature is null', () => {
+    it('module is rendered with deactivated when temperature is null', () => {
       temperatureProps.substeps = {
         substepType: stepType,
         temperature: null,
@@ -150,7 +150,7 @@ describe('getStepItemContents', () => {
       }
     })
 
-    test('module is rendered with temperature', () => {
+    it('module is rendered with temperature', () => {
       awaitTemperatureProps.substeps = {
         substepType: stepType,
         temperature: 45,
@@ -162,7 +162,7 @@ describe('getStepItemContents', () => {
       const wrapper = renderWrapper(Component)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
-      expect(component.prop('action')).toEqual('temperature')
+      expect(component.prop('action')).toEqual('pause until')
       expect(component.prop('actionText')).toEqual('45 °C')
     })
   })

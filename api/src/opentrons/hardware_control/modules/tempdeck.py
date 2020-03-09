@@ -1,11 +1,35 @@
 import asyncio
+import logging
 from threading import Thread, Event
-from typing import Union, Optional
+from typing import Mapping, Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
+from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
+log = logging.getLogger(__name__)
+
 TEMP_POLL_INTERVAL_SECS = 1
+
+FIRST_GEN2_REVISION = 20
+
+
+def _model_from_revision(revision: Optional[str]) -> str:
+    """ Defines the revision -> model mapping"""
+    if not revision or 'v' not in revision:
+        log.error(f'bad revision: {revision}')
+        return 'temperatureModuleV1'
+    try:
+        revision_num = float(revision.split('v')[-1])  # type: ignore
+    except (ValueError, TypeError):
+        # none or corrupt
+        log.exception('no revision')
+        return 'temperatureModuleV1'
+
+    if revision_num < FIRST_GEN2_REVISION:
+        return 'temperatureModuleV1'
+    else:
+        return 'temperatureModuleV2'
 
 
 class MissingDevicePortError(Exception):
@@ -18,11 +42,11 @@ class SimulatingDriver:
         self._active = False
         self._port = None
 
-    async def set_temperature(self, celsius):
+    async def set_temperature(self, celsius: float):
         self._target_temp = celsius
         self._active = True
 
-    def legacy_set_temperature(self, celsius):
+    def legacy_set_temperature(self, celsius: float):
         self._target_temp = celsius
         self._active = True
 
@@ -33,10 +57,10 @@ class SimulatingDriver:
     def update_temperature(self):
         pass
 
-    def connect(self, port):
+    def connect(self, port: str):
         self._port = port
 
-    def is_connected(self):
+    def is_connected(self) -> bool:
         return True
 
     def disconnect(self):
@@ -46,25 +70,25 @@ class SimulatingDriver:
         pass
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         return self._target_temp
 
     @property
-    def target(self):
+    def target(self) -> Optional[float]:
         return self._target_temp if self._active else None
 
     @property
-    def status(self):
+    def status(self) -> str:
         return 'holding at target' if self._active else 'idle'
 
-    def get_device_info(self):
+    def get_device_info(self) -> Mapping[str, str]:
         return {'serial': 'dummySerialTD',
                 'model': 'dummyModelTD',
                 'version': 'dummyVersionTD'}
 
 
 class Poller(Thread):
-    def __init__(self, driver):
+    def __init__(self, driver: TempDeckDriver):
         self._driver_ref = driver
         self._stop_event = Event()
         super().__init__(target=self._poll_temperature,
@@ -86,6 +110,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -95,7 +120,8 @@ class TempDeck(mod_abc.AbstractModule):
         # passed on
         mod = cls(port=port,
                   simulating=simulating,
-                  loop=loop)
+                  loop=loop,
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -103,12 +129,11 @@ class TempDeck(mod_abc.AbstractModule):
     def name(cls) -> str:
         return 'tempdeck'
 
-    @classmethod
-    def display_name(cls) -> str:
-        return 'Temperature Deck'
+    def model(self) -> str:
+        return _model_from_revision(self._device_info.get('model'))
 
     @classmethod
-    def bootloader(cls) -> types.UploadFunction:
+    def bootloader(cls) -> mod_abc.UploadFunction:
         return update.upload_via_avrdude
 
     @staticmethod
@@ -121,18 +146,22 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __init__(self,
                  port: str,
+                 execution_manager: ExecutionManager,
                  simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop,
+                         execution_manager=execution_manager)
+        self._device_info: Mapping[str, str] = {}
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._current_task: Optional[asyncio.Task] = None
         self._poller = None
 
-    async def set_temperature(self, celsius):
+    async def set_temperature(self, celsius: float):
         """
         Set temperature in degree Celsius
         Range: 4 to 95 degree Celsius (QA tested).
@@ -140,21 +169,22 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        self._current_task = self._loop.create_task(
+        await self.wait_for_is_running()
+        return await self._loop.create_task(
             self._driver.set_temperature(celsius)
         )
-        return await self._current_task
 
-    def deactivate(self):
+    async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
+        await self.wait_for_is_running()
         self._driver.deactivate()
 
     @property
-    def device_info(self):
+    def device_info(self) -> Mapping[str, str]:
         return self._device_info
 
     @property
-    def live_data(self):
+    def live_data(self) -> types.LiveData:
         return {
             'status': self.status,
             'data': {
@@ -164,40 +194,35 @@ class TempDeck(mod_abc.AbstractModule):
         }
 
     @property
-    def temperature(self):
+    def temperature(self) -> float:
         return self._driver.temperature
 
     @property
-    def target(self):
+    def target(self) -> float:
         return self._driver.target
 
     @property
-    def status(self):
+    def status(self) -> str:
         return self._driver.status
 
     @property
-    def port(self):
+    def port(self) -> str:
         return self._port
 
     @property
-    def is_simulated(self):
+    def is_simulated(self) -> bool:
         return isinstance(self._driver, SimulatingDriver)
 
     @property
-    def interrupt_callback(self):
+    def interrupt_callback(self) -> types.InterruptCallback:
         return lambda x: None
 
     @property
-    def loop(self):
+    def loop(self) -> asyncio.AbstractEventLoop:
         return self._loop
 
-    def set_loop(self, loop):
+    def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
 
     async def _connect(self):
         """

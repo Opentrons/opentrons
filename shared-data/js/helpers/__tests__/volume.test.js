@@ -85,6 +85,6 @@ describe('volume helpers', () => {
   ]
 
   SPECS.forEach(s => {
-    test(s.name, () => expect(s.func(...s.input)).toEqual(s.expected))
+    it(s.name, () => expect(s.func(...s.input)).toEqual(s.expected))
   })
 })

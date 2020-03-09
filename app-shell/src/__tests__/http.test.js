@@ -69,7 +69,7 @@ describe('app-shell main http module', () => {
   SUCCESS_SPECS.forEach(spec => {
     const { name, method, request, requestOptions, response, expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       mockFetch.mockResolvedValueOnce(response)
 
       return method(request).then(result => {
@@ -82,7 +82,7 @@ describe('app-shell main http module', () => {
   FAILURE_SPECS.forEach(spec => {
     const { name, method, request, response, expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       if (isError(response)) {
         mockFetch.mockRejectedValueOnce(response)
       } else {

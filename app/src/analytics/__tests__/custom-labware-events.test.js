@@ -107,7 +107,7 @@ const MOCK_STATE: State = ({ mockState: true }: any)
 describe('custom labware analytics events', () => {
   SPECS.forEach(spec => {
     const { name, action, expected } = spec
-    test(name, () => {
+    it(name, () => {
       return expect(makeEvent(action, MOCK_STATE)).resolves.toEqual(expected)
     })
   })

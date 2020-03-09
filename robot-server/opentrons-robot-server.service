@@ -1,11 +1,11 @@
 [Unit]
-Description=Opentrons API server
+Description=Opentrons Robot HTTP Server
 Requires=nginx.service
 After=nginx.service
 
 [Service]
 Type=exec
-ExecStart=python -m opentrons.main -U /run/aiohttp.sock --hardware-server
+ExecStart=python -m robot_server.main -U /run/aiohttp.sock --hardware-server
 # Stop the button blinking
 ExecStartPost=systemctl stop opentrons-gpio-setup.service
 Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true

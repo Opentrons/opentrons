@@ -23,7 +23,7 @@ describe('steps actions', () => {
       })
     })
 
-    test('action is created to populate form with default engage height to scale when engage magnet step', () => {
+    it('action is created to populate form with default engage height to scale when engage magnet step', () => {
       const magnetModule = 'magnet123'
       const magnetAction = 'engage'
       uiModulesSelectors.getSingleMagneticModuleId = jest
@@ -53,7 +53,7 @@ describe('steps actions', () => {
       ])
     })
 
-    test('action is created to populate form with null default engage height when engage magnet step with labware with no engage height', () => {
+    it('action is created to populate form with null default engage height when engage magnet step with labware with no engage height', () => {
       const magnetModule = 'magnet123'
       const magnetAction = 'engage'
       uiModulesSelectors.getSingleMagneticModuleId = jest

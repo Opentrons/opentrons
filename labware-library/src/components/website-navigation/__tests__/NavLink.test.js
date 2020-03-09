@@ -16,13 +16,13 @@ const linkProps = {
 }
 
 describe('NavLink', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<NavLink {...linkProps} />)
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('component renders name and optional description from props', () => {
+  it('component renders name and optional description from props', () => {
     const props = {
       ...linkProps,
       description: 'some link description',
@@ -32,7 +32,7 @@ describe('NavLink', () => {
     expect(tree.find('.link_description').text()).toEqual(props.description)
   })
 
-  test('component renders conditional cta class', () => {
+  it('component renders conditional cta class', () => {
     const tree = shallow(<NavLink {...linkProps} cta={true} />)
     expect(tree.find('a').hasClass('link_cta')).toEqual(true)
   })

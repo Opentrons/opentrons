@@ -58,12 +58,12 @@ describe('getWellContentsAllLabware', () => {
     )
   })
 
-  test('containers have expected number of wells', () => {
+  it('containers have expected number of wells', () => {
     expect(Object.keys(singleIngredResult.container1Id).length).toEqual(96)
     expect(Object.keys(singleIngredResult.container2Id).length).toEqual(96)
   })
 
-  test('selects well contents of all labware (for Plate props)', () => {
+  it('selects well contents of all labware (for Plate props)', () => {
     expect(singleIngredResult).toMatchObject({
       FIXED_TRASH_ID: {
         A1: defaultWellContents,
@@ -98,7 +98,7 @@ describe('getWellContentsAllLabware', () => {
     })
   })
 
-  test('no selected wells when labwareId is not selected', () => {
+  it('no selected wells when labwareId is not selected', () => {
     const result = getWellContentsAllLabware.resultFunc(
       labwareEntities,
       ingredsByLabwareXXSingleIngred,

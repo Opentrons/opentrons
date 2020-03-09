@@ -2,10 +2,10 @@
 import { getIdsInRange } from '../utils'
 
 describe('getIdsInRange', () => {
-  test('gets id in array of length 1', () => {
+  it('gets id in array of length 1', () => {
     expect(getIdsInRange(['X'], 'X', 'X')).toEqual(['X'])
   })
-  test('gets ids in array of length > 1', () => {
+  it('gets ids in array of length > 1', () => {
     const orderedIds = ['T', 'E', 'S', 'TTT', 'C', 'A', 'SSS', 'EEE']
     // includes first element
     expect(getIdsInRange(orderedIds, 'T', 'C')).toEqual([

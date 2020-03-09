@@ -1,12 +1,15 @@
 import asyncio
 from pathlib import Path
 from unittest import mock
+import pytest
 try:
     import aionotify
 except OSError:
     aionotify = None  # type: ignore
+from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import ModuleAtPort
 from opentrons.hardware_control.modules.types import BundledFirmware
+from opentrons.hardware_control.modules import tempdeck, magdeck
 
 
 async def test_get_modules_simulating():
@@ -72,11 +75,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test temperature module update with avrdude bootloader
 
-    tempdeck = await modules.build('/dev/ot_module_sim_tempdeck0',
-                                   'tempdeck',
-                                   True,
-                                   lambda x: None,
-                                   loop=loop)
+    tempdeck = await modules.build(
+            port='/dev/ot_module_sim_tempdeck0',
+            which='tempdeck',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     upload_via_avrdude_mock = mock.Mock(
         return_value=(async_return((True, 'avrdude bootloader worked'))))
@@ -101,11 +106,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test magnetic module update with avrdude bootloader
 
-    magdeck = await modules.build('/dev/ot_module_sim_magdeck0',
-                                  'magdeck',
-                                  True,
-                                  lambda x: None,
-                                  loop=loop)
+    magdeck = await modules.build(
+            port='/dev/ot_module_sim_magdeck0',
+            which='magdeck',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     await modules.update_firmware(magdeck, 'fake_fw_file_path', loop)
     upload_via_avrdude_mock.assert_called_once_with(
@@ -116,11 +123,13 @@ async def test_module_update_integration(monkeypatch, loop):
 
     # test thermocycler module update with bossa bootloader
 
-    thermocycler = await modules.build('/dev/ot_module_sim_thermocycler0',
-                                       'thermocycler',
-                                       True,
-                                       lambda x: None,
-                                       loop=loop)
+    thermocycler = await modules.build(
+            port='/dev/ot_module_sim_thermocycler0',
+            which='thermocycler',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            loop=loop,
+            execution_manager=ExecutionManager(loop=loop))
 
     upload_via_bossa_mock = mock.Mock(
         return_value=(async_return((True, 'bossa bootloader worked'))))
@@ -174,3 +183,32 @@ async def test_get_bundled_fw(monkeypatch, tmpdir):
         version='3.2.1', path=dummy_md_file)
     assert api.attached_modules[2].bundled_fw == BundledFirmware(
         version='0.1.2', path=dummy_tc_file)
+
+
+@pytest.mark.parametrize(
+    'revision,model',
+    [
+        ('mag_deck_v1.1', 'magneticModuleV1'),
+        ('mag_deck_v20', 'magneticModuleV2'),
+        ('', 'magneticModuleV1'),
+        ('asdasdadvasdasd', 'magneticModuleV1'),
+        (None, 'magneticModuleV1')
+    ])
+def test_magnetic_module_revision_parsing(revision, model):
+    assert magdeck._model_from_revision(revision) == model
+
+
+@pytest.mark.parametrize(
+    'revision,model',
+    [
+        ('temp_deck_v1.1', 'temperatureModuleV1'),
+        ('temp_deck_v3.0', 'temperatureModuleV1'),
+        ('temp_deck_v4.0', 'temperatureModuleV1'),
+        ('temp_deck_v15', 'temperatureModuleV1'),
+        ('temp_deck_v20', 'temperatureModuleV2'),
+        ('', 'temperatureModuleV1'),
+        ('v', 'temperatureModuleV1'),
+        (None, 'temperatureModuleV1')
+    ])
+def test_temperature_module_revision_parsing(revision, model):
+    assert tempdeck._model_from_revision(revision) == model

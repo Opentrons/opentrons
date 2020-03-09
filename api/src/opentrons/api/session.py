@@ -520,8 +520,9 @@ class Session(object):
                 sleep(0.1)
             self.set_state('finished')
             self._hw_iface().home()
-        except SmoothieAlarm:
+        except (SmoothieAlarm, asyncio.CancelledError):
             log.info("Protocol cancelled")
+            self.set_state('error')
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)

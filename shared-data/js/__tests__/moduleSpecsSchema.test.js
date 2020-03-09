@@ -22,7 +22,7 @@ beforeAll(() => {
 })
 
 describe('validate all module specs with schema', () => {
-  test('ensure V1 module specs match the V1 JSON schema', () => {
+  it('ensure V1 module specs match the V1 JSON schema', () => {
     const valid = validateModuleSpecsV1(moduleSpecsV1)
     const validationErrors = validateModuleSpecsV1.errors
 
@@ -33,14 +33,14 @@ describe('validate all module specs with schema', () => {
   MODULE_PATHS.forEach(modulePath => {
     const filename = path.parse(modulePath).name
     const moduleDef = require(modulePath)
-    test(`${filename} validates against schema`, () => {
+    it(`${filename} validates against schema`, () => {
       const valid = validateModuleSpecsV2(moduleDef)
       const validationErrors = validateModuleSpecsV2.errors
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
   })
-  test('validate each module specs model matches its filename', () => {
+  it('validate each module specs model matches its filename', () => {
     MODULE_PATHS.forEach(modulePath => {
       const filename = path.parse(modulePath).name
       const moduleDef = require(modulePath)

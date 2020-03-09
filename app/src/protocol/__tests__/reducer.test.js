@@ -3,7 +3,7 @@
 import { protocolReducer } from '../reducer'
 
 describe('protocolReducer', () => {
-  test('initial state', () => {
+  it('initial state', () => {
     expect(protocolReducer(undefined, {})).toEqual({
       file: null,
       contents: null,
@@ -130,7 +130,7 @@ describe('protocolReducer', () => {
   SPECS.forEach(spec => {
     const { name, action, initialState, expectedState } = spec
 
-    test(name, () => {
+    it(name, () => {
       expect(protocolReducer(initialState, action)).toEqual(expectedState)
     })
   })

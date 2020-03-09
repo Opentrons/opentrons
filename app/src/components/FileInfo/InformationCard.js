@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import moment from 'moment'
+import { format } from 'date-fns'
 
 import {
   getProtocolName,
@@ -31,7 +31,7 @@ type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
 const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
-const DATE_FORMAT = 'DD MMM Y, hh:mmA'
+const DATE_FORMAT = 'PPpp'
 
 export const InformationCard = connect<Props, OP, SP, _, _, _, _>(
   mapStateToProps
@@ -40,11 +40,11 @@ export const InformationCard = connect<Props, OP, SP, _, _, _, _>(
 function InformationCardComponent(props: Props) {
   const { name, author, method, description } = props
   const lastUpdated = props.lastUpdated
-    ? moment(props.lastUpdated).format(DATE_FORMAT)
+    ? format(props.lastUpdated, DATE_FORMAT)
     : '-'
 
   return (
-    <React.Fragment>
+    <>
       <InfoSection title={INFO_TITLE}>
         <CardRow>
           <SectionContentHalf>
@@ -68,7 +68,7 @@ function InformationCardComponent(props: Props) {
           <p>{description}</p>
         </InfoSection>
       )}
-    </React.Fragment>
+    </>
   )
 }
 

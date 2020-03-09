@@ -21,7 +21,7 @@ describe('analytics epics', () => {
     jest.resetAllMocks()
   })
 
-  test('sendAnalyticsEventEpic handles events', () => {
+  it('sendAnalyticsEventEpic handles events', () => {
     const action = { type: 'foo' }
     const state = { config: { analytics: { optedIn: true } } }
     const event = { name: 'fooEvent', properties: {} }
@@ -39,7 +39,7 @@ describe('analytics epics', () => {
     expect(trackEvent).toHaveBeenCalledWith(event, state.config.analytics)
   })
 
-  test('sendAnalyticsEventEpic handles nulls', () => {
+  it('sendAnalyticsEventEpic handles nulls', () => {
     const action = { type: 'foo' }
     const state = { config: { analytics: { optedIn: true } } }
 
@@ -60,7 +60,7 @@ describe('analytics epics', () => {
     const off = { config: { analytics: { optedIn: false } } }
     const on = { config: { analytics: { optedIn: true } } }
 
-    test('sets opt-in', () => {
+    it('sets opt-in', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const state$ = hot('-a-b', { a: off, b: on })
         const output$ = epics.optIntoAnalyticsEpic(null, state$)
@@ -70,7 +70,7 @@ describe('analytics epics', () => {
       expect(setMixpanelTracking).toHaveBeenCalledWith({ optedIn: true })
     })
 
-    test('sets opt-out', () => {
+    it('sets opt-out', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const state$ = hot('-a-b', { a: on, b: off })
         const output$ = epics.optIntoAnalyticsEpic(null, state$)
@@ -80,7 +80,7 @@ describe('analytics epics', () => {
       expect(setMixpanelTracking).toHaveBeenCalledWith({ optedIn: false })
     })
 
-    test('noops on no change in status', () => {
+    it('noops on no change in status', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const state$ = hot('-a-b', { a: on, b: on })
         const output$ = epics.optIntoAnalyticsEpic(null, state$)

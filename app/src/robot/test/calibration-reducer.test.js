@@ -19,13 +19,13 @@ const EXPECTED_INITIAL_STATE = {
 }
 
 describe('robot reducer - calibration', () => {
-  test('initial state', () => {
+  it('initial state', () => {
     const state = reducer(undefined, {})
 
     expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
-  test('handles robot:REFRESH_SESSION', () => {
+  it('handles robot:REFRESH_SESSION', () => {
     const state = reducer(
       { calibration: {} },
       { type: 'robot:REFRESH_SESSION' }
@@ -34,7 +34,7 @@ describe('robot reducer - calibration', () => {
     expect(state.calibration).toEqual(EXPECTED_INITIAL_STATE)
   })
 
-  test('handles DISCONNECT_RESPONSE success', () => {
+  it('handles DISCONNECT_RESPONSE success', () => {
     const expected = reducer(undefined, {}).calibration
     const state = { calibration: { dummy: 'state' } }
     const action = { type: 'robot:DISCONNECT_RESPONSE', payload: {} }
@@ -42,7 +42,7 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
-  test('handles protocol:UPLOAD', () => {
+  it('handles protocol:UPLOAD', () => {
     const expected = reducer(undefined, {}).calibration
     const state = { calibration: { dummy: 'state' } }
     const action = {
@@ -53,7 +53,7 @@ describe('robot reducer - calibration', () => {
     expect(reducer(state, action).calibration).toEqual(expected)
   })
 
-  test('handles SET_MODULES_REVIEWED action', () => {
+  it('handles SET_MODULES_REVIEWED action', () => {
     const setToTrue = { type: 'robot:SET_MODULES_REVIEWED', payload: true }
     const setToFalse = { type: 'robot:SET_MODULES_REVIEWED', payload: false }
 
@@ -68,7 +68,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles SET_DECK_POPULATED action', () => {
+  it('handles SET_DECK_POPULATED action', () => {
     const setToTrue = { type: actionTypes.SET_DECK_POPULATED, payload: true }
     const setToFalse = { type: actionTypes.SET_DECK_POPULATED, payload: false }
 
@@ -83,7 +83,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles PICKUP_AND_HOME action', () => {
+  it('handles PICKUP_AND_HOME action', () => {
     const state = {
       calibration: {
         deckPopulated: false,
@@ -113,7 +113,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles PICKUP_AND_HOME response actions', () => {
+  it('handles PICKUP_AND_HOME response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -161,7 +161,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles DROP_TIP_AND_HOME action', () => {
+  it('handles DROP_TIP_AND_HOME action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -187,7 +187,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles DROP_TIP_AND_HOME response actions', () => {
+  it('handles DROP_TIP_AND_HOME response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -235,7 +235,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles CONFIRM_TIPRACK action', () => {
+  it('handles CONFIRM_TIPRACK action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -263,7 +263,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles CONFIRM_TIPRACK response actions', () => {
+  it('handles CONFIRM_TIPRACK response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -314,7 +314,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles MOVE_TO_FRONT action', () => {
+  it('handles MOVE_TO_FRONT action', () => {
     const state = {
       calibration: {
         deckPopulated: true,
@@ -344,7 +344,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles MOVE_TO_FRONT_RESPONSE action', () => {
+  it('handles MOVE_TO_FRONT_RESPONSE action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -382,7 +382,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles PROBE_TIP action', () => {
+  it('handles PROBE_TIP action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -410,7 +410,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles PROBE_TIP_RESPONSE action', () => {
+  it('handles PROBE_TIP_RESPONSE action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -448,7 +448,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles CONFIRM_PROBED', () => {
+  it('handles CONFIRM_PROBED', () => {
     const state = {
       calibration: {
         probedByMount: { left: false, right: true },
@@ -464,7 +464,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles MOVE_TO action', () => {
+  it('handles MOVE_TO action', () => {
     const state = {
       calibration: {
         deckPopulated: false,
@@ -494,7 +494,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles MOVE_TO response actions', () => {
+  it('handles MOVE_TO response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -534,7 +534,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles JOG action', () => {
+  it('handles JOG action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -556,7 +556,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles JOG response actions', () => {
+  it('handles JOG response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -595,7 +595,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles UPDATE_OFFSET action', () => {
+  it('handles UPDATE_OFFSET action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -621,7 +621,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles UPDATE_OFFSET response actions', () => {
+  it('handles UPDATE_OFFSET response actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -667,7 +667,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles CONFIRM_LABWARE action', () => {
+  it('handles CONFIRM_LABWARE action', () => {
     const state = {
       calibration: {
         confirmedBySlot: {},
@@ -683,7 +683,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles CLEAR_CALIBRATION_REQUEST and robot home actions', () => {
+  it('handles CLEAR_CALIBRATION_REQUEST and robot home actions', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -706,7 +706,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles RETURN_TIP action', () => {
+  it('handles RETURN_TIP action', () => {
     const state = {
       calibration: {
         calibrationRequest: {
@@ -731,7 +731,7 @@ describe('robot reducer - calibration', () => {
     })
   })
 
-  test('handles RETURN_TIP_RESPONSE action', () => {
+  it('handles RETURN_TIP_RESPONSE action', () => {
     const state = {
       calibration: {
         calibrationRequest: {

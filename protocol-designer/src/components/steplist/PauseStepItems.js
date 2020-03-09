@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { i18n } from '../../localization'
-import { PDListItem } from '../lists'
+import styles from './StepItem.css'
 import type { PauseArgs } from '../../step-generation'
 type Props = {
   pauseArgs: PauseArgs,
@@ -15,25 +15,35 @@ export function PauseStepItems(props: Props) {
   }
   const { message, wait } = pauseArgs
   const { hours, minutes, seconds } = pauseArgs.meta
-
   return (
-    <React.Fragment>
-      {message && <PDListItem>{message}</PDListItem>}
-      {wait !== true && (
-        <PDListItem>
-          <span>
-            {hours} {i18n.t('application.units.hours')}
-          </span>
-          <span>
-            {minutes} {i18n.t('application.units.minutes')}
-          </span>
-          <span>
-            {seconds} {i18n.t('application.units.seconds')}
-          </span>
-          <span />
-          <span />
-        </PDListItem>
+    <>
+      {wait !== true ? (
+        <>
+          <li className={styles.substep_header}>
+            <span>Pause for Time</span>
+          </li>
+          <li className={styles.substep_content}>
+            <span>
+              {hours} {i18n.t('application.units.hours')}
+            </span>
+            <span>
+              {minutes} {i18n.t('application.units.minutes')}
+            </span>
+            <span>
+              {seconds} {i18n.t('application.units.seconds')}
+            </span>
+          </li>
+        </>
+      ) : (
+        <>
+          <li className={styles.substep_header}>
+            <span>Pause Until Told to Resume</span>
+          </li>
+        </>
       )}
-    </React.Fragment>
+      {message && (
+        <li className={styles.substep_content}>&quot;{message}&quot;</li>
+      )}
+    </>
   )
 }

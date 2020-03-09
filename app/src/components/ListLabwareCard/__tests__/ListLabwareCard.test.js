@@ -51,12 +51,12 @@ describe('ListLabwareCard', () => {
     jest.useRealTimers()
   })
 
-  test('renders a LabwareList', () => {
+  it('renders a LabwareList', () => {
     const tree = render()
     expect(tree.find(LabwareList)).toHaveLength(1)
   })
 
-  test('passes labware list and list error to LabwareList', () => {
+  it('passes labware list and list error to LabwareList', () => {
     mockGetCustomLabware.mockReturnValue([
       LabwareFixtures.mockValidLabware,
       LabwareFixtures.mockInvalidLabware,
@@ -74,7 +74,7 @@ describe('ListLabwareCard', () => {
     })
   })
 
-  test('dispatches FETCH_CUSTOM_LABWARE on mount and an interval', () => {
+  it('dispatches FETCH_CUSTOM_LABWARE on mount and an interval', () => {
     const expected = LabwareActions.fetchCustomLabware()
 
     render()

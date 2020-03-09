@@ -23,7 +23,7 @@ describe('ConfirmResetPathModal', () => {
     jest.resetAllMocks()
   })
 
-  test('renders inside a Portal', () => {
+  it('renders inside a Portal', () => {
     const wrapper = shallow(<ConfirmResetPathModal {...props} />)
     const portal = wrapper.find(Portal)
     const modal = portal.find(ConfirmResetPathModalTemplate)
@@ -31,13 +31,13 @@ describe('ConfirmResetPathModal', () => {
     expect(modal.props()).toEqual(props)
   })
 
-  test('renders an AlertModal', () => {
+  it('renders an AlertModal', () => {
     const wrapper = shallow(<ConfirmResetPathModalTemplate {...props} />)
 
     expect(wrapper.exists(AlertModal)).toBe(true)
   })
 
-  test('renders a cancel button that calls props.onCancel', () => {
+  it('renders a cancel button that calls props.onCancel', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
     const button = wrapper.find(`button[name="${CANCEL_NAME}"]`)
 
@@ -45,7 +45,7 @@ describe('ConfirmResetPathModal', () => {
     expect(mockOnCancel).toHaveBeenCalled()
   })
 
-  test('renders a confirm button that calls props.onConfirm', () => {
+  it('renders a confirm button that calls props.onConfirm', () => {
     const wrapper = mount(<ConfirmResetPathModalTemplate {...props} />)
     const button = wrapper.find(`button[name="${RESET_SOURCE_NAME}"]`)
 

@@ -358,9 +358,6 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     assert 'aspirating' in ','.join([cmd.lower() for cmd in ctx.commands()])
 
     fake_hw_aspirate.assert_called_once_with(Mount.RIGHT, 2.0, 1.0)
-    assert fake_move.call_args_list[-2] ==\
-        mock.call(Mount.RIGHT, lw.wells()[0].top().point,
-                  critical_point=None, speed=400, max_speeds={})
     assert fake_move.call_args_list[-1] ==\
         mock.call(Mount.RIGHT, lw.wells()[0].bottom().point,
                   critical_point=None, speed=400, max_speeds={})
@@ -370,14 +367,11 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
     instr.aspirate(2.0, lw.wells()[0])
     dest_point, dest_lw = lw.wells()[0].bottom()
     dest_point = dest_point._replace(z=dest_point.z + 1.0)
-    assert fake_move.call_args_list[-2] ==\
-        mock.call(Mount.RIGHT, lw.wells()[0].top().point,
-                  critical_point=None, speed=400, max_speeds={})
-    assert fake_move.call_args_list[-1] ==\
+    assert len(fake_move.call_args_list) == 1
+    assert fake_move.call_args_list[0] ==\
         mock.call(
             Mount.RIGHT, dest_point, critical_point=None, speed=400,
             max_speeds={})
-    assert len(fake_move.call_args_list) == 2
     fake_move.reset_mock()
     ctx._hw_manager.hardware._obj_to_adapt\
                             ._attached_instruments[Mount.RIGHT]\
@@ -385,6 +379,20 @@ def test_aspirate(loop, get_labware_def, monkeypatch):
 
     instr.aspirate(2.0)
     fake_move.assert_not_called()
+
+    instr.blow_out()
+    fake_move.reset_mock()
+    instr.aspirate(2.0)
+    assert len(fake_move.call_args_list) == 2
+    # reset plunger at the top of the well after blowout
+    assert fake_move.call_args_list[0] ==\
+        mock.call(
+            Mount.RIGHT, dest_lw.top().point, critical_point=None,
+            speed=400, max_speeds={})
+    assert fake_move.call_args_list[1] ==\
+        mock.call(
+            Mount.RIGHT, dest_point, critical_point=None,
+            speed=400, max_speeds={})
 
 
 def test_dispense(loop, get_labware_def, monkeypatch):

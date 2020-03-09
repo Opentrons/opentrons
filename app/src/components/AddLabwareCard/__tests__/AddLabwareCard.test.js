@@ -51,7 +51,7 @@ describe('AddLabwareCard', () => {
     jest.resetAllMocks()
   })
 
-  test('passes labware directory to ManagePath', () => {
+  it('passes labware directory to ManagePath', () => {
     const wrapper = render()
     const detail = wrapper.find(ManagePath)
 
@@ -59,7 +59,7 @@ describe('AddLabwareCard', () => {
     expect(detail.prop('path')).toEqual(mockLabwarePath)
   })
 
-  test('passes change path function to ManagePath', () => {
+  it('passes change path function to ManagePath', () => {
     const wrapper = render()
     const control = wrapper.find(ManagePath)
     const expectedChangeAction = CustomLabware.changeCustomLabwareDirectory()
@@ -69,7 +69,7 @@ describe('AddLabwareCard', () => {
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedChangeAction)
   })
 
-  test('passes open path function to ManagePath', () => {
+  it('passes open path function to ManagePath', () => {
     const wrapper = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.openCustomLabwareDirectory()
@@ -79,7 +79,7 @@ describe('AddLabwareCard', () => {
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
-  test('passes reset path function to ManagePath', () => {
+  it('passes reset path function to ManagePath', () => {
     const wrapper = render()
     const control = wrapper.find(ManagePath)
     const expectedOpenAction = CustomLabware.resetCustomLabwareDirectory()
@@ -89,7 +89,7 @@ describe('AddLabwareCard', () => {
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedOpenAction)
   })
 
-  test('passes dispatch function to AddLabware', () => {
+  it('passes dispatch function to AddLabware', () => {
     const wrapper = render()
     const control = wrapper.find(AddLabware)
     const expectedAction = CustomLabware.addCustomLabware()
@@ -99,7 +99,7 @@ describe('AddLabwareCard', () => {
     expect(mockStore.dispatch).toHaveBeenCalledWith(expectedAction)
   })
 
-  test('renders an AddLabwareFailureModal if add labware fails', () => {
+  it('renders an AddLabwareFailureModal if add labware fails', () => {
     mockGetAddLabwareFailure.mockReturnValue({
       file: CustomLabwareFixtures.mockInvalidLabware,
       errorMessage: 'AH',
@@ -117,7 +117,7 @@ describe('AddLabwareCard', () => {
     })
   })
 
-  test('AddLabwareFailureModal onCancel and onOverwrite hooked to dispatch', () => {
+  it('AddLabwareFailureModal onCancel and onOverwrite hooked to dispatch', () => {
     const file = CustomLabwareFixtures.mockDuplicateLabware
 
     mockGetAddLabwareFailure.mockReturnValue({ file, errorMessage: null })

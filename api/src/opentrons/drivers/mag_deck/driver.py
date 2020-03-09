@@ -106,7 +106,7 @@ def _parse_key_from_substring(substring) -> str:
                 substring))
 
 
-def _parse_device_information(device_info_string) -> dict:
+def _parse_device_information(device_info_string) -> Dict[str, str]:
     '''
     Parse the magnetic module's device information response.
     Example response from magnetic module:
@@ -265,7 +265,7 @@ class MagDeck:
             return str(e)
         return ''
 
-    def get_device_info(self) -> dict:
+    def get_device_info(self) -> Dict[str, str]:
         '''
         Queries Temp-Deck for it's build version, model, and serial number
 
@@ -282,10 +282,7 @@ class MagDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        try:
-            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
-        except (MagDeckError, SerialException, SerialNoResponse) as e:
-            return {'error': str(e)}
+        return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
 
     def enter_programming_mode(self) -> str:
         '''

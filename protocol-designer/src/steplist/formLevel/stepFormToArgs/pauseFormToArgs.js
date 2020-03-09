@@ -24,6 +24,7 @@ export const pauseFormToArgs = (
         commandCreatorFnName: 'awaitTemperature',
         temperature,
         module: formData.moduleId,
+        message,
       }
     case PAUSE_UNTIL_TIME:
       return {

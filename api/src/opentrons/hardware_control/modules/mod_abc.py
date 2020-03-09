@@ -3,10 +3,11 @@ import asyncio
 import logging
 import re
 from pkg_resources import parse_version
-from typing import Dict, Optional
+from typing import Mapping, Optional
 from opentrons.config import IS_ROBOT, ROBOT_FIRMWARE_DIR
 from opentrons.hardware_control.util import use_or_initialize_loop
-from .types import BundledFirmware, UploadFunction, InterruptCallback
+from ..execution_manager import ExecutionManager
+from .types import BundledFirmware, UploadFunction, InterruptCallback, LiveData
 
 mod_log = logging.getLogger(__name__)
 
@@ -18,6 +19,7 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     async def build(cls,
                     port: str,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None) \
@@ -32,11 +34,13 @@ class AbstractModule(abc.ABC):
     @abc.abstractmethod
     def __init__(self,
                  port: str,
+                 execution_manager: ExecutionManager,
                  simulating: bool = False,
                  loop: asyncio.AbstractEventLoop = None) -> None:
         self._port = port
         self._loop = use_or_initialize_loop(loop)
-        self._device_info = None
+        self._execution_manager = execution_manager
+        self._device_info: Mapping[str, str]
         self._bundled_fw: Optional[BundledFirmware] = self.get_bundled_fw()
 
     def get_bundled_fw(self) -> Optional[BundledFirmware]:
@@ -60,11 +64,15 @@ class AbstractModule(abc.ABC):
 
     def has_available_update(self) -> bool:
         """ Return whether a newer firmware file is available """
-        if self._device_info is not None and self._bundled_fw:
-            device_version = parse_version(self._device_info.get('version'))
+        if self._device_info and self._bundled_fw:
+            device_version = parse_version(self._device_info['version'])
             available_version = parse_version(self._bundled_fw.version)
             return available_version > device_version
         return False
+
+    async def wait_for_is_running(self):
+        if not self.is_simulated:
+            await self._execution_manager.wait_for_is_running()
 
     @abc.abstractmethod
     def deactivate(self):
@@ -79,13 +87,13 @@ class AbstractModule(abc.ABC):
 
     @property
     @abc.abstractmethod
-    def device_info(self) -> Dict[str, str]:
+    def device_info(self) -> Mapping[str, str]:
         """ Return a dict of the module's static information (serial, etc)"""
         pass
 
     @property
     @abc.abstractmethod
-    def live_data(self) -> Dict[str, str]:
+    def live_data(self) -> LiveData:
         """ Return a dict of the module's dynamic information """
         pass
 
@@ -123,16 +131,15 @@ class AbstractModule(abc.ABC):
     def bundled_fw(self):
         return self._bundled_fw
 
-    @classmethod
     @abc.abstractmethod
-    def name(cls) -> str:
-        """ A name for this kind of module. """
+    def model(self) -> str:
+        """ A name for this specific module, matching module defs """
         pass
 
     @classmethod
     @abc.abstractmethod
-    def display_name(cls) -> str:
-        """ A user-facing name for this kind of module. """
+    def name(cls) -> str:
+        """ A shortname used for looking up firmware, among other things """
         pass
 
     @classmethod

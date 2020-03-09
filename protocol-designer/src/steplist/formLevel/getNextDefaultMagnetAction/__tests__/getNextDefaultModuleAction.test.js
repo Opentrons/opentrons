@@ -11,7 +11,7 @@ describe('getNextDefaultMagnetAction', () => {
     ]
 
     testCases.forEach(({ testMsg, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
 
@@ -37,7 +37,7 @@ describe('getNextDefaultMagnetAction', () => {
     ]
 
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {
           e: { id: 'moduleId', stepType: 'magnet', magnetAction: 'engage' },
           d: { id: 'moduleId', stepType: 'magnet', magnetAction: 'disengage' },

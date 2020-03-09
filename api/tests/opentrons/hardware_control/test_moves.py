@@ -23,7 +23,7 @@ async def test_controller_home(loop):
                                                        [0, 0, 1, 30],
                                                        [0, 0, 0, 1]],
                                    mount_offset=[0, 0, 10])
-    conf = await c.config
+    conf = c.config
     assert conf.gantry_calibration == [[1, 0, 0, 10],
                                        [0, 1, 0, 20],
                                        [0, 0, 1, 30],
@@ -228,7 +228,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
 
     hardware_api = await hc.API.build_hardware_simulator(loop=loop)
     monkeypatch.setattr(hardware_api._backend, 'move', mock_move)
-    old_config = await hardware_api.config
+    old_config = hardware_api.config
     hardware_api._config = old_config._replace(
         gantry_calibration=new_gantry_cal)
     await hardware_api.home()

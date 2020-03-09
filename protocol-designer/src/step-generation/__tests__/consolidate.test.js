@@ -82,7 +82,7 @@ beforeEach(() => {
 })
 
 describe('consolidate single-channel', () => {
-  test('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
+  it('Minimal single-channel: A1 A2 to B1, 50uL with p300', () => {
     const data = {
       ...mixinArgs,
       sourceWells: ['A1', 'A2'],
@@ -101,7 +101,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
+  it('Single-channel with exceeding pipette max: A1 A2 A3 A4 to B1, 150uL with p300', () => {
     // TODO Ian 2018-05-03 is this a duplicate of exceeding max with changeTip="once"???
     const data = {
       ...mixinArgs,
@@ -123,7 +123,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('Single-channel with exceeding pipette max: with changeTip="always"', () => {
+  it('Single-channel with exceeding pipette max: with changeTip="always"', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -146,7 +146,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('Single-channel with exceeding pipette max: with changeTip="once"', () => {
+  it('Single-channel with exceeding pipette max: with changeTip="once"', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -167,7 +167,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('Single-channel with exceeding pipette max: with changeTip="never"', () => {
+  it('Single-channel with exceeding pipette max: with changeTip="never"', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -187,7 +187,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('mix on aspirate should mix before aspirate in first well of chunk only, and tip position bound to labware', () => {
+  it('mix on aspirate should mix before aspirate in first well of chunk only, and tip position bound to labware', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -221,7 +221,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('mix on aspirate', () => {
+  it('mix on aspirate', () => {
     const data = {
       ...mixinArgs,
       volume: 125,
@@ -279,7 +279,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('mix after dispense', () => {
+  it('mix after dispense', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -312,7 +312,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('mix after dispense with blowout to trash: first mix, then blowout', () => {
+  it('mix after dispense with blowout to trash: first mix, then blowout', () => {
     const data = {
       ...mixinArgs,
       volume: 100,
@@ -349,7 +349,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
+  it('"pre-wet tip" should aspirate and dispense consolidate volume from first well of each chunk', () => {
     // TODO LATER Ian 2018-02-13 Should it be 2/3 max volume instead?
     const data = {
       ...mixinArgs,
@@ -393,7 +393,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('touchTip after aspirate should touch tip after every aspirate command', () => {
+  it('touchTip after aspirate should touch tip after every aspirate command', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -428,7 +428,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('touchTip after dispense should touch tip after dispense on destination well', () => {
+  it('touchTip after dispense should touch tip after dispense on destination well', () => {
     const data = {
       ...mixinArgs,
       volume: 150,
@@ -460,7 +460,7 @@ describe('consolidate single-channel', () => {
     ])
   })
 
-  test('invalid pipette ID should return error', () => {
+  it('invalid pipette ID should return error', () => {
     const data = {
       ...mixinArgs,
       sourceWells: ['A1', 'A2'],
@@ -476,7 +476,7 @@ describe('consolidate single-channel', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_DOES_NOT_EXIST')
   })
 
-  test.todo('air gap') // TODO Ian 2018-04-05 determine air gap behavior
+  it.todo('air gap') // TODO Ian 2018-04-05 determine air gap behavior
 })
 
 describe('consolidate multi-channel', () => {
@@ -512,7 +512,7 @@ describe('consolidate multi-channel', () => {
     ...getFlowRateAndOffsetParams(),
   }
 
-  test('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
+  it('simple multi-channel: cols A1 A2 A3 A4 to col A12', () => {
     const data = {
       ...args,
       volume: 140,
@@ -534,7 +534,7 @@ describe('consolidate multi-channel', () => {
   })
 
   // TODO Ian 2018-03-14: address different multi-channel layouts of plates
-  test.todo('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12')
+  it.todo('multi-channel 384 plate: cols A1 B1 A2 B2 to 96-plate col A12')
 
-  test.todo('multi-channel trough A1 A2 A3 A4 to 96-plate A12')
+  it.todo('multi-channel trough A1 A2 A3 A4 to 96-plate A12')
 })
