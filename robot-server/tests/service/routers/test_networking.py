@@ -1,4 +1,3 @@
-import json
 import os
 import random
 import tempfile
@@ -86,9 +85,11 @@ def test_wifi_list(api_client, monkeypatch):
 
 
 def test_wifi_configure(api_client, monkeypatch):
-    msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
+    msg = "Device 'wlan0' successfully activated with" \
+          " '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
-    async def mock_configure(ssid, securityType=None, psk=None, hidden=False):
+    async def mock_configure(ssid, eapConfig, securityType=None,
+                             psk=None, hidden=False):
         # Command: nmcli device wifi connect "{ssid}" password "{psk}"
         return True, msg
 
@@ -102,11 +103,29 @@ def test_wifi_configure(api_client, monkeypatch):
     assert resp.status_code == 201
     assert body == expected
 
+    async def mock_configure(ssid, eapConfig, securityType=None,
+                             psk=None, hidden=False):
+        raise ValueError("nope!")
+
+    monkeypatch.setattr(nmcli, 'configure', mock_configure)
+
     resp = api_client.post(
         '/wifi/configure', json={'ssid': 'asasd', 'foo': 'bar'})
     assert resp.status_code == 400
     body = resp.json()
-    assert 'message' in body
+    assert {"message": "nope!"} == body
+
+    async def mock_configure(ssid, eapConfig, securityType=None,
+                             psk=None, hidden=False):
+        return False, "no"
+
+    monkeypatch.setattr(nmcli, 'configure', mock_configure)
+
+    resp = api_client.post(
+        '/wifi/configure', json={'ssid': 'asasd', 'foo': 'bar'})
+    assert resp.status_code == 401
+    body = resp.json()
+    assert {"message": "no"} == body
 
 
 def test_wifi_disconnect(api_client, monkeypatch):
@@ -183,7 +202,13 @@ def test_add_key_call(api_client):
                 f.write(str(random.getrandbits(20)))
 
             with patch("opentrons.system.wifi.add_key") as p:
-                api_client.post('/wifi/keys', data={'key': open(path, 'rb')})
+                p.return_value = wifi.AddKeyResult(created=True,
+                                                   key=wifi.Key(
+                                                       file="",
+                                                       directory=""
+                                                   ))
+
+                api_client.post('/wifi/keys', files={'key': open(path, 'rb')})
 
                 with open(path, 'rb') as f:
                     p.assert_called_once_with(fn, f.read())
@@ -214,11 +239,9 @@ async def test_add_key_no_key(loop, aiohttp_client):
       'message': 'Key file already present'}
      )
 ])
-async def test_add_key_response(add_key_return, expected_status, expected_body,
-                                loop, aiohttp_client, wifi_keys_tempdir):
+def test_add_key_response(add_key_return, expected_status, expected_body,
+                          api_client):
     with tempfile.TemporaryDirectory() as source_td:
-        app = init()
-        cli = await loop.create_task(aiohttp_client(app))
 
         path = os.path.join(source_td, "t.pem")
         with open(path, 'w') as f:
@@ -226,23 +249,24 @@ async def test_add_key_response(add_key_return, expected_status, expected_body,
 
         with patch("opentrons.system.wifi.add_key") as p:
             p.return_value = add_key_return
-            r = await cli.post('/wifi/keys', data={'key': open(path, 'rb')})
-            assert r.status == expected_status
-            assert await r.json() == expected_body
+            r = api_client.post('/wifi/keys', files={'key': open(path, 'rb')})
+            assert r.status_code == expected_status
+            assert r.json() == expected_body
 
 
-@pytest.mark.parametrize("arg,remove_key_return,expected_status,expected_body", [
-    ("12345",
-     None,
-     404,
-     {'message': "No such key file 12345"}
-     ),
-    ("54321",
-     "myfile.pem",
-     200,
-     {'message': 'Key file myfile.pem deleted'}
-     )
-])
+@pytest.mark.parametrize("arg,remove_key_return,expected_status,expected_body",
+                         [
+                             ("12345",
+                              None,
+                              404,
+                              {'message': "No such key file 12345"}
+                              ),
+                             ("54321",
+                              "myfile.pem",
+                              200,
+                              {'message': 'Key file myfile.pem deleted'}
+                              )
+                         ])
 async def test_remove_key(arg, remove_key_return,
                           expected_status, expected_body,
                           loop, aiohttp_client):

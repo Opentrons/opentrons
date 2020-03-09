@@ -275,6 +275,11 @@ class WifiKeyFile(BaseModel):
               description="The original filename of the key")
 
 
+class AddWifiKeyFileResponse(WifiKeyFile):
+    """Response to add wifi key file"""
+    message: typing.Optional[str]
+
+
 class WifiKeyFiles(BaseModel):
     """The list of key files"""
     wifi_keys: typing.List[WifiKeyFile] =\

@@ -3,13 +3,16 @@ import os
 import subprocess
 from http import HTTPStatus
 
-from fastapi import APIRouter, HTTPException, File, Path
+from fastapi import APIRouter, HTTPException, File, Path, UploadFile
 from opentrons.system import nmcli, wifi
+from starlette.responses import JSONResponse
+
+from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models.networking import NetworkingStatus, \
     WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
     WifiKeyFiles, WifiKeyFile, EapOptions, EapVariant, EapConfigOption, \
-    EapConfigOptionType, WifiNetworkFull
+    EapConfigOptionType, WifiNetworkFull, AddWifiKeyFileResponse
 
 log = logging.getLogger(__name__)
 
@@ -55,19 +58,20 @@ async def get_wifi_networks() -> WifiNetworks:
              response_model=WifiConfigurationResponse,
              responses={HTTPStatus.CREATED: {
                  "model": WifiConfigurationResponse
-             }})
+             }},
+             status_code=HTTPStatus.CREATED)
 async def post_wifi_configurution(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
-    # try:
-    ok, message = await nmcli.configure(**configuration.dict())
-    log.debug("Wifi configure result: %s", message)
-    # except (ValueError, TypeError) as e:
-    #     # Indicates an unexpected kwarg; check is done here to avoid keeping
-    #     # the _check_configure_args signature up to date with nmcli.configure
-    #     raise HTTPException(HTTPStatus.BAD_REQUEST, {'message': str(e)})
+    try:
+        ok, message = await nmcli.configure(**configuration.dict())
+        log.debug("Wifi configure result: %s", message)
+    except (ValueError, TypeError) as e:
+        # Indicates an unexpected kwarg; check is done here to avoid keeping
+        # the _check_configure_args signature up to date with nmcli.configure
+        raise V1HandlerError(HTTPStatus.BAD_REQUEST, str(e))
 
     if not ok:
-        raise HTTPException(HTTPStatus.UNAUTHORIZED, {'message': message})
+        raise V1HandlerError(HTTPStatus.UNAUTHORIZED, message=message)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 
@@ -87,10 +91,24 @@ async def get_wifi_keys() -> WifiKeyFiles:
 
 @router.post("/wifi/keys",
              description="Send a new key file to the OT-2",
-             responses={HTTPStatus.CREATED: {"model": WifiKeyFile}},
-             response_model=WifiKeyFile)
-async def post_wifi_key(key: bytes = File(...)) -> WifiKeyFile:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+             responses={HTTPStatus.CREATED: {"model": AddWifiKeyFileResponse}},
+             response_model=AddWifiKeyFileResponse,
+             status_code=HTTPStatus.CREATED,
+             response_model_skip_defaults=True,
+             response_model_exclude_unset=True)
+async def post_wifi_key(key: UploadFile = File(...)):
+    add_key_result = wifi.add_key(key.filename, key.file.read())
+
+    response = AddWifiKeyFileResponse(
+        uri=f'/wifi/keys/{add_key_result.key.directory}',
+        id=add_key_result.key.directory,
+        name=os.path.basename(add_key_result.key.file)
+    )
+    if add_key_result.created:
+        return response
+    else:
+        response.message = 'Key file already present'
+        return JSONResponse(content=response.dict())
 
 
 @router.delete("/wifi/keys/{key_uuid}",
