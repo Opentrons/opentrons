@@ -28,13 +28,6 @@ mod_log = logging.getLogger(__name__)
 InstrumentsByMount = Dict[top_types.Mount, Optional[Pipette]]
 
 
-def shield(crf):
-    @functools.wraps(crf)
-    async def shielded(*args, **kwargs):
-        return await asyncio.shield(crf(*args, **kwargs))
-    return shielded
-
-
 class API(HardwareAPILike):
     """ This API is the primary interface to the hardware controller.
 
@@ -436,7 +429,6 @@ class API(HardwareAPILike):
                                          self._protected_tasks)
         asyncio.run_coroutine_threadsafe(cancel_tasks(), self._loop)
 
-    @shield
     async def stop(self):
         """
         Stop motion as soon as possible, reset, and home.
@@ -447,8 +439,8 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        await self.reset()
-        await self.home()
+        await asyncio.shield(self.reset(), loop=self.loop)
+        await asyncio.shield(self.home(), loop=self.loop)
 
     async def _wait_for_is_running(self):
         if not self.is_simulator:

@@ -438,7 +438,12 @@ class Session(object):
     def stop(self):
         self._hw_iface().halt()
         with self._motion_lock:
-            self._hw_iface().stop()
+            try:
+                self._hw_iface().stop()
+            except asyncio.CancelledError:
+                pass
+            finally:
+                self._hw_iface().stop()
         self.set_state('stopped')
         return self
 
@@ -524,7 +529,6 @@ class Session(object):
         except (SmoothieAlarm, asyncio.CancelledError,
                 ExecutionCancelledError):
             log.info("Protocol cancelled")
-            self.set_state('error')
         except Exception as e:
             log.exception("Exception during run:")
             self.error_append(e)
