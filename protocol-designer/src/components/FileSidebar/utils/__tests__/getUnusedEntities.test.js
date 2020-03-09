@@ -14,7 +14,7 @@ import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getUnusedEntities } from '../getUnusedEntities'
 
 describe('getUnusedEntities', () => {
-  test('pipette entities not used in steps are returned', () => {
+  it('pipette entities not used in steps are returned', () => {
     const stepForms = {
       step123: {
         pipette: 'pipette123',
@@ -46,7 +46,7 @@ describe('getUnusedEntities', () => {
     expect(result).toEqual([pipettesOnDeck.pipette456])
   })
 
-  test('module entities not used in steps are returned', () => {
+  it('module entities not used in steps are returned', () => {
     const stepForms = {
       step123: {
         moduleId: 'magnet123',

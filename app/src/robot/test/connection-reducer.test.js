@@ -4,7 +4,7 @@ import { robotReducer as reducer } from '../'
 const getState = state => state.connection
 
 describe('robot reducer - connection', () => {
-  test('initial state', () => {
+  it('initial state', () => {
     const state = reducer(undefined, {})
 
     expect(getState(state)).toEqual({
@@ -15,7 +15,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles CONNECT action', () => {
+  it('handles CONNECT action', () => {
     const state = {
       connection: {
         connectedTo: null,
@@ -37,7 +37,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles CONNECT_RESPONSE success', () => {
+  it('handles CONNECT_RESPONSE success', () => {
     const state = {
       connection: {
         connectedTo: null,
@@ -56,7 +56,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles CONNECT_RESPONSE failure', () => {
+  it('handles CONNECT_RESPONSE failure', () => {
     const state = {
       connection: {
         connectedTo: null,
@@ -82,7 +82,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles CLEAR_CONNECT_RESPONSE action', () => {
+  it('handles CLEAR_CONNECT_RESPONSE action', () => {
     const state = {
       connection: {
         connectedTo: null,
@@ -102,7 +102,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles DISCONNECT action', () => {
+  it('handles DISCONNECT action', () => {
     const state = {
       connection: {
         connectedTo: 'ot',
@@ -121,7 +121,7 @@ describe('robot reducer - connection', () => {
     })
   })
 
-  test('handles DISCONNECT_RESPONSE', () => {
+  it('handles DISCONNECT_RESPONSE', () => {
     const state = {
       connection: {
         connectedTo: 'ot',

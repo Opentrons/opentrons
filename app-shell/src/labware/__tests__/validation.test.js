@@ -5,7 +5,7 @@ import validLabwareA from '@opentrons/shared-data/labware/fixtures/2/fixture_96_
 import validLabwareB from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough.json'
 
 describe('validateLabwareFiles', () => {
-  test('handles unparseable and invalid labware files', () => {
+  it('handles unparseable and invalid labware files', () => {
     const files = [
       { filename: 'a.json', data: null, created: Date.now() },
       { filename: 'b.json', data: { baz: 'qux' }, created: Date.now() },
@@ -25,7 +25,7 @@ describe('validateLabwareFiles', () => {
     ])
   })
 
-  test('handles valid labware files', () => {
+  it('handles valid labware files', () => {
     const files = [
       { filename: 'a.json', data: validLabwareA, created: Date.now() },
       { filename: 'b.json', data: validLabwareB, created: Date.now() },
@@ -47,7 +47,7 @@ describe('validateLabwareFiles', () => {
     ])
   })
 
-  test('handles non-unique labware files', () => {
+  it('handles non-unique labware files', () => {
     const files = [
       { filename: 'a.json', data: validLabwareA, created: 3 },
       { filename: 'b.json', data: validLabwareB, created: 2 },
@@ -77,7 +77,7 @@ describe('validateLabwareFiles', () => {
     ])
   })
 
-  test('handles Opentrons-standard labware files', () => {
+  it('handles Opentrons-standard labware files', () => {
     const opentronsDef = { ...validLabwareA, namespace: 'opentrons' }
     const files = [
       { filename: 'a.json', data: opentronsDef, created: Date.now() },
@@ -95,7 +95,7 @@ describe('validateLabwareFiles', () => {
 })
 
 describe('validateNewLabwareFile', () => {
-  test('validates a new file', () => {
+  it('validates a new file', () => {
     const existing = []
     const newFile = {
       filename: 'a.json',
@@ -111,7 +111,7 @@ describe('validateNewLabwareFile', () => {
     })
   })
 
-  test('returns a duplicate if new file conflicts with existing', () => {
+  it('returns a duplicate if new file conflicts with existing', () => {
     const existing = [
       {
         type: 'VALID_LABWARE_FILE',

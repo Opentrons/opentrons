@@ -21,7 +21,7 @@ describe('shell epics', () => {
     jest.resetAllMocks()
   })
 
-  test('sendActionToShellEpic "dispatches" actions to IPC if meta.shell', () => {
+  it('sendActionToShellEpic "dispatches" actions to IPC if meta.shell', () => {
     const shellAction = { type: 'foo', meta: { shell: true } }
 
     testScheduler.run(({ hot, expectObservable }) => {
@@ -38,7 +38,7 @@ describe('shell epics', () => {
 
   // due to the use of `fromEvent`, this test doesn't work well as a marble
   // test. `toPromise` based expectation should be sufficient
-  test('catches actions from main', () => {
+  it('catches actions from main', () => {
     const shellAction = { type: 'bar' }
     const result = shellEpic(EMPTY)
       .pipe(take(1))

@@ -30,7 +30,7 @@ describe('aspirate', () => {
     }
   })
 
-  test('aspirate normally (with tip)', () => {
+  it('aspirate normally (with tip)', () => {
     const params = {
       ...flowRateAndOffsets,
       pipette: DEFAULT_PIPETTE,
@@ -48,7 +48,7 @@ describe('aspirate', () => {
     ])
   })
 
-  test('aspirate with volume > tip max volume should throw error', () => {
+  it('aspirate with volume > tip max volume should throw error', () => {
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
     ].tiprackDefURI = getLabwareDefURI(fixture_tiprack_10_ul)
@@ -75,7 +75,7 @@ describe('aspirate', () => {
     })
   })
 
-  test('aspirate with volume > pipette max volume should throw error', () => {
+  it('aspirate with volume > pipette max volume should throw error', () => {
     // NOTE: assigning p300 to a 1000uL tiprack is nonsense, just for this test
     invariantContext.pipetteEntities[
       DEFAULT_PIPETTE
@@ -103,7 +103,7 @@ describe('aspirate', () => {
     })
   })
 
-  test('aspirate with invalid pipette ID should return error', () => {
+  it('aspirate with invalid pipette ID should return error', () => {
     const result = aspirate(
       {
         ...flowRateAndOffsets,
@@ -119,7 +119,7 @@ describe('aspirate', () => {
     expectTimelineError(getErrorResult(result).errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
-  test('aspirate with no tip should return error', () => {
+  it('aspirate with no tip should return error', () => {
     const result = aspirate(
       {
         ...flowRateAndOffsets,
@@ -138,7 +138,7 @@ describe('aspirate', () => {
     })
   })
 
-  test('aspirate from nonexistent labware should return error', () => {
+  it('aspirate from nonexistent labware should return error', () => {
     const result = aspirate(
       {
         ...flowRateAndOffsets,

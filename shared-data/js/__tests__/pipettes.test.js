@@ -44,14 +44,14 @@ const PIPETTE_MODELS = [
 describe('pipette data accessors', () => {
   describe('getPipetteNameSpecs', () => {
     PIPETTE_NAMES.forEach(name =>
-      test(`name ${name} snapshot`, () =>
+      it(`name ${name} snapshot`, () =>
         expect(getPipetteNameSpecs(name)).toMatchSnapshot())
     )
   })
 
   describe('getPipetteModelSpecs', () => {
     PIPETTE_MODELS.forEach(model =>
-      test(`model ${model} snapshot`, () =>
+      it(`model ${model} snapshot`, () =>
         expect(getPipetteModelSpecs(model)).toMatchSnapshot())
     )
   })

@@ -4,6 +4,7 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import Deck, plan_moves
 from opentrons.protocol_api import labware, module_geometry
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.protocol_api.definitions import MAX_SUPPORTED_VERSION
 
 labware_name = 'corning_96_wellplate_360ul_flat'
 trough_name = 'usascientific_12_reservoir_22ml'
@@ -23,7 +24,9 @@ def test_slot_names():
             del d[slot]
             assert slot in d
             assert d[slot] is None
-            mod = module_geometry.load_module('tempdeck', d.position_for(slot))
+            mod = module_geometry.load_module(
+                module_geometry.TemperatureModuleModel.TEMPERATURE_V1,
+                d.position_for(slot))
             d[slot] = mod
             assert mod == d[slot]
 
@@ -35,7 +38,9 @@ def test_slot_names():
 def test_slot_collisions():
     d = Deck()
     mod_slot = '7'
-    mod = module_geometry.load_module('thermocycler', d.position_for(mod_slot))
+    mod = module_geometry.load_module(
+        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1,
+        d.position_for(mod_slot))
     d[mod_slot] = mod
     with pytest.raises(ValueError):
         d['7'] = 'not this time boyo'
@@ -61,7 +66,9 @@ def test_highest_z():
     assert deck.highest_z == pytest.approx(lw.wells()[0].top().point.z)
     del deck[1]
     assert deck.highest_z == 0
-    mod = module_geometry.load_module('tempdeck', deck.position_for(8))
+    mod = module_geometry.load_module(
+        module_geometry.TemperatureModuleModel.TEMPERATURE_V1,
+        deck.position_for(8))
     deck[8] = mod
     assert deck.highest_z == mod.highest_z
     lw = labware.load(labware_name, mod.location)
@@ -265,3 +272,28 @@ def test_direct_cp():
     assert to_normal[0][1] == CriticalPoint.XY_CENTER
     assert to_normal[1][1] is None
     assert to_normal[2][1] is None
+
+
+def test_gen2_module_transforms():
+    deck = Deck()
+    tmod = module_geometry.load_module(
+        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
+        deck.position_for('1'),
+        MAX_SUPPORTED_VERSION)
+    assert tmod.labware_offset == Point(-1.45, -0.15, 80.09)
+    tmod2 = module_geometry.load_module(
+        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
+        deck.position_for('3'),
+        MAX_SUPPORTED_VERSION)
+    assert tmod2.labware_offset == Point(1.15, -0.15, 80.09)
+
+    mmod = module_geometry.load_module(
+        module_geometry.MagneticModuleModel.MAGNETIC_V2,
+        deck.position_for('1'),
+        MAX_SUPPORTED_VERSION)
+    assert mmod.labware_offset == Point(-1.175, -0.125, 82.25)
+    mmod2 = module_geometry.load_module(
+        module_geometry.MagneticModuleModel.MAGNETIC_V2,
+        deck.position_for('3'),
+        MAX_SUPPORTED_VERSION)
+    assert mmod2.labware_offset == Point(1.425, -0.125, 82.25)

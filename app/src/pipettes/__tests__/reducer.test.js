@@ -104,6 +104,6 @@ const SPECS: Array<ReducerSpec> = [
 describe('pipettesReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    test(name, () => expect(pipettesReducer(state, action)).toEqual(expected))
+    it(name, () => expect(pipettesReducer(state, action)).toEqual(expected))
   })
 })

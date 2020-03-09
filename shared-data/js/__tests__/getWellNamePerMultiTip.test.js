@@ -9,7 +9,7 @@ import { getWellNamePerMultiTip } from '../helpers/getWellNamePerMultiTip'
 describe('96 plate', () => {
   const labware = fixture_96_plate
 
-  test('A1 => column 1', () => {
+  it('A1 => column 1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
       'A1',
       'B1',
@@ -22,7 +22,7 @@ describe('96 plate', () => {
     ])
   })
 
-  test('A2 => column 2', () => {
+  it('A2 => column 2', () => {
     expect(getWellNamePerMultiTip(labware, 'A2')).toEqual([
       'A2',
       'B2',
@@ -35,7 +35,7 @@ describe('96 plate', () => {
     ])
   })
 
-  test('B1 => null (cannot access with 8-channel)', () => {
+  it('B1 => null (cannot access with 8-channel)', () => {
     expect(getWellNamePerMultiTip(labware, 'B1')).toEqual(null)
   })
 })
@@ -43,7 +43,7 @@ describe('96 plate', () => {
 describe('384 plate', () => {
   const labware = fixture_384_plate
 
-  test('A1 => column 1 ACEGIKMO', () => {
+  it('A1 => column 1 ACEGIKMO', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
       'A1',
       'C1',
@@ -56,7 +56,7 @@ describe('384 plate', () => {
     ])
   })
 
-  test('A2 => column 2 ACEGIKMO', () => {
+  it('A2 => column 2 ACEGIKMO', () => {
     expect(getWellNamePerMultiTip(labware, 'A2')).toEqual([
       'A2',
       'C2',
@@ -69,7 +69,7 @@ describe('384 plate', () => {
     ])
   })
 
-  test('B1 => column 1 BDFHJLNP', () => {
+  it('B1 => column 1 BDFHJLNP', () => {
     expect(getWellNamePerMultiTip(labware, 'B1')).toEqual([
       'B1',
       'D1',
@@ -82,7 +82,7 @@ describe('384 plate', () => {
     ])
   })
 
-  test('C1 => null (cannot access with 8-channel)', () => {
+  it('C1 => null (cannot access with 8-channel)', () => {
     expect(getWellNamePerMultiTip(labware, 'C1')).toEqual(null)
   })
 })
@@ -90,7 +90,7 @@ describe('384 plate', () => {
 describe('Fixed trash', () => {
   const labware = fixture_trash
 
-  test('A1 => all tips in A1', () => {
+  it('A1 => all tips in A1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
       'A1',
       'A1',
@@ -103,14 +103,14 @@ describe('Fixed trash', () => {
     ])
   })
 
-  test('A2 => null (well does not exist)', () => {
+  it('A2 => null (well does not exist)', () => {
     expect(getWellNamePerMultiTip(labware, 'A2')).toEqual(null)
   })
 })
 
 describe('tube rack 2mL', () => {
   const labware = fixture_24_tuberack
-  test('tube rack 2mL not accessible by 8-channel (return null)', () => {
+  it('tube rack 2mL not accessible by 8-channel (return null)', () => {
     ;['A1', 'A2', 'B1', 'B2'].forEach(well => {
       expect(getWellNamePerMultiTip(labware, 'A1')).toEqual(null)
     })
@@ -120,7 +120,7 @@ describe('tube rack 2mL', () => {
 describe('12 channel trough', () => {
   const labware = fixture_12_trough
 
-  test('A1 => all tips in A1', () => {
+  it('A1 => all tips in A1', () => {
     expect(getWellNamePerMultiTip(labware, 'A1')).toEqual([
       'A1',
       'A1',
@@ -133,7 +133,7 @@ describe('12 channel trough', () => {
     ])
   })
 
-  test('A2 => all tips in A2', () => {
+  it('A2 => all tips in A2', () => {
     expect(getWellNamePerMultiTip(labware, 'A2')).toEqual([
       'A2',
       'A2',
@@ -146,7 +146,7 @@ describe('12 channel trough', () => {
     ])
   })
 
-  test('B1 => null (well does not exist)', () => {
+  it('B1 => null (well does not exist)', () => {
     expect(getWellNamePerMultiTip(labware, 'B1')).toEqual(null)
   })
 })

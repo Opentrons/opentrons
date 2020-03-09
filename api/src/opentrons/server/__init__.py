@@ -11,7 +11,7 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
-from opentrons.config import CONFIG, feature_flags as ff
+from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
@@ -141,9 +141,4 @@ def run(hardware: 'HardwareAPILike',
             hostname, port))
         path = None
 
-    if not ff.use_fast_api():
-        web.run_app(init(hardware=hardware),
-                    host=hostname, port=port, path=path)
-    else:
-        import opentrons.app
-        opentrons.app.run(hardware, hostname, port)
+    web.run_app(init(hardware=hardware), host=hostname, port=port, path=path)

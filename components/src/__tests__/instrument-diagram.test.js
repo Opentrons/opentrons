@@ -4,7 +4,7 @@ import Renderer from 'react-test-renderer'
 import { InstrumentDiagram, InstrumentGroup } from '..'
 
 describe('InstrumentDiagram', () => {
-  test('Single-channel renders correctly', () => {
+  it('Single-channel renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram channels={1} displayCategory="GEN1" />
     ).toJSON()
@@ -12,7 +12,7 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Multi-channel renders correctly', () => {
+  it('Multi-channel renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram channels={8} displayCategory="GEN1" />
     ).toJSON()
@@ -20,7 +20,7 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Single-channel GEN2 renders correctly', () => {
+  it('Single-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram channels={1} displayCategory="GEN2" />
     ).toJSON()
@@ -28,7 +28,7 @@ describe('InstrumentDiagram', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Multi-channel GEN2 renders correctly', () => {
+  it('Multi-channel GEN2 renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentDiagram channels={8} displayCategory="GEN2" />
     ).toJSON()
@@ -38,7 +38,7 @@ describe('InstrumentDiagram', () => {
 })
 
 describe('InstrumentGroup', () => {
-  test('Renders correctly', () => {
+  it('Renders correctly', () => {
     const tree = Renderer.create(
       <InstrumentGroup
         left={{

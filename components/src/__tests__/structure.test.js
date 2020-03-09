@@ -14,7 +14,7 @@ import {
 } from '..'
 
 describe('TitleBar', () => {
-  test('adds an h1 with the title', () => {
+  it('adds an h1 with the title', () => {
     const heading = Renderer.create(<TitleBar title="hello" />).root.findByType(
       'h1'
     )
@@ -23,7 +23,7 @@ describe('TitleBar', () => {
     expect(heading.children).toEqual(['hello'])
   })
 
-  test('adds an optional h2 with the subtitle', () => {
+  it('adds an optional h2 with the subtitle', () => {
     const heading = Renderer.create(
       <TitleBar title="hello" subtitle="world" />
     ).root.findByType('h2')
@@ -32,7 +32,7 @@ describe('TitleBar', () => {
     expect(heading.children).toEqual(['world'])
   })
 
-  test('add optional back button', () => {
+  it('add optional back button', () => {
     const onBackClick = jest.fn()
     const button = Renderer.create(
       <TitleBar title="hello" onBackClick={onBackClick} />
@@ -42,13 +42,13 @@ describe('TitleBar', () => {
     expect(onBackClick).toHaveBeenCalled()
   })
 
-  test('renders TitleBar without subtitle correctly', () => {
+  it('renders TitleBar without subtitle correctly', () => {
     const tree = Renderer.create(<TitleBar title="foo" />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders TitleBar with subtitle correctly', () => {
+  it('renders TitleBar with subtitle correctly', () => {
     const tree = Renderer.create(
       <TitleBar title="foo" subtitle="bar" />
     ).toJSON()
@@ -56,7 +56,7 @@ describe('TitleBar', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders TitleBar with back button correctly', () => {
+  it('renders TitleBar with back button correctly', () => {
     const tree = Renderer.create(
       <TitleBar title="foo" subtitle="bar" onBackClick={() => {}} />
     ).toJSON()
@@ -66,7 +66,7 @@ describe('TitleBar', () => {
 })
 
 describe('PageTabs', () => {
-  test('renders h3 links for each page', () => {
+  it('renders h3 links for each page', () => {
     const pages = [
       { title: 'Page1', href: '/page1', isActive: false, isDisabled: false },
       { title: 'Page2', href: '/page2', isActive: false, isDisabled: false },
@@ -88,7 +88,7 @@ describe('PageTabs', () => {
     })
   })
 
-  test('does not create a link if disabled', () => {
+  it('does not create a link if disabled', () => {
     const pages = [
       { title: 'Page1', href: '/page1', isActive: false, isDisabled: true },
     ]
@@ -102,7 +102,7 @@ describe('PageTabs', () => {
     expect(notLink.findByType('h3').children).toEqual([pages[0].title])
   })
 
-  test('adds active class if active', () => {
+  it('adds active class if active', () => {
     const pages = [
       { title: 'Page1', href: '/page1', isActive: true, isDisabled: false },
     ]
@@ -116,7 +116,7 @@ describe('PageTabs', () => {
     expect(link.props.className).toMatch(/active/)
   })
 
-  test('renders PageTabs correctly', () => {
+  it('renders PageTabs correctly', () => {
     const pages = [
       { title: 'Page1', href: '/page1', isActive: true, isDisabled: false },
       { title: 'Page2', href: '/page2', isActive: false, isDisabled: true },
@@ -133,7 +133,7 @@ describe('PageTabs', () => {
 })
 
 describe('Card', () => {
-  test('renders Card correctly', () => {
+  it('renders Card correctly', () => {
     const tree = Renderer.create(
       <Card title={'title'}>children children children</Card>
     ).toJSON()
@@ -143,14 +143,14 @@ describe('Card', () => {
 })
 
 describe('RefreshCard', () => {
-  test('calls refresh on mount', () => {
+  it('calls refresh on mount', () => {
     const refresh = jest.fn()
     Renderer.create(<RefreshCard id="foo" refresh={refresh} />)
 
     expect(refresh).toHaveBeenCalledTimes(1)
   })
 
-  test('calls refresh on id change', () => {
+  it('calls refresh on id change', () => {
     const refresh = jest.fn()
     const renderer = Renderer.create(
       <RefreshCard watch="foo" refresh={refresh} />
@@ -166,7 +166,7 @@ describe('RefreshCard', () => {
     expect(refresh).toHaveBeenCalledTimes(0)
   })
 
-  test('renders correctly', () => {
+  it('renders correctly', () => {
     const tree = Renderer.create(
       <RefreshCard watch="foo" refresh={() => {}} refreshing>
         child1 child2 child3
@@ -178,7 +178,7 @@ describe('RefreshCard', () => {
 })
 
 describe('LabeledValue', () => {
-  test('renders LabeledValue correctly', () => {
+  it('renders LabeledValue correctly', () => {
     const tree = Renderer.create(
       <LabeledValue label={'Label'} value={'Value'} />
     ).toJSON()
@@ -188,13 +188,13 @@ describe('LabeledValue', () => {
 })
 
 describe('Splash', () => {
-  test('renders correctly with no props', () => {
+  it('renders correctly with no props', () => {
     const tree = Renderer.create(<Splash />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders correctly with custom props', () => {
+  it('renders correctly with custom props', () => {
     const tree = Renderer.create(
       <Splash iconName="flask-outline" className="swag" />
     ).toJSON()
@@ -204,7 +204,7 @@ describe('Splash', () => {
 })
 
 describe('Pill', () => {
-  test('renders Pill correctly', () => {
+  it('renders Pill correctly', () => {
     const tree = Renderer.create(
       <Pill color="blue" className="foo">
         Blue
@@ -214,7 +214,7 @@ describe('Pill', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders Pill correctly with inverted text', () => {
+  it('renders Pill correctly with inverted text', () => {
     const tree = Renderer.create(
       <Pill color="blue" className="foo" invertTextColor>
         Blue

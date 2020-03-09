@@ -6,7 +6,7 @@ import Renderer from 'react-test-renderer'
 import { SidePanelGroup, TitledList, ListItem, ListAlert } from '..'
 
 describe('TitledList', () => {
-  test('adds an h3 with the title', () => {
+  it('adds an h3 with the title', () => {
     const heading = Renderer.create(
       <TitledList title="hello" />
     ).root.findByType('h3')
@@ -15,7 +15,7 @@ describe('TitledList', () => {
     expect(heading.children).toEqual(['hello'])
   })
 
-  test('adds an optional svg icon to title', () => {
+  it('adds an optional svg icon to title', () => {
     const icon = Renderer.create(
       <TitledList title="hello" iconName="flask-outline" />
     ).root.findByType('svg')
@@ -23,13 +23,13 @@ describe('TitledList', () => {
     expect(icon).toBeDefined()
   })
 
-  test('renders TitledList without icon correctly', () => {
+  it('renders TitledList without icon correctly', () => {
     const tree = Renderer.create(<TitledList title="foo" />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders TitledList with children correctly', () => {
+  it('renders TitledList with children correctly', () => {
     const tree = Renderer.create(
       <TitledList title="foo">
         <li>Woop</li>
@@ -39,7 +39,7 @@ describe('TitledList', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
+  it('renders TitledList with onMouseEnter & onMouseLeave correctly', () => {
     const noop = () => {}
 
     const tree = Renderer.create(
@@ -49,7 +49,7 @@ describe('TitledList', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders TitledList with optional icon correctly', () => {
+  it('renders TitledList with optional icon correctly', () => {
     const tree = Renderer.create(
       <TitledList title="foo" icon="flask-outline" />
     ).toJSON()
@@ -57,7 +57,7 @@ describe('TitledList', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders expanded TitledList correctly', () => {
+  it('renders expanded TitledList correctly', () => {
     const tree = Renderer.create(
       <TitledList
         onCollapseToggle={e => {}}
@@ -71,7 +71,7 @@ describe('TitledList', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders collapsed TitledList correctly', () => {
+  it('renders collapsed TitledList correctly', () => {
     const tree = Renderer.create(
       <TitledList
         onCollapseToggle={e => {}}
@@ -88,7 +88,7 @@ describe('TitledList', () => {
 })
 
 describe('ListItem', () => {
-  test('creates a linked list item from props', () => {
+  it('creates a linked list item from props', () => {
     const linkItemProps = {
       url: '/foo/bar',
       isDisabled: false,
@@ -105,7 +105,7 @@ describe('ListItem', () => {
     expect(link.props.disabled).toBe(false)
   })
 
-  test('adds an optional svg icon as child', () => {
+  it('adds an optional svg icon as child', () => {
     const icon = Renderer.create(
       <ListItem iconName="check-circle" />
     ).root.findByType('svg')
@@ -113,7 +113,7 @@ describe('ListItem', () => {
     expect(icon).toBeDefined()
   })
 
-  test('renders ListItem with icon correctly', () => {
+  it('renders ListItem with icon correctly', () => {
     const tree = Renderer.create(
       <ListItem to="/hello" iconName="check-circle" isDisabled="false" />
     ).toJSON()
@@ -121,7 +121,7 @@ describe('ListItem', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders ListItem without icon correctly', () => {
+  it('renders ListItem without icon correctly', () => {
     const tree = Renderer.create(
       <ListItem to="/hello" isDisabled="false" />
     ).toJSON()
@@ -129,7 +129,7 @@ describe('ListItem', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Side Panel Group renders correctly', () => {
+  it('Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
       <SidePanelGroup title="title" iconName="flask-outline">
         children
@@ -139,7 +139,7 @@ describe('ListItem', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Disabled Side Panel Group renders correctly', () => {
+  it('Disabled Side Panel Group renders correctly', () => {
     const tree = Renderer.create(
       <SidePanelGroup title="title" iconName="flask-outline" disabled>
         children
@@ -151,7 +151,7 @@ describe('ListItem', () => {
 })
 
 describe('ListAlert', () => {
-  test('list alert renders correctly', () => {
+  it('list alert renders correctly', () => {
     const tree = Renderer.create(<ListAlert>alert alert</ListAlert>).toJSON()
 
     expect(tree).toMatchSnapshot()

@@ -12,7 +12,7 @@ import {
 } from '..'
 
 describe('modals', () => {
-  test('Modal has a clickable overlay', () => {
+  it('Modal has a clickable overlay', () => {
     const onCloseClick = jest.fn()
     const root = Renderer.create(
       <Modal onCloseClick={onCloseClick}>children</Modal>
@@ -24,7 +24,7 @@ describe('modals', () => {
     expect(onCloseClick).toHaveBeenCalled()
   })
 
-  test('ContinueModal has continue and cancel buttons', () => {
+  it('ContinueModal has continue and cancel buttons', () => {
     const onCancelClick = jest.fn()
     const onContinueClick = jest.fn()
     const root = Renderer.create(
@@ -46,7 +46,7 @@ describe('modals', () => {
     expect(onContinueClick).toHaveBeenCalled()
   })
 
-  test('ContinueModal calls onCancelClick on overlay click', () => {
+  it('ContinueModal calls onCancelClick on overlay click', () => {
     const onCancelClick = jest.fn()
     const onContinueClick = jest.fn()
     const root = Renderer.create(
@@ -64,7 +64,7 @@ describe('modals', () => {
     expect(onCancelClick).toHaveBeenCalled()
   })
 
-  test('Modal renders correctly', () => {
+  it('Modal renders correctly', () => {
     const tree = Renderer.create(
       <Modal onCloseClick={() => {}} className="foo">
         children
@@ -74,7 +74,7 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Modal renders correctly with optional heading', () => {
+  it('Modal renders correctly with optional heading', () => {
     const tree = Renderer.create(
       <Modal
         onCloseClick={() => {}}
@@ -88,7 +88,7 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('AlertModal renders correctly', () => {
+  it('AlertModal renders correctly', () => {
     const tree = Renderer.create(
       <AlertModal
         heading={'heading'}
@@ -106,7 +106,7 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('ContinueModal renders correctly', () => {
+  it('ContinueModal renders correctly', () => {
     const tree = Renderer.create(
       <ContinueModal onCancelClick={() => {}} onContinueClick={() => {}}>
         children
@@ -116,13 +116,13 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('Overlay renders correctly', () => {
+  it('Overlay renders correctly', () => {
     const tree = Renderer.create(<Overlay onClick={() => {}} />).toJSON()
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('ModalPage renders correctly', () => {
+  it('ModalPage renders correctly', () => {
     const tree = Renderer.create(
       <ModalPage
         titleBar={{
@@ -141,7 +141,7 @@ describe('modals', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('SpinnerModalPage renders correctly', () => {
+  it('SpinnerModalPage renders correctly', () => {
     const tree = Renderer.create(
       <SpinnerModalPage
         titleBar={{

@@ -27,20 +27,20 @@ describe('IconCta', () => {
     jest.resetAllMocks()
   })
 
-  test('renders a <button>', () => {
+  it('renders a <button>', () => {
     expect(wrapper.find('button')).toHaveLength(1)
   })
 
-  test('renders an <Icon>', () => {
+  it('renders an <Icon>', () => {
     const icon = wrapper.find(Icon)
     expect(icon.prop('name')).toEqual(ICON_NAME)
   })
 
-  test('renders text', () => {
+  it('renders text', () => {
     expect(wrapper.find('span').html()).toContain(TEXT)
   })
 
-  test('is clickable', () => {
+  it('is clickable', () => {
     expect(mockHandleClick).toHaveBeenCalledTimes(0)
     wrapper.find('button').invoke('onClick')()
     expect(mockHandleClick).toHaveBeenCalledTimes(1)

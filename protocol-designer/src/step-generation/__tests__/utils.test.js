@@ -33,21 +33,21 @@ describe('splitLiquid', () => {
     ingred2: { volume: 300 },
   }
 
-  test('simple split with 1 ingredient in source', () => {
+  it('simple split with 1 ingredient in source', () => {
     expect(splitLiquid(60, singleIngred)).toEqual({
       source: { ingred1: { volume: 40 } },
       dest: { ingred1: { volume: 60 } },
     })
   })
 
-  test('get 0 volume in source when you split it all', () => {
+  it('get 0 volume in source when you split it all', () => {
     expect(splitLiquid(100, singleIngred)).toEqual({
       source: { ingred1: { volume: 0 } },
       dest: { ingred1: { volume: 100 } },
     })
   })
 
-  test('split with 2 ingredients in source', () => {
+  it('split with 2 ingredients in source', () => {
     expect(splitLiquid(20, twoIngred)).toEqual({
       source: {
         ingred1: { volume: 95 },
@@ -60,7 +60,7 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('split all with 2 ingredients', () => {
+  it('split all with 2 ingredients', () => {
     expect(splitLiquid(400, twoIngred)).toEqual({
       source: {
         ingred1: { volume: 0 },
@@ -70,7 +70,7 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('taking out 0 volume results in same source, empty dest', () => {
+  it('taking out 0 volume results in same source, empty dest', () => {
     expect(splitLiquid(0, twoIngred)).toEqual({
       source: twoIngred,
       dest: {
@@ -80,7 +80,7 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('split with 2 ingreds, one has 0 vol', () => {
+  it('split with 2 ingreds, one has 0 vol', () => {
     expect(
       splitLiquid(50, {
         ingred1: { volume: 200 },
@@ -98,7 +98,7 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('split with 2 ingredients, floating-point volume', () => {
+  it('split with 2 ingredients, floating-point volume', () => {
     expect(
       splitLiquid(
         1000 / 3, // ~333.33
@@ -116,21 +116,21 @@ describe('splitLiquid', () => {
     })
   })
 
-  test('splitting with no ingredients in source just splits "air"', () => {
+  it('splitting with no ingredients in source just splits "air"', () => {
     expect(splitLiquid(100, {})).toEqual({
       source: {},
       dest: { [AIR]: { volume: 100 } },
     })
   })
 
-  test('splitting with 0 volume in source just splits "air"', () => {
+  it('splitting with 0 volume in source just splits "air"', () => {
     expect(splitLiquid(100, { ingred1: { volume: 0 } })).toEqual({
       source: { ingred1: { volume: 0 } },
       dest: { [AIR]: { volume: 100 } },
     })
   })
 
-  test('splitting with excessive volume leaves "air" in dest', () => {
+  it('splitting with excessive volume leaves "air" in dest', () => {
     expect(
       splitLiquid(100, { ingred1: { volume: 50 }, ingred2: { volume: 20 } })
     ).toEqual({
@@ -144,14 +144,14 @@ describe('splitLiquid', () => {
   })
 
   // TODO Ian 2018-03-19 figure out what to do with air warning reporting
-  test.todo('splitting with air in source should do something (throw error???)')
+  it.todo('splitting with air in source should do something (throw error???)')
   // expect(() =>
   // splitLiquid(50, { ingred1: { volume: 100 }, [AIR]: { volume: 20 } })
   // ).toThrow(/source cannot contain air/)
 })
 
 describe('mergeLiquid', () => {
-  test('merge ingreds 1 2 with 2 3 to get 1 2 3', () => {
+  it('merge ingreds 1 2 with 2 3 to get 1 2 3', () => {
     expect(
       mergeLiquid(
         {
@@ -170,7 +170,7 @@ describe('mergeLiquid', () => {
     })
   })
 
-  test('merge ingreds 3 with 1 2 to get 1 2 3', () => {
+  it('merge ingreds 3 with 1 2 to get 1 2 3', () => {
     expect(
       mergeLiquid(
         {
@@ -190,7 +190,7 @@ describe('mergeLiquid', () => {
 })
 
 describe('repeatArray', () => {
-  test('repeat array of objects', () => {
+  it('repeat array of objects', () => {
     expect(repeatArray([{ a: 1 }, { b: 2 }, { c: 3 }], 3)).toEqual([
       { a: 1 },
       { b: 2 },
@@ -204,7 +204,7 @@ describe('repeatArray', () => {
     ])
   })
 
-  test('repeat array of arrays', () => {
+  it('repeat array of arrays', () => {
     expect(repeatArray([[1, 2], [3, 4]], 4)).toEqual([
       [1, 2],
       [3, 4],

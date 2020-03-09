@@ -24,7 +24,7 @@ describe('getHoveredStepLabware', () => {
     }
   })
 
-  test('no labware is returned when no hovered step', () => {
+  it('no labware is returned when no hovered step', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
       labware,
@@ -41,7 +41,7 @@ describe('getHoveredStepLabware', () => {
     expect(result).toEqual([])
   })
 
-  test('no labware is returned when step is not found', () => {
+  it('no labware is returned when step is not found', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
       labware,
@@ -58,7 +58,7 @@ describe('getHoveredStepLabware', () => {
     expect(result).toEqual([])
   })
 
-  test('no labware is returned when no step arguments', () => {
+  it('no labware is returned when no step arguments', () => {
     const stepArgs = null
     const argsByStepId = createArgsForStepId(hoveredStepId, stepArgs)
 
@@ -71,7 +71,7 @@ describe('getHoveredStepLabware', () => {
     expect(result).toEqual([])
   })
   ;['consolidate', 'distribute', 'transfer'].forEach(command => {
-    test(`source and destination labware is returned when ${command}`, () => {
+    it(`source and destination labware is returned when ${command}`, () => {
       const sourceLabware = 'test tube'
       const stepArgs = {
         commandCreatorFnName: command,
@@ -90,7 +90,7 @@ describe('getHoveredStepLabware', () => {
     })
   })
 
-  test('labware is returned when command is mix', () => {
+  it('labware is returned when command is mix', () => {
     const stepArgs = {
       commandCreatorFnName: mixCommand,
       labware,
@@ -133,7 +133,7 @@ describe('getHoveredStepLabware', () => {
       }
     })
 
-    test('labware on module is returned when module id exists', () => {
+    it('labware on module is returned when module id exists', () => {
       utils.getLabwareOnModule = jest.fn().mockReturnValue({ id: labware })
       const stepArgs = {
         commandCreatorFnName: setTempCommand,
@@ -150,7 +150,7 @@ describe('getHoveredStepLabware', () => {
       expect(result).toEqual([labware])
     })
 
-    test('no labware is returned when no labware on module', () => {
+    it('no labware is returned when no labware on module', () => {
       utils.getLabwareOnModule = jest.fn().mockReturnValue(null)
       const stepArgs = {
         commandCreatorFnName: setTempCommand,

@@ -11,7 +11,7 @@ import {
 } from '..'
 
 describe('CheckboxField', () => {
-  test('renders correctly when unchecked', () => {
+  it('renders correctly when unchecked', () => {
     const tree = Renderer.create(
       <CheckboxField label="Check Box 1" className="foo" />
     ).toJSON()
@@ -19,7 +19,7 @@ describe('CheckboxField', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders correctly when checked', () => {
+  it('renders correctly when checked', () => {
     const tree = Renderer.create(
       <CheckboxField label="Check Box 1" className="foo" value />
     ).toJSON()
@@ -29,7 +29,7 @@ describe('CheckboxField', () => {
 })
 
 describe('DropdownField', () => {
-  test('renders correctly with a value', () => {
+  it('renders correctly with a value', () => {
     const tree = Renderer.create(
       <DropdownField
         className="foo"
@@ -45,7 +45,7 @@ describe('DropdownField', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders correctly with a falsey value', () => {
+  it('renders correctly with a falsey value', () => {
     const tree = Renderer.create(
       <DropdownField
         className="foo"
@@ -63,7 +63,7 @@ describe('DropdownField', () => {
 })
 
 describe('FormGroup', () => {
-  test('renders correctly', () => {
+  it('renders correctly', () => {
     const tree = Renderer.create(
       <FormGroup className="foo" label="This is the label">
         <div>Hey test here</div>
@@ -76,7 +76,7 @@ describe('FormGroup', () => {
 })
 
 describe('InputField', () => {
-  test('renders correctly', () => {
+  it('renders correctly', () => {
     const tree = Renderer.create(
       <InputField
         label="Input field"
@@ -91,7 +91,7 @@ describe('InputField', () => {
 })
 
 describe('RadioGroup', () => {
-  test('renders correctly with no checked value', () => {
+  it('renders correctly with no checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
         options={[
@@ -105,7 +105,7 @@ describe('RadioGroup', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders correctly with checked value', () => {
+  it('renders correctly with checked value', () => {
     const tree = Renderer.create(
       <RadioGroup
         value="chocolate"
@@ -120,7 +120,7 @@ describe('RadioGroup', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders correctly inline', () => {
+  it('renders correctly inline', () => {
     const tree = Renderer.create(
       <RadioGroup
         value={'chocolate'}

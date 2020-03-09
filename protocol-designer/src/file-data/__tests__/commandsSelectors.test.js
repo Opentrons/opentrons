@@ -51,17 +51,17 @@ function hasAllWellKeys(result) {
 }
 
 describe('getLabwareLiquidState', () => {
-  test('no labware + no ingreds', () => {
+  it('no labware + no ingreds', () => {
     expect(getLabwareLiquidState.resultFunc({}, {})).toEqual({})
   })
 
-  test('labware + no ingreds: generate empty well keys', () => {
+  it('labware + no ingreds: generate empty well keys', () => {
     const result = getLabwareLiquidState.resultFunc({}, labwareEntities)
 
     hasAllWellKeys(result)
   })
 
-  test('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
+  it('selects liquids with multiple ingredient groups & multiple labware: generate all well keys', () => {
     const result = getLabwareLiquidState.resultFunc(ingredLocs, labwareEntities)
 
     expect(result).toMatchObject(ingredLocs)
@@ -71,7 +71,7 @@ describe('getLabwareLiquidState', () => {
 })
 
 describe('getRobotStateTimeline', () => {
-  test('performs eager tip dropping', () => {
+  it('performs eager tip dropping', () => {
     const allStepArgsAndErrors = {
       a: {
         stepArgs: {

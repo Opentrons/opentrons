@@ -34,11 +34,11 @@ describe('no-op cases should pass through the patch unchanged', () => {
     blah: 'blaaah',
   }
 
-  test('empty patch', () => {
+  it('empty patch', () => {
     const patch = {}
     expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
-  test('patch with unhandled field', () => {
+  it('patch with unhandled field', () => {
     const patch = { fooField: 123 }
     expect(handleFormHelper(patch, minimalBaseForm)).toBe(patch)
   })
@@ -55,17 +55,17 @@ describe('well selection should update', () => {
     }
   })
 
-  test('pipette cleared', () => {
+  it('pipette cleared', () => {
     const patch = { pipette: null }
     expect(handleFormHelper(patch, form)).toEqual({ ...patch, wells: [] })
   })
 
-  test('pipette single -> multi', () => {
+  it('pipette single -> multi', () => {
     const patch = { pipette: 'pipetteMultiId' }
     expect(handleFormHelper(patch, form)).toEqual({ ...patch, wells: [] })
   })
 
-  test('pipette multi -> single', () => {
+  it('pipette multi -> single', () => {
     const multiChForm = {
       ...form,
       pipette: 'pipetteMultiId',
@@ -78,7 +78,7 @@ describe('well selection should update', () => {
     })
   })
 
-  test('select single-well labware', () => {
+  it('select single-well labware', () => {
     const patch = { labware: 'trashId' }
     expect(handleFormHelper(patch, form)).toEqual({
       ...patch,
@@ -87,7 +87,7 @@ describe('well selection should update', () => {
     })
   })
 
-  test('select labware with multiple wells', () => {
+  it('select labware with multiple wells', () => {
     const trashLabwareForm = { ...form, labware: 'trashId' }
     const patch = { labware: 'plateId' }
     expect(handleFormHelper(patch, trashLabwareForm)).toEqual({

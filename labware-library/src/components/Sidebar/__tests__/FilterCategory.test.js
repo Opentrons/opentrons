@@ -8,7 +8,7 @@ import { FilterCategory } from '../FilterCategory'
 jest.mock('../../../definitions')
 
 describe('FilterCategory', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const filters = { category: 'all', manufacturer: 'all' }
     const tree = shallow(<FilterCategory filters={filters} />)
 

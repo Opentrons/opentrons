@@ -55,7 +55,7 @@ describe('updatePipetteSettingsEpic', () => {
       meta,
     }
 
-    test('calls PATCH /settings/pipettes/:pipetteId', () => {
+    it('calls PATCH /settings/pipettes/:pipetteId', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockFetchPipetteSettingsSuccess })
@@ -80,7 +80,7 @@ describe('updatePipetteSettingsEpic', () => {
       })
     })
 
-    test('maps successful response to UPDATE_PIPETTE_SETTINGS_SUCCESS', () => {
+    it('maps successful response to UPDATE_PIPETTE_SETTINGS_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockUpdatePipetteSettingsSuccess })
@@ -101,7 +101,7 @@ describe('updatePipetteSettingsEpic', () => {
       })
     })
 
-    test('maps failed response to UPDATE_PIPETTE_SETTINGS_FAILURE', () => {
+    it('maps failed response to UPDATE_PIPETTE_SETTINGS_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockUpdatePipetteSettingsFailure })

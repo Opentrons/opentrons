@@ -204,7 +204,7 @@ async def async_server(hardware, virtual_smoothie_env, loop):
 @pytest.fixture
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
-    endpoints.session = None
+    endpoints.session_wrapper.session = None
     try:
         yield cli
     finally:
@@ -224,9 +224,9 @@ async def dc_session(request, async_server, monkeypatch, loop):
         types.Mount.LEFT: None,
         types.Mount.RIGHT: 'p300_multi_v1'})
     ses = endpoints.SessionManager(hw)
-    endpoints.session = ses
-    monkeypatch.setattr(endpoints, 'session', ses)
+    endpoints.session_wrapper.session = ses
     yield ses
+    endpoints.session_wrapper.session = None
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -536,6 +536,16 @@ def get_json_protocol_fixture():
                 return contents
 
     return _get_json_protocol_fixture
+
+
+@pytest.fixture
+def get_module_fixture():
+    def _get_module_fixture(fixture_name):
+        with open(pathlib.Path(__file__).parent
+                  / '..' / '..' / '..' / 'shared-data' / 'module' / 'fixtures'
+                  / '2' / f'{fixture_name}.json', 'rb') as f:
+            return json.loads(f.read().decode('utf-8'))
+    return _get_module_fixture
 
 
 @pytest.fixture

@@ -15,7 +15,7 @@ const mockMainWindow = { mainWindow: true }
 
 describe('dialog boxes', () => {
   describe('showOpenDirectoryDialog', () => {
-    test('directory select with cancel', () => {
+    it('directory select with cancel', () => {
       mockShowOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
 
       return Dialogs.showOpenDirectoryDialog(mockMainWindow).then(filePaths => {
@@ -26,7 +26,7 @@ describe('dialog boxes', () => {
       })
     })
 
-    test('directory select with files', () => {
+    it('directory select with files', () => {
       mockShowOpenDialog.mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/dir'],
@@ -40,7 +40,7 @@ describe('dialog boxes', () => {
       })
     })
 
-    test('directory select with default location', () => {
+    it('directory select with default location', () => {
       mockShowOpenDialog.mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/dir'],
@@ -59,7 +59,7 @@ describe('dialog boxes', () => {
   })
 
   describe('showOpenFileDialog', () => {
-    test('file select with cancel', () => {
+    it('file select with cancel', () => {
       mockShowOpenDialog.mockResolvedValue({ canceled: true, filePaths: [] })
 
       return Dialogs.showOpenFileDialog(mockMainWindow).then(filePaths => {
@@ -70,7 +70,7 @@ describe('dialog boxes', () => {
       })
     })
 
-    test('file select with files', () => {
+    it('file select with files', () => {
       mockShowOpenDialog.mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],
@@ -84,7 +84,7 @@ describe('dialog boxes', () => {
       })
     })
 
-    test('file select with filters', () => {
+    it('file select with filters', () => {
       mockShowOpenDialog.mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],
@@ -103,7 +103,7 @@ describe('dialog boxes', () => {
       )
     })
 
-    test('file select with default location', () => {
+    it('file select with default location', () => {
       mockShowOpenDialog.mockResolvedValue({
         canceled: false,
         filePaths: ['/path/to/file.json'],

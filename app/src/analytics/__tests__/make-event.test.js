@@ -16,7 +16,7 @@ describe('analytics events map', () => {
     jest.resetAllMocks()
   })
 
-  test('robot:CONNECT_RESPONSE -> robotConnected event', () => {
+  it('robot:CONNECT_RESPONSE -> robotConnected event', () => {
     discoverySelectors.getConnectedRobot.mockImplementation(state => {
       if (state === 'wired') {
         return {
@@ -80,7 +80,7 @@ describe('analytics events map', () => {
       selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)
     })
 
-    test('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
+    it('robot:PROTOCOL_UPLOAD > protocolUploadRequest', () => {
       const nextState = {}
       const success = { type: 'protocol:UPLOAD', payload: {} }
 
@@ -90,7 +90,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:SESSION_RESPONSE with upload in flight', () => {
+    it('robot:SESSION_RESPONSE with upload in flight', () => {
       const nextState = {}
       const success = {
         type: 'robot:SESSION_RESPONSE',
@@ -104,7 +104,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:SESSION_ERROR with upload in flight', () => {
+    it('robot:SESSION_ERROR with upload in flight', () => {
       const nextState = {}
       const failure = {
         type: 'robot:SESSION_ERROR',
@@ -118,7 +118,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
+    it('robot:SESSION_RESPONSE/ERROR with no upload in flight', () => {
       const nextState = {}
       const success = {
         type: 'robot:SESSION_RESPONSE',
@@ -137,7 +137,7 @@ describe('analytics events map', () => {
       ])
     })
 
-    test('robot:RUN -> runStart event', () => {
+    it('robot:RUN -> runStart event', () => {
       const state = {}
       const action = { type: 'robot:RUN' }
 
@@ -147,7 +147,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:RUN_RESPONSE success -> runFinish event', () => {
+    it('robot:RUN_RESPONSE success -> runFinish event', () => {
       const state = {}
       const action = { type: 'robot:RUN_RESPONSE', error: false }
 
@@ -159,7 +159,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:RUN_RESPONSE error -> runFinish event', () => {
+    it('robot:RUN_RESPONSE error -> runFinish event', () => {
       const state = {}
       const action = {
         type: 'robot:RUN_RESPONSE',
@@ -180,7 +180,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:PAUSE -> runPause event', () => {
+    it('robot:PAUSE -> runPause event', () => {
       const state = {}
       const action = { type: 'robot:PAUSE' }
 
@@ -195,7 +195,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:RESUME -> runResume event', () => {
+    it('robot:RESUME -> runResume event', () => {
       const state = {}
       const action = { type: 'robot:RESUME' }
 
@@ -210,7 +210,7 @@ describe('analytics events map', () => {
       })
     })
 
-    test('robot:CANCEL-> runCancel event', () => {
+    it('robot:CANCEL-> runCancel event', () => {
       const state = {}
       const action = { type: 'robot:CANCEL' }
 

@@ -15,7 +15,7 @@ const ajv = new Ajv({
 const validate = ajv.compile(labwareSchemaV1)
 
 describe('test the schema against a minimalist fixture', () => {
-  test('...', () => {
+  it('...', () => {
     const minimalLabwareDef = {
       metadata: {
         name: 'test-labware',
@@ -42,7 +42,7 @@ describe('test the schema against a minimalist fixture', () => {
     expect(valid).toBe(true)
   })
 
-  test('fail on bad labware', () => {
+  it('fail on bad labware', () => {
     const badDef = {
       metadata: { name: 'bad' },
       ordering: ['A1'], // array of strings not array of arrays
@@ -63,7 +63,7 @@ describe('test the schema against a minimalist fixture', () => {
 describe('test schemas of all definitions', () => {
   const labwarePaths = glob.sync(DEFINITIONS_GLOB_PATTERN, GLOB_OPTIONS)
 
-  test('got at least 1 labware definition file', () => {
+  it('got at least 1 labware definition file', () => {
     // Make sure definitions path didn't break, which would give you false positives
     expect(labwarePaths.length).toBeGreaterThan(0)
   })
@@ -71,14 +71,14 @@ describe('test schemas of all definitions', () => {
   labwarePaths.forEach(labwarePath => {
     const filename = path.parse(labwarePath).name
     const labwareDef = require(labwarePath)
-    test(filename, () => {
+    it(filename, () => {
       const valid = validate(labwareDef)
       const validationErrors = validate.errors
 
       expect(validationErrors).toBe(null)
       expect(valid).toBe(true)
     })
-    test(`file name matches metadata.name: ${filename}`, () => {
+    it(`file name matches metadata.name: ${filename}`, () => {
       expect(labwareDef.metadata.name).toEqual(filename)
     })
   })

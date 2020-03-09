@@ -61,6 +61,7 @@ module.exports = {
         'jest/expect-expect': 'off',
         'jest/no-standalone-expect': 'off',
         'jest/no-disabled-tests': 'error',
+        'jest/consistent-test-it': 'error',
       },
     },
     {

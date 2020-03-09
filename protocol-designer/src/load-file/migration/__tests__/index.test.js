@@ -11,21 +11,21 @@ describe('runs appropriate migrations for version', () => {
     '1.2.0': 'fake migration to 1.2.0',
     '1.1.0': 'fake migration to 1.1.0',
   }
-  test('does not run migration if only patch number is larger', () => {
+  it('does not run migration if only patch number is larger', () => {
     const migrationsToRun = getMigrationVersionsToRunFromVersion(
       stubbedMigrationByVersion,
       '1.1.2'
     )
     expect(migrationsToRun).toEqual(['1.2.0', '1.3.0', '2.0.0', '6.3.0'])
   })
-  test('does not run migration if only patch version is identical', () => {
+  it('does not run migration if only patch version is identical', () => {
     const migrationsToRun = getMigrationVersionsToRunFromVersion(
       stubbedMigrationByVersion,
       '1.1.0'
     )
     expect(migrationsToRun).toEqual(['1.2.0', '1.3.0', '2.0.0', '6.3.0'])
   })
-  test('runs all migrations if supplied version is lower than all', () => {
+  it('runs all migrations if supplied version is lower than all', () => {
     const migrationsToRun = getMigrationVersionsToRunFromVersion(
       stubbedMigrationByVersion,
       '0.0.5'
@@ -38,7 +38,7 @@ describe('runs appropriate migrations for version', () => {
       '6.3.0',
     ])
   })
-  test('runs no migrations if supplied version is higher than all', () => {
+  it('runs no migrations if supplied version is higher than all', () => {
     const migrationsToRun = getMigrationVersionsToRunFromVersion(
       stubbedMigrationByVersion,
       '8.9.5'

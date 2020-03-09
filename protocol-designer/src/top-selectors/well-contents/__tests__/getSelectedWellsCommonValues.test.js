@@ -20,7 +20,7 @@ beforeEach(() => {
 })
 
 describe('getSelectedWellsCommonValues', () => {
-  test('labware id not in ingredientLocations', () => {
+  it('labware id not in ingredientLocations', () => {
     const selectedWells = { A1: null }
     const selectedLabwareId = 'badLabwareId'
 
@@ -33,7 +33,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe(null)
   })
 
-  test('no selected labware', () => {
+  it('no selected labware', () => {
     const selectedWells = { A1: null }
     const selectedLabwareId = null
 
@@ -46,7 +46,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe(null)
   })
 
-  test('all selected wells same ingred: return ingred group id', () => {
+  it('all selected wells same ingred: return ingred group id', () => {
     const selectedWells = { A1: null, A2: null }
 
     const result = getSelectedWellsCommonValues.resultFunc(
@@ -58,7 +58,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe('ingred1')
   })
 
-  test('2 well different ingreds: return null', () => {
+  it('2 well different ingreds: return null', () => {
     const selectedWells = { A2: null, A3: null }
 
     const result = getSelectedWellsCommonValues.resultFunc(
@@ -70,7 +70,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe(null)
   })
 
-  test('2 well one empty: return null', () => {
+  it('2 well one empty: return null', () => {
     const selectedWells = { A2: null, A6: null }
 
     const result = getSelectedWellsCommonValues.resultFunc(
@@ -82,7 +82,7 @@ describe('getSelectedWellsCommonValues', () => {
     expect(result.ingredientId).toBe(null)
   })
 
-  test('1 well mixed ingreds: return null', () => {
+  it('1 well mixed ingreds: return null', () => {
     const selectedWells = { A4: null }
 
     const result = getSelectedWellsCommonValues.resultFunc(
