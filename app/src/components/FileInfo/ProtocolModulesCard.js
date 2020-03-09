@@ -44,12 +44,10 @@ function ProtocolModulesCardComponent(props: Props) {
   if (modules.length < 1) return null
 
   const moduleInfo = modules.map(module => {
-    const displayName = getModuleDisplayName(module.model)
-    const modulesMatch = actualModules.some(m =>
-      checkModuleCompatibility(m.model, module.model)
-    )
-
-    return { ...module, displayName, modulesMatch }
+    const matching = actualModules.find(
+      m => checkModuleCompatibility(m.model, module.model))
+    const displayName = matching ? getModuleDisplayName(matching.model) : getModuleDisplayName(module.model)
+    return { ...module, displayName: displayName, modulesMatch: matching !== undefined}
   })
 
   const modulesMatch = moduleInfo.every(m => m.modulesMatch)
