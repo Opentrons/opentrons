@@ -41,7 +41,7 @@ beforeEach(() => {
 })
 
 describe('addAndSelectStepWithHints', () => {
-  test('should dispatch ADD_STEP, and no hints when no hints are applicable (eg pause step)', () => {
+  it('should dispatch ADD_STEP, and no hints when no hints are applicable (eg pause step)', () => {
     const stepType = 'pause'
     const payload = { stepType }
     addAndSelectStepWithHints(payload)(dispatch, getState)
