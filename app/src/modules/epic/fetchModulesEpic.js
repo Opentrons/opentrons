@@ -17,7 +17,11 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 
-import type { MagneticModuleModel, TemperatureModuleModel, ThermocyclerModuleModel } from '@opentrons/shared-data'
+import type {
+  MagneticModuleModel,
+  TemperatureModuleModel,
+  ThermocyclerModuleModel,
+} from '@opentrons/shared-data'
 
 import * as Actions from '../actions'
 import * as Constants from '../constants'

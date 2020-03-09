@@ -17,7 +17,6 @@ import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
-  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
@@ -105,14 +104,15 @@ export const TEMPERATURE_APPROACHING_TARGET: 'TEMPERATURE_APPROACHING_TARGET' =
 export const MODELS_FOR_MODULE_TYPE: {
   [ModuleRealType]: Array<{|
     name: string,
-    value: ModuleModel,
+    value: string,
     disabled?: boolean,
   |}>,
 } = {
   [MAGNETIC_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V1}`),
-      value: MAGNETIC_MODULE_V1,
+      // downcast required because the module models are now enums rather than strings
+      value: (MAGNETIC_MODULE_V1: string),
     },
     // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
     // { name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`), value: MAGNETIC_MODULE_V2 },
@@ -120,7 +120,8 @@ export const MODELS_FOR_MODULE_TYPE: {
   [TEMPERATURE_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V1}`),
-      value: TEMPERATURE_MODULE_V1,
+      // downcast required because the module models are now enums rather than strings
+      value: (TEMPERATURE_MODULE_V1: string),
     },
     // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
     // { name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`, value: TEMPERATURE_MODULE_V2 },
@@ -128,7 +129,8 @@ export const MODELS_FOR_MODULE_TYPE: {
   [THERMOCYCLER_MODULE_TYPE]: [
     {
       name: i18n.t(`modules.model_display_name.${THERMOCYCLER_MODULE_V1}`),
-      value: THERMOCYCLER_MODULE_V1,
+      // downcast required because the module models are now enums rather than strings
+      value: (THERMOCYCLER_MODULE_V1: string),
     },
   ],
 }

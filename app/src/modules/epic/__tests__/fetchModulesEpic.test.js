@@ -85,7 +85,11 @@ describe('fetchModulesEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.fetchModulesSuccess(
           mockRobot.name,
-          [Fixtures.mockMagneticModule, Fixtures.mockTemperatureModule, Fixtures.mockThermocycler],
+          [
+            Fixtures.mockMagneticModule,
+            Fixtures.mockTemperatureModule,
+            Fixtures.mockThermocycler,
+          ],
           { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
         ),
       })
@@ -105,7 +109,11 @@ describe('fetchModulesEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.fetchModulesSuccess(
           mockRobot.name,
-          [Fixtures.mockMagneticModule, Fixtures.mockTemperatureModule, Fixtures.mockThermocycler],
+          [
+            Fixtures.mockMagneticModule,
+            Fixtures.mockTemperatureModule,
+            Fixtures.mockThermocycler,
+          ],
           { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
         ),
       })
