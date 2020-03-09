@@ -41,7 +41,7 @@ export const TextField = (props: Props) => {
           <div className={fieldStyles.field_wrapper}>
             <div className={fieldStyles.field_label}>{LABELS[name]}</div>
             <InputField
-              {...field}
+              value={field.value}
               caption={caption}
               placeholder={placeholder}
               onChange={makeHandleChange({ field, form })}

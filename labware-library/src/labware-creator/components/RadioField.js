@@ -20,7 +20,7 @@ export const RadioField = (props: Props) => (
         <div className={fieldStyles.field_wrapper}>
           <div className={fieldStyles.field_label}>{LABELS[props.name]}</div>
           <RadioGroup
-            {...field}
+            value={field.value}
             labelTextClassName={props.labelTextClassName}
             onChange={e => {
               field.onChange(e)

@@ -242,9 +242,9 @@ export class ConnectForm extends React.Component<
     // resetting the form on NO_SECURITY clears
     // validation, disabling submit, so use setValues
     if (value === NO_SECURITY) {
-      resetForm({ values: nextValues })
-    } else {
       setValues(nextValues)
+    } else {
+      resetForm({ values: nextValues })
     }
   }
 

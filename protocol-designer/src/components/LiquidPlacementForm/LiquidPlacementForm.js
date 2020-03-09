@@ -19,12 +19,12 @@ import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
 import type { Options } from '@opentrons/components'
 import type { FormikProps } from 'formik/@flow-typed'
 
-export type ValidFormValues = {|
+type ValidFormValues = {|
   selectedLiquidId: string,
   volume: string,
 |}
 
-type FormValues = {|
+export type LiquidPlacementFormValues = {|
   selectedLiquidId: ?string,
   volume: ?string,
 |}
@@ -38,19 +38,20 @@ type Props = {
 
   cancelForm: () => mixed,
   clearWells: ?() => mixed,
-  saveForm: ValidFormValues => mixed,
+  saveForm: LiquidPlacementFormValues => mixed,
 }
 
 export class LiquidPlacementForm extends React.Component<Props> {
-  getInitialValues = () => {
+  getInitialValues = (): ValidFormValues => {
     const { commonSelectedLiquidId, commonSelectedVolume } = this.props
     return {
       selectedLiquidId: commonSelectedLiquidId || '',
-      volume: commonSelectedVolume,
+      volume: commonSelectedVolume != null ? String(commonSelectedVolume) : '',
     }
   }
 
-  getValidationSchema = () => {
+  // TODO(IL, 2020-03-09): type defs for Yup
+  getValidationSchema = (): any => {
     const { selectedWellsMaxVolume } = this.props
     return Yup.object().shape({
       selectedLiquidId: Yup.string().required(
@@ -92,7 +93,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
     setFieldValue('volume', masked)
   }
 
-  handleSubmit = (values: ValidFormValues) => {
+  handleSubmit = (values: LiquidPlacementFormValues) => {
     this.props.saveForm(values)
   }
 
@@ -115,7 +116,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
             setFieldValue,
             touched,
             values,
-          }: FormikProps<FormValues>) => (
+          }: FormikProps<LiquidPlacementFormValues>) => (
             <form onSubmit={handleSubmit}>
               <div className={styles.field_row}>
                 <FormGroup
