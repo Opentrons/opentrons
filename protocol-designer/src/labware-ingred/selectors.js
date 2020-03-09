@@ -20,7 +20,7 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type { BaseState, MemoizedSelector } from './../types'
+import type { BaseState, MemoizedSelector, Selector } from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = { labwareIngred: RootState }
@@ -143,7 +143,7 @@ const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
   }
 )
 
-const getDeckHasLiquid: MemoizedSelector<boolean> = createSelector(
+const getDeckHasLiquid: Selector<boolean> = createSelector(
   getLiquidGroupsOnDeck,
   liquidGroups => liquidGroups.length > 0
 )

@@ -1,5 +1,5 @@
 // @flow
-import { addStep } from '../thunks'
+import { addStep } from '../thunks/addStep'
 import { selectStep } from '../actions'
 import { uuid } from '../../../../utils'
 jest.mock('../actions')

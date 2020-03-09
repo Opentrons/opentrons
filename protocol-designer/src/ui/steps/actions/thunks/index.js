@@ -3,40 +3,20 @@ import assert from 'assert'
 import {
   getUnsavedForm,
   getUnsavedFormIsPristineSetTempForm,
-} from '../../../step-forms/selectors'
-import { changeFormInput } from '../../../steplist/actions/actions'
+} from '../../../../step-forms/selectors'
+import { changeFormInput } from '../../../../steplist/actions/actions'
 
-import { uuid } from '../../../utils'
-import { selectors as labwareIngredsSelectors } from '../../../labware-ingred/selectors'
-import { getSelectedStepId } from '../selectors'
-import { selectStep } from './actions'
-import { actions as tutorialActions } from '../../../tutorial'
+import { uuid } from '../../../../utils'
+import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
+import { getSelectedStepId } from '../../selectors'
+import { addStep } from './addStep'
+import { actions as tutorialActions } from '../../../../tutorial'
 
-import * as uiModuleSelectors from '../../../ui/modules/selectors'
-import type { DuplicateStepAction } from './types'
+import * as uiModuleSelectors from '../../../../ui/modules/selectors'
+import type { DuplicateStepAction } from '../types'
 
-import type { StepType, StepIdType, FormData } from '../../../form-types'
-import type { GetState, ThunkDispatch } from '../../../types'
-
-// addStep thunk adds an incremental integer ID for Step reducers.
-// NOTE: if this is an "add step" directly performed by the user,
-// addAndSelectStepWithHints is probably what you want
-export const addStep = (payload: { stepType: StepType }) => (
-  dispatch: ThunkDispatch<*>,
-  getState: GetState
-) => {
-  const stepId = uuid()
-  const { stepType } = payload
-  dispatch({
-    type: 'ADD_STEP',
-    payload: {
-      ...payload,
-      id: stepId,
-    },
-  })
-
-  dispatch(selectStep(stepId, stepType))
-}
+import type { StepType, StepIdType, FormData } from '../../../../form-types'
+import type { GetState, ThunkDispatch } from '../../../../types'
 
 export const addAndSelectStepWithHints = (payload: { stepType: StepType }) => (
   dispatch: ThunkDispatch<*>,
