@@ -26,15 +26,16 @@ async def test_networking_status(
         'gatewayAddress': None,
         'state': 'disconnected',
         'type': 'wifi'
-    },
-    'eth0': {
-        'ipAddress': '169.254.229.173/16',
-        'macAddress': 'B8:27:EB:39:C0:9A',
-        # test missing output gets mapped to None
-        'gatewayAddress': None,
-        'state': 'connected',
-        'type': 'ethernet'
-    }}
+        },
+        'eth0': {
+            'ipAddress': '169.254.229.173/16',
+            'macAddress': 'B8:27:EB:39:C0:9A',
+            # test missing output gets mapped to None
+            'gatewayAddress': None,
+            'state': 'connected',
+            'type': 'ethernet'
+        }
+    }
 
     async def mock_iface_info(k: nmcli.NETWORK_IFACES):
         return connection_statuses[k.value]
@@ -257,18 +258,19 @@ async def test_add_key_response(add_key_return, expected_status, expected_body,
             assert await r.json() == expected_body
 
 
-@pytest.mark.parametrize("arg,remove_key_return,expected_status,expected_body", [
-    ("12345",
-     None,
-     404,
-     {'message': "No such key file 12345"}
-     ),
-    ("54321",
-     "myfile.pem",
-     200,
-     {'message': 'Key file myfile.pem deleted'}
-     )
-])
+@pytest.mark.parametrize("arg,remove_key_return,expected_status,expected_body",
+                         [
+                            ("12345",
+                             None,
+                             404,
+                             {'message': "No such key file 12345"}
+                             ),
+                            ("54321",
+                             "myfile.pem",
+                             200,
+                             {'message': 'Key file myfile.pem deleted'}
+                             )
+                         ])
 async def test_remove_key(arg, remove_key_return,
                           expected_status, expected_body,
                           loop, aiohttp_client):

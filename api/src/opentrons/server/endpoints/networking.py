@@ -67,8 +67,8 @@ def _deduce_security(kwargs) -> nmcli.SECURITY_TYPES:
         return sec_translation[kwargs['securityType']]
     except KeyError:
         raise wifi.ConfigureArgsError(
-            'securityType must be one of {}'
-                .format(','.join(sec_translation.keys())))
+            'securityType must be one of {}'.format(
+                ','.join(sec_translation.keys())))
 
 
 def _check_configure_args(configure_args: Dict[str, Any]) -> Dict[str, Any]:
