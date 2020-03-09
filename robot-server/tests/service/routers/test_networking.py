@@ -265,8 +265,7 @@ def test_add_key_response(add_key_return, expected_status, expected_body,
                               )
                          ])
 def test_remove_key(arg, remove_key_return,
-                          expected_status, expected_body,
-                          api_client):
+                    expected_status, expected_body, api_client):
     with patch("opentrons.system.wifi.remove_key") as p:
         p.return_value = remove_key_return
         r = api_client.delete("/wifi/keys/" + arg)

@@ -2,6 +2,7 @@ import typing
 from enum import Enum
 
 from pydantic import BaseModel, Field, SecretStr, validator, root_validator
+from opentrons.system import wifi
 
 
 class ConnectivityStatus(str, Enum):
@@ -161,8 +162,14 @@ class WifiConfiguration(BaseModel):
     @validator("eapConfig")
     def eap_config_validate(cls, v):
         """Custom validator for the eapConfig field"""
-        if v and not v.get("eapType"):
-            raise ValueError("eapType must be defined")
+        if v is not None:
+            if not v.get("eapType"):
+                raise ValueError("eapType must be defined")
+            try:
+                wifi.eap_check_config(v)
+            except wifi.ConfigureArgsError as e:
+                raise ValueError(str(e))
+
         return v
 
     @root_validator(pre=True)
