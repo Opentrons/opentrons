@@ -17,7 +17,8 @@ from opentrons.types import Location, Point
 from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
-from opentrons.hardware_control import API, ThreadManager, ExecutionCancelledError
+from opentrons.hardware_control import (API, ThreadManager,
+                                        ExecutionCancelledError)
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -520,7 +521,8 @@ class Session(object):
                 sleep(0.1)
             self.set_state('finished')
             self._hw_iface().home()
-        except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
+        except (SmoothieAlarm, asyncio.CancelledError,
+                ExecutionCancelledError):
             log.info("Protocol cancelled")
             self.set_state('error')
         except Exception as e:
