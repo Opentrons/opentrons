@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { startDeckCalibration } from '../../http-api-client'
+import { checkDeckCalibration } from '../../deck-calibration'
 import {
   home,
   fetchLights,
@@ -46,12 +47,25 @@ export function ControlsCard(props: Props) {
       dispatch(push(calibrateDeckUrl))
     )
 
+  const checkCalibration = () =>
+    dispatch(checkDeckCalibration(robot))
+
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
+      <LabeledButton
+        label="Deck calibration"
+        buttonProps={{
+          onClick: checkCalibration,
+          disabled: notConnectable || !canControl,
+          children: 'Check',
+        }}
+      >
+        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
+      </LabeledButton>
       <LabeledButton
         label="Calibrate deck"
         buttonProps={{
