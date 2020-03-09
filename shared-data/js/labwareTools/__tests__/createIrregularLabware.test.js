@@ -21,7 +21,7 @@ const exampleLabware1 = {
 }
 
 describe('test helper functions', () => {
-  test('Well name generated correctly', () => {
+  it('Well name generated correctly', () => {
     const grid = { row: 2, column: 2 }
     const gridStart = [
       { rowStart: 'A', colStart: '1', rowStride: 1, colStride: 2 },
@@ -41,7 +41,7 @@ describe('test helper functions', () => {
     })
   })
 
-  test('XYZ generates correctly for each grid', () => {
+  it('XYZ generates correctly for each grid', () => {
     const grid = { row: 1, column: 5 }
     const offset = { x: 1, y: 0.5, z: 55.5 }
     const spacing = [{ row: 10, column: 10 }, { row: 5, column: 14 }]
@@ -129,17 +129,17 @@ describe('test createIrregularLabware function', () => {
     labware1 = createIrregularLabware(labware1Args)
   })
 
-  test('irregular ordering generates as expected', () => {
+  it('irregular ordering generates as expected', () => {
     const keyList = Object.keys(labware1.wells)
     const generatedOrdering = splitWellsOnColumn(keyList.sort(sortWells))
     expect(labware1.ordering).toEqual(generatedOrdering)
   })
 
-  test('check labware matches fixture', () => {
+  it('check labware matches fixture', () => {
     expect(labware1).toEqual(exampleLabware1)
   })
 
-  test('labware loadName generated correctly for multi-grid labware', () => {
+  it('labware loadName generated correctly for multi-grid labware', () => {
     const loadName = _generateIrregularLoadName({
       grid: [{ row: 3, column: 2 }, { row: 1, column: 4 }],
       well: [
@@ -163,7 +163,7 @@ describe('test createIrregularLabware function', () => {
     expect(loadName).toEqual('somebrand_10_wellplate_6x400ul_4x2000ul')
   })
 
-  test('labware loadName generated correctly for multi-grid labware in other units', () => {
+  it('labware loadName generated correctly for multi-grid labware in other units', () => {
     const loadName = _generateIrregularLoadName({
       grid: [{ row: 3, column: 2 }],
       well: [{ depth: 20, shape: 'circular', totalLiquidVolume: 4000 }],
@@ -176,7 +176,7 @@ describe('test createIrregularLabware function', () => {
     expect(loadName).toEqual('somebrand_6_wellplate_6x4ml')
   })
 
-  test('failing to validate against labware schema throws w/o "strict"', () => {
+  it('failing to validate against labware schema throws w/o "strict"', () => {
     const args = {
       ...labware1Args,
       // negative y offset should fail schema validation by making well `y` negative

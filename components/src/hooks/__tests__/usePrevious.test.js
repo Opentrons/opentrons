@@ -11,12 +11,12 @@ describe('usePrevious hook', () => {
     )
   }
 
-  test('initial previous value is `undefined', () => {
+  it('initial previous value is `undefined', () => {
     const wrapper = mount(<TestUsePrevious value="foo" />)
     expect(wrapper.html()).toEqual('<span>undefined</span>')
   })
 
-  test('saves previous values', () => {
+  it('saves previous values', () => {
     const wrapper = mount(<TestUsePrevious value="foo" />)
     wrapper.setProps({ value: 'bar' })
     expect(wrapper.html()).toEqual('<span>foo</span>')

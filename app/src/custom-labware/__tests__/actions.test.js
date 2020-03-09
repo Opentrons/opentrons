@@ -154,6 +154,6 @@ describe('custom labware actions', () => {
 
   SPECS.forEach(spec => {
     const { name, creator, expected, args = [] } = spec
-    test(name, () => expect(creator(...args)).toEqual(expected))
+    it(name, () => expect(creator(...args)).toEqual(expected))
   })
 })

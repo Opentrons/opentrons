@@ -12,7 +12,7 @@ describe('discovery actions', () => {
     })
   })
 
-  test('startDiscoveryEpic with default timeout', () => {
+  it('startDiscoveryEpic with default timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('-a', { a: actions.startDiscovery() })
       const output$ = discoveryEpic(action$)
@@ -23,7 +23,7 @@ describe('discovery actions', () => {
     })
   })
 
-  test('startDiscoveryEpic with specified timeout', () => {
+  it('startDiscoveryEpic with specified timeout', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const action$ = hot('-a', { a: actions.startDiscovery(42) })
       const output$ = discoveryEpic(action$)
@@ -34,7 +34,7 @@ describe('discovery actions', () => {
     })
   })
 
-  test('startDiscoveryOnRestartEpic', () => {
+  it('startDiscoveryOnRestartEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const serverSuccessAction = {
         type: 'api:SERVER_SUCCESS',

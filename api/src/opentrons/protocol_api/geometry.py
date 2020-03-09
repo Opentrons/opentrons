@@ -8,7 +8,7 @@ from opentrons import types
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
-from .module_geometry import ThermocyclerGeometry
+from .module_geometry import ThermocyclerGeometry, ModuleType
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.system.shared_data import load_shared_data
 
@@ -134,9 +134,8 @@ class Deck(UserDict):
                            for idx in range(12)}
         self._highest_z = 0.0
         # TODO: support deck loadName as a param
-        def_path = 'deck/definitions/1/ot2_standard.json'
-        self._definition = json.loads(  # type: ignore
-            load_shared_data(def_path))
+        def_path = 'deck/definitions/2/ot2_standard.json'
+        self._definition = json.loads(load_shared_data(def_path))
 
     @staticmethod
     def _assure_int(key: object) -> int:
@@ -222,26 +221,34 @@ class Deck(UserDict):
         return slot_def
 
     def resolve_module_location(
-            self, module_name: str,
+            self, module_type: ModuleType,
             location: Optional[types.DeckLocation]) -> types.DeckLocation:
+        dn_from_type = {ModuleType.MAGNETIC: 'Magnetic Module',
+                        ModuleType.THERMOCYCLER: 'Thermocycler',
+                        ModuleType.TEMPERATURE: 'Temperature Module'}
         if isinstance(location, str) or isinstance(location, int):
             slot_def: Dict[str, Any] = self.get_slot_definition(
                 str(location))
-            compatible_modules: List[str] = slot_def['compatibleModules']
-            if module_name in compatible_modules:
+            compatible_modules: List[str] = slot_def['compatibleModuleTypes']
+            if module_type.value in compatible_modules:
                 return location
             else:
                 raise AssertionError(
-                    f'module {module_name} cannot be loaded'
+                    f'A {dn_from_type[module_type]} cannot be loaded'
                     f' into slot {location}')
         else:
-            valid_slots = [slot['id'] for slot in self.slots if module_name
-                           in slot['compatibleModules']]
+            valid_slots = [
+                slot['id'] for slot in self.slots
+                if module_type.value in slot['compatibleModuleTypes']]
             if len(valid_slots) == 1:
                 return valid_slots[0]
+            elif not valid_slots:
+                raise ValueError(
+                    'A {dn_from_type[module_type]} cannot be used with this '
+                    'deck')
             else:
                 raise AssertionError(
-                    f'module {module_name} does not have a default'
+                    f'{dn_from_type[module_type]}s do not have default'
                     ' location, you must specify a slot')
 
     @property

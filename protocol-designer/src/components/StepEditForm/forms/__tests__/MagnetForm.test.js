@@ -46,7 +46,7 @@ describe('MagnetForm', () => {
     ])
   })
 
-  test('engage height caption is displayed with proper height to decimal scale', () => {
+  it('engage height caption is displayed with proper height to decimal scale', () => {
     uiModuleSelectors.getMagnetLabwareEngageHeight.mockReturnValue('10.9444')
 
     const wrapper = render()
@@ -56,7 +56,7 @@ describe('MagnetForm', () => {
     )
   })
 
-  test('engage height caption is null when no engage height', () => {
+  it('engage height caption is null when no engage height', () => {
     uiModuleSelectors.getMagnetLabwareEngageHeight.mockReturnValue(null)
 
     const wrapper = render()

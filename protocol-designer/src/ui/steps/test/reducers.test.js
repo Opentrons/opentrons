@@ -6,7 +6,7 @@ jest.mock('../../../labware-defs/utils')
 const { collapsedSteps, selectedItem } = _allReducers
 
 describe('collapsedSteps reducer', () => {
-  test('add step', () => {
+  it('add step', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
@@ -17,7 +17,7 @@ describe('collapsedSteps reducer', () => {
     })
   })
 
-  test('toggle step on->off', () => {
+  it('toggle step on->off', () => {
     const state = {
       '1': true,
       '2': false,
@@ -36,7 +36,7 @@ describe('collapsedSteps reducer', () => {
     })
   })
 
-  test('toggle step off-> on', () => {
+  it('toggle step off-> on', () => {
     const state = {
       '1': true,
       '2': false,
@@ -57,7 +57,7 @@ describe('collapsedSteps reducer', () => {
 })
 
 describe('selectedItem reducer', () => {
-  test('select step', () => {
+  it('select step', () => {
     const stepId = '123'
     const action = {
       type: 'SELECT_STEP',
@@ -69,7 +69,7 @@ describe('selectedItem reducer', () => {
     })
   })
 
-  test('select terminal item', () => {
+  it('select terminal item', () => {
     const terminalId = 'test'
     const action = {
       type: 'SELECT_TERMINAL_ITEM',

@@ -22,7 +22,7 @@ describe('discovery client', () => {
     jest.clearAllMocks()
   })
 
-  test('start creates mdns browser searching for http', () => {
+  it('start creates mdns browser searching for http', () => {
     const client = createDiscoveryClient()
     const result = client.start()
 
@@ -31,7 +31,7 @@ describe('discovery client', () => {
     expect(mdns.__mockBrowser.discover).not.toHaveBeenCalled()
   })
 
-  test('mdns browser started on ready', () => {
+  it('mdns browser started on ready', () => {
     const client = createDiscoveryClient()
 
     client.start()
@@ -40,7 +40,7 @@ describe('discovery client', () => {
     expect(mdns.__mockBrowser.discover).toHaveBeenCalledTimes(1)
   })
 
-  test('stops browser on client.stop', () => {
+  it('stops browser on client.stop', () => {
     const client = createDiscoveryClient()
 
     client.start()
@@ -49,7 +49,7 @@ describe('discovery client', () => {
     expect(mdns.__mockBrowser.stop).toHaveBeenCalled()
   })
 
-  test('stops browser and creates new one on repeated client.start', () => {
+  it('stops browser and creates new one on repeated client.start', () => {
     const client = createDiscoveryClient()
 
     client.start()
@@ -60,7 +60,7 @@ describe('discovery client', () => {
     expect(mdns.__mockBrowser.stop).toHaveBeenCalledTimes(1)
   })
 
-  test('emits "service" if browser finds a service', done => {
+  it('emits "service" if browser finds a service', done => {
     const client = createDiscoveryClient()
 
     client.start()
@@ -74,7 +74,7 @@ describe('discovery client', () => {
     mdns.__mockBrowser.emit('update', MOCK_BROWSER_SERVICE)
   }, 10)
 
-  test('adds robot to client.services if browser finds a service', () => {
+  it('adds robot to client.services if browser finds a service', () => {
     const client = createDiscoveryClient()
 
     client.start()
@@ -83,7 +83,7 @@ describe('discovery client', () => {
     expect(client.candidates).toEqual([])
   })
 
-  test('new mdns service does not null out ok of existing service', () => {
+  it('new mdns service does not null out ok of existing service', () => {
     const client = createDiscoveryClient()
 
     client.services = [
@@ -108,7 +108,7 @@ describe('discovery client', () => {
     ])
   })
 
-  test('services and candidates can be prepopulated', () => {
+  it('services and candidates can be prepopulated', () => {
     const cachedServices = [MOCK_SERVICE]
     const client = createDiscoveryClient({
       services: cachedServices,
@@ -120,7 +120,7 @@ describe('discovery client', () => {
     expect(client.candidates).toEqual([{ ip: '192.168.1.43', port: 31950 }])
   })
 
-  test('candidates should be deduped by services', () => {
+  it('candidates should be deduped by services', () => {
     const client = createDiscoveryClient({
       services: [MOCK_SERVICE],
       candidates: [{ ip: MOCK_SERVICE.ip, port: 31950 }],
@@ -129,7 +129,7 @@ describe('discovery client', () => {
     expect(client.candidates).toEqual([])
   })
 
-  test('client.start should start polling with default interval 5000', () => {
+  it('client.start should start polling with default interval 5000', () => {
     const client = createDiscoveryClient({
       services: [
         {
@@ -150,7 +150,7 @@ describe('discovery client', () => {
     )
   })
 
-  test('client should have configurable poll interval', () => {
+  it('client should have configurable poll interval', () => {
     const client = createDiscoveryClient({
       pollInterval: 1000,
       candidates: [{ ip: 'foo', port: 31950 }],
@@ -165,7 +165,7 @@ describe('discovery client', () => {
     )
   })
 
-  test('client.stop should stop polling', () => {
+  it('client.stop should stop polling', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     poller.poll.mockReturnValueOnce({ id: 'foobar' })
@@ -174,7 +174,7 @@ describe('discovery client', () => {
     expect(poller.stop).toHaveBeenCalledWith({ id: 'foobar' }, client._logger)
   })
 
-  test('if polls come back good, oks should be flagged true from null', () => {
+  it('if polls come back good, oks should be flagged true from null', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.start()
@@ -190,7 +190,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(true)
   })
 
-  test('if polls come back good, oks should be flagged true from false', () => {
+  it('if polls come back good, oks should be flagged true from false', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.services[0].ok = false
@@ -207,7 +207,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(true)
   })
 
-  test('if API health comes back bad, ok should be flagged false from null', () => {
+  it('if API health comes back bad, ok should be flagged false from null', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.start()
@@ -219,7 +219,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(true)
   })
 
-  test('if API health comes back bad, ok should be flagged false from true', () => {
+  it('if API health comes back bad, ok should be flagged false from true', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.services[0].ok = true
@@ -232,7 +232,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(true)
   })
 
-  test('if /server health comes back bad, serverOk should be flagged false from null', () => {
+  it('if /server health comes back bad, serverOk should be flagged false from null', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.start()
@@ -247,7 +247,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(false)
   })
 
-  test('if /server health comes back bad, serverOk should be flagged false from true', () => {
+  it('if /server health comes back bad, serverOk should be flagged false from true', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.services[0].serverOk = true
@@ -263,7 +263,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(false)
   })
 
-  test('if both polls comes back bad, oks should be flagged false from null', () => {
+  it('if both polls comes back bad, oks should be flagged false from null', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.start()
@@ -275,7 +275,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(false)
   })
 
-  test('if both polls comes back bad, oks should be flagged false from true', () => {
+  it('if both polls comes back bad, oks should be flagged false from true', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.services[0].ok = true
@@ -289,7 +289,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(false)
   })
 
-  test('if names come back conflicting, prefer /server and set ok to false', () => {
+  it('if names come back conflicting, prefer /server and set ok to false', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     client.start()
@@ -304,7 +304,7 @@ describe('discovery client', () => {
     expect(client.services[0].serverOk).toBe(true)
   })
 
-  test('if health comes back for a candidate, it should be promoted', () => {
+  it('if health comes back for a candidate, it should be promoted', () => {
     const client = createDiscoveryClient({
       candidates: [{ ip: '192.168.1.42', port: 31950 }],
     })
@@ -329,7 +329,7 @@ describe('discovery client', () => {
     ])
   })
 
-  test('if health comes back with IP conflict, null out old services', () => {
+  it('if health comes back with IP conflict, null out old services', () => {
     const client = createDiscoveryClient()
 
     client.services = [
@@ -358,7 +358,7 @@ describe('discovery client', () => {
     ])
   })
 
-  test('if new service is added, poller is restarted', () => {
+  it('if new service is added, poller is restarted', () => {
     const client = createDiscoveryClient({
       candidates: [{ ip: '192.168.1.1', port: 31950 }],
     })
@@ -389,7 +389,7 @@ describe('discovery client', () => {
     mdns.__mockBrowser.emit('update', MOCK_BROWSER_SERVICE)
   })
 
-  test('services may be removed and removes candidates', () => {
+  it('services may be removed and removes candidates', () => {
     const client = createDiscoveryClient({
       services: [
         {
@@ -412,7 +412,7 @@ describe('discovery client', () => {
     expect(client.candidates).toEqual([])
   })
 
-  test('candidate removal restarts poll', () => {
+  it('candidate removal restarts poll', () => {
     const client = createDiscoveryClient({ services: [MOCK_SERVICE] })
 
     poller.poll.mockReturnValueOnce({ id: 1234 })
@@ -427,7 +427,7 @@ describe('discovery client', () => {
     )
   })
 
-  test('candidate removal emits removal events', done => {
+  it('candidate removal emits removal events', done => {
     const services = [
       {
         ...MOCK_SERVICE,
@@ -449,7 +449,7 @@ describe('discovery client', () => {
     client.remove('opentrons-dev')
   }, 10)
 
-  test('passes along mdns errors', () => {
+  it('passes along mdns errors', () => {
     return new Promise(resolve => {
       const mockError = new Error('AH')
       const client = createDiscoveryClient().once('error', error => {
@@ -462,7 +462,7 @@ describe('discovery client', () => {
     })
   })
 
-  test('can filter services by name', () => {
+  it('can filter services by name', () => {
     const client = createDiscoveryClient({ nameFilter: ['OPENTRONS'] })
 
     client.start()
@@ -484,7 +484,7 @@ describe('discovery client', () => {
     ])
   })
 
-  test('can filter services by ip', () => {
+  it('can filter services by ip', () => {
     const client = createDiscoveryClient({ ipFilter: ['169.254'] })
 
     client.start()
@@ -500,7 +500,7 @@ describe('discovery client', () => {
     expect(client.services.map(s => s.ip)).toEqual(['169.254.1.2'])
   })
 
-  test('can filter services by port', () => {
+  it('can filter services by port', () => {
     const client = createDiscoveryClient({ portFilter: [31950, 31951] })
 
     client.start()
@@ -521,7 +521,7 @@ describe('discovery client', () => {
     expect(client.services.map(s => s.port)).toEqual([31950, 31951])
   })
 
-  test('can add a candidate manually (with deduping)', () => {
+  it('can add a candidate manually (with deduping)', () => {
     const client = createDiscoveryClient()
     const result = client.add('localhost').add('localhost')
 
@@ -536,7 +536,7 @@ describe('discovery client', () => {
     )
   })
 
-  test('can change polling interval on the fly', () => {
+  it('can change polling interval on the fly', () => {
     const client = createDiscoveryClient({ candidates: ['localhost'] })
     const expectedCandidates = [{ ip: 'localhost', port: 31950 }]
 
@@ -558,5 +558,5 @@ describe('discovery client', () => {
     )
   })
 
-  test.todo('periodically refreshes mDNS discovery')
+  it.todo('periodically refreshes mDNS discovery')
 })

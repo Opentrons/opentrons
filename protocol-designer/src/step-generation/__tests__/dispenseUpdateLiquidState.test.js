@@ -36,7 +36,7 @@ function getUpdatedLiquidState(params, initialLiquidState) {
 }
 
 describe('...single-channel pipette', () => {
-  test('fully dispense single ingredient into empty well, with explicit volume', () => {
+  it('fully dispense single ingredient into empty well, with explicit volume', () => {
     const initialLiquidState = merge(
       {},
       createEmptyLiquidState(invariantContext),
@@ -74,7 +74,7 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  test('fully dispense single ingredient into empty well, with useFullVolume', () => {
+  it('fully dispense single ingredient into empty well, with useFullVolume', () => {
     const initialLiquidState = merge(
       {},
       createEmptyLiquidState(invariantContext),
@@ -115,7 +115,7 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  test('dispense ingred 1 into well containing ingreds 1 & 2', () => {
+  it('dispense ingred 1 into well containing ingreds 1 & 2', () => {
     const initialLiquidState = merge(
       {},
       createEmptyLiquidState(invariantContext),
@@ -164,7 +164,7 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  test('dispense ingred 1 & 2 into well containing 2 & 3', () => {
+  it('dispense ingred 1 & 2 into well containing 2 & 3', () => {
     const initialLiquidState = merge(
       {},
       createEmptyLiquidState(invariantContext),
@@ -216,7 +216,7 @@ describe('...single-channel pipette', () => {
     })
   })
 
-  test('partially dispense ingred 1 & 2 into well containing 2 & 3', () => {
+  it('partially dispense ingred 1 & 2 into well containing 2 & 3', () => {
     const initialLiquidState = merge(
       {},
       createEmptyLiquidState(invariantContext),
@@ -269,9 +269,7 @@ describe('...single-channel pipette', () => {
   })
 
   describe('handle air in pipette tips', () => {
-    test.todo(
-      'TODO(IL 2018-03-16): deal with air (especially regarding air gap)'
-    )
+    it.todo('TODO(IL 2018-03-16): deal with air (especially regarding air gap)')
   })
 })
 
@@ -344,7 +342,7 @@ describe('...8-channel pipette', () => {
 
     tests.forEach(({ labwareType, def, expectedLabwareMatch }) =>
       // make sourcePlateId a different labware def each time
-      test(labwareType, () => {
+      it(labwareType, () => {
         let customInvariantContext = makeContext()
         customInvariantContext.labwareEntities.sourcePlateId = {
           id: SOURCE_LABWARE,

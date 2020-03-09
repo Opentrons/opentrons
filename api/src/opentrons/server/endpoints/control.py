@@ -4,7 +4,6 @@ import os
 import json
 import logging
 from aiohttp import web
-from threading import Thread
 
 try:
     from opentrons import instruments
@@ -74,7 +73,7 @@ async def get_attached_pipettes(request):
         await hw.cache_instruments()
     response = {}
 
-    attached = await hw.attached_instruments
+    attached = hw.attached_instruments
     for mount, data in attached.items():
         response[mount.name.lower()] = {
             'model': data.get('model', None),
@@ -97,16 +96,16 @@ async def get_attached_modules(request):
     {
         "modules": [
             {
+                # module model name for lookups in module defs
+                "model": "string"
                 # machine readable identifying name of module
                 "name": "string",
-                # human-presentable name of module
-                "displayName": "string",
                 # module system port pat
                 "port": "string",
                 # unique serial number
                 "serial": "string",
-                # model identifier (i.e. part number)
-                "model": "string",
+                # revision identifier (i.e. part number)
+                "revision": "string",
                 # current firmware version
                 "fwVersion": "string",
                 # human readable status
@@ -125,37 +124,23 @@ async def get_attached_modules(request):
     }
     """
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-        module_data = [
-            {
-                'name': mod.name(),
-                'displayName': mod.display_name(),
-                'port': mod.port,
-                'serial': mod.device_info.get('serial'),
-                'model': mod.device_info.get('model'),
-                'fwVersion': mod.device_info.get('version'),
-                'hasAvailableUpdate': mod.has_available_update(),
-                **mod.live_data
-            }
-            for mod in hw_mods
-        ]
-    else:
-        hw.discover_modules()
-        hw_mods = hw.attached_modules.values()
-        module_data = [
-            {
-                'name': mod.name(),
-                'displayName': mod.display_name(),
-                'port': mod.port,
-                'serial': mod.device_info and mod.device_info.get('serial'),
-                'model': mod.device_info and mod.device_info.get('model'),
-                'fwVersion': mod.device_info
-                and mod.device_info.get('version'),
-                **mod.live_data
-            }
-            for mod in hw_mods
-        ]
+    hw_mods = hw.attached_modules
+    module_data = [
+        {
+            'name': mod.name(),  # TODO: legacy, remove
+            'displayName': mod.name(),  # TODO: legacy, remove
+            'model': mod.device_info.get('model'),  # TODO legacy, remove
+            'moduleModel': mod.model(),
+            'port': mod.port,  # /dev/ttyS0
+            'serial': mod.device_info.get('serial'),
+            'revision': mod.device_info.get('model'),
+            'fwVersion': mod.device_info.get('version'),
+            'hasAvailableUpdate': mod.has_available_update(),
+            **mod.live_data
+        }
+        for mod in hw_mods
+    ]
+
     return web.json_response(data={"modules": module_data},
                              status=200)
 
@@ -168,12 +153,7 @@ async def get_module_data(request):
     requested_serial = request.match_info['serial']
     res = None
 
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-    else:
-        hw_mods = hw.attached_modules.values()
-
-    for module in hw_mods:
+    for module in hw.attached_modules:
         is_serial_match = module.device_info.get('serial') == requested_serial
         if is_serial_match and hasattr(module, 'live_data'):
             res = module.live_data
@@ -194,10 +174,7 @@ async def execute_module_command(request):
     command_type = data.get('command_type')
     args = data.get('args')
 
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-    else:
-        hw_mods = hw.attached_modules.values()
+    hw_mods = hw.attached_modules
 
     if len(hw_mods) == 0:
         return web.json_response({"message": "No connected modules"},
@@ -239,13 +216,9 @@ async def get_engaged_axes(request):
         {"x": {"enabled": true}, "y": {"enabled": false}, ...}
     """
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        engaged = await hw.engaged_axes
-    else:
-        engaged = hw.engaged_axes
     return web.json_response(
         {str(k).lower(): {'enabled': v}
-         for k, v in engaged.items()})
+         for k, v in hw.engaged_axes.items()})
 
 
 async def disengage_axes(request):
@@ -487,19 +460,13 @@ async def home(request):
 async def identify(request):
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
-    if ff.use_protocol_api_v2():
-        asyncio.ensure_future(hw.identify(blink_time))
-    else:
-        Thread(target=lambda: hw.identify(blink_time)).start()
+    asyncio.ensure_future(hw.identify(blink_time))
     return web.json_response({"message": "identifying"})
 
 
 async def get_rail_lights(request):
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        on = await hw.get_lights()
-    else:
-        on = hw.get_lights()
+    on = hw.get_lights()
     return web.json_response({'on': on['rails']})
 
 

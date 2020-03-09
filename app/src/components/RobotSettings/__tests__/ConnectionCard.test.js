@@ -68,13 +68,13 @@ describe('ConnectionCard', () => {
     jest.useRealTimers()
   })
 
-  test('calls fetchStatus on mount', () => {
+  it('calls fetchStatus on mount', () => {
     const expected = Networking.fetchStatus(mockRobot.name)
     render()
     expect(dispatch).toHaveBeenCalledWith(expected)
   })
 
-  test('calls fetchStatus on an interval', () => {
+  it('calls fetchStatus on an interval', () => {
     const expected = Networking.fetchStatus(mockRobot.name)
 
     render()
@@ -84,7 +84,7 @@ describe('ConnectionCard', () => {
     expect(dispatch).toHaveBeenNthCalledWith(3, expected)
   })
 
-  test('passes internet status to ConnectionStatusMessage', () => {
+  it('passes internet status to ConnectionStatusMessage', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
     const wrapper = render()
@@ -93,7 +93,7 @@ describe('ConnectionCard', () => {
     expect(status.prop('status')).toEqual(Networking.STATUS_FULL)
   })
 
-  test('passes type ConnectionStatusMessage based on robot.local', () => {
+  it('passes type ConnectionStatusMessage based on robot.local', () => {
     mockGetInternetStatus.mockReturnValue(Networking.STATUS_FULL)
 
     const localRobot: ViewableRobot = ({ ...mockRobot, local: true }: any)
@@ -108,7 +108,7 @@ describe('ConnectionCard', () => {
     expect(wifiStatus.prop('type')).toEqual('Wi-Fi')
   })
 
-  test('passes ethernet status to ConnectionInfo', () => {
+  it('passes ethernet status to ConnectionInfo', () => {
     const mockEthernet = {
       ipAddress: null,
       subnetMask: null,
@@ -127,7 +127,7 @@ describe('ConnectionCard', () => {
     expect(info.prop('connection')).toEqual(mockEthernet)
   })
 
-  test('passes wifi status to ConnectionInfo', () => {
+  it('passes wifi status to ConnectionInfo', () => {
     const mockWifi = {
       ipAddress: null,
       subnetMask: null,
@@ -146,7 +146,7 @@ describe('ConnectionCard', () => {
     expect(info.prop('connection')).toEqual(mockWifi)
   })
 
-  test('renders SelectNetwork', () => {
+  it('renders SelectNetwork', () => {
     const wrapper = render()
     const select = wrapper.find(SelectNetwork)
 

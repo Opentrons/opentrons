@@ -1,0 +1,22 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.7"
+
+[dev-packages]
+"c445fee" = {editable = true, path = "./../api"}
+pytest = "*"
+pytest-aiohttp = "*"
+pytest-cov = "*"
+mypy = "==0.740"
+atomicwrites = {version="*", sys_platform="== 'win32'"}
+pylama = "*"
+
+[packages]
+uvicorn = "==0.11.3"
+fastapi = "==0.49.0"
+python-multipart = "==0.0.5"
+aiohttp = "==3.4.4"

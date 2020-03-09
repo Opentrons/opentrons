@@ -35,7 +35,7 @@ describe('dropTip', () => {
   }
 
   describe('replaceTip: single channel', () => {
-    test('drop tip if there is a tip', () => {
+    it('drop tip if there is a tip', () => {
       const prevRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: true,
@@ -58,11 +58,11 @@ describe('dropTip', () => {
     })
 
     // TODO: IL 2019-11-20
-    test.todo('no tip on pipette')
+    it.todo('no tip on pipette')
   })
 
   describe('Multi-channel dropTip', () => {
-    test('drop tip when there are tips', () => {
+    it('drop tip when there are tips', () => {
       const prevRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: true,
@@ -86,7 +86,7 @@ describe('dropTip', () => {
   })
 
   describe('liquid tracking', () => {
-    test('dropTip uses full volume when transfering tip to trash', () => {
+    it('dropTip uses full volume when transfering tip to trash', () => {
       const prevRobotState = makeRobotState({
         singleHasTips: true,
         multiHasTips: true,

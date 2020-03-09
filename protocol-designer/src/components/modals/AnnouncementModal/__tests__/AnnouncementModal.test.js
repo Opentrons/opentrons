@@ -23,7 +23,7 @@ describe('AnnouncementModal', () => {
     getLocalStorageItemMock.mockReturnValue(announcementKey)
   })
 
-  test('modal is not shown when announcement has been shown before', () => {
+  it('modal is not shown when announcement has been shown before', () => {
     announcementsMock.announcements = [
       {
         image: null,
@@ -38,7 +38,7 @@ describe('AnnouncementModal', () => {
     expect(wrapper.find(Modal)).toHaveLength(0)
   })
 
-  test('announcement is shown when user has not seen it before', () => {
+  it('announcement is shown when user has not seen it before', () => {
     announcementsMock.announcements = [
       {
         image: null,
@@ -55,7 +55,7 @@ describe('AnnouncementModal', () => {
     expect(modal.html()).toContain('brand new spanking feature')
   })
 
-  test('latest announcement is always shown', () => {
+  it('latest announcement is always shown', () => {
     announcementsMock.announcements = [
       {
         image: null,
@@ -78,7 +78,7 @@ describe('AnnouncementModal', () => {
     expect(modal.html()).toContain('second announcement')
   })
 
-  test('optional image component is displayed when exists', () => {
+  it('optional image component is displayed when exists', () => {
     announcementsMock.announcements = [
       {
         image: <img src="test.jpg" />,
@@ -93,7 +93,7 @@ describe('AnnouncementModal', () => {
     expect(image).toHaveLength(1)
   })
 
-  test('button click saves announcement announcementKey to localStorage and closes modal', () => {
+  it('button click saves announcement announcementKey to localStorage and closes modal', () => {
     const newAnnouncementKey = 'newFeature'
     announcementsMock.announcements = [
       {

@@ -92,7 +92,7 @@ describe('robot admin selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       const result = selector(state, ...args)
       expect(result).toEqual(expected)
     })

@@ -41,7 +41,7 @@ function expectNoTipsRemaining(
 }
 
 describe('drop all tips', () => {
-  test('should do nothing with no pipettes', () => {
+  it('should do nothing with no pipettes', () => {
     initialRobotState.pipettes = {}
     initialRobotState.tipState.pipettes = {}
 
@@ -51,14 +51,14 @@ describe('drop all tips', () => {
     expectNoTipsRemaining(initialRobotState, invariantContext, res)
   })
 
-  test('should do nothing with pipette that does not have tips', () => {
+  it('should do nothing with pipette that does not have tips', () => {
     const result = dropAllTips(null, invariantContext, initialRobotState)
     const res = getSuccessResult(result)
     expect(res.commands).toHaveLength(0)
     expectNoTipsRemaining(initialRobotState, invariantContext, res)
   })
 
-  test('should drop tips of one pipette that has them, and not one without', () => {
+  it('should drop tips of one pipette that has them, and not one without', () => {
     initialRobotState.tipState.pipettes = {
       [p300SingleId]: true,
       [p300MultiId]: false,
@@ -72,7 +72,7 @@ describe('drop all tips', () => {
     expectNoTipsRemaining(initialRobotState, invariantContext, res)
   })
 
-  test('should drop tips for both pipettes, with 2 pipettes that have tips', () => {
+  it('should drop tips for both pipettes, with 2 pipettes that have tips', () => {
     initialRobotState.tipState.pipettes = {
       [p300SingleId]: true,
       [p300MultiId]: true,

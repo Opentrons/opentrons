@@ -361,8 +361,8 @@ Fields:
 | shape             | enum   | yes      | `rectangular` or `circular`                                               |
 | totalLiquidVolume | number | yes      | Volume of the well in **µL**                                              |
 | diameter          | number | no       | Diameter of the well in **mm**; required if `shape: 'circular'`           |
-| length            | number | no       | Length (x-axis) of the well in **mm**; required if `shape: 'rectangular'` |
-| width             | number | no       | Width (y-axis) of the well in **mm**; required if `shape: 'rectangular'`  |
+| xDimension        | number | no       | Length (x-axis) of the well in **mm**; required if `shape: 'rectangular'` |
+| yDimension        | number | no       | Width (y-axis) of the well in **mm**; required if `shape: 'rectangular'`  |
 
 **`totalLiquidVolume` must be specified in µL**. The generator will convert the value in µL to `metadata.displayVolumeUnits` for the `loadName`.
 

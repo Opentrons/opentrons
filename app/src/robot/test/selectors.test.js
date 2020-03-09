@@ -1,4 +1,5 @@
 // robot selectors test
+import { format } from 'date-fns'
 import { setIn } from '@thi.ng/paths'
 import { NAME, selectors, constants } from '../'
 
@@ -57,13 +58,13 @@ describe('robot selectors', () => {
       }
     })
 
-    test('getConnectedRobotName', () => {
+    it('getConnectedRobotName', () => {
       expect(getConnectedRobotName(state)).toEqual('bar')
       state = setIn(state, 'robot.connection.connectedTo', 'foo')
       expect(getConnectedRobotName(state)).toEqual('foo')
     })
 
-    test('getConnectionStatus', () => {
+    it('getConnectionStatus', () => {
       state = setIn(state, 'robot.connection', {
         connectedTo: '',
         connectRequest: { inProgress: false },
@@ -94,7 +95,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getSessionCapabilities', () => {
+  it('getSessionCapabilities', () => {
     const state = makeState({
       session: { capabilities: ['create', 'create_from_bundle'] },
     })
@@ -104,7 +105,7 @@ describe('robot selectors', () => {
     ])
   })
 
-  test('getSessionLoadInProgress', () => {
+  it('getSessionLoadInProgress', () => {
     let state = makeState({ session: { sessionRequest: { inProgress: true } } })
     expect(getSessionLoadInProgress(state)).toBe(true)
 
@@ -112,7 +113,7 @@ describe('robot selectors', () => {
     expect(getSessionLoadInProgress(state)).toBe(false)
   })
 
-  test('getUploadError', () => {
+  it('getUploadError', () => {
     let state = makeState({ session: { sessionRequest: { error: null } } })
     expect(getUploadError(state)).toBe(null)
 
@@ -122,7 +123,7 @@ describe('robot selectors', () => {
     expect(getUploadError(state)).toEqual(new Error('AH'))
   })
 
-  test('getSessionIsLoaded', () => {
+  it('getSessionIsLoaded', () => {
     let state = makeState({ session: { state: constants.LOADED } })
     expect(getSessionIsLoaded(state)).toBe(true)
 
@@ -130,7 +131,7 @@ describe('robot selectors', () => {
     expect(getSessionIsLoaded(state)).toBe(false)
   })
 
-  test('getIsReadyToRun', () => {
+  it('getIsReadyToRun', () => {
     const expectedStates = {
       loaded: true,
       running: false,
@@ -148,7 +149,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getIsRunning', () => {
+  it('getIsRunning', () => {
     const expectedStates = {
       loaded: false,
       running: true,
@@ -165,7 +166,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getIsPaused', () => {
+  it('getIsPaused', () => {
     const expectedStates = {
       loaded: false,
       running: false,
@@ -182,7 +183,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getIsDone', () => {
+  it('getIsDone', () => {
     const expectedStates = {
       loaded: false,
       running: false,
@@ -199,14 +200,21 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getStartTime', () => {
+  it('getStartTime with no start time returns null', () => {
     const state = makeState({
-      session: { startTime: 48, remoteTimeCompensation: -6 },
+      session: { startTime: null },
     })
-    expect(getStartTime(state)).toBe(42)
+    expect(getStartTime(state)).toBe(null)
   })
 
-  test('getRunTime with no startTime', () => {
+  it('getStartTime returns local formatted time', () => {
+    const state = makeState({
+      session: { startTime: 1582926000, remoteTimeCompensation: -6000 },
+    })
+    expect(getStartTime(state)).toBe(format(1582920000, 'pp'))
+  })
+
+  it('getRunTime with no startTime', () => {
     const state = {
       [NAME]: {
         session: {
@@ -219,7 +227,7 @@ describe('robot selectors', () => {
     expect(getRunTime(state)).toEqual('00:00:00')
   })
 
-  test('getRunTime with no remoteTimeCompensation', () => {
+  it('getRunTime with no remoteTimeCompensation', () => {
     const state = {
       [NAME]: {
         session: {
@@ -233,7 +241,7 @@ describe('robot selectors', () => {
     expect(getRunTime(state)).toEqual('00:00:00')
   })
 
-  test('getRunTime', () => {
+  it('getRunTime', () => {
     const testGetRunTime = (seconds, expected) => {
       const stateWithRunTime = {
         [NAME]: {
@@ -297,12 +305,12 @@ describe('robot selectors', () => {
       },
     })
 
-    test('getRunProgress', () => {
+    it('getRunProgress', () => {
       // leaves: 2, 3, 4; processed: 2
       expect(getRunProgress(state)).toEqual((1 / 3) * 100)
     })
 
-    test('getRunProgress with no commands', () => {
+    it('getRunProgress with no commands', () => {
       const state = makeState({
         session: { protocolCommands: [], protocolCommandsById: {} },
       })
@@ -310,7 +318,7 @@ describe('robot selectors', () => {
       expect(getRunProgress(state)).toEqual(0)
     })
 
-    test('getCommands', () => {
+    it('getCommands', () => {
       expect(getCommands(state)).toEqual([
         {
           id: 0,
@@ -381,7 +389,7 @@ describe('robot selectors', () => {
     })
 
     // TODO(mc: 2018-01-10): rethink the instrument level "calibration" prop
-    test('get pipettes', () => {
+    it('get pipettes', () => {
       expect(getPipettes(state)).toEqual([
         {
           mount: 'left',
@@ -407,7 +415,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('get calibrator mount', () => {
+  it('get calibrator mount', () => {
     const leftState = makeState({
       session: {
         pipettesByMount: {
@@ -440,7 +448,7 @@ describe('robot selectors', () => {
     expect(getCalibratorMount(rightState)).toBe('right')
   })
 
-  test('get instruments are calibrated', () => {
+  it('get instruments are calibrated', () => {
     const twoPipettesCalibrated = makeState({
       session: {
         pipettesByMount: {
@@ -504,7 +512,7 @@ describe('robot selectors', () => {
       })
     })
 
-    test('get modules by slot', () => {
+    it('get modules by slot', () => {
       expect(getModulesBySlot(state)).toEqual({
         1: {
           _id: 1,
@@ -514,7 +522,7 @@ describe('robot selectors', () => {
       })
     })
 
-    test('get modules', () => {
+    it('get modules', () => {
       expect(getModules(state)).toEqual([
         {
           _id: 1,
@@ -581,7 +589,7 @@ describe('robot selectors', () => {
       })
     })
 
-    test('get labware', () => {
+    it('get labware', () => {
       expect(getLabware(state)).toEqual([
         // multi channel tiprack should be first
         {
@@ -638,7 +646,7 @@ describe('robot selectors', () => {
       ])
     })
 
-    test('get unconfirmed tipracks', () => {
+    it('get unconfirmed tipracks', () => {
       expect(getUnconfirmedTipracks(state)).toEqual([
         {
           slot: '2',
@@ -663,7 +671,7 @@ describe('robot selectors', () => {
       ])
     })
 
-    test('get unconfirmed labware', () => {
+    it('get unconfirmed labware', () => {
       expect(getUnconfirmedLabware(state)).toEqual([
         {
           slot: '2',
@@ -697,7 +705,7 @@ describe('robot selectors', () => {
       ])
     })
 
-    test('get next labware', () => {
+    it('get next labware', () => {
       expect(getNextLabware(state)).toEqual({
         slot: '2',
         type: 'm',
@@ -734,7 +742,7 @@ describe('robot selectors', () => {
       })
     })
 
-    test('getTipracksByMount', () => {
+    it('getTipracksByMount', () => {
       expect(getTipracksByMount(state)).toEqual({
         left: {
           slot: '2',
@@ -760,7 +768,7 @@ describe('robot selectors', () => {
     })
   })
 
-  test('getDeckPopulated', () => {
+  it('getDeckPopulated', () => {
     let state = makeState({ calibration: { deckPopulated: null } })
     expect(getDeckPopulated(state)).toEqual(null)
     state = makeState({ calibration: { deckPopulated: false } })

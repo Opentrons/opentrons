@@ -63,7 +63,7 @@ describe('discoveryReducer', () => {
 
   SPECS.forEach(spec => {
     const { name, action, initialState, expectedState } = spec
-    test(name, () =>
+    it(name, () =>
       expect(discoveryReducer(initialState, action)).toEqual(expectedState)
     )
   })

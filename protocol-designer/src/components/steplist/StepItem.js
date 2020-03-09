@@ -163,7 +163,7 @@ export function getStepItemContents(stepItemProps: StepItemProps) {
         labwareDisplayName={substeps.labwareDisplayName}
         labwareNickname={substeps.labwareNickname}
         message={substeps.message}
-        action={i18n.t(`modules.actions.await_temperature`)}
+        action={i18n.t('modules.actions.await_temperature')}
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
       />

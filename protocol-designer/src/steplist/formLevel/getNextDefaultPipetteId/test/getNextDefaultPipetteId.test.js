@@ -20,7 +20,7 @@ describe('getNextDefaultPipetteId', () => {
     ]
 
     testCases.forEach(({ testMsg, equippedPipettesById, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
 
@@ -65,7 +65,7 @@ describe('getNextDefaultPipetteId', () => {
     ]
 
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {
           a: { pipette: 'pipetteId_A' },
           b: { pipette: 'pipetteId_B' },

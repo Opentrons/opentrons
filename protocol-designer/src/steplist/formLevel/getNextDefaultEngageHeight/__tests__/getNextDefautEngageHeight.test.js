@@ -11,7 +11,7 @@ describe('getNextDefaultEngageHeight', () => {
     ]
 
     testCases.forEach(({ testMsg, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {}
         const orderedStepIds = []
 
@@ -44,7 +44,7 @@ describe('getNextDefaultEngageHeight', () => {
     ]
 
     testCases.forEach(({ testMsg, orderedStepIds, expected }) => {
-      test(testMsg, () => {
+      it(testMsg, () => {
         const savedForms = {
           e: {
             id: 'moduleId',

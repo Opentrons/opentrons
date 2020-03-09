@@ -64,14 +64,14 @@ describe('getSpacingIfUniform', () => {
     },
   ]
   testCases.forEach(({ wells, expected, testLabel }) =>
-    test(testLabel, () =>
+    it(testLabel, () =>
       expect(getSpacingIfUniform((wells: Array<any>), 'x')).toBe(expected)
     )
   )
 })
 
 describe('getIfConsistent', () => {
-  test('deep equal', () => {
+  it('deep equal', () => {
     const items = [
       { a: 123, b: [1, 2, [3]] },
       { a: 123, b: [1, 2, [3]] },
@@ -80,7 +80,7 @@ describe('getIfConsistent', () => {
     expect(getIfConsistent(items)).toEqual(items[0])
   })
 
-  test('deep difference', () => {
+  it('deep difference', () => {
     const items = [
       { a: 123, b: [1, 2, [3]] },
       { a: 123, b: [1, 2, [999999]] },
@@ -93,7 +93,7 @@ describe('getIfConsistent', () => {
 describe('getUniqueWellProperties', () => {
   const defs = [fixture96Plate, fixtureIrregular]
   defs.forEach(def =>
-    test(def.parameters.loadName, () => {
+    it(def.parameters.loadName, () => {
       expect(getUniqueWellProperties(def)).toMatchSnapshot()
     })
   )

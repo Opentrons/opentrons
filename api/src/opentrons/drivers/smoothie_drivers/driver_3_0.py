@@ -1824,6 +1824,7 @@ class SmoothieDriver_3_0_0:
             sleep(0.25)
             gpio.set_high(gpio.OUTPUT_PINS['HALT'])
             sleep(0.25)
+            self.run_flag.set()
 
     async def update_firmware(self,  # noqa(C901)
                               filename: str,

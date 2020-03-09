@@ -371,7 +371,8 @@ class ThermocyclerContext(ModuleContext):
                          from_loc: types.Location):
         to_lw, to_well = geometry.split_loc_labware(to_loc)
         from_lw, from_well = geometry.split_loc_labware(from_loc)
-        if (self.labware is to_lw or self.labware is from_lw) and \
+        if self.labware is not None and \
+                (self.labware is to_lw or self.labware is from_lw) and \
                 self.lid_position != 'open':
             raise RuntimeError(
                 "Cannot move to labware loaded in Thermocycler"

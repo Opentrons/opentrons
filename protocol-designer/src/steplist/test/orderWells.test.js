@@ -34,7 +34,7 @@ describe('orderWells', () => {
       },
     }
     orderTuples.forEach(tuple => {
-      test(`first ${tuple[0]} then ${tuple[1]}`, () => {
+      it(`first ${tuple[0]} then ${tuple[1]}`, () => {
         expect(orderWells(regularOrdering, ...tuple)).toEqual(
           regularAnswerMap[tuple[0]][tuple[1]]
         )
@@ -69,7 +69,7 @@ describe('orderWells', () => {
     }
 
     orderTuples.forEach(tuple => {
-      test(`first ${tuple[0]} then ${tuple[1]}`, () => {
+      it(`first ${tuple[0]} then ${tuple[1]}`, () => {
         expect(orderWells(irregularOrdering, ...tuple)).toEqual(
           irregularAnswerMap[tuple[0]][tuple[1]]
         )

@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import { Formik } from 'formik'
-import moment from 'moment'
+import { format } from 'date-fns'
+
 import {
   Card,
   FormGroup,
@@ -42,8 +43,9 @@ type State = {|
   |},
 |}
 
-const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
-const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
+// TODO(mc, 2020-02-28): explore l10n for these dates
+const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
+const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
@@ -120,16 +122,15 @@ export class FilePage extends React.Component<Props, State> {
                     label="Date Created"
                     className={formStyles.column_1_2}
                   >
-                    {values.created &&
-                      moment(values.created).format(DATE_ONLY_FORMAT)}
+                    {values.created && format(values.created, DATE_ONLY_FORMAT)}
                   </FormGroup>
 
                   <FormGroup
                     label="Last Exported"
                     className={formStyles.column_1_2}
                   >
-                    {values['last-modified'] &&
-                      moment(values['last-modified']).format(DATETIME_FORMAT)}
+                    {values.lastModified &&
+                      format(values.lastModified, DATETIME_FORMAT)}
                   </FormGroup>
                 </div>
 

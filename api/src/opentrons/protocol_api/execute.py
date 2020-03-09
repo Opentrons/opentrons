@@ -1,3 +1,4 @@
+import asyncio
 import inspect
 import logging
 import traceback
@@ -106,7 +107,7 @@ def _run_python(
     new_globs.update(new_locs)
     try:
         exec('run(context)', new_globs, new_locs)
-    except SmoothieAlarm:
+    except (SmoothieAlarm, asyncio.CancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise
     except Exception as e:

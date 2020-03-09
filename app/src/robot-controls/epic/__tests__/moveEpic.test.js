@@ -51,7 +51,7 @@ describe('moveEpic', () => {
 
   const meta = { requestId: '1234' }
 
-  test('calls GET /robot/positions and then POST /robot/move with position: changePipette', () => {
+  it('calls GET /robot/positions and then POST /robot/move with position: changePipette', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left'),
       meta,
@@ -88,7 +88,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('calls GET /robot/positions and POST /robot/move with position: attachTip', () => {
+  it('calls GET /robot/positions and POST /robot/move with position: attachTip', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'attachTip', 'right'),
       meta,
@@ -131,7 +131,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('calls POST /motors/disengage if disengageMotors: true', () => {
+  it('calls POST /motors/disengage if disengageMotors: true', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left', true),
       meta,
@@ -163,7 +163,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('maps successful response to MOVE_SUCCESS without disengage', () => {
+  it('maps successful response to MOVE_SUCCESS without disengage', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left'),
       meta,
@@ -192,7 +192,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('maps successful response to MOVE_SUCCESS with disengage', () => {
+  it('maps successful response to MOVE_SUCCESS with disengage', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left', true),
       meta,
@@ -221,7 +221,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('maps failed GET /robot/positions to MOVE_FAILURE', () => {
+  it('maps failed GET /robot/positions to MOVE_FAILURE', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left', true),
       meta,
@@ -246,7 +246,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('maps failed POST /robot/move to MOVE_FAILURE', () => {
+  it('maps failed POST /robot/move to MOVE_FAILURE', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left', true),
       meta,
@@ -273,7 +273,7 @@ describe('moveEpic', () => {
     })
   })
 
-  test('maps failed POST /motors/disengage to MOVE_FAILURE', () => {
+  it('maps failed POST /motors/disengage to MOVE_FAILURE', () => {
     const action: Types.MoveAction = {
       ...Actions.move(mockRobot.name, 'changePipette', 'left', true),
       meta,

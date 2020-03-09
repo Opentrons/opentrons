@@ -6,7 +6,7 @@ import { SelectField } from '../SelectField'
 import { Select } from '../Select'
 
 describe('SelectField', () => {
-  test('renders a Select', () => {
+  it('renders a Select', () => {
     const wrapper = shallow(
       <SelectField name="field" options={[]} value={null} />
     )
@@ -14,7 +14,7 @@ describe('SelectField', () => {
     expect(wrapper.find(Select)).toHaveLength(1)
   })
 
-  test('renders caption', () => {
+  it('renders caption', () => {
     const wrapper = shallow(
       <SelectField
         name="field"
@@ -27,7 +27,7 @@ describe('SelectField', () => {
     expect(wrapper.find('[data-hook="caption"]')).toHaveLength(1)
   })
 
-  test('passes props to Select', () => {
+  it('passes props to Select', () => {
     const id = 'id'
     const name = 'name'
     const options = [{ value: 'foo' }, { value: 'bar' }]
@@ -65,7 +65,7 @@ describe('SelectField', () => {
     })
   })
 
-  test('passes disabled to isDisabled when disabled=true', () => {
+  it('passes disabled to isDisabled when disabled=true', () => {
     const name = 'name'
     const options = [{ value: 'foo' }, { value: 'bar' }]
     const value = 'bar'
@@ -85,7 +85,7 @@ describe('SelectField', () => {
     })
   })
 
-  test('handles onChange and onBlur from Select', () => {
+  it('handles onChange and onBlur from Select', () => {
     const handleValueChange = jest.fn()
     const handleLoseFocus = jest.fn()
     const options = [{ value: 'foo' }, { value: 'bar' }]

@@ -126,7 +126,7 @@ const SPECS: Array<SelectorSpec> = [
 describe('robot api selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], before = noop, expected } = spec
-    test(name, () => {
+    it(name, () => {
       before()
       expect(selector(state, ...args)).toEqual(expected)
     })

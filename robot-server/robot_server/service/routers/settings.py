@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException
-from opentrons.app.models import V1ErrorMessage
-from opentrons.app.models.settings import AdvancedSettings, LogLevel, \
+from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
 

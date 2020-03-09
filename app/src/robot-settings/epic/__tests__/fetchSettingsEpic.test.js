@@ -57,7 +57,7 @@ describe('fetchSettingsEpic', () => {
     meta,
   }
 
-  test('calls GET /settings', () => {
+  it('calls GET /settings', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsSuccess })
@@ -78,7 +78,7 @@ describe('fetchSettingsEpic', () => {
     })
   })
 
-  test('maps successful response to FETCH_SETTINGS_SUCCESS', () => {
+  it('maps successful response to FETCH_SETTINGS_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsSuccess })
@@ -99,7 +99,7 @@ describe('fetchSettingsEpic', () => {
     })
   })
 
-  test('maps failed response to FETCH_SETTINGS_FAILURE', () => {
+  it('maps failed response to FETCH_SETTINGS_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockFetchSettingsFailure })

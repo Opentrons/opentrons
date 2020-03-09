@@ -21,7 +21,7 @@ describe('validate deck defs and fixtures', () => {
   const v1Fixtures = glob.sync(v1FixtureGlob)
   v1Fixtures.forEach(fixturePath => {
     const fixtureDef = require(fixturePath)
-    test('fixture validates against v1 schema', () => {
+    it('fixture validates against v1 schema', () => {
       const valid = validateV1Schema(fixtureDef)
       const validationErrors = validateV1Schema.errors
       if (validationErrors) {
@@ -38,7 +38,7 @@ describe('validate deck defs and fixtures', () => {
   const v2Fixtures = glob.sync(v2FixtureGlob)
   v2Fixtures.forEach(fixturePath => {
     const fixtureDef = require(fixturePath)
-    test('fixture validates against v2 schema', () => {
+    it('fixture validates against v2 schema', () => {
       const valid = validateV2Schema(fixtureDef)
       const validationErrors = validateV2Schema.errors
       if (validationErrors) {
@@ -55,7 +55,7 @@ describe('validate deck defs and fixtures', () => {
   const v1Defs = glob.sync(v1DefGlob)
   v1Defs.forEach(defPath => {
     const deckDef = require(defPath)
-    test('deck validates against v1 schema', () => {
+    it('deck validates against v1 schema', () => {
       const valid = validateV1Schema(deckDef)
       const validationErrors = validateV1Schema.errors
       if (validationErrors) {
@@ -72,7 +72,7 @@ describe('validate deck defs and fixtures', () => {
   const v2Defs = glob.sync(v2DefGlob)
   v2Defs.forEach(defPath => {
     const deckDef = require(defPath)
-    test('deck validates against v2 schema', () => {
+    it('deck validates against v2 schema', () => {
       const valid = validateV2Schema(deckDef)
       const validationErrors = validateV2Schema.errors
       if (validationErrors) {

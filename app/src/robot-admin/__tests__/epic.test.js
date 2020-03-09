@@ -53,7 +53,7 @@ describe('robotAdminEpic', () => {
     const action = Actions.restartRobot(mockRobot.name)
     const expectedRequest = { method: 'POST', path: '/server/restart' }
 
-    test('calls POST /server/restart', () => {
+    it('calls POST /server/restart', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockRestartSuccess })
@@ -77,7 +77,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('calls POST with restart path in settings capabilities', () => {
+    it('calls POST with restart path in settings capabilities', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockRestartSuccess })
@@ -103,7 +103,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps successful response to RESTART_ROBOT_SUCCESS', () => {
+    it('maps successful response to RESTART_ROBOT_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockRestartSuccess })
@@ -121,7 +121,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps failed response to RESTART_ROBOT_FAILURE', () => {
+    it('maps failed response to RESTART_ROBOT_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockRestartFailure })
@@ -141,7 +141,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('starts discovery on RESTART_SUCCESS', () => {
+    it('starts discovery on RESTART_SUCCESS', () => {
       const action = Actions.restartRobotSuccess(mockRobot.name, {})
 
       testScheduler.run(({ hot, expectObservable }) => {
@@ -160,7 +160,7 @@ describe('robotAdminEpic', () => {
     const action = Actions.fetchResetConfigOptions(mockRobot.name)
     const expectedRequest = { method: 'GET', path: '/settings/reset/options' }
 
-    test('calls GET /settings/reset/options', () => {
+    it('calls GET /settings/reset/options', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockFetchResetOptionsSuccess })
@@ -184,7 +184,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps successful response to FETCH_RESET_CONFIG_OPTIONS_SUCCESS', () => {
+    it('maps successful response to FETCH_RESET_CONFIG_OPTIONS_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockFetchResetOptionsSuccess })
@@ -204,7 +204,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps failed response to FETCH_RESET_CONFIG_OPTIONS_FAILURE', () => {
+    it('maps failed response to FETCH_RESET_CONFIG_OPTIONS_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockFetchResetOptionsFailure })
@@ -231,7 +231,7 @@ describe('robotAdminEpic', () => {
       bar: false,
     })
 
-    test('calls POST /settings/reset', () => {
+    it('calls POST /settings/reset', () => {
       const expectedRequest = {
         method: 'POST',
         path: '/settings/reset',
@@ -261,7 +261,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps successful response to RESET_CONFIG_SUCCESS', () => {
+    it('maps successful response to RESET_CONFIG_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockResetConfigSuccess })
@@ -279,7 +279,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('maps failed response to RESET_CONFIG_FAILURE', () => {
+    it('maps failed response to RESET_CONFIG_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
           cold('r', { r: Fixtures.mockResetConfigFailure })
@@ -299,7 +299,7 @@ describe('robotAdminEpic', () => {
       })
     })
 
-    test('dispatches RESTART on RESET_CONFIG_SUCCESS', () => {
+    it('dispatches RESTART on RESET_CONFIG_SUCCESS', () => {
       const action = Actions.resetConfigSuccess(mockRobot.name, {})
 
       testScheduler.run(({ hot, expectObservable }) => {

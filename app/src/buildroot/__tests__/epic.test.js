@@ -53,7 +53,7 @@ describe('buildroot update epics', () => {
   })
 
   describe('startUpdateEpic', () => {
-    test('with BR robot sends CREATE_SESSION', () => {
+    it('with BR robot sends CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobot.mockReturnValueOnce(brRobot)
 
@@ -69,7 +69,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('with BR-ready robot sends CREATE_SESSION', () => {
+    it('with BR-ready robot sends CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobot.mockReturnValueOnce(brReadyRobot)
 
@@ -88,7 +88,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('with balena robot sends START_PREMIGRATION', () => {
+    it('with balena robot sends START_PREMIGRATION', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startBuildrootUpdate(robot.name)
 
@@ -104,7 +104,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('with systemFile in payload sends READ_USER_FILE', () => {
+    it('with systemFile in payload sends READ_USER_FILE', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startBuildrootUpdate(
           robot.name,
@@ -123,7 +123,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('with bad robot sends UNEXPECTED_ERROR', () => {
+    it('with bad robot sends UNEXPECTED_ERROR', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const action = actions.startBuildrootUpdate(robot.name)
 
@@ -143,7 +143,7 @@ describe('buildroot update epics', () => {
   })
 
   describe('createSessionEpic', () => {
-    test('sends request to token URL from payload and issues CREATE_SESSION_SUCCESS', () => {
+    it('sends request to token URL from payload and issues CREATE_SESSION_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
@@ -171,7 +171,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('sends request to cancel URL if 409 and reissues CREATE_SESSION', () => {
+    it('sends request to cancel URL if 409 and reissues CREATE_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
@@ -196,7 +196,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('issues error if begin request fails without 409', () => {
+    it('issues error if begin request fails without 409', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
@@ -214,7 +214,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('issues error if cancel request fails', () => {
+    it('issues error if cancel request fails', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         const action = actions.createSession(robot, '/server/update/begin')
 
@@ -239,7 +239,7 @@ describe('buildroot update epics', () => {
     })
   })
 
-  test('retryAfterPremigrationEpic', () => {
+  it('retryAfterPremigrationEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       selectors.getBuildrootRobot.mockReturnValueOnce(brReadyRobot)
       selectors.getBuildrootRobotName.mockReturnValueOnce(brReadyRobot.name)
@@ -257,7 +257,7 @@ describe('buildroot update epics', () => {
     })
   })
 
-  test('statusPollEpic', () => {
+  it('statusPollEpic', () => {
     testScheduler.run(
       ({ hot, cold, expectObservable, expectSubscriptions, flush }) => {
         const action = {
@@ -300,7 +300,7 @@ describe('buildroot update epics', () => {
     )
   })
 
-  test('uploadFileEpic', () => {
+  it('uploadFileEpic', () => {
     testScheduler.run(({ hot, expectObservable }) => {
       const session = {
         pathPrefix: '/server/update/migration',
@@ -334,7 +334,7 @@ describe('buildroot update epics', () => {
       step: 'processFile',
     }
 
-    test('commit request success', () => {
+    it('commit request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         selectors.getBuildrootRobot.mockReturnValue(brRobot)
         selectors.getBuildrootSession.mockReturnValue(session)
@@ -359,7 +359,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('commit request failure', () => {
+    it('commit request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobot.mockReturnValue(brRobot)
         selectors.getBuildrootSession.mockReturnValue(session)
@@ -388,7 +388,7 @@ describe('buildroot update epics', () => {
       step: 'commitUpdate',
     }
 
-    test('restart request success', () => {
+    it('restart request success', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         selectors.getBuildrootRobot.mockReturnValue(brRobot)
         selectors.getBuildrootSession.mockReturnValue(session)
@@ -414,7 +414,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('restart request failure', () => {
+    it('restart request failure', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobot.mockReturnValue(brRobot)
         selectors.getBuildrootSession.mockReturnValue(session)
@@ -436,7 +436,7 @@ describe('buildroot update epics', () => {
   })
 
   describe('user file upload epics', () => {
-    test('retryAfterUserFileInfoEpic', () => {
+    it('retryAfterUserFileInfoEpic', () => {
       testScheduler.run(({ hot, cold, expectObservable }) => {
         selectors.getBuildrootRobotName.mockReturnValue(balenaRobot.name)
 
@@ -450,7 +450,7 @@ describe('buildroot update epics', () => {
       })
     })
 
-    test('uploadFileEpic sends systemFile if it exists in session', () => {
+    it('uploadFileEpic sends systemFile if it exists in session', () => {
       testScheduler.run(({ hot, expectObservable }) => {
         const session = {
           pathPrefix: '/server/update/migration',

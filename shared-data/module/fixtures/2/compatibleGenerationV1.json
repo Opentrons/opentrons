@@ -1,0 +1,45 @@
+{
+  "$otSharedSchema": "module/schemas/2",
+  "moduleType": "compatibleModuleType",
+  "model": "compatibleGenerationV1",
+  "labwareOffset": {
+    "x": -1.45,
+    "y": -0.15,
+    "z": 80.09
+  },
+  "dimensions": {
+    "bareOverallHeight": 84,
+    "overLabwareHeight": 0
+  },
+  "calibrationPoint": {
+    "x": 11.7,
+    "y": 8.75
+  },
+  "displayName": "Compatible Across Generations",
+  "quirks": [],
+  "slotTransforms": {
+    "ot2_standard": {
+      "3": {
+        "labwareOffset": [[-1, 0, -0.3], [0, 1, 0], [0, 0, 1]]
+      },
+      "6": {
+        "labwareOffset": [[-1, 0, -0.3], [0, 1, 0], [0, 0, 1]]
+      },
+      "9": {
+        "labwareOffset": [[-1, 0, -0.3], [0, 1, 0], [0, 0, 1]]
+      }
+    },
+    "ot2_short_trash": {
+      "3": {
+        "labwareOffset": [[-1, 0, -0.15], [0, 1, 0], [0, 0, 1]]
+      },
+      "6": {
+        "labwareOffset": [[-1, 0, -0.15], [0, 1, 0], [0, 0, 1]]
+      },
+      "9": {
+        "labwareOffset": [[-1, 0, -0.15], [0, 1, 0], [0, 0, 1]]
+      }
+    }
+  },
+  "compatibleWith": ["compatibleGenerationV2"]
+}

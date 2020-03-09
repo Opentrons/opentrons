@@ -3,7 +3,7 @@ import logging
 import asyncio
 from threading import Event, Thread, Lock
 from time import sleep
-from typing import Optional, Mapping, Dict, Tuple
+from typing import Any, Optional, Mapping, Dict, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication, utils
@@ -180,7 +180,7 @@ class TempDeck:
 
     def get_device_info(self) -> Mapping[str, str]:
         '''
-        Queries Temp-Deck for it's build version, model, and serial number
+        Queries Temp-Deck for its build version, model, and serial number
 
         returns: dict
             Where keys are the strings 'version', 'model', and 'serial',
@@ -195,10 +195,7 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        try:
-            return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
-        except (TempDeckError, SerialException, SerialNoResponse) as e:
-            return {'error': str(e)}
+        return self._get_info(DEFAULT_COMMAND_RETRIES)
 
     def pause(self):
         self.run_flag.clear()
@@ -294,13 +291,17 @@ class TempDeck:
             sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_update_temperature(retries)
 
-    def _recursive_get_info(self, retries) -> Mapping[str, str]:
-        try:
-            device_info = self._send_command(GCODES['DEVICE_INFO'])
-            return utils.parse_device_information(device_info)
-        except utils.ParseError as e:
-            retries -= 1
-            if retries <= 0:
-                raise TempDeckError(e)
-            sleep(DEFAULT_STABILIZE_DELAY)
-            return self._recursive_get_info(retries)
+    def _get_info(self, retries) -> Mapping[str, str]:
+        last_e: Any = None
+        for _ in range(retries):
+            try:
+                device_info = self._send_command(GCODES['DEVICE_INFO'])
+                return utils.parse_device_information(device_info)
+            except utils.ParseError as e:
+                log.exception("tempdeck device information parse failure")
+                last_e = e
+                sleep(DEFAULT_STABILIZE_DELAY)
+        if last_e:
+            raise last_e
+        else:
+            raise TempDeckError('Unknown error in temperature module')

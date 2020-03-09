@@ -40,7 +40,7 @@ describe('useDispatchApiRequest', () => {
     jest.resetAllMocks()
   })
 
-  test('adds meta.requestId to action and dispatches it', () => {
+  it('adds meta.requestId to action and dispatches it', () => {
     expect(mockDispatch).toHaveBeenCalledTimes(0)
 
     act(() => wrapper.find('button').invoke('onClick')())
@@ -52,14 +52,14 @@ describe('useDispatchApiRequest', () => {
     })
   })
 
-  test('adds requestId to requestIds list', () => {
+  it('adds requestId to requestIds list', () => {
     act(() => wrapper.find('button').invoke('onClick')())
     wrapper.update()
 
     expect(wrapper.text()).toEqual('mockId_0')
   })
 
-  test('can dispatch multiple requests', () => {
+  it('can dispatch multiple requests', () => {
     act(() => wrapper.find('button').invoke('onClick')())
     wrapper.update()
     act(() => wrapper.find('button').invoke('onClick')())

@@ -354,6 +354,8 @@ def run(ctx):
     assert 'p300_single_v1' in [pip.name for pip in session.instruments]
     assert 'p10_multi_v1' in [pip.name for pip in session.instruments]
     assert 'magdeck' in [mod.name for mod in session.modules]
+    assert 'magneticModuleV1' in [mod.model for mod in session.modules]
+    assert 'temperatureModuleV1' in [mod.model for mod in session.modules]
     assert 'tempdeck' in [mod.name for mod in session.modules]
 
     v1proto = '''
@@ -386,6 +388,7 @@ left.drop_tip()
     session3 = main_router.session_manager.create('dummy-pipette_v1',
                                                   v1proto)
     assert ['p300_single_v1'] == [pip.name for pip in session3.instruments]
+    assert ['temperatureModuleV1'] == [mod.model for mod in session3.modules]
     assert ['tempdeck'] == [mod.name for mod in session3.modules]
 
 

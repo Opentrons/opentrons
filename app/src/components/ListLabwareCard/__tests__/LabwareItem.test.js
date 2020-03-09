@@ -39,7 +39,7 @@ describe('LabwareItem', () => {
     },
   }
 
-  test('component renders', () => {
+  it('component renders', () => {
     const treeInvalid = shallow(<LabwareItem file={invalidFile} />)
     const treeValid = shallow(<LabwareItem file={validFile} />)
 
@@ -47,13 +47,13 @@ describe('LabwareItem', () => {
     expect(treeValid).toMatchSnapshot()
   })
 
-  test('is a <li>', () => {
+  it('is a <li>', () => {
     const tree = mount(<LabwareItem file={invalidFile} />)
 
     expect(tree.getDOMNode().tagName).toBe('LI')
   })
 
-  test('renders props', () => {
+  it('renders props', () => {
     const html = mount(<LabwareItem file={validFile} />).html()
 
     // file name
@@ -68,7 +68,7 @@ describe('LabwareItem', () => {
     expect(html).toContain('2019-10-21')
   })
 
-  test('displays a Warning for invalid files', () => {
+  it('displays a Warning for invalid files', () => {
     const SPECS = [
       {
         file: CustomLabwareFixtures.mockInvalidLabware,

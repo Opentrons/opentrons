@@ -1,3 +1,4 @@
+import typing
 import uvicorn  # type: ignore
 from opentrons.hardware_control import HardwareAPILike
 
@@ -5,7 +6,10 @@ from opentrons.hardware_control import HardwareAPILike
 HARDWARE_APP_KEY = 'hardware'
 
 
-def run(hardware: HardwareAPILike, hostname: str, port: int):
+def run(hardware: HardwareAPILike,
+        hostname: typing.Optional[str],
+        port: typing.Optional[int],
+        path: typing.Optional[str]):
     """Start the fastapi service."""
     # todo Amit 2/11/2020
     #  Ideally we would start the application using uvicorn command line, but
@@ -17,4 +21,4 @@ def run(hardware: HardwareAPILike, hostname: str, port: int):
     #  to play nice with existing aiohttp application bootstrap.
     app.extra[HARDWARE_APP_KEY] = hardware  # type: ignore
 
-    uvicorn.run(app, host=hostname, port=port)
+    uvicorn.run(app, host=hostname, port=port, uds=path)

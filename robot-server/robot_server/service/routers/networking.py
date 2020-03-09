@@ -3,11 +3,12 @@ import subprocess
 from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException, File, Path
-from opentrons.app.models import V1ErrorMessage
-from opentrons.app.models.networking import NetworkingStatus, WifiNetworks, \
-    WifiNetwork, WifiConfiguration, WifiConfigurationResponse, WifiKeyFiles, \
-    WifiKeyFile, EapOptions
 from opentrons.system import nmcli
+from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models.networking import NetworkingStatus, \
+    WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
+    WifiKeyFiles, WifiKeyFile, EapOptions
+
 
 log = logging.getLogger(__name__)
 

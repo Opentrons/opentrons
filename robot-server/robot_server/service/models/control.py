@@ -76,10 +76,15 @@ class Module(BaseModel):
     """An object identifying a module"""
     name: str = \
         Field(...,
-              description="A machine readable identifying name for a module", )
+              description="A machine readable identifying name for a module. "
+                          "Deprecated. Prefer moduleModel", )
     displayName: str = \
         Field(...,
-              description="A human-presentable name of the module", )
+              description="A human-presentable name of the module. Deprecated."
+                          " Prefer lookup in the def", )
+    moduleModel: str = \
+        Field(...,
+              description="The model of the module (e.g. magneticModuleV1)")
     port: str = \
         Field(...,
               description="The virtual port to which the module is attached", )
@@ -88,9 +93,15 @@ class Module(BaseModel):
               description="The unique serial number of the module", )
     model: str = \
         Field(...,
-              description="The model identifier (i.e. the part number)", )
+              description="The model identifier (i.e. the part number). "
+                          "Deprecated. Prefer revision", )
+    revision: str = \
+        Field(...,
+              description="The hardware identifier (i.e. the part number)")
     fwVersion: str = \
         Field(..., description="The current firmware version", )
+    hasAvailableUpdate: bool = \
+        Field(..., description="If set, a module update is available")
     status: str = \
         Field(...,
               description="A human-readable module-specific status", )
@@ -116,11 +127,14 @@ class Modules(BaseModel):
                         {
                             "name": "magdeck",
                             "displayName": "Magnetic Module",
+                            "moduleModel": "magneticModuleV1",
                             "port": "tty01_magdeck",
                             "serial": "MDV2313121",
-                            "model": "V23",
+                            "model": "mag_deck_v4.0",
+                            "revision": "mag_deck_v4.0",
                             "fwVersion": "2.1.3",
                             "status": "engaged",
+                            "hasAvailableUpdate": True,
                             "data": {
                                 "engaged": True,
                                 "height": 10
@@ -136,9 +150,12 @@ class Modules(BaseModel):
                         {
                             "name": "tempdeck",
                             "displayName": "Temperature Module",
+                            "moduleModel": "temperatureModuleV1",
+                            "revision": "temp_deck_v10",
                             "port": "tty2_tempdeck",
                             "serial": "TDV10231231",
-                            "model": "V10",
+                            "model": "temp_deck_v10",
+                            "hasAvailableUpdate": False,
                             "fwVersion": "1.2.0",
                             "status": "cooling",
                             "data": {
@@ -156,9 +173,12 @@ class Modules(BaseModel):
                         {
                             "name": "thermocycler",
                             "displayName": "Thermocycler",
+                            "revision": "thermocycler_v10",
+                            "moduleModel": "thermocyclerModuleV1",
                             "port": "tty3_thermocycler",
                             "serial": "TCV1006052018",
-                            "model": "V10",
+                            "model": "thermocycler_v10",
+                            "hasAvailableUpdate": True,
                             "fwVersion": "1.0.0",
                             "status": "cooling",
                             "data": {

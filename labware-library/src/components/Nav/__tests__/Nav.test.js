@@ -6,7 +6,7 @@ import { shallow } from 'enzyme'
 import { Nav } from '..'
 
 describe('Nav', () => {
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<Nav />)
 
     expect(tree).toMatchSnapshot()

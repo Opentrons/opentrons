@@ -10,7 +10,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
     const helpers = makeWellSetHelpers()
     getWellSetForMultichannel = helpers.getWellSetForMultichannel
   })
-  test('96-flat', () => {
+  it('96-flat', () => {
     const labwareDef = fixture_96_plate
     expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
       'A1',
@@ -57,12 +57,12 @@ describe('getWellSetForMultichannel (integration test)', () => {
     ])
   })
 
-  test('invalid well', () => {
+  it('invalid well', () => {
     const labwareDef = fixture_96_plate
     expect(getWellSetForMultichannel(labwareDef, 'A13')).toBeFalsy()
   })
 
-  test('trough-12row', () => {
+  it('trough-12row', () => {
     const labwareDef = fixture_12_trough
     expect(getWellSetForMultichannel(labwareDef, 'A1')).toEqual([
       'A1',
@@ -87,7 +87,7 @@ describe('getWellSetForMultichannel (integration test)', () => {
     ])
   })
 
-  test('384-plate', () => {
+  it('384-plate', () => {
     const labwareDef = fixture_384_plate
     expect(getWellSetForMultichannel(labwareDef, 'C1')).toEqual([
       'A1',

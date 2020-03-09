@@ -11,30 +11,30 @@ describe('rpc remote object factory', () => {
     }
   })
 
-  test('deserializes an int', () => {
+  it('deserializes an int', () => {
     return expect(RemoteObject(context, 42)).resolves.toBe(42)
   })
 
-  test('deserializes a string', () => {
+  it('deserializes a string', () => {
     return expect(RemoteObject(context, 'foo')).resolves.toBe('foo')
   })
 
-  test('deserializes a bool', () => {
+  it('deserializes a bool', () => {
     return expect(RemoteObject(context, true)).resolves.toBe(true)
   })
 
-  test('deserializes null', () => {
+  it('deserializes null', () => {
     return expect(RemoteObject(context, null)).resolves.toBe(null)
   })
 
-  test('deserializes an array of primitives', () => {
+  it('deserializes an array of primitives', () => {
     const source = [42, 'foo', true, null]
     const remote = RemoteObject(context, source)
 
     return expect(remote).resolves.toEqual([42, 'foo', true, null])
   })
 
-  test('deserializes an object with primitive props', () => {
+  it('deserializes an object with primitive props', () => {
     const source = { i: 1, t: 2, v: { foo: 'bar' } }
 
     context.resolveTypeValues.mockReturnValueOnce(Promise.resolve({}))
@@ -44,7 +44,7 @@ describe('rpc remote object factory', () => {
     )
   })
 
-  test('deserializes an object with remote methods from type', () => {
+  it('deserializes an object with remote methods from type', () => {
     const source = { i: 1, t: 2, v: { foo: 'bar' } }
     const typeValues = { baz: {} }
 
@@ -67,7 +67,7 @@ describe('rpc remote object factory', () => {
       })
   })
 
-  test('deserializes an object without methods if methods: false', () => {
+  it('deserializes an object without methods if methods: false', () => {
     const source = { i: 1, t: 2, v: { foo: 'bar' } }
 
     return RemoteObject(context, source, { methods: false }).then(remote => {
@@ -76,7 +76,7 @@ describe('rpc remote object factory', () => {
     })
   })
 
-  test('deserializes object props as remote objects', () => {
+  it('deserializes object props as remote objects', () => {
     const child = { i: 2, t: 100, v: { baz: 'qux' } }
     const source = { i: 1, t: 100, v: { foo: 'bar', bar: child } }
 
@@ -93,7 +93,7 @@ describe('rpc remote object factory', () => {
     })
   })
 
-  test('desrializes array of objects as remote', () => {
+  it('desrializes array of objects as remote', () => {
     const child1 = { i: 3, t: 100, v: { baz: 'qux' } }
     const child2 = { i: 2, t: 100, v: { fizz: 'buzz' } }
     const source = {
@@ -116,7 +116,7 @@ describe('rpc remote object factory', () => {
     })
   })
 
-  test('deserializes remote object with deep matching refs', () => {
+  it('deserializes remote object with deep matching refs', () => {
     const child = { i: 31, t: 30, v: { foo: 'foo' } }
     const childDup = { i: 31, t: 30, v: null }
     const parent1 = { i: 32, t: 30, v: { c: childDup } }
@@ -136,7 +136,7 @@ describe('rpc remote object factory', () => {
     })
   })
 
-  test('remote method object arg with _id,', () => {
+  it('remote method object arg with _id,', () => {
     const source = { i: 1, t: 2, v: {} }
     const typeValues = { method: {} }
 

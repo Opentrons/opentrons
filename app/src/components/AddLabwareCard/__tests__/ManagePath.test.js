@@ -33,11 +33,11 @@ describe('ManagePath', () => {
     jest.resetAllMocks()
   })
 
-  test('component displays path', () => {
+  it('component displays path', () => {
     expect(wrapper.html()).toContain(mockPath)
   })
 
-  test('has a OutlineButton that calls onOpenPath on click', () => {
+  it('has a OutlineButton that calls onOpenPath on click', () => {
     expect(mockOnOpenPath).toHaveBeenCalledTimes(0)
     wrapper
       .find(`OutlineButton[name="${OPEN_SOURCE_NAME}"]`)
@@ -45,7 +45,7 @@ describe('ManagePath', () => {
     expect(mockOnOpenPath).toHaveBeenCalledTimes(1)
   })
 
-  test('has an IconCta that calls onChangePath on click', () => {
+  it('has an IconCta that calls onChangePath on click', () => {
     expect(mockOnChangePath).toHaveBeenCalledTimes(0)
     wrapper.find(`IconCta[name="${CHANGE_SOURCE_NAME}"]`).invoke('onClick')()
     expect(mockOnChangePath).toHaveBeenCalledTimes(1)
@@ -62,11 +62,11 @@ describe('ManagePath', () => {
       wrapper.update()
     })
 
-    test('has an IconCta that opens a ConfirmResetPathModal', () => {
+    it('has an IconCta that opens a ConfirmResetPathModal', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(true)
     })
 
-    test('ConfirmResetPathModal::onCancel closes modal without resetting path', () => {
+    it('ConfirmResetPathModal::onCancel closes modal without resetting path', () => {
       act(() => {
         wrapper.find(ConfirmResetPathModal).invoke('onCancel')()
       })
@@ -76,7 +76,7 @@ describe('ManagePath', () => {
       expect(wrapper.exists(ConfirmResetPathModal)).toBe(false)
     })
 
-    test('ConfirmResetPathModal::onConfirm calls onResetPath and closes modal', () => {
+    it('ConfirmResetPathModal::onConfirm calls onResetPath and closes modal', () => {
       expect(mockOnResetPath).toHaveBeenCalledTimes(0)
       act(() => {
         wrapper.find(ConfirmResetPathModal).invoke('onConfirm')()

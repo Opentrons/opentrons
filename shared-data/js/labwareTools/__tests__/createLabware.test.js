@@ -67,16 +67,16 @@ describe('createLabware', () => {
     jest.clearAllMocks()
   })
 
-  test('snapshot tests', () => {
+  it('snapshot tests', () => {
     expect(labware1).toEqual(exampleLabware1)
     expect(labware2).toEqual(exampleLabware2)
   })
 
-  test('ordering generates as expected', () => {
+  it('ordering generates as expected', () => {
     expect(exampleLabware2.ordering).toEqual(labware2.ordering)
   })
 
-  test('well XYZ generates correctly', () => {
+  it('well XYZ generates correctly', () => {
     const spacing = { row: 10, column: 10 }
     const grid = { row: 3, column: 2 }
 
@@ -113,7 +113,7 @@ describe('createLabware', () => {
     })
   })
 
-  test('failing to validate against labware schema throws w/o "strict"', () => {
+  it('failing to validate against labware schema throws w/o "strict"', () => {
     const args = {
       ...labware2Args,
       // this spacing should make negative well `y` value and fail schema validation

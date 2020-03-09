@@ -2,8 +2,8 @@ import typing
 from enum import Enum
 from uuid import UUID
 
-from opentrons.app.models.control import Mount
 from pydantic import BaseModel, Field
+from robot_server.service.models.control import Mount
 
 
 class DeckStart(BaseModel):

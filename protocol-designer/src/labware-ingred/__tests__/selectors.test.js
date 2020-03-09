@@ -19,7 +19,7 @@ const allIngredientsXXSingleIngred = {
 // ==============================
 
 describe('allIngredientNamesIds selector', () => {
-  test('selects names & ids from allIngredients selector result', () => {
+  it('selects names & ids from allIngredients selector result', () => {
     expect(
       selectors.allIngredientNamesIds.resultFunc(
         // flow def for resultFunc is wrong and/or resultFun isn't typeable
@@ -35,12 +35,12 @@ describe('allIngredientNamesIds selector', () => {
 })
 
 describe('allIngredientGroupFields', () => {
-  test('no ingreds - return empty obj', () => {
+  it('no ingreds - return empty obj', () => {
     // flow def for resultFunc is wrong and/or resultFun isn't typeable
     expect(selectors.allIngredientGroupFields.resultFunc(({}: any))).toEqual({})
   })
 
-  test('select fields from all ingred groups', () => {
+  it('select fields from all ingred groups', () => {
     expect(
       selectors.allIngredientGroupFields.resultFunc(
         // flow def for resultFunc is wrong and/or resultFun isn't typeable

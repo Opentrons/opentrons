@@ -54,7 +54,7 @@ instrument_keys = sorted([
     'dispense_flow_rate', 'pipette_id', 'current_volume', 'display_name',
     'tip_length', 'has_tip', 'model', 'blow_out_flow_rate',
     'blow_out_speed', 'aspirate_speed', 'dispense_speed', 'working_volume',
-    'tip_overlap'])
+    'tip_overlap', 'ready_to_aspirate', 'available_volume'])
 
 
 async def test_cache_instruments(dummy_instruments, loop):
@@ -62,7 +62,7 @@ async def test_cache_instruments(dummy_instruments, loop):
         attached_instruments=dummy_instruments,
         loop=loop)
     await hw_api.cache_instruments()
-    attached = await hw_api.attached_instruments
+    attached = hw_api.attached_instruments
     assert sorted(attached[types.Mount.LEFT].keys()) == \
         instrument_keys
 
@@ -89,7 +89,7 @@ async def test_backwards_compatibility(dummy_backwards_compatibility, loop):
         types.Mount.RIGHT: {'min': 30, 'max': 300}
     }
     await hw_api.cache_instruments(requested_instr)
-    attached = await hw_api.attached_instruments
+    attached = hw_api.attached_instruments
 
     for mount, name in requested_instr.items():
         assert attached[mount]['name']\
@@ -119,7 +119,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
                         'read_pipette_id', mock_driver_id)
 
     await hw_api_cntrlr.cache_instruments()
-    attached = await hw_api_cntrlr.attached_instruments
+    attached = hw_api_cntrlr.attached_instruments
     assert sorted(
         attached[types.Mount.LEFT].keys()) == \
         instrument_keys
@@ -131,7 +131,7 @@ async def test_cache_instruments_hc(monkeypatch, dummy_instruments,
     # If we pass a matching expects it should work
     await hw_api_cntrlr.cache_instruments(
         {types.Mount.LEFT: LEFT_PIPETTE_PREFIX})
-    attached = await hw_api_cntrlr.attached_instruments
+    attached = hw_api_cntrlr.attached_instruments
     assert sorted(
         attached[types.Mount.LEFT].keys()) == \
         instrument_keys
@@ -151,7 +151,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
 
     await sim.cache_instruments()
-    attached = await sim.attached_instruments
+    attached = sim.attached_instruments
     assert attached == {
         types.Mount.LEFT: {}, types.Mount.RIGHT: {}}
     steps_mm_calls = [mock.call({'B': 768}), mock.call({'C': 768})]
@@ -172,7 +172,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     await sim.cache_instruments(
         {types.Mount.LEFT: 'p10_single_v1.3',
          types.Mount.RIGHT: 'p300_single_v2.0'})
-    attached = await sim.attached_instruments
+    attached = sim.attached_instruments
     assert attached[types.Mount.LEFT]['model']\
         == 'p10_single_v1.3'
     assert attached[types.Mount.LEFT]['name']\
@@ -190,7 +190,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         pip_config_calls, any_order=True)
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: 'p300_single'})
-    attached = await sim.attached_instruments
+    attached = sim.attached_instruments
     assert attached[types.Mount.RIGHT]['model']\
         == 'p300_single_v1'
     assert attached[types.Mount.RIGHT]['name']\
@@ -200,7 +200,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     sim = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments)
     await sim.cache_instruments()
-    attached = await sim.attached_instruments
+    attached = sim.attached_instruments
     assert sorted(
         attached[types.Mount.LEFT].keys()) == \
         instrument_keys
