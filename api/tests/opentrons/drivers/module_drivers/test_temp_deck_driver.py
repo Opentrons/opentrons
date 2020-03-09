@@ -152,6 +152,27 @@ async def test_fail_set_temp_deck_temperature(monkeypatch, temp_deck):
     assert res == error_msg
 
 
+def test_start_set_temp_deck_temperature(monkeypatch, temp_deck):
+    # Start setting target temperature
+    command_log = []
+
+    def _mock_send_command(command, timeout=None, tag=None):
+        nonlocal command_log
+        command_log += [command]
+        return ''
+
+    monkeypatch.setattr(temp_deck, '_send_command',
+                        _mock_send_command)
+
+    monkeypatch.setattr(temp_deck, '_get_status', lambda: 'holding at target')
+
+    temp_deck.start_set_temperature(99)
+    assert command_log[-1] == 'M104 S99.0'
+
+    temp_deck.start_set_temperature(-9)
+    assert command_log[-1] == 'M104 S-9.0'
+
+
 def test_turn_off_temp_deck(monkeypatch, temp_deck):
 
     command_log = []
