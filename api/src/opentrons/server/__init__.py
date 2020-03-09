@@ -8,7 +8,7 @@ import threading
 import time
 import traceback
 
-from typing import TYPE_CHECKING
+from typing import TYPE_CHECKING, Union
 from aiohttp import web
 
 from opentrons.config import CONFIG
@@ -17,7 +17,8 @@ from .http import HTTPServer
 from opentrons.api.routers import MainRouter
 
 if TYPE_CHECKING:
-    from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
+    from opentrons.hardware_control import ThreadManager  # noqa(F501)
+    from opentrons.hardware_control.types import HardwareAPILike
 
 log = logging.getLogger(__name__)
 
@@ -86,7 +87,7 @@ class ThreadedAsyncLock:
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: 'HardwareAPILike' = None,
+def init(hardware: Union[ThreadManager, HardwareAPILike] = None,
          loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
@@ -115,6 +116,8 @@ def init(hardware: 'HardwareAPILike' = None,
                 log.exception(f"failed to remove app temp path {temppath}")
 
     async def shutdown_hardware(app):
+        # import pdb
+        # pdb.set_trace()
         if app['com.opentrons.hardware']:
             app['com.opentrons.hardware'].clean_up()
 
@@ -124,7 +127,7 @@ def init(hardware: 'HardwareAPILike' = None,
     return app
 
 
-def run(hardware: 'HardwareAPILike',
+def run(hardware: Union[ThreadManager, HardwareAPILike],
         hostname=None,
         port=None,
         path=None):

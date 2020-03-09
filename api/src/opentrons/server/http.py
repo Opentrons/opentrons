@@ -2,6 +2,7 @@ import logging
 from . import endpoints as endp
 from opentrons import config
 from .endpoints import (networking, control, settings, update)
+from .endpoints.calibration import session
 from opentrons.deck_calibration import endpoints as dc_endp
 
 log = logging.getLogger(__name__)
@@ -97,3 +98,9 @@ class HTTPServer(object):
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
+        self.app.router.add_get(
+            '/calibration/{type}/session', session.get_current_session)
+        self.app.router.add_post(
+            '/calibration/{type}/session', session.create_session)
+        self.app.router.add_delete(
+            '/calibration/{type}/session', session.delete_session)
