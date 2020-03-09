@@ -7,6 +7,7 @@ import { startDiscovery } from '../../../discovery'
 import { Formik, Form, Field } from 'formik'
 import { IpField } from './IpField'
 
+import type { FormikProps } from 'formik/@flow-typed'
 import type { State, Dispatch } from '../../../types'
 import type { DiscoveryCandidates } from '../../../config/types'
 
@@ -17,6 +18,8 @@ type SP = {| candidates: DiscoveryCandidates |}
 type DP = {| addManualIp: (ip: string) => mixed |}
 
 type Props = {| ...SP, ...DP |}
+
+type ManualIpFormValues = {| ip: string |}
 
 class ManualIpFormComponent extends React.Component<Props> {
   inputRef: { current: null | HTMLInputElement }
@@ -43,14 +46,15 @@ class ManualIpFormComponent extends React.Component<Props> {
 
           actions.resetForm()
         }}
-        render={formProps => {
+      >
+        {(formProps: FormikProps<ManualIpFormValues>) => {
           return (
             <Form>
               <Field name="ip" component={IpField} inputRef={this.inputRef} />
             </Form>
           )
         }}
-      />
+      </Formik>
     )
   }
 }

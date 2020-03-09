@@ -15,12 +15,19 @@ import { i18n } from '../../localization'
 import styles from './LiquidPlacementForm.css'
 import formStyles from '../forms/forms.css'
 import stepEditFormStyles from '../StepEditForm/StepEditForm.css'
-import type { Options } from '@opentrons/components'
 
-export type ValidFormValues = {
+import type { Options } from '@opentrons/components'
+import type { FormikProps } from 'formik/@flow-typed'
+
+export type ValidFormValues = {|
   selectedLiquidId: string,
   volume: string,
-}
+|}
+
+type FormValues = {|
+  selectedLiquidId: ?string,
+  volume: ?string,
+|}
 
 type Props = {
   commonSelectedLiquidId: ?string,
@@ -99,7 +106,8 @@ export class LiquidPlacementForm extends React.Component<Props> {
           initialValues={this.getInitialValues()}
           onSubmit={this.handleSubmit}
           validationSchema={this.getValidationSchema}
-          render={({
+        >
+          {({
             handleBlur,
             handleChange,
             handleSubmit,
@@ -107,7 +115,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
             setFieldValue,
             touched,
             values,
-          }) => (
+          }: FormikProps<FormValues>) => (
             <form onSubmit={handleSubmit}>
               <div className={styles.field_row}>
                 <FormGroup
@@ -118,7 +126,11 @@ export class LiquidPlacementForm extends React.Component<Props> {
                     name="selectedLiquidId"
                     className={stepEditFormStyles.large_field}
                     options={liquidSelectionOptions}
-                    error={touched.selectedLiquidId && errors.selectedLiquidId}
+                    error={
+                      touched.selectedLiquidId == null
+                        ? errors.selectedLiquidId
+                        : null
+                    }
                     value={values.selectedLiquidId}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -131,7 +143,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
                   <InputField
                     name="volume"
                     units={i18n.t('application.units.microliter')}
-                    error={touched.volume && errors.volume}
+                    error={touched.volume == null ? errors.volume : null}
                     value={values.volume}
                     onChange={this.handleChangeVolume(setFieldValue)}
                     onBlur={handleBlur}
@@ -155,7 +167,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
               </div>
             </form>
           )}
-        />
+        </Formik>
       </div>
     )
   }

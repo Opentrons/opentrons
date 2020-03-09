@@ -22,7 +22,7 @@
     "cookie": "^0.4.0",
     "core-js": "^3.2.1",
     "file-saver": "^2.0.1",
-    "formik": "^1.5.8",
+    "formik": "^2.1.4",
     "jszip": "^3.2.2",
     "lodash": "^4.17.4",
     "mixpanel-browser": "^2.29.1",

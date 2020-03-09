@@ -50,6 +50,7 @@ import {
 } from './components/optionsWithImages'
 import styles from './styles.css'
 
+import type { FormikProps, FormikTouched } from 'formik/@flow-typed'
 import type {
   LabwareDefinition2,
   WellBottomShape,
@@ -72,7 +73,7 @@ type MakeAutofillOnChangeArgs = {|
   autofills: { [string]: $Shape<LabwareFields> },
   values: LabwareFields,
   touched: Object,
-  setTouched: ({ [$Keys<LabwareFields>]: boolean }) => void,
+  setTouched: (FormikTouched<LabwareFields>) => void,
   setValues: ($Shape<LabwareFields>) => void,
 |}
 
@@ -156,14 +157,15 @@ const WellXYImg = (props: {| wellShape: ?WellShape |}) => {
 const XYSpacingImg = (props: {|
   labwareType: ?LabwareType,
   wellShape: ?WellShape,
-  gridRows: ?number,
+  gridRows: ?string,
 |}) => {
-  const { labwareType, wellShape, gridRows } = props
+  const { labwareType, wellShape } = props
+  const gridRows = Number(props.gridRows)
   // default to this
   let src = require('./images/spacing_plate_circular.svg')
 
   if (labwareType === 'reservoir') {
-    if (gridRows != null && gridRows > 1) {
+    if (gridRows > 1) {
       src = require('./images/spacing_reservoir_multirow.svg')
     } else {
       src = require('./images/spacing_reservoir_1row.svg')
@@ -227,7 +229,7 @@ const displayAsTube = (values: LabwareFields) =>
 
 const getHeightAlerts = (
   values: LabwareFields,
-  touched: { [$Keys<LabwareFields>]: boolean }
+  touched: FormikTouched<LabwareFields>
 ) => {
   const { labwareZDimension } = values
   const zAsNum = Number(labwareZDimension) // NOTE: if empty string or null, may be cast to 0, but that's fine for `>`
@@ -253,7 +255,7 @@ const xyMessage = (
 
 const getXYDimensionAlerts = (
   values: LabwareFields,
-  touched: { [$Keys<LabwareFields>]: boolean }
+  touched: FormikTouched<LabwareFields>
 ) => {
   const xAsNum = Number(values.footprintXDimension)
   const yAsNum = Number(values.footprintYDimension)
@@ -516,7 +518,8 @@ export const LabwareCreator = () => {
           touched,
           setTouched,
           setValues,
-        }) => {
+        }: FormikProps<LabwareFields>) => {
+          console.log('DEBUG values!', values)
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(
