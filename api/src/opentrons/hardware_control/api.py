@@ -386,7 +386,7 @@ class API(HardwareAPILike):
                                                    explicit_modeset)
 
     # Global actions API
-    async def pause(self):
+    def pause(self):
         """
         Pause motion of the robot after a current motion concludes.
 

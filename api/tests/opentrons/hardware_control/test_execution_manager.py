@@ -19,7 +19,7 @@ async def test_state_machine(loop):
     assert await exec_mgr.get_state() == ExecutionState.RUNNING
 
     await exec_mgr.cancel()
-    assert await exec_mgr.get_state() == ExecutionState.CANCELED
+    assert await exec_mgr.get_state() == ExecutionState.CANCELLED
 
     with pytest.raises(ExecutionCancelledError):
         await exec_mgr.pause()

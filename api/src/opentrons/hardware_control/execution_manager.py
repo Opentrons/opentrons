@@ -17,14 +17,14 @@ class ExecutionManager():
 
     async def pause(self):
         async with self._condition:
-            if self._state is ExecutionState.CANCELED:
+            if self._state is ExecutionState.CANCELLED:
                 raise ExecutionCancelledError
             else:
                 self._state = ExecutionState.PAUSED
 
     async def resume(self):
         async with self._condition:
-            if self._state is ExecutionState.CANCELED:
+            if self._state is ExecutionState.CANCELLED:
                 pass
             else:
                 self._state = ExecutionState.RUNNING
@@ -32,7 +32,7 @@ class ExecutionManager():
 
     async def cancel(self, protected_tasks: Set[asyncio.Task] = None):
         async with self._condition:
-            self._state = ExecutionState.CANCELED
+            self._state = ExecutionState.CANCELLED
             self._condition.notify_all()
             running_task = asyncio.current_task(self._loop)
             for t in asyncio.all_tasks(self._loop):
@@ -54,9 +54,9 @@ class ExecutionManager():
         async with self._condition:
             if self._state is ExecutionState.PAUSED:
                 await self._condition.wait()
-                if self._state is ExecutionState.CANCELED:
+                if self._state is ExecutionState.CANCELLED:
                     raise ExecutionCancelledError
-            elif self._state is ExecutionState.CANCELED:
+            elif self._state is ExecutionState.CANCELLED:
                 raise ExecutionCancelledError
             else:
                 pass
