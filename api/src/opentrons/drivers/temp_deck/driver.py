@@ -125,11 +125,8 @@ class TempDeck:
         self.run_flag.wait()
         celsius = round(float(celsius),
                         utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
-        try:
-            self._send_command(
+        self._send_command(
                 '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
-        except (TempDeckError, SerialException, SerialNoResponse) as e:
-            return str(e)
         self._temperature.update({'target': celsius})
         return ''
 
