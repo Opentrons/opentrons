@@ -58,7 +58,18 @@ async def get_wifi_networks() -> WifiNetworks:
              }})
 async def post_wifi_configurution(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+    # try:
+    ok, message = await nmcli.configure(**configuration.dict())
+    log.debug("Wifi configure result: %s", message)
+    # except (ValueError, TypeError) as e:
+    #     # Indicates an unexpected kwarg; check is done here to avoid keeping
+    #     # the _check_configure_args signature up to date with nmcli.configure
+    #     raise HTTPException(HTTPStatus.BAD_REQUEST, {'message': str(e)})
+
+    if not ok:
+        raise HTTPException(HTTPStatus.UNAUTHORIZED, {'message': message})
+
+    return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 
 
 @router.get("/wifi/keys",

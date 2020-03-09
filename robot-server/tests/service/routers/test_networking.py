@@ -58,12 +58,16 @@ def test_networking_status(api_client, monkeypatch):
     assert resp.status_code == 500
 
 
-async def test_wifi_list(api_client, monkeypatch):
+def test_wifi_list(api_client, monkeypatch):
     expected_res = [
-        {'ssid': 'Opentrons', 'signal': 81, 'active': True},
-        {'ssid': 'Big Duck', 'signal': 47, 'active': False},
-        {'ssid': 'HP-Print-1-LaserJet Pro', 'signal': 35, 'active': False},
-        {'ssid': 'Guest Wireless', 'signal': 24, 'active': False}
+        {"ssid": "Opentrons", "signal": 81, "active": True,
+         "security": "WPA2 802.1X", "securityType": "wpa-eap"},
+        {"ssid": "Big Duck", "signal": 47, "active": False,
+         "security": "WPA2 802.1X", "securityType": "wpa-eap"},
+        {"ssid": "HP-Print-1-LaserJet Pro", "signal": 35, "active": False,
+         "security": "WPA2 802.1X", "securityType": "wpa-eap"},
+        {"ssid": "Guest Wireless", "signal": 24, "active": False,
+         "security": "WPA2 802.1X", "securityType": "wpa-eap"}
     ]
 
     async def mock_available():
@@ -71,17 +75,17 @@ async def test_wifi_list(api_client, monkeypatch):
 
     monkeypatch.setattr(nmcli, 'available_ssids', mock_available)
 
-    expected = json.dumps({
-        'list': expected_res
-    })
+    expected = {
+        "list": expected_res
+    }
 
     resp = api_client.get('/wifi/list')
-    text = resp.text()
+    j = resp.json()
     assert resp.status_code == 200
-    assert text == expected
+    assert j == expected
 
 
-async def test_wifi_configure(api_client, monkeypatch):
+def test_wifi_configure(api_client, monkeypatch):
     msg = "Device 'wlan0' successfully activated with '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
     async def mock_configure(ssid, securityType=None, psk=None, hidden=False):
@@ -105,8 +109,7 @@ async def test_wifi_configure(api_client, monkeypatch):
     assert 'message' in body
 
 
-async def test_wifi_disconnect(api_client, monkeypatch):
-
+def test_wifi_disconnect(api_client, monkeypatch):
     msg1 = 'Connection \'ot_wifi\' successfully deactivated. ' \
            'Connection \'ot_wifi\' (fa7ed807-23ef-41f0-ab3e-34' \
            '99cc5a960e) successfully deleted'
@@ -170,12 +173,9 @@ def test_list_keys(list_key_patch, api_client):
     ]}
 
 
-async def test_add_key_call(loop, aiohttp_client, wifi_keys_tempdir):
+def test_add_key_call(api_client):
     """Test that uploaded file is processed properly"""
     with tempfile.TemporaryDirectory() as source_td:
-        app = init()
-        cli = await loop.create_task(aiohttp_client(app))
-
         # We should be able to add multiple keys
         for fn in ['test1.pem', 'test2.pem', 'test3.pem']:
             path = os.path.join(source_td, fn)
@@ -183,7 +183,7 @@ async def test_add_key_call(loop, aiohttp_client, wifi_keys_tempdir):
                 f.write(str(random.getrandbits(20)))
 
             with patch("opentrons.system.wifi.add_key") as p:
-                await cli.post('/wifi/keys', data={'key': open(path, 'rb')})
+                api_client.post('/wifi/keys', data={'key': open(path, 'rb')})
 
                 with open(path, 'rb') as f:
                     p.assert_called_once_with(fn, f.read())
@@ -257,14 +257,12 @@ async def test_remove_key(arg, remove_key_return,
         assert await r.json() == expected_body
 
 
-async def test_eap_config_options(virtual_smoothie_env, loop, aiohttp_client):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-    resp = await cli.get('/wifi/eap-options')
+def test_eap_config_options(api_client):
+    resp = api_client.get('/wifi/eap-options')
 
-    assert resp.status == 200
+    assert resp.status_code == 200
 
-    body = await resp.json()
+    body = resp.json()
     # Check that the body is shaped correctly but ignore the actual content
     assert 'options' in body
     option_keys = ('name', 'displayName', 'required', 'type')
