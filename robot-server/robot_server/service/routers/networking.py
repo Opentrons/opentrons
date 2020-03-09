@@ -71,7 +71,7 @@ async def get_wifi_keys() -> WifiKeyFiles:
                     name=os.path.basename(key.file))
         for key in wifi.list_keys()
     ]
-    return WifiKeyFiles(keys=keys)
+    return WifiKeyFiles(wifi_keys=keys)
 
 
 @router.post("/wifi/keys",

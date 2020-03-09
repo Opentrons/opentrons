@@ -277,8 +277,9 @@ class WifiKeyFile(BaseModel):
 
 class WifiKeyFiles(BaseModel):
     """The list of key files"""
-    keys: typing.List[WifiKeyFile] =\
+    wifi_keys: typing.List[WifiKeyFile] =\
         Field([],
+              alias="keys",
               description="A list of keys in the system")
 
     class Config:
