@@ -124,10 +124,8 @@ async def delete_wifi_key(
 
     deleted_file = wifi.remove_key(key_uuid)
     if not deleted_file:
-        raise HTTPException(HTTPStatus.NOT_FOUND,
-                            V1ErrorMessage(
-                                message=f"No such key file {key_uuid}")
-                            )
+        raise V1HandlerError(HTTPStatus.NOT_FOUND,
+                             message=f"No such key file {key_uuid}")
     return V1ErrorMessage(message=f'Key file {deleted_file} deleted')
 
 
@@ -158,6 +156,14 @@ async def get_eap_options() -> EapOptions:
              response_model=V1ErrorMessage,
              responses={HTTPStatus.MULTI_STATUS: {
                  "model": V1ErrorMessage
-             }})
-async def post_wifi_disconnect(wifi_ssid: WifiNetwork) -> V1ErrorMessage:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+             }},
+             status_code=HTTPStatus.MULTI_STATUS)
+async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
+    ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)
+
+    result = V1ErrorMessage(message=message)
+    if ok:
+        stat = 200 if 'successfully deleted' in message else 207
+    else:
+        stat = 500
+    return JSONResponse(status_code=stat, content=result.dict())

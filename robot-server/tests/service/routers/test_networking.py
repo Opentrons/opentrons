@@ -139,11 +139,8 @@ def test_wifi_disconnect(api_client, monkeypatch):
 
     monkeypatch.setattr(nmcli, 'wifi_disconnect', mock_disconnect)
 
-    expected = {'message': 'SSID must be specified as a string'}
     resp = api_client.post('/wifi/disconnect', json={})
-    body = resp.json()
-    assert resp.status_code == 400
-    assert body == expected
+    assert resp.status_code == 422
 
     resp = api_client.post('wifi/disconnect', json={'ssid': 'ot_wifi'})
     body = resp.json()
@@ -267,18 +264,15 @@ def test_add_key_response(add_key_return, expected_status, expected_body,
                               {'message': 'Key file myfile.pem deleted'}
                               )
                          ])
-async def test_remove_key(arg, remove_key_return,
+def test_remove_key(arg, remove_key_return,
                           expected_status, expected_body,
-                          loop, aiohttp_client):
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-
+                          api_client):
     with patch("opentrons.system.wifi.remove_key") as p:
         p.return_value = remove_key_return
-        r = await cli.delete("/wifi/keys/" + arg)
+        r = api_client.delete("/wifi/keys/" + arg)
         p.assert_called_once_with(arg)
-        assert r.status == expected_status
-        assert await r.json() == expected_body
+        assert r.status_code == expected_status
+        assert r.json() == expected_body
 
 
 def test_eap_config_options(api_client):
