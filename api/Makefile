@@ -38,7 +38,7 @@ simfile ?=
 # make test tests=tests/opentrons/tools/test_qc_scripts.py would run only the
 # specified test
 tests ?= tests
-test_opts ?=  --cov --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
+test_opts ?=  --cov=src/opentrons --cov-report term-missing:skip-covered --cov-report xml:coverage.xml
 
 # These variables must be overridden when make deploy or make deploy-staging is run
 # to set the auth details for pypi
@@ -134,11 +134,23 @@ docs-clean:
 .PHONY: dev
 dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m opentrons.main -P 31950
+	echo "Command will be deprecated. Use \"make -C robot-server dev\""
+	$(MAKE) -C ../robot-server dev
 
 .PHONY: local-shell
 local-shell:
 	$(pipenv_envvars) pipenv shell
+
+.PHONY: push
+push: wheel
+	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
+systemctl restart jupyter-notebook &&\
+systemctl stop opentrons-robot-server &&\
+mount -o remount,rw / &&\
+cd /usr/lib/python3.7/site-packages &&\
+unzip -o /data/opentrons-*.whl && cleanup || cleanup"
 
 .PHONY: simulate
 simulate:
@@ -154,57 +166,6 @@ deploy-staging: wheel
 deploy: wheel
 	$(python) -m twine upload $(twine_auth_args)\
                             $(wheel_file)
-
-.PHONY: push-balena
-push-balena: wheel
-	curl -X POST \
-		-H "Content-Type: multipart/form-data" \
-		-F "whl=@$(wildcard dist/opentrons-*.whl)" \
-		http://$(host):31950/server/update
-
-.PHONY: push
-push: wheel
-	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-api-server; } ;\
-systemctl restart jupyter-notebook &&\
-systemctl stop opentrons-api-server &&\
-mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
-unzip -o /data/opentrons-*.whl && cleanup || cleanup"
-
-.PHONY: install-key
-install-key:
-	curl -X POST $(host):31950/server/ssh_keys\
-		-H "Content-Type: application/json"\
-		-d "{\"key\":\"$(shell cat $(br_ssh_pubkey))\"}"
-
-.PHONY: restart
-restart:
-	curl -X POST http://$(host):31950/server/restart
-
-.PHONY: change-right
-change-right:
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"target": "mount", "mount": "right", "point": [65, 40, 30]}' \
-		http://$(host):31950/robot/move
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"axes": ["c"]}' \
-		http://$(host):31950/motors/disengage
-
-
-.PHONY: change-left
-change-left:
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"target": "mount", "mount": "left", "point": [325, 40, 30]}' \
-		http://$(host):31950/robot/move
-	curl -X POST \
-		-H "Content-Type: application/json" \
-		-d '{"axes": ["b"]}' \
-		http://$(host):31950/motors/disengage
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term
