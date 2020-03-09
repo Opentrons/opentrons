@@ -12,8 +12,7 @@ const selectStepMock: JestMockFn<[string, string], *> = selectStep
 const id = 'someUUID'
 
 beforeEach(() => {
-  dispatch.mockClear()
-  getState.mockClear()
+  jest.clearAllMocks()
 
   uuidMock.mockReturnValue(id)
   selectStepMock.mockReturnValue('selectStepMockReturnValue')

@@ -27,25 +27,16 @@ const mockGetSingleThermocyclerModuleId: JestMockFn<[Object], *> =
   uiModuleSelectors.getSingleThermocyclerModuleId
 
 beforeEach(() => {
-  dispatch.mockClear()
-  getState.mockClear()
+  jest.clearAllMocks()
 
-  addStepMock.mockClear()
   addStepMock.mockReturnValue('addStepMockReturnValue')
-  addHintMock.mockClear()
   addHintMock.mockReturnValue('addHintReturnValue')
 
-  mockGetDeckHasLiquid.mockClear()
   mockGetDeckHasLiquid.mockReturnValue(true)
-  mockGetMagnetModuleHasLabware.mockClear()
   mockGetMagnetModuleHasLabware.mockReturnValue(false)
-  mockGetTemperatureModuleHasLabware.mockClear()
   mockGetTemperatureModuleHasLabware.mockReturnValue(false)
-  mockGetThermocyclerModuleHasLabware.mockClear()
   mockGetThermocyclerModuleHasLabware.mockReturnValue(false)
-  mockGetSingleTemperatureModuleId.mockClear()
   mockGetSingleTemperatureModuleId.mockReturnValue(null)
-  mockGetSingleThermocyclerModuleId.mockClear()
   mockGetSingleThermocyclerModuleId.mockReturnValue(null)
 })
 
