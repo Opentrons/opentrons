@@ -12,7 +12,7 @@ class ExecutionManager():
     """
     def __init__(self, loop: asyncio.AbstractEventLoop):
         self._state: ExecutionState = ExecutionState.RUNNING
-        self._condition = asyncio.Condition()
+        self._condition = asyncio.Condition(loop=loop)
         self._loop = loop
 
     async def pause(self):
