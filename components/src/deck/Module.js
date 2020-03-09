@@ -18,8 +18,8 @@ import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 export type ModuleProps = {|
-  /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
-  name: ModuleModel,
+  /** module model */
+  model: ModuleModel,
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info',
 |}
@@ -35,7 +35,7 @@ export function Module(props: ModuleProps) {
     yDimension: height,
   } = deckDef?.locations?.orderedSlots[0]?.boundingBox
 
-  switch (props.name) {
+  switch (props.model) {
     case MAGNETIC_MODULE_V1:
     case MAGNETIC_MODULE_V2: {
       width = 137
@@ -76,9 +76,8 @@ export function Module(props: ModuleProps) {
 }
 
 function ModuleItemContents(props: ModuleProps) {
-  // TODO(mc, 2018-07-23): displayName?
-  const { mode, name } = props
-  const displayName = getModuleDisplayName(name)
+  const { mode, model } = props
+  const displayName = getModuleDisplayName(model)
 
   const message =
     mode === 'missing' ? (
