@@ -1562,3 +1562,22 @@ class API(HardwareAPILike):
         await self.update_config(instrument_offset=inst_offs)
         pip.update_instrument_offset(new_offset)
         robot_configs.save_robot_settings(self._config)
+
+    def get_instrument_max_height(
+            self,
+            mount: top_types.Mount,
+            critical_point: CriticalPoint = None):
+        """Return max achievable height of the attached instrument
+        based on the current critical point
+        """
+        pip = self._attached_instruments[mount]
+        assert pip
+        cp = self._critical_point_for(mount, critical_point)
+
+        max_height = pip.config.home_position - \
+            self._config.z_retract_distance + cp.z
+
+        _, _, transformed_z = linal.apply_reverse(
+            self._config.gantry_calibration,
+            (0, 0, max_height))
+        return transformed_z

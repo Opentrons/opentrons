@@ -16,6 +16,10 @@ from opentrons.system.shared_data import load_shared_data
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class LabwareHeightError(Exception):
+    pass
+
+
 def max_many(*args):
     return functools.reduce(max, args[1:], args[0])
 
@@ -34,10 +38,12 @@ def plan_moves(
         from_loc: types.Location,
         to_loc: types.Location,
         deck: 'Deck',
+        instr_max_height: float,
         well_z_margin: float = 5.0,
         lw_z_margin: float = 10.0,
         force_direct: bool = False,
-        minimum_z_height: float = None)\
+        minimum_lw_z_margin: float = 1.0,
+        minimum_z_height: float = None,)\
         -> List[Tuple[types.Point,
                       Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
@@ -94,17 +100,25 @@ def plan_moves(
         # TODO: Remove these awful Well.top() calls when we eliminate the back
         #       compat wrapper
         if to_well:
-            to_safety = Well.top(to_well).point.z + well_z_margin
+            to_safety = to_well.top().point.z + well_z_margin
         else:
             to_safety = to_lw.highest_z + well_z_margin
         if from_well:
-            from_safety = Well.top(from_well).point.z + well_z_margin
+            from_safety = from_well.top().point.z + well_z_margin
         else:
             from_safety = from_lw.highest_z + well_z_margin
     else:
         # One of our labwares is invalid so we have to just go above
         # deck.highest_z since we don’t know where we are
         to_safety = deck.highest_z + lw_z_margin
+
+        if to_safety > instr_max_height:
+            if instr_max_height >= (deck.highest_z + minimum_lw_z_margin):
+                to_safety = instr_max_height
+            else:
+                raise LabwareHeightError(
+                    f"Labware height {deck.highest_z} exceeds the "
+                    f"max pipette achievable height: {instr_max_height}")
         from_safety = 0.0  # (ignore since it’s in a max())
 
     safe = max_many(

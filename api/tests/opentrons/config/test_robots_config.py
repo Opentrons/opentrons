@@ -27,6 +27,7 @@ dummy_settings = {
             'multi': [10, 11, 12]
         }
     },
+    'z_retract_distance': 2,
     'tip_length': 999,
     'mount_offset': [-3, -2, -1],
     'serial_speed': 888,
