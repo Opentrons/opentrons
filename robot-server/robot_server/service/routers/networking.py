@@ -163,6 +163,8 @@ async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
 
     result = V1ErrorMessage(message=message)
     if ok:
+        # TODO have nmcli interpret error messages rather than exposing them
+        #  all the way up here.
         stat = 200 if 'successfully deleted' in message else 207
     else:
         stat = 500
