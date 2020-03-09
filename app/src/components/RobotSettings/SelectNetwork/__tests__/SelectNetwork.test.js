@@ -17,9 +17,7 @@ import * as Fixtures from '../../../../networking/__fixtures__'
 import * as Constants from '../constants'
 import { ConnectModal } from '../ConnectModal'
 import { DisconnectModal } from '../DisconnectModal'
-import { InProgressModal } from '../InProgressModal'
-import { SuccessModal } from '../SuccessModal'
-import { FailureModal } from '../FailureModal'
+import { ResultModal } from '../ResultModal'
 
 import type { State } from '../../../../types'
 
@@ -227,11 +225,14 @@ describe('<SelectNetwork />', () => {
         disconnectAndSetMockRequestState({ status: RobotApi.PENDING })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        const inProgressModal = wrapper.find(InProgressModal)
-        expect(inProgressModal).toHaveLength(1)
-        expect(inProgressModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
           ssid: mockWifiList[0].ssid,
+          isPending: true,
+          error: null,
+          onClose: expect.any(Function),
         })
       })
 
@@ -242,21 +243,22 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        expect(wrapper.find(InProgressModal)).toHaveLength(0)
-        const successModal = wrapper.find(SuccessModal)
-        expect(successModal).toHaveLength(1)
-        expect(successModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
           ssid: mockWifiList[0].ssid,
+          isPending: false,
+          error: null,
           onClose: expect.any(Function),
         })
 
         act(() => {
-          successModal.invoke('onClose')()
+          resultModal.invoke('onClose')()
         })
         wrapper.update()
 
-        expect(wrapper.find(SuccessModal)).toHaveLength(0)
+        expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
           RobotApi.dismissRequest(((requestId: any): string))
         )
@@ -270,22 +272,22 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        expect(wrapper.find(InProgressModal)).toHaveLength(0)
-        const failureModal = wrapper.find(FailureModal)
-        expect(failureModal).toHaveLength(1)
-        expect(failureModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
           ssid: mockWifiList[0].ssid,
+          isPending: false,
           error: { message: 'oh no!' },
           onClose: expect.any(Function),
         })
 
         act(() => {
-          failureModal.invoke('onClose')()
+          resultModal.invoke('onClose')()
         })
         wrapper.update()
 
-        expect(wrapper.find(FailureModal)).toHaveLength(0)
+        expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
           RobotApi.dismissRequest(((requestId: any): string))
         )
@@ -312,6 +314,7 @@ describe('<SelectNetwork />', () => {
     it('renders a ConnectModal on SelectSsid::onSelect', () => {
       expect(connectModal).toHaveLength(1)
       expect(connectModal.props()).toEqual({
+        robotName: mockRobotName,
         network: mockWifiList[1],
         wifiKeys: mockWifiKeys,
         eapOptions: mockEapOptions,
@@ -332,6 +335,7 @@ describe('<SelectNetwork />', () => {
 
       expect(connectModal).toHaveLength(1)
       expect(connectModal.props()).toEqual({
+        robotName: mockRobotName,
         network: null,
         wifiKeys: mockWifiKeys,
         eapOptions: mockEapOptions,
@@ -384,11 +388,14 @@ describe('<SelectNetwork />', () => {
         connectAndSetMockRequestState({ status: RobotApi.PENDING })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        const inProgressModal = wrapper.find(InProgressModal)
-        expect(inProgressModal).toHaveLength(1)
-        expect(inProgressModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
+          isPending: true,
+          error: null,
+          onClose: expect.any(Function),
         })
       })
 
@@ -399,21 +406,22 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        expect(wrapper.find(InProgressModal)).toHaveLength(0)
-        const successModal = wrapper.find(SuccessModal)
-        expect(successModal).toHaveLength(1)
-        expect(successModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
+          isPending: false,
+          error: null,
           onClose: expect.any(Function),
         })
 
         act(() => {
-          successModal.invoke('onClose')()
+          resultModal.invoke('onClose')()
         })
         wrapper.update()
 
-        expect(wrapper.find(SuccessModal)).toHaveLength(0)
+        expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
           RobotApi.dismissRequest(((requestId: any): string))
         )
@@ -427,22 +435,22 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        expect(wrapper.find(InProgressModal)).toHaveLength(0)
-        const failureModal = wrapper.find(FailureModal)
-        expect(failureModal).toHaveLength(1)
-        expect(failureModal.props()).toEqual({
+        const resultModal = wrapper.find(ResultModal)
+        expect(resultModal).toHaveLength(1)
+        expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
           ssid: mockConfigure.ssid,
+          isPending: false,
           error: { message: 'oh no!' },
           onClose: expect.any(Function),
         })
 
         act(() => {
-          failureModal.invoke('onClose')()
+          resultModal.invoke('onClose')()
         })
         wrapper.update()
 
-        expect(wrapper.find(FailureModal)).toHaveLength(0)
+        expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
           RobotApi.dismissRequest(((requestId: any): string))
         )

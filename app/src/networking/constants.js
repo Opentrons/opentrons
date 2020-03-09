@@ -24,6 +24,11 @@ export const AUTH_TYPE_STRING: 'string' = 'string'
 export const AUTH_TYPE_PASSWORD: 'password' = 'password'
 export const AUTH_TYPE_FILE: 'file' = 'file'
 
+// NOTE: must match WifiConfigureRequest type
+export const CONFIGURE_FIELD_SSID: 'ssid' = 'ssid'
+export const CONFIGURE_FIELD_PSK: 'psk' = 'psk'
+export const CONFIGURE_FIELD_SECURITY_TYPE: 'securityType' = 'securityType'
+
 // http request paths
 
 export const STATUS_PATH: '/networking/status' = '/networking/status'

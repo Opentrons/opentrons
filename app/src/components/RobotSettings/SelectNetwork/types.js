@@ -4,7 +4,11 @@ import typeof { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 
 export type {
   WifiNetwork,
+  WifiSecurityType,
+  WifiAuthField,
   WifiConfigureRequest,
+  WifiKey,
+  EapOption,
 } from '../../../networking/types'
 
 export type NetworkChangeType = CONNECT | DISCONNECT | JOIN_OTHER

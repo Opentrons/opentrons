@@ -28,6 +28,8 @@ export type ButtonProps = {
   children?: React.Node,
   /** type of button (default "button") */
   type?: 'submit' | 'reset' | 'button',
+  /** ID of form that button is for */
+  form?: string,
   /** custom element or component to use instead of `<button>` */
   Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
@@ -55,7 +57,7 @@ const STRIP_PROPS = [
  * ```
  */
 export function Button(props: ButtonProps) {
-  const { name, title, disabled, hover, tabIndex } = props
+  const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined
   const Component = props.Component || 'button'
@@ -63,7 +65,7 @@ export function Button(props: ButtonProps) {
 
   // pass all props if using a custom component
   const buttonProps = !props.Component
-    ? { name, type, title, disabled, onClick, className, tabIndex }
+    ? { name, type, form, title, disabled, onClick, className, tabIndex }
     : {
         ...omit(props, STRIP_PROPS),
         className: cx(className, { [styles.disabled]: disabled }),

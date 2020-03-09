@@ -102,7 +102,7 @@ export const fetchWifiKeys = (
 
 export const fetchWifiKeysSuccess = (
   robotName: string,
-  wifiKeys: Array<Types.WifiKey>,
+  wifiKeys: Array<Types.ApiWifiKey>,
   meta: RobotApiRequestMeta
 ): Types.FetchWifiKeysSuccessAction => ({
   type: Constants.FETCH_WIFI_KEYS_SUCCESS,
@@ -131,7 +131,7 @@ export const postWifiKeys = (
 
 export const postWifiKeysSuccess = (
   robotName: string,
-  wifiKey: Types.WifiKey,
+  wifiKey: Types.ApiWifiKey,
   meta: RobotApiRequestMeta
 ): Types.PostWifiKeysSuccessAction => ({
   type: Constants.POST_WIFI_KEYS_SUCCESS,

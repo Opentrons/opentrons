@@ -104,7 +104,7 @@ export type FetchWifiKeysAction = {|
 
 export type FetchWifiKeysSuccessAction = {|
   type: FETCH_WIFI_KEYS_SUCCESS,
-  payload: {| robotName: string, wifiKeys: Array<ApiTypes.WifiKey> |},
+  payload: {| robotName: string, wifiKeys: Array<ApiTypes.ApiWifiKey> |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -124,7 +124,7 @@ export type PostWifiKeysAction = {|
 
 export type PostWifiKeysSuccessAction = {|
   type: POST_WIFI_KEYS_SUCCESS,
-  payload: {| robotName: string, wifiKey: ApiTypes.WifiKey |},
+  payload: {| robotName: string, wifiKey: ApiTypes.ApiWifiKey |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -205,12 +205,19 @@ export type NetworkingAction =
 
 // state types
 
+export type WifiKey = {|
+  ...ApiTypes.ApiWifiKey,
+  // if the api key was added by a specific request, add the ID in networking
+  // state so the UI can track which key it added
+  requestId?: string,
+|}
+
 export type PerRobotNetworkingState = $Shape<{|
   internetStatus?: ApiTypes.InternetStatus,
   interfaces?: ApiTypes.InterfaceStatusMap,
   wifiList?: Array<ApiTypes.WifiNetwork>,
   wifiKeyIds?: Array<string>,
-  wifiKeysById?: $Shape<{| [id: string]: ApiTypes.WifiKey |}>,
+  wifiKeysById?: $Shape<{| [id: string]: WifiKey |}>,
   eapOptions?: Array<ApiTypes.EapOption>,
 |}>
 

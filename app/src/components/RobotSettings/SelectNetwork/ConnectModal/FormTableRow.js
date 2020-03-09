@@ -1,7 +1,7 @@
 // @flow
 // presentational components for the wifi connect form
 import * as React from 'react'
-import styles from './styles.css'
+import styles from './FormTableRow.css'
 
 export type FormRowProps = {|
   label?: string,

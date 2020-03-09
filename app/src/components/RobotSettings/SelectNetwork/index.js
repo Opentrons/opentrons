@@ -8,25 +8,11 @@ import * as Networking from '../../../networking'
 
 import { useInterval } from '@opentrons/components'
 import { SelectSsid } from './SelectSsid'
-// import { SelectNetworkModal } from './SelectNetworkModal'
 import { ConnectModal } from './ConnectModal'
 import { DisconnectModal } from './DisconnectModal'
-import { InProgressModal } from './InProgressModal'
-import { SuccessModal } from './SuccessModal'
-import { FailureModal } from './FailureModal'
+import { ResultModal } from './ResultModal'
 
-import {
-  // LIST_REFRESH_MS,
-  // DISCONNECT_WIFI_VALUE,
-  // JOIN_OTHER_VALUE,
-  CONNECT,
-  // NETWORKING_TYPE,
-  DISCONNECT,
-  JOIN_OTHER,
-} from './constants'
-
-// import { useStateSelectNetwork, stateSelector } from './hooks'
-// import { getActiveSsid, getSecurityType, hasSecurityType } from './utils'
+import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 
 import type { State, Dispatch } from '../../../types'
 import type { WifiConfigureRequest, NetworkChangeState } from './types'
@@ -90,6 +76,7 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
   const handleSelectConnect = ssid => {
     const network = list.find(nw => nw.ssid === ssid)
     network != null && setChangeState({ type: CONNECT, ssid, network })
+    // TODO(mc, 2020-03-04): connect to no security network automatically
   }
 
   const handleSelectDisconnect = () => {
@@ -97,8 +84,9 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
     ssid != null && setChangeState({ type: DISCONNECT, ssid })
   }
 
-  const handleSelectJoinOther = () =>
+  const handleSelectJoinOther = () => {
     setChangeState({ type: JOIN_OTHER, ssid: null })
+  }
 
   const handleDone = () => {
     if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
@@ -117,19 +105,12 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
       />
       {changeState.type && (
         <>
-          {requestState?.status === RobotApi.PENDING ? (
-            <InProgressModal type={changeState.type} ssid={changeState.ssid} />
-          ) : requestState?.status === RobotApi.SUCCESS ? (
-            <SuccessModal
+          {requestState ? (
+            <ResultModal
               type={changeState.type}
               ssid={changeState.ssid}
-              onClose={handleDone}
-            />
-          ) : requestState && requestState.status === RobotApi.FAILURE ? (
-            <FailureModal
-              type={changeState.type}
-              ssid={changeState.ssid}
-              error={requestState.error}
+              isPending={requestState.status === RobotApi.PENDING}
+              error={requestState.error ? requestState.error : null}
               onClose={handleDone}
             />
           ) : changeState.type === DISCONNECT ? (
@@ -140,6 +121,7 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
             />
           ) : (
             <ConnectModal
+              robotName={robotName}
               network={
                 // if we're connecting to a known network, pass it to the ConnectModal
                 // otherwise we're joining a hidden network, so set network to null
@@ -155,45 +137,4 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
       )}
     </>
   )
-
-  // TODO: (isk: 2/27/20): Refactor this SelectNetworkModal and handlers
-  // return (
-  //   <IntervalWrapper refresh={dispatchRefresh} interval={LIST_REFRESH_MS}>
-  //     <SelectSsid
-  //       list={list || []}
-  //       value={getActiveSsid(list)}
-  //       disabled={connectingTo != null}
-  //       onValueChange={handleValueChange}
-  //       showWifiDisconnect={showWifiDisconnect}
-  //     />
-  //     <SelectNetworkModal
-  //       addKey={(file: File) => dispatch(addWifiKey(robot, file))}
-  //       close={
-  //         showConfig
-  //           ? dispatch(clearConfigureWifiResponse(robot))
-  //           : () => dispatch(dismissRequest(latestRequestId))
-  //       }
-  //       onDisconnectWifi={handleDisconnectWifi}
-  //       onCancel={handleCancel}
-  //       {...{
-  //         connectingTo,
-  //         pending,
-  //         failure,
-  //         modalOpen,
-  //         ssid,
-  //         previousSsid,
-  //         networkingType,
-  //         securityType,
-  //         eapOptions,
-  //         keys,
-  //         dispatchConfigure,
-  //         configRequest,
-  //         configError,
-  //         configResponse,
-  //         response,
-  //         error,
-  //       }}
-  //     />
-  //   </IntervalWrapper>
-  // )
 }

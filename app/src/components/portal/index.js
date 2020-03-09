@@ -2,9 +2,9 @@
 import * as React from 'react'
 import ReactDom from 'react-dom'
 
-type Props = { children: React.Node }
+type Props = {| children: React.Node |}
 
-type State = { hasRoot: boolean }
+type State = {| hasRoot: boolean |}
 
 const PORTAL_ROOT_ID = '__otAppModalPortalRoot'
 const getPortalRoot = () => global.document.getElementById(PORTAL_ROOT_ID)

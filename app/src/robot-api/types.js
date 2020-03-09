@@ -18,13 +18,17 @@ export type RobotApiRequestOptions = {|
   form?: FormData,
 |}
 
-export type RobotApiResponse = {|
-  host: RobotHost,
+export type RobotApiResponseMeta = {|
   path: string,
   method: Method,
-  body: any,
   status: number,
   ok: boolean,
+|}
+
+export type RobotApiResponse = {|
+  ...RobotApiResponseMeta,
+  host: RobotHost,
+  body: any,
 |}
 
 export type RobotApiRequestMeta = $Shape<{|
@@ -55,10 +59,10 @@ export type RobotApiAction = DismissRequestAction
 
 export type RequestState =
   | $ReadOnly<{| status: 'pending' |}>
-  | $ReadOnly<{| status: 'success', response: RobotApiResponse |}>
+  | $ReadOnly<{| status: 'success', response: RobotApiResponseMeta |}>
   | $ReadOnly<{|
       status: 'failure',
-      response: RobotApiResponse,
+      response: RobotApiResponseMeta,
       error: { message?: string },
     |}>
 

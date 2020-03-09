@@ -229,7 +229,6 @@ describe('robot settings selectors', () => {
       args: ['robotName'],
       expected: [],
     },
-
     {
       name: 'getWifiKeys returns keys from state',
       selector: Selectors.getWifiKeys,
@@ -249,6 +248,40 @@ describe('robot settings selectors', () => {
         { ...Fixtures.mockWifiKey, id: 'abc' },
         { ...Fixtures.mockWifiKey, id: 'def' },
       ],
+    },
+    {
+      name: 'getWifiKeyByRequestId returns key with request ID',
+      selector: Selectors.getWifiKeyByRequestId,
+      state: {
+        networking: {
+          robotName: {
+            wifiKeyIds: ['abc', 'def'],
+            wifiKeysById: {
+              def: { ...Fixtures.mockWifiKey, id: 'def' },
+              abc: { ...Fixtures.mockWifiKey, id: 'abc', requestId: 'foobar' },
+            },
+          },
+        },
+      },
+      args: ['robotName', 'foobar'],
+      expected: { ...Fixtures.mockWifiKey, id: 'abc', requestId: 'foobar' },
+    },
+    {
+      name: 'getWifiKeyByRequestId returns null if not found',
+      selector: Selectors.getWifiKeyByRequestId,
+      state: {
+        networking: {
+          robotName: {
+            wifiKeyIds: ['abc', 'def'],
+            wifiKeysById: {
+              def: { ...Fixtures.mockWifiKey, id: 'def' },
+              abc: { ...Fixtures.mockWifiKey, id: 'abc' },
+            },
+          },
+        },
+      },
+      args: ['robotName', 'foobar'],
+      expected: null,
     },
     {
       name: 'getEapOptions returns [] if unavailable',

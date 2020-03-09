@@ -1,6 +1,9 @@
 // @flow
 // api request state reducer
 // tracks requests by ID
+// TODO(mc, 2020-03-05): caution! type checking in this file appears to
+// be fairly broken; make sure you have unit tests in place when changing
+
 import omit from 'lodash/omit'
 import { PENDING, SUCCESS, FAILURE, DISMISS_REQUEST } from './constants'
 

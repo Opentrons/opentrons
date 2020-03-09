@@ -107,6 +107,31 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
+    name: 'handles post wifi keys success action with requestId',
+    action: Actions.postWifiKeysSuccess(ROBOT_NAME, Fixtures.mockWifiKey, {
+      requestId: 'request-id',
+    }),
+    state: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeyIds: [],
+        wifiKeysById: {},
+      },
+    },
+    expected: {
+      [ROBOT_NAME]: {
+        wifiList: [],
+        wifiKeyIds: [Fixtures.mockWifiKey.id],
+        wifiKeysById: {
+          [Fixtures.mockWifiKey.id]: {
+            ...Fixtures.mockWifiKey,
+            requestId: 'request-id',
+          },
+        },
+      },
+    },
+  },
+  {
     name: 'handles post wifi keys success action with existing key',
     action: Actions.postWifiKeysSuccess(ROBOT_NAME, Fixtures.mockWifiKey, {}),
     state: {

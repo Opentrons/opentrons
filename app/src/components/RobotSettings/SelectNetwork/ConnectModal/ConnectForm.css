@@ -11,3 +11,7 @@
     font-size: var(--fs-body-1);
   }
 }
+
+.form_field {
+  min-width: 12rem;
+}

@@ -93,20 +93,20 @@ export type WifiConfigureResponse = {|
 
 // GET /wifi/keys
 
-export type WifiKey = {|
+export type ApiWifiKey = {|
   id: string,
   uri: string,
   name: string,
 |}
 
 export type FetchWifiKeysResponse = {|
-  keys: Array<WifiKey>,
+  keys: Array<ApiWifiKey>,
 |}
 
 // POST /wifi/keys
 
 export type PostWifiKeysResponse = {|
-  ...WifiKey,
+  ...ApiWifiKey,
   message?: string,
 |}
 
