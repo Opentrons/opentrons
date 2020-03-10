@@ -244,8 +244,7 @@ export class ConnectForm extends React.Component<
     if (value === NO_SECURITY) {
       setValues(nextValues)
     } else {
-      resetForm()
-      setValues(nextValues)
+      resetForm({ values: nextValues })
     }
   }
 
@@ -254,7 +253,11 @@ export class ConnectForm extends React.Component<
     const { keys, addKey, close } = this.props
 
     return (
-      <Formik onSubmit={this.handleSubmit} validate={this.validate}>
+      <Formik
+        onSubmit={this.handleSubmit}
+        validate={this.validate}
+        initialValues={{}}
+      >
         {(formProps: FormikProps<FormValues>) => {
           const {
             values,
