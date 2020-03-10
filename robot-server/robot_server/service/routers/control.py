@@ -1,7 +1,7 @@
 import typing
 from http import HTTPStatus
 from starlette.responses import StreamingResponse
-from fastapi import APIRouter, Query, HTTPException, Path
+from fastapi import APIRouter, Query, HTTPException
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models import control
 
@@ -14,51 +14,6 @@ router = APIRouter()
 async def post_identify(
         seconds: int = Query(...,
                              description="Time to blink the lights for")) \
-        -> V1BasicResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
-@router.get("/modules",
-            description="Describe the modules attached to the OT-2",
-            response_model=control.Modules)
-async def get_modules() -> control.Modules:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
-@router.get("/modules/{serial}/data",
-            description="Get live data for a specific module",
-            summary="This is similar to the values in GET /modules, but for "
-                    "only a specific currently-attached module",
-            response_model=control.ModuleSerial)
-async def get_module_serial(
-        serial: str = Path(...,
-                           description="Serial number of the module")) \
-        -> control.ModuleSerial:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
-@router.post("/modules/{serial}",
-             description="Execute a command on a specific module",
-             summary="Command a module to take an action. Valid actions depend"
-                     " on the specific module attached, which is the model "
-                     "value from GET /modules/{serial}/data or GET /modules",
-             response_model=control.SerialCommandResponse)
-async def post_serial_command(
-        command: control.SerialCommand,
-        serial: str = Path(...,
-                           description="Serial number of the module")) \
-        -> control.SerialCommandResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
-@router.post("/modules/{serial}/update",
-             description="Initiate a firmware update on a specific module",
-             summary="Command robot to flash its bundled firmware file for "
-                     "this module's type to this specific module",
-             response_model=V1BasicResponse)
-async def post_serial_update(
-        serial: str = Path(...,
-                           description="Serial number of the module"))\
         -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
