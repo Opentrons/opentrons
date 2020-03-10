@@ -56,11 +56,8 @@ async def get_wifi_networks() -> WifiNetworks:
              summary="Configures the wireless network interface to connect to"
                      " a network",
              response_model=WifiConfigurationResponse,
-             responses={HTTPStatus.CREATED: {
-                 "model": WifiConfigurationResponse
-             }},
              status_code=HTTPStatus.CREATED)
-async def post_wifi_configurution(configuration: WifiConfiguration)\
+async def post_wifi_configure(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
     try:
         ok, message = await nmcli.configure(**configuration.dict())
@@ -91,7 +88,7 @@ async def get_wifi_keys() -> WifiKeyFiles:
 
 @router.post("/wifi/keys",
              description="Send a new key file to the OT-2",
-             responses={HTTPStatus.CREATED: {"model": AddWifiKeyFileResponse}},
+             responses={HTTPStatus.OK: {"model": AddWifiKeyFileResponse}},
              response_model=AddWifiKeyFileResponse,
              status_code=HTTPStatus.CREATED,
              response_model_skip_defaults=True,
@@ -107,6 +104,7 @@ async def post_wifi_key(key: UploadFile = File(...)):
     if add_key_result.created:
         return response
     else:
+        # We return a JSONResponse because we want the 200 status code.
         response.message = 'Key file already present'
         return JSONResponse(content=response.dict())
 
@@ -154,7 +152,7 @@ async def get_eap_options() -> EapOptions:
              summary="Deactivates the wifi connection and removes it from "
                      "known connections",
              response_model=V1ErrorMessage,
-             responses={HTTPStatus.MULTI_STATUS: {
+             responses={HTTPStatus.OK: {
                  "model": V1ErrorMessage
              }},
              status_code=HTTPStatus.MULTI_STATUS)
