@@ -442,8 +442,6 @@ class Session(object):
                 self._hw_iface().stop()
             except asyncio.CancelledError:
                 pass
-            finally:
-                self._hw_iface().stop()
         self.set_state('stopped')
         return self
 

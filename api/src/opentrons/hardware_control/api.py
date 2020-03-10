@@ -73,7 +73,6 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
-        self._protected_tasks: Set[asyncio.Task] = set()
 
     @classmethod
     async def build_hardware_controller(
@@ -101,7 +100,6 @@ class API(HardwareAPILike):
         mod_watch_task = checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
-        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     @classmethod
@@ -131,7 +129,6 @@ class API(HardwareAPILike):
         api_instance = cls(backend, loop=checked_loop, config=config)
         mod_watch_task = checked_loop.create_task(backend.watch_modules(
                 register_modules=api_instance.register_modules))
-        api_instance.add_protected_task(mod_watch_task)
         return api_instance
 
     def __repr__(self):
@@ -151,9 +148,6 @@ class API(HardwareAPILike):
     def is_simulator(self):
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
-
-    def add_protected_task(self, task: asyncio.Task):
-        self._protected_tasks.add(task)
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -425,9 +419,7 @@ class API(HardwareAPILike):
         :py:meth:`stop`.
         """
         self._backend.hard_halt()
-        cancel_tasks = functools.partial(self._execution_manager.cancel,
-                                         self._protected_tasks)
-        asyncio.run_coroutine_threadsafe(cancel_tasks(), self._loop)
+        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
 
     async def stop(self):
         """
@@ -452,11 +444,8 @@ class API(HardwareAPILike):
         This will re-scan instruments and models, clearing any cached
         information about their presence or state.
         """
-        async def _chained_calls():
-            await self._execution_manager.reset()
-            await self.cache_instruments()
-
-        asyncio.run_coroutine_threadsafe(_chained_calls(), self._loop)
+        await self._execution_manager.reset()
+        await self.cache_instruments()
 
     # Gantry/frame (i.e. not pipette) action API
     async def home_z(self, mount: top_types.Mount = None):

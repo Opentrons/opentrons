@@ -39,18 +39,18 @@ async def test_cancel_tasks(loop):
 
     exec_mgr = ExecutionManager(loop=loop)
 
-    unprotected_task = loop.create_task(fake_task())
+    # unprotected_task = loop.create_task(fake_task())
 
-    protected_task = loop.create_task(fake_task())
+    # protected_task = loop.create_task(fake_task())
 
-    # current, protected, and unprotected
-    assert len(asyncio.all_tasks(loop)) == 3
-    assert len([t for t in asyncio.all_tasks(loop) if t.cancelled()]) == 0
+    # # current, protected, and unprotected
+    # assert len(asyncio.all_tasks(loop)) == 3
+    # assert len([t for t in asyncio.all_tasks(loop) if t.cancelled()]) == 0
 
-    await exec_mgr.cancel(protected_tasks={protected_task})
-    await asyncio.sleep(0.1)
+    # await exec_mgr.cancel(protected_tasks={protected_task})
+    # await asyncio.sleep(0.1)
 
-    all_tasks = asyncio.all_tasks(loop)
-    assert len(all_tasks) == 2  # current and protected
-    assert protected_task in all_tasks
-    assert unprotected_task not in all_tasks
+    # all_tasks = asyncio.all_tasks(loop)
+    # assert len(all_tasks) == 2  # current and protected
+    # assert protected_task in all_tasks
+    # assert unprotected_task not in all_tasks
