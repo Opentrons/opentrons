@@ -431,8 +431,8 @@ class API(HardwareAPILike):
         """
         self._backend.halt()
         self._log.info("Recovering from halt")
-        await asyncio.shield(self.reset(), loop=self.loop)
-        await asyncio.shield(self.home(), loop=self.loop)
+        await self.reset()
+        await self.home()
 
     async def _wait_for_is_running(self):
         if not self.is_simulator:
