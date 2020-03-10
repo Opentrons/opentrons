@@ -519,7 +519,6 @@ export const LabwareCreator = () => {
           setTouched,
           setValues,
         }: FormikProps<LabwareFields>) => {
-          console.log('DEBUG values!', values)
           reportErrors({ values, errors, touched })
           // TODO (ka 2019-8-27): factor out this as sub-schema from Yup schema and use it to validate instead of repeating the logic
           const canProceedToForm = Boolean(

@@ -41,6 +41,7 @@ export const TextField = (props: Props) => {
           <div className={fieldStyles.field_wrapper}>
             <div className={fieldStyles.field_label}>{LABELS[name]}</div>
             <InputField
+              name={field.name}
               value={field.value}
               caption={caption}
               placeholder={placeholder}

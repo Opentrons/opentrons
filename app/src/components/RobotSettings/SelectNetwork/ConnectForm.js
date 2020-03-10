@@ -228,8 +228,8 @@ export class ConnectForm extends React.Component<
     name: string,
     value: ?string,
     ssid: ?string,
-    setValues: FormValues => mixed,
-    resetForm: ({| values: FormValues |}) => mixed,
+    setValues: *,
+    resetForm: *,
   |}): mixed {
     const { name, value, ssid, setValues, resetForm } = args
     const { eapOptions, securityType: knownSecurityType } = this.props
@@ -244,7 +244,8 @@ export class ConnectForm extends React.Component<
     if (value === NO_SECURITY) {
       setValues(nextValues)
     } else {
-      resetForm({ values: nextValues })
+      resetForm()
+      setValues(nextValues)
     }
   }
 

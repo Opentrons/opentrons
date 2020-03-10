@@ -65,7 +65,7 @@ declare module 'formik/@flow-typed' {
   declare export type FormikHandlers = {|
     handleSubmit(e?: { ... }): void,
     handleReset(e?: { ... }): void,
-    handleBlur(e?: { ... }): void, // TODO(IL, 2020-03-09): `e` should not be Maybe (I think??) but react-select doesn't provide an event
+    handleBlur(e: { ... }): void,
     handleChange(e: { ... }): void,
   |}
 
