@@ -117,7 +117,7 @@
       },
       "setTemperature": {
         "options": {
-          "false": "Deactivate and let module passively return to room temperature",
+          "false": "Deactivate module",
           "true": "Change to temperature"
         }
       }
