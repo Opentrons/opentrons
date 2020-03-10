@@ -31,7 +31,7 @@ import type {
 } from '../../../http-api-client'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+import type { FormikProps, FormikState } from 'formik/@flow-typed'
 
 type ConnectFormProps = {|
   ssid: ?string,
@@ -228,8 +228,8 @@ export class ConnectForm extends React.Component<
     name: string,
     value: ?string,
     ssid: ?string,
-    setValues: *,
-    resetForm: *,
+    setValues: (values: FormValues) => void,
+    resetForm: (nextState?: $Shape<FormikState<FormValues>>) => void,
   |}): mixed {
     const { name, value, ssid, setValues, resetForm } = args
     const { eapOptions, securityType: knownSecurityType } = this.props

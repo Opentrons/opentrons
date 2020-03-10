@@ -46,9 +46,9 @@ export const Dropdown = (props: DropdownProps) => {
             caption={props.caption}
             value={field.value}
             options={options}
-            onBlur={e => {
-              reportFieldEdit({ value: field.value, name: field.name })
-              field.onBlur(e)
+            onLoseFocus={name => {
+              reportFieldEdit({ value: field.value, name })
+              form.setFieldTouched(name)
             }}
             onValueChange={
               props.onValueChange ||

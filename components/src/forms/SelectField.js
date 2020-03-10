@@ -1,6 +1,5 @@
 // @flow
-import React, { useMemo, type Node } from 'react'
-import assert from 'assert'
+import * as React from 'react'
 import cx from 'classnames'
 import find from 'lodash/find'
 
@@ -29,14 +28,13 @@ export type SelectFieldProps = {|
   /** optional className */
   className?: string,
   /** optional caption. hidden when `error` is given */
-  caption?: Node,
+  caption?: React.Node,
   /** if included, use error style and display error instead of caption */
   error?: ?string,
   /** change handler called with (name, value) */
   onValueChange?: (name: string, value: string) => mixed,
   /** blur handler called with (name) */
   onLoseFocus?: (name: string) => mixed,
-  onBlur?: (e: SyntheticFocusEvent<HTMLElement>) => mixed,
 |}
 
 export function SelectField(props: SelectFieldProps) {
@@ -52,23 +50,12 @@ export function SelectField(props: SelectFieldProps) {
     error,
     onValueChange,
     onLoseFocus,
-    onBlur,
   } = props
   const allOptions = options.flatMap(og => og.options || [og])
   const value = find(allOptions, { value: props.value }) || null
   const caption = error || props.caption
   const captionCx = cx(styles.select_caption, { [styles.error]: error })
   const fieldCx = cx(styles.select_field, { [styles.error]: error }, className)
-
-  if (props.onLoseFocus && props.onBlur) {
-    assert(
-      false,
-      'SelectField should use `onLoseFocus` OR `onBlur` prop, not both'
-    )
-  }
-  const handleOnBlur = useMemo(() => {
-    return onLoseFocus ? () => onLoseFocus(name) : onBlur
-  }, [onLoseFocus, onBlur, name])
 
   return (
     <div>
@@ -83,7 +70,7 @@ export function SelectField(props: SelectFieldProps) {
         menuPosition={menuPosition}
         formatOptionLabel={formatOptionLabel}
         onChange={opt => onValueChange && onValueChange(name, opt?.value || '')}
-        onBlur={handleOnBlur}
+        onBlur={() => onLoseFocus && onLoseFocus(name)}
       />
       {caption && <p className={captionCx}>{caption}</p>}
     </div>
