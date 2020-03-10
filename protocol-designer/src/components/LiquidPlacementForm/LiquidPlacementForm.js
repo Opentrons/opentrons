@@ -128,9 +128,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
                     className={stepEditFormStyles.large_field}
                     options={liquidSelectionOptions}
                     error={
-                      touched.selectedLiquidId == null
-                        ? errors.selectedLiquidId
-                        : null
+                      touched.selectedLiquidId ? errors.selectedLiquidId : null
                     }
                     value={values.selectedLiquidId}
                     onChange={handleChange}
@@ -144,7 +142,7 @@ export class LiquidPlacementForm extends React.Component<Props> {
                   <InputField
                     name="volume"
                     units={i18n.t('application.units.microliter')}
-                    error={touched.volume == null ? errors.volume : null}
+                    error={touched.volume ? errors.volume : null}
                     value={values.volume}
                     onChange={this.handleChangeVolume(setFieldValue)}
                     onBlur={handleBlur}
