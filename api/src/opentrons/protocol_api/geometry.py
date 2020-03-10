@@ -107,6 +107,11 @@ def plan_moves(
             from_safety = from_well.top().point.z + well_z_margin
         else:
             from_safety = from_lw.highest_z + well_z_margin
+        # if we are already at the labware, we know the instr max height would
+        # would tall enough
+        if max(from_safety, to_safety) > instr_max_height:
+            to_safety = instr_max_height
+            from_safety = 0.0  # (ignore since it's in a max())
     else:
         # One of our labwares is invalid so we have to just go above
         # deck.highest_z since we don’t know where we are
