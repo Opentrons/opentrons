@@ -82,6 +82,10 @@ export function ConfigInput(props: ConfigInputProps) {
         {(fieldProps: FieldProps<DisplayFieldProps>) => (
           <InputField
             placeholder={_default}
+            name={fieldProps.field.name}
+            value={String(fieldProps.field.value ?? '')}
+            onChange={fieldProps.field.onChange}
+            onBlur={fieldProps.field.onBlur}
             error={fieldProps.form.errors[name]}
             {...{
               units,
@@ -105,14 +109,13 @@ export function ConfigCheckbox(props: ConfigCheckboxProps) {
   const id = makeId(name)
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
-      <Field name={name}>
+      <Field name={name} type="checkbox">
         {fieldProps => (
           <CheckboxField
-            {...{
-              onChange: fieldProps.field.onChange,
-              value: fieldProps.field.checked,
-              className,
-            }}
+            name={fieldProps.field.name}
+            onChange={fieldProps.field.onChange}
+            value={fieldProps.field.checked}
+            className={className}
           />
         )}
       </Field>

@@ -203,6 +203,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
           const handleReset = () => {
             const newValues = mapValues(values, v => {
               if (typeof v === 'boolean') {
+                // NOTE: all checkbox fields default to checked.
                 return true
               }
               return ''
