@@ -8,7 +8,7 @@ from opentrons.system import nmcli, wifi
 from starlette.responses import JSONResponse
 
 from robot_server.service.exceptions import V1HandlerError
-from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.networking import NetworkingStatus, \
     WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
     WifiKeyFiles, WifiKeyFile, EapOptions, EapVariant, EapConfigOption, \
@@ -111,20 +111,20 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
 @router.delete("/wifi/keys/{key_uuid}",
                description="Delete a key file from the OT-2",
-               responses={HTTPStatus.NOT_FOUND: {"model": V1ErrorMessage}},
-               response_model=V1ErrorMessage)
+               responses={HTTPStatus.NOT_FOUND: {"model": V1BasicResponse}},
+               response_model=V1BasicResponse)
 async def delete_wifi_key(
         key_uuid: str = Path(...,
                              description="The ID of key to delete, as "
                                          "determined by a previous call to GET"
                                          " /wifi/keys"))\
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
 
     deleted_file = wifi.remove_key(key_uuid)
     if not deleted_file:
         raise V1HandlerError(HTTPStatus.NOT_FOUND,
                              message=f"No such key file {key_uuid}")
-    return V1ErrorMessage(message=f'Key file {deleted_file} deleted')
+    return V1BasicResponse(message=f'Key file {deleted_file} deleted')
 
 
 @router.get("/wifi/eap-options",
@@ -151,15 +151,15 @@ async def get_eap_options() -> EapOptions:
              description="Disconnect the OT-2 from WiFi network",
              summary="Deactivates the wifi connection and removes it from "
                      "known connections",
-             response_model=V1ErrorMessage,
+             response_model=V1BasicResponse,
              responses={HTTPStatus.OK: {
-                 "model": V1ErrorMessage
+                 "model": V1BasicResponse
              }},
              status_code=HTTPStatus.MULTI_STATUS)
 async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
     ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)
 
-    result = V1ErrorMessage(message=message)
+    result = V1BasicResponse(message=message)
     if ok:
         # TODO have nmcli interpret error messages rather than exposing them
         #  all the way up here.

@@ -2,7 +2,7 @@ import typing
 from http import HTTPStatus
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, Query, HTTPException, Path
-from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models import V1BasicResponse
 from robot_server.service.models import control
 
 router = APIRouter()
@@ -14,7 +14,7 @@ router = APIRouter()
 async def post_identify(
         seconds: int = Query(...,
                              description="Time to blink the lights for")) \
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
@@ -55,11 +55,11 @@ async def post_serial_command(
              description="Initiate a firmware update on a specific module",
              summary="Command robot to flash its bundled firmware file for "
                      "this module's type to this specific module",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_serial_update(
         serial: str = Path(...,
                            description="Serial number of the module"))\
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
@@ -103,9 +103,9 @@ async def get_engaged_motors() -> control.EngagedMotors:
 
 @router.post("/motors/disengage",
              description="Disengage a motor or set of motors",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_disengage_motors(motors: typing.List[control.MotorName]) \
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
@@ -119,17 +119,17 @@ async def get_robot_positions() -> control.RobotPositions:
 @router.post("/robot/move",
              description="Move the robot's gantry to a position (usually to a "
                          "position retrieved from GET /robot/positions)",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_move_robot(robot_move_target: control.RobotMoveTarget)\
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/robot/home",
              description="Home the robot",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_home_robot(robot_home_target: control. RobotHomeTarget) \
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
