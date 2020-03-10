@@ -135,9 +135,6 @@ async def test_execute_module_command(
         monkeypatch):
     hw = async_server['com.opentrons.hardware']
 
-    def dummy_get_attached_modules():
-        return []
-
     magdeck = await hw._backend.build_module(
             port='/dev/ot_module_magdeck1',
             model='magdeck',

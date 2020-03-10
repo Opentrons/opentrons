@@ -55,16 +55,18 @@ async def update_module_firmware(request):
                              status=404)
 
     try:
-        if module.bundled_fw:
+        if matching_module.bundled_fw:
             await asyncio.wait_for(
                 modules.update_firmware(
-                    module, module.bundled_fw.path, request.loop),
+                    matching_module,
+                    matching_module.bundled_fw.path,
+                    request.loop),
                 UPDATE_TIMEOUT)
-            res = f'Successully updated module {serial}'
+            res = f'Successfully updated module {serial}'
             status = 200
         else:
             res = (f'Bundled fw file not found for module of '
-                   f'type: {module.name()}')
+                   f'type: {matching_module.name()}')
             status = 500
     except modules.UpdateError as e:
         res = f'Update error: {e}'
