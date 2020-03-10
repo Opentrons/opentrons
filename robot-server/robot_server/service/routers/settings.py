@@ -1,9 +1,12 @@
 from http import HTTPStatus
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Query
+from opentrons.system import log_control
+
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
-    PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
+    PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
+    LogIdentifier, LogFormat
 
 router = APIRouter()
 
@@ -82,4 +85,16 @@ async def post_pipette_setting(
         pipette_id: str,
         settings_update: PipetteSettingsUpdate) \
         -> PipetteSettings:
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+
+@router.get("/logs/{syslog_identifier}",
+            description="Get logs from the robot")
+async def get_logs(syslog_identifier: LogIdentifier,
+                   format: LogFormat = LogFormat.text,
+                   records: int = Query(500000,
+                                        description="Number of records to "
+                                                    "retrieve",
+                                        gt=0,
+                                        le=log_control.MAX_RECORDS)) -> str:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
