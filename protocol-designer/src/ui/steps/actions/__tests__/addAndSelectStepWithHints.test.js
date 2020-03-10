@@ -41,7 +41,7 @@ beforeEach(() => {
 })
 
 describe('addAndSelectStepWithHints', () => {
-  it('should dispatch ADD_STEP, and no hints when no hints are applicable (eg pause step)', () => {
+  it('should dispatch addStep thunk, and no hints when no hints are applicable (eg pause step)', () => {
     const stepType = 'pause'
     const payload = { stepType }
     addAndSelectStepWithHints(payload)(dispatch, getState)
@@ -50,7 +50,7 @@ describe('addAndSelectStepWithHints', () => {
     expect(dispatch.mock.calls).toEqual([['addStepMockReturnValue']])
   })
 
-  it('should dispatch ADD_STEP, and also ADD_HINT "add_liquids_and_labware" if we\'re adding a step that uses liquid but have no liquids on the deck', () => {
+  it('should dispatch addStep thunk, and also ADD_HINT "add_liquids_and_labware" if we\'re adding a step that uses liquid but have no liquids on the deck', () => {
     const stepType = 'moveLiquid'
     const payload = { stepType }
     mockGetDeckHasLiquid.mockReturnValue(false) // no liquid!
@@ -100,7 +100,7 @@ describe('addAndSelectStepWithHints', () => {
         },
       },
     ].forEach(({ testName, stepType, selectorValues }) => {
-      it(`should be dispatched (after ADD_STEP) for ${testName}`, () => {
+      it(`should be dispatched (after addStep thunk is dispatched) for ${testName}`, () => {
         mockGetMagnetModuleHasLabware.mockReturnValue(
           selectorValues.getMagnetModuleHasLabware
         )
