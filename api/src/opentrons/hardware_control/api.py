@@ -1,9 +1,8 @@
 import asyncio
 import contextlib
-import functools
 import logging
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional, Set
+from typing import Dict, Union, List, Optional
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -97,7 +96,7 @@ class API(HardwareAPILike):
 
         api_instance = cls(backend, loop=checked_loop, config=config)
         await api_instance.cache_instruments()
-        mod_watch_task = checked_loop.create_task(backend.watch_modules(
+        checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
         return api_instance
@@ -127,7 +126,7 @@ class API(HardwareAPILike):
                             config, checked_loop,
                             strict_attached_instruments)
         api_instance = cls(backend, loop=checked_loop, config=config)
-        mod_watch_task = checked_loop.create_task(backend.watch_modules(
+        checked_loop.create_task(backend.watch_modules(
                 register_modules=api_instance.register_modules))
         return api_instance
 
@@ -419,7 +418,8 @@ class API(HardwareAPILike):
         :py:meth:`stop`.
         """
         self._backend.hard_halt()
-        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(), self._loop)
+        asyncio.run_coroutine_threadsafe(self._execution_manager.cancel(),
+                                         self._loop)
 
     async def stop(self):
         """

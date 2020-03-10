@@ -1,6 +1,5 @@
 import asyncio
 from typing import Set
-from contextlib import asynccontextmanager
 from .types import ExecutionState, ExecutionCancelledError
 
 
@@ -15,7 +14,7 @@ class ExecutionManager():
         self._state: ExecutionState = ExecutionState.RUNNING
         self._condition = asyncio.Condition(loop=loop)
         self._loop = loop
-        self._cancellable_tasks: Set[asyncio.Task]= set()
+        self._cancellable_tasks: Set[asyncio.Task] = set()
 
     async def pause(self):
         async with self._condition:
@@ -52,7 +51,7 @@ class ExecutionManager():
 
     def register_cancellable_task(self, task: asyncio.Task):
         self._cancellable_tasks.add(task)
-        task.add_done_callback(lambda: self._cancellable_tasks.discard(task))
+        task.add_done_callback(lambda t: self._cancellable_tasks.discard(t))
         return task
 
     async def wait_for_is_running(self):

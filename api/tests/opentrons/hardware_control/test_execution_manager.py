@@ -12,8 +12,15 @@ async def test_state_machine(loop):
     exec_mgr = ExecutionManager(loop=loop)
     assert await exec_mgr.get_state() == ExecutionState.RUNNING
 
+    # passes through on wait_for_is_running if state is RUNNING
+    await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
+
     await exec_mgr.pause()
     assert await exec_mgr.get_state() == ExecutionState.PAUSED
+
+    with pytest.raises(asyncio.TimeoutError):
+        # should stall on wait_for_is_running when state is PAUSED
+        await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
 
     await exec_mgr.resume()
     assert await exec_mgr.get_state() == ExecutionState.RUNNING
@@ -22,7 +29,12 @@ async def test_state_machine(loop):
     assert await exec_mgr.get_state() == ExecutionState.CANCELLED
 
     with pytest.raises(ExecutionCancelledError):
+        # attempting to pause when CANCELLED should raise
         await exec_mgr.pause()
+
+    with pytest.raises(ExecutionCancelledError):
+        # should raise on wait_for_is_running when state is CANCELLED
+        await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
 
     await exec_mgr.reset()
     assert await exec_mgr.get_state() == ExecutionState.RUNNING
@@ -39,18 +51,19 @@ async def test_cancel_tasks(loop):
 
     exec_mgr = ExecutionManager(loop=loop)
 
-    # unprotected_task = loop.create_task(fake_task())
+    cancellable_task = loop.create_task(fake_task())
+    exec_mgr.register_cancellable_task(cancellable_task)
 
-    # protected_task = loop.create_task(fake_task())
+    other_task = loop.create_task(fake_task())
 
-    # # current, protected, and unprotected
-    # assert len(asyncio.all_tasks(loop)) == 3
-    # assert len([t for t in asyncio.all_tasks(loop) if t.cancelled()]) == 0
+    # current, cancellable, and other
+    assert len(asyncio.all_tasks(loop)) == 3
+    assert len([t for t in asyncio.all_tasks(loop) if t.cancelled()]) == 0
 
-    # await exec_mgr.cancel(protected_tasks={protected_task})
-    # await asyncio.sleep(0.1)
+    await exec_mgr.cancel()
+    await asyncio.sleep(0.1)
 
-    # all_tasks = asyncio.all_tasks(loop)
-    # assert len(all_tasks) == 2  # current and protected
-    # assert protected_task in all_tasks
-    # assert unprotected_task not in all_tasks
+    all_tasks = asyncio.all_tasks(loop)
+    assert len(all_tasks) == 2  # current and other
+    assert other_task in all_tasks
+    assert cancellable_task not in all_tasks
