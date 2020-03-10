@@ -34,7 +34,7 @@ describe('robot reducer - session', () => {
       remoteTimeCompensation: null,
       startTime: null,
       runTime: 0,
-      apiLevel: [1, 0],
+      apiLevel: null,
     })
   })
 
