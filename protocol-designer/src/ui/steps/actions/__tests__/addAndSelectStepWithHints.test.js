@@ -64,10 +64,10 @@ describe('addAndSelectStepWithHints', () => {
     ])
   })
 
-  describe('should dispatch ADD_STEP, and also ADD_HINT "module_without_labware" for module steps if module lacks labware', () => {
+  describe('ADD_HINT "module_without_labware"', () => {
     ;[
       {
-        testName: 'magnet step, magnetic module has no labware',
+        testName: 'magnet step, when magnetic module has no labware',
         stepType: 'magnet',
         selectorValues: {
           getMagnetModuleHasLabware: false,
@@ -78,7 +78,7 @@ describe('addAndSelectStepWithHints', () => {
         },
       },
       {
-        testName: 'temperature step, temperature module has no labware',
+        testName: 'temperature step, when temperature module has no labware',
         stepType: 'temperature',
         selectorValues: {
           getMagnetModuleHasLabware: false,
@@ -89,7 +89,7 @@ describe('addAndSelectStepWithHints', () => {
         },
       },
       {
-        testName: 'temperature step, thermocycler has no labware',
+        testName: 'temperature step, when thermocycler has no labware',
         stepType: 'temperature',
         selectorValues: {
           getMagnetModuleHasLabware: false,
@@ -100,7 +100,7 @@ describe('addAndSelectStepWithHints', () => {
         },
       },
     ].forEach(({ testName, stepType, selectorValues }) => {
-      it(testName, () => {
+      it(`should be dispatched (after ADD_STEP) for ${testName}`, () => {
         mockGetMagnetModuleHasLabware.mockReturnValue(
           selectorValues.getMagnetModuleHasLabware
         )
