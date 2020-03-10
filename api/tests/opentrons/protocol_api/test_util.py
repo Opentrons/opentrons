@@ -4,7 +4,7 @@ from opentrons.protocol_api.util import HardwareManager, AxisMaxSpeeds
 from opentrons.hardware_control import API, adapters, types, ThreadManager
 
 
-def test_hw_manager(loop):
+async def test_hw_manager(loop):
     # When built without an input it should build its own adapter
     mgr = HardwareManager(None)
     adapter = mgr.hardware
@@ -17,8 +17,8 @@ def test_hw_manager(loop):
 
     # When built with a hardware API input it should wrap it with a new
     # synchronous adapter and not build its own API
-    mgr = HardwareManager(
-        API.build_hardware_simulator(loop=loop))
+    sim = await API.build_hardware_simulator(loop=loop)
+    mgr = HardwareManager(sim)
     assert isinstance(mgr.hardware, adapters.SynchronousAdapter)
     passed = mgr.hardware
     # When disconnecting from a real external adapter, it should create
