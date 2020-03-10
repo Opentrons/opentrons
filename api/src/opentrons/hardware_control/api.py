@@ -1566,7 +1566,7 @@ class API(HardwareAPILike):
     def get_instrument_max_height(
             self,
             mount: top_types.Mount,
-            critical_point: CriticalPoint = None):
+            critical_point: CriticalPoint = None) -> float:
         """Return max achievable height of the attached instrument
         based on the current critical point
         """
