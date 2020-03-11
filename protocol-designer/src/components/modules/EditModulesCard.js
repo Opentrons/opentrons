@@ -36,7 +36,7 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
-  const moduleRestritionsDisabled = Boolean(
+  const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
   const crashablePipettesSelected = getIsCrashablePipetteSelected(
@@ -44,7 +44,7 @@ export function EditModulesCard(props: Props) {
   )
 
   const warningsEnabled =
-    !moduleRestritionsDisabled && crashablePipettesSelected
+    !moduleRestrictionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
     warningsEnabled &&
     (modules[MAGNETIC_MODULE_TYPE] || modules[TEMPERATURE_MODULE_TYPE])
