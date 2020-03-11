@@ -8,6 +8,7 @@ export type ProtocolAnalyticsData = {|
   protocolType: string,
   protocolAppName: string,
   protocolAppVersion: string,
+  protocolApiVersion: string,
   protocolSource: string,
   protocolName: string,
   protocolAuthor: string,

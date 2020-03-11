@@ -60,6 +60,8 @@ function mapStateToProps(state: State, ownProps: OP): SP {
   const calibrator =
     pipettes.find(i => i.mount === calibratorMount) ||
     robotSelectors.getCalibrator(state)
-  const useCenteredTroughs = robotSelectors.getApiLevel(state)[0] > 1
+  const apiLevel = robotSelectors.getApiLevel(state)
+  const useCenteredTroughs = apiLevel !== null && apiLevel[0] > 1
+
   return { calibrator, useCenteredTroughs }
 }

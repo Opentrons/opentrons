@@ -52,6 +52,18 @@ class LogLevel(BaseModel):
                           "log levels)")
 
 
+class LogIdentifier(str, Enum):
+    """Identifier of the log"""
+    api = "api.log"
+    serial = "serial.log"
+
+
+class LogFormat(str, Enum):
+    """Format to use for log records"""
+    text = "text"
+    json = "json"
+
+
 class FactoryResetOption(BaseModel):
     id: str = \
         Field(..., description="A short machine-readable id for the setting")

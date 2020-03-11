@@ -31,6 +31,7 @@ import type {
 } from '../../../http-api-client'
 
 import type { SelectOptionOrGroup } from '@opentrons/components'
+import type { FormikProps, FormikState } from 'formik/@flow-typed'
 
 type ConnectFormProps = {|
   ssid: ?string,
@@ -223,12 +224,14 @@ export class ConnectForm extends React.Component<
     return get(values, name)
   }
 
-  handleSecurityChange(
+  handleSecurityChange(args: {|
     name: string,
     value: ?string,
     ssid: ?string,
-    setValues: FormValues => mixed
-  ): mixed {
+    setValues: (values: FormValues) => void,
+    resetForm: (nextState?: $Shape<FormikState<FormValues>>) => void,
+  |}): mixed {
+    const { name, value, ssid, setValues, resetForm } = args
     const { eapOptions, securityType: knownSecurityType } = this.props
     const nextValues = ssid ? { ssid } : {}
     const eapType = find(eapOptions, { name: value })
@@ -236,7 +239,13 @@ export class ConnectForm extends React.Component<
 
     if (!knownSecurityType) set(nextValues, name, securityValue)
     if (eapType) set(nextValues, EAP_TYPE_FIELD, value)
-    setValues(nextValues)
+    // resetting the form on NO_SECURITY clears
+    // validation, disabling submit, so use setValues
+    if (value === NO_SECURITY) {
+      setValues(nextValues)
+    } else {
+      resetForm({ values: nextValues })
+    }
   }
 
   render() {
@@ -247,7 +256,9 @@ export class ConnectForm extends React.Component<
       <Formik
         onSubmit={this.handleSubmit}
         validate={this.validate}
-        render={formProps => {
+        initialValues={{}}
+      >
+        {(formProps: FormikProps<FormValues>) => {
           const {
             values,
             errors,
@@ -301,15 +312,14 @@ export class ConnectForm extends React.Component<
                         placeholder={SECURITY_TYPE_PLACEHOLDER}
                         onLoseFocus={setFieldTouched}
                         onValueChange={(name, value) => {
-                          this.handleSecurityChange(
+                          this.handleSecurityChange({
                             name,
                             value,
                             // needed to ensure SSID is not wiped out
-                            this.getSsid(values),
-                            // resetting the form on NO_SECURITY clears
-                            // validation, disabling submit, so use setValues
-                            value === NO_SECURITY ? setValues : resetForm
-                          )
+                            ssid: this.getSsid(values),
+                            setValues,
+                            resetForm,
+                          })
                         }}
                       />
                     )
@@ -345,7 +355,7 @@ export class ConnectForm extends React.Component<
             </form>
           )
         }}
-      />
+      </Formik>
     )
   }
 }
