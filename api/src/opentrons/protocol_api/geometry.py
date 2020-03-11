@@ -130,8 +130,8 @@ def plan_moves(
                     " mm, which is too tall for your current pipette "
                     "configurations. The longest pipette on your robot can "
                     f"only be raised to {instr_max_height} mm above the deck."
-                    " This may be because the labware is correctly defined, "
-                    "incorrectly calibrated, or physically too tall. Please "
+                    " This may be because the labware is incorrectly defined,"
+                    " incorrectly calibrated, or physically too tall. Please "
                     "check your labware definitions and calibrations.")
         from_safety = 0.0  # (ignore since it’s in a max())
 
