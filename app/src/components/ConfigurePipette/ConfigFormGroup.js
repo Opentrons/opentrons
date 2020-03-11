@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Field } from 'formik'
+import { Field, type FieldProps } from 'formik'
 import { FormGroup, InputField, CheckboxField } from '@opentrons/components'
 
 import styles from './styles.css'
@@ -79,15 +79,17 @@ export function ConfigInput(props: ConfigInputProps) {
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
       <Field name={name}>
-        {fieldProps => (
+        {(fieldProps: FieldProps<DisplayFieldProps>) => (
           <InputField
             placeholder={_default}
+            name={fieldProps.field.name}
+            value={String(fieldProps.field.value ?? '')}
+            onChange={fieldProps.field.onChange}
+            onBlur={fieldProps.field.onBlur}
+            error={fieldProps.form.errors[name]}
             {...{
-              ...fieldProps.field,
               units,
               className,
-              error: fieldProps.form.errors[name],
-              touched: fieldProps.form.touched[name],
             }}
           />
         )}
@@ -107,13 +109,13 @@ export function ConfigCheckbox(props: ConfigCheckboxProps) {
   const id = makeId(name)
   return (
     <ConfigFormRow label={displayName} labelFor={id}>
-      <Field name={name}>
+      <Field name={name} type="checkbox">
         {fieldProps => (
           <CheckboxField
-            {...{
-              ...fieldProps.field,
-              className,
-            }}
+            name={fieldProps.field.name}
+            onChange={fieldProps.field.onChange}
+            value={fieldProps.field.checked}
+            className={className}
           />
         )}
       </Field>

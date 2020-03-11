@@ -19,6 +19,7 @@ import {
   ConfigQuirkGroup,
 } from './ConfigFormGroup'
 
+import type { FormikProps } from 'formik/@flow-typed'
 import type {
   PipetteSettingsField,
   PipetteSettingsFieldsMap,
@@ -195,18 +196,21 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
         initialValues={initialValues}
         validate={this.validate}
         validateOnChange={false}
-        render={formProps => {
+      >
+        {(formProps: FormikProps<FormValues>) => {
           const { errors, values } = formProps
           const disableSubmit = !isEmpty(errors)
-          const handleReset = () =>
-            formProps.resetForm(
-              mapValues(values, v => {
-                if (typeof v === 'boolean') {
-                  return true
-                }
-                return ''
-              })
-            )
+          const handleReset = () => {
+            const newValues = mapValues(values, v => {
+              if (typeof v === 'boolean') {
+                // NOTE: checkbox fields don't have defaults from the API b/c they come in from `quirks`
+                // For now, we'll reset all checkboxes to true
+                return true
+              }
+              return ''
+            })
+            formProps.resetForm({ values: newValues })
+          }
           return (
             <Form>
               <FormColumn>
@@ -264,7 +268,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
             </Form>
           )
         }}
-      />
+      </Formik>
     )
   }
 }
