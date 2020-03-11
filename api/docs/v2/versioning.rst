@@ -97,7 +97,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.2     |          3.16.0             |
 +-------------+-----------------------------+
-
+|     2.3     |          3.17.0             |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -118,3 +119,14 @@ Version 2.2
   magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
 - Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
 - When using the return tip function, tips are no longer added back into the tip tracker. For more information, see :ref:`pipette-return-tip`.
+
+
+Version 2.3
++++++++++++
+
+- GEN2 Magnetic Modules and GEN2 Temperature Modules are now supported; you can load them with the names ``"magnetic
+  module gen2"`` and ``"temperature module gen2"``, respectively
+- All pipettes will return tips to tipracks from a higher position to avoid
+  possible collisions
+- During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
+  between every dispense and following aspirate
