@@ -155,7 +155,7 @@ class ThreadManager:
     @functools.lru_cache(8)
     def wrap_module(
             self, module: AbstractModule) -> CallBridger[AbstractModule]:
-        return CallBridger(module, self._loop)
+        return CallBridger(module, object.__getattribute__(self, '_loop'))
 
     def __getattribute__(self, attr_name):
         # hardware_control.api.API.attached_modules is the only hardware
