@@ -24,9 +24,9 @@ function getModuleImg(model: ModuleModel) {
 }
 
 const MODULE_IMGS: { [ModuleModel]: mixed } = {
-  temperatureModuleV1: require('./images/module-temp@3x.png'),
-  temperatureModuleV2: require('./images/module-temp@3x.png'),
-  magneticModuleV1: require('./images/module-mag@3x.png'),
-  magneticModuleV2: require('./images/module-mag@3x.png'),
-  thermocyclerModuleV1: require('./images/module-thermo@3x.png'),
+  temperatureModuleV1: require('./images/temperatureModuleV1@3x.png'),
+  temperatureModuleV2: require('./images/temperatureModuleV2@3x.png'),
+  magneticModuleV1: require('./images/magneticModuleV1@3x.png'),
+  magneticModuleV2: require('./images/magneticModuleV2@3x.png'),
+  thermocyclerModuleV1: require('./images/thermocyclerModuleV1@3x.png'),
 }
