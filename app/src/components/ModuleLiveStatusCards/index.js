@@ -17,7 +17,7 @@ import { ThermocyclerCard } from './ThermocyclerCard'
 export const ModuleLiveStatusCards = () => {
   const modules = useSelector(getAttachedModulesForConnectedRobot)
   const sendModuleCommand = useSendModuleCommand()
-  const isProtocolActive: boolean = useSelector(robotSelectors.getIsActive)
+  const isProtocolRunning: boolean = useSelector(robotSelectors.getIsRunning)
   const [expandedCard, setExpandedCard] = React.useState(
     modules.length > 0 ? modules[0].serial : ''
   )
@@ -47,7 +47,7 @@ export const ModuleLiveStatusCards = () => {
                 toggleCard={makeToggleCard(module.serial)}
                 isCardExpanded={expandedCard === module.serial}
                 sendModuleCommand={sendModuleCommand}
-                isProtocolActive={isProtocolActive}
+                allowInteraction={!isProtocolRunning}
               />
             )
           case THERMOCYCLER:
@@ -58,7 +58,7 @@ export const ModuleLiveStatusCards = () => {
                 toggleCard={makeToggleCard(module.serial)}
                 isCardExpanded={expandedCard === module.serial}
                 sendModuleCommand={sendModuleCommand}
-                isProtocolActive={isProtocolActive}
+                allowInteraction={!isProtocolRunning}
               />
             )
           case MAGDECK:

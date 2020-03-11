@@ -17,7 +17,7 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
-  isProtocolActive: boolean,
+  allowInteraction: boolean,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
@@ -25,7 +25,7 @@ type Props = {|
 export const TempDeckCard = ({
   module,
   sendModuleCommand,
-  isProtocolActive,
+  allowInteraction,
   isCardExpanded,
   toggleCard,
 }: Props) => (
@@ -36,7 +36,7 @@ export const TempDeckCard = ({
   >
     <div className={styles.card_row}>
       <StatusItem status={module.status} />
-      {!isProtocolActive && (
+      {allowInteraction && (
         <TemperatureControl
           module={module}
           sendModuleCommand={sendModuleCommand}
