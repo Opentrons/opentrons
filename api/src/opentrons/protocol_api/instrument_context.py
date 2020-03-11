@@ -569,7 +569,7 @@ class InstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        drop_loc = self._determine_drop_tip_target(loc, APIVersion(2, 3))
+        drop_loc = self._determine_drop_target(loc, APIVersion(2, 3))
         self.drop_tip(drop_loc, home_after=home_after)
 
         return self
@@ -669,7 +669,8 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    def _determine_drop_target(self, location: Well, version_breakpoint: APIVersion = None):
+    def _determine_drop_target(
+            self, location: Well, version_breakpoint: APIVersion = None):
         version_breakpoint = version_breakpoint or APIVersion(2, 2)
         if self.api_version < version_breakpoint:
             bot = location.bottom()
