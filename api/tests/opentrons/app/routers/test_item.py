@@ -1,8 +1,8 @@
 from starlette.testclient import TestClient
-from opentrons.app.main import app
-from opentrons.app.models.item import ItemData
-from opentrons.app.models.json_api.errors import Error
 from starlette.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY
+
+from opentrons.app.main import app
+from tests.opentrons.app.helpers import ItemData
 
 client = TestClient(app)
 
@@ -32,10 +32,12 @@ def test_create_item():
         "/items",
         json={"data": { "type": "item", "attributes": vars(item) }}
     )
+    # NOTE(isk: 3/11/20): We don't have the id until the resource is created
+    response_id = response.json().get("data", {}).get('id')
     assert response.status_code == HTTP_200_OK
     assert response.json() == {
         "data": {
-            "id": item.id,
+            "id": response_id,
             "type": 'item',
             "attributes": {
                 "name": item.name,
@@ -44,7 +46,7 @@ def test_create_item():
             },
         },
         "links": {
-            "self": f'/items/{item.id}',
+            "self": f'/items/{response_id}',
         }
     }
 
