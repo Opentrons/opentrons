@@ -170,6 +170,22 @@ const SPECS = [
     expected: 3,
   },
   {
+    name: 'getProtocolApiVersion returns null if null in state',
+    selector: protocol.getProtocolApiVersion,
+    state: {
+      robot: { session: { apiLevel: null } },
+    },
+    expected: null,
+  },
+  {
+    name: 'getProtocolApiVersion concats major.minor from state',
+    selector: protocol.getProtocolApiVersion,
+    state: {
+      robot: { session: { apiLevel: [2, 4] } },
+    },
+    expected: '2.4',
+  },
+  {
     name: 'getProtocolMethod if nothing loaded',
     selector: protocol.getProtocolMethod,
     state: {
@@ -268,6 +284,6 @@ const SPECS = [
 describe('protocol selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, expected } = spec
-    test(name, () => expect(selector(state)).toEqual(expected))
+    it(name, () => expect(selector(state)).toEqual(expected))
   })
 })

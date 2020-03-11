@@ -15,6 +15,9 @@ import typeof {
   SECURITY_NONE,
   SECURITY_WPA_PSK,
   SECURITY_WPA_EAP,
+  AUTH_TYPE_STRING,
+  AUTH_TYPE_PASSWORD,
+  AUTH_TYPE_FILE,
 } from './constants'
 
 // GET /networking/status
@@ -86,4 +89,48 @@ export type WifiConfigureRequest = {|
 export type WifiConfigureResponse = {|
   ssid: string,
   message: string,
+|}
+
+// GET /wifi/keys
+
+export type WifiKey = {|
+  id: string,
+  uri: string,
+  name: string,
+|}
+
+export type FetchWifiKeysResponse = {|
+  keys: Array<WifiKey>,
+|}
+
+// POST /wifi/keys
+
+export type PostWifiKeysResponse = {|
+  ...WifiKey,
+  message?: string,
+|}
+
+// GET /wifi/eap-options
+
+export type WifiAuthFieldType =
+  | AUTH_TYPE_STRING
+  | AUTH_TYPE_PASSWORD
+  | AUTH_TYPE_FILE
+
+export type WifiAuthField = {|
+  name: string,
+  displayName: string,
+  required: boolean,
+  type: WifiAuthFieldType,
+|}
+
+export type EapOption = {|
+  name: string,
+  // displayName added to response in API v3.4.0
+  displayName?: string,
+  options: Array<WifiAuthField>,
+|}
+
+export type FetchEapOptionsResponse = {|
+  options: Array<EapOption>,
 |}

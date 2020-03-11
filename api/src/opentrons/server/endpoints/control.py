@@ -4,7 +4,6 @@ import os
 import json
 import logging
 from aiohttp import web
-from threading import Thread
 
 try:
     from opentrons import instruments
@@ -71,25 +70,22 @@ async def get_attached_pipettes(request):
     """
     hw = hw_from_req(request)
     if request.url.query.get('refresh') == 'true':
-        if ff.use_protocol_api_v2():
-            await hw.cache_instruments()
-        else:
-            hw.cache_instrument_models()
+        await hw.cache_instruments()
     response = {}
-    if ff.use_protocol_api_v2():
-        attached = await hw.get_attached_pipettes()
-    else:
-        attached = hw.get_attached_pipettes()
+
+    attached = hw.attached_instruments
     for mount, data in attached.items():
-        response[mount] = {
-            'model': data['model'],
-            'name': data['name'],
-            'mount_axis': str(data['mount_axis']).lower(),
-            'plunger_axis': str(data['plunger_axis']).lower(),
-            'id': data['id']
+        response[mount.name.lower()] = {
+            'model': data.get('model', None),
+            'name': data.get('name', None),
+            'id': data.get('pipette_id', None),
+            'mount_axis': str(Axis.by_mount(mount)).lower(),
+            'plunger_axis': str(Axis.of_plunger(mount)).lower()
         }
-        if 'tip_length' in data:
-            response[mount]['tip_length'] = data.get('tip_length', 0)
+        if data.get('model'):
+            response[mount.name.lower()]['tip_length'] \
+                = data.get('tip_length', 0)
+
     return web.json_response(response, status=200)
 
 
@@ -133,7 +129,7 @@ async def get_attached_modules(request):
         {
             'name': mod.name(),  # TODO: legacy, remove
             'displayName': mod.name(),  # TODO: legacy, remove
-            'model': mod.device_info.get('revision'),  # TODO legacy, remove
+            'model': mod.device_info.get('model'),  # TODO legacy, remove
             'moduleModel': mod.model(),
             'port': mod.port,  # /dev/ttyS0
             'serial': mod.device_info.get('serial'),
@@ -144,6 +140,7 @@ async def get_attached_modules(request):
         }
         for mod in hw_mods
     ]
+
     return web.json_response(data={"modules": module_data},
                              status=200)
 
@@ -156,9 +153,7 @@ async def get_module_data(request):
     requested_serial = request.match_info['serial']
     res = None
 
-    hw_mods = hw.attached_modules
-
-    for module in hw_mods:
+    for module in hw.attached_modules:
         is_serial_match = module.device_info.get('serial') == requested_serial
         if is_serial_match and hasattr(module, 'live_data'):
             res = module.live_data
@@ -179,10 +174,7 @@ async def execute_module_command(request):
     command_type = data.get('command_type')
     args = data.get('args')
 
-    if ff.use_protocol_api_v2():
-        hw_mods = hw.attached_modules
-    else:
-        hw_mods = hw.attached_modules.values()
+    hw_mods = hw.attached_modules
 
     if len(hw_mods) == 0:
         return web.json_response({"message": "No connected modules"},
@@ -224,13 +216,9 @@ async def get_engaged_axes(request):
         {"x": {"enabled": true}, "y": {"enabled": false}, ...}
     """
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        engaged = await hw.engaged_axes
-    else:
-        engaged = hw.engaged_axes
     return web.json_response(
         {str(k).lower(): {'enabled': v}
-         for k, v in engaged.items()})
+         for k, v in hw.engaged_axes.items()})
 
 
 async def disengage_axes(request):
@@ -249,7 +237,7 @@ async def disengage_axes(request):
         message = "Invalid axes: {}".format(', '.join(invalid_axes))
         status = 400
     else:
-        await hw.disengage_axes([ax.upper() for ax in axes])
+        await hw.disengage_axes([Axis[ax.upper()] for ax in axes])
         message = "Disengaged axes: {}".format(', '.join(axes))
         status = 200
     return web.json_response({"message": message}, status=status)
@@ -472,19 +460,13 @@ async def home(request):
 async def identify(request):
     hw = hw_from_req(request)
     blink_time = int(request.query.get('seconds', '10'))
-    if ff.use_protocol_api_v2():
-        asyncio.ensure_future(hw.identify(blink_time))
-    else:
-        Thread(target=lambda: hw.identify(blink_time)).start()
+    asyncio.ensure_future(hw.identify(blink_time))
     return web.json_response({"message": "identifying"})
 
 
 async def get_rail_lights(request):
     hw = hw_from_req(request)
-    if ff.use_protocol_api_v2():
-        on = await hw.get_lights()
-    else:
-        on = hw.get_lights()
+    on = hw.get_lights()
     return web.json_response({'on': on['rails']})
 
 

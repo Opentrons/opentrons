@@ -38,7 +38,7 @@ describe('/calibration/**', () => {
       pipette: { mount: 'left', model: 'p300_single_v1' },
     }
 
-    test('calls POST /calibration/deck/start', () => {
+    it('calls POST /calibration/deck/start', () => {
       const expected = { force: false }
 
       client.__setMockResponse(response)
@@ -55,7 +55,7 @@ describe('/calibration/**', () => {
         )
     })
 
-    test('calls POST /calibration/deck/start with force: true', () => {
+    it('calls POST /calibration/deck/start with force: true', () => {
       const expected = { force: true }
 
       client.__setMockResponse(response)
@@ -72,7 +72,7 @@ describe('/calibration/**', () => {
         )
     })
 
-    test('dispatches api:REQUEST and api:SUCCESS', () => {
+    it('dispatches api:REQUEST and api:SUCCESS', () => {
       const request = { force: false }
       const expectedActions = [
         { type: 'api:REQUEST', payload: { robot, request, path } },
@@ -86,7 +86,7 @@ describe('/calibration/**', () => {
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
-    test('dispatches api:REQUEST and api:FAILURE', () => {
+    it('dispatches api:REQUEST and api:FAILURE', () => {
       const request = { force: false }
       const error = { name: 'ResponseError', status: 409, message: '' }
       const expectedActions = [
@@ -114,7 +114,7 @@ describe('/calibration/**', () => {
       }
     })
 
-    test('calls POST /calibration/deck and adds token to request', () => {
+    it('calls POST /calibration/deck and adds token to request', () => {
       client.__setMockResponse(response)
 
       return store
@@ -129,7 +129,7 @@ describe('/calibration/**', () => {
         )
     })
 
-    test('dispatches api:REQUEST and api:SUCCESS', () => {
+    it('dispatches api:REQUEST and api:SUCCESS', () => {
       const expectedActions = [
         { type: 'api:REQUEST', payload: { robot, request, path } },
         { type: 'api:SUCCESS', payload: { robot, response, path } },
@@ -142,7 +142,7 @@ describe('/calibration/**', () => {
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
-    test('dispatches api:REQUEST and api:FAILURE', () => {
+    it('dispatches api:REQUEST and api:FAILURE', () => {
       const error = { name: 'ResponseError', message: 'AH' }
       const expectedActions = [
         { type: 'api:REQUEST', payload: { robot, request, path } },
@@ -156,7 +156,7 @@ describe('/calibration/**', () => {
         .then(() => expect(store.getActions()).toEqual(expectedActions))
     })
 
-    test('dispatchs api:CLEAR_RESPONSE if command is "release"', () => {
+    it('dispatchs api:CLEAR_RESPONSE if command is "release"', () => {
       const request = { command: 'release' }
       const expectedActions = [
         {
@@ -201,14 +201,14 @@ describe('/calibration/**', () => {
 
       // TODO(mc, 2019-04-23): these tests (and the module they test) are
       // brittle; rewrite tests when HTTP request state is redone
-      describe.skip(`reducer with /calibration/${path}`, () => {
-        test('handles api:REQUEST', () => {
+      describe(`reducer with /calibration/${path}`, () => {
+        it('handles api:REQUEST', () => {
           const action = {
             type: 'api:REQUEST',
             payload: { path, robot, request },
           }
 
-          expect(reducer(state, action).calibration).toEqual({
+          expect(reducer(state, action).calibration).toMatchObject({
             [NAME]: {
               [path]: {
                 request,
@@ -220,7 +220,7 @@ describe('/calibration/**', () => {
           })
         })
 
-        test('handles api:SUCCESS', () => {
+        it('handles api:SUCCESS', () => {
           const action = {
             type: 'api:SUCCESS',
             payload: { path, robot, response },
@@ -247,7 +247,7 @@ describe('/calibration/**', () => {
           })
         })
 
-        test('handles api:FAILURE', () => {
+        it('handles api:FAILURE', () => {
           const error = { message: 'we did not do it!' }
           const action = {
             type: 'api:FAILURE',
@@ -278,7 +278,7 @@ describe('/calibration/**', () => {
     })
   })
 
-  test('reducer with api:CLEAR_RESPONSE', () => {
+  it('reducer with api:CLEAR_RESPONSE', () => {
     state = state.superDeprecatedRobotApi
 
     const path = 'calibration/deck/start'
@@ -309,7 +309,7 @@ describe('/calibration/**', () => {
       }
     })
 
-    test('makeGetDeckCalibrationStartState', () => {
+    it('makeGetDeckCalibrationStartState', () => {
       const getStartState = makeGetDeckCalibrationStartState()
 
       expect(getStartState(state, robot)).toEqual(
@@ -323,7 +323,7 @@ describe('/calibration/**', () => {
       })
     })
 
-    test('makeGetDeckCalibrationCommandState', () => {
+    it('makeGetDeckCalibrationCommandState', () => {
       const getCommandState = makeGetDeckCalibrationCommandState()
 
       expect(getCommandState(state, robot)).toEqual(

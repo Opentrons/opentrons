@@ -34,7 +34,7 @@ describe('http api client', () => {
     global.fetch.mockClear()
   })
 
-  test('GET request', () => {
+  it('GET request', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,
@@ -56,7 +56,7 @@ describe('http api client', () => {
       )
   })
 
-  test('GET request failure', () => {
+  it('GET request failure', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,
@@ -78,7 +78,7 @@ describe('http api client', () => {
     )
   })
 
-  test('GET request error', () => {
+  it('GET request error', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,
@@ -93,7 +93,7 @@ describe('http api client', () => {
     )
   })
 
-  test('POST request', () => {
+  it('POST request', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,
@@ -115,7 +115,7 @@ describe('http api client', () => {
       )
   })
 
-  test('POST request failure', () => {
+  it('POST request failure', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,
@@ -137,7 +137,7 @@ describe('http api client', () => {
     )
   })
 
-  test('POST request error', () => {
+  it('POST request error', () => {
     const robot = {
       ip: '1.2.3.4',
       port: 8080,

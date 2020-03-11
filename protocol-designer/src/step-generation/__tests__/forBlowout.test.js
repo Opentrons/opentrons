@@ -29,7 +29,7 @@ beforeEach(() => {
 
 describe('Blowout command', () => {
   describe('liquid tracking', () => {
-    test('blowout updates with max volume of pipette', () => {
+    it('blowout updates with max volume of pipette', () => {
       robotStateWithTip.liquidState.pipettes.p300SingleId['0'] = {
         ingred1: { volume: 150 },
       }

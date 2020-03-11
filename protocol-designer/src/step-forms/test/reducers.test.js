@@ -18,7 +18,7 @@ import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 
 describe('steps reducer', () => {
-  test('initial add step', () => {
+  it('initial add step', () => {
     const state = {}
     const action = {
       type: 'ADD_STEP',
@@ -33,7 +33,7 @@ describe('steps reducer', () => {
     })
   })
 
-  test('second add step', () => {
+  it('second add step', () => {
     const state = {
       '333': {
         id: '333',
@@ -59,7 +59,7 @@ describe('steps reducer', () => {
 })
 
 describe('orderedStepIds reducer', () => {
-  test('initial add step', () => {
+  it('initial add step', () => {
     const state = []
     const action = {
       type: 'ADD_STEP',
@@ -68,7 +68,7 @@ describe('orderedStepIds reducer', () => {
     expect(orderedStepIds(state, action)).toEqual(['123'])
   })
 
-  test('second add step', () => {
+  it('second add step', () => {
     const state = ['123']
     const action = {
       type: 'ADD_STEP',
@@ -149,7 +149,7 @@ describe('orderedStepIds reducer', () => {
     ]
 
     testCases.forEach(({ label, payload, expected }) => {
-      test(label, () => {
+      it(label, () => {
         const action = {
           type: 'REORDER_SELECTED_STEP',
           payload,
@@ -161,7 +161,7 @@ describe('orderedStepIds reducer', () => {
 })
 
 describe('labwareInvariantProperties reducer', () => {
-  test('replace custom labware def', () => {
+  it('replace custom labware def', () => {
     const prevState = {
       labwareIdA1: { labwareDefURI: 'foo/a/1' },
       labwareIdA2: { labwareDefURI: 'foo/a/1' },
@@ -200,7 +200,7 @@ describe('moduleInvariantProperties reducer', () => {
     }
   })
 
-  test('create module', () => {
+  it('create module', () => {
     const newModuleData = {
       id: newId,
       slot: '3',
@@ -221,7 +221,7 @@ describe('moduleInvariantProperties reducer', () => {
     })
   })
 
-  test('edit module (change its model)', () => {
+  it('edit module (change its model)', () => {
     const newModel = 'someDifferentModel'
     const result = moduleInvariantProperties(prevState, {
       type: 'EDIT_MODULE',
@@ -232,7 +232,7 @@ describe('moduleInvariantProperties reducer', () => {
     })
   })
 
-  test('delete module', () => {
+  it('delete module', () => {
     const result = moduleInvariantProperties(prevState, {
       type: 'DELETE_MODULE',
       payload: { id: existingModuleId },
@@ -298,7 +298,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     ]
 
     testCases.forEach(({ testName, action }) => {
-      test(testName, () => {
+      it(testName, () => {
         const prevRootState = makePrevRootState({
           labwareLocationUpdate: {
             [existingLabwareId]: '1',
@@ -542,7 +542,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedLabwareLocations,
         expectedModuleLocations,
       }) => {
-        test(testName, () => {
+        it(testName, () => {
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
           const result = savedStepForms(prevRootState, action)
@@ -562,7 +562,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     )
   })
 
-  test('delete labware -> removes labware from initial deck setup step', () => {
+  it('delete labware -> removes labware from initial deck setup step', () => {
     const labwareToDeleteId = '__labwareToDelete'
     const prevRootState = makePrevRootState({
       labwareLocationUpdate: {
@@ -580,7 +580,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     })
   })
 
-  test('delete pipettes -> removes pipette(s) from initial deck setup step', () => {
+  it('delete pipettes -> removes pipette(s) from initial deck setup step', () => {
     const leftPipetteId = '__leftPipette'
     const rightPipetteId = '__rightPipette'
     const prevRootState = makePrevRootState({
@@ -638,7 +638,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           expectedLabwareLocations,
           expectedModuleLocations,
         }) => {
-          test(testName, () => {
+          it(testName, () => {
             const action = {
               type: 'CREATE_MODULE',
               payload: {
@@ -718,7 +718,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       ]
 
       testCases.forEach(({ testName, action, expectedModuleId }) => {
-        test(testName, () => {
+        it(testName, () => {
           const result = savedStepForms(prevRootStateWithMagStep, action)
           expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
         })
@@ -772,7 +772,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         expectedLabwareLocations,
         expectedModuleLocations,
       }) => {
-        test(testName, () => {
+        it(testName, () => {
           const action = { type: 'DELETE_MODULE', payload: { id: moduleId } }
           const prevRootState = makePrevRootState(makeStateArgs)
           const result = savedStepForms(prevRootState, action)
@@ -846,7 +846,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
     ]
 
     testCases.forEach(({ testName, step }) => {
-      test(testName, () => {
+      it(testName, () => {
         const result = savedStepForms(getPrevRootStateWithStep(step), action)
         expect(result[stepId]).toEqual({ ...step, moduleId: null })
       })

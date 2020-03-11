@@ -6,21 +6,21 @@ function concat(a: string, b: string): string {
 }
 
 describe('mergeWhen', () => {
-  test('empty array input', () => {
+  it('empty array input', () => {
     ;[true, false].forEach(shouldSplit => {
       const result = mergeWhen([], (current, next) => shouldSplit, concat)
       expect(result).toEqual([])
     })
   })
 
-  test('single array input', () => {
+  it('single array input', () => {
     ;[true, false].forEach(shouldSplit => {
       const result2 = mergeWhen(['a'], (current, next) => shouldSplit, concat)
       expect(result2).toEqual(['a'])
     })
   })
 
-  test('single array uses alternative when predicate is false', () => {
+  it('single array uses alternative when predicate is false', () => {
     const result = mergeWhen(
       ['a'],
       (current, next) => false,
@@ -30,17 +30,17 @@ describe('mergeWhen', () => {
     expect(result).toEqual(['A'])
   })
 
-  test('always merge', () => {
+  it('always merge', () => {
     const result = mergeWhen(['1', '2', '3'], (current, next) => true, concat)
     expect(result).toEqual(['12', '3'])
   })
 
-  test('never split', () => {
+  it('never split', () => {
     const result = mergeWhen(['1', '2', '3'], (current, next) => false, concat)
     expect(result).toEqual(['1', '2', '3'])
   })
 
-  test('predicate true on index=0 only', () => {
+  it('predicate true on index=0 only', () => {
     const result = mergeWhen(
       ['1', '2', '3'],
       (current, next) => current === 1,
@@ -49,7 +49,7 @@ describe('mergeWhen', () => {
     expect(result).toEqual(['1', '2', '3'])
   })
 
-  test('merge at end', () => {
+  it('merge at end', () => {
     const result = mergeWhen(
       ['1', '2', '3'],
       (current, next) => current === '3',
@@ -58,7 +58,7 @@ describe('mergeWhen', () => {
     expect(result).toEqual(['1', '2', '3'])
   })
 
-  test('merge when "a*" before "b*"', () => {
+  it('merge when "a*" before "b*"', () => {
     const result = mergeWhen(
       ['a1', 'a2', 'b3', 'a4', 'b5', 'b6', 'a7', 'b8'],
       (prev: string, current: string) =>

@@ -9,12 +9,12 @@
 // getWellsForTips,
 
 // TODO IMMEDIATELY: way to do this using mocks? Or just don't integration test this, too brittle
-// describe('transferLikeSubsteps integration tests', () => {
+// exampleDescribe('transferLikeSubsteps integration tests', () => {
 //   const testCases = [
 //     { testName: '', input: {}, expected: [] }
 //   ]
 //   testCases.forEach(({ testName, input, expected }) =>
-//     test(testName, () => {
+//     exampleTest(testName, () => {
 //       expect(foo).toEqual(expected)
 //     })
 //   )
@@ -22,14 +22,14 @@
 
 describe('substep timeline', () => {
   describe('substepTimelineSingleChannel', () => {
-    test('returns empty array if initial timeline frame has errors', () => {})
+    it('returns empty array if initial timeline frame has errors', () => {})
   })
   describe('substepTimelineMultiChannel', () => {
-    test('returns empty array if initial timeline frame has errors', () => {})
+    it('returns empty array if initial timeline frame has errors', () => {})
   })
 
   describe('_getNewActiveTips', () => {
-    test('gets params of last pickUpTip command in an array of commands', () => {})
-    test('returns null when there were no pickUpTip commands', () => {})
+    it('gets params of last pickUpTip command in an array of commands', () => {})
+    it('returns null when there were no pickUpTip commands', () => {})
   })
 })

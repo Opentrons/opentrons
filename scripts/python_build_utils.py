@@ -8,26 +8,34 @@ import argparse
 import json
 import os
 import subprocess
+from collections import namedtuple
+
+
+PackageEntry = namedtuple("PackageEntry", ("pkg_json", "br_version_prefix"))
 
 
 HERE = os.path.dirname(__file__)
 
-pkg_jsons = {
-    'api': os.path.join(
-        HERE, '..', 'api', 'src', 'opentrons', 'package.json'),
-    'update-server': os.path.join(
-        HERE, '..', 'update-server', 'otupdate', 'package.json')
-}
+# current working directory for shell calls. will only be empty if running
+# from script directory.
+CWD = HERE or '.'
 
 
-br_version_prefixes = {
-    'api': 'opentrons_api',
-    'update-server': 'update_server'
+package_entries = {
+    'api': PackageEntry(
+        os.path.join(HERE, '..', 'api', 'src', 'opentrons', 'package.json'),
+        'opentrons_api'),
+    'update-server': PackageEntry(
+        os.path.join(HERE, '..', 'update-server', 'otupdate', 'package.json'),
+        'update_server'),
+    'robot-server': PackageEntry(
+        os.path.join(HERE, '..', 'robot-server', 'robot_server', 'package.json'),
+        'robot_server')
 }
 
 
 def get_version(project):
-    pkg_json_path = pkg_jsons[project]
+    pkg_json_path = package_entries[project].pkg_json
     return json.load(open(pkg_json_path))['version']
 
 
@@ -52,7 +60,7 @@ def _ref_from_sha(sha):
     # refs
     allrefs = subprocess.check_output(
         ['git', 'show-ref', '--tags', '--heads'],
-        cwd=HERE).strip().decode().split('\n')
+        cwd=CWD).strip().decode().split('\n')
     # Keep...
     matching = [
         this_ref for this_sha, this_ref in   # the refs
@@ -86,9 +94,9 @@ def dump_br_version(project):
     """
     normalized = get_version(project)
     sha = subprocess.check_output(
-        ['git', 'rev-parse', 'HEAD'], cwd=HERE).strip().decode()
+        ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode()
     branch = _ref_from_sha(sha)
-    pref = br_version_prefixes[project]
+    pref = package_entries[project].br_version_prefix
     return json.dumps({pref+'_version': normalized,
                        pref+'_sha': sha,
                        pref+'_branch': branch})
@@ -98,7 +106,7 @@ if __name__ == '__main__':
     parser = argparse.ArgumentParser(
         description='Perform one of several build-time tasks')
     parser.add_argument(dest='project', metavar='SUBPROJECT', type=str,
-                        choices=['api', 'update-server'])
+                        choices=package_entries.keys())
     parser.add_argument(dest='task', metavar='TASK', type=str,
                         choices=['normalize_version', 'dump_br_version'])
     args = parser.parse_args()

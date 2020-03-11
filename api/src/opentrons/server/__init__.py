@@ -11,7 +11,7 @@ import traceback
 from typing import TYPE_CHECKING
 from aiohttp import web
 
-from opentrons.config import CONFIG, feature_flags as ff
+from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
 from opentrons.api.routers import MainRouter
@@ -114,7 +114,12 @@ def init(hardware: 'HardwareAPILike' = None,
             except Exception:
                 log.exception(f"failed to remove app temp path {temppath}")
 
+    async def shutdown_hardware(app):
+        if app['com.opentrons.hardware']:
+            app['com.opentrons.hardware'].clean_up()
+
     app.on_shutdown.append(dispose_response_file_tempdir)
+    app.on_shutdown.append(shutdown_hardware)
     app.on_shutdown.freeze()
     return app
 
@@ -122,8 +127,7 @@ def init(hardware: 'HardwareAPILike' = None,
 def run(hardware: 'HardwareAPILike',
         hostname=None,
         port=None,
-        path=None,
-        loop=None):
+        path=None):
     """
     The arguments are not all optional. Either a path or hostname+port should
     be specified; you have to specify one.
@@ -137,9 +141,4 @@ def run(hardware: 'HardwareAPILike',
             hostname, port))
         path = None
 
-    if not ff.use_fast_api():
-        web.run_app(init(hardware=hardware),
-                    host=hostname, port=port, path=path)
-    else:
-        import opentrons.app
-        opentrons.app.run(hardware, hostname, port)
+    web.run_app(init(hardware=hardware), host=hostname, port=port, path=path)

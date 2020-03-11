@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import { Formik } from 'formik'
-import moment from 'moment'
+import { format } from 'date-fns'
+
 import {
   Card,
   FormGroup,
@@ -19,9 +20,12 @@ import { EditModulesCard } from './modules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
+
+import type { FormikProps } from 'formik/@flow-typed'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
-import type { ModuleRealType } from '@opentrons/shared-data'
+
 export type Props = {|
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
@@ -42,8 +46,9 @@ type State = {|
   |},
 |}
 
-const DATE_ONLY_FORMAT = 'MMM DD, YYYY'
-const DATETIME_FORMAT = 'MMM DD, YYYY | h:mm A'
+// TODO(mc, 2020-02-28): explore l10n for these dates
+const DATE_ONLY_FORMAT = 'MMM dd, yyyy'
+const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
@@ -102,16 +107,14 @@ export class FilePage extends React.Component<Props, State> {
             enableReinitialize
             initialValues={formValues}
             onSubmit={saveFileMetadata}
-            render={({
-              handleBlur,
+          >
+            {({
               handleChange,
               handleSubmit,
               dirty,
-              errors,
-              setFieldValue,
               touched,
               values,
-            }) => (
+            }: FormikProps<FileMetadataFields>) => (
               <form onSubmit={handleSubmit} className={styles.card_content}>
                 <div
                   className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
@@ -120,16 +123,15 @@ export class FilePage extends React.Component<Props, State> {
                     label="Date Created"
                     className={formStyles.column_1_2}
                   >
-                    {values.created &&
-                      moment(values.created).format(DATE_ONLY_FORMAT)}
+                    {values.created && format(values.created, DATE_ONLY_FORMAT)}
                   </FormGroup>
 
                   <FormGroup
                     label="Last Exported"
                     className={formStyles.column_1_2}
                   >
-                    {values['last-modified'] &&
-                      moment(values['last-modified']).format(DATETIME_FORMAT)}
+                    {values.lastModified &&
+                      format(values.lastModified, DATETIME_FORMAT)}
                   </FormGroup>
                 </div>
 
@@ -181,7 +183,7 @@ export class FilePage extends React.Component<Props, State> {
                 </div>
               </form>
             )}
-          />
+          </Formik>
         </Card>
 
         <Card title="Pipettes">

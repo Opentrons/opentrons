@@ -6,13 +6,13 @@ import { shallow } from 'enzyme'
 import { Select } from '../Select'
 
 describe('Select', () => {
-  test('component renders a ReactSelect', () => {
+  it('component renders a ReactSelect', () => {
     const wrapper = shallow(<Select options={[]} />)
 
     expect(wrapper.find(ReactSelect)).toHaveLength(1)
   })
 
-  test('passes props to ReactSelect', () => {
+  it('passes props to ReactSelect', () => {
     const options = [{ value: 'foo' }, { value: 'bar' }]
     const value = options[1]
     const name = 'inputName'
@@ -38,7 +38,7 @@ describe('Select', () => {
     })
   })
 
-  test('merges in className prop', () => {
+  it('merges in className prop', () => {
     const wrapperDefault = shallow(<Select options={[]} />)
     const wrapperWithClass = shallow(
       <Select options={[]} className="something_else" />

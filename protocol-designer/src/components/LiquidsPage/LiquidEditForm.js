@@ -13,6 +13,8 @@ import {
 } from '@opentrons/components'
 import styles from './LiquidEditForm.css'
 import formStyles from '../forms/forms.css'
+
+import type { FormikProps } from 'formik/@flow-typed'
 import type { LiquidGroup } from '../../labware-ingred/types'
 
 type Props = {
@@ -41,8 +43,8 @@ export const liquidEditFormSchema = Yup.object().shape({
 export function LiquidEditForm(props: Props) {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
-  const initialValues = {
-    name: props.name,
+  const initialValues: LiquidEditFormValues = {
+    name: props.name || '',
     description: props.description || '',
     serialize: props.serialize || false,
   }
@@ -51,14 +53,15 @@ export function LiquidEditForm(props: Props) {
     <Formik
       initialValues={initialValues}
       validationSchema={liquidEditFormSchema}
-      onSubmit={(values: LiquidEditFormValues) =>
+      onSubmit={(values: LiquidEditFormValues) => {
         saveForm({
           name: values.name,
           description: values.description || null,
           serialize: values.serialize || false,
         })
-      }
-      render={({
+      }}
+    >
+      {({
         handleChange,
         handleBlur,
         handleSubmit,
@@ -67,7 +70,7 @@ export function LiquidEditForm(props: Props) {
         isValid,
         touched,
         values,
-      }) => (
+      }: FormikProps<LiquidEditFormValues>) => (
         <Card className={styles.form_card}>
           <form onSubmit={handleSubmit}>
             <section className={styles.section}>
@@ -81,7 +84,7 @@ export function LiquidEditForm(props: Props) {
                 >
                   <InputField
                     name="name"
-                    error={touched.name && errors.name}
+                    error={touched.name ? errors.name : null}
                     value={values.name}
                     onChange={handleChange}
                     onBlur={handleBlur}
@@ -129,6 +132,6 @@ export function LiquidEditForm(props: Props) {
           </form>
         </Card>
       )}
-    />
+    </Formik>
   )
 }

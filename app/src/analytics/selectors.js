@@ -4,6 +4,7 @@ import { createSelector } from 'reselect'
 import {
   getProtocolType,
   getProtocolCreatorApp,
+  getProtocolApiVersion,
   getProtocolName,
   getProtocolSource,
   getProtocolAuthor,
@@ -45,14 +46,16 @@ export const FF_PREFIX = 'robotFF_'
 const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   getProtocolType,
   getProtocolCreatorApp,
+  getProtocolApiVersion,
   getProtocolName,
   getProtocolSource,
   getProtocolAuthor,
   getProtocolContents,
-  (type, app, name, source, author, contents) => ({
+  (type, app, apiVersion, name, source, author, contents) => ({
     protocolType: type || '',
     protocolAppName: app.name || '',
     protocolAppVersion: app.version || '',
+    protocolApiVersion: apiVersion || '',
     protocolName: name || '',
     protocolSource: source || '',
     protocolAuthor: author || '',
@@ -67,8 +70,8 @@ export const getProtocolAnalyticsData: State => Promise<ProtocolAnalyticsData> =
 
     return Promise.all(hashTasks).then(([protocolAuthor, protocolText]) => ({
       ...data,
-      protocolAuthor,
-      protocolText,
+      protocolAuthor: data.protocolAuthor !== '' ? protocolAuthor : '',
+      protocolText: data.protocolText !== '' ? protocolText : '',
     }))
   }
 )

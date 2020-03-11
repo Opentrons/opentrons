@@ -21,7 +21,7 @@ beforeEach(() => {
 })
 
 describe('delay indefinitely', () => {
-  test('...', () => {
+  it('...', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay indefinitely message'
 
@@ -49,7 +49,7 @@ describe('delay indefinitely', () => {
 })
 
 describe('delay for a given time', () => {
-  test('...', () => {
+  it('...', () => {
     const robotInitialState = getRobotInitialState()
     const message = 'delay 95.5 secs message'
 

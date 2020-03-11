@@ -125,7 +125,7 @@ describe('rpc client', () => {
     RemoteObject.mockReturnValueOnce(Promise.resolve(MOCK_REMOTE))
   }
 
-  test('rejects if control message never comes', () => {
+  it('rejects if control message never comes', () => {
     jest.useFakeTimers()
 
     const result = Client(url)
@@ -138,7 +138,7 @@ describe('rpc client', () => {
     })
   })
 
-  test('connects to ws server and resolves when control is received', () => {
+  it('connects to ws server and resolves when control is received', () => {
     sendControlAndResolveRemote()
 
     return Client(url).then(client => {
@@ -152,7 +152,7 @@ describe('rpc client', () => {
     const name = 'method_name'
     const args = [1, 2, 3]
 
-    test('calls remote methods and wraps result in RemoteObject', () => {
+    it('calls remote methods and wraps result in RemoteObject', () => {
       const mockRemote = { i: 42, t: 43, v: {} }
       const mockResult = { foo: 'bar' }
       const expectedMessage = {
@@ -187,20 +187,20 @@ describe('rpc client', () => {
         })
     })
 
-    test('rejects if call nacks', () => {
+    it('rejects if call nacks', () => {
       sendControlAndResolveRemote(message => {
         const token = message.$.token
         setTimeout(() => ws.send(makeNackResponse(token, 'You done messed up')))
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/NACK.+You done messed up/),
       })
     })
 
-    test('rejects if client errors during call', () => {
+    it('rejects if client errors during call', () => {
       sendControlAndResolveRemote(message => {
         const token = message.$.token
         const nack = makeNackResponse(token, 'You done messed up')
@@ -218,7 +218,7 @@ describe('rpc client', () => {
       })
     })
 
-    test('rejects if call is unsuccessful (string response)', () => {
+    it('rejects if call is unsuccessful (string response)', () => {
       sendControlAndResolveRemote(message => {
         const token = message.$.token
         const ack = makeAckResponse(token)
@@ -227,14 +227,14 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
       })
     })
 
-    test('rejects if call is unsuccessful (object response)', () => {
+    it('rejects if call is unsuccessful (object response)', () => {
       sendControlAndResolveRemote(message => {
         const token = message.$.token
         const ack = makeAckResponse(token)
@@ -243,16 +243,16 @@ describe('rpc client', () => {
         setTimeout(() => ws.send(result), 5)
       })
 
-      const call = Client(url).then(client => client.callRemote(id, name, args))
-
-      return expect(call).rejects.toMatchObject({
+      return expect(
+        Client(url).then(client => client.callRemote(id, name, args))
+      ).rejects.toMatchObject({
         message: expect.stringMatching(/ahhh/),
       })
     })
   })
 
   describe('resolveTypeValues', () => {
-    test('resolves cached type objects', () => {
+    it('resolves cached type objects', () => {
       sendControlAndResolveRemote()
 
       return Client(url)
@@ -260,7 +260,7 @@ describe('rpc client', () => {
         .then(values => expect(values).toEqual(REMOTE_TYPE.v))
     })
 
-    test('resolves empty object for type types', () => {
+    it('resolves empty object for type types', () => {
       sendControlAndResolveRemote()
 
       return Client(url)
@@ -268,7 +268,7 @@ describe('rpc client', () => {
         .then(values => expect(values).toEqual({}))
     })
 
-    test('calls get object by id for unknown type objects', () => {
+    it('calls get object by id for unknown type objects', () => {
       const instance = { i: 42, t: 101, v: { bar: 'baz' } }
       const type = { i: 101, t: 3, v: { baz: {} } }
       const expectedMessage = {
@@ -302,7 +302,7 @@ describe('rpc client', () => {
         })
     })
 
-    test('will not ask for a type object more than once', () => {
+    it('will not ask for a type object more than once', () => {
       const instance = { i: 42, t: 101, v: { bar: 'baz' } }
       const type = { i: 101, t: 3, v: { baz: {} } }
       let remoteCalls = 0
@@ -327,28 +327,30 @@ describe('rpc client', () => {
     })
   })
 
-  test('emits notification data wrapped in RemoteObjects', done => {
+  it('emits notification data wrapped in RemoteObjects', () => {
     const INSTANCE = { i: 32, t: 30, v: { foo: 'bar', baz: 'qux' } }
     const notification = { $: { type: NOTIFICATION }, data: INSTANCE }
     const mockRemote = { foo: 'bar', baz: 'qux' }
 
-    sendControlAndResolveRemote()
-    RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
+    return new Promise(resolve => {
+      sendControlAndResolveRemote()
+      RemoteObject.mockReturnValue(Promise.resolve(mockRemote))
 
-    Client(url).then(client => {
-      addListener(client, 'notification', message => {
-        expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE, {
-          methods: false,
+      Client(url).then(client => {
+        addListener(client, 'notification', message => {
+          expect(RemoteObject).toHaveBeenCalledWith(client, INSTANCE, {
+            methods: false,
+          })
+          expect(message).toEqual(mockRemote)
+          resolve()
         })
-        expect(message).toEqual(mockRemote)
-        done()
-      })
 
-      setTimeout(() => ws.send(notification), 10)
+        setTimeout(() => ws.send(notification), 10)
+      })
     })
   })
 
-  test('closes the socket', () => {
+  it('closes the socket', () => {
     sendControlAndResolveRemote()
 
     return Client(url)

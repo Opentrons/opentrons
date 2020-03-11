@@ -87,7 +87,7 @@ describe('move liquid step form -> command creator args', () => {
     }
   })
 
-  test('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
+  it('moveLiquidFormToArgs calls getOrderedWells correctly', () => {
     moveLiquidFormToArgs(hydratedForm)
 
     expect(getOrderedWells).toHaveBeenCalledTimes(2)
@@ -105,7 +105,7 @@ describe('move liquid step form -> command creator args', () => {
     )
   })
 
-  test('moveLiquid form with 1:1 single transfer translated to args', () => {
+  it('moveLiquid form with 1:1 single transfer translated to args', () => {
     const result = moveLiquidFormToArgs(hydratedForm)
 
     expect(result).toMatchObject({
@@ -160,7 +160,7 @@ describe('move liquid step form -> command creator args', () => {
       expectedArgsChecked,
       expectedArgsUnchecked,
     }) => {
-      test(`${checkboxField} toggles dependent fields`, () => {
+      it(`${checkboxField} toggles dependent fields`, () => {
         expect(
           moveLiquidFormToArgs({
             ...hydratedForm,
@@ -196,7 +196,7 @@ describe('move liquid step form -> command creator args', () => {
       // remember the blowout/disposalVolume checkboxes are false by default!
     }
 
-    test('disposal volume works when checkbox true', () => {
+    it('disposal volume works when checkbox true', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -213,7 +213,7 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    test('disposal volume fields ignored when checkbox false', () => {
+    it('disposal volume fields ignored when checkbox false', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -230,7 +230,7 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    test('disposal volume overrides blowout', () => {
+    it('disposal volume overrides blowout', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -248,7 +248,7 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    test('fallback to blowout when disposal volume unchecked', () => {
+    it('fallback to blowout when disposal volume unchecked', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -266,7 +266,7 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    test('blowout in source', () => {
+    it('blowout in source', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -284,7 +284,7 @@ describe('move liquid step form -> command creator args', () => {
       })
     })
 
-    test('blowout in dest', () => {
+    it('blowout in dest', () => {
       const result = moveLiquidFormToArgs({
         ...hydratedForm,
         fields: {
@@ -305,7 +305,7 @@ describe('move liquid step form -> command creator args', () => {
 })
 
 describe('getMixData', () => {
-  test('return null if checkbox field is false', () => {
+  it('return null if checkbox field is false', () => {
     expect(
       getMixData(
         { checkboxField: false, volumeField: 30, timesField: 2 },
@@ -316,7 +316,7 @@ describe('getMixData', () => {
     ).toBe(null)
   })
 
-  test('return null if either number fields <= 0 / null', () => {
+  it('return null if either number fields <= 0 / null', () => {
     const cases = [[0, 5], [null, 5], [10, 0], [10, null]]
 
     cases.forEach(testCase => {
@@ -336,7 +336,7 @@ describe('getMixData', () => {
     })
   })
 
-  test('return volume & times if checkbox is checked', () => {
+  it('return volume & times if checkbox is checked', () => {
     expect(
       getMixData(
         { checkboxField: true, volumeField: 30, timesField: 2 },

@@ -1,3 +1,4 @@
+import asyncio
 import copy
 import logging
 from threading import Event
@@ -9,6 +10,7 @@ from opentrons.config.pipette_config import (config_models,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from . import modules
+from .execution_manager import ExecutionManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
 
@@ -209,13 +211,17 @@ class Simulator:
             self,
             port: str,
             model: str,
-            interrupt_callback: modules.InterruptCallback
+            interrupt_callback: modules.InterruptCallback,
+            loop: asyncio.AbstractEventLoop,
+            execution_manager: ExecutionManager
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
             which=model,
             simulating=True,
-            interrupt_callback=interrupt_callback)
+            interrupt_callback=interrupt_callback,
+            loop=loop,
+            execution_manager=execution_manager)
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

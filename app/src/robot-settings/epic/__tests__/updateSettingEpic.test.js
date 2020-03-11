@@ -57,7 +57,7 @@ describe('updateSettingEpic', () => {
     meta,
   }
 
-  test('calls POST /settings', () => {
+  it('calls POST /settings', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
@@ -79,7 +79,7 @@ describe('updateSettingEpic', () => {
     })
   })
 
-  test('maps successful response to UPDATE_SETTING_SUCCESS', () => {
+  it('maps successful response to UPDATE_SETTING_SUCCESS', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateSettingSuccess })
@@ -100,7 +100,7 @@ describe('updateSettingEpic', () => {
     })
   })
 
-  test('maps failed response to UPDATE_SETTING_FAILURE', () => {
+  it('maps failed response to UPDATE_SETTING_FAILURE', () => {
     testScheduler.run(({ hot, cold, expectObservable, flush }) => {
       mockFetchRobotApi.mockReturnValue(
         cold('r', { r: Fixtures.mockUpdateSettingFailure })

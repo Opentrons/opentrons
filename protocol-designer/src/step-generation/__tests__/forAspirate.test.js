@@ -42,7 +42,7 @@ describe('...single-channel pipette', () => {
     }
   })
   describe('...fresh tip', () => {
-    test('aspirate from single-ingredient well', () => {
+    it('aspirate from single-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: {
           volume: 200,
@@ -71,7 +71,7 @@ describe('...single-channel pipette', () => {
       })
     })
 
-    test('aspirate everything + air from a single-ingredient well', () => {
+    it('aspirate everything + air from a single-ingredient well', () => {
       // aspirate 300 from well with 200, leaving 100 of air
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: {
@@ -103,7 +103,7 @@ describe('...single-channel pipette', () => {
       })
     })
 
-    test('aspirate from two-ingredient well', () => {
+    it('aspirate from two-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: { volume: 200 },
         ingred2: { volume: 100 },
@@ -133,7 +133,7 @@ describe('...single-channel pipette', () => {
       })
     })
 
-    test('aspirate everything + air from two-ingredient well', () => {
+    it('aspirate everything + air from two-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: { volume: 60 },
         ingred2: { volume: 70 },
@@ -168,7 +168,7 @@ describe('...single-channel pipette', () => {
   })
 
   describe('...tip already containing liquid', () => {
-    test('aspirate from single-ingredient well', () => {
+    it('aspirate from single-ingredient well', () => {
       robotState.liquidState.labware[labwareId].A1 = {
         ingred1: { volume: 200 },
       }
@@ -213,7 +213,7 @@ describe('...8-channel pipette', () => {
     }
   })
 
-  test('aspirate from single-ingredient set of wells (96-flat)', () => {
+  it('aspirate from single-ingredient set of wells (96-flat)', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     robotState.liquidState.labware[labwareId] = {
       ...robotState.liquidState.labware[labwareId],
@@ -255,7 +255,7 @@ describe('...8-channel pipette', () => {
     })
   })
 
-  test('aspirate everything + air from single-ingredient wells (96-flat)', () => {
+  it('aspirate everything + air from single-ingredient wells (96-flat)', () => {
     // A1 and B1 have 1 ingred of different volumes, rest of column 1 is empty
     robotState.liquidState.labware[labwareId] = {
       ...robotState.liquidState.labware[labwareId],
@@ -332,7 +332,7 @@ describe('8-channel trough', () => {
       expectedWarnings,
       expectedWellContents,
     }) =>
-      test(`aspirate from single-ingredient common well (trough-12row): ${testName}`, () => {
+      it(`aspirate from single-ingredient common well (trough-12row): ${testName}`, () => {
         robotState.liquidState.labware[labwareId] = {
           ...robotState.liquidState.labware[labwareId],
           A1: initialWellContents,
@@ -364,5 +364,5 @@ describe('8-channel trough', () => {
       })
   )
 
-  test.skip('aspirate from 384 plate starting from B row', () => {}) // TODO
+  it.todo('aspirate from 384 plate starting from B row') // TODO
 })

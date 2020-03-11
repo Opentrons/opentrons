@@ -24,25 +24,25 @@ describe('LabwareList', () => {
     jest.clearAllMocks()
   })
 
-  test('component renders', () => {
+  it('component renders', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree).toMatchSnapshot()
   })
 
-  test('renders a <ul>', () => {
+  it('renders a <ul>', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree.find('ul')).toHaveLength(1)
   })
 
-  test('renders a LabwareCard per labware definition', () => {
+  it('renders a LabwareCard per labware definition', () => {
     const tree = shallow(<LabwareList filters={filtersOff} />)
 
     expect(tree.find(LabwareCard)).toHaveLength(getAllDefinitions().length)
   })
 
-  test('renders <NoResults> without <ul> if everything filtered out', () => {
+  it('renders <NoResults> without <ul> if everything filtered out', () => {
     getAllDefinitions.mockReturnValueOnce([])
 
     const tree = shallow(<LabwareList filters={filtersOff} />)

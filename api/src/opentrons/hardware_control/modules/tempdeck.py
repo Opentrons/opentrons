@@ -4,11 +4,14 @@ from threading import Thread, Event
 from typing import Mapping, Union, Optional
 from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
 from opentrons.drivers.temp_deck.driver import temp_locks
+from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
 
 log = logging.getLogger(__name__)
 
 TEMP_POLL_INTERVAL_SECS = 1
+
+FIRST_GEN2_REVISION = 20
 
 
 def _model_from_revision(revision: Optional[str]) -> str:
@@ -23,7 +26,7 @@ def _model_from_revision(revision: Optional[str]) -> str:
         log.exception('no revision')
         return 'temperatureModuleV1'
 
-    if revision_num < 20:
+    if revision_num < FIRST_GEN2_REVISION:
         return 'temperatureModuleV1'
     else:
         return 'temperatureModuleV2'
@@ -40,6 +43,10 @@ class SimulatingDriver:
         self._port = None
 
     async def set_temperature(self, celsius: float):
+        self._target_temp = celsius
+        self._active = True
+
+    def start_set_temperature(self, celsius):
         self._target_temp = celsius
         self._active = True
 
@@ -107,6 +114,7 @@ class TempDeck(mod_abc.AbstractModule):
     @classmethod
     async def build(cls,
                     port: str,
+                    execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
                     loop: asyncio.AbstractEventLoop = None):
@@ -114,7 +122,10 @@ class TempDeck(mod_abc.AbstractModule):
         """ Build and connect to a TempDeck"""
         # TempDeck does not currently use interrupts, so the callback is not
         # passed on
-        mod = cls(port, simulating, loop)
+        mod = cls(port=port,
+                  simulating=simulating,
+                  loop=loop,
+                  execution_manager=execution_manager)
         await mod._connect()
         return mod
 
@@ -138,17 +149,20 @@ class TempDeck(mod_abc.AbstractModule):
             return TempDeckDriver()
 
     def __init__(self,
-                 port,
-                 simulating,
+                 port: str,
+                 execution_manager: ExecutionManager,
+                 simulating: bool,
                  loop: asyncio.AbstractEventLoop = None) -> None:
-        super().__init__(port, simulating, loop)
+        super().__init__(port=port,
+                         simulating=simulating,
+                         loop=loop,
+                         execution_manager=execution_manager)
         self._device_info: Mapping[str, str] = {}
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
 
-        self._current_task: Optional[asyncio.Task] = None
         self._poller = None
 
     async def set_temperature(self, celsius: float):
@@ -159,13 +173,25 @@ class TempDeck(mod_abc.AbstractModule):
         temperature display. Any input outside of this range will be clipped
         to the nearest limit
         """
-        self._current_task = self._loop.create_task(
+        await self.wait_for_is_running()
+        return await self._loop.create_task(
             self._driver.set_temperature(celsius)
         )
-        return await self._current_task
 
-    def deactivate(self):
+    async def start_set_temperature(self, celsius):
+        """
+        Set temperature in degree Celsius
+        Range: 4 to 95 degree Celsius (QA tested).
+        The internal temp range is -9 to 99 C, which is limited by the 2-digit
+        temperature display. Any input outside of this range will be clipped
+        to the nearest limit
+        """
+        await self.wait_for_is_running()
+        return self._driver.start_set_temperature(celsius)
+
+    async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
+        await self.wait_for_is_running()
         self._driver.deactivate()
 
     @property
@@ -212,11 +238,6 @@ class TempDeck(mod_abc.AbstractModule):
 
     def set_loop(self, loop: asyncio.AbstractEventLoop):
         self._loop = loop
-
-    def cancel(self):
-        if self._current_task:
-            self._current_task.cancel()
-            self._current_task = None
 
     async def _connect(self):
         """

@@ -24,7 +24,7 @@ describe('update', () => {
     __updaterMockReset()
   })
 
-  test('handles shell:CHECK_UPDATE with available update', () => {
+  it('handles shell:CHECK_UPDATE with available update', () => {
     getConfig.mockReturnValue('dev')
     handleAction({ type: 'shell:CHECK_UPDATE' })
 
@@ -40,7 +40,7 @@ describe('update', () => {
     })
   })
 
-  test('handles shell:CHECK_UPDATE with no available update', () => {
+  it('handles shell:CHECK_UPDATE with no available update', () => {
     handleAction({ type: 'shell:CHECK_UPDATE' })
     autoUpdater.emit('update-not-available', { version: '1.0.0' })
 
@@ -50,7 +50,7 @@ describe('update', () => {
     })
   })
 
-  test('handles shell:CHECK_UPDATE with error', () => {
+  it('handles shell:CHECK_UPDATE with error', () => {
     handleAction({ type: 'shell:CHECK_UPDATE' })
     autoUpdater.emit('error', new Error('AH'))
 
@@ -60,7 +60,7 @@ describe('update', () => {
     })
   })
 
-  test('handles shell:DOWNLOAD_UPDATE', () => {
+  it('handles shell:DOWNLOAD_UPDATE', () => {
     handleAction({ type: 'shell:DOWNLOAD_UPDATE' })
 
     expect(autoUpdater.downloadUpdate).toHaveBeenCalledTimes(1)
@@ -73,7 +73,7 @@ describe('update', () => {
     })
   })
 
-  test('handles shell:DOWNLOAD_UPDATE with error', () => {
+  it('handles shell:DOWNLOAD_UPDATE with error', () => {
     handleAction({ type: 'shell:DOWNLOAD_UPDATE' })
     autoUpdater.emit('error', new Error('AH'))
 
@@ -83,7 +83,7 @@ describe('update', () => {
     })
   })
 
-  test('handles shell:APPLY_UPDATE', () => {
+  it('handles shell:APPLY_UPDATE', () => {
     handleAction({ type: 'shell:APPLY_UPDATE' })
     expect(autoUpdater.quitAndInstall).toHaveBeenCalledTimes(1)
   })

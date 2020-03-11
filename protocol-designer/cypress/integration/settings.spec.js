@@ -3,6 +3,12 @@ describe('The Settings Page', () => {
     cy.visit('/')
   })
 
+  it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
+    cy.get('button')
+      .contains('Got It!')
+      .click()
+  })
+
   it('contains a working settings button', () => {
     cy.get("button[class*='navbar__tab__']")
       .contains('Settings')

@@ -216,7 +216,7 @@ describe('mergeSubstepRowsSingleChannel', () => {
     },
   ]
   testCases.forEach(({ testName, showDispenseVol, substepRows, expected }) =>
-    test(testName, () => {
+    it(testName, () => {
       const result = mergeSubstepRowsSingleChannel({
         substepRows,
         showDispenseVol,
@@ -259,7 +259,7 @@ describe('mergeSubstepRowsMultiChannel', () => {
     },
   ]
   testCases.forEach(({ testName, isMixStep, showDispenseVol, substepRows }) =>
-    test(testName, () => {
+    it(testName, () => {
       const channels = 8
       const result = mergeSubstepRowsMultiChannel({
         channels,

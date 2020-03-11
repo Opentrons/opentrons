@@ -5,6 +5,12 @@ describe('Desktop Navigation', () => {
   })
 
   describe('the setup form', () => {
+    it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
+      cy.get('button')
+        .contains('Got It!')
+        .click()
+    })
+
     it('clicks the "CREATE NEW" button', () => {
       cy.get('button')
         .contains('Create New')
@@ -303,7 +309,8 @@ describe('Desktop Navigation', () => {
     it('displays a confirmation modal', () => {
       // We need to confirm our changes
       cy.contains('Are you sure you want to make this change?').should('exist')
-      cy.get("div[class*='StepChangesConfirmModal__button_row__']")
+      cy.get("ul[class*='StepChangesConfirmModal__cause_effect_list__']")
+        .next()
         .contains('cancel')
         .should('exist')
       cy.get('button')
@@ -313,7 +320,8 @@ describe('Desktop Navigation', () => {
 
     it('cancels the changes from the confirmation modal', () => {
       // No, let's go back
-      cy.get("div[class*='StepChangesConfirmModal__button_row__']")
+      cy.get("ul[class*='StepChangesConfirmModal__cause_effect_list__']")
+        .next()
         .contains('cancel')
         .click({ force: true })
       cy.contains('Change Pipette Selection').should('exist')

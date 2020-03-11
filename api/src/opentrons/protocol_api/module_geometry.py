@@ -443,6 +443,30 @@ def load_module_from_definition(
         f'The specified module definition is not valid.')
 
 
+def _load_v1_module_def(module_model: ModuleModel) -> Dict[str, Any]:
+    v1names = {MagneticModuleModel.MAGNETIC_V1: 'magdeck',
+               TemperatureModuleModel.TEMPERATURE_V1: 'tempdeck',
+               ThermocyclerModuleModel.THERMOCYCLER_V1: 'thermocycler'}
+    try:
+        name = v1names[module_model]
+    except KeyError:
+        raise NoSuchModuleError(
+            f'Could not find module {module_model.value}',
+            module_model)
+    return json.loads(load_shared_data('module/definitions/1.json'))[name]
+
+
+def _load_v2_module_def(module_model: ModuleModel) -> Dict[str, Any]:
+    try:
+        return json.loads(
+            load_shared_data(
+                f'module/definitions/2/{module_model.value}.json'))
+    except OSError:
+        raise NoSuchModuleError(
+            f'Could not find the module {module_model.value}.',
+            module_model)
+
+
 @functools.lru_cache(maxsize=128)
 def _load_module_definition(api_level: APIVersion,
                             module_model: ModuleModel) -> Dict[str, Any]:
@@ -450,27 +474,19 @@ def _load_module_definition(api_level: APIVersion,
     Load the appropriate module definition for this api version
     """
     if api_level < V2_MODULE_DEF_VERSION:
-        v1names = {MagneticModuleModel.MAGNETIC_V1: 'magdeck',
-                   TemperatureModuleModel.TEMPERATURE_V1: 'tempdeck',
-                   ThermocyclerModuleModel.THERMOCYCLER_V1: 'thermocycler'}
         try:
-            name = v1names[module_model]
-        except KeyError:
+            return _load_v1_module_def(module_model)
+        except NoSuchModuleError:
+            try:
+                dname = _load_v2_module_def(module_model)['displayName']
+            except NoSuchModuleError:
+                dname = module_model.value
             raise NoSuchModuleError(
                 f'API version {api_level} does not support the module '
-                f'{module_model.value} Please use at least version'
+                f'{dname}. Please use at least version '
                 f'{V2_MODULE_DEF_VERSION} to use this module.', module_model)
-        return json.loads(load_shared_data('module/definitions/1.json'))[name]
     else:
-        try:
-            defn = json.loads(
-                load_shared_data(
-                    f'module/definitions/2/{module_model.value}.json'))
-        except OSError:
-            raise NoSuchModuleError(
-                f'Could not find the module {module_model.value}.',
-                module_model)
-        return defn
+        return _load_v2_module_def(module_model)
 
 
 def load_module(
@@ -525,5 +541,7 @@ def resolve_module_type(module_model: ModuleModel) -> ModuleType:
 
 def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:
     """ Check if two module models may be considered the same """
+    if model_a == model_b:
+        return True
     return model_b.value in _load_module_definition(
         V2_MODULE_DEF_VERSION, model_a)['compatibleWith']

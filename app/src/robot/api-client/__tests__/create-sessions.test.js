@@ -6,7 +6,7 @@ import { actions as RobotActions } from '../../actions'
 import * as ProtocolSelectors from '../../../protocol/selectors'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
-import { MockSession } from '../../test/__mocks__/session'
+import { MockSession } from '../../test/__fixtures__/session'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../../protocol/selectors')
@@ -59,7 +59,7 @@ describe('RPC API client - session creation', () => {
     jest.resetAllMocks()
   })
 
-  test('calls session_manager.create on protocol:UPLOAD', () => {
+  it('calls session_manager.create on protocol:UPLOAD', () => {
     const mockProtocolFile = { name: 'protocol.py' }
     const mockSession = MockSession()
 
@@ -79,7 +79,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('calls session_manager.create_from_bundle if zip protocol', () => {
+  it('calls session_manager.create_from_bundle if zip protocol', () => {
     const mockProtocolFile = { name: 'protocol.zip', type: 'zip' }
     const mockSession = MockSession()
 
@@ -98,7 +98,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('calls create with third param if zip and create_from_bundle not available', () => {
+  it('calls create with third param if zip and create_from_bundle not available', () => {
     const mockProtocolFile = { name: 'protocol.zip', type: 'zip' }
     const mockSession = MockSession()
 
@@ -120,7 +120,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('calls create_with_extra_labware if python protocol and custom labware exist', () => {
+  it('calls create_with_extra_labware if python protocol and custom labware exist', () => {
     const mockProtocolFile = { name: 'protocol.py', type: 'python' }
     const mockSession = MockSession()
 
@@ -144,7 +144,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('calls create if custom labware but create_with_extra_labware not available', () => {
+  it('calls create if custom labware but create_with_extra_labware not available', () => {
     const mockProtocolFile = { name: 'protocol.py', type: 'python' }
     const mockSession = MockSession()
 
@@ -169,7 +169,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('calls create if custom labware but protocol is JSON', () => {
+  it('calls create if custom labware but protocol is JSON', () => {
     const mockProtocolFile = { name: 'protocol.json', type: 'json' }
     const mockSession = MockSession()
 
@@ -192,7 +192,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('dispatches session response with error if create throws', () => {
+  it('dispatches session response with error if create throws', () => {
     const mockProtocolFile = { name: 'protocol.py', type: 'python' }
 
     ProtocolSelectors.getProtocolFile.mockReturnValue(mockProtocolFile)
@@ -209,7 +209,7 @@ describe('RPC API client - session creation', () => {
     })
   })
 
-  test('dispatches helpful error response with if create throws with bundle', () => {
+  it('dispatches helpful error response with if create throws with bundle', () => {
     const mockProtocolFile = { name: 'protocol.zip', type: 'zip' }
     const mockError = Object.assign(
       new Error(

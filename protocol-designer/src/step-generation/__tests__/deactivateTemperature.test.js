@@ -66,7 +66,7 @@ describe('deactivateTemperature', () => {
   ]
 
   testCases.forEach(({ expected, moduleId, testName }) => {
-    test(testName, () => {
+    it(testName, () => {
       const args = { module: moduleId, commandCreatorFnName }
       const result = deactivateTemperature(args, invariantContext, robotState)
       expect(result).toEqual(expected)

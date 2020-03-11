@@ -5,10 +5,13 @@ import logging
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
-from opentrons.hardware_control import types, adapters, API, HardwareAPILike
+from opentrons.hardware_control import (types, SynchronousAdapter, API,
+                                        HardwareAPILike, ThreadManager)
 
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
+    from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
+
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -139,12 +142,8 @@ class AxisMaxSpeeds(UserDict):
     """
 
     def __getitem__(self, key: Union[str, types.Axis]):
-        if key in types.Axis:
-            return self.data[key]
-        elif isinstance(key, str):
-            return self.data[types.Axis[key.upper()]]
-        else:
-            raise KeyError(key)
+        checked_key = AxisMaxSpeeds._verify_key(key)
+        return self.data[checked_key]
 
     @staticmethod
     def _verify_key(key: Any) -> types.Axis:
@@ -184,62 +183,54 @@ class AxisMaxSpeeds(UserDict):
         return ((k.name, v) for k, v in self.data.items())
 
 
+HardwareToManage = Union[ThreadManager,
+                         SynchronousAdapter,
+                         'HasLoop']
+
+
+# TODO: BC 2020-03-02 This class's utility as a utility class is drying up.
+# It's only job is to ensure that the hardware a given
+# ProtocolContext references, is synchronously callable.
+# All internal calls to ProtocolContext __init__
+# or build_using, either pass a ThreadManaged API instance
+# or pass None and expect HardwareManager to create one
+# for them. It seems as though we could replace this
+# with a single if else that covers just those two cases.
+# If that were the case, perhaps it would be clearer to move
+# this logic back into the ProtocolContext definition
+# and hold onto a sync hardware api directly instead of
+# through the ._hw_manager.hardware indirection.
 class HardwareManager:
-    def __init__(self, hardware):
-        if None is hardware:
-            self._is_orig = True
-            self._built_own_adapter = True
-            self._current = adapters.SynchronousAdapter.build(
-                API.build_hardware_simulator)
-        elif isinstance(hardware, adapters.SynchronousAdapter):
-            self._is_orig = False
+    def __init__(self, hardware: Optional[HardwareToManage]):
+        if hardware is None:
+            self._current = ThreadManager(API.build_hardware_simulator).sync
+        elif isinstance(hardware, SynchronousAdapter):
             self._current = hardware
-            self._built_own_adapter = False
+        elif isinstance(hardware, ThreadManager):
+            self._current = hardware.sync
         else:
-            self._is_orig = False
-            self._current = adapters.SynchronousAdapter(hardware)
-            self._built_own_adapter = True
+            self._current = SynchronousAdapter(hardware)
 
     @property
     def hardware(self):
         return self._current
 
     def set_hw(self, hardware):
-        if self._current and (self._is_orig or self._built_own_adapter):
-            self._current.join()
-        if isinstance(hardware, adapters.SynchronousAdapter):
+        if isinstance(hardware, SynchronousAdapter):
             self._current = hardware
-            self._built_own_adapter = False
+        elif isinstance(hardware, ThreadManager):
+            self._current = hardware.sync
         elif isinstance(hardware, HardwareAPILike):
-            self._current = adapters.SynchronousAdapter(hardware)
-            self._built_own_adapter = True
+            self._current = SynchronousAdapter(hardware)
         else:
             raise TypeError(
                 "hardware should be API or synch adapter but is {}"
                 .format(hardware))
-        self._is_orig = False
         return self._current
 
     def reset_hw(self):
-        if self._is_orig or self._built_own_adapter:
-            self._current.join()
-        self._current = adapters.SynchronousAdapter.build(
-            API.build_hardware_simulator)
-        self._is_orig = True
-        self._built_own_adapter = True
+        self._current = ThreadManager(API.build_hardware_simulator).sync
         return self._current
-
-    def __del__(self):
-        orig = getattr(self, '_is_orig', False)
-        cur = getattr(self, '_current', None)
-        built_own = getattr(self, '_built_own_adapter')
-        if cur and (orig or built_own):
-            cur.join()
-
-    def cleanup(self):
-        """ Call to cleanup attached hardware (if it was created locally) """
-        if self._current and (self._is_orig or self._built_own_adapter):
-            self._current.join()
 
 
 def clamp_value(

@@ -13,7 +13,7 @@ import { getSelectedWells } from '../../well-selection/selectors'
 import { deselectAllWells } from '../../well-selection/actions'
 import { LiquidPlacementForm as LiquidPlacementFormComponent } from './LiquidPlacementForm'
 import type { Dispatch } from 'redux'
-import type { ValidFormValues } from './LiquidPlacementForm'
+import type { LiquidPlacementFormValues } from './LiquidPlacementForm'
 import type { BaseState } from '../../types'
 
 type Props = React.ElementProps<typeof LiquidPlacementFormComponent>
@@ -99,7 +99,8 @@ function mergeProps(
     ...passThruProps,
     cancelForm: () => dispatch(deselectAllWells()),
     clearWells,
-    saveForm: (values: ValidFormValues) => {
+    saveForm: (values: LiquidPlacementFormValues) => {
+      const { selectedLiquidId } = values
       const volume = Number(values.volume)
 
       assert(
@@ -113,14 +114,20 @@ function mergeProps(
         )}`
       )
       assert(
+        selectedLiquidId != null,
+        `when saving liquid placement form, expected selectedLiquidId to be non-nullsy but got ${String(
+          selectedLiquidId
+        )}`
+      )
+      assert(
         volume > 0,
         `when saving liquid placement form, expected volume > 0, got ${volume}`
       )
 
-      if (_labwareId != null) {
+      if (_labwareId != null && selectedLiquidId != null) {
         dispatch(
           setWellContents({
-            liquidGroupId: values.selectedLiquidId,
+            liquidGroupId: selectedLiquidId,
             labwareId: _labwareId,
             wells: _selectedWells || [],
             volume: Number(values.volume),

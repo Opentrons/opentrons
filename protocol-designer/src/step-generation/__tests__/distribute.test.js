@@ -70,7 +70,7 @@ beforeEach(() => {
 })
 
 describe('distribute: minimal example', () => {
-  test('single channel; 60uL from A1 -> A2, A3; no tip pickup', () => {
+  it('single channel; 60uL from A1 -> A2, A3; no tip pickup', () => {
     const distributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -94,7 +94,7 @@ describe('distribute: minimal example', () => {
 })
 
 describe('tip handling for multiple distribute chunks', () => {
-  test('changeTip: "once"', () => {
+  it('changeTip: "once"', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -126,7 +126,7 @@ describe('tip handling for multiple distribute chunks', () => {
     ])
   })
 
-  test('changeTip: "always"', () => {
+  it('changeTip: "always"', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -160,7 +160,7 @@ describe('tip handling for multiple distribute chunks', () => {
     ])
   })
 
-  test('changeTip: "never" with carried-over tip', () => {
+  it('changeTip: "never" with carried-over tip', () => {
     // NOTE: this has been used as BASE CASE for the "advanced settings" tests
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
@@ -188,7 +188,7 @@ describe('tip handling for multiple distribute chunks', () => {
     ])
   })
 
-  test('changeTip: "never" should fail with no initial tip', () => {
+  it('changeTip: "never" should fail with no initial tip', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -212,7 +212,7 @@ describe('tip handling for multiple distribute chunks', () => {
 })
 
 describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position', () => {
-  test('mix before aspirate, then aspirate disposal volume', () => {
+  it('mix before aspirate, then aspirate disposal volume', () => {
     // NOTE this also tests "uneven final chunk" eg A6 in [A2 A3 | A4 A5 | A6]
     // which is especially relevant to disposal volume
     const distributeArgs: DistributeArgs = {
@@ -267,45 +267,46 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  test.skip('pre-wet tip', () => {
-    // TODO Ian 2018-05-04 pre-wet volume is TBD.
-    const distributeArgs: DistributeArgs = {
-      ...mixinArgs,
-      sourceWell: 'A1',
-      destWells: ['A2', 'A3', 'A4', 'A5'],
-      changeTip: 'never',
-      volume: 150,
-      preWetTip: true,
-    }
-    const result = distribute(
-      distributeArgs,
-      invariantContext,
-      robotStateWithTip
-    )
-    const res = getSuccessResult(result)
+  // TODO(IL, 2020-02-28): pre-wet volume is not implemented for distribute! #5122
+  it.todo('pre-wet tip')
+  // (() => {
+  //   const distributeArgs: DistributeArgs = {
+  //     ...mixinArgs,
+  //     sourceWell: 'A1',
+  //     destWells: ['A2', 'A3', 'A4', 'A5'],
+  //     changeTip: 'never',
+  //     volume: 150,
+  //     preWetTip: true,
+  //   }
+  //   const result = distribute(
+  //     distributeArgs,
+  //     invariantContext,
+  //     robotStateWithTip
+  //   )
+  //   const res = getSuccessResult(result)
 
-    const preWetVolume = 42 // TODO what is pre-wet volume?
+  //   const preWetVolume = 42 // TODO what is pre-wet volume?
 
-    const preWetTipCommands = [
-      aspirateHelper('A1', preWetVolume),
-      dispenseHelper('A1', preWetVolume, { labware: SOURCE_LABWARE }),
-    ]
+  //   const preWetTipCommands = [
+  //     aspirateHelper('A1', preWetVolume),
+  //     dispenseHelper('A1', preWetVolume, { labware: SOURCE_LABWARE }),
+  //   ]
 
-    expect(res.commands).toEqual([
-      ...preWetTipCommands,
-      aspirateHelper('A1', 300),
-      dispenseHelper('A2', 150),
-      dispenseHelper('A3', 150),
-      blowoutSingleToTrash,
-      ...preWetTipCommands,
-      aspirateHelper('A1', 300),
-      dispenseHelper('A4', 150),
-      dispenseHelper('A5', 150),
-      blowoutSingleToTrash,
-    ])
-  })
+  //   expect(res.commands).toEqual([
+  //     ...preWetTipCommands,
+  //     aspirateHelper('A1', 300),
+  //     dispenseHelper('A2', 150),
+  //     dispenseHelper('A3', 150),
+  //     blowoutSingleToTrash,
+  //     ...preWetTipCommands,
+  //     aspirateHelper('A1', 300),
+  //     dispenseHelper('A4', 150),
+  //     dispenseHelper('A5', 150),
+  //     blowoutSingleToTrash,
+  //   ])
+  // })
 
-  test('touch tip after aspirate', () => {
+  it('touch tip after aspirate', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -336,7 +337,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  test('touch tip after dispense', () => {
+  it('touch tip after dispense', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -369,7 +370,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
     ])
   })
 
-  test('mix before aspirate w/ disposal vol', () => {
+  it('mix before aspirate w/ disposal vol', () => {
     const volume = 130
     const disposalVolume = 20
     const disposalLabware = SOURCE_LABWARE
@@ -429,7 +430,7 @@ describe('advanced settings: volume, mix, pre-wet tip, tip touch, tip position',
 })
 
 describe('invalid input + state errors', () => {
-  test('invalid pipette ID should throw error', () => {
+  it('invalid pipette ID should throw error', () => {
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
       sourceWell: 'A1',
@@ -454,7 +455,7 @@ describe('invalid input + state errors', () => {
 })
 
 describe('distribute volume exceeds pipette max volume', () => {
-  test(`no disposal volume`, () => {
+  it(`no disposal volume`, () => {
     const changeTip = 'once'
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,
@@ -477,7 +478,7 @@ describe('distribute volume exceeds pipette max volume', () => {
     expect(res.errors[0].type).toEqual('PIPETTE_VOLUME_EXCEEDED')
   })
 
-  test(`with disposal volume`, () => {
+  it(`with disposal volume`, () => {
     const changeTip = 'once'
     const distributeArgs: DistributeArgs = {
       ...mixinArgs,

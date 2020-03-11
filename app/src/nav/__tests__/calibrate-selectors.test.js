@@ -124,7 +124,7 @@ describe('calibrate nav selectors', () => {
     const { name, selector, expected, before = noop, after = noop } = spec
     const state = { ...mockState }
 
-    test(name, () => {
+    it(name, () => {
       before()
       expect(selector(state)).toEqual(expected)
       after()

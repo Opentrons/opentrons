@@ -55,7 +55,7 @@ describe('service utils', () => {
 
     SPECS.forEach(spec => {
       const { name, args, expected } = spec
-      test(name, () =>
+      it(name, () =>
         expect(service.makeService.apply(null, args)).toEqual(expected)
       )
     })
@@ -77,7 +77,7 @@ describe('service utils', () => {
 
     SPECS.forEach(spec => {
       const { name, args, expected } = spec
-      test(name, () =>
+      it(name, () =>
         expect(service.makeCandidate.apply(null, args)).toEqual(expected)
       )
     })
@@ -148,7 +148,7 @@ describe('service utils', () => {
 
     SPECS.forEach(spec => {
       const { name, args, expected } = spec
-      test(name, () =>
+      it(name, () =>
         expect(service.fromMdnsBrowser.apply(null, args)).toEqual(expected)
       )
     })
@@ -242,7 +242,7 @@ describe('service utils', () => {
 
     SPECS.forEach(spec => {
       const { name, args, expected } = spec
-      test(name, () =>
+      it(name, () =>
         expect(service.fromResponse.apply(null, args)).toEqual(expected)
       )
     })

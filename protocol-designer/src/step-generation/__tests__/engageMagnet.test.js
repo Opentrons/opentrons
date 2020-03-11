@@ -26,7 +26,7 @@ describe('engageMagnet', () => {
       moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
     }
   })
-  test('creates engage magnet command', () => {
+  it('creates engage magnet command', () => {
     const module = moduleId
     const engageHeight = 2
     const result = engageMagnet(

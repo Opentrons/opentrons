@@ -6,7 +6,6 @@ from typing import Dict, List, Tuple, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
-                              feature_flags as ff,
                               pipette_config as pc,
                               IS_ROBOT,
                               ARCHITECTURE,
@@ -297,13 +296,8 @@ async def set_log_level(request: web.Request) -> web.Response:
     logging.getLogger('opentrons').setLevel(level_val)
     hw = request.app['com.opentrons.hardware']
 
-    if ff.use_protocol_api_v2():
-        await hw.update_config(log_level=log_level)
-        conf = await hw.config
-    else:
-        hw.update_config(log_level=log_level)
-        conf = hw.config
-    rc.save_robot_settings(conf)
+    await hw.update_config(log_level=log_level)
+    rc.save_robot_settings(hw.config)
     return web.json_response(
         status=200,
         data={'message': f'log_level set to {log_level}'})
@@ -317,8 +311,4 @@ async def get_robot_settings(request: web.Request) -> web.Response:
 
     hw = request.app['com.opentrons.hardware']
 
-    if ff.use_protocol_api_v2():
-        conf = await hw.config
-    else:
-        conf = hw.config
-    return web.json_response(conf._asdict(), status=200)
+    return web.json_response(hw.config._asdict(), status=200)

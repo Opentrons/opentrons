@@ -3,7 +3,7 @@
 import { protocolReducer } from '../reducer'
 
 describe('protocolReducer', () => {
-  test('initial state', () => {
+  it('initial state', () => {
     expect(protocolReducer(undefined, {})).toEqual({
       file: null,
       contents: null,
@@ -44,7 +44,7 @@ describe('protocolReducer', () => {
       },
     },
     {
-      name: 'handles robot:SESSION_RESPONSE with JSON protocol',
+      name: 'handles robot:SESSION_RESPONSE with .json protocol',
       action: {
         type: 'robot:SESSION_RESPONSE',
         payload: { name: 'foo.json', protocolText: '{"metadata": {}}' },
@@ -61,7 +61,7 @@ describe('protocolReducer', () => {
       },
     },
     {
-      name: 'handles robot:SESSION_RESPONSE with Python protocol metadata',
+      name: 'handles robot:SESSION_RESPONSE with .py protocol',
       action: {
         type: 'robot:SESSION_RESPONSE',
         payload: {
@@ -82,6 +82,44 @@ describe('protocolReducer', () => {
       },
     },
     {
+      name: 'handles robot:SESSION_RESPONSE with .JSON protocol',
+      action: {
+        type: 'robot:SESSION_RESPONSE',
+        payload: { name: 'foo.JSON', protocolText: '{"metadata": {}}' },
+      },
+      initialState: { file: null, contents: null, data: null },
+      expectedState: {
+        file: {
+          name: 'foo.JSON',
+          type: 'json',
+          lastModified: null,
+        },
+        contents: '{"metadata": {}}',
+        data: { metadata: {} },
+      },
+    },
+    {
+      name: 'handles robot:SESSION_RESPONSE with .PY protocol',
+      action: {
+        type: 'robot:SESSION_RESPONSE',
+        payload: {
+          name: 'foo.PY',
+          protocolText: '# foo.py',
+          metadata: { protocolName: 'foo' },
+        },
+      },
+      initialState: { file: null, contents: null, data: null },
+      expectedState: {
+        file: {
+          name: 'foo.PY',
+          type: 'python',
+          lastModified: null,
+        },
+        contents: '# foo.py',
+        data: { metadata: { protocolName: 'foo' } },
+      },
+    },
+    {
       name: 'handles robot:DISCONNECT by clearing state',
       action: { type: 'robot:DISCONNECT_RESPONSE' },
       initialState: { file: { name: 'proto.py' }, contents: 'foo', data: {} },
@@ -92,7 +130,7 @@ describe('protocolReducer', () => {
   SPECS.forEach(spec => {
     const { name, action, initialState, expectedState } = spec
 
-    test(name, () => {
+    it(name, () => {
       expect(protocolReducer(initialState, action)).toEqual(expectedState)
     })
   })

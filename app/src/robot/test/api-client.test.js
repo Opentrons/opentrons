@@ -8,8 +8,8 @@ import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession } from './__mocks__/session'
-import { MockCalibrationManager } from './__mocks__/calibration-manager'
+import { MockSession } from './__fixtures__/session'
+import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
@@ -130,7 +130,7 @@ describe('api client', () => {
   }
 
   describe('connect and disconnect', () => {
-    test('connect RpcClient on CONNECT message', () => {
+    it('connect RpcClient on CONNECT message', () => {
       const expectedResponse = actions.connectResponse(null, expect.any(Array))
 
       expect(RpcClient).toHaveBeenCalledTimes(0)
@@ -141,7 +141,7 @@ describe('api client', () => {
       })
     })
 
-    test('dispatch CONNECT_RESPONSE error if connection fails', () => {
+    it('dispatch CONNECT_RESPONSE error if connection fails', () => {
       const error = new Error('AHH get_root')
       const expectedResponse = actions.connectResponse(error)
 
@@ -152,7 +152,7 @@ describe('api client', () => {
       )
     })
 
-    test('send CONNECT_RESPONSE w/ capabilities from remote.session_manager', () => {
+    it('send CONNECT_RESPONSE w/ capabilities from remote.session_manager', () => {
       const expectedResponse = actions.connectResponse(null, [
         'create',
         'create_from_bundle',
@@ -166,7 +166,7 @@ describe('api client', () => {
       })
     })
 
-    test('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
+    it('dispatch DISCONNECT_RESPONSE if already disconnected', () => {
       const expected = actions.disconnectResponse()
 
       return sendDisconnect().then(() =>
@@ -174,7 +174,7 @@ describe('api client', () => {
       )
     })
 
-    test('disconnects RPC client on DISCONNECT message', () => {
+    it('disconnects RPC client on DISCONNECT message', () => {
       const expected = actions.disconnectResponse()
 
       return sendConnect()
@@ -183,7 +183,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('disconnects RPC client on robotAdmin:RESTART message', () => {
+    it('disconnects RPC client on robotAdmin:RESTART message', () => {
       const state = {
         ...STATE,
         robot: { ...STATE.robot, connection: { connectedTo: ROBOT_NAME } },
@@ -197,7 +197,7 @@ describe('api client', () => {
     })
 
     // TODO(mc, 2018-03-01): rethink / remove this behavior
-    test('dispatch push to /run if connect to running session', () => {
+    it('dispatch push to /run if connect to running session', () => {
       const expected = push('/run')
       session.state = constants.RUNNING
 
@@ -206,7 +206,7 @@ describe('api client', () => {
       )
     })
 
-    test('dispatch push to /run if connect to paused session', () => {
+    it('dispatch push to /run if connect to paused session', () => {
       const expected = push('/run')
       session.state = constants.PAUSED
 
@@ -217,7 +217,7 @@ describe('api client', () => {
   })
 
   describe('running', () => {
-    test('calls session.run and dispatches RUN_RESPONSE success', () => {
+    it('calls session.run and dispatches RUN_RESPONSE success', () => {
       const expected = actions.runResponse()
 
       session.run.mockResolvedValue()
@@ -230,7 +230,7 @@ describe('api client', () => {
         })
     })
 
-    test('calls session.run and dispatches RUN_RESPONSE failure', () => {
+    it('calls session.run and dispatches RUN_RESPONSE failure', () => {
       const expected = actions.runResponse(new Error('AH'))
 
       session.run.mockRejectedValue(new Error('AH'))
@@ -240,7 +240,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('calls session.pause and dispatches PAUSE_RESPONSE success', () => {
+    it('calls session.pause and dispatches PAUSE_RESPONSE success', () => {
       const expected = actions.pauseResponse()
 
       session.pause.mockResolvedValue()
@@ -253,7 +253,7 @@ describe('api client', () => {
         })
     })
 
-    test('calls session.stop and dispatches PAUSE_RESPONSE failure', () => {
+    it('calls session.stop and dispatches PAUSE_RESPONSE failure', () => {
       const expected = actions.pauseResponse(new Error('AH'))
 
       session.pause.mockRejectedValue(new Error('AH'))
@@ -263,7 +263,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('calls session.resume and dispatches RESUME_RESPONSE success', () => {
+    it('calls session.resume and dispatches RESUME_RESPONSE success', () => {
       const expected = actions.resumeResponse()
 
       session.resume.mockResolvedValue()
@@ -276,7 +276,7 @@ describe('api client', () => {
         })
     })
 
-    test('calls session.resume and dispatches RESUME_RESPONSE failure', () => {
+    it('calls session.resume and dispatches RESUME_RESPONSE failure', () => {
       const expected = actions.resumeResponse(new Error('AH'))
 
       session.resume.mockRejectedValue(new Error('AH'))
@@ -286,7 +286,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('calls session.resume + stop and dispatches CANCEL_RESPONSE', () => {
+    it('calls session.resume + stop and dispatches CANCEL_RESPONSE', () => {
       const expected = actions.cancelResponse()
 
       session.resume.mockResolvedValue()
@@ -301,7 +301,7 @@ describe('api client', () => {
         })
     })
 
-    test('calls session.stop and dispatches CANCEL_RESPONSE failure', () => {
+    it('calls session.stop and dispatches CANCEL_RESPONSE failure', () => {
       const expected = actions.cancelResponse(new Error('AH'))
 
       session.resume.mockResolvedValue()
@@ -312,7 +312,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
-    test('calls session.refresh with REFRESH_SESSION', () => {
+    it('calls session.refresh with REFRESH_SESSION', () => {
       session.refresh.mockResolvedValue()
 
       return sendConnect()
@@ -320,7 +320,7 @@ describe('api client', () => {
         .then(() => expect(session.refresh).toHaveBeenCalled())
     })
 
-    test('start a timer when the run starts', () => {
+    it('start a timer when the run starts', () => {
       session.run.mockResolvedValue()
 
       return sendConnect()
@@ -350,13 +350,13 @@ describe('api client', () => {
       )
     })
 
-    test('dispatches sessionResponse on connect', () => {
+    it('dispatches sessionResponse on connect', () => {
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expectedInitial)
       )
     })
 
-    test('dispatches sessionResponse on full session notification', () => {
+    it('dispatches sessionResponse on full session notification', () => {
       return sendConnect()
         .then(() => {
           dispatch.mockClear()
@@ -365,7 +365,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
     })
 
-    test('handles connnect without session', () => {
+    it('handles connnect without session', () => {
       const notExpected = actions.sessionResponse(
         null,
         expect.anything(),
@@ -379,7 +379,7 @@ describe('api client', () => {
       )
     })
 
-    test('maps api session commands and command log to commands', () => {
+    it('maps api session commands and command log to commands', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -423,7 +423,7 @@ describe('api client', () => {
       )
     })
 
-    test('maps api instruments and instruments by mount', () => {
+    it('maps api instruments and instruments by mount', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -473,7 +473,7 @@ describe('api client', () => {
       )
     })
 
-    test('maps api containers to labware by slot', () => {
+    it('maps api containers to labware by slot', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -513,7 +513,80 @@ describe('api client', () => {
       )
     })
 
-    test('maps api modules to modules by slot', () => {
+    it('reconciles reported tiprack / pipette usage', () => {
+      const expected = actions.sessionResponse(
+        null,
+        expect.objectContaining({
+          pipettesByMount: {
+            left: {
+              _id: 123,
+              mount: 'left',
+              name: 'p200',
+              channels: 1,
+              tipRacks: [789],
+              requestedAs: 'bar',
+            },
+            right: {
+              _id: 456,
+              mount: 'right',
+              name: 'p50',
+              channels: 8,
+              tipRacks: [789],
+              requestedAs: 'foo',
+            },
+          },
+          labwareBySlot: {
+            1: {
+              _id: 789,
+              slot: '1',
+              name: 'a',
+              type: 'tiprack',
+              isTiprack: true,
+              calibratorMount: 'left',
+            },
+          },
+        }),
+        false
+      )
+
+      session.instruments = [
+        {
+          _id: 456,
+          mount: 'right',
+          name: 'p50',
+          channels: 8,
+          tip_racks: [],
+          requested_as: 'foo',
+        },
+        {
+          _id: 123,
+          mount: 'left',
+          name: 'p200',
+          channels: 1,
+          tip_racks: [],
+          requested_as: 'bar',
+        },
+      ]
+
+      session.containers = [
+        {
+          _id: 789,
+          slot: '1',
+          name: 'a',
+          type: 'tiprack',
+          instruments: [
+            { mount: 'left', channels: 1 },
+            { mount: 'right', channels: 8 },
+          ],
+        },
+      ]
+
+      return sendConnect().then(() =>
+        expect(dispatch).toHaveBeenCalledWith(expected)
+      )
+    })
+
+    it('maps api modules to modules by slot', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -551,7 +624,7 @@ describe('api client', () => {
       )
     })
 
-    test('maps api metadata to session metadata', () => {
+    it('maps api metadata to session metadata', () => {
       const expected = actions.sessionResponse(
         null,
         expect.objectContaining({
@@ -581,7 +654,7 @@ describe('api client', () => {
       )
     })
 
-    test('sends error if received malformed session from API', () => {
+    it('sends error if received malformed session from API', () => {
       const expected = actions.sessionResponse(expect.anything(), null, false)
 
       session.commands = [{ foo: 'bar' }]
@@ -592,7 +665,7 @@ describe('api client', () => {
       )
     })
 
-    test('sends SESSION_UPDATE if session notification has lastCommand', () => {
+    it('sends SESSION_UPDATE if session notification has lastCommand', () => {
       const update = { state: 'running', startTime: 1, lastCommand: null }
       const expected = actions.sessionUpdate(update, expect.any(Number))
 
@@ -637,7 +710,7 @@ describe('api client', () => {
       }
     })
 
-    test('handles MOVE_TO_FRONT success', () => {
+    it('handles MOVE_TO_FRONT success', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse()
 
@@ -653,7 +726,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles MOVE_TO_FRONT failure', () => {
+    it('handles MOVE_TO_FRONT failure', () => {
       const action = actions.moveToFront('left')
       const expectedResponse = actions.moveToFrontResponse(new Error('AH'))
 
@@ -664,7 +737,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles PROBE_TIP success', () => {
+    it('handles PROBE_TIP success', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse()
 
@@ -680,7 +753,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles PROBE_TIP failure', () => {
+    it('handles PROBE_TIP failure', () => {
       const action = actions.probeTip('right')
       const expectedResponse = actions.probeTipResponse(new Error('AH'))
 
@@ -691,7 +764,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles MOVE_TO success', () => {
+    it('handles MOVE_TO success', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse()
 
@@ -708,7 +781,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles MOVE_TO failure', () => {
+    it('handles MOVE_TO failure', () => {
       const action = actions.moveTo('left', '5')
       const expectedResponse = actions.moveToResponse(new Error('AH'))
 
@@ -719,7 +792,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles PICKUP_AND_HOME success', () => {
+    it('handles PICKUP_AND_HOME success', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse()
 
@@ -738,7 +811,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles PICKUP_AND_HOME failure update offset', () => {
+    it('handles PICKUP_AND_HOME failure update offset', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
@@ -751,7 +824,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles PICKUP_AND_HOME failure during pickup', () => {
+    it('handles PICKUP_AND_HOME failure during pickup', () => {
       const action = actions.pickupAndHome('left', '5')
       const expectedResponse = actions.pickupAndHomeResponse(new Error('AH'))
 
@@ -763,7 +836,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles DROP_TIP_AND_HOME success', () => {
+    it('handles DROP_TIP_AND_HOME success', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse()
 
@@ -789,7 +862,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles DROP_TIP_AND_HOME failure in drop_tip', () => {
+    it('handles DROP_TIP_AND_HOME failure in drop_tip', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
@@ -800,7 +873,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles DROP_TIP_AND_HOME failure in home', () => {
+    it('handles DROP_TIP_AND_HOME failure in home', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
@@ -812,7 +885,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles DROP_TIP_AND_HOME failure in move_to', () => {
+    it('handles DROP_TIP_AND_HOME failure in move_to', () => {
       const action = actions.dropTipAndHome('right', '9')
       const expectedResponse = actions.dropTipAndHomeResponse(new Error('AH'))
 
@@ -825,7 +898,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('CONFIRM_TIPRACK drops tip if not last tiprack', () => {
+    it('CONFIRM_TIPRACK drops tip if not last tiprack', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse()
 
@@ -842,7 +915,7 @@ describe('api client', () => {
         })
     })
 
-    test('CONFIRM_TIPRACK noops and keeps tip if last tiprack', () => {
+    it('CONFIRM_TIPRACK noops and keeps tip if last tiprack', () => {
       state[NAME].calibration.confirmedBySlot[5] = true
 
       const action = actions.confirmTiprack('left', '9')
@@ -858,7 +931,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles CONFIRM_TIPRACK drop tip failure', () => {
+    it('handles CONFIRM_TIPRACK drop tip failure', () => {
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(new Error('AH'))
 
@@ -869,7 +942,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles JOG success', () => {
+    it('handles JOG success', () => {
       const action = actions.jog('left', 'y', -1, 10)
       const expectedResponse = actions.jogResponse()
 
@@ -887,7 +960,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles JOG failure', () => {
+    it('handles JOG failure', () => {
       const action = actions.jog('left', 'x', 1, 10)
       const expectedResponse = actions.jogResponse(new Error('AH'))
 
@@ -898,7 +971,7 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedResponse))
     })
 
-    test('handles UPDATE_OFFSET success', () => {
+    it('handles UPDATE_OFFSET success', () => {
       const action = actions.updateOffset('left', 1)
       const expectedResponse = actions.updateOffsetResponse(null, false)
 
@@ -914,7 +987,7 @@ describe('api client', () => {
         })
     })
 
-    test('handles UPDATE_OFFSET failure', () => {
+    it('handles UPDATE_OFFSET failure', () => {
       const action = actions.updateOffset('left', 9)
       const expectedResponse = actions.updateOffsetResponse(new Error('AH'))
 

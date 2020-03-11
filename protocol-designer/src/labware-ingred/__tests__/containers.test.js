@@ -4,7 +4,7 @@ jest.mock('../../labware-defs/utils')
 const containersInitialState = {}
 
 describe('DELETE_CONTAINER action', () => {
-  test('no-op with no containers', () => {
+  it('no-op with no containers', () => {
     expect(
       containers(containersInitialState, {
         type: 'DELETE_CONTAINER',
@@ -13,7 +13,7 @@ describe('DELETE_CONTAINER action', () => {
     ).toEqual(containersInitialState)
   })
 
-  test('no-op with nonexistent labwareId', () => {
+  it('no-op with nonexistent labwareId', () => {
     expect(
       containers(
         {
@@ -31,7 +31,7 @@ describe('DELETE_CONTAINER action', () => {
     })
   })
 
-  test('delete given labwareId', () => {
+  it('delete given labwareId', () => {
     expect(
       containers(
         {
@@ -52,7 +52,7 @@ describe('DELETE_CONTAINER action', () => {
 })
 
 describe('DUPLICATE_LABWARE action', () => {
-  test('duplicate correct labware', () => {
+  it('duplicate correct labware', () => {
     expect(
       containers(
         {

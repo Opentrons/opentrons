@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import moment from 'moment'
+import { addSeconds, format } from 'date-fns'
 import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
@@ -24,12 +24,8 @@ const TimeRemaining = ({
   >
     <p className={styles.time_remaining_label}>Time remaining for step:</p>
     <p>
-      {`${moment
-        .utc(
-          // NOTE: moment still doesn't allow duration formatting, hence fake moment creation
-          moment.duration(holdTime || 0, 'seconds').asMilliseconds()
-        )
-        .format('HH:mm:ss')}`}
+      {// convert duration to seconds from epoch (midnight), then format
+      format(addSeconds(0, holdTime ?? 0), 'HH:mm:ss')}
     </p>
   </span>
 )

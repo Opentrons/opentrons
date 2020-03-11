@@ -15,12 +15,12 @@ describe('discovery poller', () => {
     fetch.__mockReset()
   })
 
-  test('returns empty poll request if no candidates', () => {
+  it('returns empty poll request if no candidates', () => {
     const request = poll([], 5000, jest.fn())
     expect(request.id).toBe(null)
   })
 
-  test('sets an interval to poll candidates evenly', () => {
+  it('sets an interval to poll candidates evenly', () => {
     poll(
       [{ ip: 'foo', port: 31950 }, { ip: 'bar', port: 31950 }],
       6000,
@@ -43,7 +43,7 @@ describe('discovery poller', () => {
     expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 2000)
   })
 
-  test('will not set a subinterval smaller than 100ms', () => {
+  it('will not set a subinterval smaller than 100ms', () => {
     poll(
       [{ ip: 'foo', port: 31950 }, { ip: 'bar', port: 31950 }],
       42,
@@ -53,7 +53,7 @@ describe('discovery poller', () => {
     expect(setInterval).toHaveBeenCalledWith(expect.any(Function), 100)
   })
 
-  test('returns interval ID in request object', () => {
+  it('returns interval ID in request object', () => {
     const intervalId = 1234
     setInterval.mockReturnValueOnce(intervalId)
 
@@ -66,14 +66,14 @@ describe('discovery poller', () => {
     expect(request.id).toEqual(intervalId)
   })
 
-  test('can stop polling', () => {
+  it('can stop polling', () => {
     const request = { id: 1234 }
 
     stop(request)
     expect(clearInterval).toHaveBeenCalledWith(1234)
   })
 
-  test('calls fetch health for all candidates in an interval', () => {
+  it('calls fetch health for all candidates in an interval', () => {
     poll(
       [
         { ip: 'foo', port: 31950 },
@@ -109,7 +109,7 @@ describe('discovery poller', () => {
     )
   })
 
-  test('calls onHealth with health response if successful', done => {
+  it('calls onHealth with health response if successful', done => {
     fetch.__setMockResponse({
       ok: true,
       json: () => Promise.resolve({ name: 'foo' }),
@@ -125,7 +125,7 @@ describe('discovery poller', () => {
     jest.runTimersToTime(1000)
   }, 10)
 
-  test('calls onHealth with null response if fetch not ok', done => {
+  it('calls onHealth with null response if fetch not ok', done => {
     fetch.__setMockResponse({
       ok: false,
       json: () => Promise.resolve({ message: 'oh no!' }),
@@ -141,7 +141,7 @@ describe('discovery poller', () => {
     jest.runTimersToTime(1000)
   }, 10)
 
-  test('calls onHealth with null response if fetch rejects', done => {
+  it('calls onHealth with null response if fetch rejects', done => {
     fetch.__setMockError(new Error('failed to fetch'))
 
     poll([{ ip: 'foo', port: 31950 }], 1000, (candidate, apiRes, serverRes) => {
@@ -154,7 +154,7 @@ describe('discovery poller', () => {
     jest.runTimersToTime(1000)
   }, 10)
 
-  test('calls onHealth with null response if JSON parse rejects', done => {
+  it('calls onHealth with null response if JSON parse rejects', done => {
     fetch.__setMockResponse({
       ok: true,
       json: () => Promise.reject(new Error('oh no!')),

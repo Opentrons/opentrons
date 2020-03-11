@@ -22,7 +22,7 @@ describe('touchTip', () => {
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
   })
 
-  test('touchTip with tip, specifying offsetFromBottomMm', () => {
+  it('touchTip with tip, specifying offsetFromBottomMm', () => {
     const result = touchTip(
       {
         pipette: DEFAULT_PIPETTE,
@@ -48,7 +48,7 @@ describe('touchTip', () => {
     ])
   })
 
-  test('touchTip with invalid pipette ID should throw error', () => {
+  it('touchTip with invalid pipette ID should throw error', () => {
     const result = touchTip(
       {
         pipette: 'badPipette',
@@ -64,7 +64,7 @@ describe('touchTip', () => {
     expectTimelineError(res.errors, 'PIPETTE_DOES_NOT_EXIST')
   })
 
-  test('touchTip with no tip should throw error', () => {
+  it('touchTip with no tip should throw error', () => {
     const result = touchTip(
       {
         pipette: DEFAULT_PIPETTE,

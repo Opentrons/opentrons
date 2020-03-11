@@ -8,7 +8,7 @@ import { Page } from '../Page'
 jest.mock('../../../definitions')
 
 describe('Page', () => {
-  test('component renders sidebar and content', () => {
+  it('component renders sidebar and content', () => {
     const tree = shallow(
       <Page
         scrollRef={{ current: null }}
@@ -21,7 +21,7 @@ describe('Page', () => {
     expect(tree).toMatchSnapshot()
   })
 
-  test('component renders with detailPage CSS', () => {
+  it('component renders with detailPage CSS', () => {
     const tree = shallow(
       <Page
         scrollRef={{ current: null }}

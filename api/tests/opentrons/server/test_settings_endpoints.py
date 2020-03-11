@@ -272,14 +272,14 @@ async def test_set_log_level(mock_config, async_client):
     assert resp.status == 400
     body = await resp.json()
     assert 'message'in body
-    conf = await hardware.config
+    conf = hardware.config
     assert conf.log_level != 'ERROR'
     resp = await async_client.post('/settings/log_level/local',
                                    json={'log_level': 'error'})
     assert resp.status == 200
     body = await resp.json()
     assert 'message' in body
-    conf = await hardware.config
+    conf = hardware.config
     assert conf.log_level == 'ERROR'
 
 
@@ -288,5 +288,5 @@ async def test_get_robot_settings(mock_config, async_client):
     body = await resp.json()
     assert resp.status == 200
     hardware = async_client.app['com.opentrons.hardware']
-    conf = await hardware.config
+    conf = hardware.config
     assert json.dumps(conf._asdict()) == json.dumps(body)

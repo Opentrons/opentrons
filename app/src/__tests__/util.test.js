@@ -18,7 +18,7 @@ describe('chainActions utility', () => {
     store = mockStore(state)
   })
 
-  test('dispatches a chain of plain actions', () => {
+  it('dispatches a chain of plain actions', () => {
     const actions = [{ type: 'foo' }, { type: 'bar' }, { type: 'baz' }]
 
     return store.dispatch(chainActions(...actions)).then(result => {
@@ -27,7 +27,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('dispatches a chain of thunk actions', () => {
+  it('dispatches a chain of thunk actions', () => {
     const actions = [{ type: 'foo' }, { type: 'bar' }, { type: 'baz' }]
     const thunks = actions.map(a => dispatch => dispatch(a))
 
@@ -37,7 +37,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('dispatches a chain of thunk promise actions', () => {
+  it('dispatches a chain of thunk promise actions', () => {
     const actions = [{ type: 'foo' }, { type: 'bar' }, { type: 'baz' }]
     const thunks = actions.map(a => dispatch => Promise.resolve(dispatch(a)))
 
@@ -47,7 +47,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('dispatches a combination of action types', () => {
+  it('dispatches a combination of action types', () => {
     const actions = [{ type: 'foo' }, { type: 'bar' }, { type: 'baz' }]
     const thunks = [
       dispatch => dispatch(actions[0]),
@@ -61,7 +61,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a plain action has an error', () => {
+  it('bails out early if a plain action has an error', () => {
     const actions = [{ type: 'foo', error: new Error('AH') }, { type: 'bar' }]
 
     return store.dispatch(chainActions(...actions)).then(result => {
@@ -70,7 +70,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a thunk action has an error', () => {
+  it('bails out early if a thunk action has an error', () => {
     const errorAction = { type: 'foo', error: new Error('AH') }
     const actions = [dispatch => dispatch(errorAction), { type: 'bar' }]
 
@@ -80,7 +80,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a thunk promise has an error', () => {
+  it('bails out early if a thunk promise has an error', () => {
     const errorAction = { type: 'foo', error: new Error('AH') }
     const actions = [
       dispatch => Promise.resolve(dispatch(errorAction)),
@@ -93,7 +93,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a plain action has an error in the payload', () => {
+  it('bails out early if a plain action has an error in the payload', () => {
     const actions = [
       { type: 'foo', payload: { error: new Error('AH') } },
       { type: 'bar' },
@@ -105,7 +105,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a thunk action has an error in the payload', () => {
+  it('bails out early if a thunk action has an error in the payload', () => {
     const errorAction = { type: 'foo', payload: { error: new Error('AH') } }
     const actions = [dispatch => dispatch(errorAction), { type: 'bar' }]
 
@@ -115,7 +115,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a thunk promise has an error in the payload', () => {
+  it('bails out early if a thunk promise has an error in the payload', () => {
     const errorAction = { type: 'foo', payload: { error: new Error('AH') } }
     const actions = [
       dispatch => Promise.resolve(dispatch(errorAction)),
@@ -128,7 +128,7 @@ describe('chainActions utility', () => {
     })
   })
 
-  test('bails out early if a thunk promise rejects', () => {
+  it('bails out early if a thunk promise rejects', () => {
     const actions = [
       dispatch => Promise.reject(new Error('AH')),
       { type: 'bar' },

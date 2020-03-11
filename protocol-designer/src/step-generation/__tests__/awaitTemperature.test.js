@@ -35,7 +35,7 @@ describe('awaitTemperature', () => {
     robotState = stateAndContext.robotState
   })
 
-  test('temperature module id exists and temp status is approaching temp', () => {
+  it('temperature module id exists and temp status is approaching temp', () => {
     const temperature = 20
     const args = {
       module: temperatureModuleId,
@@ -63,7 +63,7 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, previousRobotState)
     expect(result).toEqual(expected)
   })
-  test('returns missing module error when module id does not exist', () => {
+  it('returns missing module error when module id does not exist', () => {
     const temperature = 42
     const args = {
       module: 'someNonexistentModuleId',
@@ -74,7 +74,7 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, robotState)
     expect(result).toEqual(missingModuleError)
   })
-  test('returns missing module error when module id is null', () => {
+  it('returns missing module error when module id is null', () => {
     const temperature = 42
     const args = {
       module: null,
@@ -85,7 +85,7 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, robotState)
     expect(result).toEqual(missingModuleError)
   })
-  test('returns awaitTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
+  it('returns awaitTemperature command creator when temperature module already at target temp and awaiting that same temp', () => {
     const temperature = 42
     const args = {
       module: temperatureModuleId,
@@ -112,7 +112,7 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, previousRobotState)
     expect(result).toEqual(expected)
   })
-  test('returns missing temperature step error when temperature module already at target temp and awaiting different temp', () => {
+  it('returns missing temperature step error when temperature module already at target temp and awaiting different temp', () => {
     const temperature = 80
     const args = {
       module: temperatureModuleId,
@@ -130,7 +130,7 @@ describe('awaitTemperature', () => {
     const result = awaitTemperature(args, invariantContext, previousRobotState)
     expect(result).toEqual(missingTemperatureStep)
   })
-  test('returns missing temperature step error when prev temp state is DEACTIVATED', () => {
+  it('returns missing temperature step error when prev temp state is DEACTIVATED', () => {
     const temperature = 80
     const args = {
       module: temperatureModuleId,

@@ -32,7 +32,7 @@ module.exports = {
     '!**/test/**',
     '!**/scripts/**',
   ],
-  testPathIgnorePatterns: ['cypress/'],
+  testPathIgnorePatterns: ['cypress/', '/node_modules/'],
   coverageReporters: ['lcov', 'text-summary'],
   snapshotSerializers: ['enzyme-to-json/serializer'],
 }

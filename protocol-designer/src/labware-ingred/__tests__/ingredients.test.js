@@ -2,7 +2,7 @@ import { ingredients, ingredLocations } from '../reducers'
 jest.mock('../../labware-defs/utils')
 
 describe('DUPLICATE_LABWARE action', () => {
-  test('duplicate ingredient locations from cloned container', () => {
+  it('duplicate ingredient locations from cloned container', () => {
     const copyLabwareAction = {
       type: 'DUPLICATE_LABWARE',
       payload: {

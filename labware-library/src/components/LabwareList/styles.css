@@ -50,9 +50,9 @@
    * non-standard, but works on all webkit browsers, Edge, and Firefox >= 68
    * it turns out CSS ellipses for multiline blocks are hard
    */
-  display: -webkit-box; /* stylelint-disable-line declaration-block-no-duplicate-properties */
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
+  display: -webkit-box; /* stylelint-disable-line declaration-block-no-duplicate-properties, value-no-vendor-prefix */
+  -webkit-line-clamp: 2; /* stylelint-disable-line value-no-vendor-prefix */
+  -webkit-box-orient: vertical; /* stylelint-disable-line property-no-vendor-prefix */
 }
 
 .title_icon {

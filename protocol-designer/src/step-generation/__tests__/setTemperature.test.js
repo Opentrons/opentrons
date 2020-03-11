@@ -69,7 +69,7 @@ describe('setTemperature', () => {
   ]
 
   testCases.forEach(({ expected, moduleId, testName }) => {
-    test(testName, () => {
+    it(testName, () => {
       const args = { module: moduleId, targetTemperature, commandCreatorFnName }
       const result = setTemperature(args, invariantContext, robotState)
       expect(result).toEqual(expected)

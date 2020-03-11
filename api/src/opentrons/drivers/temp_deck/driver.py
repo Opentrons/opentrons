@@ -121,6 +121,15 @@ class TempDeck:
             await asyncio.sleep(0.1)
         return ''
 
+    def start_set_temperature(self, celsius) -> str:
+        self.run_flag.wait()
+        celsius = round(float(celsius),
+                        utils.TEMPDECK_GCODE_ROUNDING_PRECISION)
+        self._send_command(
+                '{0} S{1}'.format(GCODES['SET_TEMP'], celsius))
+        self._temperature.update({'target': celsius})
+        return ''
+
     # NOTE: only present to support apiV1 non-blocking by default behavior
     def legacy_set_temperature(self, celsius) -> str:
         self.run_flag.wait()
@@ -195,7 +204,7 @@ class TempDeck:
         Example input from Temp-Deck's serial response:
             "serial:aa11bb22 model:aa11bb22 version:aa11bb22"
         '''
-        return self._recursive_get_info(DEFAULT_COMMAND_RETRIES)
+        return self._get_info(DEFAULT_COMMAND_RETRIES)
 
     def pause(self):
         self.run_flag.clear()
@@ -291,7 +300,7 @@ class TempDeck:
             sleep(DEFAULT_STABILIZE_DELAY)
             return self._recursive_update_temperature(retries)
 
-    def _recursive_get_info(self, retries) -> Mapping[str, str]:
+    def _get_info(self, retries) -> Mapping[str, str]:
         last_e: Any = None
         for _ in range(retries):
             try:

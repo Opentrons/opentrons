@@ -128,7 +128,7 @@ describe('robotAdminReducer', () => {
   SPECS.forEach(spec => {
     const { name, action, state, expected } = spec
 
-    test(name, () => {
+    it(name, () => {
       expect(robotAdminReducer(state, action)).toEqual(expected)
     })
   })

@@ -199,7 +199,7 @@ def test_thermocycler_temp(loop, monkeypatch):
 
     set_temp_hw_mock = mock.Mock()
     monkeypatch.setattr(
-        mod._module._api, 'set_temperature', set_temp_hw_mock)
+        mod._module._obj_to_adapt, 'set_temperature', set_temp_hw_mock)
 
     # Test volume param
     mod.set_block_temperature(80.5, block_max_volume=45)
@@ -253,9 +253,9 @@ def test_thermocycler_profile(loop, monkeypatch):
     assert mod.lid_temperature == 80
 
     set_temp_hw_mock = mock.Mock(
-        side_effect=mod._module._api.set_temperature)
+        side_effect=mod._module._obj_to_adapt.set_temperature)
     monkeypatch.setattr(
-        mod._module._api, 'set_temperature', set_temp_hw_mock)
+        mod._module._obj_to_adapt, 'set_temperature', set_temp_hw_mock)
 
     # Test volume param
     mod.execute_profile(steps=[{'temperature': 30, 'hold_time_seconds': 20},
@@ -385,3 +385,33 @@ def test_magdeck_labware_props(loop):
     assert mod._module._driver.plate_height == 2
     mod.engage(height_from_base=2)
     assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
+
+
+def test_module_compatibility(get_module_fixture, monkeypatch):
+
+    def load_fixtures(version, model):
+        return get_module_fixture(model.value)
+
+    monkeypatch.setattr(
+        papi.module_geometry, '_load_module_definition', load_fixtures)
+
+    class DummyEnum:
+        def __init__(self, value: str):
+            self.value = value
+
+        def __eq__(self, other: 'DummyEnum') -> bool:
+            return self.value == other.value
+
+    assert not papi.module_geometry.models_compatible(
+        DummyEnum('incompatibleGenerationV1'),
+        DummyEnum('incompatibleGenerationV2'))
+    assert papi.module_geometry.models_compatible(
+        DummyEnum('incompatibleGenerationV2'),
+        DummyEnum('incompatibleGenerationV2'))
+    assert papi.module_geometry.models_compatible(
+        DummyEnum('compatibleGenerationV1'),
+        DummyEnum('compatibleGenerationV1'))
+    assert not papi.module_geometry.models_compatible(
+        DummyEnum('compatibleGenerationV1'),
+        DummyEnum('incompatibleGenerationV1')
+    )

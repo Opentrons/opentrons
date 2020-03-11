@@ -28,16 +28,6 @@ endef
 
 ot_api_name := python-opentrons-api
 
-define PYTHON_OPENTRONS_API_INSTALL_INIT_SYSTEMD
-	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/api/opentrons-api-server.service \
-	  $(TARGET_DIR)/etc/systemd/system/opentrons-api-server.service
-
-  mkdir -p $(TARGET_DIR)/etc/systemd/system/opentrons.target.wants
-
-  ln -sf ../opentrons-api-server.service \
-    $(TARGET_DIR)/etc/systemd/system/opentrons.target.wants/opentrons-api-server.service
-endef
-
 define PYTHON_OPENTRONS_API_INSTALL_RELEASE_NOTES
 	$(INSTALL) -D -m 0644 $(BR2_EXTERNAL_OPENTRONS_MONOREPO_PATH)/api/release-notes.md $(BINARIES_DIR)/release-notes.md
 endef

@@ -5,7 +5,7 @@ import Renderer from 'react-test-renderer'
 import { VerticalNavBar, NavButton, SidePanel } from '..'
 
 describe('VerticalNavBar', () => {
-  test('renders correctly', () => {
+  it('renders correctly', () => {
     const onClick = () => {}
     const tree = Renderer.create(
       <VerticalNavBar onClick={onClick} className="c">
@@ -18,7 +18,7 @@ describe('VerticalNavBar', () => {
 })
 
 describe('NavButton', () => {
-  test('creates a button with props', () => {
+  it('creates a button with props', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
       <NavButton onClick={onClick} disabled={false} iconName="ot-file" />
@@ -30,7 +30,7 @@ describe('NavButton', () => {
     expect(onClick).toHaveBeenCalled()
   })
 
-  test('adds svg icon to button by name', () => {
+  it('adds svg icon to button by name', () => {
     const icon = Renderer.create(
       <NavButton iconName="ot-file" />
     ).root.findByType('svg')
@@ -38,7 +38,7 @@ describe('NavButton', () => {
     expect(icon).toBeDefined()
   })
 
-  test('renders nav button with icon correctly', () => {
+  it('renders nav button with icon correctly', () => {
     const tree = Renderer.create(
       <NavButton iconName="ot-file" disabled="false" />
     ).toJSON()
@@ -48,7 +48,7 @@ describe('NavButton', () => {
 })
 
 describe('SidePanel', () => {
-  test('renders sidebar with title', () => {
+  it('renders sidebar with title', () => {
     const heading = Renderer.create(
       <SidePanel title={'title'} />
     ).root.findByType('h2')
@@ -56,7 +56,7 @@ describe('SidePanel', () => {
     expect(heading.children).toEqual(['title'])
   })
 
-  test('renders close button when onClick is present', () => {
+  it('renders close button when onClick is present', () => {
     const onClick = jest.fn()
     const button = Renderer.create(
       <SidePanel title={'title'} onCloseClick={onClick} />
@@ -67,7 +67,7 @@ describe('SidePanel', () => {
     expect(onClick).toHaveBeenCalled()
   })
 
-  test('renders closed panel when onClick present and isOpen is false', () => {
+  it('renders closed panel when onClick present and isOpen is false', () => {
     const onClick = jest.fn()
     const panel = Renderer.create(
       <SidePanel title={'title'} isClosed="true" onCloseClick={onClick} />
@@ -76,7 +76,7 @@ describe('SidePanel', () => {
     expect(panel.props.className).toEqual('panel closed')
   })
 
-  test('renders SidePanel correctly', () => {
+  it('renders SidePanel correctly', () => {
     const onClick = jest.fn()
     const tree = Renderer.create(
       <SidePanel title={'title'} onCloseClick={onClick} isClosed="true">

@@ -7,7 +7,7 @@ import fixtureIrregularExample1 from '@opentrons/shared-data/labware/fixtures/2/
 jest.mock('../../definitions')
 
 describe('labwareDefToFields', () => {
-  test('fixture_96_plate', () => {
+  it('fixture_96_plate', () => {
     const def = fixture96Plate
     const result = labwareDefToFields(def)
     expect(result).toEqual({
@@ -52,7 +52,7 @@ describe('labwareDefToFields', () => {
     })
   })
 
-  test('fixture_12_trough', () => {
+  it('fixture_12_trough', () => {
     // make sure rectangular wells + single row works as expected
     const def = fixture12Trough
     const result = labwareDefToFields(def)
@@ -63,7 +63,7 @@ describe('labwareDefToFields', () => {
     expect(result).toMatchSnapshot()
   })
 
-  test('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
+  it('fixture_irregular_example_1 should return null (until multi-grid labware is supported in LC)', () => {
     const def = fixtureIrregularExample1
     const result = labwareDefToFields(def)
     expect(result).toEqual(null)

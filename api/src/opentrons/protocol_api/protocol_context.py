@@ -1,11 +1,12 @@
 import asyncio
 import contextlib
 import logging
-from typing import (
-    Dict, Iterator, List, Optional, Set, Tuple, Union)
+from typing import (Dict, Iterator, List,
+                    Optional, Set, Tuple, Union)
 
 from opentrons import types, commands as cmds
-from opentrons.hardware_control import adapters, modules, API, Simulator
+from opentrons.hardware_control import (SynchronousAdapter, modules,
+                                        API, ExecutionManager)
 from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
@@ -21,7 +22,8 @@ from .instrument_context import InstrumentContext
 from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
-from .util import AxisMaxSpeeds, HardwareManager, requires_version
+from .util import (AxisMaxSpeeds, HardwareManager,
+                   requires_version, HardwareToManage)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -52,7 +54,7 @@ class ProtocolContext(CommandPublisher):
 
     def __init__(self,
                  loop: asyncio.AbstractEventLoop = None,
-                 hardware: API = None,
+                 hardware: HardwareToManage = None,
                  broker=None,
                  bundled_labware: Dict[str, LabwareDefinition] = None,
                  bundled_data: Dict[str, bytes] = None,
@@ -163,7 +165,6 @@ class ProtocolContext(CommandPublisher):
         """ Finalize and clean up the protocol context. """
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
-        self._hw_manager.cleanup()
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
@@ -281,7 +282,7 @@ class ProtocolContext(CommandPublisher):
 
     @requires_version(2, 0)
     def is_simulating(self) -> bool:
-        return self._hw_manager.hardware.get_is_simulator()
+        return self._hw_manager.hardware.is_simulator
 
     @requires_version(2, 0)
     def load_labware_from_definition(
@@ -430,7 +431,6 @@ class ProtocolContext(CommandPublisher):
                 resolved_location),
             self._api_version)
         hc_mod_instance = None
-        hw = self._hw_manager.hardware._api._backend
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
             ModuleType.TEMPERATURE: TemperatureModuleContext,
@@ -438,17 +438,21 @@ class ProtocolContext(CommandPublisher):
         for mod in self._hw_manager.hardware.attached_modules:
             if models_compatible(
                     module_model_from_string(mod.model()), resolved_model):
-                hc_mod_instance = adapters.SynchronousAdapter(mod)
+                hc_mod_instance = SynchronousAdapter(mod)
                 break
 
-        if isinstance(hw, Simulator) and hc_mod_instance is None:
+        if self.is_simulating() and hc_mod_instance is None:
             mod_type = {
                 ModuleType.MAGNETIC: modules.magdeck.MagDeck,
                 ModuleType.TEMPERATURE: modules.tempdeck.TempDeck,
                 ModuleType.THERMOCYCLER: modules.thermocycler.Thermocycler
                 }[resolved_type]
-            hc_mod_instance = adapters.SynchronousAdapter(mod_type(
-                port='', simulating=True, loop=self._loop))
+            hc_mod_instance = SynchronousAdapter(mod_type(
+                    port='',
+                    simulating=True,
+                    loop=self._hw_manager.hardware.loop,
+                    execution_manager=ExecutionManager(
+                        loop=self._hw_manager.hardware.loop)))
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

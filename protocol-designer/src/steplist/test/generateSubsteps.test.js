@@ -36,7 +36,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('null is returned when no robotState', () => {
+  it('null is returned when no robotState', () => {
     robotState = null
     const stepArgsAndErrors = {
       stepArgs: {
@@ -81,7 +81,7 @@ describe('generateSubsteps', () => {
       },
     },
   ].forEach(({ testName, args }) => {
-    test(testName, () => {
+    it(testName, () => {
       const result = generateSubsteps(
         args,
         invariantContext,
@@ -94,7 +94,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('delay command returns pause substep data', () => {
+  it('delay command returns pause substep data', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -310,7 +310,7 @@ describe('generateSubsteps', () => {
         },
       },
     ].forEach(({ testName, stepArgs, expected }) => {
-      test(testName, () => {
+      it(testName, () => {
         const stepArgsAndErrors = {
           errors: {},
           stepArgs: { ...sharedArgs, ...stepArgs },
@@ -329,7 +329,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('mix command returns substep data', () => {
+  it('mix command returns substep data', () => {
     const stepArgsAndErrors = {
       stepArgs: {
         name: 'testing',
@@ -484,7 +484,7 @@ describe('generateSubsteps', () => {
     expect(result).toEqual(expected)
   })
 
-  test('engageMagnet returns substep data with engage = true', () => {
+  it('engageMagnet returns substep data with engage = true', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -511,7 +511,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('disengageMagnet returns substep data with engage = false', () => {
+  it('disengageMagnet returns substep data with engage = false', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -538,7 +538,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('setTemperature returns substep data with temperature', () => {
+  it('setTemperature returns substep data with temperature', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -566,7 +566,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('setTemperature returns temperature when 0', () => {
+  it('setTemperature returns temperature when 0', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -594,7 +594,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('deactivateTemperature returns substep data with null temp', () => {
+  it('deactivateTemperature returns substep data with null temp', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {
@@ -621,7 +621,7 @@ describe('generateSubsteps', () => {
     })
   })
 
-  test('null is returned when no matching command', () => {
+  it('null is returned when no matching command', () => {
     const stepArgsAndErrors = {
       errors: {},
       stepArgs: {

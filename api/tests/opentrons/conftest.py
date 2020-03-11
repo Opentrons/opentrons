@@ -32,7 +32,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import adapters, API
+from opentrons.hardware_control import API, ThreadManager
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 from opentrons import (robot as rb,
@@ -204,7 +204,7 @@ async def async_server(hardware, virtual_smoothie_env, loop):
 @pytest.fixture
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
-    endpoints.session = None
+    endpoints.session_wrapper.session = None
     try:
         yield cli
     finally:
@@ -224,9 +224,9 @@ async def dc_session(request, async_server, monkeypatch, loop):
         types.Mount.LEFT: None,
         types.Mount.RIGHT: 'p300_multi_v1'})
     ses = endpoints.SessionManager(hw)
-    endpoints.session = ses
-    monkeypatch.setattr(endpoints, 'session', ses)
+    endpoints.session_wrapper.session = ses
     yield ses
+    endpoints.session_wrapper.session = None
 
 
 @pytest.fixture(params=["dinosaur.py"])
@@ -334,27 +334,28 @@ def virtual_smoothie_env(monkeypatch):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-def hardware(request, loop, virtual_smoothie_env):
-    hw_manager = adapters.SingletonAdapter(loop)
+async def hardware(request, loop, virtual_smoothie_env):
+    hw_sim = ThreadManager(API.build_hardware_simulator)
     old_config = config.robot_configs.load()
     try:
-        yield hw_manager
+        yield hw_sim
     finally:
-        asyncio.ensure_future(hw_manager.reset())
-        hw_manager.set_config(old_config)
+        hw_sim.set_config(old_config)
+        hw_sim.clean_up()
 
 
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
 def sync_hardware(request, loop, virtual_smoothie_env):
-    hardware = adapters.SynchronousAdapter.build(
-        API.build_hardware_controller)
+    thread_manager = ThreadManager(API.build_hardware_controller)
+    hardware = thread_manager.sync
     try:
         yield hardware
     finally:
         hardware.reset()
         hardware.set_config(config.robot_configs.load())
+        thread_manager.clean_up()
 
 
 @pytest.fixture
@@ -506,8 +507,8 @@ def cntrlr_mock_connect(monkeypatch):
 
 
 @pytest.fixture
-def hardware_api(loop):
-    hw_api = API.build_hardware_simulator(loop=loop)
+async def hardware_api(loop):
+    hw_api = await API.build_hardware_simulator(loop=loop)
     return hw_api
 
 
@@ -535,6 +536,16 @@ def get_json_protocol_fixture():
                 return contents
 
     return _get_json_protocol_fixture
+
+
+@pytest.fixture
+def get_module_fixture():
+    def _get_module_fixture(fixture_name):
+        with open(pathlib.Path(__file__).parent
+                  / '..' / '..' / '..' / 'shared-data' / 'module' / 'fixtures'
+                  / '2' / f'{fixture_name}.json', 'rb') as f:
+            return json.loads(f.read().decode('utf-8'))
+    return _get_module_fixture
 
 
 @pytest.fixture
