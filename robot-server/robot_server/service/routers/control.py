@@ -35,20 +35,6 @@ async def post_picture_capture() -> StreamingResponse:
     )
 
 
-@router.get("/pipettes",
-            description="Get the pipettes currently attached",
-            summary="This endpoint lists properties of the pipettes currently "
-                    "attached to the robot like name, model, and mount. It "
-                    "queries a cached value unless the refresh query parameter"
-                    " is set to true, in which case it will actively scan for "
-                    "pipettes. This requires disabling the pipette motors "
-                    "(which is done automatically) and therefore should only "
-                    "be done through user intent",
-            response_model=control.Pipette)
-async def get_pipettes(refresh: bool) -> control.Pipette:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
 @router.get("/motors/engaged",
             description="Query which motors are engaged and holding",
             response_model=control.EngagedMotors)
