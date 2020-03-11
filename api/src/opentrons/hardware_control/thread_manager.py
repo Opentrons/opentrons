@@ -72,7 +72,7 @@ class CallBridger(Generic[WrappedObj]):
 # object.__get_attribute__(self,...) to opt out of the overwritten
 # functionality. It is more readable and protected from
 # unintentional recursion.
-class ThreadManager():
+class ThreadManager:
     """ A wrapper to make every call into :py:class:`.hardware_control.API`
     execute within the same thread.
 
@@ -100,6 +100,7 @@ class ThreadManager():
 
         self._loop = None
         self.managed_obj = None
+        self.bridged_obj = None
         self._sync_managed_obj = None
         is_running = threading.Event()
         self._is_running = is_running
@@ -123,6 +124,7 @@ class ThreadManager():
                                                           loop=loop,
                                                           **kwargs))
             self.managed_obj = managed_obj
+            self.bridged_obj = CallBridger(managed_obj, loop)
             self._sync_managed_obj = SynchronousAdapter(managed_obj)
         except Exception:
             MODULE_LOG.exception('Exception in Thread Manager build')
@@ -156,33 +158,19 @@ class ThreadManager():
         return CallBridger(module, self._loop)
 
     def __getattribute__(self, attr_name):
-        # Almost every attribute retrieved from us will be for people actually
-        # looking for an attribute of the managed object, so check there first.
-        managed_obj = object.__getattribute__(self, 'managed_obj')
-        loop = object.__getattribute__(self, '_loop')
-        try:
-            attr = getattr(managed_obj, attr_name)
-        except AttributeError:
-            # Maybe this actually was for us? Let’s find it
-            return object.__getattribute__(self, attr_name)
-
-        if asyncio.iscoroutinefunction(attr):
-            # Return coroutine result of async function
-            # executed in managed thread to calling thread
-
-            @functools.wraps(attr)
-            async def wrapper(*args, **kwargs):
-                return await call_coroutine_threadsafe(
-                    loop, attr, *args, **kwargs)
-
-            return wrapper
-        elif asyncio.iscoroutine(attr):
-            # Return awaitable coroutine properties run in managed thread/loop
-            fut = asyncio.run_coroutine_threadsafe(attr, loop)
-            wrapped = asyncio.wrap_future(fut)
-            return wrapped
-
+        # hardware_control.api.API.attached_modules is the only hardware
+        # API method that returns something other than data. The module
+        # objects it returns have associated methods that can be called.
+        # That means they need the same wrapping treatment as the API
+        # itself.
         if attr_name == 'attached_modules':
-            return [self.wrap_module(mod) for mod in attr]
-
-        return attr
+            wrap = object.__getattribute__(self, 'wrap_module')
+            managed = object.__getattribute__(self, 'managed_obj')
+            attr = getattr(managed, attr_name)
+            return [wrap(mod) for mod in attr]
+        else:
+            try:
+                return getattr(
+                    object.__getattribute__(self, 'bridged_obj'), attr_name)
+            except AttributeError:
+                return object.__getattribute__(self, attr_name)
