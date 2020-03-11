@@ -1,4 +1,3 @@
-import typing
 from http import HTTPStatus
 from starlette.responses import StreamingResponse
 from fastapi import APIRouter, Query, HTTPException
@@ -33,21 +32,6 @@ async def post_picture_capture() -> StreamingResponse:
         status_code=HTTPStatus.OK,
         media_type="image/png"
     )
-
-
-@router.get("/motors/engaged",
-            description="Query which motors are engaged and holding",
-            response_model=control.EngagedMotors)
-async def get_engaged_motors() -> control.EngagedMotors:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
-
-
-@router.post("/motors/disengage",
-             description="Disengage a motor or set of motors",
-             response_model=V1BasicResponse)
-async def post_disengage_motors(motors: typing.List[control.MotorName]) \
-        -> V1BasicResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.get("/robot/positions",
