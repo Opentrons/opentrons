@@ -74,6 +74,9 @@ class AbstractModule(abc.ABC):
         if not self.is_simulated:
             await self._execution_manager.wait_for_is_running()
 
+    async def make_cancellable(self, task: asyncio.Task):
+        self._execution_manager.register_cancellable_task(task)
+
     @abc.abstractmethod
     def deactivate(self):
         """ Deactivate the module. """

@@ -15,7 +15,9 @@ from .api import API
 from .controller import Controller
 from .simulator import Simulator
 from .pipette import Pipette
-from .types import HardwareAPILike, CriticalPoint, NoTipAttachedError
+from .types import (HardwareAPILike, CriticalPoint,
+                    NoTipAttachedError, ExecutionState,
+                    ExecutionCancelledError)
 from .constants import DROP_TIP_RELEASE_DISTANCE
 from .thread_manager import ThreadManager
 from .execution_manager import ExecutionManager
@@ -24,5 +26,6 @@ __all__ = [
     'API', 'Controller', 'Simulator', 'Pipette',
     'SynchronousAdapter', 'HardwareAPILike', 'CriticalPoint',
     'NoTipAttachedError', 'DROP_TIP_RELEASE_DISTANCE',
-    'ThreadManager', 'ExecutionManager'
+    'ThreadManager', 'ExecutionManager', 'ExecutionState',
+    'ExecutionCancelledError'
 ]

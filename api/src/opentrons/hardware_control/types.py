@@ -95,6 +95,19 @@ class CriticalPoint(enum.Enum):
     """
 
 
+class ExecutionState(enum.Enum):
+    RUNNING = enum.auto()
+    PAUSED = enum.auto()
+    CANCELLED = enum.auto()
+
+    def __str__(self):
+        return self.name
+
+
+class ExecutionCancelledError(RuntimeError):
+    pass
+
+
 class MustHomeError(RuntimeError):
     pass
 
