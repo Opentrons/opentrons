@@ -211,16 +211,13 @@ def test_add_key_call(api_client):
                     p.assert_called_once_with(fn, f.read())
 
 
-async def test_add_key_no_key(loop, aiohttp_client):
+def test_add_key_no_key(api_client):
     """Test response when no key supplied"""
-    app = init()
-    cli = await loop.create_task(aiohttp_client(app))
-
     with patch("opentrons.system.wifi.add_key") as p:
-        r = await cli.post('/wifi/keys', data={})
+        r = api_client.post('/wifi/keys', data={})
 
         p.assert_not_called()
-        assert r.status == 400
+        assert r.status_code == 422
 
 
 @pytest.mark.parametrize("add_key_return,expected_status,expected_body", [
