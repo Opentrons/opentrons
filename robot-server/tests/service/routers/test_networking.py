@@ -5,7 +5,6 @@ from unittest.mock import patch
 
 import pytest
 from opentrons.system import nmcli, wifi
-from opentrons.server import init
 
 
 def test_networking_status(api_client, monkeypatch):
