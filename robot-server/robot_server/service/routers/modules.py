@@ -1,7 +1,9 @@
+import typing
 import asyncio
 from http import HTTPStatus
 from fastapi import Path, APIRouter, Depends
 from opentrons.hardware_control import HardwareAPILike, modules
+from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1ErrorMessage
@@ -51,11 +53,9 @@ async def get_module_serial(
     res = None
 
     attached_modules = hardware.attached_modules   # type: ignore
-    if attached_modules:
-        for module in attached_modules:
-            is_serial_match = module.device_info.get('serial') == serial
-            if is_serial_match and hasattr(module, 'live_data'):
-                res = module.live_data
+    matching_module = find_matching_module(serial, attached_modules)
+    if matching_module and hasattr(matching_module, 'live_data'):
+        res = matching_module.live_data
 
     if not res:
         raise V1HandlerError(status_code=404, message="Module not found")
@@ -76,15 +76,13 @@ async def post_serial_command(
         hardware: HardwareAPILike = Depends(get_hardware)) \
         -> SerialCommandResponse:
     """Send a command on device identified by serial"""
-    modules = hardware.attached_modules     # type: ignore
-    if not modules:
+    attached_modules = hardware.attached_modules     # type: ignore
+    if not attached_modules:
         raise V1HandlerError(message="No connected modules",
                              status_code=HTTPStatus.NOT_FOUND)
 
     # Search for the module
-    matching_mod = next((mod for mod in modules if
-                         mod.device_info.get('serial') == serial),
-                        None)
+    matching_mod = find_matching_module(serial, attached_modules)
 
     if not matching_mod:
         raise V1HandlerError(message="Specified module not found",
@@ -116,12 +114,8 @@ async def post_serial_update(
         hardware: HardwareAPILike = Depends(get_hardware))\
         -> V1ErrorMessage:
     """Update module firmware"""
-    matching_module = None
     attached_modules = hardware.attached_modules     # type: ignore
-    for module in attached_modules:
-        if module.device_info.get('serial') == serial:
-            matching_module = module
-            break
+    matching_module = find_matching_module(serial, attached_modules)
 
     if not matching_module:
         raise V1HandlerError(message=f'Module {serial} not found',
@@ -149,3 +143,20 @@ async def post_serial_update(
         res = 'Module not responding'
         status = 500
     raise V1HandlerError(message=res, status_code=status)
+
+
+def find_matching_module(serial: str,
+                         attached_modules: typing.List[AbstractModule]) -> \
+        typing.Optional[AbstractModule]:
+    """
+    Given a serial name try to find a matching attached instrument.
+
+    :param serial: Serial number
+    :param attached_modules: List of attached modules
+    :return: The module if found otherwise None
+    """
+    if attached_modules:
+        for m in attached_modules:
+            if m.device_info.get('serial') == serial:
+                return m
+    return None
