@@ -13,11 +13,6 @@ import re
 import time
 import os
 import shutil
-<<<<<<< HEAD
-
-=======
-import abc
->>>>>>> use shared_data module instead of pkgutil.get_data
 from pathlib import Path
 from collections import defaultdict
 from enum import Enum, auto

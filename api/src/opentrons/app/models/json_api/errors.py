@@ -1,5 +1,7 @@
 from typing import Optional, List
 from pydantic import BaseModel, ValidationError
+
+from starlette.exceptions import HTTPException as StarletteHTTPException
 # https://github.com/encode/starlette/blob/master/starlette/status.py
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
@@ -28,16 +30,23 @@ class ErrorResponse(BaseModel):
     errors: List[Error]
 
 def transform_to_json_api_errors(status_code, exception) -> dict:
-    def transform_error(error):
-        return {
+    if isinstance(exception, StarletteHTTPException):
+        request_error = {
             'status': status_code,
-            'detail': error.get('msg'),
-            'title': error.get('type'),
-            'source': {
-                'pointer': '/' + '/'.join(error['loc']),
-            },
+            'detail': exception.detail,
+            'title': 'Bad Request'
         }
-    error_response = ErrorResponse(
-        errors=[transform_error(error) for error in exception.errors()]
-    )
-    return filter_none(error_response.dict())
+        error_response = ErrorResponse(errors=[request_error])
+        return filter_none(error_response.dict())
+    else:
+        def transform_error(error):
+            return {
+                'status': status_code,
+                'detail': error.get('msg'),
+                'source': { 'pointer': '/' + '/'.join(error['loc']) },
+                'title': error.get('type')
+            }
+        error_response = ErrorResponse(
+            errors=[transform_error(error) for error in exception.errors()]
+        )
+        return filter_none(error_response.dict())

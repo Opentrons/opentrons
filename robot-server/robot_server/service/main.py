@@ -1,5 +1,5 @@
 from opentrons import __version__
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
 from starlette.exceptions import HTTPException as StarletteHTTPException
@@ -22,29 +22,17 @@ app = FastAPI(
 @app.exception_handler(RequestValidationError)
 async def custom_request_validation_exception_handler(request, exception) -> JSONResponse:
     errors = transform_to_json_api_errors(HTTP_422_UNPROCESSABLE_ENTITY, exception)
-    errors_response = ErrorResponse(**errors)
     return JSONResponse(
         status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-        content=errors_response.dict(),
+        content=errors,
      )
-
-# @app.exception_handler(HTTPException)
-# async def custom_http_exception_handler(request, exception) -> JSONResponse:
-#     errors = transform_to_json_api_errors(exception.status_code, exception.detail)
-#     errors_response = ErrorResponse(**errors)
-#     return JSONResponse(
-#         status_code=exception.status_code,
-#         content=errors_response.dict(),
-#      )
 
 @app.exception_handler(StarletteHTTPException)
 async def custom_http_exception_handler(request, exception) -> JSONResponse:
-    print('HERE', exception.detail)
-    errors = transform_to_json_api_errors(exception.status_code, exception.detail)
-    errors_response = ErrorResponse(**errors)
+    errors = transform_to_json_api_errors(exception.status_code, exception)
     return JSONResponse(
         status_code=exception.status_code,
-        content=errors_response.dict(),
+        content=errors,
      )
 
 app.include_router(router=health.router,

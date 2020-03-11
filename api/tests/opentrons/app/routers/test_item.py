@@ -6,22 +6,23 @@ from starlette.status import HTTP_200_OK, HTTP_422_UNPROCESSABLE_ENTITY
 
 client = TestClient(app)
 
-# TODO(isk: 2/7/20): Add factories and add/refactor setup
-
 def test_get_item():
     item_id = "1"
     response = client.get(f'items/{item_id}')
     assert response.status_code == HTTP_200_OK
     assert response.json() == {
-      "data": {
-        "id": item_id,
-        "type": 'item',
-        "attributes": {
-          "name": "apple",
-          "quantity": 10,
-          "price": 1.20
+        "data": {
+            "id": item_id,
+            "type": 'item',
+            "attributes": {
+                "name": "apple",
+                "quantity": 10,
+                "price": 1.2
+            },
+        },
+        "links": {
+            "self": f'/items/{item_id}',
         }
-      }
     }
 
 def test_create_item():
@@ -29,41 +30,58 @@ def test_create_item():
     item = ItemData(**data)
     response = client.post(
         "/items",
-        json=vars(item)
+        json={"data": { "type": "item", "attributes": vars(item) }}
     )
     assert response.status_code == HTTP_200_OK
     assert response.json() == {
-      "meta": None,
-      "links": None,
-      "data": {
-        "id": item.id,
-        "type": 'item',
-        "attributes": {
-          "name": item.name,
-          "quantity": item.quantity,
-          "price": item.price
+        "data": {
+            "id": item.id,
+            "type": 'item',
+            "attributes": {
+                "name": item.name,
+                "quantity": item.quantity,
+                "price": item.price
+            },
+        },
+        "links": {
+            "self": f'/items/{item.id}',
         }
-      }
     }
 
 def test_create_item_with_attribute_validation_error():
     response = client.post(
         "/items",
-        json={ "quantity": "10", "price": 1.20 }
+        json={
+            "data": {
+                "type": "item",
+                "attributes": {}
+            }
+        }
     )
     assert response.status_code == HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json() == {
       'errors': [{
-          'id': None,
-          'links': None,
           'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-          'code': None,
           'title': 'value_error.missing',
           'detail': 'field required',
           'source': {
-            'pointer': '/body/attributes/name',
-            'parameter': None
-          },
-          'meta': None
+            'pointer': '/body/item_request/data/attributes/name',
+          }
+      },
+      {
+          'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
+          'title': 'value_error.missing',
+          'detail': 'field required',
+          'source': {
+            'pointer': '/body/item_request/data/attributes/quantity',
+          }
+      },
+      {
+          'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
+          'title': 'value_error.missing',
+          'detail': 'field required',
+          'source': {
+            'pointer': '/body/item_request/data/attributes/price',
+          }
       }]
     }
