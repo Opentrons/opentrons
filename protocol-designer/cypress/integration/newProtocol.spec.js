@@ -5,6 +5,12 @@ describe('Desktop Navigation', () => {
   })
 
   describe('the setup form', () => {
+    it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
+      cy.get('button')
+        .contains('Got It!')
+        .click()
+    })
+
     it('clicks the "CREATE NEW" button', () => {
       cy.get('button')
         .contains('Create New')

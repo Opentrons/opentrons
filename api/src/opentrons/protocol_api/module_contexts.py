@@ -204,6 +204,15 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.set_temperature(celsius)
 
+    def start_set_temperature(self, celsius: float):
+        """ Start setting the target temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param celsius: The target temperature, in C
+        """
+        return self._module.start_set_temperature(celsius)
+
     @cmds.publish.both(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self):

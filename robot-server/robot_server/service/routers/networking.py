@@ -6,8 +6,9 @@ from fastapi import APIRouter, HTTPException, File, Path
 from opentrons.system import nmcli
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models.networking import NetworkingStatus, \
-    WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
-    WifiKeyFiles, WifiKeyFile, EapOptions
+    WifiNetworks, WifiNetworkFull, WifiConfiguration, \
+    WifiConfigurationResponse, WifiKeyFiles, WifiKeyFile, EapOptions, \
+    WifiNetwork
 
 
 log = logging.getLogger(__name__)
@@ -31,7 +32,7 @@ async def get_networking_status() -> NetworkingStatus:
         log.debug("Connectivity: %s", connectivity)
         log.debug("Interfaces: %s", interfaces)
         return NetworkingStatus(status=connectivity, interfaces=interfaces)
-    except (subprocess.CalledProcessError, FileNotFoundError) as e:
+    except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
         log.error("Failed calling nmcli")
         raise HTTPException(HTTPStatus.INTERNAL_SERVER_ERROR, str(e))
 
@@ -44,7 +45,7 @@ async def get_networking_status() -> NetworkingStatus:
             response_model=WifiNetworks)
 async def get_wifi_networks() -> WifiNetworks:
     networks = await nmcli.available_ssids()
-    return WifiNetworks(list=[WifiNetwork(**n) for n in networks])
+    return WifiNetworks(list=[WifiNetworkFull(**n) for n in networks])
 
 
 @router.post("/wifi/configure",
@@ -93,4 +94,16 @@ async def delete_wifi_key(
                         "configuration parameters",
             response_model=EapOptions)
 async def get_eap_options() -> EapOptions:
+    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+
+@router.post("/wifi/disconnect",
+             description="Disconnect the OT-2 from WiFi network",
+             summary="Deactivates the wifi connection and removes it from "
+                     "known connections",
+             response_model=V1ErrorMessage,
+             responses={HTTPStatus.MULTI_STATUS: {
+                 "model": V1ErrorMessage
+             }})
+async def post_wifi_disconnect(wifi_ssid: WifiNetwork) -> V1ErrorMessage:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")

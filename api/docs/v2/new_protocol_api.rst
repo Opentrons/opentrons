@@ -29,6 +29,7 @@ Modules
 -------
 .. autoclass:: opentrons.protocol_api.contexts.TemperatureModuleContext
    :members:
+   :exclude-members: start_set_temperature
    :inherited-members:
 
 .. autoclass:: opentrons.protocol_api.contexts.MagneticModuleContext

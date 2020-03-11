@@ -9,14 +9,13 @@ import { createLogger } from '../logger'
 
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
-import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type { ProtocolData, ProtocolType } from './types'
 
 type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
-type StringSelector = OutputSelector<State, void, ?string>
-type NumberSelector = OutputSelector<State, void, ?number>
+type StringSelector = State => ?string
+type NumberSelector = State => ?number
 type ProtocolTypeSelector = State => ProtocolType | null
 
 type ProtocolInfoSelector = State => {|
@@ -181,6 +180,14 @@ export const getProtocolCreatorApp: CreatorAppSelector = createSelector(
   }
 )
 
+export const getProtocolApiVersion = (state: State): string | null => {
+  // TODO(mc, 2019-11-26): did not import due to circular dependency
+  // protocol API level should probably be part of protocol state
+  const level = state.robot.session.apiLevel
+
+  return level != null ? level.join('.') : null
+}
+
 const METHOD_OT_API = 'Python Protocol API'
 const METHOD_UNKNOWN = 'Unknown Application'
 
@@ -189,10 +196,8 @@ export const getProtocolMethod: StringSelector = createSelector(
   getProtocolContents,
   getProtocolData,
   getProtocolCreatorApp,
-  // TODO(mc, 2019-11-26): did not import due to circular dependency
-  // protocol API level should probably be part of protocol state
-  state => state.robot.session.apiLevel,
-  (file, contents, data, app, apiLevel) => {
+  getProtocolApiVersion,
+  (file, contents, data, app, apiVersion) => {
     const isJson = file && fileIsJson(file)
     const jsonAppName = app.name
       ? startCase(app.name.replace(/^opentrons\//, ''))
@@ -202,6 +207,6 @@ export const getProtocolMethod: StringSelector = createSelector(
 
     if (!file || !contents) return null
     if (readableJsonName) return readableJsonName
-    return `${METHOD_OT_API} v${apiLevel.join('.')}`
+    return `${METHOD_OT_API}${apiVersion !== null ? ` v${apiVersion}` : ''}`
   }
 )

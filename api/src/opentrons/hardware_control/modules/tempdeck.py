@@ -46,6 +46,10 @@ class SimulatingDriver:
         self._target_temp = celsius
         self._active = True
 
+    def start_set_temperature(self, celsius):
+        self._target_temp = celsius
+        self._active = True
+
     def legacy_set_temperature(self, celsius: float):
         self._target_temp = celsius
         self._active = True
@@ -173,6 +177,17 @@ class TempDeck(mod_abc.AbstractModule):
         return await self._loop.create_task(
             self._driver.set_temperature(celsius)
         )
+
+    async def start_set_temperature(self, celsius):
+        """
+        Set temperature in degree Celsius
+        Range: 4 to 95 degree Celsius (QA tested).
+        The internal temp range is -9 to 99 C, which is limited by the 2-digit
+        temperature display. Any input outside of this range will be clipped
+        to the nearest limit
+        """
+        await self.wait_for_is_running()
+        return self._driver.start_set_temperature(celsius)
 
     async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """

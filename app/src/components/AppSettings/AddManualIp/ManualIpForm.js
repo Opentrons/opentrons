@@ -43,14 +43,11 @@ class ManualIpFormComponent extends React.Component<Props> {
 
           actions.resetForm()
         }}
-        render={formProps => {
-          return (
-            <Form>
-              <Field name="ip" component={IpField} inputRef={this.inputRef} />
-            </Form>
-          )
-        }}
-      />
+      >
+        <Form>
+          <Field name="ip" component={IpField} inputRef={this.inputRef} />
+        </Form>
+      </Formik>
     )
   }
 }

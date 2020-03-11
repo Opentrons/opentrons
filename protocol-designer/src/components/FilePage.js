@@ -20,9 +20,12 @@ import { EditModulesCard } from './modules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
+
+import type { FormikProps } from 'formik/@flow-typed'
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FileMetadataFields } from '../file-data'
 import type { ModulesForEditModulesCard } from '../step-forms'
-import type { ModuleRealType } from '@opentrons/shared-data'
+
 export type Props = {|
   formValues: FileMetadataFields,
   instruments: React.ElementProps<typeof InstrumentGroup>,
@@ -104,16 +107,14 @@ export class FilePage extends React.Component<Props, State> {
             enableReinitialize
             initialValues={formValues}
             onSubmit={saveFileMetadata}
-            render={({
-              handleBlur,
+          >
+            {({
               handleChange,
               handleSubmit,
               dirty,
-              errors,
-              setFieldValue,
               touched,
               values,
-            }) => (
+            }: FormikProps<FileMetadataFields>) => (
               <form onSubmit={handleSubmit} className={styles.card_content}>
                 <div
                   className={cx(formStyles.row_wrapper, formStyles.stacked_row)}
@@ -182,7 +183,7 @@ export class FilePage extends React.Component<Props, State> {
                 </div>
               </form>
             )}
-          />
+          </Formik>
         </Card>
 
         <Card title="Pipettes">
