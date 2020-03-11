@@ -1,6 +1,5 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException, Query
-from opentrons.system import log_control
 
 from robot_server.service.models import V1ErrorMessage
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
@@ -96,5 +95,5 @@ async def get_logs(syslog_identifier: LogIdentifier,
                                         description="Number of records to "
                                                     "retrieve",
                                         gt=0,
-                                        le=log_control.MAX_RECORDS)) -> str:
+                                        le=100000)) -> str:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
