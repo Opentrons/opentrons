@@ -111,10 +111,15 @@ export const getSwapBlocked = (args: {
   hoveredLabware: ?LabwareOnDeckType,
   draggedLabware: ?LabwareOnDeckType,
   modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
-  customLabwares: LabwareDefByDefURI,
+  customLabwareDefs: LabwareDefByDefURI,
 }): boolean => {
-  const { hoveredLabware, draggedLabware, modulesById, customLabwares } = args
-
+  const {
+    hoveredLabware,
+    draggedLabware,
+    modulesById,
+    customLabwareDefs,
+  } = args
+  console.log('hovered ', hoveredLabware, modulesById)
   if (!hoveredLabware || !draggedLabware) {
     return false
   }
@@ -125,11 +130,11 @@ export const getSwapBlocked = (args: {
     modulesById[hoveredLabware.slot]?.type || null
 
   const draggedLabwareIsCustom = getLabwareIsCustom(
-    customLabwares,
+    customLabwareDefs,
     draggedLabware
   )
   const hoveredLabwareIsCustom = getLabwareIsCustom(
-    customLabwares,
+    customLabwareDefs,
     hoveredLabware
   )
 
@@ -166,15 +171,16 @@ const DeckSetupContents = (props: ContentsProps) => {
   const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
   const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
 
-  const customLabwares = useSelector(
+  const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
   )
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
     modulesById: initialDeckSetup.modules,
-    customLabwares,
+    customLabwareDefs,
   })
+
   const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(

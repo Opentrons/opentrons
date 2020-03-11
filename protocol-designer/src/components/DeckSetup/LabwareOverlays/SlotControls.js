@@ -45,7 +45,7 @@ type DP = {|
   moveDeckItem: (DeckSlot, DeckSlot) => mixed,
 |}
 type SP = {|
-  customLabwares: LabwareDefByDefURI,
+  customLabwareDefs: LabwareDefByDefURI,
 |}
 type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
@@ -58,13 +58,13 @@ export const SlotControlsComponent = (props: Props) => {
     connectDropTarget,
     moduleType,
     draggedItem,
-    customLabwares,
+    customLabwareDefs,
   } = props
   if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
   const isCustomLabware = draggedItem
-    ? getLabwareIsCustom(customLabwares, draggedItem.labwareOnDeck)
+    ? getLabwareIsCustom(customLabwareDefs, draggedItem.labwareOnDeck)
     : false
 
   let slotBlocked: string | null = null
@@ -114,7 +114,7 @@ export const SlotControlsComponent = (props: Props) => {
 
 const mapStateToProps = (state: BaseState): SP => {
   return {
-    customLabwares: labwareDefSelectors.getCustomLabwareDefsByURI(state),
+    customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
   }
 }
 
@@ -145,7 +145,7 @@ const slotTarget = {
     if (moduleType != null && draggedDef != null) {
       // this is a module slot, prevent drop if the dragged labware is not compatible
       const isCustomLabware = getLabwareIsCustom(
-        props.customLabwares,
+        props.customLabwareDefs,
         draggedItem.labwareOnDeck
       )
 

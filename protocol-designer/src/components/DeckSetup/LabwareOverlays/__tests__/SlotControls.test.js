@@ -2,7 +2,8 @@
 
 import React from 'react'
 import { shallow } from 'enzyme'
-import fixture_96_plate_def from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate.json'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
 import { START_TERMINAL_ITEM_ID } from '../../../../steplist'
 import { SlotControlsComponent } from '../SlotControls'
@@ -27,7 +28,7 @@ describe('SlotControlsComponent', () => {
       labwareDefURI: 'fixture/fixture_96_plate',
       id: 'plate123',
       slot: '3',
-      def: fixture_96_plate_def,
+      def: fixture_96_plate,
     }
 
     props = {
@@ -37,11 +38,11 @@ describe('SlotControlsComponent', () => {
       selectedTerminalItemId: START_TERMINAL_ITEM_ID,
       isOver: true,
       connectDropTarget: el => <svg>{el}</svg>,
-      moduleType: 'magneticModuleType',
+      moduleType: MAGNETIC_MODULE_TYPE,
       draggedItem: {
         labwareOnDeck,
       },
-      customLabwares: {},
+      customLabwareDefs: {},
     }
 
     getLabwareIsCompatibleSpy = jest.spyOn(
@@ -82,8 +83,8 @@ describe('SlotControlsComponent', () => {
   })
 
   it('displays place here when dragged labware is custom and hovered over another labware on module slot', () => {
-    props.customLabwares = {
-      'fixture/fixture_96_plate': fixture_96_plate_def,
+    props.customLabwareDefs = {
+      'fixture/fixture_96_plate': fixture_96_plate,
     }
 
     const wrapper = shallow(<SlotControlsComponent {...props} />)
@@ -91,9 +92,8 @@ describe('SlotControlsComponent', () => {
     expect(wrapper.render().text()).toContain('Place Here')
   })
 
-  it('displays add labware when slot is empty and compatible', () => {
+  it('displays add labware when slot is empty', () => {
     props.isOver = false
-    getLabwareIsCompatibleSpy.mockReturnValue(true)
 
     const wrapper = shallow(<SlotControlsComponent {...props} />)
 
