@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareAPILike, modules
 from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.service.dependencies import get_hardware
-from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.modules import Module, ModuleSerial,\
     Modules, SerialCommandResponse, SerialCommand
@@ -107,12 +107,12 @@ async def post_serial_command(
              description="Initiate a firmware update on a specific module",
              summary="Command robot to flash its bundled firmware file for "
                      "this module's type to this specific module",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_serial_update(
         serial: str = Path(...,
                            description="Serial number of the module"),
         hardware: HardwareAPILike = Depends(get_hardware))\
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     """Update module firmware"""
     attached_modules = hardware.attached_modules     # type: ignore
     matching_module = find_matching_module(serial, attached_modules)
@@ -129,7 +129,7 @@ async def post_serial_update(
                     matching_module.bundled_fw.path,
                     asyncio.get_event_loop()),
                 100)
-            return V1ErrorMessage(
+            return V1BasicResponse(
                 message=f'Successfully updated module {serial}'
             )
         else:
