@@ -401,6 +401,17 @@ async def test_move_bad_request(async_client):
         'model': 'p9000+'
     }
     res = await async_client.post('/robot/move', json=data3)
+    r = await res.json()
+    assert res.status == 400
+
+    data4 = {
+        'target': 'mount',
+        # Z is too low
+        'point': (1, 2, 3),
+        'mount': 'left',
+        'model': 'p9000+'
+    }
+    res = await async_client.post('/robot/move', json=data4)
     assert res.status == 400
 
 
