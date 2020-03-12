@@ -83,7 +83,7 @@ def test_wifi_list(api_client, monkeypatch):
     assert j == expected
 
 
-def test_wifi_configure(api_client, monkeypatch):
+def test_wifi_configure(api_client):
     msg = "Device 'wlan0' successfully activated with" \
           " '076aa998-0275-4aa0-bf85-e9629021e267'."  # noqa
 
@@ -92,15 +92,25 @@ def test_wifi_configure(api_client, monkeypatch):
         # Command: nmcli device wifi connect "{ssid}" password "{psk}"
         return True, msg
 
-    monkeypatch.setattr(nmcli, 'configure', mock_configure)
+    with patch("opentrons.system.nmcli.configure") as m:
+        m.side_effect = mock_configure
 
-    expected = {'ssid': 'Opentrons', 'message': msg}
+        expected = {'ssid': 'Opentrons', 'message': msg}
 
-    resp = api_client.post(
-        '/wifi/configure', json={'ssid': 'Opentrons', 'psk': 'scrt sqrl'})
-    body = resp.json()
-    assert resp.status_code == 201
-    assert body == expected
+        resp = api_client.post(
+            '/wifi/configure', json={'ssid': 'Opentrons', 'psk': 'scrt sqrl'})
+        body = resp.json()
+        assert resp.status_code == 201
+        assert body == expected
+
+        m.assert_called_once_with(ssid="Opentrons",
+                                  eapConfig=None,
+                                  securityType=nmcli.SECURITY_TYPES.WPA_PSK,
+                                  psk="scrt sqrl",
+                                  hidden=False)
+
+
+def test_wifi_configure_value_error(api_client, monkeypatch):
 
     async def mock_configure(ssid, eapConfig, securityType=None,
                              psk=None, hidden=False):
@@ -113,6 +123,9 @@ def test_wifi_configure(api_client, monkeypatch):
     assert resp.status_code == 400
     body = resp.json()
     assert {"message": "nope!"} == body
+
+
+def test_wifi_configure_nmcli_error(api_client, monkeypatch):
 
     async def mock_configure(ssid, eapConfig, securityType=None,
                              psk=None, hidden=False):
@@ -176,15 +189,29 @@ def test_list_keys(list_key_patch, api_client):
     def gen():
         dummy_names = ['ad12d1df199bc912', 'cbdda8124128cf', '812410990c5412']
         for n in dummy_names:
-            yield wifi.Key(directory=n, file=f"{n[:3]}.pem")
+            yield wifi.Key(directory=n, file=f"{n[:4]}.pem")
 
     list_key_patch.side_effect = gen
 
-    empty_resp = api_client.get('/wifi/keys')
-    assert empty_resp.status_code == 200
-    empty_body = empty_resp.json()
-    assert empty_body == {'keys': [
-
+    resp = api_client.get('/wifi/keys')
+    assert resp.status_code == 200
+    body = resp.json()
+    assert body == {'keys': [
+            {
+                "uri": "/wifi/keys/ad12d1df199bc912",
+                "id": "ad12d1df199bc912",
+                "name": "ad12.pem"
+            },
+            {
+                "uri": "/wifi/keys/cbdda8124128cf",
+                "id": "cbdda8124128cf",
+                "name": "cbdd.pem"
+            },
+            {
+                "uri": "/wifi/keys/812410990c5412",
+                "id": "812410990c5412",
+                "name": "8124.pem"
+            }
     ]}
 
 

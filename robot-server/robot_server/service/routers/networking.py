@@ -60,7 +60,15 @@ async def get_wifi_networks() -> WifiNetworks:
 async def post_wifi_configure(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
     try:
-        ok, message = await nmcli.configure(**configuration.dict())
+        psk = configuration.psk.get_secret_value() if \
+            configuration.psk else None
+        ok, message = await nmcli.configure(
+            ssid=configuration.ssid,
+            securityType=nmcli.SECURITY_TYPES(configuration.securityType),
+            eapConfig=configuration.eapConfig,
+            hidden=configuration.hidden is True,
+            psk=psk
+        )
         log.debug("Wifi configure result: %s", message)
     except (ValueError, TypeError) as e:
         # Indicates an unexpected kwarg; check is done here to avoid keeping
@@ -75,15 +83,24 @@ async def post_wifi_configure(configuration: WifiConfiguration)\
 
 @router.get("/wifi/keys",
             description="Get a list of key files known to the system",
-            response_model=WifiKeyFiles)
-async def get_wifi_keys() -> WifiKeyFiles:
+            response_model=WifiKeyFiles,
+            response_model_by_alias=True,
+            )
+async def get_wifi_keys():
     keys = [
         WifiKeyFile(uri=f'/wifi/keys/{key.directory}',
                     id=key.directory,
                     name=os.path.basename(key.file))
         for key in wifi.list_keys()
     ]
-    return WifiKeyFiles(wifi_keys=keys)
+    # Why not create a WifiKeyFiles? Because validation fails when there's a
+    # pydantic model with attribute named keys. Deep in the guts of pydantic
+    # there's a call to `dict(model)` which raises an exception because `keys`
+    # is not callable, like the `keys` member of dict.
+    # A problem for another time.
+    return {
+        "keys": keys
+    }
 
 
 @router.post("/wifi/keys",
