@@ -15,7 +15,7 @@ import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
-import { isVersionOneModule } from './'
+import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import type { ModuleRealType } from '@opentrons/shared-data'
@@ -42,11 +42,13 @@ export function ModuleRow(props: Props) {
   let slotDisplayName = null
   let occupiedSlotsForMap: Array<string> = []
   let collisionSlots: Array<string> = []
-  const versionOneModel = model ? isVersionOneModule(model) : false
+  const moduleHasCollisionIssue = model
+    ? isModuleWithCollisionIssue(model)
+    : false
   // Populate warnings are enabled (crashable pipette in protocol + !disable module restrictions)
-  if (showCollisionWarnings && versionOneModel && slot === '1') {
+  if (showCollisionWarnings && moduleHasCollisionIssue && slot === '1') {
     collisionSlots = ['4']
-  } else if (showCollisionWarnings && versionOneModel && slot === '3') {
+  } else if (showCollisionWarnings && moduleHasCollisionIssue && slot === '3') {
     collisionSlots = ['6']
   }
 
@@ -105,7 +107,7 @@ export function ModuleRow(props: Props) {
         <div className={styles.module_diagram_container}>
           <ModuleDiagram
             type={type}
-            model={module?.model || DEFAULT_MODEL_FOR_MODULE_TYPE[type]}
+            model={model || DEFAULT_MODEL_FOR_MODULE_TYPE[type]}
           />
         </div>
         <div className={styles.module_col}>

@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
+import some from 'lodash/some'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -15,6 +16,7 @@ import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
+import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModulesForEditModulesCard } from '../../step-forms'
@@ -36,6 +38,10 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
+  const hasCrashableModule = some(modules, module => {
+    return module ? isModuleWithCollisionIssue(module.model) : false
+  })
+
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
@@ -47,7 +53,8 @@ export function EditModulesCard(props: Props) {
     !moduleRestrictionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
     warningsEnabled &&
-    (modules[MAGNETIC_MODULE_TYPE] || modules[TEMPERATURE_MODULE_TYPE])
+    (modules[MAGNETIC_MODULE_TYPE] || modules[TEMPERATURE_MODULE_TYPE]) &&
+    hasCrashableModule
 
   return (
     <Card title="Modules">

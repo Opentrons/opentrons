@@ -141,7 +141,10 @@ export const DEFAULT_MODEL_FOR_MODULE_TYPE: { [ModuleRealType]: string } = {
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
 }
 
-export const GEN_ONE_MODULES = [MAGNETIC_MODULE_V1, TEMPERATURE_MODULE_V1]
+export const MODULES_WITH_COLLISION_ISSUES = [
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+]
 
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
