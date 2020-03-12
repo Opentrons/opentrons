@@ -515,6 +515,15 @@ def load_module(
 
 def resolve_module_model(module_name: str) -> ModuleModel:
     """ Turn any of the supported load names into module model names """
+
+    model_map: Mapping[str, ModuleModel] = {
+        'magneticModuleV1': MagneticModuleModel.MAGNETIC_V1,
+        'magneticModuleV2': MagneticModuleModel.MAGNETIC_V2,
+        'temperatureModuleV1': TemperatureModuleModel.TEMPERATURE_V1,
+        'temperatureModuleV2': TemperatureModuleModel.TEMPERATURE_V2,
+        'thermocyclerModuleV1': ThermocyclerModuleModel.THERMOCYCLER_V1,
+    }
+
     alias_map: Mapping[str, ModuleModel] = {
         'magdeck': MagneticModuleModel.MAGNETIC_V1,
         'magnetic module': MagneticModuleModel.MAGNETIC_V1,
@@ -525,12 +534,14 @@ def resolve_module_model(module_name: str) -> ModuleModel:
         'thermocycler': ThermocyclerModuleModel.THERMOCYCLER_V1,
         'thermocycler module': ThermocyclerModuleModel.THERMOCYCLER_V1,
     }
+
     lower_name = module_name.lower()
-    resolved_name = alias_map.get(lower_name, None)
+    resolved_name = model_map.get(module_name, None) \
+        or alias_map.get(lower_name, None)
     if not resolved_name:
         raise ValueError(f'{module_name} is not a valid module load name.\n'
-                         'Valid names (ignoring case): '
-                         '"' + '", "'.join(alias_map.keys()) + '"')
+                         'Valid names (ignoring case): ''"' + '", "'
+                         .join(*model_map.keys(), *alias_map.keys()) + '"')
     return resolved_name
 
 
