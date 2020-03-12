@@ -39,7 +39,6 @@ export const getLabwareOptions: Selector<Options> = createSelector(
       labwareEntities,
       (acc: Options, l: LabwareEntity, labwareId: string): Options => {
         const module = getModuleUnderLabware(initialDeckSetup, labwareId)
-        console.log(module)
         const prefix = module
           ? i18n.t(
               `form.step_edit_form.field.moduleLabwarePrefix.${module.type}`
