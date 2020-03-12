@@ -41,6 +41,7 @@ X_CURRENT_HIGH = 1.25
 Y_CURRENT_LOW = 0.3
 Y_CURRENT_HIGH = 1.25
 
+Z_RETRACT_DISTANCE = 2
 
 HIGH_CURRENT: Dict[str, float] = {
     'X': X_CURRENT_HIGH,
@@ -177,7 +178,8 @@ robot_config = namedtuple(
         'mount_offset',
         'log_level',
         'tip_probe',
-        'default_pipette_configs'
+        'default_pipette_configs',
+        'z_retract_distance'
     ]
 )
 
@@ -290,7 +292,9 @@ def build_config(deck_cal: List[List[float]],
         tip_probe=_build_tip_probe(
             _tip_probe_settings_with_migration(robot_settings)),
         default_pipette_configs=robot_settings.get(
-            'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS)
+            'default_pipette_configs', DEFAULT_PIPETTE_CONFIGS),
+        z_retract_distance=robot_settings.get(
+            'z_retract_distance', Z_RETRACT_DISTANCE),
     )
     return cfg
 
