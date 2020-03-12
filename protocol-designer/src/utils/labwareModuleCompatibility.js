@@ -7,7 +7,8 @@ import {
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
-
+import type { LabwareDefByDefURI } from '../labware-defs'
+import type { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
 const COMPATIBLE_LABWARE_WHITELIST_BY_MODULE_TYPE: {
   [ModuleRealType]: $ReadOnlyArray<string>,
@@ -60,4 +61,11 @@ export const getLabwareIsCompatible = (
   const whitelist =
     COMPATIBLE_LABWARE_WHITELIST_BY_MODULE_TYPE[moduleType] || []
   return whitelist.includes(def.parameters.loadName)
+}
+
+export const getLabwareIsCustom = (
+  customLabwares: LabwareDefByDefURI,
+  labwareOnDeck: LabwareOnDeck
+): boolean => {
+  return labwareOnDeck.labwareDefURI in customLabwares
 }
