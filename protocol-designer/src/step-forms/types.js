@@ -50,7 +50,7 @@ export type PipetteEntities = {
 // =========== MODULES ========
 export type FormModule = {|
   onDeck: boolean,
-  model: ModuleModel,
+  model: ModuleModel | null,
   slot: DeckSlot,
 |}
 
