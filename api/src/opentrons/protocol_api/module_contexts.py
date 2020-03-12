@@ -232,6 +232,16 @@ class TemperatureModuleContext(ModuleContext):
         """ Current target temperature in C"""
         return self._module.target
 
+    @property  # type: ignore
+    @requires_version(2, 0)
+    def status(self):
+        """ The status of the module.
+
+        Returns 'holding at target', 'cooling', 'heating', or 'idle'
+
+        """
+        return self._module.status
+
 
 class MagneticModuleContext(ModuleContext):
     """ An object representing a connected Temperature Module.

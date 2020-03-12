@@ -1,4 +1,5 @@
 import logging
+import asyncio
 from typing import Any, Dict
 
 from .contexts import ProtocolContext, InstrumentContext, ModuleContext
@@ -7,6 +8,28 @@ from .execute_v3 import _delay, _blowout, _pick_up_tip, _drop_tip, _aspirate, \
     _dispense, _touch_tip, _move_to_slot
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+def load_labware_from_json_defs(
+        ctx: ProtocolContext,
+        protocol: Dict[Any, Any],
+        modules: Dict[str, ModuleContext]) -> Dict[str, labware.Labware]:
+    protocol_labware = protocol['labware']
+    definitions = protocol['labwareDefinitions']
+    loaded_labware = {}
+
+    for labware_id, props in protocol_labware.items():
+        slot = props['slot']
+        definition = definitions[props['definitionId']]
+        label = props.get('displayName', None)
+        if slot in modules:
+            loaded_labware[labware_id] = \
+                modules[slot].load_labware_from_definition(definition, label)
+        else:
+            loaded_labware[labware_id] = \
+                ctx.load_labware_from_definition(definition, slot, label)
+
+    return loaded_labware
 
 
 def load_modules_from_json(
@@ -50,9 +73,22 @@ def _temperature_module_deactivate(modules, params) -> None:
 
 
 def _temperature_module_await_temp(modules, params) -> None:
-    # module_id = params['module']
-    # module = modules[module_id]
-    raise NotImplementedError()
+    module_id = params['module']
+    module = modules[module_id]
+
+    awaiting_temperature = params['temperature']
+    status = module.status
+    # in some cases the module status will flicker from one state to another
+    # while holding, because the temperature delta will be exceeded.
+    # when this flicker happens, this function would sleep for a moment longer
+
+    if status == 'heating':
+        while (module.temperature < awaiting_temperature):
+            asyncio.sleep(0.2)
+
+    elif status == 'cooling':
+        while (module.temperature > awaiting_temperature):
+            asyncio.sleep(0.2)
 
 
 dispatcher_map: Dict[Any, Any] = {

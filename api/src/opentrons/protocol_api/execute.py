@@ -147,11 +147,12 @@ def run_protocol(protocol: Protocol,
             # b/c the v4 protocol has no changes for these keys
             ins = execute_v3.load_pipettes_from_json(
                 context, protocol.contents)
-            lw = execute_v3.load_labware_from_json_defs(
-                context, protocol.contents)
 
             modules = execute_v4.load_modules_from_json(
                 context, protocol.contents)
+
+            lw = execute_v4.load_labware_from_json_defs(
+                context, protocol.contents, modules)
             execute_v4.dispatch_json(
                 context, protocol.contents, ins, lw, modules)
         else:
