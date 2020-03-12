@@ -95,10 +95,6 @@ export function getIsReadyToRun(state: State): boolean {
   return getSessionStatus(state) === ('loaded': SessionStatus)
 }
 
-export function getIsActive(state: State): boolean {
-  return getSessionStatus(state) === ('running': SessionStatus)
-}
-
 export function getIsRunning(state: State): boolean {
   const status = getSessionStatus(state)
 
