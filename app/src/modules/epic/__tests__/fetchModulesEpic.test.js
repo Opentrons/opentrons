@@ -85,7 +85,35 @@ describe('fetchModulesEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.fetchModulesSuccess(
           mockRobot.name,
-          Fixtures.mockFetchModulesSuccess.body.modules,
+          [
+            Fixtures.mockMagneticModule,
+            Fixtures.mockTemperatureModule,
+            Fixtures.mockThermocycler,
+          ],
+          { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
+        ),
+      })
+    })
+  })
+
+  it('maps successful legacy response to FETCH_MODULES_SUCCESS', () => {
+    testScheduler.run(({ hot, cold, expectObservable, flush }) => {
+      mockFetchRobotApi.mockReturnValue(
+        cold('r', { r: Fixtures.mockLegacyFetchModulesSuccess })
+      )
+
+      const action$ = hot('--a', { a: action })
+      const state$ = hot('a-a', { a: {} })
+      const output$ = modulesEpic(action$, state$)
+
+      expectObservable(output$).toBe('--a', {
+        a: Actions.fetchModulesSuccess(
+          mockRobot.name,
+          [
+            Fixtures.mockMagneticModule,
+            Fixtures.mockTemperatureModule,
+            Fixtures.mockThermocycler,
+          ],
           { ...meta, response: Fixtures.mockFetchModulesSuccessMeta }
         ),
       })

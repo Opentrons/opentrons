@@ -1,93 +1,56 @@
 // @flow
 
 import type { RobotApiRequestMeta } from '../robot-api/types'
-import typeof { MAGDECK, TEMPDECK, THERMOCYCLER } from './constants'
+import type {
+  TemperatureModuleModel,
+  ThermocyclerModuleModel,
+  MagneticModuleModel,
+} from '@opentrons/shared-data'
+
+import {
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
+
+import * as ApiTypes from './api-types'
+export * from './api-types'
 
 // common types
 
-type BaseModule = {|
-  displayName: string,
-  model: string,
-  serial: string,
-  fwVersion: string,
-  port: string,
-  hasAvailableUpdate: boolean,
-|}
-
-export type TemperatureData = {|
-  currentTemp: number,
-  targetTemp: number | null,
-|}
-
-export type MagneticData = {|
-  engaged: boolean,
-  height: number,
-|}
-
-export type ThermocyclerData = {|
-  // TODO(mc, 2019-12-12): in_between comes from the thermocycler firmware and
-  // will be rare in normal operation due to limitations in current revision
-  lid: 'open' | 'closed' | 'in_between',
-  lidTarget: number | null,
-  lidTemp: number | null,
-  currentTemp: number | null,
-  targetTemp: number | null,
-  holdTime: number | null,
-  rampRate: number | null,
-  totalStepCount: number | null,
-  currentStepIndex: number | null,
-  totalCycleCount: number | null,
-  currentCycleIndex: number | null,
-|}
-
-export type TemperatureStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
-
-export type ThermocyclerStatus =
-  | 'idle'
-  | 'holding at target'
-  | 'cooling'
-  | 'heating'
-  | 'error'
-
-export type MagneticStatus = 'engaged' | 'disengaged'
+export type CommonModuleInfo = $Diff<
+  ApiTypes.ApiBaseModule,
+  {| model: mixed, displayName: mixed, moduleModel: mixed |}
+>
 
 export type TemperatureModule = {|
-  ...BaseModule,
-  name: TEMPDECK,
-  data: TemperatureData,
-  status: TemperatureStatus,
+  type: typeof TEMPERATURE_MODULE_TYPE,
+  model: TemperatureModuleModel,
+  status: ApiTypes.TemperatureStatus,
+  data: ApiTypes.TemperatureData,
+  ...CommonModuleInfo,
 |}
 
 export type MagneticModule = {|
-  ...BaseModule,
-  name: MAGDECK,
-  data: MagneticData,
-  status: MagneticStatus,
+  type: typeof MAGNETIC_MODULE_TYPE,
+  model: MagneticModuleModel,
+  status: ApiTypes.MagneticStatus,
+  data: ApiTypes.MagneticData,
+  ...CommonModuleInfo,
 |}
 
 export type ThermocyclerModule = {|
-  ...BaseModule,
-  name: THERMOCYCLER,
-  data: ThermocyclerData,
-  status: ThermocyclerStatus,
+  type: typeof THERMOCYCLER_MODULE_TYPE,
+  model: ThermocyclerModuleModel,
+  status: ApiTypes.ThermocyclerStatus,
+  data: ApiTypes.ThermocyclerData,
+  ...CommonModuleInfo,
 |}
 
 export type AttachedModule =
-  | ThermocyclerModule
-  | MagneticModule
   | TemperatureModule
-
-export type ModuleCommand =
-  | 'set_temperature'
-  | 'set_block_temperature'
-  | 'set_lid_temperature'
-  | 'deactivate'
-  | 'open'
-
+  | MagneticModule
+  | ThermocyclerModule
 // action object types
 
 // fetch modules
@@ -117,7 +80,7 @@ export type SendModuleCommandAction = {|
   payload: {|
     robotName: string,
     moduleId: string,
-    command: ModuleCommand,
+    command: ApiTypes.ModuleCommand,
     args: Array<mixed>,
   |},
   meta: RobotApiRequestMeta,
@@ -128,7 +91,7 @@ export type SendModuleCommandSuccessAction = {|
   payload: {|
     robotName: string,
     moduleId: string,
-    command: ModuleCommand,
+    command: ApiTypes.ModuleCommand,
     returnValue: mixed,
   |},
   meta: RobotApiRequestMeta,
@@ -139,7 +102,7 @@ export type SendModuleCommandFailureAction = {|
   payload: {|
     robotName: string,
     moduleId: string,
-    command: ModuleCommand,
+    command: ApiTypes.ModuleCommand,
     error: {},
   |},
   meta: RobotApiRequestMeta,
