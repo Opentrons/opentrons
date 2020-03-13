@@ -1,10 +1,9 @@
-from http import HTTPStatus
+import asyncio
 
 from opentrons.hardware_control import HardwareAPILike
-from opentrons.hardware_control.types import Axis
-from opentrons.types import Mount
-from starlette.responses import StreamingResponse
-from fastapi import APIRouter, Query, HTTPException, Depends
+from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.types import Mount, Point
+from fastapi import APIRouter, Query, Depends
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.exceptions import V1HandlerError
@@ -19,26 +18,14 @@ router = APIRouter()
                          "out of a crowd")
 async def post_identify(
         seconds: int = Query(...,
-                             description="Time to blink the lights for")) \
+                             description="Time to blink the lights for"),
+        hardware: HardwareAPILike = Depends(get_hardware)) \
         -> V1BasicResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+    asyncio.ensure_future(hardware.identify(seconds))
+    return V1BasicResponse(message="identifying")
 
 
-@router.post("/camera/picture",
-             description="Capture an image from the OT-2's onboard camera "
-                         "and return it",
-             responses={
-                 HTTPStatus.OK: {
-                     "content": {"image/png": {}},
-                     "description": "The image"
-                 }
-             })
-async def post_picture_capture() -> StreamingResponse:
-    return StreamingResponse(
-        content=iter([]),
-        status_code=HTTPStatus.OK,
-        media_type="image/png"
-    )
+
 
 
 @router.get("/robot/positions",
@@ -65,9 +52,35 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
              description="Move the robot's gantry to a position (usually to a "
                          "position retrieved from GET /robot/positions)",
              response_model=V1BasicResponse)
-async def post_move_robot(robot_move_target: control.RobotMoveTarget)\
+async def post_move_robot(
+        robot_move_target: control.RobotMoveTarget,
+        hardware: HardwareAPILike = Depends(get_hardware))\
         -> V1BasicResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+    """Move the robot"""
+    await hardware.cache_instruments()
+
+    critical_point = None
+    if robot_move_target.target == control.MotionTarget.mount:
+        critical_point = CriticalPoint.MOUNT
+
+    mount = Mount[robot_move_target.mount.upper()]
+    target_pos = Point(*robot_move_target.point)
+
+    # Reset z position
+    await hardware.home_z()
+    pos = await hardware.gantry_position(mount,
+                                         critical_point=critical_point)
+    # Move to requested x, y and current z position
+    await hardware.move_to(mount,
+                           target_pos._replace(z=pos.z),
+                           critical_point=critical_point)
+    # Move to requested z position
+    await hardware.move_to(mount,
+                           target_pos,
+                           critical_point=critical_point)
+    pos = await hardware.gantry_position(mount)
+
+    return V1BasicResponse(message=f"Move complete. New position: {pos}")
 
 
 @router.post("/robot/home",
