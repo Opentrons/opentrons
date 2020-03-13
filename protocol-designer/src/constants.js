@@ -17,6 +17,7 @@ import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
@@ -135,7 +136,9 @@ export const MODELS_FOR_MODULE_TYPE: {
   ],
 }
 
-export const DEFAULT_MODEL_FOR_MODULE_TYPE: { [ModuleRealType]: string } = {
+export const DEFAULT_MODEL_FOR_MODULE_TYPE: {
+  [ModuleRealType]: ModuleModel,
+} = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
