@@ -1,7 +1,7 @@
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException, Query
 
-from robot_server.service.models import V1ErrorMessage
+from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
@@ -27,17 +27,17 @@ async def get_settings() -> AdvancedSettings:
 
 @router.post("/settings/log_level/local",
              description="Set the minimum level of logs saved locally",
-             response_model=V1ErrorMessage)
-async def post_log_level_local(log_level: LogLevel) -> V1ErrorMessage:
+             response_model=V1BasicResponse)
+async def post_log_level_local(log_level: LogLevel) -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 
 @router.post("/settings/log_level/upstream",
              description="Set the minimum level of logs sent upstream to "
                          "Opentrons. Only available on a real robot",
-             response_model=V1ErrorMessage)
+             response_model=V1BasicResponse)
 async def post_log_level_upstream(log_level: LogLevel)\
-        -> V1ErrorMessage:
+        -> V1BasicResponse:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
 
 

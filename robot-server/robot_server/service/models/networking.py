@@ -2,6 +2,7 @@ import typing
 from enum import Enum
 
 from pydantic import BaseModel, Field, SecretStr, validator, root_validator
+from opentrons.system import wifi
 
 
 class ConnectivityStatus(str, Enum):
@@ -161,21 +162,43 @@ class WifiConfiguration(BaseModel):
     @validator("eapConfig")
     def eap_config_validate(cls, v):
         """Custom validator for the eapConfig field"""
-        if v and not v.get("eapType"):
-            raise ValueError("eapType must be defined")
+        if v is not None:
+            if not v.get("eapType"):
+                raise ValueError("eapType must be defined")
+            try:
+                wifi.eap_check_config(v)
+            except wifi.ConfigureArgsError as e:
+                raise ValueError(str(e))
+
         return v
 
-    @root_validator
-    def security_type_validate(cls, values):
+    @root_validator(pre=True)
+    def validate_configuration(cls, values):
+        """Validate the configuration"""
         security_type = values.get('securityType')
-        if security_type == NetworkingSecurityType.wpa_psk and not\
-                values.get("psk"):
-            raise ValueError("If securityType is wpa-psk, psk "
-                             "must be specified")
-        elif security_type == NetworkingSecurityType.wpa_eap and not \
-                values.get("eapConfig"):
-            raise ValueError("If securityType is wpa-eap,"
-                             " eapConfig must be specified")
+        psk = values.get('psk')
+        eapconfig = values.get('eapConfig')
+        if not security_type:
+            # security type is not specified. Try to to deduce from the
+            # remainder of the payload.
+            if psk and eapconfig:
+                raise ValueError(
+                    'Cannot deduce security type: psk and eap both passed'
+                )
+            security_type = NetworkingSecurityType.none
+            if psk:
+                security_type = NetworkingSecurityType.wpa_psk
+            elif eapconfig:
+                security_type = NetworkingSecurityType.wpa_eap
+            values['securityType'] = security_type
+        elif security_type == NetworkingSecurityType.wpa_psk and not psk:
+            raise ValueError(
+                'If securityType is wpa-psk, psk must be specified'
+            )
+        elif security_type == NetworkingSecurityType.wpa_eap and not eapconfig:
+            raise ValueError(
+                'If securityType is wpa-eap, eapConfig must be specified'
+            )
         return values
 
     class Config:
@@ -259,10 +282,16 @@ class WifiKeyFile(BaseModel):
               description="The original filename of the key")
 
 
+class AddWifiKeyFileResponse(WifiKeyFile):
+    """Response to add wifi key file"""
+    message: typing.Optional[str]
+
+
 class WifiKeyFiles(BaseModel):
     """The list of key files"""
-    keys: typing.List[WifiKeyFile] =\
+    wifi_keys: typing.List[WifiKeyFile] =\
         Field([],
+              alias="keys",
               description="A list of keys in the system")
 
     class Config:
@@ -278,9 +307,9 @@ class WifiKeyFiles(BaseModel):
 
 
 class EapConfigOptionType(str, Enum):
-    string: str
-    password: str
-    file: str
+    string = "string"
+    password = "password"
+    file = "file"
 
 
 class EapConfigOption(BaseModel):
