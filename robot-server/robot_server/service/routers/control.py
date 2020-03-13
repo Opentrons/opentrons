@@ -1,11 +1,11 @@
 import asyncio
 
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import HardwareAPILike, ThreadedAsyncLock
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 from fastapi import APIRouter, Query, Depends
 
-from robot_server.service.dependencies import get_hardware
+from robot_server.service.dependencies import get_hardware, get_motion_lock
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models import control
@@ -52,36 +52,35 @@ async def get_robot_positions() -> control.RobotPositionsResponse:
              response_model=V1BasicResponse)
 async def post_move_robot(
         robot_move_target: control.RobotMoveTarget,
-        hardware: HardwareAPILike = Depends(get_hardware))\
+        hardware: HardwareAPILike = Depends(get_hardware),
+        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock))\
         -> V1BasicResponse:
     """Move the robot"""
-    await hardware.cache_instruments()  # type: ignore
+    async with motion_lock:
+        await hardware.cache_instruments()  # type: ignore
 
-    critical_point = None
-    if robot_move_target.target == control.MotionTarget.mount:
-        critical_point = CriticalPoint.MOUNT
+        critical_point = None
+        if robot_move_target.target == control.MotionTarget.mount:
+            critical_point = CriticalPoint.MOUNT
 
-    mount = Mount[robot_move_target.mount.upper()]
-    target_pos = Point(*robot_move_target.point)
+        mount = Mount[robot_move_target.mount.upper()]
+        target_pos = Point(*robot_move_target.point)
 
-    # Reset z position
-    await hardware.home_z()  # type: ignore
+        # Reset z position
+        await hardware.home_z()  # type: ignore
 
-    gantry_position = hardware.gantry_position  # type: ignore
-    move_to = hardware.move_to  # type: ignore
+        gantry_position = hardware.gantry_position  # type: ignore
+        move_to = hardware.move_to  # type: ignore
 
-    pos = await gantry_position(mount, critical_point=critical_point)
-    # Move to requested x, y and current z position
-    await move_to(mount,
-                  target_pos._replace(z=pos.z),
-                  critical_point=critical_point)
-    # Move to requested z position
-    await move_to(mount,
-                  target_pos,
-                  critical_point=critical_point)
-    pos = await gantry_position(mount)
+        pos = await gantry_position(mount, critical_point=critical_point)
+        # Move to requested x, y and current z position
+        await move_to(mount, Point(x=target_pos.x, y=target_pos.y, z=pos.z),
+                      critical_point=critical_point)
+        # Move to requested z position
+        await move_to(mount, target_pos, critical_point=critical_point)
+        pos = await gantry_position(mount)
 
-    return V1BasicResponse(message=f"Move complete. New position: {pos}")
+        return V1BasicResponse(message=f"Move complete. New position: {pos}")
 
 
 @router.post("/robot/home",
@@ -89,26 +88,29 @@ async def post_move_robot(
              response_model=V1BasicResponse)
 async def post_home_robot(
         robot_home_target: control.RobotHomeTarget,
-        hardware: HardwareAPILike = Depends(get_hardware)) \
+        hardware: HardwareAPILike = Depends(get_hardware),
+        motion_lock: ThreadedAsyncLock = Depends(get_motion_lock)) \
         -> V1BasicResponse:
     """Home the robot or one of the pipettes"""
-    mount = robot_home_target.mount
-    target = robot_home_target.target
+    async with motion_lock:
+        mount = robot_home_target.mount
+        target = robot_home_target.target
 
-    home = hardware.home  # type: ignore
-    home_plunger = hardware.home_plunger  # type: ignore
+        home = hardware.home  # type: ignore
+        home_plunger = hardware.home_plunger  # type: ignore
 
-    if target == control.HomeTarget.pipette and mount:
-        await home([Axis.by_mount(Mount[mount.upper()])])
-        await home_plunger(Mount[mount.upper()])
-        message = f"Pipette on {mount} homed successfully"
-    elif target == control.HomeTarget.robot:
-        await home()
-        message = "Homing robot."
-    else:
-        raise V1HandlerError(message=f"{target} is invalid", status_code=400)
+        if target == control.HomeTarget.pipette and mount:
+            await home([Axis.by_mount(Mount[mount.upper()])])
+            await home_plunger(Mount[mount.upper()])
+            message = f"Pipette on {mount} homed successfully"
+        elif target == control.HomeTarget.robot:
+            await home()
+            message = "Homing robot."
+        else:
+            raise V1HandlerError(message=f"{target} is invalid",
+                                 status_code=400)
 
-    return V1BasicResponse(message=message)
+        return V1BasicResponse(message=message)
 
 
 @router.get("/robot/lights",
