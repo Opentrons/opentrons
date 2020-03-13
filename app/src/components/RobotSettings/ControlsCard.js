@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { checkDeckCalibration } from '../../deck-calibration'
+import { startDeckCalibrationCheck } from '../../deck-calibration'
+import { getConfig } from '../../config'
 import {
   home,
   fetchLights,
@@ -36,19 +37,23 @@ export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
   const { name: robotName, status } = robot
+  const config = useSelector(getConfig)
+  const enableDeckCalCheck = Boolean(config.devInternal?.enableDeckCalCheck)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
   const canControl = robot.connected && !isRunning
 
-  const startCalibration = () =>
+  const startCalibration = () => {
     dispatch(startDeckCalibration(robot)).then(() =>
       dispatch(push(calibrateDeckUrl))
     )
+  }
 
-  const checkCalibration = () =>
-    dispatch(checkDeckCalibration(robot))
+  const checkCalibration = () => {
+    dispatch(startDeckCalibrationCheck(robotName))
+  }
 
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
@@ -56,16 +61,18 @@ export function ControlsCard(props: Props) {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      <LabeledButton
-        label="Deck calibration"
-        buttonProps={{
-          onClick: checkCalibration,
-          disabled: notConnectable || !canControl,
-          children: 'Check',
-        }}
-      >
-        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
-      </LabeledButton>
+      {enableDeckCalCheck && (
+        <LabeledButton
+          label="Deck calibration"
+          buttonProps={{
+            onClick: checkCalibration,
+            disabled: notConnectable || !canControl,
+            children: 'Check',
+          }}
+        >
+          <p>{CALIBRATE_DECK_DESCRIPTION}</p>
+        </LabeledButton>
+      )}
       <LabeledButton
         label="Calibrate deck"
         buttonProps={{
