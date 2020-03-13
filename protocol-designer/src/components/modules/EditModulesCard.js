@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import some from 'lodash/some'
 import { Card } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -38,9 +37,15 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
-  const hasCrashableModule = some(modules, module => {
-    return module ? isModuleWithCollisionIssue(module.model) : false
-  })
+  const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
+  const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
+
+  const hasCrashableMagneticModule =
+    magneticModuleOnDeck &&
+    isModuleWithCollisionIssue(magneticModuleOnDeck.model)
+  const hasCrashableTempModule =
+    temperatureModuleOnDeck &&
+    isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
 
   const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
@@ -52,17 +57,15 @@ export function EditModulesCard(props: Props) {
   const warningsEnabled =
     !moduleRestrictionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
-    warningsEnabled &&
-    (modules[MAGNETIC_MODULE_TYPE] || modules[TEMPERATURE_MODULE_TYPE]) &&
-    hasCrashableModule
+    warningsEnabled && (hasCrashableMagneticModule || hasCrashableTempModule)
 
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
         {showCrashInfoBox && (
           <CrashInfoBox
-            magnetOnDeck={Boolean(modules[MAGNETIC_MODULE_TYPE])}
-            temperatureOnDeck={Boolean(modules[TEMPERATURE_MODULE_TYPE])}
+            magnetOnDeck={hasCrashableMagneticModule}
+            temperatureOnDeck={hasCrashableTempModule}
           />
         )}
         {visibleModules.map((moduleType, i) => {

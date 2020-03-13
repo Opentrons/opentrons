@@ -7,10 +7,13 @@ import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_TYPE,
+  TEMPERATURE_MODULE_V1,
 } from '@opentrons/shared-data'
 import { selectors as featureFlagSelectors } from '../../../feature-flags'
 import { selectors as stepFormSelectors } from '../../../step-forms'
 import { SUPPORTED_MODULE_TYPES } from '../../../modules'
+import { TEMPERATURE_DEACTIVATED } from '../../../constants'
 import { EditModulesCard } from '../EditModulesCard'
 import { CrashInfoBox } from '../CrashInfoBox'
 import { ModuleRow } from '../ModuleRow'
@@ -125,6 +128,31 @@ describe('EditModulesCard', () => {
     const wrapper = render(props)
 
     expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+  })
+
+  it('displays crash info text only for the module with issue', () => {
+    const crashableTemperatureModule = {
+      id: 'temp098',
+      type: TEMPERATURE_MODULE_TYPE,
+      model: TEMPERATURE_MODULE_V1,
+      slot: '3',
+      moduleState: {
+        type: TEMPERATURE_MODULE_TYPE,
+        status: TEMPERATURE_DEACTIVATED,
+        targetTemperature: null,
+      },
+    }
+    props.modules = {
+      [MAGNETIC_MODULE_TYPE]: nonCrashableMagneticModule,
+      [TEMPERATURE_MODULE_TYPE]: crashableTemperatureModule,
+    }
+
+    const wrapper = render(props)
+
+    expect(wrapper.find(CrashInfoBox).props()).toEqual({
+      magnetOnDeck: false,
+      temperatureOnDeck: true,
+    })
   })
 
   it('does not display crash warnings when restrictions are disabled', () => {
