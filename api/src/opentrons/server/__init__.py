@@ -10,7 +10,7 @@ from typing import TYPE_CHECKING
 from aiohttp import web
 
 from opentrons.config import CONFIG
-from opentrons.hardware_control.thread_async_lock import ThreadedAsyncLock
+from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 
 from .rpc import RPCServer
 from .http import HTTPServer
