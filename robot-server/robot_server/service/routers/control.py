@@ -21,11 +21,9 @@ async def post_identify(
                              description="Time to blink the lights for"),
         hardware: HardwareAPILike = Depends(get_hardware)) \
         -> V1BasicResponse:
-    asyncio.ensure_future(hardware.identify(seconds))
+    identify = hardware.identify  # type: ignore
+    asyncio.ensure_future(identify(seconds))
     return V1BasicResponse(message="identifying")
-
-
-
 
 
 @router.get("/robot/positions",
@@ -57,7 +55,7 @@ async def post_move_robot(
         hardware: HardwareAPILike = Depends(get_hardware))\
         -> V1BasicResponse:
     """Move the robot"""
-    await hardware.cache_instruments()
+    await hardware.cache_instruments()  # type: ignore
 
     critical_point = None
     if robot_move_target.target == control.MotionTarget.mount:
@@ -67,18 +65,21 @@ async def post_move_robot(
     target_pos = Point(*robot_move_target.point)
 
     # Reset z position
-    await hardware.home_z()
-    pos = await hardware.gantry_position(mount,
-                                         critical_point=critical_point)
+    await hardware.home_z()  # type: ignore
+
+    gantry_position = hardware.gantry_position  # type: ignore
+    move_to = hardware.move_to  # type: ignore
+
+    pos = await gantry_position(mount, critical_point=critical_point)
     # Move to requested x, y and current z position
-    await hardware.move_to(mount,
-                           target_pos._replace(z=pos.z),
-                           critical_point=critical_point)
+    await move_to(mount,
+                  target_pos._replace(z=pos.z),
+                  critical_point=critical_point)
     # Move to requested z position
-    await hardware.move_to(mount,
-                           target_pos,
-                           critical_point=critical_point)
-    pos = await hardware.gantry_position(mount)
+    await move_to(mount,
+                  target_pos,
+                  critical_point=critical_point)
+    pos = await gantry_position(mount)
 
     return V1BasicResponse(message=f"Move complete. New position: {pos}")
 
@@ -94,12 +95,15 @@ async def post_home_robot(
     mount = robot_home_target.mount
     target = robot_home_target.target
 
-    if target == control.HomeTarget.pipette:
-        await hardware.home([Axis.by_mount(Mount[mount.upper()])])
-        await hardware.home_plunger(Mount[mount.upper()])
+    home = hardware.home  # type: ignore
+    home_plunger = hardware.home_plunger  # type: ignore
+
+    if target == control.HomeTarget.pipette and mount:
+        await home([Axis.by_mount(Mount[mount.upper()])])
+        await home_plunger(Mount[mount.upper()])
         message = f"Pipette on {mount} homed successfully"
     elif target == control.HomeTarget.robot:
-        await hardware.home()
+        await home()
         message = "Homing robot."
     else:
         raise V1HandlerError(message=f"{target} is invalid", status_code=400)
@@ -113,7 +117,7 @@ async def post_home_robot(
 async def get_robot_light_state(
         hardware: HardwareAPILike = Depends(get_hardware)) \
         -> control.RobotLightState:
-    on = hardware.get_lights()
+    on = hardware.get_lights()  # type: ignore
     return control.RobotLightState(on=on.get('rails', False))
 
 
@@ -124,5 +128,5 @@ async def post_robot_light_state(
         robot_light_state: control.RobotLightState,
         hardware: HardwareAPILike = Depends(get_hardware)) \
         -> control.RobotLightState:
-    await hardware.set_lights(rails=robot_light_state.on)
+    await hardware.set_lights(rails=robot_light_state.on)  # type: ignore
     return robot_light_state

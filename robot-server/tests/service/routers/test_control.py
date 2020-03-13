@@ -1,7 +1,6 @@
 from unittest.mock import call
 
 import pytest
-from opentrons import types
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
@@ -80,7 +79,7 @@ def hardware_move(hardware):
 
     async def mock_gantry_position(mount,
                                    critical_point=None,
-                                   refresh = False):
+                                   refresh=False):
         return state['cur_pos']
 
     async def mock_move_to(mount, abs_position, speed=None,
