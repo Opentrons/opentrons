@@ -5,10 +5,8 @@ import json
 import logging
 import traceback
 
-from aiohttp import web
-from aiohttp import WSCloseCode
 from asyncio import Queue
-from opentrons.server import serialize
+from . import serialize
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 from concurrent.futures import ThreadPoolExecutor
 
@@ -30,8 +28,9 @@ PONG_MESSAGE = 5
 class RPCServer(object):
     def __init__(self, app, root=None):
         self.monitor_events_task = None
-        self.app = app
-        self.loop = app.loop or asyncio.get_event_loop()
+        # self.app = app
+        # self.loop = app.loop or asyncio.get_event_loop()
+        self.loop = asyncio.get_event_loop()
         self.objects = {}
         self.system = SystemCalls(self.objects)
 
@@ -43,8 +42,8 @@ class RPCServer(object):
         self.clients = {}
         self.tasks = []
 
-        self.app.router.add_get('/', self.handler)
-        self.app.on_shutdown.append(self.on_shutdown)
+        # self.app.router.add_get('/', self.handler)
+        # self.app.on_shutdown.append(self.on_shutdown)
 
     @property
     def root(self):
@@ -58,12 +57,6 @@ class RPCServer(object):
             self.loop.create_task(self.monitor_events(value))
         self._root = value
 
-    def start(self, host, port):
-        # This call will block while server is running
-        # run_app is capable of catching SIGINT and shutting down
-        log.info("Starting server on {}:{}".format(host, port))
-        web.run_app(self.app, host=host, port=port)
-
     def shutdown(self):
         [task.cancel() for task, _ in self.clients.values()]
         self.monitor_events_task.cancel()
@@ -75,8 +68,8 @@ class RPCServer(object):
         See https://docs.aiohttp.org/en/stable/web.html#graceful-shutdown
         """
         for ws in self.clients.copy():
-            await ws.close(code=WSCloseCode.GOING_AWAY,
-                           message='Server shutdown')
+            await ws.close(code=1001)  # GOING_AWAY
+
         self.shutdown()
 
     def send_worker(self, socket):
@@ -104,7 +97,7 @@ class RPCServer(object):
         task.add_done_callback(task_done)
         log.debug('Send task for {0} started'.format(_id))
 
-        return (task, queue)
+        return task, queue
 
     async def monitor_events(self, instance):
         async for event in instance.notifications:
@@ -121,10 +114,8 @@ class RPCServer(object):
             except Exception:
                 log.exception('While processing event {0}:'.format(event))
 
-    async def handler(self, request):
-        """
-        Receives HTTP request and negotiates up to a Websocket session
-        """
+    async def handle_new_connection(self, client):
+        """Handle a new client connection"""
 
         def task_done(future):
             self.tasks.remove(future)
@@ -136,11 +127,7 @@ class RPCServer(object):
                         traceback.format_exc())
                 )
 
-        client = web.WebSocketResponse(max_msg_size=0)
         client_id = id(client)
-
-        # upgrade to Websockets
-        await client.prepare(request)
 
         log.info('Opening Websocket {0}'.format(id(client)))
 
