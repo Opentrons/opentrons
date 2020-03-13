@@ -1,9 +1,53 @@
-from opentrons.types import Point
-from opentrons.protocol_api import execute_v3, ProtocolContext, execute
+from .test_accessor_fn import minimalLabwareDef2
+from unittest import mock
+from copy import deepcopy
+import pytest
+from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
+from opentrons.protocol_api import ProtocolContext, InstrumentContext, \
+    execute, labware, MAX_SUPPORTED_VERSION
+from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
+    _drop_tip, _blowout, dispatch_json, _pick_up_tip, _touch_tip, \
+    _move_to_slot, load_labware_from_json_defs, _get_well, _set_flow_rate, \
+    _get_location_with_offset, load_pipettes_from_json
 
 
-def test_load_labware_v2(loop, get_labware_fixture):
+def test_load_pipettes_from_json():
+    def fake_pipette(name, mount):
+        return (name, mount)
+    ctx = mock.create_autospec(ProtocolContext)
+    ctx.load_instrument = fake_pipette
+    protocol = {'pipettes': {
+        'aID': {'mount': 'left', 'name': 'a'},
+        'bID': {'mount': 'right', 'name': 'b'}}}
+    result = load_pipettes_from_json(ctx, protocol)
+    assert result == {'aID': ('a', 'left'), 'bID': ('b', 'right')}
+
+
+def test_get_well():
+    deck = Location(Point(0, 0, 0), 'deck')
+    well_name = 'A2'
+    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    loaded_labware = {'someLabwareId': some_labware}
+    params = {'labware': 'someLabwareId', 'well': well_name}
+    result = _get_well(loaded_labware, params)
+    assert result == some_labware[well_name]
+
+
+def test_set_flow_rate():
+    pipette = mock.create_autospec(InstrumentContext)
+    pipette.flow_rate.aspirate = 1
+    pipette.flow_rate.dispense = 2
+    pipette.flow_rate.blow_out = 3
+    params = {'flowRate': 42}
+
+    _set_flow_rate(pipette, params)
+    assert pipette.flow_rate.aspirate == 42
+    assert pipette.flow_rate.dispense == 42
+    assert pipette.flow_rate.blow_out == 42
+
+
+def test_load_labware_from_json_defs(loop, get_labware_fixture):
     ctx = ProtocolContext(loop=loop)
     custom_trough_def = get_labware_fixture('fixture_12_trough')
     data = {
@@ -22,7 +66,7 @@ def test_load_labware_v2(loop, get_labware_fixture):
             },
         }
     }
-    loaded_labware = execute_v3.load_labware_from_json_defs(ctx, data)
+    loaded_labware = load_labware_from_json_defs(ctx, data)
 
     # objects in loaded_labware should be same objs as labware objs in the deck
     assert loaded_labware['sourcePlateId'] == ctx.loaded_labwares[10]
@@ -34,120 +78,275 @@ def test_load_labware_v2(loop, get_labware_fixture):
             str(loaded_labware['destPlateId']))
 
 
-class MockPipette(object):
-    def __init__(self, command_log):
-        self.log = command_log
-
-    def _make_logger(self, name):
-        def log_fn(*args, **kwargs):
-            if kwargs:
-                self.log.append((name, args, kwargs))
-            else:
-                self.log.append((name, args))
-        return log_fn
-
-    def _make_operation_setter(self, name):
-        class Setter:
-            def __init__(self, name, log):
-                self._name = name
-                self._log = log
-                self._aspirate = 0
-                self._blow_out = 0
-                self._dispense = 0
-
-            @property
-            def aspirate(self):
-                return self._aspirate
-
-            @aspirate.setter
-            def aspirate(self, new_val):
-                self._log.append(('set: ' + name + '.aspirate', (new_val,)))
-                self._aspirate = new_val
-
-            @property
-            def dispense(self):
-                return self._dispense
-
-            @dispense.setter
-            def dispense(self, new_val):
-                self._log.append(('set: ' + name + '.dispense', (new_val,)))
-                self._dispense = new_val
-
-            @property
-            def blow_out(self):
-                return self._blow_out
-
-            @blow_out.setter
-            def blow_out(self, new_val):
-                self._log.append(('set: ' + name + '.blow_out', (new_val,)))
-                self._blow_out = new_val
-        return Setter(name, self.log)
-
-    def __getattr__(self, name):
-        if name == 'log':
-            return self.log
-        elif name == 'flow_rate':
-            return self._make_operation_setter(name)
-        else:
-            return self._make_logger(name)
-
-    def __setattr__(self, name, value):
-        if name == 'log':
-            super(MockPipette, self).__setattr__(name, value)
-        else:
-            self.log.append(("set: {}".format(name), value))
+def test_get_location_with_offset():
+    deck = Location(Point(0, 0, 0), 'deck')
+    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    loaded_labware = {'someLabwareId': some_labware}
+    params = {'offsetFromBottomMm': 3,
+              'labware': 'someLabwareId', 'well': 'A2'}
+    result = _get_location_with_offset(loaded_labware, params)
+    assert result == Location(Point(19, 28, 8), some_labware['A2'])
 
 
-def test_dispatch_commands(monkeypatch, loop, get_json_protocol_fixture):
-    protocol_data = get_json_protocol_fixture('3', 'simple')
-    command_log = []
-    mock_pipette = MockPipette(command_log)
-    insts = {"pipetteId": mock_pipette}
+def test_get_location_with_offset_fixed_trash():
+    deck = Location(Point(0, 0, 0), 'deck')
+    trash_labware_def = deepcopy(minimalLabwareDef2)
+    trash_labware_def['parameters']['quirks'] = ["fixedTrash"]
+    trash_labware = labware.Labware(trash_labware_def, deck)
 
-    ctx = ProtocolContext(loop=loop)
+    loaded_labware = {'someLabwareId': trash_labware}
+    params = {'offsetFromBottomMm': 3,
+              'labware': 'someLabwareId', 'well': 'A1'}
 
-    def mock_delay(seconds=0, minutes=0, msg=None):
-        command_log.append(("delay", seconds + minutes * 60))
+    result = _get_location_with_offset(loaded_labware, params)
 
-    monkeypatch.setattr(ctx, 'delay', mock_delay)
+    assert result == Location(Point(10, 28, 45), trash_labware['A1'])
 
-    source_plate = ctx.load_labware(
-        'corning_96_wellplate_360ul_flat', '1')
-    dest_plate = ctx.load_labware(
-        'corning_96_wellplate_360ul_flat', '2')
-    tiprack = ctx.load_labware('opentrons_96_tiprack_10ul', '3')
 
-    loaded_labware = {
-        'sourcePlateId': source_plate,
-        'destPlateId': dest_plate,
-        'tiprackId': tiprack,
-        'trashId': ctx.fixed_trash
+@pytest.mark.parametrize(
+    'params, expected',
+    [
+        ({'wait': True, 'message': 'm'},
+         [mock.call.pause(msg='m')]),
+        ({'wait': 123, 'message': 'm'}, [
+         mock.call.delay(seconds=123, msg='m')])
+    ])
+def test_delay(params, expected):
+    mock_context = mock.MagicMock()
+    _delay(mock_context, params)
+
+    assert mock_context.mock_calls == expected
+
+
+def test_blowout():
+    m = mock.MagicMock()
+    m.pipette_mock = mock.create_autospec(InstrumentContext)
+    m.mock_set_flow_rate = mock.MagicMock()
+
+    params = {'pipette': 'somePipetteId',
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': m.pipette_mock}
+    well = 'theWell'
+    loaded_labware = {'someLabwareId': {'someWell': well}}
+
+    with mock.patch('opentrons.protocol_api.execute_v3._set_flow_rate',
+                    new=m.mock_set_flow_rate):
+        _blowout(instruments, loaded_labware, params)
+
+    assert m.mock_calls == [
+        mock.call.mock_set_flow_rate(m.pipette_mock, params),
+        mock.call.pipette_mock.blow_out(well)
+    ]
+
+
+def test_pick_up_tip():
+    pipette_mock = mock.create_autospec(InstrumentContext)
+    params = {'pipette': 'somePipetteId',
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': pipette_mock}
+    well = 'theWell'
+    loaded_labware = {'someLabwareId': {'someWell': well}}
+
+    _pick_up_tip(instruments, loaded_labware, params)
+
+    assert pipette_mock.mock_calls == [
+        mock.call.pick_up_tip(well)
+    ]
+
+
+def test_drop_tip():
+    pipette_mock = mock.create_autospec(InstrumentContext)
+
+    params = {'pipette': 'somePipetteId',
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': pipette_mock}
+    well = 'theWell'
+    loaded_labware = {'someLabwareId': {'someWell': well}}
+    _drop_tip(instruments, loaded_labware, params)
+
+    assert pipette_mock.mock_calls == [
+        mock.call.drop_tip(well)
+    ]
+
+
+def test_aspirate():
+    m = mock.MagicMock()
+    m.pipette_mock = mock.create_autospec(InstrumentContext)
+    m.mock_get_location_with_offset = mock.MagicMock(
+        return_value=mock.sentinel.location)
+    m.mock_set_flow_rate = mock.MagicMock()
+
+    params = {'pipette': 'somePipetteId', 'volume': 42,
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': m.pipette_mock}
+
+    with mock.patch(
+            'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=m.mock_get_location_with_offset):
+        with mock.patch(
+                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                new=m.mock_set_flow_rate):
+            _aspirate(instruments, mock.sentinel.loaded_labware, params)
+
+    assert m.mock_calls == [
+        mock.call.mock_get_location_with_offset(
+            mock.sentinel.loaded_labware, params),
+        mock.call.mock_set_flow_rate(m.pipette_mock, params),
+        mock.call.pipette_mock.aspirate(42, mock.sentinel.location)
+    ]
+
+
+def test_dispense():
+    m = mock.MagicMock()
+    m.pipette_mock = mock.create_autospec(InstrumentContext)
+    m.mock_get_location_with_offset = mock.MagicMock(
+        return_value=mock.sentinel.location)
+    m.mock_set_flow_rate = mock.MagicMock()
+
+    params = {'pipette': 'somePipetteId', 'volume': 42,
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': m.pipette_mock}
+
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=m.mock_get_location_with_offset):
+        with mock.patch(
+            'opentrons.protocol_api.execute_v3._set_flow_rate',
+                new=m.mock_set_flow_rate):
+            _dispense(instruments, mock.sentinel.loaded_labware, params)
+
+    assert m.mock_calls == [
+        mock.call.mock_get_location_with_offset(
+            mock.sentinel.loaded_labware, params),
+        mock.call.mock_set_flow_rate(m.pipette_mock, params),
+        mock.call.pipette_mock.dispense(42, mock.sentinel.location)
+    ]
+
+
+def test_touch_tip():
+    location = Location(Point(1, 2, 3), 'deck')
+    well = labware.Well({
+        'shape': 'circular',
+        'depth': 40,
+        'totalLiquidVolume': 100,
+        'diameter': 30,
+        'x': 40,
+        'y': 50,
+        'z': 3},
+        parent=Location(Point(10, 20, 30), 1),
+        has_tip=False,
+        display_name='some well',
+        api_level=MAX_SUPPORTED_VERSION)
+
+    pipette_mock = mock.create_autospec(InstrumentContext, name='pipette_mock')
+    mock_get_location_with_offset = mock.MagicMock(
+        return_value=location, name='mock_get_location_with_offset')
+    mock_get_well = mock.MagicMock(
+        return_value=well, name='mock_get_well')
+    mock_set_flow_rate = mock.MagicMock(name='mock_set_flow_rate')
+
+    params = {'pipette': 'somePipetteId',
+              'labware': 'someLabwareId', 'well': 'someWell'}
+    instruments = {'somePipetteId': pipette_mock}
+
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3._get_location_with_offset',
+            new=mock_get_location_with_offset):
+        with mock.patch(
+            'opentrons.protocol_api.execute_v3._get_well',
+                new=mock_get_well):
+            with mock.patch(
+                'opentrons.protocol_api.execute_v3._set_flow_rate',
+                    new=mock_set_flow_rate):
+                _touch_tip(instruments, mock.sentinel.loaded_labware, params)
+
+    # note: for this fn, order of calls doesn't matter b/c
+    # we don't have stateful stuff like flow_rate
+    mock_get_location_with_offset.assert_called_once_with(
+        mock.sentinel.loaded_labware, params)
+    mock_get_well.assert_called_once_with(mock.sentinel.loaded_labware, params)
+    assert pipette_mock.mock_calls == [
+        mock.call.touch_tip(well, v_offset=-70.0)]
+
+
+def test_move_to_slot():
+    slot_position = Location(Point(1, 2, 3), 'deck')
+    mock_context = mock.create_autospec(ProtocolContext)
+    mock_context.deck.position_for = mock.Mock(return_value=slot_position)
+    pipette_mock = mock.create_autospec(InstrumentContext)
+
+    instruments = {'somePipetteId': pipette_mock}
+
+    params = {'pipette': 'somePipetteId', 'slot': '4',
+              'offset': {'x': 10, 'y': 11, 'z': 12},
+              'forceDirect': mock.sentinel.force_direct,
+              'minimumZHeight': mock.sentinel.minimum_z_height}
+
+    _move_to_slot(mock_context, instruments, params)
+
+    assert pipette_mock.mock_calls == [
+        mock.call.move_to(
+            Location(Point(11, 13, 15), 'deck'),
+            force_direct=mock.sentinel.force_direct,
+            minimum_z_height=mock.sentinel.minimum_z_height)]
+
+
+def test_dispatch_json():
+    m = mock.MagicMock()
+    mock_dispatcher_map = {
+        "delay": m._delay,
+        "blowout": m._blowout,
+        "pickUpTip": m._pick_up_tip,
+        "dropTip": m._drop_tip,
+        "aspirate": m._aspirate,
+        "dispense": m._dispense,
+        "touchTip": m._touch_tip,
+        "moveToSlot": m._move_to_slot
     }
 
-    execute_v3.dispatch_json(
-        ctx, protocol_data, insts, loaded_labware)
+    with mock.patch(
+        'opentrons.protocol_api.execute_v3.dispatcher_map',
+            new=mock_dispatcher_map):
+        protocol_data = {'commands': [
+            {'command': 'delay', 'params': 'delay_params'},
+            {'command': 'blowout', 'params': 'blowout_params'},
+            {'command': 'pickUpTip', 'params': 'pickUpTip_params'},
+            {'command': 'dropTip', 'params': 'dropTip_params'},
+            {'command': 'aspirate', 'params': 'aspirate_params'},
+            {'command': 'dispense', 'params': 'dispense_params'},
+            {'command': 'touchTip', 'params': 'touchTip_params'},
+            {'command': 'moveToSlot', 'params': 'moveToSlot_params'},
+        ]}
+        context = mock.sentinel.context
+        instruments = mock.sentinel.instruments
+        loaded_labware = mock.sentinel.loaded_labware
+        dispatch_json(
+            context, protocol_data, instruments, loaded_labware)
 
-    assert command_log == [
-        ("pick_up_tip", (tiprack['B1'],)),
-        ("set: flow_rate.aspirate", (3,)),
-        ("set: flow_rate.dispense", (3,)),
-        ("set: flow_rate.blow_out", (3,)),
-        ("aspirate", (5, source_plate['A1'].bottom(2),)),
-        ("delay", 42),
-        ("set: flow_rate.aspirate", (2.5,)),
-        ("set: flow_rate.dispense", (2.5,)),
-        ("set: flow_rate.blow_out", (2.5,)),
-        ("dispense", (4.5, dest_plate['B1'].bottom(1),)),
-        ("touch_tip", (dest_plate['B1'],),
-            {"v_offset": 0.33000000000000007}),
-        ("set: flow_rate.aspirate", (2,)),
-        ("set: flow_rate.dispense", (2,)),
-        ("set: flow_rate.blow_out", (2,)),
-        ("blow_out", (dest_plate['B1'],)),
-        ("move_to", (ctx.deck.position_for('5').move(Point(1, 2, 3)),),
-            {"force_direct": None, "minimum_z_height": None}),
-        ("drop_tip", (ctx.fixed_trash['A1'],))
-    ]
+        assert m.mock_calls == [
+            mock.call._delay(context, 'delay_params'),
+            mock.call._blowout(instruments, loaded_labware, 'blowout_params'),
+            mock.call._pick_up_tip(
+                instruments, loaded_labware, 'pickUpTip_params'),
+            mock.call._drop_tip(instruments, loaded_labware, 'dropTip_params'),
+            mock.call._aspirate(
+                instruments, loaded_labware, 'aspirate_params'),
+            mock.call._dispense(
+                instruments, loaded_labware, 'dispense_params'),
+            mock.call._touch_tip(
+                instruments, loaded_labware, 'touchTip_params'),
+            mock.call._move_to_slot(context, instruments, 'moveToSlot_params')
+        ]
+
+
+def test_dispatch_json_invalid_command():
+    protocol_data = {'commands': [
+        {'command': 'no_such_command', 'params': 'foo'},
+    ]}
+    with pytest.raises(RuntimeError):
+        dispatch_json(
+            context=None, protocol_data=protocol_data, instruments=None,
+            loaded_labware=None)
 
 
 def test_papi_execute_json_v3(monkeypatch, loop, get_json_protocol_fixture):

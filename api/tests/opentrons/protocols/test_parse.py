@@ -194,6 +194,10 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     assert validate_json(v3) == 3
 
+    # TODO IMMEDIATELY: v4 fixture here
+    # v4 = get_json_protocol_fixture('4', 'someV4ProtocolTODO')
+    # assert validate_json(v4) == 4
+
 
 @pytest.mark.parametrize('protocol_file',
                          ['testosaur.py', 'testosaur_v2.py'])

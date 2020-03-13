@@ -77,8 +77,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return bottom.move(Point(z=offset_from_bottom))
 
 
-def _delay(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _delay(context, params) -> None:
     wait = params['wait']
     message = params.get('message')
     if wait is None or wait is False:
@@ -90,8 +89,7 @@ def _delay(
         context.delay(seconds=wait, msg=message)
 
 
-def _blowout(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _blowout(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -99,24 +97,21 @@ def _blowout(
     pipette.blow_out(well)
 
 
-def _pick_up_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _pick_up_tip(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
     pipette.pick_up_tip(well)
 
 
-def _drop_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _drop_tip(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
     pipette.drop_tip(well)
 
 
-def _aspirate(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _aspirate(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -125,8 +120,7 @@ def _aspirate(
     pipette.aspirate(volume, location)
 
 
-def _dispense(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _dispense(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -135,8 +129,7 @@ def _dispense(
     pipette.dispense(volume, location)
 
 
-def _touch_tip(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _touch_tip(instruments, loaded_labware, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -146,12 +139,11 @@ def _touch_tip(
     pipette.touch_tip(well, v_offset=v_offset)
 
 
-def _move_to_slot(
-        context, protocol_data, instruments, loaded_labware, params) -> None:
+def _move_to_slot(context, instruments, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
-    if slot not in [str(s+1) for s in range(12)]:
+    if slot not in [str(s + 1) for s in range(12)]:
         raise ValueError('Invalid "slot" for "moveToSlot": {}'
                          .format(slot))
     slot_obj = context.deck.position_for(slot)
@@ -168,27 +160,46 @@ def _move_to_slot(
         minimum_z_height=params.get('minimumZHeight'))
 
 
+dispatcher_map: Dict[Any, Any] = {
+    "delay": _delay,
+    "blowout": _blowout,
+    "pickUpTip": _pick_up_tip,
+    "dropTip": _drop_tip,
+    "aspirate": _aspirate,
+    "dispense": _dispense,
+    "touchTip": _touch_tip,
+    "moveToSlot": _move_to_slot
+}
+
+
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Dict[str, InstrumentContext],
                   loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
-    dispatcher_map = {
-        "delay": _delay,
-        "blowout": _blowout,
-        "pickUpTip": _pick_up_tip,
-        "dropTip": _drop_tip,
-        "aspirate": _aspirate,
-        "dispense": _dispense,
-        "touchTip": _touch_tip,
-        "moveToSlot": _move_to_slot
-    }
+
+    pipette_command_list = [
+        "blowout",
+        "pickUpTip",
+        "dropTip",
+        "aspirate",
+        "dispense",
+        "touchTip",
+    ]
+
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
 
-        if command_type not in dispatcher_map:
+        # different `_command` helpers take different args
+        if command_type in pipette_command_list:
+            dispatcher_map[command_type](
+                instruments, loaded_labware, params)
+        elif command_type == 'delay':
+            dispatcher_map[command_type](context, params)
+        elif command_type == 'moveToSlot':
+            dispatcher_map[command_type](
+                context, instruments, params)
+        else:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
-        dispatcher_map[command_type](
-            context, protocol_data, instruments, loaded_labware, params)
