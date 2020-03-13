@@ -541,7 +541,8 @@ def resolve_module_model(module_name: str) -> ModuleModel:
     if not resolved_name:
         raise ValueError(f'{module_name} is not a valid module load name.\n'
                          'Valid names (ignoring case): ''"' + '", "'
-                         .join(*model_map.keys(), *alias_map.keys()) + '"')
+                         .join(model_map.keys()) + '", "' + '", "'
+                         .join(alias_map.keys()) + '"')
     return resolved_name
 
 
