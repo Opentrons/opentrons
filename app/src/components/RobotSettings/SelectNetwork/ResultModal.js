@@ -23,8 +23,8 @@ export const ResultModal = (props: ResultModalProps) => {
 
   if (isPending) {
     const message = isDisconnect
-      ? Copy.CONNECTING_TO_NETWORK(ssid)
-      : Copy.DISCONNECTING_FROM_NETWORK(ssid)
+      ? Copy.DISCONNECTING_FROM_NETWORK(ssid)
+      : Copy.CONNECTING_TO_NETWORK(ssid)
 
     return <SpinnerModal alertOverlay message={message} />
   }
