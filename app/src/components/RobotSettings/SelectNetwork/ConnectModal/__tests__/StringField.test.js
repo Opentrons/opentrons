@@ -3,6 +3,14 @@ import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
 import { StringField } from '../StringField'
+import * as FormState from '../form-state'
+
+jest.mock('../form-state')
+
+const useConnectFormField: JestMockFn<
+  [string],
+  $Call<typeof FormState.useConnectFormField, string>
+> = FormState.useConnectFormField
 
 describe('ConnectModal StringField', () => {
   const fieldId = 'field-id'
@@ -17,15 +25,23 @@ describe('ConnectModal StringField', () => {
   const checkboxSelector = 'input[type="checkbox"]'
 
   const render = (isPassword = false, error = null) => {
+    useConnectFormField.mockImplementation(name => {
+      expect(name).toBe(fieldName)
+      return {
+        value: fieldValue,
+        error,
+        onChange: handleChange,
+        onBlur: handleBlur,
+        setValue: () => {},
+        setTouched: () => {},
+      }
+    })
+
     return mount(
       <StringField
         id={fieldId}
         label={fieldLabel}
         name={fieldName}
-        value={fieldValue}
-        onChange={handleChange}
-        onBlur={handleBlur}
-        error={error}
         isPassword={isPassword}
       />
     )
@@ -39,7 +55,7 @@ describe('ConnectModal StringField', () => {
     const wrapper = render()
     const input = wrapper.find(inputSelector)
 
-    expect(input).toHaveLength(1)
+    expect(input.prop('id')).toEqual(fieldId)
     expect(input.prop('name')).toEqual(fieldName)
     expect(input.prop('value')).toEqual(fieldValue)
     expect(input.prop('onChange')).toEqual(handleChange)
@@ -50,8 +66,6 @@ describe('ConnectModal StringField', () => {
     const wrapper = render()
     const input = wrapper.find(inputSelector)
 
-    expect(input).toHaveLength(1)
-    expect(input.prop('id')).toEqual(fieldId)
     expect(input.prop('type')).toEqual('text')
   })
 

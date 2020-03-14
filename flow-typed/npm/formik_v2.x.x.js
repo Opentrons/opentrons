@@ -38,8 +38,9 @@ declare module 'formik/@flow-typed' {
     setStatus(status?: any): void,
     setErrors(errors: FormikErrors<Values>): void,
     setSubmitting(isSubmitting: boolean): void,
-    setTouched(touched: FormikTouched<Values>): void,
-    setValues(values: Values): void,
+    // NOTE(mc, 2020-03-13): shouldValidate arg was missing
+    setTouched(touched: FormikTouched<Values>, shouldValidate?: boolean): void,
+    setValues(values: Values, shouldValidate?: boolean): void,
     setFieldValue(
       fieldName: string,
       value: any,
@@ -72,6 +73,8 @@ declare module 'formik/@flow-typed' {
   declare export type FormikSharedConfig = {|
     validateOnChange?: boolean,
     validateOnBlur?: boolean,
+    // NOTE(mc, 2020-03-13): validateOnMount was missing
+    validateOnMount?: boolean,
     isInitialValid?: boolean | ((props: { ... }) => boolean),
     enableReinitialize?: boolean,
   |}
@@ -124,6 +127,17 @@ declare module 'formik/@flow-typed' {
     render?: (props: T) => React$Node;
     children?: (props: T) => React$Node;
   }
+
+  // NOTE(mc, 2020-03-13): FieldHelperProps was missing from useField
+  // https://github.com/jaredpalmer/formik/blob/f80c36c96ca1ee9fe07566cef285aeb10e4fa981/packages/formik/src/types.tsx#L286-L293
+  declare export type FieldHelperProps<Value> = $ReadOnly<{|
+    /** Set the field's value */
+    setValue: (value: Value) => void,
+    /** Set the field's touched value */
+    setTouched: (value: boolean) => void,
+    /** Set the field's error value */
+    setError: (value: Value) => void,
+  |}>
 
   declare export type FieldMetaProps<Value> = $ReadOnly<{|
     value: Value,
@@ -191,6 +205,7 @@ declare module 'formik/@Field' {
     FormikProps,
     FieldMetaProps,
     FieldInputProps,
+    FieldHelperProps,
     FieldValidator,
   } from 'formik/@flow-typed'
 
@@ -226,9 +241,10 @@ declare module 'formik/@Field' {
     ...
   }
 
+  // NOTE(mc, 2020-03-13): FieldHelperProps was missing
   declare export function useField<Value>(
     propsOrFieldName: string | UseFieldConfig<Value>
-  ): [FieldInputProps<Value>, FieldMetaProps<Value>]
+  ): [FieldInputProps<Value>, FieldMetaProps<Value>, FieldHelperProps<Value>]
 
   declare export var Field: {
     <Props, Value>(props: FieldAttributes<Props, Value>): React$Node,

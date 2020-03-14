@@ -28,6 +28,7 @@ export const AUTH_TYPE_FILE: 'file' = 'file'
 export const CONFIGURE_FIELD_SSID: 'ssid' = 'ssid'
 export const CONFIGURE_FIELD_PSK: 'psk' = 'psk'
 export const CONFIGURE_FIELD_SECURITY_TYPE: 'securityType' = 'securityType'
+export const CONFIGURE_PSK_MIN_LENGTH = 8
 
 // http request paths
 

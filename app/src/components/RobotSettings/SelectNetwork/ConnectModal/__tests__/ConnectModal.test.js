@@ -1,13 +1,32 @@
 // @flow
 import * as React from 'react'
-import { shallow } from 'enzyme'
+import { Formik } from 'formik'
+import { shallow, mount } from 'enzyme'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import * as Networking from '../../../../../networking'
-import { ScrollableAlertModal } from '../../../../modals'
-import { Portal } from '../../../../portal'
+import * as FormFields from '../form-fields'
+
 import { ConnectModal, ConnectModalComponent } from '..'
-import { ConnectForm } from '../ConnectForm'
+import { ConnectFormModal } from '../ConnectFormModal'
+
+import type { WifiNetwork, EapOption, ConnectFormValues } from '../../types'
+
+jest.mock('../form-fields')
+
+const getConnectFormFields: JestMockFn<
+  [WifiNetwork | null, Array<EapOption>, ConnectFormValues],
+  $Call<typeof FormFields.getConnectFormFields, any, any, any>
+> = FormFields.getConnectFormFields
+
+const validateConnectFormFields: JestMockFn<
+  [WifiNetwork | null, Array<EapOption>, ConnectFormValues],
+  $Call<typeof FormFields.validateConnectFormFields, any, any, any>
+> = FormFields.validateConnectFormFields
+
+const connectFormToConfigureRequest: JestMockFn<
+  [WifiNetwork | null, ConnectFormValues],
+  $Call<typeof FormFields.connectFormToConfigureRequest, any, any, any>
+> = FormFields.connectFormToConfigureRequest
 
 const robotName = 'robotName'
 const eapOptions = [Fixtures.mockEapOption]
@@ -17,133 +36,162 @@ describe("SelectNetwork's ConnectModal", () => {
   const handleConnect = jest.fn()
   const handleCancel = jest.fn()
 
-  const render = (network = null) => {
-    return shallow(
-      <ConnectModalComponent
-        {...{
-          robotName,
-          network,
-          eapOptions,
-          wifiKeys,
-          onConnect: handleConnect,
-          onCancel: handleCancel,
-        }}
-      />
-    )
-  }
+  beforeEach(() => {
+    getConnectFormFields.mockReturnValue([])
+    validateConnectFormFields.mockReturnValue({})
+    connectFormToConfigureRequest.mockReturnValue(null)
+  })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('renders inside a Portal', () => {
-    const wrapper = shallow(
-      <ConnectModal
-        robotName={robotName}
-        network={null}
-        eapOptions={eapOptions}
-        wifiKeys={wifiKeys}
-        onConnect={handleConnect}
-        onCancel={handleCancel}
-      />
-    )
-    const portal = wrapper.find(Portal)
-    expect(portal).toHaveLength(1)
-    expect(portal.find(ConnectModalComponent)).toHaveLength(1)
-  })
-
-  it('renders a ScrollableAlertModal', () => {
-    const wrapper = render()
-    const alert = wrapper.find(ScrollableAlertModal)
-    expect(alert).toHaveLength(1)
-    expect(alert.prop('alertOverlay')).toEqual(true)
-    expect(alert.prop('iconName')).toEqual('wifi')
-    expect(alert.prop('onCloseClick')).toEqual(handleCancel)
-    expect(alert.prop('heading')).toEqual(expect.any(String))
-  })
-
-  it('renders proper heading for unknown network', () => {
-    const wrapper = render(null)
-    const alert = wrapper.find(ScrollableAlertModal)
-    expect(alert.prop('heading')).toEqual('Find and join a Wi-Fi network')
-  })
-
-  it('renders proper copy for unknown network', () => {
-    const wrapper = render()
-    const alert = wrapper.find(ScrollableAlertModal)
-    const copy = alert.find('p').html()
-
-    expect(copy).toMatch(/Enter the network name and security/)
-  })
-
-  it('renders proper heading for known network', () => {
-    const network = Fixtures.mockWifiNetwork
-    const wrapper = render(network)
-    const alert = wrapper.find(ScrollableAlertModal)
-    expect(alert.prop('heading')).toEqual(`Connect to ${network.ssid}`)
-  })
-
-  it('renders proper body for WPA-PSK network', () => {
-    const network = {
-      ...Fixtures.mockWifiNetwork,
-      securityType: Networking.SECURITY_WPA_PSK,
+  describe('Formik wrapper', () => {
+    const render = (network = null) => {
+      return shallow(
+        <ConnectModal
+          {...{
+            robotName,
+            network,
+            eapOptions,
+            wifiKeys,
+            onConnect: handleConnect,
+            onCancel: handleCancel,
+          }}
+        />
+      )
     }
 
-    const wrapper = render(network)
-    const alert = wrapper.find(ScrollableAlertModal)
-    const copy = alert.find('p').html()
+    it('wraps ConnectModalComponent in a Formik wrapper', () => {
+      const wrapper = render()
+      const formik = wrapper.find(Formik)
+      const component = wrapper.find(ConnectModalComponent)
 
-    expect(copy).toMatch(/requires a WPA2 password/)
+      expect(formik.prop('initialValues')).toEqual({})
+      expect(formik.prop('onSubmit')).toEqual(expect.any(Function))
+      expect(formik.prop('validate')).toEqual(expect.any(Function))
+      expect(formik.prop('validateOnMount')).toBe(true)
+      expect(component.props()).toEqual({
+        robotName,
+        eapOptions,
+        wifiKeys,
+        network: null,
+        onConnect: handleConnect,
+        onCancel: handleCancel,
+      })
+    })
+
+    it('calls onConnect on submit', () => {
+      const network = Fixtures.mockWifiNetwork
+      const wrapper = render(network)
+      const formik = wrapper.find(Formik)
+      const mockValues = { ssid: 'foobar' }
+      const mockRequest = { ssid: 'foobar', hidden: false }
+
+      connectFormToConfigureRequest.mockReturnValue(mockRequest)
+      formik.invoke('onSubmit')(mockValues)
+
+      expect(connectFormToConfigureRequest).toHaveBeenCalledWith(
+        network,
+        mockValues
+      )
+      expect(handleConnect).toHaveBeenCalledWith(mockRequest)
+    })
+
+    it('does not call onConnect if request comes back null', () => {
+      const network = Fixtures.mockWifiNetwork
+      const wrapper = render(network)
+      const formik = wrapper.find(Formik)
+      const mockValues = {}
+
+      connectFormToConfigureRequest.mockReturnValue(null)
+      formik.invoke('onSubmit')(mockValues)
+
+      expect(handleConnect).not.toHaveBeenCalled()
+    })
+
+    it('validates using validateConnectFormFields', () => {
+      const network = Fixtures.mockWifiNetwork
+      const wrapper = render(network)
+      const formik = wrapper.find(Formik)
+      const mockValues = { ssid: 'foobar' }
+      const mockErrors = { ssid: 'oh no!' }
+
+      validateConnectFormFields.mockReturnValue(mockErrors)
+
+      const result = formik.invoke('validate')(mockValues)
+
+      expect(result).toEqual(mockErrors)
+      expect(validateConnectFormFields).toHaveBeenCalledWith(
+        network,
+        eapOptions,
+        mockValues
+      )
+    })
   })
 
-  it('renders proper body for WPA-EAP network', () => {
-    const network = {
-      ...Fixtures.mockWifiNetwork,
-      securityType: Networking.SECURITY_WPA_EAP,
+  describe('connected form', () => {
+    const handleSubmit = jest.fn()
+    const handleValidate = jest.fn()
+
+    const render = (network = null) => {
+      return mount(
+        <ConnectModalComponent
+          {...{
+            robotName,
+            network,
+            eapOptions,
+            wifiKeys,
+            onConnect: handleConnect,
+            onCancel: handleCancel,
+          }}
+        />,
+        {
+          wrappingComponent: Formik,
+          wrappingComponentProps: {
+            initialValues: {},
+            onSubmit: handleSubmit,
+            validate: handleValidate,
+          },
+        }
+      )
     }
 
-    const wrapper = render(network)
-    const alert = wrapper.find(ScrollableAlertModal)
-    const copy = alert.find('p').html()
+    it('renders a ConnectFormModal for unknown network', () => {
+      const wrapper = render()
+      const modal = wrapper.find(ConnectFormModal)
 
-    expect(copy).toMatch(/requires 802.1X authentication/)
-  })
+      expect(modal.prop('robotName')).toEqual(robotName)
+      expect(modal.prop('network')).toEqual(null)
+      expect(modal.prop('wifiKeys')).toEqual(wifiKeys)
+      expect(modal.prop('eapOptions')).toEqual(eapOptions)
+      expect(modal.prop('onCancel')).toBe(handleCancel)
+    })
 
-  it('renders a connect form for an unknown network', () => {
-    const wrapper = render()
-    const form = wrapper.find(ConnectForm)
+    it('renders a connect form for an known network', () => {
+      const network = Fixtures.mockWifiNetwork
+      const wrapper = render(network)
+      const modal = wrapper.find(ConnectFormModal)
 
-    expect(form).toHaveLength(1)
-    expect(form.prop('network')).toEqual(null)
-    expect(form.prop('wifiKeys')).toEqual(wifiKeys)
-    expect(form.prop('eapOptions')).toEqual(eapOptions)
-    expect(form.prop('onConnect')).toEqual(handleConnect)
-    expect(form.prop('onCancel')).toEqual(handleCancel)
-  })
+      expect(modal.prop('network')).toEqual(network)
+    })
 
-  it('renders a connect form for an known network', () => {
-    const network = Fixtures.mockWifiNetwork
-    const wrapper = render(network)
-    const form = wrapper.find(ConnectForm)
+    it('passes fields to the connect form modal', () => {
+      const mockFields = [
+        {
+          type: 'string',
+          name: 'fieldName',
+          label: 'Field Name',
+          required: true,
+        },
+      ]
 
-    expect(form).toHaveLength(1)
-    expect(form.prop('network')).toEqual(network)
-    expect(form.prop('wifiKeys')).toEqual(wifiKeys)
-    expect(form.prop('eapOptions')).toEqual(eapOptions)
-    expect(form.prop('onConnect')).toEqual(handleConnect)
-    expect(form.prop('onCancel')).toEqual(handleCancel)
-  })
+      getConnectFormFields.mockReturnValue(mockFields)
 
-  it('gives the form an ID and attaches it to a submit button', () => {
-    const wrapper = render()
-    const form = wrapper.find(ConnectForm)
-    const formId = form.prop('id')
-    const buttons = wrapper.find(ScrollableAlertModal).prop('buttons')
+      const wrapper = render()
+      const modal = wrapper.find(ConnectFormModal)
 
-    expect(formId).toEqual(expect.any(String))
-    expect(buttons).toEqual([
-      { children: 'cancel', onClick: handleCancel },
-      { children: 'connect', type: 'submit', form: formId },
-    ])
+      expect(modal.prop('fields')).toEqual(mockFields)
+    })
   })
 })

@@ -1,36 +1,22 @@
 // @flow
 import * as React from 'react'
-
 import { SelectField } from '@opentrons/components'
-import type { SelectFieldProps } from '@opentrons/components'
 
-import {
-  SECURITY_NONE,
-  SECURITY_WPA_PSK,
-  SECURITY_WPA_EAP,
-  LABEL_SECURITY_NONE,
-  LABEL_SECURITY_PSK,
-} from './constants'
+import { SECURITY_NONE, SECURITY_WPA_PSK } from '../constants'
+import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../i18n'
+import { useConnectFormField } from './form-state'
+import { FormRow } from './FormRow'
 
-import { FormTableRow } from './FormTableRow'
-
-import type { EapOption, WifiSecurityType, ConnectFormValues } from './types'
+import type { EapOption } from '../types'
 
 export type SelectSecurityProps = {|
-  id: $PropertyType<SelectFieldProps, 'id'>,
-  name: $PropertyType<SelectFieldProps, 'name'>,
-  placeholder: $PropertyType<SelectFieldProps, 'placeholder'>,
-  error: $PropertyType<SelectFieldProps, 'error'>,
-  onLoseFocus: $PropertyType<SelectFieldProps, 'onLoseFocus'>,
+  id: string,
+  name: string,
+  placeholder: string,
   label: string,
-  values: ConnectFormValues,
-  showAll: boolean,
+  showAllOptions: boolean,
   eapOptions: Array<EapOption>,
   className?: string,
-  onSecurityChange: ({|
-    securityType: WifiSecurityType,
-    eapConfig?: {| eapType: string |},
-  |}) => mixed,
 |}
 
 const ALL_SECURITY_OPTIONS = [
@@ -47,43 +33,38 @@ const makeEapOptionsGroup = (eapOptions: Array<EapOption>) => ({
 
 export const SelectSecurity = (props: SelectSecurityProps) => {
   const {
-    eapOptions,
-    showAll,
-    values,
-    onSecurityChange,
+    id,
+    name,
+    placeholder,
     label,
-    ...fieldProps
+    showAllOptions,
+    eapOptions,
+    className,
   } = props
 
-  const value = values.eapConfig?.eapType ?? values.securityType ?? null
+  const { value, error, setValue, setTouched } = useConnectFormField(name)
+
   const options = [
-    ...(showAll ? ALL_SECURITY_OPTIONS : []),
+    ...(showAllOptions ? ALL_SECURITY_OPTIONS : []),
     makeEapOptionsGroup(eapOptions),
   ]
 
-  const handleValueChange = (fieldName: string, optionValue: string) => {
-    if (optionValue !== value) {
-      if (optionValue === SECURITY_NONE || optionValue === SECURITY_WPA_PSK) {
-        // NOTE(mc, 2020-03-05): Flow v0.119.1 is unable to figure out this refinement
-        onSecurityChange({ securityType: (optionValue: any) })
-      } else {
-        onSecurityChange({
-          securityType: SECURITY_WPA_EAP,
-          eapConfig: { eapType: optionValue },
-        })
-      }
-    }
-  }
-
   return (
-    <FormTableRow label={label} labelFor={fieldProps.id}>
+    <FormRow label={label} labelFor={id}>
       <SelectField
-        {...fieldProps}
-        options={options}
-        value={value}
-        onValueChange={handleValueChange}
-        menuPosition="fixed"
+        {...{
+          id,
+          name,
+          value,
+          error,
+          placeholder,
+          options,
+          className,
+          menuPosition: 'fixed',
+          onValueChange: (_, value) => setValue(value),
+          onLoseFocus: () => setTouched(true),
+        }}
       />
-    </FormTableRow>
+    </FormRow>
   )
 }

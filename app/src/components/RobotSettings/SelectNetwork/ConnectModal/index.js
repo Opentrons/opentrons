@@ -1,69 +1,75 @@
 // @flow
 import * as React from 'react'
+import { Formik, useFormikContext } from 'formik'
 
+import { useResetFormOnSecurityChange } from './form-state'
 import {
-  SECURITY_WPA_PSK,
-  SECURITY_WPA_EAP,
-  SECURITY_NONE,
-} from '../../../../networking'
-import { Portal } from '../../../portal'
-import { ScrollableAlertModal } from '../../../modals'
-import { ConnectForm } from './ConnectForm'
-import styles from './styles.css'
+  getConnectFormFields,
+  validateConnectFormFields,
+  connectFormToConfigureRequest,
+} from './form-fields'
 
-import type { ConnectFormProps } from './ConnectForm'
-import * as Types from '../types'
+import { ConnectFormModal } from './ConnectFormModal'
 
-// TODO(mc, 2020-03-04): i18n
-const FIND_AND_JOIN = 'Find and join a Wi-Fi network'
-const CONNECT_TO = 'Connect to'
-const ENTER_NAME_AND_SECURITY_TYPE = 'Enter the network name and security type.'
-const WIFI_NETWORK = 'Wi-Fi network'
-const REQUIRES_WPA2_PASSWORD = 'requires a WPA2 password'
-const REQUIRES_802_1X = 'requires 802.1X authentication'
-const IS_UNSECURED = 'is unsecured'
-const CANCEL = 'cancel'
-const CONNECT = 'connect'
-const SECURITY_DESC = {
-  [SECURITY_WPA_PSK]: REQUIRES_WPA2_PASSWORD,
-  [SECURITY_WPA_EAP]: REQUIRES_802_1X,
-  [SECURITY_NONE]: IS_UNSECURED,
-}
+import type {
+  ConnectFormValues,
+  WifiConfigureRequest,
+  WifiNetwork,
+  WifiKey,
+  EapOption,
+} from '../types'
 
-const formatHeading = (ssid: string | void): string => {
-  return ssid == null ? FIND_AND_JOIN : `${CONNECT_TO} ${ssid}`
-}
+export type ConnectModalProps = {|
+  robotName: string,
+  network: WifiNetwork | null,
+  wifiKeys: Array<WifiKey>,
+  eapOptions: Array<EapOption>,
+  onConnect: WifiConfigureRequest => mixed,
+  onCancel: () => mixed,
+|}
 
-const formatBody = (network: Types.WifiNetwork | null): string => {
-  return network === null
-    ? ENTER_NAME_AND_SECURITY_TYPE
-    : `${WIFI_NETWORK} ${network.ssid} ${SECURITY_DESC[network.securityType]}`
-}
+export const ConnectModal = (props: ConnectModalProps) => {
+  const { network, eapOptions, onConnect } = props
 
-export type ConnectModalProps = $Diff<ConnectFormProps, {| id: mixed |}>
+  const handleSubmit = (values: ConnectFormValues) => {
+    const request = connectFormToConfigureRequest(network, values)
+    if (request) onConnect(request)
+  }
 
-export const ConnectModalComponent = (props: ConnectModalProps) => {
-  const formId = `${props.robotName}__ConnectModal`
+  const handleValidate = (values: ConnectFormValues) => {
+    return validateConnectFormFields(network, eapOptions, values)
+  }
 
   return (
-    <ScrollableAlertModal
-      alertOverlay
-      heading={formatHeading(props.network?.ssid)}
-      iconName="wifi"
-      onCloseClick={props.onCancel}
-      buttons={[
-        { children: CANCEL, onClick: props.onCancel },
-        { children: CONNECT, type: 'submit', form: formId },
-      ]}
+    <Formik
+      initialValues={({}: ConnectFormValues)}
+      onSubmit={handleSubmit}
+      validate={handleValidate}
+      validateOnMount
     >
-      <p className={styles.copy}>{formatBody(props.network)}</p>
-      <ConnectForm {...props} id={formId} />
-    </ScrollableAlertModal>
+      <ConnectModalComponent {...props} />
+    </Formik>
   )
 }
 
-export const ConnectModal = (props: ConnectModalProps) => (
-  <Portal>
-    <ConnectModalComponent {...props} />
-  </Portal>
-)
+export const ConnectModalComponent = (props: ConnectModalProps) => {
+  const { robotName, network, wifiKeys, eapOptions, onCancel } = props
+  const { values, isValid } = useFormikContext<ConnectFormValues>()
+  const fields = getConnectFormFields(network, eapOptions, values)
+
+  useResetFormOnSecurityChange()
+
+  return (
+    <ConnectFormModal
+      {...{
+        robotName,
+        network,
+        fields,
+        wifiKeys,
+        eapOptions,
+        isValid,
+        onCancel,
+      }}
+    />
+  )
+}

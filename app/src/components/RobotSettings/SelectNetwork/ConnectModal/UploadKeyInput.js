@@ -1,11 +1,11 @@
 // @flow
 import * as React from 'react'
+import styled from 'styled-components'
 import { useSelector } from 'react-redux'
 import last from 'lodash/last'
 
 import { useDispatchApiRequest } from '../../../../robot-api'
 import { postWifiKeys, getWifiKeyByRequestId } from '../../../../networking'
-import styles from './UploadKeyInput.css'
 
 import type { State } from '../../../../types'
 
@@ -14,6 +14,18 @@ export type UploadKeyInputProps = {|
   label: string,
   onUpload: (keyId: string) => mixed,
 |}
+
+// TODO(mc, 2020-03-04): create styled HiddenInput in components library
+const HiddenInput = styled.input`
+  position: absolute;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  height: 1px;
+  width: 1px;
+  margin: -1px;
+  padding: 0;
+  border: 0;
+`
 
 const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
   const { robotName, label, onUpload } = props
@@ -44,12 +56,11 @@ const UploadKeyInputComponent = (props: UploadKeyInputProps, ref) => {
   }, [createdKeyId])
 
   return (
-    <input
+    <HiddenInput
       ref={ref}
       aria-label={label}
       type="file"
       onChange={handleFileInput}
-      className={styles.hidden_input}
     />
   )
 }

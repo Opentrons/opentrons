@@ -1,41 +1,43 @@
 // @flow
 import * as React from 'react'
 
-import { InputField, CheckboxField } from '@opentrons/components'
-import { FormTableRow } from './FormTableRow'
-import { LABEL_SHOW_PASSWORD } from './constants'
+import {
+  InputField,
+  CheckboxField,
+  INPUT_TYPE_TEXT,
+  INPUT_TYPE_PASSWORD,
+} from '@opentrons/components'
+
+import { FormRow } from './FormRow'
+import { useConnectFormField } from './form-state'
+import { LABEL_SHOW_PASSWORD } from '../i18n'
 
 export type StringFieldProps = {|
-  isPassword: boolean,
-  label: string,
-  error: string | null,
   id: string,
   name: string,
-  value: string,
+  label: string,
+  isPassword: boolean,
   className?: string,
-  onChange: (event: SyntheticInputEvent<HTMLInputElement>) => mixed,
-  onBlur: (event: SyntheticFocusEvent<HTMLInputElement>) => mixed,
 |}
 
 export const StringField = (props: StringFieldProps) => {
-  const { isPassword, label, ...fieldProps } = props
+  const { id, name, label, isPassword, className } = props
+  const { value, error, onChange, onBlur } = useConnectFormField(name)
   const [showPw, toggleShowPw] = React.useReducer(show => !show, false)
-  const type = isPassword && !showPw ? 'password' : 'text'
+  const type = isPassword && !showPw ? INPUT_TYPE_PASSWORD : INPUT_TYPE_TEXT
 
   return (
-    <>
-      <FormTableRow label={label} labelFor={fieldProps.id}>
-        <InputField {...{ type, ...fieldProps }} />
-      </FormTableRow>
+    <FormRow label={label} labelFor={id}>
+      <InputField
+        {...{ className, type, id, name, value, error, onChange, onBlur }}
+      />
       {isPassword && (
-        <FormTableRow>
-          <CheckboxField
-            label={LABEL_SHOW_PASSWORD}
-            value={showPw}
-            onChange={toggleShowPw}
-          />
-        </FormTableRow>
+        <CheckboxField
+          label={LABEL_SHOW_PASSWORD}
+          value={showPw}
+          onChange={toggleShowPw}
+        />
       )}
-    </>
+    </FormRow>
   )
 }

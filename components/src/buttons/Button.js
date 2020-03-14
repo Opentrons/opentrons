@@ -7,6 +7,10 @@ import type { HoverTooltipHandlers } from '../tooltips'
 import { Icon, type IconName } from '../icons'
 import styles from './buttons.css'
 
+export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
+export const BUTTON_TYPE_RESET: 'reset' = 'reset'
+export const BUTTON_TYPE_BUTTON: 'button' = 'button'
+
 export type ButtonProps = {
   /** click handler */
   onClick?: (event: SyntheticMouseEvent<>) => mixed,
@@ -27,7 +31,10 @@ export type ButtonProps = {
   /** contents of the button */
   children?: React.Node,
   /** type of button (default "button") */
-  type?: 'submit' | 'reset' | 'button',
+  type?:
+    | typeof BUTTON_TYPE_SUBMIT
+    | typeof BUTTON_TYPE_RESET
+    | typeof BUTTON_TYPE_BUTTON,
   /** ID of form that button is for */
   form?: string,
   /** custom element or component to use instead of `<button>` */
@@ -60,8 +67,8 @@ export function Button(props: ButtonProps) {
   const { name, title, disabled, hover, tabIndex, form } = props
   const className = cx(props.className, { [styles.hover]: hover })
   const onClick = !disabled ? props.onClick : undefined
-  const Component = props.Component || 'button'
-  const type = props.type || 'button'
+  const Component = props.Component ?? 'button'
+  const type = props.type ?? BUTTON_TYPE_BUTTON
 
   // pass all props if using a custom component
   const buttonProps = !props.Component

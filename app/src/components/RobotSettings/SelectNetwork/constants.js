@@ -1,12 +1,20 @@
 // @flow
 
+export {
+  AUTH_TYPE_STRING,
+  AUTH_TYPE_PASSWORD,
+  AUTH_TYPE_FILE,
+  SECURITY_NONE,
+  SECURITY_WPA_EAP,
+  SECURITY_WPA_PSK,
+  CONFIGURE_FIELD_SSID,
+  CONFIGURE_FIELD_PSK,
+  CONFIGURE_FIELD_SECURITY_TYPE,
+  CONFIGURE_PSK_MIN_LENGTH,
+} from '../../../networking'
+
 export const CONNECT: 'connect' = 'connect'
 export const DISCONNECT: 'disconnect' = 'disconnect'
 export const JOIN_OTHER: 'join-other' = 'join-other'
 
-export const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
-export const JOIN_OTHER_VALUE = '__join-other-network__'
-
-// TODO(mc, 2020-03-04): i18n
-export const DISCONNECT_WIFI_LABEL = 'Disconnect from Wifi'
-export const JOIN_OTHER_LABEL = 'Join other network...'
+export const AUTH_TYPE_SECURITY: 'security' = 'security'

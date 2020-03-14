@@ -1,13 +1,17 @@
 // @flow
 import * as React from 'react'
+import styled from 'styled-components'
 
 import { SelectField } from '@opentrons/components'
-import * as Constants from './constants'
+import * as Copy from '../i18n'
 import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
-import styles from './styles.css'
 
-import type { SelectOptionOrGroup } from '@opentrons/components'
-import type { WifiNetwork } from '../../../../networking/types'
+import type {
+  SelectFieldProps,
+  SelectOptionOrGroup,
+} from '@opentrons/components'
+
+import type { WifiNetwork } from '../types'
 
 export type SelectSsidProps = {|
   list: Array<WifiNetwork>,
@@ -18,15 +22,37 @@ export type SelectSsidProps = {|
   onDisconnect: () => mixed,
 |}
 
+const FIELD_NAME = '__SelectSsid__'
+
+const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
+
+const JOIN_OTHER_VALUE = '__join-other-network__'
+
+const SELECT_DISCONNECT_GROUP = {
+  options: [
+    { value: DISCONNECT_WIFI_VALUE, label: Copy.LABEL_DISCONNECT_FROM_WIFI },
+  ],
+}
+
+const SELECT_JOIN_OTHER_GROUP = {
+  options: [{ value: JOIN_OTHER_VALUE, label: Copy.LABEL_JOIN_OTHER_NETWORK }],
+}
+
+const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
+  SelectField
+)`
+  max-width: 16.875rem;
+`
+
 const formatOptions = (
   list: Array<WifiNetwork>,
   showWifiDisconnect: boolean
 ): Array<SelectOptionOrGroup> => {
   const ssidOptionsList = { options: list.map(({ ssid }) => ({ value: ssid })) }
-  const options = [ssidOptionsList, Constants.SELECT_JOIN_OTHER_GROUP]
+  const options = [ssidOptionsList, SELECT_JOIN_OTHER_GROUP]
 
   if (showWifiDisconnect) {
-    options.unshift(Constants.SELECT_DISCONNECT_GROUP)
+    options.unshift(SELECT_DISCONNECT_GROUP)
   }
 
   return options
@@ -43,9 +69,9 @@ export function SelectSsid(props: SelectSsidProps) {
   } = props
 
   const handleValueChange = (_, value) => {
-    if (value === Constants.JOIN_OTHER_VALUE) {
+    if (value === JOIN_OTHER_VALUE) {
       onJoinOther()
-    } else if (value === Constants.DISCONNECT_WIFI_VALUE) {
+    } else if (value === DISCONNECT_WIFI_VALUE) {
       onDisconnect()
     } else {
       onConnect(value)
@@ -61,12 +87,11 @@ export function SelectSsid(props: SelectSsidProps) {
   }
 
   return (
-    <SelectField
-      name={Constants.FIELD_NAME}
+    <StyledSelectField
+      name={FIELD_NAME}
       value={value}
       options={formatOptions(list, showWifiDisconnect)}
-      placeholder={Constants.PLACEHOLDER}
-      className={styles.wifi_dropdown}
+      placeholder={Copy.SELECT_NETWORK}
       onValueChange={handleValueChange}
       formatOptionLabel={formatOptionLabel}
     />

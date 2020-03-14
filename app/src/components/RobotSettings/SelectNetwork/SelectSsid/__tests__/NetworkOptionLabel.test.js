@@ -1,20 +1,14 @@
 // @flow
 import * as React from 'react'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import { SECURITY_NONE } from '../../../../../networking'
-
+import { SECURITY_NONE } from '../../constants'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
-import {
-  SIGNAL_LEVEL_LOW,
-  SIGNAL_LEVEL_MED,
-  SIGNAL_LEVEL_HIGH,
-} from '../constants'
 
 describe('NetworkOptionLabel presentational component', () => {
   let props
-  const render = () => shallow(<NetworkOptionLabel {...props} />)
+  const render = () => mount(<NetworkOptionLabel {...props} />)
 
   beforeEach(() => {
     props = Fixtures.mockWifiNetwork
@@ -55,28 +49,28 @@ describe('NetworkOptionLabel presentational component', () => {
   })
 
   it('renders very low signal icon when props.signal is very low', () => {
-    props = { ...props, signal: SIGNAL_LEVEL_LOW - 1 }
+    props = { ...props, signal: 24 }
     const wrapper = render()
     const icon = wrapper.find('Icon[name="ot-wifi-0"]')
     expect(icon).toHaveLength(1)
   })
 
   it('renders low signal icon when props.signal is "low"', () => {
-    props = { ...props, signal: SIGNAL_LEVEL_MED - 1 }
+    props = { ...props, signal: 49 }
     const wrapper = render()
     const icon = wrapper.find('Icon[name="ot-wifi-1"]')
     expect(icon).toHaveLength(1)
   })
 
   it('renders medium signal icon when props.signal is "medium"', () => {
-    props = { ...props, signal: SIGNAL_LEVEL_HIGH - 1 }
+    props = { ...props, signal: 74 }
     const wrapper = render()
     const icon = wrapper.find('Icon[name="ot-wifi-2"]')
     expect(icon).toHaveLength(1)
   })
 
   it('renders high signal icon when props.signal is "high"', () => {
-    props = { ...props, signal: SIGNAL_LEVEL_HIGH + 1 }
+    props = { ...props, signal: 76 }
     const wrapper = render()
     const icon = wrapper.find('Icon[name="ot-wifi-3"]')
     expect(icon).toHaveLength(1)

@@ -15,11 +15,10 @@ import {
   AUTH_TYPE_STRING,
   AUTH_TYPE_PASSWORD,
   AUTH_TYPE_FILE,
-  AUTH_TYPE_SECURITY_INTERNAL,
-  LABEL_SECURITY,
-  LABEL_SSID,
-  LABEL_PSK,
-} from '../constants'
+  AUTH_TYPE_SECURITY,
+} from '../../constants'
+
+import { LABEL_SECURITY, LABEL_SSID, LABEL_PSK } from '../../i18n'
 
 import {
   getConnectFormFields,
@@ -43,7 +42,7 @@ describe('getConnectFormFields', () => {
     const fields = getConnectFormFields(null, [], {})
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_SECURITY_INTERNAL,
+      type: AUTH_TYPE_SECURITY,
       name: CONFIGURE_FIELD_SECURITY_TYPE,
       label: LABEL_SECURITY,
       required: true,
@@ -58,7 +57,7 @@ describe('getConnectFormFields', () => {
     const fields = getConnectFormFields(network, [], {})
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_SECURITY_INTERNAL,
+      type: AUTH_TYPE_SECURITY,
       name: CONFIGURE_FIELD_SECURITY_TYPE,
       label: LABEL_SECURITY,
       required: true,
@@ -99,10 +98,7 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
     ]
     const fields = getConnectFormFields(null, eapOptions, {
-      securityType: SECURITY_WPA_EAP,
-      eapConfig: {
-        eapType: 'someOtherEapType',
-      },
+      securityType: 'someOtherEapType',
     })
 
     expect(fields).toEqual(
@@ -139,9 +135,7 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someOtherEapType', options: [] },
     ]
     const fields = getConnectFormFields(network, eapOptions, {
-      eapConfig: {
-        eapType: 'someEapType',
-      },
+      securityType: 'someEapType',
     })
 
     expect(fields).toEqual(
@@ -173,7 +167,7 @@ describe('validateConnectFormFields', () => {
   it('should error if network is hidden and ssid is blank', () => {
     const errors = validateConnectFormFields(null, [], {
       securityType: SECURITY_WPA_PSK,
-      psk: 'foobar',
+      psk: '12345678',
     })
 
     expect(errors).toEqual({
@@ -210,7 +204,7 @@ describe('validateConnectFormFields', () => {
     })
   })
 
-  it('should error securityType if network is EAP and eapConfig.eapType is blank', () => {
+  it('should error if network is EAP and securityType is blank', () => {
     const network = {
       ...Fixtures.mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
@@ -232,10 +226,8 @@ describe('validateConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
     ]
     const values = {
-      eapConfig: {
-        eapType: 'someOtherEapType',
-        [('fileField': string)]: '123',
-      },
+      securityType: 'someOtherEapType',
+      eapConfig: { [('fileField': string)]: '123' },
     }
     const errors = validateConnectFormFields(network, eapOptions, values)
 
@@ -297,14 +289,15 @@ describe('connectFormToConfigureRequest', () => {
     })
   })
 
-  it('should set eapConfig from values', () => {
+  it('should set eapConfig from values with known network', () => {
     const network = {
       ...Fixtures.mockWifiNetwork,
       ssid: 'foobar',
       securityType: SECURITY_WPA_EAP,
     }
     const values = {
-      eapConfig: { eapType: 'fizz', [('option1': string)]: 'buzz' },
+      securityType: 'someEapType',
+      eapConfig: { [('option1': string)]: 'fizzbuzz' },
     }
     const result = connectFormToConfigureRequest(network, values)
 
@@ -312,7 +305,23 @@ describe('connectFormToConfigureRequest', () => {
       ssid: 'foobar',
       securityType: SECURITY_WPA_EAP,
       hidden: false,
-      eapConfig: { eapType: 'fizz', option1: 'buzz' },
+      eapConfig: { eapType: 'someEapType', option1: 'fizzbuzz' },
+    })
+  })
+
+  it('should set eapConfig from values with unknown network', () => {
+    const values = {
+      ssid: 'foobar',
+      securityType: 'someEapType',
+      eapConfig: { [('option1': string)]: 'fizzbuzz' },
+    }
+    const result = connectFormToConfigureRequest(null, values)
+
+    expect(result).toEqual({
+      ssid: 'foobar',
+      securityType: SECURITY_WPA_EAP,
+      hidden: true,
+      eapConfig: { eapType: 'someEapType', option1: 'fizzbuzz' },
     })
   })
 })

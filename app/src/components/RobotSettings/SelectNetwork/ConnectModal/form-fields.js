@@ -1,40 +1,57 @@
 // @flow
 import get from 'lodash/get'
-import * as Constants from './constants'
+
+import * as Constants from '../constants'
+import * as Copy from '../i18n'
 
 import type {
   WifiNetwork,
   EapOption,
   WifiAuthField,
   WifiConfigureRequest,
+  WifiSecurityType,
+  WifiEapConfig,
   ConnectFormValues,
   ConnectFormErrors,
   ConnectFormField,
-} from './types'
+} from '../types'
 
 const FIELD_SSID = {
   type: Constants.AUTH_TYPE_STRING,
   name: Constants.CONFIGURE_FIELD_SSID,
-  label: Constants.LABEL_SSID,
+  label: Copy.LABEL_SSID,
   required: true,
 }
 
 const FIELD_SECURITY = {
-  type: Constants.AUTH_TYPE_SECURITY_INTERNAL,
+  type: Constants.AUTH_TYPE_SECURITY,
   name: Constants.CONFIGURE_FIELD_SECURITY_TYPE,
-  label: Constants.LABEL_SECURITY,
+  label: Copy.LABEL_SECURITY,
   required: true,
 }
 
 const FIELD_PSK = {
   type: Constants.AUTH_TYPE_PASSWORD,
   name: Constants.CONFIGURE_FIELD_PSK,
-  label: Constants.LABEL_PSK,
+  label: Copy.LABEL_PSK,
   required: true,
 }
 
-const getEapFields = (eapOptions, values): Array<ConnectFormField> => {
-  const eapType = values.eapConfig?.eapType
+const getEapIsSelected = (formSecurityType): boolean %checks => {
+  return (
+    formSecurityType != null &&
+    formSecurityType !== Constants.SECURITY_NONE &&
+    formSecurityType !== Constants.SECURITY_WPA_PSK
+  )
+}
+
+const getEapFields = (
+  eapOptions,
+  values,
+  errors,
+  touched
+): Array<ConnectFormField> => {
+  const eapType = values.securityType
   return eapOptions
     .filter(opt => opt.name === eapType)
     .flatMap(opt => opt.options)
@@ -51,6 +68,7 @@ export function getConnectFormFields(
   eapOptions: Array<EapOption>,
   values: ConnectFormValues
 ): Array<ConnectFormField> {
+  const { securityType: formSecurityType } = values
   const fields = []
 
   // if the network is unknown, display a field to enter the SSID
@@ -69,7 +87,7 @@ export function getConnectFormFields(
   // display a password field for the PSK
   if (
     network?.securityType === Constants.SECURITY_WPA_PSK ||
-    values.securityType === Constants.SECURITY_WPA_PSK
+    formSecurityType === Constants.SECURITY_WPA_PSK
   ) {
     fields.push(FIELD_PSK)
   }
@@ -77,7 +95,7 @@ export function getConnectFormFields(
   // if known network is EAP or user selected EAP, map eap options to fields
   if (
     network?.securityType === Constants.SECURITY_WPA_EAP ||
-    values.securityType === Constants.SECURITY_WPA_EAP
+    getEapIsSelected(formSecurityType)
   ) {
     fields.push(...getEapFields(eapOptions, values))
   }
@@ -90,35 +108,43 @@ export function validateConnectFormFields(
   eapOptions: Array<EapOption>,
   values: ConnectFormValues
 ): ConnectFormErrors {
-  const errors = {}
-  if (network === null && !values.ssid) {
-    errors.ssid = `${Constants.LABEL_SSID} ${Constants.IS_REQUIRED}`
+  const {
+    ssid: formSsid,
+    securityType: formSecurityType,
+    psk: formPsk,
+  } = values
+  const errors: $Shape<ConnectFormErrors> = {}
+
+  if (network === null && !formSsid) {
+    errors.ssid = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SSID)
   }
 
   if (
-    (network === null && !values.securityType) ||
-    (network?.securityType === Constants.SECURITY_WPA_EAP &&
-      !values.eapConfig?.eapType)
+    (network === null || network.securityType === Constants.SECURITY_WPA_EAP) &&
+    !formSecurityType
   ) {
-    errors.securityType = `${Constants.LABEL_SECURITY} ${Constants.IS_REQUIRED}`
+    errors.securityType = Copy.FIELD_IS_REQUIRED(Copy.LABEL_SECURITY)
   }
 
   if (
-    !values.psk &&
     (network?.securityType === Constants.SECURITY_WPA_PSK ||
-      values.securityType === Constants.SECURITY_WPA_PSK)
+      formSecurityType === Constants.SECURITY_WPA_PSK) &&
+    (!formPsk || formPsk.length < Constants.CONFIGURE_PSK_MIN_LENGTH)
   ) {
-    errors.psk = `${Constants.LABEL_PSK} ${Constants.MUST_BE_8_CHARACTERS}`
+    errors.psk = Copy.FIELD_NOT_LONG_ENOUGH(
+      Copy.LABEL_PSK,
+      Constants.CONFIGURE_PSK_MIN_LENGTH
+    )
   }
 
   if (
     network?.securityType === Constants.SECURITY_WPA_EAP ||
-    values.securityType === Constants.SECURITY_WPA_EAP
+    getEapIsSelected(formSecurityType)
   ) {
     getEapFields(eapOptions, values)
       .filter(({ name, required }) => required && !get(values, name))
       .forEach(({ name, label }) => {
-        errors[name] = `${label} ${Constants.IS_REQUIRED}`
+        errors[name] = Copy.FIELD_IS_REQUIRED(label)
       })
   }
 
@@ -129,15 +155,39 @@ export const connectFormToConfigureRequest = (
   network: WifiNetwork | null,
   values: ConnectFormValues
 ): WifiConfigureRequest | null => {
-  const ssid = network?.ssid ?? values.ssid ?? null
+  const {
+    ssid: formSsid,
+    securityType: formSecurityType,
+    psk: formPsk,
+    eapConfig: formEapConfig,
+  } = values
 
-  if (ssid !== null) {
-    const options: WifiConfigureRequest = { ssid, hidden: network === null }
-    const securityType = network?.securityType ?? values.securityType
+  const ssid = network?.ssid ?? formSsid ?? null
+  let securityType: WifiSecurityType | null = null
+  let eapConfig: WifiEapConfig | null = null
 
-    if (securityType) options.securityType = securityType
-    if (values.psk != null) options.psk = values.psk
-    if (values.eapConfig) options.eapConfig = values.eapConfig
+  if (getEapIsSelected(formSecurityType)) {
+    securityType = Constants.SECURITY_WPA_EAP
+    eapConfig = { eapType: formSecurityType }
+  } else if (network) {
+    securityType = network.securityType
+  } else if (
+    values.securityType === Constants.SECURITY_NONE ||
+    values.securityType === Constants.SECURITY_WPA_PSK
+  ) {
+    // NOTE(mc, 2020-03-13): Flow v0.119 unable to refine via consts
+    securityType = ((values.securityType: any): WifiSecurityType)
+  }
+
+  if (ssid !== null && securityType !== null) {
+    const options: WifiConfigureRequest = {
+      ssid,
+      securityType,
+      hidden: network === null,
+    }
+
+    if (formPsk != null) options.psk = formPsk
+    if (eapConfig) options.eapConfig = { ...eapConfig, ...formEapConfig }
     return options
   }
 

@@ -5,9 +5,17 @@ import { shallow } from 'enzyme'
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SelectField } from '@opentrons/components'
 import { UploadKeyInput } from '../UploadKeyInput'
-import { SelectKey, ADD_NEW_KEY_VALUE } from '../SelectKey'
+import { SelectKey } from '../SelectKey'
+import * as FormState from '../form-state'
 
-import { LABEL_ADD_NEW_KEY } from '../constants'
+import { LABEL_ADD_NEW_KEY } from '../../i18n'
+
+jest.mock('../form-state')
+
+const useConnectFormField: JestMockFn<
+  [string],
+  $Call<typeof FormState.useConnectFormField, string>
+> = FormState.useConnectFormField
 
 describe('ConnectModal SelectKey', () => {
   const fieldId = 'field-id'
@@ -21,20 +29,28 @@ describe('ConnectModal SelectKey', () => {
     { ...Fixtures.mockWifiKey, id: 'bar', name: 'bar.crt' },
     { ...Fixtures.mockWifiKey, id: 'baz', name: 'baz.crt' },
   ]
-  const handleValueChange = jest.fn()
-  const handleLoseFocus = jest.fn()
+  const setValue = jest.fn()
+  const setTouched = jest.fn()
 
   const render = (value = null) => {
+    useConnectFormField.mockImplementation(name => {
+      expect(name).toBe(fieldName)
+      return {
+        value,
+        setValue,
+        setTouched,
+        error: fieldError,
+        onChange: () => {},
+        onBlur: () => {},
+      }
+    })
+
     return shallow(
       <SelectKey
         id={fieldId}
         name={fieldName}
         label={fieldLabel}
         placeholder={fieldPlaceholder}
-        error={fieldError}
-        value={value}
-        onValueChange={handleValueChange}
-        onLoseFocus={handleLoseFocus}
         wifiKeys={wifiKeys}
         robotName={robotName}
       />
@@ -44,21 +60,21 @@ describe('ConnectModal SelectKey', () => {
   it('renders a SelectField', () => {
     const wrapper = render('bar')
     const select = wrapper.find(SelectField)
-    expect(select).toHaveLength(1)
+
     expect(select.prop('id')).toEqual(fieldId)
     expect(select.prop('name')).toEqual(fieldName)
     expect(select.prop('error')).toEqual(fieldError)
     expect(select.prop('placeholder')).toEqual(fieldPlaceholder)
-    expect(select.prop('onLoseFocus')).toEqual(handleLoseFocus)
     expect(select.prop('value')).toEqual('bar')
   })
 
   it('renders a label for the field', () => {
     const wrapper = render()
+
     const label = wrapper
       .find(`[label="${fieldLabel}"]`)
       .dive()
-      .find(`label[htmlFor="${fieldId}"]`)
+      .find(`[htmlFor="${fieldId}"]`)
 
     expect(label.text()).toEqual(fieldLabel)
   })
@@ -84,7 +100,7 @@ describe('ConnectModal SelectKey', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
     const upload = wrapper.find(UploadKeyInput)
-    const expected = { value: ADD_NEW_KEY_VALUE, label: LABEL_ADD_NEW_KEY }
+    const expected = { value: expect.any(String), label: LABEL_ADD_NEW_KEY }
 
     expect(upload.prop('label')).toEqual(LABEL_ADD_NEW_KEY)
     expect(upload.prop('robotName')).toEqual(robotName)
@@ -102,25 +118,32 @@ describe('ConnectModal SelectKey', () => {
     const upload = wrapper.find(UploadKeyInput)
 
     upload.invoke('onUpload')('new-key-id')
-    expect(handleValueChange).toHaveBeenCalledWith(fieldName, 'new-key-id')
+    expect(setValue).toHaveBeenCalledWith('new-key-id')
   })
 
   it('updates the field value with SelectField::onValueChange', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
 
-    select.invoke('onValueChange')('new-key-id')
-    expect(handleValueChange).toHaveBeenCalledWith(fieldName, 'new-key-id')
+    select.invoke('onValueChange')(fieldName, 'new-key-id')
+    expect(setValue).toHaveBeenCalledWith('new-key-id')
   })
 
   it('does not update the field value when add new option is selected', () => {
     const wrapper = render()
     const select = wrapper.find(SelectField)
+    const options = select.prop('options').flatMap(o => o.options)
+    const addNewOpt = options.find(o => o?.label === LABEL_ADD_NEW_KEY)
 
-    select.invoke('onValueChange')(ADD_NEW_KEY_VALUE)
-    expect(handleValueChange).not.toHaveBeenCalledWith(
-      fieldName,
-      ADD_NEW_KEY_VALUE
-    )
+    select.invoke('onValueChange')(fieldName, addNewOpt?.value)
+    expect(setValue).not.toHaveBeenCalledWith(addNewOpt?.value)
+  })
+
+  it('updates field touched with SelectField::onLoseFocus', () => {
+    const wrapper = render()
+    const select = wrapper.find(SelectField)
+
+    select.invoke('onLoseFocus')()
+    expect(setTouched).toHaveBeenCalledWith(true)
   })
 })

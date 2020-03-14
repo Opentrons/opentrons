@@ -8,21 +8,24 @@ import { mount } from 'enzyme'
 
 import * as Networking from '../../../../networking'
 import * as RobotApi from '../../../../robot-api'
-
-import { SelectNetwork } from '..'
-import { SelectSsid } from '../SelectSsid'
-// import { SelectNetworkModal } from '../SelectNetworkModal'
-
 import * as Fixtures from '../../../../networking/__fixtures__'
 import * as Constants from '../constants'
+
+import { Portal } from '../../../portal'
+import { SelectSsid } from '../SelectSsid'
 import { ConnectModal } from '../ConnectModal'
 import { DisconnectModal } from '../DisconnectModal'
 import { ResultModal } from '../ResultModal'
+import { SelectNetwork } from '..'
 
 import type { State } from '../../../../types'
 
 jest.mock('../../../../networking/selectors')
 jest.mock('../../../../robot-api/selectors')
+
+// mock out ConnectModal to prevent warning logs from async formik
+// validation happening outside an `act`
+jest.mock('../ConnectModal', () => ({ ConnectModal: () => <></> }))
 
 const mockState = { state: true, mock: true }
 
@@ -31,7 +34,11 @@ const mockRobotName = 'robot-name'
 const mockWifiList = [
   { ...Fixtures.mockWifiNetwork, ssid: 'foo', active: true },
   { ...Fixtures.mockWifiNetwork, ssid: 'bar' },
-  { ...Fixtures.mockWifiNetwork, ssid: 'baz' },
+  {
+    ...Fixtures.mockWifiNetwork,
+    ssid: 'baz',
+    securityType: Networking.SECURITY_NONE,
+  },
 ]
 
 const mockWifiKeys = [
@@ -225,7 +232,7 @@ describe('<SelectNetwork />', () => {
         disconnectAndSetMockRequestState({ status: RobotApi.PENDING })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
@@ -243,7 +250,7 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
@@ -272,7 +279,7 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(DisconnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.DISCONNECT,
@@ -331,7 +338,7 @@ describe('<SelectNetwork />', () => {
         selectSsid.invoke('onJoinOther')()
       })
       wrapper.update()
-      connectModal = wrapper.find(ConnectModal)
+      connectModal = wrapper.find(Portal).find(ConnectModal)
 
       expect(connectModal).toHaveLength(1)
       expect(connectModal.props()).toEqual({
@@ -388,7 +395,7 @@ describe('<SelectNetwork />', () => {
         connectAndSetMockRequestState({ status: RobotApi.PENDING })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
@@ -406,7 +413,7 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
@@ -435,7 +442,7 @@ describe('<SelectNetwork />', () => {
         })
 
         expect(wrapper.find(ConnectModal)).toHaveLength(0)
-        const resultModal = wrapper.find(ResultModal)
+        const resultModal = wrapper.find(Portal).find(ResultModal)
         expect(resultModal).toHaveLength(1)
         expect(resultModal.props()).toEqual({
           type: Constants.CONNECT,
@@ -453,6 +460,29 @@ describe('<SelectNetwork />', () => {
         expect(wrapper.find(ResultModal)).toHaveLength(0)
         expect(dispatch).toHaveBeenCalledWith(
           RobotApi.dismissRequest(((requestId: any): string))
+        )
+      })
+
+      it('dispatches a configure request immediately for an open network', () => {
+        wrapper = render()
+
+        const selectSsid = wrapper.find(SelectSsid)
+        const expectedConfigure = {
+          ssid: mockWifiList[2].ssid,
+          securityType: Networking.SECURITY_NONE,
+          hidden: false,
+        }
+
+        act(() => {
+          selectSsid.invoke('onConnect')(mockWifiList[2].ssid)
+        })
+        wrapper.update()
+
+        expect(dispatch).toHaveBeenCalledWith(
+          expect.objectContaining({
+            ...Networking.postWifiConfigure(mockRobotName, expectedConfigure),
+            meta: { requestId: expect.any(String) },
+          })
         )
       })
     })

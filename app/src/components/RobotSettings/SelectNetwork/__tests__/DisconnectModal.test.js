@@ -3,8 +3,7 @@ import * as React from 'react'
 import { shallow } from 'enzyme'
 
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../../portal'
-import { DisconnectModal, DisconnectModalComponent } from '../DisconnectModal'
+import { DisconnectModal } from '../DisconnectModal'
 
 describe("SelectNetwork's DisconnectModal", () => {
   const ssid = 'some-network'
@@ -15,22 +14,9 @@ describe("SelectNetwork's DisconnectModal", () => {
     jest.resetAllMocks()
   })
 
-  it('renders inside a Portal', () => {
+  it('displays an AlertModal with copy for disconnect', () => {
     const wrapper = shallow(
       <DisconnectModal
-        ssid={ssid}
-        onDisconnect={handleDisconnect}
-        onCancel={handleCancel}
-      />
-    )
-    const portal = wrapper.find(Portal)
-    expect(portal).toHaveLength(1)
-    expect(portal.find(DisconnectModalComponent)).toHaveLength(1)
-  })
-
-  it('displays an AlertModal with success message for disconnect', () => {
-    const wrapper = shallow(
-      <DisconnectModalComponent
         ssid={ssid}
         onDisconnect={handleDisconnect}
         onCancel={handleCancel}

@@ -1,9 +1,8 @@
 // @flow
-
 import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
-import { Portal } from '../../portal'
+import * as Copy from './i18n'
 
 export type DisconnectModalProps = {|
   ssid: string,
@@ -11,14 +10,7 @@ export type DisconnectModalProps = {|
   onCancel: () => mixed,
 |}
 
-// TODO(mc, 2020-03-04): i18n
-const CANCEL = 'cancel'
-const DISCONNECT = 'disconnect'
-const formatHeading = ssid => `Disconnect from ${ssid}`
-const formatMessage = ssid =>
-  `Are you sure you want to disconnect from ${ssid}?`
-
-export const DisconnectModalComponent = ({
+export const DisconnectModal = ({
   ssid,
   onDisconnect,
   onCancel,
@@ -26,19 +18,13 @@ export const DisconnectModalComponent = ({
   <AlertModal
     alertOverlay
     iconName="wifi"
-    heading={formatHeading(ssid)}
+    heading={Copy.DISCONNECT_FROM_SSID(ssid)}
     onCloseClick={onCancel}
     buttons={[
-      { children: CANCEL, onClick: onCancel },
-      { children: DISCONNECT, onClick: onDisconnect },
+      { children: Copy.CANCEL, onClick: onCancel },
+      { children: Copy.DISCONNECT, onClick: onDisconnect },
     ]}
   >
-    {formatMessage(ssid)}
+    {Copy.ARE_YOU_SURE_YOU_WANT_TO_DISCONNECT(ssid)}
   </AlertModal>
-)
-
-export const DisconnectModal = (props: DisconnectModalProps) => (
-  <Portal>
-    <DisconnectModalComponent {...props} />
-  </Portal>
 )

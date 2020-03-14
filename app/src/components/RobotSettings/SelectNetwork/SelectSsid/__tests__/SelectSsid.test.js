@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react'
-import { shallow } from 'enzyme'
+import { mount } from 'enzyme'
 import { SelectField } from '@opentrons/components'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import * as Constants from '../constants'
+import {
+  LABEL_JOIN_OTHER_NETWORK,
+  LABEL_DISCONNECT_FROM_WIFI,
+} from '../../i18n'
+
 import { SelectSsid } from '..'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
 
@@ -20,7 +24,7 @@ describe('SelectSsid component', () => {
   const handleDisconnect = jest.fn()
 
   const render = (showDisconnect = true) => {
-    return shallow(
+    return mount(
       <SelectSsid
         list={mockWifiList}
         value={null}
@@ -61,8 +65,8 @@ describe('SelectSsid component', () => {
     expect(options).toContainEqual({
       options: [
         {
-          value: Constants.JOIN_OTHER_VALUE,
-          label: Constants.JOIN_OTHER_LABEL,
+          value: expect.any(String),
+          label: 'Join other network...',
         },
       ],
     })
@@ -76,8 +80,8 @@ describe('SelectSsid component', () => {
     expect(options).toContainEqual({
       options: [
         {
-          value: Constants.DISCONNECT_WIFI_VALUE,
-          label: Constants.DISCONNECT_WIFI_LABEL,
+          value: expect.any(String),
+          label: 'Disconnect from Wi-Fi',
         },
       ],
     })
@@ -89,7 +93,7 @@ describe('SelectSsid component', () => {
     const options = selectField.prop('options')
 
     expect(options).not.toContainEqual({
-      options: [{ value: Constants.DISCONNECT_WIFI_VALUE }],
+      options: [{ label: 'Disconnect from Wi-Fi' }],
     })
   })
 
@@ -105,8 +109,13 @@ describe('SelectSsid component', () => {
   it('if user selects join other value, onJoinOther is called', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
+    const options = selectField.prop('options').flatMap(o => o.options)
+    const joinOtherValue = options.find(
+      o => o.label === LABEL_JOIN_OTHER_NETWORK
+    )?.value
 
-    selectField.invoke('onValueChange')('_', Constants.JOIN_OTHER_VALUE)
+    expect(joinOtherValue).toEqual(expect.any(String))
+    selectField.invoke('onValueChange')('_', joinOtherValue)
 
     expect(handleJoinOther).toHaveBeenCalled()
   })
@@ -114,8 +123,13 @@ describe('SelectSsid component', () => {
   it('if user selects disconnect value, onDisconnect is called', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
+    const options = selectField.prop('options').flatMap(o => o.options)
+    const disconectValue = options.find(
+      o => o.label === LABEL_DISCONNECT_FROM_WIFI
+    )?.value
 
-    selectField.invoke('onValueChange')('_', Constants.DISCONNECT_WIFI_VALUE)
+    expect(disconectValue).toEqual(expect.any(String))
+    selectField.invoke('onValueChange')('_', disconectValue)
 
     expect(handleDisconnect).toHaveBeenCalled()
   })
@@ -124,36 +138,42 @@ describe('SelectSsid component', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
 
-    const expectedFoo = shallow(<NetworkOptionLabel {...mockWifiList[0]} />)
-    const expectedBar = shallow(<NetworkOptionLabel {...mockWifiList[1]} />)
+    const expectedFoo = mount(<NetworkOptionLabel {...mockWifiList[0]} />)
+    const expectedBar = mount(<NetworkOptionLabel {...mockWifiList[1]} />)
     const fooLabel = selectField.prop('formatOptionLabel')({ value: 'foo' })
     const barLabel = selectField.prop('formatOptionLabel')({ value: 'bar' })
 
-    expect(shallow(fooLabel)).toEqual(expectedFoo)
-    expect(shallow(barLabel)).toEqual(expectedBar)
+    expect(mount(fooLabel)).toEqual(expectedFoo)
+    expect(mount(barLabel)).toEqual(expectedBar)
   })
 
   it('formats the join other label', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
+    const options = selectField.prop('options').flatMap(o => o.options)
+    const joinOtherOpt = options.find(o => o.label === LABEL_JOIN_OTHER_NETWORK)
 
-    const label = selectField.prop('formatOptionLabel')({
-      value: Constants.JOIN_OTHER_VALUE,
-      label: Constants.JOIN_OTHER_LABEL,
-    })
+    expect(joinOtherOpt?.value).toEqual(expect.any(String))
+    expect(joinOtherOpt?.label).toEqual(expect.any(String))
 
-    expect(shallow(label).html()).toContain(Constants.JOIN_OTHER_LABEL)
+    const label = selectField.prop('formatOptionLabel')(joinOtherOpt)
+
+    expect(mount(label).html()).toContain(joinOtherOpt?.label)
   })
 
   it('formats the disconnect label', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
+    const options = selectField.prop('options').flatMap(o => o.options)
+    const disconectOpt = options.find(
+      o => o.label === LABEL_DISCONNECT_FROM_WIFI
+    )
 
-    const label = selectField.prop('formatOptionLabel')({
-      value: Constants.DISCONNECT_WIFI_VALUE,
-      label: Constants.DISCONNECT_WIFI_LABEL,
-    })
+    expect(disconectOpt?.value).toEqual(expect.any(String))
+    expect(disconectOpt?.label).toEqual(expect.any(String))
 
-    expect(shallow(label).html()).toContain(Constants.DISCONNECT_WIFI_LABEL)
+    const label = selectField.prop('formatOptionLabel')(disconectOpt)
+
+    expect(mount(label).html()).toContain(disconectOpt?.label)
   })
 })

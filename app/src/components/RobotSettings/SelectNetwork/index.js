@@ -7,6 +7,7 @@ import * as RobotApi from '../../../robot-api'
 import * as Networking from '../../../networking'
 
 import { useInterval } from '@opentrons/components'
+import { Portal } from '../../portal'
 import { SelectSsid } from './SelectSsid'
 import { ConnectModal } from './ConnectModal'
 import { DisconnectModal } from './DisconnectModal'
@@ -75,8 +76,16 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
 
   const handleSelectConnect = ssid => {
     const network = list.find(nw => nw.ssid === ssid)
-    network != null && setChangeState({ type: CONNECT, ssid, network })
-    // TODO(mc, 2020-03-04): connect to no security network automatically
+
+    if (network) {
+      const { ssid, securityType } = network
+
+      if (securityType === Networking.SECURITY_NONE) {
+        handleConnect({ ssid, securityType, hidden: false })
+      }
+
+      setChangeState({ type: CONNECT, ssid, network })
+    }
   }
 
   const handleSelectDisconnect = () => {
@@ -104,7 +113,7 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
         onDisconnect={handleSelectDisconnect}
       />
       {changeState.type && (
-        <>
+        <Portal>
           {requestState ? (
             <ResultModal
               type={changeState.type}
@@ -133,7 +142,7 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
               onCancel={handleDone}
             />
           )}
-        </>
+        </Portal>
       )}
     </>
   )

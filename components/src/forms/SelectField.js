@@ -16,7 +16,7 @@ export type SelectFieldProps = {|
   /** react-Select option, usually label, value */
   options: $PropertyType<SelectProps, 'options'>,
   /** currently selected value */
-  value: $NonMaybeType<$PropertyType<SelectProps, 'id'>> | null,
+  value: string | null | void,
   /** disable the select */
   disabled?: $PropertyType<SelectProps, 'isDisabled'>,
   /** optional placeholder  */
@@ -52,7 +52,7 @@ export function SelectField(props: SelectFieldProps) {
     onLoseFocus,
   } = props
   const allOptions = options.flatMap(og => og.options || [og])
-  const value = find(allOptions, { value: props.value }) || null
+  const value = find(allOptions, opt => opt.value === props.value) || null
   const caption = error || props.caption
   const captionCx = cx(styles.select_caption, { [styles.error]: error })
   const fieldCx = cx(styles.select_field, { [styles.error]: error }, className)
