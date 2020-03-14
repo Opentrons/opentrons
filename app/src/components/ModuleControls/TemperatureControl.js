@@ -15,7 +15,7 @@ import type {
   TemperatureModule,
   ModuleCommand,
 } from '../../modules/types'
-import { THERMOCYCLER } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE } from '../../modules'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
 const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
@@ -41,7 +41,7 @@ export const TemperatureControl = ({
 
   const hasTarget =
     module.status !== 'idle' ||
-    (module.name === THERMOCYCLER && module.data.lidTarget != null)
+    (module.type === THERMOCYCLER_MODULE_TYPE && module.data.lidTarget != null)
 
   const handleClick = () => {
     if (hasTarget) {
@@ -66,8 +66,8 @@ export const TemperatureControl = ({
     setPrimaryTempValue(null)
     setSecondaryTempValue(null)
   }
-  const isThermocycler = module.name === THERMOCYCLER
-  const displayName = getModuleDisplayName(module.name)
+  const isThermocycler = module.type === THERMOCYCLER_MODULE_TYPE
+  const displayName = getModuleDisplayName(module.model)
   const alertHeading = `Set ${displayName} Temp`
   const alertBody = `Pre heat or cool ${displayName}.`
   const primaryFieldLabel = `Set ${isThermocycler ? 'Base' : ''} Temp:`

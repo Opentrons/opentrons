@@ -11,7 +11,7 @@ import type { Dispatch } from '../../types'
 import pcrSealSrc from '../../img/place_pcr_seal.png'
 import { Portal } from '../portal'
 import styles from './styles.css'
-import { THERMOCYCLER } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE, getModuleType } from '../../modules'
 
 const IS_HOMING_MESSAGE = 'Returning tip and homing robot'
 
@@ -28,7 +28,12 @@ export function ProceedToRun(props: ProceedToRunProps) {
   const [runPrepModalOpen, setRunPrepModalOpen] = useState(false)
 
   useEffect(() => {
-    if (some(sessionModules, mod => mod.name === THERMOCYCLER)) {
+    if (
+      some(
+        sessionModules,
+        mod => getModuleType(mod.model) === THERMOCYCLER_MODULE_TYPE
+      )
+    ) {
       setMustPrepForRun(true)
     }
   }, [sessionModules])

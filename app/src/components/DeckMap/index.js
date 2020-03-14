@@ -90,7 +90,7 @@ function DeckMapComponent(props: Props) {
                   })`}
                 >
                   <ModuleItem
-                    name={moduleInSlot.name}
+                    model={moduleInSlot.model}
                     mode={moduleInSlot.mode || 'default'}
                   />
                 </g>
@@ -133,7 +133,7 @@ function mapStateToProps(state: State, ownProps: OP): SP {
     modulesBySlot = mapValues(
       robotSelectors.getModulesBySlot(state),
       module => {
-        const present = !missingModules.some(mm => mm.name === module.name)
+        const present = !missingModules.some(mm => mm.model === module.model)
         return { ...module, mode: present ? 'present' : 'missing' }
       }
     )

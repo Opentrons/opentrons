@@ -3,12 +3,14 @@ import * as React from 'react'
 
 import styles from './styles.css'
 
+import type { ModuleModel } from '@opentrons/shared-data'
+
 type Props = {|
-  name: string,
+  model: ModuleModel,
 |}
 
 export function ModuleImage(props: Props) {
-  const imgSrc = getModuleImg(props.name)
+  const imgSrc = getModuleImg(props.model)
 
   return (
     <div className={styles.module_image_wrapper}>
@@ -17,12 +19,14 @@ export function ModuleImage(props: Props) {
   )
 }
 
-function getModuleImg(name: string) {
-  return MODULE_IMGS[name]
+function getModuleImg(model: ModuleModel) {
+  return MODULE_IMGS[model]
 }
 
-const MODULE_IMGS = {
-  tempdeck: require('./images/module-temp@3x.png'),
-  magdeck: require('./images/module-mag@3x.png'),
-  thermocycler: require('./images/module-thermo@3x.png'),
+const MODULE_IMGS: { [ModuleModel]: mixed } = {
+  temperatureModuleV1: require('./images/temperatureModuleV1@3x.png'),
+  temperatureModuleV2: require('./images/temperatureModuleV2@3x.png'),
+  magneticModuleV1: require('./images/magneticModuleV1@3x.png'),
+  magneticModuleV2: require('./images/magneticModuleV2@3x.png'),
+  thermocyclerModuleV1: require('./images/thermocyclerModuleV1@3x.png'),
 }

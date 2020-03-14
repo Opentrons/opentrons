@@ -1,11 +1,15 @@
 // @flow
-import { THERMOCYCLER } from '@opentrons/shared-data'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 
 // common constants
 
-export const PREPARABLE_MODULES = [THERMOCYCLER]
+export const PREPARABLE_MODULE_TYPES = [THERMOCYCLER_MODULE_TYPE]
 
-export { MAGDECK, TEMPDECK, THERMOCYCLER } from '@opentrons/shared-data'
+export {
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 
 // http paths
 

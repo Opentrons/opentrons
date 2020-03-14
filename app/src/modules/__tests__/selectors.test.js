@@ -82,7 +82,7 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', name: 'thermocycler' },
+        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
       ])
     },
     expected: [
@@ -111,14 +111,41 @@ const SPECS: Array<SelectorSpec> = [
     before: () => {
       mockGetConnectedRobotName.mockReturnValue('robotName')
       mockGetProtocolModules.mockReturnValue([
-        { _id: 0, slot: '1', name: 'thermocycler' },
-        { _id: 1, slot: '2', name: 'tempdeck' },
-        { _id: 2, slot: '3', name: 'magdeck' },
+        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
+        { _id: 1, slot: '2', model: 'temperatureModuleV1' },
+        { _id: 2, slot: '3', model: 'magneticModuleV1' },
       ])
     },
     expected: [
-      { _id: 0, slot: '1', name: 'thermocycler' },
-      { _id: 2, slot: '3', name: 'magdeck' },
+      { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
+      { _id: 2, slot: '3', model: 'magneticModuleV1' },
+    ],
+  },
+  {
+    name: 'getMissingModules allows compatible modules of different models',
+    selector: Selectors.getMissingModules,
+    state: {
+      modules: {
+        robotName: {
+          modulesById: {
+            abc123: Fixtures.mockTemperatureModuleGen2,
+            def456: Fixtures.mockMagneticModule,
+          },
+        },
+      },
+    },
+    args: [],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolModules.mockReturnValue([
+        { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
+        { _id: 1, slot: '2', model: 'temperatureModuleV1' },
+        { _id: 2, slot: '3', model: 'magneticModuleV2' },
+      ])
+    },
+    expected: [
+      { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
+      { _id: 2, slot: '3', model: 'magneticModuleV2' },
     ],
   },
 ]

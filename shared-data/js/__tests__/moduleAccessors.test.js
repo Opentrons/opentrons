@@ -2,8 +2,9 @@
 
 import {
   getModuleDef2,
-  getModuleTypeFromModuleModel,
+  getModuleType,
   getModuleDisplayName,
+  normalizeModuleModel,
 } from '../modules'
 
 import {
@@ -25,8 +26,8 @@ describe('all valid models work', () => {
       expect(loadedDef?.model).toEqual(model)
     })
     it('valid models have valid module types', () => {
-      expect(getModuleTypeFromModuleModel(model)).toEqual(loadedDef.moduleType)
-      expect(MODULE_TYPES).toContain(getModuleTypeFromModuleModel(model))
+      expect(getModuleType(model)).toEqual(loadedDef.moduleType)
+      expect(MODULE_TYPES).toContain(getModuleType(model))
     })
     it('valid modules have display names that match the def', () => {
       expect(getModuleDisplayName(model)).toEqual(loadedDef.displayName)
@@ -41,7 +42,7 @@ describe('legacy models work too', () => {
     [THERMOCYCLER, THERMOCYCLER_MODULE_V1],
   ]
   legacyEquivs.forEach(([legacy, modern]) => {
-    const fromLegacy = getModuleDef2(legacy)
-    expect(fromLegacy?.model).toEqual(modern)
+    const fromLegacy = normalizeModuleModel(legacy)
+    expect(fromLegacy).toEqual(modern)
   })
 })

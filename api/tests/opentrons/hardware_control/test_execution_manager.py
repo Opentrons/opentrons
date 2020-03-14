@@ -1,26 +1,46 @@
 import asyncio
-from opentrons.hardware_control import ExecutionManager
+import pytest
+from opentrons.hardware_control import (ExecutionManager, ExecutionState,
+                                        ExecutionCancelledError)
 
 
-def test_is_running(loop):
+async def test_state_machine(loop):
     """
-    Test that an execution manager hoists the run flag on init
-    and lowers it when pause is called, then re-hoists upon calling resume
+    Test that an execution manager's state is RUNNING on init
+    and PAUSE when it when pause is called, unless CANCELLED
     """
     exec_mgr = ExecutionManager(loop=loop)
-    assert exec_mgr.is_running
+    assert await exec_mgr.get_state() == ExecutionState.RUNNING
 
-    exec_mgr.pause()
-    assert not exec_mgr.is_running
+    # passes through on wait_for_is_running if state is RUNNING
+    await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
 
-    exec_mgr.resume()
-    assert exec_mgr.is_running
+    await exec_mgr.pause()
+    assert await exec_mgr.get_state() == ExecutionState.PAUSED
 
-    exec_mgr.cancel()
-    assert exec_mgr.is_running
+    with pytest.raises(asyncio.TimeoutError):
+        # should stall on wait_for_is_running when state is PAUSED
+        await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
+
+    await exec_mgr.resume()
+    assert await exec_mgr.get_state() == ExecutionState.RUNNING
+
+    await exec_mgr.cancel()
+    assert await exec_mgr.get_state() == ExecutionState.CANCELLED
+
+    with pytest.raises(ExecutionCancelledError):
+        # attempting to pause when CANCELLED should raise
+        await exec_mgr.pause()
+
+    with pytest.raises(ExecutionCancelledError):
+        # should raise on wait_for_is_running when state is CANCELLED
+        await asyncio.wait_for(exec_mgr.wait_for_is_running(), timeout=0.2)
+
+    await exec_mgr.reset()
+    assert await exec_mgr.get_state() == ExecutionState.RUNNING
 
 
-def test_cancel_tasks(loop):
+async def test_cancel_tasks(loop):
     """
     Test that an execution manager cancels all un-protected
     running asyncio Tasks when cancel is called
@@ -31,17 +51,19 @@ def test_cancel_tasks(loop):
 
     exec_mgr = ExecutionManager(loop=loop)
 
-    unprotected_task = loop.create_task(fake_task())
+    cancellable_task = loop.create_task(fake_task())
+    exec_mgr.register_cancellable_task(cancellable_task)
 
-    protected_task = loop.create_task(fake_task())
+    other_task = loop.create_task(fake_task())
 
-    assert len(asyncio.all_tasks(loop)) == 2
+    # current, cancellable, and other
+    assert len(asyncio.all_tasks(loop)) == 3
     assert len([t for t in asyncio.all_tasks(loop) if t.cancelled()]) == 0
 
-    exec_mgr.cancel(protected_tasks={protected_task})
-    loop.run_until_complete(asyncio.sleep(0.1))
+    await exec_mgr.cancel()
+    await asyncio.sleep(0.1)
 
     all_tasks = asyncio.all_tasks(loop)
-    assert len(all_tasks) == 1
-    assert protected_task in all_tasks
-    assert unprotected_task not in all_tasks
+    assert len(all_tasks) == 2  # current and other
+    assert other_task in all_tasks
+    assert cancellable_task not in all_tasks

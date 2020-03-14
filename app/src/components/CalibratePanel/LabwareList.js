@@ -48,10 +48,10 @@ function LabwareListComponent(props: Props) {
         <LabwareListItem
           {...lw}
           key={lw.slot}
-          moduleName={
+          moduleModel={
             modulesBySlot &&
             modulesBySlot[lw.slot] &&
-            modulesBySlot[lw.slot].name
+            modulesBySlot[lw.slot].model
           }
           isDisabled={disabled}
           onClick={() => setLabware(lw)}

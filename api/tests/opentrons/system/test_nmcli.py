@@ -87,3 +87,58 @@ mock_bad_security:50:no:foobar
     monkeypatch.setattr(nmcli, '_call', mock_call)
     result = await nmcli.available_ssids()
     assert result == expected
+
+
+async def test_networking_status(loop, monkeypatch):
+    async def mock_call(cmd):
+        # Command: `nmcli networking connectivity`
+        if 'connectivity' in cmd:
+            res = 'full'
+        elif 'wlan0' in cmd:
+            res = '''GENERAL.HWADDR:B8:27:EB:5F:A6:89
+IP4.ADDRESS[1]:--
+IP4.GATEWAY:--
+GENERAL.TYPE:wifi
+GENERAL.STATE:30 (disconnected)'''
+        elif 'eth0' in cmd:
+            res = '''GENERAL.HWADDR:B8:27:EB:39:C0:9A
+IP4.ADDRESS[1]:169.254.229.173/16
+GENERAL.TYPE:ethernet
+GENERAL.STATE:100 (connected)'''
+        else:
+            res = 'incorrect nmcli call'
+
+        return res, ''
+
+    monkeypatch.setattr(nmcli, '_call', mock_call)
+
+    assert await nmcli.is_connected() == 'full'
+    assert await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI) == {
+                # test "--" gets mapped to None
+                'ipAddress': None,
+                'macAddress': 'B8:27:EB:5F:A6:89',
+                # test "--" gets mapped to None
+                'gatewayAddress': None,
+                'state': 'disconnected',
+                'type': 'wifi'
+            }
+
+    assert await nmcli.iface_info(nmcli.NETWORK_IFACES.ETH_LL) == {
+                'ipAddress': '169.254.229.173/16',
+                'macAddress': 'B8:27:EB:39:C0:9A',
+                # test missing output gets mapped to None
+                'gatewayAddress': None,
+                'state': 'connected',
+                'type': 'ethernet'
+    }
+
+    async def mock_call(cmd):
+        if 'connectivity' in cmd:
+            return 'full', ''
+        else:
+            return '', 'this is a dummy error'
+
+    monkeypatch.setattr(nmcli, '_call', mock_call)
+    assert await nmcli.is_connected() == 'full'
+    with pytest.raises(ValueError, match='this is a dummy error'):
+        await nmcli.iface_info(nmcli.NETWORK_IFACES.WIFI)

@@ -27,6 +27,16 @@ export function getLabwareOnModule(
   )
 }
 
+export function getModuleUnderLabware(
+  initialDeckSetup: InitialDeckSetup,
+  labwareId: string
+): ?ModuleOnDeck {
+  return values(initialDeckSetup.modules).find(
+    (module: ModuleOnDeck) =>
+      initialDeckSetup.labware[labwareId]?.slot === module.id
+  )
+}
+
 export function getModuleLabwareOptions(
   initialDeckSetup: InitialDeckSetup,
   nicknamesById: { [labwareId: string]: string },

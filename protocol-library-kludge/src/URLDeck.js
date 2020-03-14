@@ -12,7 +12,7 @@ import {
 } from '@opentrons/components'
 import { getLatestLabwareDef, getLegacyLabwareDef } from './getLabware'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import type { ModuleType, DeckSlotId } from '@opentrons/shared-data'
+import type { ModuleModel, DeckSlotId } from '@opentrons/shared-data'
 
 // URI-encoded JSON expected as URL param "data" (eg `?data=...`)
 type UrlData = {
@@ -23,7 +23,7 @@ type UrlData = {
     },
   },
   modules: {
-    [DeckSlotId]: ModuleType,
+    [DeckSlotId]: ModuleModel,
   },
 }
 
@@ -78,7 +78,7 @@ export class URLDeck extends React.Component<{||}> {
           Object.keys(deckSlotsById).map((slotId): Node => {
             const slot = deckSlotsById[slotId]
             if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
-            const module = modulesBySlot && modulesBySlot[slotId]
+            const moduleModel = modulesBySlot && modulesBySlot[slotId]
             const labware = labwareBySlot && labwareBySlot[slotId]
             const labwareDefV2 =
               labware && getLatestLabwareDef(labware.labwareType)
@@ -95,23 +95,16 @@ export class URLDeck extends React.Component<{||}> {
             } else {
               labwareDisplayType = labware?.labwareType || null
             }
-            console.log({
-              slot,
-              labware,
-              labwareDefV1,
-              labwareDefV2,
-              labwareDisplayType,
-            })
 
             return (
               <Fragment key={slotId}>
-                {module && (
+                {moduleModel && (
                   <g
                     transform={`translate(${slot.position[0]}, ${
                       slot.position[1]
                     })`}
                   >
-                    <Module name={module} mode={'default'} />
+                    <Module model={moduleModel} mode={'default'} />
                   </g>
                 )}
                 {labware && (

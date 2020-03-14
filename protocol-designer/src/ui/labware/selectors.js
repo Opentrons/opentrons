@@ -7,10 +7,11 @@ import {
   getLabwareDisplayName,
   getLabwareHasQuirk,
 } from '@opentrons/shared-data'
+import { i18n } from '../../localization'
 import * as stepFormSelectors from '../../step-forms/selectors'
 
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-
+import { getModuleUnderLabware } from '../modules/utils'
 import type { Options } from '@opentrons/components'
 import type { Selector } from '../../types'
 import type { LabwareEntity } from '../../step-forms'
@@ -32,16 +33,26 @@ export const getLabwareNicknamesById: Selector<{
 export const getLabwareOptions: Selector<Options> = createSelector(
   stepFormSelectors.getLabwareEntities,
   getLabwareNicknamesById,
-  (labwareEntities, nicknamesById) =>
+  stepFormSelectors.getInitialDeckSetup,
+  (labwareEntities, nicknamesById, initialDeckSetup) =>
     reduce(
       labwareEntities,
       (acc: Options, l: LabwareEntity, labwareId: string): Options => {
+        const module = getModuleUnderLabware(initialDeckSetup, labwareId)
+        const prefix = module
+          ? i18n.t(
+              `form.step_edit_form.field.moduleLabwarePrefix.${module.type}`
+            )
+          : null
+        const nickName = prefix
+          ? `${prefix} ${nicknamesById[labwareId]}`
+          : nicknamesById[labwareId]
         return getIsTiprack(l.def)
           ? acc
           : [
               ...acc,
               {
-                name: nicknamesById[labwareId],
+                name: nickName,
                 value: labwareId,
               },
             ]
