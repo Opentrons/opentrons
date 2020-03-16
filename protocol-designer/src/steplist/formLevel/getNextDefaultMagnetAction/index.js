@@ -1,11 +1,11 @@
 // @flow
 import last from 'lodash/last'
-import type { StepIdType, FormData } from '../../../form-types'
+import type { StepIdType, FormData, MagnetAction } from '../../../form-types'
 
 export function getNextDefaultMagnetAction(
   savedForms: { [StepIdType]: FormData },
   orderedStepIds: Array<StepIdType>
-): ?string {
+): MagnetAction {
   const prevMagnetSteps = orderedStepIds
     .map(stepId => savedForms[stepId])
     .filter(form => form && form.magnetAction)
@@ -14,7 +14,7 @@ export function getNextDefaultMagnetAction(
 
   // default the first magnet step to engage so that
   // recommended engage height can auto populate
-  let nextDefaultMagnetAction: ?string = 'engage'
+  let nextDefaultMagnetAction: MagnetAction = 'engage'
 
   if (lastMagnetStep && lastMagnetStep.magnetAction) {
     nextDefaultMagnetAction =
