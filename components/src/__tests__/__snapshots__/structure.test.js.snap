@@ -1,11 +1,28 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
 exports[`Card renders Card correctly 1`] = `
+.c0 {
+  font-size: 0.875rem;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.33);
+}
+
+.c1 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #4a4a4a;
+  font-weight: 400;
+  margin: 0;
+  padding: 1rem 1rem 0;
+  text-transform: capitalize;
+}
+
 <section
-  className="Card__Section-sc-1ltsa6e-0 fUnCuR"
+  className="c0"
 >
   <h3
-    className="Card__Title-sc-1ltsa6e-1 cONCT"
+    className="c1"
   >
     title
   </h3>
@@ -86,8 +103,15 @@ exports[`Pill renders Pill correctly with inverted text 1`] = `
 `;
 
 exports[`RefreshCard renders correctly 1`] = `
+.c0 {
+  font-size: 0.875rem;
+  position: relative;
+  overflow: visible;
+  box-shadow: 0 1px 2px 0 rgba(0,0,0,0.33);
+}
+
 <section
-  className="Card__Section-sc-1ltsa6e-0 fUnCuR"
+  className="c0"
 >
   <button
     className="button_flat button_icon refresh_card_icon"

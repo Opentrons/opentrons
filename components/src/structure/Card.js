@@ -4,6 +4,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
+import type { StyledComponent } from 'styled-components'
+
 import * as styles from '../styles'
 
 export type CardProps = {|
@@ -33,7 +35,17 @@ export function Card(props: CardProps) {
   )
 }
 
-const Section = styled.section`
+type SectionProps = {|
+  disabled?: boolean,
+  className?: string,
+  // children?: React.Node,
+|}
+
+const Section: StyledComponent<
+  SectionProps,
+  {||},
+  HTMLElement
+> = styled.section`
   ${styles.FS_BODY_2}
   position: relative;
   overflow: visible;
