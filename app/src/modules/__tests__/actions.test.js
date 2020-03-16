@@ -29,14 +29,14 @@ describe('robot modules actions', () => {
       creator: Actions.fetchModulesSuccess,
       args: [
         'robot-name',
-        Fixtures.mockFetchModulesSuccess.body.modules,
+        Fixtures.mockFetchModulesSuccessActionPayloadModules,
         { requestId: 'abc' },
       ],
       expected: {
         type: 'modules:FETCH_MODULES_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          modules: Fixtures.mockFetchModulesSuccess.body.modules,
+          modules: Fixtures.mockFetchModulesSuccessActionPayloadModules,
         },
         meta: { requestId: 'abc' },
       },

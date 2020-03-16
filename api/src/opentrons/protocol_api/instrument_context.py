@@ -1095,9 +1095,13 @@ class InstrumentContext(CommandPublisher):
             if isinstance(mod, ThermocyclerContext):
                 mod.flag_unsafe_move(to_loc=location, from_loc=from_loc)
 
+        instr_max_height = \
+            self._hw_manager.hardware.get_instrument_max_height(self._mount)
         moves = geometry.plan_moves(from_loc, location, self._ctx.deck,
+                                    instr_max_height,
                                     force_direct=force_direct,
-                                    minimum_z_height=minimum_z_height)
+                                    minimum_z_height=minimum_z_height
+                                    )
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:

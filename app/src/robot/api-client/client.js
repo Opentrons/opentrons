@@ -20,6 +20,7 @@ import { getConnectableRobots } from '../../discovery/selectors'
 import { getProtocolFile } from '../../protocol/selectors'
 import { fileIsBundle, fileIsPython } from '../../protocol/protocol-data'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
+import { normalizeModuleModel } from '@opentrons/shared-data'
 
 const RUN_TIME_TICK_INTERVAL_MS = 1000
 const NO_INTERVAL = -1
@@ -618,7 +619,11 @@ export function client(dispatch) {
     }
 
     function addApiModuleToModules(apiModule) {
-      update.modulesBySlot[apiModule.slot] = apiModule
+      const { name, ...noName } = apiModule
+      update.modulesBySlot[apiModule.slot] = {
+        ...noName,
+        model: apiModule?.model ?? normalizeModuleModel(apiModule.name),
+      }
     }
   }
 

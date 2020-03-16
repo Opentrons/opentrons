@@ -7,7 +7,10 @@ import { ModuleUpdate } from './ModuleUpdate'
 import { ModuleControls } from '../ModuleControls'
 import styles from './styles.css'
 import type { AttachedModule } from '../../modules/types'
-import { TEMPDECK, THERMOCYCLER } from '../../modules'
+import {
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+} from '../../modules'
 
 type Props = {|
   module: AttachedModule,
@@ -21,7 +24,7 @@ export function ModuleItem(props: Props) {
   return (
     <div className={styles.module_item}>
       <div className={styles.module_content}>
-        <ModuleImage name={module.name} />
+        <ModuleImage model={module.model} />
         <ModuleInfo module={module} />
         <ModuleUpdate
           hasAvailableUpdate={!!module.hasAvailableUpdate}
@@ -29,7 +32,8 @@ export function ModuleItem(props: Props) {
           moduleId={module.serial}
         />
       </div>
-      {(module.name === THERMOCYCLER || module.name === TEMPDECK) && (
+      {(module.type === THERMOCYCLER_MODULE_TYPE ||
+        module.type === TEMPERATURE_MODULE_TYPE) && (
         <ModuleControls
           module={module}
           controlDisabledReason={controlDisabledReason}

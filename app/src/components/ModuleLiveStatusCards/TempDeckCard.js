@@ -30,7 +30,7 @@ export const TempDeckCard = ({
   toggleCard,
 }: Props) => (
   <StatusCard
-    title={getModuleDisplayName(module.name)}
+    title={getModuleDisplayName(module.model)}
     isCardExpanded={isCardExpanded}
     toggleCard={toggleCard}
   >

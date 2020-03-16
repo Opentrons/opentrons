@@ -140,7 +140,7 @@ class TempDeck(commands.CommandPublisher):
                 self._driver.connect(self._port)
             self._device_info = self._driver.get_device_info()
             self._poll_stop_event = Event()
-            Thread(target=self._poll_temperature).start()
+            Thread(target=self._poll_temperature, daemon=True).start()
         else:
             # Sanity check Should never happen, because connect should never
             # be called without a port on Module

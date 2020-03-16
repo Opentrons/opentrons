@@ -166,7 +166,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
         types.Mount.LEFT: {'model': test_model, 'id': test_id}
     }
 
-    await hw.reset()
+    await hw.cache_instruments()
 
     model = pipette_config.load(test_model)
     expected = {

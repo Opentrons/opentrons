@@ -16,7 +16,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from './constants'
 
-import type { ModuleModel, ModuleRealType } from './types'
+import type { ModuleModel, ModuleRealType, ModuleType } from './types'
 
 // The module objects in v2 Module Definitions representing a single module model
 type Coordinates = {|
@@ -50,31 +50,47 @@ export type ModuleDef2 = {|
 // TODO IMMEDIATELY: Phase out code that uses legacy models
 export const getModuleDef2 = (moduleModel: ModuleModel): ModuleDef2 => {
   switch (moduleModel) {
-    case MAGDECK: // TODO IMMEDIATE: Remove when callsites use only new models
-    case MAGNETIC_MODULE_V1: // fallthrough: legacy model
+    case MAGNETIC_MODULE_V1:
       return magneticModuleV1
     case MAGNETIC_MODULE_V2:
       return magneticModuleV2
-    case TEMPDECK: // TODO IMMEDIATE: Remove when callsites use only new models
-    case TEMPERATURE_MODULE_V1: // fallthrough: legacy model
+    case TEMPERATURE_MODULE_V1:
       return temperatureModuleV1
     case TEMPERATURE_MODULE_V2:
       return temperatureModuleV2
-    case THERMOCYCLER: // TODO IMMEDIATE: Remove when callsites use only new models
-    case THERMOCYCLER_MODULE_V1: // fallthrough: legacy model
+    case THERMOCYCLER_MODULE_V1:
       return thermocyclerModuleV1
     default:
       throw new Error(`Invalid module model ${moduleModel}`)
   }
 }
 
-export const getModuleTypeFromModuleModel = (
-  moduleModel: ModuleModel
-): ModuleRealType => {
+export function normalizeModuleModel(legacyModule: ModuleType): ModuleModel {
+  switch (legacyModule) {
+    case TEMPDECK:
+      return TEMPERATURE_MODULE_V1
+    case MAGDECK:
+      return MAGNETIC_MODULE_V1
+    case THERMOCYCLER:
+      return THERMOCYCLER_MODULE_V1
+    default:
+      throw new Error(`Invalid legacy module model ${legacyModule}`)
+  }
+}
+
+export function getModuleType(moduleModel: ModuleModel): ModuleRealType {
   return getModuleDef2(moduleModel).moduleType
 }
 
 // use module model (not type!) to get model-specific displayName for UI
 export function getModuleDisplayName(moduleModel: ModuleModel): string {
   return getModuleDef2(moduleModel).displayName
+}
+
+export function checkModuleCompatibility(
+  modelA: ModuleModel,
+  modelB: ModuleModel
+): boolean {
+  const bDef = getModuleDef2(modelB)
+  return modelA === modelB || bDef.compatibleWith.includes(modelA)
 }

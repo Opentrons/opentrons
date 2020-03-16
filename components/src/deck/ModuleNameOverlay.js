@@ -2,11 +2,11 @@
 // TODO(mc, 2020-02-19): no longer used; remove
 import * as React from 'react'
 
-import { getModuleDisplayName, type ModuleType } from '@opentrons/shared-data'
+import { getModuleDisplayName, type ModuleModel } from '@opentrons/shared-data'
 
 import styles from './Module.css'
 
-export type ModuleNameOverlayProps = {| name: ModuleType |}
+export type ModuleNameOverlayProps = {| name: ModuleModel |}
 
 // TODO (ka 2019-1-7): eventually add option to override with props
 const HEIGHT = 20

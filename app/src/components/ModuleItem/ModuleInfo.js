@@ -12,8 +12,8 @@ type Props = {|
 |}
 
 export function ModuleInfo(props: Props) {
-  const { name, serial, status, fwVersion } = props.module
-  const displayName = getModuleDisplayName(name)
+  const { model, serial, status, fwVersion } = props.module
+  const displayName = getModuleDisplayName(model)
 
   return (
     <div className={styles.module_info}>

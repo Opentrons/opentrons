@@ -4,10 +4,12 @@ import cx from 'classnames'
 
 import {
   getModuleDisplayName,
-  type ModuleType,
-  MAGDECK,
-  TEMPDECK,
-  THERMOCYCLER,
+  type ModuleModel,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
@@ -16,8 +18,8 @@ import { RobotCoordsForeignDiv } from './RobotCoordsForeignDiv'
 import styles from './Module.css'
 
 export type ModuleProps = {|
-  /** name of module, eg 'magdeck', 'tempdeck', or 'thermocycler' */
-  name: ModuleType,
+  /** module model */
+  model: ModuleModel,
   /** display mode: 'default', 'present', 'missing', or 'info' */
   mode: 'default' | 'present' | 'missing' | 'info',
 |}
@@ -33,22 +35,24 @@ export function Module(props: ModuleProps) {
     yDimension: height,
   } = deckDef?.locations?.orderedSlots[0]?.boundingBox
 
-  switch (props.name) {
-    case MAGDECK: {
+  switch (props.model) {
+    case MAGNETIC_MODULE_V1:
+    case MAGNETIC_MODULE_V2: {
       width = 137
       height = 91
       x = -7
       y = 4
       break
     }
-    case TEMPDECK: {
+    case TEMPERATURE_MODULE_V1:
+    case TEMPERATURE_MODULE_V2: {
       width = 196
       height = 91
       x = -66
       y = 4
       break
     }
-    case THERMOCYCLER: {
+    case THERMOCYCLER_MODULE_V1: {
       // TODO: BC 2019-07-24 these are taken from snapshots of the cad file, they should
       // be included in the module spec schema and added to the data
       width = 172
@@ -72,9 +76,8 @@ export function Module(props: ModuleProps) {
 }
 
 function ModuleItemContents(props: ModuleProps) {
-  // TODO(mc, 2018-07-23): displayName?
-  const { mode, name } = props
-  const displayName = getModuleDisplayName(name)
+  const { mode, model } = props
+  const displayName = getModuleDisplayName(model)
 
   const message =
     mode === 'missing' ? (

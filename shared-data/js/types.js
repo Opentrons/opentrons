@@ -1,18 +1,18 @@
 // @flow
 import typeof {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-  THERMOCYCLER_MODULE_TYPE,
-  // MAGNETIC_MODULE_V1,
-  // MAGNETIC_MODULE_V2,
-  // TEMPERATURE_MODULE_V1,
-  // TEMPERATURE_MODULE_V2,
-  // THERMOCYCLER_MODULE_V1,
-  GEN1,
-  GEN2,
   MAGDECK,
   TEMPDECK,
   THERMOCYCLER,
+  MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V1,
+  TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_V1,
+  MAGNETIC_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
+  GEN1,
+  GEN2,
 } from './constants'
 // TODO Ian 2019-06-04 split this out into eg ../labware/flowTypes/labwareV1.js
 export type WellDefinition = {
@@ -169,13 +169,23 @@ export type ModuleRealType =
   | THERMOCYCLER_MODULE_TYPE
 
 // ModuleModel corresponds to top-level keys in shared-data/module/definitions/2
-export type ModuleModel = string // TODO: IL 2020-02-20 Change to enum type below as soon as callsites are compatible
-// export type ModuleModel =
-//   | MAGNETIC_MODULE_V1
-//   | MAGNETIC_MODULE_V2
-//   | TEMPERATURE_MODULE_V1
-//   | TEMPERATURE_MODULE_V2
-//   | THERMOCYCLER_MODULE_V1
+
+export type MagneticModuleModel = MAGNETIC_MODULE_V1 | MAGNETIC_MODULE_V2
+export type TemperatureModuleModel =
+  | TEMPERATURE_MODULE_V1
+  | TEMPERATURE_MODULE_V2
+export type ThermocyclerModuleModel = THERMOCYCLER_MODULE_V1
+
+export type ModuleModel =
+  | MagneticModuleModel
+  | TemperatureModuleModel
+  | ThermocyclerModuleModel
+
+export type ModuleModelWithLegacy =
+  | ModuleModel
+  | THERMOCYCLER
+  | MAGDECK
+  | TEMPDECK
 
 export type DeckOffset = {|
   x: number,

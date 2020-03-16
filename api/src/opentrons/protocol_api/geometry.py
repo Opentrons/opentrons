@@ -8,12 +8,16 @@ from opentrons import types
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
-from .module_geometry import ThermocyclerGeometry, ModuleType
+from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.system.shared_data import load_shared_data
 
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+class LabwareHeightError(Exception):
+    pass
 
 
 def max_many(*args):
@@ -34,10 +38,12 @@ def plan_moves(
         from_loc: types.Location,
         to_loc: types.Location,
         deck: 'Deck',
+        instr_max_height: float,
         well_z_margin: float = 5.0,
         lw_z_margin: float = 10.0,
         force_direct: bool = False,
-        minimum_z_height: float = None)\
+        minimum_lw_z_margin: float = 1.0,
+        minimum_z_height: float = None,)\
         -> List[Tuple[types.Point,
                       Optional[CriticalPoint]]]:
     """ Plan moves between one :py:class:`.Location` and another.
@@ -91,20 +97,42 @@ def plan_moves(
     if to_lw and to_lw == from_lw:
         # If we know the labwares we’re moving from and to, we can calculate
         # a safe z based on their heights
-        # TODO: Remove these awful Well.top() calls when we eliminate the back
-        #       compat wrapper
         if to_well:
-            to_safety = Well.top(to_well).point.z + well_z_margin
+            to_safety = to_well.top().point.z + well_z_margin
         else:
             to_safety = to_lw.highest_z + well_z_margin
         if from_well:
-            from_safety = Well.top(from_well).point.z + well_z_margin
+            from_safety = from_well.top().point.z + well_z_margin
         else:
             from_safety = from_lw.highest_z + well_z_margin
+        # if we are already at the labware, we know the instr max height would
+        # be tall enough
+        if max(from_safety, to_safety) > instr_max_height:
+            to_safety = instr_max_height
+            from_safety = 0.0  # (ignore since it's in a max())
     else:
         # One of our labwares is invalid so we have to just go above
         # deck.highest_z since we don’t know where we are
         to_safety = deck.highest_z + lw_z_margin
+
+        if to_safety > instr_max_height:
+            if instr_max_height >= (deck.highest_z + minimum_lw_z_margin):
+                to_safety = instr_max_height
+            else:
+                tallest_lw = list(filter(
+                    lambda lw: lw.highest_z == deck.highest_z,
+                    [lw for lw in deck.data.values() if lw]))[0]
+                if isinstance(tallest_lw, ModuleGeometry) and\
+                        tallest_lw.labware:
+                    tallest_lw = tallest_lw.labware
+                raise LabwareHeightError(
+                    f"The {tallest_lw} has a total height of {deck.highest_z}"
+                    " mm, which is too tall for your current pipette "
+                    "configurations. The longest pipette on your robot can "
+                    f"only be raised to {instr_max_height} mm above the deck."
+                    " This may be because the labware is incorrectly defined,"
+                    " incorrectly calibrated, or physically too tall. Please "
+                    "check your labware definitions and calibrations.")
         from_safety = 0.0  # (ignore since it’s in a max())
 
     safe = max_many(

@@ -255,7 +255,7 @@ async def test_call_on_reference(session, root):
     session.server.root = TickTock()
     session.server.root = root
 
-    # TODO (artyom, 20170905): assert server.monitor_events task gets canceled
+    # TODO (artyom, 20170905): assert server.monitor_events task gets cancelled
 
     await session.socket.receive_json()  # Skip init
 

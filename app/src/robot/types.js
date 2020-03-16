@@ -1,30 +1,19 @@
 // @flow
 // common robot types
-import type {
-  PipetteModelSpecs,
-  PipetteChannels,
-  ModuleType,
-  LabwareDefinition2,
+import {
+  type PipetteModelSpecs,
+  type PipetteChannels,
+  type LabwareDefinition2,
 } from '@opentrons/shared-data'
 import type { Mount } from '@opentrons/components'
+
+import * as ApiTypes from './api-types'
+export * from './api-types'
 
 // TODO Ian 2018-02-27 files that import from here should just import from @opentrons/components directly
 export type { Mount }
 
 export type Channels = PipetteChannels
-
-export type Slot =
-  | '1'
-  | '2'
-  | '3'
-  | '4'
-  | '5'
-  | '6'
-  | '7'
-  | '8'
-  | '9'
-  | '10'
-  | '11'
 
 // jog axes and directions
 // TODO(mc, 2018-05-04): deprecate in favor of types in HTTP API module
@@ -102,8 +91,8 @@ export type StateLabware = {|
   // resource ID
   _id: number,
   // slot labware is installed in
-  slot: Slot,
-  // deck coordinates of labware when not in slot
+  slot: ApiTypes.Slot,
+  // deck coordinates of la<bware when not in slot
   position: ?Array<number>,
   // unique type of the labware
   type: string,
@@ -127,14 +116,7 @@ export type Labware = {|
 
 export type LabwareType = 'tiprack' | 'labware'
 
-export type SessionModule = {|
-  // resource ID
-  _id: number,
-  // slot module is installed in
-  slot: Slot,
-  // name identifier of the module
-  name: ModuleType,
-|}
+export type SessionModule = $Diff<ApiTypes.ApiSessionModule, {| name: mixed |}>
 
 export type SessionStatus =
   | ''

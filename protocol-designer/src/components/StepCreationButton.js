@@ -132,7 +132,7 @@ const mapSTP = (state: BaseState): SP => {
 
 const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
   makeAddStep: (stepType: StepType) => (e: SyntheticEvent<>) =>
-    dispatch(stepsActions.addStep({ stepType })),
+    dispatch(stepsActions.addAndSelectStepWithHints({ stepType })),
 })
 
 export const StepCreationButton = connect<Props, {||}, SP, DP, _, _>(

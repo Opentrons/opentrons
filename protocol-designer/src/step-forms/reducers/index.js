@@ -8,7 +8,7 @@ import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
   getLabwareDefURI,
-  getModuleTypeFromModuleModel,
+  getModuleType,
   MAGNETIC_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
@@ -58,7 +58,8 @@ import type {
 import type {
   DuplicateStepAction,
   ReorderSelectedStepAction,
-} from '../../ui/steps'
+} from '../../ui/steps/actions/types'
+import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,
@@ -73,7 +74,6 @@ import type {
   CreateModuleAction,
   EditModuleAction,
   DeleteModuleAction,
-  SaveStepFormAction,
 } from '../actions'
 
 type FormState = FormData | null
@@ -699,7 +699,7 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
         file.modules || {}, // TODO: Ian 2019-11-11 this fallback to empty object is for JSONv3 protocols. Once JSONv4 is released, this should be handled in migration in PD
         (fileModule: FileModule, id: string) => ({
           id,
-          type: getModuleTypeFromModuleModel(fileModule.model),
+          type: getModuleType(fileModule.model),
           model: fileModule.model,
         })
       )

@@ -1,0 +1,20 @@
+@import '@opentrons/components';
+
+.header {
+  @apply --font-header-dark;
+
+  margin-bottom: 1rem;
+}
+
+.body {
+  @apply --font-body-2-dark;
+}
+
+.later_button {
+  width: 16rem;
+}
+
+.now_button {
+  width: 15rem;
+  margin-left: 1rem;
+}

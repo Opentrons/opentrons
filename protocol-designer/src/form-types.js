@@ -224,13 +224,15 @@ export type HydratedMixFormDataLegacy = {
   blowout_location: ?string, // labwareId or 'SOURCE_WELL' or 'DEST_WELL'
 }
 
+export type MagnetAction = 'engage' | 'disengage'
+
 export type HydratedMagnetFormData = {|
   ...AnnotationFields,
   id: string,
   stepType: 'magnet',
   stepDetails: string | null,
   moduleId: string | null,
-  magnetAction: 'engage' | 'disengage',
+  magnetAction: MagnetAction,
   engageHeight: string | null,
 |}
 

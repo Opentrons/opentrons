@@ -2,7 +2,7 @@
 import * as React from 'react'
 
 import { TemperatureControl } from './TemperatureControl'
-import { THERMOCYCLER, useSendModuleCommand } from '../../modules'
+import { THERMOCYCLER_MODULE_TYPE, useSendModuleCommand } from '../../modules'
 import { TemperatureData } from './TemperatureData'
 import styles from './styles.css'
 
@@ -26,10 +26,12 @@ export function ModuleControls(props: Props) {
           current={mod.data.currentTemp}
           target={mod.data.targetTemp}
           title={
-            mod.name === THERMOCYCLER ? 'Base Temperature:' : 'Temperature:'
+            mod.type === THERMOCYCLER_MODULE_TYPE
+              ? 'Base Temperature:'
+              : 'Temperature:'
           }
         />
-        {mod.name === THERMOCYCLER && (
+        {mod.type === THERMOCYCLER_MODULE_TYPE && (
           <TemperatureData
             className={styles.temp_data_item}
             current={mod.data.lidTemp}

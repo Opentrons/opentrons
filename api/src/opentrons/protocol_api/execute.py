@@ -11,6 +11,7 @@ from .contexts import ProtocolContext
 from . import execute_v3
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
+from opentrons.hardware_control import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -107,7 +108,7 @@ def _run_python(
     new_globs.update(new_locs)
     try:
         exec('run(context)', new_globs, new_locs)
-    except (SmoothieAlarm, asyncio.CancelledError):
+    except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise
     except Exception as e:

@@ -16,7 +16,11 @@ import {
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
 import type { TerminalItemId } from '../../steplist'
-import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import {
+  getLabwareIsCompatible,
+  getLabwareIsCustom,
+} from '../../utils/labwareModuleCompatibility'
+import { selectors as labwareDefSelectors } from '../../labware-defs'
 import {
   getModuleVizDims,
   inferModuleOrientationFromSlot,
@@ -36,6 +40,7 @@ import type {
   LabwareOnDeck as LabwareOnDeckType,
   ModuleOnDeck,
 } from '../../step-forms'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
@@ -102,13 +107,19 @@ const getModuleSlotDefs = (
   )
 }
 
-const getSwapBlocked = (args: {
+export const getSwapBlocked = (args: {
   hoveredLabware: ?LabwareOnDeckType,
   draggedLabware: ?LabwareOnDeckType,
   modulesById: $PropertyType<InitialDeckSetup, 'modules'>,
+  customLabwareDefs: LabwareDefByDefURI,
 }): boolean => {
-  const { hoveredLabware, draggedLabware, modulesById } = args
-
+  const {
+    hoveredLabware,
+    draggedLabware,
+    modulesById,
+    customLabwareDefs,
+  } = args
+  console.log('hovered ', hoveredLabware, modulesById)
   if (!hoveredLabware || !draggedLabware) {
     return false
   }
@@ -118,11 +129,23 @@ const getSwapBlocked = (args: {
   const destModuleType: ?ModuleRealType =
     modulesById[hoveredLabware.slot]?.type || null
 
+  const draggedLabwareIsCustom = getLabwareIsCustom(
+    customLabwareDefs,
+    draggedLabware
+  )
+  const hoveredLabwareIsCustom = getLabwareIsCustom(
+    customLabwareDefs,
+    hoveredLabware
+  )
+
+  // dragging custom labware to module gives not compat error
   const labwareSourceToDestBlocked = sourceModuleType
-    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType)
+    ? !getLabwareIsCompatible(hoveredLabware.def, sourceModuleType) &&
+      !hoveredLabwareIsCustom
     : false
   const labwareDestToSourceBlocked = destModuleType
-    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType)
+    ? !getLabwareIsCompatible(draggedLabware.def, destModuleType) &&
+      !draggedLabwareIsCustom
     : false
 
   return labwareSourceToDestBlocked || labwareDestToSourceBlocked
@@ -147,11 +170,17 @@ const DeckSetupContents = (props: ContentsProps) => {
   // whether swapping will be blocked due to labware<>module compat:
   const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
   const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
+
+  const customLabwareDefs = useSelector(
+    labwareDefSelectors.getCustomLabwareDefsByURI
+  )
   const swapBlocked = getSwapBlocked({
     hoveredLabware,
     draggedLabware,
     modulesById: initialDeckSetup.modules,
+    customLabwareDefs,
   })
+
   const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(

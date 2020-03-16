@@ -594,12 +594,12 @@ describe('api client', () => {
             1: {
               _id: 1,
               slot: '1',
-              name: 'tempdeck',
+              model: 'temperatureModuleV1',
             },
             9: {
               _id: 9,
               slot: '9',
-              name: 'magdeck',
+              model: 'magneticModuleV2',
             },
           },
         }),
@@ -616,6 +616,7 @@ describe('api client', () => {
           _id: 9,
           slot: '9',
           name: 'magdeck',
+          model: 'magneticModuleV2',
         },
       ]
 

@@ -2,14 +2,12 @@ import json
 import os
 import random
 import tempfile
+from unittest.mock import patch
+
 import pytest
-from opentrons.system import nmcli
+from opentrons.system import nmcli, wifi
 from opentrons.server import init
 from opentrons.server.endpoints import networking
-
-"""
-All mocks in this test suite represent actual output from nmcli commands
-"""
 
 
 async def test_networking_status(
@@ -17,63 +15,48 @@ async def test_networking_status(
     app = init()
     cli = await loop.create_task(aiohttp_client(app))
 
-    async def mock_call(cmd):
-        # Command: `nmcli networking connectivity`
-        if 'connectivity' in cmd:
-            res = 'full'
-        elif 'wlan0' in cmd:
-            res = '''GENERAL.HWADDR:B8:27:EB:5F:A6:89
-IP4.ADDRESS[1]:--
-IP4.GATEWAY:--
-GENERAL.TYPE:wifi
-GENERAL.STATE:30 (disconnected)'''
-        elif 'eth0' in cmd:
-            res = '''GENERAL.HWADDR:B8:27:EB:39:C0:9A
-IP4.ADDRESS[1]:169.254.229.173/16
-GENERAL.TYPE:ethernet
-GENERAL.STATE:100 (connected)'''
-        else:
-            res = 'incorrect nmcli call'
+    async def mock_is_connected():
+        return 'full'
 
-        return res, ''
-
-    monkeypatch.setattr(nmcli, '_call', mock_call)
-
-    expected = json.dumps({
-        'status': 'full',
-        'interfaces': {
-            'wlan0': {
-                # test "--" gets mapped to None
-                'ipAddress': None,
-                'macAddress': 'B8:27:EB:5F:A6:89',
-                # test "--" gets mapped to None
-                'gatewayAddress': None,
-                'state': 'disconnected',
-                'type': 'wifi'
-            },
-            'eth0': {
-                'ipAddress': '169.254.229.173/16',
-                'macAddress': 'B8:27:EB:39:C0:9A',
-                # test missing output gets mapped to None
-                'gatewayAddress': None,
-                'state': 'connected',
-                'type': 'ethernet'
-            }
+    connection_statuses = {'wlan0': {
+        # test "--" gets mapped to None
+        'ipAddress': None,
+        'macAddress': 'B8:27:EB:5F:A6:89',
+        # test "--" gets mapped to None
+        'gatewayAddress': None,
+        'state': 'disconnected',
+        'type': 'wifi'
+        },
+        'eth0': {
+            'ipAddress': '169.254.229.173/16',
+            'macAddress': 'B8:27:EB:39:C0:9A',
+            # test missing output gets mapped to None
+            'gatewayAddress': None,
+            'state': 'connected',
+            'type': 'ethernet'
         }
-    })
+    }
+
+    async def mock_iface_info(k: nmcli.NETWORK_IFACES):
+        return connection_statuses[k.value]
+
+    monkeypatch.setattr(nmcli, 'is_connected', mock_is_connected)
+    monkeypatch.setattr(nmcli, 'iface_info', mock_iface_info)
+
+    expected = {
+        'status': 'full',
+        'interfaces': connection_statuses
+    }
 
     resp = await cli.get('/networking/status')
-    text = await resp.text()
+    body_json = await resp.json()
     assert resp.status == 200
-    assert text == expected
+    assert body_json == expected
 
-    async def mock_call(cmd):
-        if 'connectivity' in cmd:
-            return 'full', ''
-        else:
-            return '', 'this is a dummy error'
+    async def mock_is_connected():
+        raise FileNotFoundError("No")
 
-    monkeypatch.setattr(nmcli, '_call', mock_call)
+    monkeypatch.setattr(nmcli, 'is_connected', mock_is_connected)
     resp = await cli.get('/networking/status')
     assert resp.status == 500
 
@@ -174,110 +157,16 @@ async def test_wifi_disconnect(loop, aiohttp_client, monkeypatch):
 
 
 def test_deduce_security():
-    with pytest.raises(networking.ConfigureArgsError):
+    with pytest.raises(wifi.ConfigureArgsError):
         networking._deduce_security({'psk': 'hi', 'eapConfig': {'hi': 'nope'}})
     assert networking._deduce_security({'psk': 'test-psk'})\
         == nmcli.SECURITY_TYPES.WPA_PSK
     assert networking._deduce_security({'eapConfig': {'hi': 'this is bad'}})\
         == nmcli.SECURITY_TYPES.WPA_EAP
     assert networking._deduce_security({}) == nmcli.SECURITY_TYPES.NONE
-    with pytest.raises(networking.ConfigureArgsError):
+    with pytest.raises(wifi.ConfigureArgsError):
         networking._deduce_security(
             {'securityType': 'this is invalid you fool'})
-
-
-def test_check_eap_config(wifi_keys_tempdir):
-    wifi_key_id = '88188cafcf'
-    os.mkdir(os.path.join(wifi_keys_tempdir, wifi_key_id))
-    with open(os.path.join(wifi_keys_tempdir,
-                           wifi_key_id,
-                           'test.pem'), 'w') as f:
-        f.write('what a terrible key')
-    # Bad eap types should fail
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_config({'eapType': 'afaosdasd'})
-    # Valid (if short) arguments should work
-    networking._eap_check_config({'eapType': 'peap/eap-mschapv2',
-                                  'identity': 'test@hi.com',
-                                  'password': 'passwd'})
-    # Extra args should fail
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_config({'eapType': 'tls',
-                                      'identity': 'test@example.com',
-                                      'privateKey': wifi_key_id,
-                                      'clientCert': wifi_key_id,
-                                      'phase2CaCertf': 'foo'})
-    # Filenames should be rewritten
-    rewritten = networking._eap_check_config({'eapType': 'ttls/eap-md5',
-                                              'identity': 'hello@example.com',
-                                              'password': 'hi',
-                                              'caCert': wifi_key_id})
-    assert rewritten['caCert'] == os.path.join(wifi_keys_tempdir,
-                                               wifi_key_id,
-                                               'test.pem')
-    # A config should be returned with the same keys
-    config = {'eapType': 'ttls/eap-tls',
-              'identity': "test@hello.com",
-              'phase2ClientCert': wifi_key_id,
-              'phase2PrivateKey': wifi_key_id}
-    out = networking._eap_check_config(config)
-    for key in config.keys():
-        assert key in out
-
-
-def test_eap_check_option():
-    # Required arguments that are not specified should raise
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_option_ok({'name': 'test-opt', 'required': True,
-                                         'displayName': 'Test Option'},
-                                        {'eapType': 'test'})
-    # Non-required arguments that are not specified should not raise
-    networking._eap_check_option_ok({'name': 'test-1',
-                                     'required': False,
-                                     'type': 'string',
-                                     'displayName': 'Test Option'},
-                                    {'eapType': 'test'})
-
-    # Check type mismatch detection pos and neg
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_option_ok({'name': 'identity',
-                                         'displayName': 'Username',
-                                         'required': True,
-                                         'type': 'string'},
-                                        {'identity': 2,
-                                         'eapType': 'test'})
-    networking._eap_check_option_ok({'name': 'identity',
-                                     'required': True,
-                                     'displayName': 'Username',
-                                     'type': 'string'},
-                                    {'identity': 'hi',
-                                     'eapType': 'test'})
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_option_ok({'name': 'password',
-                                         'required': True,
-                                         'displayName': 'Password',
-                                         'type': 'password'},
-                                        {'password': [2, 3],
-                                         'eapType': 'test'})
-    networking._eap_check_option_ok({'name': 'password',
-                                     'required': True,
-                                     'displayName': 'password',
-                                     'type': 'password'},
-                                    {'password': 'secret',
-                                     'eapType': 'test'})
-    with pytest.raises(networking.ConfigureArgsError):
-        networking._eap_check_option_ok({'name': 'phase2CaCert',
-                                         'displayName': 'some file who cares',
-                                         'required': True,
-                                         'type': 'file'},
-                                        {'phase2CaCert': 2,
-                                         'eapType': 'test'})
-    networking._eap_check_option_ok({'name': 'phase2CaCert',
-                                     'required': True,
-                                     'displayName': 'hello',
-                                     'type': 'file'},
-                                    {'phase2CaCert': '82141cceaf',
-                                     'eapType': 'test'})
 
 
 async def test_list_keys(loop, aiohttp_client, wifi_keys_tempdir):
@@ -308,61 +197,92 @@ async def test_list_keys(loop, aiohttp_client, wifi_keys_tempdir):
             raise KeyError(dn)
 
 
-async def test_key_lifecycle(loop, aiohttp_client, wifi_keys_tempdir):
+async def test_add_key_call(loop, aiohttp_client, wifi_keys_tempdir):
+    """Test that uploaded file is processed properly"""
     with tempfile.TemporaryDirectory() as source_td:
         app = init()
         cli = await loop.create_task(aiohttp_client(app))
-        empty_resp = await cli.get('/wifi/keys')
-        assert empty_resp.status == 200
-        empty_body = await empty_resp.json()
-        assert empty_body == {'keys': []}
 
-        results = {}
         # We should be able to add multiple keys
         for fn in ['test1.pem', 'test2.pem', 'test3.pem']:
             path = os.path.join(source_td, fn)
             with open(path, 'w') as f:
-                f.write(str(random.getrandbits(2048)))
-            upload_resp = await cli.post('/wifi/keys',
-                                         data={'key': open(path, 'rb')})
-            assert upload_resp.status == 201
-            upload_body = await upload_resp.json()
-            assert 'uri' in upload_body
-            assert 'id' in upload_body
-            assert 'name' in upload_body
-            assert upload_body['name'] == os.path.basename(fn)
-            assert upload_body['uri'] == '/wifi/keys/'\
-                + upload_body['id']
-            results[fn] = upload_body
+                f.write(str(random.getrandbits(20)))
 
-        # We should not be able to upload a duplicate
-        dup_resp = await cli.post(
-            '/wifi/keys',
-            data={'key': open(os.path.join(source_td, 'test1.pem'))})
-        assert dup_resp.status == 200
-        dup_body = await dup_resp.json()
-        assert 'message' in dup_body
+            with patch("opentrons.system.wifi.add_key") as p:
+                await cli.post('/wifi/keys', data={'key': open(path, 'rb')})
 
-        # We should be able to see them all
-        list_resp = await cli.get('/wifi/keys')
-        assert list_resp.status == 200
-        list_body = await list_resp.json()
-        keys = list_body['keys']
-        assert len(keys) == 3
-        for elem in keys:
-            assert elem['id'] in [r['id'] for r in results.values()]
+                with open(path, 'rb') as f:
+                    p.assert_called_once_with(fn, f.read())
 
-        for fn, data in results.items():
-            del_resp = await cli.delete(data['uri'])
-            assert del_resp.status == 200
-            del_body = await del_resp.json()
-            assert 'message' in del_body
-            del_list_resp = await cli.get('/wifi/keys')
-            del_list_body = await del_list_resp.json()
-            assert data['id'] not in [k['id'] for k in del_list_body['keys']]
 
-        dup_del_resp = await cli.delete(results['test1.pem']['uri'])
-        assert dup_del_resp.status == 404
+async def test_add_key_no_key(loop, aiohttp_client):
+    """Test response when no key supplied"""
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
+
+    with patch("opentrons.system.wifi.add_key") as p:
+        r = await cli.post('/wifi/keys', data={})
+
+        p.assert_not_called()
+        assert r.status == 400
+
+
+@pytest.mark.parametrize("add_key_return,expected_status,expected_body", [
+    (wifi.AddKeyResult(created=True,
+                       key=wifi.Key(file="a", directory="b")),
+     201,
+     {'name': 'a', 'uri': '/wifi/keys/b', 'id': 'b'}
+     ),
+    (wifi.AddKeyResult(created=False,
+                       key=wifi.Key(file="x", directory="g")),
+     200,
+     {'name': 'x', 'uri': '/wifi/keys/g', 'id': 'g',
+      'message': 'Key file already present'}
+     )
+])
+async def test_add_key_response(add_key_return, expected_status, expected_body,
+                                loop, aiohttp_client, wifi_keys_tempdir):
+    with tempfile.TemporaryDirectory() as source_td:
+        app = init()
+        cli = await loop.create_task(aiohttp_client(app))
+
+        path = os.path.join(source_td, "t.pem")
+        with open(path, 'w') as f:
+            f.write(str(random.getrandbits(20)))
+
+        with patch("opentrons.system.wifi.add_key") as p:
+            p.return_value = add_key_return
+            r = await cli.post('/wifi/keys', data={'key': open(path, 'rb')})
+            assert r.status == expected_status
+            assert await r.json() == expected_body
+
+
+@pytest.mark.parametrize("arg,remove_key_return,expected_status,expected_body",
+                         [
+                            ("12345",
+                             None,
+                             404,
+                             {'message': "No such key file 12345"}
+                             ),
+                            ("54321",
+                             "myfile.pem",
+                             200,
+                             {'message': 'Key file myfile.pem deleted'}
+                             )
+                         ])
+async def test_remove_key(arg, remove_key_return,
+                          expected_status, expected_body,
+                          loop, aiohttp_client):
+    app = init()
+    cli = await loop.create_task(aiohttp_client(app))
+
+    with patch("opentrons.system.wifi.remove_key") as p:
+        p.return_value = remove_key_return
+        r = await cli.delete("/wifi/keys/" + arg)
+        p.assert_called_once_with(arg)
+        assert r.status == expected_status
+        assert await r.json() == expected_body
 
 
 async def test_eap_config_options(virtual_smoothie_env, loop, aiohttp_client):

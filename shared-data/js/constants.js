@@ -1,5 +1,6 @@
 // @flow
 
+import type { ModuleModel } from './types'
 // constants for dealing with robot coordinate system (eg in labwareTools)
 export const SLOT_LENGTH_MM = 127.76 // along X axis in robot coordinate system
 export const SLOT_WIDTH_MM = 85.48 // along Y axis in robot coordinate system
@@ -39,15 +40,22 @@ export const MAGNETIC_MODULE_TYPE: 'magneticModuleType' = 'magneticModuleType'
 export const THERMOCYCLER_MODULE_TYPE: 'thermocyclerModuleType' =
   'thermocyclerModuleType'
 
-export const MODULE_MODELS = [
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
+export const MAGNETIC_MODULE_MODELS = [MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2]
+
+export const TEMPERATURE_MODULE_MODELS = [
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
 ]
 
-// offset added to parameters.magneticModuleEngageHeight for displaying reccomended height in PD
+export const THERMOCYCLER_MODULE_MODELS = [THERMOCYCLER_MODULE_V1]
+
+export const MODULE_MODELS: Array<ModuleModel> = [
+  ...MAGNETIC_MODULE_MODELS,
+  ...TEMPERATURE_MODULE_MODELS,
+  ...THERMOCYCLER_MODULE_MODELS,
+]
+
+// offset added to parameters.agneticModuleEngageHeight for displaying reccomended height in PD
 export const ENGAGE_HEIGHT_OFFSET = -4
 
 export const MODULE_TYPES = [

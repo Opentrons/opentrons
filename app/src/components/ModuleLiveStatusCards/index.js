@@ -3,9 +3,9 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 
 import {
-  THERMOCYCLER,
-  TEMPDECK,
-  MAGDECK,
+  THERMOCYCLER_MODULE_TYPE,
+  TEMPERATURE_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
   useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
   getModuleControlsDisabled,
@@ -39,8 +39,8 @@ export const ModuleLiveStatusCards = () => {
   return (
     <>
       {modules.map((module, index) => {
-        switch (module.name) {
-          case TEMPDECK:
+        switch (module.type) {
+          case TEMPERATURE_MODULE_TYPE:
             return (
               <TempDeckCard
                 key={module.serial}
@@ -51,7 +51,7 @@ export const ModuleLiveStatusCards = () => {
                 controlDisabledReason={controlDisabledReason}
               />
             )
-          case THERMOCYCLER:
+          case THERMOCYCLER_MODULE_TYPE:
             return (
               <ThermocyclerCard
                 key={module.serial}
@@ -62,7 +62,7 @@ export const ModuleLiveStatusCards = () => {
                 controlDisabledReason={controlDisabledReason}
               />
             )
-          case MAGDECK:
+          case MAGNETIC_MODULE_TYPE:
             return (
               <MagDeckCard
                 key={module.serial}

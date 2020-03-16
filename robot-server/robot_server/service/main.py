@@ -1,6 +1,10 @@
 from opentrons import __version__
 from fastapi import FastAPI
+from starlette.responses import JSONResponse
+from starlette.requests import Request
 from .routers import health, networking, control, settings, deck_calibration
+from .models import V1BasicResponse
+from .exceptions import V1HandlerError
 
 
 app = FastAPI(
@@ -24,3 +28,11 @@ app.include_router(router=settings.router,
                    tags=["settings"])
 app.include_router(router=deck_calibration.router,
                    tags=["deckCalibration"])
+
+
+@app.exception_handler(V1HandlerError)
+async def v1_exception_handler(request: Request, exc: V1HandlerError):
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=V1BasicResponse(message=exc.message).dict()
+    )
