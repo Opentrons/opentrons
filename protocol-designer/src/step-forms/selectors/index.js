@@ -523,6 +523,17 @@ export const getIsNewStepForm: Selector<boolean> = createSelector(
     formData && formData.id != null ? !savedForms[formData.id] : true
 )
 
+export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSelector(
+  getUnsavedForm,
+  getIsNewStepForm,
+  (unsavedForm, isNewStepForm) => {
+    const isSetTempForm =
+      unsavedForm?.stepType === 'temperature' &&
+      unsavedForm?.setTemperature === 'true'
+    return isNewStepForm && isSetTempForm
+  }
+)
+
 export const getFormLevelWarningsForUnsavedForm: Selector<
   Array<FormWarning>
 > = createSelector(

@@ -100,5 +100,11 @@
       "body1": "Warning: Any experimental features used in this protocol may cause inconsistent behavior in the Protocol Designer. For example, the Protocol Designer may no longer display all warnings or errors that exist when no experimental features have been used.",
       "body2": "We encourage you to report any bugs you find, however note that at this time we are unable to prioritize fixes as they are a result of experimental features."
     }
+  },
+  "auto_add_pause_until_temp_step": {
+    "title": "Pause until module is {{temperature}}°C?",
+    "body": "Should your protocol pause until the module is {{temperature}}°C? Or should the protocol continue while the module changes temperature?",
+    "now_button": "Pause protocol now",
+    "later_button": "I will build a pause later"
   }
 }
