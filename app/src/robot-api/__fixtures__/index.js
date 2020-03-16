@@ -50,10 +50,8 @@ export const mockFailureBody = { message: 'AH' }
 
 export const mockFailedRequestState: RequestState = {
   response: {
-    host: { name: 'robotName', ip: '8.6.75.309', port: 666 },
     path: '/modules/abc123/update',
     method: 'POST',
-    body: mockFailureBody,
     status: 500,
     ok: false,
   },

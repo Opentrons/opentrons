@@ -5,6 +5,10 @@ import map from 'lodash/map'
 import orderBy from 'lodash/orderBy'
 import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
+import Semver from 'semver'
+
+import { getFeatureFlags } from '../config'
+import { getRobotApiVersionByName } from '../discovery'
 
 import { INTERFACE_WIFI, INTERFACE_ETHERNET } from './constants'
 
@@ -59,7 +63,7 @@ export const getWifiList: (
   robotName: string
 ) => Array<Types.WifiNetwork> = createSelector(
   (state, robotName) => state.networking[robotName]?.wifiList,
-  (wifiList = []) => orderBy(uniqBy(wifiList, 'ssid'), ...LIST_ORDER)
+  (wifiList = []) => uniqBy(orderBy(wifiList, ...LIST_ORDER), 'ssid')
 )
 
 export const getWifiKeys: (
@@ -74,9 +78,42 @@ export const getWifiKeys: (
   ) => ids.map(id => keysById[id])
 )
 
+// NOTE: not memoized because used in several rendered components
+// passing different requestIds simultaneously
+export const getWifiKeyByRequestId = (
+  state: State,
+  robotName: string,
+  reqId: string | null
+): Types.WifiKey | null => {
+  return reqId !== null
+    ? getWifiKeys(state, robotName).find(k => k.requestId === reqId) ?? null
+    : null
+}
+
 export const getEapOptions = (
   state: State,
   robotName: string
 ): Array<Types.EapOption> => {
   return state.networking[robotName]?.eapOptions ?? []
 }
+
+const API_MIN_DISCONNECT_VERSION = '3.17.0'
+
+export const getCanDisconnect: (
+  state: State,
+  robotName: string
+) => boolean = createSelector(
+  getWifiList,
+  getRobotApiVersionByName,
+  getFeatureFlags,
+  (list, apiVersion, featureFlags) => {
+    const active = list.some(nw => nw.active)
+    const supportsDisconnect = Semver.valid(apiVersion)
+      ? Semver.gte(apiVersion, API_MIN_DISCONNECT_VERSION)
+      : false
+    // TODO(mc, 2020-03-03): remove disconnect feature flag
+    const ffEnabled = featureFlags.enableWifiDisconnect
+
+    return Boolean(active && supportsDisconnect && ffEnabled)
+  }
+)

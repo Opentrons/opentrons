@@ -9,13 +9,9 @@ import {
 
 import { WIFI_KEYS_PATH } from '../constants'
 
-import type {
-  FetchWifiKeysResponse,
-  PostWifiKeysResponse,
-  WifiKey,
-} from '../types'
+import type { FetchWifiKeysResponse, PostWifiKeysResponse } from '../types'
 
-export const mockWifiKey: WifiKey = {
+export const mockWifiKey = {
   id: '123',
   uri: '/wifi/keys/123',
   name: 'key.crt',
