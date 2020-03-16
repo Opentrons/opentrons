@@ -43,7 +43,7 @@
   small, that your change may affect some other part of the system - for
   instance, changing return tip behavior in protocol may also change the
   behavior of labware calibration.
-  
+
   Identify the other parts of the system your codebase may affect, so that in
   addition to your own review and testing, other people who may not have
   the system internalized as much as you can focus their attention and testing
