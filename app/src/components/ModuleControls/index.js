@@ -10,11 +10,11 @@ import type { TemperatureModule, ThermocyclerModule } from '../../modules/types'
 
 type Props = {|
   module: TemperatureModule | ThermocyclerModule,
-  canControl: boolean,
+  controlDisabledReason: string | null,
 |}
 
 export function ModuleControls(props: Props) {
-  const { module: mod, canControl } = props
+  const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
 
   return (
@@ -41,7 +41,7 @@ export function ModuleControls(props: Props) {
       <div className={styles.control_wrapper}>
         <TemperatureControl
           module={mod}
-          disabled={!canControl}
+          disabledReason={controlDisabledReason}
           sendModuleCommand={sendModuleCommand}
         />
       </div>

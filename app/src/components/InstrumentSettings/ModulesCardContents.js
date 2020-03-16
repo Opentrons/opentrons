@@ -7,17 +7,21 @@ import type { AttachedModule } from '../../modules/types'
 
 type Props = {|
   modules: Array<AttachedModule>,
-  canControl: boolean,
+  controlDisabledReason: string | null,
 |}
 
 export function ModulesCardContents(props: Props) {
-  const { modules, canControl } = props
+  const { modules, controlDisabledReason } = props
   if (modules.length === 0) return <NoModulesMessage />
 
   return (
     <>
       {modules.map(mod => (
-        <ModuleItem key={mod.serial} module={mod} canControl={canControl} />
+        <ModuleItem
+          key={mod.serial}
+          module={mod}
+          controlDisabledReason={controlDisabledReason}
+        />
       ))}
     </>
   )

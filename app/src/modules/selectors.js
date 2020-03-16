@@ -4,6 +4,7 @@ import sortBy from 'lodash/sortBy'
 import countBy from 'lodash/countBy'
 
 import { selectors as RobotSelectors } from '../robot'
+import * as Copy from './i18n'
 import * as Types from './types'
 
 import type { State } from '../types'
@@ -70,3 +71,24 @@ export const getMissingModules: (
     )
   }
 )
+
+// selector to return a reason for module control being disabled if they
+// should be disabled. Omit `robotName` arg to refer to currently connected
+// RPC robot
+export const getModuleControlsDisabled = (state: State, robotName?: string) => {
+  const connectedRobotName = RobotSelectors.getConnectedRobotName(state)
+  const protocolIsRunning = RobotSelectors.getIsRunning(state)
+
+  if (
+    connectedRobotName === null ||
+    (robotName != null && connectedRobotName !== robotName)
+  ) {
+    return Copy.CONNECT_FOR_MODULE_CONTROL
+  }
+
+  if (protocolIsRunning) {
+    return Copy.CANNOT_CONTROL_MODULE_WHILE_RUNNING
+  }
+
+  return null
+}

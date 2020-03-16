@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { Provider } from 'react-redux'
-import { shallow, mount } from 'enzyme'
+import { mount } from 'enzyme'
 import configureMockStore from 'redux-mock-store'
 
 import { Button } from '@opentrons/components'
@@ -11,6 +11,7 @@ const mockStore = configureMockStore([])
 
 describe('ModuleUpdate', () => {
   let store
+
   beforeEach(() => {
     store = mockStore({
       mockState: true,
@@ -25,84 +26,88 @@ describe('ModuleUpdate', () => {
     jest.resetAllMocks()
   })
 
-  it('component renders', () => {
-    const treeAvailableCanControl = shallow(
-      <Provider store={store}>
-        <ModuleUpdate
-          canControl={true}
-          moduleId="FAKEMODULE1234"
-          hasAvailableUpdate={true}
-        />
-      </Provider>
-    )
-    const treeAvailableNoControl = shallow(
-      <Provider store={store}>
-        <ModuleUpdate
-          canControl={false}
-          moduleId="FAKEMODULE1234"
-          hasAvailableUpdate={true}
-        />
-      </Provider>
-    )
-    const treeNotAvailableCanControl = shallow(
-      <Provider store={store}>
-        <ModuleUpdate
-          canControl={true}
-          moduleId="FAKEMODULE1234"
-          hasAvailableUpdate={false}
-        />
-      </Provider>
-    )
-    const treeNotAvailableNoControl = shallow(
-      <Provider store={store}>
-        <ModuleUpdate
-          canControl={false}
-          moduleId="FAKEMODULE1234"
-          hasAvailableUpdate={false}
-        />
-      </Provider>
-    )
-    expect(treeAvailableCanControl).toMatchSnapshot()
-    expect(treeNotAvailableCanControl).toMatchSnapshot()
-    expect(treeAvailableNoControl).toMatchSnapshot()
-    expect(treeNotAvailableNoControl).toMatchSnapshot()
-  })
+  // TODO(mc, 2020-03-16): these shallow snapshots don't test anything
+  // remove commented out tests when actual tests have been written
+  // it('component renders', () => {
+  //   const treeAvailableCanControl = shallow(
+  //     <Provider store={store}>
+  //       <ModuleUpdate
+  //         controlDisabledReason={null}
+  //         moduleId="FAKEMODULE1234"
+  //         hasAvailableUpdate={true}
+  //       />
+  //     </Provider>,
+  //   )
+  //   const treeAvailableNoControl = shallow(
+  //     <Provider store={store}>
+  //       <ModuleUpdate
+  //         controlDisabledReason={"Can't touch this"}
+  //         moduleId="FAKEMODULE1234"
+  //         hasAvailableUpdate={true}
+  //       />
+  //     </Provider>
+  //   )
+  //   const treeNotAvailableCanControl = shallow(
+  //     <Provider store={store}>
+  //       <ModuleUpdate
+  //         controlDisabledReason={null}
+  //         moduleId="FAKEMODULE1234"
+  //         hasAvailableUpdate={false}
+  //       />
+  //     </Provider>
+  //   )
+  //   const treeNotAvailableNoControl = shallow(
+  //     <Provider store={store}>
+  //       <ModuleUpdate
+  //         controlDisabledReason={"Can't touch this"}
+  //         moduleId="FAKEMODULE1234"
+  //         hasAvailableUpdate={false}
+  //       />
+  //     </Provider>
+  //   )
+  //   expect(treeAvailableCanControl).toMatchSnapshot()
+  //   expect(treeNotAvailableCanControl).toMatchSnapshot()
+  //   expect(treeAvailableNoControl).toMatchSnapshot()
+  //   expect(treeNotAvailableNoControl).toMatchSnapshot()
+  // })
 
   it('displays a Warning for invalid files', () => {
     const SPECS = [
       {
-        canControl: true,
+        controlDisabledReason: null,
         hasAvailableUpdate: true,
         expectDisabled: false,
       },
       {
-        canControl: true,
+        controlDisabledReason: null,
         hasAvailableUpdate: false,
         expectDisabled: true,
       },
       {
-        canControl: false,
+        controlDisabledReason: "Can't touch this",
         hasAvailableUpdate: true,
         expectDisabled: true,
       },
       {
-        canControl: false,
+        controlDisabledReason: "Can't touch this",
         hasAvailableUpdate: false,
         expectDisabled: true,
       },
     ]
 
-    SPECS.forEach(({ canControl, hasAvailableUpdate, expectDisabled }) => {
-      const wrapper = mount(
-        <Provider store={store}>
-          <ModuleUpdate
-            moduleId="FAKEMODULE1234"
-            canControl={canControl}
-            hasAvailableUpdate={hasAvailableUpdate}
-          />
-        </Provider>
-      )
-      expect(wrapper.find(Button).prop('disabled')).toEqual(expectDisabled)
-    })
+    SPECS.forEach(
+      ({ controlDisabledReason, hasAvailableUpdate, expectDisabled }) => {
+        const wrapper = mount(
+          <Provider store={store}>
+            <ModuleUpdate
+              moduleId="FAKEMODULE1234"
+              controlDisabledReason={controlDisabledReason}
+              hasAvailableUpdate={hasAvailableUpdate}
+            />
+          </Provider>
+        )
+        expect(wrapper.find(Button).prop('disabled')).toEqual(expectDisabled)
+      }
+    )
   })
 })

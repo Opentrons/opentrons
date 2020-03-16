@@ -17,7 +17,7 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
-  allowInteraction: boolean,
+  controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
@@ -25,7 +25,7 @@ type Props = {|
 export const TempDeckCard = ({
   module,
   sendModuleCommand,
-  allowInteraction,
+  controlDisabledReason,
   isCardExpanded,
   toggleCard,
 }: Props) => (
@@ -36,12 +36,11 @@ export const TempDeckCard = ({
   >
     <div className={styles.card_row}>
       <StatusItem status={module.status} />
-      {allowInteraction && (
-        <TemperatureControl
-          module={module}
-          sendModuleCommand={sendModuleCommand}
-        />
-      )}
+      <TemperatureControl
+        module={module}
+        sendModuleCommand={sendModuleCommand}
+        disabledReason={controlDisabledReason}
+      />
     </div>
     <div className={styles.card_row}>
       <LabeledValue

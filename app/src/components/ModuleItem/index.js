@@ -11,12 +11,12 @@ import { TEMPDECK, THERMOCYCLER } from '../../modules'
 
 type Props = {|
   module: AttachedModule,
-  canControl: boolean,
+  controlDisabledReason: string | null,
   availableUpdate?: ?string,
 |}
 
 export function ModuleItem(props: Props) {
-  const { module, canControl } = props
+  const { module, controlDisabledReason } = props
 
   return (
     <div className={styles.module_item}>
@@ -25,12 +25,15 @@ export function ModuleItem(props: Props) {
         <ModuleInfo module={module} />
         <ModuleUpdate
           hasAvailableUpdate={!!module.hasAvailableUpdate}
-          canControl={canControl}
+          controlDisabledReason={controlDisabledReason}
           moduleId={module.serial}
         />
       </div>
       {(module.name === THERMOCYCLER || module.name === TEMPDECK) && (
-        <ModuleControls module={module} canControl={canControl} />
+        <ModuleControls
+          module={module}
+          controlDisabledReason={controlDisabledReason}
+        />
       )}
     </div>
   )

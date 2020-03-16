@@ -8,8 +8,9 @@ import {
   MAGDECK,
   useSendModuleCommand,
   getAttachedModulesForConnectedRobot,
+  getModuleControlsDisabled,
 } from '../../modules'
-import { selectors as robotSelectors } from '../../robot'
+
 import { TempDeckCard } from './TempDeckCard'
 import { MagDeckCard } from './MagDeckCard'
 import { ThermocyclerCard } from './ThermocyclerCard'
@@ -17,7 +18,7 @@ import { ThermocyclerCard } from './ThermocyclerCard'
 export const ModuleLiveStatusCards = () => {
   const modules = useSelector(getAttachedModulesForConnectedRobot)
   const sendModuleCommand = useSendModuleCommand()
-  const isProtocolRunning: boolean = useSelector(robotSelectors.getIsRunning)
+  const controlDisabledReason = useSelector(getModuleControlsDisabled)
   const [expandedCard, setExpandedCard] = React.useState(
     modules.length > 0 ? modules[0].serial : ''
   )
@@ -47,7 +48,7 @@ export const ModuleLiveStatusCards = () => {
                 toggleCard={makeToggleCard(module.serial)}
                 isCardExpanded={expandedCard === module.serial}
                 sendModuleCommand={sendModuleCommand}
-                allowInteraction={!isProtocolRunning}
+                controlDisabledReason={controlDisabledReason}
               />
             )
           case THERMOCYCLER:
@@ -58,7 +59,7 @@ export const ModuleLiveStatusCards = () => {
                 toggleCard={makeToggleCard(module.serial)}
                 isCardExpanded={expandedCard === module.serial}
                 sendModuleCommand={sendModuleCommand}
-                allowInteraction={!isProtocolRunning}
+                controlDisabledReason={controlDisabledReason}
               />
             )
           case MAGDECK:

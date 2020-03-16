@@ -18,7 +18,6 @@ import type {
 import { THERMOCYCLER } from '../../modules'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
-const CONNECT_FOR_CONTROL = 'Connect to robot to control modules'
 type Props = {|
   module: ThermocyclerModule | TemperatureModule,
   sendModuleCommand: (
@@ -26,13 +25,13 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
-  disabled?: boolean,
+  disabledReason?: string | null,
 |}
 
 export const TemperatureControl = ({
   module,
   sendModuleCommand,
-  disabled,
+  disabledReason,
 }: Props) => {
   const [primaryTempValue, setPrimaryTempValue] = useState(null)
   const [secondaryTempValue, setSecondaryTempValue] = useState(null)
@@ -125,12 +124,12 @@ export const TemperatureControl = ({
           </AlertModal>
         </Portal>
       )}
-      <HoverTooltip tooltipComponent={disabled ? CONNECT_FOR_CONTROL : null}>
+      <HoverTooltip tooltipComponent={disabledReason}>
         {hoverTooltipHandlers => (
           <div {...hoverTooltipHandlers}>
             <OutlineButton
               onClick={handleClick}
-              disabled={disabled}
+              disabled={disabledReason != null}
               className={styles.temp_control_button}
             >
               {hasTarget === true ? 'Deactivate' : 'Set Temp'}
