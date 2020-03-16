@@ -213,6 +213,16 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.start_set_temperature(celsius)
 
+    @requires_version(2, 3)
+    def await_temperature(self, celsius: float):
+        """ Wait until module reaches temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param celsius: The target temperature, in C
+        """
+        return self._module.await_temperature(celsius)
+
     @cmds.publish.both(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
     def deactivate(self):

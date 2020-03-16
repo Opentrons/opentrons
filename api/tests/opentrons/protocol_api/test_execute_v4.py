@@ -1,11 +1,12 @@
 from unittest import mock
 import pytest
+from opentrons.protocols.parse import parse
 from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
     _disengage_magnet, _temperature_module_set_temp, load_modules_from_json, \
     _temperature_module_deactivate, \
     _temperature_module_await_temp
 from opentrons.protocol_api import MagneticModuleContext, \
-    TemperatureModuleContext, ProtocolContext
+    TemperatureModuleContext, ProtocolContext, execute
 
 
 def test_load_modules_from_json():
@@ -78,7 +79,9 @@ def test_temperature_module_await_temp():
     _temperature_module_await_temp(modules, params)
 
     # TODO IMMEDIATELY must be implemented in executor
-    assert False
+    assert module_mock.mock_calls == [
+        mock.call.await_temperature(12.3)
+    ]
 
 
 def test_dispatch_json():
@@ -164,13 +167,11 @@ def test_dispatch_json_invalid_command():
             loaded_labware=None, modules=None)
 
 
-# TODO IMMEDIATELY
-#
-# def test_papi_execute_json_v4(monkeypatch, loop, get_json_protocol_fixture):
-#     protocol_data = get_json_protocol_fixture(
-#         '4', 'someV4Protocol', False)
-#     protocol = parse(protocol_data, None)
-#     ctx = ProtocolContext(loop=loop)
-#     ctx.home()
-#     # Check that we end up executing the protocol ok
-#     execute.run_protocol(protocol, ctx)
+def test_papi_execute_json_v4(monkeypatch, loop, get_json_protocol_fixture):
+    protocol_data = get_json_protocol_fixture(
+        '4', 'testModulesProtocol', False)
+    protocol = parse(protocol_data, None)
+    ctx = ProtocolContext(loop=loop)
+    ctx.home()
+    # Check that we end up executing the protocol ok
+    execute.run_protocol(protocol, ctx)

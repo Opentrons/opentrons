@@ -1,5 +1,4 @@
 import logging
-import asyncio
 from typing import Any, Dict
 
 from .contexts import ProtocolContext, InstrumentContext, ModuleContext
@@ -74,21 +73,9 @@ def _temperature_module_deactivate(modules, params) -> None:
 
 def _temperature_module_await_temp(modules, params) -> None:
     module_id = params['module']
+    temperature = params['temperature']
     module = modules[module_id]
-
-    awaiting_temperature = params['temperature']
-    status = module.status
-    # in some cases the module status will flicker from one state to another
-    # while holding, because the temperature delta will be exceeded.
-    # when this flicker happens, this function would sleep for a moment longer
-
-    if status == 'heating':
-        while (module.temperature < awaiting_temperature):
-            asyncio.sleep(0.2)
-
-    elif status == 'cooling':
-        while (module.temperature > awaiting_temperature):
-            asyncio.sleep(0.2)
+    module.await_temperature(temperature)
 
 
 dispatcher_map: Dict[Any, Any] = {
