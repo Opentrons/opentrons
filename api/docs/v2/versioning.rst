@@ -97,6 +97,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.2     |          3.16.0             |
 +-------------+-----------------------------+
+|     2.3     |          3.17.0             |
++-------------+-----------------------------+
 
 
 Changes in API Versions
@@ -118,3 +120,8 @@ Version 2.2
   magnet from the base of the labware. For more, see :ref:`magnetic-module-engage`.
 - Return tip will now use pre-defined heights from hardware testing. For more information, see :ref:`pipette-return-tip`.
 - When using the return tip function, tips are no longer added back into the tip tracker. For more information, see :ref:`pipette-return-tip`.
+
+Version 2.3
++++++++++++
+
+- You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
