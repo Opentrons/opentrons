@@ -26,8 +26,8 @@ async def start(request):
         body = {}
 
     try:
-        res = await dc.start(body.get('force') is not None,
-                             hw_from_req(request))
+        res = await dc.create_session(body.get('force') is not None,
+                                      hw_from_req(request))
         status = 201
         data = {'token': res.token, 'pipette': res.pipette}
     except dc.SessionForbidden as e:

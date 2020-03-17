@@ -349,7 +349,7 @@ async def move(data) -> Result:
         raise NoSessionInProgress()
 
     point_name = data.get('point')
-    point = safe_points().get(point_name)
+    point = safe_points().get(str(point_name))
     if point and len(point) == 3:
         if not feature_flags.use_protocol_api_v2():
             pipette = session_wrapper.session.pipettes[
@@ -606,7 +606,7 @@ class StartSessionResult(NamedTuple):
     pipette: Dict
 
 
-async def start(force: bool, hardware) -> StartSessionResult:
+async def create_session(force: bool, hardware) -> StartSessionResult:
     """
     Begins the session manager for factory calibration, if a session is not
     already in progress, or if the "force" key is specified in the request. To
