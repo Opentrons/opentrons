@@ -18,7 +18,7 @@ import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 
-import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
+import { Card, LabeledToggle, LabeledButton, HoverTooltip } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -32,6 +32,10 @@ const TITLE = 'Robot Controls'
 
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
+
+const CHECK_DECK_CAL_DESCRIPTION = "Check the robot's deck calibration"
+
+const CONNECT_FOR_CONTROL = 'Connect to robot to control'
 
 export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
@@ -59,25 +63,36 @@ export function ControlsCard(props: Props) {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
 
+  const buttonDisabled = notConnectable || !canControl
+
   return (
     <Card title={TITLE} disabled={notConnectable}>
       {enableDeckCalCheck && (
-        <LabeledButton
-          label="Deck calibration"
-          buttonProps={{
-            onClick: checkCalibration,
-            disabled: notConnectable || !canControl,
-            children: 'Check',
-          }}
+        <HoverTooltip
+          tooltipComponent={buttonDisabled ? CONNECT_FOR_CONTROL : null}
+          modifiers={{ shift: {enabled: true} }} //, offset: { offset: '100%, 8px' } }}
         >
-          <p>{CALIBRATE_DECK_DESCRIPTION}</p>
-        </LabeledButton>
+          {hoverTooltipHandlers => (
+            <div {...hoverTooltipHandlers}>
+              <LabeledButton
+                label="Check deck calibration"
+                buttonProps={{
+                  onClick: checkCalibration,
+                  disabled: buttonDisabled,
+                  children: 'Check',
+                }}
+              >
+                <p>{CHECK_DECK_CAL_DESCRIPTION}</p>
+              </LabeledButton>
+            </div>
+          )}
+        </HoverTooltip>
       )}
       <LabeledButton
         label="Calibrate deck"
         buttonProps={{
           onClick: startCalibration,
-          disabled: notConnectable || !canControl,
+          disabled: buttonDisabled,
           children: 'Calibrate',
         }}
       >
@@ -87,7 +102,7 @@ export function ControlsCard(props: Props) {
         label="Home all axes"
         buttonProps={{
           onClick: () => dispatch(home(robotName, ROBOT)),
-          disabled: notConnectable || !canControl,
+          disabled: buttonDisabled,
           children: 'Home',
         }}
       >
@@ -97,7 +112,7 @@ export function ControlsCard(props: Props) {
         label="Restart robot"
         buttonProps={{
           onClick: () => dispatch(restartRobot(robotName)),
-          disabled: notConnectable || !canControl,
+          disabled: buttonDisabled,
           children: 'Restart',
         }}
       >
