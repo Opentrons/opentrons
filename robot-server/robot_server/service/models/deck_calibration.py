@@ -68,10 +68,6 @@ class JogDirection(int, Enum):
     neg = -1
 
 
-class AttachTipArgs(BaseModel):
-    """Command \"attach tip\" dispatch args"""
-
-
 class DeckCalibrationCommand(str, Enum):
     """The command to execute"""
     jog = "jog"
