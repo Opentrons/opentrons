@@ -57,9 +57,9 @@ class AttachedPipette(BaseModel):
 
 
 class Instruments(BaseModel):
-    """None"""
-    left_id: typing.Dict[UUID4, AttachedPipette]
-    right_id: typing.Dict[UUID4, AttachedPipette]
+    """Example structure"""
+    typing.Dict[UUID4, AttachedPipette]
+    typing.Dict[UUID4, AttachedPipette]
 
     class Config:
         schema_extra = {

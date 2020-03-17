@@ -74,9 +74,9 @@ class CalibrationSession:
             exit_code = available_actions.sessionExit
             if action.value == 0:
                 no_pips = errors.noPipettesAttached
-                state_obj.add_relationship(no_pips, exit_code)
+                state_obj.add_relationship(no_pips.value, exit_code.value)  # type: ignore # noqa(E501)
             bad_cal = errors.badDeckCalibration
-            state_obj.add_relationship(bad_cal, exit_code)
+            state_obj.add_relationship(bad_cal.value, exit_code.value)  # type: ignore # noqa(E501)
             sm.add_state(action.value, state_obj)
         return sm
 
