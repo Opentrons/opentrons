@@ -29,8 +29,8 @@ class AttachedPipette(BaseModel):
               description="The serial number of the attached pipette")
 
 
-class Pipette(BaseModel):
-    """None"""
+class PipettesByMount(BaseModel):
+    """The attached pipettes by mount"""
     left: AttachedPipette
     right: AttachedPipette
 

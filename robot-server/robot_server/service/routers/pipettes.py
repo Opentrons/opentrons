@@ -19,7 +19,7 @@ router = APIRouter()
                     "pipettes. This requires disabling the pipette motors "
                     "(which is done automatically) and therefore should only "
                     "be done through user intent",
-            response_model=pipettes.Pipette)
+            response_model=pipettes.PipettesByMount)
 async def get_pipettes(
         refresh: typing.Optional[bool] = Query(
             False,
@@ -28,7 +28,7 @@ async def get_pipettes(
                         " should only be done when no  protocol is running "
                         "and you know  it won't cause a problem"),
         hardware: HardwareAPILike = Depends(get_hardware))\
-        -> pipettes.Pipette:
+        -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a
     dict with the results keyed by mount. By default, this endpoint provides
@@ -59,4 +59,4 @@ async def get_pipettes(
     e = {mount.name.lower(): make_pipette(mount, data)
          for mount, data in attached.items()}
 
-    return pipettes.Pipette(**e)
+    return pipettes.PipettesByMount(**e)
