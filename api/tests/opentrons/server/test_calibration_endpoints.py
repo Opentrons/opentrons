@@ -12,7 +12,7 @@ from opentrons import types
 # values from the driver during simulating vs. non-simulating modes. In
 # particular, during simulating mode the driver's `position` method returns
 # the xyz position of the tip of the pipette, but during non-simulating mode
-# it returns a position that correponds roughly to the gantry (e.g.: where the
+# it returns a position that corresponds roughly to the gantry (e.g.: where the
 # Smoothie board sees the position of itself--after a fashion). Simulating mode
 # should be replaced with something that accurately reflects actual robot
 # operation, and then these tests should be revised to match expected reality.
@@ -32,32 +32,32 @@ async def test_add_and_remove_tip(async_server, dc_session, instruments):
 
     # Check malformed packet
     res0 = await endpoints.attach_tip({})
-    assert res0.status == 400
+    assert res0.success is False
     assert dc_session.tip_length is None
     assert hardware.attached_instruments[mount]['has_tip'] is False
 
     # Check correct attach command
     tip_length = 50
     res1 = await endpoints.attach_tip({'tipLength': tip_length})
-    assert res1.status == 200
+    assert res1.success is True
     assert dc_session.tip_length == tip_length
     assert hardware.attached_instruments[mount]['has_tip'] is True
 
     # Check command with tip already attached
     res2 = await endpoints.attach_tip({'tipLength': tip_length + 5})
-    assert res2.status == 200
+    assert res2.success is True
     assert dc_session.tip_length == tip_length + 5
     assert hardware.attached_instruments[mount]['has_tip'] is True
 
     # Check correct detach command
     res3 = await endpoints.detach_tip({})
-    assert res3.status == 200
+    assert res3.success is True
     assert dc_session.tip_length is None
     assert hardware.attached_instruments[mount]['has_tip'] is False
 
     # Check command with no tip
     res4 = await endpoints.detach_tip({})
-    assert res4.status == 200
+    assert res4.success is True
     assert dc_session.tip_length is None
     assert hardware.attached_instruments[mount]['has_tip'] is False
 

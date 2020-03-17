@@ -1,10 +1,9 @@
-from aiohttp import web
 from uuid import uuid1
 
-from typing import Dict, Tuple, Optional
+from typing import Dict, Tuple, Optional, NamedTuple
 
 import logging
-import json
+
 try:
     from opentrons import instruments
 except ImportError:
@@ -25,7 +24,7 @@ class SessionWrapper:
         self._session = None
 
     @property
-    def session(self) -> 'SessionManager':
+    def session(self) -> Optional['SessionManager']:
         """Get access to the session manager"""
         return self._session
 
@@ -36,11 +35,6 @@ class SessionWrapper:
 
 
 session_wrapper = SessionWrapper()
-
-
-def hw_from_req(req):
-    """ Utility function to get the hardware resource from requests """
-    return req.app['com.opentrons.hardware']
 
 
 def expected_points():
@@ -111,38 +105,33 @@ class SessionManager:
                 map(lambda i: list(i), self.current_transform)))
 
 
-# -------------- Route Fns -----------------------------------------------
-# Note: endpoints should not call these functions directly, to ensure that
-# session protections are applied--should be called through the dispatch
-# endpoint
-# ------------------------------------------------------------------------
-def init_pipette():
+def init_pipette(session):
     """
     Finds pipettes attached to the robot currently and chooses the correct one
     to add to the session.
 
     :return: The pipette type and mount chosen for deck calibration
     """
-    pipette_info = set_current_mount(session_wrapper.session)
+    pipette_info = set_current_mount(session)
     pipette = pipette_info['pipette']
     res = {}
     if pipette:
-        session_wrapper.session.current_model = pipette_info['model']
+        session.current_model = pipette_info['model']
         if not feature_flags.use_protocol_api_v2():
             mount = pipette.mount
-            session_wrapper.session.current_mount = mount
+            session.current_mount = mount
         else:
             mount = pipette.get('mount')
-            session_wrapper.session.current_mount = mount_by_name[mount]
-        session_wrapper.session.pipettes[mount] = pipette
+            session.current_mount = mount_by_name[mount]
+        session.pipettes[mount] = pipette
         res = {'mount': mount, 'model': pipette_info['model']}
 
-    log.info("Pipette info {}".format(session_wrapper.session.pipettes))
+    log.info("Pipette info {}".format(session.pipettes))
 
     return res
 
 
-def get_pipettes(sess):
+def get_pipettes(sess: SessionManager):
     if not feature_flags.use_protocol_api_v2():
         attached_pipettes = sess.adapter.get_attached_pipettes()
         left_pipette = None
@@ -162,7 +151,7 @@ def get_pipettes(sess):
     return right_pipette, left_pipette
 
 
-def set_current_mount(session):
+def set_current_mount(session: SessionManager):
     """
     Choose the pipette in which to execute commands. If there is no pipette,
     or it is uncommissioned, the pipette is not mounted.
@@ -177,7 +166,7 @@ def set_current_mount(session):
     pipette = None
     right_channel = None
     left_channel = None
-    right_pipette, left_pipette = get_pipettes(session_wrapper.session)
+    right_pipette, left_pipette = get_pipettes(session)
     if right_pipette:
         if not feature_flags.use_protocol_api_v2():
             right_channel = right_pipette.channels
@@ -194,19 +183,19 @@ def set_current_mount(session):
 
     if right_channel == 1:
         pipette = right_pipette
-        session_wrapper.session.cp = CriticalPoint.NOZZLE
+        session.cp = CriticalPoint.NOZZLE
     elif left_channel == 1:
         pipette = left_pipette
-        session_wrapper.session.cp = CriticalPoint.NOZZLE
+        session.cp = CriticalPoint.NOZZLE
     elif right_pipette:
         pipette = right_pipette
-        session_wrapper.session.cp = CriticalPoint.FRONT_NOZZLE
+        session.cp = CriticalPoint.FRONT_NOZZLE
     elif left_pipette:
         pipette = left_pipette
-        session_wrapper.session.cp = CriticalPoint.FRONT_NOZZLE
+        session.cp = CriticalPoint.FRONT_NOZZLE
 
-    model, pip_id = _get_model_name(pipette, session_wrapper.session.adapter)
-    session_wrapper.session.pipette_id = pip_id
+    model, pip_id = _get_model_name(pipette, session.adapter)
+    session.pipette_id = pip_id
     return {'pipette': pipette, 'model': model}
 
 
@@ -227,25 +216,35 @@ def _get_model_name(pipette, adapter):
     return model, pip_id
 
 
-async def attach_tip(data):
+# -------------- Route Fns -----------------------------------------------
+# Note: endpoints should not call these functions directly, to ensure that
+# session protections are applied--should be called through the dispatch
+# endpoint
+# ------------------------------------------------------------------------
+
+class Result(NamedTuple):
+    success: bool
+    message: str
+
+
+async def attach_tip(data) -> Result:
     """
     Attach a tip to the current pipette
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
+    :param data: a dict that with schema:
     {
-      'token': UUID token from current session start
-      'command': 'attach tip'
       'tipLength': a float representing how much the length of a pipette
         increases when a tip is added
     }
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     tip_length = data.get('tipLength')
 
     if not tip_length:
         message = 'Error: "tipLength" must be specified in request'
-        status = 400
+        status = False
     else:
         if not feature_flags.use_protocol_api_v2():
             pipette = session_wrapper.session.pipettes[
@@ -262,23 +261,20 @@ async def attach_tip(data):
         session_wrapper.session.tip_length = tip_length
 
         message = "Tip length set: {}".format(tip_length)
-        status = 200
+        status = True
 
-    return web.json_response({'message': message}, status=status)
+    return Result(success=status, message=message)
 
 
-async def detach_tip(data):
+async def detach_tip(data) -> Result:
     """
     Detach the tip from the current pipette
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
-    {
-      'token': UUID token from current session start
-      'command': 'detach tip'
-    }
+    :param data: unused
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     if not feature_flags.use_protocol_api_v2():
         pipette = session_wrapper.session.pipettes[
             session_wrapper.session.current_mount]
@@ -292,39 +288,38 @@ async def detach_tip(data):
             session_wrapper.session.cp = CriticalPoint.NOZZLE
     session_wrapper.session.tip_length = None
 
-    return web.json_response({'message': "Tip removed"}, status=200)
+    return Result(success=True, message="Tip removed")
 
 
-async def run_jog(data):
+async def run_jog(data: dict) -> Result:
     """
     Allow the user to jog the selected pipette around the deck map
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json
-    The correct packet form should be as follows:
+    :param data: a dict with schema:
     {
-      'token': UUID token from current session start
-      'command': 'jog'
       'axis': The current axis you wish to move
       'direction': The direction you wish to move (+ or -)
       'step': The increment you wish to move
     }
-    :return: The position you are moving to based on axis, direction, step
+    :return: The position moved to based on axis, direction, step
     given by the user.
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     axis = data.get('axis')
     direction = data.get('direction')
     step = data.get('step')
 
-    if axis not in ('x', 'y', 'z'):
+    if axis not in {'x', 'y', 'z'}:
         message = '"axis" must be "x", "y", or "z"'
-        status = 400
-    elif direction not in (-1, 1):
+        status = False
+    elif direction not in {-1, 1}:
         message = '"direction" must be -1 or 1'
-        status = 400
+        status = False
     elif step is None:
         message = '"step" must be specified'
-        status = 400
+        status = False
     else:
         position = jog(
             axis,
@@ -334,26 +329,25 @@ async def run_jog(data):
             session_wrapper.session.current_mount,
             session_wrapper.session.cp)
         message = 'Jogged to {}'.format(position)
-        status = 200
+        status = True
 
-    return web.json_response({'message': message}, status=status)
+    return Result(success=status, message=message)
 
 
-async def move(data):
+async def move(data) -> Result:
     """
     Allow the user to move the selected pipette to a specific point
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json
-    The correct packet form should be as follows:
+    :param data: a dict with schema:
     {
-      'token': UUID token from current session start
-      'command': 'move'
       'point': The name of the point to move to. Must be one of
                ["1", "2", "3", "safeZ", "attachTip"]
     }
     :return: The position you are moving to
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     point_name = data.get('point')
     point = safe_points().get(point_name)
     if point and len(point) == 3:
@@ -419,35 +413,34 @@ async def move(data):
                     Point(x=point[0], y=point[1], z=point[2]),
                     critical_point=session_wrapper.session.cp)
         message = 'Moved to {}'.format(point)
-        status = 200
+        status = True
     else:
         message = '"point" must be one of "1", "2", "3", "safeZ", "attachTip"'
-        status = 400
+        status = False
 
-    return web.json_response({'message': message}, status=status)
+    return Result(success=status, message=message)
 
 
-async def save_xy(data):
+async def save_xy(data) -> Result:
     """
     Save the current XY values for the calibration data
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
+    :param data: a dict with schema:
     {
-      'token': UUID token from current session start
-      'command': 'save xy'
       'point': a string ID ['1', '2', or '3'] of the calibration point to save
     }
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     valid_points = list(session_wrapper.session.points.keys())
     point = data.get('point')
     if point not in valid_points:
         message = 'point must be one of {}'.format(valid_points)
-        status = 400
+        status = False
     elif not session_wrapper.session.current_mount:
         message = "Mount must be set before calibrating"
-        status = 400
+        status = False
     else:
         if not feature_flags.use_protocol_api_v2():
             mount = 'Z' if session_wrapper.session.current_mount == 'left'\
@@ -470,25 +463,23 @@ async def save_xy(data):
         session_wrapper.session.points[point] = (x, y)
         message = "Saved point {} value: {}".format(
             point, session_wrapper.session.points[point])
-        status = 200
-    return web.json_response({'message': message}, status=status)
+        status = True
+
+    return Result(success=status, message=message)
 
 
-async def save_z(data):
+async def save_z(data) -> Result:
     """
     Save the current Z height value for the calibration data
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
-    {
-      'token': UUID token from current session start
-      'command': 'save z'
-    }
+    :param data: unused
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     if not session_wrapper.session.tip_length:
         message = "Tip length must be set before calibrating"
-        status = 400
+        status = False
     else:
         if not feature_flags.use_protocol_api_v2():
             mount = 'Z' if session_wrapper.session.current_mount == 'left' \
@@ -516,24 +507,23 @@ async def save_z(data):
         )
 
         message = "Saved z: {}".format(session_wrapper.session.z_value)
-        status = 200
-    return web.json_response({'message': message}, status=status)
+        status = True
+
+    return Result(success=status, message=message)
 
 
-async def save_transform(data):
+async def save_transform(data) -> Result:
     """
-    Calculate the transormation matrix that calibrates the gantry to the deck
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
-    {
-      'token': UUID token from current session start
-      'command': 'save transform'
-    }
+    Calculate the transformation matrix that calibrates the gantry to the deck
+
+    :param data: unused
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     if any([v is None for v in session_wrapper.session.points.values()]):
         message = "Not all points have been saved"
-        status = 400
+        status = False
     else:
         # expected values based on mechanical drawings of the robot
         expected_pos = expected_points()
@@ -562,29 +552,29 @@ async def save_transform(data):
             session_wrapper.session.adapter.config)
 
         message = "Config file saved and backed up"
-        status = 200
-    return web.json_response({'message': message}, status=status)
+        status = True
+
+    return Result(success=status, message=message)
 
 
-async def release(data):
+async def release(data) -> Result:
     """
     Release a session
 
-    :param data: Information obtained from a POST request.
-    The content type is application/json.
-    The correct packet form should be as follows:
-    {
-      'token': UUID token from current session start
-      'command': 'release'
-    }
+    :param data: unused
     """
+    if not session_wrapper.session:
+        raise NoSessionInProgress()
+
     if not feature_flags.use_protocol_api_v2():
         session_wrapper.session.adapter.remove_instrument('left')
         session_wrapper.session.adapter.remove_instrument('right')
     else:
         session_wrapper.session.adapter.cache_instruments()
     session_wrapper.session = None
-    return web.json_response({"message": "calibration session released"})
+
+    return Result(success=True, message="calibration session released")
+
 
 # ---------------------- End Route Fns -------------------------
 
@@ -599,76 +589,69 @@ router = {'jog': run_jog,
           'release': release}
 
 
-async def start(request):
+class SessionInProgress(Exception):
+    pass
+
+
+class NoSessionInProgress(Exception):
+    pass
+
+
+class SessionForbidden(Exception):
+    pass
+
+
+class StartSessionResult(NamedTuple):
+    token: str
+    pipette: Dict
+
+
+async def start(force: bool, hardware) -> StartSessionResult:
     """
     Begins the session manager for factory calibration, if a session is not
     already in progress, or if the "force" key is specified in the request. To
     force, use the following body:
-    {
-      "force": true
-    }
+
+    :param force: force creation of a session
+    :param hardware: hardware instance
     :return: The current session ID token or an error message
     """
-    try:
-        body = await request.json()
-    except json.decoder.JSONDecodeError:
-        # Body will be null for requests without parameters (normal operation)
-        log.debug("No body in {}".format(request))
-        body = {}
+    if session_wrapper.session and not force:
+        raise SessionInProgress(
+            'Error, session in progress. Use "force" key in request '
+            'body to override')
 
-    if not session_wrapper.session or body.get('force'):
-        hardware = hw_from_req(request)
-        if body.get('force') and session_wrapper.session:
-            await release(data={})
+    if force and session_wrapper.session:
+        await release({})
 
-        session_wrapper.session = SessionManager(hardware)
-        res = init_pipette()
-        if res:
-            status = 201
-            data = {'token': session_wrapper.session.id, 'pipette': res}
-        else:
-            session_wrapper.session = None
-            status = 403
-            data = {'message': 'Error, pipette not recognized'}
-    else:
-        data = {'message': 'Error, session in progress. Use "force" key in'
-                           ' request body to override'}
-        status = 409
-    return web.json_response(data, status=status)
+    session_wrapper.session = SessionManager(hardware)
+    res = init_pipette(session_wrapper.session)
+    if not res:
+        session_wrapper.session = None
+        raise SessionForbidden('Error, pipette not recognized')
+
+    return StartSessionResult(token=session_wrapper.session.id,
+                              pipette=res)
 
 
-async def dispatch(request):
+async def dispatch(token: str, command: str, command_data) -> Result:
     """
     Routes commands to subhandlers based on the command field in the body.
-    """
-    if session_wrapper.session:
-        message = ''
-        data = await request.json()
-        try:
-            log.info("Dispatching {}".format(data))
-            _id = data.get('token')
-            if not _id:
-                message = '"token" field required for calibration requests'
-                raise AssertionError
-            command = data.get('command')
-            if not command:
-                message = '"command" field required for calibration requests'
-                raise AssertionError
 
-            if _id == session_wrapper.session.id:
-                res = await router[command](data)
-            else:
-                res = web.json_response(
-                    {'message': 'Invalid token: {}'.format(_id)}, status=403)
-        except AssertionError:
-            res = web.json_response({'message': message}, status=400)
-        except Exception as e:
-            res = web.json_response(
-                {'message': 'Exception {} raised by dispatch of {}: {}'.format(
-                    type(e), data, e)},
-                status=500)
-    else:
-        res = web.json_response(
-            {'message': 'Session must be started before issuing commands'},
-            status=418)
+    :param token: The session token. Must match the current session
+    :param command: The calibration command
+    :param command_data: The data to pass to command router
+    """
+    if not session_wrapper.session:
+        raise NoSessionInProgress("Session must be started before "
+                                  "issuing commands")
+
+    log.info("Dispatching token=%s, command=%s, command_data=%s",
+             token, command, command_data)
+
+    if token != session_wrapper.session.id:
+        raise SessionForbidden(f"Invalid token: {token}")
+
+    res = await router[command](data=command_data)
+
     return res
