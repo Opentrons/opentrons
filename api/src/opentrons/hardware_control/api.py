@@ -266,7 +266,7 @@ class API(HardwareAPILike):
                 if 'needsUnstick' in p.config.quirks:
                     splits[plunger_axis.name.upper()] = MoveSplit(
                         split_distance=1,
-                        split_current=1.5,
+                        split_current=1.75,
                         split_speed=1,
                         after_time=1800,
                         fullstep=True)
