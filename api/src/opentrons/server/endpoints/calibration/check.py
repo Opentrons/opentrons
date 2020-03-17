@@ -1,10 +1,9 @@
+import json
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 
 from .session import CalibrationSession
-from .models import (CalibrationCheckStates,
-                     CalibrationSessionStatus,
-                     CalibrationErrorStates)
+from .models import CalibrationSessionStatus
 
 
 def _format_status(
@@ -12,20 +11,23 @@ def _format_status(
         router: UrlDispatcher,
         pipette_id: str = None) -> 'CalibrationSessionStatus':
     pips = session._pipettes
+    # pydantic restricts dictionary keys that can be evaluated. Since
+    # the session pipettes dictionary has a UUID as a key, we must first
+    # convert the UUID to a hex string.
     instruments = {token.hex: data for token, data in pips.items() if token}
-    current = session.state_machine.current_state
-    next = session.state_machine.next_state(current.value).name
+    current = session.state_machine.current_state.name
+    next = session.state_machine.next_state(current).name
     path = router.get(next, '')
     if path:
         url = path.url_for()
     else:
         url = path
     links = {'links': {next: url}}
-    token = session.token.hex
+    token = session.token
     status = CalibrationSessionStatus(
         instruments=instruments,
         activeInstrument=pipette_id,
-        currentStep=current.name,
+        currentStep=current,
         nextSteps=links,
         sessionToken=token)
     return status
@@ -51,7 +53,8 @@ async def get_current_session(request):
         return web.json_response(response, status=404)
     else:
         response = _format_status(current_session, request.app.router, pip_id)
-        return web.json_response(response.dict(), status=200)
+        serialize = response.json()
+        return web.json_response(json.loads(serialize), status=200)
 
 
 async def create_session(request):
@@ -65,18 +68,19 @@ async def create_session(request):
     session_storage = request.app['com.opentrons.session_manager']
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
-        # There is a new session created, we must cache currently attached
-        # instruments and return them.
         hardware = request.app['com.opentrons.hardware']
         await hardware.cache_instruments()
-        new_session = CalibrationSession(
-            hardware, CalibrationCheckStates, CalibrationErrorStates)
+        new_session = CalibrationSession(hardware)
         session_storage.sessions[session_type] = new_session
         response = _format_status(new_session, request.app.router)
-        return web.json_response(response.dict(), status=201)
+        # Ugly work-around for serializing UUIDs and Axis types. See
+        # models.py for further information.
+        serialize = response.json()
+        return web.json_response(json.loads(serialize), status=201)
     else:
         response = _format_status(current_session, request.app.router)
-        return web.json_response(response.dict(), status=200)
+        serialize = response.json()
+        return web.json_response(json.loads(serialize), status=200)
 
 
 async def delete_session(request):
