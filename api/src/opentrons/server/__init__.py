@@ -8,17 +8,17 @@ import threading
 import time
 import traceback
 
-from typing import TYPE_CHECKING, Union
+from typing import TYPE_CHECKING
 from aiohttp import web
 
 from opentrons.config import CONFIG
 from .rpc import RPCServer
 from .http import HTTPServer
+from .endpoints.calibration.session import SessionManager
 from opentrons.api.routers import MainRouter
 
 if TYPE_CHECKING:
     from opentrons.hardware_control import ThreadManager  # noqa(F501)
-    from opentrons.hardware_control.types import HardwareAPILike
 
 log = logging.getLogger(__name__)
 
@@ -87,7 +87,7 @@ class ThreadedAsyncLock:
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: Union[ThreadManager, HardwareAPILike] = None,
+def init(hardware: 'ThreadManager' = None,
          loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
@@ -106,6 +106,7 @@ def init(hardware: Union[ThreadManager, HardwareAPILike] = None,
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.session_manager'] = SessionManager()
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -116,8 +117,6 @@ def init(hardware: Union[ThreadManager, HardwareAPILike] = None,
                 log.exception(f"failed to remove app temp path {temppath}")
 
     async def shutdown_hardware(app):
-        # import pdb
-        # pdb.set_trace()
         if app['com.opentrons.hardware']:
             app['com.opentrons.hardware'].clean_up()
 
@@ -127,7 +126,7 @@ def init(hardware: Union[ThreadManager, HardwareAPILike] = None,
     return app
 
 
-def run(hardware: Union[ThreadManager, HardwareAPILike],
+def run(hardware: 'ThreadManager',
         hostname=None,
         port=None,
         path=None):

@@ -198,7 +198,6 @@ def old_aspiration(monkeypatch):
 async def async_server(hardware, virtual_smoothie_env, loop, aiohttp_server):
     testserver = await aiohttp_server(init(hardware, loop=loop))
     yield testserver.app
-    # await app.shutdown()
 
 
 @pytest.fixture
