@@ -393,9 +393,6 @@ def test_magdeck_gen1_labware_props(loop):
 
 def test_magdeck_gen2_labware_props(loop):
     ctx = papi.ProtocolContext(loop)
-    labware_name = 'biorad_96_wellplate_200ul_pcr'
-    labware_def = json.loads(
-        load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
     mod = ctx.load_module('magnetic module gen2', 1)
     mod.engage(height=25)
     assert mod._module.current_height == 25
