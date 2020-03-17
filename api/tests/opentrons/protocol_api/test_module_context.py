@@ -85,6 +85,7 @@ def test_load_simulating_module(loop, loadname, klass, model):
     mod = ctx.load_module(loadname, 7)
     assert isinstance(mod, klass)
     assert mod.geometry.model.value == model
+    assert mod._module.model() == model
 
 
 def test_tempdeck(loop):
@@ -355,15 +356,18 @@ def test_deprecated_module_load_labware(loop):
     assert lw2.name == labware_name
 
 
-def test_magdeck_labware_props(loop):
+def test_magdeck_gen1_labware_props(loop):
     ctx = papi.ProtocolContext(loop)
     # TODO Ian 2019-05-29 load fixtures, not real defs
     labware_name = 'biorad_96_wellplate_200ul_pcr'
     labware_def = json.loads(
         load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
-    ctx._hw_manager.hardware._backend._attached_modules = [('mod0', 'magdeck')]
     mod = ctx.load_module('magdeck', 1)
     assert mod.labware is None
+    mod.engage(height=45)
+    assert mod._module.current_height == 45
+    with pytest.raises(ValueError):
+        mod.engage(height=45.1)  # max engage height for gen1 is 45 mm
     mod.load_labware(labware_name)
     mod.engage()
     lw_offset = labware_def['parameters']['magneticModuleEngageHeight']
@@ -385,6 +389,18 @@ def test_magdeck_labware_props(loop):
     assert mod._module._driver.plate_height == 2
     mod.engage(height_from_base=2)
     assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
+
+
+def test_magdeck_gen2_labware_props(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'biorad_96_wellplate_200ul_pcr'
+    labware_def = json.loads(
+        load_shared_data(f'labware/definitions/2/{labware_name}/1.json'))
+    mod = ctx.load_module('magnetic module gen2', 1)
+    mod.engage(height=25)
+    assert mod._module.current_height == 25
+    with pytest.raises(ValueError):
+        mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
 
 
 def test_module_compatibility(get_module_fixture, monkeypatch):

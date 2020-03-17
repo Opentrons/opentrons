@@ -134,7 +134,8 @@ class TempDeck(mod_abc.AbstractModule):
         return 'tempdeck'
 
     def model(self) -> str:
-        return _model_from_revision(self._device_info.get('model'))
+        return (self._sim_model or
+                _model_from_revision(self._device_info.get('model')))
 
     @classmethod
     def bootloader(cls) -> mod_abc.UploadFunction:
@@ -152,7 +153,8 @@ class TempDeck(mod_abc.AbstractModule):
                  port: str,
                  execution_manager: ExecutionManager,
                  simulating: bool,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 sim_model: str = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
@@ -164,6 +166,7 @@ class TempDeck(mod_abc.AbstractModule):
             self._driver = self._build_driver(simulating)  # type: ignore
 
         self._poller = None
+        self._sim_model = sim_model
 
     async def set_temperature(self, celsius: float):
         """

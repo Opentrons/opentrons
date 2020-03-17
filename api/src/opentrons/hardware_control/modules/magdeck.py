@@ -8,8 +8,9 @@ from . import update, mod_abc, types
 
 log = logging.getLogger('__name__')
 
-LABWARE_ENGAGE_HEIGHT = {'biorad-hardshell-96-PCR': 18}    # mm
-MAX_ENGAGE_HEIGHT = 45  # mm from home position
+MAX_ENGAGE_HEIGHT = {  # mm from home position
+    'magneticModuleV1': 45,
+    'magneticModuleV2': 25}
 OFFSET_TO_LABWARE_BOTTOM = 5
 
 FIRST_GEN2_REVISION = 20
@@ -100,7 +101,8 @@ class MagDeck(mod_abc.AbstractModule):
         return 'magdeck'
 
     def model(self) -> str:
-        return _model_from_revision(self._device_info.get('model'))
+        return (self._sim_model or
+                _model_from_revision(self._device_info.get('model')))
 
     @classmethod
     def bootloader(cls) -> types.UploadFunction:
@@ -118,7 +120,8 @@ class MagDeck(mod_abc.AbstractModule):
                  port: str,
                  execution_manager: ExecutionManager,
                  simulating: bool,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 sim_model: str = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
@@ -128,6 +131,7 @@ class MagDeck(mod_abc.AbstractModule):
             self._driver = mag_locks[port][1]
         else:
             self._driver = self._build_driver(simulating)  # type: ignore
+        self._sim_model = sim_model
 
     async def calibrate(self):
         """
@@ -142,9 +146,9 @@ class MagDeck(mod_abc.AbstractModule):
         Move the magnet to a specific height, in mm from home position
         """
         await self.wait_for_is_running()
-        if height > MAX_ENGAGE_HEIGHT or height < 0:
+        if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
             raise ValueError('Invalid engage height. Should be 0 to {}'.format(
-                MAX_ENGAGE_HEIGHT))
+                MAX_ENGAGE_HEIGHT[self.model()]))
         self._driver.move(height)
 
     async def deactivate(self):

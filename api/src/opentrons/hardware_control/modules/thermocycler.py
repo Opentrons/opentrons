@@ -161,7 +161,8 @@ class Thermocycler(mod_abc.AbstractModule):
                  execution_manager: ExecutionManager,
                  interrupt_callback: types.InterruptCallback = None,
                  simulating: bool = False,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 sim_model: str = None) -> None:
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
