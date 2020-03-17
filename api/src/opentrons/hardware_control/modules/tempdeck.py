@@ -204,16 +204,16 @@ class TempDeck(mod_abc.AbstractModule):
             status = self.status
 
             if status == 'heating':
-                while (self.temperature < awaiting_temperature):
+                while self.temperature < awaiting_temperature:
                     asyncio.sleep(0.2)
 
             elif status == 'cooling':
-                while (self.temperature > awaiting_temperature):
+                while self.temperature > awaiting_temperature:
                     asyncio.sleep(0.2)
 
         t = self._loop.create_task(_await_temperature(awaiting_temperature))
         await self.make_cancellable(t)
-        return await t
+        await t
 
     async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """
