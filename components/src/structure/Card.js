@@ -2,7 +2,9 @@
 // Card component with drop shadow
 
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
+
+import type { StyledComponent } from 'styled-components'
 
 import * as styles from '../styles'
 
@@ -33,23 +35,27 @@ export function Card(props: CardProps) {
   )
 }
 
-const Section = styled.section`
+const Section: StyledComponent<
+  {| disabled?: boolean |},
+  {||},
+  HTMLElement
+> = styled.section`
   ${styles.FS_BODY_2}
   position: relative;
   overflow: visible;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
   ${({ disabled }) =>
     disabled &&
-    `
-    pointer-events: none;
-    background-color: transparent;
-
-    & * {
-      color: ${styles.C_FONT_DISABLED};
-      fill: ${styles.C_FONT_DISABLED};
+    css`
+      pointer-events: none;
       background-color: transparent;
-    }
-  `}
+
+      & * {
+        color: ${styles.C_FONT_DISABLED};
+        fill: ${styles.C_FONT_DISABLED};
+        background-color: transparent;
+      }
+    `}
 `
 
 const Title = styled.h3`

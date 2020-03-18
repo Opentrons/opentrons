@@ -4,6 +4,9 @@ import cx from 'classnames'
 import { Icon } from '../icons'
 import styles from './forms.css'
 
+export const INPUT_TYPE_TEXT: 'text' = 'text'
+export const INPUT_TYPE_PASSWORD: 'password' = 'password'
+
 // TODO: Ian 2018-09-14 remove 'label' prop when IngredientPropertiesForm gets updated
 
 export type InputFieldProps = {|
@@ -34,7 +37,7 @@ export type InputFieldProps = {|
   /** appears to the right of the caption. Used for character limits, eg '0/45' */
   secondaryCaption?: ?string,
   /** optional input type (default "text") */
-  type?: 'text' | 'password',
+  type?: typeof INPUT_TYPE_TEXT | typeof INPUT_TYPE_PASSWORD,
   /** mouse click handler */
   onClick?: (event: SyntheticMouseEvent<HTMLInputElement>) => mixed,
   /** focus handler */
@@ -88,8 +91,8 @@ function Input(props: InputFieldProps) {
       <div className={styles.input_field}>
         <input
           id={props.id}
-          type={props.type || 'text'}
-          value={props.value || ''}
+          type={props.type ?? INPUT_TYPE_TEXT}
+          value={props.value ?? ''}
           name={props.name}
           placeholder={props.placeholder}
           onChange={props.disabled ? undefined : props.onChange}

@@ -22,5 +22,8 @@ export * from './slotmap'
 export * from './structure'
 export * from './tooltips'
 
+// styles
+export * from './styles'
+
 // Pure Types
 export * from './robot-types'
