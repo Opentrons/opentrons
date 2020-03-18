@@ -7,6 +7,7 @@ import { postWifiKeysEpic } from './postWifiKeysEpic'
 import { statusEpic } from './statusEpic'
 import { wifiConfigureEpic } from './wifiConfigureEpic'
 import { wifiListEpic } from './wifiListEpic'
+import { disconnectEpic } from './disconnectEpic'
 
 import type { Epic } from '../../types'
 
@@ -16,5 +17,6 @@ export const networkingEpic: Epic = combineEpics(
   postWifiKeysEpic,
   statusEpic,
   wifiConfigureEpic,
-  wifiListEpic
+  wifiListEpic,
+  disconnectEpic
 )

@@ -30,7 +30,7 @@ export const mockEapStringField: WifiAuthField = {
 export const mockEapPasswordField: WifiAuthField = {
   name: 'passwordField',
   displayName: 'Password Field',
-  required: true,
+  required: false,
   type: AUTH_TYPE_PASSWORD,
 }
 
