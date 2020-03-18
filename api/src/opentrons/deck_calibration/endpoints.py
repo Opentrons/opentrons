@@ -652,6 +652,11 @@ async def dispatch(token: str, command: str, command_data) -> Result:
     if token != session_wrapper.session.id:
         raise SessionForbidden(f"Invalid token: {token}")
 
+    route_func = router.get(command)
+    if not route_func:
+        raise SessionForbidden(
+            f"Command \"{command}\" is unknown and cannot be executed")
+
     res = await router[command](data=command_data)
 
     return res

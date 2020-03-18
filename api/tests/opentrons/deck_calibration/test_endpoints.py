@@ -332,6 +332,20 @@ async def test_incorrect_token(dc_session):
                                  })
 
 
+async def test_invalid_command(dc_session):
+    """
+    Test that an unknown command to dispatch will raise an error.
+    """
+    with pytest.raises(endpoints.SessionForbidden,
+                       match="Command \"do something wrong\""):
+        await endpoints.dispatch(token=dc_session.id,
+                                 command='do something wrong',
+                                 command_data={
+                                     'mount': 'left',
+                                     'model': 'p10_single_v1'
+                                 })
+
+
 # ------------ Router tests (integration) ----------------------
 # TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
 async def test_set_and_jog_integration(hardware, monkeypatch):
