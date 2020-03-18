@@ -15,6 +15,7 @@ import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { SUPPORTED_MODULE_TYPES } from '../../modules'
 import { CrashInfoBox } from './CrashInfoBox'
 import { ModuleRow } from './ModuleRow'
+import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModulesForEditModulesCard } from '../../step-forms'
@@ -36,7 +37,17 @@ export function EditModulesCard(props: Props) {
     stepFormSelectors.getPipettesForEditPipetteForm
   )
 
-  const moduleRestritionsDisabled = Boolean(
+  const magneticModuleOnDeck = modules[MAGNETIC_MODULE_TYPE]
+  const temperatureModuleOnDeck = modules[TEMPERATURE_MODULE_TYPE]
+
+  const hasCrashableMagneticModule =
+    magneticModuleOnDeck &&
+    isModuleWithCollisionIssue(magneticModuleOnDeck.model)
+  const hasCrashableTempModule =
+    temperatureModuleOnDeck &&
+    isModuleWithCollisionIssue(temperatureModuleOnDeck.model)
+
+  const moduleRestrictionsDisabled = Boolean(
     useSelector(featureFlagSelectors.getDisableModuleRestrictions)
   )
   const crashablePipettesSelected = getIsCrashablePipetteSelected(
@@ -44,18 +55,17 @@ export function EditModulesCard(props: Props) {
   )
 
   const warningsEnabled =
-    !moduleRestritionsDisabled && crashablePipettesSelected
+    !moduleRestrictionsDisabled && crashablePipettesSelected
   const showCrashInfoBox =
-    warningsEnabled &&
-    (modules[MAGNETIC_MODULE_TYPE] || modules[TEMPERATURE_MODULE_TYPE])
+    warningsEnabled && (hasCrashableMagneticModule || hasCrashableTempModule)
 
   return (
     <Card title="Modules">
       <div className={styles.modules_card_content}>
         {showCrashInfoBox && (
           <CrashInfoBox
-            magnetOnDeck={Boolean(modules[MAGNETIC_MODULE_TYPE])}
-            temperatureOnDeck={Boolean(modules[TEMPERATURE_MODULE_TYPE])}
+            magnetOnDeck={hasCrashableMagneticModule}
+            temperatureOnDeck={hasCrashableTempModule}
           />
         )}
         {visibleModules.map((moduleType, i) => {

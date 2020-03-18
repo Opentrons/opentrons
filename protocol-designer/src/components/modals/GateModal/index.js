@@ -2,9 +2,10 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
-import { AlertModal, Icon } from '@opentrons/components'
+import { AlertModal, Icon, OutlineButton } from '@opentrons/components'
 import { opentronsWebApi, type GateStage } from '../../../networking'
 import { i18n } from '../../../localization'
+import { writeFakeIdentityCookie } from '../../../networking/opentronsWebApi'
 import CHECK_EMAIL_IMAGE from '../../../images/youve_got_mail.svg'
 import {
   actions as analyticsActions,
@@ -31,11 +32,17 @@ type State = { gateStage: GateStage, errorMessage: ?string }
 
 class GateModalComponent extends React.Component<Props, State> {
   constructor(props: Props) {
-    super()
+    super(props)
     this.state = { gateStage: 'loading', errorMessage: '' }
+  }
 
-    opentronsWebApi
-      .getGateStage(props.hasOptedIn)
+  componentDidMount() {
+    this.refreshState()
+  }
+
+  refreshState() {
+    return opentronsWebApi
+      .getGateStage(this.props.hasOptedIn)
       .then(({ gateStage, errorMessage }) => {
         this.setState({ gateStage, errorMessage })
       })
@@ -63,6 +70,15 @@ class GateModalComponent extends React.Component<Props, State> {
             <div className={settingsStyles.body_wrapper}>
               <SignUpForm />
             </div>
+            <OutlineButton
+              className={modalStyles.bottom_button}
+              onClick={() => {
+                writeFakeIdentityCookie()
+                this.refreshState()
+              }}
+            >
+              SKIP SIGN UP
+            </OutlineButton>
           </AlertModal>
         )
       case 'promptOptForAnalytics':

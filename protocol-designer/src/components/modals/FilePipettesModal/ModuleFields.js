@@ -41,7 +41,7 @@ export function ModuleFields(props: Props) {
               onChange={handleOnDeckChange(moduleType)}
               tabIndex={i}
             />
-            <ModuleDiagram type={moduleType} />
+            <ModuleDiagram type={moduleType} model={defaultModel} />
             {/*
               TODO (ka 2019-10-22): This field is disabled until Gen 2 Modules are available
               - onChange returns null because onChange is required by DropdownFields
