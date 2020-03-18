@@ -24,8 +24,8 @@ async def test_start_call(async_client, hardware, body, args):
 async def test_start_response(async_client):
     with patch(CREATE_SESSION_PATCH) as p:
         async def mock_create_session(*args, **kwargs):
-            return endpoints.StartSessionResult(token="my token",
-                                                pipette={"left": 3})
+            return endpoints.CreateSessionResult(token="my token",
+                                                 pipette={"left": 3})
 
         p.side_effect = mock_create_session
         response = await async_client.post('/calibration/deck/start')
@@ -90,7 +90,7 @@ async def test_dispatch_call_response(async_client,
                                       expected_status):
     with patch(DISPATCH_PATCH) as p:
         async def mock_dispatch(*args, **kwargs):
-            return endpoints.Result(success=success, message=message)
+            return endpoints.CommandResult(success=success, message=message)
 
         p.side_effect = mock_dispatch
         response = await async_client.post('/calibration/deck',

@@ -222,12 +222,12 @@ def _get_model_name(pipette, adapter):
 # endpoint
 # ------------------------------------------------------------------------
 
-class Result(NamedTuple):
+class CommandResult(NamedTuple):
     success: bool
     message: str
 
 
-async def attach_tip(data) -> Result:
+async def attach_tip(data) -> CommandResult:
     """
     Attach a tip to the current pipette
 
@@ -263,10 +263,10 @@ async def attach_tip(data) -> Result:
         message = "Tip length set: {}".format(tip_length)
         status = True
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def detach_tip(data) -> Result:
+async def detach_tip(data) -> CommandResult:
     """
     Detach the tip from the current pipette
 
@@ -288,10 +288,10 @@ async def detach_tip(data) -> Result:
             session_wrapper.session.cp = CriticalPoint.NOZZLE
     session_wrapper.session.tip_length = None
 
-    return Result(success=True, message="Tip removed")
+    return CommandResult(success=True, message="Tip removed")
 
 
-async def run_jog(data: dict) -> Result:
+async def run_jog(data: dict) -> CommandResult:
     """
     Allow the user to jog the selected pipette around the deck map
 
@@ -331,10 +331,10 @@ async def run_jog(data: dict) -> Result:
         message = 'Jogged to {}'.format(position)
         status = True
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def move(data) -> Result:
+async def move(data) -> CommandResult:
     """
     Allow the user to move the selected pipette to a specific point
 
@@ -418,10 +418,10 @@ async def move(data) -> Result:
         message = '"point" must be one of "1", "2", "3", "safeZ", "attachTip"'
         status = False
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def save_xy(data) -> Result:
+async def save_xy(data) -> CommandResult:
     """
     Save the current XY values for the calibration data
 
@@ -465,10 +465,10 @@ async def save_xy(data) -> Result:
             point, session_wrapper.session.points[point])
         status = True
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def save_z(data) -> Result:
+async def save_z(data) -> CommandResult:
     """
     Save the current Z height value for the calibration data
 
@@ -509,10 +509,10 @@ async def save_z(data) -> Result:
         message = "Saved z: {}".format(session_wrapper.session.z_value)
         status = True
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def save_transform(data) -> Result:
+async def save_transform(data) -> CommandResult:
     """
     Calculate the transformation matrix that calibrates the gantry to the deck
 
@@ -554,10 +554,10 @@ async def save_transform(data) -> Result:
         message = "Config file saved and backed up"
         status = True
 
-    return Result(success=status, message=message)
+    return CommandResult(success=status, message=message)
 
 
-async def release(data) -> Result:
+async def release(data) -> CommandResult:
     """
     Release a session
 
@@ -573,7 +573,7 @@ async def release(data) -> Result:
         session_wrapper.session.adapter.cache_instruments()
     session_wrapper.session = None
 
-    return Result(success=True, message="calibration session released")
+    return CommandResult(success=True, message="calibration session released")
 
 
 # ---------------------- End Route Fns -------------------------
@@ -601,12 +601,12 @@ class SessionForbidden(Exception):
     pass
 
 
-class StartSessionResult(NamedTuple):
+class CreateSessionResult(NamedTuple):
     token: str
     pipette: Dict
 
 
-async def create_session(force: bool, hardware) -> StartSessionResult:
+async def create_session(force: bool, hardware) -> CreateSessionResult:
     """
     Begins the session manager for factory calibration, if a session is not
     already in progress, or if the "force" key is specified in the request. To
@@ -630,11 +630,11 @@ async def create_session(force: bool, hardware) -> StartSessionResult:
         session_wrapper.session = None
         raise SessionForbidden('Error, pipette not recognized')
 
-    return StartSessionResult(token=session_wrapper.session.id,
-                              pipette=res)
+    return CreateSessionResult(token=session_wrapper.session.id,
+                               pipette=res)
 
 
-async def dispatch(token: str, command: str, command_data) -> Result:
+async def dispatch(token: str, command: str, command_data) -> CommandResult:
     """
     Routes commands to subhandlers based on the command field in the body.
 
