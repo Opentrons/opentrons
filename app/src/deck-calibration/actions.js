@@ -1,8 +1,8 @@
 // @flow
-import type { StartDeckCalibrationCheckAction } from './types'
-import { START_CHECK } from './constants'
+import type { StartDeckCheckAction } from './types'
+import { START_DECK_CHECK } from './constants'
 
-export const startDeckCalibrationCheck = (robotName: string): StartDeckCalibrationCheckAction => ({
-  type: START_CHECK,
+export const startDeckCheck = (robotName: string): StartDeckCheckAction => ({
+  type: START_DECK_CHECK,
   meta: { robotName },
 })

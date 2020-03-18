@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { startDeckCalibrationCheck } from '../../deck-calibration'
+import { startDeckCalibrationCheck } from '../../calibration'
 import { getConfig } from '../../config'
 import {
   home,
