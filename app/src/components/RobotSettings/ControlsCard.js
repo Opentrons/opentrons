@@ -18,7 +18,7 @@ import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
 
-import { Card, LabeledToggle, LabeledButton, HoverTooltip } from '@opentrons/components'
+import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -34,8 +34,6 @@ const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
 const CHECK_DECK_CAL_DESCRIPTION = "Check the robot's deck calibration"
-
-const CONNECT_FOR_CONTROL = 'Connect to robot to control'
 
 export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
@@ -68,25 +66,16 @@ export function ControlsCard(props: Props) {
   return (
     <Card title={TITLE} disabled={notConnectable}>
       {enableDeckCalCheck && (
-        <HoverTooltip
-          tooltipComponent={buttonDisabled ? CONNECT_FOR_CONTROL : null}
-          modifiers={{ shift: {enabled: true} }} //, offset: { offset: '100%, 8px' } }}
+        <LabeledButton
+          label="Check deck calibration"
+          buttonProps={{
+            onClick: checkCalibration,
+            disabled: buttonDisabled,
+            children: 'Check',
+          }}
         >
-          {hoverTooltipHandlers => (
-            <div {...hoverTooltipHandlers}>
-              <LabeledButton
-                label="Check deck calibration"
-                buttonProps={{
-                  onClick: checkCalibration,
-                  disabled: buttonDisabled,
-                  children: 'Check',
-                }}
-              >
-                <p>{CHECK_DECK_CAL_DESCRIPTION}</p>
-              </LabeledButton>
-            </div>
-          )}
-        </HoverTooltip>
+          <p>{CHECK_DECK_CAL_DESCRIPTION}</p>
+        </LabeledButton>
       )}
       <LabeledButton
         label="Calibrate deck"
