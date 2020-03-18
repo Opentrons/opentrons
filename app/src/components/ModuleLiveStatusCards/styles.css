@@ -21,7 +21,6 @@ updated component library cards after redesign/refactor
 
 .card_row {
   padding: 1rem 0.5rem;
-  text-align: justify;
   font-size: var(--fs-body-1);
   display: flex;
   align-items: center;
