@@ -16,15 +16,16 @@ class AttachedPipette(BaseModel):
                           "case as in the Protocol API. This includes the full"
                           " version string")
     name: Optional[str] =\
-        Field(None, description="")
+        Field(None, description="Short name of pipette model without"
+                                "generation version")
     tip_length: Optional[float] =\
-        Field(None, description="")
+        Field(None, description="The default tip length for this pipette")
     mount_axis: Optional[Axis] =\
-        Field(None, description="")
+        Field(None, description="The axis that moves this pipette up and down")
     plunger_axis: Optional[Axis] =\
-        Field(None, description="")
+        Field(None, description="The axis that moves plunger of this pipette")
     pipette_id: Optional[str] =\
-        Field(None, description="")
+        Field(None, description="The serial number of the attached pipette")
 
     class Config:
         json_encoders = {Axis: str}
@@ -68,8 +69,6 @@ class CalibrationSessionStatus(BaseModel):
     The current status of a given session.
     """
     instruments: Instruments
-    activeInstrument: Optional[UUID4] =\
-        Field(None, description="The active instrument")
     currentStep: str = Field(..., description="Current step of session")
     nextSteps: Dict[str, Dict[str, str]] =\
         Field(..., description="Next Available Step in Session")
@@ -98,7 +97,6 @@ class CalibrationSessionStatus(BaseModel):
                             "id": None
                         }
                     },
-                    "activeInstrument": "FakeUUIDHex",
                     "currentStep": "sessionStart",
                     "nextSteps": {
                         "links": {

@@ -1,4 +1,5 @@
-from typing import Dict, TypeVar, Union
+import enum
+from typing import TypeVar
 
 """
 Note, the general types below should be restricted to the following:
@@ -12,6 +13,8 @@ type checking. See https://github.com/python/mypy/issues/3644
 stateInput = TypeVar('stateInput', bound=str)
 stateOutput = TypeVar('stateOutput')
 
+relationship = TypeVar('relationship', bound=enum.Enum)
+
 
 class State:
     """
@@ -21,13 +24,43 @@ class State:
     def __init__(self, name: stateInput, value: stateOutput):
         self.name = name
         self.value = value
-        self._relationships: Dict[Union[int, str], stateOutput] = {}
 
-    def add_relationship(self, input: stateInput, output: stateOutput):
-        self._relationships[input] = output
 
-    def next(self, input):
-        return self._relationships[input]
+class StateEnum(enum.Enum):
+    sessionStart = State("sessionStart", enum.auto())
+    specifyLabware = State("specifyLabware", enum.auto())
+    pickUpTip = State("pickUpTip", enum.auto())
+    checkPointOne = State("checkPointOne", enum.auto())
+    checkPointTwo = State("checkPointTwo", enum.auto())
+    checkPointThree = State("checkPointThree", enum.auto())
+    checkHeight = State("checkHeight", enum.auto())
+    sessionExit = State("sessionExit", enum.auto())
+    badDeckCalibration = State("badDeckCalibration", enum.auto())
+    noPipettesAttached = State("noPipettesAttached", enum.auto())
+
+
+class RelationshipEnum(enum.Enum):
+    sessionStart = StateEnum.specifyLabware
+    specifyLabware = StateEnum.pickUpTip
+    checkPointOne = StateEnum.checkPointTwo
+    checkPointTwo = StateEnum.checkPointThree
+    checkPointThree = StateEnum.checkHeight
+    checkHeight = StateEnum.sessionStart
+
+
+class ExitRelationshipEnum(enum.Enum):
+    badDeckCalibration = StateEnum.sessionExit
+    checkHeight = StateEnum.sessionExit
+    noPipettesAttached = StateEnum.sessionExit
+
+
+class ErrorRelationshipEnum(enum.Enum):
+    sessionStart = StateEnum.noPipettesAttached
+    specifyLabware = StateEnum.badDeckCalibration
+    checkPointOne = StateEnum.badDeckCalibration
+    checkPointTwo = StateEnum.badDeckCalibration
+    checkPointThree = StateEnum.badDeckCalibration
+    checkHeight = StateEnum.badDeckCalibration
 
 
 class StateMachine:
@@ -35,71 +68,55 @@ class StateMachine:
     A class for building a mealy state machine pattern based on
     steps provided to this class.
     """
-    def __init__(self):
-        self.states = {}
-        self._current_state = None
-
-    def add_state(self, state_name: stateInput, state_value: stateOutput):
-        self.states[state_name] = State(state_name, state_value)
+    def __init__(
+            self, states, rel: relationship,
+            exit: relationship, error: relationship):
+        state_list = list(states)
+        self._states = {enum.name: enum.value for enum in state_list}
+        self._relationship = rel
+        self._exit_relationship = exit
+        self._error_relationship = error
+        self._current_state = state_list[0].value
 
     def get_state(self, state_name: stateInput) -> 'State':
-        return self.states[state_name]
+        return self._states[state_name]
 
     def update_state(self, state_name: stateInput):
         next_state = self.next_state(state_name)
-        self._current_state = next_state
+        if next_state:
+            self._current_state = next_state
 
-    def next_state(self, input: stateInput) -> 'State':
-        next = self._current_state.next(input)
-        return self.states[next.name]
+    def next_state(self, input: stateInput = None) -> 'State':
+        """
+        Next state will either check the input or the current state to see
+        if it can find a relationship in any of the enum classes provided.
+        """
+        curr = input if input else self._current_state.name
+        if curr and hasattr(self._relationship, curr):
+            rel = getattr(self._relationship, curr)
+            if rel:
+                return self._states[rel.value.name]
+        if curr and hasattr(self._exit_relationship, curr):
+            rel = getattr(self._exit_relationship, curr)
+            if rel:
+                return self._states[rel.value.name]
+        if curr and hasattr(self._error_relationship, curr):
+            rel = getattr(self._error_relationship, curr)
+            if rel:
+                return self._states[rel.value.name]
+        return self._current_state
 
     def set_start(self, state_name: stateInput):
-        self._current_state = self.states[state_name]
+        self._current_state = self._states[state_name]
 
     @property
-    def current_state(self):
+    def current_state(self) -> 'State':
         return self._current_state
 
 
 class CalibrationCheckMachine(StateMachine):
     def __init__(self):
-        super().__init__()
-        self._build_state_machine()
-
-    def _build_state_machine(self):
-        self.add_state("sessionStart", 0)
-        self.add_state("specifyLabware", 1)
-        self.add_state("pickUpTip", 2)
-        self.add_state("checkPointOne", 3)
-        self.add_state("checkPointTwo", 4)
-        self.add_state("checkPointThree", 5)
-        self.add_state("checkHeight", 6)
-        self.add_state("sessionExit", 7)
-        self.add_state("badDeckCalibration", 8)
-        self.add_state("noPipettesAttached", 9)
-
-        self._modify_state("sessionStart", "sessionStart", "specifyLabware")
-        self._modify_state("sessionStart", "noPipettesAttached", "sessionExit")
-        self._modify_state("sessionStart", "badDeckCalibration", "sessionExit")
-        self._modify_state("specifyLabware", "specifyLabware", "pickUpTip")
-        self._modify_state(
-            "specifyLabware", "badDeckCalibration", "sessionExit")
-        self._modify_state("pickUpTip", "pickUpTip", "checkPointOne")
-        self._modify_state("pickUpTip", "badDeckCalibration", "sessionExit")
-        self._modify_state("checkPointOne", "checkPointOne", "checkPointTwo")
-        self._modify_state(
-            "checkPointOne", "badDeckCalibration", "sessionExit")
-        self._modify_state("checkPointTwo", "checkPointTwo", "checkPointThree")
-        self._modify_state(
-            "checkPointTwo", "badDeckCalibration", "sessionExit")
-        self._modify_state(
-            "checkPointThree", "checkPointThree", "specifyLabware")
-        self._modify_state("checkPointThree", "sessionExit", "sessionExit")
-
-    def _modify_state(
-            self,
-            state_name: stateInput,
-            input: stateInput,
-            output: stateInput):
-        output_state = self.get_state(output)
-        self.get_state(state_name).add_relationship(input, output_state)
+        super().__init__(StateEnum,
+                         RelationshipEnum,
+                         ExitRelationshipEnum,
+                         ErrorRelationshipEnum)

@@ -61,5 +61,9 @@ class CalibrationSession:
     def hardware(self):
         return self._hardware
 
-    def current_pipette(self, uuid: UUID4) -> 'AttachedPipette':
+    def get_pipette(self, uuid: UUID4) -> 'AttachedPipette':
         return self._pipettes[uuid]
+
+    @property
+    def pipettes(self) -> typing.Dict:
+        return self._pipettes

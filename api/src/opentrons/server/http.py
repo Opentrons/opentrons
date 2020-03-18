@@ -98,8 +98,6 @@ class HTTPServer(object):
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
-        self.app.router.add_get(
-            '/calibration/{type}/session/{id}', check.get_current_session)
         self.app.router.add_post(
             '/calibration/{type}/session', check.create_session)
         self.app.router.add_delete(
