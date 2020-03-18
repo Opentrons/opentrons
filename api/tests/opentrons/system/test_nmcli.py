@@ -3,6 +3,16 @@ import pytest  # noqa
 from opentrons.system import nmcli
 
 
+def test_parse_colonsep():
+    assert nmcli._parse_colonsep_response(
+        'dank mimos\\: slow zone:100:yes:wpa2\n'
+        'some other network:20:no:wep\n'
+        'blah:4:yes:none\n')\
+        == [['dank mimos: slow zone', '100', 'yes', 'wpa2'],
+            ['some other network', '20', 'no', 'wep'],
+            ['blah', '4', 'yes', 'none']]
+
+
 def test_sanitize_args():
     cmd = ['nmcli',
            'connection', 'add', 'wifi.ssid', 'Opentrons',

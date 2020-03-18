@@ -11,6 +11,7 @@ is relevant in particular because they mostly do not handle exceptions coming
 from subprocess itself, only parsing nmcli output.
 """
 
+import csv
 import logging
 import re
 import copy
@@ -643,6 +644,13 @@ def sanitize_args(cmd: List[str]) -> List[str]:
     return sanitized
 
 
+def _parse_colonsep_response(
+        response_fullstring: str) -> List[List[str]]:
+    reader = csv.reader(response_fullstring.split('\n'),
+                        delimiter=':', escapechar='\\')
+    return [row for row in reader if row]
+
+
 def _dict_from_terse_tabular(
         names: List[str],
         inp: str,
@@ -666,10 +674,10 @@ def _dict_from_terse_tabular(
     for n in names:
         if n not in transformers:
             transformers[n] = lambda s: s
-    for line in inp.split('\n'):
-        if len(line) < 3:
+    for fields in _parse_colonsep_response(inp):
+        if len(fields) != len(names):
+            log.warning(f'ignoring unparsable fields <{fields}>')
             continue
-        fields = line.split(':')
         res.append(dict([
             (elem[0], transformers[elem[0]](elem[1]))
             for elem in zip(names, fields)]))
