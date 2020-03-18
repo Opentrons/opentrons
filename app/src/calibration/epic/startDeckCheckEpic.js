@@ -1,7 +1,7 @@
 // @flow
 import { ofType } from 'redux-observable'
 
-import { GET } from '../../robot-api/constants'
+import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 
 import * as Actions from '../actions'
@@ -15,15 +15,13 @@ import type {
 } from '../../robot-api/operators'
 
 import type { StartDeckCheckAction } from '../types'
-import type {
-} from '../api-types'
 
 const mapActionToRequest: ActionToRequestMapper<StartDeckCheckAction> = action => ({
-  method: GET,
+  method: POST,
   path: Constants.DECK_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchModulesAction> = (
+const mapResponseToAction: ResponseToActionMapper<StartDeckCheckAction> = (
   response,
   originalAction
 ) => {

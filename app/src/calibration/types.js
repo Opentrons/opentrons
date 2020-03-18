@@ -14,6 +14,11 @@ export type StartDeckCheckSuccessAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type StartDeckCheckFailureAction = {|
+  type: START_DECK_CHECK_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
 export type PerRobotCalibrationState = $ReadOnly<{|
   deckCheck: DeckCheckSessionData | null,
 |}>

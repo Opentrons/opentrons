@@ -5,7 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { startDeckCalibrationCheck } from '../../calibration'
+import { startDeckCheck } from '../../calibration'
 import { getConfig } from '../../config'
 import {
   home,
@@ -54,7 +54,7 @@ export function ControlsCard(props: Props) {
   }
 
   const checkCalibration = () => {
-    dispatch(startDeckCalibrationCheck(robotName))
+    dispatch(startDeckCheck(robotName))
   }
 
   React.useEffect(() => {
