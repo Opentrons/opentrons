@@ -1,219 +1,183 @@
-import json
+import uuid
 from unittest.mock import patch
+import pytest
+import typing
 
 from opentrons.deck_calibration import endpoints
-from opentrons import types
+
+CREATE_SESSION_PATCH = "robot_server.service.routers." \
+                       "deck_calibration.dc.create_session"
+DISPATCH_PATCH = "robot_server.service.routers.deck_calibration.dc.dispatch"
 
 
-# ------------ Session and token tests ----------------------\
-@patch("robot_server.service.routers.deck_calibration.dc.SessionManager")
-def test_create_session(m, api_client, hardware, monkeypatch):
-    """
-    Tests that the POST request to initiate a session manager for factory
-    calibration returns a good token, along with the correct preferred pipette
-    """
-    dummy_token = 'Test Token'
-
-    def uuid_mock():
-        return dummy_token
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    # each tuple in this list is (left-mount, right-mount, correct-choice)
-    pipette_combinations = [
-        ('p300_multi_v1', 'p10_single_v1', 'p10_single_v1'),
-        ('p300_single_v1', 'p10_single_v1', 'p10_single_v1'),
-        ('p10_multi_v1', 'p300_multi_v1', 'p300_multi_v1'),
-        (None, 'p10_single_v1', 'p10_single_v1'),
-        ('p300_multi_v1', None, 'p300_multi_v1'),
-        ('p10_single_v1', 'p300_multi_v1', 'p10_single_v1')]
-    hardware.sync = hardware
-    # hardware = async_server['com.opentrons.hardware']
-    for left_model, right_model, preferred in pipette_combinations:
-        # def dummy_read_model(mount):
-        #     if mount == 'left':
-        #         res = left_model
-        #     else:
-        #         res = right_model
-        #     return res
-        # await hardware.cache_instruments(
-        #     {types.Mount.LEFT: left_model, types.Mount.RIGHT: right_model})
-        resp = api_client.post('/calibration/deck/start')
-        start_result = resp.json()
-        endpoints.session_wrapper.session = None
-
-        assert start_result.get('token') == dummy_token
-        assert start_result.get('pipette', {}).get('model') == preferred
-        assert resp.status_code == 201
+@pytest.fixture
+def test_token() -> str:
+    return str(uuid.uuid1())
 
 
-async def test_create_session_fail(async_client, monkeypatch):
-    """
-    Tests that the GET request to initiate a session manager for factory
-    calibration returns a good token.
-    """
-    from opentrons.legacy_api.robot import Robot
-    dummy_token = 'Test Token'
-
-    def uuid_mock():
-        return dummy_token
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    def dummy_get_pipettes(self):
-        return {
-            'left': {
-                'mount_axis': 'z',
-                'plunger_axis': 'b',
-                'model': None
-            },
-            'right': {
-                'mount_axis': 'a',
-                'plunger_axis': 'c',
-                'model': None
-            }
-        }
-
-    monkeypatch.setattr(Robot, 'get_attached_pipettes', dummy_get_pipettes)
-
-    resp = await async_client.post('/calibration/deck/start')
-    text = await resp.text()
-    assert json.loads(text) == {'message': 'Error, pipette not recognized'}
-    assert resp.status == 403
-    assert endpoints.session_wrapper.session is None
-
-
-async def test_release(async_client, async_server, monkeypatch, dc_session):
-    """
-    Tests that the GET request to initiate a session manager for factory
-    calibration returns an error if a session is in progress, and can be
-    overridden.
-    """
-    resp1 = await async_client.post('/calibration/deck/start')
-    assert resp1.status == 409
-
-    # Release
-    resp2 = await async_client.post(
-        '/calibration/deck',
-        json={
-            'token': dc_session.id,
-            'command': 'release'
-        })
-    assert resp2.status == 200
-    assert endpoints.session_wrapper.session is None
-    await async_server['com.opentrons.hardware'].cache_instruments({
-        types.Mount.LEFT:  None,
-        types.Mount.RIGHT: 'p300_multi_v1'
-    })
-    resp3 = await async_client.post('/calibration/deck/start')
-    assert resp3.status == 201
-
-
-async def test_forcing_new_session(
-        async_server, async_client, monkeypatch, dc_session):
-    """
-    Tests that the GET request to initiate a session manager for factory
-    calibration returns an error if a session is in progress, and can be
-    overridden.
-    """
-    test_model = 'p300_multi_v1'
-    dummy_token = 'fake token'
-
-    def uuid_mock():
-        return dummy_token
-
-    async def mock_release(data):
-        return data
-
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
-
-    resp1 = await async_client.post('/calibration/deck/start')
-    assert resp1.status == 409
-
-    monkeypatch.setattr(endpoints, 'release', mock_release)
-
-    resp2 = await async_client.post(
-        '/calibration/deck/start', json={'force': 'true'})
-    text2 = await resp2.json()
-    assert resp2.status == 201
-    expected2 = {
-        'token': dummy_token,
-        'pipette': {
-            'mount': 'right',
-            'model': test_model
-        }
+@pytest.fixture
+def test_pipette_response() -> typing.Dict:
+    return {
+        "mount": "right",
+        "model": "model"
     }
-    assert text2 == expected2
 
 
-async def test_incorrect_token(async_client, dc_session):
-    """
-    Test that putting in an incorrect token for a POST request does not work
-    after a session was already created with a different token.
-    """
-    resp = await async_client.post(
-        '/calibration/deck',
-        json={
-            'token': 'FAKE TOKEN',
-            'command': 'init pipette',
-            'mount': 'left',
-            'model': 'p10_single_v1'
-        })
+@pytest.mark.parametrize(argnames=["body", "args"],
+                         argvalues=[
+                             [None, False],
+                             [{}, False],
+                             [{"force": False}, False],
+                             [{"force": True}, True],
+                         ])
+def test_start_call(api_client, hardware, body, args,
+                    test_token, test_pipette_response):
+    with patch(CREATE_SESSION_PATCH) as p:
+        async def mock_create_session(*args, **kwargs):
+            return endpoints.CreateSessionResult(token=test_token,
+                                                 pipette=test_pipette_response)
 
-    assert resp.status == 403
+        p.side_effect = mock_create_session
+        api_client.post('/calibration/deck/start', json=body)
+        p.assert_called_once_with(args, hardware)
 
 
-# ------------ Router tests (integration) ----------------------
-# TODO(mc, 2018-05-02): this does not adequately test z to smoothie axis logic
-async def test_set_and_jog_integration(
-        async_client, async_server, monkeypatch):
-    """
-    Test that the jog function works.
-    Note that in order for the jog function to work, the following must
-    be done:
-    1. Create a session manager
+def test_start_response(api_client, test_token, test_pipette_response):
+    with patch(CREATE_SESSION_PATCH) as p:
+        async def mock_create_session(*args, **kwargs):
+            return endpoints.CreateSessionResult(token=test_token,
+                                                 pipette=test_pipette_response)
 
-    Then jog requests will work as expected.
-    """
-    test_model = 'p300_multi_v1'
-    hardware = async_server['com.opentrons.hardware']
-    # Why does this need to be awaited for a synch adapter
-    await hardware.cache_instruments(
-        {types.Mount.LEFT: None, types.Mount.RIGHT: test_model})
+        p.side_effect = mock_create_session
+        response = api_client.post('/calibration/deck/start')
 
-    dummy_token = 'Test Token'
+        assert response.status_code == 201
+        assert response.json() == {"token": test_token,
+                                   "pipette": test_pipette_response}
 
-    def uuid_mock():
-        return dummy_token
 
-    monkeypatch.setattr(endpoints, '_get_uuid', uuid_mock)
+@pytest.mark.parametrize(argnames=["exception_to_raise", "expected_status"],
+                         argvalues=[
+                             [endpoints.SessionForbidden("forbidden"), 403],
+                             [endpoints.SessionInProgress("in prog’"), 409],
+                         ])
+def test_start_error_response(api_client, exception_to_raise,
+                              expected_status, test_token):
+    with patch(CREATE_SESSION_PATCH) as p:
+        async def mock_create_session(*args, **kwargs):
+            raise exception_to_raise
 
-    token_res = await async_client.post('/calibration/deck/start')
-    assert token_res.status == 201, token_res
-    token_text = await token_res.json()
-    token = token_text['token']
+        p.side_effect = mock_create_session
+        response = api_client.post('/calibration/deck/start')
 
-    axis = 'z'
-    direction = 1
-    step = 3
-    # left pipette z carriage motor is smoothie axis "Z", right is "A"
-    sess = endpoints.session_wrapper.session
-    sess.adapter.home()
-    prior_x, prior_y, prior_z = endpoints.position(
-        sess.current_mount, sess.adapter, sess.cp)
+        assert response.status_code == expected_status
+        assert response.json() == {"message": str(exception_to_raise)}
 
-    resp = await async_client.post(
-        '/calibration/deck',
-        json={
-            'token': token,
-            'command': 'jog',
-            'axis': axis,
-            'direction': direction,
-            'step': step
-        })
 
-    body = await resp.json()
-    msg = body.get('message')
+@pytest.mark.parametrize(argnames=["body", "args"],
+                         argvalues=[
+                             [{"token": "f0000000-0000-0000-0001-000000000000",
+                               "command": "attach tip"},
+                              {"token": "f0000000-0000-0000-0001-000000000000",
+                               "command": "attach tip",
+                               "command_data": {}}
+                              ],
+                             [{"token": "f0000000-0000-0000-0000-000000000000",
+                               "command": "attach tip",
+                               "tipLength": 0.1,
+                               "point": "safeZ",
+                               "axis": "x",
+                               "direction": -1,
+                               "step": 0.1
+                               },
+                              {"token": "f0000000-0000-0000-0000-000000000000",
+                               "command": "attach tip",
+                               "command_data": {
+                                   "tipLength": 0.1,
+                                   "point": "safeZ",
+                                   "axis": "x",
+                                   "direction": -1,
+                                   "step": 0.1
+                               }}
+                              ],
+                         ])
+def test_dispatch_call(api_client, body, args):
+    with patch(DISPATCH_PATCH) as p:
+        api_client.post('/calibration/deck', json=body)
+        p.assert_called_once_with(**args)
 
-    assert '{}'.format((prior_x, prior_y, prior_z + step)) in msg
-    endpoints.session_wrapper.session = None
+
+@pytest.mark.parametrize(argnames=["success", "message", "expected_status"],
+                         argvalues=[
+                             [True, "hooray", 200],
+                             [False, "booray", 400],
+                         ])
+def test_dispatch_call_response(api_client,
+                                test_token,
+                                success,
+                                message,
+                                expected_status):
+    with patch(DISPATCH_PATCH) as p:
+        async def mock_dispatch(*args, **kwargs):
+            return endpoints.CommandResult(success=success, message=message)
+
+        p.side_effect = mock_dispatch
+        response = api_client.post('/calibration/deck',
+                                   json={"token": test_token,
+                                         "command": "jog"})
+
+        assert response.status_code == expected_status
+        assert response.json() == {"message": message}
+
+
+@pytest.mark.parametrize(argnames=["exception_to_raise",
+                                   "expected_status"],
+                         argvalues=[
+                             [endpoints.NoSessionInProgress("nosession"),
+                              418
+                              ],
+                             [endpoints.SessionForbidden("cant do it"),
+                              403
+                              ],
+                             [AssertionError("assertion"),
+                              400
+                              ],
+                             [KeyError("Some Error"),
+                              500,
+                              ],
+                         ])
+def test_dispatch_error_response(api_client,
+                                 test_token,
+                                 exception_to_raise,
+                                 expected_status):
+    with patch(DISPATCH_PATCH) as p:
+        async def mock_dispatch(*args, **kwargs):
+            raise exception_to_raise
+
+        p.side_effect = mock_dispatch
+        response = api_client.post('/calibration/deck',
+                                   json={
+                                       "token": test_token,
+                                       "command": "attach tip"
+                                   })
+
+        assert response.status_code == expected_status
+
+
+@pytest.mark.parametrize(argnames=["body"],
+                         argvalues=[
+                             [{}],
+                             [{
+                                 "token": '00000000-0000-0000'
+                                          '-0001-000000000000'
+                             }],
+                             [{"command": "boo"}],
+                             [{
+                                 "token": 'not a uuid',
+                                 "command": "attach tip"
+                             }],
+                             [{"boo": "boo"}],
+                         ])
+def test_dispatch_validation_error(api_client, body):
+    response = api_client.post('/calibration/deck', json=body)
+    assert response.status_code == 422

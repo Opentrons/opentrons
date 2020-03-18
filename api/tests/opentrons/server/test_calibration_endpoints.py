@@ -17,6 +17,9 @@ DISPATCH_PATCH = "opentrons.server.endpoints.deck_calibration.dc.dispatch"
                          ])
 async def test_start_call(async_client, hardware, body, args):
     with patch(CREATE_SESSION_PATCH) as p:
+        async def mock_create_session(*args, **kwargs):
+            pass
+
         await async_client.post('/calibration/deck/start', json=body)
         p.assert_called_once_with(args, hardware)
 
