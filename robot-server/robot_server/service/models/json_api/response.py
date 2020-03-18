@@ -76,7 +76,7 @@ class ResponseModel(GenericModel, Generic[DataT]):
 
 # Note(isk: 3/13/20): returns response based on whether
 # the data object is a list or not
-def JsonApiResponse(
+def json_api_response(
     type_string: str,
     attributes_model: Any,
     *,

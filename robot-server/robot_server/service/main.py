@@ -41,6 +41,8 @@ app.include_router(router=modules.router,
                    tags=["modules"])
 app.include_router(router=pipettes.router,
                    tags=["pipettes"])
+# TODO(isk: 3/18/20): this is an example route, remove item route and model
+# once response work is implemented in new route handlers
 app.include_router(router=item.router,
                    tags=["item"])
 

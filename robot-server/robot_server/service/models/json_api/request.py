@@ -41,7 +41,7 @@ class RequestModel(GenericModel, Generic[DataT]):
 
 
 # Note(isk: 3/13/20): formats and returns request model
-def JsonApiRequest(
+def json_api_request(
     type_string: str,
     attributes_model: Any
 ) -> Type[RequestModel]:

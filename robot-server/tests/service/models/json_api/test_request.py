@@ -2,12 +2,12 @@ from pytest import raises
 
 from pydantic import ValidationError
 
-from robot_server.service.models.json_api.request import JsonApiRequest
+from robot_server.service.models.json_api.request import json_api_request
 from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
-    DictRequest = JsonApiRequest('item', dict)
+    DictRequest = json_api_request('item', dict)
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': {}}
     }
@@ -22,7 +22,7 @@ def test_attributes_as_dict():
 
 
 def test_attributes_as_item_model():
-    ItemRequest = JsonApiRequest('item', ItemModel)
+    ItemRequest = json_api_request('item', ItemModel)
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -39,7 +39,7 @@ def test_attributes_as_item_model():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemRequest = JsonApiRequest('item', ItemModel)
+    ItemRequest = json_api_request('item', ItemModel)
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -67,7 +67,7 @@ def test_attributes_as_item_model__empty_dict():
 
 
 def test_type_invalid_string():
-    MyRequest = JsonApiRequest('item', dict)
+    MyRequest = json_api_request('item', dict)
     obj_to_validate = {
         'data': {'type': 'not_an_item', 'attributes': {}}
     }
@@ -85,7 +85,7 @@ def test_type_invalid_string():
 
 
 def test_attributes_required():
-    MyRequest = JsonApiRequest('item', dict)
+    MyRequest = json_api_request('item', dict)
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': None}
     }
@@ -102,7 +102,7 @@ def test_attributes_required():
 
 
 def test_data_required():
-    MyRequest = JsonApiRequest('item', dict)
+    MyRequest = json_api_request('item', dict)
     obj_to_validate = {
         'data': None
     }
@@ -119,7 +119,7 @@ def test_data_required():
 
 
 def test_request_with_id():
-    MyRequest = JsonApiRequest('item', dict)
+    MyRequest = json_api_request('item', dict)
     obj_to_validate = {
         'data': {
             'type': 'item',

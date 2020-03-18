@@ -16,7 +16,7 @@ ItemRequest, ItemResponse = generate_json_api_models(ITEM_TYPE_NAME, Item)
 
 
 @router.get("/items/{item_id}",
-            description="Get an individual item by it's ID",
+            description="Get an individual item by its ID",
             summary="Get an individual item",
             response_model=ItemResponse,
             response_model_exclude_unset=True,

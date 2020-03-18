@@ -1,7 +1,7 @@
 from typing import Type, Any, Tuple
 
-from .request import JsonApiRequest, RequestModel
-from .response import JsonApiResponse, ResponseModel
+from .request import json_api_request, RequestModel
+from .response import json_api_response, ResponseModel
 
 
 def generate_json_api_models(
@@ -11,6 +11,8 @@ def generate_json_api_models(
     list_response: bool = False
 ) -> Tuple[Type[RequestModel], Type[ResponseModel]]:
     return (
-        JsonApiRequest(type_string, attributes_model),
-        JsonApiResponse(type_string, attributes_model, use_list=list_response),
+        json_api_request(type_string, attributes_model),
+        json_api_response(
+            type_string, attributes_model, use_list=list_response
+        ),
     )

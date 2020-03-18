@@ -1,12 +1,12 @@
 from pytest import raises
 from pydantic import BaseModel, ValidationError
 
-from robot_server.service.models.json_api.response import JsonApiResponse
+from robot_server.service.models.json_api.response import json_api_response
 from tests.service.helpers import ItemModel, ItemData
 
 
 def test_attributes_as_dict():
-    MyResponse = JsonApiResponse('item', dict)
+    MyResponse = json_api_response('item', dict)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': {}},
     }
@@ -23,7 +23,7 @@ def test_attributes_as_dict():
 
 
 def test_missing_attributes_dict():
-    MyResponse = JsonApiResponse('item', dict)
+    MyResponse = json_api_response('item', dict)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -43,7 +43,7 @@ def test_missing_attributes_empty_model():
     class EmptyModel(BaseModel):
         pass
 
-    MyResponse = JsonApiResponse('item', EmptyModel)
+    MyResponse = json_api_response('item', EmptyModel)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -61,7 +61,7 @@ def test_missing_attributes_empty_model():
 
 
 def test_attributes_as_item_model():
-    ItemResponse = JsonApiResponse('item', ItemModel)
+    ItemResponse = json_api_response('item', ItemModel)
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -92,7 +92,7 @@ def test_attributes_as_item_model():
 
 
 def test_list_item_model():
-    ItemResponse = JsonApiResponse('item', ItemModel, use_list=True)
+    ItemResponse = json_api_response('item', ItemModel, use_list=True)
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -145,7 +145,7 @@ def test_list_item_model():
 
 
 def test_type_invalid_string():
-    MyResponse = JsonApiResponse('item', dict)
+    MyResponse = json_api_response('item', dict)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'not_an_item', 'attributes': {}}
     }
@@ -163,7 +163,7 @@ def test_type_invalid_string():
 
 
 def test_attributes_required():
-    ItemResponse = JsonApiResponse('item', ItemModel)
+    ItemResponse = json_api_response('item', ItemModel)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': None}
     }
@@ -180,7 +180,7 @@ def test_attributes_required():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemResponse = JsonApiResponse('item', ItemModel)
+    ItemResponse = json_api_response('item', ItemModel)
     obj_to_validate = {
         'data': {
             'id': '123',
@@ -209,7 +209,7 @@ def test_attributes_as_item_model__empty_dict():
 
 
 def test_resource_object_constructor():
-    ItemResponse = JsonApiResponse('item', ItemModel)
+    ItemResponse = json_api_response('item', ItemModel)
     item = ItemModel(name='pear', price=1.2, quantity=10)
     document = ItemResponse.resource_object(
         id='abc123',
@@ -228,7 +228,7 @@ def test_resource_object_constructor():
 
 
 def test_resource_object_constructor__no_attributes():
-    IdentifierResponse = JsonApiResponse('item', dict)
+    IdentifierResponse = json_api_response('item', dict)
     document = IdentifierResponse.resource_object(id='abc123').dict()
 
     assert document == {
@@ -239,7 +239,7 @@ def test_resource_object_constructor__no_attributes():
 
 
 def test_resource_object_constructor__with_list_response():
-    ItemResponse = JsonApiResponse('item', ItemModel, use_list=True)
+    ItemResponse = json_api_response('item', ItemModel, use_list=True)
     item = ItemModel(name='pear', price=1.2, quantity=10)
     document = ItemResponse.resource_object(
         id='abc123',
@@ -258,7 +258,7 @@ def test_resource_object_constructor__with_list_response():
 
 
 def test_response_constructed_with_resource_object():
-    ItemResponse = JsonApiResponse('item', ItemModel)
+    ItemResponse = json_api_response('item', ItemModel)
     item = ItemModel(name='pear', price=1.2, quantity=10)
     data = ItemResponse.resource_object(
         id='abc123',
@@ -281,7 +281,7 @@ def test_response_constructed_with_resource_object():
 
 
 def test_response_constructed_with_resource_object__list():
-    ItemResponse = JsonApiResponse('item', ItemModel, use_list=True)
+    ItemResponse = json_api_response('item', ItemModel, use_list=True)
     items = [
         ItemData(id=1, name='apple', price=1.5, quantity=3),
         ItemData(id=2, name='pear', price=1.2, quantity=10),
