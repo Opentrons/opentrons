@@ -3,6 +3,7 @@ from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, Field
+from opentrons.deck_calibration.endpoints import CalibrationCommand
 from robot_server.service.models.control import Mount
 
 
@@ -68,22 +69,10 @@ class JogDirection(int, Enum):
     neg = -1
 
 
-class DeckCalibrationCommand(str, Enum):
-    """The command to execute"""
-    jog = "jog"
-    move = "move"
-    save_xy = "save xy"
-    attach_tip = "attach tip"
-    detach_tip = "detach tip"
-    save_z = "save z"
-    save_transform = "save transform"
-    release = "release"
-
-
 class DeckCalibrationDispatch(BaseModel):
     token: UUID =\
         Field(..., description="The deck calibration session token")
-    command: DeckCalibrationCommand
+    command: CalibrationCommand
     tipLength: typing.Optional[float] = \
         Field(None,
               description="The length of the tip you are prompting the user to"

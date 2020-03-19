@@ -1,8 +1,7 @@
 from uuid import uuid1
-
 from typing import Dict, Tuple, Optional, NamedTuple
-
 import logging
+from enum import Enum
 
 try:
     from opentrons import instruments
@@ -578,15 +577,29 @@ async def release(data) -> CommandResult:
 
 # ---------------------- End Route Fns -------------------------
 
+# The description of the routes
+class CalibrationCommand(str, Enum):
+    run_jog = "jog"
+    move = "move"
+    save_xy = "save xy"
+    attach_tip = "attach tip"
+    detach_tip = "detach tip"
+    save_z = "save z"
+    save_transform = "save transform"
+    release = "release"
+
+
 # Router must be defined after all route functions
-router = {'jog': run_jog,
-          'move': move,
-          'save xy': save_xy,
-          'attach tip': attach_tip,
-          'detach tip': detach_tip,
-          'save z': save_z,
-          'save transform': save_transform,
-          'release': release}
+router = {
+    CalibrationCommand.run_jog: run_jog,
+    CalibrationCommand.move: move,
+    CalibrationCommand.save_xy: save_xy,
+    CalibrationCommand.attach_tip: attach_tip,
+    CalibrationCommand.detach_tip: detach_tip,
+    CalibrationCommand.save_z: save_z,
+    CalibrationCommand.save_transform: save_transform,
+    CalibrationCommand.release: release
+}
 
 
 class SessionInProgress(Exception):
@@ -652,11 +665,12 @@ async def dispatch(token: str, command: str, command_data) -> CommandResult:
     if token != session_wrapper.session.id:
         raise SessionForbidden(f"Invalid token: {token}")
 
-    route_func = router.get(command)
-    if not route_func:
+    try:
+        command = CalibrationCommand(command)
+        res = await router[command](data=command_data)
+
+    except (ValueError, KeyError):
         raise SessionForbidden(
             f"Command \"{command}\" is unknown and cannot be executed")
-
-    res = await router[command](data=command_data)
 
     return res
