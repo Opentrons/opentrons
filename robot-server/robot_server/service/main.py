@@ -9,7 +9,7 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .routers import health, networking, control, settings, deck_calibration, \
-    modules, pipettes, item
+    modules, pipettes, motors, item
 from .models.json_api.errors import \
     transform_validation_error_to_json_api_errors, \
     transform_http_exception_to_json_api_errors
@@ -41,6 +41,8 @@ app.include_router(router=modules.router,
                    tags=["modules"])
 app.include_router(router=pipettes.router,
                    tags=["pipettes"])
+app.include_router(router=motors.router,
+                   tags=["motors"])
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
 app.include_router(router=item.router,

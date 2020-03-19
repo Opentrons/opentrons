@@ -5,40 +5,6 @@ from enum import Enum
 from pydantic import BaseModel, Field
 
 
-class EngagedMotor(BaseModel):
-    """Engaged motor"""
-    enabled: bool = Field(..., description="Is engine enabled")
-
-
-class EngagedMotors(BaseModel):
-    """Which motors are engaged"""
-    x: EngagedMotor
-    y: EngagedMotor
-    z: EngagedMotor
-    a: EngagedMotor
-    b: EngagedMotor
-    c: EngagedMotor
-
-    class Config:
-        schema_extra = {"example": {
-            "x": {"enabled": False},
-            "y": {"enabled": True},
-            "z": {"enabled": False},
-            "a": {"enabled": True},
-            "b": {"enabled": False},
-            "c": {"enabled": True}
-        }}
-
-
-class MotorName(str, Enum):
-    x = "x"
-    y = "y"
-    z = "z"
-    a = "a"
-    b = "b"
-    c = "c"
-
-
 class MotionTarget(str, Enum):
     """
     What should be moved. If mount, move the nominal position of the mount;
