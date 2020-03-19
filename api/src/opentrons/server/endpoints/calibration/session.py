@@ -55,6 +55,7 @@ class CalibrationSession:
     async def cache_instruments(self):
         await self.hardware.cache_instruments()
         new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
+        self._pipettes.clear()
         self._pipettes.update(new_dict)
 
     @property

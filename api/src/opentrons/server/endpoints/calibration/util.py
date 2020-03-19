@@ -4,16 +4,16 @@ from typing import TypeVar
 """
 Note, the general types below should be restricted to the following:
 
-stateOutput contrained to int, str and State
-stateInput constrained to str (may expand where applicable)
+StateOutput contrained to int, str and State
+StateInput constrained to str (may expand where applicable)
 
 Currently, mypy evaluates TypeVar to be the first class specified when
 type checking. See https://github.com/python/mypy/issues/3644
 """
-stateInput = TypeVar('stateInput', bound=str)
-stateOutput = TypeVar('stateOutput')
+StateInput = TypeVar('StateInput', bound=str)
+StateOutput = TypeVar('StateOutput')
 
-relationship = TypeVar('relationship', bound=enum.Enum)
+Relationship = TypeVar('Relationship', bound=enum.Enum)
 
 
 class State:
@@ -21,7 +21,7 @@ class State:
     A class that encapsulates a state and its relationships,
     similar to a directed acyclic graph.
     """
-    def __init__(self, name: stateInput, value: stateOutput):
+    def __init__(self, name: StateInput, value: StateOutput):
         self.name = name
         self.value = value
 
@@ -69,49 +69,58 @@ class StateMachine:
     steps provided to this class.
     """
     def __init__(
-            self, states, rel: relationship,
-            exit: relationship, error: relationship):
-        state_list = list(states)
-        self._states = {enum.name: enum.value for enum in state_list}
+            self, states: StateEnum, rel: Relationship,
+            exit: Relationship, error: Relationship):
+        self._states = states
         self._relationship = rel
         self._exit_relationship = exit
         self._error_relationship = error
-        self._current_state = state_list[0].value
+        # set first state as current
+        self._current_state = self._states(1)  # type: ignore
 
-    def get_state(self, state_name: stateInput) -> 'State':
-        return self._states[state_name]
+    def get_state(self, state_name: StateInput) -> 'State':
+        return getattr(self._states, state_name)
 
-    def update_state(self, state_name: stateInput):
-        next_state = self.next_state(state_name)
-        if next_state:
-            self._current_state = next_state
+    def update_state(self, state_name: StateInput):
+        self._current_state = self._iterate_thru_relationships(state_name)
 
-    def next_state(self, input: stateInput = None) -> 'State':
+    def _iterate_thru_relationships(self, state_name: StateInput) -> 'State':
+        rel_list = [
+            self._relationship,
+            self._exit_relationship,
+            self._error_relationship]
+        for relationship in rel_list:
+            next_state = self._find_next(state_name, relationship)
+            if next_state != self.current_state:
+                return next_state
+        return self.current_state
+
+    def _find_next(
+            self, input: StateInput,
+            relationship_enum: Relationship) -> 'State':
         """
         Next state will either check the input or the current state to see
         if it can find a relationship in any of the enum classes provided.
         """
-        curr = input if input else self._current_state.name
-        if curr and hasattr(self._relationship, curr):
-            rel = getattr(self._relationship, curr)
-            if rel:
-                return self._states[rel.value.name]
-        if curr and hasattr(self._exit_relationship, curr):
-            rel = getattr(self._exit_relationship, curr)
-            if rel:
-                return self._states[rel.value.name]
-        if curr and hasattr(self._error_relationship, curr):
-            rel = getattr(self._error_relationship, curr)
-            if rel:
-                return self._states[rel.value.name]
-        return self._current_state
+        if hasattr(relationship_enum, input):
+            output = getattr(relationship_enum, input)
+            return self.get_state(output.value.name)
+        else:
+            return self.get_state(input)
 
-    def set_start(self, state_name: stateInput):
-        self._current_state = self._states[state_name]
+    def set_start(self, state_name: StateInput):
+        self._current_state = self.get_state(state_name)
 
     @property
     def current_state(self) -> 'State':
         return self._current_state
+
+    @property
+    def next_state(self) -> 'State':
+        """
+        The next state based on current state only. For session status msg.
+        """
+        return self._iterate_thru_relationships(self.current_state.name)
 
 
 class CalibrationCheckMachine(StateMachine):

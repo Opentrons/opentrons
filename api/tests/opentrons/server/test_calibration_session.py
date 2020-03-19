@@ -14,8 +14,12 @@ def test_setup(async_server):
 
 
 async def test_start_session(async_client, test_setup):
+    # check that you cannot start a session with an arbitrary name.
+    resp = await async_client.post('/calibration/banana/session')
+    assert resp.status == 403
+
     resp = await async_client.post('/calibration/check/session')
-    resp.status == 201
+    assert resp.status == 201
     text = await resp.json()
     assert list(text.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "sessionToken"]

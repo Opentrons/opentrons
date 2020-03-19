@@ -28,7 +28,9 @@ class AttachedPipette(BaseModel):
         Field(None, description="The serial number of the attached pipette")
 
     class Config:
-        json_encoders = {Axis: str}
+        json_encoders = {
+            Axis: str,
+            UUID4: convert_uuid}
 
 
 class Instruments(BaseModel):
