@@ -332,7 +332,8 @@ class API(HardwareAPILike):
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model', 'blow_out_flow_rate',
-                   'working_volume', 'tip_overlap', 'available_volume']
+                   'working_volume', 'tip_overlap', 'available_volume',
+                   'return_tip_height']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}

@@ -1276,7 +1276,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 2)
     def return_height(self) -> int:
         """ The height to return a tip to its tiprack. """
-        return self.hw_pipette.get('returnTipHeight', 0.5)
+        return self.hw_pipette.get('return_tip_height', 0.5)
 
     @property  # type: ignore
     @requires_version(2, 0)
