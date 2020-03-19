@@ -83,7 +83,8 @@ def transform_validation_error_to_json_api_errors(
         return Error(
             status=status_code,
             detail=error.get('msg'),
-            source=ErrorSource(pointer='/' + '/'.join(error['loc'])),
+            source=ErrorSource(pointer='/' + '/'.join(
+                str(node) for node in error['loc'])),
             title=error.get('type')
         )
 
