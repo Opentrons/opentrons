@@ -76,7 +76,8 @@ def test_state_machine():
     class Error(enum.Enum):
         SeeDogPictures = StateEnum.Exit
 
-    sm = util.StateMachine(StateEnum, Relationship, Exit, Error)
+    sm = util.StateMachine(
+        StateEnum, Relationship, Exit, Error, "ThinkAboutCats")
 
     state1 = sm.get_state('ThinkAboutCats')
     state2 = sm.get_state('FindCatPictures')

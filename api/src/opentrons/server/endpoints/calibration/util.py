@@ -1,5 +1,5 @@
 import enum
-from typing import TypeVar
+from typing import TypeVar, Generic, Type
 
 """
 Note, the general types below should be restricted to the following:
@@ -13,8 +13,12 @@ type checking. See https://github.com/python/mypy/issues/3644
 StateInput = TypeVar('StateInput', bound=str)
 StateOutput = TypeVar('StateOutput')
 
-Relationship = TypeVar('Relationship', bound=enum.Enum)
+Relationship = TypeVar('Relationship', bound=Type[enum.Enum])
 
+
+class StateEnum(State, enum.Enum): pass
+
+class RelationshipEnum(StateEnum, enum.Enum): pass
 
 class State:
     """
@@ -26,7 +30,7 @@ class State:
         self.value = value
 
 
-class StateEnum(enum.Enum):
+class CalibrationCheckState(StateEnum):
     sessionStart = State("sessionStart", enum.auto())
     specifyLabware = State("specifyLabware", enum.auto())
     pickUpTip = State("pickUpTip", enum.auto())
@@ -39,7 +43,7 @@ class StateEnum(enum.Enum):
     noPipettesAttached = State("noPipettesAttached", enum.auto())
 
 
-class RelationshipEnum(enum.Enum):
+class RelationshipEnum(RelationshipEnum):
     sessionStart = StateEnum.specifyLabware
     specifyLabware = StateEnum.pickUpTip
     checkPointOne = StateEnum.checkPointTwo
@@ -48,13 +52,13 @@ class RelationshipEnum(enum.Enum):
     checkHeight = StateEnum.sessionStart
 
 
-class ExitRelationshipEnum(enum.Enum):
+class ExitRelationshipEnum(RelationshipEnum):
     badDeckCalibration = StateEnum.sessionExit
     checkHeight = StateEnum.sessionExit
     noPipettesAttached = StateEnum.sessionExit
 
 
-class ErrorRelationshipEnum(enum.Enum):
+class ErrorRelationshipEnum(RelationshipEnum):
     sessionStart = StateEnum.noPipettesAttached
     specifyLabware = StateEnum.badDeckCalibration
     checkPointOne = StateEnum.badDeckCalibration
@@ -63,20 +67,21 @@ class ErrorRelationshipEnum(enum.Enum):
     checkHeight = StateEnum.badDeckCalibration
 
 
-class StateMachine:
+StateEnumType = Typevar('StateEnumType', bound=StateEnum)
+
+class StateMachine(Generic[StateEnumType]):
     """
     A class for building a mealy state machine pattern based on
     steps provided to this class.
     """
     def __init__(
-            self, states: StateEnum, rel: Relationship,
-            exit: Relationship, error: Relationship):
+            self, states: Type[StateEnumType], rel: Relationship,
+            exit: Relationship, error: Relationship, first_state: StateEnumType):
         self._states = states
         self._relationship = rel
         self._exit_relationship = exit
         self._error_relationship = error
-        # set first state as current
-        self._current_state = self._states(1)  # type: ignore
+        self._current_state = self._states[first_state]
 
     def get_state(self, state_name: StateInput) -> 'State':
         return getattr(self._states, state_name)
@@ -84,7 +89,8 @@ class StateMachine:
     def update_state(self, state_name: StateInput):
         self._current_state = self._iterate_thru_relationships(state_name)
 
-    def _iterate_thru_relationships(self, state_name: StateInput) -> 'State':
+    def _iterate_thru_relationships(
+            self, state_name: StateInput) -> 'State':
         rel_list = [
             self._relationship,
             self._exit_relationship,
@@ -124,8 +130,9 @@ class StateMachine:
 
 
 class CalibrationCheckMachine(StateMachine):
-    def __init__(self):
-        super().__init__(StateEnum,
+    def __init__(self)  -> None:
+        super().__init__(CalibrationCheckState,
                          RelationshipEnum,
                          ExitRelationshipEnum,
-                         ErrorRelationshipEnum)
+                         ErrorRelationshipEnum,
+                         CalibrationCheckState.sessionStart)
