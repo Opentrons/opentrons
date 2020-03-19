@@ -1032,7 +1032,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     smoothie._position['B'] = 100
     smoothie.move({'B': 75})
     assert command_log\
-        == ['G0F30 M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B75 '
+        == ['G0F30 M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+            'G0B75',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 G0B75',
             'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']
 
@@ -1041,8 +1042,8 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     time_mock.return_value = 50
     smoothie.move({'B': 100})
     assert command_log\
-        == ['G0F30 M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
-            'G0B100.3 '
+        == ['G0F30 M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+            'G0B100.3',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
             'G0B100.3 G0B100',
             'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']
@@ -1056,13 +1057,14 @@ def test_move_splitting(smoothie, robot, monkeypatch):
         fullstep=True)})
     command_log.clear()
     smoothie.move({'C': 20})
-    assert command_log[0:1]\
-        == ['M55 M92 C100.0 '
-            'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 '
-            'G0C1 '
-            'M54 M92 C3200 '
+    assert command_log\
+        == ['M55 M92 C100.0 G4P0.01 '
+            'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005',
+            'G0C1',
+            ' M54 M92 C3200 G4P0.01',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
-            'G0C20.3 G0C20']  # noqa(E501)
+            'G0C20.3 G0C20',
+            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']  # noqa(E501)
 
     # if backlash is involved, the backlash target should be the limit
     # for the split move
@@ -1077,13 +1079,14 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     # it is active because that is the robot config default active plunger
     # current. when the driver is used with the rest of the robot or hardware
     # control stack it uses the higher currents
-    assert command_log[0:1]\
-        == ['M55 M92 C100.0 '
-            'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005 '
-            'G0C20.3 '
-            'M54 M92 C3200 '
+    assert command_log\
+        == ['M55 M92 C100.0 G4P0.01 '
+            'G0F60 M907 A0.1 B0.05 C2.0 X0.3 Y0.3 Z0.1 G4P0.005',
+            'G0C20.3',
+            ' M54 M92 C3200 G4P0.01',
             'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
-            'G0C20.3 G0C20']  # noqa(E501)
+            'G0C20.3 G0C20',
+            'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']  # noqa(E501)
     smoothie.configure_splits_for(
         {'B': types.MoveSplit(
             split_distance=50, split_current=1.5,
@@ -1108,11 +1111,14 @@ def test_move_splitting(smoothie, robot, monkeypatch):
     time_mock.return_value = 89.01
     command_log.clear()
     smoothie.move({'B': 100})
-    assert command_log[0:1] == [
-        'M53 M92 B100.0 G0F30 M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
-        'G0B51 '
-        'M52 M92 B3200 G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
-        'G0B100.3 G0B100']
+    assert command_log == [
+        'M53 M92 B100.0 G4P0.01 G0F30 '
+        'M907 A0.1 B1.5 C0.05 X0.3 Y0.3 Z0.1 G4P0.005',
+        'G0B51',
+        ' M52 M92 B3200 G4P0.01',
+        'G0F24000 M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005 '
+        'G0B100.3 G0B100',
+        'M907 A0.1 B0.05 C0.05 X0.3 Y0.3 Z0.1 G4P0.005']
 
 
 def test_per_move_speed(smoothie, robot, monkeypatch):
