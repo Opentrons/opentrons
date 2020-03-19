@@ -68,7 +68,7 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   buildroot: buildrootReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,
-  calibraton: calibrationReducer,
+  calibration: calibrationReducer,
   networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,

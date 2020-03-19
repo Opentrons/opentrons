@@ -3,10 +3,11 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
+import { Link } from 'react-router-dom'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { startDeckCheck } from '../../calibration'
 import { getConfig } from '../../config'
+
 import {
   home,
   fetchLights,
@@ -26,6 +27,7 @@ import type { ViewableRobot } from '../../discovery/types'
 type Props = {|
   robot: ViewableRobot,
   calibrateDeckUrl: string,
+  checkDeckUrl: string,
 |}
 
 const TITLE = 'Robot Controls'
@@ -37,7 +39,7 @@ const CHECK_DECK_CAL_DESCRIPTION = "Check the robot's deck calibration"
 
 export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
-  const { robot, calibrateDeckUrl } = props
+  const { robot, calibrateDeckUrl, checkDeckUrl } = props
   const { name: robotName, status } = robot
   const config = useSelector(getConfig)
   const enableDeckCalCheck = Boolean(config.devInternal?.enableDeckCalCheck)
@@ -53,10 +55,6 @@ export function ControlsCard(props: Props) {
     )
   }
 
-  const checkCalibration = () => {
-    dispatch(startDeckCheck(robotName))
-  }
-
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
@@ -69,9 +67,11 @@ export function ControlsCard(props: Props) {
         <LabeledButton
           label="Check deck calibration"
           buttonProps={{
-            onClick: checkCalibration,
+            // onClick: checkCalibration,
             disabled: buttonDisabled,
             children: 'Check',
+            Component: Link,
+            to: checkDeckUrl,
           }}
         >
           <p>{CHECK_DECK_CAL_DESCRIPTION}</p>

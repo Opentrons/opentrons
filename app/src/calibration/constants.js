@@ -1,13 +1,13 @@
 // @flow
 
-export const START_DECK_CHECK: 'calibration:START_DECK_CHECK' =
-  'calibration:START_DECK_CHECK'
+export const FETCH_DECK_CHECK_SESSION: 'calibration:FETCH_DECK_CHECK_SESSION' =
+  'calibration:FETCH_DECK_CHECK_SESSION'
 
-export const START_DECK_CHECK_SUCCESS: 'calibration:START_DECK_CHECK_SUCCESS' =
-  'calibration:START_DECK_CHECK_SUCCESS'
+export const FETCH_DECK_CHECK_SESSION_SUCCESS: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS' =
+  'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS'
 
-export const START_DECK_CHECK_FAILURE: 'calibration:START_DECK_CHECK_FAILURE' =
-  'calibration:START_DECK_CHECK_FAILURE'
+export const FETCH_DECK_CHECK_SESSION_FAILURE: 'calibration:FETCH_DECK_CHECK_SESSION_FAILURE' =
+  'calibration:FETCH_DECK_CHECK_SESSION_FAILURE'
 
 export const DECK_CHECK_PATH: '/calibration/check/session' =
   '/calibration/check/session'

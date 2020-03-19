@@ -1,37 +1,39 @@
 // @flow
 import type {
-  StartDeckCheckAction,
-  StartDeckCheckSuccessAction,
-  StartDeckCheckFailureAction,
+  FetchDeckCheckSessionAction,
+  FetchDeckCheckSessionSuccessAction,
+  FetchDeckCheckSessionFailureAction,
 } from './types'
 import {
-  START_DECK_CHECK,
-  START_DECK_CHECK_SUCCESS,
-  START_DECK_CHECK_FAILURE,
+  FETCH_DECK_CHECK_SESSION,
+  FETCH_DECK_CHECK_SESSION_SUCCESS,
+  FETCH_DECK_CHECK_SESSION_FAILURE,
 } from './constants'
 
-export const startDeckCheck = (robotName: string): StartDeckCheckAction => ({
-  type: START_DECK_CHECK,
+export const fetchDeckCheckSession = (
+  robotName: string
+): FetchDeckCheckSessionAction => ({
+  type: FETCH_DECK_CHECK_SESSION,
   payload: { robotName },
   meta: { robotName },
 })
 
-export const startDeckCheckSuccess = (
+export const fetchDeckCheckSessionSuccess = (
   robotName: string,
   body: DeckCheckSessionData,
   meta: RobotApiRequestMeta
-): StartDeckCheckSuccessAction => ({
-  type: START_DECK_CHECK_SUCCESS,
+): FetchDeckCheckSessionSuccessAction => ({
+  type: FETCH_DECK_CHECK_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: { robotName },
 })
 
-export const startDeckCheckFailure = (
+export const fetchDeckCheckSessionFailure = (
   robotName: string,
   error: {},
   meta: RobotApiRequestMeta
-): StartDeckCheckFailureAction => ({
-  type: START_DECK_CHECK_FAILURE,
+): FetchDeckCheckSessionFailureAction => ({
+  type: FETCH_DECK_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
   meta: { robotName },
 })

@@ -14,27 +14,27 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { StartDeckCheckAction } from '../types'
+import type { FetchDeckCheckSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<StartDeckCheckAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<FetchDeckCheckSessionAction> = action => ({
   method: POST,
   path: Constants.DECK_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<StartDeckCheckAction> = (
+const mapResponseToAction: ResponseToActionMapper<FetchDeckCheckSessionAction> = (
   response,
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.startDeckCheckSuccess(host.name, body, meta)
-    : Actions.startDeckCheckFailure(host.name, body, meta)
+    ? Actions.fetchDeckCheckSessionSuccess(host.name, body, meta)
+    : Actions.fetchDeckCheckSessionFailure(host.name, body, meta)
 }
 
-export const startDeckCheckEpic: Epic = (action$, state$) => {
+export const fetchDeckCheckSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.START_DECK_CHECK),
+    ofType(Constants.FETCH_DECK_CHECK_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

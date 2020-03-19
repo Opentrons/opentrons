@@ -1,21 +1,24 @@
 // @flow
-import typeof { START_DECK_CHECK, START_DECK_CHECK_SUCCESS } from './constants'
+import typeof {
+  FETCH_DECK_CHECK_SESSION,
+  FETCH_DECK_CHECK_SESSION_SUCCESS,
+} from './constants'
 import type { DeckCheckSessionData } from './api-types'
 
 export type StartDeckCheckAction = {|
-  type: START_DECK_CHECK,
+  type: FETCH_DECK_CHECK_SESSION,
   meta: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type StartDeckCheckSuccessAction = {|
-  type: START_DECK_CHECK_SUCCESS,
+  type: FETCH_DECK_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...DeckCheckSessionData |},
   meta: RobotApiRequestMeta,
 |}
 
 export type StartDeckCheckFailureAction = {|
-  type: START_DECK_CHECK_FAILURE,
+  type: FETCH_DECK_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}

@@ -16,11 +16,12 @@ export type RobotSettingsProps = {|
   robot: ViewableRobot,
   updateUrl: string,
   calibrateDeckUrl: string,
+  checkUrl: string,
   resetUrl: string,
 |}
 
 export function RobotSettings(props: RobotSettingsProps) {
-  const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
+  const { robot, updateUrl, checkDeckUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
     <CardContainer>
@@ -31,7 +32,11 @@ export function RobotSettings(props: RobotSettingsProps) {
         <InformationCard robot={robot} updateUrl={updateUrl} />
       </CardRow>
       <CardRow>
-        <ControlsCard robot={robot} calibrateDeckUrl={calibrateDeckUrl} />
+        <ControlsCard
+          robot={robot}
+          checkDeckUrl={checkDeckUrl}
+          calibrateDeckUrl={calibrateDeckUrl}
+        />
       </CardRow>
       <CardRow>
         <ConnectionCard robot={robot} />

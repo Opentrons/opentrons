@@ -15,7 +15,7 @@ export function calibrationReducer(
   action: Action
 ): CalibrationState {
   switch (action.type) {
-    case Constants.START_DECK_CHECK_SUCCESS: {
+    case Constants.FETCH_DECK_CHECK_SESSION_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_CALIBRATION_STATE
 
