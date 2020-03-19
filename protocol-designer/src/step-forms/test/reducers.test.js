@@ -10,12 +10,38 @@ import {
   labwareInvariantProperties,
   moduleInvariantProperties,
   savedStepForms,
+  unsavedForm,
 } from '../reducers'
+import {
+  _getPipetteEntitiesRootState,
+  _getLabwareEntitiesRootState,
+} from '../selectors'
+import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { moveDeckItem } from '../../labware-ingred/actions'
 import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
 import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
+jest.mock('../selectors')
+jest.mock('../../steplist/formLevel/handleFormChange')
+
+const handleFormChangeMock: JestMockFn<
+  [{ [string]: any }, { [string]: any }, any, any],
+  { [string]: any }
+> = handleFormChange
+
+const mock_getPipetteEntitiesRootState: JestMockFn<
+  [any],
+  any
+> = _getPipetteEntitiesRootState
+const mock_getLabwareEntitiesRootState: JestMockFn<
+  [any],
+  any
+> = _getLabwareEntitiesRootState
+
+beforeEach(() => {
+  jest.clearAllMocks()
+})
 
 describe('steps reducer', () => {
   it('initial add step', () => {
@@ -850,6 +876,147 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         const result = savedStepForms(getPrevRootStateWithStep(step), action)
         expect(result[stepId]).toEqual({ ...step, moduleId: null })
       })
+    })
+  })
+
+  describe('EDIT_MODULE', () => {
+    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed', () => {
+      const action = {
+        type: 'EDIT_MODULE',
+        payload: { id: 'magModuleId', model: 'magneticModuleV2' },
+      }
+
+      const prevRootState = {
+        savedStepForms: {
+          magnetEngageStepId: {
+            stepType: 'magnet',
+            engage: true,
+            moduleId: 'magModuleId',
+            engageHeight: 12,
+          },
+          magnetDisengageStepId: {
+            stepType: 'magnet',
+            engage: false,
+            engageHeight: null,
+            moduleId: 'magModuleId',
+          },
+          unrelatedMagnetEngageStepId: {
+            stepType: 'magnet',
+            engage: true,
+            moduleId: 'otherMagModuleId', // not 'magModuleId'
+            engageHeight: 12,
+          },
+        },
+      }
+      const result = savedStepForms(prevRootState, action)
+      expect(result).toEqual({
+        magnetEngageStepId: {
+          ...prevRootState.savedStepForms.magnetEngageStepId,
+          engage: true,
+          engageHeight: null,
+          moduleId: 'magModuleId',
+        },
+        magnetDisengageStepId:
+          prevRootState.savedStepForms.magnetDisengageStepId,
+        // module id not matching, unchanged
+        unrelatedMagnetEngageStepId:
+          prevRootState.savedStepForms.unrelatedMagnetEngageStepId,
+      })
+    })
+  })
+})
+
+describe('unsavedForm reducer', () => {
+  const someState: any = { something: 'foo' }
+
+  it('should take on the payload of the POPULATE_FORM action', () => {
+    const payload = { formStuff: 'example' }
+    const result = unsavedForm(someState, { type: 'POPULATE_FORM', payload })
+    expect(result).toEqual(payload)
+  })
+
+  it('should use handleFormChange to update the state with CHANGE_FORM_INPUT action', () => {
+    const rootState: any = {
+      unsavedForm: { existingField: 123 },
+    }
+    const action = {
+      type: 'CHANGE_FORM_INPUT',
+      payload: { update: { someField: -1 } },
+    }
+
+    handleFormChangeMock.mockReturnValue({ someField: 42 })
+    mock_getPipetteEntitiesRootState.mockReturnValue(
+      'pipetteEntitiesPlaceholder'
+    )
+    mock_getLabwareEntitiesRootState.mockReturnValue(
+      'labwareEntitiesPlaceholder'
+    )
+
+    const result = unsavedForm(rootState, action)
+    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
+    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
+    expect(handleFormChangeMock.mock.calls).toEqual([
+      [
+        action.payload.update,
+        rootState.unsavedForm,
+        'pipetteEntitiesPlaceholder',
+        'labwareEntitiesPlaceholder',
+      ],
+    ])
+    expect(result).toEqual({ existingField: 123, someField: 42 })
+  })
+
+  it("should switch out pipettes via handleFormChange in response to SUBSTITUTE_STEP_FORM_PIPETTES if the unsaved form's ID is in range", () => {
+    const action = {
+      type: 'SUBSTITUTE_STEP_FORM_PIPETTES',
+      payload: {
+        substitutionMap: { oldPipetteId: 'newPipetteId' },
+        startStepId: '3',
+        endStepId: '5',
+      },
+    }
+    const rootState = {
+      orderedStepIds: ['1', '3', '4', '5', '6'],
+      unsavedForm: { pipette: 'oldPipetteId', id: '4', otherField: 'blah' },
+    }
+
+    handleFormChangeMock.mockReturnValue({ pipette: 'newPipetteId' })
+    mock_getPipetteEntitiesRootState.mockReturnValue(
+      'pipetteEntitiesPlaceholder'
+    )
+    mock_getLabwareEntitiesRootState.mockReturnValue(
+      'labwareEntitiesPlaceholder'
+    )
+
+    const result = unsavedForm(rootState, action)
+    expect(mock_getPipetteEntitiesRootState.mock.calls).toEqual([[rootState]])
+    expect(mock_getLabwareEntitiesRootState.mock.calls).toEqual([[rootState]])
+    expect(handleFormChangeMock.mock.calls).toEqual([
+      [
+        { pipette: 'newPipetteId' },
+        rootState.unsavedForm,
+        'pipetteEntitiesPlaceholder',
+        'labwareEntitiesPlaceholder',
+      ],
+    ])
+    expect(result).toEqual({
+      id: '4',
+      pipette: 'newPipetteId',
+      otherField: 'blah',
+    })
+  })
+
+  const actionTypes = [
+    'CANCEL_STEP_FORM',
+    'SELECT_TERMINAL_ITEM',
+    'SAVE_STEP_FORM',
+    'DELETE_STEP',
+    'EDIT_MODULE',
+  ]
+  actionTypes.forEach(actionType => {
+    it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
+      const result = unsavedForm(someState, { type: actionType })
+      expect(result).toEqual(null)
     })
   })
 })
