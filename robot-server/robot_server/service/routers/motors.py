@@ -16,8 +16,7 @@ router = APIRouter()
             response_model=model.EngagedMotors
             )
 async def get_engaged_motors(hardware: HardwareAPILike = Depends(get_hardware)
-                             ) -> model.EngagedMotors:
-
+                             ) -> model.EngagedMotors:  # type: ignore
     try:
         engaged_axes = hardware.engaged_axes    # type: ignore
         axes_dict = {str(k).lower(): model.EngagedMotor(enabled=v)
