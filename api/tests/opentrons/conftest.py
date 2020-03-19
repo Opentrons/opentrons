@@ -18,6 +18,7 @@ import tempfile
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
+from unittest import mock
 import zipfile
 
 import pytest
@@ -212,6 +213,24 @@ async def async_client(async_server, loop, aiohttp_client):
             await cli.close()
         else:
             await async_server.shutdown()
+
+
+@pytest.fixture
+async def mocked_hw(async_server, monkeypatch):
+    original_hw = async_server['com.opentrons.hardware']
+    # TODO(seth,03/17/2020): this is an annoying hack caused by fixture
+    # ordering in pytest. the monkeypatch fixture gets finalized after
+    # the async_server fixture, which means the async_server or
+    # async_client finalizer calls shutdown(), and that calls clean_up
+    # on the mock. We need to add clean_up (a method of the threadmanager)
+    # to the spec of the mock, and we need to make sure that we clean up
+    # the original object.
+    hw_mock = mock.Mock(spec=dir(API) + ['clean_up'])
+    monkeypatch.setitem(async_server, 'com.opentrons.hardware', hw_mock)
+    try:
+        yield hw_mock
+    finally:
+        original_hw.clean_up()
 
 
 @pytest.fixture
