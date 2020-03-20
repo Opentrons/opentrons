@@ -222,7 +222,7 @@ const SPECS: Array<SelectorSpec> = [
   },
 ]
 
-describe('robot api selectors', () => {
+describe('modules selectors', () => {
   SPECS.forEach(spec => {
     const { name, selector, state, args = [], before = noop, expected } = spec
     it(name, () => {
