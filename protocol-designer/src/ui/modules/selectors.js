@@ -6,6 +6,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -139,9 +140,19 @@ export const getMagnetLabwareEngageHeight: Selector<
   stepFormSelectors.getInitialDeckSetup,
   getSingleMagneticModuleId,
   (initialDeckSetup, magnetModuleId) => {
-    const labware =
-      magnetModuleId && getLabwareOnModule(initialDeckSetup, magnetModuleId)
-    return (labware && getLabwareDefaultEngageHeight(labware.def)) || null
+    if (magnetModuleId == null) return null
+
+    const moduleModel = initialDeckSetup.modules[magnetModuleId]?.model
+    const labware = getLabwareOnModule(initialDeckSetup, magnetModuleId)
+    const engageHeightMm = labware
+      ? getLabwareDefaultEngageHeight(labware.def)
+      : null
+
+    if (engageHeightMm != null && moduleModel === MAGNETIC_MODULE_V1) {
+      // convert to 'short mm' units for GEN1
+      return engageHeightMm / 2
+    }
+    return engageHeightMm
   }
 )
 

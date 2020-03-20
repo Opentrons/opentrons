@@ -55,11 +55,6 @@ export const MODULE_MODELS: Array<ModuleModel> = [
   ...THERMOCYCLER_MODULE_MODELS,
 ]
 
-// offset added to parameters.magneticModuleEngageHeight to convert older labware
-// definitions from "distance from home switch" to "distance from labware bottom"
-// Note: this is in actual mm, not "short mm" :)
-export const ENGAGE_HEIGHT_OFFSET = -4
-
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,

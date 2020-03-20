@@ -4,9 +4,9 @@ import mapValues from 'lodash/mapValues'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
 import {
-  SLOT_RENDER_HEIGHT,
   FIXED_TRASH_RENDER_HEIGHT,
-  ENGAGE_HEIGHT_OFFSET,
+  OPENTRONS_LABWARE_NAMESPACE,
+  SLOT_RENDER_HEIGHT,
 } from './constants'
 import type {
   LabwareDefinition1,
@@ -62,12 +62,17 @@ const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
   'nest_96_wellplate_100ul_pcr_full_skirt',
   'usascientific_96_wellplate_2.4ml_deep',
 ]
+// offset added to parameters.magneticModuleEngageHeight to convert older labware
+// definitions from "distance from home switch" to "distance from labware bottom"
+// Note: this is in actual mm, not "short mm" :)
+const ENGAGE_HEIGHT_OFFSET = -4
+
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
   if (
-    labwareDef.namespace === 'opentrons' &&
-    labwareDef.parameters.loadName in _SHORT_MM_LABWARE_DEF_LOADNAMES
+    labwareDef.namespace === OPENTRONS_LABWARE_NAMESPACE &&
+    _SHORT_MM_LABWARE_DEF_LOADNAMES.includes(labwareDef.parameters.loadName)
   ) {
     const rawEngageHeight: ?number =
       labwareDef.parameters.magneticModuleEngageHeight
