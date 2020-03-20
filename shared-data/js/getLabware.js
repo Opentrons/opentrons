@@ -48,12 +48,36 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
   return labwareDef.parameters.isTiprack
 }
 
+// NOTE: these labware definitions in _SHORT_MM_LABWARE_DEF_LOADNAMES
+// were written in "short mm" = 0.5mm, but
+// we will write all future definitions in actual mm.
+// These whitelisted labware also have engage heights measured from home switch
+// instead of from labware bottom, which is why we add ENGAGE_HEIGHT_OFFSET.
+//
+// Ideally instead of using this whitelist, we would publish a new version
+// of these definitions with corrected labware heights. However, we don't
+// support labware versioning well enough yet.
+const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
+  'biorad_96_wellplate_200ul_pcr',
+  'nest_96_wellplate_100ul_pcr_full_skirt',
+  'usascientific_96_wellplate_2.4ml_deep',
+]
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
+  if (
+    labwareDef.namespace === 'opentrons' &&
+    labwareDef.parameters.loadName in _SHORT_MM_LABWARE_DEF_LOADNAMES
+  ) {
+    const rawEngageHeight: ?number =
+      labwareDef.parameters.magneticModuleEngageHeight
+    return rawEngageHeight == null
+      ? null
+      : rawEngageHeight * 2 + ENGAGE_HEIGHT_OFFSET
+  }
   const rawEngageHeight: ?number =
     labwareDef.parameters.magneticModuleEngageHeight
-  return rawEngageHeight == null ? null : rawEngageHeight + ENGAGE_HEIGHT_OFFSET
+  return rawEngageHeight == null ? null : rawEngageHeight
 }
 
 /* Render Helpers */
