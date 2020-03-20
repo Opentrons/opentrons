@@ -2,25 +2,21 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
-import { ModalPage, Icon, PrimaryButton } from '@opentrons/components'
+import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
   fetchDeckCheckSession,
   endDeckCheckSession,
   getDeckCheckSession,
 } from '../../calibration'
+import { createLogger } from '../../logger'
+
+import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
 
-// import { createLogger } from '../../logger'
-
-// const log = createLogger(__filename)
+const log = createLogger(__filename)
 
 const DECK_CHECK_SUBTITLE = 'Check deck calibration'
-
-const END_DECK_CHECK_HEADER = 'Calibration check is complete'
-const END_DECK_CHECK_BODY =
-  "You have successfully checked the accuracy of this robot's calibration."
-const END_DECK_CHECK_BUTTON_TEXT = 'Home Robot and Complete'
 
 type CheckDeckProps = {|
   parentUrl: string,
@@ -40,7 +36,8 @@ export function CheckDeck(props: CheckDeckProps) {
     dispatch(endDeckCheckSession(robotName))
     dispatch(push(parentUrl))
   }
-  console.table({ deckCheckSessionData })
+
+  log.info('deck check session data: ', deckCheckSessionData || {})
   return (
     <ModalPage
       titleBar={{
@@ -49,12 +46,7 @@ export function CheckDeck(props: CheckDeckProps) {
       }}
       contentsClassName={styles.modal_contents}
     >
-      <div className={styles.modal_header}>
-        <Icon name="check-circle" className={styles.status_icon} />
-        <h3>{END_DECK_CHECK_HEADER}</h3>
-      </div>
-      <p className={styles.complete_body}>{END_DECK_CHECK_BODY}</p>
-      <PrimaryButton onClick={exit}>{END_DECK_CHECK_BUTTON_TEXT}</PrimaryButton>
+      <CompleteConfirmation robotName={robotName} exit={exit} />
     </ModalPage>
   )
 }

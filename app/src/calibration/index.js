@@ -1,5 +1,5 @@
 // @flow
-// calibration  actions, and selectors
+// calibration  actions, reducer, and selectors
 export * from './actions'
 export * from './reducer'
 export * from './selectors'

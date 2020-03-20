@@ -5,5 +5,5 @@ import type { DeckCheckSessionData } from './api-types'
 export const getDeckCheckSession: (
   state: State,
   robotName: string | null
-) => DeckCheckSessionData = (state, robotName) =>
-  robotName !== null ? state.calibration[robotName]?.deckCheck : {}
+) => ?DeckCheckSessionData = (state, robotName) =>
+  robotName !== null ? state.calibration[robotName]?.deckCheck : null

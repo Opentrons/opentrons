@@ -77,7 +77,11 @@ describe('ControlsCard', () => {
   it('calls fetchLights on mount', () => {
     mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
@@ -91,7 +95,11 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
@@ -105,7 +113,11 @@ describe('ControlsCard', () => {
   it('calls restartRobot on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
@@ -119,7 +131,11 @@ describe('ControlsCard', () => {
   it('calls home on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
@@ -137,6 +153,7 @@ describe('ControlsCard', () => {
       <Provider store={mockStore}>
         <ControlsCard
           robot={mockUnconnectableRobot}
+          checkDeckUrl="/check-deck"
           calibrateDeckUrl="/deck/calibrate"
         />
       </Provider>
@@ -152,6 +169,7 @@ describe('ControlsCard', () => {
       <Provider store={mockStore}>
         <ControlsCard
           robot={mockUnconnectableRobot}
+          checkDeckUrl="/check-deck"
           calibrateDeckUrl="/deck/calibrate"
         />
       </Provider>
@@ -171,7 +189,11 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
@@ -185,7 +207,11 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        <ControlsCard
+          robot={mockRobot}
+          checkDeckUrl="/check-deck"
+          calibrateDeckUrl="/deck/calibrate"
+        />
       </Provider>
     )
 
