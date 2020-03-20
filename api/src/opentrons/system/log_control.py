@@ -14,6 +14,7 @@ from typing import Tuple
 LOG = logging.getLogger(__name__)
 
 MAX_RECORDS = 100000
+DEFAULT_RECORDS = 50000
 
 _SYSLOG_PRIORITY_TO_NAME = {
     syslog.LOG_EMERG: 'emergency',

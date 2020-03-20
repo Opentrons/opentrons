@@ -1,7 +1,8 @@
 import typing
 from enum import Enum
 
-from pydantic import BaseModel, Field, create_model
+from typing import Optional
+from pydantic import BaseModel, Field, create_model, validator
 from opentrons.server.endpoints.settings import _common_settings_reset_options
 
 
@@ -45,23 +46,14 @@ class LogLevels(str, Enum):
 
 
 class LogLevel(BaseModel):
-    """None"""
-    log_level: LogLevels = \
+    log_level: Optional[LogLevels] = \
         Field(...,
               description="The value to set (conforming to Python "
                           "log levels)")
 
-
-class LogIdentifier(str, Enum):
-    """Identifier of the log"""
-    api = "api.log"
-    serial = "serial.log"
-
-
-class LogFormat(str, Enum):
-    """Format to use for log records"""
-    text = "text"
-    json = "json"
+    @validator('log_level', pre=True)
+    def lower_case_log_keys(cls, value):
+        return value if value is None else LogLevels(value.lower())
 
 
 class FactoryResetOption(BaseModel):
