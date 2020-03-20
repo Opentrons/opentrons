@@ -142,7 +142,7 @@ export const selectStep = (
   }
 
   // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
-  if (formData && formData.stepType === 'magnet') {
+  if (newStepType === 'magnet') {
     const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
     const magnetAction = getNextDefaultMagnetAction(
       stepFormSelectors.getSavedStepForms(state),
@@ -166,6 +166,11 @@ export const selectStep = (
     // recommended value is null when no labware found on module
     const engageHeight = prevEngageHeight || stringDefaultEngageHeight
     formData = { ...formData, moduleId, magnetAction, engageHeight }
+  } else if (formData?.stepType === 'magnet') {
+    // handle case for pristine-never-saved Magnet step:
+    // it needs the moduleId field populated, bc that field has no UI
+    const moduleId = uiModulesSelectors.getSingleMagneticModuleId(state)
+    formData = { ...formData, moduleId }
   }
 
   dispatch({
