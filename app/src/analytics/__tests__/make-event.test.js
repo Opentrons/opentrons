@@ -225,4 +225,39 @@ describe('analytics events map', () => {
       })
     })
   })
+
+  describe('events with calibration data', () => {
+    const deckCheckSessionData = {
+      instruments: {},
+      currentStep: 'sessionStart',
+      nextSteps: {
+        links: { specifyLabware: '/fake/route' },
+      },
+      sessionToken: 'abc123',
+    }
+
+    it('calibration:FETCH_DECK_CHECK_SESSION_SUCCESS -> calibrationCheckStart event', () => {
+      const state = {}
+      const action = { type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS' }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'calibrationCheckStart',
+        properties: deckCheckSessionData,
+      })
+    })
+
+    it('calibration:COMPLETE_DECK_CHECK -> calibrationCheckPass event', () => {
+      const state = {}
+      const action = { type: 'calibration:COMPLETE_DECK_CHECK' }
+
+      robotSelectors.getRunSeconds.mockReturnValue(4)
+
+      return expect(makeEvent(action, state)).resolves.toEqual({
+        name: 'calibrationCheckPass',
+        properties: deckCheckSessionData,
+      })
+    })
+  })
 })

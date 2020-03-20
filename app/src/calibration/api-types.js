@@ -14,7 +14,6 @@ export type DeckCheckStep =
 
 export type DeckCheckSessionData = {|
   instruments: { [string]: string },
-  activeInstrument: ?string,
   currentStep: DeckCheckStep,
   nextSteps: {
     links: { [DeckCheckStep]: string },
