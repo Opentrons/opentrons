@@ -539,10 +539,14 @@ def resolve_module_model(module_name: str) -> ModuleModel:
     resolved_name = model_map.get(module_name, None) \
         or alias_map.get(lower_name, None)
     if not resolved_name:
-        raise ValueError(f'{module_name} is not a valid module load name.\n'
-                         'Valid names (ignoring case): ''"' + '", "'
-                         .join(model_map.keys()) + '", "' + '", "'
-                         .join(alias_map.keys()) + '"')
+        raise ValueError(
+            f'{module_name} is not a valid module load name.\n'
+            'Valid names (ignoring case): ''"' + '", "'
+            .join(alias_map.keys()) + '"\n' +
+            'You can also refer to modules by their ' +
+            'exact model: ''"' + '", "'
+            .join(model_map.keys()) + '"'
+            )
     return resolved_name
 
 
