@@ -10,6 +10,51 @@ from opentrons.protocol_api import MagneticModuleContext, \
     TemperatureModuleContext, ProtocolContext, execute
 from opentrons.protocol_api.json_dispatchers import JsonCommand
 
+# autouse set to True to setup/teardown mock after each run
+@pytest.fixture(autouse=True)
+def mockObj():
+    m = mock.Mock()
+    yield m
+    m.reset()
+
+
+@pytest.fixture
+def pipette_command_map(mockObj):
+    mock_pipette_command_map = {
+        JsonCommand.blowout.value: mockObj._blowout,
+        JsonCommand.pickUpTip.value: mockObj._pick_up_tip,
+        JsonCommand.dropTip.value: mockObj._drop_tip,
+        JsonCommand.aspirate.value: mockObj._aspirate,
+        JsonCommand.dispense.value: mockObj._dispense,
+        JsonCommand.touchTip.value: mockObj._touch_tip,
+        }
+    return mock_pipette_command_map
+
+
+@pytest.fixture
+def magnetic_module_command_map(mockObj):
+    mock_magnetic_module_command_map = {
+        JsonCommand.magneticModuleEngageMagnet.value:
+        mockObj._engage_magnet,
+        JsonCommand.magneticModuleDisengageMagnet.value:
+        mockObj._disengage_magnet,
+    }
+
+    return mock_magnetic_module_command_map
+
+
+@pytest.fixture
+def temperature_module_command_map(mockObj):
+    mock_temperature_module_command_map = {
+        JsonCommand.temperatureModuleSetTargetTemperature.value:
+        mockObj._temperature_module_set_temp,
+        JsonCommand.temperatureModuleDeactivate.value:
+        mockObj._temperature_module_deactivate,
+        JsonCommand.temperatureModuleAwaitTemperature.value:
+        mockObj._temperature_module_await_temp
+    }
+    return mock_temperature_module_command_map
+
 
 def test_load_modules_from_json():
     def fake_module(model, slot):
@@ -75,14 +120,23 @@ def test_temperature_module_await_temp():
     ]
 
 
-def test_dispatch_json(monkeypatch):
-    m = mock.MagicMock()
-    monkeypatch.setattr(v4, '_delay', m)
-    monkeypatch.setattr(v4, '_move_to_slot', m)
+def test_dispatch_json(
+    monkeypatch,
+    pipette_command_map,
+    magnetic_module_command_map,
+    temperature_module_command_map,
+    mockObj
+     ):
+
+    monkeypatch.setattr(v4, '_delay', mockObj)
+    monkeypatch.setattr(v4, '_move_to_slot', mockObj)
+
     magnetic_module_id = 'magnetic_module_id'
     temperature_module_id = 'temperature_module_id'
+
     mock_magnetic_module = mock.create_autospec(MagneticModuleContext)
     mock_temperature_module = mock.create_autospec(TemperatureModuleContext)
+
     protocol_data = {'commands': [
         {'command': 'delay', 'params': 'delay_params'},
         {'command': 'blowout', 'params': 'blowout_params'},
@@ -103,47 +157,28 @@ def test_dispatch_json(monkeypatch):
         {'command': 'temperatureModule/awaitTemperature',
             'params': {'module': temperature_module_id}},
     ]}
-    mock_pipette_command_map = {
-        JsonCommand.blowout.value: m._blowout,
-        JsonCommand.pickUpTip.value: m._pick_up_tip,
-        JsonCommand.dropTip.value: m._drop_tip,
-        JsonCommand.aspirate.value: m._aspirate,
-        JsonCommand.dispense.value: m._dispense,
-        JsonCommand.touchTip.value: m._touch_tip,
-    }
 
-    mock_magnetic_module_command_map = {
-        JsonCommand.magneticModuleEngageMagnet.value: m._engage_magnet,
-        JsonCommand.magneticModuleDisengageMagnet.value: m. _disengage_magnet,
-    }
-
-    mock_temperature_module_command_map = {
-        JsonCommand.temperatureModuleSetTargetTemperature.value:
-        m._temperature_module_set_temp,
-        JsonCommand.temperatureModuleDeactivate.value:
-        m._temperature_module_deactivate,
-        JsonCommand.temperatureModuleAwaitTemperature.value:
-        m._temperature_module_await_temp
-    }
     context = mock.sentinel.context
     instruments = mock.sentinel.instruments
     loaded_labware = mock.sentinel.loaded_labware
+
     modules = {
         magnetic_module_id: mock_magnetic_module,
         temperature_module_id: mock_temperature_module
         }
+
     dispatch_json(
         context,
         protocol_data,
         instruments,
         loaded_labware,
         modules,
-        mock_pipette_command_map,
-        mock_magnetic_module_command_map,
-        mock_temperature_module_command_map
+        pipette_command_map,
+        magnetic_module_command_map,
+        temperature_module_command_map
         )
 
-    assert m.mock_calls == [
+    assert mockObj.mock_calls == [
         mock.call._delay(context, 'delay_params'),
         mock.call._blowout(instruments, loaded_labware, 'blowout_params'),
         mock.call._pick_up_tip(
@@ -174,7 +209,11 @@ def test_dispatch_json(monkeypatch):
     ]
 
 
-def test_dispatch_json_invalid_command():
+def test_dispatch_json_invalid_command(
+    pipette_command_map,
+    magnetic_module_command_map,
+    temperature_module_command_map
+     ):
     protocol_data = {'commands': [
         {'command': 'no_such_command', 'params': 'foo'},
     ]}
@@ -185,9 +224,9 @@ def test_dispatch_json_invalid_command():
             instruments=None,
             loaded_labware=None,
             modules=None,
-            pipette_command_map={},
-            magnetic_module_command_map={},
-            temperature_module_command_map={},
+            pipette_command_map=pipette_command_map,
+            magnetic_module_command_map=magnetic_module_command_map,
+            temperature_module_command_map=temperature_module_command_map,
             )
 
 
