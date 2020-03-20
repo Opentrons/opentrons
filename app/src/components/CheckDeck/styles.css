@@ -23,5 +23,6 @@
 
 .complete_body {
   @apply --font-body-2-dark;
-  margin:  1rem 0 2rem 0;
+
+  margin: 1rem 0 2rem 0;
 }
