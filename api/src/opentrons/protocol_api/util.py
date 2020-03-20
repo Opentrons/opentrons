@@ -2,12 +2,12 @@
 from collections import UserDict
 import functools
 import logging
+import enum
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
-
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
@@ -290,3 +290,22 @@ class ModifiedList(list):
             if name == item.replace("-", "_").lower():
                 return True
         return False
+
+
+class JsonCommand(enum.Enum):
+    delay = "delay"
+    blowout = "blowout"
+    pickUpTip = "pickUpTip"
+    dropTip = "dropTip"
+    aspirate = "aspirate"
+    dispense = "dispense"
+    touchTip = "touchTip"
+    moveToSlot = "moveToSlot"
+    magneticModuleEngageMagnet = "magneticModule/engageMagnet"
+    magneticModuleDisengageMagnet = "magneticModule/disengageMagnet"
+    temperatureModuleSetTargetTemperature = \
+        "temperatureModule/setTargetTemperature"
+    temperatureModuleDeactivate = \
+        "temperatureModule/deactivate"
+    temperatureModuleAwaitTemperature = \
+        "temperatureModule/awaitTemperature"

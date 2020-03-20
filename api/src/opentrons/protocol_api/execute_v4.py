@@ -1,10 +1,11 @@
+import enum
 import logging
 from typing import Any, Dict
-
-from .contexts import ProtocolContext, InstrumentContext, ModuleContext
-from . import labware
-from .execute_v3 import _delay, _blowout, _pick_up_tip, _drop_tip, _aspirate, \
-    _dispense, _touch_tip, _move_to_slot
+from .contexts import ProtocolContext, \
+    MagneticModuleContext, TemperatureModuleContext, ModuleContext
+from .execute_v3 import _delay, _move_to_slot
+from .types import LoadedLabware, Instruments, PipetteHandler, \
+    MagneticModuleHandler, TemperatureModuleHandler
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -12,7 +13,7 @@ MODULE_LOG = logging.getLogger(__name__)
 def load_labware_from_json_defs(
         ctx: ProtocolContext,
         protocol: Dict[Any, Any],
-        modules: Dict[str, ModuleContext]) -> Dict[str, labware.Labware]:
+        modules: Dict[str, ModuleContext]) -> LoadedLabware:
     protocol_labware = protocol['labware']
     definitions = protocol['labwareDefinitions']
     loaded_labware = {}
@@ -45,97 +46,122 @@ def load_modules_from_json(
     return modules_by_id
 
 
-def _engage_magnet(modules, params) -> None:
-    module_id = params['module']
-    module = modules[module_id]
+def _engage_magnet(module: MagneticModuleContext, params) -> None:
     engage_height = params['engageHeight']
     module.engage(height_from_base=engage_height)
 
 
-def _disengage_magnet(modules, params) -> None:
-    module_id = params['module']
-    module = modules[module_id]
+def _disengage_magnet(module: MagneticModuleContext, params) -> None:
     module.disengage()
 
 
-def _temperature_module_set_temp(modules, params) -> None:
-    module_id = params['module']
-    module = modules[module_id]
+def _temperature_module_set_temp(module: TemperatureModuleContext,
+                                 params) -> None:
     temperature = params['temperature']
     module.start_set_temperature(temperature)
 
 
-def _temperature_module_deactivate(modules, params) -> None:
-    module_id = params['module']
-    module = modules[module_id]
+def _temperature_module_deactivate(module: TemperatureModuleContext,
+                                   params) -> None:
     module.deactivate()
 
 
-def _temperature_module_await_temp(modules, params) -> None:
-    module_id = params['module']
+def _temperature_module_await_temp(module: TemperatureModuleContext,
+                                   params) -> None:
     temperature = params['temperature']
-    module = modules[module_id]
     module.await_temperature(temperature)
 
 
-dispatcher_map: Dict[Any, Any] = {
-    "delay": _delay,
-    "blowout": _blowout,
-    "pickUpTip": _pick_up_tip,
-    "dropTip": _drop_tip,
-    "aspirate": _aspirate,
-    "dispense": _dispense,
-    "touchTip": _touch_tip,
-    "moveToSlot": _move_to_slot,
-    "magneticModule/engageMagnet": _engage_magnet,
-    "magneticModule/disengageMagnet": _disengage_magnet,
-    "temperatureModule/setTargetTemperature": _temperature_module_set_temp,
-    "temperatureModule/deactivate": _temperature_module_deactivate,
-    "temperatureModule/awaitTemperature": _temperature_module_await_temp
-}
+class JsonCommand(enum.Enum):
+    delay = "delay"
+    blowout = "blowout"
+    pickUpTip = "pickUpTip"
+    dropTip = "dropTip"
+    aspirate = "aspirate"
+    dispense = "dispense"
+    touchTip = "touchTip"
+    moveToSlot = "moveToSlot"
+    magneticModuleEngageMagnet = "magneticModule/engageMagnet"
+    magneticModuleDisengageMagnet = "magneticModule/disengageMagnet"
+    temperatureModuleSetTargetTemperature = \
+        "temperatureModule/setTargetTemperature"
+    temperatureModuleDeactivate = \
+        "temperatureModule/deactivate"
+    temperatureModuleAwaitTemperature = \
+        "temperatureModule/awaitTemperature"
 
 
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
-                  instruments: Dict[str, InstrumentContext],
-                  loaded_labware: Dict[str, labware.Labware],
-                  modules: Dict[str, ModuleContext]) -> None:
+                  instruments: Instruments,
+                  loaded_labware: LoadedLabware,
+                  modules: Dict[str, ModuleContext],
+                  pipette_command_map: Dict[str, PipetteHandler],
+                  magnetic_module_command_map:
+                  Dict[str, MagneticModuleHandler],
+                  temperature_module_command_map:
+                  Dict[str, TemperatureModuleHandler]
+                  ) -> None:
     commands = protocol_data['commands']
-
-    pipette_command_list = [
-        "blowout",
-        "pickUpTip",
-        "dropTip",
-        "aspirate",
-        "dispense",
-        "touchTip",
-    ]
-
-    module_command_list = [
-        "magneticModule/engageMagnet",
-        "magneticModule/disengageMagnet",
-        "temperatureModule/setTargetTemperature",
-        "temperatureModule/deactivate",
-        "temperatureModule/awaitTemperature"
-    ]
 
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
 
-        # different `_command` helpers take different args
-        if command_type in pipette_command_list:
-            dispatcher_map[command_type](
+        if command_type in pipette_command_map:
+            pipette_command_map[command_type](
                 instruments, loaded_labware, params)
-        elif command_type == 'delay':
-            dispatcher_map[command_type](context, params)
-        elif command_type == 'moveToSlot':
-            dispatcher_map[command_type](
-                context, instruments, params)
-        elif command_type in module_command_list:
-            dispatcher_map[command_type](
-                modules, params
-            )
+        elif command_type in magnetic_module_command_map:
+            handleMagnetCommand(
+                                params,
+                                modules,
+                                command_type,
+                                magnetic_module_command_map
+                                )
+        elif command_type in temperature_module_command_map:
+            handleTemperatureCommand(params,
+                                     modules,
+                                     command_type,
+                                     temperature_module_command_map
+                                     )
+        elif command_type == JsonCommand.delay.value:
+            _delay(context, params)
+        elif command_type == JsonCommand.moveToSlot.value:
+            _move_to_slot(context, instruments, params)
         else:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
+
+
+def handleTemperatureCommand(params,
+                             modules,
+                             command_type,
+                             temperature_module_command_map
+                             ) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    if isinstance(module, TemperatureModuleContext):
+        temperature_module_command_map[command_type](
+            module, params
+        )
+    else:
+        raise RuntimeError(
+         "Temperature Module does not match TemperatureModuleContext interface"
+         )
+
+
+def handleMagnetCommand(params,
+                        modules,
+                        command_type,
+                        magnetic_module_command_map
+                        ) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    if isinstance(module, MagneticModuleContext):
+        magnetic_module_command_map[command_type](
+            module, params
+        )
+    else:
+        raise RuntimeError(
+         "Magnetic Module does not match MagneticModuleContext interface"
+         )
