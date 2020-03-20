@@ -1,0 +1,20 @@
+.status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-success);
+}
+
+.modal_header {
+  display: flex;
+  align-items: center;
+}
+
+.modal_contents {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  max-width: 48rem;
+  min-height: 32rem;
+  padding: 2rem 1.25rem;
+}
