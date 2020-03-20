@@ -44,7 +44,11 @@ describe('robot modules actions', () => {
     {
       name: 'calibration:FETCH_DECK_CHECK_SESSION_FAILURE',
       creator: Actions.fetchDeckCheckSessionFailure,
-      args: ['robot-name', { message: 'AH' }, { requestId: 'abc' }],
+      args: [
+        'robot-name',
+        { message: 'Heck, your deck check wrecked!' },
+        { requestId: 'abc' },
+      ],
       expected: {
         type: 'calibration:FETCH_DECK_CHECK_SESSION_FAILURE',
         payload: {

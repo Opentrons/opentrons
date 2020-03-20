@@ -237,8 +237,17 @@ describe('analytics events map', () => {
     }
 
     it('calibration:FETCH_DECK_CHECK_SESSION_SUCCESS -> calibrationCheckStart event', () => {
-      const state = {}
-      const action = { type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS' }
+      const state = {
+        calibration: {
+          'wiley-coyote': {
+            deckCheck: deckCheckSessionData,
+          },
+        },
+      }
+      const action = {
+        type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS',
+        payload: { robotName: 'wiley-coyote' },
+      }
 
       robotSelectors.getRunSeconds.mockReturnValue(4)
 
@@ -249,8 +258,17 @@ describe('analytics events map', () => {
     })
 
     it('calibration:COMPLETE_DECK_CHECK -> calibrationCheckPass event', () => {
-      const state = {}
-      const action = { type: 'calibration:COMPLETE_DECK_CHECK' }
+      const state = {
+        calibration: {
+          'wiley-coyote': {
+            deckCheck: deckCheckSessionData,
+          },
+        },
+      }
+      const action = {
+        type: 'calibration:COMPLETE_DECK_CHECK',
+        payload: { robotName: 'wiley-coyote' },
+      }
 
       robotSelectors.getRunSeconds.mockReturnValue(4)
 
