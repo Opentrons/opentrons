@@ -8,7 +8,7 @@ from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
 import opentrons.protocol_api.execute_v4 as v4
 from opentrons.protocol_api import MagneticModuleContext, \
     TemperatureModuleContext, ProtocolContext, execute
-from opentrons.protocol_api.json_dispatchers import JsonCommand
+from opentrons.protocol_api.constants import JsonCommand
 
 # autouse set to True to setup/teardown mock after each run
 @pytest.fixture(autouse=True)

@@ -1,4 +1,3 @@
-import enum
 from typing import Dict
 from opentrons.protocol_api.execute_v3 import _blowout, _pick_up_tip, \
     _drop_tip, _aspirate, _dispense, _touch_tip
@@ -8,25 +7,7 @@ from opentrons.protocol_api.execute_v4 import _engage_magnet, \
     _temperature_module_await_temp
 from .types import PipetteHandler, MagneticModuleHandler, \
                    TemperatureModuleHandler
-
-
-class JsonCommand(enum.Enum):
-    delay = "delay"
-    blowout = "blowout"
-    pickUpTip = "pickUpTip"
-    dropTip = "dropTip"
-    aspirate = "aspirate"
-    dispense = "dispense"
-    touchTip = "touchTip"
-    moveToSlot = "moveToSlot"
-    magneticModuleEngageMagnet = "magneticModule/engageMagnet"
-    magneticModuleDisengageMagnet = "magneticModule/disengageMagnet"
-    temperatureModuleSetTargetTemperature = \
-        "temperatureModule/setTargetTemperature"
-    temperatureModuleDeactivate = \
-        "temperatureModule/deactivate"
-    temperatureModuleAwaitTemperature = \
-        "temperatureModule/awaitTemperature"
+from .constants import JsonCommand
 
 
 pipette_command_map: Dict[str, PipetteHandler] = {

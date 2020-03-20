@@ -1,4 +1,3 @@
-import enum
 import logging
 from typing import Any, Dict
 from .contexts import ProtocolContext, \
@@ -6,6 +5,7 @@ from .contexts import ProtocolContext, \
 from .execute_v3 import _delay, _move_to_slot
 from .types import LoadedLabware, Instruments, PipetteHandler, \
     MagneticModuleHandler, TemperatureModuleHandler
+from .constants import JsonCommand
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -70,25 +70,6 @@ def _temperature_module_await_temp(module: TemperatureModuleContext,
                                    params) -> None:
     temperature = params['temperature']
     module.await_temperature(temperature)
-
-
-class JsonCommand(enum.Enum):
-    delay = "delay"
-    blowout = "blowout"
-    pickUpTip = "pickUpTip"
-    dropTip = "dropTip"
-    aspirate = "aspirate"
-    dispense = "dispense"
-    touchTip = "touchTip"
-    moveToSlot = "moveToSlot"
-    magneticModuleEngageMagnet = "magneticModule/engageMagnet"
-    magneticModuleDisengageMagnet = "magneticModule/disengageMagnet"
-    temperatureModuleSetTargetTemperature = \
-        "temperatureModule/setTargetTemperature"
-    temperatureModuleDeactivate = \
-        "temperatureModule/deactivate"
-    temperatureModuleAwaitTemperature = \
-        "temperatureModule/awaitTemperature"
 
 
 def dispatch_json(context: ProtocolContext,
