@@ -29,14 +29,14 @@ describe('robot modules actions', () => {
       creator: Actions.fetchDeckCheckSessionSuccess,
       args: [
         'robot-name',
-        Fixtures.mockFetchDeckCheckSessionSuccessActionPayload,
+        Fixtures.mockDeckCheckSessionData,
         { requestId: 'abc' },
       ],
       expected: {
         type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          ...Fixtures.mockFetchDeckCheckSessionSuccessActionPayload,
+          ...Fixtures.mockDeckCheckSessionData,
         },
         meta: { requestId: 'abc' },
       },
@@ -54,6 +54,52 @@ describe('robot modules actions', () => {
         payload: {
           robotName: 'robot-name',
           error: { message: 'Heck, your deck check wrecked!' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:END_DECK_CHECK_SESSION',
+      creator: Actions.endDeckCheckSession,
+      args: ['robot-name'],
+      expected: {
+        type: 'calibration:END_DECK_CHECK_SESSION',
+        payload: { robotName: 'robot-name' },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:END_DECK_CHECK_SESSION_SUCCESS',
+      creator: Actions.endDeckCheckSessionSuccess,
+      args: [
+        'robot-name',
+        Fixtures.mockDeckCheckSessionData,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:END_DECK_CHECK_SESSION_SUCCESS',
+        payload: { robotName: 'robot-name' },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:END_DECK_CHECK_SESSION_FAILURE',
+      creator: Actions.endDeckCheckSessionFailure,
+      args: [
+        'robot-name',
+        {
+          message: 'Heck, your deck check wreck attempt did not go as specced!',
+        },
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:END_DECK_CHECK_SESSION_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          error: {
+            message:
+              'Heck, your deck check wreck attempt did not go as specced!',
+          },
         },
         meta: { requestId: 'abc' },
       },
