@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import type { ContextRouter } from 'react-router-dom'
+import { push } from 'connected-react-router'
 import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
-import { fetchDeckCheckSession, getDeckCheckSession } from '../../calibration'
+import {
+  fetchDeckCheckSession,
+  endDeckCheckSession,
+  getDeckCheckSession,
+} from '../../calibration'
 
 // import { createLogger } from '../../logger'
 
@@ -13,11 +17,11 @@ import { fetchDeckCheckSession, getDeckCheckSession } from '../../calibration'
 const DECK_CHECK_SUBTITLE = 'Check deck calibration'
 
 type CheckDeckProps = {|
-  ...ContextRouter,
+  parentUrl: string,
   robotName: string,
 |}
 export function CheckDeck(props: CheckDeckProps) {
-  const { robotName } = props
+  const { robotName, parentUrl } = props
   const dispatch = useDispatch<Dispatch>()
   const deckCheckSessionData = useSelector((state: State) =>
     getDeckCheckSession(state, robotName)
@@ -27,7 +31,8 @@ export function CheckDeck(props: CheckDeckProps) {
   }, [dispatch, robotName])
 
   function exit() {
-    console.log('TODO: exit')
+    dispatch(endDeckCheckSession(robotName))
+    dispatch(push(parentUrl))
   }
   console.table({ deckCheckSessionData })
   return (
