@@ -2,20 +2,16 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { CheckboxField, DropdownField, FormGroup } from '@opentrons/components'
-import {
-  MAGNETIC_MODULE_V1,
-  MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
-  TEMPERATURE_MODULE_V2,
-  THERMOCYCLER_MODULE_V1,
-  type ModuleRealType,
-} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
-import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../constants'
+import {
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+  MODELS_FOR_MODULE_TYPE,
+} from '../../../constants'
 import { ModuleDiagram } from '../../modules'
 
 import styles from './FilePipettesModal.css'
 
+import type { ModuleRealType } from '@opentrons/shared-data'
 import type { FormModulesByType } from '../../../step-forms'
 
 type Props = {|
@@ -57,36 +53,6 @@ type Props = {|
   onSetFieldTouched: (field: string, touched: boolean) => void,
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
 |}
-
-const moduleOptionNamePrefix = 'modules.model_display_name.'
-const modulesAndModels = {
-  magneticModuleType: [
-    {
-      name: i18n.t(`${moduleOptionNamePrefix}${MAGNETIC_MODULE_V1}`),
-      value: MAGNETIC_MODULE_V1,
-    },
-    {
-      name: i18n.t(`${moduleOptionNamePrefix}${MAGNETIC_MODULE_V2}`),
-      value: MAGNETIC_MODULE_V2,
-    },
-  ],
-  temperatureModuleType: [
-    {
-      name: i18n.t(`${moduleOptionNamePrefix}${TEMPERATURE_MODULE_V1}`),
-      value: TEMPERATURE_MODULE_V1,
-    },
-    {
-      name: i18n.t(`${moduleOptionNamePrefix}${TEMPERATURE_MODULE_V2}`),
-      value: TEMPERATURE_MODULE_V2,
-    },
-  ],
-  thermocyclerModuleType: [
-    {
-      name: i18n.t(`${moduleOptionNamePrefix}${THERMOCYCLER_MODULE_V1}`),
-      value: THERMOCYCLER_MODULE_V1,
-    },
-  ],
-}
 
 export function ModuleFields(props: Props) {
   const {
@@ -156,7 +122,7 @@ export function ModuleFields(props: Props) {
                     }
                     tabIndex={i}
                     name={`${moduleTypeAccessor}.model`}
-                    options={modulesAndModels[moduleType]}
+                    options={MODELS_FOR_MODULE_TYPE[moduleType]}
                     value={selectedModel}
                     onChange={onFieldChange}
                     onBlur={onBlur}

@@ -143,19 +143,37 @@ describe('FilePipettesModal', () => {
       expect(saveButton.prop('disabled')).toBe(true)
     })
 
-    it('is not disabled when pipette is selected', () => {
+    it('is not disabled when pipette is selected', async () => {
       props.initialPipetteValues = initialPipetteValues
+      props.initialModuleValues = initialModuleValues
 
-      const wrapper = shallow(<FilePipettesModal {...props} />)
-        .find(Formik)
-        .dive()
+      const wrapper = renderFormComponent(props)
       const saveButton = wrapper
         .find(OutlineButton)
         .filterWhere(n => n.render().text() === 'save')
-
+      saveButton.simulate('click')
       // issue #823 in enzyme where simulate events are sync so we cannot test
-      // the btn click -> component handleSubmit properly here
+      // the btn click -> component handleSubmit properly here since formik submit is async
+      await new Promise(resolve => setTimeout(resolve, 0))
+
       expect(saveButton.prop('disabled')).toBe(false)
+      expect(props.onSave).toHaveBeenCalledWith({
+        modules: [
+          {
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: initialModuleValues[MAGNETIC_MODULE_TYPE].slot,
+          },
+        ],
+        newProtocolFields: { name: '' },
+        pipettes: [
+          {
+            mount: 'left',
+            name: initialPipetteValues.left.pipetteName,
+            tiprackDefURI: initialPipetteValues.left.tiprackDefURI,
+          },
+        ],
+      })
     })
 
     it('closes the modal when clicking cancel button', () => {

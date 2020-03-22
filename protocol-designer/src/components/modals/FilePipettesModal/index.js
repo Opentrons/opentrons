@@ -23,7 +23,7 @@ import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { ModuleFields } from './ModuleFields'
 import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox } from '../../modules'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
@@ -34,12 +34,10 @@ import type {
   PipetteOnDeck,
   FormPipette,
   FormPipettesByMount,
-  // FormModule,
   FormModulesByType,
 } from '../../../step-forms'
 import type { FormikProps } from 'formik/@flow-typed'
 
-import { isModuleWithCollisionIssue } from '../../modules/utils'
 type PipetteFieldsData = $Diff<
   PipetteOnDeck,
   {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
@@ -275,7 +273,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                   touched,
                   values,
                   handleBlur,
-                  setValues,
                   setFieldTouched,
                 }: FormikProps<FormState>) => {
                   const { left, right } = values.pipettesByMount
