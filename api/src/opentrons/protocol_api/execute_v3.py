@@ -33,7 +33,7 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
 # absolute value (not % value) as an argument in
 # aspirate/dispense/blowout/air_gap fns, remove this
-def _set_flow_rate(pipette, params) -> None:
+def _set_flow_rate(pipette: InstrumentContext, params: Dict[str, Any]) -> None:
     """
     Set flow rate in uL/mm, to value obtained from command's params.
     """
