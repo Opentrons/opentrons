@@ -213,7 +213,8 @@ class Simulator:
             model: str,
             interrupt_callback: modules.InterruptCallback,
             loop: asyncio.AbstractEventLoop,
-            execution_manager: ExecutionManager
+            execution_manager: ExecutionManager,
+            sim_model: str = None
             ) -> modules.AbstractModule:
         return await modules.build(
             port=port,
@@ -221,7 +222,8 @@ class Simulator:
             simulating=True,
             interrupt_callback=interrupt_callback,
             loop=loop,
-            execution_manager=execution_manager)
+            execution_manager=execution_manager,
+            sim_model=sim_model)
 
     @property
     def axis_bounds(self) -> Dict[str, Tuple[float, float]]:

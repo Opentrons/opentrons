@@ -1,5 +1,6 @@
-from .driver import Thermocycler
+from .driver import Thermocycler, SimulatingDriver
 
 __all__ = [
-    'Thermocycler'
+    'Thermocycler',
+    'SimulatingDriver'
 ]

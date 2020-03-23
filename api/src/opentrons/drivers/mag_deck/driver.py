@@ -2,7 +2,7 @@ from os import environ
 import logging
 from threading import Event, Lock
 from time import sleep
-from typing import Optional, Dict, Tuple
+from typing import Dict, Optional, Mapping, Tuple
 from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
@@ -41,6 +41,11 @@ MAG_DECK_BAUDRATE = 115200
 
 MAG_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 MAG_DECK_ACK = 'ok\r\nok\r\n'
+
+MAG_DECK_MODELS = {
+    'magneticModuleV1': 'mag_deck_v1.1',
+    'magneticModuleV2': 'mag_deck_v20'
+}
 
 # Number of digits after the decimal point for millimeter values
 # being sent to/from magnetic module
@@ -147,6 +152,47 @@ def _parse_distance_response(distance_string) -> float:
         raise ParseError(err_msg)
     return _parse_number_from_substring(  # type: ignore
         distance_string.strip())          # (preconditions checked above)
+
+
+class SimulatingDriver:
+    def __init__(self, sim_model):
+        self._port = None
+        self._height = 0
+        self._model = MAG_DECK_MODELS[sim_model]
+
+    def probe_plate(self):
+        pass
+
+    def home(self):
+        pass
+
+    def move(self, location: float):
+        self._height = location
+
+    def get_device_info(self) -> Mapping[str, str]:
+        return {'serial': 'dummySerialMD',
+                'model': self._model,
+                'version': 'dummyVersionMD'}
+
+    def connect(self, port: str):
+        pass
+
+    def disconnect(self, port: str = None):
+        pass
+
+    def enter_programming_mode(self):
+        pass
+
+    @property
+    def plate_height(self) -> float:
+        return self._height
+
+    @property
+    def mag_position(self) -> float:
+        return self._height
+
+    def is_connected(self) -> bool:
+        return True
 
 
 class MagDeck:

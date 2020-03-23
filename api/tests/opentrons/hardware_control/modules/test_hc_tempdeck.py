@@ -28,7 +28,8 @@ async def test_sim_state(loop):
     assert temp.live_data['data']['targetTemp'] == temp.target
     status = temp.device_info
     assert status['serial'] == 'dummySerialTD'
-    assert status['model'] == 'dummyModelTD'
+    # return v1 if sim_model is not passed
+    assert status['model'] == 'temp_deck_v1.1'
     assert status['version'] == 'dummyVersionTD'
 
 

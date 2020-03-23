@@ -2,7 +2,8 @@ import asyncio
 import logging
 from threading import Thread, Event
 from typing import Mapping, Union, Optional
-from opentrons.drivers.temp_deck import TempDeck as TempDeckDriver
+from opentrons.drivers.temp_deck import (
+    SimulatingDriver, TempDeck as TempDeckDriver)
 from opentrons.drivers.temp_deck.driver import temp_locks
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
@@ -36,61 +37,6 @@ class MissingDevicePortError(Exception):
     pass
 
 
-class SimulatingDriver:
-    def __init__(self):
-        self._target_temp = 0
-        self._active = False
-        self._port = None
-
-    async def set_temperature(self, celsius: float):
-        self._target_temp = celsius
-        self._active = True
-
-    def start_set_temperature(self, celsius):
-        self._target_temp = celsius
-        self._active = True
-
-    def legacy_set_temperature(self, celsius: float):
-        self._target_temp = celsius
-        self._active = True
-
-    def deactivate(self):
-        self._target_temp = 0
-        self._active = False
-
-    def update_temperature(self):
-        pass
-
-    def connect(self, port: str):
-        self._port = port
-
-    def is_connected(self) -> bool:
-        return True
-
-    def disconnect(self):
-        pass
-
-    def enter_programming_mode(self):
-        pass
-
-    @property
-    def temperature(self) -> float:
-        return self._target_temp
-
-    @property
-    def target(self) -> Optional[float]:
-        return self._target_temp if self._active else None
-
-    @property
-    def status(self) -> str:
-        return 'holding at target' if self._active else 'idle'
-
-    def get_device_info(self) -> Mapping[str, str]:
-        return {'serial': 'dummySerialTD',
-                'model': 'dummyModelTD',
-                'version': 'dummyVersionTD'}
-
-
 class Poller(Thread):
     def __init__(self, driver: TempDeckDriver):
         self._driver_ref = driver
@@ -117,7 +63,8 @@ class TempDeck(mod_abc.AbstractModule):
                     execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating: bool = False,
-                    loop: asyncio.AbstractEventLoop = None):
+                    loop: asyncio.AbstractEventLoop = None,
+                    sim_model: str = None):
 
         """ Build and connect to a TempDeck"""
         # TempDeck does not currently use interrupts, so the callback is not
@@ -125,7 +72,8 @@ class TempDeck(mod_abc.AbstractModule):
         mod = cls(port=port,
                   simulating=simulating,
                   loop=loop,
-                  execution_manager=execution_manager)
+                  execution_manager=execution_manager,
+                  sim_model=sim_model)
         await mod._connect()
         return mod
 
@@ -134,8 +82,7 @@ class TempDeck(mod_abc.AbstractModule):
         return 'tempdeck'
 
     def model(self) -> str:
-        return (self._sim_model or
-                _model_from_revision(self._device_info.get('model')))
+        return _model_from_revision(self._device_info.get('model'))
 
     @classmethod
     def bootloader(cls) -> mod_abc.UploadFunction:
@@ -143,9 +90,10 @@ class TempDeck(mod_abc.AbstractModule):
 
     @staticmethod
     def _build_driver(
-            simulating: bool) -> Union['SimulatingDriver', 'TempDeckDriver']:
+            simulating: bool,
+            sim_model: str) -> Union['SimulatingDriver', 'TempDeckDriver']:
         if simulating:
-            return SimulatingDriver()
+            return SimulatingDriver(sim_model=sim_model)
         else:
             return TempDeckDriver()
 
@@ -158,15 +106,16 @@ class TempDeck(mod_abc.AbstractModule):
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
-                         execution_manager=execution_manager)
+                         execution_manager=execution_manager,
+                         sim_model=sim_model)
         self._device_info: Mapping[str, str] = {}
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
-            self._driver = self._build_driver(simulating)  # type: ignore
+            self._driver = self._build_driver(  # type: ignore
+                simulating, sim_model or self.model())
 
         self._poller = None
-        self._sim_model = sim_model
 
     async def set_temperature(self, celsius: float):
         """

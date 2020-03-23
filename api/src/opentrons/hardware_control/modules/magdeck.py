@@ -1,7 +1,8 @@
 import asyncio
 import logging
 from typing import Mapping, Optional, Union
-from opentrons.drivers.mag_deck import MagDeck as MagDeckDriver
+from opentrons.drivers.mag_deck import (
+    SimulatingDriver, MagDeck as MagDeckDriver)
 from opentrons.drivers.mag_deck.driver import mag_locks
 from ..execution_manager import ExecutionManager
 from . import update, mod_abc, types
@@ -36,46 +37,6 @@ class MissingDevicePortError(Exception):
     pass
 
 
-class SimulatingDriver:
-    def __init__(self):
-        self._port = None
-        self._height = 0
-
-    def probe_plate(self):
-        pass
-
-    def home(self):
-        pass
-
-    def move(self, location: float):
-        self._height = location
-
-    def get_device_info(self) -> Mapping[str, str]:
-        return {'serial': 'dummySerialMD',
-                'model': 'dummyModelMD',
-                'version': 'dummyVersionMD'}
-
-    def connect(self, port: str):
-        pass
-
-    def disconnect(self, port: str = None):
-        pass
-
-    def enter_programming_mode(self):
-        pass
-
-    @property
-    def plate_height(self) -> float:
-        return self._height
-
-    @property
-    def mag_position(self) -> float:
-        return self._height
-
-    def is_connected(self) -> bool:
-        return True
-
-
 class MagDeck(mod_abc.AbstractModule):
     """
     Under development. API subject to change
@@ -86,13 +47,15 @@ class MagDeck(mod_abc.AbstractModule):
                     execution_manager: ExecutionManager,
                     interrupt_callback: types.InterruptCallback = None,
                     simulating=False,
-                    loop: asyncio.AbstractEventLoop = None):
+                    loop: asyncio.AbstractEventLoop = None,
+                    sim_model: str = None):
         # MagDeck does not currently use interrupts, so the callback is not
         # passed on
         mod = cls(port=port,
                   simulating=simulating,
                   loop=loop,
-                  execution_manager=execution_manager)
+                  execution_manager=execution_manager,
+                  sim_model=sim_model)
         await mod._connect()
         return mod
 
@@ -101,8 +64,7 @@ class MagDeck(mod_abc.AbstractModule):
         return 'magdeck'
 
     def model(self) -> str:
-        return (self._sim_model or
-                _model_from_revision(self._device_info.get('model')))
+        return _model_from_revision(self._device_info.get('model'))
 
     @classmethod
     def bootloader(cls) -> types.UploadFunction:
@@ -110,9 +72,11 @@ class MagDeck(mod_abc.AbstractModule):
 
     @staticmethod
     def _build_driver(
-            simulating: bool) -> Union['SimulatingDriver', 'MagDeckDriver']:
+            simulating: bool,
+            sim_model: str = None
+    ) -> Union['SimulatingDriver', 'MagDeckDriver']:
         if simulating:
-            return SimulatingDriver()
+            return SimulatingDriver(sim_model=sim_model)
         else:
             return MagDeckDriver()
 
@@ -125,13 +89,14 @@ class MagDeck(mod_abc.AbstractModule):
         super().__init__(port=port,
                          simulating=simulating,
                          loop=loop,
-                         execution_manager=execution_manager)
+                         execution_manager=execution_manager,
+                         sim_model=sim_model)
         self._device_info: Mapping[str, str] = {}
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:
-            self._driver = self._build_driver(simulating)  # type: ignore
-        self._sim_model = sim_model
+            self._driver = self._build_driver(  # type: ignore
+                simulating, sim_model or self.model())
 
     async def calibrate(self):
         """

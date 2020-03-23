@@ -75,6 +75,110 @@ class ThermocyclerError(Exception):
     pass
 
 
+class SimulatingDriver:
+    def __init__(self, sim_model):
+        self._target_temp = None
+        self._ramp_rate = None
+        self._hold_time = None
+        self._active = False
+        self._port = None
+        self._lid_status = 'open'
+        self._lid_target = None
+        self._lid_heating_active = False
+
+    async def open(self):
+        self._lid_status = 'open'
+        return self._lid_status
+
+    async def close(self):
+        self._lid_status = 'closed'
+        return self._lid_status
+
+    @property
+    def status(self):
+        return 'holding at target' if self._active else 'idle'
+
+    @property
+    def lid_status(self):
+        return self._lid_status
+
+    @property
+    def ramp_rate(self):
+        return self._ramp_rate
+
+    @property
+    def hold_time(self):
+        # Simulating driver acts as if cycles end immediately
+        return 0
+
+    @property
+    def temperature(self):
+        return self._target_temp
+
+    @property
+    def target(self):
+        return self._target_temp
+
+    @property
+    def lid_target(self):
+        return self._lid_target
+
+    @property
+    def lid_temp_status(self):
+        return 'holding at target' if self._lid_heating_active else 'idle'
+
+    @property
+    def lid_temp(self):
+        return self._lid_target
+
+    async def connect(self, port):
+        self._port = port
+
+    def disconnect(self):
+        self._port = None
+
+    async def set_temperature(self,
+                              temp: float,
+                              hold_time: float = None,
+                              ramp_rate: float = None,
+                              volume: float = None) -> None:
+        self._target_temp = temp
+        self._hold_time = hold_time
+        self._ramp_rate = ramp_rate
+        self._active = True
+
+    async def set_lid_temperature(self, temp: Optional[float]):
+        """ Set the lid temperature in deg Celsius """
+        self._lid_heating_active = True
+        self._lid_target = temp
+
+    async def deactivate_lid(self):
+        self._lid_heating_active = False
+        self._lid_target = None
+
+    async def deactivate_block(self):
+        self._target_temp = None
+        self._ramp_rate = None
+        self._hold_time = None
+        self._active = None
+
+    async def deactivate_all(self):
+        self._target_temp = None
+        self._ramp_rate = None
+        self._hold_time = None
+        self._active = None
+        self._lid_heating_active = False
+        self._lid_target = None
+
+    async def get_device_info(self):
+        return {'serial': 'dummySerialTC',
+                'model': 'dummyModelTC',
+                'version': 'dummyVersionTC'}
+
+    async def enter_programming_mode(self):
+        pass
+
+
 class TCPoller(threading.Thread):
     def __init__(self, port, interrupt_callback, temp_status_callback,
                  lid_status_callback, lid_temp_status_callback):

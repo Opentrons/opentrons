@@ -20,7 +20,8 @@ async def test_sim_data(loop):
                               execution_manager=ExecutionManager(loop=loop))
     assert mag.status == 'disengaged'
     assert mag.device_info['serial'] == 'dummySerialMD'
-    assert mag.device_info['model'] == 'dummyModelMD'
+    # return v1 when sim_model is not passed
+    assert mag.device_info['model'] == 'mag_deck_v1.1'
     assert mag.device_info['version'] == 'dummyVersionMD'
     assert mag.live_data['status'] == mag.status
     assert 'data' in mag.live_data

@@ -454,6 +454,7 @@ class ProtocolContext(CommandPublisher):
                     execution_manager=ExecutionManager(
                         loop=self._hw_manager.hardware.loop),
                     sim_model=resolved_model.value))
+            hc_mod_instance._connect()
         if hc_mod_instance:
             mod_ctx = mod_class(self,
                                 hc_mod_instance,

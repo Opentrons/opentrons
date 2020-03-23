@@ -41,11 +41,72 @@ TEMP_DECK_BAUDRATE = 115200
 TEMP_DECK_COMMAND_TERMINATOR = '\r\n\r\n'
 TEMP_DECK_ACK = 'ok\r\nok\r\n'
 
+TEMP_DECK_MODELS = {
+    'temperatureModuleV1': 'temp_deck_v1.1',
+    'temperatureModuleV2': 'temp_deck_v20'
+}
+
 temp_locks: Dict[str, Tuple[Lock, 'TempDeck']] = {}
 
 
 class TempDeckError(Exception):
     pass
+
+
+class SimulatingDriver:
+    def __init__(self, sim_model):
+        self._target_temp = 0
+        self._active = False
+        self._port = None
+        self._model = TEMP_DECK_MODELS[sim_model]
+
+    async def set_temperature(self, celsius: float):
+        self._target_temp = celsius
+        self._active = True
+
+    def start_set_temperature(self, celsius):
+        self._target_temp = celsius
+        self._active = True
+
+    def legacy_set_temperature(self, celsius: float):
+        self._target_temp = celsius
+        self._active = True
+
+    def deactivate(self):
+        self._target_temp = 0
+        self._active = False
+
+    def update_temperature(self):
+        pass
+
+    def connect(self, port: str):
+        self._port = port
+
+    def is_connected(self) -> bool:
+        return True
+
+    def disconnect(self):
+        pass
+
+    def enter_programming_mode(self):
+        pass
+
+    @property
+    def temperature(self) -> float:
+        return self._target_temp
+
+    @property
+    def target(self) -> Optional[float]:
+        return self._target_temp if self._active else None
+
+    @property
+    def status(self) -> str:
+        return 'holding at target' if self._active else 'idle'
+
+    def get_device_info(self) -> Mapping[str, str]:
+        return {'serial': 'dummySerialTD',
+                'model': self._model,
+                'version': 'dummyVersionTD'}
 
 
 class TempDeck:
