@@ -11,12 +11,21 @@ import type { Action } from '../types'
 // NOTE: these values will always be overridden by persisted values,
 // whenever the browser has seen the feature flag before and persisted it.
 // Only "never before seen" flags will take on the default values from `initialFlags`.
+//
+// For debugging / E2E testing: if these flags don't have persisted values already
+// in the browser session, then corresponding env vars can be used to set the
+// initial values. Eg `OT_PD_PRERELEASE_MODE=1 make -C protocol-designer dev`
+// will initialize PRERELEASE_MODE to true (but as per the note above, that
+// initial value is only relevant matters if there is no persisted value already)
 const initialFlags: Flags = {
-  PRERELEASE_MODE: false,
-  OT_PD_ENABLE_MODULES: false,
-  OT_PD_DISABLE_MODULE_RESTRICTIONS: false,
-  OT_PD_ENABLE_MULTI_GEN2_PIPETTES: false,
-  OT_PD_ENABLE_THERMOCYCLER: false,
+  PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
+  OT_PD_ENABLE_MODULES: process.env.OT_PD_ENABLE_MODULES === '1' || false,
+  OT_PD_DISABLE_MODULE_RESTRICTIONS:
+    process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
+  OT_PD_ENABLE_MULTI_GEN2_PIPETTES:
+    process.env.OT_PD_ENABLE_MULTI_GEN2_PIPETTES === '1' || false,
+  OT_PD_ENABLE_THERMOCYCLER:
+    process.env.OT_PD_ENABLE_THERMOCYCLER === '1' || false,
 }
 
 const flags = handleActions<Flags, any>(
