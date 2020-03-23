@@ -461,7 +461,8 @@ class API(HardwareAPILike):
             axis: Axis = None,
             mount: top_types.Mount = None,
             acquire_lock: bool = True):
-        assert axis or mount, 'specify either axis or mount'
+        assert (axis is not None) ^ (mount is not None),\
+            'specify either axis or mount'
         if axis:
             checked_axis = axis
             checked_mount = Axis.to_mount(checked_axis)
