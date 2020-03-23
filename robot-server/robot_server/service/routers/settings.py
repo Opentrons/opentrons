@@ -7,7 +7,7 @@ from opentrons.system import log_control
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
-    FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
+    LogLevels, FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
 
 log = logging.getLogger(__name__)
@@ -46,10 +46,10 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     log_level_value = log_level.log_level
     log_level_name = None if log_level_value is None else log_level_value.name
     ok_syslogs = {
-        "error": "err",
-        "warning": "warning",
-        "info": "info",
-        "debug": "debug"
+        LogLevels.error.name: "err",
+        LogLevels.warning.name: "warning",
+        LogLevels.info.name: "info",
+        LogLevels.debug.name: "debug"
     }
 
     syslog_level = "emerg"
@@ -61,7 +61,10 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
     if code != 0:
         msg = f"Could not reload config: {stdout} {stderr}"
         log.error(msg)
-        raise V1HandlerError(status_code=500, message=msg)
+        raise V1HandlerError(
+                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                message=msg
+        )
 
     if log_level_name:
         result = f"Upstreaming log level changed to {log_level_name}"
@@ -70,7 +73,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
         result = "Upstreaming logs disabled"
         log.info(result)
 
-    return V1BasicResponse(status=200, message=result)
+    return V1BasicResponse(status=HTTPStatus.OK, message=result)
 
 
 @router.get("/settings/reset/options",

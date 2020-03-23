@@ -1,7 +1,8 @@
 import pytest
 from unittest.mock import patch
 
-from opentrons.system.log_control import MAX_RECORDS, DEFAULT_RECORDS
+MAX_RECORDS = 100000
+DEFAULT_RECORDS = 50000
 
 
 def test_get_serial_log_with_defaults(api_client):
