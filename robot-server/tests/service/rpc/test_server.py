@@ -304,6 +304,59 @@ def test_call_on_result(session, root):
 
 
 @pytest.mark.parametrize('root', [Foo(0)])
+def test_call_unknown_object(session, root):
+    session.socket.receive_json()  # Skip init
+
+    session.call(
+        id=1234321,
+        name='value',
+        args=[]
+    )
+    session.socket.receive_json()  # Skip ack
+
+    x = session.socket.receive_json()  # Skip ack
+    assert x == {
+        "$": {
+            "token": session.token,
+            "type": rpc.CALL_NACK_MESSAGE
+        },
+        "reason": "ValueError: object with id 1234321 not found"
+    }
+
+
+@pytest.mark.parametrize('root', [Foo(0)])
+def test_call_unknown_method(session, root):
+    session.socket.receive_json()  # Skip init
+
+    session.call(
+        id=id(root),
+        name='no_no_no',
+        args=[]
+    )
+    session.socket.receive_json()  # Skip ack
+
+    x = session.socket.receive_json()  # Skip ack
+    assert x == {
+        "$": {
+            "token": session.token,
+            "type": rpc.CALL_NACK_MESSAGE
+        },
+        "reason":
+            "AttributeError: type object 'Foo' has no attribute 'no_no_no'"
+    }
+
+
+@pytest.mark.parametrize('root', [Foo(0)])
+def test_ping(session, root):
+    session.socket.receive_json()  # Skip init
+
+    session.socket.send_json({"$": {"ping": 1}})
+
+    res = session.socket.receive_json()
+    assert {"$": {"type": rpc.PONG_MESSAGE}} == res
+
+
+@pytest.mark.parametrize('root', [Foo(0)])
 def test_exception_on_call(session, root):
     session.socket.receive_json()  # Skip init
 
