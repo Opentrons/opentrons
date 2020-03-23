@@ -112,8 +112,9 @@ class MagDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         if height > MAX_ENGAGE_HEIGHT[self.model()] or height < 0:
-            raise ValueError('Invalid engage height. Should be 0 to {}'.format(
-                MAX_ENGAGE_HEIGHT[self.model()]))
+            raise ValueError(
+                f'Invalid engage height for {self.model()}: {height} mm. '
+                f'Must be 0 - {MAX_ENGAGE_HEIGHT[self.model()]} mm')
         self._driver.move(height)
 
     async def deactivate(self):
