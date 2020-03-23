@@ -4,7 +4,7 @@ from os import environ
 import logging
 from time import sleep
 from threading import Event, RLock
-from typing import Any, Dict, Optional, Union, List
+from typing import Any, Dict, Optional, Union, List, Tuple
 
 from math import isclose
 from serial.serialutil import SerialException  # type: ignore
@@ -98,6 +98,18 @@ GCODES = {'HOME': 'G28.2',
           'HOMING_STATUS': 'G28.6',
           'ACCELERATION': 'M204 S10000',
           'WAIT': 'M400'}
+
+
+MICROSTEPPING_GCODES = {
+    'B': {
+        'ENABLE': 'M52',
+        'DISABLE': 'M53',
+    },
+    'C': {
+        'ENABLE': 'M54',
+        'DISABLE': 'M55',
+    }
+}
 
 # Number of digits after the decimal point for coordinates being sent
 # to Smoothie
@@ -423,7 +435,11 @@ class SmoothieDriver_3_0_0:
         time. The move created will adhere to the split config.
 
         To remove the setting, set None for the specified axis.
+
+        Only pipette axes may be specified for splitting
         """
+        assert all((ax.lower() in 'bc' for ax in config.keys())),\
+            'splits may only be configured for plunger axes'
         self._move_split_config.update(config)
         log.info(f"Updated move split config with {config}")
         self._axes_moved_at.reset_moved(config.keys())
@@ -956,7 +972,8 @@ class SmoothieDriver_3_0_0:
             command: str,
             timeout: float = DEFAULT_EXECUTE_TIMEOUT,
             suppress_error_msg: bool = False,
-            ack_timeout: float = DEFAULT_ACK_TIMEOUT):
+            ack_timeout: float = DEFAULT_ACK_TIMEOUT,
+            suppress_home_after_error: bool = False):
         """
         Submit a GCODE command to the robot, followed by M400 to block until
         done. This method also ensures that any command on the B or C axis
@@ -1009,7 +1026,8 @@ class SmoothieDriver_3_0_0:
             if not suppress_error_msg:
                 log.warning(
                         f"alarm/error: command={command}, resp={se.ret_code}")
-            if GCODES['MOVE'] in command or GCODES['PROBE'] in command:
+            if (GCODES['MOVE'] in command or GCODES['PROBE'] in command)\
+               and not suppress_home_after_error:
                 if error_axis not in 'XYZABC':
                     error_axis = AXES
                 log.info("Homing after alarm/error")
@@ -1208,6 +1226,9 @@ class SmoothieDriver_3_0_0:
         self._reset_from_error()
         log.debug("_reset")
         self.update_steps_per_mm(self._config.gantry_steps_per_mm)
+        self.update_steps_per_mm({
+            ax: self._config.default_pipette_configs['stepsPerMM']
+            for ax in 'BC'})
         log.debug("sent steps")
         self._send_command(GCODES['ABSOLUTE_COORDS'])
         log.debug("sent abs")
@@ -1219,10 +1240,19 @@ class SmoothieDriver_3_0_0:
         self.pop_acceleration()
         log.debug("setup done")
 
-    def update_steps_per_mm(self, data: Dict[str, float]):
+    def _build_steps_per_mm(self, data: Dict[str, float]) -> str:
+        """ Build the set steps/mm command string without sending """
+        if not data:
+            return ''
+        return GCODES['STEPS_PER_MM'] + ' ' + ' '.join(
+            [f'{axis}{value}' for axis, value in data.items()]
+        )
+
+    def update_steps_per_mm(self, data: Union[Dict[str, float], str]):
         # Using M92, update steps per mm for a given axis
         if self.simulating:
-            self.steps_per_mm.update(data)
+            if isinstance(data, dict):
+                self.steps_per_mm.update(data)
             return
 
         if isinstance(data, str):
@@ -1231,11 +1261,9 @@ class SmoothieDriver_3_0_0:
             # Need to account for old command format to avoid this issue.
             self._send_command(data)
         else:
-            cmd = ''
-            for axis, value in data.items():
-                cmd = f'{cmd} {axis}{value}'
-                self.steps_per_mm[axis] = value
-            self._send_command(GCODES['STEPS_PER_MM'] + cmd)
+            self.steps_per_mm.update(data)
+            cmd = self._build_steps_per_mm(data)
+            self._send_command(cmd)
 
     def _read_from_pipette(self, gcode: str, mount: str) -> Optional[str]:
         '''
@@ -1428,24 +1456,39 @@ class SmoothieDriver_3_0_0:
         checked_speed = speed or self._combined_speed
 
         command = ''
+        split_prefix = ''
+        split_postfix = ''
 
         if split_command_string:
-            cached = {}
+            # set fullstepping if necessary
+            step_prefix, step_postfix = self._build_fullstep_configurations(
+                ''.join((ax for ax in split_target.keys()
+                         if self._move_split_config[ax].fullstep))
+            )
+
             # move at the slowest required speed
             split_speed = min([split.split_speed
                                for ax, split in self._move_split_config.items()
                                if ax in split_target])
-            command += self._build_speed_command(split_speed) + ' '
+
+            # use the higher current from the split config without changing
+            # our global cache
+            split_prefix = step_prefix\
+                + self._build_speed_command(split_speed) + ' '
+            cached = {}
             for ax in split_target.keys():
                 cached[ax] = self.current[ax]
                 self.current[ax] = self._move_split_config[ax].split_current
-            command += self._generate_current_command()
+            split_prefix += self._generate_current_command()
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
-            command += ' ' + GCODES['MOVE'] + split_command_string + ' '
-            log.info(
-                f"Splitting {list(split_target.keys())} (have not moved since:"
-                f" {since_moved})")
+
+            split_postfix = step_postfix
+            split_command = GCODES['MOVE'] + split_command_string
+        else:
+            split_prefix = ''
+            split_command = ''
+            split_postfix = ''
 
         if split_command_string or (checked_speed != self._combined_speed):
             command += self._build_speed_command(checked_speed) + ' '
@@ -1459,14 +1502,24 @@ class SmoothieDriver_3_0_0:
         command += GCODES['MOVE'] + primary_command_string
         if checked_speed != self._combined_speed:
             command += ' ' + self._build_speed_command(self._combined_speed)
+
+        for axis in target.keys():
+            self.engaged_axes[axis] = True
+        if home_flagged_axes:
+            self.home_flagged_axes(''.join(list(target.keys())))
+
+        def _do_split():
+            try:
+                for sc in (c for c in (split_prefix, split_command) if c):
+                    self._send_command(sc)
+            finally:
+                if split_postfix:
+                    self._send_command(split_postfix)
         try:
-            for axis in target.keys():
-                self.engaged_axes[axis] = True
-            if home_flagged_axes:
-                self.home_flagged_axes(''.join(list(target.keys())))
             log.debug("move: {}".format(command))
             # TODO (hmg) a movement's timeout should be calculated by
             # how long the movement is expected to take.
+            _do_split()
             self._send_command(command, timeout=DEFAULT_EXECUTE_TIMEOUT)
         finally:
             # dwell pipette motors because they get hot
@@ -1525,7 +1578,8 @@ class SmoothieDriver_3_0_0:
             else:
                 # if we are homing neither the X nor Y axes, simple home
                 self.activate_axes(axes)
-                self._do_relative_splits_for(axes)
+                self._do_relative_splits_during_home_for(
+                    ''.join([ax for ax in axes if ax in 'BC']))
 
                 command = self._generate_current_command()
                 command += ' ' + GCODES['HOME'] + ''.join(sorted(axes))
@@ -1561,7 +1615,37 @@ class SmoothieDriver_3_0_0:
         self._axes_moved_at.mark_moved(axis)
         return self.position
 
-    def _do_relative_splits_for(self, axes: str):
+    def _build_fullstep_configurations(self, axes: str) -> Tuple[str, str]:
+        """ For one or more specified pipette axes,
+        build a prefix and postfix command string that will configure
+        the step mode and steps/mm value to
+        - in the prefix: set full stepping with an appropriate steps/mm
+        - in the postfix: set 1/32 microstepping with the correct steps/mm
+
+        Prefix will always be empty or end with a space, and postfix will
+        always be empty or start with a space, so they can be added to
+        command strings easily
+        """
+        if not axes:
+            return '', ''
+        assert all((ax in 'BC' for ax in axes)),\
+            'only plunger axes have controllable microstepping'
+        prefix = ' '.join((MICROSTEPPING_GCODES[ax]['DISABLE']
+                           for ax in axes)) + ' '
+        postfix = ' '.join((MICROSTEPPING_GCODES[ax]['ENABLE']
+                            for ax in axes)) + ' '
+        prefix += self._build_steps_per_mm({
+            ax: self.steps_per_mm[ax] / 32
+            for ax in axes
+        }) + ' ' + GCODES['DWELL'] + 'P' + str(0.01)
+
+        postfix += self._build_steps_per_mm({
+            ax: self.steps_per_mm[ax]
+            for ax in axes
+        }) + ' ' + GCODES['DWELL'] + 'P' + str(0.01)
+        return prefix + ' ', ' ' + postfix
+
+    def _do_relative_splits_during_home_for(self, axes: str):
         """ Handle split moves for unsticking axes before home.
 
         This is particularly ugly bit of code that flips the motor controller
@@ -1570,44 +1654,60 @@ class SmoothieDriver_3_0_0:
         It will induce a movement. It should really only be called before a
         home because it doesn't update the position cache.
 
-        :param axes: A string that is a sequence of axis names.
+        :param axes: A string that is a sequence of plunger axis names.
         """
+        assert all([ax.lower() in 'bc' for ax in axes]),\
+            'only plunger axes may be unstuck'
         since_moved = self._axes_moved_at.time_since_moved()
         split_currents = GCODES['SET_CURRENT']
         split_moves = ''
         applicable_speeds: List[float] = []
         log.debug(f"Finding splits for {axes} with since moved {since_moved}")
+        to_unstick = [
+            ax for ax in axes if
+            (since_moved.get(ax) is None
+             or (
+             self._move_split_config.get(ax)
+             and since_moved[ax] > self._move_split_config[ax].after_time))
+        ]
         for axis in axes:
             msc = self._move_split_config.get(axis)
             log.debug(f"axis {axis}: msc {msc}")
             if not msc:
                 continue
-            if since_moved.get(axis) is None\
-               or (since_moved[axis] > msc.after_time):
+            if axis in to_unstick:
                 log.debug(f"adding unstick for {axis}")
                 split_currents += f'{axis}{msc.split_current} '
-                split_moves += f'{axis}{msc.split_distance}'
+                split_moves += f'{axis}{-msc.split_distance}'
                 applicable_speeds.append(msc.split_speed)
         if not split_moves:
             log.debug(f"no unstick needed")
             # nothing to do
             return
 
-        command_string =\
-            split_currents + \
-            GCODES['DWELL'] + 'P' + str(CURRENT_CHANGE_DELAY) + ' ' +\
-            self._build_speed_command(min(applicable_speeds)) + ' ' + \
-            GCODES['RELATIVE_COORDS'] + ' ' +\
-            GCODES['MOVE'] + split_moves + ' ' + \
-            GCODES['ABSOLUTE_COORDS'] + ' ' + \
-            self._build_speed_command(self._combined_speed)
+        fullstep_prefix, fullstep_postfix\
+            = self._build_fullstep_configurations(
+                ''.join(to_unstick))
+
+        command_sequence = [
+            fullstep_prefix +
+            split_currents +
+            GCODES['DWELL'] + 'P' + str(CURRENT_CHANGE_DELAY) + ' ' +
+            self._build_speed_command(min(applicable_speeds)) + ' ' +
+            GCODES['RELATIVE_COORDS'],
+            GCODES['MOVE'] + split_moves
+            ]
         try:
-            self._send_command(command_string, timeout=DEFAULT_EXECUTE_TIMEOUT)
+            for command_string in command_sequence:
+                self._send_command(
+                    command_string, timeout=DEFAULT_EXECUTE_TIMEOUT,
+                    suppress_home_after_error=True)
         except SmoothieError:
-            # these may cause a hard limit error, since we have no idea where
-            # we are in this context. Hopefully that's ok though because
-            # otherwise we have very little way to get out
-            log.exception("Hard limit in pre-home unstick!")
+            pass
+        finally:
+            self._send_command(
+                GCODES['ABSOLUTE_COORDS'] + fullstep_postfix + ' ' +
+                self._build_speed_command(self._combined_speed))
 
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
