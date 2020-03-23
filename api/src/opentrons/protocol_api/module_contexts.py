@@ -17,6 +17,11 @@ from .util import requires_version
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
 
+ENGAGE_HEIGHT_UNIT_CNV = 2
+STANDARD_MAGDECK_LABWARE = [
+    'biorad_96_wellplate_200ul_pcr',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'usascientific_96_wellplate_2.4ml_deep']
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -314,7 +319,7 @@ class MagneticModuleContext(ModuleContext):
         elif height_from_base and self._ctx._api_version >= APIVersion(2, 2):
             dist = height_from_base + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM
         elif self.labware and self.labware.magdeck_engage_height is not None:
-            dist = self.labware.magdeck_engage_height
+            dist = self._determine_lw_engage_height()
             if offset:
                 dist += offset
         else:
@@ -323,6 +328,30 @@ class MagneticModuleContext(ModuleContext):
                 "height; please specify explicitly with the height param"
                 .format(self.labware))
         self._module.engage(dist)
+
+    def _determine_lw_engage_height(self) -> float:
+        """ Return engage height based on Protocol API and module versions
+
+        For API Version 2.3 or later:
+           - Multiply non-standard labware engage heights by 2 for gen1 modules
+           - Divide standard labware engage heights by 2 for gen2 modules
+        If none of the above, return the labware engage heights as defined in
+        the labware definitions
+        """
+        assert self.labware, self.labware.magdeck_engage_height
+
+        engage_height = self.labware.magdeck_engage_height
+
+        is_api_breakpoint = (self._ctx._api_version >= APIVersion(2, 3))
+        is_v1_module = (self._module.model() == 'magneticModuleV1')
+        is_standard_lw = self.labware.load_name in STANDARD_MAGDECK_LABWARE
+
+        if is_api_breakpoint and is_v1_module and not is_standard_lw:
+            return engage_height * ENGAGE_HEIGHT_UNIT_CNV
+        elif is_api_breakpoint and not is_v1_module and is_standard_lw:
+            return engage_height / ENGAGE_HEIGHT_UNIT_CNV
+        else:
+            return engage_height
 
     @cmds.publish.both(command=cmds.magdeck_disengage)
     @requires_version(2, 0)
