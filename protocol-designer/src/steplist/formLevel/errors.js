@@ -2,7 +2,12 @@
 import * as React from 'react'
 import { getWellRatio } from '../utils'
 import { canPipetteUseLabware } from '../../utils'
+import { MAGNETIC_MODULE_V1, MAGNETIC_MODULE_V2 } from '@opentrons/shared-data'
 import {
+  MIN_ENGAGE_HEIGHT_V1,
+  MAX_ENGAGE_HEIGHT_V1,
+  MIN_ENGAGE_HEIGHT_V2,
+  MAX_ENGAGE_HEIGHT_V2,
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
@@ -21,6 +26,8 @@ export type FormErrorKey =
   | 'TIME_PARAM_REQUIRED'
   | 'PAUSE_TEMP_PARAM_REQUIRED'
   | 'MAGNET_ACTION_TYPE_REQUIRED'
+  | 'ENGAGE_HEIGHT_MIN_EXCEEDED'
+  | 'ENGAGE_HEIGHT_MAX_EXCEEDED'
   | 'ENGAGE_HEIGHT_REQUIRED'
   | 'MODULE_ID_REQUIRED'
   | 'TARGET_TEMPERATURE_REQUIRED'
@@ -72,6 +79,14 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   },
   ENGAGE_HEIGHT_REQUIRED: {
     title: 'Engage height is required',
+    dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  ENGAGE_HEIGHT_MIN_EXCEEDED: {
+    title: 'Specified distance is below module minimum',
+    dependentFields: ['magnetAction', 'engageHeight'],
+  },
+  ENGAGE_HEIGHT_MAX_EXCEEDED: {
+    title: 'Specified distance is above module maximum',
     dependentFields: ['magnetAction', 'engageHeight'],
   },
   MODULE_ID_REQUIRED: {
@@ -202,6 +217,33 @@ export const targetTemperatureRequired = (
   return setTemperature === 'true' && !targetTemperature
     ? FORM_ERRORS.TARGET_TEMPERATURE_REQUIRED
     : null
+}
+
+export const engageHeightRangeExceeded = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { magnetAction, engageHeight } = fields
+  const module = fields.hydrated?.module
+  const model = module?.model
+
+  if (magnetAction === 'engage') {
+    if (model === MAGNETIC_MODULE_V1) {
+      if (engageHeight < MIN_ENGAGE_HEIGHT_V1) {
+        return FORM_ERRORS.ENGAGE_HEIGHT_MIN_EXCEEDED
+      } else if (engageHeight > MAX_ENGAGE_HEIGHT_V1) {
+        return FORM_ERRORS.ENGAGE_HEIGHT_MAX_EXCEEDED
+      }
+    } else if (model === MAGNETIC_MODULE_V2) {
+      if (engageHeight < MIN_ENGAGE_HEIGHT_V2) {
+        return FORM_ERRORS.ENGAGE_HEIGHT_MIN_EXCEEDED
+      } else if (engageHeight > MAX_ENGAGE_HEIGHT_V2) {
+        return FORM_ERRORS.ENGAGE_HEIGHT_MAX_EXCEEDED
+      }
+    } else {
+      console.warn(`unhandled model for engageHeightRangeExceeded: ${model}`)
+    }
+  }
+  return null
 }
 
 /*******************

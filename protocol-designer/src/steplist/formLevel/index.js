@@ -8,6 +8,7 @@ import {
   wellRatioMoveLiquid,
   magnetActionRequired,
   engageHeightRequired,
+  engageHeightRangeExceeded,
   type FormError,
   moduleIdRequired,
   targetTemperatureRequired,
@@ -17,7 +18,6 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  engageHeightRangeExceeded,
   temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
@@ -66,9 +66,9 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getErrors: composeErrors(
       magnetActionRequired,
       engageHeightRequired,
-      moduleIdRequired
+      moduleIdRequired,
+      engageHeightRangeExceeded
     ),
-    getWarnings: composeWarnings(engageHeightRangeExceeded),
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
