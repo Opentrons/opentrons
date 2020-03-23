@@ -375,7 +375,7 @@ def test_notifications(session, root):
     assert res == [(rpc.NOTIFICATION_MESSAGE, i) for i in range(5)]
 
     # Last comes call result
-    message =  session.socket.receive_json()
+    message = session.socket.receive_json()
     assert message == {
         '$': {
             'status': 'success',

@@ -1,11 +1,11 @@
 import asyncio
-import aiohttp
 import functools
-import json
 import logging
 import traceback
+import typing
 
-from asyncio import Queue
+from starlette.websockets import WebSocket, WebSocketState
+
 from . import serialize
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 from concurrent.futures import ThreadPoolExecutor
@@ -25,12 +25,16 @@ CALL_NACK_MESSAGE = 4
 PONG_MESSAGE = 5
 
 
+class ClientWriterTask(typing.NamedTuple):
+    socket: WebSocket
+    queue: asyncio.Queue
+    task: asyncio.Task
+
+
 class RPCServer(object):
-    def __init__(self, app, root=None):
+    def __init__(self, loop, root=None):
         self.monitor_events_task = None
-        # self.app = app
-        # self.loop = app.loop or asyncio.get_event_loop()
-        self.loop = asyncio.get_event_loop()
+        self.loop = loop or asyncio.get_event_loop()
         self.objects = {}
         self.system = SystemCalls(self.objects)
 
@@ -39,11 +43,8 @@ class RPCServer(object):
         # Allow for two concurrent calls max
         self.executor = ThreadPoolExecutor(max_workers=MAX_WORKERS)
 
-        self.clients = {}
+        self.clients: typing.List[ClientWriterTask] = []
         self.tasks = []
-
-        # self.app.router.add_get('/', self.handler)
-        # self.app.on_shutdown.append(self.on_shutdown)
 
     @property
     def root(self):
@@ -58,21 +59,29 @@ class RPCServer(object):
         self._root = value
 
     def shutdown(self):
-        [task.cancel() for task, _ in self.clients.values()]
+        for writer in self.clients:
+            writer.task.cancel()
         self.monitor_events_task.cancel()
 
-    async def on_shutdown(self, app):
+    async def on_shutdown(self):
         """
         Graceful shutdown handler
 
         See https://docs.aiohttp.org/en/stable/web.html#graceful-shutdown
         """
-        for ws in self.clients.copy():
-            await ws.close(code=1001)  # GOING_AWAY
+        for client_write_tasks in self.clients.copy():
+            await client_write_tasks.socket.close(code=1001)  # GOING_AWAY
 
         self.shutdown()
 
-    def send_worker(self, socket):
+    def send_worker(self, socket: WebSocket) -> ClientWriterTask:
+        """
+        Create a send queue and task to read from said queue and send objects
+        over socket.
+
+        :param socket: Web socket
+        :return: The client object.
+        """
         _id = id(socket)
 
         def task_done(future):
@@ -81,23 +90,21 @@ class RPCServer(object):
             except Exception:
                 log.exception("send_task for socket {} threw:".format(_id))
 
-        async def send_task(socket, queue):
+        async def send_task(socket_: WebSocket, queue_: asyncio.Queue):
             while True:
-                payload = await queue.get()
-                if socket.closed:
-                    log.debug('Websocket {0} closed'.format(id(_id)))
+                payload = await queue_.get()
+                if socket_.client_state == WebSocketState.DISCONNECTED:
+                    log.debug('Websocket %s closed', id(_id))
                     break
 
-                # see: http://aiohttp.readthedocs.io/en/stable/web_reference.html#aiohttp.web.StreamResponse.drain # NOQA
-                await socket.drain()
-                await socket.send_json(payload)
+                await socket_.send_json(payload)
 
-        queue = Queue(loop=self.loop)
+        queue: asyncio.Queue = asyncio.Queue(loop=self.loop)
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
         log.debug('Send task for {0} started'.format(_id))
 
-        return task, queue
+        return ClientWriterTask(socket=socket, queue=queue, task=task)
 
     async def monitor_events(self, instance):
         async for event in instance.notifications:
@@ -114,7 +121,7 @@ class RPCServer(object):
             except Exception:
                 log.exception('While processing event {0}:'.format(event))
 
-    async def handle_new_connection(self, client):
+    async def handle_new_connection(self, socket: WebSocket):
         """Handle a new client connection"""
 
         def task_done(future):
@@ -127,34 +134,37 @@ class RPCServer(object):
                         traceback.format_exc())
                 )
 
-        client_id = id(client)
+        socket_id = id(socket)
 
-        log.info('Opening Websocket {0}'.format(id(client)))
+        log.info('Opening Websocket {0}'.format(id(socket)))
 
         try:
-            await client.send_json({
+            await socket.send_json({
                 '$': {'type': CONTROL_MESSAGE, 'monitor': True},
                 'root': self.call_and_serialize(lambda: self.root),
                 'type': self.call_and_serialize(lambda: type(self.root))
             })
         except Exception:
-            log.exception('While sending root info to {0}'.format(client_id))
+            log.exception('While sending root info to {0}'.format(socket_id))
 
         try:
-            self.clients[client] = self.send_worker(client)
+            # Add new client to list of clients
+            self.clients.append(self.send_worker(socket))
             # Async receive client data until websocket is closed
-            async for msg in client:
+            while socket.client_state != WebSocketState.DISCONNECTED:
+                msg = await socket.receive_json()
                 task = self.loop.create_task(self.process(msg))
                 task.add_done_callback(task_done)
                 self.tasks += [task]
         except Exception:
             log.exception('While reading from socket:')
         finally:
-            log.info('Closing WebSocket {0}'.format(id(client)))
-            await client.close()
-            del self.clients[client]
+            log.info('Closing WebSocket {0}'.format(id(socket)))
+            await socket.close()
+            # Remove the client from the list
+            self.clients = [c for c in self.clients if c.socket != socket]
 
-        return client
+        return socket
 
     def build_call(self, _id, name, args):
         if _id not in self.objects:
@@ -203,41 +213,39 @@ class RPCServer(object):
 
         return [resolve(a) for a in args]
 
-    async def process(self, message):
+    async def process(self, data):
+        """
+        Process the payload from a call
+
+        :param data: dict
+        :return: None
+        """
         try:
-            if message.type == aiohttp.WSMsgType.TEXT:
-                data = json.loads(message.data)
-                meta = data.get('$', {})
-                token = meta.get('token')
-                _id = data.get('id')
+            meta = data.get('$', {})
+            token = meta.get('token')
+            _id = data.get('id')
 
-                if meta.get('ping'):
-                    return self.send_pong()
+            if meta.get('ping'):
+                return self.send_pong()
 
-                # if id is missing from payload or explicitely set to null,
-                # use the system object
-                if _id is None:
-                    _id = id(self.system)
+            # if id is missing from payload or explicitely set to null,
+            # use the system object
+            if _id is None:
+                _id = id(self.system)
 
-                try:
-                    self.send_ack(token)
-                    func = self.build_call(
-                        _id=_id,
-                        name=data.get('name'),
-                        args=data.get('args', []))
-                except Exception as e:
-                    log.exception("Exception during rpc.Server.process:")
-                    error = '{0}: {1}'.format(e.__class__.__name__, e)
-                    self.send_error(error, token)
-                else:
-                    response = await self.make_call(func, token)
-                    self.send(response)
-            elif message.type == aiohttp.WSMsgType.ERROR:
-                log.error(
-                    'WebSocket connection closed unexpectedly: {0}'.format(
-                        message))
+            try:
+                self.send_ack(token)
+                func = self.build_call(
+                    _id=_id,
+                    name=data.get('name'),
+                    args=data.get('args', []))
+            except Exception as e:
+                log.exception("Exception during rpc.Server.process:")
+                error = '{0}: {1}'.format(e.__class__.__name__, e)
+                self.send_error(error, token)
             else:
-                log.warning('Unhandled WSMsgType: {0}'.format(message.type))
+                response = await self.make_call(func, token)
+                self.send(response)
         except Exception:
             log.exception('Error while processing request')
 
@@ -312,9 +320,11 @@ class RPCServer(object):
         })
 
     def send(self, payload):
-        for socket, value in self.clients.items():
-            task, queue = value
-            asyncio.run_coroutine_threadsafe(queue.put(payload), self.loop)
+        for writer in self.clients:
+            asyncio.run_coroutine_threadsafe(
+                writer.queue.put(payload),
+                self.loop
+            )
 
 
 class SystemCalls(object):
