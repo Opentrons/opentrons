@@ -70,18 +70,16 @@ const ENGAGE_HEIGHT_OFFSET = -4
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
+  const rawEngageHeight: ?number =
+    labwareDef.parameters.magneticModuleEngageHeight
   if (
     labwareDef.namespace === OPENTRONS_LABWARE_NAMESPACE &&
     _SHORT_MM_LABWARE_DEF_LOADNAMES.includes(labwareDef.parameters.loadName)
   ) {
-    const rawEngageHeight: ?number =
-      labwareDef.parameters.magneticModuleEngageHeight
     return rawEngageHeight == null
       ? null
-      : rawEngageHeight * 2 + ENGAGE_HEIGHT_OFFSET
+      : rawEngageHeight / 2 + ENGAGE_HEIGHT_OFFSET
   }
-  const rawEngageHeight: ?number =
-    labwareDef.parameters.magneticModuleEngageHeight
   return rawEngageHeight == null ? null : rawEngageHeight
 }
 

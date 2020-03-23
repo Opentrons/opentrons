@@ -150,7 +150,7 @@ export const getMagnetLabwareEngageHeight: Selector<
 
     if (engageHeightMm != null && moduleModel === MAGNETIC_MODULE_V1) {
       // convert to 'short mm' units for GEN1
-      return engageHeightMm / 2
+      return engageHeightMm * 2
     }
     return engageHeightMm
   }
