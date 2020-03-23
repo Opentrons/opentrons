@@ -77,7 +77,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return bottom.move(Point(z=offset_from_bottom))
 
 
-def _delay(context, params) -> None:
+def _delay(context: ProtocolContext, params) -> None:
     wait = params['wait']
     message = params.get('message')
     if wait is None or wait is False:
@@ -139,7 +139,7 @@ def _touch_tip(instruments, loaded_labware, params) -> None:
     pipette.touch_tip(well, v_offset=v_offset)
 
 
-def _move_to_slot(context, instruments, params) -> None:
+def _move_to_slot(context: ProtocolContext, instruments, params) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
