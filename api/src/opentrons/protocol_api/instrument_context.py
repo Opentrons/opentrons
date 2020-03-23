@@ -679,7 +679,7 @@ class InstrumentContext(CommandPublisher):
             tr = location.parent
             assert tr.is_tiprack
             z_height = self.return_height * self._tip_length_for(tr)
-            return location.top(-z_height + 10)
+            return location.top(-z_height)
 
     @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
