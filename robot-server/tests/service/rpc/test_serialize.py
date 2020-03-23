@@ -36,30 +36,6 @@ def type_id(instance):
     return id(type(instance))
 
 
-@pytest.mark.skip()
-def test_robot(singletons):
-    robot = singletons['robot']
-    containers = singletons['labware']
-    instruments = singletons['instruments']
-    robot.reset()
-
-    containers.load('trough-12row', '3', 'trough')
-    containers.load('96-PCR-flat', '1', 'plate')
-
-    # a tip rack for our pipette
-    p200rack = containers.load('tiprack-200ul', '2', 'tiprack')
-
-    # create a p200 pipette on robot axis B
-    instruments.P300_Single(
-        mount="left",
-        tip_racks=[p200rack]
-    )
-
-    # Robot tree is pretty big and hard to verify
-    # Making sure we can serialize it into json
-    tree, refs = serialize.get_object_tree(robot)
-
-
 def test_get_object_tree(instance):
     root, a1, a2, a3 = instance
     tree, refs = serialize.get_object_tree(root)
