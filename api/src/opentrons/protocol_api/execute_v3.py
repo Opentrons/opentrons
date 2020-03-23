@@ -77,7 +77,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return bottom.move(Point(z=offset_from_bottom))
 
 
-def _delay(context: ProtocolContext, params) -> None:
+def _delay(context: ProtocolContext, params: Dict[str, Any]) -> None:
     wait = params['wait']
     message = params.get('message')
     if wait is None or wait is False:
@@ -89,7 +89,7 @@ def _delay(context: ProtocolContext, params) -> None:
         context.delay(seconds=wait, msg=message)
 
 
-def _blowout(instruments, loaded_labware, params) -> None:
+def _blowout(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -97,21 +97,21 @@ def _blowout(instruments, loaded_labware, params) -> None:
     pipette.blow_out(well)
 
 
-def _pick_up_tip(instruments, loaded_labware, params) -> None:
+def _pick_up_tip(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
     pipette.pick_up_tip(well)
 
 
-def _drop_tip(instruments, loaded_labware, params) -> None:
+def _drop_tip(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
     pipette.drop_tip(well)
 
 
-def _aspirate(instruments, loaded_labware, params) -> None:
+def _aspirate(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -120,7 +120,7 @@ def _aspirate(instruments, loaded_labware, params) -> None:
     pipette.aspirate(volume, location)
 
 
-def _dispense(instruments, loaded_labware, params) -> None:
+def _dispense(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -129,7 +129,7 @@ def _dispense(instruments, loaded_labware, params) -> None:
     pipette.dispense(volume, location)
 
 
-def _touch_tip(instruments, loaded_labware, params) -> None:
+def _touch_tip(instruments, loaded_labware, params: Dict[str, Any]) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -139,7 +139,9 @@ def _touch_tip(instruments, loaded_labware, params) -> None:
     pipette.touch_tip(well, v_offset=v_offset)
 
 
-def _move_to_slot(context: ProtocolContext, instruments, params) -> None:
+def _move_to_slot(context: ProtocolContext,
+                  instruments, params: Dict[str, Any]
+                  ) -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
