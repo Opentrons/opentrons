@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { MemoryRouter } from 'react-router-dom'
 
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
@@ -47,6 +48,12 @@ describe('ControlsCard', () => {
       .find(LabeledButton)
       .find('button')
 
+  const getDeckCheckButton = wrapper =>
+    wrapper
+      .find({ label: 'Check deck calibration' })
+      .find(LabeledButton)
+      .find('a')
+
   const getHomeButton = wrapper =>
     wrapper
       .find({ label: 'Home all axes' })
@@ -65,7 +72,10 @@ describe('ControlsCard', () => {
   beforeEach(() => {
     mockStore = {
       subscribe: () => {},
-      getState: () => ({ mockState: true }),
+      getState: () => ({
+        mockState: true,
+        config: { devInternal: { enableDeckCalCheck: true } },
+      }),
       dispatch: jest.fn(),
     }
   })
@@ -77,11 +87,13 @@ describe('ControlsCard', () => {
   it('calls fetchLights on mount', () => {
     mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
@@ -95,11 +107,13 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
@@ -113,11 +127,13 @@ describe('ControlsCard', () => {
   it('calls restartRobot on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
@@ -131,11 +147,13 @@ describe('ControlsCard', () => {
   it('calls home on button click', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
@@ -151,15 +169,18 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockUnconnectableRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockUnconnectableRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -167,15 +188,18 @@ describe('ControlsCard', () => {
   it('DC, home, and restart buttons disabled if not connectable', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockUnconnectableRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockUnconnectableRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -189,15 +213,18 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -207,15 +234,18 @@ describe('ControlsCard', () => {
 
     const wrapper = mount(
       <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockRobot}
-          checkDeckUrl="/check-deck"
-          calibrateDeckUrl="/deck/calibrate"
-        />
+        <MemoryRouter>
+          <ControlsCard
+            robot={mockRobot}
+            checkDeckUrl="/check-deck"
+            calibrateDeckUrl="/deck/calibrate"
+          />
+        </MemoryRouter>
       </Provider>
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
