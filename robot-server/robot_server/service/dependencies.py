@@ -26,6 +26,6 @@ def get_motion_lock() -> ThreadedAsyncLock:
 
 async def get_rpc_server() -> RPCServer:
     """The RPC Server instance"""
-    h = get_hardware()
+    h = await get_hardware()
     root = MainRouter(h, lock=get_motion_lock())
     return RPCServer(None, root)
