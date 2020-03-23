@@ -2,6 +2,7 @@ import logging
 from typing import Any, Dict
 
 from .contexts import ProtocolContext, InstrumentContext
+from .constants import JsonCommand
 from . import labware
 from opentrons.types import Point, Location
 
@@ -181,15 +182,15 @@ def _move_to_slot(context: ProtocolContext,
         minimum_z_height=params.get('minimumZHeight'))
 
 
-dispatcher_map: Dict[Any, Any] = {
-    "delay": _delay,
-    "blowout": _blowout,
-    "pickUpTip": _pick_up_tip,
-    "dropTip": _drop_tip,
-    "aspirate": _aspirate,
-    "dispense": _dispense,
-    "touchTip": _touch_tip,
-    "moveToSlot": _move_to_slot
+dispatcher_map: Dict[str, Any] = {
+    JsonCommand.delay: _delay,
+    JsonCommand.blowout: _blowout,
+    JsonCommand.pickUpTip: _pick_up_tip,
+    JsonCommand.dropTip: _drop_tip,
+    JsonCommand.aspirate: _aspirate,
+    JsonCommand.dispense: _dispense,
+    JsonCommand.touchTip: _touch_tip,
+    JsonCommand.moveToSlot: _move_to_slot
 }
 
 
@@ -200,12 +201,12 @@ def dispatch_json(context: ProtocolContext,
     commands = protocol_data['commands']
 
     pipette_command_list = [
-        "blowout",
-        "pickUpTip",
-        "dropTip",
-        "aspirate",
-        "dispense",
-        "touchTip",
+        JsonCommand.blowout,
+        JsonCommand.pickUpTip,
+        JsonCommand.dropTip,
+        JsonCommand.aspirate,
+        JsonCommand.dispense,
+        JsonCommand.touchTip,
     ]
 
     for command_item in commands:
