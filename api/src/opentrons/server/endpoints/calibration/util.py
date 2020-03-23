@@ -1,5 +1,6 @@
 import enum
 from typing import TypeVar, Generic, Type
+from dataclasses import dataclass
 
 """
 Note, the general types below should be restricted to the following:
@@ -16,21 +17,17 @@ StateOutput = TypeVar('StateOutput')
 Relationship = TypeVar('Relationship', bound=Type[enum.Enum])
 
 
-class StateEnum(State, enum.Enum): pass
-
-class RelationshipEnum(StateEnum, enum.Enum): pass
-
+@dataclass
 class State:
     """
     A class that encapsulates a state and its relationships,
     similar to a directed acyclic graph.
     """
-    def __init__(self, name: StateInput, value: StateOutput):
-        self.name = name
-        self.value = value
+    name: str
+    value: int
 
 
-class CalibrationCheckState(StateEnum):
+class CalibrationCheckState(enum.Enum):
     sessionStart = State("sessionStart", enum.auto())
     specifyLabware = State("specifyLabware", enum.auto())
     pickUpTip = State("pickUpTip", enum.auto())
@@ -43,31 +40,32 @@ class CalibrationCheckState(StateEnum):
     noPipettesAttached = State("noPipettesAttached", enum.auto())
 
 
-class RelationshipEnum(RelationshipEnum):
-    sessionStart = StateEnum.specifyLabware
-    specifyLabware = StateEnum.pickUpTip
-    checkPointOne = StateEnum.checkPointTwo
-    checkPointTwo = StateEnum.checkPointThree
-    checkPointThree = StateEnum.checkHeight
-    checkHeight = StateEnum.sessionStart
+class CheckRelationshipEnum(enum.Enum):
+    sessionStart = CalibrationCheckState.specifyLabware
+    specifyLabware = CalibrationCheckState.pickUpTip
+    checkPointOne = CalibrationCheckState.checkPointTwo
+    checkPointTwo = CalibrationCheckState.checkPointThree
+    checkPointThree = CalibrationCheckState.checkHeight
+    checkHeight = CalibrationCheckState.sessionStart
 
 
-class ExitRelationshipEnum(RelationshipEnum):
-    badDeckCalibration = StateEnum.sessionExit
-    checkHeight = StateEnum.sessionExit
-    noPipettesAttached = StateEnum.sessionExit
+class CheckExitRelationshipEnum(enum.Enum):
+    badDeckCalibration = CalibrationCheckState.sessionExit
+    checkHeight = CalibrationCheckState.sessionExit
+    noPipettesAttached = CalibrationCheckState.sessionExit
 
 
-class ErrorRelationshipEnum(RelationshipEnum):
-    sessionStart = StateEnum.noPipettesAttached
-    specifyLabware = StateEnum.badDeckCalibration
-    checkPointOne = StateEnum.badDeckCalibration
-    checkPointTwo = StateEnum.badDeckCalibration
-    checkPointThree = StateEnum.badDeckCalibration
-    checkHeight = StateEnum.badDeckCalibration
+class CheckErrorRelationshipEnum(enum.Enum):
+    sessionStart = CalibrationCheckState.noPipettesAttached
+    specifyLabware = CalibrationCheckState.badDeckCalibration
+    checkPointOne = CalibrationCheckState.badDeckCalibration
+    checkPointTwo = CalibrationCheckState.badDeckCalibration
+    checkPointThree = CalibrationCheckState.badDeckCalibration
+    checkHeight = CalibrationCheckState.badDeckCalibration
 
 
-StateEnumType = Typevar('StateEnumType', bound=StateEnum)
+StateEnumType = TypeVar('StateEnumType', bound=CalibrationCheckState)
+
 
 class StateMachine(Generic[StateEnumType]):
     """
@@ -76,21 +74,22 @@ class StateMachine(Generic[StateEnumType]):
     """
     def __init__(
             self, states: Type[StateEnumType], rel: Relationship,
-            exit: Relationship, error: Relationship, first_state: StateEnumType):
+            exit: Relationship, error: Relationship,
+            first_state: StateEnumType):
         self._states = states
         self._relationship = rel
         self._exit_relationship = exit
         self._error_relationship = error
-        self._current_state = self._states[first_state]
+        self._current_state = first_state
 
-    def get_state(self, state_name: StateInput) -> 'State':
+    def get_state(self, state_name: StateInput) -> StateEnumType:
         return getattr(self._states, state_name)
 
     def update_state(self, state_name: StateInput):
         self._current_state = self._iterate_thru_relationships(state_name)
 
     def _iterate_thru_relationships(
-            self, state_name: StateInput) -> 'State':
+            self, state_name: StateInput) -> StateEnumType:
         rel_list = [
             self._relationship,
             self._exit_relationship,
@@ -103,7 +102,7 @@ class StateMachine(Generic[StateEnumType]):
 
     def _find_next(
             self, input: StateInput,
-            relationship_enum: Relationship) -> 'State':
+            relationship_enum: Relationship) -> StateEnumType:
         """
         Next state will either check the input or the current state to see
         if it can find a relationship in any of the enum classes provided.
@@ -118,21 +117,22 @@ class StateMachine(Generic[StateEnumType]):
         self._current_state = self.get_state(state_name)
 
     @property
-    def current_state(self) -> 'State':
+    def current_state(self) -> StateEnumType:
         return self._current_state
 
     @property
-    def next_state(self) -> 'State':
+    def next_state(self) -> StateEnumType:
         """
         The next state based on current state only. For session status msg.
         """
-        return self._iterate_thru_relationships(self.current_state.name)
+        state = self.current_state.value
+        return self._iterate_thru_relationships(state.name)
 
 
 class CalibrationCheckMachine(StateMachine):
-    def __init__(self)  -> None:
+    def __init__(self) -> None:
         super().__init__(CalibrationCheckState,
-                         RelationshipEnum,
-                         ExitRelationshipEnum,
-                         ErrorRelationshipEnum,
+                         CheckRelationshipEnum,
+                         CheckExitRelationshipEnum,
+                         CheckErrorRelationshipEnum,
                          CalibrationCheckState.sessionStart)
