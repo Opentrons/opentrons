@@ -55,9 +55,6 @@ export const MODULE_MODELS: Array<ModuleModel> = [
   ...THERMOCYCLER_MODULE_MODELS,
 ]
 
-// offset added to parameters.agneticModuleEngageHeight for displaying reccomended height in PD
-export const ENGAGE_HEIGHT_OFFSET = -4
-
 export const MODULE_TYPES = [
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
