@@ -28,17 +28,23 @@ def hardware_home(hardware):
     return hardware
 
 
-def test_home_pipette(api_client, hardware_home):
+@pytest.mark.parametrize(argnames="mount_name,mount",
+                         argvalues=[
+                             ["left", Mount.LEFT],
+                             ["right", Mount.RIGHT]
+                         ])
+def test_home_pipette(api_client, hardware_home, mount_name, mount):
     test_data = {
         'target': 'pipette',
-        'mount': 'left'
+        'mount': mount_name
     }
 
     res = api_client.post('/robot/home', json=test_data)
-    assert res.json() == {"message": "Pipette on left homed successfully"}
+    assert res.json() == {"message": f"Pipette on {mount_name}"
+                                     f" homed successfully"}
     assert res.status_code == 200
-    hardware_home.home.assert_called_once_with([Axis.by_mount(Mount.LEFT)])
-    hardware_home.home_plunger.assert_called_once_with(Mount.LEFT)
+    hardware_home.home.assert_called_once_with([Axis.by_mount(mount)])
+    hardware_home.home_plunger.assert_called_once_with(mount)
 
 
 def test_home_robot(api_client, hardware_home):

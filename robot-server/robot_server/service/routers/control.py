@@ -119,8 +119,8 @@ async def post_home_robot(
 async def get_robot_light_state(
         hardware: HardwareAPILike = Depends(get_hardware)) \
         -> control.RobotLightState:
-    on = hardware.get_lights()  # type: ignore
-    return control.RobotLightState(on=on.get('rails', False))
+    light_state = hardware.get_lights()  # type: ignore
+    return control.RobotLightState(on=light_state.get('rails', False))
 
 
 @router.post("/robot/lights",
