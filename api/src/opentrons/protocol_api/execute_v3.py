@@ -90,7 +90,7 @@ def _delay(context: ProtocolContext, params: Dict[str, Any]) -> None:
 
 
 def _blowout(instruments: Dict[str, InstrumentContext],
-             loaded_labware,
+             loaded_labware: Dict[str, labware.Labware],
              params: Dict[str, Any]
              ) -> None:
     pipette_id = params['pipette']
@@ -101,7 +101,7 @@ def _blowout(instruments: Dict[str, InstrumentContext],
 
 
 def _pick_up_tip(instruments: Dict[str, InstrumentContext],
-                 loaded_labware,
+                 loaded_labware: Dict[str, labware.Labware],
                  params: Dict[str, Any]
                  ) -> None:
     pipette_id = params['pipette']
@@ -111,7 +111,7 @@ def _pick_up_tip(instruments: Dict[str, InstrumentContext],
 
 
 def _drop_tip(instruments: Dict[str, InstrumentContext],
-              loaded_labware,
+              loaded_labware: Dict[str, labware.Labware],
               params: Dict[str, Any]
               ) -> None:
     pipette_id = params['pipette']
@@ -121,7 +121,7 @@ def _drop_tip(instruments: Dict[str, InstrumentContext],
 
 
 def _aspirate(instruments: Dict[str, InstrumentContext],
-              loaded_labware,
+              loaded_labware: Dict[str, labware.Labware],
               params: Dict[str, Any]
               ) -> None:
     pipette_id = params['pipette']
@@ -133,7 +133,7 @@ def _aspirate(instruments: Dict[str, InstrumentContext],
 
 
 def _dispense(instruments: Dict[str, InstrumentContext],
-              loaded_labware,
+              loaded_labware: Dict[str, labware.Labware],
               params: Dict[str, Any]
               ) -> None:
     pipette_id = params['pipette']
@@ -145,7 +145,7 @@ def _dispense(instruments: Dict[str, InstrumentContext],
 
 
 def _touch_tip(instruments: Dict[str, InstrumentContext],
-               loaded_labware,
+               loaded_labware: Dict[str, labware.Labware],
                params: Dict[str, Any]
                ) -> None:
     pipette_id = params['pipette']
