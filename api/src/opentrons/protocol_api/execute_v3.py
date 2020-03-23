@@ -183,14 +183,14 @@ def _move_to_slot(context: ProtocolContext,
 
 
 dispatcher_map: Dict[str, Any] = {
-    JsonCommand.delay: _delay,
-    JsonCommand.blowout: _blowout,
-    JsonCommand.pickUpTip: _pick_up_tip,
-    JsonCommand.dropTip: _drop_tip,
-    JsonCommand.aspirate: _aspirate,
-    JsonCommand.dispense: _dispense,
-    JsonCommand.touchTip: _touch_tip,
-    JsonCommand.moveToSlot: _move_to_slot
+    JsonCommand.delay.value: _delay,
+    JsonCommand.blowout.value: _blowout,
+    JsonCommand.pickUpTip.value: _pick_up_tip,
+    JsonCommand.dropTip.value: _drop_tip,
+    JsonCommand.aspirate.value: _aspirate,
+    JsonCommand.dispense.value: _dispense,
+    JsonCommand.touchTip.value: _touch_tip,
+    JsonCommand.moveToSlot.value: _move_to_slot
 }
 
 
@@ -200,21 +200,21 @@ def dispatch_json(context: ProtocolContext,
                   loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
 
-    pipette_command_list = [
-        JsonCommand.blowout,
-        JsonCommand.pickUpTip,
-        JsonCommand.dropTip,
-        JsonCommand.aspirate,
-        JsonCommand.dispense,
-        JsonCommand.touchTip,
-    ]
+    pipette_commands = {
+        JsonCommand.blowout.value,
+        JsonCommand.pickUpTip.value,
+        JsonCommand.dropTip.value,
+        JsonCommand.aspirate.value,
+        JsonCommand.dispense.value,
+        JsonCommand.touchTip.value,
+    }
 
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
 
         # different `_command` helpers take different args
-        if command_type in pipette_command_list:
+        if command_type in pipette_commands:
             dispatcher_map[command_type](
                 instruments, loaded_labware, params)
         elif command_type == 'delay':
