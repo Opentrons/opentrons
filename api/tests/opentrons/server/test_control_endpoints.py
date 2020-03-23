@@ -374,6 +374,7 @@ async def test_home_pipette_bad_request(async_client):
 
 async def test_move_bad_request(async_client):
     data0 = {
+        # missing entries
         'target': 'other'
     }
     res = await async_client.post('/robot/move', json=data0)
@@ -381,6 +382,7 @@ async def test_move_bad_request(async_client):
 
     data1 = {
         'target': 'mount',
+        # too many points
         'point': (1, 2, 3, 4)
     }
     res = await async_client.post('/robot/move', json=data1)
@@ -389,6 +391,7 @@ async def test_move_bad_request(async_client):
     data2 = {
         'target': 'mount',
         'point': (1, 2, 3),
+        # Bad mount
         'mount': 'middle'
     }
     res = await async_client.post('/robot/move', json=data2)
@@ -398,9 +401,19 @@ async def test_move_bad_request(async_client):
         'target': 'pipette',
         'point': (1, 2, 3),
         'mount': 'left',
+        # Bad model
         'model': 'p9000+'
     }
     res = await async_client.post('/robot/move', json=data3)
+    assert res.status == 400
+
+    data4 = {
+        'target': 'mount',
+        # Z is too low
+        'point': (1, 2, 3),
+        'mount': 'left',
+    }
+    res = await async_client.post('/robot/move', json=data4)
     assert res.status == 400
 
 
