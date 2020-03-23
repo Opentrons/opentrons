@@ -390,9 +390,9 @@ function _getHydratedForm(
   // Consider nesting all additional fields under 'hydrated' key,
   // following what we're doing with 'module'.
   // See #3161
-  hydratedForm.hydrated = {}
+  hydratedForm.meta = {}
   if (rawForm?.moduleId != null) {
-    hydratedForm.hydrated.module = getModuleEntity(
+    hydratedForm.meta.module = getModuleEntity(
       invariantContext,
       rawForm.moduleId
     )
