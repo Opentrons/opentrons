@@ -678,7 +678,7 @@ class InstrumentContext(CommandPublisher):
         else:
             tr = location.parent
             assert tr.is_tiprack
-            z_height = self.return_height * self._tip_length_for(tr)
+            z_height = self.return_height * tr.tip_length
             return location.top(-z_height)
 
     @requires_version(2, 0)
