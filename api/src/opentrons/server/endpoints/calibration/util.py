@@ -15,7 +15,7 @@ class CalibrationCheckState(enum.Enum):
     noPipettesAttached = enum.auto()
 
 
-CheckNormalRelationshipDict = {
+check_normal_relationship_dict = {
     CalibrationCheckState.sessionStart: CalibrationCheckState.specifyLabware,
     CalibrationCheckState.specifyLabware: CalibrationCheckState.pickUpTip,
     CalibrationCheckState.checkPointOne: CalibrationCheckState.checkPointTwo,
@@ -26,7 +26,7 @@ CheckNormalRelationshipDict = {
 }
 
 exit = CalibrationCheckState.sessionExit
-CheckExitRelationshipDict = {
+check_exit_relationship_dict = {
     CalibrationCheckState.badDeckCalibration: exit,
     CalibrationCheckState.checkHeight: exit,
     CalibrationCheckState.noPipettesAttached: exit
@@ -34,7 +34,7 @@ CheckExitRelationshipDict = {
 
 nopips = CalibrationCheckState.noPipettesAttached
 badcal = CalibrationCheckState.badDeckCalibration
-CheckErrorRelationshipDict = {
+check_error_relationship_dict = {
     CalibrationCheckState.sessionStart: nopips,
     CalibrationCheckState.specifyLabware: badcal,
     CalibrationCheckState.checkPointOne: badcal,
@@ -109,7 +109,7 @@ class StateMachine(Generic[StateEnumType]):
 class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
     def __init__(self) -> None:
         super().__init__(CalibrationCheckState,
-                         CheckNormalRelationshipDict,
-                         CheckExitRelationshipDict,
-                         CheckErrorRelationshipDict,
+                         check_normal_relationship_dict,
+                         check_exit_relationship_dict,
+                         check_error_relationship_dict,
                          CalibrationCheckState.sessionStart)

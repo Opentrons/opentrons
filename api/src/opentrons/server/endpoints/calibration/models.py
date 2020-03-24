@@ -33,44 +33,11 @@ class AttachedPipette(BaseModel):
             UUID4: convert_uuid}
 
 
-class Instruments(BaseModel):
-    """
-    A Dictionary of Attached Pipettes. Note that although the key should be
-    a UUID type, we have to set it to a string and convert the UUID to a hex
-    string at serialization time.
-    """
-    Dict[str, AttachedPipette]
-
-    class Config:
-        schema_extra = {
-            "examples": [
-                {
-                    "fakeUUID4": {
-                        "model": "p300_single_v1.5",
-                        "name": "p300_single",
-                        "tip_length": 51.7,
-                        "mount_axis": "z",
-                        "plunger_axis": "b",
-                        "id": "P3HS12123041"
-                    },
-                    "fakeUUID2": {
-                        "model": None,
-                        "name": None,
-                        "tip_length": None,
-                        "mount_axis": "a",
-                        "plunger_axis": "c",
-                        "id": None
-                    }
-                }
-            ]
-        }
-
-
 class CalibrationSessionStatus(BaseModel):
     """
     The current status of a given session.
     """
-    instruments: Instruments
+    instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
     nextSteps: Dict[str, Dict[str, str]] =\
         Field(..., description="Next Available Step in Session")
