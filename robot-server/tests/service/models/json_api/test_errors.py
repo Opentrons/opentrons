@@ -66,11 +66,12 @@ def test_transform_validation_error_to_json_api_errors():
         'errors': [
             {
                 'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-                'detail': "unexpected value; permitted: 'item'",
+                'detail': "value is not a valid enumeration member; permitted:"
+                          " 'item'",
                 'source': {
                     'pointer': '/data/type'
                 },
-                'title': 'value_error.const'
+                'title': 'type_error.enum'
             },
             {
                 'status': str(HTTP_422_UNPROCESSABLE_ENTITY),

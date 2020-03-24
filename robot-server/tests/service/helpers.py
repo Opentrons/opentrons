@@ -3,6 +3,7 @@ from dataclasses import dataclass
 from uuid import uuid4
 
 from robot_server.service.models.json_api.request import json_api_request
+from robot_server.service.models.json_api import ResourceTypes
 
 
 @dataclass
@@ -19,5 +20,5 @@ class ItemModel(BaseModel):
     price: float
 
 
-item_type_name = 'item'
-ItemRequest = json_api_request(item_type_name, ItemModel)
+item_type = ResourceTypes.item
+ItemRequest = json_api_request(item_type, ItemModel)

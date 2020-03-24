@@ -1,22 +1,22 @@
 from typing import Generic, TypeVar, Optional, List, \
     Dict, Any, Type, get_type_hints
-from typing_extensions import Literal
 from pydantic import Field
 from pydantic.generics import GenericModel
 
 from .resource_links import ResourceLinks
+from . import ResourceTypes
 
-TypeT = TypeVar('TypeT', bound=str)
+
 AttributesT = TypeVar('AttributesT')
 
 
-class ResponseDataModel(GenericModel, Generic[TypeT, AttributesT]):
+class ResponseDataModel(GenericModel, Generic[AttributesT]):
     """
     """
     id: str = \
         Field(...,
               description="id member represents a resource object.")
-    type: TypeT = \
+    type: ResourceTypes = \
         Field(...,
               description="type member is used to describe resource objects"
                           " that share common attributes.")
@@ -64,9 +64,9 @@ class ResponseModel(GenericModel, Generic[DataT]):
         # a list, if not return None.
         if getattr(data_type, '__origin__', None) is list:
             data_type = data_type.__args__[0]
-        # Note(isk: 3/13/20): get type name from data object
-        # using get_type_hints
-        typename = get_type_hints(data_type)['type'].__args__[0]
+        # Note(isk: 3/24/20): get type name from _resource_type private
+        # variable set in json_api_response
+        typename = cls._resource_type     # type: ignore
         return data_type(
             id=id,
             type=typename,
@@ -77,23 +77,23 @@ class ResponseModel(GenericModel, Generic[DataT]):
 # Note(isk: 3/13/20): returns response based on whether
 # the data object is a list or not
 def json_api_response(
-    type_string: str,
+    resource_type: ResourceTypes,
     attributes_model: Any,
     *,
     use_list: bool = False
 ) -> Type[ResponseModel]:
-    response_data_model = ResponseDataModel[
-        Literal[type_string],    # type: ignore
-        attributes_model,    # type: ignore
-    ]
+    type_string = resource_type.value
+    response_data_model = ResponseDataModel[attributes_model]    # type: ignore
     if use_list:
         response_data_model = List[response_data_model]    # type: ignore
         response_data_model.__name__ = f'ListResponseData[{type_string}]'
         response_model_list = ResponseModel[response_data_model]
         response_model_list.__name__ = f'ListResponse[{type_string}]'
+        response_model_list._resource_type = type_string     # type: ignore
         return response_model_list
     else:
         response_data_model.__name__ = f'ResponseData[{type_string}]'
         response_model = ResponseModel[response_data_model]
         response_model.__name__ = f'Response[{type_string}]'
+        response_model._resource_type = type_string     # type: ignore
         return response_model
