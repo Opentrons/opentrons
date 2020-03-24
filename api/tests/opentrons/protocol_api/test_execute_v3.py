@@ -4,6 +4,7 @@ from copy import deepcopy
 import pytest
 from opentrons.types import Location, Point
 from opentrons.protocols.parse import parse
+from opentrons.protocol_api.geometry import Deck
 from opentrons.protocol_api import ProtocolContext, InstrumentContext, \
     execute, labware, MAX_SUPPORTED_VERSION
 from opentrons.protocol_api.execute_v3 import _aspirate, _dispense, _delay, \
@@ -271,8 +272,13 @@ def test_touch_tip():
 
 def test_move_to_slot():
     slot_position = Location(Point(1, 2, 3), 'deck')
-    mock_context = mock.create_autospec(ProtocolContext)
-    mock_context.deck.position_for = mock.Mock(return_value=slot_position)
+    mock_context = mock.Mock()
+
+    mock_deck = mock.MagicMock(spec=Deck)
+    mock_deck.__contains__.return_value = True
+    mock_deck.position_for.return_value = slot_position
+
+    mock_context.deck = mock_deck
     pipette_mock = mock.create_autospec(InstrumentContext)
 
     instruments = {'somePipetteId': pipette_mock}
