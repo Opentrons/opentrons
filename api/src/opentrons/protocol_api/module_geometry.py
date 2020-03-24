@@ -9,6 +9,7 @@ by :py:mod:`.module_contexts`)
 
 from enum import Enum
 import functools
+import itertools
 import json
 import logging
 import re
@@ -515,14 +516,12 @@ def load_module(
 
 def resolve_module_model(module_name: str) -> ModuleModel:
     """ Turn any of the supported load names into module model names """
-
-    model_map: Mapping[str, ModuleModel] = {
-        'magneticModuleV1': MagneticModuleModel.MAGNETIC_V1,
-        'magneticModuleV2': MagneticModuleModel.MAGNETIC_V2,
-        'temperatureModuleV1': TemperatureModuleModel.TEMPERATURE_V1,
-        'temperatureModuleV2': TemperatureModuleModel.TEMPERATURE_V2,
-        'thermocyclerModuleV1': ThermocyclerModuleModel.THERMOCYCLER_V1,
-    }
+    MODELS_BY_NAME = {
+        e.value: e for e in itertools.chain(
+            list(MagneticModuleModel),
+            list(TemperatureModuleModel),
+            list(ThermocyclerModuleModel))
+        }
 
     alias_map: Mapping[str, ModuleModel] = {
         'magdeck': MagneticModuleModel.MAGNETIC_V1,
@@ -536,7 +535,7 @@ def resolve_module_model(module_name: str) -> ModuleModel:
     }
 
     lower_name = module_name.lower()
-    resolved_name = model_map.get(module_name, None) \
+    resolved_name = MODELS_BY_NAME.get(module_name, None) \
         or alias_map.get(lower_name, None)
     if not resolved_name:
         raise ValueError(
@@ -545,7 +544,7 @@ def resolve_module_model(module_name: str) -> ModuleModel:
             .join(alias_map.keys()) + '"\n' +
             'You can also refer to modules by their ' +
             'exact model: ''"' + '", "'
-            .join(model_map.keys()) + '"'
+            .join(MODELS_BY_NAME.keys()) + '"'
             )
     return resolved_name
 
