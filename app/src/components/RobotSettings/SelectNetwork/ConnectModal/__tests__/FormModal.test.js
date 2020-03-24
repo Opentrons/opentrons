@@ -6,30 +6,29 @@ import * as Fixtures from '../../../../../networking/__fixtures__'
 import * as Networking from '../../../../../networking'
 import { ScrollableAlertModal } from '../../../../modals'
 import * as Constants from '../../constants'
-import { StringField } from '../StringField'
-import { SelectKey } from '../SelectKey'
-import { SelectSecurity } from '../SelectSecurity'
-import { ConnectFormModal } from '../ConnectFormModal'
+import { TextField } from '../TextField'
+import { KeyFileField } from '../KeyFileField'
+import { SecurityField } from '../SecurityField'
+import { FormModal } from '../FormModal'
 
-// SelectKey is wired to redux, so mock it out
-jest.mock('../SelectKey', () => ({ SelectKey: () => null }))
+// KeyFileField is wired to redux, so mock it out
+jest.mock('../KeyFileField', () => ({ KeyFileField: () => null }))
 
+const id = 'formId'
 const robotName = 'robotName'
 const eapOptions = [Fixtures.mockEapOption]
 const wifiKeys = [Fixtures.mockWifiKey]
 
-describe('ConnectFormModal', () => {
+describe('FormModal', () => {
   const handleCancel = jest.fn()
 
   const render = (network = null, fields = [], isValid = false) => {
     return mount(
-      <ConnectFormModal
-        robotName={robotName}
+      <FormModal
+        id={id}
         network={network}
         fields={fields}
         isValid={isValid}
-        eapOptions={eapOptions}
-        wifiKeys={wifiKeys}
         onCancel={handleCancel}
       />,
       {
@@ -58,6 +57,7 @@ describe('ConnectFormModal', () => {
     const form = modal.find(Form)
     const formId = form.prop('id')
 
+    expect(formId).toBe(id)
     expect(modal.prop('buttons')).toEqual([
       { children: 'cancel', onClick: handleCancel },
       { children: 'connect', type: 'submit', form: formId, disabled: false },
@@ -127,16 +127,16 @@ describe('ConnectFormModal', () => {
 
   describe('string fields', () => {
     const stringField = {
-      type: Constants.AUTH_TYPE_STRING,
+      type: Constants.FIELD_TYPE_TEXT,
       name: 'fieldName',
-      label: 'Field Name',
-      required: true,
+      label: '* Field Name',
+      isPassword: false,
     }
 
-    it('can render a "string" field', () => {
+    it('can render a string field', () => {
       const fields = [stringField]
       const wrapper = render(null, fields)
-      const field = wrapper.find(StringField)
+      const field = wrapper.find(TextField)
 
       expect(field.prop('isPassword')).toBe(false)
       expect(field.prop('label')).toBe('* Field Name')
@@ -144,10 +144,10 @@ describe('ConnectFormModal', () => {
       expect(field.prop('id')).toMatch(/__fieldName$/)
     })
 
-    it('can render a "password" field', () => {
-      const fields = [{ ...stringField, type: Constants.AUTH_TYPE_PASSWORD }]
+    it('can render a password field', () => {
+      const fields = [{ ...stringField, isPassword: true }]
       const wrapper = render(null, fields)
-      const field = wrapper.find(StringField)
+      const field = wrapper.find(TextField)
 
       expect(field.prop('isPassword')).toBe(true)
       expect(field.prop('label')).toBe('* Field Name')
@@ -158,18 +158,20 @@ describe('ConnectFormModal', () => {
 
   describe('wifi key fields', () => {
     const keyField = {
-      type: Constants.AUTH_TYPE_FILE,
+      type: Constants.FIELD_TYPE_KEY_FILE,
       name: 'fieldName',
-      label: 'Field Name',
-      required: false,
+      label: '* Field Name',
+      placeholder: 'Select file',
+      robotName,
+      wifiKeys,
     }
 
     it('can render a "file" field', () => {
       const fields = [keyField]
       const wrapper = render(null, fields)
-      const field = wrapper.find(SelectKey)
+      const field = wrapper.find(KeyFileField)
 
-      expect(field.prop('label')).toBe('Field Name')
+      expect(field.prop('label')).toBe('* Field Name')
       expect(field.prop('name')).toBe('fieldName')
       expect(field.prop('placeholder')).toBe('Select file')
       expect(field.prop('id')).toMatch(/__fieldName$/)
@@ -180,29 +182,32 @@ describe('ConnectFormModal', () => {
 
   describe('wifi security fields', () => {
     const securityField = {
-      type: Constants.AUTH_TYPE_SECURITY,
+      type: Constants.FIELD_TYPE_SECURITY,
       name: 'securityType',
-      label: 'Authentication',
-      required: true,
+      label: '* Authentication',
+      showAllOptions: true,
+      placeholder: 'Select authentication method',
+      eapOptions,
     }
 
     it('can render a "security" field for unknown network', () => {
       const fields = [securityField]
       const wrapper = render(null, fields)
-      const field = wrapper.find(SelectSecurity)
+      const field = wrapper.find(SecurityField)
 
       expect(field.prop('label')).toBe('* Authentication')
       expect(field.prop('name')).toBe('securityType')
       expect(field.prop('id')).toMatch(/__securityType$/)
       expect(field.prop('showAllOptions')).toBe(true)
       expect(field.prop('placeholder')).toBe('Select authentication method')
+      expect(field.prop('eapOptions')).toBe(eapOptions)
     })
 
     it('can render a "security" field for known network', () => {
       const network = Fixtures.mockWifiNetwork
-      const fields = [securityField]
+      const fields = [{ ...securityField, showAllOptions: false }]
       const wrapper = render(network, fields)
-      const field = wrapper.find(SelectSecurity)
+      const field = wrapper.find(SecurityField)
 
       expect(field.prop('showAllOptions')).toBe(false)
     })

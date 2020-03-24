@@ -7,15 +7,26 @@ import * as Fixtures from '../../../../../networking/__fixtures__'
 import * as FormFields from '../form-fields'
 
 import { ConnectModal, ConnectModalComponent } from '..'
-import { ConnectFormModal } from '../ConnectFormModal'
+import { FormModal } from '../FormModal'
 
-import type { WifiNetwork, EapOption, ConnectFormValues } from '../../types'
+import type {
+  WifiNetwork,
+  EapOption,
+  WifiKey,
+  ConnectFormValues,
+} from '../../types'
 
 jest.mock('../form-fields')
 
 const getConnectFormFields: JestMockFn<
-  [WifiNetwork | null, Array<EapOption>, ConnectFormValues],
-  $Call<typeof FormFields.getConnectFormFields, any, any, any>
+  [
+    WifiNetwork | null,
+    string,
+    Array<EapOption>,
+    Array<WifiKey>,
+    ConnectFormValues
+  ],
+  $Call<typeof FormFields.getConnectFormFields, any, any, any, any, any>
 > = FormFields.getConnectFormFields
 
 const validateConnectFormFields: JestMockFn<
@@ -157,21 +168,19 @@ describe("SelectNetwork's ConnectModal", () => {
       )
     }
 
-    it('renders a ConnectFormModal for unknown network', () => {
+    it('renders a FormModal for unknown network', () => {
       const wrapper = render()
-      const modal = wrapper.find(ConnectFormModal)
+      const modal = wrapper.find(FormModal)
 
-      expect(modal.prop('robotName')).toEqual(robotName)
+      expect(modal.prop('id')).toContain(robotName)
       expect(modal.prop('network')).toEqual(null)
-      expect(modal.prop('wifiKeys')).toEqual(wifiKeys)
-      expect(modal.prop('eapOptions')).toEqual(eapOptions)
       expect(modal.prop('onCancel')).toBe(handleCancel)
     })
 
     it('renders a connect form for an known network', () => {
       const network = Fixtures.mockWifiNetwork
       const wrapper = render(network)
-      const modal = wrapper.find(ConnectFormModal)
+      const modal = wrapper.find(FormModal)
 
       expect(modal.prop('network')).toEqual(network)
     })
@@ -179,17 +188,17 @@ describe("SelectNetwork's ConnectModal", () => {
     it('passes fields to the connect form modal', () => {
       const mockFields = [
         {
-          type: 'string',
+          type: 'text',
           name: 'fieldName',
-          label: 'Field Name',
-          required: true,
+          label: '* Field Name',
+          isPassword: false,
         },
       ]
 
       getConnectFormFields.mockReturnValue(mockFields)
 
       const wrapper = render()
-      const modal = wrapper.find(ConnectFormModal)
+      const modal = wrapper.find(FormModal)
 
       expect(modal.prop('fields')).toEqual(mockFields)
     })

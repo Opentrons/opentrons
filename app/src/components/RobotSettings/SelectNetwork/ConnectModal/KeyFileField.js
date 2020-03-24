@@ -9,7 +9,7 @@ import { useConnectFormField } from './form-state'
 
 import type { WifiKey } from '../types'
 
-export type SelectKeyProps = {|
+export type KeyFileFieldProps = {|
   id: string,
   name: string,
   label: string,
@@ -29,7 +29,7 @@ const makeKeyOptions = (keys: Array<WifiKey>) => ({
   options: keys.map(k => ({ value: k.id, label: k.name })),
 })
 
-export const SelectKey = (props: SelectKeyProps) => {
+export const KeyFileField = (props: KeyFileFieldProps) => {
   const { id, name, label, placeholder, robotName, wifiKeys } = props
   const { value, error, setValue, setTouched } = useConnectFormField(name)
   const options = [makeKeyOptions(wifiKeys), ADD_NEW_KEY_OPTION_GROUP]

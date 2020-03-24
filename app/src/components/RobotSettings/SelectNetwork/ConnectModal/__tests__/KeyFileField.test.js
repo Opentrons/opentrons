@@ -5,7 +5,7 @@ import { shallow } from 'enzyme'
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SelectField } from '@opentrons/components'
 import { UploadKeyInput } from '../UploadKeyInput'
-import { SelectKey } from '../SelectKey'
+import { KeyFileField } from '../KeyFileField'
 import * as FormState from '../form-state'
 
 import { LABEL_ADD_NEW_KEY } from '../../i18n'
@@ -17,7 +17,7 @@ const useConnectFormField: JestMockFn<
   $Call<typeof FormState.useConnectFormField, string>
 > = FormState.useConnectFormField
 
-describe('ConnectModal SelectKey', () => {
+describe('ConnectModal KeyFileField', () => {
   const fieldId = 'field-id'
   const fieldName = 'field-name'
   const fieldLabel = 'Field Label:'
@@ -46,7 +46,7 @@ describe('ConnectModal SelectKey', () => {
     })
 
     return shallow(
-      <SelectKey
+      <KeyFileField
         id={fieldId}
         name={fieldName}
         label={fieldLabel}

@@ -12,13 +12,18 @@ import {
 } from '../../../../../networking'
 
 import {
-  AUTH_TYPE_STRING,
-  AUTH_TYPE_PASSWORD,
-  AUTH_TYPE_FILE,
-  AUTH_TYPE_SECURITY,
+  FIELD_TYPE_TEXT,
+  FIELD_TYPE_KEY_FILE,
+  FIELD_TYPE_SECURITY,
 } from '../../constants'
 
-import { LABEL_SECURITY, LABEL_SSID, LABEL_PSK } from '../../i18n'
+import {
+  LABEL_SECURITY,
+  LABEL_SSID,
+  LABEL_PSK,
+  SELECT_AUTHENTICATION_METHOD,
+  SELECT_FILE,
+} from '../../i18n'
 
 import {
   getConnectFormFields,
@@ -28,39 +33,51 @@ import {
 
 describe('getConnectFormFields', () => {
   it('should add a string field for SSID if network is unknown', () => {
-    const fields = getConnectFormFields(null, [], {})
+    const fields = getConnectFormFields(null, 'robot-name', [], [], {})
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_STRING,
+      type: FIELD_TYPE_TEXT,
       name: CONFIGURE_FIELD_SSID,
-      label: LABEL_SSID,
-      required: true,
+      label: `* ${LABEL_SSID}`,
+      isPassword: false,
     })
   })
 
   it('should add a security dropdown field if network is unknown', () => {
-    const fields = getConnectFormFields(null, [], {})
+    const eapOptions = [Fixtures.mockEapOption]
+    const fields = getConnectFormFields(null, 'robot-name', eapOptions, [], {})
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_SECURITY,
+      type: FIELD_TYPE_SECURITY,
       name: CONFIGURE_FIELD_SECURITY_TYPE,
-      label: LABEL_SECURITY,
-      required: true,
+      label: `* ${LABEL_SECURITY}`,
+      eapOptions,
+      showAllOptions: true,
+      placeholder: SELECT_AUTHENTICATION_METHOD,
     })
   })
 
   it('should add a security dropdown field if known network has EAP security', () => {
+    const eapOptions = [Fixtures.mockEapOption]
     const network = {
       ...Fixtures.mockWifiNetwork,
       securityType: SECURITY_WPA_EAP,
     }
-    const fields = getConnectFormFields(network, [], {})
+    const fields = getConnectFormFields(
+      network,
+      'robot-name',
+      eapOptions,
+      [],
+      {}
+    )
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_SECURITY,
+      type: FIELD_TYPE_SECURITY,
       name: CONFIGURE_FIELD_SECURITY_TYPE,
-      label: LABEL_SECURITY,
-      required: true,
+      label: `* ${LABEL_SECURITY}`,
+      eapOptions,
+      showAllOptions: false,
+      placeholder: SELECT_AUTHENTICATION_METHOD,
     })
   })
 
@@ -69,26 +86,26 @@ describe('getConnectFormFields', () => {
       ...Fixtures.mockWifiNetwork,
       securityType: SECURITY_WPA_PSK,
     }
-    const fields = getConnectFormFields(network, [], {})
+    const fields = getConnectFormFields(network, 'robot-name', [], [], {})
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_PASSWORD,
+      type: FIELD_TYPE_TEXT,
       name: CONFIGURE_FIELD_PSK,
-      label: LABEL_PSK,
-      required: true,
+      label: `* ${LABEL_PSK}`,
+      isPassword: true,
     })
   })
 
   it('should add a password field for PSK if unknown network and user selects PSK', () => {
-    const fields = getConnectFormFields(null, [], {
+    const fields = getConnectFormFields(null, 'robot-name', [], [], {
       securityType: SECURITY_WPA_PSK,
     })
 
     expect(fields).toContainEqual({
-      type: AUTH_TYPE_PASSWORD,
+      type: FIELD_TYPE_TEXT,
       name: CONFIGURE_FIELD_PSK,
-      label: LABEL_PSK,
-      required: true,
+      label: `* ${LABEL_PSK}`,
+      isPassword: true,
     })
   })
 
@@ -97,29 +114,38 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someEapType', options: [] },
       { ...Fixtures.mockEapOption, name: 'someOtherEapType' },
     ]
-    const fields = getConnectFormFields(null, eapOptions, {
-      securityType: 'someOtherEapType',
-    })
+    const wifiKeys = [Fixtures.mockWifiKey]
+    const fields = getConnectFormFields(
+      null,
+      'robot-name',
+      eapOptions,
+      wifiKeys,
+      {
+        securityType: 'someOtherEapType',
+      }
+    )
 
     expect(fields).toEqual(
       expect.arrayContaining([
         {
-          type: AUTH_TYPE_STRING,
+          type: FIELD_TYPE_TEXT,
           name: 'eapConfig.stringField',
-          label: 'String Field',
-          required: true,
+          label: '* String Field',
+          isPassword: false,
         },
         {
-          type: AUTH_TYPE_PASSWORD,
+          type: FIELD_TYPE_TEXT,
           name: 'eapConfig.passwordField',
           label: 'Password Field',
-          required: false,
+          isPassword: true,
         },
         {
-          type: AUTH_TYPE_FILE,
+          type: FIELD_TYPE_KEY_FILE,
           name: 'eapConfig.fileField',
-          label: 'File Field',
-          required: true,
+          label: '* File Field',
+          robotName: 'robot-name',
+          wifiKeys,
+          placeholder: SELECT_FILE,
         },
       ])
     )
@@ -134,29 +160,36 @@ describe('getConnectFormFields', () => {
       { ...Fixtures.mockEapOption, name: 'someEapType' },
       { ...Fixtures.mockEapOption, name: 'someOtherEapType', options: [] },
     ]
-    const fields = getConnectFormFields(network, eapOptions, {
-      securityType: 'someEapType',
-    })
+    const wifiKeys = [Fixtures.mockWifiKey]
+    const fields = getConnectFormFields(
+      network,
+      'robot-name',
+      eapOptions,
+      wifiKeys,
+      { securityType: 'someEapType' }
+    )
 
     expect(fields).toEqual(
       expect.arrayContaining([
         {
-          type: AUTH_TYPE_STRING,
+          type: FIELD_TYPE_TEXT,
           name: 'eapConfig.stringField',
-          label: 'String Field',
-          required: true,
+          label: '* String Field',
+          isPassword: false,
         },
         {
-          type: AUTH_TYPE_PASSWORD,
+          type: FIELD_TYPE_TEXT,
           name: 'eapConfig.passwordField',
           label: 'Password Field',
-          required: false,
+          isPassword: true,
         },
         {
-          type: AUTH_TYPE_FILE,
+          type: FIELD_TYPE_KEY_FILE,
           name: 'eapConfig.fileField',
-          label: 'File Field',
-          required: true,
+          label: '* File Field',
+          robotName: 'robot-name',
+          wifiKeys,
+          placeholder: SELECT_FILE,
         },
       ])
     )

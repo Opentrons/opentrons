@@ -9,7 +9,7 @@ import { FormRow } from './FormRow'
 
 import type { EapOption } from '../types'
 
-export type SelectSecurityProps = {|
+export type SecurityFieldProps = {|
   id: string,
   name: string,
   placeholder: string,
@@ -31,7 +31,7 @@ const makeEapOptionsGroup = (eapOptions: Array<EapOption>) => ({
   })),
 })
 
-export const SelectSecurity = (props: SelectSecurityProps) => {
+export const SecurityField = (props: SecurityFieldProps) => {
   const {
     id,
     name,

@@ -12,7 +12,7 @@ import { FormRow } from './FormRow'
 import { useConnectFormField } from './form-state'
 import { LABEL_SHOW_PASSWORD } from '../i18n'
 
-export type StringFieldProps = {|
+export type TextFieldProps = {|
   id: string,
   name: string,
   label: string,
@@ -20,7 +20,7 @@ export type StringFieldProps = {|
   className?: string,
 |}
 
-export const StringField = (props: StringFieldProps) => {
+export const TextField = (props: TextFieldProps) => {
   const { id, name, label, isPassword, className } = props
   const { value, error, onChange, onBlur } = useConnectFormField(name)
   const [showPw, toggleShowPw] = React.useReducer(show => !show, false)

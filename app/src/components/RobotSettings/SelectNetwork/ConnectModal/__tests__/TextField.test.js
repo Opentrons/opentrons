@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { act } from 'react-dom/test-utils'
 import { mount } from 'enzyme'
-import { StringField } from '../StringField'
+import { TextField } from '../TextField'
 import * as FormState from '../form-state'
 
 jest.mock('../form-state')
@@ -12,7 +12,7 @@ const useConnectFormField: JestMockFn<
   $Call<typeof FormState.useConnectFormField, string>
 > = FormState.useConnectFormField
 
-describe('ConnectModal StringField', () => {
+describe('ConnectModal TextField', () => {
   const fieldId = 'field-id'
   const fieldName = 'field-name'
   const fieldValue = 'field-value'
@@ -38,7 +38,7 @@ describe('ConnectModal StringField', () => {
     })
 
     return mount(
-      <StringField
+      <TextField
         id={fieldId}
         label={fieldLabel}
         name={fieldName}

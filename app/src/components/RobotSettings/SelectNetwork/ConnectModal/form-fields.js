@@ -6,6 +6,7 @@ import * as Copy from '../i18n'
 
 import type {
   WifiNetwork,
+  WifiKey,
   EapOption,
   WifiAuthField,
   WifiConfigureRequest,
@@ -14,28 +15,38 @@ import type {
   ConnectFormValues,
   ConnectFormErrors,
   ConnectFormField,
+  ConnectFormTextField,
+  ConnectFormSecurityField,
 } from '../types'
 
-const FIELD_SSID = {
-  type: Constants.AUTH_TYPE_STRING,
+export const renderLabel = (label: string, required: boolean): string =>
+  `${required ? '* ' : ''}${label}`
+
+const FIELD_SSID: ConnectFormTextField = {
+  type: Constants.FIELD_TYPE_TEXT,
   name: Constants.CONFIGURE_FIELD_SSID,
-  label: Copy.LABEL_SSID,
-  required: true,
+  label: renderLabel(Copy.LABEL_SSID, true),
+  isPassword: false,
 }
 
-const FIELD_SECURITY = {
-  type: Constants.AUTH_TYPE_SECURITY,
-  name: Constants.CONFIGURE_FIELD_SECURITY_TYPE,
-  label: Copy.LABEL_SECURITY,
-  required: true,
-}
-
-const FIELD_PSK = {
-  type: Constants.AUTH_TYPE_PASSWORD,
+const FIELD_PSK: ConnectFormTextField = {
+  type: Constants.FIELD_TYPE_TEXT,
   name: Constants.CONFIGURE_FIELD_PSK,
-  label: Copy.LABEL_PSK,
-  required: true,
+  label: renderLabel(Copy.LABEL_PSK, true),
+  isPassword: true,
 }
+
+const makeSecurityField = (
+  eapOptions: Array<EapOption>,
+  showAllOptions: boolean
+): ConnectFormSecurityField => ({
+  type: Constants.FIELD_TYPE_SECURITY,
+  name: Constants.CONFIGURE_FIELD_SECURITY_TYPE,
+  label: renderLabel(Copy.LABEL_SECURITY, true),
+  placeholder: Copy.SELECT_AUTHENTICATION_METHOD,
+  eapOptions,
+  showAllOptions,
+})
 
 const getEapIsSelected = (formSecurityType): boolean %checks => {
   return (
@@ -50,22 +61,20 @@ const getEapFields = (
   values,
   errors,
   touched
-): Array<ConnectFormField> => {
+): Array<WifiAuthField> => {
   const eapType = values.securityType
   return eapOptions
     .filter(opt => opt.name === eapType)
     .flatMap(opt => opt.options)
-    .map(({ type, name, displayName, required }: WifiAuthField) => ({
-      type,
-      required,
-      label: displayName ?? name,
-      name: `eapConfig.${name}`,
-    }))
 }
+
+const getEapFieldName = baseName => `eapConfig.${baseName}`
 
 export function getConnectFormFields(
   network: WifiNetwork | null,
+  robotName: string,
   eapOptions: Array<EapOption>,
+  wifiKeys: Array<WifiKey>,
   values: ConnectFormValues
 ): Array<ConnectFormField> {
   const { securityType: formSecurityType } = values
@@ -80,7 +89,7 @@ export function getConnectFormFields(
   // security dropdown; security dropdown will handle which options to
   // display based on known or unknown network
   if (!network || network.securityType === Constants.SECURITY_WPA_EAP) {
-    fields.push(FIELD_SECURITY)
+    fields.push(makeSecurityField(eapOptions, !network))
   }
 
   // if known network is PSK or network is unknown and user has selected PSK
@@ -97,7 +106,31 @@ export function getConnectFormFields(
     network?.securityType === Constants.SECURITY_WPA_EAP ||
     getEapIsSelected(formSecurityType)
   ) {
-    fields.push(...getEapFields(eapOptions, values))
+    fields.push(
+      ...getEapFields(eapOptions, values).map(field => {
+        const { type } = field
+        const name = getEapFieldName(field.name)
+        const label = renderLabel(field.displayName, field.required)
+
+        if (type === Constants.AUTH_TYPE_FILE) {
+          return {
+            type: Constants.FIELD_TYPE_KEY_FILE,
+            name,
+            label,
+            robotName,
+            wifiKeys,
+            placeholder: Copy.SELECT_FILE,
+          }
+        }
+
+        return {
+          type: Constants.FIELD_TYPE_TEXT,
+          name,
+          label,
+          isPassword: type === Constants.AUTH_TYPE_PASSWORD,
+        }
+      })
+    )
   }
 
   return fields
@@ -142,9 +175,11 @@ export function validateConnectFormFields(
     getEapIsSelected(formSecurityType)
   ) {
     getEapFields(eapOptions, values)
-      .filter(({ name, required }) => required && !get(values, name))
-      .forEach(({ name, label }) => {
-        errors[name] = Copy.FIELD_IS_REQUIRED(label)
+      .filter(
+        ({ name, required }) => required && !get(values, getEapFieldName(name))
+      )
+      .forEach(({ name, displayName }) => {
+        errors[getEapFieldName(name)] = Copy.FIELD_IS_REQUIRED(displayName)
       })
   }
 

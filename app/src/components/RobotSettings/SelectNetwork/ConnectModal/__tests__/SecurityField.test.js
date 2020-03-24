@@ -4,7 +4,7 @@ import { mount } from 'enzyme'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
 import { SelectField } from '@opentrons/components'
-import { SelectSecurity } from '../SelectSecurity'
+import { SecurityField } from '../SecurityField'
 import * as FormState from '../form-state'
 
 import { LABEL_SECURITY_NONE, LABEL_SECURITY_PSK } from '../../i18n'
@@ -17,7 +17,7 @@ const useConnectFormField: JestMockFn<
   $Call<typeof FormState.useConnectFormField, string>
 > = FormState.useConnectFormField
 
-describe('ConnectModal SelectSecurity', () => {
+describe('ConnectModal SecurityField', () => {
   const fieldId = 'field-id'
   const fieldName = 'field-name'
   const fieldLabel = 'Field Label:'
@@ -44,7 +44,7 @@ describe('ConnectModal SelectSecurity', () => {
     })
 
     return mount(
-      <SelectSecurity
+      <SecurityField
         id={fieldId}
         name={fieldName}
         label={fieldLabel}

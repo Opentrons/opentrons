@@ -1,16 +1,15 @@
 // @flow
 import type { FormikErrors } from 'formik'
 
-import type { WifiNetwork } from '../../../networking/types'
+import type { WifiNetwork, EapOption, WifiKey } from '../../../networking/types'
 
 import typeof {
   CONNECT,
   DISCONNECT,
   JOIN_OTHER,
-  AUTH_TYPE_STRING,
-  AUTH_TYPE_PASSWORD,
-  AUTH_TYPE_FILE,
-  AUTH_TYPE_SECURITY,
+  FIELD_TYPE_TEXT,
+  FIELD_TYPE_KEY_FILE,
+  FIELD_TYPE_SECURITY,
 } from './constants'
 
 export type {
@@ -43,18 +42,38 @@ export type ConnectFormValues = $Shape<{|
 
 export type ConnectFormErrors = $Shape<FormikErrors<ConnectFormValues>>
 
-export type ConnectFormFieldType =
-  | AUTH_TYPE_STRING
-  | AUTH_TYPE_PASSWORD
-  | AUTH_TYPE_FILE
-  | AUTH_TYPE_SECURITY
-
-export type ConnectFormField = {|
-  type: ConnectFormFieldType,
+type ConnectFormFieldCommon = {|
   name: string,
   label: string,
-  required: boolean,
 |}
+
+export type ConnectFormTextField = {|
+  ...ConnectFormFieldCommon,
+  type: FIELD_TYPE_TEXT,
+  isPassword: boolean,
+|}
+
+export type ConnectFormKeyField = {|
+  ...ConnectFormFieldCommon,
+  type: FIELD_TYPE_KEY_FILE,
+  robotName: string,
+  wifiKeys: Array<WifiKey>,
+  placeholder: string,
+|}
+
+// UI only auth field; server will never return this field type
+export type ConnectFormSecurityField = {|
+  ...ConnectFormFieldCommon,
+  type: FIELD_TYPE_SECURITY,
+  eapOptions: Array<EapOption>,
+  showAllOptions: boolean,
+  placeholder: string,
+|}
+
+export type ConnectFormField =
+  | ConnectFormTextField
+  | ConnectFormKeyField
+  | ConnectFormSecurityField
 
 export type ConnectFormFieldProps = $ReadOnly<{|
   value: string | null,

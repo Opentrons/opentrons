@@ -36,13 +36,13 @@ export function ConnectionCard(props: Props) {
   useInterval(() => dispatch(fetchStatus(robotName)), STATUS_REFRESH_MS, true)
 
   return (
-    <Card title={CONNECTIVITY} disabled={disabled}>
+    <Card key={robotName} title={CONNECTIVITY} disabled={disabled}>
       <ConnectionStatusMessage
         type={local ? 'USB' : 'Wi-Fi'}
         status={internetStatus}
       />
       <ConnectionInfo connection={wifi} title="Wi-Fi" disabled={disabled}>
-        <SelectNetwork key={robot.name} robotName={robotName} />
+        <SelectNetwork robotName={robotName} />
       </ConnectionInfo>
       <ConnectionInfo
         connection={ethernet}

@@ -4,9 +4,9 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 
-import * as styles from '../styles'
-
 import type { StyledComponent } from 'styled-components'
+
+import * as styles from '../styles'
 
 export type CardProps = {|
   /** Title for card, all cards should receive a title. */

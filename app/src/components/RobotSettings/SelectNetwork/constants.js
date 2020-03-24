@@ -17,4 +17,6 @@ export const CONNECT: 'connect' = 'connect'
 export const DISCONNECT: 'disconnect' = 'disconnect'
 export const JOIN_OTHER: 'join-other' = 'join-other'
 
-export const AUTH_TYPE_SECURITY: 'security' = 'security'
+export const FIELD_TYPE_TEXT: 'text' = 'text'
+export const FIELD_TYPE_KEY_FILE: 'key-file' = 'key-file'
+export const FIELD_TYPE_SECURITY: 'security' = 'security'

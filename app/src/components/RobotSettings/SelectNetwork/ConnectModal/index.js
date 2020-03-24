@@ -9,7 +9,7 @@ import {
   connectFormToConfigureRequest,
 } from './form-fields'
 
-import { ConnectFormModal } from './ConnectFormModal'
+import { FormModal } from './FormModal'
 
 import type {
   ConnectFormValues,
@@ -55,18 +55,24 @@ export const ConnectModal = (props: ConnectModalProps) => {
 export const ConnectModalComponent = (props: ConnectModalProps) => {
   const { robotName, network, wifiKeys, eapOptions, onCancel } = props
   const { values, isValid } = useFormikContext<ConnectFormValues>()
-  const fields = getConnectFormFields(network, eapOptions, values)
+
+  const id = `ConnectForm__${robotName}`
+  const fields = getConnectFormFields(
+    network,
+    robotName,
+    eapOptions,
+    wifiKeys,
+    values
+  )
 
   useResetFormOnSecurityChange()
 
   return (
-    <ConnectFormModal
+    <FormModal
       {...{
-        robotName,
+        id,
         network,
         fields,
-        wifiKeys,
-        eapOptions,
         isValid,
         onCancel,
       }}
