@@ -6,8 +6,8 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import {
   THERMOCYCLER_MODULE_TYPE,
-  type ModuleModel,
   MODULE_MODELS,
+  type ModuleModel,
 } from '@opentrons/shared-data'
 import {
   Modal,
@@ -34,11 +34,10 @@ import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
 import { i18n } from '../../../localization'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
+import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
-
-import { isModuleWithCollisionIssue } from '../../modules'
 
 const validationSchema = Yup.object().shape({
   selectedModel: Yup.string()
@@ -76,10 +75,9 @@ export function EditModulesModal(props: EditModulesProps) {
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-
   const dispatch = useDispatch()
 
-  let onSaveClick = values => {
+  const onSaveClick = values => {
     const { selectedModel, selectedSlot } = values
 
     if (module) {
@@ -158,8 +156,7 @@ export function EditModulesModal(props: EditModulesProps) {
 
             hasSlotOrIncompatibleError = !labwareIsCompatible
           }
-          console.log(touched)
-          console.log(errors)
+
           const occupiedSlotError = hasSlotOrIncompatibleError
             ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
             : null
@@ -181,6 +178,7 @@ export function EditModulesModal(props: EditModulesProps) {
             if (modelValueIndex >= 0) {
               value = MODULE_MODELS[modelValueIndex]
             }
+
             // reset slot if user switches from module with no collision issue
             // to one that does have collision issues
             if (
