@@ -84,6 +84,7 @@ class CalibrationManager:
         self._set_state('probing')
 
         if instrument._context:
+            instrument._context.location_cache = None
             mount = Mount[instrument._instrument.mount.upper()]
             assert instrument.tip_racks,\
                 'No known tipracks for {}'.format(instrument)
@@ -92,6 +93,7 @@ class CalibrationManager:
             # TODO (tm, 2019-04-22): This warns "coroutine not awaited" in
             # TODO: test. The test fixture probably needs to be modified to get
             # TODO: a synchronous adapter instead of a raw hardware_control API
+            #             finally:
             measured_center = self._hardware.locate_tip_probe_center(
                 mount, tip_length)
         else:
@@ -186,7 +188,8 @@ class CalibrationManager:
         if instrument._context:
             current = self._hardware.gantry_position(
                 Mount[inst.mount.upper()],
-                critical_point=CriticalPoint.NOZZLE)
+                critical_point=CriticalPoint.NOZZLE,
+                refresh=True)
             dest = instrument._context.deck.position_for(5)\
                                            .point._replace(z=150)
             self._hardware.move_to(Mount[inst.mount.upper()],
@@ -283,7 +286,8 @@ class CalibrationManager:
             else:
                 cp = None
             here = self._hardware.gantry_position(Mount[inst.mount.upper()],
-                                                  critical_point=cp)
+                                                  critical_point=cp,
+                                                  refresh=True)
             # Reset calibration so we don’t actually calibrate the offset
             # relative to the old calibration
             container._container.set_calibration(Point(0, 0, 0))
