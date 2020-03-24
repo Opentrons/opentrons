@@ -6,7 +6,6 @@ import shutil
 import tempfile
 import traceback
 
-from typing import TYPE_CHECKING
 from aiohttp import web
 
 from opentrons.config import CONFIG
@@ -14,10 +13,9 @@ from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 
 from .rpc import RPCServer
 from .http import HTTPServer
+from .endpoints.calibration.session import SessionManager
 from opentrons.api.routers import MainRouter
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
+from opentrons.hardware_control import ThreadManager
 
 log = logging.getLogger(__name__)
 
@@ -45,7 +43,7 @@ async def error_middleware(request, handler):
 
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: 'HardwareAPILike' = None,
+def init(hardware: ThreadManager = None,
          loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
@@ -64,6 +62,7 @@ def init(hardware: 'HardwareAPILike' = None,
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.session_manager'] = SessionManager()
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -83,7 +82,7 @@ def init(hardware: 'HardwareAPILike' = None,
     return app
 
 
-def run(hardware: 'HardwareAPILike',
+def run(hardware: ThreadManager,
         hostname=None,
         port=None,
         path=None):

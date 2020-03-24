@@ -196,23 +196,16 @@ def old_aspiration(monkeypatch):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-async def async_server(hardware, virtual_smoothie_env, loop):
-    app = init(hardware, loop=loop)
-    yield app
-    await app.shutdown()
+async def async_server(hardware, virtual_smoothie_env, loop, aiohttp_server):
+    testserver = await aiohttp_server(init(hardware, loop=loop))
+    yield testserver.app
 
 
 @pytest.fixture
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
     endpoints.session_wrapper.session = None
-    try:
-        yield cli
-    finally:
-        if cli.app.on_shutdown.frozen:
-            await cli.close()
-        else:
-            await async_server.shutdown()
+    yield cli
 
 
 @pytest.fixture
