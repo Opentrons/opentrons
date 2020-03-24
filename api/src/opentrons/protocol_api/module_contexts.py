@@ -204,6 +204,7 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.set_temperature(celsius)
 
+    @requires_version(2, 3)
     def start_set_temperature(self, celsius: float):
         """ Start setting the target temperature, in C.
 
