@@ -109,6 +109,7 @@ class TempDeck(mod_abc.AbstractModule):
                          execution_manager=execution_manager,
                          sim_model=sim_model)
         self._device_info: Mapping[str, str] = {}
+        self._driver: Union['SimulatingDriver', 'TempDeckDriver']
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
@@ -165,7 +166,7 @@ class TempDeck(mod_abc.AbstractModule):
         return self._driver.temperature
 
     @property
-    def target(self) -> float:
+    def target(self) -> Optional[float]:
         return self._driver.target
 
     @property

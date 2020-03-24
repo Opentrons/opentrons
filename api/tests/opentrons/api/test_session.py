@@ -343,7 +343,6 @@ def run(ctx):
     mod = ctx.load_module('magdeck', '4')
     mod2 = ctx.load_module('tempdeck', '5')
     plate = mod2.load_labware('corning_96_wellplate_360ul_flat')
-    print(type(mod2))
     mod2.set_temperature(60)
     left.pick_up_tip()
     left.aspirate(50, plate['A1'])

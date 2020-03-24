@@ -92,10 +92,11 @@ class MagDeck(mod_abc.AbstractModule):
                          execution_manager=execution_manager,
                          sim_model=sim_model)
         self._device_info: Mapping[str, str] = {}
+        self._driver: Union['SimulatingDriver', 'MagDeckDriver']
         if mag_locks.get(port):
             self._driver = mag_locks[port][1]
         else:
-            self._driver = self._build_driver(  # type: ignore
+            self._driver = self._build_driver(
                 simulating, sim_model or self.model())
 
     async def calibrate(self):

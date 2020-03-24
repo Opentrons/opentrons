@@ -66,6 +66,7 @@ class Thermocycler(mod_abc.AbstractModule):
                          simulating=simulating,
                          loop=loop,
                          execution_manager=execution_manager)
+        self._driver: Union['SimulatingDriver', 'ThermocyclerDriver']
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(
             simulating,
