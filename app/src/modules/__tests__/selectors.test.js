@@ -19,6 +19,11 @@ const mockGetProtocolModules: JestMockFn<
   $Call<typeof RobotSelectors.getModules, State>
 > = RobotSelectors.getModules
 
+const mockGetProtocolIsRunning: JestMockFn<
+  [State],
+  $Call<typeof RobotSelectors.getIsRunning, State>
+> = RobotSelectors.getIsRunning
+
 type SelectorSpec = {|
   name: string,
   selector: (State, ...Array<any>) => mixed,
@@ -147,6 +152,73 @@ const SPECS: Array<SelectorSpec> = [
       { _id: 0, slot: '1', model: 'thermocyclerModuleV1' },
       { _id: 2, slot: '3', model: 'magneticModuleV2' },
     ],
+  },
+  {
+    name: 'getModuleControlsDisabled returns connect message if not connected',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: ['someOtherRobotName'],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+    },
+    expected: expect.stringMatching(/connect to robot/i),
+  },
+  {
+    name: 'getModuleControlsDisabled returns running message if running',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: ['robotName'],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolIsRunning.mockReturnValue(true)
+    },
+    expected: expect.stringMatching(/protocol is running/i),
+  },
+  {
+    name: 'getModuleControlsDisabled returns null if can control',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: ['robotName'],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolIsRunning.mockReturnValue(false)
+    },
+    expected: null,
+  },
+  {
+    name:
+      'getModuleControlsDisabled returns connect message if not connected and no robotName passed',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: [],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue(null)
+    },
+    expected: expect.stringMatching(/connect to robot/i),
+  },
+  {
+    name:
+      'getModuleControlsDisabled returns running message if running and no robotName passed',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: [],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolIsRunning.mockReturnValue(true)
+    },
+    expected: expect.stringMatching(/protocol is running/i),
+  },
+  {
+    name:
+      'getModuleControlsDisabled returns null if no robotName passed and can control',
+    selector: Selectors.getModuleControlsDisabled,
+    state: { modules: {} },
+    args: [],
+    before: () => {
+      mockGetConnectedRobotName.mockReturnValue('robotName')
+      mockGetProtocolIsRunning.mockReturnValue(false)
+    },
+    expected: null,
   },
 ]
 

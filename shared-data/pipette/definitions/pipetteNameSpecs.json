@@ -84,17 +84,17 @@
     "displayName": "P20 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 3.8,
+      "value": 7.6,
       "min": 0.08,
       "max": 24
     },
     "defaultDispenseFlowRate": {
-      "value": 3.8,
+      "value": 7.6,
       "min": 0.08,
       "max": 24
     },
     "defaultBlowOutFlowRate": {
-      "value": 3.8,
+      "value": 7.6,
       "min": 0.08,
       "max": 24
     },
@@ -219,17 +219,17 @@
     "displayName": "P300 8-Channel GEN2",
     "displayCategory": "GEN2",
     "defaultAspirateFlowRate": {
-      "value": 47,
+      "value": 94,
       "min": 1,
       "max": 275
     },
     "defaultDispenseFlowRate": {
-      "value": 47,
+      "value": 94,
       "min": 1,
       "max": 275
     },
     "defaultBlowOutFlowRate": {
-      "value": 47,
+      "value": 94,
       "min": 1,
       "max": 275
     },

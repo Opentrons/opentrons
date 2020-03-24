@@ -4004,6 +4004,7 @@
         "min": 0,
         "max": 100
       },
+      "returnTipHeight": 0.4,
       "quirks": ["needsUnstick"]
     },
     "p1000_single_v1": {

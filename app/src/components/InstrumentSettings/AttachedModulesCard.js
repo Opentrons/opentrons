@@ -4,7 +4,11 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 
 import { Card, useInterval } from '@opentrons/components'
-import { fetchModules, getAttachedModules } from '../../modules'
+import {
+  fetchModules,
+  getAttachedModules,
+  getModuleControlsDisabled,
+} from '../../modules'
 import { getConnectedRobotName } from '../../robot/selectors'
 import { ModulesCardContents } from './ModulesCardContents'
 
@@ -22,7 +26,9 @@ export function AttachedModulesCard(props: Props) {
   const modules = useSelector((state: State) =>
     getAttachedModules(state, robotName)
   )
-  const canControl = connectedRobotName === robotName
+  const controlDisabledReason = useSelector((state: State) =>
+    getModuleControlsDisabled(state, robotName)
+  )
 
   // if robot is connected, the modules epic will poll /modules automatically,
   // but we need to poll ourselves if we're viewing this robot without
@@ -35,7 +41,10 @@ export function AttachedModulesCard(props: Props) {
 
   return (
     <Card title={TITLE}>
-      <ModulesCardContents modules={modules} canControl={canControl} />
+      <ModulesCardContents
+        modules={modules}
+        controlDisabledReason={controlDisabledReason}
+      />
     </Card>
   )
 }

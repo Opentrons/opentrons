@@ -56,6 +56,7 @@ import type {
   LabwareEntities,
   MagneticModuleState,
   ModuleOnDeck,
+  ModuleEntity,
   ModuleEntities,
   ModulesForEditModulesCard,
   PipetteEntities,
@@ -370,14 +371,32 @@ const getOrderedSavedForms: Selector<Array<FormData>> = createSelector(
   }
 )
 
-// TODO: Ian 2019-01-25 type with hydrated form type
+const getModuleEntity = (state: InvariantContext, id: string): ModuleEntity => {
+  return state.moduleEntities[id]
+}
+
+// TODO: Ian 2019-01-25 type with hydrated form type, see #3161
 function _getHydratedForm(
-  rawForm: FormData,
+  rawForm: ?FormData,
   invariantContext: InvariantContext
 ) {
   const hydratedForm = mapValues(rawForm, (value, name) =>
     hydrateField(invariantContext, name, value)
   )
+  // TODO(IL, 2020-03-23): separate hydrated/denormalized fields from the other fields.
+  // It's confusing that pipette is an ID string before this,
+  // but a PipetteEntity object after this.
+  // For `moduleId` field, it would be surprising to be a ModuleEntity!
+  // Consider nesting all additional fields under 'hydrated' key,
+  // following what we're doing with 'module'.
+  // See #3161
+  hydratedForm.meta = {}
+  if (rawForm?.moduleId != null) {
+    hydratedForm.meta.module = getModuleEntity(
+      invariantContext,
+      rawForm.moduleId
+    )
+  }
   return hydratedForm
 }
 

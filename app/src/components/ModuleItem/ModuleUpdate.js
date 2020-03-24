@@ -24,7 +24,6 @@ import type { RequestState } from '../../robot-api/types'
 import styles from './styles.css'
 
 const FW_IS_UP_TO_DATE = 'Module Firmware is up to date'
-const CONNECT_TO_UPDATE = 'Connect to Robot to update Module'
 const OK_TEXT = 'Ok'
 
 const UPDATE = 'update'
@@ -36,12 +35,12 @@ const FAILED_UPDATE_BODY =
 
 type Props = {|
   hasAvailableUpdate: boolean,
-  canControl: boolean,
+  controlDisabledReason: string | null,
   moduleId: string,
 |}
 
 export function ModuleUpdate(props: Props) {
-  const { hasAvailableUpdate, moduleId, canControl } = props
+  const { hasAvailableUpdate, moduleId, controlDisabledReason } = props
   const dispatch = useDispatch<Dispatch>()
   const robotName = useSelector(getConnectedRobotName)
   const [
@@ -49,6 +48,7 @@ export function ModuleUpdate(props: Props) {
     requestIds,
   ] = useDispatchApiRequest<UpdateModuleAction>()
 
+  const canControl = controlDisabledReason === null
   const handleClick = () => {
     canControl &&
       robotName &&
@@ -62,8 +62,11 @@ export function ModuleUpdate(props: Props) {
 
   const buttonText = hasAvailableUpdate ? UPDATE : UPDATE_TO_DATE
   let tooltipText = null
-  if (!canControl) tooltipText = CONNECT_TO_UPDATE
-  if (!hasAvailableUpdate) tooltipText = FW_IS_UP_TO_DATE
+  if (!hasAvailableUpdate) {
+    tooltipText = FW_IS_UP_TO_DATE
+  } else if (controlDisabledReason !== null) {
+    tooltipText = controlDisabledReason
+  }
 
   const handleCloseErrorModal = () => {
     dispatch(dismissRequest(latestRequestId))
