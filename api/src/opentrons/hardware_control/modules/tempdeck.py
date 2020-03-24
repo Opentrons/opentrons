@@ -50,6 +50,9 @@ class SimulatingDriver:
         self._target_temp = celsius
         self._active = True
 
+    def await_temperature(self, celsius):
+        pass
+
     def legacy_set_temperature(self, celsius: float):
         self._target_temp = celsius
         self._active = True
@@ -188,6 +191,29 @@ class TempDeck(mod_abc.AbstractModule):
         """
         await self.wait_for_is_running()
         return self._driver.start_set_temperature(celsius)
+
+    async def await_temperature(self, awaiting_temperature: float):
+        """
+        Await temperature in degree Celsius
+        Polls temperature module's temperature until
+        the specified temperature is reached
+        """
+        await self.wait_for_is_running()
+
+        async def _await_temperature(awaiting_temperature: float):
+            status = self.status
+
+            if status == 'heating':
+                while self.temperature < awaiting_temperature:
+                    asyncio.sleep(0.2)
+
+            elif status == 'cooling':
+                while self.temperature > awaiting_temperature:
+                    asyncio.sleep(0.2)
+
+        t = self._loop.create_task(_await_temperature(awaiting_temperature))
+        await self.make_cancellable(t)
+        await t
 
     async def deactivate(self):
         """ Stop heating/cooling and turn off the fan """

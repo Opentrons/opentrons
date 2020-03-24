@@ -130,3 +130,4 @@ Version 2.3
   possible collisions
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate
+- You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
