@@ -1,14 +1,14 @@
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 
-from .session import CalibrationSession
+from .session import CheckCalibrationSession
 from .models import CalibrationSessionStatus
 
 ALLOWED_SESSIONS = ['check']
 
 
 def _format_status(
-        session: 'CalibrationSession',
+        session: 'CheckCalibrationSession',
         router: UrlDispatcher) -> 'CalibrationSessionStatus':
     pips = session.pipettes
     # pydantic restricts dictionary keys that can be evaluated. Since
@@ -53,7 +53,7 @@ async def create_session(request):
     if not current_session:
         hardware = request.app['com.opentrons.hardware']
         await hardware.cache_instruments()
-        new_session = CalibrationSession(hardware)
+        new_session = CheckCalibrationSession(hardware)
         session_storage.sessions[session_type] = new_session
 
         response = _format_status(new_session, request.app.router)

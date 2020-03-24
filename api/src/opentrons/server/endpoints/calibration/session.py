@@ -33,15 +33,10 @@ class SessionManager:
 
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
-    def __init__(
-            self,
-            hardware: 'ThreadManager',
-            type: str = None):
+    def __init__(self, hardware: 'ThreadManager'):
         self.token = uuid4()
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
-        self.state_machine = CalibrationCheckMachine()
-        self.state_machine.set_start("sessionStart")
 
     def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
@@ -68,3 +63,9 @@ class CalibrationSession:
     @property
     def pipettes(self) -> typing.Dict:
         return self._pipettes
+
+
+class CheckCalibrationSession(CalibrationSession):
+    def __init__(self, hardware: 'ThreadManager'):
+        super().__init__(hardware)
+        self.state_machine = CalibrationCheckMachine()

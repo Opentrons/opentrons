@@ -55,46 +55,48 @@ async def test_delete_session(async_client, async_server, test_setup):
 
 def test_state_machine():
     class StateEnum(enum.Enum):
-        ThinkAboutCats = util.State("ThinkAboutCats", enum.auto())
-        FindCatPictures = util.State("FindCatPictures", enum.auto())
-        SeeCutiestCat = util.State("SeeCutiestCat", enum.auto())
-        LookatTime = util.State("LookatTime", enum.auto())
-        DecideToDoWork = util.State("DecideToDoWork", enum.auto())
-        SeeDogPictures = util.State("SeeDogPictures", enum.auto())
-        Exit = util.State("Exit", enum.auto())
+        ThinkAboutCats = enum.auto()
+        FindCatPictures = enum.auto()
+        SeeCutiestCat = enum.auto()
+        LookatTime = enum.auto()
+        DecideToDoWork = enum.auto()
+        SeeDogPictures = enum.auto()
+        Exit = enum.auto()
 
-    class Relationship(enum.Enum):
-        ThinkAboutCats = StateEnum.FindCatPictures
-        FindCatPictures = StateEnum.ThinkAboutCats
-        SeeCutiestCat = StateEnum.LookatTime
-        LookatTime = StateEnum.DecideToDoWork
-        DecideToDoWork = StateEnum.ThinkAboutCats
+    Relationship = {
+        StateEnum.ThinkAboutCats: StateEnum.FindCatPictures,
+        StateEnum.FindCatPictures: StateEnum.ThinkAboutCats,
+        StateEnum.SeeCutiestCat: StateEnum.LookatTime,
+        StateEnum.LookatTime: StateEnum.DecideToDoWork,
+        StateEnum.DecideToDoWork: StateEnum.ThinkAboutCats
+    }
 
-    class Exit(enum.Enum):
-        DecideToDoWork = StateEnum.Exit
+    Exit = {
+        StateEnum.DecideToDoWork: StateEnum.Exit
+    }
 
-    class Error(enum.Enum):
-        SeeDogPictures = StateEnum.Exit
+    Error = {
+        StateEnum.SeeDogPictures: StateEnum.Exit
+    }
 
     sm = util.StateMachine(
-        StateEnum, Relationship, Exit, Error, "ThinkAboutCats")
+        StateEnum, Relationship, Exit, Error, StateEnum.ThinkAboutCats)
 
     state1 = sm.get_state('ThinkAboutCats')
     state2 = sm.get_state('FindCatPictures')
     state3 = sm.get_state('SeeCutiestCat')
     state4 = sm.get_state('LookatTime')
     state5 = sm.get_state('DecideToDoWork')
-    sm.set_start(state1.name)
 
     assert sm.current_state.name == state1.name
-    sm.update_state(state1.name)
+    sm.update_state(state1)
     assert sm.current_state.name == state2.name
-    sm.update_state(state2.name)
+    sm.update_state(state2)
     assert sm.current_state.name == state1.name
-    sm.update_state(state1.name)
-    sm.update_state(state3.name)
+    sm.update_state(state1)
+    sm.update_state(state3)
     assert sm.current_state.name == state4.name
-    sm.update_state(state4.name)
+    sm.update_state(state4)
     assert sm.current_state.name == state5.name
-    sm.update_state(state5.name)
+    sm.update_state(state5)
     assert sm.current_state.name == state1.name
