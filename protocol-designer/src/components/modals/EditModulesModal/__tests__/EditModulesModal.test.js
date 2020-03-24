@@ -1,4 +1,5 @@
-// TODO: IL 2020-02-19 add Flow directive (need to figure out how to flow-ignore mocking, or refactor to avoid mocking)
+// @flow
+
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
@@ -6,19 +7,39 @@ import { OutlineButton, DropdownField } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  type LabwareDefinition2,
+  type ModuleRealType,
 } from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import { DEFAULT_MODEL_FOR_MODULE_TYPE } from '../../../../constants'
-import { selectors as stepFormSelectors } from '../../../../step-forms'
+import {
+  selectors as stepFormSelectors,
+  type InitialDeckSetup,
+} from '../../../../step-forms'
 import { selectors as featureSelectors } from '../../../../feature-flags'
 import * as stepFormActions from '../../../../step-forms/actions'
-import * as labwareModuleCompatibility from '../../../../utils/labwareModuleCompatibility'
+import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
 import * as labwareIngredActions from '../../../../labware-ingred/actions'
 import { PDAlert } from '../../../alerts/PDAlert'
 import { EditModulesModal } from '../'
+
+import type { BaseState } from '../../../../types'
+
 // only mock actions and selectors from step-forms
 jest.mock('../../../../step-forms/actions')
+jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../labware-ingred/actions')
 jest.mock('../../../../utils/labwareModuleCompatibility')
+jest.mock('../../../../feature-flags')
+
+const getInitialDeckSetupMock: JestMockFn<[BaseState], InitialDeckSetup> =
+  stepFormSelectors.getInitialDeckSetup
+const getLabwareIsCompatibleMock: JestMockFn<
+  [LabwareDefinition2, ModuleRealType],
+  boolean
+> = getLabwareIsCompatible
+const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
+  featureSelectors.getDisableModuleRestrictions
 
 describe('EditModulesModal', () => {
   let mockStore
@@ -31,31 +52,29 @@ describe('EditModulesModal', () => {
   }
 
   beforeEach(() => {
+    jest.clearAllMocks()
     mockStore = {
       dispatch: jest.fn(),
       subscribe: jest.fn(),
       getState: () => ({}),
     }
 
-    stepFormSelectors.getInitialDeckSetup = jest.fn()
-    labwareModuleCompatibility.getLabwareIsCompatible = jest.fn()
-    featureSelectors.getDisableModuleRestrictions = jest
-      .fn()
-      .mockReturnValue(true)
+    getDisableModuleRestrictionsMock.mockReturnValue(true)
   })
 
   it('displays warning and disabled save button when slot is occupied by incompatible labware', () => {
     const slot = '1'
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {
-        well: {
+        well96Id: {
+          ...fixture_96_plate,
           slot,
         },
       },
       modules: {},
       pipettes: {},
     })
-    labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(false)
+    getLabwareIsCompatibleMock.mockReturnValue(false)
     const props = {
       moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
@@ -74,16 +93,17 @@ describe('EditModulesModal', () => {
 
   it('save button is clickable and saves when slot is occupied by compatible labware', () => {
     const slot = '1'
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {
-        well: {
+        well96Id: {
+          ...fixture_96_plate,
           slot,
         },
       },
       modules: {},
       pipettes: {},
     })
-    labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(true)
+    getLabwareIsCompatibleMock.mockReturnValue(true)
     const props = {
       moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
@@ -107,15 +127,20 @@ describe('EditModulesModal', () => {
   })
 
   it('save button saves when adding module to empty slot', () => {
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {
-        well: {
-          slot: '1',
-        },
+        well96Id: fixture_96_plate,
       },
       modules: {
-        magnet: {
+        magnet123: {
+          id: 'magnet123',
           slot: '3',
+          type: 'magneticModuleType',
+          model: 'magneticModuleV1',
+          moduleState: {
+            engaged: false,
+            type: 'magneticModuleType',
+          },
         },
       },
       pipettes: {},
@@ -146,20 +171,28 @@ describe('EditModulesModal', () => {
   it('move deck item when moving module to a different slot', () => {
     const currentSlot = '1'
     const targetSlot = '10'
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {
-        well: {
+        wellId: {
+          ...fixture_96_plate,
           slot: currentSlot,
         },
       },
       modules: {
         magnet123: {
+          id: 'magnet123',
           slot: currentSlot,
+          type: 'magneticModuleType',
+          model: 'magneticModuleV1',
+          moduleState: {
+            engaged: false,
+            type: 'magneticModuleType',
+          },
         },
       },
       pipettes: {},
     })
-    labwareModuleCompatibility.getLabwareIsCompatible.mockReturnValue(true)
+    getLabwareIsCompatibleMock.mockReturnValue(true)
     const props = {
       moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: 'magnet123',
@@ -182,15 +215,23 @@ describe('EditModulesModal', () => {
   })
 
   it('no warning when slot is occupied by same module', () => {
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {
-        well: {
+        wellId: {
+          ...fixture_96_plate,
           slot: '1',
         },
       },
       modules: {
         magnet123: {
+          id: 'magnet123',
           slot: '3',
+          type: 'magneticModuleType',
+          model: 'magneticModuleV1',
+          moduleState: {
+            engaged: false,
+            type: 'magneticModuleType',
+          },
         },
       },
       pipettes: {},
@@ -213,7 +254,7 @@ describe('EditModulesModal', () => {
       moduleId: null,
       onCloseClick: jest.fn(),
     }
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {},
       modules: {},
       pipettes: {},
@@ -227,15 +268,13 @@ describe('EditModulesModal', () => {
   })
 
   it('slot dropdown is disabled when module restrictions are disabled', () => {
-    featureSelectors.getDisableModuleRestrictions = jest
-      .fn()
-      .mockReturnValue(true)
+    getDisableModuleRestrictionsMock.mockReturnValue(true)
     const props = {
       moduleType: MAGNETIC_MODULE_TYPE,
       moduleId: null,
       onCloseClick: jest.fn(),
     }
-    stepFormSelectors.getInitialDeckSetup.mockReturnValue({
+    getInitialDeckSetupMock.mockReturnValue({
       labware: {},
       modules: {},
       pipettes: {},
