@@ -37,6 +37,7 @@ import { PDAlert } from '../../alerts/PDAlert'
 import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
+import type { FormikProps } from 'formik/@flow-typed'
 import type { ModuleRealType } from '@opentrons/shared-data'
 
 const validationSchema = Yup.object().shape({
@@ -45,6 +46,11 @@ const validationSchema = Yup.object().shape({
     .required('This field is required'),
   selectedSlot: Yup.string().required(),
 })
+
+type EditModulesState = {
+  selectedModel: ModuleModel | null,
+  selectedSlot: string,
+}
 
 type EditModulesProps = {
   moduleType: ModuleRealType,
@@ -79,6 +85,10 @@ export function EditModulesModal(props: EditModulesProps) {
 
   const onSaveClick = values => {
     const { selectedModel, selectedSlot } = values
+
+    // validator from formik should never let onSaveClick be called
+    // this case might never be true but still need to handle for flow
+    if (!selectedModel) return null
 
     if (module) {
       // disabled if something lives in the slot selected in local state
@@ -134,7 +144,7 @@ export function EditModulesModal(props: EditModulesProps) {
           values,
           handleBlur,
           setFieldTouched,
-        }) => {
+        }: FormikProps<EditModulesState>) => {
           const { selectedSlot, selectedModel } = values
 
           const slotIsEmpty =
