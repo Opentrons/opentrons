@@ -57,9 +57,9 @@ def test_execute_function_apiv2(protocol,
         ]
 
 
-def test_execute_function_json_apiv2(get_json_protocol_fixture,
-                                     virtual_smoothie_env,
-                                     mock_get_attached_instr):
+def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
+                                        virtual_smoothie_env,
+                                        mock_get_attached_instr):
     jp = get_json_protocol_fixture('3', 'simple', False)
     filelike = io.StringIO(jp)
     entries = []
@@ -82,7 +82,31 @@ def test_execute_function_json_apiv2(get_json_protocol_fixture,
         'Dropping tip into A1 of Trash on 12'
     ]
 
-# TODO IMMEDIATELY: test v4 fixture
+
+def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
+                                        virtual_smoothie_env,
+                                        mock_get_attached_instr):
+    jp = get_json_protocol_fixture('4', 'simplev4', False)
+    filelike = io.StringIO(jp)
+    entries = []
+
+    def emit_runlog(entry):
+        nonlocal entries
+        entries.append(entry)
+
+    mock_get_attached_instr.return_value[types.Mount.LEFT] = {
+        'model': 'p10_single_v1.5', 'id': 'testid'}
+    execute.execute(filelike, 'simple.json', emit_runlog=emit_runlog)
+    assert [item['payload']['text'] for item in entries
+            if item['$'] == 'before'] == [
+        'Picking up tip from B1 of Opentrons 96 Tip Rack 10 µL on 1',
+        'Aspirating 5.0 uL from A1 of Source Plate on 2 at 1.0 speed',
+        'Delaying for 0 minutes and 42 seconds',
+        'Dispensing 4.5 uL into B1 of Dest Plate on 3 at 1.0 speed',
+        'Touching tip',
+        'Blowing out at B1 of Dest Plate on 3',
+        'Dropping tip into A1 of Trash on 12'
+    ]
 
 
 def test_execute_function_bundle_apiv2(get_bundle_fixture,
