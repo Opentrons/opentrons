@@ -93,8 +93,9 @@ async def _do_fw_update(driver, new_fw_path, new_fw_ver):
 
 async def check_for_smoothie_update():
     driver = SmoothieDriver_3_0_0(robot_configs.load())
-    driver.connect()
+
     try:
+        driver.connect()
         fw_version = driver.get_fw_version()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
