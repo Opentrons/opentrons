@@ -6,19 +6,17 @@ from opentrons.hardware_control.types import Axis
 
 from .models import AttachedPipette
 from .util import CalibrationCheckMachine
-
-if typing.TYPE_CHECKING:
-    from opentrons.hardware_control import ThreadManager  # noqa(F501)
+from opentrons.hardware_control import ThreadManager
 
 """
-A set of endpoints that can be used to create a session for any deck
+A set of endpoints that can be used to create a session for any robot
 calibration tasks such as checking your calibration data, performing mount
-offset or a deck transform.
+offset or a robot deck transform.
 """
 
 
 class SessionManager:
-    """Small wrapper to keep track of deck calibration sessions created."""
+    """Small wrapper to keep track of robot calibration sessions created."""
     def __init__(self):
         self._sessions = {}
 
@@ -33,7 +31,7 @@ class SessionManager:
 
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
-    def __init__(self, hardware: 'ThreadManager'):
+    def __init__(self, hardware: ThreadManager):
         self.token = uuid4()
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware

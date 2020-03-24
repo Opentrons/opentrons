@@ -42,7 +42,7 @@ def build_arg_parser():
     return arg_parser
 
 
-def run(hardware: 'ThreadManager',
+def run(hardware: ThreadManager,
         hostname: typing.Optional[str],
         port: typing.Optional[int],
         path: str = None):
