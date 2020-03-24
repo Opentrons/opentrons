@@ -22,9 +22,7 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
     uiModuleSelectors.getMagneticLabwareOptions
   )
 
-  // TODO IMMEDIATELY
-  const moduleModel = props.formData?.meta?.modelId
-
+  const moduleModel: ?string = props.formData?.meta?.module?.model
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
