@@ -1,13 +1,10 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { SelectField } from '@opentrons/components'
+import { SelectField, CONTEXT_VALUE, CONTEXT_MENU } from '@opentrons/components'
 
 import * as Fixtures from '../../../../../networking/__fixtures__'
-import {
-  LABEL_JOIN_OTHER_NETWORK,
-  LABEL_DISCONNECT_FROM_WIFI,
-} from '../../i18n'
+import { LABEL_JOIN_OTHER_NETWORK, DISCONNECT_FROM_SSID } from '../../i18n'
 
 import { SelectSsid } from '..'
 import { NetworkOptionLabel } from '../NetworkOptionLabel'
@@ -66,7 +63,7 @@ describe('SelectSsid component', () => {
       options: [
         {
           value: expect.any(String),
-          label: 'Join other network...',
+          label: LABEL_JOIN_OTHER_NETWORK,
         },
       ],
     })
@@ -81,7 +78,7 @@ describe('SelectSsid component', () => {
       options: [
         {
           value: expect.any(String),
-          label: 'Disconnect from Wi-Fi',
+          label: DISCONNECT_FROM_SSID('foo'),
         },
       ],
     })
@@ -93,7 +90,7 @@ describe('SelectSsid component', () => {
     const options = selectField.prop('options')
 
     expect(options).not.toContainEqual({
-      options: [{ label: 'Disconnect from Wi-Fi' }],
+      options: [{ label: DISCONNECT_FROM_SSID('foo') }],
     })
   })
 
@@ -125,7 +122,7 @@ describe('SelectSsid component', () => {
     const selectField = wrapper.find(SelectField)
     const options = selectField.prop('options').flatMap(o => o.options)
     const disconectValue = options.find(
-      o => o.label === LABEL_DISCONNECT_FROM_WIFI
+      o => o.label === DISCONNECT_FROM_SSID('foo')
     )?.value
 
     expect(disconectValue).toEqual(expect.any(String))
@@ -138,10 +135,20 @@ describe('SelectSsid component', () => {
     const wrapper = render()
     const selectField = wrapper.find(SelectField)
 
-    const expectedFoo = mount(<NetworkOptionLabel {...mockWifiList[0]} />)
-    const expectedBar = mount(<NetworkOptionLabel {...mockWifiList[1]} />)
-    const fooLabel = selectField.prop('formatOptionLabel')({ value: 'foo' })
-    const barLabel = selectField.prop('formatOptionLabel')({ value: 'bar' })
+    const expectedFoo = mount(
+      <NetworkOptionLabel {...mockWifiList[0]} showConnectedIcon={false} />
+    )
+    const expectedBar = mount(
+      <NetworkOptionLabel {...mockWifiList[1]} showConnectedIcon={true} />
+    )
+    const fooLabel = selectField.prop('formatOptionLabel')(
+      { value: 'foo' },
+      { context: CONTEXT_VALUE }
+    )
+    const barLabel = selectField.prop('formatOptionLabel')(
+      { value: 'bar' },
+      { context: CONTEXT_MENU }
+    )
 
     expect(mount(fooLabel)).toEqual(expectedFoo)
     expect(mount(barLabel)).toEqual(expectedBar)
@@ -156,7 +163,9 @@ describe('SelectSsid component', () => {
     expect(joinOtherOpt?.value).toEqual(expect.any(String))
     expect(joinOtherOpt?.label).toEqual(expect.any(String))
 
-    const label = selectField.prop('formatOptionLabel')(joinOtherOpt)
+    const label = selectField.prop('formatOptionLabel')(joinOtherOpt, {
+      context: CONTEXT_MENU,
+    })
 
     expect(mount(label).html()).toContain(joinOtherOpt?.label)
   })
@@ -166,13 +175,15 @@ describe('SelectSsid component', () => {
     const selectField = wrapper.find(SelectField)
     const options = selectField.prop('options').flatMap(o => o.options)
     const disconectOpt = options.find(
-      o => o.label === LABEL_DISCONNECT_FROM_WIFI
+      o => o.label === DISCONNECT_FROM_SSID('foo')
     )
 
     expect(disconectOpt?.value).toEqual(expect.any(String))
     expect(disconectOpt?.label).toEqual(expect.any(String))
 
-    const label = selectField.prop('formatOptionLabel')(disconectOpt)
+    const label = selectField.prop('formatOptionLabel')(disconectOpt, {
+      context: CONTEXT_MENU,
+    })
 
     expect(mount(label).html()).toContain(disconectOpt?.label)
   })

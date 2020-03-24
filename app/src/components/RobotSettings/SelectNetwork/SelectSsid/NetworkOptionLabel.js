@@ -22,10 +22,20 @@ const StyledIcon: StyledComponent<IconProps, {||}, typeof Icon> = styled(Icon)`
   flex: none;
   height: 1rem;
   width: 1rem;
+  padding-left: 0.125rem;
+`
+
+const StyledConnectedIcon: StyledComponent<
+  IconProps,
+  {||},
+  typeof StyledIcon
+> = styled(StyledIcon)`
+  margin-left: -0.5rem;
+  padding-left: 0;
 `
 
 const StyledName: StyledComponent<
-  {| padLeft?: boolean, padRight?: boolean |},
+  {| padLeft?: boolean |},
   {||},
   HTMLSpanElement
 > = styled.span`
@@ -33,22 +43,25 @@ const StyledName: StyledComponent<
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  ${({ padLeft, padRight }) => `
-    padding-left: ${padLeft ? '1.25rem' : '0.25rem'};
-    padding-right: ${padRight ? '1.25rem' : '0.25rem'};
+  ${({ padLeft }) => `
+    padding-left: ${padLeft ? '0.75rem' : '0.25rem'};
   `}
 `
 
-export const NetworkOptionLabel = (props: WifiNetwork) => {
-  const { ssid, active, securityType } = props
+export type NetworkOptionLabelProps = {|
+  ...WifiNetwork,
+  showConnectedIcon: boolean,
+|}
+
+export const NetworkOptionLabel = (props: NetworkOptionLabelProps) => {
+  const { ssid, active, securityType, showConnectedIcon } = props
+  const hasConnectedIcon = active && showConnectedIcon
   const hasSecureIcon = securityType !== SECURITY_NONE
 
   return (
     <StyledWrapper>
-      {active && <StyledIcon name="check" />}
-      <StyledName padLeft={!active} padRight={!hasSecureIcon}>
-        {ssid}
-      </StyledName>
+      {hasConnectedIcon && <StyledConnectedIcon name="check" />}
+      <StyledName padLeft={!active}>{ssid}</StyledName>
       {hasSecureIcon && <StyledIcon name="lock" />}
       {renderSignalIcon(props.signal)}
     </StyledWrapper>
@@ -56,9 +69,7 @@ export const NetworkOptionLabel = (props: WifiNetwork) => {
 }
 
 export const NetworkActionLabel = ({ label }: {| label: string |}) => (
-  <StyledName padLeft={false} padRight={false}>
-    {label}
-  </StyledName>
+  <StyledName padLeft={true}>{label}</StyledName>
 )
 
 const renderSignalIcon = signal => {

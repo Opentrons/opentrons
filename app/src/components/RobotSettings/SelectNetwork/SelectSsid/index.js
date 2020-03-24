@@ -2,7 +2,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { SelectField } from '@opentrons/components'
+import { SelectField, CONTEXT_MENU } from '@opentrons/components'
 import * as Copy from '../i18n'
 import { NetworkOptionLabel, NetworkActionLabel } from './NetworkOptionLabel'
 
@@ -28,15 +28,15 @@ const DISCONNECT_WIFI_VALUE = '__disconnect-from-wifi__'
 
 const JOIN_OTHER_VALUE = '__join-other-network__'
 
-const SELECT_DISCONNECT_GROUP = {
-  options: [
-    { value: DISCONNECT_WIFI_VALUE, label: Copy.LABEL_DISCONNECT_FROM_WIFI },
-  ],
-}
-
 const SELECT_JOIN_OTHER_GROUP = {
   options: [{ value: JOIN_OTHER_VALUE, label: Copy.LABEL_JOIN_OTHER_NETWORK }],
 }
+
+const makeSelectDisconnectGroup = ssid => ({
+  options: [
+    { value: DISCONNECT_WIFI_VALUE, label: Copy.DISCONNECT_FROM_SSID(ssid) },
+  ],
+})
 
 const StyledSelectField: React.ComponentType<SelectFieldProps> = styled(
   SelectField
@@ -52,7 +52,8 @@ const formatOptions = (
   const options = [ssidOptionsList, SELECT_JOIN_OTHER_GROUP]
 
   if (showWifiDisconnect) {
-    options.unshift(SELECT_DISCONNECT_GROUP)
+    const ssid = list.find(nw => nw.active)?.ssid ?? ''
+    options.unshift(makeSelectDisconnectGroup(ssid))
   }
 
   return options
@@ -78,12 +79,17 @@ export function SelectSsid(props: SelectSsidProps) {
     }
   }
 
-  const formatOptionLabel = option => {
+  const formatOptionLabel = (option, { context }) => {
     const { value, label } = option
 
     if (label != null) return <NetworkActionLabel label={label} />
     const network = list.find(nw => nw.ssid === value)
-    return network ? <NetworkOptionLabel {...network} /> : null
+    return network ? (
+      <NetworkOptionLabel
+        {...network}
+        showConnectedIcon={context === CONTEXT_MENU}
+      />
+    ) : null
   }
 
   return (

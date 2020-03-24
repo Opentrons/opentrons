@@ -11,7 +11,7 @@ describe('NetworkOptionLabel presentational component', () => {
   const render = () => mount(<NetworkOptionLabel {...props} />)
 
   beforeEach(() => {
-    props = Fixtures.mockWifiNetwork
+    props = { ...Fixtures.mockWifiNetwork, showConnectedIcon: true }
   })
 
   it('renders the ssid of the network', () => {
@@ -34,7 +34,7 @@ describe('NetworkOptionLabel presentational component', () => {
   })
 
   it('renders a check icon if network is active', () => {
-    props = { ...props, active: true }
+    props = { ...props, active: true, showConnectedIcon: true }
 
     const wrapper = render()
     const icon = wrapper.find('Icon[name="check"]')
@@ -42,7 +42,14 @@ describe('NetworkOptionLabel presentational component', () => {
   })
 
   it('renders no check icon if network is not active', () => {
-    props = { ...props, active: false }
+    props = { ...props, active: false, showConnectedIcon: true }
+    const wrapper = render()
+    const icon = wrapper.find('Icon[name="check"]')
+    expect(icon).toHaveLength(0)
+  })
+
+  it('renders no check icon if network is active but showConnectedIcon is false', () => {
+    props = { ...props, active: true, showConnectedIcon: false }
     const wrapper = render()
     const icon = wrapper.find('Icon[name="check"]')
     expect(icon).toHaveLength(0)

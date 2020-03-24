@@ -44,8 +44,6 @@ export const LABEL_ADD_NEW_KEY = 'Add new...'
 
 export const LABEL_SHOW_PASSWORD = 'Show password'
 
-export const LABEL_DISCONNECT_FROM_WIFI = 'Disconnect from Wi-Fi'
-
 export const LABEL_JOIN_OTHER_NETWORK = 'Join other network...'
 
 export const SELECT_AUTHENTICATION_METHOD = 'Select authentication method'
