@@ -67,7 +67,6 @@ export function ControlsCard(props: Props) {
         <LabeledButton
           label="Check deck calibration"
           buttonProps={{
-            // onClick: checkCalibration,
             disabled: buttonDisabled,
             children: 'Check',
             Component: Link,
