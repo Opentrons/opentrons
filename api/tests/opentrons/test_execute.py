@@ -86,7 +86,7 @@ def test_execute_function_json_v3_apiv2(get_json_protocol_fixture,
 def test_execute_function_json_v4_apiv2(get_json_protocol_fixture,
                                         virtual_smoothie_env,
                                         mock_get_attached_instr):
-    jp = get_json_protocol_fixture('4', 'simplev4', False)
+    jp = get_json_protocol_fixture('4', 'simpleV4', False)
     filelike = io.StringIO(jp)
     entries = []
 
