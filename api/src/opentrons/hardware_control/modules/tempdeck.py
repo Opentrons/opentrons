@@ -91,7 +91,8 @@ class TempDeck(mod_abc.AbstractModule):
     @staticmethod
     def _build_driver(
             simulating: bool,
-            sim_model: str) -> Union['SimulatingDriver', 'TempDeckDriver']:
+            sim_model: str = None
+    ) -> Union['SimulatingDriver', 'TempDeckDriver']:
         if simulating:
             return SimulatingDriver(sim_model=sim_model)
         else:
@@ -113,8 +114,8 @@ class TempDeck(mod_abc.AbstractModule):
         if temp_locks.get(port):
             self._driver = temp_locks[port][1]
         else:
-            self._driver = self._build_driver(  # type: ignore
-                simulating, sim_model or self.model())
+            self._driver = self._build_driver(
+                simulating, sim_model)
 
         self._poller = None
 

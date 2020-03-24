@@ -54,11 +54,12 @@ class TempDeckError(Exception):
 
 
 class SimulatingDriver:
-    def __init__(self, sim_model):
-        self._target_temp = 0
+    def __init__(self, sim_model: str = None):
+        self._target_temp = 0.0
         self._active = False
-        self._port = None
-        self._model = TEMP_DECK_MODELS[sim_model]
+        self._port: Optional[str] = None
+        self._model = TEMP_DECK_MODELS[sim_model] if sim_model\
+            else 'temp_deck_v1.1'
 
     async def set_temperature(self, celsius: float):
         self._target_temp = celsius

@@ -76,14 +76,14 @@ class ThermocyclerError(Exception):
 
 
 class SimulatingDriver:
-    def __init__(self, sim_model):
-        self._target_temp = None
-        self._ramp_rate = None
-        self._hold_time = None
+    def __init__(self, sim_model: str = None):
+        self._target_temp: Optional[float] = None
+        self._ramp_rate: Optional[float] = None
+        self._hold_time: Optional[float] = None
         self._active = False
         self._port = None
         self._lid_status = 'open'
-        self._lid_target = None
+        self._lid_target: Optional[float] = None
         self._lid_heating_active = False
 
     async def open(self):

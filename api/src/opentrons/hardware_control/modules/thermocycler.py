@@ -47,7 +47,7 @@ class Thermocycler(mod_abc.AbstractModule):
     @staticmethod
     def _build_driver(
             simulating: bool,
-            sim_model: str,
+            sim_model: str = None,
             interrupt_cb: Callable[[str], None] = None)\
             -> Union['SimulatingDriver', 'ThermocyclerDriver']:
         if simulating:
@@ -70,7 +70,7 @@ class Thermocycler(mod_abc.AbstractModule):
         self._interrupt_cb = interrupt_callback
         self._driver = self._build_driver(
             simulating,
-            sim_model or self.model(),
+            sim_model,
             interrupt_callback)
 
         self._total_cycle_count: Optional[int] = None

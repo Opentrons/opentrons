@@ -155,10 +155,11 @@ def _parse_distance_response(distance_string) -> float:
 
 
 class SimulatingDriver:
-    def __init__(self, sim_model):
+    def __init__(self, sim_model: str = None):
         self._port = None
-        self._height = 0
-        self._model = MAG_DECK_MODELS[sim_model]
+        self._height = 0.0
+        self._model = MAG_DECK_MODELS[sim_model] if sim_model\
+            else 'mag_deck_v1.1'
 
     def probe_plate(self):
         pass

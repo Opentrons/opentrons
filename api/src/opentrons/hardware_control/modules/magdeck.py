@@ -97,7 +97,7 @@ class MagDeck(mod_abc.AbstractModule):
             self._driver = mag_locks[port][1]
         else:
             self._driver = self._build_driver(
-                simulating, sim_model or self.model())
+                simulating, sim_model)
 
     async def calibrate(self):
         """
