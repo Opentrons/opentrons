@@ -33,6 +33,24 @@ class AttachedPipette(BaseModel):
             UUID4: convert_uuid}
 
 
+class LabwareStatus(BaseModel):
+    """
+    A model describing all labware attached
+    """
+    alternatives: List[str]
+    slot: DeckItem
+    tiprackID: UUID4
+    forPipettes: List[UUID4]
+    loadName: str
+    namespace: str
+    version: int
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_uuid,
+            DeckItem}
+
+
 class CalibrationSessionStatus(BaseModel):
     """
     The current status of a given session.
@@ -42,6 +60,7 @@ class CalibrationSessionStatus(BaseModel):
     nextSteps: Dict[str, Dict[str, str]] =\
         Field(..., description="Next Available Step in Session")
     sessionToken: UUID4 = Field(..., description="Session token")
+    labware: List[LabwareStatus]
 
     class Config:
         json_encoders = {UUID4: convert_uuid}
@@ -69,7 +88,7 @@ class CalibrationSessionStatus(BaseModel):
                     "currentStep": "sessionStart",
                     "nextSteps": {
                         "links": {
-                            "specifyLabware": ""
+                            "loadLabware": ""
                         }
                     },
                     "sessionToken": "FakeUUIDHex"

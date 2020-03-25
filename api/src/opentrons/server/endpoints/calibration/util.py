@@ -4,7 +4,7 @@ from typing import TypeVar, Generic, Type, Dict
 
 class CalibrationCheckState(enum.Enum):
     sessionStart = enum.auto()
-    specifyLabware = enum.auto()
+    loadLabware = enum.auto()
     pickUpTip = enum.auto()
     checkPointOne = enum.auto()
     checkPointTwo = enum.auto()
@@ -16,8 +16,8 @@ class CalibrationCheckState(enum.Enum):
 
 
 check_normal_relationship_dict = {
-    CalibrationCheckState.sessionStart: CalibrationCheckState.specifyLabware,
-    CalibrationCheckState.specifyLabware: CalibrationCheckState.pickUpTip,
+    CalibrationCheckState.sessionStart: CalibrationCheckState.loadLabware,
+    CalibrationCheckState.loadLabware: CalibrationCheckState.pickUpTip,
     CalibrationCheckState.checkPointOne: CalibrationCheckState.checkPointTwo,
     CalibrationCheckState.checkPointTwo: CalibrationCheckState.checkPointThree,
     CalibrationCheckState.checkPointThree: CalibrationCheckState.checkHeight,
@@ -36,7 +36,7 @@ nopips = CalibrationCheckState.noPipettesAttached
 badcal = CalibrationCheckState.badDeckCalibration
 check_error_relationship_dict = {
     CalibrationCheckState.sessionStart: nopips,
-    CalibrationCheckState.specifyLabware: badcal,
+    CalibrationCheckState.loadLabware: badcal,
     CalibrationCheckState.checkPointOne: badcal,
     CalibrationCheckState.checkPointTwo: badcal,
     CalibrationCheckState.checkPointThree: badcal,

@@ -24,7 +24,7 @@ async def test_start_session(async_client, test_setup):
     assert list(text.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "sessionToken"]
     assert text["currentStep"] == "sessionStart"
-    assert text["nextSteps"] == {"links": {"specifyLabware": ""}}
+    assert text["nextSteps"] == {"links": {"loadLabware": ""}}
 
 
 async def test_check_session(async_client, test_setup):
@@ -40,7 +40,7 @@ async def test_check_session(async_client, test_setup):
     assert list(text.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "sessionToken"]
     assert text["currentStep"] == "sessionStart"
-    assert text["nextSteps"] == {"links": {"specifyLabware": ""}}
+    assert text["nextSteps"] == {"links": {"loadLabware": ""}}
 
 
 async def test_delete_session(async_client, async_server, test_setup):

@@ -15,6 +15,10 @@ offset or a robot deck transform.
 """
 
 
+ALTERNATIVE_LABWARE = 'opentrons_96_filtertiprack_{}ul'
+LOAD_NAME = 'opentrons_96_tiprack_{}ul'
+
+
 class SessionManager:
     """Small wrapper to keep track of robot calibration sessions created."""
     def __init__(self):
@@ -52,7 +56,7 @@ class CalibrationSession:
         self._pipettes.update(new_dict)
 
     @property
-    def hardware(self):
+    def hardware(self) -> ThreadManager:
         return self._hardware
 
     def get_pipette(self, uuid: UUID4) -> 'AttachedPipette':
@@ -67,3 +71,28 @@ class CheckCalibrationSession(CalibrationSession):
     def __init__(self, hardware: 'ThreadManager'):
         super().__init__(hardware)
         self.state_machine = CalibrationCheckMachine()
+        self._lw_definitions = {}
+        self._labware_info = self._determine_required_labware()
+
+    def _determine_required_labware(self) -> typing.Dict:
+        lw = {}
+        for id, data in self._pipettes:
+            vol = data['max_volume']
+            load_name = LOAD_NAME.format(vol)
+            if_labware = lw.get(load_name)
+            if if_labware:
+                lw[load_name]['forPipettes'].append(id)
+            else:
+                lw['tiprackID'] = uuid4()
+                lw['alternatives'] = [ALTERNATIVE_LABWARE.format(vol)]
+                lw['forPipettes'] = [id]
+                lw['loadName'] = load_name
+                lw['slot'] = slot.pop()
+                lw['namespace'] =
+                lw['version'] =
+                self._lw_definitions[load_name] = definition
+        return lw
+
+    @property
+    def labware(self) -> typing.Dict:
+        return self._labware
