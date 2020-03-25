@@ -1,8 +1,8 @@
 import asyncio
 import functools
-import os
 import json
 import logging
+from pathlib import Path
 from aiohttp import web
 
 try:
@@ -14,6 +14,7 @@ from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.system import camera
 
 
 log = logging.getLogger(__name__)
@@ -487,29 +488,12 @@ async def set_rail_lights(request):
 
 
 async def take_picture(request):
-    filename = os.path.join(
-        request.app['com.opentrons.response_file_tempdir'], 'picture.jpg')
-    if os.path.exists(filename):
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
+    filename = Path(request.app['com.opentrons.response_file_tempdir'])
+    filename = filename.joinpath('picture.jpg')
 
-    cmd = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1'  # NOQA
-    proc = await asyncio.create_subprocess_shell(
-        '{} {}'.format(cmd, filename),
-        stdout=asyncio.subprocess.PIPE,
-        loop=request.loop)
-
-    res = await proc.stdout.read()
-    res = res.decode().strip()
-    await proc.wait()
-
-    # TODO (andy - 2018-04-23) find better way of ensuring picture was taken
-    # TODO              and properly saved by ffmpeg
-    if 'video:' in res and 'audio:' in res and 'subtitle:' in res:
-        return web.json_response({'message': res}, status=500)
-    if not os.path.exists(filename):
-        return web.json_response({'message': 'picture not saved'}, status=500)
+    try:
+        await camera.take_picture(filename, request.loop)
+    except camera.CameraException as e:
+        return web.json_response({'message': str(e)}, status=500)
 
     return web.FileResponse(filename)

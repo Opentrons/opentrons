@@ -1,12 +1,12 @@
 import typing
 import uvicorn  # type: ignore
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 
 
 HARDWARE_APP_KEY = 'hardware'
 
 
-def run(hardware: HardwareAPILike,
+def run(hardware: ThreadManager,
         hostname: typing.Optional[str],
         port: typing.Optional[int],
         path: typing.Optional[str]):

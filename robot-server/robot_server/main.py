@@ -2,7 +2,7 @@ import typing
 import logging
 from argparse import ArgumentParser
 
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 from opentrons.main import initialize as initialize_api
 from opentrons.config import feature_flags as ff
 
@@ -42,7 +42,7 @@ def build_arg_parser():
     return arg_parser
 
 
-def run(hardware: HardwareAPILike,
+def run(hardware: ThreadManager,
         hostname: typing.Optional[str],
         port: typing.Optional[int],
         path: str = None):

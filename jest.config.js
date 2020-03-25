@@ -1,7 +1,7 @@
 'use strict'
 
 module.exports = {
-  setupFiles: [
+  setupFilesAfterEnv: [
     '<rootDir>/scripts/setup-enzyme.js',
     '<rootDir>/scripts/setup-global-mocks.js',
   ],

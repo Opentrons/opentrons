@@ -8,6 +8,7 @@ class MoveSplit(NamedTuple):
     split_current: float
     split_speed: float
     after_time: float
+    fullstep: bool
 
 
 MoveSplits = Dict[str, MoveSplit]

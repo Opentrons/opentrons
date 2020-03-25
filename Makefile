@@ -86,9 +86,11 @@ push-update-server:
 push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
-	$(MAKE) -C $(API_DIR) push
+	$(MAKE) -C $(API_DIR) push-no-restart
 	sleep 1
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
+	sleep 1
+	$(MAKE) -C $(ROBOT_SERVER_DIR) push
 
 
 .PHONY: term

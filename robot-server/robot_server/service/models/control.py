@@ -2,41 +2,7 @@ import typing
 from functools import partial
 from enum import Enum
 
-from pydantic import BaseModel, Field
-
-
-class EngagedMotor(BaseModel):
-    """Engaged motor"""
-    enabled: bool = Field(..., description="Is engine enabled")
-
-
-class EngagedMotors(BaseModel):
-    """Which motors are engaged"""
-    x: EngagedMotor
-    y: EngagedMotor
-    z: EngagedMotor
-    a: EngagedMotor
-    b: EngagedMotor
-    c: EngagedMotor
-
-    class Config:
-        schema_extra = {"example": {
-            "x": {"enabled": False},
-            "y": {"enabled": True},
-            "z": {"enabled": False},
-            "a": {"enabled": True},
-            "b": {"enabled": False},
-            "c": {"enabled": True}
-        }}
-
-
-class MotorName(str, Enum):
-    x = "x"
-    y = "y"
-    z = "z"
-    a = "a"
-    b = "b"
-    c = "c"
+from pydantic import BaseModel, Field, root_validator
 
 
 class MotionTarget(str, Enum):
@@ -76,6 +42,10 @@ class RobotPositions(BaseModel):
     change_pipette: ChangePipette
     attach_tip: AttachTip
 
+
+class RobotPositionsResponse(BaseModel):
+    positions: RobotPositions
+
     class Config:
         schema_extra = {"example": {
             "positions": {
@@ -98,7 +68,6 @@ class Mount(str, Enum):
 
 
 class RobotMoveTarget(BaseModel):
-    """None"""
     target: MotionTarget
     point: Point = PointField()
     mount: Mount = Field(..., description="Which mount to move")
@@ -107,6 +76,18 @@ class RobotMoveTarget(BaseModel):
               description="A pipette model that matches the pipette attached "
                           "to the specified mount. Required "
                           "if target is pipette")
+
+    @root_validator(pre=True)
+    def root_validator(cls, values):
+        points = values.get("point", [])
+        target = values.get("target")
+        if target == MotionTarget.mount and \
+                len(points) == 3 and points[2] < 30:
+            raise ValueError("Sending a mount to a z position lower than 30 "
+                             "can cause a collision with the deck or reach the"
+                             " end of the Z axis  movement screw. Z values for"
+                             " mount movement must be >= 30")
+        return values
 
     class Config:
         schema_extra = {"examples": {
@@ -150,9 +131,17 @@ class RobotHomeTarget(BaseModel):
                           "pipette, only that pipette's carriage and pipette "
                           "axes")
     mount: typing.Optional[Mount] = \
-        Field(...,
+        Field(None,
               description="Which mount to home, if target is pipette (required"
                           " in that case)")
+
+    @root_validator(pre=True)
+    def root_validate(cls, values):
+        # Make sure that mount is present if target is pipette
+        if values.get("target") == HomeTarget.pipette.value \
+                and not values.get("mount"):
+            raise ValueError("mount must be specified if target is pipette")
+        return values
 
     class Config:
         schema_extra = {"examples": {

@@ -4,28 +4,26 @@ import reduce from 'lodash/reduce'
 import omit from 'lodash/omit'
 import * as React from 'react'
 import cx from 'classnames'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
 import { getIsCrashablePipetteSelected } from '../../../step-forms'
 import {
   Modal,
   FormGroup,
   InputField,
   OutlineButton,
-  type Mount,
 } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
-  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
 import { StepChangesConfirmModal } from '../EditPipettesModal/StepChangesConfirmModal'
 import { ModuleFields } from './ModuleFields'
 import { PipetteFields } from './PipetteFields'
-import { CrashInfoBox } from '../../modules'
+import { CrashInfoBox, isModuleWithCollisionIssue } from '../../modules'
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import modalStyles from '../modal.css'
@@ -36,9 +34,9 @@ import type {
   PipetteOnDeck,
   FormPipette,
   FormPipettesByMount,
-  FormModule,
   FormModulesByType,
 } from '../../../step-forms'
+import type { FormikProps } from 'formik/@flow-typed'
 
 type PipetteFieldsData = $Diff<
   PipetteOnDeck,
@@ -51,20 +49,23 @@ type ModuleCreationArgs = {|
   slot: DeckSlot,
 |}
 
-type State = {|
+type FormState = {|
   fields: NewProtocolFields,
   pipettesByMount: FormPipettesByMount,
-  showEditPipetteConfirmation: boolean,
   modulesByType: FormModulesByType,
 |}
 
-type Props = {|
+type State = {|
+  showEditPipetteConfirmation: boolean,
+|}
+
+export type Props = {|
   showProtocolFields?: ?boolean,
   showModulesFields?: ?boolean,
   hideModal?: boolean,
   onCancel: () => mixed,
-  initialPipetteValues?: $PropertyType<State, 'pipettesByMount'>,
-  initialModuleValues?: $PropertyType<State, 'modulesByType'>,
+  initialPipetteValues?: $PropertyType<FormState, 'pipettesByMount'>,
+  initialModuleValues?: $PropertyType<FormState, 'modulesByType'>,
   onSave: ({|
     newProtocolFields: NewProtocolFields,
     pipettes: Array<PipetteFieldsData>,
@@ -74,9 +75,8 @@ type Props = {|
   thermocyclerEnabled: ?boolean,
 |}
 
-const initialState: State = {
+const initialFormState: FormState = {
   fields: { name: '' },
-  showEditPipetteConfirmation: false,
   pipettesByMount: {
     left: { pipetteName: '', tiprackDefURI: null },
     right: { pipetteName: '', tiprackDefURI: null },
@@ -84,94 +84,102 @@ const initialState: State = {
   modulesByType: {
     [MAGNETIC_MODULE_TYPE]: {
       onDeck: false,
-      model: MAGNETIC_MODULE_V1,
+      model: null,
       slot: '1',
     },
     [TEMPERATURE_MODULE_TYPE]: {
       onDeck: false,
-      model: TEMPERATURE_MODULE_V1,
+      model: null,
       slot: '3',
     },
     [THERMOCYCLER_MODULE_TYPE]: {
       onDeck: false,
-      model: THERMOCYCLER_MODULE_V1,
+      model: null,
       slot: SPAN7_8_10_11_SLOT,
     },
   },
 }
 
+const pipetteValidationShape = Yup.object().shape({
+  pipetteName: Yup.string().nullable(),
+  tiprackDefURI: Yup.string()
+    .nullable()
+    .when('pipetteName', {
+      is: val => Boolean(val),
+      then: Yup.string().required('Required'),
+      otherwise: null,
+    }),
+})
+const moduleValidationShape = Yup.object().shape({
+  onDeck: Yup.boolean().default(false),
+  model: Yup.string()
+    .nullable()
+    .when('onDeck', {
+      is: true,
+      then: Yup.string().required('Required'),
+      otherwise: null,
+    }),
+  slot: Yup.string(),
+})
+
+const validationSchema = Yup.object().shape({
+  fields: Yup.object().shape({
+    name: Yup.string(),
+  }),
+  pipettesByMount: Yup.object()
+    .shape({
+      left: pipetteValidationShape,
+      right: pipetteValidationShape,
+    })
+    .test('pipette-is-required', 'a pipette is required', value =>
+      Object.keys(value).some(val => value[val].pipetteName)
+    ),
+  modulesByType: Yup.object().shape({
+    [MAGNETIC_MODULE_TYPE]: moduleValidationShape,
+    [TEMPERATURE_MODULE_TYPE]: moduleValidationShape,
+    [THERMOCYCLER_MODULE_TYPE]: moduleValidationShape,
+  }),
+})
+
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePipettesModal extends React.Component<Props, State> {
   constructor(props: Props) {
     super(props)
+
     this.state = {
-      ...initialState,
-      pipettesByMount: {
-        ...initialState.pipettesByMount,
-        ...props.initialPipetteValues,
-      },
-      modulesByType: {
-        ...initialState.modulesByType,
-        ...props.initialModuleValues,
-      },
+      showEditPipetteConfirmation: false,
     }
   }
 
   componentDidUpdate(prevProps: Props) {
-    // reset form state when modal is hidden
     if (!prevProps.hideModal && this.props.hideModal)
-      this.setState(initialState)
+      this.setState({ showEditPipetteConfirmation: false })
   }
 
-  getCrashableModuleSelected = (modules: FormModulesByType) => {
-    return (
-      modules[MAGNETIC_MODULE_TYPE].onDeck ||
-      modules[TEMPERATURE_MODULE_TYPE].onDeck
-    )
-  }
-
-  handlePipetteFieldsChange = (
-    mount: Mount,
-    fieldName: $Keys<FormPipette>,
-    value: string | null
+  getCrashableModuleSelected = (
+    modules: FormModulesByType,
+    moduleType: ModuleRealType
   ) => {
-    let nextMountState: $Shape<FormPipette> = {}
-    nextMountState[fieldName] = value
-    if (fieldName === 'pipetteName') {
-      nextMountState.tiprackDefURI = null
-    }
+    const module = modules[moduleType]
+    const crashableModuleOnDeck =
+      module.onDeck && module.model
+        ? isModuleWithCollisionIssue(module.model)
+        : false
 
-    // TODO(IL, 2020-02-24): consider using an immutable type to this.state
-    // to make this less precarious, see #5073
-    const stateUpdate = { pipettesByMount: { ...this.state.pipettesByMount } }
-    stateUpdate.pipettesByMount[mount] = {
-      ...this.state.pipettesByMount[mount],
-      ...nextMountState,
-    }
-
-    this.setState(stateUpdate)
+    return crashableModuleOnDeck
   }
 
-  handleModuleOnDeckChange = (type: ModuleRealType, value: boolean) => {
-    let nextMountState: $Shape<FormModule> = { onDeck: value }
+  handleSubmit = (values: FormState) => {
+    const { showProtocolFields } = this.props
+    const { showEditPipetteConfirmation } = this.state
 
-    // TODO(IL, 2020-02-24): consider using an immutable type to this.state
-    // to make this less precarious, see #5073
-    const stateUpdate = { modulesByType: { ...this.state.modulesByType } }
-    stateUpdate.modulesByType[type] = {
-      ...this.state.modulesByType[type],
-      ...nextMountState,
+    if (!showProtocolFields && !showEditPipetteConfirmation) {
+      return this.showEditPipetteConfirmationModal()
     }
-    this.setState(stateUpdate)
-  }
 
-  handleNameChange = (e: SyntheticInputEvent<*>) =>
-    this.setState({ fields: { ...this.state.fields, name: e.target.value } })
-
-  handleSubmit = () => {
-    const newProtocolFields = this.state.fields
+    const newProtocolFields = values.fields
     const pipettes = reduce(
-      this.state.pipettesByMount,
+      values.pipettesByMount,
       (acc, formPipette: FormPipette, mount): Array<PipetteFieldsData> => {
         assert(mount === 'left' || mount === 'right', `invalid mount: ${mount}`) // this is mostly for flow
         return formPipette &&
@@ -193,16 +201,18 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
     // NOTE: this is extra-explicit for flow. Reduce fns won't cooperate
     // with enum-typed key like `{[ModuleRealType]: ___}`
-    const moduleTypes: Array<ModuleRealType> = Object.keys(
-      this.state.modulesByType
-    )
+    const moduleTypes: Array<ModuleRealType> = Object.keys(values.modulesByType)
     const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
       (acc, moduleType) => {
-        const module = this.state.modulesByType[moduleType]
+        const module = values.modulesByType[moduleType]
         return module?.onDeck
           ? [
               ...acc,
-              { type: moduleType, model: module.model, slot: module.slot },
+              {
+                type: moduleType,
+                model: module.model || '',
+                slot: module.slot,
+              },
             ]
           : acc
       },
@@ -219,31 +229,23 @@ export class FilePipettesModal extends React.Component<Props, State> {
     this.setState({ showEditPipetteConfirmation: false })
   }
 
+  getInitialValues = () => {
+    return {
+      ...initialFormState,
+      pipettesByMount: {
+        ...initialFormState.pipettesByMount,
+        ...this.props.initialPipetteValues,
+      },
+      modulesByType: {
+        ...initialFormState.modulesByType,
+        ...this.props.initialModuleValues,
+      },
+    }
+  }
+
   render() {
     if (this.props.hideModal) return null
     const { showProtocolFields } = this.props
-
-    const { name } = this.state.fields
-    const { left, right } = this.state.pipettesByMount
-
-    const pipetteSelectionIsValid =
-      // at least one must not be none (empty string)
-      left.pipetteName || right.pipetteName
-
-    // if pipette selected, corresponding tiprack type also selected
-    const tiprackSelectionIsValid =
-      (left.pipetteName ? Boolean(left.tiprackDefURI) : true) &&
-      (right.pipetteName ? Boolean(right.tiprackDefURI) : true)
-
-    const canSubmit = pipetteSelectionIsValid && tiprackSelectionIsValid
-
-    const showCrashInfoBox =
-      getIsCrashablePipetteSelected(this.state.pipettesByMount) &&
-      this.getCrashableModuleSelected(this.state.modulesByType)
-
-    const visibleModules = this.props.thermocyclerEnabled
-      ? this.state.modulesByType
-      : omit(this.state.modulesByType, THERMOCYCLER_MODULE_TYPE)
 
     return (
       <React.Fragment>
@@ -256,98 +258,155 @@ export class FilePipettesModal extends React.Component<Props, State> {
         >
           <div className={modalStyles.scrollable_modal_wrapper}>
             <div className={modalStyles.scrollable_modal_scroll}>
-              <form
-                onSubmit={() => {
-                  canSubmit && this.handleSubmit()
-                }}
+              <Formik
+                enableReinitialize
+                initialValues={this.getInitialValues()}
+                onSubmit={this.handleSubmit}
+                validationSchema={validationSchema}
+                validateOnChange={false}
               >
-                {showProtocolFields && (
-                  <div className={styles.protocol_file_group}>
-                    <h2 className={styles.new_file_modal_title}>
-                      {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
-                    </h2>
-                    <FormGroup className={formStyles.stacked_row} label="Name">
-                      <InputField
-                        autoFocus
-                        tabIndex={1}
-                        placeholder={i18n.t(
-                          'form.generic.default_protocol_name'
+                {({
+                  handleChange,
+                  handleSubmit,
+                  errors,
+                  setFieldValue,
+                  touched,
+                  values,
+                  handleBlur,
+                  setFieldTouched,
+                }: FormikProps<FormState>) => {
+                  const { left, right } = values.pipettesByMount
+
+                  const pipetteSelectionIsValid =
+                    // at least one must not be none (empty string)
+                    left.pipetteName || right.pipetteName
+
+                  const hasCrashableMagnetModuleSelected = this.getCrashableModuleSelected(
+                    values.modulesByType,
+                    MAGNETIC_MODULE_TYPE
+                  )
+                  const hasCrashableTemperatureModuleSelected = this.getCrashableModuleSelected(
+                    values.modulesByType,
+                    TEMPERATURE_MODULE_TYPE
+                  )
+                  const showCrashInfoBox =
+                    getIsCrashablePipetteSelected(values.pipettesByMount) &&
+                    (hasCrashableMagnetModuleSelected ||
+                      hasCrashableTemperatureModuleSelected)
+
+                  const visibleModules = this.props.thermocyclerEnabled
+                    ? values.modulesByType
+                    : omit(values.modulesByType, THERMOCYCLER_MODULE_TYPE)
+
+                  return (
+                    <>
+                      <form onSubmit={handleSubmit}>
+                        {showProtocolFields && (
+                          <div className={styles.protocol_file_group}>
+                            <h2 className={styles.new_file_modal_title}>
+                              {i18n.t('modal.new_protocol.title.PROTOCOL_FILE')}
+                            </h2>
+                            <FormGroup
+                              className={formStyles.stacked_row}
+                              label="Name"
+                            >
+                              <InputField
+                                autoFocus
+                                tabIndex={1}
+                                placeholder={i18n.t(
+                                  'form.generic.default_protocol_name'
+                                )}
+                                name="fields.name"
+                                value={values.fields.name}
+                                onChange={handleChange}
+                                onBlur={handleBlur}
+                              />
+                            </FormGroup>
+                          </div>
                         )}
-                        value={name}
-                        onChange={this.handleNameChange}
-                      />
-                    </FormGroup>
-                  </div>
-                )}
 
-                <h2 className={styles.new_file_modal_title}>
-                  {showProtocolFields
-                    ? i18n.t('modal.new_protocol.title.PROTOCOL_PIPETTES')
-                    : i18n.t('modal.edit_pipettes.title')}
-                </h2>
+                        <h2 className={styles.new_file_modal_title}>
+                          {showProtocolFields
+                            ? i18n.t(
+                                'modal.new_protocol.title.PROTOCOL_PIPETTES'
+                              )
+                            : i18n.t('modal.edit_pipettes.title')}
+                        </h2>
 
-                <PipetteFields
-                  initialTabIndex={1}
-                  values={this.state.pipettesByMount}
-                  onFieldChange={this.handlePipetteFieldsChange}
-                />
+                        <PipetteFields
+                          initialTabIndex={1}
+                          values={values.pipettesByMount}
+                          onFieldChange={handleChange}
+                          onSetFieldValue={setFieldValue}
+                          onBlur={handleBlur}
+                          errors={errors.pipettesByMount ?? null}
+                          touched={touched.pipettesByMount ?? null}
+                          onSetFieldTouched={setFieldTouched}
+                        />
 
-                {this.props.modulesEnabled && this.props.showModulesFields && (
-                  <div className={styles.protocol_modules_group}>
-                    <h2 className={styles.new_file_modal_title}>
-                      {i18n.t('modal.new_protocol.title.PROTOCOL_MODULES')}
-                    </h2>
-                    <ModuleFields
-                      values={visibleModules}
-                      thermocyclerEnabled={this.props.thermocyclerEnabled}
-                      onFieldChange={this.handleModuleOnDeckChange}
-                    />
-                  </div>
-                )}
-              </form>
+                        {this.props.modulesEnabled &&
+                          this.props.showModulesFields && (
+                            <div className={styles.protocol_modules_group}>
+                              <h2 className={styles.new_file_modal_title}>
+                                {i18n.t(
+                                  'modal.new_protocol.title.PROTOCOL_MODULES'
+                                )}
+                              </h2>
+                              <ModuleFields
+                                errors={errors.modulesByType ?? null}
+                                values={visibleModules}
+                                thermocyclerEnabled={
+                                  this.props.thermocyclerEnabled
+                                }
+                                onFieldChange={handleChange}
+                                onSetFieldValue={setFieldValue}
+                                onBlur={handleBlur}
+                                touched={touched.modulesByType ?? null}
+                                onSetFieldTouched={setFieldTouched}
+                              />
+                            </div>
+                          )}
+                        {showCrashInfoBox && (
+                          <CrashInfoBox
+                            showDiagram
+                            magnetOnDeck={hasCrashableMagnetModuleSelected}
+                            temperatureOnDeck={
+                              hasCrashableTemperatureModuleSelected
+                            }
+                          />
+                        )}
+                        <div className={modalStyles.button_row}>
+                          <OutlineButton
+                            onClick={this.props.onCancel}
+                            tabIndex={7}
+                            className={styles.button}
+                          >
+                            {i18n.t('button.cancel')}
+                          </OutlineButton>
+                          <OutlineButton
+                            disabled={!pipetteSelectionIsValid}
+                            onClick={handleSubmit}
+                            tabIndex={6}
+                            className={styles.button}
+                          >
+                            {i18n.t('button.save')}
+                          </OutlineButton>
+                        </div>
+                      </form>
 
-              {showCrashInfoBox && (
-                <CrashInfoBox
-                  showDiagram
-                  magnetOnDeck={
-                    this.state.modulesByType[MAGNETIC_MODULE_TYPE].onDeck
-                  }
-                  temperatureOnDeck={
-                    this.state.modulesByType[TEMPERATURE_MODULE_TYPE].onDeck
-                  }
-                />
-              )}
-
-              <div className={modalStyles.button_row}>
-                <OutlineButton
-                  onClick={this.props.onCancel}
-                  tabIndex={7}
-                  className={styles.button}
-                >
-                  {i18n.t('button.cancel')}
-                </OutlineButton>
-                <OutlineButton
-                  onClick={
-                    showProtocolFields
-                      ? this.handleSubmit
-                      : this.showEditPipetteConfirmationModal
-                  }
-                  disabled={!canSubmit}
-                  tabIndex={6}
-                  className={styles.button}
-                >
-                  {i18n.t('button.save')}
-                </OutlineButton>
-              </div>
+                      {this.state.showEditPipetteConfirmation && (
+                        <StepChangesConfirmModal
+                          onCancel={this.handleCancel}
+                          onConfirm={handleSubmit}
+                        />
+                      )}
+                    </>
+                  )
+                }}
+              </Formik>
             </div>
           </div>
         </Modal>
-        {this.state.showEditPipetteConfirmation && (
-          <StepChangesConfirmModal
-            onCancel={this.handleCancel}
-            onConfirm={this.handleSubmit}
-          />
-        )}
       </React.Fragment>
     )
   }

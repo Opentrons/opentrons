@@ -102,7 +102,7 @@ export const fetchWifiKeys = (
 
 export const fetchWifiKeysSuccess = (
   robotName: string,
-  wifiKeys: Array<Types.WifiKey>,
+  wifiKeys: Array<Types.ApiWifiKey>,
   meta: RobotApiRequestMeta
 ): Types.FetchWifiKeysSuccessAction => ({
   type: Constants.FETCH_WIFI_KEYS_SUCCESS,
@@ -131,7 +131,7 @@ export const postWifiKeys = (
 
 export const postWifiKeysSuccess = (
   robotName: string,
-  wifiKey: Types.WifiKey,
+  wifiKey: Types.ApiWifiKey,
   meta: RobotApiRequestMeta
 ): Types.PostWifiKeysSuccessAction => ({
   type: Constants.POST_WIFI_KEYS_SUCCESS,
@@ -173,6 +173,34 @@ export const fetchEapOptionsFailure = (
   meta: RobotApiRequestMeta
 ): Types.FetchEapOptionsFailureAction => ({
   type: Constants.FETCH_EAP_OPTIONS_FAILURE,
+  payload: { robotName, error },
+  meta,
+})
+
+export const postWifiDisconnect = (
+  robotName: string,
+  ssid: string
+): Types.PostWifiDisconnectAction => ({
+  type: Constants.POST_WIFI_DISCONNECT,
+  payload: { robotName, ssid },
+  meta: {},
+})
+
+export const postWifiDisconnectSuccess = (
+  robotName: string,
+  meta: RobotApiRequestMeta
+): Types.PostWifiDisconnectSuccessAction => ({
+  type: Constants.POST_WIFI_DISCONNECT_SUCCESS,
+  payload: { robotName },
+  meta,
+})
+
+export const postWifiDisconnectFailure = (
+  robotName: string,
+  error: RobotApiErrorResponse,
+  meta: RobotApiRequestMeta
+): Types.PostWifiDisconnectFailureAction => ({
+  type: Constants.POST_WIFI_DISCONNECT_FAILURE,
   payload: { robotName, error },
   meta,
 })

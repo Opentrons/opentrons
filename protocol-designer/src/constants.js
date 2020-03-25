@@ -7,9 +7,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER,
   MAGNETIC_MODULE_V1,
-  // MAGNETIC_MODULE_V2,
+  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
-  // TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
@@ -17,6 +17,7 @@ import type {
   LabwareDefinition2,
   DeckSlot as DeckDefSlot,
   ModuleRealType,
+  ModuleModel,
 } from '@opentrons/shared-data'
 import type { DeckSlot, WellVolumes } from './types'
 // TODO Ian 2018-11-27: import these from components lib, not from this constants file
@@ -87,8 +88,10 @@ export const DEFAULT_MM_BLOWOUT_OFFSET_FROM_TOP = 0
 export const DEFAULT_WELL_ORDER_FIRST_OPTION: 't2b' = 't2b'
 export const DEFAULT_WELL_ORDER_SECOND_OPTION: 'l2r' = 'l2r'
 
-export const MIN_ENGAGE_HEIGHT = -4
-export const MAX_ENGAGE_HEIGHT = 16
+export const MIN_ENGAGE_HEIGHT_V1 = -5
+export const MAX_ENGAGE_HEIGHT_V1 = 40
+export const MIN_ENGAGE_HEIGHT_V2 = -4
+export const MAX_ENGAGE_HEIGHT_V2 = 19
 
 export const MIN_TEMP_MODULE_TEMP = 0
 export const MAX_TEMP_MODULE_TEMP = 95
@@ -114,8 +117,10 @@ export const MODELS_FOR_MODULE_TYPE: {
       // downcast required because the module models are now enums rather than strings
       value: (MAGNETIC_MODULE_V1: string),
     },
-    // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
-    // { name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`), value: MAGNETIC_MODULE_V2 },
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      value: MAGNETIC_MODULE_V2,
+    },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
@@ -123,8 +128,10 @@ export const MODELS_FOR_MODULE_TYPE: {
       // downcast required because the module models are now enums rather than strings
       value: (TEMPERATURE_MODULE_V1: string),
     },
-    // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
-    // { name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`, value: TEMPERATURE_MODULE_V2 },
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      value: TEMPERATURE_MODULE_V2,
+    },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
@@ -135,11 +142,18 @@ export const MODELS_FOR_MODULE_TYPE: {
   ],
 }
 
-export const DEFAULT_MODEL_FOR_MODULE_TYPE: { [ModuleRealType]: string } = {
+export const DEFAULT_MODEL_FOR_MODULE_TYPE: {
+  [ModuleRealType]: ModuleModel,
+} = {
   [MAGNETIC_MODULE_TYPE]: MAGNETIC_MODULE_V1,
   [TEMPERATURE_MODULE_TYPE]: TEMPERATURE_MODULE_V1,
   [THERMOCYCLER_MODULE_TYPE]: THERMOCYCLER_MODULE_V1,
 }
+
+export const MODULES_WITH_COLLISION_ISSUES = [
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
+]
 
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'

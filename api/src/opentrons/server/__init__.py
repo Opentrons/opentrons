@@ -4,20 +4,18 @@ import asyncio
 import logging
 import shutil
 import tempfile
-import threading
-import time
 import traceback
 
-from typing import TYPE_CHECKING
 from aiohttp import web
 
 from opentrons.config import CONFIG
+from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
+
 from .rpc import RPCServer
 from .http import HTTPServer
+from .endpoints.calibration.session import SessionManager
 from opentrons.api.routers import MainRouter
-
-if TYPE_CHECKING:
-    from opentrons.hardware_control.types import HardwareAPILike  # noqa(F501)
+from opentrons.hardware_control import ThreadManager
 
 log = logging.getLogger(__name__)
 
@@ -43,50 +41,9 @@ async def error_middleware(request, handler):
     return response
 
 
-class ThreadedAsyncLock:
-    """ A thread-safe async lock
-
-    This is required to properly lock access to motion calls, which are
-    a) done in async contexts (rpc methods and http methods) and should
-       block as little as possible
-    b) done from several different threads (rpc workers and main thread)
-
-    This is a code wart that needs to be removed. It can be removed by
-    - making smoothie async so we don't need worker threads anymore
-    - removing said threads
-
-    This object can be used as either an asynchronous context manager using
-    ``async with`` or a synchronous context manager using ``with``.
-    """
-
-    def __init__(self):
-        self._thread_lock = threading.RLock()
-
-    async def __aenter__(self):
-        pref = f"[ThreadedAsyncLock tid {threading.get_ident()} "\
-            f"task {asyncio.Task.current_task()}] "
-        log.debug(pref + 'will acquire')
-        then = time.perf_counter()
-        while not self._thread_lock.acquire(blocking=False):
-            await asyncio.sleep(0.1)
-        now = time.perf_counter()
-        log.debug(pref + f'acquired in {now-then}s')
-
-    async def __aexit__(self, exc_type, exc, tb):
-        log.debug(f"[ThreadedAsyncLock tid {threading.get_ident()} "
-                  f"task {asyncio.Task.current_task()}] will release")
-        self._thread_lock.release()
-
-    def __enter__(self):
-        self._thread_lock.acquire()
-
-    def __exit__(self, exc_type, exc, tb):
-        self._thread_lock.release()
-
-
 # Support for running using aiohttp CLI.
 # See: https://docs.aiohttp.org/en/stable/web.html#command-line-interface-cli
-def init(hardware: 'HardwareAPILike' = None,
+def init(hardware: ThreadManager = None,
          loop: asyncio.AbstractEventLoop = None):
     """
     Builds an application and sets up RPC and HTTP servers with it.
@@ -105,6 +62,7 @@ def init(hardware: 'HardwareAPILike' = None,
             hardware, lock=app['com.opentrons.motion_lock'], loop=loop))
     app['com.opentrons.response_file_tempdir'] = tempfile.mkdtemp()
     app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.session_manager'] = SessionManager()
 
     async def dispose_response_file_tempdir(app):
         temppath = app.get('com.opentrons.response_file_tempdir')
@@ -124,7 +82,7 @@ def init(hardware: 'HardwareAPILike' = None,
     return app
 
 
-def run(hardware: 'HardwareAPILike',
+def run(hardware: ThreadManager,
         hostname=None,
         port=None,
         path=None):

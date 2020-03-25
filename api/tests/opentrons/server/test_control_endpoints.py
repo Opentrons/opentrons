@@ -1,13 +1,13 @@
 import json
-from copy import deepcopy
 
 import pytest
+from unittest import mock
 
 from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
-from opentrons.hardware_control import API, ExecutionManager
+from opentrons.hardware_control import (
+    API, ExecutionManager, types as hwtypes)
 
-from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieDriver_3_0_0
 from opentrons.config import pipette_config
 
 
@@ -228,44 +228,51 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     assert json.loads(text2) == expected2
 
 
-async def test_disengage_axes(async_client, monkeypatch):
-    def mock_send(self, command, timeout=None):
+async def test_disengage_axes(async_client, mocked_hw):
+
+    async def _mock_dummy(*args, **kwargs):
         pass
 
-    monkeypatch.setattr(
-        SmoothieDriver_3_0_0, '_send_command', mock_send)
+    mocked_hw.disengage_axes.side_effect = _mock_dummy
+    res = await async_client.post('/motors/disengage',
+                                  json={'axes': ['x', 'a', 'b']})
+    assert res.status == 200
+    mocked_hw.disengage_axes.assert_called_once_with(
+        [hwtypes.Axis.X, hwtypes.Axis.A, hwtypes.Axis.B])
+    mocked_hw.reset_mock()
+    mocked_hw.disengage_axes.side_effect = _mock_dummy
+    res2 = await async_client.post('/motors/disengage',
+                                   json={'axes': ['asdaf', 'acasc', 'b']})
+    assert res2.status == 400
+    body = await res2.json()
+    assert 'invalid' in body['message'].lower()
+    mocked_hw.disengage_axes.assert_not_called()
 
-    alltrue = {
-        "x": {"enabled": True},
-        "y": {"enabled": True},
-        "z": {"enabled": True},
-        "a": {"enabled": True},
-        "b": {"enabled": True},
-        "c": {"enabled": True}}
+
+async def test_engaged_axes(async_client, mocked_hw):
+    pm = mock.PropertyMock()
+    type(mocked_hw).engaged_axes = pm
+    pm.return_value = {
+        hwtypes.Axis.X: True,
+        hwtypes.Axis.Y: False,
+        hwtypes.Axis.Z: True,
+        hwtypes.Axis.A: True,
+        hwtypes.Axis.B: False,
+        hwtypes.Axis.C: True}
+
+    should_return = {
+        'x': {'enabled': True},
+        'y': {'enabled': False},
+        'z': {'enabled': True},
+        'a': {'enabled': True},
+        'b': {'enabled': False},
+        'c': {'enabled': True}
+    }
     res0 = await async_client.get('/motors/engaged')
     result0 = await res0.text()
     assert res0.status == 200
-    assert json.loads(result0) == alltrue
-
-    postres = await async_client.post(
-        '/motors/disengage', json={'axes': ['X', 'b']})
-    assert postres.status == 200
-
-    xbfalse = deepcopy(alltrue)
-    xbfalse["x"]["enabled"] = False
-    xbfalse["b"]["enabled"] = False
-    res1 = await async_client.get('/motors/engaged')
-    result1 = await res1.text()
-    assert res1.status == 200
-    assert json.loads(result1) == xbfalse
-
-    resp = await async_client.post('/robot/home',
-                                   json={'target': 'robot'})
-    assert resp.status == 200
-    res2 = await async_client.get('/motors/engaged')
-    result2 = await res2.text()
-    assert res2.status == 200
-    assert json.loads(result2) == alltrue
+    assert json.loads(result0) == should_return
+    pm.assert_called_once()
 
 
 async def test_robot_info(async_client):
@@ -374,6 +381,7 @@ async def test_home_pipette_bad_request(async_client):
 
 async def test_move_bad_request(async_client):
     data0 = {
+        # missing entries
         'target': 'other'
     }
     res = await async_client.post('/robot/move', json=data0)
@@ -381,6 +389,7 @@ async def test_move_bad_request(async_client):
 
     data1 = {
         'target': 'mount',
+        # too many points
         'point': (1, 2, 3, 4)
     }
     res = await async_client.post('/robot/move', json=data1)
@@ -389,6 +398,7 @@ async def test_move_bad_request(async_client):
     data2 = {
         'target': 'mount',
         'point': (1, 2, 3),
+        # Bad mount
         'mount': 'middle'
     }
     res = await async_client.post('/robot/move', json=data2)
@@ -398,9 +408,19 @@ async def test_move_bad_request(async_client):
         'target': 'pipette',
         'point': (1, 2, 3),
         'mount': 'left',
+        # Bad model
         'model': 'p9000+'
     }
     res = await async_client.post('/robot/move', json=data3)
+    assert res.status == 400
+
+    data4 = {
+        'target': 'mount',
+        # Z is too low
+        'point': (1, 2, 3),
+        'mount': 'left',
+    }
+    res = await async_client.post('/robot/move', json=data4)
     assert res.status == 400
 
 

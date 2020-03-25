@@ -11,7 +11,11 @@ import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
 
 import { ModuleDiagram } from './ModuleDiagram'
-import { SPAN7_8_10_11_SLOT } from '../../constants'
+import {
+  SPAN7_8_10_11_SLOT,
+  DEFAULT_MODEL_FOR_MODULE_TYPE,
+} from '../../constants'
+import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
 import type { ModuleRealType } from '@opentrons/shared-data'
@@ -38,10 +42,13 @@ export function ModuleRow(props: Props) {
   let slotDisplayName = null
   let occupiedSlotsForMap: Array<string> = []
   let collisionSlots: Array<string> = []
+  const moduleHasCollisionIssue = model
+    ? isModuleWithCollisionIssue(model)
+    : false
   // Populate warnings are enabled (crashable pipette in protocol + !disable module restrictions)
-  if (showCollisionWarnings && slot === '1') {
+  if (showCollisionWarnings && moduleHasCollisionIssue && slot === '1') {
     collisionSlots = ['4']
-  } else if (showCollisionWarnings && slot === '3') {
+  } else if (showCollisionWarnings && moduleHasCollisionIssue && slot === '3') {
     collisionSlots = ['6']
   }
 
@@ -98,7 +105,10 @@ export function ModuleRow(props: Props) {
       </h4>
       <div className={styles.module_row}>
         <div className={styles.module_diagram_container}>
-          <ModuleDiagram type={type} />
+          <ModuleDiagram
+            type={type}
+            model={model || DEFAULT_MODEL_FOR_MODULE_TYPE[type]}
+          />
         </div>
         <div className={styles.module_col}>
           {model && (

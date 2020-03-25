@@ -183,8 +183,10 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
     # valid data that has no schema should fail
     with pytest.raises(RuntimeError, match='deprecated'):
         validate_json({'protocol-schema': '1.0.0'})
-    with pytest.raises(RuntimeError, match='update'):
-        validate_json({'schemaVersion': '4'})
+    with pytest.raises(RuntimeError, match='Please update your OT-2 App' +
+                       ' ' +
+                       'and robot server to the latest version and try again'):
+        validate_json({'schemaVersion': '5'})
     labware = get_labware_fixture('fixture_12_trough_v2')
     with pytest.raises(RuntimeError, match='labware'):
         validate_json(labware)
@@ -193,6 +195,9 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
 
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
     assert validate_json(v3) == 3
+
+    v4 = get_json_protocol_fixture('4', 'testModulesProtocol')
+    assert validate_json(v4) == 4
 
 
 @pytest.mark.parametrize('protocol_file',

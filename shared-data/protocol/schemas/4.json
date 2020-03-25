@@ -234,7 +234,7 @@
           "properties": {
             "slot": { "$ref": "#/definitions/slot" },
             "model": {
-              "description": "model of module. Eg 'magdeck' or 'magdeckGen2'. This should match a top-level key in shared-data/module/definitions/2.json",
+              "description": "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
               "type": "string"
             }
           }
@@ -397,7 +397,7 @@
                 "additionalProperties": false,
                 "properties": {
                   "engageHeight": {
-                    "description": "Height in mm from bottom plane of labware (above if positive, below if negative)",
+                    "description": "Height in mm(*) from bottom plane of labware (above if positive, below if negative). *NOTE: for magneticModuleV1 (aka GEN1), these are not true mm but an arbitrary unit equal to 0.5mm. So `engageHeight: 2` means 1mm above the labware plane if the command is for a GEN1 magnetic module, but would mean 2mm above the labware plane for GEN2 module",
                     "type": "number"
                   },
                   "module": {

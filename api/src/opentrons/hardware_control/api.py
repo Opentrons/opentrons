@@ -266,9 +266,10 @@ class API(HardwareAPILike):
                 if 'needsUnstick' in p.config.quirks:
                     splits[plunger_axis.name.upper()] = MoveSplit(
                         split_distance=1,
-                        split_current=1.5,
+                        split_current=1.75,
                         split_speed=1,
-                        after_time=1800)
+                        after_time=1800,
+                        fullstep=True)
 
             if req_instr and not self.is_simulator:
                 if not model:
@@ -318,7 +319,8 @@ class API(HardwareAPILike):
                    'aspirate_flow_rate', 'dispense_flow_rate',
                    'pipette_id', 'current_volume', 'display_name',
                    'tip_length', 'model', 'blow_out_flow_rate',
-                   'working_volume', 'tip_overlap', 'available_volume']
+                   'working_volume', 'tip_overlap', 'available_volume',
+                   'return_tip_height']
         instruments: Dict[top_types.Mount, Pipette.DictType] = {
             top_types.Mount.LEFT: {},
             top_types.Mount.RIGHT: {}
@@ -456,6 +458,37 @@ class API(HardwareAPILike):
             axes = [Axis.by_mount(mount)]
         await self.home(axes)
 
+    async def _do_plunger_home(
+            self,
+            axis: Axis = None,
+            mount: top_types.Mount = None,
+            acquire_lock: bool = True):
+        assert (axis is not None) ^ (mount is not None),\
+            'specify either axis or mount'
+        if axis:
+            checked_axis = axis
+            checked_mount = Axis.to_mount(checked_axis)
+        if mount:
+            checked_mount = mount
+            checked_axis = Axis.of_plunger(checked_mount)
+        instr = self._attached_instruments[checked_mount]
+        if not instr:
+            return
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
+            with self._backend.save_current():
+                self._backend.set_active_current(
+                    checked_axis, instr.config.plunger_current)
+                smoothie_pos = self._backend.home([checked_axis.name.upper()])
+                smoothie_pos.update(self._backend.update_position())
+                # either we were passed False for our acquire_lock and we
+                # should pass it on, or we acquired the lock above and
+                # shouldn't do it again
+                await self._move_plunger(checked_mount,
+                                         instr.config.bottom,
+                                         acquire_lock=False)
+
     async def home_plunger(self, mount: top_types.Mount):
         """
         Home the plunger motor for a mount, and then return it to the 'bottom'
@@ -464,11 +497,8 @@ class API(HardwareAPILike):
         :param mount: the mount associated with the target plunger
         :type mount: :py:class:`.top_types.Mount`
         """
-        instr = self._attached_instruments[mount]
-        if instr:
-            await self.home([Axis.of_plunger(mount)])
-            await self._move_plunger(mount,
-                                     instr.config.bottom)
+        await self._do_plunger_home(mount=mount,
+                                    acquire_lock=True)
 
     async def home(self, axes: List[Axis] = None):
         """ Home the entire robot and initialize current position.
@@ -484,27 +514,12 @@ class API(HardwareAPILike):
         plungers = [ax for ax in checked_axes
                     if ax not in Axis.gantry_axes()]
 
-        def _current_with_fallback(mount: top_types.Mount) -> float:
-            attached = self._attached_instruments[mount]
-            if attached:
-                return attached.config.plunger_current
-            else:
-                return self._config.high_current[Axis.of_plunger(mount).name]
-
-        smoothie_plungers = {
-            ax: _current_with_fallback(Axis.to_mount(ax))
-            for ax in plungers
-        }
         async with self._motion_lock:
             if smoothie_gantry:
                 smoothie_pos.update(self._backend.home(smoothie_gantry))
-            if smoothie_plungers:
-                for smoothie_plunger, current in smoothie_plungers.items():
-                    self._backend.set_active_current(
-                        smoothie_plunger, current)
-                    self._backend.home([smoothie_plunger.name.upper()])
-                    smoothie_pos.update(self._backend.update_position())
-            self._current_position = self._deck_from_smoothie(smoothie_pos)
+                self._current_position = self._deck_from_smoothie(smoothie_pos)
+            for plunger in plungers:
+                await self._do_plunger_home(axis=plunger, acquire_lock=False)
 
     async def add_tip(
             self,
@@ -730,7 +745,8 @@ class API(HardwareAPILike):
         self._last_moved_mount = mount
 
     async def _move_plunger(self, mount: top_types.Mount, dist: float,
-                            speed: float = None):
+                            speed: float = None,
+                            acquire_lock: bool = True):
         z_axis = Axis.by_mount(mount)
         pl_axis = Axis.of_plunger(mount)
         all_axes_pos = OrderedDict(
@@ -742,11 +758,13 @@ class API(HardwareAPILike):
               self._current_position[z_axis]),
              (pl_axis, dist))
         )
-        await self._move(all_axes_pos, speed, False)
+        await self._move(all_axes_pos, speed, False,
+                         acquire_lock=acquire_lock)
 
     async def _move(self, target_position: 'OrderedDict[Axis, float]',
                     speed: float = None, home_flagged_axes: bool = True,
-                    max_speeds: Dict[Axis, float] = None):
+                    max_speeds: Dict[Axis, float] = None,
+                    acquire_lock: bool = True):
         """ Worker function to apply robot motion.
 
         Robot motion means the kind of motions that are relevant to the robot,
@@ -811,7 +829,9 @@ class API(HardwareAPILike):
                                 bounds[ax.name][0], bounds[ax.name][1]))
         checked_maxes = max_speeds or {}
         str_maxes = {ax.name: val for ax, val in checked_maxes.items()}
-        async with self._motion_lock:
+        async with contextlib.AsyncExitStack() as stack:
+            if acquire_lock:
+                await stack.enter_async_context(self._motion_lock)
             try:
                 self._backend.move(smoothie_pos, speed=speed,
                                    home_flagged_axes=home_flagged_axes,

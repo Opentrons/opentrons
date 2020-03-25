@@ -18,6 +18,7 @@ import tempfile
 from collections import namedtuple
 from functools import partial
 from uuid import uuid4 as uuid
+from unittest import mock
 import zipfile
 
 import pytest
@@ -195,23 +196,34 @@ def old_aspiration(monkeypatch):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-async def async_server(hardware, virtual_smoothie_env, loop):
-    app = init(hardware, loop=loop)
-    yield app
-    await app.shutdown()
+async def async_server(hardware, virtual_smoothie_env, loop, aiohttp_server):
+    testserver = await aiohttp_server(init(hardware, loop=loop))
+    yield testserver.app
 
 
 @pytest.fixture
 async def async_client(async_server, loop, aiohttp_client):
     cli = await loop.create_task(aiohttp_client(async_server))
     endpoints.session_wrapper.session = None
+    yield cli
+
+
+@pytest.fixture
+async def mocked_hw(async_server, monkeypatch):
+    original_hw = async_server['com.opentrons.hardware']
+    # TODO(seth,03/17/2020): this is an annoying hack caused by fixture
+    # ordering in pytest. the monkeypatch fixture gets finalized after
+    # the async_server fixture, which means the async_server or
+    # async_client finalizer calls shutdown(), and that calls clean_up
+    # on the mock. We need to add clean_up (a method of the threadmanager)
+    # to the spec of the mock, and we need to make sure that we clean up
+    # the original object.
+    hw_mock = mock.Mock(spec=dir(API) + ['clean_up'])
+    monkeypatch.setitem(async_server, 'com.opentrons.hardware', hw_mock)
     try:
-        yield cli
+        yield hw_mock
     finally:
-        if cli.app.on_shutdown.frozen:
-            await cli.close()
-        else:
-            await async_server.shutdown()
+        original_hw.clean_up()
 
 
 @pytest.fixture

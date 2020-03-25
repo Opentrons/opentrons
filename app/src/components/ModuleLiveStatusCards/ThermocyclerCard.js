@@ -76,7 +76,7 @@ type Props = {|
     command: ModuleCommand,
     args?: Array<mixed>
   ) => mixed,
-  isProtocolActive: boolean,
+  controlDisabledReason: string | null,
   isCardExpanded: boolean,
   toggleCard: boolean => mixed,
 |}
@@ -84,7 +84,7 @@ type Props = {|
 export const ThermocyclerCard = ({
   module,
   sendModuleCommand,
-  isProtocolActive,
+  controlDisabledReason,
   isCardExpanded,
   toggleCard,
 }: Props) => {
@@ -113,12 +113,11 @@ export const ThermocyclerCard = ({
     >
       <div className={styles.card_row}>
         <StatusItem status={module.status} />
-        {!isProtocolActive && (
-          <TemperatureControl
-            module={module}
-            sendModuleCommand={sendModuleCommand}
-          />
-        )}
+        <TemperatureControl
+          module={module}
+          sendModuleCommand={sendModuleCommand}
+          disabledReason={controlDisabledReason}
+        />
       </div>
       <div className={styles.card_row}>
         <TemperatureData

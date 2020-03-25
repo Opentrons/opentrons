@@ -3,12 +3,14 @@ import inspect
 import logging
 import traceback
 import sys
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
 from .contexts import ProtocolContext
-from . import execute_v3
+from .json_dispatchers import pipette_command_map, \
+    temperature_module_command_map, magnetic_module_command_map
+from . import execute_v3, execute_v4
 
 from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
 from opentrons.hardware_control import ExecutionCancelledError
@@ -91,9 +93,8 @@ def _find_protocol_error(tb, proto_name):
 
 def _run_python(
         proto: PythonProtocol, context: ProtocolContext):
-    new_locs = locals()
-    new_globs = globals()
-    exec(proto.contents, new_globs, new_locs)
+    new_globs: Dict[Any, Any] = {}
+    exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
@@ -102,12 +103,13 @@ def _run_python(
     else:
         filename = proto.filename or '<protocol>'
     try:
-        _runfunc_ok(new_locs.get('run'))
+        _runfunc_ok(new_globs.get('run'))
     except SyntaxError as se:
         raise MalformedProtocolError(str(se))
-    new_globs.update(new_locs)
+
+    new_globs['__context'] = context
     try:
-        exec('run(context)', new_globs, new_locs)
+        exec('run(__context)', new_globs)
     except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise
@@ -142,6 +144,21 @@ def run_protocol(protocol: Protocol,
             lw = execute_v3.load_labware_from_json_defs(
                 context, protocol.contents)
             execute_v3.dispatch_json(context, protocol.contents, ins, lw)
+        elif protocol.schema_version == 4:
+            # reuse the v3 fns for loading labware and pipettes
+            # b/c the v4 protocol has no changes for these keys
+            ins = execute_v3.load_pipettes_from_json(
+                context, protocol.contents)
+
+            modules = execute_v4.load_modules_from_json(
+                context, protocol.contents)
+
+            lw = execute_v4.load_labware_from_json_defs(
+                context, protocol.contents, modules)
+            execute_v4.dispatch_json(
+                context, protocol.contents, ins, lw, modules,
+                pipette_command_map, magnetic_module_command_map,
+                temperature_module_command_map)
         else:
             raise RuntimeError(
                 f'Unsupported JSON protocol schema: {protocol.schema_version}')

@@ -4,9 +4,9 @@ import mapValues from 'lodash/mapValues'
 // TODO: Ian 2019-06-04 remove the shared-data build process for labware v1
 import definitions from '../build/labware.json'
 import {
-  SLOT_RENDER_HEIGHT,
   FIXED_TRASH_RENDER_HEIGHT,
-  ENGAGE_HEIGHT_OFFSET,
+  OPENTRONS_LABWARE_NAMESPACE,
+  SLOT_RENDER_HEIGHT,
 } from './constants'
 import type {
   LabwareDefinition1,
@@ -48,12 +48,39 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
   return labwareDef.parameters.isTiprack
 }
 
+// NOTE: these labware definitions in _SHORT_MM_LABWARE_DEF_LOADNAMES
+// were written in "short mm" = 0.5mm, but
+// we will write all future definitions in actual mm.
+// These whitelisted labware also have engage heights measured from home switch
+// instead of from labware bottom, which is why we add ENGAGE_HEIGHT_OFFSET.
+//
+// Ideally instead of using this whitelist, we would publish a new version
+// of these definitions with corrected labware heights. However, we don't
+// support labware versioning well enough yet.
+const _SHORT_MM_LABWARE_DEF_LOADNAMES = [
+  'biorad_96_wellplate_200ul_pcr',
+  'nest_96_wellplate_100ul_pcr_full_skirt',
+  'usascientific_96_wellplate_2.4ml_deep',
+]
+// offset added to parameters.magneticModuleEngageHeight to convert older labware
+// definitions from "distance from home switch" to "distance from labware bottom"
+// Note: this is in actual mm, not "short mm" :)
+const ENGAGE_HEIGHT_OFFSET = -4
+
 export function getLabwareDefaultEngageHeight(
   labwareDef: LabwareDefinition2
 ): number | null {
   const rawEngageHeight: ?number =
     labwareDef.parameters.magneticModuleEngageHeight
-  return rawEngageHeight == null ? null : rawEngageHeight + ENGAGE_HEIGHT_OFFSET
+  if (
+    labwareDef.namespace === OPENTRONS_LABWARE_NAMESPACE &&
+    _SHORT_MM_LABWARE_DEF_LOADNAMES.includes(labwareDef.parameters.loadName)
+  ) {
+    return rawEngageHeight == null
+      ? null
+      : rawEngageHeight / 2 + ENGAGE_HEIGHT_OFFSET
+  }
+  return rawEngageHeight == null ? null : rawEngageHeight
 }
 
 /* Render Helpers */

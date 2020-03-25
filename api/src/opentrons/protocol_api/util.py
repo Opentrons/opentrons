@@ -7,7 +7,6 @@ from typing import Any, Callable, Optional, TYPE_CHECKING, Union
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
-
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)

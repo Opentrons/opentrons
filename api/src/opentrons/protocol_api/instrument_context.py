@@ -569,9 +569,8 @@ class InstrumentContext(CommandPublisher):
         if not isinstance(loc, Well):
             raise TypeError('Last tip location should be a Well but it is: '
                             '{}'.format(loc))
-        bot = loc.bottom()
-        bot = bot._replace(point=bot.point._replace(z=bot.point.z + 10))
-        self.drop_tip(bot, home_after=home_after)
+        drop_loc = self._determine_drop_target(loc, APIVersion(2, 3))
+        self.drop_tip(drop_loc, home_after=home_after)
 
         return self
 
@@ -670,15 +669,17 @@ class InstrumentContext(CommandPublisher):
 
         return self
 
-    def _determine_drop_target(self, location: Well):
-        if self.api_version < APIVersion(2, 2):
+    def _determine_drop_target(
+            self, location: Well, version_breakpoint: APIVersion = None):
+        version_breakpoint = version_breakpoint or APIVersion(2, 2)
+        if self.api_version < version_breakpoint:
             bot = location.bottom()
             return bot._replace(point=bot.point._replace(z=bot.point.z + 10))
         else:
             tr = location.parent
             assert tr.is_tiprack
-            z_height = self.return_height * self._tip_length_for(tr)
-            return location.top(-z_height + 10)
+            z_height = self.return_height * tr.tip_length
+            return location.top(-z_height)
 
     @requires_version(2, 0)
     def drop_tip(  # noqa(C901)
@@ -1279,7 +1280,7 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 2)
     def return_height(self) -> int:
         """ The height to return a tip to its tiprack. """
-        return self.hw_pipette.get('returnTipHeight', 0.5)
+        return self.hw_pipette.get('return_tip_height', 0.5)
 
     @property  # type: ignore
     @requires_version(2, 0)

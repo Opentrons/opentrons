@@ -110,12 +110,10 @@ export const unsavedForm = (
     case 'POPULATE_FORM':
       return action.payload
     case 'CANCEL_STEP_FORM':
-      return unsavedFormInitialState
     case 'SELECT_TERMINAL_ITEM':
-      return unsavedFormInitialState
     case 'SAVE_STEP_FORM':
-      return unsavedFormInitialState
     case 'DELETE_STEP':
+    case 'EDIT_MODULE':
       return unsavedFormInitialState
     case 'SUBSTITUTE_STEP_FORM_PIPETTES': {
       // only substitute unsaved step form if its ID is in the start-end range
@@ -183,6 +181,7 @@ type SavedStepFormsActions =
   | DuplicateLabwareAction
   | SwapSlotContentsAction
   | ReplaceCustomLabwareDef
+  | EditModuleAction
 
 export const savedStepForms = (
   rootState: RootState,
@@ -280,6 +279,24 @@ export const savedStepForms = (
           return { ...savedForm, moduleId }
         }
 
+        return savedForm
+      })
+    }
+    case 'EDIT_MODULE': {
+      const moduleId = action.payload.id
+      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
+        if (
+          savedForm.stepType === 'magnet' &&
+          savedForm.moduleId === moduleId
+        ) {
+          // null out engageHeight if magnet step's module has been edited
+          const blankEngageHeight = getDefaultsForStepType('magnet')
+            .engageHeight
+          return {
+            ...savedForm,
+            engageHeight: blankEngageHeight,
+          }
+        }
         return savedForm
       })
     }

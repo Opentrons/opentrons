@@ -2,14 +2,39 @@
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { Options } from './fields'
 
-const tiprackForPipette = {
-  P10_Single: 'opentrons_96_tiprack_10ul',
-  P300_Single: 'opentrons_96_tiprack_300ul',
-  P1000_Single: 'opentrons_96_tiprack_1000ul',
+const pipettes = {
+  p20_single_gen2: {
+    displayName: 'P20 Single GEN2',
+    tiprack: 'opentrons_96_tiprack_20ul',
+  },
+  p300_single_gen2: {
+    displayName: 'P300 Single GEN2',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  p1000_single_gen2: {
+    displayName: 'P1000 Single GEN2',
+    tiprack: 'opentrons_96_tiprack_1000ul',
+  },
+  p10_single: {
+    displayName: 'P10 Single GEN1',
+    tiprack: 'opentrons_96_tiprack_20ul',
+  },
+  p50_single: {
+    displayName: 'P50 Single GEN1',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  p300_single: {
+    displayName: 'P300 Single GEN1',
+    tiprack: 'opentrons_96_tiprack_300ul',
+  },
+  p1000_single: {
+    displayName: 'P1000 Single GEN1',
+    tiprack: 'opentrons_96_tiprack_1000ul',
+  },
 }
 
-export const pipetteNameOptions: Options = Object.keys(tiprackForPipette).map(
-  pipetteName => ({ name: pipetteName.replace(/_/g, ' '), value: pipetteName })
+export const pipetteNameOptions: Options = Object.keys(pipettes).map(
+  loadName => ({ name: pipettes[loadName].displayName, value: loadName })
 )
 
 type LabwareTestProtocolArgs = {|
@@ -21,8 +46,7 @@ export const labwareTestProtocol = ({
   pipetteName,
   definition,
 }: LabwareTestProtocolArgs): string => {
-  const instrumentName = pipetteName.toLowerCase()
-  const tiprackLoadName = tiprackForPipette[pipetteName]
+  const tiprackLoadName = pipettes[pipetteName].tiprack
   const mount = 'right' // NOTE: for now, we'll ONLY use right so that mount-offset issues are reduced
 
   return `import json
@@ -52,7 +76,7 @@ RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
 
 PIPETTE_MOUNT = '${mount}'
-PIPETTE_NAME = '${instrumentName}'
+PIPETTE_NAME = '${pipetteName}'
 
 TIPRACK_SLOT = '5'
 TIPRACK_LOADNAME = '${tiprackLoadName}'

@@ -75,15 +75,17 @@ export type WifiListResponse = {|
 
 // POST /wifi/configure
 
+export type WifiEapConfig = {|
+  [eapOption: string]: string,
+  eapType: string,
+|}
+
 export type WifiConfigureRequest = {|
   ssid: string,
   psk?: string,
   securityType?: WifiSecurityType,
   hidden?: boolean,
-  eapConfig?: {|
-    [eapOption: string]: string,
-    eapType: string,
-  |},
+  eapConfig?: WifiEapConfig,
 |}
 
 export type WifiConfigureResponse = {|
@@ -93,20 +95,20 @@ export type WifiConfigureResponse = {|
 
 // GET /wifi/keys
 
-export type WifiKey = {|
+export type ApiWifiKey = {|
   id: string,
   uri: string,
   name: string,
 |}
 
 export type FetchWifiKeysResponse = {|
-  keys: Array<WifiKey>,
+  keys: Array<ApiWifiKey>,
 |}
 
 // POST /wifi/keys
 
 export type PostWifiKeysResponse = {|
-  ...WifiKey,
+  ...ApiWifiKey,
   message?: string,
 |}
 

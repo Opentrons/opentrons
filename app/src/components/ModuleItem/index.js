@@ -14,12 +14,12 @@ import {
 
 type Props = {|
   module: AttachedModule,
-  canControl: boolean,
+  controlDisabledReason: string | null,
   availableUpdate?: ?string,
 |}
 
 export function ModuleItem(props: Props) {
-  const { module, canControl } = props
+  const { module, controlDisabledReason } = props
 
   return (
     <div className={styles.module_item}>
@@ -28,15 +28,16 @@ export function ModuleItem(props: Props) {
         <ModuleInfo module={module} />
         <ModuleUpdate
           hasAvailableUpdate={!!module.hasAvailableUpdate}
-          canControl={canControl}
+          controlDisabledReason={controlDisabledReason}
           moduleId={module.serial}
         />
       </div>
-      {module.type === THERMOCYCLER_MODULE_TYPE && (
-        <ModuleControls module={module} canControl={canControl} />
-      )}
-      {module.type === TEMPERATURE_MODULE_TYPE && (
-        <ModuleControls module={module} canControl={canControl} />
+      {(module.type === THERMOCYCLER_MODULE_TYPE ||
+        module.type === TEMPERATURE_MODULE_TYPE) && (
+        <ModuleControls
+          module={module}
+          controlDisabledReason={controlDisabledReason}
+        />
       )}
     </div>
   )
