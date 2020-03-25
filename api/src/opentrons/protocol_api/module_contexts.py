@@ -217,7 +217,7 @@ class TemperatureModuleContext(ModuleContext):
 
     @cmds.publish.both(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
-    def await_temperature(self, celsius: float, msg=None):
+    def await_temperature(self, celsius: float):
         """ Wait until module reaches temperature, in C.
 
         Must be between 4 and 95C based on Opentrons QA.
