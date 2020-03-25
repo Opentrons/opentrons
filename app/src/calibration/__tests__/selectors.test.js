@@ -18,8 +18,8 @@ type SelectorSpec = {|
 
 const SPECS: Array<SelectorSpec> = [
   {
-    name: 'getDeckCheckSuccess returns undefined if no deck cal check session',
-    selector: Selectors.getDeckCheckSession,
+    name: 'getRobotCalibrationCheckSuccess returns undefined if no deck cal check session',
+    selector: Selectors.getRobotCalibrationCheckSession,
     state: {
       calibration: {},
     },
@@ -27,17 +27,17 @@ const SPECS: Array<SelectorSpec> = [
     expected: undefined,
   },
   {
-    name: 'getDeckCheckSuccess returns ',
-    selector: Selectors.getDeckCheckSession,
+    name: 'getRobotCalibrationCheckSuccess returns ',
+    selector: Selectors.getRobotCalibrationCheckSession,
     state: {
       calibration: {
         'germanium-cobweb': {
-          deckCheck: Fixtures.mockDeckCheckSessionData,
+          robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
         },
       },
     },
     args: ['germanium-cobweb'],
-    expected: Fixtures.mockDeckCheckSessionData,
+    expected: Fixtures.mockRobotCalibrationCheckSessionData,
   },
 ]
 

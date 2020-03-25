@@ -3,7 +3,7 @@
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getDeckCheckSession } from '../calibration'
+import { getRobotCalibrationCheckSession } from '../calibration'
 import * as CustomLabware from '../custom-labware'
 import * as brActions from '../buildroot/constants'
 import * as calibrationActions from '../calibration/constants'
@@ -255,9 +255,9 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.FETCH_DECK_CHECK_SESSION_SUCCESS: {
+    case calibrationActions.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
       const { robotName } = action.payload
-      const sessionData = getDeckCheckSession(state, robotName)
+      const sessionData = getRobotCalibrationCheckSession(state, robotName)
 
       return Promise.resolve({
         name: 'calibrationCheckStart',
@@ -265,9 +265,9 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.COMPLETE_DECK_CHECK: {
+    case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
       const { robotName } = action.payload
-      const sessionData = getDeckCheckSession(state, robotName)
+      const sessionData = getRobotCalibrationCheckSession(state, robotName)
 
       return Promise.resolve({
         name: 'calibrationCheckPass',

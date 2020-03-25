@@ -1,9 +1,9 @@
 // @flow
 import type { State } from '../types'
-import type { DeckCheckSessionData } from './api-types'
+import type { RobotCalibrationCheckSessionData } from './api-types'
 
-export const getDeckCheckSession: (
+export const getRobotCalibrationCheckSession: (
   state: State,
   robotName: string | null
-) => ?DeckCheckSessionData = (state, robotName) =>
-  robotName !== null ? state.calibration[robotName]?.deckCheck : null
+) => ?RobotCalibrationCheckSessionData = (state, robotName) =>
+  robotName !== null ? state.calibration[robotName]?.robotCalibrationCheck : null

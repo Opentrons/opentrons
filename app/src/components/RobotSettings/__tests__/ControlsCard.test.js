@@ -48,7 +48,7 @@ describe('ControlsCard', () => {
       .find(LabeledButton)
       .find('button')
 
-  const getDeckCheckButton = wrapper =>
+  const getRobotCalibrationCheckButton = wrapper =>
     wrapper
       .find({ label: 'Check deck calibration' })
       .find(LabeledButton)
@@ -180,7 +180,7 @@ describe('ControlsCard', () => {
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -199,7 +199,7 @@ describe('ControlsCard', () => {
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -224,7 +224,7 @@ describe('ControlsCard', () => {
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -245,7 +245,7 @@ describe('ControlsCard', () => {
     )
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getDeckCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })

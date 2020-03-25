@@ -14,27 +14,27 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchDeckCheckSessionAction } from '../types'
+import type { FetchRobotCalibrationCheckSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchDeckCheckSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<FetchRobotCalibrationCheckSessionAction> = action => ({
   method: POST,
-  path: Constants.DECK_CHECK_PATH,
+  path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchDeckCheckSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<FetchRobotCalibrationCheckSessionAction> = (
   response,
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.fetchDeckCheckSessionSuccess(host.name, body, meta)
-    : Actions.fetchDeckCheckSessionFailure(host.name, body, meta)
+    ? Actions.fetchRobotCalibrationCheckSessionSuccess(host.name, body, meta)
+    : Actions.fetchRobotCalibrationCheckSessionFailure(host.name, body, meta)
 }
 
-export const fetchDeckCheckSessionEpic: Epic = (action$, state$) => {
+export const fetchRobotCalibrationCheckSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_DECK_CHECK_SESSION),
+    ofType(Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

@@ -1,6 +1,6 @@
 // @flow
 
-export type DeckCheckStep =
+export type RobotCalibrationCheckStep =
   | 'sessionStart'
   | 'specifyLabware'
   | 'pickUpTip'
@@ -12,11 +12,11 @@ export type DeckCheckStep =
   | 'badRobotCalibration'
   | 'noPipettesAttached'
 
-export type DeckCheckSessionData = {|
+export type RobotCalibrationCheckSessionData = {|
   instruments: { [string]: string },
-  currentStep: DeckCheckStep,
+  currentStep: RobotCalibrationCheckStep,
   nextSteps: {
-    links: { [DeckCheckStep]: string },
+    links: { [RobotCalibrationCheckStep]: string },
   },
   sessionToken: string,
 |}

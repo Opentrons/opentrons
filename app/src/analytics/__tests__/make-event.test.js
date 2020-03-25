@@ -227,7 +227,7 @@ describe('analytics events map', () => {
   })
 
   describe('events with calibration data', () => {
-    const deckCheckSessionData = {
+    const robotCalibrationCheckSessionData = {
       instruments: {},
       currentStep: 'sessionStart',
       nextSteps: {
@@ -236,16 +236,16 @@ describe('analytics events map', () => {
       sessionToken: 'abc123',
     }
 
-    it('calibration:FETCH_DECK_CHECK_SESSION_SUCCESS -> calibrationCheckStart event', () => {
+    it('calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS -> calibrationCheckStart event', () => {
       const state = {
         calibration: {
           'wiley-coyote': {
-            deckCheck: deckCheckSessionData,
+            robotCalibrationCheck: robotCalibrationCheckSessionData,
           },
         },
       }
       const action = {
-        type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS',
+        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
         payload: { robotName: 'wiley-coyote' },
       }
 
@@ -253,20 +253,20 @@ describe('analytics events map', () => {
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'calibrationCheckStart',
-        properties: deckCheckSessionData,
+        properties: robotCalibrationCheckSessionData,
       })
     })
 
-    it('calibration:COMPLETE_DECK_CHECK -> calibrationCheckPass event', () => {
+    it('calibration:COMPLETE_ROBOT_CALIBRATION_CHECK -> calibrationCheckPass event', () => {
       const state = {
         calibration: {
           'wiley-coyote': {
-            deckCheck: deckCheckSessionData,
+            robotCalibrationCheck: robotCalibrationCheckSessionData,
           },
         },
       }
       const action = {
-        type: 'calibration:COMPLETE_DECK_CHECK',
+        type: 'calibration:COMPLETE_ROBOT_CALIBRATION_CHECK',
         payload: { robotName: 'wiley-coyote' },
       }
 
@@ -274,7 +274,7 @@ describe('analytics events map', () => {
 
       return expect(makeEvent(action, state)).resolves.toEqual({
         name: 'calibrationCheckPass',
-        properties: deckCheckSessionData,
+        properties: robotCalibrationCheckSessionData,
       })
     })
   })

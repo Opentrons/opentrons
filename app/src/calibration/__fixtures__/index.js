@@ -1,6 +1,6 @@
 // @flow
 
-export const mockDeckCheckSessionData = {
+export const mockRobotCalibrationCheckSessionData = {
   instruments: {},
   currentStep: 'sessionStart',
   nextSteps: {

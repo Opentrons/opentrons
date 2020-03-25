@@ -14,30 +14,30 @@ type ReducerSpec = {|
 
 const SPECS: Array<ReducerSpec> = [
   {
-    name: 'handles calibration:FETCH_DECK_CHECK_SESSION_SUCCESS',
+    name: 'handles calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
     action: {
-      type: 'calibration:FETCH_DECK_CHECK_SESSION_SUCCESS',
+      type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
       payload: {
         robotName: 'terpentine-martini',
-        ...Fixtures.mockDeckCheckSessionData,
+        ...Fixtures.mockRobotCalibrationCheckSessionData,
       },
       meta: {},
     },
     state: {
       'terpentine-martini': {
-        deckCheck: null,
+        robotCalibrationCheck: null,
       },
     },
     expected: {
       'terpentine-martini': {
-        deckCheck: Fixtures.mockDeckCheckSessionData,
+        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
       },
     },
   },
   {
-    name: 'handles calibration:END_DECK_CHECK_SESSION_SUCCESS',
+    name: 'handles calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
     action: {
-      type: 'calibration:END_DECK_CHECK_SESSION_SUCCESS',
+      type: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
       payload: {
         robotName: 'terpentine-martini',
       },
@@ -45,12 +45,12 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'terpentine-martini': {
-        deckCheck: Fixtures.mockDeckCheckSessionData,
+        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
       },
     },
     expected: {
       'terpentine-martini': {
-        deckCheck: null,
+        robotCalibrationCheck: null,
       },
     },
   },

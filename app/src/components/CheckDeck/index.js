@@ -5,9 +5,9 @@ import { push } from 'connected-react-router'
 import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
-  fetchDeckCheckSession,
-  endDeckCheckSession,
-  getDeckCheckSession,
+  fetchRobotCalibrationCheckSession,
+  endRobotCalibrationCheckSession,
+  getRobotCalibrationCheckSession,
 } from '../../calibration'
 import { createLogger } from '../../logger'
 
@@ -16,7 +16,7 @@ import styles from './styles.css'
 
 const log = createLogger(__filename)
 
-const DECK_CHECK_SUBTITLE = 'Check deck calibration'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
 type CheckDeckProps = {|
   parentUrl: string,
@@ -25,23 +25,23 @@ type CheckDeckProps = {|
 export function CheckDeck(props: CheckDeckProps) {
   const { robotName, parentUrl } = props
   const dispatch = useDispatch<Dispatch>()
-  const deckCheckSessionData = useSelector((state: State) =>
-    getDeckCheckSession(state, robotName)
+  const robotCalibrationCheckSessionData = useSelector((state: State) =>
+    getRobotCalibrationCheckSession(state, robotName)
   )
   React.useEffect(() => {
-    dispatch(fetchDeckCheckSession(robotName))
+    dispatch(fetchRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
   function exit() {
-    dispatch(endDeckCheckSession(robotName))
+    dispatch(endRobotCalibrationCheckSession(robotName))
     dispatch(push(parentUrl))
   }
 
-  log.info('deck check session data: ', deckCheckSessionData || {})
+  log.info('robot calibration check session data: ', robotCalibrationCheckSessionData || {})
   return (
     <ModalPage
       titleBar={{
-        title: DECK_CHECK_SUBTITLE,
+        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
         back: { onClick: exit },
       }}
       contentsClassName={styles.modal_contents}

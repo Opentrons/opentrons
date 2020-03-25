@@ -1,84 +1,84 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import type {
-  FetchDeckCheckSessionAction,
-  FetchDeckCheckSessionSuccessAction,
-  FetchDeckCheckSessionFailureAction,
-  EndDeckCheckSessionAction,
-  EndDeckCheckSessionSuccessAction,
-  EndDeckCheckSessionFailureAction,
-  CompleteDeckCheckAction,
+  FetchRobotCalibrationCheckSessionAction,
+  FetchRobotCalibrationCheckSessionSuccessAction,
+  FetchRobotCalibrationCheckSessionFailureAction,
+  EndRobotCalibrationCheckSessionAction,
+  EndRobotCalibrationCheckSessionSuccessAction,
+  EndRobotCalibrationCheckSessionFailureAction,
+  CompleteRobotCalibrationCheckAction,
 } from './types'
-import type { DeckCheckSessionData } from './api-types'
+import type { RobotCalibrationCheckSessionData } from './api-types'
 import {
-  FETCH_DECK_CHECK_SESSION,
-  FETCH_DECK_CHECK_SESSION_SUCCESS,
-  FETCH_DECK_CHECK_SESSION_FAILURE,
-  END_DECK_CHECK_SESSION,
-  END_DECK_CHECK_SESSION_SUCCESS,
-  END_DECK_CHECK_SESSION_FAILURE,
-  COMPLETE_DECK_CHECK,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  END_ROBOT_CALIBRATION_CHECK_SESSION,
+  END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  COMPLETE_ROBOT_CALIBRATION_CHECK,
 } from './constants'
 
-export const fetchDeckCheckSession = (
+export const fetchRobotCalibrationCheckSession = (
   robotName: string
-): FetchDeckCheckSessionAction => ({
-  type: FETCH_DECK_CHECK_SESSION,
+): FetchRobotCalibrationCheckSessionAction => ({
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
   meta: {},
 })
 
-export const fetchDeckCheckSessionSuccess = (
+export const fetchRobotCalibrationCheckSessionSuccess = (
   robotName: string,
-  body: DeckCheckSessionData,
+  body: RobotCalibrationCheckSessionData,
   meta: RobotApiRequestMeta
-): FetchDeckCheckSessionSuccessAction => ({
-  type: FETCH_DECK_CHECK_SESSION_SUCCESS,
+): FetchRobotCalibrationCheckSessionSuccessAction => ({
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const fetchDeckCheckSessionFailure = (
+export const fetchRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: {},
   meta: RobotApiRequestMeta
-): FetchDeckCheckSessionFailureAction => ({
-  type: FETCH_DECK_CHECK_SESSION_FAILURE,
+): FetchRobotCalibrationCheckSessionFailureAction => ({
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })
 
-export const endDeckCheckSession = (
+export const endRobotCalibrationCheckSession = (
   robotName: string
-): EndDeckCheckSessionAction => ({
-  type: END_DECK_CHECK_SESSION,
+): EndRobotCalibrationCheckSessionAction => ({
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
   meta: {},
 })
 
-export const endDeckCheckSessionSuccess = (
+export const endRobotCalibrationCheckSessionSuccess = (
   robotName: string,
-  body: DeckCheckSessionData,
+  body: RobotCalibrationCheckSessionData,
   meta: RobotApiRequestMeta
-): EndDeckCheckSessionSuccessAction => ({
-  type: END_DECK_CHECK_SESSION_SUCCESS,
+): EndRobotCalibrationCheckSessionSuccessAction => ({
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName },
   meta: meta,
 })
 
-export const endDeckCheckSessionFailure = (
+export const endRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: {},
   meta: RobotApiRequestMeta
-): EndDeckCheckSessionFailureAction => ({
-  type: END_DECK_CHECK_SESSION_FAILURE,
+): EndRobotCalibrationCheckSessionFailureAction => ({
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })
 
-export const completeDeckCheck = (
+export const completeRobotCalibrationCheck = (
   robotName: string
-): CompleteDeckCheckAction => ({
-  type: COMPLETE_DECK_CHECK,
+): CompleteRobotCalibrationCheckAction => ({
+  type: COMPLETE_ROBOT_CALIBRATION_CHECK,
   payload: { robotName },
 })

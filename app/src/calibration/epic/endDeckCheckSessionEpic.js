@@ -14,27 +14,27 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { EndDeckCheckSessionAction } from '../types'
+import type { EndRobotCalibrationCheckSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<EndDeckCheckSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<EndRobotCalibrationCheckSessionAction> = action => ({
   method: DELETE,
-  path: Constants.DECK_CHECK_PATH,
+  path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<EndDeckCheckSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<EndRobotCalibrationCheckSessionAction> = (
   response,
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-    ? Actions.endDeckCheckSessionSuccess(host.name, body, meta)
-    : Actions.endDeckCheckSessionFailure(host.name, body, meta)
+    ? Actions.endRobotCalibrationCheckSessionSuccess(host.name, body, meta)
+    : Actions.endRobotCalibrationCheckSessionFailure(host.name, body, meta)
 }
 
-export const endDeckCheckSessionEpic: Epic = (action$, state$) => {
+export const endRobotCalibrationCheckSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.END_DECK_CHECK_SESSION),
+    ofType(Constants.END_ROBOT_CALIBRATION_CHECK_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

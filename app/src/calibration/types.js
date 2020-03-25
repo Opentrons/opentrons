@@ -1,68 +1,68 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import {
-  FETCH_DECK_CHECK_SESSION,
-  FETCH_DECK_CHECK_SESSION_SUCCESS,
-  FETCH_DECK_CHECK_SESSION_FAILURE,
-  END_DECK_CHECK_SESSION,
-  END_DECK_CHECK_SESSION_SUCCESS,
-  END_DECK_CHECK_SESSION_FAILURE,
-  COMPLETE_DECK_CHECK,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  END_ROBOT_CALIBRATION_CHECK_SESSION,
+  END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  COMPLETE_ROBOT_CALIBRATION_CHECK,
 } from './constants'
-import type { DeckCheckSessionData } from './api-types'
+import type { RobotCalibrationCheckSessionData } from './api-types'
 
-export type FetchDeckCheckSessionAction = {|
-  type: typeof FETCH_DECK_CHECK_SESSION,
+export type FetchRobotCalibrationCheckSessionAction = {|
+  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchDeckCheckSessionSuccessAction = {|
-  type: typeof FETCH_DECK_CHECK_SESSION_SUCCESS,
-  payload: {| robotName: string, ...DeckCheckSessionData |},
+export type FetchRobotCalibrationCheckSessionSuccessAction = {|
+  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchDeckCheckSessionFailureAction = {|
-  type: typeof FETCH_DECK_CHECK_SESSION_FAILURE,
+export type FetchRobotCalibrationCheckSessionFailureAction = {|
+  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
 
-export type EndDeckCheckSessionAction = {|
-  type: typeof END_DECK_CHECK_SESSION,
+export type EndRobotCalibrationCheckSessionAction = {|
+  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type EndDeckCheckSessionSuccessAction = {|
-  type: typeof END_DECK_CHECK_SESSION_SUCCESS,
+export type EndRobotCalibrationCheckSessionSuccessAction = {|
+  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type EndDeckCheckSessionFailureAction = {|
-  type: typeof END_DECK_CHECK_SESSION_FAILURE,
+export type EndRobotCalibrationCheckSessionFailureAction = {|
+  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
 
-export type CompleteDeckCheckAction = {|
-  type: typeof COMPLETE_DECK_CHECK,
+export type CompleteRobotCalibrationCheckAction = {|
+  type: typeof COMPLETE_ROBOT_CALIBRATION_CHECK,
   payload: {| robotName: string |},
 |}
 
 export type CalibrationAction =
-  | FetchDeckCheckSessionAction
-  | FetchDeckCheckSessionSuccessAction
-  | FetchDeckCheckSessionFailureAction
-  | EndDeckCheckSessionAction
-  | EndDeckCheckSessionSuccessAction
-  | EndDeckCheckSessionFailureAction
-  | CompleteDeckCheckAction
+  | FetchRobotCalibrationCheckSessionAction
+  | FetchRobotCalibrationCheckSessionSuccessAction
+  | FetchRobotCalibrationCheckSessionFailureAction
+  | EndRobotCalibrationCheckSessionAction
+  | EndRobotCalibrationCheckSessionSuccessAction
+  | EndRobotCalibrationCheckSessionFailureAction
+  | CompleteRobotCalibrationCheckAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|
-  deckCheck: DeckCheckSessionData | null,
+  robotCalibrationCheck: RobotCalibrationCheckSessionData | null,
 |}>
 
 export type CalibrationState = $Shape<
