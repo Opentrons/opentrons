@@ -47,7 +47,7 @@ declare module 'formik/@flow-typed' {
     ): void,
     setFieldError(fieldName: $Keys<Values>, message: string): void,
     setFieldTouched(
-      fieldName: $Keys<Values>,
+      fieldName: string,
       isTouched?: boolean,
       shouldValidate?: boolean
     ): void,

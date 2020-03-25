@@ -7,9 +7,9 @@ import {
   THERMOCYCLER_MODULE_TYPE,
   THERMOCYCLER,
   MAGNETIC_MODULE_V1,
-  // MAGNETIC_MODULE_V2,
+  MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
-  // TEMPERATURE_MODULE_V2,
+  TEMPERATURE_MODULE_V2,
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from './localization'
@@ -117,8 +117,10 @@ export const MODELS_FOR_MODULE_TYPE: {
       // downcast required because the module models are now enums rather than strings
       value: (MAGNETIC_MODULE_V1: string),
     },
-    // TODO: IL 2019-01-31 enable this to support Magnetic Module GEN2 in PD
-    // { name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`), value: MAGNETIC_MODULE_V2 },
+    {
+      name: i18n.t(`modules.model_display_name.${MAGNETIC_MODULE_V2}`),
+      value: MAGNETIC_MODULE_V2,
+    },
   ],
   [TEMPERATURE_MODULE_TYPE]: [
     {
@@ -126,8 +128,10 @@ export const MODELS_FOR_MODULE_TYPE: {
       // downcast required because the module models are now enums rather than strings
       value: (TEMPERATURE_MODULE_V1: string),
     },
-    // TODO: IL 2019-01-31 enable this to support Temperature Module GEN2 in PD
-    // { name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`, value: TEMPERATURE_MODULE_V2 },
+    {
+      name: i18n.t(`modules.model_display_name.${TEMPERATURE_MODULE_V2}`),
+      value: TEMPERATURE_MODULE_V2,
+    },
   ],
   [THERMOCYCLER_MODULE_TYPE]: [
     {
