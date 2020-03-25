@@ -7,9 +7,11 @@ import merge from 'lodash/merge'
 import omit from 'lodash/omit'
 import reduce from 'lodash/reduce'
 import {
+  getLabwareDefaultEngageHeight,
   getLabwareDefURI,
   getModuleType,
   MAGNETIC_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
@@ -29,8 +31,10 @@ import { cancelStepForm } from '../../steplist/actions'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
+  _getInitialDeckSetupRootState,
 } from '../selectors'
 import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
+import { getLabwareOnModule } from '../../ui/modules/utils'
 
 import type { ActionType } from 'redux-actions'
 import type { LoadFileAction } from '../../load-file'
@@ -183,6 +187,70 @@ type SavedStepFormsActions =
   | ReplaceCustomLabwareDef
   | EditModuleAction
 
+export const _editModuleFormUpdate = ({
+  savedForm,
+  moduleId,
+  formId,
+  rootState,
+  nextModuleModel,
+}: {|
+  savedForm: FormData,
+  moduleId: string,
+  formId: string,
+  rootState: RootState,
+  nextModuleModel: string,
+|}): FormData => {
+  if (
+    savedForm.stepType === 'magnet' &&
+    savedForm.moduleId === moduleId &&
+    savedForm.magnetAction === 'engage'
+  ) {
+    const prevEngageHeight = parseFloat(savedForm.engageHeight)
+
+    if (Number.isFinite(prevEngageHeight)) {
+      const initialDeckSetup = _getInitialDeckSetupRootState(rootState)
+      const labwareEntity = getLabwareOnModule(initialDeckSetup, moduleId)
+      const labwareDefaultEngageHeight = labwareEntity
+        ? getLabwareDefaultEngageHeight(labwareEntity.def)
+        : null
+      const moduleEntity = initialDeckSetup.modules[moduleId]
+      assert(
+        moduleEntity,
+        `editModuleFormUpdate expected moduleEntity for module ${moduleId}`
+      )
+      const prevModuleModel = moduleEntity?.model
+
+      if (labwareDefaultEngageHeight != null) {
+        // compensate for fact that V1 mag module uses 'short mm'
+        const shortMMDefault = labwareDefaultEngageHeight * 2
+        const prevModelSpecificDefault =
+          prevModuleModel === MAGNETIC_MODULE_V1
+            ? shortMMDefault
+            : labwareDefaultEngageHeight
+        const nextModelSpecificDefault =
+          nextModuleModel === MAGNETIC_MODULE_V1
+            ? shortMMDefault
+            : labwareDefaultEngageHeight
+        if (prevEngageHeight === prevModelSpecificDefault) {
+          return {
+            ...savedForm,
+            engageHeight: String(nextModelSpecificDefault),
+          }
+        }
+      }
+    }
+
+    // default case: null out engageHeight if magnet step's module has been edited
+    const blankEngageHeight = getDefaultsForStepType('magnet').engageHeight
+    return {
+      ...savedForm,
+      engageHeight: blankEngageHeight,
+    }
+  }
+  // not a Magnet > Engage step for the edited moduleId, no change
+  return savedForm
+}
+
 export const savedStepForms = (
   rootState: RootState,
   action: SavedStepFormsActions
@@ -284,21 +352,15 @@ export const savedStepForms = (
     }
     case 'EDIT_MODULE': {
       const moduleId = action.payload.id
-      return mapValues(savedStepForms, (savedForm: FormData, formId) => {
-        if (
-          savedForm.stepType === 'magnet' &&
-          savedForm.moduleId === moduleId
-        ) {
-          // null out engageHeight if magnet step's module has been edited
-          const blankEngageHeight = getDefaultsForStepType('magnet')
-            .engageHeight
-          return {
-            ...savedForm,
-            engageHeight: blankEngageHeight,
-          }
-        }
-        return savedForm
-      })
+      return mapValues(savedStepForms, (savedForm: FormData, formId) =>
+        _editModuleFormUpdate({
+          moduleId,
+          savedForm,
+          formId,
+          rootState,
+          nextModuleModel: action.payload.model,
+        })
+      )
     }
     case 'MOVE_DECK_ITEM': {
       const { sourceSlot, destSlot } = action.payload

@@ -3,6 +3,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_V1,
 } from '@opentrons/shared-data'
 import {
   legacySteps as steps,
@@ -15,6 +16,7 @@ import {
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
+  _getInitialDeckSetupRootState,
 } from '../selectors'
 import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { moveDeckItem } from '../../labware-ingred/actions'
@@ -38,6 +40,10 @@ const mock_getLabwareEntitiesRootState: JestMockFn<
   [any],
   any
 > = _getLabwareEntitiesRootState
+const mock_getInitialDeckSetupRootState: JestMockFn<
+  [any],
+  any
+> = _getInitialDeckSetupRootState
 
 beforeEach(() => {
   jest.clearAllMocks()
@@ -880,7 +886,26 @@ describe('savedStepForms reducer: initial deck setup step', () => {
   })
 
   describe('EDIT_MODULE', () => {
-    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed', () => {
+    it('should set engageHeight to null for all Magnet > Engage steps when a magnet module has its model changed, unless height matches default', () => {
+      mock_getInitialDeckSetupRootState.mockReturnValue({
+        labware: {
+          magPlateId: {
+            id: 'magPlateId',
+            slot: 'magModuleId',
+            def: { parameters: { magneticModuleEngageHeight: 12 } },
+          },
+        },
+        pipettes: {},
+        modules: {
+          magModuleId: {
+            id: 'magModuleId',
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '1',
+          },
+        },
+      })
+
       const action = {
         type: 'EDIT_MODULE',
         payload: { id: 'magModuleId', model: 'magneticModuleV2' },
@@ -890,34 +915,46 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         savedStepForms: {
           magnetEngageStepId: {
             stepType: 'magnet',
-            engage: true,
+            magnetAction: 'engage',
             moduleId: 'magModuleId',
-            engageHeight: 12,
+            engageHeight: '24', // = 12 * 2 b/c we're going V1 -> V2
           },
           magnetDisengageStepId: {
             stepType: 'magnet',
-            engage: false,
+            magnetAction: 'disengage',
             engageHeight: null,
             moduleId: 'magModuleId',
           },
+          nonDefaultMagnetEngageStepId: {
+            stepType: 'magnet',
+            magnetAction: 'engage',
+            moduleId: 'magModuleId',
+            engageHeight: '8',
+          },
           unrelatedMagnetEngageStepId: {
             stepType: 'magnet',
-            engage: true,
+            magnetAction: 'engage',
             moduleId: 'otherMagModuleId', // not 'magModuleId'
-            engageHeight: 12,
+            engageHeight: '8',
           },
         },
       }
       const result = savedStepForms(prevRootState, action)
       expect(result).toEqual({
         magnetEngageStepId: {
-          ...prevRootState.savedStepForms.magnetEngageStepId,
-          engage: true,
-          engageHeight: null,
+          stepType: 'magnet',
+          magnetAction: 'engage',
+          engageHeight: '12', // V2 units default
           moduleId: 'magModuleId',
         },
         magnetDisengageStepId:
           prevRootState.savedStepForms.magnetDisengageStepId,
+        nonDefaultMagnetEngageStepId: {
+          stepType: 'magnet',
+          magnetAction: 'engage',
+          moduleId: 'magModuleId',
+          engageHeight: null,
+        },
         // module id not matching, unchanged
         unrelatedMagnetEngageStepId:
           prevRootState.savedStepForms.unrelatedMagnetEngageStepId,
