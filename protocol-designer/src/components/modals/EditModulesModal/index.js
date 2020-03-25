@@ -143,7 +143,6 @@ export function EditModulesModal(props: EditModulesProps) {
           touched,
           values,
           handleBlur,
-          setFieldTouched,
         }: FormikProps<EditModulesState>) => {
           const { selectedSlot, selectedModel } = values
 
