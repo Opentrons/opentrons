@@ -1,6 +1,6 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
-import {
+import typeof {
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -12,43 +12,43 @@ import {
 import type { RobotCalibrationCheckSessionData } from './api-types'
 
 export type FetchRobotCalibrationCheckSessionAction = {|
-  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type FetchRobotCalibrationCheckSessionSuccessAction = {|
-  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
   meta: RobotApiRequestMeta,
 |}
 
 export type FetchRobotCalibrationCheckSessionFailureAction = {|
-  type: typeof FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
 
 export type EndRobotCalibrationCheckSessionAction = {|
-  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION,
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type EndRobotCalibrationCheckSessionSuccessAction = {|
-  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type EndRobotCalibrationCheckSessionFailureAction = {|
-  type: typeof END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  type: END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
 
 export type CompleteRobotCalibrationCheckAction = {|
-  type: typeof COMPLETE_ROBOT_CALIBRATION_CHECK,
+  type: COMPLETE_ROBOT_CALIBRATION_CHECK,
   payload: {| robotName: string |},
 |}
 
