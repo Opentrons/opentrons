@@ -1,6 +1,7 @@
 import logging
 import os
 import tempfile
+from pathlib import Path
 from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
@@ -27,7 +28,7 @@ JPG = "image/jpg"
              })
 async def post_picture_capture() -> StreamingResponse:
     """Take a picture"""
-    filename = tempfile.mktemp(suffix=".jpg")
+    filename = Path(tempfile.mktemp(suffix=".jpg"))
 
     try:
         await camera.take_picture(filename)
@@ -44,8 +45,7 @@ async def post_picture_capture() -> StreamingResponse:
 def _cleanup(filename: str) -> None:
     """Clean up after sending the response"""
     try:
-        if os.path.exists(filename):
-            log.info("Deleting image at %s", filename)
-            os.remove(filename)
+        log.info("Deleting image at %s", filename)
+        os.remove(filename)
     except OSError:
         pass

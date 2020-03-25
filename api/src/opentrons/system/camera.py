@@ -1,5 +1,6 @@
 import asyncio
 import os
+from pathlib import Path
 from opentrons.config import IS_OSX
 
 
@@ -7,7 +8,7 @@ class CameraException(Exception):
     pass
 
 
-async def take_picture(filename: str,
+async def take_picture(filename: Path,
                        loop: asyncio.AbstractEventLoop = None):
     """
     Take a picture and save it to filename
@@ -17,11 +18,10 @@ async def take_picture(filename: str,
     :return: None
     :raises: CameraException
     """
-    if os.path.exists(filename):
-        try:
-            os.remove(filename)
-        except OSError:
-            pass
+    try:
+        os.remove(filename)
+    except OSError:
+        pass
 
     cmd = 'ffmpeg -f video4linux2 -s 640x480 -i /dev/video0 -ss 0:0:1 -frames 1'  # NOQA
 
@@ -40,5 +40,5 @@ async def take_picture(filename: str,
 
     if proc.returncode != 0:
         raise CameraException(res)
-    if not os.path.exists(filename):
+    if not filename.exists():
         raise CameraException('picture not saved')

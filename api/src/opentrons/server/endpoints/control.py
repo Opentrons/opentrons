@@ -1,8 +1,8 @@
 import asyncio
 import functools
-import os
 import json
 import logging
+from pathlib import Path
 from aiohttp import web
 
 try:
@@ -488,8 +488,8 @@ async def set_rail_lights(request):
 
 
 async def take_picture(request):
-    filename = os.path.join(
-        request.app['com.opentrons.response_file_tempdir'], 'picture.jpg')
+    filename = Path(request.app['com.opentrons.response_file_tempdir'])
+    filename = filename.joinpath('picture.jpg')
 
     try:
         await camera.take_picture(filename, request.loop)
