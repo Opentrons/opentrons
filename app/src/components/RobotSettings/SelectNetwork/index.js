@@ -70,9 +70,13 @@ export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
   )
 
   React.useEffect(() => {
-    dispatch(Networking.fetchEapOptions(robotName))
-    dispatch(Networking.fetchWifiKeys(robotName))
-  }, [robotName, dispatch])
+    // if we're connecting to a network, ensure we get the info needed to
+    // populate the configuration forms
+    if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {
+      dispatch(Networking.fetchEapOptions(robotName))
+      dispatch(Networking.fetchWifiKeys(robotName))
+    }
+  }, [robotName, dispatch, changeState.type])
 
   const handleSelectConnect = ssid => {
     const network = list.find(nw => nw.ssid === ssid)

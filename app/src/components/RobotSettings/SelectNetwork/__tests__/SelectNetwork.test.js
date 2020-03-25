@@ -127,23 +127,16 @@ describe('<SelectNetwork />', () => {
     jest.useRealTimers()
   })
 
-  it('dispatches fetchEapOptions, fetchWifiKeys on mount and fetchWifiList on an interval', () => {
+  it('dispatches fetchWifiList on mount and on an interval', () => {
     const expectedFetchList = Networking.fetchWifiList(mockRobotName)
 
     render()
     expect(dispatch).toHaveBeenNthCalledWith(1, expectedFetchList)
-    expect(dispatch).toHaveBeenNthCalledWith(
-      2,
-      Networking.fetchEapOptions(mockRobotName)
-    )
-    expect(dispatch).toHaveBeenNthCalledWith(
-      3,
-      Networking.fetchWifiKeys(mockRobotName)
-    )
-    expect(dispatch).toHaveBeenCalledTimes(3)
+    expect(dispatch).toHaveBeenCalledTimes(1)
     jest.advanceTimersByTime(20000)
-    expect(dispatch).toHaveBeenNthCalledWith(4, expectedFetchList)
-    expect(dispatch).toHaveBeenNthCalledWith(5, expectedFetchList)
+    expect(dispatch).toHaveBeenNthCalledWith(2, expectedFetchList)
+    expect(dispatch).toHaveBeenNthCalledWith(3, expectedFetchList)
+    expect(dispatch).toHaveBeenCalledTimes(3)
   })
 
   it('renders an <SelectSsid /> child with props from state', () => {
@@ -309,6 +302,7 @@ describe('<SelectNetwork />', () => {
     beforeEach(() => {
       wrapper = render()
       const selectSsid = wrapper.find(SelectSsid)
+      dispatch.mockReset()
 
       act(() => {
         selectSsid.invoke('onConnect')(mockWifiList[1].ssid)
@@ -330,6 +324,14 @@ describe('<SelectNetwork />', () => {
       })
     })
 
+    it('dispatches fetchEapOptions and fetchWifiKeys on SelectSsid::onSelect', () => {
+      const expectedFetchEap = Networking.fetchEapOptions(mockRobotName)
+      const expectedFetchKeys = Networking.fetchEapOptions(mockRobotName)
+
+      expect(dispatch).toHaveBeenCalledWith(expectedFetchEap)
+      expect(dispatch).toHaveBeenCalledWith(expectedFetchKeys)
+    })
+
     it('renders a ConnectModal with network={null} on SelectSsid::onJoinOther', () => {
       wrapper = render()
       const selectSsid = wrapper.find(SelectSsid)
@@ -349,6 +351,22 @@ describe('<SelectNetwork />', () => {
         onConnect: expect.any(Function),
         onCancel: expect.any(Function),
       })
+    })
+
+    it('dispatches fetchEapOptions and fetchWifiKeys on SelectSsid::onJoinOther', () => {
+      wrapper = render()
+      const selectSsid = wrapper.find(SelectSsid)
+      dispatch.mockReset()
+
+      act(() => {
+        selectSsid.invoke('onJoinOther')()
+      })
+
+      const expectedFetchEap = Networking.fetchEapOptions(mockRobotName)
+      const expectedFetchKeys = Networking.fetchEapOptions(mockRobotName)
+
+      expect(dispatch).toHaveBeenCalledWith(expectedFetchEap)
+      expect(dispatch).toHaveBeenCalledWith(expectedFetchKeys)
     })
 
     it('passes onCancel prop that closes the modal', () => {
