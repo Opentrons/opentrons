@@ -83,7 +83,7 @@ describe('FormModal', () => {
     expect(heading).toMatch(/Find and join a Wi-Fi network/)
   })
 
-  it('should render the correct heading for an known network', () => {
+  it('should render the correct heading for a known network', () => {
     const network = Fixtures.mockWifiNetwork
     const wrapper = render(network)
     const heading = wrapper.find(ScrollableAlertModal).prop('heading')
