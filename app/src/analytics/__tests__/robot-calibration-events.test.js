@@ -16,14 +16,6 @@ type EventSpec = {|
   expected: AnalyticsEvent,
 |}
 
-const robotCalibrationCheckSessionData = {
-  instruments: {},
-  currentStep: 'sessionStart',
-  nextSteps: {
-    links: { specifyLabware: '/fake/route' },
-  },
-}
-
 const SPECS: Array<EventSpec> = [
   {
     name: 'calibrationCheckStart',
@@ -34,7 +26,7 @@ const SPECS: Array<EventSpec> = [
     ),
     expected: {
       name: 'calibrationCheckStart',
-      properties: robotCalibrationCheckSessionData,
+      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionData,
     },
   },
   {
@@ -53,13 +45,17 @@ describe('robot calibration analytics events', () => {
   beforeEach(() => {
     jest.resetAllMocks()
   })
+  const getRobotCalibrationCheckSession: JestMockFn<
+    [State, string],
+    $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
+  > = Calibration.getRobotCalibrationCheckSession
 
+  getRobotCalibrationCheckSession.mockReturnValue(
+    CalibrationFixtures.mockRobotCalibrationCheckSessionData
+  )
   SPECS.forEach(spec => {
     const { name, action, expected } = spec
     it(name, () => {
-      Calibration.getRobotCalibrationCheckSession.mockReturnValue(
-        CalibrationFixtures.mockRobotCalibrationCheckSessionData
-      )
       return expect(makeEvent(action, MOCK_STATE)).resolves.toEqual(expected)
     })
   })

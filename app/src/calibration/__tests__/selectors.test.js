@@ -18,13 +18,13 @@ type SelectorSpec = {|
 
 const SPECS: Array<SelectorSpec> = [
   {
-    name: 'getRobotCalibrationCheckSuccess returns undefined if no deck cal check session',
+    name: 'getRobotCalibrationCheckSuccess returns null if no deck cal check session',
     selector: Selectors.getRobotCalibrationCheckSession,
     state: {
       calibration: {},
     },
     args: ['germanium-cobweb'],
-    expected: undefined,
+    expected: null,
   },
   {
     name: 'getRobotCalibrationCheckSuccess returns ',
