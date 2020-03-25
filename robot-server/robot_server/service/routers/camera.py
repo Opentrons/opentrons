@@ -1,5 +1,6 @@
 import logging
 import os
+import io
 import tempfile
 from pathlib import Path
 from http import HTTPStatus
@@ -33,19 +34,24 @@ async def post_picture_capture() -> StreamingResponse:
     try:
         await camera.take_picture(filename)
         log.info("Image taken at %s", filename)
-        return StreamingResponse(open(filename, 'rb'),
+        # Open the file. It will be closed and deleted when the response is
+        # finished.
+        fd = filename.open('rb')
+        return StreamingResponse(fd,
                                  media_type=JPG,
                                  background=BackgroundTask(func=_cleanup,
-                                                           filename=filename))
+                                                           filename=filename,
+                                                           fd=fd))
     except camera.CameraException as e:
         raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
                             detail=str(e))
 
 
-def _cleanup(filename: str) -> None:
+def _cleanup(filename: Path, fd: io.IOBase) -> None:
     """Clean up after sending the response"""
     try:
-        log.info("Deleting image at %s", filename)
+        log.info("Closing and deleting image at %s", filename)
+        fd.close()
         os.remove(filename)
     except OSError:
         pass
