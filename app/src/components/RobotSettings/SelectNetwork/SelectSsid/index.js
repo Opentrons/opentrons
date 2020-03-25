@@ -84,6 +84,11 @@ export function SelectSsid(props: SelectSsidProps) {
 
     if (label != null) return <NetworkActionLabel label={label} />
     const network = list.find(nw => nw.ssid === value)
+
+    // react-select sets context to tell us if the value is rendered in the
+    // options menu list or in the currently selected value. If it's being
+    // rendered in the menu, we want to show a connected icon if the network
+    // is active, but if the context is value, we want to hide the icon
     return network ? (
       <NetworkOptionLabel
         {...network}

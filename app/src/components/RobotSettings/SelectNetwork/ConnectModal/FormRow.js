@@ -16,14 +16,18 @@ const StyledRow: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
   display: table-row;
 `
 
-const StyledLabel = styled.label`
+const StyledLabel: StyledComponent<{||}, {||}, HTMLLabelElement> = styled.label`
   display: table-cell;
   padding-right: 1rem;
   text-align: right;
   ${FW_SEMIBOLD}
 `
 
-const StyledInputWrapper = styled.div`
+const StyledInputWrapper: StyledComponent<
+  {||},
+  {||},
+  HTMLDivElement
+> = styled.div`
   padding-bottom: 0.75rem;
   display: table-cell;
 
