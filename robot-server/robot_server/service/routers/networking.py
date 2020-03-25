@@ -108,7 +108,6 @@ async def get_wifi_keys():
              responses={HTTPStatus.OK: {"model": AddWifiKeyFileResponse}},
              response_model=AddWifiKeyFileResponse,
              status_code=HTTPStatus.CREATED,
-             response_model_skip_defaults=True,
              response_model_exclude_unset=True)
 async def post_wifi_key(key: UploadFile = File(...)):
     add_key_result = wifi.add_key(key.filename, key.file.read())

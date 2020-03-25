@@ -5,6 +5,7 @@ import traceback
 import typing
 
 from starlette.websockets import WebSocket, WebSocketState
+from starlette.status import WS_1001_GOING_AWAY
 
 from . import serialize
 from opentrons.protocol_api.execute import ExceptionInProtocolError
@@ -70,7 +71,7 @@ class RPCServer(object):
         See https://docs.aiohttp.org/en/stable/web.html#graceful-shutdown
         """
         for client_write_tasks in self.clients.copy():
-            await client_write_tasks.socket.close(code=1001)  # GOING_AWAY
+            await client_write_tasks.socket.close(code=WS_1001_GOING_AWAY)
 
         self.shutdown()
 
