@@ -165,6 +165,7 @@ class ProtocolContext(CommandPublisher):
         """ Finalize and clean up the protocol context. """
         if self._unsubscribe_commands:
             self._unsubscribe_commands()
+            self._unsubscribe_commands = None
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
