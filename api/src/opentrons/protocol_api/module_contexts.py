@@ -215,6 +215,7 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.start_set_temperature(celsius)
 
+    @cmds.publish.both(command=cmds.tempdeck_await_temp)
     @requires_version(2, 3)
     def await_temperature(self, celsius: float, msg=None):
         """ Wait until module reaches temperature, in C.
