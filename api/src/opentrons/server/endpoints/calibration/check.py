@@ -29,9 +29,29 @@ def _format_status(
     status = CalibrationSessionStatus(
         instruments=instruments,
         currentStep=current,
-        nextSteps=links,
-        sessionToken=session.token)
+        nextSteps=links)
     return status
+
+
+async def get_session(request):
+    """
+    GET /calibration/check/session
+
+    If a session exists, this endpoint will return the current status.
+
+    Otherwise, this endpoint will return a 404 with links to the post request.
+    """
+    session_type = request.match_info['type']
+    session_storage = request.app['com.opentrons.session_manager']
+    current_session = session_storage.sessions.get(session_type)
+    if current_session:
+        response = _format_status(current_session, request.app.router)
+        return web.json_response(text=response.json(), status=200)
+    else:
+        response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(response, status=404)
 
 
 async def create_session(request):
@@ -59,8 +79,11 @@ async def create_session(request):
         response = _format_status(new_session, request.app.router)
         return web.json_response(text=response.json(), status=201)
     else:
-        response = _format_status(current_session, request.app.router)
-        return web.json_response(text=response.json(), status=200)
+        response = {
+            "message": f"A {session_type} session exists."
+                       "Please delete to proceed.",
+            "links": {"deleteSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(response, status=409)
 
 
 async def delete_session(request):

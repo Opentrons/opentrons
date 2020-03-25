@@ -41,7 +41,6 @@ class CalibrationSessionStatus(BaseModel):
     currentStep: str = Field(..., description="Current step of session")
     nextSteps: Dict[str, Dict[str, str]] =\
         Field(..., description="Next Available Step in Session")
-    sessionToken: UUID4 = Field(..., description="Session token")
 
     class Config:
         json_encoders = {UUID4: convert_uuid}
@@ -71,8 +70,7 @@ class CalibrationSessionStatus(BaseModel):
                         "links": {
                             "specifyLabware": ""
                         }
-                    },
-                    "sessionToken": "FakeUUIDHex"
+                    }
 
                 }
             ]
