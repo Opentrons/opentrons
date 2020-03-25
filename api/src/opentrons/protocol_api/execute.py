@@ -3,7 +3,7 @@ import inspect
 import logging
 import traceback
 import sys
-from typing import Any, Callable
+from typing import Any, Callable, Dict
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
@@ -93,9 +93,8 @@ def _find_protocol_error(tb, proto_name):
 
 def _run_python(
         proto: PythonProtocol, context: ProtocolContext):
-    new_locs = locals()
-    new_globs = globals()
-    exec(proto.contents, new_globs, new_locs)
+    new_globs: Dict[Any, Any] = {}
+    exec(proto.contents, new_globs)
     # If the protocol is written correctly, it will have defined a function
     # like run(context: ProtocolContext). If so, that function is now in the
     # current scope.
@@ -104,12 +103,13 @@ def _run_python(
     else:
         filename = proto.filename or '<protocol>'
     try:
-        _runfunc_ok(new_locs.get('run'))
+        _runfunc_ok(new_globs.get('run'))
     except SyntaxError as se:
         raise MalformedProtocolError(str(se))
-    new_globs.update(new_locs)
+
+    new_globs['__context'] = context
     try:
-        exec('run(context)', new_globs, new_locs)
+        exec('run(__context)', new_globs)
     except (SmoothieAlarm, asyncio.CancelledError, ExecutionCancelledError):
         # this is a protocol cancel and shouldn't have special logging
         raise
