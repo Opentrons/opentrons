@@ -80,7 +80,8 @@ async def create_session(request):
         return web.json_response(text=response.json(), status=201)
     else:
         response = {
-            "message": f"A {session_type} session exists. Please delete to proceed.",
+            "message": f"A {session_type} session exists."
+                       "Please delete to proceed.",
             "links": {"deleteSession": f"/calibration/{session_type}/session"}}
         return web.json_response(response, status=409)
 
