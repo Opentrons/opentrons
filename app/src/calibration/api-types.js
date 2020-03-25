@@ -18,5 +18,4 @@ export type RobotCalibrationCheckSessionData = {|
   nextSteps: {
     links: { [RobotCalibrationCheckStep]: string },
   },
-  sessionToken: string,
 |}
