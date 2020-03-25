@@ -22,25 +22,31 @@ async def test_start_session(async_client, test_setup):
     assert resp.status == 201
     text = await resp.json()
     assert list(text.keys()) ==\
-        ["instruments", "currentStep", "nextSteps", "sessionToken"]
+        ["instruments", "currentStep", "nextSteps"]
     assert text["currentStep"] == "sessionStart"
     assert text["nextSteps"] == {"links": {"specifyLabware": ""}}
 
+    resp = await async_client.post('/calibration/check/session')
+    assert resp.status == 409
+
 
 async def test_check_session(async_client, test_setup):
+    resp = await async_client.get('/calibration/check/session')
+    assert resp.status == 404
+
     resp = await async_client.post('/calibration/check/session')
     assert resp.status == 201
     text = await resp.json()
 
-    resp = await async_client.post('/calibration/check/session')
-    text2 = await resp.json()
+    resp = await async_client.get('/calibration/check/session')
     assert resp.status == 200
+    text2 = await resp.json()
+    assert text == text2
 
-    assert text["sessionToken"] == text2["sessionToken"]
-    assert list(text.keys()) ==\
-        ["instruments", "currentStep", "nextSteps", "sessionToken"]
-    assert text["currentStep"] == "sessionStart"
-    assert text["nextSteps"] == {"links": {"specifyLabware": ""}}
+    assert list(text2.keys()) ==\
+        ["instruments", "currentStep", "nextSteps"]
+    assert text2["currentStep"] == "sessionStart"
+    assert text2["nextSteps"] == {"links": {"specifyLabware": ""}}
 
 
 async def test_delete_session(async_client, async_server, test_setup):

@@ -32,7 +32,6 @@ class SessionManager:
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
     def __init__(self, hardware: ThreadManager):
-        self.token = uuid4()
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
 
