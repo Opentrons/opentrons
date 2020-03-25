@@ -9,7 +9,7 @@ export type DeckCheckStep =
   | 'checkPointThree'
   | 'checkHeight'
   | 'sessionExit'
-  | 'badDeckCalibration'
+  | 'badRobotCalibration'
   | 'noPipettesAttached'
 
 export type DeckCheckSessionData = {|

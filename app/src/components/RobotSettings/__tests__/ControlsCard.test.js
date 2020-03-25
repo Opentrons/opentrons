@@ -74,7 +74,7 @@ describe('ControlsCard', () => {
       subscribe: () => {},
       getState: () => ({
         mockState: true,
-        config: { devInternal: { enableDeckCalCheck: true } },
+        config: { devInternal: { enableRobotCalCheck: true } },
       }),
       dispatch: jest.fn(),
     }

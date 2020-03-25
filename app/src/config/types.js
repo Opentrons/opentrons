@@ -10,7 +10,7 @@ export type DiscoveryCandidates = string | Array<string>
 export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
-  | 'enableDeckCalCheck'
+  | 'enableRobotCalCheck'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,

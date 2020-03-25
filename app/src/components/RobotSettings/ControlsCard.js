@@ -42,7 +42,7 @@ export function ControlsCard(props: Props) {
   const { robot, calibrateDeckUrl, checkDeckUrl } = props
   const { name: robotName, status } = robot
   const config = useSelector(getConfig)
-  const enableDeckCalCheck = Boolean(config.devInternal?.enableDeckCalCheck)
+  const enableRobotCalCheck = Boolean(config.devInternal?.enableRobotCalCheck)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const notConnectable = status !== CONNECTABLE
@@ -63,7 +63,7 @@ export function ControlsCard(props: Props) {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      {enableDeckCalCheck && (
+      {enableRobotCalCheck && (
         <LabeledButton
           label="Check deck calibration"
           buttonProps={{
