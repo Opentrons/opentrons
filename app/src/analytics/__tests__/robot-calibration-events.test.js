@@ -50,12 +50,12 @@ describe('robot calibration analytics events', () => {
     $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
   > = Calibration.getRobotCalibrationCheckSession
 
-  getRobotCalibrationCheckSession.mockReturnValue(
-    CalibrationFixtures.mockRobotCalibrationCheckSessionData
-  )
   SPECS.forEach(spec => {
     const { name, action, expected } = spec
     it(name, () => {
+      getRobotCalibrationCheckSession.mockReturnValue(
+        CalibrationFixtures.mockRobotCalibrationCheckSessionData
+      )
       return expect(makeEvent(action, MOCK_STATE)).resolves.toEqual(expected)
     })
   })
