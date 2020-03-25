@@ -49,8 +49,8 @@ async def get_session(request):
         return web.json_response(text=response.json(), status=200)
     else:
         response = {
-            "message": "No check session exists. Please create one.",
-            "links": {"POST": "/calibration/check/session"}}
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
         return web.json_response(response, status=404)
 
 
@@ -80,8 +80,8 @@ async def create_session(request):
         return web.json_response(text=response.json(), status=201)
     else:
         response = {
-            "message": "A check session exists. Please delete to proceed.",
-            "links": {"DELETE": "/calibration/check/session"}}
+            "message": f"A {session_type} session exists. Please delete to proceed.",
+            "links": {"deleteSession": f"/calibration/{session_type}/session"}}
         return web.json_response(response, status=409)
 
 
