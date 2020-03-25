@@ -204,6 +204,8 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.set_temperature(celsius)
 
+    @cmds.publish.both(command=cmds.tempdeck_set_temp)
+    @requires_version(2, 3)
     def start_set_temperature(self, celsius: float):
         """ Start setting the target temperature, in C.
 
@@ -212,6 +214,17 @@ class TemperatureModuleContext(ModuleContext):
         :param celsius: The target temperature, in C
         """
         return self._module.start_set_temperature(celsius)
+
+    @cmds.publish.both(command=cmds.tempdeck_await_temp)
+    @requires_version(2, 3)
+    def await_temperature(self, celsius: float):
+        """ Wait until module reaches temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param celsius: The target temperature, in C
+        """
+        return self._module.await_temperature(celsius)
 
     @cmds.publish.both(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
@@ -231,6 +244,16 @@ class TemperatureModuleContext(ModuleContext):
     def target(self):
         """ Current target temperature in C"""
         return self._module.target
+
+    @property  # type: ignore
+    @requires_version(2, 3)
+    def status(self):
+        """ The status of the module.
+
+        Returns 'holding at target', 'cooling', 'heating', or 'idle'
+
+        """
+        return self._module.status
 
 
 class MagneticModuleContext(ModuleContext):

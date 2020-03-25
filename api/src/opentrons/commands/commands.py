@@ -374,6 +374,20 @@ def tempdeck_set_temp(celsius):
     )
 
 
+def tempdeck_await_temp(celsius):
+    text = "Waiting for Temperature Module to reach temperature " \
+           "{temp} °C (rounded off to nearest integer)".format(
+            temp=round(float(celsius),
+                       utils.TEMPDECK_GCODE_ROUNDING_PRECISION))
+    return make_command(
+        name=command_types.TEMPDECK_AWAIT_TEMP,
+        payload={
+            'celsius': celsius,
+            'text': text
+        }
+    )
+
+
 def tempdeck_deactivate():
     text = "Deactivating Temperature Module"
     return make_command(

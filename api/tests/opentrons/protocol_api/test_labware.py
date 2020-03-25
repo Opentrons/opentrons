@@ -391,7 +391,20 @@ def test_module_load_v2(module_model):
 
 @pytest.mark.parametrize(
     'module_name', [
-        'tempdeck', 'magdeck', 'temperature module', 'magnetic module'])
+        'tempdeck',
+        'magdeck',
+        'temperature module',
+        'temperature module gen2',
+        'thermocycler',
+        'thermocycler module',
+        'magnetic module',
+        'magnetic module gen2',
+        'magneticModuleV1',
+        'magneticModuleV2',
+        'temperatureModuleV1',
+        'temperatureModuleV2',
+        'thermocyclerModuleV1'
+        ])
 def test_module_load_labware(module_name):
     labware_name = 'corning_96_wellplate_360ul_flat'
     labware_def = labware.get_labware_definition(labware_name)
