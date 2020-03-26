@@ -35,9 +35,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+    name: 'handles calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
     action: {
-      type: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
       payload: {
         robotName: 'terpentine-martini',
       },

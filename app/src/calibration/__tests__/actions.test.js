@@ -59,32 +59,32 @@ describe('robot modules actions', () => {
       },
     },
     {
-      name: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION',
-      creator: Actions.endRobotCalibrationCheckSession,
+      name: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION',
+      creator: Actions.deleteRobotCalibrationCheckSession,
       args: ['robot-name'],
       expected: {
-        type: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION',
+        type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION',
         payload: { robotName: 'robot-name' },
         meta: {},
       },
     },
     {
-      name: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-      creator: Actions.endRobotCalibrationCheckSessionSuccess,
+      name: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      creator: Actions.deleteRobotCalibrationCheckSessionSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotCalibrationCheckSessionData,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+        type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
         payload: { robotName: 'robot-name' },
         meta: { requestId: 'abc' },
       },
     },
     {
-      name: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
-      creator: Actions.endRobotCalibrationCheckSessionFailure,
+      name: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+      creator: Actions.deleteRobotCalibrationCheckSessionFailure,
       args: [
         'robot-name',
         {
@@ -93,7 +93,7 @@ describe('robot modules actions', () => {
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'calibration:END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+        type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
         payload: {
           robotName: 'robot-name',
           error: {

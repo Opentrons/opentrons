@@ -4,9 +4,9 @@ import typeof {
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  END_ROBOT_CALIBRATION_CHECK_SESSION,
-  END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
+  DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   COMPLETE_ROBOT_CALIBRATION_CHECK,
 } from './constants'
 import type { RobotCalibrationCheckSessionData } from './api-types'
@@ -29,20 +29,20 @@ export type FetchRobotCalibrationCheckSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type EndRobotCalibrationCheckSessionAction = {|
-  type: END_ROBOT_CALIBRATION_CHECK_SESSION,
+export type DeleteRobotCalibrationCheckSessionAction = {|
+  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type EndRobotCalibrationCheckSessionSuccessAction = {|
-  type: END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
+  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type EndRobotCalibrationCheckSessionFailureAction = {|
-  type: END_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+export type DeleteRobotCalibrationCheckSessionFailureAction = {|
+  type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
@@ -56,9 +56,9 @@ export type CalibrationAction =
   | FetchRobotCalibrationCheckSessionAction
   | FetchRobotCalibrationCheckSessionSuccessAction
   | FetchRobotCalibrationCheckSessionFailureAction
-  | EndRobotCalibrationCheckSessionAction
-  | EndRobotCalibrationCheckSessionSuccessAction
-  | EndRobotCalibrationCheckSessionFailureAction
+  | DeleteRobotCalibrationCheckSessionAction
+  | DeleteRobotCalibrationCheckSessionSuccessAction
+  | DeleteRobotCalibrationCheckSessionFailureAction
   | CompleteRobotCalibrationCheckAction
 
 export type PerRobotCalibrationState = $ReadOnly<{|

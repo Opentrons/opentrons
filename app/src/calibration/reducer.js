@@ -28,7 +28,7 @@ export function calibrationReducer(
       }
     }
 
-    case Constants.END_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
+    case Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
       const { robotName } = action.payload
       const robotState = state[robotName] || INITIAL_CALIBRATION_STATE
 

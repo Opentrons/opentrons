@@ -6,10 +6,10 @@ import type { Dispatch } from '../../types'
 import { completeRobotCalibrationCheck } from '../../calibration'
 import styles from './styles.css'
 
-const END_ROBOT_CALIBRATION_CHECK_HEADER = 'Calibration check is complete'
-const END_ROBOT_CALIBRATION_CHECK_BODY =
+const DELETE_ROBOT_CALIBRATION_CHECK_HEADER = 'Calibration check is complete'
+const DELETE_ROBOT_CALIBRATION_CHECK_BODY =
   "You have successfully checked the accuracy of this robot's calibration."
-const END_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip and exit'
+const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip and exit'
 
 type CompleteConfirmationProps = {|
   robotName: string,
@@ -26,10 +26,10 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
     <>
       <div className={styles.modal_header}>
         <Icon name="check-circle" className={styles.status_icon} />
-        <h3>{END_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
+        <h3>{DELETE_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
       </div>
-      <p className={styles.complete_body}>{END_ROBOT_CALIBRATION_CHECK_BODY}</p>
-      <PrimaryButton onClick={exit}>{END_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}</PrimaryButton>
+      <p className={styles.complete_body}>{DELETE_ROBOT_CALIBRATION_CHECK_BODY}</p>
+      <PrimaryButton onClick={exit}>{DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}</PrimaryButton>
     </>
   )
 }

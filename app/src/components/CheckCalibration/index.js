@@ -5,7 +5,7 @@ import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
   fetchRobotCalibrationCheckSession,
-  endRobotCalibrationCheckSession,
+  deleteRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
 } from '../../calibration'
 import { useLogger } from '../../logger'
@@ -31,7 +31,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   const log = useLogger(__dirname)
 
   function exit() {
-    dispatch(endRobotCalibrationCheckSession(robotName))
+    dispatch(deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
   }
 
