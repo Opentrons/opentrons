@@ -281,7 +281,9 @@ def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
 def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
     """ Retrieve the json schema for a protocol schema version
     """
-    if version_num > 3:
+    # TODO(IL, 2020/03/05): use $otSharedSchema, but maybe wait until
+    # deprecating v1/v2 JSON protocols?
+    if version_num > 4:
         raise RuntimeError(
             f'JSON Protocol version {version_num} is not yet ' +
             'supported in this version of the API')
@@ -321,7 +323,7 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'Designer and save it to migrate the protocol to a later '
             'version. This error might mean a labware '
             'definition was specified instead of a protocol.')
-    if version_num > 3:
+    if version_num > 4:
         raise RuntimeError(
             f'The protocol you are trying to open is a JSONv{version_num} '
             'protocol and is not supported by your current robot server '

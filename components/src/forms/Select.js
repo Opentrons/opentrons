@@ -104,10 +104,10 @@ const CLEAR_STYLES = {
   multiValue: NO_STYLE,
   multiValueLabel: NO_STYLE,
   multiValueRemove: NO_STYLE,
-  noOptionsMessage: NO_STYLE,
   option: NO_STYLE,
   // the following should not be cleared to ensure proper positioning
   // included as comments so we can see what we're not touching
+  // noOptionsMessage: NO_STYLE,
   // menuPortal: _ => _,
   // placeholder: _ => _,
   // singleValue: _ => _,

@@ -13,10 +13,11 @@ type Props = {|
   description: string,
   close?: () => mixed,
   closeUrl?: string,
-  error: Error,
+  error: Error | { message?: string, ... },
 |}
 
 const DEFAULT_HEADING = 'Unexpected Error'
+const AN_UNKNOWN_ERROR_OCCURRED = 'An unknown error occurred'
 
 export function ErrorModal(props: Props) {
   const { description, error } = props
@@ -34,7 +35,9 @@ export function ErrorModal(props: Props) {
   return (
     <Portal>
       <AlertModal heading={heading} buttons={[closeButtonProps]} alertOverlay>
-        <p className={styles.error_modal_message}>{error.message}</p>
+        <p className={styles.error_modal_message}>
+          {error.message ?? AN_UNKNOWN_ERROR_OCCURRED}
+        </p>
         <p>{description}</p>
         <p>
           If you keep getting this message, try restarting your app and/or

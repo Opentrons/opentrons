@@ -179,7 +179,7 @@ function RobotSettingsComponent(props: Props) {
                 {homeError !== null && (
                   <ErrorModal
                     heading="Robot unable to home"
-                    error={{ name: 'HomeError', message: homeError }}
+                    error={{ message: homeError }}
                     description="Robot was unable to home, please try again."
                     close={closeHomeAlert}
                   />

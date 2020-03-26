@@ -234,7 +234,7 @@
           "properties": {
             "slot": { "$ref": "#/definitions/slot" },
             "model": {
-              "description": "model of module. Eg 'magdeck' or 'magdeckGen2'. This should match a top-level key in shared-data/module/definitions/2.json",
+              "description": "model of module. Eg 'magneticModuleV1' or 'magneticModuleV2'. This should match a top-level key in shared-data/module/definitions/2.json",
               "type": "string"
             }
           }

@@ -17,6 +17,11 @@ from .util import requires_version
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
 
+ENGAGE_HEIGHT_UNIT_CNV = 2
+STANDARD_MAGDECK_LABWARE = [
+    'biorad_96_wellplate_200ul_pcr',
+    'nest_96_wellplate_100ul_pcr_full_skirt',
+    'usascientific_96_wellplate_2.4ml_deep']
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -204,6 +209,8 @@ class TemperatureModuleContext(ModuleContext):
         """
         return self._module.set_temperature(celsius)
 
+    @cmds.publish.both(command=cmds.tempdeck_set_temp)
+    @requires_version(2, 3)
     def start_set_temperature(self, celsius: float):
         """ Start setting the target temperature, in C.
 
@@ -212,6 +219,17 @@ class TemperatureModuleContext(ModuleContext):
         :param celsius: The target temperature, in C
         """
         return self._module.start_set_temperature(celsius)
+
+    @cmds.publish.both(command=cmds.tempdeck_await_temp)
+    @requires_version(2, 3)
+    def await_temperature(self, celsius: float):
+        """ Wait until module reaches temperature, in C.
+
+        Must be between 4 and 95C based on Opentrons QA.
+
+        :param celsius: The target temperature, in C
+        """
+        return self._module.await_temperature(celsius)
 
     @cmds.publish.both(command=cmds.tempdeck_deactivate)
     @requires_version(2, 0)
@@ -231,6 +249,16 @@ class TemperatureModuleContext(ModuleContext):
     def target(self):
         """ Current target temperature in C"""
         return self._module.target
+
+    @property  # type: ignore
+    @requires_version(2, 3)
+    def status(self):
+        """ The status of the module.
+
+        Returns 'holding at target', 'cooling', 'heating', or 'idle'
+
+        """
+        return self._module.status
 
 
 class MagneticModuleContext(ModuleContext):
@@ -314,7 +342,7 @@ class MagneticModuleContext(ModuleContext):
         elif height_from_base and self._ctx._api_version >= APIVersion(2, 2):
             dist = height_from_base + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM
         elif self.labware and self.labware.magdeck_engage_height is not None:
-            dist = self.labware.magdeck_engage_height
+            dist = self._determine_lw_engage_height()
             if offset:
                 dist += offset
         else:
@@ -323,6 +351,30 @@ class MagneticModuleContext(ModuleContext):
                 "height; please specify explicitly with the height param"
                 .format(self.labware))
         self._module.engage(dist)
+
+    def _determine_lw_engage_height(self) -> float:
+        """ Return engage height based on Protocol API and module versions
+
+        For API Version 2.3 or later:
+           - Multiply non-standard labware engage heights by 2 for gen1 modules
+           - Divide standard labware engage heights by 2 for gen2 modules
+        If none of the above, return the labware engage heights as defined in
+        the labware definitions
+        """
+        assert self.labware, self.labware.magdeck_engage_height
+
+        engage_height = self.labware.magdeck_engage_height
+
+        is_api_breakpoint = (self._ctx._api_version >= APIVersion(2, 3))
+        is_v1_module = (self._module.model() == 'magneticModuleV1')
+        is_standard_lw = self.labware.load_name in STANDARD_MAGDECK_LABWARE
+
+        if is_api_breakpoint and is_v1_module and not is_standard_lw:
+            return engage_height * ENGAGE_HEIGHT_UNIT_CNV
+        elif is_api_breakpoint and not is_v1_module and is_standard_lw:
+            return engage_height / ENGAGE_HEIGHT_UNIT_CNV
+        else:
+            return engage_height
 
     @cmds.publish.both(command=cmds.magdeck_disengage)
     @requires_version(2, 0)

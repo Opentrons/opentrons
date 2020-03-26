@@ -1,13 +1,13 @@
 from typing import Generic, TypeVar, Optional, Any, Type
-from typing_extensions import Literal
 from pydantic import Field
 from pydantic.generics import GenericModel
 
-TypeT = TypeVar('TypeT')
+from . import ResourceTypes
+
 AttributesT = TypeVar('AttributesT')
 
 
-class RequestDataModel(GenericModel, Generic[TypeT, AttributesT]):
+class RequestDataModel(GenericModel, Generic[AttributesT]):
     """
     """
     id: Optional[str] = \
@@ -16,7 +16,7 @@ class RequestDataModel(GenericModel, Generic[TypeT, AttributesT]):
                           " required when the resource object originates at"
                           " the client and represents a new resource to be"
                           " created on the server.")
-    type: TypeT = \
+    type: ResourceTypes = \
         Field(...,
               description="type member is used to describe resource objects"
                           " that share common attributes.")
@@ -42,13 +42,11 @@ class RequestModel(GenericModel, Generic[DataT]):
 
 # Note(isk: 3/13/20): formats and returns request model
 def json_api_request(
-    type_string: str,
+    resource_type: ResourceTypes,
     attributes_model: Any
 ) -> Type[RequestModel]:
-    request_data_model = RequestDataModel[
-        Literal[type_string],    # type: ignore
-        attributes_model,    # type: ignore
-    ]
+    type_string = resource_type.value
+    request_data_model = RequestDataModel[attributes_model]    # type: ignore
     request_data_model.__name__ = f'RequestData[{type_string}]'
     request_model = RequestModel[request_data_model]
     request_model.__name__ = f'Request[{type_string}]'

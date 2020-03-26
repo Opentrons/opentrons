@@ -5,7 +5,7 @@ metadata = {
     'author': 'Opentrons <engineering@opentrons.com>',
     'description': 'A variant on "Dinosaur" for testing',
     'source': 'Opentrons Repository',
-    'apiLevel': '2.0'
+    'apiLevel': '2.3'
 }
 
 

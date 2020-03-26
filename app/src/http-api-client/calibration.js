@@ -11,6 +11,7 @@ import type {
   ApiRequestAction,
   ApiSuccessAction,
   ApiFailureAction,
+  ClearApiResponseAction,
 } from './actions'
 
 import { chainActions } from '../util'
@@ -63,6 +64,7 @@ export type CalibrationAction =
   | ApiRequestAction<CalPath, CalRequest>
   | ApiSuccessAction<CalPath, CalResponse>
   | ApiFailureAction<CalPath>
+  | ClearApiResponseAction<CalPath>
 
 export type DeckCalStartState = ApiCall<DeckStartRequest, DeckStartResponse>
 

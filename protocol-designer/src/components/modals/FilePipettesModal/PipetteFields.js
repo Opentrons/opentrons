@@ -18,24 +18,54 @@ import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
 import { getOnlyLatestDefs } from '../../../labware-defs/utils'
 
-import type { FormPipette, FormPipettesByMount } from '../../../step-forms'
+import type { FormPipettesByMount } from '../../../step-forms'
 import { getEnableMultiGEN2Pipettes } from '../../../feature-flags/selectors'
 
-type Props = {|
+export type Props = {|
   initialTabIndex?: number,
   values: FormPipettesByMount,
-  onFieldChange: (
-    mount: Mount,
-    fieldName: $Keys<FormPipette>,
-    value: string | null
-  ) => mixed,
+  // TODO 2020-3-20 use formik typing here after we update the def in flow-typed
+  errors:
+    | null
+    | string
+    | {
+        left?: {
+          tiprackDefURI: string,
+        },
+        right?: {
+          tiprackDefURI: string,
+        },
+      },
+  touched:
+    | null
+    | boolean
+    | {
+        left?: {
+          tiprackDefURI: boolean,
+        },
+        right?: {
+          tiprackDefURI: boolean,
+        },
+      },
+  onFieldChange: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
+  onSetFieldValue: (field: string, value: string | null) => void,
+  onSetFieldTouched: (field: string, touched: boolean) => void,
+  onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
 |}
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
 type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
 
 export function PipetteFields(props: Props) {
-  const { values, onFieldChange } = props
+  const {
+    values,
+    onFieldChange,
+    onSetFieldValue,
+    onSetFieldTouched,
+    onBlur,
+    errors,
+    touched,
+  } = props
   const enableMultiGEN2 = useSelector(getEnableMultiGEN2Pipettes)
 
   const tiprackOptions = useMemo(() => {
@@ -58,16 +88,13 @@ export function PipetteFields(props: Props) {
 
   const initialTabIndex = props.initialTabIndex || 1
 
-  const makeHandleChange = (mount: Mount, fieldName: $Keys<FormPipette>) => (
-    e: SyntheticInputEvent<HTMLInputElement | HTMLSelectElement>
-  ) => onFieldChange(mount, fieldName, e.currentTarget.value || null)
-
   const renderPipetteSelect = (props: PipetteSelectProps) => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
     const nameBlacklist = enableMultiGEN2
       ? []
       : ['p20_multi_gen2', 'p300_multi_gen2']
+
     return (
       <PipetteSelect
         enableNoneOption
@@ -75,7 +102,13 @@ export function PipetteFields(props: Props) {
         nameBlacklist={nameBlacklist}
         pipetteName={pipetteName != null ? pipetteName : null}
         onPipetteChange={pipetteName => {
-          onFieldChange(mount, 'pipetteName', pipetteName)
+          const nameAccessor = `pipettesByMount.${mount}.pipetteName`
+          const value = pipetteName
+          const targetToClear = `pipettesByMount.${mount}.tiprackDefURI`
+          // this select does not return an event so we have to manually set the field val
+          onSetFieldValue(nameAccessor, value)
+          onSetFieldValue(targetToClear, null)
+          onSetFieldTouched(targetToClear, false)
         }}
       />
     )
@@ -102,12 +135,26 @@ export function PipetteFields(props: Props) {
             className={formStyles.stacked_row}
           >
             <DropdownField
+              error={
+                // TODO JF 2020-3-19 allow dropdowns to take error
+                // components from formik so we avoid manually doing this
+                touched &&
+                typeof touched !== 'boolean' &&
+                touched.left &&
+                touched.left.tiprackDefURI &&
+                errors !== null &&
+                typeof errors !== 'string' &&
+                errors.left
+                  ? errors.left.tiprackDefURI
+                  : null
+              }
               tabIndex={initialTabIndex + 2}
               disabled={isEmpty(values.left.pipetteName)}
               options={tiprackOptions}
               value={values.left.tiprackDefURI}
-              name="left.tiprackDefURI"
-              onChange={makeHandleChange('left', 'tiprackDefURI')}
+              name="pipettesByMount.left.tiprackDefURI"
+              onChange={onFieldChange}
+              onBlur={onBlur}
             />
           </FormGroup>
         </div>
@@ -129,12 +176,26 @@ export function PipetteFields(props: Props) {
             className={formStyles.stacked_row}
           >
             <DropdownField
+              error={
+                // TODO JF 2020-3-19 allow dropdowns to take error
+                // components from formik so we avoid manually doing this
+                touched &&
+                typeof touched !== 'boolean' &&
+                touched.right &&
+                touched.right.tiprackDefURI &&
+                errors !== null &&
+                typeof errors !== 'string' &&
+                errors.right
+                  ? errors.right.tiprackDefURI
+                  : null
+              }
               tabIndex={initialTabIndex + 4}
               disabled={isEmpty(values.right.pipetteName)}
               options={tiprackOptions}
               value={values.right.tiprackDefURI}
-              name="right.tiprackDefURI"
-              onChange={makeHandleChange('right', 'tiprackDefURI')}
+              name="pipettesByMount.right.tiprackDefURI"
+              onChange={onFieldChange}
+              onBlur={onBlur}
             />
           </FormGroup>
         </div>

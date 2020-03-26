@@ -1,234 +1,153 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
-import find from 'lodash/find'
+import { useDispatch, useSelector } from 'react-redux'
+import last from 'lodash/last'
 
-import {
-  NO_SECURITY,
-  WPA_EAP_SECURITY,
-  fetchWifiList,
-  fetchWifiEapOptions,
-  fetchWifiKeys,
-  addWifiKey,
-  configureWifi,
-  makeGetRobotWifiList,
-  makeGetRobotWifiEapOptions,
-  makeGetRobotWifiKeys,
-  makeGetRobotWifiConfigure,
-  clearConfigureWifiResponse,
-} from '../../../http-api-client'
+import * as RobotApi from '../../../robot-api'
+import * as Networking from '../../../networking'
 
-import { startDiscovery } from '../../../discovery'
-import { chainActions } from '../../../util'
-
-import { IntervalWrapper, SpinnerModal } from '@opentrons/components'
+import { useInterval } from '@opentrons/components'
 import { Portal } from '../../portal'
-import { ConnectModal } from './ConnectModal'
-import { ConnectForm } from './ConnectForm'
 import { SelectSsid } from './SelectSsid'
-import { WifiConnectModal } from './WifiConnectModal'
+import { ConnectModal } from './ConnectModal'
+import { DisconnectModal } from './DisconnectModal'
+import { ResultModal } from './ResultModal'
+
+import { CONNECT, DISCONNECT, JOIN_OTHER } from './constants'
 
 import type { State, Dispatch } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
-import type {
-  WifiNetworkList,
-  WifiSecurityType,
-  WifiEapOptionsList,
-  WifiKeysList,
-  WifiConfigureRequest,
-  WifiConfigureResponse,
-  ApiRequestError,
-} from '../../../http-api-client'
+import type { WifiConfigureRequest, NetworkChangeState } from './types'
 
-type OP = {| robot: ViewableRobot |}
+type SelectNetworkProps = {| robotName: string |}
 
-type SP = {|
-  list: ?WifiNetworkList,
-  connectingTo: ?string,
-  eapOptions: ?WifiEapOptionsList,
-  keys: ?WifiKeysList,
-  configRequest: ?WifiConfigureRequest,
-  configResponse: ?WifiConfigureResponse,
-  configError: ?ApiRequestError,
-|}
+const LIST_REFRESH_MS = 10000
 
-type DP = {|
-  fetchEapOptions: () => mixed,
-  fetchKeys: () => mixed,
-  addKey: (file: File) => mixed,
-  configure: WifiConfigureRequest => mixed,
-  refresh: () => mixed,
-  clearConfigure: () => mixed,
-|}
+export const SelectNetwork = ({ robotName }: SelectNetworkProps) => {
+  const list = useSelector((state: State) =>
+    Networking.getWifiList(state, robotName)
+  )
+  const keys = useSelector((state: State) =>
+    Networking.getWifiKeys(state, robotName)
+  )
+  const eapOptions = useSelector((state: State) =>
+    Networking.getEapOptions(state, robotName)
+  )
+  const canDisconnect = useSelector((state: State) =>
+    Networking.getCanDisconnect(state, robotName)
+  )
 
-type Props = {| ...OP, ...SP, ...DP |}
+  const [changeState, setChangeState] = React.useState<NetworkChangeState>({
+    type: null,
+  })
 
-type SelectNetworkState = {|
-  ssid: ?string,
-  securityType: ?WifiSecurityType,
-  modalOpen: boolean,
-|}
+  const dispatch = useDispatch<Dispatch>()
 
-const LIST_REFRESH_MS = 15000
+  const [dispatchApi, requestIds] = RobotApi.useDispatchApiRequest()
 
-class SelectNetworkComponent extends React.Component<
-  Props,
-  SelectNetworkState
-> {
-  constructor(props: Props) {
-    super(props)
-    // prepopulate selected SSID with currently connected network, if any
-    this.state = {
-      ssid: this.getActiveSsid(),
-      securityType: null,
-      modalOpen: false,
+  const requestState = useSelector((state: State) =>
+    RobotApi.getRequestById(state, last(requestIds))
+  )
+
+  const activeNetwork = list.find(nw => nw.active)
+
+  const handleDisconnect = () => {
+    if (activeNetwork) {
+      dispatchApi(Networking.postWifiDisconnect(robotName, activeNetwork.ssid))
     }
   }
 
-  setCurrentSsid = (_: string, ssid: ?string) => {
-    const network = find(this.props.list, { ssid })
-    const securityType = network && network.securityType
-    const nextState = {
-      ssid,
-      securityType,
-      modalOpen: securityType !== NO_SECURITY,
+  const handleConnect = (options: WifiConfigureRequest) => {
+    dispatchApi(Networking.postWifiConfigure(robotName, options))
+    if (changeState.type === JOIN_OTHER) {
+      setChangeState({ ...changeState, ssid: options.ssid })
     }
-
-    if (ssid && !nextState.modalOpen) {
-      this.props.configure({ ssid })
-    } else if (securityType === WPA_EAP_SECURITY || !securityType) {
-      this.props.fetchEapOptions()
-      this.props.fetchKeys()
-    }
-
-    this.setState(nextState)
   }
 
-  closeConnectForm = () =>
-    this.setState({ securityType: null, modalOpen: false })
+  useInterval(
+    () => dispatch(Networking.fetchWifiList(robotName)),
+    LIST_REFRESH_MS,
+    true
+  )
 
-  getActiveSsid(): ?string {
-    const activeNetwork = find(this.props.list, 'active')
-    return activeNetwork && activeNetwork.ssid
+  React.useEffect(() => {
+    // if we're connecting to a network, ensure we get the info needed to
+    // populate the configuration forms
+    if (changeState.type === CONNECT || changeState.type === JOIN_OTHER) {
+      dispatch(Networking.fetchEapOptions(robotName))
+      dispatch(Networking.fetchWifiKeys(robotName))
+    }
+  }, [robotName, dispatch, changeState.type])
+
+  const handleSelectConnect = ssid => {
+    const network = list.find(nw => nw.ssid === ssid)
+
+    if (network) {
+      const { ssid, securityType } = network
+
+      if (securityType === Networking.SECURITY_NONE) {
+        handleConnect({ ssid, securityType, hidden: false })
+      }
+
+      setChangeState({ type: CONNECT, ssid, network })
+    }
   }
 
-  render() {
-    const {
-      // TODO(mc, 2020-02-03): ?WifiNetworkList is not an easy type to work
-      // with here; fix up as part of #4842
-      list,
-      connectingTo,
-      eapOptions,
-      keys,
-      refresh,
-      addKey,
-      configure,
-      configRequest,
-      configResponse,
-      configError,
-      clearConfigure,
-    } = this.props
-    const { ssid, securityType, modalOpen } = this.state
+  const handleSelectDisconnect = () => {
+    const ssid = activeNetwork?.ssid
+    ssid != null && setChangeState({ type: DISCONNECT, ssid })
+  }
 
-    return (
-      <IntervalWrapper refresh={refresh} interval={LIST_REFRESH_MS}>
-        <SelectSsid
-          list={list || []}
-          disabled={connectingTo != null}
-          onValueChange={this.setCurrentSsid}
-        />
+  const handleSelectJoinOther = () => {
+    setChangeState({ type: JOIN_OTHER, ssid: null })
+  }
+
+  const handleDone = () => {
+    if (last(requestIds)) dispatch(RobotApi.dismissRequest(last(requestIds)))
+    setChangeState({ type: null })
+  }
+
+  return (
+    <>
+      <SelectSsid
+        list={list}
+        value={activeNetwork?.ssid ?? null}
+        showWifiDisconnect={canDisconnect}
+        onConnect={handleSelectConnect}
+        onJoinOther={handleSelectJoinOther}
+        onDisconnect={handleSelectDisconnect}
+      />
+      {changeState.type && (
         <Portal>
-          {connectingTo && (
-            <SpinnerModal
-              message={`Attempting to connect to network ${connectingTo}`}
-              alertOverlay
+          {requestState ? (
+            <ResultModal
+              type={changeState.type}
+              ssid={changeState.ssid}
+              isPending={requestState.status === RobotApi.PENDING}
+              error={requestState.error ? requestState.error : null}
+              onClose={handleDone}
             />
-          )}
-          {modalOpen && (
+          ) : changeState.type === DISCONNECT ? (
+            <DisconnectModal
+              ssid={changeState.ssid}
+              onDisconnect={handleDisconnect}
+              onCancel={handleDone}
+            />
+          ) : (
             <ConnectModal
-              ssid={ssid}
-              securityType={securityType}
-              close={this.closeConnectForm}
-            >
-              <ConnectForm
-                ssid={ssid}
-                securityType={securityType}
-                eapOptions={eapOptions}
-                keys={keys}
-                configure={configure}
-                close={this.closeConnectForm}
-                addKey={addKey}
-              />
-            </ConnectModal>
-          )}
-          {configRequest && !!(configError || configResponse) && (
-            <WifiConnectModal
-              error={configError}
-              request={configRequest}
-              response={configResponse}
-              close={clearConfigure}
+              robotName={robotName}
+              network={
+                // if we're connecting to a known network, pass it to the ConnectModal
+                // otherwise we're joining a hidden network, so set network to null
+                changeState.type === CONNECT ? changeState.network : null
+              }
+              wifiKeys={keys}
+              eapOptions={eapOptions}
+              onConnect={handleConnect}
+              onCancel={handleDone}
             />
           )}
         </Portal>
-      </IntervalWrapper>
-    )
-  }
+      )}
+    </>
+  )
 }
-
-function makeMapStateToProps(): (State, OP) => SP {
-  const getListCall = makeGetRobotWifiList()
-  const getEapCall = makeGetRobotWifiEapOptions()
-  const getKeysCall = makeGetRobotWifiKeys()
-  const getConfigureCall = makeGetRobotWifiConfigure()
-
-  return (state, ownProps) => {
-    const { robot } = ownProps
-    const { response: listResponse } = getListCall(state, robot)
-    const { response: eapResponse } = getEapCall(state, robot)
-    const { response: keysResponse } = getKeysCall(state, robot)
-    const {
-      request: cfgRequest,
-      inProgress: cfgInProgress,
-      response: cfgResponse,
-      error: cfgError,
-    } = getConfigureCall(state, robot)
-
-    return {
-      list: listResponse && listResponse.list,
-      eapOptions: eapResponse && eapResponse.options,
-      keys: keysResponse && keysResponse.keys,
-      connectingTo:
-        !cfgError && cfgInProgress && cfgRequest ? cfgRequest.ssid : null,
-      configRequest: cfgRequest,
-      configResponse: cfgResponse,
-      configError: cfgError,
-    }
-  }
-}
-
-function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
-  const { robot } = ownProps
-  const refreshActions = [fetchWifiList(robot)]
-  const configure = params =>
-    dispatch(
-      chainActions(
-        configureWifi(robot, params),
-        startDiscovery(),
-        ...refreshActions
-      )
-    )
-
-  return {
-    configure,
-    clearConfigure: () => dispatch(clearConfigureWifiResponse(robot)),
-    fetchEapOptions: () => dispatch(fetchWifiEapOptions(robot)),
-    fetchKeys: () => dispatch(fetchWifiKeys(robot)),
-    addKey: file => dispatch(addWifiKey(robot, file)),
-    refresh: () => refreshActions.forEach(dispatch),
-  }
-}
-
-export const SelectNetwork = connect<Props, OP, SP, _, _, _>(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(SelectNetworkComponent)

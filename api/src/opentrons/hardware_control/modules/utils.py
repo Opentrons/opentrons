@@ -32,13 +32,15 @@ async def build(
         simulating: bool,
         interrupt_callback: InterruptCallback,
         loop: asyncio.AbstractEventLoop,
-        execution_manager: ExecutionManager) -> AbstractModule:
+        execution_manager: ExecutionManager,
+        sim_model: str = None) -> AbstractModule:
     return await MODULE_HW_BY_NAME[which].build(
         port,
         interrupt_callback=interrupt_callback,
         simulating=simulating,
         loop=loop,
-        execution_manager=execution_manager
+        execution_manager=execution_manager,
+        sim_model=sim_model
     )
 
 

@@ -37,10 +37,12 @@ class SessionManager:
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
     def __init__(self, hardware: ThreadManager):
-        self.token = uuid4()
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
         self._deck = geometry.Deck()
+        self._lw_definitions: typing.Dict[str, typing.Dict] = {}
+        self._slot_options = ['8', '6']
+        self._labware_info = self._determine_required_labware()
 
     def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
@@ -50,32 +52,6 @@ class CalibrationSession:
             data['plunger_axis'] = Axis.of_plunger(mount)
             pipette_dict[token] = {**data}
         return pipette_dict
-
-    async def cache_instruments(self):
-        await self.hardware.cache_instruments()
-        new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
-        self._pipettes.clear()
-        self._pipettes.update(new_dict)
-
-    @property
-    def hardware(self) -> ThreadManager:
-        return self._hardware
-
-    def get_pipette(self, uuid: UUID4) -> 'AttachedPipette':
-        return self._pipettes[uuid]
-
-    @property
-    def pipettes(self) -> typing.Dict:
-        return self._pipettes
-
-
-class CheckCalibrationSession(CalibrationSession):
-    def __init__(self, hardware: 'ThreadManager'):
-        super().__init__(hardware)
-        self.state_machine = CalibrationCheckMachine()
-        self._lw_definitions: typing.Dict[str, typing.Dict] = {}
-        self._slot_options = ['8', '6']
-        self._labware_info = self._determine_required_labware()
 
     def _determine_required_labware(self) -> typing.Dict:
         lw: typing.Dict[str, typing.Dict] = {}
@@ -117,6 +93,33 @@ class CheckCalibrationSession(CalibrationSession):
         else:
             return None
 
+    async def cache_instruments(self):
+        await self.hardware.cache_instruments()
+        new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
+        self._pipettes.clear()
+        self._pipettes.update(new_dict)
+
+    @property
+    def hardware(self) -> ThreadManager:
+        return self._hardware
+
+    def get_pipette(self, uuid: UUID4) -> 'AttachedPipette':
+        return self._pipettes[uuid]
+
+    @property
+    def pipettes(self) -> typing.Dict:
+        return self._pipettes
+
+    @property
+    def labware(self) -> typing.Dict:
+        return self._labware_info
+
+
+class CheckCalibrationSession(CalibrationSession):
+    def __init__(self, hardware: 'ThreadManager'):
+        super().__init__(hardware)
+        self.state_machine = CalibrationCheckMachine()
+
     def _create_labware_objects(self):
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'loadLabware',\
@@ -127,7 +130,3 @@ class CheckCalibrationSession(CalibrationSession):
             objs[name] = {
                 'object': labware.Labware(data['definition'], parent)}
         self._lw_definitions.update(**objs)
-
-    @property
-    def labware(self) -> typing.Dict:
-        return self._labware_info

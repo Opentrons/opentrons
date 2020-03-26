@@ -119,7 +119,6 @@ export const getSwapBlocked = (args: {
     modulesById,
     customLabwareDefs,
   } = args
-  console.log('hovered ', hoveredLabware, modulesById)
   if (!hoveredLabware || !draggedLabware) {
     return false
   }

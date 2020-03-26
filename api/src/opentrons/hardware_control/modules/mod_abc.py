@@ -22,7 +22,8 @@ class AbstractModule(abc.ABC):
                     execution_manager: ExecutionManager,
                     interrupt_callback: InterruptCallback = None,
                     simulating: bool = False,
-                    loop: asyncio.AbstractEventLoop = None) \
+                    loop: asyncio.AbstractEventLoop = None,
+                    sim_model: str = None) \
             -> 'AbstractModule':
         """ Modules should always be created using this factory.
 
@@ -36,7 +37,8 @@ class AbstractModule(abc.ABC):
                  port: str,
                  execution_manager: ExecutionManager,
                  simulating: bool = False,
-                 loop: asyncio.AbstractEventLoop = None) -> None:
+                 loop: asyncio.AbstractEventLoop = None,
+                 sim_model: str = None) -> None:
         self._port = port
         self._loop = use_or_initialize_loop(loop)
         self._execution_manager = execution_manager

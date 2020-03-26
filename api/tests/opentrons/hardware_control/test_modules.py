@@ -81,7 +81,8 @@ async def test_module_update_integration(monkeypatch, loop):
             simulating=True,
             interrupt_callback=lambda x: None,
             loop=loop,
-            execution_manager=ExecutionManager(loop=loop))
+            execution_manager=ExecutionManager(loop=loop),
+            sim_model='temperatureModuleV2')
 
     upload_via_avrdude_mock = mock.Mock(
         return_value=(async_return((True, 'avrdude bootloader worked'))))

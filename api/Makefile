@@ -141,16 +141,19 @@ dev:
 local-shell:
 	$(pipenv_envvars) pipenv shell
 
-.PHONY: push
-push: wheel
+.PHONY: push-no-restart
+push-no-restart: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
-systemctl restart jupyter-notebook &&\
-systemctl stop opentrons-robot-server &&\
+"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / ; } ;\
 mount -o remount,rw / &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+
+.PHONY: push
+push: push-no-restart
+	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
+"systemctl restart jupyter-notebook && systemctl restart opentrons-robot-server"
 
 .PHONY: simulate
 simulate:

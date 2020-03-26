@@ -31,7 +31,8 @@
 }
 
 .new_file_modal_contents {
-  position: relative;
+  /* override the position relative of default modal style to allow another modal's overlay to take up entire space */
+  position: static;
   border-radius: 0;
   margin: 0;
   height: 100%;
