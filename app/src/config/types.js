@@ -9,7 +9,6 @@ export type DiscoveryCandidates = string | Array<string>
 
 export type DevInternalFlag =
   | 'allPipetteConfig'
-  | 'enableMultiGEN2'
   | 'enableBundleUpload'
 
 export type FeatureFlags = $Shape<{|
