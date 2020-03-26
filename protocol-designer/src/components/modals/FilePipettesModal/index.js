@@ -73,6 +73,7 @@ export type Props = {|
   |}) => mixed,
   modulesEnabled: ?boolean,
   thermocyclerEnabled: ?boolean,
+  moduleRestrictionsDisabled: ?boolean,
 |}
 
 const initialFormState: FormState = {
@@ -245,7 +246,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
 
   render() {
     if (this.props.hideModal) return null
-    const { showProtocolFields } = this.props
+    const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 
     return (
       <React.Fragment>
@@ -366,7 +367,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
                               />
                             </div>
                           )}
-                        {showCrashInfoBox && (
+                        {showCrashInfoBox && !moduleRestrictionsDisabled && (
                           <CrashInfoBox
                             showDiagram
                             magnetOnDeck={hasCrashableMagnetModuleSelected}
