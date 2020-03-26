@@ -26,6 +26,7 @@ To take advantage of Jupyter's ability to run only parts of your protocol, you h
 
     import opentrons.execute
     protocol = opentrons.execute.get_protocol_api('2.0')
+    protocol.home()
 
 
 This returns the same kind of object - a :py:class:`.ProtocolContext` - that is passed into your protocol's ``run`` function when you upload your protocol in the Opentrons App. Full documentation on the capabilities and use of the :py:class:`.ProtocolContext` object is available in the other sections of this guide - :ref:`new-pipette`, :ref:`v2-atomic-commands`, :ref:`v2-complex-commands`, :ref:`new-labware`, and :ref:`new_modules`; a full list of all available attributes and methods is available in :ref:`protocol-api-reference`.
