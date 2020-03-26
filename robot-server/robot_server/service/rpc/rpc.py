@@ -95,7 +95,7 @@ class RPCServer(object):
             while True:
                 payload = await queue_.get()
                 if socket_.client_state == WebSocketState.DISCONNECTED:
-                    log.debug('Websocket %s closed', id(_id))
+                    log.debug('Websocket %s closed', _id)
                     break
 
                 await socket_.send_json(payload)
@@ -103,7 +103,7 @@ class RPCServer(object):
         queue: asyncio.Queue = asyncio.Queue(loop=self.loop)
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
-        log.debug('Send task for {0} started'.format(_id))
+        log.debug('Send task for %s started', _id)
 
         return ClientWriterTask(socket=socket, queue=queue, task=task)
 
@@ -229,7 +229,7 @@ class RPCServer(object):
             if meta.get('ping'):
                 return self.send_pong()
 
-            # if id is missing from payload or explicitely set to null,
+            # if id is missing from payload or explicitly set to null,
             # use the system object
             if _id is None:
                 _id = id(self.system)

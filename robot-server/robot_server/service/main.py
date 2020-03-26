@@ -15,6 +15,7 @@ from .models.json_api.errors import \
     transform_http_exception_to_json_api_errors
 from .models import V1BasicResponse
 from .exceptions import V1HandlerError
+from .dependencies import get_rpc_server
 
 
 app = FastAPI(
@@ -53,6 +54,12 @@ app.include_router(router=rpc.router,
 # once response work is implemented in new route handlers
 app.include_router(router=item.router,
                    tags=["item"])
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    s = await get_rpc_server()
+    await s.on_shutdown()
 
 
 @app.exception_handler(V1HandlerError)
