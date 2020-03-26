@@ -6,7 +6,6 @@ export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'enableMultiGEN2',
   'enableBundleUpload',
-  'enableWifiDisconnect',
 ]
 
 // action type constants
