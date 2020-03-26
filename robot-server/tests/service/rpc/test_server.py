@@ -3,8 +3,7 @@ import typing
 
 import pytest
 import sys
-import time
-from threading import Event
+from threading import Event, Semaphore
 from uuid import uuid4 as uuid
 
 from fastapi.routing import APIWebSocketRoute
@@ -162,26 +161,56 @@ class Notifications(object):
         return self._loop
 
 
-class TickTock(object):
+class NotifyTester(object):
+    """
+    An RPC test object that, when start is called, will send 5 notifications
+    then wait on an event which is initially cleared. Calling finish will
+    set the event and cause start to return.
+    """
     def __init__(self):
         self.value = 0
         self.notifications = Notifications()
         self.running = Event()
+        self.running.clear()
 
     def start(self):
-        self.running.set()
         for i in range(5):
-            self.running.wait()
             self.notifications.put(i)
-            time.sleep(.1)
+        self.running.wait()
         return "Done!"
 
-    def pause(self):
-        self.running.clear()
-        return "Paused"
+    def finish(self):
+        self.running.set()
+        return "Finishing"
+
+
+class ConcurrentCallTester(object):
+    """
+    An RPC test object with a start methond that will send a notifcation, wait
+    on a semaphore, send another notification, wait on a semaphore, then
+    return. The semaphore's initial count is 0.
+    resume will will release the semaphore.
+    Using the notifications and semaphore, the unit test can prove that
+    concurrent function calls work.
+    """
+    def __init__(self):
+        self.notifications = Notifications()
+        # Semaphore used for control of execution.
+        self.running = Semaphore(0)
+
+    def start(self):
+        # Notify that we're starting
+        self.notifications.put("starting")
+        # Wait on the semaphore.
+        self.running.acquire()
+        # Notify that we are awake
+        self.notifications.put("awake")
+        # Wait on the semaphore
+        self.running.acquire()
+        return "Done!"
 
     def resume(self):
-        self.running.set()
+        self.running.release()
         return "Resumed"
 
 
@@ -403,7 +432,7 @@ def test_exception_on_call(session, root):
 def test_call_on_reference(session, root):
     # Flip root object outside of constructor to ensure
     # server is re-initialized properly
-    session.server.root = TickTock()
+    session.server.root = NotifyTester()
     session.server.root = root
 
     # TODO (artyom, 20170905): assert server.monitor_events task gets canceled
@@ -441,7 +470,7 @@ def test_call_on_reference(session, root):
     assert res == expected
 
 
-@pytest.mark.parametrize('root', [TickTock()])
+@pytest.mark.parametrize('root', [NotifyTester()])
 def test_notifications(session, root):
     session.socket.receive_json()  # Skip init
 
@@ -461,20 +490,47 @@ def test_notifications(session, root):
 
     assert res == [(rpc.NOTIFICATION_MESSAGE, i) for i in range(5)]
 
-    # Last comes call result
-    message = session.socket.receive_json()
-    assert message == {
-        '$': {
-            'status': 'success',
-            'type': 0, 'token': session.token
+    # Tell notifier to finish
+    session.call(
+        id=id(root),
+        name='finish',
+        args=[]
+    )
+
+    session.socket.receive_json()  # Skip ack
+
+    # The order of results of finish and start are not deterministic due to
+    # being in separate threads. Let's just make sure we got them.
+    messages = []
+    for i in range(2):
+        messages.append(session.socket.receive_json())
+
+    # Sort by the data field (ie the string returned by each function)
+    messages.sort(key=lambda o: o['data'])
+
+    assert messages == [
+        # Result of start call
+        {
+            '$': {
+                'status': 'success',
+                'type': 0, 'token': session.token
+            },
+            'data': 'Done!'
         },
-        'data': 'Done!'
-    }
+        # Result of finish call
+        {
+            '$': {
+                'status': 'success',
+                'type': 0, 'token': session.token
+            },
+            'data': 'Finishing'
+        }
+    ]
 
 
 @pytest.mark.api1_only
-@pytest.mark.parametrize('root', [TickTock()])
-def test_concurrent_calls(session, root):
+@pytest.mark.parametrize('root', [ConcurrentCallTester()])
+def test_concurrent_call(session, root):
     session.socket.receive_json()  # Skip init
 
     session.call(
@@ -484,52 +540,54 @@ def test_concurrent_calls(session, root):
     )
     session.socket.receive_json()  # Skip ack
 
-    session.call(
-        id=id(root),
-        name='pause',
-        args=[]
-    )
+    # Get the notification that the function is starting
+    r = session.socket.receive_json()
+    assert r == {'$': {'type': rpc.NOTIFICATION_MESSAGE},
+                 'data': 'starting'}
 
-    res = []
-    while True:
-        message = session.socket.receive_json()
-        if 'token' in message['$']:
-            message['$'].pop('token')
-
-        res += [message]
-        if message.get('data') == 'Paused':
-            break
-    # Confirm receiving first notification, ACK for pause and pause result
-    assert res == [
-        {'data': 0, '$': {'type': 2}},
-        {'$': {'type': 1}},
-        {'data': 'Paused', '$': {'status': 'success', 'type': 0}}
-    ]
-    res.clear()
-    time.sleep(1.0)
-
+    # Call function to awaken the thread
     session.call(
         id=id(root),
         name='resume',
         args=[]
     )
 
-    while True:
-        message = session.socket.receive_json()
-        if 'token' in message['$']:
-            message['$'].pop('token')
+    # Ack for call
+    r = session.socket.receive_json()
+    assert r == {'$': {'token': session.token,
+                       'type': rpc.CALL_ACK_MESSAGE}}
 
-        res += [message]
-        if message.get('data') == 'Done!':
-            break
+    # Result of awaken call
+    r = session.socket.receive_json()
+    assert r == {'$': {'status': 'success', 'token': session.token,
+                       'type': rpc.CALL_RESULT_MESSAGE},
+                 'data': 'Resumed'}
 
-    assert res == [
-        {'$': {'type': 1}},  # resume() call ACK
-        {'$': {'status': 'success', 'type': 0}, 'data': 'Resumed'},  # resume() call result # noqa
-        # Original start() call proceeds
-        {'$': {'type': 2}, 'data': 1},
-        {'$': {'type': 2}, 'data': 2},
-        {'$': {'type': 2}, 'data': 3},
-        {'$': {'type': 2}, 'data': 4},
-        {'$': {'status': 'success', 'type': 0}, 'data': 'Done!'}
-    ]
+    # Notification of being awake
+    r = session.socket.receive_json()
+    assert r == {'$': {'type': rpc.NOTIFICATION_MESSAGE},
+                 'data': 'awake'}
+
+    # Awaken again
+    session.call(
+        id=id(root),
+        name='resume',
+        args=[]
+    )
+
+    # Ack for call
+    r = session.socket.receive_json()
+    assert r == {'$': {'token': session.token,
+                       'type': rpc.CALL_ACK_MESSAGE}}
+
+    # Result of awaken
+    r = session.socket.receive_json()
+    assert r == {'$': {'status': 'success', 'token': session.token,
+                       'type': rpc.CALL_RESULT_MESSAGE},
+                 'data': 'Resumed'}
+
+    # Result of start function
+    r = session.socket.receive_json()
+    assert r == {'$': {'status': 'success', 'token': session.token,
+                       'type': rpc.CALL_RESULT_MESSAGE},
+                 'data': 'Done!'}
