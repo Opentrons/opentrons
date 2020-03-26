@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from pydantic import BaseModel, Field, UUID4
 
 from opentrons.hardware_control.types import Axis
@@ -38,7 +38,7 @@ class LabwareStatus(BaseModel):
     A model describing all labware attached
     """
     alternatives: List[str]
-    slot: DeckItem
+    slot: Optional[str]
     tiprackID: UUID4
     forPipettes: List[UUID4]
     loadName: str
@@ -47,8 +47,7 @@ class LabwareStatus(BaseModel):
 
     class Config:
         json_encoders = {
-            UUID4: convert_uuid,
-            DeckItem}
+            UUID4: convert_uuid}
 
 
 class CalibrationSessionStatus(BaseModel):

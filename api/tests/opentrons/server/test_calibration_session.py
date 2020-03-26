@@ -22,9 +22,10 @@ async def test_start_session(async_client, test_setup):
     assert resp.status == 201
     text = await resp.json()
     assert list(text.keys()) ==\
-        ["instruments", "currentStep", "nextSteps", "sessionToken"]
+        ["instruments", "currentStep", "nextSteps", "sessionToken", "labware"]
     assert text["currentStep"] == "sessionStart"
     assert text["nextSteps"] == {"links": {"loadLabware": ""}}
+    print(text["labware"])
 
 
 async def test_check_session(async_client, test_setup):
@@ -38,7 +39,7 @@ async def test_check_session(async_client, test_setup):
 
     assert text["sessionToken"] == text2["sessionToken"]
     assert list(text.keys()) ==\
-        ["instruments", "currentStep", "nextSteps", "sessionToken"]
+        ["instruments", "currentStep", "nextSteps", "sessionToken", "labware"]
     assert text["currentStep"] == "sessionStart"
     assert text["nextSteps"] == {"links": {"loadLabware": ""}}
 

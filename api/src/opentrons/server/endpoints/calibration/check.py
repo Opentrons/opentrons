@@ -1,8 +1,8 @@
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 
-from .session import CheckCalibrationSession, LabwareStatus
-from .models import CalibrationSessionStatus
+from .session import CheckCalibrationSession
+from .models import CalibrationSessionStatus, LabwareStatus
 
 ALLOWED_SESSIONS = ['check']
 
@@ -31,7 +31,7 @@ def _format_status(
         currentStep=current,
         nextSteps=links,
         sessionToken=session.token,
-        labware=[LabwareStatus(**lw) for lw in session.labware])
+        labware=[LabwareStatus(**lw) for lw in session.labware.values()])
     return status
 
 
