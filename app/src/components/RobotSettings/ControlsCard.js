@@ -6,7 +6,7 @@ import { push } from 'connected-react-router'
 import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { getConfig } from '../../config'
+import { getFeatureFlags } from '../../config'
 
 import {
   home,
@@ -18,7 +18,6 @@ import {
 import { restartRobot } from '../../robot-admin'
 import { selectors as robotSelectors } from '../../robot'
 import { CONNECTABLE } from '../../discovery'
-
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
@@ -41,8 +40,7 @@ export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
   const { name: robotName, status } = robot
-  const config = useSelector(getConfig)
-  const enableRobotCalCheck = Boolean(config.devInternal?.enableRobotCalCheck)
+  const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const [isCheckingRobotCal, setIsCheckingRobotCal] = React.useState(false)
@@ -65,7 +63,7 @@ export function ControlsCard(props: Props) {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      {enableRobotCalCheck && (
+      {ff.enableRobotCalCheck && (
         <LabeledButton
           label="Check deck calibration"
           buttonProps={{

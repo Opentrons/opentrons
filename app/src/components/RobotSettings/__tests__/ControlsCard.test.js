@@ -7,6 +7,7 @@ import { MemoryRouter } from 'react-router-dom'
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
+import * as ConfigSelectors from '../../../config/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, REACHABLE } from '../../../discovery'
@@ -16,6 +17,7 @@ import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')
+jest.mock('../../../config/selectors')
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -74,7 +76,6 @@ describe('ControlsCard', () => {
       subscribe: () => {},
       getState: () => ({
         mockState: true,
-        config: { devInternal: { enableRobotCalCheck: true } },
       }),
       dispatch: jest.fn(),
     }
@@ -88,11 +89,7 @@ describe('ControlsCard', () => {
     mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -108,11 +105,7 @@ describe('ControlsCard', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -128,11 +121,7 @@ describe('ControlsCard', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -148,11 +137,7 @@ describe('ControlsCard', () => {
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -164,15 +149,18 @@ describe('ControlsCard', () => {
     )
   })
 
-  it('DC, home, and restart buttons enabled if connected and not running', () => {
+  it('DC, check cal, home, and restart buttons enabled if connected and not running', () => {
     mockGetIsRunning.mockReturnValue(false)
 
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: true,
+    })
+
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
           <ControlsCard
             robot={mockUnconnectableRobot}
-            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -185,13 +173,16 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('DC, home, and restart buttons disabled if not connectable', () => {
+  it('DC, check cal, home, and restart buttons disabled if not connectable', () => {
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: true,
+    })
+
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
           <ControlsCard
             robot={mockUnconnectableRobot}
-            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -204,21 +195,21 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('DC, home, and restart buttons disabled if not connected', () => {
+  it('DC, check cal, home, and restart buttons disabled if not connected', () => {
     const mockRobot: ViewableRobot = ({
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
     }: any)
 
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: true,
+    })
+
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -229,17 +220,17 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('DC, home, and restart buttons disabled if protocol running', () => {
+  it('DC, check cal, home, and restart buttons disabled if protocol running', () => {
     mockGetIsRunning.mockReturnValue(true)
+
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: true,
+    })
 
     const wrapper = mount(
       <Provider store={mockStore}>
         <MemoryRouter>
-          <ControlsCard
-            robot={mockRobot}
-            checkCalibrationUrl="/check-deck"
-            calibrateDeckUrl="/deck/calibrate"
-          />
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
         </MemoryRouter>
       </Provider>
     )
@@ -248,5 +239,22 @@ describe('ControlsCard', () => {
     expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
+  })
+
+  it('Check cal button does not render if feature flag off', () => {
+    mockGetIsRunning.mockReturnValue(true)
+
+    ConfigSelectors.getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: false,
+    })
+
+    const wrapper = mount(
+      <Provider store={mockStore}>
+        <MemoryRouter>
+          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
+        </MemoryRouter>
+      </Provider>
+    )
+    expect(wrapper.find({ label: 'Check deck calibration' })).toBe(undefined)
   })
 })
