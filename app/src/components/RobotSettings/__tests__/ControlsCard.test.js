@@ -90,7 +90,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -110,7 +110,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -130,7 +130,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -150,7 +150,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -172,7 +172,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockUnconnectableRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -191,7 +191,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockUnconnectableRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -216,7 +216,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>
@@ -237,7 +237,7 @@ describe('ControlsCard', () => {
         <MemoryRouter>
           <ControlsCard
             robot={mockRobot}
-            checkDeckUrl="/check-deck"
+            checkCalibrationUrl="/check-deck"
             calibrateDeckUrl="/deck/calibrate"
           />
         </MemoryRouter>

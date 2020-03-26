@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { push } from 'connected-react-router'
 import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
@@ -9,21 +8,19 @@ import {
   endRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
 } from '../../calibration'
-import { createLogger } from '../../logger'
+import { useLogger } from '../../logger'
 
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
 
-const log = createLogger(__filename)
-
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
-type CheckDeckProps = {|
-  parentUrl: string,
+type CheckCalibrationProps = {|
   robotName: string,
+  closeCalibrationCheck: () => mixed,
 |}
-export function CheckDeck(props: CheckDeckProps) {
-  const { robotName, parentUrl } = props
+export function CheckCalibration(props: CheckCalibrationProps) {
+  const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
   const robotCalibrationCheckSessionData = useSelector((state: State) =>
     getRobotCalibrationCheckSession(state, robotName)
@@ -31,13 +28,14 @@ export function CheckDeck(props: CheckDeckProps) {
   React.useEffect(() => {
     dispatch(fetchRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
+  const log = useLogger(__dirname)
 
   function exit() {
     dispatch(endRobotCalibrationCheckSession(robotName))
-    dispatch(push(parentUrl))
+    closeCalibrationCheck()
   }
 
-  log.info('robot calibration check session data: ', robotCalibrationCheckSessionData || {})
+  log.debug('robot calibration check session data: ', robotCalibrationCheckSessionData || {})
   return (
     <ModalPage
       titleBar={{

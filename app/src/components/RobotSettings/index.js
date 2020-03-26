@@ -16,7 +16,6 @@ export type RobotSettingsProps = {|
   robot: ViewableRobot,
   updateUrl: string,
   calibrateDeckUrl: string,
-  checkDeckUrl: string,
   resetUrl: string,
 |}
 
@@ -24,7 +23,7 @@ export type RobotSettingsProps = {|
 // various reasons.  We should surface those reasons to users in hover tooltips
 // on the buttons, this is currently limited by the existing LabeledButton component.
 export function RobotSettings(props: RobotSettingsProps) {
-  const { robot, updateUrl, checkDeckUrl, calibrateDeckUrl, resetUrl } = props
+  const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
     <CardContainer>
@@ -35,11 +34,7 @@ export function RobotSettings(props: RobotSettingsProps) {
         <InformationCard robot={robot} updateUrl={updateUrl} />
       </CardRow>
       <CardRow>
-        <ControlsCard
-          robot={robot}
-          checkDeckUrl={checkDeckUrl}
-          calibrateDeckUrl={calibrateDeckUrl}
-        />
+        <ControlsCard robot={robot} calibrateDeckUrl={calibrateDeckUrl} />
       </CardRow>
       <CardRow>
         <ConnectionCard robot={robot} />

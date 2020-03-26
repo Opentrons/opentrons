@@ -34,7 +34,6 @@ import {
 } from '../../components/RobotSettings'
 import { UpdateBuildroot } from '../../components/RobotSettings/UpdateBuildroot'
 import { CalibrateDeck } from '../../components/CalibrateDeck'
-import { CheckDeck } from '../../components/CheckDeck'
 import { ConnectBanner } from '../../components/RobotSettings/ConnectBanner'
 import { ReachableRobotBanner } from '../../components/RobotSettings/ReachableRobotBanner'
 import { RestartRequiredBanner } from '../../components/RobotSettings/RestartRequiredBanner'
@@ -77,7 +76,6 @@ export const RobotSettings = withRouter<_, _>(
 
 const UPDATE_FRAGMENT = 'update'
 const CALIBRATE_DECK_FRAGMENT = 'calibrate-deck'
-const CHECK_DECK_FRAGMENT = 'check-deck'
 const RESET_FRAGMENT = 'reset'
 
 function RobotSettingsComponent(props: Props) {
@@ -99,7 +97,6 @@ function RobotSettingsComponent(props: Props) {
   const titleBarProps = { title: robot.displayName }
   const updateUrl = `${url}/${UPDATE_FRAGMENT}`
   const calibrateDeckUrl = `${url}/${CALIBRATE_DECK_FRAGMENT}`
-  const checkDeckUrl = `${url}/${CHECK_DECK_FRAGMENT}`
   const resetUrl = `${url}/${RESET_FRAGMENT}`
 
   // TODO(mc, 2018-07-26): these routes are too complicated and mess with the
@@ -124,7 +121,6 @@ function RobotSettingsComponent(props: Props) {
           robot={robot}
           updateUrl={updateUrl}
           calibrateDeckUrl={calibrateDeckUrl}
-          checkDeckUrl={checkDeckUrl}
           resetUrl={resetUrl}
         />
       </Page>
@@ -144,11 +140,6 @@ function RobotSettingsComponent(props: Props) {
         <Route
           path={`${path}/${CALIBRATE_DECK_FRAGMENT}`}
           render={() => <CalibrateDeck robot={robot} parentUrl={url} />}
-        />
-
-        <Route
-          path={`${path}/${CHECK_DECK_FRAGMENT}`}
-          render={() => <CheckDeck robotName={robotName} parentUrl={url} />}
         />
 
         <Route
