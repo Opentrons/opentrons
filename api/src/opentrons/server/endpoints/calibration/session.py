@@ -59,8 +59,11 @@ class CalibrationSession:
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
         self._deck = geometry.Deck()
+<<<<<<< HEAD
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
+=======
+>>>>>>> feat(api): Add labware required to session status
 
     def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}

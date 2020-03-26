@@ -27,6 +27,7 @@ async def test_start_session(async_client, test_setup):
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text["currentStep"] == "sessionStart"
     assert text["nextSteps"] == {"links": {"loadLabware": ""}}
+    print(text["labware"])
 
     first_lw = text["labware"][0]
     second_lw = text["labware"][1]
@@ -52,10 +53,18 @@ async def test_check_session(async_client, test_setup):
     text2 = await resp.json()
     assert text == text2
 
+<<<<<<< HEAD
     assert list(text2.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text2["currentStep"] == "sessionStart"
     assert text2["nextSteps"] == {"links": {"loadLabware": ""}}
+=======
+    assert text["sessionToken"] == text2["sessionToken"]
+    assert list(text.keys()) ==\
+        ["instruments", "currentStep", "nextSteps", "sessionToken", "labware"]
+    assert text["currentStep"] == "sessionStart"
+    assert text["nextSteps"] == {"links": {"loadLabware": ""}}
+>>>>>>> feat(api): Add labware required to session status
 
 
 async def test_delete_session(async_client, async_server, test_setup):

@@ -31,7 +31,12 @@ def _format_status(
         instruments=instruments,
         currentStep=current,
         nextSteps=links,
+<<<<<<< HEAD
         labware=[LabwareStatus(**data) for data in lw_status])
+=======
+        sessionToken=session.token,
+        labware=[LabwareStatus(**lw) for lw in session.labware.values()])
+>>>>>>> feat(api): Add labware required to session status
     return status
 
 
