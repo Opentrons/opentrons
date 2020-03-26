@@ -13,7 +13,13 @@ import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../networking/selectors')
-jest.mock('../../../components/RobotSettings/SelectNetwork')
+jest.mock('../../../components/RobotSettings/SelectNetwork', () => {
+  return {
+    SelectNetwork: () => {
+      return <></>
+    },
+  }
+})
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -144,6 +150,6 @@ describe('ConnectionCard', () => {
     const wrapper = render()
     const select = wrapper.find(SelectNetwork)
 
-    expect(select.prop('robot')).toEqual(mockRobot)
+    expect(select.prop('robotName')).toEqual(mockRobot.name)
   })
 })
