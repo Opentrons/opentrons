@@ -65,7 +65,7 @@ async def create_session(request):
     """
     session_type = request.match_info['type']
     if session_type not in ALLOWED_SESSIONS:
-        message = f'Session of type {session_type} is not supported'
+        message = f"Session of type {session_type} is not supported."
         return web.json_response(message, status=403)
 
     session_storage = request.app['com.opentrons.session_manager']
@@ -96,9 +96,10 @@ async def delete_session(request):
     session_storage = request.app['com.opentrons.session_manager']
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
-        response = {'message': f'A {session_type} session does not exist.'}
+        response = {"message": f"A {session_type} session does not exist."}
         return web.json_response(response, status=404)
     else:
         await current_session.hardware.home()
         del session_storage.sessions[session_type]
-        return web.json_response(status=200)
+        response = {'message': f"Successfully deleted {session_type} session."}
+        return web.json_response(response, status=200)
