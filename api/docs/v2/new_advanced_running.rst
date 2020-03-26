@@ -26,13 +26,24 @@ To take advantage of Jupyter's ability to run only parts of your protocol, you h
 
     import opentrons.execute
     protocol = opentrons.execute.get_protocol_api('2.0')
+    protocol.home()
 
 
 This returns the same kind of object - a :py:class:`.ProtocolContext` - that is passed into your protocol's ``run`` function when you upload your protocol in the Opentrons App. Full documentation on the capabilities and use of the :py:class:`.ProtocolContext` object is available in the other sections of this guide - :ref:`new-pipette`, :ref:`v2-atomic-commands`, :ref:`v2-complex-commands`, :ref:`new-labware`, and :ref:`new_modules`; a full list of all available attributes and methods is available in :ref:`protocol-api-reference`.
 
 Whenever you call ``get_protocol_api``, the robot will update its cache of attached instruments and modules. You can call ``get_protocol_api`` repeatedly; it will return an entirely new :py:class:`.ProtocolContext` each time, without any labware loaded or any instruments established. This can be a good way to reset the state of the system, if you accidentally loaded in the wrong labware.
 
-Now that you have a :py:class:`.ProtocolContext`, you call all its methods just as you would in a protocol, without the encompassing ``run`` function, just like if you were prototyping a plotting or pandas script for later use.
+Now that you have a :py:class:`.ProtocolContext`, you call all its methods just
+as you would in a protocol, without the encompassing ``run`` function, just like
+if you were prototyping a plotting or pandas script for later use.
+
+.. note::
+
+    Before you can command the OT-2 to move using the protocol API you have just
+    built, you must home the robot using ``protocol.home()``. If you try to move
+    the OT-2 before you have called ``protocol.home()``, you will get a
+    ``MustHomeError``.
+
 
 Running A Previously-Written Protocol
 +++++++++++++++++++++++++++++++++++++
