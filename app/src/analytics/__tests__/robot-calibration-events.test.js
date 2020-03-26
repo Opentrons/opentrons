@@ -19,7 +19,7 @@ type EventSpec = {|
 const SPECS: Array<EventSpec> = [
   {
     name: 'calibrationCheckStart',
-    action: Calibration.fetchRobotCalibrationCheckSessionSuccess(
+    action: Calibration.createRobotCalibrationCheckSessionSuccess(
       'fake-robot-name',
       CalibrationFixtures.mockRobotCalibrationCheckSessionData,
       {}

@@ -1,11 +1,11 @@
 // @flow
 import { combineEpics } from 'redux-observable'
-import { fetchRobotCalibrationCheckSessionEpic } from './fetchRobotCalibrationCheckSessionEpic'
+import { createRobotCalibrationCheckSessionEpic } from './createRobotCalibrationCheckSessionEpic'
 import { deleteRobotCalibrationCheckSessionEpic } from './deleteRobotCalibrationCheckSessionEpic'
 
 import type { Epic } from '../../types'
 
 export const calibrationEpic: Epic = combineEpics(
-  fetchRobotCalibrationCheckSessionEpic,
+  createRobotCalibrationCheckSessionEpic,
   deleteRobotCalibrationCheckSessionEpic
 )

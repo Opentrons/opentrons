@@ -1,5 +1,5 @@
 // @flow
-import { ofType } from 'redux-observable'
+import { filter, map } from 'rxjs/operators'
 
 import { DELETE } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -32,9 +32,28 @@ const mapResponseToAction: ResponseToActionMapper<DeleteRobotCalibrationCheckSes
     : Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
 }
 
-export const deleteRobotCalibrationCheckSessionEpic: Epic = (action$, state$) => {
+export const deleteRobotCalibrationCheckSessionEpic: Epic = (
+  action$,
+  state$
+) => {
   return action$.pipe(
-    ofType(Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION),
+    filter(action => {
+      const explicitDelete =
+        action.type === Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION
+      const clearExisting =
+        action.type ===
+          Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE &&
+        action.meta.response.status === 409
+
+      return explicitDelete || clearExisting
+    }),
+    map(action => {
+      if (
+        action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE
+      ) {
+        return { ...action, meta: { ...action.meta, recreating: true } }
+      }
+    }),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

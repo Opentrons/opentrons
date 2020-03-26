@@ -14,9 +14,9 @@ type ReducerSpec = {|
 
 const SPECS: Array<ReducerSpec> = [
   {
-    name: 'handles calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+    name: 'handles calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
     action: {
-      type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
       payload: {
         robotName: 'terpentine-martini',
         ...Fixtures.mockRobotCalibrationCheckSessionData,

@@ -4,14 +4,16 @@ import { useDispatch, useSelector } from 'react-redux'
 import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
-  fetchRobotCalibrationCheckSession,
+  createRobotCalibrationCheckSession,
   deleteRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
 } from '../../calibration'
-import { useLogger } from '../../logger'
+import { createLogger } from '../../logger'
 
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
+
+const log = createLogger(__filename)
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
@@ -26,9 +28,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     getRobotCalibrationCheckSession(state, robotName)
   )
   React.useEffect(() => {
-    dispatch(fetchRobotCalibrationCheckSession(robotName))
+    dispatch(createRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
-  const log = useLogger(__dirname)
 
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
@@ -37,14 +38,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   log.debug('robot calibration check session data: ', robotCalibrationCheckSessionData || {})
   return (
-    <ModalPage
-      titleBar={{
-        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-        back: { onClick: exit },
-      }}
-      contentsClassName={styles.modal_contents}
-    >
-      <CompleteConfirmation robotName={robotName} exit={exit} />
-    </ModalPage>
+    robotCalibrationCheckSessionData && (
+      <ModalPage
+        titleBar={{
+          title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+          back: { onClick: exit },
+        }}
+        contentsClassName={styles.modal_contents}
+      >
+        <CompleteConfirmation robotName={robotName} exit={exit} />
+      </ModalPage>
+    )
   )
 }

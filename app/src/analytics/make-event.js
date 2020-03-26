@@ -255,7 +255,7 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
+    case calibrationActions.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
       const { robotName } = action.payload
       const sessionData = getRobotCalibrationCheckSession(state, robotName)
 

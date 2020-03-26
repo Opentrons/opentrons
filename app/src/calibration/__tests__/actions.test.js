@@ -15,25 +15,25 @@ type ActionSpec = {|
 describe('robot modules actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
-      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION',
-      creator: Actions.fetchRobotCalibrationCheckSession,
+      name: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION',
+      creator: Actions.createRobotCalibrationCheckSession,
       args: ['robot-name'],
       expected: {
-        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION',
+        type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION',
         payload: { robotName: 'robot-name' },
         meta: {},
       },
     },
     {
-      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
-      creator: Actions.fetchRobotCalibrationCheckSessionSuccess,
+      name: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      creator: Actions.createRobotCalibrationCheckSessionSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotCalibrationCheckSessionData,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+        type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
           ...Fixtures.mockRobotCalibrationCheckSessionData,
@@ -42,15 +42,15 @@ describe('robot modules actions', () => {
       },
     },
     {
-      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
-      creator: Actions.fetchRobotCalibrationCheckSessionFailure,
+      name: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+      creator: Actions.createRobotCalibrationCheckSessionFailure,
       args: [
         'robot-name',
         { message: 'Heck, your deck check wrecked!' },
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+        type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
         payload: {
           robotName: 'robot-name',
           error: { message: 'Heck, your deck check wrecked!' },

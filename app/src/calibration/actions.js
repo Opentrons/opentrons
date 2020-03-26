@@ -7,30 +7,30 @@ import * as Types from './types'
 import type { RobotCalibrationCheckSessionData } from './api-types'
 import * as Constants from './constants'
 
-export const fetchRobotCalibrationCheckSession = (
+export const createRobotCalibrationCheckSession = (
   robotName: string
-): Types.FetchRobotCalibrationCheckSessionAction => ({
-  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+): Types.CreateRobotCalibrationCheckSessionAction => ({
+  type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
   meta: {},
 })
 
-export const fetchRobotCalibrationCheckSessionSuccess = (
+export const createRobotCalibrationCheckSessionSuccess = (
   robotName: string,
   body: RobotCalibrationCheckSessionData,
   meta: RobotApiRequestMeta
-): Types.FetchRobotCalibrationCheckSessionSuccessAction => ({
-  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+): Types.CreateRobotCalibrationCheckSessionSuccessAction => ({
+  type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const fetchRobotCalibrationCheckSessionFailure = (
+export const createRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
   meta: RobotApiRequestMeta
-): Types.FetchRobotCalibrationCheckSessionFailureAction => ({
-  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+): Types.CreateRobotCalibrationCheckSessionFailureAction => ({
+  type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })

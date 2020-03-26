@@ -1,9 +1,9 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import typeof {
-  FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
-  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
-  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
+  CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -11,20 +11,20 @@ import typeof {
 } from './constants'
 import type { RobotCalibrationCheckSessionData } from './api-types'
 
-export type FetchRobotCalibrationCheckSessionAction = {|
-  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+export type CreateRobotCalibrationCheckSessionAction = {|
+  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchRobotCalibrationCheckSessionSuccessAction = {|
-  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+export type CreateRobotCalibrationCheckSessionSuccessAction = {|
+  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchRobotCalibrationCheckSessionFailureAction = {|
-  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+export type CreateRobotCalibrationCheckSessionFailureAction = {|
+  type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
@@ -32,19 +32,19 @@ export type FetchRobotCalibrationCheckSessionFailureAction = {|
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
-  meta: RobotApiRequestMeta,
+  meta: {| ...RobotApiRequestMeta, recreating?: boolean |},
 |}
 
 export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
-  meta: RobotApiRequestMeta,
+  meta: {| ...RobotApiRequestMeta, recreating?: boolean |},
 |}
 
 export type DeleteRobotCalibrationCheckSessionFailureAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
-  meta: RobotApiRequestMeta,
+  meta: {| ...RobotApiRequestMeta, recreating?: boolean |},
 |}
 
 export type CompleteRobotCalibrationCheckAction = {|
@@ -53,9 +53,9 @@ export type CompleteRobotCalibrationCheckAction = {|
 |}
 
 export type CalibrationAction =
-  | FetchRobotCalibrationCheckSessionAction
-  | FetchRobotCalibrationCheckSessionSuccessAction
-  | FetchRobotCalibrationCheckSessionFailureAction
+  | CreateRobotCalibrationCheckSessionAction
+  | CreateRobotCalibrationCheckSessionSuccessAction
+  | CreateRobotCalibrationCheckSessionFailureAction
   | DeleteRobotCalibrationCheckSessionAction
   | DeleteRobotCalibrationCheckSessionSuccessAction
   | DeleteRobotCalibrationCheckSessionFailureAction
