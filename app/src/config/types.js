@@ -11,7 +11,6 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableMultiGEN2'
   | 'enableBundleUpload'
-  | 'enableWifiDisconnect'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,

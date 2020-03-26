@@ -5,7 +5,7 @@ import map from 'lodash/map'
 import orderBy from 'lodash/orderBy'
 import uniqBy from 'lodash/uniqBy'
 import { long2ip } from 'netmask'
-// import Semver from 'semver'
+import Semver from 'semver'
 
 import { getFeatureFlags } from '../config'
 import { getRobotApiVersionByName } from '../discovery'
@@ -97,7 +97,7 @@ export const getEapOptions = (
   return state.networking[robotName]?.eapOptions ?? []
 }
 
-// const API_MIN_DISCONNECT_VERSION = '3.17.0'
+const API_MIN_DISCONNECT_VERSION = '3.17.0-alpha.0'
 
 export const getCanDisconnect: (
   state: State,
@@ -108,12 +108,9 @@ export const getCanDisconnect: (
   getFeatureFlags,
   (list, apiVersion, featureFlags) => {
     const active = list.some(nw => nw.active)
-    // TODO(mc, 2020-03-03): replace disconnect feature flag with version check
-    // unit tests are in place to validate this switchover
-    const supportsDisconnect = featureFlags.enableWifiDisconnect
-    // const supportsDisconnect = Semver.valid(apiVersion)
-    //   ? Semver.gte(apiVersion, API_MIN_DISCONNECT_VERSION)
-    //   : false
+    const supportsDisconnect = Semver.valid(apiVersion)
+      ? Semver.gte(apiVersion, API_MIN_DISCONNECT_VERSION)
+      : false
 
     return Boolean(active && supportsDisconnect)
   }
