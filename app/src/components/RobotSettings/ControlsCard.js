@@ -61,6 +61,11 @@ export function ControlsCard(props: Props) {
 
   const buttonDisabled = notConnectable || !canControl
 
+  console.log('robot = ', robot)
+  console.log('status = ', status)
+  console.log('button disabled', buttonDisabled)
+  console.log('not connectable', notConnectable)
+  console.log('not canControl', !canControl)
   return (
     <Card title={TITLE} disabled={notConnectable}>
       {ff.enableRobotCalCheck && (
