@@ -11,8 +11,8 @@ import { maskField } from '../../../steplist/fieldLevel'
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
-import type { FocusHandlers } from '../types'
 import type { FormData } from '../../../form-types'
+import type { FocusHandlers } from '../types'
 
 type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }
 
