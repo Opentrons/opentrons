@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { MemoryRouter } from 'react-router-dom'
 
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
@@ -101,13 +100,7 @@ describe('ControlsCard', () => {
   })
 
   it('calls fetchLights on mount', () => {
-    mount(
-      <Provider store={mockStore}>
-        <MemoryRouter>
-          <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-        </MemoryRouter>
-      </Provider>
-    )
+    render()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       RobotControls.fetchLights(mockRobot.name)
