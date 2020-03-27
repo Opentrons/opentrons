@@ -15,12 +15,16 @@ import * as Types from '../types'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-const mapActionToRequest: ActionToRequestMapper<Types.DeleteRobotCalibrationCheckSessionAction> = action => ({
+type TriggerAction =
+  | Types.CreateRobotCalibrationCheckSessionFailureAction
+  | Types.DeleteRobotCalibrationCheckSessionSuccessAction
+
+const mapActionToRequest: ActionToRequestMapper<TriggerAction> = action => ({
   method: DELETE,
   path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCheckSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<TriggerAction> = (
   response,
   originalAction
 ) => {
@@ -30,10 +34,6 @@ const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCh
     ? Actions.deleteRobotCalibrationCheckSessionSuccess(host.name, body, meta)
     : Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
 }
-
-type TriggerAction =
-  | Types.CreateRobotCalibrationCheckSessionFailureAction
-  | Types.DeleteRobotCalibrationCheckSessionSuccessAction
 
 export const deleteRobotCalibrationCheckSessionEpic: Epic = (
   action$,

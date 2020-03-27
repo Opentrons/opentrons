@@ -32,7 +32,7 @@ export type CreateRobotCalibrationCheckSessionSuccessAction = {|
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  payload: {| robotName: string, error: {} |},
+  payload: $Shape<{| robotName: string, error: {} |}>,
   meta: $Shape<{|
     ...RobotApiResponseMeta,
     ...RobotApiRequestMeta,
@@ -42,7 +42,7 @@ export type CreateRobotCalibrationCheckSessionFailureAction = {|
 
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: {| robotName: string |},
+  payload: $Shape<{| robotName: string |}>,
   meta: $Shape<{|
     ...RobotApiResponseMeta,
     ...RobotApiRequestMeta,
