@@ -1,6 +1,5 @@
 // @flow
 import React, { useMemo } from 'react'
-import { useSelector } from 'react-redux'
 import {
   DropdownField,
   FormGroup,
@@ -19,7 +18,6 @@ import formStyles from '../../forms/forms.css'
 import { getOnlyLatestDefs } from '../../../labware-defs/utils'
 
 import type { FormPipettesByMount } from '../../../step-forms'
-import { getEnableMultiGEN2Pipettes } from '../../../feature-flags/selectors'
 
 export type Props = {|
   initialTabIndex?: number,
@@ -66,7 +64,6 @@ export function PipetteFields(props: Props) {
     errors,
     touched,
   } = props
-  const enableMultiGEN2 = useSelector(getEnableMultiGEN2Pipettes)
 
   const tiprackOptions = useMemo(() => {
     const defs = getOnlyLatestDefs()
@@ -91,15 +88,11 @@ export function PipetteFields(props: Props) {
   const renderPipetteSelect = (props: PipetteSelectProps) => {
     const { tabIndex, mount } = props
     const pipetteName = values[mount].pipetteName
-    const nameBlacklist = enableMultiGEN2
-      ? []
-      : ['p20_multi_gen2', 'p300_multi_gen2']
 
     return (
       <PipetteSelect
         enableNoneOption
         tabIndex={tabIndex}
-        nameBlacklist={nameBlacklist}
         pipetteName={pipetteName != null ? pipetteName : null}
         onPipetteChange={pipetteName => {
           const nameAccessor = `pipettesByMount.${mount}.pipetteName`
