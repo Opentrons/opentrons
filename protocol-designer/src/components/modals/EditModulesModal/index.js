@@ -6,7 +6,6 @@ import { Formik } from 'formik'
 import * as Yup from 'yup'
 import {
   THERMOCYCLER_MODULE_TYPE,
-  MODULE_MODELS,
   type ModuleModel,
 } from '@opentrons/shared-data'
 import {
@@ -63,18 +62,18 @@ export function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
 
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const module = props.moduleId
+  const moduleOnDeck = props.moduleId
     ? _initialDeckSetup.modules[props.moduleId]
     : null
   const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
 
   const initialValues = {
-    selectedSlot: module?.slot || supportedModuleSlot,
-    selectedModel: module?.model || null,
+    selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
+    selectedModel: moduleOnDeck?.model || null,
   }
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
-  const previousModuleSlot = module && module.slot
+  const previousModuleSlot = moduleOnDeck?.slot
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
 
@@ -83,25 +82,26 @@ export function EditModulesModal(props: EditModulesProps) {
   )
   const dispatch = useDispatch()
 
-  const onSaveClick = values => {
+  const onSaveClick = (values: EditModulesState) => {
     const { selectedModel, selectedSlot } = values
 
     // validator from formik should never let onSaveClick be called
     // this case might never be true but still need to handle for flow
     if (!selectedModel) return null
 
-    if (module) {
+    if (moduleOnDeck) {
       // disabled if something lives in the slot selected in local state
-      // if previous module.model is different, edit module
-      if (module.model !== selectedModel) {
+      // if previous moduleOnDeck.model is different, edit module
+      if (moduleOnDeck.model !== selectedModel) {
         module.id &&
           dispatch(
             stepFormActions.editModule({ id: module.id, model: selectedModel })
           )
       }
-      // if previous module.slot is different than state, move deck item
-      if (selectedSlot && module.slot !== selectedSlot) {
-        module.slot && dispatch(moveDeckItem(module.slot, selectedSlot))
+      // if previous moduleOnDeck.slot is different than state, move deck item
+      if (selectedSlot && moduleOnDeck.slot !== selectedSlot) {
+        moduleOnDeck.slot &&
+          dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
       }
     } else {
       dispatch(
@@ -175,18 +175,12 @@ export function EditModulesModal(props: EditModulesProps) {
           const enableSlotSelection =
             disabledModuleRestriction || moduleHasCollisionIssue
 
-          function handleModelChange(
+          const handleModelChange = (
             e: SyntheticInputEvent<HTMLSelectElement>
-          ) {
+          ): void => {
             handleChange(e)
-
-            // to handle flow issue with calling isModuleWithCollisionIssue on
-            // e.target.value since it is a string at runtime
-            let value: ModuleModel | null = null
-            const modelValueIndex = MODULE_MODELS.indexOf(e.target.value)
-            if (modelValueIndex >= 0) {
-              value = MODULE_MODELS[modelValueIndex]
-            }
+            // TODO(IL, 2020-03-27): can't make Flow understand that dropdown values are ModuleModel type
+            let value: ModuleModel | null = (e.target.value: any) || null
 
             // reset slot if user switches from module with no collision issue
             // to one that does have collision issues
