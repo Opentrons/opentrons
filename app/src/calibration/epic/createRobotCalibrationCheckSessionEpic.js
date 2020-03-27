@@ -46,7 +46,6 @@ export const createRobotCalibrationCheckSessionEpic: Epic = (
           Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS &&
         action.meta.recreating
 
-      console.table(action, recreating)
       return explicitCreate || recreating
     }),
     mapToRobotApiRequest(

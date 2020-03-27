@@ -31,6 +31,8 @@ describe('calibrationEpics', () => {
   let testScheduler
 
   beforeEach(() => {
+    mockGetRobotByName.mockReturnValue(mockRobot)
+
     testScheduler = new TestScheduler((actual, expected) => {
       expect(actual).toEqual(expected)
     })
@@ -60,10 +62,6 @@ describe('calibrationEpics', () => {
         expectObservable(output$)
         flush()
 
-        expect(mockGetRobotByName).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
         expect(mockFetchRobotApi).toHaveBeenCalledWith(
           mockRobot,
           expectedRequest
@@ -82,9 +80,11 @@ describe('calibrationEpics', () => {
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.restartRobotSuccess(mockRobot.name, {
-            response: Fixtures.mockCreateCheckSessionSuccessMeta,
-          }),
+          a: Actions.createRobotCalibrationCheckSessionSuccess(
+            mockRobot.name,
+            Fixtures.mockCreateCheckSessionSuccess.body,
+            { response: Fixtures.mockCreateCheckSessionSuccessMeta }
+          ),
         })
       })
     })
@@ -100,37 +100,40 @@ describe('calibrationEpics', () => {
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.restartRobotFailure(
+          a: Actions.createRobotCalibrationCheckSessionFailure(
             mockRobot.name,
-            { message: 'AH' },
-            { response: Fixtures.mockRestartFailureMeta }
+            { message: 'Failed to make a cal check sesh' },
+            { response: Fixtures.mockCreateCheckSessionFailureMeta }
           ),
         })
       })
     })
   })
 
-  describe('handles FETCH_RESET_CONFIG_OPTIONS', () => {
-    const action = Actions.fetchResetConfigOptions(mockRobot.name)
-    const expectedRequest = { method: 'GET', path: '/settings/reset/options' }
+  describe('handles recreating check session after conflicting session deleted', () => {
+    const action = Actions.deleteRobotCalibrationCheckSessionSuccess(
+      mockRobot.name,
+      { message: 'Session deleted successfully' },
+      { ...Fixtures.mockDeleteCheckSessionSuccessMeta, recreating: true }
+    )
+    const expectedRequest = {
+      method: 'POST',
+      path: '/calibration/check/session',
+    }
 
-    it('calls GET /settings/reset/options', () => {
+    it('calls POST /calibration/check/session', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchResetOptionsSuccess })
+          cold('r', { r: Fixtures.mockCreateCheckSessionSuccess })
         )
 
         const action$ = hot('--a', { a: action })
         const state$ = hot('a-a', { a: mockState })
-        const output$ = robotAdminEpic(action$, state$)
+        const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$)
         flush()
 
-        expect(mockGetRobotByName).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
         expect(mockFetchRobotApi).toHaveBeenCalledWith(
           mockRobot,
           expectedRequest
@@ -138,131 +141,50 @@ describe('calibrationEpics', () => {
       })
     })
 
-    it('maps successful response to FETCH_RESET_CONFIG_OPTIONS_SUCCESS', () => {
+    it('maps successful response to CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchResetOptionsSuccess })
+          cold('r', { r: Fixtures.mockCreateCheckSessionSuccess })
         )
 
         const action$ = hot('--a', { a: action })
         const state$ = hot('a-a', { a: {} })
-        const output$ = robotAdminEpic(action$, state$)
+        const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchResetConfigOptionsSuccess(
+          a: Actions.createRobotCalibrationCheckSessionSuccess(
             mockRobot.name,
-            Fixtures.mockResetOptions,
-            { response: Fixtures.mockFetchResetOptionsSuccessMeta }
+            Fixtures.mockCreateCheckSessionSuccess.body,
+            {
+              ...Fixtures.mockDeleteCheckSessionSuccessMeta,
+              recreating: true,
+              response: Fixtures.mockCreateCheckSessionSuccessMeta,
+            }
           ),
         })
       })
     })
 
-    it('maps failed response to FETCH_RESET_CONFIG_OPTIONS_FAILURE', () => {
+    it('maps failed response to CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchResetOptionsFailure })
+          cold('r', { r: Fixtures.mockCreateCheckSessionFailure })
         )
 
         const action$ = hot('--a', { a: action })
         const state$ = hot('a-a', { a: {} })
-        const output$ = robotAdminEpic(action$, state$)
+        const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchResetConfigOptionsFailure(
+          a: Actions.createRobotCalibrationCheckSessionFailure(
             mockRobot.name,
-            { message: 'AH' },
-            { response: Fixtures.mockFetchResetOptionsFailureMeta }
+            { message: 'Failed to make a cal check sesh' },
+            {
+              ...Fixtures.mockDeleteCheckSessionSuccessMeta,
+              recreating: true,
+              response: Fixtures.mockCreateCheckSessionFailureMeta
+            }
           ),
-        })
-      })
-    })
-  })
-
-  describe('handles RESET_CONFIG', () => {
-    const action = Actions.resetConfig(mockRobot.name, {
-      foo: true,
-      bar: false,
-    })
-
-    it('calls POST /settings/reset', () => {
-      const expectedRequest = {
-        method: 'POST',
-        path: '/settings/reset',
-        body: { foo: true, bar: false },
-      }
-
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockResetConfigSuccess })
-        )
-
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
-        const output$ = robotAdminEpic(action$, state$)
-
-        expectObservable(output$)
-        flush()
-
-        expect(mockGetRobotByName).toHaveBeenCalledWith(
-          mockState,
-          mockRobot.name
-        )
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(
-          mockRobot,
-          expectedRequest
-        )
-      })
-    })
-
-    it('maps successful response to RESET_CONFIG_SUCCESS', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockResetConfigSuccess })
-        )
-
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
-        const output$ = robotAdminEpic(action$, state$)
-
-        expectObservable(output$).toBe('--a', {
-          a: Actions.resetConfigSuccess(mockRobot.name, {
-            response: Fixtures.mockResetConfigSuccessMeta,
-          }),
-        })
-      })
-    })
-
-    it('maps failed response to RESET_CONFIG_FAILURE', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockResetConfigFailure })
-        )
-
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
-        const output$ = robotAdminEpic(action$, state$)
-
-        expectObservable(output$).toBe('--a', {
-          a: Actions.resetConfigFailure(
-            mockRobot.name,
-            { message: 'AH' },
-            { response: Fixtures.mockResetConfigFailureMeta }
-          ),
-        })
-      })
-    })
-
-    it('dispatches RESTART on RESET_CONFIG_SUCCESS', () => {
-      const action = Actions.resetConfigSuccess(mockRobot.name, {})
-
-      testScheduler.run(({ hot, expectObservable }) => {
-        const action$ = hot('-a', { a: action })
-        const state$ = hot('a-', { a: mockState })
-        const output$ = robotAdminEpic(action$, state$)
-
-        expectObservable(output$).toBe('-a', {
-          a: Actions.restartRobot(mockRobot.name),
         })
       })
     })

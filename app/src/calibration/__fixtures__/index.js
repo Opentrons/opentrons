@@ -32,11 +32,43 @@ export const mockCreateCheckSessionFailure = {
   path: '/calibration/check/session',
   ok: false,
   status: 500,
-  body: { message: 'Failed to make a check sesh' },
+  body: { message: 'Failed to make a cal check sesh' },
 }
 
 export const mockCreateCheckSessionFailureMeta = {
   method: 'POST',
+  path: '/calibration/check/session',
+  ok: false,
+  status: 500,
+}
+
+export const mockDeleteCheckSessionSuccess = {
+  host: mockRobot,
+  method: 'DELETE',
+  path: '/calibration/check/session',
+  ok: true,
+  status: 200,
+  body: { message: 'Successfully deleted session'},
+}
+
+export const mockDeleteCheckSessionSuccessMeta = {
+  method: 'DELETE',
+  path: '/calibration/check/session',
+  ok: true,
+  status: 200,
+}
+
+export const mockDeleteCheckSessionFailure = {
+  host: mockRobot,
+  method: 'DELETE',
+  path: '/calibration/check/session',
+  ok: false,
+  status: 500,
+  body: { message: 'Failed delete cal check sesh' },
+}
+
+export const mockDeleteCheckSessionFailureMeta = {
+  method: 'DELETE',
   path: '/calibration/check/session',
   ok: false,
   status: 500,
