@@ -98,7 +98,7 @@ class PipetteSettingsField(BaseModel):
     units: str = \
         Field(None,
               description="The physical units this value is in (e.g. mm, uL)")
-    type: PipetteSettingsFieldType = None
+    type: Optional[PipetteSettingsFieldType]
     min: float = \
         Field(...,
               description="The minimum acceptable value of the property")
@@ -143,19 +143,25 @@ class BasePipetteSettingFields(BaseModel):
 # generated from pipette_config module. It's derived from an object with the
 # 'quirks` member.
 PipetteSettingsFields = create_model(
-    'PipetteSettingsFields', __base__=BasePipetteSettingFields, **{
+    'PipetteSettingsFields',
+    __base__=BasePipetteSettingFields,
+    __config__=None,
+    __module__=None,
+    __validators__=None,
+    **{
         conf: (PipetteSettingsField, None) for conf in MUTABLE_CONFIGS
         if conf != 'quirks'
     }
 )
+PipetteSettingsField.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
     info: PipetteSettingsInfo
-    setting_fields: PipetteSettingsFields = \
-        Field(...,
-              alias="fields",
-              description="The fields of the pipette settings")
+    setting_fields: PipetteSettingsFields   # type: ignore
+
+    class Config:
+        fields = {'setting_fields': 'fields'}
 
 
 MultiPipetteSettings = typing.Dict[str, PipetteSettings]

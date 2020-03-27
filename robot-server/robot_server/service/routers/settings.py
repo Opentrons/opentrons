@@ -13,7 +13,7 @@ from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     LogLevels, FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
-    PipetteSettingsInfo, PipetteSettingsField, PipetteSettingsFields
+    PipetteSettingsInfo, PipetteSettingsFields
 
 log = logging.getLogger(__name__)
 
