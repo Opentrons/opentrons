@@ -169,7 +169,7 @@ class ProtocolContext(CommandPublisher):
 
     def __del__(self):
         if getattr(self, '_unsubscribe_commands', None):
-            self._unsubscribe_commands()
+            self._unsubscribe_commands()  # type: ignore
 
     @property  # type: ignore
     @requires_version(2, 0)

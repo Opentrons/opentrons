@@ -50,10 +50,10 @@ async def get_session(request):
         response = _format_status(current_session, request.app.router)
         return web.json_response(text=response.json(), status=200)
     else:
-        response = {
+        error_response = {
             "message": f"No {session_type} session exists. Please create one.",
             "links": {"createSession": f"/calibration/{session_type}/session"}}
-        return web.json_response(response, status=404)
+        return web.json_response(error_response, status=404)
 
 
 async def create_session(request):
@@ -81,11 +81,11 @@ async def create_session(request):
         response = _format_status(new_session, request.app.router)
         return web.json_response(text=response.json(), status=201)
     else:
-        response = {
+        error_response = {
             "message": f"A {session_type} session exists."
                        "Please delete to proceed.",
             "links": {"deleteSession": f"/calibration/{session_type}/session"}}
-        return web.json_response(response, status=409)
+        return web.json_response(error_response, status=409)
 
 
 async def delete_session(request):

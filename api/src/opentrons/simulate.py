@@ -69,12 +69,14 @@ class CommandScraper:
         if level != 'none':
             level = getattr(logging, level.upper(), logging.WARNING)
             self._logger.setLevel(level)
-            logger.addHandler(
-                AccumulatingHandler(
-                    level,
-                    self._queue))
+            self._handler: Optional[AccumulatingHandler]\
+                = AccumulatingHandler(
+                    level, self._queue)
+            logger.addHandler(self._handler)
+        else:
+            self._handler = None
         self._depth = 0
-        self._commands: List[Mapping[str, Mapping[str, Any]]] = []
+        self._commands: List[Mapping[str, Any]] = []
         self._unsub = self._broker.subscribe(
             opentrons.commands.command_types.COMMAND,
             self._command_callback)
@@ -85,8 +87,11 @@ class CommandScraper:
         return self._commands
 
     def __del__(self):
-        if hasattr(self, '_handler'):
-            self._logger.removeHandler(self._handler)
+        if getattr(self, '_handler', None):
+            try:
+                self._logger.removeHandler(self._handler)  # type: ignore
+            except Exception:
+                pass
         if hasattr(self, '_unsub'):
             self._unsub()
 
@@ -299,7 +304,7 @@ def simulate(protocol_file: TextIO,
             opentrons.robot.reset()
             scraper = CommandScraper(stack_logger, log_level,
                                      opentrons.robot.broker)
-            exec(protocol.contents, {})
+            exec(protocol.contents, {})  # type: ignore
             return scraper
 
         scraper = _simulate_v1()

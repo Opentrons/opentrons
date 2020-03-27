@@ -42,7 +42,9 @@ class VectorValue(tuple):
 
     def __repr__(self):
         'Return a nicely formatted representation string'
-        return self.__class__.__name__ + '(x=%r, y=%r, z=%r)' % self
+        return self.__class__.__name__\
+            + '(x=%r, y=%r, z=%r)'\
+            % (self.x, self.y, self.z)
 
     def _asdict(self):
         'Return a new OrderedDict which maps field names to their values.'

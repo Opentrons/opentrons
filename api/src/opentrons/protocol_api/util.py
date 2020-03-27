@@ -267,7 +267,7 @@ def requires_version(
         @functools.wraps(decorated_obj)
         def _check_version_wrapper(*args, **kwargs):
             slf = args[0]
-            added_in = decorated_obj.__opentrons_version_added
+            added_in = decorated_obj.__opentrons_version_added  # type: ignore
             current_version = slf._api_version
             if current_version >= APIVersion(2, 0)\
                and current_version < added_in:

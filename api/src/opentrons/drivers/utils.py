@@ -1,6 +1,6 @@
 import logging
 import time
-from typing import Dict, Optional, Mapping, Sequence
+from typing import Dict, Optional, Mapping, Iterable, Sequence
 
 log = logging.getLogger(__name__)
 
@@ -138,6 +138,6 @@ class AxisMoveTimestamp:
         return {ax: now-val if val else None
                 for ax, val, in self._moved_at.items()}
 
-    def reset_moved(self, axis_iter: Sequence[str]):
+    def reset_moved(self, axis_iter: Iterable[str]):
         """ Reset the clocks for a set of axes """
         self._moved_at.update({ax: None for ax in axis_iter})

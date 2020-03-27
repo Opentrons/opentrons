@@ -204,10 +204,10 @@ class MagDeck:
         self._connection = None
         self._config = config
 
-        self._plate_height = None
-        self._mag_position = None
-        self._port = None
-        self._lock = None
+        self._plate_height: Optional[float] = None
+        self._mag_position: Optional[float] = None
+        self._port: Optional[str] = None
+        self._lock: Optional[Lock] = None
 
     def connect(self, port=None) -> str:
         '''
@@ -235,10 +235,10 @@ class MagDeck:
 
     def disconnect(self, port=None):
         if port and self.is_connected():
-            self._connection.close()
+            self._connection.close()  # type: ignore
             del mag_locks[port]
         elif self.is_connected():
-            self._connection.close()
+            self._connection.close()  # type: ignore
         self._connection = None
 
     def is_connected(self) -> bool:
@@ -285,6 +285,7 @@ class MagDeck:
         calculated as MAX_TRAVEL_DISTANCE(45mm) - 15mm
         '''
         self._update_plate_height()
+        assert self._plate_height is not None, 'not connected'
         return self._plate_height
 
     @property
@@ -294,6 +295,7 @@ class MagDeck:
         i.e. it boots with the current position as 0.0
         '''
         self._update_mag_position()
+        assert self._mag_position is not None, 'not connected'
         return self._mag_position
 
     def move(self, position_mm) -> str:
@@ -378,6 +380,7 @@ class MagDeck:
     # Potential place for command optimization (buffering, flushing, etc)
     def _send_command(self, command, timeout=DEFAULT_MAG_DECK_TIMEOUT):
         command_line = command + ' ' + MAG_DECK_COMMAND_TERMINATOR
+        assert self._lock, 'need a lock'
         with self._lock:
             ret_code = self._recursive_write_and_return(
                 command_line, timeout, DEFAULT_COMMAND_RETRIES)

@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, List, Optional, TYPE_CHECKING
+from typing import Any, Dict, Generic, List, Optional, TYPE_CHECKING, TypeVar
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import modules
@@ -25,8 +25,8 @@ STANDARD_MAGDECK_LABWARE = [
 
 MODULE_LOG = logging.getLogger(__name__)
 
-
-class ModuleContext(CommandPublisher):
+GeometryType = TypeVar('GeometryType', bound=ModuleGeometry)
+class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     """ An object representing a connected module.
 
 
@@ -36,7 +36,7 @@ class ModuleContext(CommandPublisher):
 
     def __init__(self,
                  ctx: 'ProtocolContext',
-                 geometry: ModuleGeometry,
+                 geometry: GeometryType,
                  at_version: APIVersion) -> None:
         """ Build the ModuleContext.
 
@@ -158,7 +158,7 @@ class ModuleContext(CommandPublisher):
                                        self.labware)
 
 
-class TemperatureModuleContext(ModuleContext):
+class TemperatureModuleContext(ModuleContext[ModuleGeometry]):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
@@ -261,7 +261,7 @@ class TemperatureModuleContext(ModuleContext):
         return self._module.status
 
 
-class MagneticModuleContext(ModuleContext):
+class MagneticModuleContext(ModuleContext[ModuleGeometry]):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
@@ -390,7 +390,7 @@ class MagneticModuleContext(ModuleContext):
         return self._module.status
 
 
-class ThermocyclerContext(ModuleContext):
+class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
     """ An object representing a connected Temperature Module.
 
     It should not be instantiated directly; instead, it should be
@@ -444,7 +444,7 @@ class ThermocyclerContext(ModuleContext):
     def open_lid(self):
         """ Opens the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.open()
+        self._geometry.lid_status = self._module.open()  # type: ignore
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_close)
@@ -452,7 +452,7 @@ class ThermocyclerContext(ModuleContext):
     def close_lid(self):
         """ Closes the lid"""
         self._prepare_for_lid_move()
-        self._geometry.lid_status = self._module.close()
+        self._geometry.lid_status = self._module.close()  # type: ignore
         return self._geometry.lid_status
 
     @cmds.publish.both(command=cmds.thermocycler_set_block_temp)

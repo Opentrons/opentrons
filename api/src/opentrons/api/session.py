@@ -4,7 +4,7 @@ from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time, sleep
-from typing import List, Dict, Any
+from typing import List, Dict, Any, Optional
 from uuid import uuid4
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons import robot
@@ -312,9 +312,9 @@ class Session(object):
     def _simulate(self):
         self._reset()
 
-        stack = []
-        res = []
-        commands = []
+        stack: List[Dict[str, Any]] = []
+        res: List[Dict[str, Any]] = []
+        commands: List[Dict[str, Any]] = []
 
         self._containers.clear()
         self._instruments.clear()
@@ -381,14 +381,14 @@ class Session(object):
                         'use robot.connect(). Allowing this call would cause '
                         'the robot to execute commands during simulation, and '
                         'then raise an error on execution.')
-                robot.connect = robot_connect_error
+                robot.connect = robot_connect_error  # type: ignore
                 exec(self._protocol.contents, {})
         finally:
             # physically attached pipettes are re-cached during robot.connect()
             # which is important, because during a simulation, the robot could
             # think that it holds a pipette model that it actually does not
             if not self._use_v2:
-                robot.connect = old_robot_connect
+                robot.connect = old_robot_connect  # type: ignore
                 robot.connect()
 
             unsubscribe()
@@ -573,12 +573,13 @@ class Session(object):
 
     def _snapshot(self):
         if self.state == 'loaded':
-            payload = copy(self)
+            payload: Any = copy(self)
         else:
             if self.command_log.keys():
                 idx = sorted(self.command_log.keys())[-1]
                 timestamp = self.command_log[idx]
-                last_command = {'id': idx, 'handledAt': timestamp}
+                last_command: Optional[Dict[str, Any]]\
+                    = {'id': idx, 'handledAt': timestamp}
             else:
                 last_command = None
 
@@ -603,13 +604,13 @@ class Session(object):
 
 def _accumulate(iterable):
     return reduce(
-        lambda x, y: tuple([x + y for x, y in zip(x, y)]),
+        lambda x, y: tuple([x + y for x, y in zip(x, y)]),  # type: ignore
         iterable,
         ([], [], [], []))
 
 
 def _dedupe(iterable):
-    acc = set()
+    acc = set()  # type: ignore
 
     for item in iterable:
         if item not in acc:

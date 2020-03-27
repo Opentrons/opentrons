@@ -1,6 +1,7 @@
 import functools
 import logging
 from copy import copy
+from typing import Optional
 
 from opentrons.util import calibration_functions
 from opentrons.config import feature_flags as ff
@@ -282,7 +283,7 @@ class CalibrationManager:
         log.info('Updating {} in {}'.format(container.name, container.slot))
         if instrument._context:
             if 'centerMultichannelOnWells' in container._container.quirks:
-                cp = CriticalPoint.XY_CENTER
+                cp: Optional[CriticalPoint] = CriticalPoint.XY_CENTER
             else:
                 cp = None
             here = self._hardware.gantry_position(Mount[inst.mount.upper()],

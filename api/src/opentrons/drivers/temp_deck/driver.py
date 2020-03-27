@@ -143,10 +143,10 @@ class TempDeck:
 
     def disconnect(self, port=None):
         if self._port and self.is_connected():
-            self._connection.close()
+            self._connection.close()  # type: ignore
             del temp_locks[self._port]
         elif self.is_connected():
-            self._connection.close()
+            self._connection.close()  # type: ignore
 
         self._connection = None
 
@@ -222,20 +222,20 @@ class TempDeck:
         return ''
 
     @property
-    def target(self) -> int:
+    def target(self) -> Optional[int]:
         return self._temperature.get('target')
 
     @property
     def temperature(self) -> int:
-        return self._temperature.get('current')
+        return self._temperature['current']  # type: ignore
 
     def _get_status(self) -> str:
         # Separate function for testability
-        current = self._temperature.get('current')
+        current = self._temperature['current']
         target = self._temperature.get('target')
         delta = 0.7
         if target:
-            diff = target - current
+            diff = target - current  # type: ignore
             if abs(diff) < delta:   # To avoid status fluctuation near target
                 return 'holding at target'
             elif diff < 0:
@@ -312,6 +312,7 @@ class TempDeck:
         """
 
         """
+        assert self._lock, 'not connected'
         with self._lock:
             command_line = command + ' ' + TEMP_DECK_COMMAND_TERMINATOR
             ret_code = self._recursive_write_and_return(

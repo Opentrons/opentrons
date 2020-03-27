@@ -375,16 +375,16 @@ class SmoothieDriver_3_0_0:
             'C': False
         })
 
+        class DummyLock:
+            def __enter__(self):
+                pass
+
+            def __exit__(self, *args, **kwargs):
+                pass
+
         if handle_locks:
-            self._serial_lock = RLock()
+            self._serial_lock: Union[RLock, DummyLock] = RLock()
         else:
-            class DummyLock:
-                def __enter__(self):
-                    pass
-
-                def __exit__(self, *args, **kwargs):
-                    pass
-
             self._serial_lock = DummyLock()
         self._is_hard_halting = Event()
         self._move_split_config: MoveSplits = {}
@@ -572,7 +572,7 @@ class SmoothieDriver_3_0_0:
 
     def disconnect(self):
         if self.is_connected():
-            self._connection.close()
+            self._connection.close()  # type: ignore
         self._connection = None
         self.simulating = True
 
@@ -1444,7 +1444,7 @@ class SmoothieDriver_3_0_0:
             and split
             # - it's been long enough since the last time it moved
             and ((since_moved[ax] is None)
-                 or (split.after_time < since_moved[ax]))}
+                 or (split.after_time < since_moved[ax]))}  # type: ignore
 
         split_command_string = create_coords_list(split_target)
         primary_command_string = create_coords_list(moving_target)
@@ -1668,7 +1668,8 @@ class SmoothieDriver_3_0_0:
             (since_moved.get(ax) is None
              or (
              self._move_split_config.get(ax)
-             and since_moved[ax] > self._move_split_config[ax].after_time))
+             and since_moved[ax]  # type: ignore
+                 > self._move_split_config[ax].after_time))   # type: ignore
         ]
         for axis in axes:
             msc = self._move_split_config.get(axis)
@@ -1952,6 +1953,8 @@ class SmoothieDriver_3_0_0:
             log.info("Getting port to connect")
             self._connect_to_port()
 
+        assert self._connection,\
+            'driver must have been initialized with a port'
         # get port name
         port = self._connection.port
 
