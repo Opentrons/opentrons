@@ -1,16 +1,19 @@
 import logging
+from typing import Union, Dict
 from http import HTTPStatus
 from fastapi import APIRouter, HTTPException, Depends
-from opentrons.hardware_control import HardwareAPILike
 
+from opentrons.hardware_control import HardwareAPILike
 from opentrons.system import log_control
+from opentrons.config import pipette_config
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     LogLevels, FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
-    PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings
+    PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
+    PipetteSettingsInfo, PipetteSettingsField
 
 log = logging.getLogger(__name__)
 
@@ -103,16 +106,34 @@ async def get_robot_settings(
 
 @router.get("/settings/pipettes",
             description="List all settings for all known pipettes by id",
-            response_model=MultiPipetteSettings)
-async def get_pipette_settings() -> MultiPipetteSettings:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+            response_model=MultiPipetteSettings,
+            response_model_by_alias=True)
+async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
+    res = {}
+    for pipette_id in pipette_config.known_pipettes():
+        # Have to convert to dict using by_alias due to bug in fastapi
+        res[pipette_id] = _pipette_settings_from_config(
+            pipette_config,
+            pipette_id,
+        ).dict(by_alias=True)
+
+    return res
 
 
-@router.get("/settings/pipettes/{pipetteId}",
+@router.get("/settings/pipettes/{pipette_id}",
             description="Get the settings of a specific pipette by ID",
-            response_model=PipetteSettings)
-async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+            response_model=PipetteSettings,
+            response_model_by_alias=True)
+async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
+    if pipette_id not in pipette_config.known_pipettes():
+        raise V1HandlerError(status_code=HTTPStatus.NOT_FOUND,
+                             message=f'{pipette_id} is not a valid pipette id')
+    # Have to convert to dict using by_alias due to bug in fastapi
+    return _pipette_settings_from_config(
+        pipette_config, pipette_id
+    ).dict(
+        by_alias=True
+    )
 
 
 @router.patch("/settings/pipettes/{pipetteId}",
@@ -123,3 +144,20 @@ async def post_pipette_setting(
         settings_update: PipetteSettingsUpdate) \
         -> PipetteSettings:
     raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+
+
+def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
+    """
+    Create a PipetteSettings object from pipette config for single pipette
+
+    :param pc: pipette config module
+    :param pipette_id: pipette id
+    :return: PipetteSettings object
+    """
+    c = pc.load_config_dict(pipette_id)
+    fields = {k: PipetteSettingsField(**v) for k, v in
+              pc.list_mutable_configs(
+                  pipette_id=pipette_id).items()}
+    return PipetteSettings(info=PipetteSettingsInfo(name=c.get('name'),
+                                                    model=c.get('model')),
+                           fields=fields)

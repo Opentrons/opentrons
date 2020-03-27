@@ -100,3 +100,77 @@ def test_get_robot_settings(api_client, hardware):
         "b": "this",
         "c": 5
     }
+
+
+@pytest.fixture
+def mock_pipette_data():
+    return {
+        'p1': {
+            'info': {
+                'name': 'p1_name',
+                'model': 'p1_model',
+            },
+            'fields': {
+                'p1': {
+                    'units': 'mm',
+                    'type': 'float',
+                    'min': 0.0,
+                    'max': 2.0,
+                    'default': 1.0,
+                    'value': 0.5,
+                }
+            }
+        },
+        'p2': {
+            'info': {
+                'name': 'p2_name',
+                'model': 'p2_model',
+            },
+            'fields': {
+                'p2': {
+                    'units': 'inch',
+                    'type': 'int',
+                    'min': 0,
+                    'max': 2,
+                    'default': 1.,
+                    'value': 2,
+                }
+            }
+        }
+    }
+
+
+@pytest.fixture
+def mock_pipette_config(mock_pipette_data):
+    with patch("robot_server.service.routers.settings.pipette_config") as p:
+        p.known_pipettes.return_value = list(mock_pipette_data.keys())
+        p.load_config_dict.side_effect = \
+            lambda id: mock_pipette_data[id]['info']
+        p.list_mutable_configs.side_effect = \
+            lambda pipette_id: mock_pipette_data[pipette_id]['fields']
+        yield p
+
+
+def test_receive_pipette_settings(api_client,
+                                  mock_pipette_config,
+                                  mock_pipette_data):
+
+    resp = api_client.get('/settings/pipettes')
+    assert resp.status_code == 200
+    assert resp.json() == mock_pipette_data
+
+
+def test_receive_pipette_settings_unknown(api_client,
+                                          mock_pipette_config,
+                                          mock_pipette_data):
+    # Non-existent pipette id and get 404
+    resp = api_client.get('/settings/pipettes/wannabepipette')
+    assert resp.status_code == 404
+
+
+def test_receive_pipette_settings_found(api_client,
+                                        mock_pipette_config,
+                                        mock_pipette_data):
+    resp = api_client.get('/settings/pipettes/p1')
+    assert resp.status_code == 200
+    assert resp.json() == mock_pipette_data['p1']
