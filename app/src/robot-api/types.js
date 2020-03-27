@@ -18,12 +18,12 @@ export type RobotApiRequestOptions = {|
   form?: FormData,
 |}
 
-export type RobotApiResponseMeta = {|
+export type RobotApiResponseMeta = $Shape<{|
   path: string,
   method: Method,
   status: number,
   ok: boolean,
-|}
+|}>
 
 export type RobotApiResponse = {|
   ...RobotApiResponseMeta,

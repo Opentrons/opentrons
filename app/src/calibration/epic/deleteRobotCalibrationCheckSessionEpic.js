@@ -4,24 +4,23 @@ import { filter, map } from 'rxjs/operators'
 import { DELETE } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 
-import * as Actions from '../actions'
-import * as Constants from '../constants'
-
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { DeleteRobotCalibrationCheckSessionAction } from '../types'
+import * as Types from '../types'
+import * as Actions from '../actions'
+import * as Constants from '../constants'
 
-const mapActionToRequest: ActionToRequestMapper<DeleteRobotCalibrationCheckSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<Types.DeleteRobotCalibrationCheckSessionAction> = action => ({
   method: DELETE,
   path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<DeleteRobotCalibrationCheckSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCheckSessionAction> = (
   response,
   originalAction
 ) => {
@@ -32,12 +31,16 @@ const mapResponseToAction: ResponseToActionMapper<DeleteRobotCalibrationCheckSes
     : Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
 }
 
+type TriggerAction =
+  | Types.CreateRobotCalibrationCheckSessionFailureAction
+  | Types.DeleteRobotCalibrationCheckSessionSuccessAction
+
 export const deleteRobotCalibrationCheckSessionEpic: Epic = (
   action$,
   state$
 ) => {
   return action$.pipe(
-    filter(action => {
+    filter((action: Action) => {
       const explicitDelete =
         action.type === Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION
       const clearExisting =
@@ -47,7 +50,7 @@ export const deleteRobotCalibrationCheckSessionEpic: Epic = (
 
       return explicitDelete || clearExisting
     }),
-    map(action =>
+    map((action: TriggerAction): TriggerAction =>
       action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE
         ? { ...action, meta: { ...action.meta, recreating: true } }
         : action

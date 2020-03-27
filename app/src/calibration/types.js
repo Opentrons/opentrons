@@ -1,5 +1,8 @@
 // @flow
-import type { RobotApiRequestMeta } from '../robot-api/types'
+import type {
+  RobotApiRequestMeta,
+  RobotApiResponseMeta,
+} from '../robot-api/types'
 import typeof {
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
@@ -20,31 +23,51 @@ export type CreateRobotCalibrationCheckSessionAction = {|
 export type CreateRobotCalibrationCheckSessionSuccessAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
-  meta: RobotApiRequestMeta,
+  meta: $Shape<{|
+    ...RobotApiResponseMeta,
+    ...RobotApiRequestMeta,
+    recreating?: boolean,
+  |}>,
 |}
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
-  meta: RobotApiRequestMeta,
+  meta: $Shape<{|
+    ...RobotApiResponseMeta,
+    ...RobotApiRequestMeta,
+    recreating?: boolean,
+  |}>,
 |}
 
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
-  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
+  meta: $Shape<{|
+    ...RobotApiResponseMeta,
+    ...RobotApiRequestMeta,
+    recreating?: boolean,
+  |}>,
 |}
 
 export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
-  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
+  meta: $Shape<{|
+    ...RobotApiResponseMeta,
+    ...RobotApiRequestMeta,
+    recreating?: boolean,
+  |}>,
 |}
 
 export type DeleteRobotCalibrationCheckSessionFailureAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
-  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
+  meta: $Shape<{|
+    ...RobotApiResponseMeta,
+    ...RobotApiRequestMeta,
+    recreating?: boolean,
+  |}>,
 |}
 
 export type CompleteRobotCalibrationCheckAction = {|

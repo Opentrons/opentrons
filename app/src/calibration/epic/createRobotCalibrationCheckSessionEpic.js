@@ -7,7 +7,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -38,13 +38,13 @@ export const createRobotCalibrationCheckSessionEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    filter(action => {
+    filter((action: Action) => {
       const explicitCreate =
         action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION
       const recreating =
         action.type ===
           Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS &&
-        action.meta.recreating
+        !!action.meta.recreating
 
       return explicitCreate || recreating
     }),
