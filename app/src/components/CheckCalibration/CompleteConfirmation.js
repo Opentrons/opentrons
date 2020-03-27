@@ -28,8 +28,12 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
         <Icon name="check-circle" className={styles.status_icon} />
         <h3>{DELETE_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
       </div>
-      <p className={styles.complete_body}>{DELETE_ROBOT_CALIBRATION_CHECK_BODY}</p>
-      <PrimaryButton onClick={exit}>{DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}</PrimaryButton>
+      <p className={styles.complete_body}>
+        {DELETE_ROBOT_CALIBRATION_CHECK_BODY}
+      </p>
+      <PrimaryButton onClick={exit}>
+        {DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
+      </PrimaryButton>
     </>
   )
 }

@@ -18,7 +18,8 @@ type SelectorSpec = {|
 
 const SPECS: Array<SelectorSpec> = [
   {
-    name: 'getRobotCalibrationCheckSuccess returns null if no deck cal check session',
+    name:
+      'getRobotCalibrationCheckSuccess returns null if no deck cal check session',
     selector: Selectors.getRobotCalibrationCheckSession,
     state: {
       calibration: {},

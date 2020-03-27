@@ -36,7 +36,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     closeCalibrationCheck()
   }
 
-  log.debug('robot calibration check session data: ', robotCalibrationCheckSessionData || {})
+  log.debug(
+    'robot calibration check session data: ',
+    robotCalibrationCheckSessionData || {}
+  )
   return (
     robotCalibrationCheckSessionData && (
       <ModalPage

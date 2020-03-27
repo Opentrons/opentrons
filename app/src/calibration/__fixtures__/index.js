@@ -5,5 +5,5 @@ export const mockRobotCalibrationCheckSessionData = {
   currentStep: 'sessionStart',
   nextSteps: {
     links: { specifyLabware: '/fake/route' },
-  }
+  },
 }

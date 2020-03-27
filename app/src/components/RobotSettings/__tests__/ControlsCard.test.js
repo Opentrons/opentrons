@@ -10,7 +10,7 @@ import * as RobotSelectors from '../../../robot/selectors'
 import * as ConfigSelectors from '../../../config/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
-import { CONNECTABLE, REACHABLE, UNREACHABLE } from '../../../discovery'
+import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
