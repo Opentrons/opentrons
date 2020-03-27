@@ -71,7 +71,6 @@ export type Props = {|
     pipettes: Array<PipetteFieldsData>,
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
-  modulesEnabled: ?boolean,
   thermocyclerEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
@@ -345,28 +344,27 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           onSetFieldTouched={setFieldTouched}
                         />
 
-                        {this.props.modulesEnabled &&
-                          this.props.showModulesFields && (
-                            <div className={styles.protocol_modules_group}>
-                              <h2 className={styles.new_file_modal_title}>
-                                {i18n.t(
-                                  'modal.new_protocol.title.PROTOCOL_MODULES'
-                                )}
-                              </h2>
-                              <ModuleFields
-                                errors={errors.modulesByType ?? null}
-                                values={visibleModules}
-                                thermocyclerEnabled={
-                                  this.props.thermocyclerEnabled
-                                }
-                                onFieldChange={handleChange}
-                                onSetFieldValue={setFieldValue}
-                                onBlur={handleBlur}
-                                touched={touched.modulesByType ?? null}
-                                onSetFieldTouched={setFieldTouched}
-                              />
-                            </div>
-                          )}
+                        {this.props.showModulesFields && (
+                          <div className={styles.protocol_modules_group}>
+                            <h2 className={styles.new_file_modal_title}>
+                              {i18n.t(
+                                'modal.new_protocol.title.PROTOCOL_MODULES'
+                              )}
+                            </h2>
+                            <ModuleFields
+                              errors={errors.modulesByType ?? null}
+                              values={visibleModules}
+                              thermocyclerEnabled={
+                                this.props.thermocyclerEnabled
+                              }
+                              onFieldChange={handleChange}
+                              onSetFieldValue={setFieldValue}
+                              onBlur={handleBlur}
+                              touched={touched.modulesByType ?? null}
+                              onSetFieldTouched={setFieldTouched}
+                            />
+                          </div>
+                        )}
                         {showCrashInfoBox && !moduleRestrictionsDisabled && (
                           <CrashInfoBox
                             showDiagram
