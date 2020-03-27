@@ -1,3 +1,4 @@
+import typing
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 
@@ -5,6 +6,14 @@ from .session import CheckCalibrationSession
 from .models import CalibrationSessionStatus, LabwareStatus
 
 ALLOWED_SESSIONS = ['check']
+TypeSession = typing.Tuple[str, typing.Optional[CheckCalibrationSession]]
+
+
+def _fetch_type_and_session(request: web.Request) -> TypeSession:
+    session_type = request.match_info['type']
+    session_storage = request.app['com.opentrons.session_manager']
+    session = session_storage.sessions.get(session_type)
+    return session_type, session
 
 
 def _format_status(
@@ -40,7 +49,7 @@ def _format_status(
     return status
 
 
-async def get_session(request):
+async def get_session(request: web.Request) -> web.Response:
     """
     GET /calibration/check/session
 
@@ -99,14 +108,54 @@ async def delete_session(request):
 
     Endpoint to delete a session if it exists.
     """
-    session_type = request.match_info['type']
-    session_storage = request.app['com.opentrons.session_manager']
-    current_session = session_storage.sessions.get(session_type)
+    session_type, current_session = _fetch_type_and_session(request)
     if not current_session:
         response = {"message": f"A {session_type} session does not exist."}
         return web.json_response(response, status=404)
     else:
         await current_session.hardware.home()
         del session_storage.sessions[session_type]
+<<<<<<< HEAD
         response = {'message': f"Successfully deleted {session_type} session."}
         return web.json_response(response, status=200)
+=======
+        return web.json_response(status=200)
+
+
+async def move(request: web.Request) -> web.Response:
+    req = await request.json()
+    pipette = req.get("pipetteId")
+    position = req.get("location")
+    _, session = _fetch_type_and_session(request)
+    session.move(pipette, position)
+    response = _format_status(session, request.app.router)
+    return web.json_response(response, status=200)
+
+
+async def jog(request):
+    _, session = _fetch_type_and_session(request)
+    session.jog()
+    response = _format_status(session, request.app.router)
+    return web.json_response(response, status=200)
+
+
+async def pick_up_tip(request):
+    return web.json_response()
+
+
+async def invalidate_tip(request):
+    session_type, session = _fetch_type_and_session(request)
+    if not session:
+        response = {'message': f'A {session_type} session does not exist.'}
+        return web.json_response(response, status=404)
+    else:
+        req = await request.json()
+        pipette_id = req.get("pipetteId")
+        session.invalidate_tip(pipette_id)
+        session.state_machine.update_state(session.state_machine.current_state)
+        return web.json_response(response, status=200)
+
+
+async def drop_tip(request):
+    return web.json_response()
+>>>>>>> feat(api): Allow move, jog and tip handling for a cal session

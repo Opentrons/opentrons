@@ -26,6 +26,7 @@ class AttachedPipette(BaseModel):
         Field(None, description="The axis that moves plunger of this pipette")
     pipette_id: Optional[str] =\
         Field(None, description="The serial number of the attached pipette")
+    hasTip: bool
 
     class Config:
         json_encoders = {

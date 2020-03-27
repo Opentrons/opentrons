@@ -1,23 +1,26 @@
 import enum
-from typing import TypeVar, Generic, Type, Dict
+from typing import TypeVar, Generic, Type, Dict, Optional
 
 
 class CalibrationCheckState(enum.Enum):
     sessionStart = enum.auto()
     loadLabware = enum.auto()
+    moveToTipRack = enum.auto()
     pickUpTip = enum.auto()
     checkPointOne = enum.auto()
     checkPointTwo = enum.auto()
     checkPointThree = enum.auto()
     checkHeight = enum.auto()
     sessionExit = enum.auto()
+    invalidateTip = enum.auto()
     badDeckCalibration = enum.auto()
     noPipettesAttached = enum.auto()
 
 
 check_normal_relationship_dict = {
     CalibrationCheckState.sessionStart: CalibrationCheckState.loadLabware,
-    CalibrationCheckState.loadLabware: CalibrationCheckState.pickUpTip,
+    CalibrationCheckState.loadLabware: CalibrationCheckState.moveToTipRack,
+    CalibrationCheckState.pickUpTip: CalibrationCheckState.checkPointOne,
     CalibrationCheckState.checkPointOne: CalibrationCheckState.checkPointTwo,
     CalibrationCheckState.checkPointTwo: CalibrationCheckState.checkPointThree,
     CalibrationCheckState.checkPointThree: CalibrationCheckState.checkHeight,
@@ -40,7 +43,8 @@ check_error_relationship_dict = {
     CalibrationCheckState.checkPointOne: badcal,
     CalibrationCheckState.checkPointTwo: badcal,
     CalibrationCheckState.checkPointThree: badcal,
-    CalibrationCheckState.checkHeight: badcal
+    CalibrationCheckState.checkHeight: badcal,
+    CalibrationCheckState.invalidateTip: CalibrationCheckState.pickUpTip
 }
 
 
@@ -66,8 +70,11 @@ class StateMachine(Generic[StateEnumType]):
     def get_state(self, state_name: str) -> StateEnumType:
         return getattr(self._states, state_name)
 
-    def update_state(self, state_name: StateEnumType):
-        self._current_state = self._iterate_thru_relationships(state_name)
+    def update_state(self, state_name: Optional[StateEnumType] = None):
+        if state_name:
+            self._current_state = self._iterate_thru_relationships(state_name)
+        else:
+            self._current_state = self.next_state
 
     def _iterate_thru_relationships(
             self, state_name: StateEnumType) -> StateEnumType:

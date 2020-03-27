@@ -102,6 +102,26 @@ class HTTPServer(object):
             '/calibration/{type}/session', check.get_session)
         self.app.router.add_post(
             '/calibration/{type}/session', check.create_session)
+        self.app.router.add_post(
+            '/calibration/{type}/session/move', check.move)
+        self.app.router.add_post(
+            '/calibration/{type}/session/loadLabware',
+            check.load_labware,
+            name="loadLabware")
+        self.app.router.add_post(
+            '/calibration/{type}/session/pickUpTip',
+            check.pick_up_tip,
+            name="pickUpTip")
+        self.app.router.add_post(
+            '/calibration/{type}/session/invalidateTip',
+            check.invalidate_tip,
+            name="invalidateTip")
+        self.app.router.add_post(
+            '/calibration/{type}/session/dropTip',
+            check.drop_tip,
+            name="dropTip")
+        self.app.router.add_post(
+            '/calibration/{type}/session/jog', check.jog)
         self.app.router.add_delete(
             '/calibration/{type}/session',
             check.delete_session,
