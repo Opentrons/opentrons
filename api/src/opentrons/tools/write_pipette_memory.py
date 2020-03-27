@@ -1,4 +1,4 @@
-from opentrons.tools import driver
+from . import args_handler
 
 BAD_BARCODE_MESSAGE = 'Unexpected Serial -> {}'
 WRITE_FAIL_MESSAGE = 'Data not saved, HOLD BUTTON'
@@ -62,7 +62,7 @@ MODELS = {
 }
 
 
-def write_identifiers(mount, new_id, new_model):
+def write_identifiers(mount, new_id, new_model, driver):
     '''
     Send a bytearray to the specified mount, so that Smoothieware can
     save the bytes to the pipette's memory
@@ -75,7 +75,7 @@ def write_identifiers(mount, new_id, new_model):
     _assert_the_same(new_model, read_model)
 
 
-def check_previous_data(mount):
+def check_previous_data(mount, driver):
     old_id = driver.read_pipette_id(mount)
     old_model = driver.read_pipette_model(mount)
     if old_id and old_model:
@@ -114,12 +114,12 @@ def _parse_model_from_barcode(barcode):
     raise Exception(BAD_BARCODE_MESSAGE.format(barcode))
 
 
-def _do_wpm():
+def _do_wpm(driver):
     try:
         barcode = _user_submitted_barcode(32)
         model = _parse_model_from_barcode(barcode)
-        check_previous_data('right')
-        write_identifiers('right', barcode, model)
+        check_previous_data('right', driver)
+        write_identifiers('right', barcode, model, driver)
         print('PASS: Saved -> {0} (model {1})'.format(barcode, model))
     except KeyboardInterrupt:
         exit()
@@ -128,8 +128,12 @@ def _do_wpm():
 
 
 def main():
+    parser = args_handler.root_argparser(
+        "Write model and serial to a pipette's eeprom")
+    args = parser.parse_args()
+    _, driver = args_handler.build_driver(args.port)
     while True:
-        _do_wpm()
+        _do_wpm(driver)
 
 
 if __name__ == "__main__":
