@@ -32,19 +32,19 @@ export type CreateRobotCalibrationCheckSessionFailureAction = {|
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
-  meta: { ...RobotApiRequestMeta, recreating?: boolean },
+  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
 |}
 
 export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
-  meta: { ...RobotApiRequestMeta, recreating?: boolean },
+  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
 |}
 
 export type DeleteRobotCalibrationCheckSessionFailureAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
-  meta: { ...RobotApiRequestMeta, recreating?: boolean },
+  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>,
 |}
 
 export type CompleteRobotCalibrationCheckAction = {|

@@ -46,7 +46,7 @@ export const deleteRobotCalibrationCheckSession = (
 export const deleteRobotCalibrationCheckSessionSuccess = (
   robotName: string,
   body: { message: string },
-  meta: { ...RobotApiRequestMeta, recreating?: boolean }
+  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>
 ): Types.DeleteRobotCalibrationCheckSessionSuccessAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName },
@@ -56,7 +56,7 @@ export const deleteRobotCalibrationCheckSessionSuccess = (
 export const deleteRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
-  meta: { ...RobotApiRequestMeta, recreating?: boolean }
+  meta: $Shape<{| ...RobotApiRequestMeta, recreating?: boolean |}>
 ): Types.DeleteRobotCalibrationCheckSessionFailureAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
