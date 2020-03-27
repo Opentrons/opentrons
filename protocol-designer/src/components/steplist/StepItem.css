@@ -70,10 +70,6 @@
   font-size: var(--fs-body-1);
   font-weight: var(--fw-semibold);
 
-  & span {
-    margin-right: 0.5rem;
-  }
-
   &:last-child {
     padding-bottom: 1.25rem;
   }
@@ -82,6 +78,7 @@
 .module_substep_value {
   text-align: right;
   flex: 0.5;
+  text-transform: capitalize;
 }
 
 /* Multi-channel row representing a single channel */
