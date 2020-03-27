@@ -1,43 +1,52 @@
-Basic usage:
+Basic usage with the `useTooltip` hook
 
 ```js
-<Tooltip open={true} tooltipComponent={<div>Something Explanatory!</div>}>
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
+import { useTooltip } from '@opentrons/components'
+const { targetRef, ...tooltipProps } = useTooltip()
+
+;<>
+  <span ref={targetRef} aria-describedby={tooltipProps.tooltipId}>
+    Target!
+  </span>
+  <Tooltip visible={true} {...tooltipProps}>
+    Something Explanatory!
+  </Tooltip>
+</>
 ```
 
-Component is controlled by the `open` prop:
+Getting a little fancier and overriding the position:
 
 ```js
-<Tooltip open={false} tooltipComponent={<div>Something Explanatory!</div>}>
-  {props => <span ref={props.ref}>My tooltip is closed!</span>}
-</Tooltip>
-```
+import { useTooltip } from '@opentrons/components'
+const [placement, setPlacement] = React.useState(null)
+const { targetRef, ...tooltipProps } = useTooltip({ placement })
 
-Specify Placement:
+const handleChange = e => setPlacement(e.target.value)
 
-```js
-<Tooltip
-  open={true}
-  placement="right"
-  tooltipComponent={<div>Something Explanatory, but over here this time!</div>}
->
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
-```
-
-Specify Placement (with override):
-
-```js
-<Tooltip
-  open={true}
-  placement="left"
-  tooltipComponent={
-    <div>
-      Something explanatory that cannot go left so it defaults to right!
-    </div>
-  }
->
-  {props => <span ref={props.ref}>Look at my tooltip!</span>}
-</Tooltip>
+;<>
+  <span ref={targetRef} aria-describedby={tooltipProps.tooltipId}>
+    Target!
+  </span>
+  <Tooltip visible={true} {...tooltipProps}>
+    Something Explanatory!
+  </Tooltip>
+  <div style={{ float: 'left', marginRight: '8rem' }}>
+    <label style={{ display: 'block' }}>
+      <input type="radio" name="place" value="top" onChange={handleChange} />
+      top
+    </label>
+    <label style={{ display: 'block' }}>
+      <input type="radio" name="place" value="right" onChange={handleChange} />
+      right
+    </label>
+    <label style={{ display: 'block' }}>
+      <input type="radio" name="place" value="bottom" onChange={handleChange} />
+      bottom
+    </label>
+    <label style={{ display: 'block' }}>
+      <input type="radio" name="place" value="left" onChange={handleChange} />
+      left
+    </label>
+  </div>
+</>
 ```

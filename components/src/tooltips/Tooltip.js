@@ -1,107 +1,125 @@
 // @flow
-
 import * as React from 'react'
-import { Manager, Reference, Popper } from 'react-popper'
-import cx from 'classnames'
-import styles from './tooltips.css'
+import { css } from 'styled-components'
 
-const DISTANCE_FROM_REFERENCE = 8
+import { FONT_BODY_1_LIGHT, C_DARK_GRAY } from '../styles'
+import { ARROW_SIZE_PX } from './styles'
 
-type PopperProps = React.ElementProps<typeof Popper>
+import type { CSSRules } from 'styled-components'
+import type { Placement } from './types'
 
-export type TooltipChildProps<ChildProps: {}> = {|
-  ...$Exact<ChildProps>,
-  ref: React.Ref<*>,
-|}
+const TOOLTIP_CSS = css`
+  position: absolute;
+  z-index: 9001;
+  padding: 0.5rem;
+  ${FONT_BODY_1_LIGHT}
+  background-color: ${C_DARK_GRAY};
+  box-shadow: 0 3px 6px 0 rgba(0, 0, 0, 0.13), 0 3px 6px 0 rgba(0, 0, 0, 0.23);
+  cursor: pointer;
+`
 
-export type TooltipProps<ChildProps: {}> = {|
-  /** show or hide the tooltip */
-  open?: boolean,
-  /** contents of the tooltip */
-  tooltipComponent?: React.Node,
-  /** optional portal to place the tooltipComponent inside */
-  portal?: React.ComponentType<*>,
-  /** <https://github.com/FezVrasta/react-popper#placement> */
-  placement?: $PropertyType<PopperProps, 'placement'>,
-  /** <https://github.com/FezVrasta/react-popper#positionfixed> */
-  positionFixed?: $PropertyType<PopperProps, 'positionFixed'>,
-  /** <https://github.com/FezVrasta/react-popper#modifiers> */
-  modifiers?: $PropertyType<PopperProps, 'modifiers'>,
-  /** render function for tooltip'd component */
-  children: (props?: TooltipChildProps<ChildProps>) => React.Node,
-  /** extra props to pass to the children render function */
-  childProps?: ChildProps,
+export type TooltipProps = {|
+  visible: boolean,
+  placement: Placement | '',
+  tooltipId: string,
+  tooltipRef: (HTMLElement | null) => mixed,
+  tooltipStyle: $Shape<CSSStyleDeclaration>,
+  arrowRef: (HTMLElement | null) => mixed,
+  arrowStyle: $Shape<CSSStyleDeclaration>,
+  children?: React.Node,
 |}
 
 /**
- *  Basic, fully controlled Tooltip component.
- *
- * `props.children` is a function that receives the following props object:
- * ```js
- * type TooltipChildProps = {|
- *   ref: React.Ref<*>,
- * |}
+ * Tooltip component that renders based on its `visible` prop. For use with the
+ * `useTooltip` hook; see examples below.
  * ```
- *
- * `props.childProps` can be used to add extra fields to the child props object
  */
-export function Tooltip<ChildProps: {}>(props: TooltipProps<ChildProps>) {
-  if (!props.tooltipComponent) return props.children()
+export function Tooltip(props: TooltipProps) {
+  const {
+    visible,
+    placement,
+    tooltipId,
+    tooltipRef,
+    tooltipStyle,
+    arrowRef,
+    arrowStyle,
+    children,
+  } = props
 
-  return (
-    <Manager>
-      <Reference>
-        {// TODO(mc, 2020-02-21): this is pretty hard to type as is, ref
-        // should probably be a whole separate argument to children
-        // this may become a moot point if we switch tooltips to hooks
-        // $FlowFixMe(mc, 2020-02-21): Error from Flow 0.118 upgrade
-        ({ ref }) => props.children({ ...props.childProps, ref })}
-      </Reference>
-      {props.open && (
-        <Popper
-          placement={props.placement}
-          modifiers={{
-            offset: { offset: `0, ${DISTANCE_FROM_REFERENCE}` },
-            ...props.modifiers,
-          }}
-          positionFixed={props.positionFixed}
-        >
-          {({ ref, style, placement, arrowProps }) => {
-            // remove optional -start and -end modifiers for arrow style
-            // https://popper.js.org/popper-documentation.html#Popper.placements
-            const arrowPlacement = placement
-              ? placement.replace(/-(?:start|end)/, '')
-              : ''
+  return visible ? (
+    <div
+      role="tooltip"
+      id={tooltipId}
+      style={tooltipStyle}
+      ref={tooltipRef}
+      css={TOOLTIP_CSS}
+    >
+      {children}
+      <Arrow {...{ arrowRef, arrowStyle, placement }} />
+    </div>
+  ) : null
+}
 
-            let { style: arrowStyle } = arrowProps
-            if (arrowPlacement === 'left' || arrowPlacement === 'right') {
-              arrowStyle = { top: '0.6em' }
-            }
-            const tooltipContents = (
-              <div
-                ref={ref}
-                className={styles.tooltip_box}
-                style={style}
-                data-placement={placement}
-              >
-                {props.tooltipComponent}
-                <div
-                  className={cx(styles.arrow, styles[arrowPlacement])}
-                  ref={arrowProps.ref}
-                  style={arrowStyle}
-                />
-              </div>
-            )
+// shift arrows off the element
+const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`
 
-            if (props.portal) {
-              const PortalClass = props.portal
-              return <PortalClass>{tooltipContents}</PortalClass>
-            }
+// use borders to create arrows
+const ARROW_CSS_BASE = css`
+  position: absolute;
+  border-width: ${ARROW_SIZE_PX}px;
+  border-style: solid;
+  border-color: transparent;
+`
 
-            return tooltipContents
-          }}
-        </Popper>
-      )}
-    </Manager>
-  )
+// arrow pointing down from the top tooltip
+const ARROW_CSS_TOP = css`
+  ${ARROW_CSS_BASE}
+  bottom: ${ARROW_ANCHOR_OFFSET};
+  border-bottom-style: none;
+  border-top-color: ${C_DARK_GRAY};
+`
+
+// arrow pointing left from the right tooltip
+const ARROW_CSS_RIGHT = css`
+  ${ARROW_CSS_BASE}
+  left: ${ARROW_ANCHOR_OFFSET};
+  border-left-style: none;
+  border-right-color: ${C_DARK_GRAY};
+`
+
+// arrow pointing up from the bottom tooltip
+const ARROW_CSS_BOTTOM = css`
+  ${ARROW_CSS_BASE}
+  top: ${ARROW_ANCHOR_OFFSET};
+  border-top-style: none;
+  border-bottom-color: ${C_DARK_GRAY};
+`
+
+// arrow pointing right from the left tooltip
+const ARROW_CSS_LEFT = css`
+  ${ARROW_CSS_BASE}
+  right: ${ARROW_ANCHOR_OFFSET};
+  border-right-style: none;
+  border-left-color: ${C_DARK_GRAY};
+`
+
+const ARROW_CSS_BY_PLACEMENT_BASE: { [string]: CSSRules | void } = {
+  top: ARROW_CSS_TOP,
+  right: ARROW_CSS_RIGHT,
+  bottom: ARROW_CSS_BOTTOM,
+  left: ARROW_CSS_LEFT,
+}
+
+export type ArrowProps = {|
+  placement: Placement | '',
+  arrowRef: (HTMLElement | null) => mixed,
+  arrowStyle: $Shape<CSSStyleDeclaration>,
+|}
+
+export function Arrow(props: ArrowProps) {
+  const { placement = '' } = props
+  const placementBase = placement.split('-')[0]
+  const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]
+
+  return <div ref={props.arrowRef} style={props.arrowStyle} css={arrowCss} />
 }
