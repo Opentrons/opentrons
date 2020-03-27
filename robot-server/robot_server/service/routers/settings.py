@@ -1,9 +1,11 @@
 import logging
 from http import HTTPStatus
-from fastapi import APIRouter, HTTPException
+from fastapi import APIRouter, HTTPException, Depends
+from opentrons.hardware_control import HardwareAPILike
 
 from opentrons.system import log_control
 
+from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
@@ -94,8 +96,9 @@ async def post_settings_reset_options(
 @router.get("/settings/robot",
             description="Get the current robot config",
             response_model=RobotConfigs)
-async def get_robot_settings() -> RobotConfigs:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+async def get_robot_settings(
+        hardware: HardwareAPILike = Depends(get_hardware)) -> RobotConfigs:
+    return hardware.config._asdict()  # type: ignore
 
 
 @router.get("/settings/pipettes",

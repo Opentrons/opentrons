@@ -1,5 +1,6 @@
 import pytest
 from unittest.mock import patch
+from collections import namedtuple
 
 
 # TDOD(isk: 3/20/20): test validation errors after refactor
@@ -57,7 +58,7 @@ def test_post_log_level_upstream(
     expected_message
 ):
     async def mock_set_syslog_level(syslog_level):
-        return (0, "stdout", "stderr")
+        return 0, "stdout", "stderr"
 
     with patch("opentrons.system.log_control.set_syslog_level") as m:
         m.side_effect = mock_set_syslog_level
@@ -74,7 +75,7 @@ def test_post_log_level_upstream_fails_reload(api_client):
     log_level = "debug"
 
     async def mock_set_syslog_level(syslog_level):
-        return (1, "stdout", "stderr")
+        return 1, "stdout", "stderr"
 
     with patch("opentrons.system.log_control.set_syslog_level") as m:
         m.side_effect = mock_set_syslog_level
@@ -85,3 +86,17 @@ def test_post_log_level_upstream_fails_reload(api_client):
         assert response.status_code == 500
         assert body == {"message": "Could not reload config: stdout stderr"}
         m.assert_called_once_with(log_level)
+
+
+def test_get_robot_settings(api_client, hardware):
+    Conf = namedtuple("Conf", ("a", "b", "c"))
+    hardware.config = Conf("test", "this", 5)
+
+    res = api_client.get("/settings/robot")
+
+    assert res.status_code == 200
+    assert res.json() == {
+        "a": "test",
+        "b": "this",
+        "c": 5
+    }
