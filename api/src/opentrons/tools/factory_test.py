@@ -1,14 +1,18 @@
 import asyncio
 import atexit
+import functools
 import logging
 import os
 import subprocess
+from typing import Dict
 
 from opentrons.config import infer_config_base_dir
 from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers import serial_communication
+from opentrons.drivers.smoothie_drivers.driver_3_0\
+    import SmoothieDriver_3_0_0
 from opentrons.system import nmcli
-from opentrons.tools import driver
+from . import args_handler
 
 log = logging.getLogger(__name__)
 
@@ -56,12 +60,12 @@ def _erase_data(filepath):
         os.remove(filepath)
 
 
-def _reset_lights():
+def _reset_lights(driver: SmoothieDriver_3_0_0):
     driver.turn_off_rail_lights()
     gpio.set_button_light(blue=True)
 
 
-def _get_state_of_inputs():
+def _get_state_of_inputs(driver: SmoothieDriver_3_0_0):
     smoothie_switches = driver.switch_state
     probe = smoothie_switches['Probe']
     endstops = {
@@ -77,7 +81,8 @@ def _get_state_of_inputs():
     }
 
 
-def _set_lights(state):
+def _set_lights(state: Dict[str, Dict[str, bool]],
+                driver: SmoothieDriver_3_0_0):
     if state['windows']:
         driver.turn_off_rail_lights()
     else:
@@ -124,7 +129,9 @@ def _get_unique_smoothie_responses(responses):
     return true_uniques
 
 
-def test_smoothie_gpio():
+def test_smoothie_gpio(driver: SmoothieDriver_3_0_0):
+    assert driver._connection, 'must be connected'
+
     def _write_and_return(msg):
         return serial_communication.write_and_return(
             msg + '\r\n',
@@ -158,7 +165,7 @@ def test_smoothie_gpio():
     driver.hard_halt()
 
     old_timeout = int(driver._connection.timeout)
-    driver._connection.timeout = 1  # 1 second
+    driver._connection.timeout = 1
     r = driver._connection.readline().decode()
     if 'ALARM' in r:
         print(RESULT_SPACE.format(PASS))
@@ -187,7 +194,7 @@ def test_smoothie_gpio():
         print(RESULT_SPACE.format(FAIL))
 
 
-def test_switches_and_lights():
+def test_switches_and_lights(driver: SmoothieDriver_3_0_0):
     print('\n')
     print('* BUTTON\t--> BLUE')
     print('* PROBE\t\t--> GREEN')
@@ -200,8 +207,8 @@ def test_switches_and_lights():
 
     try:
         while True:
-            state = _get_state_of_inputs()
-            _set_lights(state)
+            state = _get_state_of_inputs(driver)
+            _set_lights(state, driver)
     except KeyboardInterrupt:
         print()
         pass
@@ -272,16 +279,20 @@ def start_server(folder, filepath):
 
 
 if __name__ == '__main__':
+    parser = args_handler.root_argparser(
+        "run a suite of tests for the OT-2's hardware")
+    args = parser.parse_args()
+    _, driver = args_handler.build_driver(args.port)
     # put quotes around filepaths to allow whitespaces
     logging.basicConfig(filename='factory-test.log')
     data_folder_quoted = '{}'.format(DATA_FOLDER)
     video_filepath_quoted = '{}'.format(VIDEO_FILEPATH)
-    atexit.register(_reset_lights)
+    atexit.register(functools.partial(_reset_lights, driver))
     atexit.register(_erase_data, video_filepath_quoted)
-    _reset_lights()
+    _reset_lights(driver)
     _erase_data(video_filepath_quoted)
-    test_smoothie_gpio()
-    test_switches_and_lights()
+    test_smoothie_gpio(driver)
+    test_switches_and_lights(driver)
     test_speaker()
     record_camera(video_filepath_quoted)
     copy_to_usb_drive_and_back(video_filepath_quoted)

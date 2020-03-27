@@ -13,11 +13,13 @@ Example of calling this script:
 
 import time
 import logging
+from typing import Dict, List
 
-from opentrons.tools import driver
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-    SmoothieError, DEFAULT_AXES_SPEED
+    SmoothieError, DEFAULT_AXES_SPEED, SmoothieDriver_3_0_0
 from opentrons.drivers.rpi_drivers import gpio
+
+from . import args_handler
 
 
 test_time_minutes = 24 * 60
@@ -30,49 +32,6 @@ XY_TOLERANCE = 30
 ZA_TOLERANCE = 10
 
 AXIS_TEST_SKIPPING_TOLERANCE = 0.5
-
-COORDS_MAX = {
-    'X': driver.homed_position['X'] - XY_TOLERANCE,
-    'Y': driver.homed_position['Y'] - XY_TOLERANCE,
-    'Z': driver.homed_position['Z'] - ZA_TOLERANCE,
-    'A': driver.homed_position['A'] - ZA_TOLERANCE,
-}
-
-COORDS_MIN = {
-    'X': XY_TOLERANCE,
-    'Y': XY_TOLERANCE,
-    'Z': ZA_TOLERANCE,
-    'A': ZA_TOLERANCE,
-}
-
-COORDS_MIDDLE = {
-    'X': ((COORDS_MAX['X'] - COORDS_MIN['X']) / 2) + COORDS_MIN['X'],
-    'Y': ((COORDS_MAX['Y'] - COORDS_MIN['Y']) / 2) + COORDS_MIN['Y'],
-}
-
-COORDS_HOURGLASS = [
-    {'X': COORDS_MIN['X'], 'Y': COORDS_MIN['Y']},
-    {'X': COORDS_MAX['X'], 'Y': COORDS_MIN['Y']},
-    {'X': COORDS_MIN['X'], 'Y': COORDS_MAX['Y']},
-    {'X': COORDS_MAX['X'], 'Y': COORDS_MAX['Y']}
-]
-
-COORDS_BOWTIE = [
-    {'X': COORDS_MAX['X'], 'Y': COORDS_MIN['Y']},
-    {'X': COORDS_MIN['X'], 'Y': COORDS_MAX['Y']},
-    {'X': COORDS_MIN['X'], 'Y': COORDS_MIN['Y']},
-    {'X': COORDS_MAX['X'], 'Y': COORDS_MAX['Y']}
-]
-
-COORDS_Z_STAGE = [
-    {'X': COORDS_MIDDLE['X'], 'Y': COORDS_MIDDLE['Y']},
-    {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
-    {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']},
-    {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
-    {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']},
-    {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
-    {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']}
-]
 
 
 def setup_logging():
@@ -114,7 +73,7 @@ def attempt_movement(driver, logger, coords_list):
             attempt_homing(driver, logger)
 
 
-def attempt_homing(driver, logger):
+def attempt_homing(driver: SmoothieDriver_3_0_0, logger: logging.Logger):
     global attempts_to_home
     logger.info('Resetting Smoothieware...')
     driver._smoothie_reset()
@@ -137,14 +96,17 @@ def attempt_homing(driver, logger):
     attempts_to_home = 0
 
 
-def run_time_trial(driver, logger):
-    global COORDS_HOURGLASS, COORDS_BOWTIE, COORDS_Z_STAGE
+def run_time_trial(
+        driver: SmoothieDriver_3_0_0, logger: logging.Logger,
+        COORDS_HOURGLASS: List[Dict[str, float]],
+        COORDS_BOWTIE: List[Dict[str, float]],
+        COORDS_Z_STAGE: List[Dict[str, float]]):
     while int(time.time() / 60) - start_time_minutes < test_time_minutes:
         for i in range(10):
             attempt_movement(
                 driver, logger, (COORDS_HOURGLASS + COORDS_BOWTIE))
             attempt_movement(driver, logger, COORDS_Z_STAGE)
-        test_all_axes(driver, logger)
+        test_all_axes(driver, logger, COORDS_MAX)
         attempt_homing(driver, logger)
         # log a message, so we get confirmation that the test is still running
         logger.info('Test is still running :)')
@@ -162,13 +124,15 @@ def button_red():
     gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
 
 
-def test_all_axes(driver, logger):
+def test_all_axes(
+        driver: SmoothieDriver_3_0_0, logger: logging.Logger,
+        COORDS_MAX: Dict[str, float]):
     driver.move(COORDS_MAX)
     for ax in ['Z', 'A', 'X', 'Y']:
         test_axis(driver, logger, ax)
 
 
-def test_axis(driver, logger, axis):
+def test_axis(driver: SmoothieDriver_3_0_0, logger: logging.Logger, axis: str):
     retract_amounts = {
         'X': 3,
         'Y': 3,
@@ -216,11 +180,60 @@ def test_axis(driver, logger, axis):
 if __name__ == '__main__':
     logger = setup_logging()
     logger.info('Starting 24-hours Test')
+    parser = args_handler.root_argparser(
+        "run a long-running (overnight) series of tests for drift")
+    args = parser.parse_args()
+    _, driver = args_handler.build_driver(args.port)
+    COORDS_MAX = {
+        'X': driver.homed_position['X'] - XY_TOLERANCE,
+        'Y': driver.homed_position['Y'] - XY_TOLERANCE,
+        'Z': driver.homed_position['Z'] - ZA_TOLERANCE,
+        'A': driver.homed_position['A'] - ZA_TOLERANCE,
+    }
+
+    COORDS_MIN = {
+        'X': XY_TOLERANCE,
+        'Y': XY_TOLERANCE,
+        'Z': ZA_TOLERANCE,
+        'A': ZA_TOLERANCE,
+    }
+
+    COORDS_MIDDLE = {
+        'X': ((COORDS_MAX['X'] - COORDS_MIN['X']) / 2) + COORDS_MIN['X'],
+        'Y': ((COORDS_MAX['Y'] - COORDS_MIN['Y']) / 2) + COORDS_MIN['Y'],
+    }
+
+    COORDS_HOURGLASS = [
+        {'X': COORDS_MIN['X'], 'Y': COORDS_MIN['Y']},
+        {'X': COORDS_MAX['X'], 'Y': COORDS_MIN['Y']},
+        {'X': COORDS_MIN['X'], 'Y': COORDS_MAX['Y']},
+        {'X': COORDS_MAX['X'], 'Y': COORDS_MAX['Y']}
+    ]
+
+    COORDS_BOWTIE = [
+        {'X': COORDS_MAX['X'], 'Y': COORDS_MIN['Y']},
+        {'X': COORDS_MIN['X'], 'Y': COORDS_MAX['Y']},
+        {'X': COORDS_MIN['X'], 'Y': COORDS_MIN['Y']},
+        {'X': COORDS_MAX['X'], 'Y': COORDS_MAX['Y']}
+    ]
+
+    COORDS_Z_STAGE = [
+        {'X': COORDS_MIDDLE['X'], 'Y': COORDS_MIDDLE['Y']},
+        {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
+        {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']},
+        {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
+        {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']},
+        {'Z': COORDS_MIN['Z'], 'A': COORDS_MIN['A']},
+        {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']}
+    ]
     try:
         button_green()
         attempt_homing(driver, logger)
-        test_all_axes(driver, logger)
-        run_time_trial(driver, logger)
+        test_all_axes(driver, logger, COORDS_MAX)
+        run_time_trial(driver, logger,
+                       COORDS_HOURGLASS,
+                       COORDS_BOWTIE,
+                       COORDS_Z_STAGE)
     except Exception:
         button_red()
         logger.exception('Unexpected Error')

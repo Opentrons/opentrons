@@ -9,13 +9,18 @@ Author: Carlos Fernandez
 """
 import logging
 
-from opentrons.tools import driver, hardware
 from opentrons.drivers.rpi_drivers import gpio
+from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
     SmoothieError, DEFAULT_AXES_SPEED
+from opentrons.drivers.smoothie_drivers.driver_3_0\
+    import SmoothieDriver_3_0_0
+
+from . import args_handler
 
 
-def setup_motor_current():
+def setup_motor_current(hardware: SynchronousAdapter,
+                        driver: SmoothieDriver_3_0_0):
     # only set the current, keeping all other settings at the driver's default
     driver.set_speed(DEFAULT_AXES_SPEED)
     x_current = hardware.config.high_current['X'] * 0.85
@@ -24,7 +29,8 @@ def setup_motor_current():
         {'X': x_current, 'Y': y_current})
 
 
-def bowtie_pattern(X_max, Y_max):
+def bowtie_pattern(X_max: float, Y_max: float,
+                   driver: SmoothieDriver_3_0_0):
     zero = 10
     offset = 5
     driver.move({'X': zero, 'Y': zero + offset})
@@ -33,7 +39,8 @@ def bowtie_pattern(X_max, Y_max):
     driver.move({'X': X_max, 'Y': Y_max})
 
 
-def hourglass_pattern(X_max, Y_max):
+def hourglass_pattern(X_max: float, Y_max: float,
+                      driver: SmoothieDriver_3_0_0):
     zero = 10
     offset = 5
     driver.move({'X': zero, 'Y': zero + offset})
@@ -42,7 +49,8 @@ def hourglass_pattern(X_max, Y_max):
     driver.move({'X': X_max, 'Y': Y_max})
 
 
-def test_axis(axis, tolerance):
+def test_axis(axis: str, tolerance: float,
+              driver: SmoothieDriver_3_0_0):
     retract_amounts = {
         'X': 3,
         'Y': 3,
@@ -78,40 +86,46 @@ def test_axis(axis, tolerance):
     driver.pop_speed()
 
 
-def run_x_axis(cycles, x_max, y_max, tolerance):
+def run_x_axis(
+        cycles: int, x_max: float, y_max: float, tolerance: float,
+        hardware: SynchronousAdapter, driver: SmoothieDriver_3_0_0):
     # Test X Axis
     for cycle in range(cycles):
         print("Testing X")
-        setup_motor_current()
-        hourglass_pattern(x_max, y_max)
+        setup_motor_current(hardware, driver)
+        hourglass_pattern(x_max, y_max, driver)
         try:
-            test_axis('X', tolerance)
+            test_axis('X', tolerance, driver)
         except Exception as e:
             print("FAIL: {}".format(e))
 
 
-def run_y_axis(cycles, x_max, y_max, tolerance):
+def run_y_axis(cycles: int, x_max: float, y_max: float, tolerance: float,
+               hardware: SynchronousAdapter, driver: SmoothieDriver_3_0_0):
     # Test Y Axis
     for cycle in range(cycles):
         print("Testing Y")
-        setup_motor_current()
-        bowtie_pattern(x_max, y_max)
+        setup_motor_current(hardware, driver)
+        bowtie_pattern(x_max, y_max, driver)
         try:
-            test_axis('Y', tolerance)
+            test_axis('Y', tolerance, driver)
         except Exception as e:
             print("FAIL: {}".format(e))
         finally:
             driver.home('Y')  # we tell it to home Y manually
 
 
-def _exit_test():
+def _exit_test(driver: SmoothieDriver_3_0_0):
     driver._smoothie_reset()
     driver._setup()
     driver.disengage_axis('XYZABC')
 
 
 if __name__ == '__main__':
-
+    parser = args_handler.root_argparser(
+        "run tests checking the assembly of the OT-2's gantry")
+    args = parser.parse_args()
+    hardware, driver = args_handler.build_driver(args.port)
     num_cycles = 3
     b_x_max = 417.2
     b_y_max = 320
@@ -119,15 +133,17 @@ if __name__ == '__main__':
     logging.basicConfig(filename='gantry-test.log')
     try:
         hardware.home()
-        run_x_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
-        run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm)
+        run_x_axis(num_cycles, b_x_max, b_y_max, tolerance_mm,
+                   hardware, driver)
+        run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm,
+                   hardware, driver)
         gpio.set_button_light(red=False, green=True, blue=False)
         print("PASS")
-        _exit_test()
+        _exit_test(driver)
     except KeyboardInterrupt:
         print("Test Cancelled")
         driver.turn_on_blue_button_light()
     except Exception as e:
         driver.turn_on_red_button_light()
         print("FAIL: {}".format(e))
-        _exit_test()
+        _exit_test(driver)
