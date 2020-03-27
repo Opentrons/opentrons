@@ -115,15 +115,13 @@ export const _getLabwareEntitiesRootState: RootState => LabwareEntities = create
     )
 )
 
+// Special version of `getModuleEntities` selector for use in step-forms reducers
+export const _getModuleEntitiesRootState: RootState => ModuleEntities = rs =>
+  rs.moduleInvariantProperties
+
 export const getModuleEntities: Selector<ModuleEntities> = createSelector(
   rootSelector,
-  rs => rs.moduleInvariantProperties
-)
-
-export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
-  state => rootSelector(state).pipetteInvariantProperties,
-  labwareDefSelectors.getLabwareDefsByURI,
-  denormalizePipetteEntities
+  _getModuleEntitiesRootState
 )
 
 // Special version of `getPipetteEntities` selector for use in step-forms reducers
@@ -133,8 +131,18 @@ export const _getPipetteEntitiesRootState: RootState => PipetteEntities = create
   denormalizePipetteEntities
 )
 
-export const getInitialDeckSetupStepForm = (state: BaseState) =>
-  rootSelector(state).savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+export const getPipetteEntities: Selector<PipetteEntities> = createSelector(
+  rootSelector,
+  _getPipetteEntitiesRootState
+)
+
+const _getInitialDeckSetupStepFormRootState: RootState => FormData = rs =>
+  rs.savedStepForms[INITIAL_DECK_SETUP_STEP_ID]
+
+export const getInitialDeckSetupStepForm: Selector<FormData> = createSelector(
+  rootSelector,
+  _getInitialDeckSetupStepFormRootState
+)
 
 // TODO: BC: 2019-05-06 currently not being used, but should be used as the interface
 // for presenting labware locations on the deck for a given step
@@ -167,68 +175,83 @@ const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   type: THERMOCYCLER_MODULE_TYPE,
 }
+const _getInitialDeckSetup = (
+  initialSetupStep: FormData,
+  labwareEntities: LabwareEntities,
+  pipetteEntities: PipetteEntities,
+  moduleEntities: ModuleEntities
+): InitialDeckSetup => {
+  assert(
+    initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
+    'expected initial deck setup step to be "manualIntervention" step'
+  )
+  const labwareLocations =
+    (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
+  const moduleLocations =
+    (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
+  const pipetteLocations =
+    (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
+  return {
+    labware: mapValues(
+      labwareLocations,
+      (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
+        return { slot, ...labwareEntities[labwareId] }
+      }
+    ),
+    modules: mapValues(
+      moduleLocations,
+      (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
+        const module = moduleEntities[moduleId]
+        if (module.type === MAGNETIC_MODULE_TYPE) {
+          return {
+            id: module.id,
+            model: module.model,
+            type: MAGNETIC_MODULE_TYPE,
+            slot,
+            moduleState: MAGNETIC_MODULE_INITIAL_STATE,
+          }
+        } else if (module.type === TEMPERATURE_MODULE_TYPE) {
+          return {
+            id: module.id,
+            model: module.model,
+            type: TEMPERATURE_MODULE_TYPE,
+            slot,
+            moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
+          }
+        } else {
+          return {
+            id: module.id,
+            model: module.model,
+            type: THERMOCYCLER_MODULE_TYPE,
+            slot,
+            moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
+          }
+        }
+      }
+    ),
+    pipettes: mapValues(
+      pipetteLocations,
+      (mount: Mount, pipetteId: string): PipetteOnDeck => {
+        return { mount, ...pipetteEntities[pipetteId] }
+      }
+    ),
+  }
+}
 export const getInitialDeckSetup: Selector<InitialDeckSetup> = createSelector(
   getInitialDeckSetupStepForm,
   getLabwareEntities,
   getPipetteEntities,
   getModuleEntities,
-  (initialSetupStep, labwareEntities, pipetteEntities, moduleEntities) => {
-    assert(
-      initialSetupStep && initialSetupStep.stepType === 'manualIntervention',
-      'expected initial deck setup step to be "manualIntervention" step'
-    )
-    const labwareLocations =
-      (initialSetupStep && initialSetupStep.labwareLocationUpdate) || {}
-    const moduleLocations =
-      (initialSetupStep && initialSetupStep.moduleLocationUpdate) || {}
-    const pipetteLocations =
-      (initialSetupStep && initialSetupStep.pipetteLocationUpdate) || {}
-    return {
-      labware: mapValues(
-        labwareLocations,
-        (slot: DeckSlot, labwareId: string): LabwareOnDeck => {
-          return { slot, ...labwareEntities[labwareId] }
-        }
-      ),
-      modules: mapValues(
-        moduleLocations,
-        (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
-          const module = moduleEntities[moduleId]
-          if (module.type === MAGNETIC_MODULE_TYPE) {
-            return {
-              id: module.id,
-              model: module.model,
-              type: MAGNETIC_MODULE_TYPE,
-              slot,
-              moduleState: MAGNETIC_MODULE_INITIAL_STATE,
-            }
-          } else if (module.type === TEMPERATURE_MODULE_TYPE) {
-            return {
-              id: module.id,
-              model: module.model,
-              type: TEMPERATURE_MODULE_TYPE,
-              slot,
-              moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
-            }
-          } else {
-            return {
-              id: module.id,
-              model: module.model,
-              type: THERMOCYCLER_MODULE_TYPE,
-              slot,
-              moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
-            }
-          }
-        }
-      ),
-      pipettes: mapValues(
-        pipetteLocations,
-        (mount: Mount, pipetteId: string): PipetteOnDeck => {
-          return { mount, ...pipetteEntities[pipetteId] }
-        }
-      ),
-    }
-  }
+  _getInitialDeckSetup
+)
+
+// Special version of `getLabwareEntities` selector for use in step-forms reducers
+export const _getInitialDeckSetupRootState: RootState => InitialDeckSetup = createSelector(
+  _getInitialDeckSetupStepFormRootState,
+  _getLabwareEntitiesRootState,
+  _getPipetteEntitiesRootState,
+  _getModuleEntitiesRootState,
+  _getInitialDeckSetup
 )
 
 export const getPermittedTipracks: Selector<Array<string>> = createSelector(
