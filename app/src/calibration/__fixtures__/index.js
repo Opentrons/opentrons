@@ -42,13 +42,20 @@ export const mockCreateCheckSessionFailureMeta = {
   status: 500,
 }
 
+export const mockCreateCheckSessionConflictMeta = {
+  method: 'POST',
+  path: '/calibration/check/session',
+  ok: false,
+  status: 409,
+}
+
 export const mockDeleteCheckSessionSuccess = {
   host: mockRobot,
   method: 'DELETE',
   path: '/calibration/check/session',
   ok: true,
   status: 200,
-  body: { message: 'Successfully deleted session'},
+  body: { message: 'Successfully deleted session' },
 }
 
 export const mockDeleteCheckSessionSuccessMeta = {
@@ -64,7 +71,7 @@ export const mockDeleteCheckSessionFailure = {
   path: '/calibration/check/session',
   ok: false,
   status: 500,
-  body: { message: 'Failed delete cal check sesh' },
+  body: { message: 'Failed to delete cal check sesh' },
 }
 
 export const mockDeleteCheckSessionFailureMeta = {
