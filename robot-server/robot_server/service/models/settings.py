@@ -2,6 +2,8 @@ import typing
 from enum import Enum
 
 from typing import Optional
+
+from opentrons.config.pipette_config import MUTABLE_CONFIGS
 from pydantic import BaseModel, Field, create_model, validator
 from opentrons.server.endpoints.settings import _common_settings_reset_options
 
@@ -94,9 +96,9 @@ class PipetteSettingsFieldType(str, Enum):
 class PipetteSettingsField(BaseModel):
     """A pipette config element identified by the property's name"""
     units: str = \
-        Field(...,
+        Field(None,
               description="The physical units this value is in (e.g. mm, uL)")
-    type: PipetteSettingsFieldType
+    type: PipetteSettingsFieldType = None
     min: float = \
         Field(...,
               description="The minimum acceptable value of the property")
@@ -122,14 +124,9 @@ class PipetteSettingsInfo(BaseModel):
                           "p300_single_v1.5\")")
 
 
-class PipetteSettings(BaseModel):
-    info: PipetteSettingsInfo
-    setting_fields: typing.Dict[str, PipetteSettingsField] = \
-        Field(...,
-              alias="fields",
-              description="The fields of the pipette settings")
+class BasePipetteSettingFields(BaseModel):
     quirks: typing.Dict[str, bool] = \
-        Field(...,
+        Field(None,
               description="Quirks are behavioral changes associated with "
                           "pipettes. For instance, some models of pipette "
                           "might need to run their drop tip behavior twice. "
@@ -140,6 +137,25 @@ class PipetteSettings(BaseModel):
                           "pipette. Because quirks are only defined as "
                           "compatible for a pipette if they should be on, "
                           "the default value for all quirks is true.")
+
+
+# A dynamic model of the possible fields in pipette configuration. It's
+# generated from pipette_config module. It's derived from an object with the
+# 'quirks` member.
+PipetteSettingsFields = create_model(
+    'PipetteSettingsFields', __base__=BasePipetteSettingFields, **{
+        conf: (PipetteSettingsField, None) for conf in MUTABLE_CONFIGS
+        if conf != 'quirks'
+    }
+)
+
+
+class PipetteSettings(BaseModel):
+    info: PipetteSettingsInfo
+    setting_fields: PipetteSettingsFields = \
+        Field(...,
+              alias="fields",
+              description="The fields of the pipette settings")
 
 
 MultiPipetteSettings = typing.Dict[str, PipetteSettings]

@@ -111,13 +111,16 @@ def mock_pipette_data():
                 'model': 'p1_model',
             },
             'fields': {
-                'p1': {
+                'pickUpCurrent': {
                     'units': 'mm',
                     'type': 'float',
                     'min': 0.0,
                     'max': 2.0,
                     'default': 1.0,
                     'value': 0.5,
+                },
+                'quirks': {
+                    'dropTipShake': True
                 }
             }
         },
@@ -127,7 +130,7 @@ def mock_pipette_data():
                 'model': 'p2_model',
             },
             'fields': {
-                'p2': {
+                'pickUpIncrement': {
                     'units': 'inch',
                     'type': 'int',
                     'min': 0,

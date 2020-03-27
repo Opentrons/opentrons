@@ -13,7 +13,7 @@ from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
     LogLevels, FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
-    PipetteSettingsInfo, PipetteSettingsField
+    PipetteSettingsInfo, PipetteSettingsField, PipetteSettingsFields
 
 log = logging.getLogger(__name__)
 
@@ -107,7 +107,8 @@ async def get_robot_settings(
 @router.get("/settings/pipettes",
             description="List all settings for all known pipettes by id",
             response_model=MultiPipetteSettings,
-            response_model_by_alias=True)
+            response_model_by_alias=True,
+            response_model_exclude_unset=True)
 async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
     res = {}
     for pipette_id in pipette_config.known_pipettes():
@@ -115,7 +116,8 @@ async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
         res[pipette_id] = _pipette_settings_from_config(
             pipette_config,
             pipette_id,
-        ).dict(by_alias=True)
+        ).dict(by_alias=True,
+               exclude_unset=True)
 
     return res
 
@@ -123,17 +125,20 @@ async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
 @router.get("/settings/pipettes/{pipette_id}",
             description="Get the settings of a specific pipette by ID",
             response_model=PipetteSettings,
-            response_model_by_alias=True)
+            response_model_by_alias=True,
+            response_model_exclude_unset=True)
 async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
     if pipette_id not in pipette_config.known_pipettes():
         raise V1HandlerError(status_code=HTTPStatus.NOT_FOUND,
                              message=f'{pipette_id} is not a valid pipette id')
     # Have to convert to dict using by_alias due to bug in fastapi
-    return _pipette_settings_from_config(
+    r = _pipette_settings_from_config(
         pipette_config, pipette_id
     ).dict(
-        by_alias=True
+        by_alias=True,
+        exclude_unset=True,
     )
+    return r
 
 
 @router.patch("/settings/pipettes/{pipetteId}",
@@ -154,10 +159,11 @@ def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
     :param pipette_id: pipette id
     :return: PipetteSettings object
     """
+    mutuble_configs = pc.list_mutable_configs(pipette_id=pipette_id)
+    fields = PipetteSettingsFields(
+        **{k: v for k, v in mutuble_configs.items()}
+    )
     c = pc.load_config_dict(pipette_id)
-    fields = {k: PipetteSettingsField(**v) for k, v in
-              pc.list_mutable_configs(
-                  pipette_id=pipette_id).items()}
     return PipetteSettings(info=PipetteSettingsInfo(name=c.get('name'),
                                                     model=c.get('model')),
                            fields=fields)
