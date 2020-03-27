@@ -40,6 +40,11 @@ const mockGetIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
+const getFeatureFlags: JestMockFn<
+  [State],
+  $Call<typeof ConfigSelectors.getFeatureFlags, State>
+> = ConfigSelectors.getFeatureFlags
+
 describe('ControlsCard', () => {
   let mockStore
   let render
@@ -80,7 +85,7 @@ describe('ControlsCard', () => {
       dispatch: jest.fn(),
     }
 
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
+    getFeatureFlags.mockReturnValue({
       enableRobotCalCheck: true,
     })
 
@@ -188,7 +193,7 @@ describe('ControlsCard', () => {
   it('Check cal button does not render if feature flag off', () => {
     mockGetIsRunning.mockReturnValue(true)
 
-    ConfigSelectors.getFeatureFlags.mockReturnValue({
+    getFeatureFlags.mockReturnValue({
       enableRobotCalCheck: false,
     })
 

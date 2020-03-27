@@ -5,5 +5,5 @@ import type { RobotCalibrationCheckSessionData } from './api-types'
 export const getRobotCalibrationCheckSession: (
   state: State,
   robotName: string
-) => ?RobotCalibrationCheckSessionData = (state, robotName) =>
+) => RobotCalibrationCheckSessionData | null = (state, robotName) =>
   state.calibration[robotName]?.robotCalibrationCheck || null
