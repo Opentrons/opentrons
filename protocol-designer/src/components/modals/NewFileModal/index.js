@@ -31,6 +31,7 @@ type SP = {|
   _hasUnsavedChanges: ?boolean,
   modulesEnabled: ?boolean,
   thermocyclerEnabled: ?boolean,
+  moduleRestrictionsDisabled: ?boolean,
 |}
 
 type DP = {|
@@ -50,6 +51,9 @@ function mapStateToProps(state: BaseState): SP {
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
     thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
+    moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
+      state
+    ),
   }
 }
 
@@ -111,6 +115,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
     ...ownProps,
     modulesEnabled: stateProps.modulesEnabled,
     thermocyclerEnabled: stateProps.thermocyclerEnabled,
+    moduleRestrictionsDisabled: stateProps.moduleRestrictionsDisabled,
     showModulesFields: true,
     hideModal: stateProps.hideModal,
     onCancel: dispatchProps.onCancel,

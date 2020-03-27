@@ -59,6 +59,7 @@ describe('FilePipettesModal', () => {
       onSave: jest.fn(),
       modulesEnabled: true,
       thermocyclerEnabled: true,
+      moduleRestrictionsDisabled: false,
     }
   })
 
@@ -256,6 +257,19 @@ describe('FilePipettesModal', () => {
 
       props.initialPipetteValues = initialPipetteValues
       props.initialModuleValues = initialModuleValues
+
+      const wrapper = renderFormComponent(props)
+
+      expect(wrapper.find(CrashInfoBox)).toHaveLength(0)
+    })
+
+    it('does not display crash info when module restrictions disabled', () => {
+      initialPipetteValues.left = crashablePipette
+      initialModuleValues[MAGNETIC_MODULE_TYPE] = crashableMagnet
+
+      props.initialPipetteValues = initialPipetteValues
+      props.initialModuleValues = initialModuleValues
+      props.moduleRestrictionsDisabled = true
 
       const wrapper = renderFormComponent(props)
 

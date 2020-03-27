@@ -30,6 +30,7 @@ type SP = {|
   _orderedStepIds: Array<StepIdType>,
   modulesEnabled: ?boolean,
   thermocyclerEnabled: ?boolean,
+  moduleRestrictionsDisabled: ?boolean,
 |}
 
 type OP = {|
@@ -45,6 +46,9 @@ const mapSTP = (state: BaseState): SP => {
     _orderedStepIds: stepFormSelectors.getOrderedStepIds(state),
     modulesEnabled: featureFlagSelectors.getEnableModules(state),
     thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
+    moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
+      state
+    ),
   }
 }
 
