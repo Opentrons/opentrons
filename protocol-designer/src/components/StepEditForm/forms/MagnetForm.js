@@ -1,7 +1,9 @@
 // @flow
+import cx from 'classnames'
 import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { FormGroup } from '@opentrons/components'
+import { MAGNETIC_MODULE_V1 } from '@opentrons/shared-data'
 import { selectors as uiModuleSelectors } from '../../../ui/modules'
 import { i18n } from '../../../localization'
 import { maskField } from '../../../steplist/fieldLevel'
@@ -9,15 +11,18 @@ import { maskField } from '../../../steplist/fieldLevel'
 import { ConditionalOnField, TextField, RadioGroupField } from '../fields'
 import styles from '../StepEditForm.css'
 
+import type { FormData } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
-type MagnetFormProps = { focusHandlers: FocusHandlers }
+type MagnetFormProps = { focusHandlers: FocusHandlers, formData: FormData }
 
 export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
   const moduleLabwareOptions = useSelector(
     uiModuleSelectors.getMagneticLabwareOptions
   )
+
+  const moduleModel: ?string = props.formData?.meta?.module?.model
   const moduleOption: ?string = moduleLabwareOptions[0]
     ? moduleLabwareOptions[0].name
     : 'No magnetic module'
@@ -97,7 +102,14 @@ export const MagnetForm = (props: MagnetFormProps): React.Element<'div'> => {
         condition={val => val === 'engage'}
       >
         <div className={styles.diagram_row}>
-          <div className={styles.engage_height_diagram} />
+          <div
+            className={cx(
+              styles.engage_height_diagram,
+              moduleModel === MAGNETIC_MODULE_V1
+                ? styles.engage_height_diagram_gen1
+                : styles.engage_height_diagram_gen2
+            )}
+          />
         </div>
       </ConditionalOnField>
     </div>

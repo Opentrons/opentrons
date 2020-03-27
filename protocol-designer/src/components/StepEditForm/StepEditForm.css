@@ -255,12 +255,26 @@ and when that is implemented.
 .engage_height_diagram {
   width: 90%;
   padding-top: calc(40 / 540 * 90%);
-  background-image: url('../../images/modules/engage_height_static.png');
   background-repeat: no-repeat;
   background-size: cover;
 
   &:hover {
     cursor: pointer;
-    background-image: url('../../images/modules/engage_height_animation.gif');
+  }
+}
+
+.engage_height_diagram_gen1 {
+  background-image: url('../../images/modules/engage_height_static_gen1.png');
+
+  &:hover {
+    background-image: url('../../images/modules/engage_height_animation_gen1.gif');
+  }
+}
+
+.engage_height_diagram_gen2 {
+  background-image: url('../../images/modules/engage_height_static_gen2.png');
+
+  &:hover {
+    background-image: url('../../images/modules/engage_height_animation_gen2.gif');
   }
 }

@@ -460,12 +460,21 @@ export const getInvariantContext: Selector<InvariantContext> = createSelector(
   })
 )
 
-export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+// TODO(IL, 2020-03-24) type this as Selector<HydratedFormData>. See #3161
+export const getHydratedUnsavedForm: Selector<any> = createSelector(
   getUnsavedForm,
   getInvariantContext,
-  (unsavedForm, contextualState) => {
+  (unsavedForm, invariantContext) => {
     if (!unsavedForm) return null
-    const hydratedForm = _getHydratedForm(unsavedForm, contextualState)
+    const hydratedForm = _getHydratedForm(unsavedForm, invariantContext)
+    return hydratedForm
+  }
+)
+
+export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+  getHydratedUnsavedForm,
+  hydratedForm => {
+    if (!hydratedForm) return null
     const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
     return errors
   }
