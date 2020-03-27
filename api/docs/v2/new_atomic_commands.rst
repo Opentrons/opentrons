@@ -158,6 +158,7 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
 To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
 
 .. code-block:: python
+
     pipette.starting_tip = tip_rack_1.well('C3')
     pipette.pick_up_tip()  # pick up C3 from "tip_rack_1"
     pipette.return_tip()

@@ -22,6 +22,7 @@ which informed the protocol context that the deck contains a 300 µL tiprack in 
 A third optional argument can be used to give the labware a nickname to be displayed in the Opentrons App.
 
 .. code-block:: python
+
     plate = protocol.load_labware('corning_96_wellplate_360ul_flat',
                                   slot='2',
                                   label='any-name-you-want')

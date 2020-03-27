@@ -70,7 +70,7 @@ If you have custom labware definitions you want to use with Jupyter, make a new 
 Command Line
 ------------
 
-The OT-2's command line is accessible either by creating a new terminal in Jupyter or by `using SSH to access its terminal<https://app.intercom.io/a/apps/bsgvg3q7/articles/articles/3203681/show>`_.
+The OT-2's command line is accessible either by creating a new terminal in Jupyter or by `using SSH to access its terminal <https://support.opentrons.com/en/articles/3203681>`_.
 
 To execute a protocol via SSH, copy it to the OT-2 using a program like ``scp`` and then use the command line program ``opentrons_execute``:
 

@@ -33,15 +33,23 @@ Modules are loaded using the function :py:meth:`.ProtocolContext.load_module`:
 
 Module names can be specified in a few different ways. The valid names can be found below. They are not case-sensitive.
 
-+--------------------------+-----------------------------------------------+
-|        Module Type       |               Valid Names                     |
-+==========================+===============================================+
-| ``Temperature Module``   | ``'Temperature Module'``, ``'tempdeck'``      |
-+--------------------------+-----------------------------------------------+
-| ``Magnetic Module``      | ``'Magnetic Module'``, ``'magdeck'``          |
-+--------------------------+-----------------------------------------------+
-| ``Thermocycler Module``  | ``'Thermocycler Module'``, ``'thermocycler'`` |
-+--------------------------+-----------------------------------------------+
++-----------------------------+-----------------------------------------------+
+|        Module Type          |               Valid Names                     |
++=============================+===============================================+
+| ``Temperature Module``      | ``'Temperature Module'``, ``'tempdeck'``      |
++-----------------------------+-----------------------------------------------+
+| ``Temperature Module GEN2`` | ``'Temperature Module Gen2'``                 |
++-----------------------------+-----------------------------------------------+
+| ``Magnetic Module``         | ``'Magnetic Module'``, ``'magdeck'``          |
++-----------------------------+-----------------------------------------------+
+| ``Magnetic Module GEN2``    | ``'Magnetic Module Gen2'``                    |
++-----------------------------+-----------------------------------------------+
+| ``Thermocycler Module``     | ``'Thermocycler Module'``, ``'thermocycler'`` |
++-----------------------------+-----------------------------------------------+
+
+.. note::
+
+    GEN2 Temperature Module and GEN2 Magnetic Module are introduced in Robot Software version 3.17.0. If you are using these modules, make sure the API level of your protocol is at least 2.3 or higher.
 
 .. versionadded:: 2.0
 
@@ -49,6 +57,27 @@ Module names can be specified in a few different ways. The valid names can be fo
 
     When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
 
+GEN2 Modules
+============
+
+Tempearture Module
+------------------
+
+The GEN2 Temperature Module has a plastic insulating rim around the plate and plastic
+insulating shrouds designed to fit over our aluminum blocks, mitigating an issue where the
+Temperature Module Gen1 would not be able to sufficiently cool itself when a Thermocycler
+profile was ongoing in the same robot.
+
+Magnetic Module
+---------------
+
+Compared to the older version, the GEN2 Magnetic Module uses smaller magnets. This mitigates an
+issue where beads would be attracted even when the magnets were retracted. This also means the
+attraction times for the magnets have increased:
+
+Recommended GEN2 Magnetic Module bead attraction time:
+    - <= 50 uL: 5 minutes
+    -  > 50 uL: 7 minutes
 
 Module and Labware Compatibility
 ================================
