@@ -7,24 +7,13 @@ This is the implementation of the endpoints in
 import asyncio
 import logging
 import subprocess
-import syslog
 from typing import Tuple
 
 
 LOG = logging.getLogger(__name__)
 
 MAX_RECORDS = 100000
-
-_SYSLOG_PRIORITY_TO_NAME = {
-    syslog.LOG_EMERG: 'emergency',
-    syslog.LOG_CRIT: 'critical',
-    syslog.LOG_ERR: 'error',
-    syslog.LOG_WARNING: 'warning',
-    syslog.LOG_INFO: 'info',
-    syslog.LOG_DEBUG: 'debug',
-    syslog.LOG_ALERT: 'alert',
-    syslog.LOG_NOTICE: 'notice'
-}
+DEFAULT_RECORDS = 50000
 
 
 async def get_records_dumb(selector: str, records: int,
