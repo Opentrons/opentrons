@@ -49,7 +49,7 @@ Module names can be specified in a few different ways. The valid names can be fo
 
 .. note::
 
-    GEN2 Temperature Module and GEN2 Magnetic Module are introduced in Robot Software version 3.17.0. If you are using these modules, make sure the API level of your protocol is at least 2.3 or higher.
+    GEN2 Temperature Module and GEN2 Magnetic Module are introduced in Robot Software version 3.17.0. You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`. If you are using these modules, make sure the API level of your protocol is at least 2.3 or higher.
 
 .. versionadded:: 2.0
 
@@ -76,8 +76,8 @@ issue where beads would be attracted even when the magnets were retracted. This 
 attraction times for the magnets have increased:
 
 Recommended GEN2 Magnetic Module bead attraction time:
-    - <= 50 uL: 5 minutes
-    -  > 50 uL: 7 minutes
+    - Total liquid volume <= 50 uL: 5 minutes
+    - Total liquid volume > 50 uL: 7 minutes
 
 Module and Labware Compatibility
 ================================
