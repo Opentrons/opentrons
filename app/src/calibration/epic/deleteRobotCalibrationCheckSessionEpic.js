@@ -47,13 +47,11 @@ export const deleteRobotCalibrationCheckSessionEpic: Epic = (
 
       return explicitDelete || clearExisting
     }),
-    map(action => {
-      if (
-        action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE
-      ) {
-        return { ...action, meta: { ...action.meta, recreating: true } }
-      }
-    }),
+    map(action =>
+      action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE
+        ? { ...action, meta: { ...action.meta, recreating: true } }
+        : action
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
