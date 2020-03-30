@@ -15,18 +15,12 @@ export const maskToInteger = (rawValue: mixed): mixed => {
   return rawNumericValue
 }
 
-const DEFAULT_DECIMAL_PLACES = 1
+const DEFAULT_DECIMAL_PLACES: number = 1
 
-export const maskToFloat = (rawValue: mixed): ?mixed => {
-  const rawNumericValue =
-    typeof rawValue === 'string'
-      ? rawValue.replace(/[^-/.0-9]/g, '')
-      : String(rawValue)
-  const trimRegex = new RegExp(
-    `(\\d*[.]{1}\\d{${DEFAULT_DECIMAL_PLACES}})(\\d*)`
-  )
-  return rawNumericValue.replace(trimRegex, (match, group1) => group1)
-}
+export const maskToFloat = (rawValue: mixed): string =>
+  typeof rawValue === 'string'
+    ? rawValue.replace(/[^-/.0-9]/g, '')
+    : String(rawValue)
 
 /*********************
  **  Value Limiters  **
