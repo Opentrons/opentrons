@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
-import { addSeconds, format } from 'date-fns'
 import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
+import { formatSeconds } from '../../robot/selectors' // TODO: move helper from robot selector to helper file
 import { TemperatureControl, TemperatureData } from '../ModuleControls'
+
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
-
-import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
 
 const TimeRemaining = ({
   holdTime,
@@ -23,10 +23,7 @@ const TimeRemaining = ({
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
     <p className={styles.time_remaining_label}>Time remaining for step:</p>
-    <p>
-      {// convert duration to seconds from epoch (midnight), then format
-      format(addSeconds(0, holdTime ?? 0), 'HH:mm:ss')}
-    </p>
+    <p>{formatSeconds(holdTime ?? 0)}</p>
   </span>
 )
 
@@ -53,19 +50,31 @@ const CycleInfo = ({
     return null
   }
   return (
-    <div className={styles.card_row}>
-      <LabeledValue
-        label="Cycle #"
-        className={styles.compact_labeled_value}
-        value={`${currentCycleIndex} / ${totalCycleCount}`}
-      />
-      <LabeledValue
-        label="Step #"
-        className={styles.compact_labeled_value}
-        value={`${currentStepIndex} / ${totalStepCount}`}
-      />
-      <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
-    </div>
+    <>
+      <div className={styles.card_row}>
+        <div className={styles.cycle_info_wrapper}>
+          <div className={styles.cycle_info_counts}>
+            <LabeledValue
+              label="Cycle #"
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentCycleIndex} / ${totalCycleCount}`}
+            />
+            <LabeledValue
+              label="Step #"
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentStepIndex} / ${totalStepCount}`}
+            />
+          </div>
+          <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
+        </div>
+      </div>
+    </>
   )
 }
 
