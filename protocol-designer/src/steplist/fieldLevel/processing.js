@@ -22,6 +22,13 @@ export const maskToFloat = (rawValue: mixed): string =>
     ? rawValue.replace(/[^-/.0-9]/g, '')
     : String(rawValue)
 
+export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
+  rawValue: mixed
+): string => {
+  const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
+  return String(rawValue).replace(trimRegex, (match, group1) => group1)
+}
+
 /*********************
  **  Value Limiters  **
  **********************/
@@ -33,13 +40,6 @@ export const onlyPositiveNumbers = (value: mixed) =>
   value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : null
 export const defaultTo = (defaultValue: mixed) => (value: mixed) =>
   value === null || Number.isNaN(value) ? defaultValue : value
-
-export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
-  rawValue: mixed
-): string => {
-  const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
-  return String(rawValue).replace(trimRegex, (match, group1) => group1)
-}
 
 /*******************
  **     Helpers    **
