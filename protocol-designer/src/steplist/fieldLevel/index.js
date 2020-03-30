@@ -6,6 +6,7 @@ import {
   composeErrors,
   minFieldValue,
   maxFieldValue,
+  realNumber,
 } from './errors'
 import {
   maskToInteger,
@@ -128,6 +129,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   magnetAction: { getErrors: composeErrors(requiredField) },
   engageHeight: {
+    getErrors: composeErrors(realNumber),
     maskValue: composeMaskers(maskToFloat),
     castValue: Number,
   },

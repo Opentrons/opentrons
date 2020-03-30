@@ -13,6 +13,7 @@ export type FieldError =
   | 'NON_ZERO'
   | 'UNDER_RANGE_MINIMUM'
   | 'OVER_RANGE_MAXIMUM'
+  | 'NOT_A_REAL_NUMBER'
 
 const FIELD_ERRORS: { [FieldError]: string } = {
   REQUIRED: 'This field is required',
@@ -20,6 +21,7 @@ const FIELD_ERRORS: { [FieldError]: string } = {
   NON_ZERO: 'Must be greater than zero',
   UNDER_RANGE_MINIMUM: 'Min is',
   OVER_RANGE_MAXIMUM: 'Max is',
+  NOT_A_REAL_NUMBER: 'Must be a real number',
 }
 
 // TODO: test these
@@ -52,6 +54,9 @@ export const maxFieldValue = (maximum: number): ErrorChecker => (
   Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
+
+export const realNumber: ErrorChecker = (value: mixed) =>
+  isNaN(Number(value)) ? FIELD_ERRORS.NOT_A_REAL_NUMBER : null
 
 /*******************
  **     Helpers    **
