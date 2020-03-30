@@ -10,6 +10,8 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareHasQuirk,
+  MAGNETIC_MODULE_V1,
+  TEMPERATURE_MODULE_V1,
   type DeckSlot as DeckDefSlot,
   type ModuleRealType,
 } from '@opentrons/shared-data'
@@ -210,13 +212,15 @@ const DeckSetupContents = (props: ContentsProps) => {
     ? compact([
         (allModules.some(
           moduleOnDeck =>
-            moduleOnDeck.slot === '1' && moduleOnDeck.model.includes('V1')
+            moduleOnDeck.slot === '1' &&
+            moduleOnDeck.model.includes(MAGNETIC_MODULE_V1)
         ) &&
           deckSlotsById?.['4']) ||
           null,
         (allModules.some(
           moduleOnDeck =>
-            moduleOnDeck.slot === '3' && moduleOnDeck.model.includes('V1')
+            moduleOnDeck.slot === '3' &&
+            moduleOnDeck.model.includes(TEMPERATURE_MODULE_V1)
         ) &&
           deckSlotsById?.['6']) ||
           null,
