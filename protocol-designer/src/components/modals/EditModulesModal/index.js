@@ -2,7 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { useSelector, useDispatch } from 'react-redux'
-import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { Formik } from 'formik'
+import * as Yup from 'yup'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  type ModuleModel,
+} from '@opentrons/shared-data'
 import {
   Modal,
   OutlineButton,
@@ -24,16 +29,27 @@ import {
   SUPPORTED_MODULE_SLOTS,
   getAllModuleSlotsByType,
 } from '../../../modules'
-import {
-  MODELS_FOR_MODULE_TYPE,
-  DEFAULT_MODEL_FOR_MODULE_TYPE,
-} from '../../../constants'
+import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
 import { i18n } from '../../../localization'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
 import { PDAlert } from '../../alerts/PDAlert'
+import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
+import type { FormikProps } from 'formik/@flow-typed'
 import type { ModuleRealType } from '@opentrons/shared-data'
+
+const validationSchema = Yup.object().shape({
+  selectedModel: Yup.string()
+    .nullable()
+    .required('This field is required'),
+  selectedSlot: Yup.string().required(),
+})
+
+type EditModulesState = {
+  selectedModel: ModuleModel | null,
+  selectedSlot: string,
+}
 
 type EditModulesProps = {
   moduleType: ModuleRealType,
@@ -44,83 +60,61 @@ type EditModulesProps = {
 
 export function EditModulesModal(props: EditModulesProps) {
   const { moduleType, onCloseClick } = props
-  const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
 
-  const module = props.moduleId
+  const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const moduleOnDeck = props.moduleId
     ? _initialDeckSetup.modules[props.moduleId]
     : null
+  const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
 
-  const [selectedSlot, setSelectedSlot] = React.useState<string>(
-    module?.slot || SUPPORTED_MODULE_SLOTS[moduleType][0].value
-  )
-
-  const [selectedModel, setSelectedModel] = React.useState<string>(
-    module?.model || DEFAULT_MODEL_FOR_MODULE_TYPE[moduleType]
-  )
+  const initialValues = {
+    selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
+    selectedModel: moduleOnDeck?.model || null,
+  }
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(_initialDeckSetup)
-  const previousModuleSlot = module && module.slot
-
-  const slotIsEmpty =
-    !slotsBlockedBySpanning.includes(selectedSlot) &&
-    (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
-      previousModuleSlot === selectedSlot)
-
-  let hasSlotOrIncompatibleError = true
-  if (slotIsEmpty) {
-    hasSlotOrIncompatibleError = false
-  } else {
-    const labwareOnSlot = getLabwareOnSlot(_initialDeckSetup, selectedSlot)
-    const labwareIsCompatible =
-      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
-
-    hasSlotOrIncompatibleError = !labwareIsCompatible
-  }
+  const previousModuleSlot = moduleOnDeck?.slot
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
 
-  const enableSlotSelection = useSelector(
+  const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-
-  const occupiedSlotError = hasSlotOrIncompatibleError
-    ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
-    : null
-
   const dispatch = useDispatch()
 
-  const handleSlotChange = (e: SyntheticInputEvent<*>) =>
-    setSelectedSlot(e.target.value)
-  const handleModelChange = (e: SyntheticInputEvent<*>) =>
-    setSelectedModel(e.target.value)
+  const onSaveClick = (values: EditModulesState) => {
+    const { selectedModel, selectedSlot } = values
 
-  let onSaveClick = () => {
-    dispatch(
-      stepFormActions.createModule({
-        slot: selectedSlot,
-        type: moduleType,
-        model: selectedModel,
-      })
-    )
-    onCloseClick()
-  }
-  if (module) {
-    onSaveClick = () => {
+    // validator from formik should never let onSaveClick be called
+    // this case might never be true but still need to handle for flow
+    if (!selectedModel) return null
+
+    if (moduleOnDeck) {
       // disabled if something lives in the slot selected in local state
-      // if previous module.model is different, edit module
-      if (module.model !== selectedModel) {
+      // if previous moduleOnDeck.model is different, edit module
+      if (moduleOnDeck.model !== selectedModel) {
         module.id &&
           dispatch(
             stepFormActions.editModule({ id: module.id, model: selectedModel })
           )
       }
-      // if previous module.slot is different than state, move deck item
-      if (selectedSlot && module.slot !== selectedSlot) {
-        module.slot && dispatch(moveDeckItem(module.slot, selectedSlot))
+      // if previous moduleOnDeck.slot is different than state, move deck item
+      if (selectedSlot && moduleOnDeck.slot !== selectedSlot) {
+        moduleOnDeck.slot &&
+          dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
       }
-      onCloseClick()
+    } else {
+      dispatch(
+        stepFormActions.createModule({
+          slot: selectedSlot,
+          type: moduleType,
+          model: selectedModel,
+        })
+      )
     }
+    onCloseClick()
   }
+
   const heading = i18n.t(`modules.module_long_names.${moduleType}`)
 
   const slotOptionTooltip = (
@@ -128,75 +122,158 @@ export function EditModulesModal(props: EditModulesProps) {
       {i18n.t('tooltip.edit_module_modal.slot_selection')}
     </div>
   )
+
   return (
     <Modal
       heading={heading}
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
-      {hasSlotOrIncompatibleError && (
-        <PDAlert
-          alertType="warning"
-          title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-          description={''}
-        />
-      )}
-      <form>
-        <div className={styles.form_row}>
-          <FormGroup label="Model" className={styles.option_model}>
-            <DropdownField
-              tabIndex={0}
-              options={MODELS_FOR_MODULE_TYPE[moduleType]}
-              value={selectedModel}
-              onChange={handleModelChange}
-            />
-          </FormGroup>
-          {showSlotOption && (
-            <>
-              <HoverTooltip
-                placement="top"
-                tooltipComponent={slotOptionTooltip}
-              >
-                {hoverTooltipHandlers => (
-                  <div {...hoverTooltipHandlers} className={styles.option_slot}>
-                    <FormGroup label="Position">
-                      <DropdownField
-                        tabIndex={1}
-                        options={getAllModuleSlotsByType(moduleType)}
-                        value={selectedSlot}
-                        disabled={!enableSlotSelection}
-                        onChange={handleSlotChange}
-                        error={occupiedSlotError}
-                      />
-                    </FormGroup>
-                  </div>
-                )}
-              </HoverTooltip>
-              <div className={styles.slot_map_container}>
-                {selectedSlot && (
-                  <SlotMap
-                    occupiedSlots={[`${selectedSlot}`]}
-                    isError={Boolean(occupiedSlotError)}
-                  />
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </form>
+      <Formik
+        enableReinitialize
+        initialValues={initialValues}
+        onSubmit={onSaveClick}
+        validationSchema={validationSchema}
+      >
+        {({
+          handleChange,
+          handleSubmit,
+          errors,
+          setFieldValue,
+          touched,
+          values,
+          handleBlur,
+        }: FormikProps<EditModulesState>) => {
+          const { selectedSlot, selectedModel } = values
 
-      <div className={modalStyles.button_row}>
-        <OutlineButton className={styles.button_margin} onClick={onCloseClick}>
-          {i18n.t('button.cancel')}
-        </OutlineButton>
-        <OutlineButton
-          className={styles.button_margin}
-          disabled={hasSlotOrIncompatibleError}
-          onClick={onSaveClick}
-        >
-          {i18n.t('button.save')}
-        </OutlineButton>
-      </div>
+          const slotIsEmpty =
+            !slotsBlockedBySpanning.includes(selectedSlot) &&
+            (getSlotIsEmpty(_initialDeckSetup, selectedSlot) ||
+              previousModuleSlot === selectedSlot)
+
+          let hasSlotOrIncompatibleError = true
+          if (slotIsEmpty) {
+            hasSlotOrIncompatibleError = false
+          } else {
+            const labwareOnSlot = getLabwareOnSlot(
+              _initialDeckSetup,
+              selectedSlot
+            )
+            const labwareIsCompatible =
+              labwareOnSlot &&
+              getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+
+            hasSlotOrIncompatibleError = !labwareIsCompatible
+          }
+
+          const occupiedSlotError = hasSlotOrIncompatibleError
+            ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
+            : null
+
+          const moduleHasCollisionIssue =
+            selectedModel && !isModuleWithCollisionIssue(selectedModel)
+          const enableSlotSelection =
+            disabledModuleRestriction || moduleHasCollisionIssue
+
+          const handleModelChange = (
+            e: SyntheticInputEvent<HTMLSelectElement>
+          ): void => {
+            handleChange(e)
+            // TODO(IL, 2020-03-27): can't make Flow understand that dropdown values are ModuleModel type
+            let value: ModuleModel | null = (e.target.value: any) || null
+
+            // reset slot if user switches from module with no collision issue
+            // to one that does have collision issues
+            if (
+              value &&
+              (!disabledModuleRestriction && isModuleWithCollisionIssue(value))
+            ) {
+              setFieldValue('selectedSlot', supportedModuleSlot)
+            }
+          }
+
+          return (
+            <>
+              {hasSlotOrIncompatibleError && (
+                <PDAlert
+                  alertType="warning"
+                  title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+                  description={''}
+                />
+              )}
+              <form>
+                <div className={styles.form_row}>
+                  <FormGroup label="Model*" className={styles.option_model}>
+                    <DropdownField
+                      tabIndex={0}
+                      options={MODELS_FOR_MODULE_TYPE[moduleType]}
+                      name="selectedModel"
+                      value={selectedModel}
+                      onChange={handleModelChange}
+                      onBlur={handleBlur}
+                      error={
+                        touched.selectedModel && errors && errors.selectedModel
+                          ? errors.selectedModel
+                          : null
+                      }
+                    />
+                  </FormGroup>
+                  {showSlotOption && (
+                    <>
+                      <HoverTooltip
+                        placement="top"
+                        tooltipComponent={slotOptionTooltip}
+                      >
+                        {hoverTooltipHandlers => (
+                          <div
+                            {...hoverTooltipHandlers}
+                            className={styles.option_slot}
+                          >
+                            <FormGroup label="Position">
+                              <DropdownField
+                                tabIndex={1}
+                                options={getAllModuleSlotsByType(moduleType)}
+                                name="selectedSlot"
+                                value={selectedSlot}
+                                disabled={!enableSlotSelection}
+                                onChange={handleChange}
+                                error={occupiedSlotError}
+                              />
+                            </FormGroup>
+                          </div>
+                        )}
+                      </HoverTooltip>
+                      <div className={styles.slot_map_container}>
+                        {selectedSlot && (
+                          <SlotMap
+                            occupiedSlots={[`${selectedSlot}`]}
+                            isError={Boolean(occupiedSlotError)}
+                          />
+                        )}
+                      </div>
+                    </>
+                  )}
+                </div>
+                <div className={modalStyles.button_row}>
+                  <OutlineButton
+                    className={styles.button_margin}
+                    onClick={onCloseClick}
+                  >
+                    {i18n.t('button.cancel')}
+                  </OutlineButton>
+                  <OutlineButton
+                    className={styles.button_margin}
+                    disabled={hasSlotOrIncompatibleError}
+                    onClick={handleSubmit}
+                  >
+                    {i18n.t('button.save')}
+                  </OutlineButton>
+                </div>
+              </form>
+            </>
+          )
+        }}
+      </Formik>
     </Modal>
   )
 }
