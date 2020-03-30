@@ -13,6 +13,7 @@ import {
   onlyPositiveNumbers,
   defaultTo,
   composeMaskers,
+  trimDecimals,
   type ValueMasker,
   type ValueCaster,
 } from './processing'
@@ -45,7 +46,11 @@ type StepFieldHelpers = {|
 |}
 const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   aspirate_airGap_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_labware: {
