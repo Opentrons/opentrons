@@ -27,7 +27,7 @@ export type ResolvedRobot = {|
 
 // fully connectable robot
 export type Robot = {|
-  ...$Exact<ResolvedRobot>,
+  ...ResolvedRobot,
   ok: true,
   health: $NonMaybeType<$PropertyType<Service, 'health'>>,
   status: ConnectableStatus,
@@ -36,7 +36,7 @@ export type Robot = {|
 
 // robot with a known IP (i.e. advertising over mDNS) but unconnectable
 export type ReachableRobot = {|
-  ...$Exact<ResolvedRobot>,
+  ...ResolvedRobot,
   ok: false,
   status: ReachableStatus,
 |}

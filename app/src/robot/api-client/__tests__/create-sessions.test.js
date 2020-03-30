@@ -6,12 +6,14 @@ import { actions as RobotActions } from '../../actions'
 import * as ProtocolSelectors from '../../../protocol/selectors'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as LabwareSelectors from '../../../custom-labware/selectors'
+import * as RobotSelectors from '../../selectors'
 import { MockSession } from '../../test/__fixtures__/session'
 
 jest.mock('../../../rpc/client')
 jest.mock('../../../protocol/selectors')
 jest.mock('../../../discovery/selectors')
 jest.mock('../../../custom-labware/selectors')
+jest.mock('../../selectors')
 
 const mockState = { state: true }
 const mockRobot = { name: 'robot-name', ip: '127.0.0.1', port: 31950 }
@@ -43,6 +45,7 @@ describe('RPC API client - session creation', () => {
     RpcClient.mockResolvedValue(mockRpcClient)
     DiscoverySelectors.getConnectableRobots.mockReturnValue([mockRobot])
     LabwareSelectors.getCustomLabwareDefinitions.mockReturnValue([])
+    RobotSelectors.getConnectRequest.mockReturnValue({ inProgress: false })
 
     const _receive = client(mockDispatch)
     const _flush = () => new Promise(resolve => setTimeout(resolve, 0))

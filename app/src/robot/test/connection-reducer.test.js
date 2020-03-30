@@ -37,6 +37,28 @@ describe('robot reducer - connection', () => {
     })
   })
 
+  it('handles CONNECT action if connect already in flight', () => {
+    const state = {
+      connection: {
+        connectedTo: null,
+        connectRequest: {
+          inProgress: true,
+          error: null,
+          name: 'ot',
+        },
+      },
+    }
+    const action = {
+      type: 'robot:CONNECT',
+      payload: { name: 'someone-else' },
+    }
+
+    expect(getState(reducer(state, action))).toEqual({
+      connectedTo: null,
+      connectRequest: { inProgress: true, error: null, name: 'ot' },
+    })
+  })
+
   it('handles CONNECT_RESPONSE success', () => {
     const state = {
       connection: {

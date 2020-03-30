@@ -5,35 +5,30 @@ import type { Mount, Slot } from './types'
 export const _NAME = 'robot'
 
 // connection states
-// TODO(mc, 2018-01-11): remove constant exports in favor of flowtype
-export const DISCONNECTED = 'disconnected'
-export const CONNECTING = 'connecting'
-export const CONNECTED = 'connected'
-export const DISCONNECTING = 'disconnecting'
-export type ConnectionStatus =
-  | 'disconnected'
-  | 'connecting'
-  | 'connected'
-  | 'disconnecting'
+export const DISCONNECTED: 'disconnected' = 'disconnected'
+export const CONNECTING: 'connecting' = 'connecting'
+export const CONNECTED: 'connected' = 'connected'
+export const DISCONNECTING: 'disconnecting' = 'disconnecting'
 
 // session status (api/opentrons/api/session.py::VALID_STATES)
-// TODO(mc, 2018-01-11): remove constant exports in favor of flowtype
-export const RUNNING = 'running'
-export const PAUSED = 'paused'
-export const FINISHED = 'finished'
+export const LOADED: 'loaded' = 'loaded'
+export const RUNNING: 'running' = 'running'
+export const FINISHED: 'finished' = 'finished'
+export const STOPPED: 'stopped' = 'stopped'
+export const PAUSED: 'paused' = 'paused'
+export const ERROR: 'error' = 'error'
 
 // labware confirmation states
 // TODO(mc, 2018-01-11): remove constant exports in favor of types.js
-export const UNCONFIRMED = 'unconfirmed'
-export const MOVING_TO_SLOT = 'moving-to-slot'
-export const OVER_SLOT = 'over-slot'
-export const PICKING_UP = 'picking-up'
-export const HOMING = 'homing'
-export const HOMED = 'homed'
-export const UPDATING = 'updating'
-export const UPDATED = 'updated'
-export const CONFIRMING = 'confirming'
-export const CONFIRMED = 'confirmed'
+export const UNCONFIRMED: 'unconfirmed' = 'unconfirmed'
+export const MOVING_TO_SLOT: 'moving-to-slot' = 'moving-to-slot'
+export const JOGGING: 'jogging' = 'jogging'
+export const DROPPING_TIP: 'dropping-tip' = 'dropping-tip'
+export const OVER_SLOT: 'over-slot' = 'over-slot'
+export const PICKING_UP: 'picking-up' = 'picking-up'
+export const PICKED_UP: 'picked-up' = 'picked-up'
+export const CONFIRMING: 'confirming' = 'confirming'
+export const CONFIRMED: 'confirmed' = 'confirmed'
 
 // deck layout
 export const PIPETTE_MOUNTS: Array<Mount> = ['left', 'right']
