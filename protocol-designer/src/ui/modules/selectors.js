@@ -26,7 +26,7 @@ export const getLabwareNamesByModuleId: Selector<{
   stepFormSelectors.getInitialDeckSetup,
   getLabwareNicknamesById,
   (initialDeckSetup, nicknamesById) =>
-    mapValues(initialDeckSetup.modules, (module, moduleId) => {
+    mapValues(initialDeckSetup.modules, (_, moduleId) => {
       const labware = getLabwareOnModule(initialDeckSetup, moduleId)
       return labware
         ? {

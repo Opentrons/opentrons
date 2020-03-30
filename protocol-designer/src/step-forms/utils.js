@@ -96,9 +96,9 @@ export const getSlotsBlockedBySpanning = (
   // NOTE: Ian 2019-10-25 dumb heuristic since there's only one case this can happen now
   if (
     values(initialDeckSetup.modules).some(
-      (module: ModuleOnDeck) =>
-        module.type === THERMOCYCLER_MODULE_TYPE &&
-        module.slot === SPAN7_8_10_11_SLOT
+      (moduleOnDeck: ModuleOnDeck) =>
+        moduleOnDeck.type === THERMOCYCLER_MODULE_TYPE &&
+        moduleOnDeck.slot === SPAN7_8_10_11_SLOT
     )
   ) {
     return ['7', '8', '10', '11']
@@ -126,7 +126,7 @@ export const getSlotIsEmpty = (
   return (
     [
       ...values(initialDeckSetup.modules).filter(
-        (module: ModuleOnDeck) => module.slot === slot
+        (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.slot === slot
       ),
       ...values(initialDeckSetup.labware).filter(
         (labware: LabwareOnDeckType) => labware.slot === slot

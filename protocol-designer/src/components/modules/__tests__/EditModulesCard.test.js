@@ -180,7 +180,7 @@ describe('EditModulesCard', () => {
         .props()
     ).toEqual({
       type: MAGNETIC_MODULE_TYPE,
-      module: crashableMagneticModule,
+      moduleOnDeck: crashableMagneticModule,
       showCollisionWarnings: true,
       openEditModuleModal: props.openEditModuleModal,
     })

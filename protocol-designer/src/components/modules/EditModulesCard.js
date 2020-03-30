@@ -74,7 +74,7 @@ export function EditModulesCard(props: Props) {
             return (
               <ModuleRow
                 type={moduleType}
-                module={moduleData}
+                moduleOnDeck={moduleData}
                 showCollisionWarnings={warningsEnabled}
                 key={i}
                 openEditModuleModal={openEditModuleModal}

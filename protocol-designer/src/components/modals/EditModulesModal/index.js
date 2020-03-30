@@ -93,9 +93,12 @@ export function EditModulesModal(props: EditModulesProps) {
       // disabled if something lives in the slot selected in local state
       // if previous moduleOnDeck.model is different, edit module
       if (moduleOnDeck.model !== selectedModel) {
-        module.id &&
+        moduleOnDeck.id &&
           dispatch(
-            stepFormActions.editModule({ id: module.id, model: selectedModel })
+            stepFormActions.editModule({
+              id: moduleOnDeck.id,
+              model: selectedModel,
+            })
           )
       }
       // if previous moduleOnDeck.slot is different than state, move deck item

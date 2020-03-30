@@ -38,10 +38,10 @@ export const getLabwareOptions: Selector<Options> = createSelector(
     reduce(
       labwareEntities,
       (acc: Options, l: LabwareEntity, labwareId: string): Options => {
-        const module = getModuleUnderLabware(initialDeckSetup, labwareId)
-        const prefix = module
+        const moduleOnDeck = getModuleUnderLabware(initialDeckSetup, labwareId)
+        const prefix = moduleOnDeck
           ? i18n.t(
-              `form.step_edit_form.field.moduleLabwarePrefix.${module.type}`
+              `form.step_edit_form.field.moduleLabwarePrefix.${moduleOnDeck.type}`
             )
           : null
         const nickName = prefix

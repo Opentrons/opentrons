@@ -14,7 +14,7 @@ export function getModuleOnDeckByType(
   type: ModuleRealType
 ): ?ModuleOnDeck {
   return values(initialDeckSetup.modules).find(
-    (module: ModuleOnDeck) => module.type === type
+    (moduleOnDeck: ModuleOnDeck) => moduleOnDeck.type === type
   )
 }
 
@@ -32,8 +32,8 @@ export function getModuleUnderLabware(
   labwareId: string
 ): ?ModuleOnDeck {
   return values(initialDeckSetup.modules).find(
-    (module: ModuleOnDeck) =>
-      initialDeckSetup.labware[labwareId]?.slot === module.id
+    (moduleOnDeck: ModuleOnDeck) =>
+      initialDeckSetup.labware[labwareId]?.slot === moduleOnDeck.id
   )
 }
 
@@ -42,23 +42,24 @@ export function getModuleLabwareOptions(
   nicknamesById: { [labwareId: string]: string },
   type: ModuleRealType
 ): Options {
-  const module = getModuleOnDeckByType(initialDeckSetup, type)
-  const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
+  const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
+  const labware =
+    moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
   const prefix = i18n.t(`form.step_edit_form.field.moduleLabwarePrefix.${type}`)
   let options = []
-  if (module) {
+  if (moduleOnDeck) {
     if (labware) {
       options = [
         {
           name: `${prefix} ${nicknamesById[labware.id]}`,
-          value: module.id,
+          value: moduleOnDeck.id,
         },
       ]
     } else {
       options = [
         {
           name: `${prefix} No labware on module`,
-          value: module.id,
+          value: moduleOnDeck.id,
         },
       ]
     }
@@ -71,7 +72,8 @@ export function getModuleHasLabware(
   initialDeckSetup: InitialDeckSetup,
   type: ModuleRealType
 ): boolean {
-  const module = getModuleOnDeckByType(initialDeckSetup, type)
-  const labware = module && getLabwareOnModule(initialDeckSetup, module.id)
-  return Boolean(module) && Boolean(labware)
+  const moduleOnDeck = getModuleOnDeckByType(initialDeckSetup, type)
+  const labware =
+    moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
+  return Boolean(moduleOnDeck) && Boolean(labware)
 }

@@ -81,7 +81,9 @@ function getWarningContent({
     .map(pipette => `${pipette.mount} ${pipette.spec.displayName}`)
     .join(' and ')
   const modulesDetails = modulesWithoutStep
-    .map(module => i18n.t(`modules.module_long_names.${module.type}`))
+    .map(moduleOnDeck =>
+      i18n.t(`modules.module_long_names.${moduleOnDeck.type}`)
+    )
     .join(' and ')
 
   if (pipettesWithoutStep.length && modulesWithoutStep.length) {

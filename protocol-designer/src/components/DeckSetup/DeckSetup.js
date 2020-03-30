@@ -74,16 +74,17 @@ const VIEWBOX_WIDTH = 520
 const VIEWBOX_HEIGHT = 414
 
 const getSlotDefForModuleSlot = (
-  module: ModuleOnDeck,
+  moduleOnDeck: ModuleOnDeck,
   deckSlots: { [slotId: string]: DeckDefSlot }
 ): DeckDefSlot => {
-  const parentSlotDef = deckSlots[module.slot] || PSEUDO_DECK_SLOTS[module.slot]
-  const moduleOrientation = inferModuleOrientationFromSlot(module.slot)
-  const moduleData = getModuleVizDims(moduleOrientation, module.type)
+  const parentSlotDef =
+    deckSlots[moduleOnDeck.slot] || PSEUDO_DECK_SLOTS[moduleOnDeck.slot]
+  const moduleOrientation = inferModuleOrientationFromSlot(moduleOnDeck.slot)
+  const moduleData = getModuleVizDims(moduleOrientation, moduleOnDeck.type)
 
   return {
     ...parentSlotDef,
-    id: module.id,
+    id: moduleOnDeck.id,
     position: [
       parentSlotDef.position[0] + moduleData.childXOffset,
       parentSlotDef.position[1] + moduleData.childYOffset,
@@ -94,7 +95,7 @@ const getSlotDefForModuleSlot = (
       yDimension: moduleData.childYDimension,
       zDimension: 0,
     },
-    displayName: `Slot of ${module.type} in slot ${module.slot}`,
+    displayName: `Slot of ${moduleOnDeck.type} in slot ${moduleOnDeck.slot}`,
   }
 }
 
@@ -102,8 +103,8 @@ const getModuleSlotDefs = (
   initialDeckSetup: InitialDeckSetup,
   deckSlots: { [slotId: string]: DeckDefSlot }
 ): Array<DeckDefSlot> => {
-  return values(initialDeckSetup.modules).map((module: ModuleOnDeck) =>
-    getSlotDefForModuleSlot(module, deckSlots)
+  return values(initialDeckSetup.modules).map((moduleOnDeck: ModuleOnDeck) =>
+    getSlotDefForModuleSlot(moduleOnDeck, deckSlots)
   )
 }
 
@@ -207,10 +208,10 @@ const DeckSetupContents = (props: ContentsProps) => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   let multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(module => module.slot === '1') &&
+        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '1') &&
           deckSlotsById?.['4']) ||
           null,
-        (allModules.some(module => module.slot === '3') &&
+        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '3') &&
           deckSlotsById?.['6']) ||
           null,
       ])
@@ -219,10 +220,14 @@ const DeckSetupContents = (props: ContentsProps) => {
   return (
     <>
       {/* all modules */}
-      {allModules.map(module => {
-        const slot = moduleParentSlots.find(slot => slot.id === module.slot)
+      {allModules.map(moduleOnDeck => {
+        const slot = moduleParentSlots.find(
+          slot => slot.id === moduleOnDeck.slot
+        )
         if (!slot) {
-          console.warn(`no slot ${module.slot} for module ${module.id}`)
+          console.warn(
+            `no slot ${moduleOnDeck.slot} for module ${moduleOnDeck.id}`
+          )
           return null
         }
 
@@ -235,14 +240,14 @@ const DeckSetupContents = (props: ContentsProps) => {
               x={moduleX}
               y={moduleY}
               orientation={orientation}
-              module={module}
+              module={moduleOnDeck}
               slotName={slot.id}
             />
             <ModuleTag
               x={moduleX}
               y={moduleY}
               orientation={orientation}
-              id={module.id}
+              id={moduleOnDeck.id}
             />
           </React.Fragment>
         )

@@ -36,7 +36,9 @@ function mapStateToProps(state: BaseState): SP {
     moduleId => modulesById[moduleId]
   )
   const parentModule =
-    (slot != null && initialModules.find(module => module.id === slot)) || null
+    (slot != null &&
+      initialModules.find(moduleOnDeck => moduleOnDeck.id === slot)) ||
+    null
 
   return {
     customLabwareDefs: labwareDefSelectors.getCustomLabwareDefsByURI(state),
