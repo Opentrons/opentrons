@@ -1,6 +1,6 @@
 import typing
-from uuid import uuid4
-from pydantic import UUID4
+from uuid import uuid4, UUID
+from dataclasses import dataclass
 
 from opentrons.hardware_control.types import Axis
 
@@ -34,13 +34,46 @@ class SessionManager:
         self._sessions[key] = value
 
 
+@dataclass
+class LabwareInfo:
+    """
+    This class purely maps to :py:class:`.models.LabwareStatus` and is
+    intended to inform a client about the tipracks required for a session.
+
+    :note: The UUID class is utilized here instead of UUID4 for type checking
+    as UUID4 is only valid in pydantic models.
+    """
+    alternatives: typing.List[str]
+    forPipettes: typing.List[UUID]
+    loadName: str
+    slot: typing.Optional[str]
+    namespace: str
+    version: str
+    id: UUID
+
+
+@dataclass
+class LabwareDefinition:
+    """
+    This class will be used internally to move/pick up tip from the tipracks
+    specified.
+
+    :note: The UUID class is utilized here instead of UUID4 for type checking
+    as UUID4 is only valid in pydantic models.
+    """
+    definition: labware.LabwareDefinition
+    slot: typing.Optional[str]
+    object: typing.Optional[labware.Labware]
+    id: UUID
+
+
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
         self._deck = geometry.Deck()
-        self._lw_definitions: typing.Dict[str, typing.Dict] = {}
+        self._lw_definitions: typing.Dict[UUID, LabwareDefinition] = {}
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
 
@@ -53,38 +86,41 @@ class CalibrationSession:
             pipette_dict[token] = {**data}
         return pipette_dict
 
-    def _determine_required_labware(self) -> typing.Dict:
-        lw: typing.Dict[str, typing.Dict] = {}
+    def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
+        """
+        A function that inserts tiprack information into two dataclasses
+        :py:class:`.LabwareInfo` and :py:class:`.LabwareDefinition` based
+        on the current pipettes attached.
+        """
+        lw: typing.Dict[UUID, LabwareInfo] = {}
+        _uuid: typing.Optional[UUID] = None
         for id, data in self._pipettes.items():
             vol = data['max_volume']
             load_name = LOAD_NAME.format(vol)
-            if_labware = lw.get(load_name)
-            if if_labware:
-                lw[load_name]['forPipettes'].append(id)
+            if_labware = None
+            if _uuid:
+                if_labware = lw.get(_uuid)
+            if _uuid and if_labware and if_labware.loadName == load_name:
+                lw[_uuid].forPipettes.append(id)
             else:
                 lw_def = labware.get_labware_definition(load_name)
+                alt_lw = [name.format(vol) for name in ALTERNATIVE_LABWARE]
+                new_uuid: UUID = uuid4()
+                _uuid = new_uuid
                 slot = self._decide_slot()
-                lw[load_name] = self._build_lw_dict(
-                    slot, load_name, lw_def, vol, id)
-                self._lw_definitions[load_name] = {
-                    'definition': lw_def,
-                    'slot': slot,
-                    'object': None}
-        return lw
-
-    def _build_lw_dict(
-            self,
-            slot: typing.Optional[str], load_name: str,
-            lw_def: labware.LabwareDefinition, vol: str,
-            id: UUID4) -> typing.Dict:
-        lw: typing.Dict[str, typing.Any] = {}
-        lw['tiprackID'] = uuid4()
-        lw['alternatives'] = [name.format(vol) for name in ALTERNATIVE_LABWARE]
-        lw['forPipettes'] = [id]
-        lw['loadName'] = load_name
-        lw['slot'] = slot
-        lw['namespace'] = lw_def['namespace']
-        lw['version'] = lw_def['version']
+                lw[new_uuid] = LabwareInfo(
+                    alternatives=alt_lw,
+                    forPipettes=[id],
+                    loadName=load_name,
+                    slot=slot,
+                    namespace=lw_def['namespace'],
+                    version=lw_def['version'],
+                    id=new_uuid)
+                self._lw_definitions[new_uuid] = LabwareDefinition(
+                    definition=lw_def,
+                    slot=slot,
+                    id=new_uuid,
+                    object=None)
         return lw
 
     def _decide_slot(self) -> typing.Optional[str]:
@@ -103,7 +139,7 @@ class CalibrationSession:
     def hardware(self) -> ThreadManager:
         return self._hardware
 
-    def get_pipette(self, uuid: UUID4) -> 'AttachedPipette':
+    def get_pipette(self, uuid: UUID) -> 'AttachedPipette':
         return self._pipettes[uuid]
 
     @property
@@ -120,13 +156,15 @@ class CheckCalibrationSession(CalibrationSession):
         super().__init__(hardware)
         self.state_machine = CalibrationCheckMachine()
 
-    def _create_labware_objects(self):
+    def _load_labware_objects(self):
+        """
+        A function that takes tiprack information and loads them onto the deck.
+        """
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'loadLabware',\
-            'You cannot build a labware object during {curr_state} state.'
-        objs = {}
+            f'You cannot build a labware object during {curr_state} state.'
         for name, data in self._lw_definitions.items():
-            parent = self._deck.position_for(data['slot'])
-            objs[name] = {
-                'object': labware.Labware(data['definition'], parent)}
-        self._lw_definitions.update(**objs)
+            parent = self._deck.position_for(data.slot)
+            self._lw_definitions[name].object =\
+                labware.Labware(data.definition, parent)
+            self._deck[data.slot] = self._lw_definitions[name].object

@@ -1,6 +1,9 @@
 import pytest
 import enum
+
 from opentrons import types
+from opentrons.protocol_api import labware
+
 from opentrons.server.endpoints.calibration import util
 
 
@@ -64,6 +67,24 @@ async def test_delete_session(async_client, async_server, test_setup):
     resp = await async_client.delete('/calibration/check/session')
     sess = async_server['com.opentrons.session_manager'].sessions.get('check')
     assert not sess
+
+
+async def test_create_lw_object(async_client, async_server, test_setup):
+    """
+    A test to check that a labware object was successfully created if
+    the current session state is set to loadLabware.
+    """
+    # Create a session
+    await async_client.post('/calibration/check/session')
+    sess = async_server['com.opentrons.session_manager'].sessions['check']
+    sess.state_machine.update_state(sess.state_machine.current_state)
+    assert sess.state_machine.current_state ==\
+        util.CalibrationCheckState.loadLabware
+
+    sess._load_labware_objects()
+    for lw_def_cls in sess._lw_definitions.values():
+        assert lw_def_cls.object
+        assert isinstance(lw_def_cls.object, labware.Labware)
 
 
 def test_state_machine():

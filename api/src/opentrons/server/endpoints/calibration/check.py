@@ -1,5 +1,6 @@
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
+from dataclasses import asdict
 
 from .session import CheckCalibrationSession
 from .models import CalibrationSessionStatus, LabwareStatus
@@ -26,11 +27,12 @@ def _format_status(
         links = {'links': {next.name: url}}
     else:
         links = {'links': {}}
+    labware_values = session.labware.values()
     status = CalibrationSessionStatus(
         instruments=instruments,
         currentStep=current,
         nextSteps=links,
-        labware=[LabwareStatus(**data) for data in session.labware.values()])
+        labware=[LabwareStatus(**asdict(data)) for data in labware_values])
     return status
 
 

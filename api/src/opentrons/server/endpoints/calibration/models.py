@@ -35,11 +35,11 @@ class AttachedPipette(BaseModel):
 
 class LabwareStatus(BaseModel):
     """
-    A model describing all labware attached
+    A model describing all tipracks required, based on pipettes attached.
     """
     alternatives: List[str]
     slot: Optional[str]
-    tiprackID: UUID4
+    id: UUID4
     forPipettes: List[UUID4]
     loadName: str
     namespace: str
