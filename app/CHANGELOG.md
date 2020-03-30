@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-alpha.0...v3.17.0-alpha.1) (2020-03-30)
+
+
+### Bug Fixes
+
+* **app:** alignment and time formatting in thermocycler card ([#5320](https://github.com/Opentrons/opentrons/issues/5320)) ([3c7fcc8](https://github.com/Opentrons/opentrons/commit/3c7fcc8))
+* **app:** fix tiprack in tip probe instructions when tipracks are shared ([#5319](https://github.com/Opentrons/opentrons/issues/5319)) ([7d5f4ab](https://github.com/Opentrons/opentrons/commit/7d5f4ab)), closes [#5311](https://github.com/Opentrons/opentrons/issues/5311)
+
+
+
+
+
 # [3.17.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-alpha.0) (2020-03-27)
 
 
