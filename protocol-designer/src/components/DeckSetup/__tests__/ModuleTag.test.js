@@ -77,7 +77,7 @@ describe('ModuleTag', () => {
 
         const component = render(<ModuleStatus moduleState={moduleState} />)
 
-        expect(component.text()).toBe('Deactivated')
+        expect(component.text()).toBe('deactivated')
       })
 
       it('target temperature is shown when module is at target', () => {
