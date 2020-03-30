@@ -88,7 +88,8 @@ export class LiquidPlacementForm extends React.Component<Props> {
     const value: ?string = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
-      fieldProcessors.onlyPositiveNumbers
+      fieldProcessors.onlyPositiveNumbers,
+      fieldProcessors.trimDecimals(1)
     )(value)
     setFieldValue('volume', masked)
   }

@@ -34,6 +34,13 @@ export const onlyPositiveNumbers = (value: mixed) =>
 export const defaultTo = (defaultValue: mixed) => (value: mixed) =>
   value === null || Number.isNaN(value) ? defaultValue : value
 
+export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
+  rawValue: mixed
+): string => {
+  const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
+  return String(rawValue).replace(trimRegex, (match, group1) => group1)
+}
+
 /*******************
  **     Helpers    **
  ********************/
