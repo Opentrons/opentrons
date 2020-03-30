@@ -153,7 +153,7 @@ PipetteSettingsFields = create_model(
         if conf != 'quirks'
     }
 )
-PipetteSettingsField.__doc__ = "The fields of the pipette settings"
+PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
 
 
 class PipetteSettings(BaseModel):
