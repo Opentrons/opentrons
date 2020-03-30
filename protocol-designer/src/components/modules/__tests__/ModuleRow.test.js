@@ -1,3 +1,4 @@
+// @flow
 import React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
@@ -48,7 +49,7 @@ describe('ModuleRow', () => {
 
   it('displays crash warning tooltip when module is crashable and in slot 1', () => {
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: true,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -63,7 +64,7 @@ describe('ModuleRow', () => {
   it('displays crash warning tooltip when module is crashable and in slot 3', () => {
     magneticModule.slot = '3'
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: true,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -78,7 +79,7 @@ describe('ModuleRow', () => {
   it('does not display crash warning tooltip when module is not crashable regardless of slot', () => {
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: true,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -92,7 +93,7 @@ describe('ModuleRow', () => {
 
   it('does not display warning tooltip when showCollisionWarnings is false', () => {
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: false,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -120,7 +121,7 @@ describe('ModuleRow', () => {
   it('displays the correct module diagram for the selected module model', () => {
     magneticModule.model = MAGNETIC_MODULE_V2
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: true,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -135,7 +136,7 @@ describe('ModuleRow', () => {
 
   it('displays the correct module model and slot when it is added to protocol', () => {
     const props = {
-      module: magneticModule,
+      moduleOnDeck: magneticModule,
       showCollisionWarnings: true,
       type: MAGNETIC_MODULE_TYPE,
       openEditModuleModal: jest.fn(),
@@ -172,7 +173,7 @@ describe('ModuleRow', () => {
   describe('buttons', () => {
     it('opens edit modal when module is added', () => {
       const props = {
-        module: magneticModule,
+        moduleOnDeck: magneticModule,
         showCollisionWarnings: true,
         type: MAGNETIC_MODULE_TYPE,
         openEditModuleModal: jest.fn(),
@@ -211,7 +212,7 @@ describe('ModuleRow', () => {
 
     it('removes module when module has been added', () => {
       const props = {
-        module: magneticModule,
+        moduleOnDeck: magneticModule,
         showCollisionWarnings: true,
         type: MAGNETIC_MODULE_TYPE,
         openEditModuleModal: jest.fn(),

@@ -94,7 +94,9 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
       )
 
       // create modules
-      modules.forEach(module => dispatch(stepFormActions.createModule(module)))
+      modules.forEach(moduleArgs =>
+        dispatch(stepFormActions.createModule(moduleArgs))
+      )
 
       // auto-generate tipracks for pipettes
       const newTiprackModels: Array<string> = uniq(

@@ -161,10 +161,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
     modules: FormModulesByType,
     moduleType: ModuleRealType
   ) => {
-    const module = modules[moduleType]
+    const formModule = modules[moduleType]
     const crashableModuleOnDeck =
-      module.onDeck && module.model
-        ? isModuleWithCollisionIssue(module.model)
+      formModule.onDeck && formModule.model
+        ? isModuleWithCollisionIssue(formModule.model)
         : false
 
     return crashableModuleOnDeck
@@ -205,14 +205,14 @@ export class FilePipettesModal extends React.Component<Props, State> {
     const moduleTypes: Array<ModuleRealType> = Object.keys(values.modulesByType)
     const modules: Array<ModuleCreationArgs> = moduleTypes.reduce(
       (acc, moduleType) => {
-        const module = values.modulesByType[moduleType]
-        return module?.onDeck
+        const formModule = values.modulesByType[moduleType]
+        return formModule?.onDeck
           ? [
               ...acc,
               {
                 type: moduleType,
-                model: module.model || '',
-                slot: module.slot,
+                model: formModule.model || '',
+                slot: formModule.slot,
               },
             ]
           : acc

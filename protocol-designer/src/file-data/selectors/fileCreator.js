@@ -130,9 +130,9 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
 
     const modules: { [moduleId: string]: FileModule } = mapValues(
       moduleEntities,
-      (module: ModuleEntity, moduleId: string): FileModule => ({
+      (moduleEntity: ModuleEntity, moduleId: string): FileModule => ({
         slot: initialRobotState.modules[moduleId].slot,
-        model: module.model,
+        model: moduleEntity.model,
       })
     )
 

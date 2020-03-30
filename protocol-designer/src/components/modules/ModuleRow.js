@@ -21,19 +21,19 @@ import styles from './styles.css'
 import type { ModuleRealType } from '@opentrons/shared-data'
 import type { ModuleOnDeck } from '../../step-forms'
 
-type Props = {
-  module?: ModuleOnDeck,
+type Props = {|
+  moduleOnDeck?: ModuleOnDeck,
   showCollisionWarnings?: boolean,
   type: ModuleRealType,
   openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
-}
+|}
 
 export function ModuleRow(props: Props) {
-  const { module, openEditModuleModal, showCollisionWarnings } = props
-  const type: ModuleRealType = module?.type || props.type
+  const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
+  const type: ModuleRealType = moduleOnDeck?.type || props.type
 
-  const model = module?.model
-  const slot = module?.slot
+  const model = moduleOnDeck?.model
+  const slot = moduleOnDeck?.slot
 
   /*
   TODO (ka 2020-2-3): This logic is very specific to this individual implementation
@@ -88,15 +88,16 @@ export function ModuleRow(props: Props) {
     moduleId?: string
   ) => () => openEditModuleModal(moduleType, moduleId)
 
-  const addRemoveText = module ? 'remove' : 'add'
+  const addRemoveText = moduleOnDeck ? 'remove' : 'add'
 
   const dispatch = useDispatch()
 
-  const handleAddOrRemove = module
-    ? () => dispatch(stepFormActions.deleteModule(module.id))
+  const handleAddOrRemove = moduleOnDeck
+    ? () => dispatch(stepFormActions.deleteModule(moduleOnDeck.id))
     : setCurrentModule(type)
 
-  const handleEditModule = module && setCurrentModule(type, module.id)
+  const handleEditModule =
+    moduleOnDeck && setCurrentModule(type, moduleOnDeck.id)
 
   return (
     <div>
@@ -141,7 +142,7 @@ export function ModuleRow(props: Props) {
           )}
         </div>
         <div className={styles.modules_button_group}>
-          {module && (
+          {moduleOnDeck && (
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}

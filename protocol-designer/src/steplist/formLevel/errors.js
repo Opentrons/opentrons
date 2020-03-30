@@ -223,8 +223,8 @@ export const engageHeightRangeExceeded = (
   fields: HydratedFormData
 ): FormError | null => {
   const { magnetAction, engageHeight } = fields
-  const module = fields.meta?.module
-  const model = module?.model
+  const moduleEntity = fields.meta?.module
+  const model = moduleEntity?.model
 
   if (magnetAction === 'engage') {
     if (model === MAGNETIC_MODULE_V1) {

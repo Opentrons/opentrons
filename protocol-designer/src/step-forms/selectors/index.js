@@ -201,27 +201,27 @@ const _getInitialDeckSetup = (
     modules: mapValues(
       moduleLocations,
       (slot: DeckSlot, moduleId: string): ModuleOnDeck => {
-        const module = moduleEntities[moduleId]
-        if (module.type === MAGNETIC_MODULE_TYPE) {
+        const moduleEntity = moduleEntities[moduleId]
+        if (moduleEntity.type === MAGNETIC_MODULE_TYPE) {
           return {
-            id: module.id,
-            model: module.model,
+            id: moduleEntity.id,
+            model: moduleEntity.model,
             type: MAGNETIC_MODULE_TYPE,
             slot,
             moduleState: MAGNETIC_MODULE_INITIAL_STATE,
           }
-        } else if (module.type === TEMPERATURE_MODULE_TYPE) {
+        } else if (moduleEntity.type === TEMPERATURE_MODULE_TYPE) {
           return {
-            id: module.id,
-            model: module.model,
+            id: moduleEntity.id,
+            model: moduleEntity.model,
             type: TEMPERATURE_MODULE_TYPE,
             slot,
             moduleState: TEMPERATURE_MODULE_INITIAL_STATE,
           }
         } else {
           return {
-            id: module.id,
-            model: module.model,
+            id: moduleEntity.id,
+            model: moduleEntity.model,
             type: THERMOCYCLER_MODULE_TYPE,
             slot,
             moduleState: THERMOCYCLER_MODULE_INITIAL_STATE,
