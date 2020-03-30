@@ -212,7 +212,6 @@ export const getRunSeconds = createSelector(
   }
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export function formatSeconds(runSeconds: number): string {
   const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
   const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')

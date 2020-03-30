@@ -144,11 +144,11 @@ export const ThermocyclerCard = ({
       </div>
       {executingProfile && (
         <CycleInfo
-          holdTime={50}
-          totalCycleCount={2}
-          currentCycleIndex={1}
-          totalStepCount={30}
-          currentStepIndex={4}
+          holdTime={holdTime}
+          totalCycleCount={totalCycleCount}
+          currentCycleIndex={currentCycleIndex}
+          totalStepCount={totalStepCount}
+          currentStepIndex={currentStepIndex}
         />
       )}
       {holdTime != null && holdTime > 0 && !executingProfile && (
