@@ -128,9 +128,10 @@ class TempDeck(mod_abc.AbstractModule):
         to the nearest limit
         """
         await self.wait_for_is_running()
-        return await self.make_cancellable(
+        task = await self.make_cancellable(
             self._loop.create_task(self._driver.set_temperature(celsius))
         )
+        return await task
 
     async def start_set_temperature(self, celsius):
         """

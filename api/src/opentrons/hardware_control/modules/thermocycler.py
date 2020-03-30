@@ -126,11 +126,12 @@ class Thermocycler(mod_abc.AbstractModule):
                                            ramp_rate=ramp_rate,
                                            volume=volume)
         if hold_time:
-            await self.make_cancellable(self._loop.create_task(
-                                                self.wait_for_hold()))
+            task = await self.make_cancellable(self._loop.create_task(
+                self.wait_for_hold()))
         else:
-            await self.make_cancellable(self._loop.create_task(
-                                                self.wait_for_temp()))
+            task = await self.make_cancellable(self._loop.create_task(
+                self.wait_for_temp()))
+        await task
 
     async def _execute_cycle_step(self,
                                   step: types.ThermocyclerStep,
@@ -166,17 +167,19 @@ class Thermocycler(mod_abc.AbstractModule):
         self._total_cycle_count = repetitions
         self._total_step_count = len(steps)
 
-        await self.make_cancellable(
-                self._loop.create_task(self._execute_cycles(steps,
-                                                            repetitions,
-                                                            volume)))
+        task = await self.make_cancellable(
+            self._loop.create_task(self._execute_cycles(steps,
+                                                        repetitions,
+                                                        volume)))
+        await task
 
     async def set_lid_temperature(self, temperature: float):
         """ Set the lid temperature in deg Celsius """
         await self.wait_for_is_running()
         await self._driver.set_lid_temperature(temp=temperature)
-        await self.make_cancellable(
+        task = await self.make_cancellable(
                 self._loop.create_task(self.wait_for_lid_temp()))
+        await task
 
     async def wait_for_lid_temp(self):
         """
