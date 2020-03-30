@@ -53,19 +53,31 @@ const CycleInfo = ({
     return null
   }
   return (
-    <div className={styles.card_row}>
-      <LabeledValue
-        label="Cycle #"
-        className={styles.compact_labeled_value}
-        value={`${currentCycleIndex} / ${totalCycleCount}`}
-      />
-      <LabeledValue
-        label="Step #"
-        className={styles.compact_labeled_value}
-        value={`${currentStepIndex} / ${totalStepCount}`}
-      />
-      <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
-    </div>
+    <>
+      <div className={styles.card_row}>
+        <div className={styles.cycle_info_wrapper}>
+          <div className={styles.cycle_info_counts}>
+            <LabeledValue
+              label="Cycle #"
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentCycleIndex} / ${totalCycleCount}`}
+            />
+            <LabeledValue
+              label="Step #"
+              className={cx(
+                styles.compact_labeled_value,
+                styles.cycle_data_item
+              )}
+              value={`${currentStepIndex} / ${totalStepCount}`}
+            />
+          </div>
+          <TimeRemaining holdTime={holdTime} title="Time remaining for step:" />
+        </div>
+      </div>
+    </>
   )
 }
 
@@ -133,20 +145,20 @@ export const ThermocyclerCard = ({
           target={lidTarget}
         />
       </div>
-      {executingProfile && (
+      {/* {executingProfile && ( */}
         <CycleInfo
-          holdTime={holdTime}
-          totalCycleCount={totalCycleCount}
-          currentCycleIndex={currentCycleIndex}
-          totalStepCount={totalStepCount}
-          currentStepIndex={currentStepIndex}
+          holdTime={50}
+          totalCycleCount={2}
+          currentCycleIndex={1}
+          totalStepCount={30}
+          currentStepIndex={4}
         />
-      )}
-      {holdTime != null && holdTime > 0 && !executingProfile && (
+      {/* )} */}
+      {/* {holdTime != null && holdTime > 0 && !executingProfile && ( */}
         <div className={styles.card_row}>
           <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
         </div>
-      )}
+      {/* )} */}
     </StatusCard>
   )
 }
