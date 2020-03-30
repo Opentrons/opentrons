@@ -142,20 +142,20 @@ export const ThermocyclerCard = ({
           target={lidTarget}
         />
       </div>
-      {/* {executingProfile && ( */}
-      <CycleInfo
-        holdTime={50}
-        totalCycleCount={2}
-        currentCycleIndex={1}
-        totalStepCount={30}
-        currentStepIndex={4}
-      />
-      {/* )} */}
-      {/* {holdTime != null && holdTime > 0 && !executingProfile && ( */}
-      <div className={styles.card_row}>
-        <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
-      </div>
-      {/* )} */}
+      {executingProfile && (
+        <CycleInfo
+          holdTime={50}
+          totalCycleCount={2}
+          currentCycleIndex={1}
+          totalStepCount={30}
+          currentStepIndex={4}
+        />
+      )}
+      {holdTime != null && holdTime > 0 && !executingProfile && (
+        <div className={styles.card_row}>
+          <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
+        </div>
+      )}
     </StatusCard>
   )
 }
