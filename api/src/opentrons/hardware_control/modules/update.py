@@ -18,14 +18,14 @@ async def update_firmware(
 
         raises an UpdateError with the reason for the failure.
     """
-    cls = type(module)
     flash_port = await module.prep_for_update()
     kwargs: Dict[str, Any] = {
         'stdout': asyncio.subprocess.PIPE,
         'stderr': asyncio.subprocess.PIPE,
         'loop': loop
     }
-    successful, res = await cls.bootloader()(flash_port, firmware_file, kwargs)
+    successful, res = await module.bootloader()(
+        flash_port, firmware_file, kwargs)
     if not successful:
         log.info(f'Bootloader reponse: {res}')
         raise UpdateError(res)
