@@ -479,8 +479,20 @@ export const getTipracksByMount: (
   state: State
 ) => TiprackByMountMap = createSelector(
   getTipracks,
-  tipracks => ({
-    left: tipracks.find(tr => tr.calibratorMount === 'left') || null,
-    right: tipracks.find(tr => tr.calibratorMount === 'right') || null,
-  })
+  getPipettesByMount,
+  (tipracks, pipettesMap) => {
+    return PIPETTE_MOUNTS.reduce<TiprackByMountMap>(
+      (tiprackMap, mount) => {
+        const byCalibrator = tipracks.find(tr => tr.calibratorMount === mount)
+        const byTiprackList = tipracks.find(tr =>
+          (pipettesMap[mount]?.tipRacks ?? []).includes(tr._id)
+        )
+
+        tiprackMap[mount] = byCalibrator ?? byTiprackList ?? null
+
+        return tiprackMap
+      },
+      { left: null, right: null }
+    )
+  }
 )
