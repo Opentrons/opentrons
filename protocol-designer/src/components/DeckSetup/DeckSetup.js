@@ -208,10 +208,16 @@ const DeckSetupContents = (props: ContentsProps) => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   let multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '1') &&
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '1' && moduleOnDeck.model.includes('V1')
+        ) &&
           deckSlotsById?.['4']) ||
           null,
-        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '3') &&
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '3' && moduleOnDeck.model.includes('V1')
+        ) &&
           deckSlotsById?.['6']) ||
           null,
       ])
