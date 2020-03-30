@@ -468,6 +468,8 @@ describe('api client', () => {
         },
       ]
 
+      session.containers = [{ _id: 3 }, { _id: 4 }, { _id: 5 }]
+
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expected)
       )
@@ -555,7 +557,9 @@ describe('api client', () => {
           mount: 'right',
           name: 'p50',
           channels: 8,
-          tip_racks: [],
+          // guard against bogus tipracks in this array, which RPC API has been
+          // observed doing as of 3.16
+          tip_racks: [{ _id: 888 }],
           requested_as: 'foo',
         },
         {
@@ -563,7 +567,7 @@ describe('api client', () => {
           mount: 'left',
           name: 'p200',
           channels: 1,
-          tip_racks: [],
+          tip_racks: [{ _id: 999 }],
           requested_as: 'bar',
         },
       ]
@@ -581,9 +585,9 @@ describe('api client', () => {
         },
       ]
 
-      return sendConnect().then(() =>
+      return sendConnect().then(() => {
         expect(dispatch).toHaveBeenCalledWith(expected)
-      )
+      })
     })
 
     it('maps api modules to modules by slot', () => {
