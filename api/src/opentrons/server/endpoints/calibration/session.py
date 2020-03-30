@@ -80,6 +80,10 @@ class CalibrationSession:
     def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
         for mount, data in new_pipettes.items():
+            # TODO: Adding in error state is out of scope for this PR.
+            # This is to ensure during testing that two pipettes are
+            # attached -- for now.
+            assert data, "Please attach pipettes before proceeding"
             token = uuid4()
             data['mount_axis'] = Axis.by_mount(mount)
             data['plunger_axis'] = Axis.of_plunger(mount)
@@ -94,6 +98,7 @@ class CalibrationSession:
         """
         lw: typing.Dict[UUID, LabwareInfo] = {}
         _uuid: typing.Optional[UUID] = None
+
         for id, data in self._pipettes.items():
             vol = data['max_volume']
             load_name = LOAD_NAME.format(vol)
