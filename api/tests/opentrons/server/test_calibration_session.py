@@ -1,6 +1,8 @@
 import pytest
 import enum
+
 from opentrons import types
+
 from opentrons.server.endpoints.calibration import util
 
 
@@ -22,9 +24,16 @@ async def test_start_session(async_client, test_setup):
     assert resp.status == 201
     text = await resp.json()
     assert list(text.keys()) ==\
-        ["instruments", "currentStep", "nextSteps"]
+        ["instruments", "currentStep", "nextSteps", "labware"]
     assert text["currentStep"] == "sessionStart"
-    assert text["nextSteps"] == {"links": {"specifyLabware": ""}}
+    assert text["nextSteps"] == {"links": {"loadLabware": ""}}
+
+    first_lw = text["labware"][0]
+    second_lw = text["labware"][1]
+    assert first_lw["slot"] == "8"
+    assert second_lw["slot"] == "6"
+    assert first_lw["loadName"] == "opentrons_96_tiprack_10ul"
+    assert second_lw["loadName"] == "opentrons_96_tiprack_300ul"
 
     resp = await async_client.post('/calibration/check/session')
     assert resp.status == 409
@@ -44,9 +53,9 @@ async def test_check_session(async_client, test_setup):
     assert text == text2
 
     assert list(text2.keys()) ==\
-        ["instruments", "currentStep", "nextSteps"]
+        ["instruments", "currentStep", "nextSteps", "labware"]
     assert text2["currentStep"] == "sessionStart"
-    assert text2["nextSteps"] == {"links": {"specifyLabware": ""}}
+    assert text2["nextSteps"] == {"links": {"loadLabware": ""}}
 
 
 async def test_delete_session(async_client, async_server, test_setup):
@@ -57,6 +66,25 @@ async def test_delete_session(async_client, async_server, test_setup):
     resp = await async_client.delete('/calibration/check/session')
     sess = async_server['com.opentrons.session_manager'].sessions.get('check')
     assert not sess
+
+
+async def test_create_lw_object(async_client, async_server, test_setup):
+    """
+    A test to check that a labware object was successfully created if
+    the current session state is set to loadLabware.
+    """
+    # Create a session
+    await async_client.post('/calibration/check/session')
+    sess = async_server['com.opentrons.session_manager'].sessions['check']
+    sess.state_machine.update_state(sess.state_machine.current_state)
+    assert sess.state_machine.current_state ==\
+        util.CalibrationCheckState.loadLabware
+
+    sess._load_labware_objects()
+    assert sess._deck['8']
+    assert sess._deck['8'].name == 'opentrons_96_tiprack_10ul'
+    assert sess._deck['6']
+    assert sess._deck['6'].name == 'opentrons_96_tiprack_300ul'
 
 
 def test_state_machine():

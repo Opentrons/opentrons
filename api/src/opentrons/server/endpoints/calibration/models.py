@@ -1,4 +1,4 @@
-from typing import Dict, Optional
+from typing import Dict, Optional, List
 from pydantic import BaseModel, Field, UUID4
 
 from opentrons.hardware_control.types import Axis
@@ -33,6 +33,23 @@ class AttachedPipette(BaseModel):
             UUID4: convert_uuid}
 
 
+class LabwareStatus(BaseModel):
+    """
+    A model describing all tipracks required, based on pipettes attached.
+    """
+    alternatives: List[str]
+    slot: Optional[str]
+    id: UUID4
+    forPipettes: List[UUID4]
+    loadName: str
+    namespace: str
+    version: int
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_uuid}
+
+
 class CalibrationSessionStatus(BaseModel):
     """
     The current status of a given session.
@@ -41,6 +58,7 @@ class CalibrationSessionStatus(BaseModel):
     currentStep: str = Field(..., description="Current step of session")
     nextSteps: Dict[str, Dict[str, str]] =\
         Field(..., description="Next Available Step in Session")
+    labware: List[LabwareStatus]
 
     class Config:
         json_encoders = {UUID4: convert_uuid}
@@ -68,7 +86,7 @@ class CalibrationSessionStatus(BaseModel):
                     "currentStep": "sessionStart",
                     "nextSteps": {
                         "links": {
-                            "specifyLabware": ""
+                            "loadLabware": ""
                         }
                     }
 
