@@ -1,6 +1,6 @@
 import typing
 from uuid import uuid4, UUID
-from dataclasses import dataclass
+from dataclasses import dataclass, asdict
 
 from opentrons.hardware_control.types import Axis
 
@@ -50,21 +50,7 @@ class LabwareInfo:
     namespace: str
     version: str
     id: UUID
-
-
-@dataclass
-class LabwareDefinition:
-    """
-    This class will be used internally to move/pick up tip from the tipracks
-    specified.
-
-    :note: The UUID class is utilized here instead of UUID4 for type checking
-    as UUID4 is only valid in pydantic models.
-    """
     definition: labware.LabwareDefinition
-    slot: typing.Optional[str]
-    object: typing.Optional[labware.Labware]
-    id: UUID
 
 
 class CalibrationSession:
@@ -73,7 +59,6 @@ class CalibrationSession:
         self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
         self._deck = geometry.Deck()
-        self._lw_definitions: typing.Dict[UUID, LabwareDefinition] = {}
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
 
@@ -112,7 +97,7 @@ class CalibrationSession:
                 alt_lw = [name.format(vol) for name in ALTERNATIVE_LABWARE]
                 new_uuid: UUID = uuid4()
                 _uuid = new_uuid
-                slot = self._decide_slot()
+                slot = self._available_slot_options()
                 lw[new_uuid] = LabwareInfo(
                     alternatives=alt_lw,
                     forPipettes=[id],
@@ -120,15 +105,11 @@ class CalibrationSession:
                     slot=slot,
                     namespace=lw_def['namespace'],
                     version=lw_def['version'],
-                    id=new_uuid)
-                self._lw_definitions[new_uuid] = LabwareDefinition(
-                    definition=lw_def,
-                    slot=slot,
                     id=new_uuid,
-                    object=None)
+                    definition=lw_def)
         return lw
 
-    def _decide_slot(self) -> typing.Optional[str]:
+    def _available_slot_options(self) -> typing.Optional[str]:
         if self._slot_options:
             return self._slot_options.pop(0)
         else:
@@ -152,8 +133,13 @@ class CalibrationSession:
         return self._pipettes
 
     @property
-    def labware(self) -> typing.Dict:
-        return self._labware_info
+    def labware_status(self) -> typing.Dict:
+        to_dict = {}
+        for name, value in self._labware_info.items():
+            temp_dict = asdict(value)
+            del temp_dict['definition']
+            to_dict[name] = temp_dict
+        return to_dict
 
 
 class CheckCalibrationSession(CalibrationSession):
@@ -168,8 +154,6 @@ class CheckCalibrationSession(CalibrationSession):
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'loadLabware',\
             f'You cannot build a labware object during {curr_state} state.'
-        for name, data in self._lw_definitions.items():
+        for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
-            self._lw_definitions[name].object =\
-                labware.Labware(data.definition, parent)
-            self._deck[data.slot] = self._lw_definitions[name].object
+            self._deck[data.slot] = labware.Labware(data.definition, parent)

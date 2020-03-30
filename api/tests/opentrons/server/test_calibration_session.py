@@ -2,7 +2,6 @@ import pytest
 import enum
 
 from opentrons import types
-from opentrons.protocol_api import labware
 
 from opentrons.server.endpoints.calibration import util
 
@@ -82,9 +81,10 @@ async def test_create_lw_object(async_client, async_server, test_setup):
         util.CalibrationCheckState.loadLabware
 
     sess._load_labware_objects()
-    for lw_def_cls in sess._lw_definitions.values():
-        assert lw_def_cls.object
-        assert isinstance(lw_def_cls.object, labware.Labware)
+    assert sess._deck['8']
+    assert sess._deck['8'].name == 'opentrons_96_tiprack_10ul'
+    assert sess._deck['6']
+    assert sess._deck['6'].name == 'opentrons_96_tiprack_300ul'
 
 
 def test_state_machine():
