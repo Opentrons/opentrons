@@ -17,6 +17,7 @@ class ConnectionState(str, Enum):
     connected = "connected"
     connecting = "connecting"
     disconnected = "disconnected"
+    unavailable = "unavailable"
 
 
 class ConnectionType(str, Enum):
