@@ -1,16 +1,16 @@
 // @flow
 import * as React from 'react'
-import { addSeconds, format } from 'date-fns'
 import cx from 'classnames'
 import { LabeledValue } from '@opentrons/components'
 import { getModuleDisplayName } from '@opentrons/shared-data'
 
+import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
+import { formatSeconds } from '../../robot/selectors' // TODO: move helper from robot selector to helper file
 import { TemperatureControl, TemperatureData } from '../ModuleControls'
+
 import { StatusCard } from './StatusCard'
 import { StatusItem } from './StatusItem'
 import styles from './styles.css'
-
-import type { ThermocyclerModule, ModuleCommand } from '../../modules/types'
 
 const TimeRemaining = ({
   holdTime,
@@ -23,10 +23,7 @@ const TimeRemaining = ({
     className={cx(styles.inline_labeled_value, styles.time_remaining_wrapper)}
   >
     <p className={styles.time_remaining_label}>Time remaining for step:</p>
-    <p>
-      {// convert duration to seconds from epoch (midnight), then format
-      format(addSeconds(0, holdTime ?? 0), 'HH:mm:ss')}
-    </p>
+    <p>{formatSeconds(holdTime ?? 0)}</p>
   </span>
 )
 
@@ -146,18 +143,18 @@ export const ThermocyclerCard = ({
         />
       </div>
       {/* {executingProfile && ( */}
-        <CycleInfo
-          holdTime={50}
-          totalCycleCount={2}
-          currentCycleIndex={1}
-          totalStepCount={30}
-          currentStepIndex={4}
-        />
+      <CycleInfo
+        holdTime={50}
+        totalCycleCount={2}
+        currentCycleIndex={1}
+        totalStepCount={30}
+        currentStepIndex={4}
+      />
       {/* )} */}
       {/* {holdTime != null && holdTime > 0 && !executingProfile && ( */}
-        <div className={styles.card_row}>
-          <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
-        </div>
+      <div className={styles.card_row}>
+        <TimeRemaining holdTime={holdTime} title="Hold time remaining:" />
+      </div>
       {/* )} */}
     </StatusCard>
   )
