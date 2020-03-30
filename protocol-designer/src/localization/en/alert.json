@@ -31,6 +31,9 @@
     "export_v4_protocol": {
       "title": "Robot requirements for running module inclusive JSON protocols",
       "body": "This protocol utilizes modules and can only run on app and robot server version 3.17 or higher. Please ensure your OT-2 is updated to the correct version."
+    },
+    "change_magnet_module_model": {
+      "title": "All existing engage heights will be cleared"
     }
   },
   "timeline": {
