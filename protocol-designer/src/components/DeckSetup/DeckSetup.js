@@ -10,13 +10,15 @@ import {
 } from '@opentrons/components'
 import {
   getLabwareHasQuirk,
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
   type DeckSlot as DeckDefSlot,
   type ModuleRealType,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
+import {
+  PSEUDO_DECK_SLOTS,
+  GEN_ONE_MULTI_PIPETTES,
+  MODULES_WITH_COLLISION_ISSUES,
+} from '../../constants'
 import type { TerminalItemId } from '../../steplist'
 import {
   getLabwareIsCompatible,
@@ -213,14 +215,14 @@ const DeckSetupContents = (props: ContentsProps) => {
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '1' &&
-            moduleOnDeck.model.includes(MAGNETIC_MODULE_V1)
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['4']) ||
           null,
         (allModules.some(
           moduleOnDeck =>
             moduleOnDeck.slot === '3' &&
-            moduleOnDeck.model.includes(TEMPERATURE_MODULE_V1)
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
         ) &&
           deckSlotsById?.['6']) ||
           null,
