@@ -1,5 +1,5 @@
 // @flow
-import { filter, map } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 
 import { DELETE } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -15,24 +15,29 @@ import * as Types from '../types'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-type TriggerAction =
-  | Types.CreateRobotCalibrationCheckSessionFailureAction
+type ResponseAction =
+  | Types.CreateRobotCalibrationCheckSessionAction
   | Types.DeleteRobotCalibrationCheckSessionSuccessAction
+  | Types.DeleteRobotCalibrationCheckSessionFailureAction
 
-const mapActionToRequest: ActionToRequestMapper<TriggerAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<Types.DeleteRobotCalibrationCheckSessionAction> = action => ({
   method: DELETE,
   path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
 })
 
-const mapResponseToAction: ResponseToActionMapper<TriggerAction> = (
+const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCheckSessionAction> = (
   response,
   originalAction
-) => {
+): ResponseAction => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-  return response.ok
-    ? Actions.deleteRobotCalibrationCheckSessionSuccess(host.name, body, meta)
-    : Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
+  if (response.ok) {
+    return originalAction.payload.recreate
+      ? Actions.createRobotCalibrationCheckSession(host.name)
+      : Actions.deleteRobotCalibrationCheckSessionSuccess(host.name, body, meta)
+  } else {
+    return Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
+  }
 }
 
 export const deleteRobotCalibrationCheckSessionEpic: Epic = (
@@ -40,21 +45,7 @@ export const deleteRobotCalibrationCheckSessionEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    filter((action: Action) => {
-      const explicitDelete =
-        action.type === Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION
-      const clearExisting =
-        action.type ===
-          Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE &&
-        action.meta.response.status === 409
-
-      return explicitDelete || clearExisting
-    }),
-    map((action: TriggerAction): TriggerAction =>
-      action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE
-        ? { ...action, meta: { ...action.meta, recreating: true } }
-        : action
-    ),
+    ofType(Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

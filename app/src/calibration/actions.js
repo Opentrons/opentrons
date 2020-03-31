@@ -22,7 +22,6 @@ export const createRobotCalibrationCheckSessionSuccess = (
   meta: $Shape<{|
     ...RobotApiRequestMeta,
     ...RobotApiResponseMeta,
-    recreating?: boolean,
   |}>
 ): Types.CreateRobotCalibrationCheckSessionSuccessAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
@@ -36,7 +35,6 @@ export const createRobotCalibrationCheckSessionFailure = (
   meta: $Shape<{|
     ...RobotApiRequestMeta,
     ...RobotApiResponseMeta,
-    recreating?: boolean,
   |}>
 ): Types.CreateRobotCalibrationCheckSessionFailureAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -45,10 +43,11 @@ export const createRobotCalibrationCheckSessionFailure = (
 })
 
 export const deleteRobotCalibrationCheckSession = (
-  robotName: string
+  robotName: string,
+  recreate: boolean = false
 ): Types.DeleteRobotCalibrationCheckSessionAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: { robotName },
+  payload: { robotName, recreate },
   meta: {},
 })
 
@@ -58,7 +57,6 @@ export const deleteRobotCalibrationCheckSessionSuccess = (
   meta: $Shape<{|
     ...RobotApiRequestMeta,
     ...RobotApiResponseMeta,
-    recreating?: boolean,
   |}>
 ): Types.DeleteRobotCalibrationCheckSessionSuccessAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
@@ -72,7 +70,6 @@ export const deleteRobotCalibrationCheckSessionFailure = (
   meta: $Shape<{|
     ...RobotApiRequestMeta,
     ...RobotApiResponseMeta,
-    recreating?: boolean,
   |}>
 ): Types.DeleteRobotCalibrationCheckSessionFailureAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,

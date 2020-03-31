@@ -26,7 +26,7 @@ export function RobotSettings(props: RobotSettingsProps) {
   const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
-    <CardContainer>
+    <CardContainer key={robot.name}>
       <CardRow>
         <StatusCard robot={robot} />
       </CardRow>

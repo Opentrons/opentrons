@@ -23,51 +23,31 @@ export type CreateRobotCalibrationCheckSessionAction = {|
 export type CreateRobotCalibrationCheckSessionSuccessAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
-  meta: $Shape<{|
-    ...RobotApiResponseMeta,
-    ...RobotApiRequestMeta,
-    recreating?: boolean,
-  |}>,
+  meta: RobotApiRequestMeta,
 |}
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: $Shape<{| robotName: string, error: {} |}>,
-  meta: $Shape<{|
-    ...RobotApiResponseMeta,
-    ...RobotApiRequestMeta,
-    recreating?: boolean,
-  |}>,
+  meta: RobotApiRequestMeta,
 |}
 
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: $Shape<{| robotName: string |}>,
-  meta: $Shape<{|
-    ...RobotApiResponseMeta,
-    ...RobotApiRequestMeta,
-    recreating?: boolean,
-  |}>,
+  payload: $Shape<{| robotName: string, recreate: boolean |}>,
+  meta: RobotApiRequestMeta,
 |}
 
 export type DeleteRobotCalibrationCheckSessionSuccessAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string |},
-  meta: $Shape<{|
-    ...RobotApiResponseMeta,
-    ...RobotApiRequestMeta,
-    recreating?: boolean,
-  |}>,
+  meta: RobotApiRequestMeta,
 |}
 
 export type DeleteRobotCalibrationCheckSessionFailureAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
-  meta: $Shape<{|
-    ...RobotApiResponseMeta,
-    ...RobotApiRequestMeta,
-    recreating?: boolean,
-  |}>,
+  meta: RobotApiRequestMeta,
 |}
 
 export type CompleteRobotCalibrationCheckAction = {|

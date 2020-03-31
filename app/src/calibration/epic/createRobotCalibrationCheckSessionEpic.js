@@ -1,5 +1,5 @@
 // @flow
-import { filter } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
@@ -16,6 +16,10 @@ import type {
 
 import type { CreateRobotCalibrationCheckSessionAction } from '../types'
 
+// TODO: next BC 2020-03-31: make this epic called "fetch" instead of "create"
+// and have it first check if there is a session in state and issue a GET request if so,
+// then post if there isn't then delete and post again if that original returns a 409
+
 const mapActionToRequest: ActionToRequestMapper<CreateRobotCalibrationCheckSessionAction> = action => ({
   method: POST,
   path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
@@ -28,9 +32,13 @@ const mapResponseToAction: ResponseToActionMapper<CreateRobotCalibrationCheckSes
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
-  return response.ok
-    ? Actions.createRobotCalibrationCheckSessionSuccess(host.name, body, meta)
-    : Actions.createRobotCalibrationCheckSessionFailure(host.name, body, meta)
+  if (response.status === 409) { // delete session and recreate if conflicting
+    return Actions.deleteRobotCalibrationCheckSession(host.name, true)
+  } else {
+    return response.ok
+      ? Actions.createRobotCalibrationCheckSessionSuccess(host.name, body, meta)
+      : Actions.createRobotCalibrationCheckSessionFailure(host.name, body, meta)
+  }
 }
 
 export const createRobotCalibrationCheckSessionEpic: Epic = (
@@ -38,16 +46,7 @@ export const createRobotCalibrationCheckSessionEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    filter((action: Action) => {
-      const explicitCreate =
-        action.type === Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION
-      const recreating =
-        action.type ===
-          Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS &&
-        !!action.meta.recreating
-
-      return explicitCreate || recreating
-    }),
+    ofType(Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

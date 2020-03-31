@@ -6,4 +6,4 @@ export const getRobotCalibrationCheckSession: (
   state: State,
   robotName: string
 ) => RobotCalibrationCheckSessionData | null = (state, robotName) =>
-  state.calibration[robotName]?.robotCalibrationCheck || null
+  state.calibration[robotName]?.robotCalibrationCheck ?? null
