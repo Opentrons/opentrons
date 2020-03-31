@@ -4,7 +4,7 @@ import { ofType } from 'redux-observable'
 import { DELETE } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 
-import type { Action, Epic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -36,7 +36,11 @@ const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCh
       ? Actions.createRobotCalibrationCheckSession(host.name)
       : Actions.deleteRobotCalibrationCheckSessionSuccess(host.name, body, meta)
   } else {
-    return Actions.deleteRobotCalibrationCheckSessionFailure(host.name, body, meta)
+    return Actions.deleteRobotCalibrationCheckSessionFailure(
+      host.name,
+      body,
+      meta
+    )
   }
 }
 

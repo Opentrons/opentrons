@@ -7,7 +7,7 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Action, Epic } from '../../types'
+import type { Epic } from '../../types'
 
 import type {
   ActionToRequestMapper,
@@ -32,7 +32,8 @@ const mapResponseToAction: ResponseToActionMapper<CreateRobotCalibrationCheckSes
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
 
-  if (response.status === 409) { // delete session and recreate if conflicting
+  if (response.status === 409) {
+    // delete session and recreate if conflicting
     return Actions.deleteRobotCalibrationCheckSession(host.name, true)
   } else {
     return response.ok

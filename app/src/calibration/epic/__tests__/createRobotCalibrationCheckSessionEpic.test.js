@@ -112,10 +112,11 @@ describe('createRobotCalibrationCheckSessionEpic', () => {
     it('maps conflict response to DELETE_ROBOT_CALIBRATION_CHECK_SESSION', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: {
+          cold('r', {
+            r: {
               ...Fixtures.mockCreateCheckSessionFailure,
-              status: 409
-            }
+              status: 409,
+            },
           })
         )
 

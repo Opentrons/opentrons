@@ -1,8 +1,5 @@
 // @flow
-import type {
-  RobotApiRequestMeta,
-  RobotApiResponseMeta,
-} from '../robot-api/types'
+import type { RobotApiRequestMeta } from '../robot-api/types'
 import typeof {
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,

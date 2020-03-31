@@ -59,7 +59,8 @@ describe('robot modules actions', () => {
       },
     },
     {
-      name: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION without recreating session',
+      name:
+        'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION without recreating session',
       creator: Actions.deleteRobotCalibrationCheckSession,
       args: ['robot-name'],
       expected: {
@@ -69,12 +70,13 @@ describe('robot modules actions', () => {
       },
     },
     {
-      name: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION with recreating session',
+      name:
+        'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION with recreating session',
       creator: Actions.deleteRobotCalibrationCheckSession,
       args: ['robot-name', true],
       expected: {
         type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION',
-        payload: { robotName: 'robot-name', recreate: true},
+        payload: { robotName: 'robot-name', recreate: true },
         meta: {},
       },
     },

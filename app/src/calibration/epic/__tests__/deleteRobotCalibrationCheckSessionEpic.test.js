@@ -110,7 +110,10 @@ describe('deleteRobotCalibrationCheckSessionEpic', () => {
     })
 
     it('maps success response with recreate to CREATE_ROBOT_CALIBRATION_CHECK_SESSION', () => {
-      const recreateAction = Actions.deleteRobotCalibrationCheckSession(mockRobot.name, true)
+      const recreateAction = Actions.deleteRobotCalibrationCheckSession(
+        mockRobot.name,
+        true
+      )
 
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(

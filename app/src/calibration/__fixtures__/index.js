@@ -4,7 +4,7 @@ import { POST, DELETE } from '../../robot-api'
 import {
   makeResponseFixtures,
   mockFailureBody,
-  mockRobot
+  mockRobot,
 } from '../../robot-api/__fixtures__'
 import { ROBOT_CALIBRATION_CHECK_PATH } from '../constants'
 import type { RobotCalibrationCheckSessionData } from '../api-types'
@@ -28,12 +28,12 @@ export const {
   RobotCalibrationCheckSessionData,
   {| message: string |}
 >({
- method: POST,
- path: ROBOT_CALIBRATION_CHECK_PATH,
- successStatus: 200,
- successBody: mockRobotCalibrationCheckSessionData,
- failureStatus: 500,
- failureBody: mockFailureBody,
+  method: POST,
+  path: ROBOT_CALIBRATION_CHECK_PATH,
+  successStatus: 200,
+  successBody: mockRobotCalibrationCheckSessionData,
+  failureStatus: 500,
+  failureBody: mockFailureBody,
 })
 
 export const {
@@ -41,14 +41,11 @@ export const {
   failureMeta: mockDeleteCheckSessionFailureMeta,
   success: mockDeleteCheckSessionSuccess,
   failure: mockDeleteCheckSessionFailure,
-} = makeResponseFixtures<
-  {| message: string |},
-  {| message: string |}
->({
- method: DELETE,
- path: ROBOT_CALIBRATION_CHECK_PATH,
- successStatus: 200,
- successBody: { message: 'Successfully deleted session' },
- failureStatus: 500,
- failureBody: mockFailureBody,
+} = makeResponseFixtures<{| message: string |}, {| message: string |}>({
+  method: DELETE,
+  path: ROBOT_CALIBRATION_CHECK_PATH,
+  successStatus: 200,
+  successBody: { message: 'Successfully deleted session' },
+  failureStatus: 500,
+  failureBody: mockFailureBody,
 })

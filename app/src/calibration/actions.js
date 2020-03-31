@@ -1,7 +1,6 @@
 // @flow
 import type {
   RobotApiRequestMeta,
-  RobotApiResponseMeta,
   RobotApiErrorResponse,
 } from '../robot-api/types'
 import * as Types from './types'
@@ -19,7 +18,7 @@ export const createRobotCalibrationCheckSession = (
 export const createRobotCalibrationCheckSessionSuccess = (
   robotName: string,
   body: RobotCalibrationCheckSessionData,
-  meta: RobotApiRequestMeta,
+  meta: RobotApiRequestMeta
 ): Types.CreateRobotCalibrationCheckSessionSuccessAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName, ...body },
@@ -29,7 +28,7 @@ export const createRobotCalibrationCheckSessionSuccess = (
 export const createRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta,
+  meta: RobotApiRequestMeta
 ): Types.CreateRobotCalibrationCheckSessionFailureAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
@@ -48,7 +47,7 @@ export const deleteRobotCalibrationCheckSession = (
 export const deleteRobotCalibrationCheckSessionSuccess = (
   robotName: string,
   body: { message: string },
-  meta: RobotApiRequestMeta,
+  meta: RobotApiRequestMeta
 ): Types.DeleteRobotCalibrationCheckSessionSuccessAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: { robotName },
@@ -58,7 +57,7 @@ export const deleteRobotCalibrationCheckSessionSuccess = (
 export const deleteRobotCalibrationCheckSessionFailure = (
   robotName: string,
   error: RobotApiErrorResponse,
-  meta: RobotApiRequestMeta,
+  meta: RobotApiRequestMeta
 ): Types.DeleteRobotCalibrationCheckSessionFailureAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: { robotName, error },
