@@ -5,7 +5,7 @@ from typing import Optional
 
 from opentrons.config.pipette_config import MUTABLE_CONFIGS
 from pydantic import BaseModel, Field, create_model, validator
-from opentrons.server.endpoints.settings import _common_settings_reset_options
+from opentrons.config.reset import ResetOptionId
 
 
 class AdvancedSetting(BaseModel):
@@ -59,7 +59,7 @@ class LogLevel(BaseModel):
 
 
 class FactoryResetOption(BaseModel):
-    id: str = \
+    id: ResetOptionId = \
         Field(..., description="A short machine-readable id for the setting")
     name: str = \
         Field(..., description="A short human-readable name for the setting")
@@ -71,17 +71,6 @@ class FactoryResetOption(BaseModel):
 class FactoryResetOptions(BaseModel):
     """Available values to reset as factory reset"""
     options: typing.List[FactoryResetOption]
-
-
-FactoryResetCommands = create_model("FactoryResetCommands",
-                                    __config__=None,
-                                    __base__=None,
-                                    __module__=None,
-                                    __validators__=None,
-                                    **{x['id']: (typing.Optional[bool], None)
-                                       for x in _common_settings_reset_options}
-                                    )
-FactoryResetCommands.__doc__ = "The specific elements of robot data to reset"
 
 
 RobotConfigs = typing.Dict[str, typing.Any]

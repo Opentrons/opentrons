@@ -5,6 +5,9 @@ from collections import namedtuple
 
 # TDOD(isk: 3/20/20): test validation errors after refactor
 # return {message: string}
+from opentrons.config.reset import ResetOptionId
+
+
 @pytest.mark.parametrize(
     "log_level, syslog_level, expected_message",
     [
@@ -177,3 +180,57 @@ def test_receive_pipette_settings_found(api_client,
     resp = api_client.get('/settings/pipettes/p1')
     assert resp.status_code == 200
     assert resp.json() == mock_pipette_data['p1']
+
+
+def test_available_resets(api_client):
+    resp = api_client.get('/settings/reset/options')
+    body = resp.json()
+    options_list = body.get('options')
+    assert resp.status_code == 200
+    assert sorted(['tipProbe', 'labwareCalibration', 'bootScripts'])\
+        == sorted([item['id'] for item in options_list])
+
+
+@pytest.fixture
+def mock_reset():
+    with patch("robot_server.service.routers.settings.reset_util.reset") as m:
+        yield m
+
+
+@pytest.mark.parametrize(argnames="body,called_with",
+                         argvalues=[
+                             # Empty body
+                             [{}, set()],
+                             # None true
+                             [{
+                                 'labwareCalibration': False,
+                                 'tipProbe': False,
+                                 'bootScripts': False
+                             }, set()],
+                             # All set
+                             [{
+                                 'labwareCalibration': True,
+                                 'tipProbe': True,
+                                 'bootScripts': True
+                             }, set(v for v in ResetOptionId)],
+                             [{'labwareCalibration': True},
+                              {ResetOptionId.labware_calibration}],
+                             [{'tipProbe': True},
+                              {ResetOptionId.tip_probe}],
+                             [{'bootScripts': True},
+                              {ResetOptionId.boot_scripts}],
+                         ])
+def test_reset_success(api_client, mock_reset, body, called_with):
+    resp = api_client.post('/settings/reset', json=body)
+    body = resp.json()
+    assert resp.status_code == 200
+    mock_reset.assert_called_once_with(called_with)
+
+
+def test_reset_invalid_option(api_client, mock_reset):
+    resp = api_client.post('/settings/reset', json={'aksgjajhadjasl': False})
+    assert resp.status_code == 422
+    # TODO Blocked by https://github.com/Opentrons/opentrons/issues/5285
+    # body = resp.json()
+    # assert 'message' in body
+    # assert 'aksgjajhadjasl' in body['message']

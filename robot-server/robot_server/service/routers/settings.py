@@ -5,15 +5,15 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from opentrons.hardware_control import HardwareAPILike
 from opentrons.system import log_control
-from opentrons.config import pipette_config
+from opentrons.config import pipette_config, reset as reset_util
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
-    LogLevels, FactoryResetOptions, FactoryResetCommands, PipetteSettings, \
+    LogLevels, FactoryResetOptions, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
-    PipetteSettingsInfo, PipetteSettingsFields
+    PipetteSettingsInfo, PipetteSettingsFields, FactoryResetOption
 
 log = logging.getLogger(__name__)
 
@@ -86,14 +86,30 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
                         "factory reset",
             response_model=FactoryResetOptions)
 async def get_settings_reset_options() -> FactoryResetOptions:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+    reset_options = reset_util.reset_options().items()
+    return FactoryResetOptions(
+        options=[
+            FactoryResetOption(
+                id=k,
+                name=v.name,
+                description=v.description)
+            for k, v in reset_options
+        ]
+    )
 
 
 @router.post("/settings/reset",
              description="Perform a factory reset of some robot data")
 async def post_settings_reset_options(
-        factory_reset_commands: FactoryResetCommands):  # type: ignore
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+        factory_reset_commands: Dict[reset_util.ResetOptionId, bool]) \
+        -> V1BasicResponse:
+    options = set(k for k, v in factory_reset_commands.items() if v)
+    reset_util.reset(options)
+
+    message = "Options '{}' were reset".format(
+        ", ".join(o.name for o in options)) \
+        if options else "Nothing to do"
+    return V1BasicResponse(message=message)
 
 
 @router.get("/settings/robot",
