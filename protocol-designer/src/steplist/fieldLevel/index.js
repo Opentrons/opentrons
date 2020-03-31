@@ -63,7 +63,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     castValue: Number,
   },
   aspirate_mix_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_mmFromBottom: {
