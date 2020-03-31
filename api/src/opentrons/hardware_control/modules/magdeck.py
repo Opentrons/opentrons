@@ -12,7 +12,9 @@ log = logging.getLogger('__name__')
 MAX_ENGAGE_HEIGHT = {  # mm from home position
     'magneticModuleV1': 45,
     'magneticModuleV2': 25}
-OFFSET_TO_LABWARE_BOTTOM = 5
+OFFSET_TO_LABWARE_BOTTOM = {
+    'magneticModuleV1': 10,
+    'magneticModuleV2': 5}
 
 FIRST_GEN2_REVISION = 20
 

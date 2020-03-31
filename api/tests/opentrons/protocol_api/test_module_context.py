@@ -387,8 +387,11 @@ def test_magdeck_gen1_labware_props(loop):
         mod.engage(offset=1)
     mod.engage(height=2)
     assert mod._module._driver.plate_height == 2
+    mod.engage(height=0)
+    assert mod._module._driver.plate_height == 0
     mod.engage(height_from_base=2)
-    assert mod._module._driver.plate_height == 2 + OFFSET_TO_LABWARE_BOTTOM
+    assert mod._module._driver.plate_height == 2 +\
+        OFFSET_TO_LABWARE_BOTTOM[mod._module.model()]
 
 
 def test_magdeck_gen2_labware_props(loop):
@@ -398,6 +401,8 @@ def test_magdeck_gen2_labware_props(loop):
     assert mod._module.current_height == 25
     with pytest.raises(ValueError):
         mod.engage(height=25.1)  # max engage height for gen2 is 25 mm
+    mod.engage(height=0)
+    assert mod._module.current_height == 0
 
 
 def test_module_compatibility(get_module_fixture, monkeypatch):

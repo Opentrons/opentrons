@@ -337,10 +337,12 @@ class MagneticModuleContext(ModuleContext):
         :param offset: An offset relative to the default height for the labware
                        in mm
         """
-        if height:
+        if height is not None:
             dist = height
-        elif height_from_base and self._ctx._api_version >= APIVersion(2, 2):
-            dist = height_from_base + modules.magdeck.OFFSET_TO_LABWARE_BOTTOM
+        elif height_from_base is not None and\
+                self._ctx._api_version >= APIVersion(2, 2):
+            dist = height_from_base +\
+                modules.magdeck.OFFSET_TO_LABWARE_BOTTOM[self._module.model()]
         elif self.labware and self.labware.magdeck_engage_height is not None:
             dist = self._determine_lw_engage_height()
             if offset:
