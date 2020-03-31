@@ -101,7 +101,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   labware: {
