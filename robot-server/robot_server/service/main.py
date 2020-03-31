@@ -9,12 +9,13 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .routers import health, networking, control, settings, deck_calibration, \
-    modules, pipettes, motors, camera, item, logs
+    modules, pipettes, motors, camera, logs, rpc, item
 from .models.json_api.errors import \
     transform_validation_error_to_json_api_errors, \
     transform_http_exception_to_json_api_errors
 from .models import V1BasicResponse
 from .exceptions import V1HandlerError
+from .dependencies import get_rpc_server
 
 
 app = FastAPI(
@@ -45,12 +46,20 @@ app.include_router(router=motors.router,
                    tags=["motors"])
 app.include_router(router=camera.router,
                    tags=["camera"])
+app.include_router(router=logs.router,
+                   tags=["logs"])
+app.include_router(router=rpc.router,
+                   tags=["rpc"])
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
 app.include_router(router=item.router,
                    tags=["item"])
-app.include_router(router=logs.router,
-                   tags=["logs"])
+
+
+@app.on_event("shutdown")
+async def on_shutdown():
+    s = await get_rpc_server()
+    await s.on_shutdown()
 
 
 @app.exception_handler(V1HandlerError)
