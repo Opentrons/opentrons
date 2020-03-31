@@ -132,7 +132,12 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   volume: {
     getErrors: composeErrors(requiredField, nonZero),
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers, defaultTo(0)),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      defaultTo(0),
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   wells: {
@@ -142,7 +147,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   magnetAction: { getErrors: composeErrors(requiredField) },
   engageHeight: {
     getErrors: composeErrors(realNumber),
-    maskValue: composeMaskers(maskToFloat),
+    maskValue: composeMaskers(maskToFloat, trimDecimals(1)),
     castValue: Number,
   },
   setTemperature: { getErrors: composeErrors(requiredField) },
