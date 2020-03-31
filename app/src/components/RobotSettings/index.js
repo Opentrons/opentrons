@@ -19,11 +19,14 @@ export type RobotSettingsProps = {|
   resetUrl: string,
 |}
 
+// TODO BC 2020-03-20 all of the buttons in these settings are disabled for
+// various reasons.  We should surface those reasons to users in hover tooltips
+// on the buttons, this is currently limited by the existing LabeledButton component.
 export function RobotSettings(props: RobotSettingsProps) {
   const { robot, updateUrl, calibrateDeckUrl, resetUrl } = props
 
   return (
-    <CardContainer>
+    <CardContainer key={robot.name}>
       <CardRow>
         <StatusCard robot={robot} />
       </CardRow>

@@ -6,15 +6,17 @@ import { mount } from 'enzyme'
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
+import * as ConfigSelectors from '../../../config/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
-import { CONNECTABLE, REACHABLE } from '../../../discovery'
+import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
 import type { State } from '../../../types'
 import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')
+jest.mock('../../../config/selectors')
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -25,7 +27,7 @@ const mockRobot: ViewableRobot = ({
 const mockUnconnectableRobot: ViewableRobot = ({
   name: 'robot-name',
   connected: true,
-  status: REACHABLE,
+  status: UNREACHABLE,
 }: any)
 
 const mockGetLightsOn: JestMockFn<
@@ -38,12 +40,24 @@ const mockGetIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
+const getFeatureFlags: JestMockFn<
+  [State],
+  $Call<typeof ConfigSelectors.getFeatureFlags, State>
+> = ConfigSelectors.getFeatureFlags
+
 describe('ControlsCard', () => {
   let mockStore
+  let render
 
   const getDeckCalButton = wrapper =>
     wrapper
       .find({ label: 'Calibrate deck' })
+      .find(LabeledButton)
+      .find('button')
+
+  const getRobotCalibrationCheckButton = wrapper =>
+    wrapper
+      .find({ label: 'Check deck calibration' })
       .find(LabeledButton)
       .find('button')
 
@@ -65,8 +79,24 @@ describe('ControlsCard', () => {
   beforeEach(() => {
     mockStore = {
       subscribe: () => {},
-      getState: () => ({ mockState: true }),
+      getState: () => ({
+        mockState: true,
+      }),
       dispatch: jest.fn(),
+    }
+
+    getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: true,
+    })
+
+    render = (robot: ViewableRobot = mockRobot) => {
+      return mount(
+        <ControlsCard robot={robot} calibrateDeckUrl="/deck/calibrate" />,
+        {
+          wrappingComponent: Provider,
+          wrappingComponentProps: { store: mockStore },
+        }
+      )
     }
   })
 
@@ -75,11 +105,7 @@ describe('ControlsCard', () => {
   })
 
   it('calls fetchLights on mount', () => {
-    mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    render()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       RobotControls.fetchLights(mockRobot.name)
@@ -89,11 +115,7 @@ describe('ControlsCard', () => {
   it('calls updateLights with toggle on button click', () => {
     mockGetLightsOn.mockReturnValue(true)
 
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    const wrapper = render()
 
     getLightsButton(wrapper).invoke('onClick')()
 
@@ -103,11 +125,7 @@ describe('ControlsCard', () => {
   })
 
   it('calls restartRobot on button click', () => {
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    const wrapper = render()
 
     getRestartButton(wrapper).invoke('onClick')()
 
@@ -117,11 +135,7 @@ describe('ControlsCard', () => {
   })
 
   it('calls home on button click', () => {
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    const wrapper = render()
 
     getHomeButton(wrapper).invoke('onClick')()
 
@@ -130,67 +144,61 @@ describe('ControlsCard', () => {
     )
   })
 
-  it('DC, home, and restart buttons enabled if connected and not running', () => {
+  it('DC, check cal, home, and restart buttons enabled if connected and not running', () => {
     mockGetIsRunning.mockReturnValue(false)
 
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockUnconnectableRobot}
-          calibrateDeckUrl="/deck/calibrate"
-        />
-      </Provider>
-    )
+    const wrapper = render()
+
+    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(false)
+    expect(getHomeButton(wrapper).prop('disabled')).toBe(false)
+    expect(getRestartButton(wrapper).prop('disabled')).toBe(false)
+  })
+
+  it('DC, check cal, home, and restart buttons disabled if not connectable', () => {
+    const wrapper = render(mockUnconnectableRobot)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('DC, home, and restart buttons disabled if not connectable', () => {
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard
-          robot={mockUnconnectableRobot}
-          calibrateDeckUrl="/deck/calibrate"
-        />
-      </Provider>
-    )
-
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
-  })
-
-  it('DC, home, and restart buttons disabled if not connected', () => {
-    const mockRobot: ViewableRobot = ({
+  it('DC, check cal, home, and restart buttons disabled if not connected', () => {
+    const mockRobotNotConnected: ViewableRobot = ({
       name: 'robot-name',
       connected: false,
       status: CONNECTABLE,
     }: any)
 
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    const wrapper = render(mockRobotNotConnected)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('DC, home, and restart buttons disabled if protocol running', () => {
+  it('DC, check cal, home, and restart buttons disabled if protocol running', () => {
     mockGetIsRunning.mockReturnValue(true)
 
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <ControlsCard robot={mockRobot} calibrateDeckUrl="/deck/calibrate" />
-      </Provider>
-    )
+    const wrapper = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
+  })
+
+  it('Check cal button does not render if feature flag off', () => {
+    mockGetIsRunning.mockReturnValue(true)
+
+    getFeatureFlags.mockReturnValue({
+      enableRobotCalCheck: false,
+    })
+
+    const wrapper = render()
+
+    expect(wrapper.exists({ label: 'Check deck calibration' })).toBe(false)
   })
 })

@@ -14,6 +14,7 @@ import type {
 import type { BuildrootState, BuildrootAction } from './buildroot/types'
 import type { PipettesState, PipettesAction } from './pipettes/types'
 import type { ModulesState, ModulesAction } from './modules/types'
+import type { CalibrationState, CalibrationAction } from './calibration/types'
 import type {
   State as SuperDeprecatedRobotApiState,
   HttpApiAction as SuperDeprecatedRobotApiAction,
@@ -44,6 +45,7 @@ export type State = $ReadOnly<{|
   buildroot: BuildrootState,
   pipettes: PipettesState,
   modules: ModulesState,
+  calibration: CalibrationState,
   config: ConfigState,
   discovery: DiscoveryState,
   networking: NetworkingState,
@@ -63,6 +65,7 @@ export type Action =
   | BuildrootAction
   | PipettesAction
   | ModulesAction
+  | CalibrationAction
   | ShellAction
   | ConfigAction
   | RouterAction

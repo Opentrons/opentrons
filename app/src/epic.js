@@ -3,6 +3,7 @@
 import { combineEpics } from 'redux-observable'
 
 import { analyticsEpic } from './analytics'
+import { calibrationEpic } from './calibration/epic'
 import { discoveryEpic } from './discovery/epic'
 import { robotAdminEpic } from './robot-admin/epic'
 import { robotControlsEpic } from './robot-controls/epic'
@@ -15,6 +16,7 @@ import { shellEpic } from './shell/epic'
 
 export const rootEpic = combineEpics(
   analyticsEpic,
+  calibrationEpic,
   discoveryEpic,
   robotAdminEpic,
   robotControlsEpic,

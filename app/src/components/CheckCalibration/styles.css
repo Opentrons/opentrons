@@ -1,0 +1,28 @@
+@import '@opentrons/components';
+
+.status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-success);
+}
+
+.modal_header {
+  display: flex;
+  align-items: center;
+}
+
+.modal_contents {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 48rem;
+  min-height: 14rem;
+  padding: 2rem 3.5rem;
+}
+
+.complete_body {
+  @apply --font-body-2-dark;
+
+  margin: 1rem 0 2rem 0;
+}

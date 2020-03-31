@@ -14,7 +14,7 @@ type ReducerSpec = {|
 
 const SPECS: Array<ReducerSpec> = [
   {
-    name: 'handles pipettes:FETCH_MODULES_SUCCESS',
+    name: 'handles modules:FETCH_MODULES_SUCCESS',
     action: {
       type: 'modules:FETCH_MODULES_SUCCESS',
       payload: {
@@ -39,7 +39,7 @@ const SPECS: Array<ReducerSpec> = [
   },
 ]
 
-describe('pipettesReducer', () => {
+describe('modulesReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
     it(name, () => expect(modulesReducer(state, action)).toEqual(expected))

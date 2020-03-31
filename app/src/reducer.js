@@ -32,6 +32,9 @@ import { pipettesReducer } from './pipettes/reducer'
 // modules state
 import { modulesReducer } from './modules/reducer'
 
+// calibration state
+import { calibrationReducer } from './calibration/reducer'
+
 // networking state
 import { networkingReducer } from './networking/reducer'
 
@@ -65,6 +68,7 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   buildroot: buildrootReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,
+  calibration: calibrationReducer,
   networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,
