@@ -1,9 +1,8 @@
 // @flow
 import {
-  MAGNETIC_MODULE_TYPE,
-  TEMPERATURE_MODULE_TYPE,
-} from '@opentrons/shared-data'
-import { GEN_ONE_MULTI_PIPETTES } from '../../constants'
+  GEN_ONE_MULTI_PIPETTES,
+  MODULES_WITH_COLLISION_ISSUES,
+} from '../../constants'
 import { _getFeatureFlag } from './_getFeatureFlag'
 import type { PipetteEntity } from '../../step-forms/types'
 import type { DeckSlot } from '../../types'
@@ -34,17 +33,16 @@ export const modulePipetteCollision = (args: {|
   // Does not care about GEN1/GEN2 module, just GEN1 multi-ch pipette
   const labwareInDangerZone = Object.keys(invariantContext.moduleEntities).some(
     moduleId => {
-      const moduleSlot: ?DeckSlot = prevRobotState.modules[moduleId]?.slot
-      const moduleType: ?string =
-        invariantContext.moduleEntities[moduleId]?.type
-      const hasNorthSouthProblem = [
-        MAGNETIC_MODULE_TYPE,
-        TEMPERATURE_MODULE_TYPE,
-      ].includes(moduleType)
-      const labwareInNorthSlot =
-        (moduleSlot === '1' && labwareSlot === '4') ||
-        (moduleSlot === '3' && labwareSlot === '6')
-      return hasNorthSouthProblem && labwareInNorthSlot
+      const moduleModel = invariantContext.moduleEntities[moduleId].model
+      if (MODULES_WITH_COLLISION_ISSUES.includes(moduleModel)) {
+        const moduleSlot: ?DeckSlot = prevRobotState.modules[moduleId]?.slot
+        const labwareInNorthSlot =
+          (moduleSlot === '1' && labwareSlot === '4') ||
+          (moduleSlot === '3' && labwareSlot === '6')
+        return labwareInNorthSlot
+      } else {
+        return false
+      }
     }
   )
 

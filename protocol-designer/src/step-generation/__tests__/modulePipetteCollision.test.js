@@ -2,6 +2,7 @@
 import {
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import { modulePipetteCollision } from '../utils/modulePipetteCollision'
 import { getInitialRobotStateStandard, makeContext } from '../__fixtures__'
@@ -43,6 +44,7 @@ describe('modulePipetteCollision', () => {
   it('should return true if using a GEN1 multi pipette "north" of a GEN1 magnetic module', () => {
     expect(modulePipetteCollision(collisionArgs)).toBe(true)
   })
+
   it('should return false under the same conditions, if OT_PD_DISABLE_MODULE_RESTRICTIONS flag is enabled', () => {
     mock_getFeatureFlag.mockReturnValue(true)
     expect(modulePipetteCollision(collisionArgs)).toBe(false)
@@ -50,6 +52,7 @@ describe('modulePipetteCollision', () => {
       'OT_PD_DISABLE_MODULE_RESTRICTIONS'
     )
   })
+
   it('should return false with no labware', () => {
     expect(
       modulePipetteCollision({
@@ -58,11 +61,24 @@ describe('modulePipetteCollision', () => {
       })
     ).toBe(false)
   })
+
   it('should return false with no pipette', () => {
     expect(
       modulePipetteCollision({
         ...collisionArgs,
         pipette: null,
+      })
+    ).toBe(false)
+  })
+
+  it('should return false when module is GEN2', () => {
+    invariantContext.moduleEntities['magDeckId'].model = MAGNETIC_MODULE_V2
+    expect(
+      modulePipetteCollision({
+        pipette: 'p10MultiId',
+        labware: 'destPlateId',
+        invariantContext,
+        prevRobotState: robotState,
       })
     ).toBe(false)
   })
