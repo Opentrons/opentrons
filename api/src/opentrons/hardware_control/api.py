@@ -245,8 +245,7 @@ class API(HardwareAPILike):
             back_compat: List[str] = []
             mount_axis = Axis.by_mount(mount)
             plunger_axis = Axis.of_plunger(mount)
-            splits: Dict[Axis, Optional[MoveSplit]] = {
-                plunger_axis.name.upper(): None}
+            splits: Dict[str, MoveSplit] = {}
             if model:
                 p = Pipette(
                     model,
@@ -1210,8 +1209,9 @@ class API(HardwareAPILike):
                                 dropping the tip, and is also used to recover
                                 the ejector shroud after a drop.
         """
-        instr = self._attached_instruments[mount]
-        assert instr
+        maybe_instr = self._attached_instruments[mount]
+        assert maybe_instr, f'No instrument on {mount.name}'
+        instr = maybe_instr
         assert instr.has_tip, 'Cannot drop tip without a tip attached'
         self._log.info("Dropping tip off from {}".format(instr.name))
         plunger_ax = Axis.of_plunger(mount)
@@ -1524,7 +1524,7 @@ class API(HardwareAPILike):
         @contextlib.contextmanager
         def _assure_tip():
             if pip.has_tip:
-                old_tip = pip._current_tip_length
+                old_tip: Optional[float] = pip._current_tip_length
                 pip.remove_tip()
             else:
                 old_tip = None

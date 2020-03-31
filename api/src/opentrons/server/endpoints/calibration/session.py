@@ -46,7 +46,7 @@ class LabwareInfo:
     alternatives: typing.List[str]
     forPipettes: typing.List[UUID]
     loadName: str
-    slot: typing.Optional[str]
+    slot: str
     namespace: str
     version: str
     id: UUID
@@ -109,11 +109,11 @@ class CalibrationSession:
                     definition=lw_def)
         return lw
 
-    def _available_slot_options(self) -> typing.Optional[str]:
+    def _available_slot_options(self) -> str:
         if self._slot_options:
             return self._slot_options.pop(0)
         else:
-            return None
+            raise KeyError("No available slots remaining")
 
     async def cache_instruments(self):
         await self.hardware.cache_instruments()

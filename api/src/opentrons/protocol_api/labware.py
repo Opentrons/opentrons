@@ -417,9 +417,11 @@ class Labware(DeckItem):
         will collect wells that have the same numeric postfix and therefore
         are considered to be in the same column.
         """
-        dict_list = defaultdict(list)
+        dict_list: Dict[str, List['Well']] = defaultdict(list)
         for index, well_obj in zip(self._ordering, self._wells):
-            dict_list[self._pattern.match(index).group(group)].append(well_obj)
+            match = self._pattern.match(index)
+            assert match, 'could not match well name pattern'
+            dict_list[match.group(group)].append(well_obj)
         return dict_list
 
     def set_calibration(self, delta: Point):
@@ -1140,7 +1142,8 @@ def get_all_labware_definitions() -> List[str]:
     def _check_for_subdirectories(path):
         with os.scandir(path) as top_path:
             for sub_dir in top_path:
-                labware_list.append(sub_dir.name) if sub_dir.is_dir() else None
+                if sub_dir.is_dir():
+                    labware_list.append(sub_dir.name)
 
     # check for standard labware
     _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)

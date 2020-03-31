@@ -55,7 +55,7 @@ class SimulatingDriver:
 
     @property
     def current(self):
-        return self._current_settings
+        pass
 
     @property
     def speed(self):

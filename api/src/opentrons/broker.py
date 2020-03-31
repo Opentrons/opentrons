@@ -10,7 +10,7 @@ MODULE_LOG = logging.getLogger(__name__)
 class Notifications(object):
     def __init__(self, topics, broker, loop=None):
         self.loop = loop or asyncio.get_event_loop()
-        self.queue = Queue(loop=self.loop)
+        self.queue = Queue(loop=self.loop)  # type: ignore
         self.snoozed = False
         self._unsubscribe = [
             broker.subscribe(topic, self.on_notify) for topic in topics]

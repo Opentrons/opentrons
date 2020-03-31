@@ -76,20 +76,20 @@ class Module:
     def __init__(self, module, context=None):
         self.id = id(module)
         if isinstance(module, module_geometry.ModuleGeometry):
-            _lookup = {
+            _type_lookup = {
                 module_geometry.ModuleType.MAGNETIC: 'magdeck',
                 module_geometry.ModuleType.TEMPERATURE: 'tempdeck',
                 module_geometry.ModuleType.THERMOCYCLER: 'thermocycler'}
-            self.name = _lookup[module.module_type]
+            self.name = _type_lookup[module.module_type]
             self.model = module.model.value
             self.slot = module.parent
         else:
             self.name = module.get_name()
-            _lookup = {
+            _legacy_lookup = {
                 'tempdeck': 'temperatureModuleV1',
                 'magdeck': 'magneticModuleV1',
                 'thermocycler': 'thermocyclerModuleV1'
             }
-            self.model = _lookup[module.get_name()]
+            self.model = _legacy_lookup[module.get_name()]
             self.slot = module.parent.get_name()
         self._context = context

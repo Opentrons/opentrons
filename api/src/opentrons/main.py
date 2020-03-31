@@ -3,6 +3,7 @@ from pathlib import Path
 import logging
 import asyncio
 import re
+from typing import List, Optional
 from opentrons import HERE
 from opentrons import server
 from opentrons.hardware_control import API, ThreadManager
@@ -29,12 +30,12 @@ SMOOTHIE_HEX_RE = re.compile('smoothie-(.*).hex')
 
 def _find_smoothie_file():
 
-    resources = []
+    resources: List[Path] = []
 
     # Search for smoothie files in /usr/lib/firmware first then fall back to
     # value packed in wheel
     if IS_ROBOT:
-        resources.extend(ROBOT_FIRMWARE_DIR.iterdir())
+        resources.extend(ROBOT_FIRMWARE_DIR.iterdir())  # type: ignore
 
     resources_path = Path(HERE) / 'resources'
     resources.extend(resources_path.iterdir())
@@ -96,7 +97,7 @@ async def check_for_smoothie_update():
 
     try:
         driver.connect()
-        fw_version = driver.get_fw_version()
+        fw_version: Optional[str] = driver.get_fw_version()
     except Exception as e:
         # The most common reason for this exception (aside from hardware
         # failures such as a disconnected smoothie) is that the smoothie
@@ -135,7 +136,7 @@ async def initialize_robot() -> ThreadManager:
 
 def initialize(
         hardware_server: bool = False,
-        hardware_server_socket: str = "/var/run/opentrons-hardware.sock") \
+        hardware_server_socket: str = None) \
         -> ThreadManager:
     """
     Initialize the Opentrons hardware returning a hardware instance.
@@ -145,6 +146,8 @@ def initialize(
      required.
     :param hardware_server_socket: Override for the hardware server socket
     """
+    checked_socket = hardware_server_socket\
+        or "/var/run/opentrons-hardware.sock"
     robot_conf = robot_configs.load()
     logging_config.log_init(robot_conf.log_level)
 
@@ -157,7 +160,7 @@ def initialize(
     if hardware_server:
         #  TODO: BC 2020-02-25 adapt hardware socket server to ThreadManager
         loop.run_until_complete(
-                install_hardware_server(hardware_server_socket,
+                install_hardware_server(checked_socket,
                                         hardware))  # type: ignore
 
     return hardware
@@ -171,7 +174,7 @@ def run(**kwargs):  # noqa(C901)
     an additional argument of 'patch_old_init'. kwargs are hence used to allow
     the use of different length args
     """
-    hardware = initialize(kwargs.get('hardware_server'),
+    hardware = initialize(bool(kwargs.get('hardware_server', False)),
                           kwargs.get('hardware_server_socket'))
 
     server.run(hardware,

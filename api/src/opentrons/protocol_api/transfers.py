@@ -1,13 +1,14 @@
 import enum
 from typing import (Any, Dict, List, Optional, Union, NamedTuple,
                     Callable, Generator, Iterator, Tuple,
-                    TYPE_CHECKING)
+                    TYPE_CHECKING, TypeVar)
 from .labware import Well
 from opentrons import types
 from opentrons.protocols.types import APIVersion
 
 if TYPE_CHECKING:
-    from .contexts import InstrumentContext  #noqa (F501)
+    from .contexts import InstrumentContext  # noqa (F501)
+    from .dev_types import Dictable  # noqa(F501)
 
 
 class MixStrategy(enum.Enum):
@@ -50,7 +51,7 @@ class Transfer(NamedTuple):
     air_gap: float = 0
     carryover: bool = True
     gradient_function: Optional[Callable[[float], float]] = None
-    disposal_volume: Optional[float] = 0
+    disposal_volume: float = 0
     mix_strategy: MixStrategy = MixStrategy.NEVER
     drop_tip_strategy: DropTipStrategy = DropTipStrategy.TRASH
     blow_out_strategy: BlowOutStrategy = BlowOutStrategy.NONE
@@ -475,7 +476,7 @@ class TransferPlan:
                 yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
             max_vol = self._max_volume - \
                 self._strategy.disposal_volume - self._strategy.air_gap
-            xferred_vol = 0
+            xferred_vol = 0.0
             while xferred_vol < step_vol:
                 # TODO: account for unequal length sources, dests
                 # TODO: ensure last transfer is > min_vol
@@ -558,7 +559,7 @@ class TransferPlan:
         if self._strategy.new_tip == types.TransferTipPolicy.ALWAYS:
             yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
         while not done:
-            asp_grouped = []
+            asp_grouped: List[Tuple[float, Well]] = []
             try:
                 while (sum(a[0] for a in asp_grouped) +
                        self._strategy.disposal_volume +
@@ -576,11 +577,13 @@ class TransferPlan:
                                                   step is not asp_grouped[-1])
         yield from self._new_tip_action()
 
+    Target = TypeVar('Target')
     @staticmethod
     def _expand_for_volume_constraints(
             volumes: Iterator[float],
-            targets: Iterator[Well],
-            max_volume: float) -> Generator[Tuple[float, Well], None, None]:
+            targets: Iterator[Target],
+            max_volume: float)\
+            -> Generator[Tuple[float, 'Target'], None, None]:
         """ Split a sequence of proposed transfers if necessary to keep each
         transfer under the given max volume.
         """
@@ -638,7 +641,7 @@ class TransferPlan:
             yield self._format_dict('pick_up_tip', kwargs=self._tip_opts)
         done = False
         while not done:
-            asp_grouped = []
+            asp_grouped: List[Tuple[float, Well]] = []
             try:
                 while (sum([a[0] for a in asp_grouped]) +
                        self._strategy.disposal_volume +
@@ -736,7 +739,7 @@ class TransferPlan:
 
     def _format_dict(self, method: str,
                      args: List = None,
-                     kwargs: Union[NamedTuple, Dict[str, Any]] = None):
+                     kwargs: Union['Dictable', Dict[str, Any]] = None):
         if kwargs:
             if isinstance(kwargs, Dict):
                 params = {key: val for key, val in kwargs.items() if val}

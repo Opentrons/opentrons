@@ -3,6 +3,7 @@ import functools
 import json
 import logging
 from pathlib import Path
+from typing import Optional
 from aiohttp import web
 
 try:
@@ -331,7 +332,7 @@ async def move(request):
         if ff.use_protocol_api_v2():
             await hw.cache_instruments()
             if target == 'mount':
-                critical_point = CriticalPoint.MOUNT
+                critical_point: Optional[CriticalPoint] = CriticalPoint.MOUNT
             else:
                 critical_point = None
             mount = Mount[mount.upper()]

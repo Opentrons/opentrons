@@ -10,6 +10,7 @@ def _ensure_programmer_executable():
     # is not executable (since that’s exactly what we’re trying to fix)
     updater_executable = shutil.which('lpc21isp',
                                       mode=os.F_OK)
+    assert updater_executable, 'could not find lpc21isp'
     # updater_executable might be None; we’re passing it here unchecked
     # because if it is None, we’re about to fail when we try to program
     # the smoothie, and we want the exception to bubble up.

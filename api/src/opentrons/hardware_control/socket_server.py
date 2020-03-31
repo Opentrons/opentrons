@@ -278,6 +278,8 @@ class JsonRpcProtocol(asyncio.Protocol):
         self._inflight.add(task)
 
         def done_callback(fut):
+            if not self._transport:  # closed under us
+                return
             try:
                 res = fut.result()
             except asyncio.InvalidStateError:
@@ -293,8 +295,7 @@ class JsonRpcProtocol(asyncio.Protocol):
                     _build_jrpc_error('uncaught exception in dispatch',
                                       e).encode())
             else:
-                if self._transport:
-                    self._transport.write(res.encode())
+                self._transport.write(res.encode())
             finally:
                 self._inflight.remove(task)
 

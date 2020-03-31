@@ -9,10 +9,16 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Optional, Mapping
+from typing import Callable, Optional, Mapping, Tuple, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
+
+if TYPE_CHECKING:
+    # avoid an issue where Queue doesn't support generics at runtime
+    CommandQueue = Queue[Tuple[str, Callable[[str], None]]]
+else:
+    CommandQueue = Queue
 
 
 log = logging.getLogger(__name__)
@@ -160,13 +166,13 @@ class SimulatingDriver:
         self._target_temp = None
         self._ramp_rate = None
         self._hold_time = None
-        self._active = None
+        self._active = False
 
     async def deactivate_all(self):
         self._target_temp = None
         self._ramp_rate = None
         self._hold_time = None
-        self._active = None
+        self._active = False
         self._lid_heating_active = False
         self._lid_target = None
 
@@ -191,7 +197,7 @@ class TCPoller(threading.Thread):
         self._lid_status_callback = lid_status_callback
         self._lid_temp_status_callback = lid_temp_status_callback
         self._lock = threading.Lock()
-        self._command_queue = Queue()
+        self._command_queue: CommandQueue = Queue()
 
         # Note: the options and order of operations for opening file
         # descriptors is very specific. For more info, see:
@@ -362,8 +368,8 @@ class Thermocycler:
 
     def disconnect(self) -> 'Thermocycler':
         if self.is_connected():
-            self._poller.close()
-            self._poller.join()
+            self._poller.close()  # type: ignore
+            self._poller.join()  # type: ignore
         self._poller = None
         return self
 
@@ -551,6 +557,7 @@ class Thermocycler:
             nonlocal ret
             ret = cmd
 
+        assert self._poller, 'not connected'
         self._poller.send(command, cb)
 
         while None is ret:
@@ -567,6 +574,6 @@ class Thermocycler:
 
     def __del__(self):
         try:
-            self._poller.close()
+            self._poller.close()  # type: ignore
         except Exception:
             log.exception('Exception while cleaning up Thermocycler:')

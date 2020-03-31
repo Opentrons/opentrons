@@ -1,3 +1,5 @@
+import abc
+import asyncio
 import enum
 import logging
 from typing import Tuple
@@ -46,10 +48,12 @@ class Axis(enum.Enum):
         return self.name
 
 
-class HardwareAPILike:
+class HardwareAPILike(abc.ABC):
     """ A dummy class useful in isinstance checks to accept an API or adapter
     """
-    pass
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        ...
 
 
 class CriticalPoint(enum.Enum):

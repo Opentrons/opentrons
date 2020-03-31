@@ -38,7 +38,7 @@ class MissingDevicePortError(Exception):
 
 
 class Poller(Thread):
-    def __init__(self, driver: TempDeckDriver):
+    def __init__(self, driver: Union[TempDeckDriver, SimulatingDriver]):
         self._driver_ref = driver
         self._stop_event = Event()
         super().__init__(target=self._poll_temperature,
@@ -117,7 +117,7 @@ class TempDeck(mod_abc.AbstractModule):
             self._driver = self._build_driver(
                 simulating, sim_model)
 
-        self._poller = None
+        self._poller: Optional[Poller] = None
 
     async def set_temperature(self, celsius: float):
         """
