@@ -43,6 +43,9 @@ export function ControlsCard(props: Props) {
   const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
+
+  // TODO: next BC 2020-03-31 derive this initial robot cal check state from
+  // GET request response to /calibration/check/session
   const [isCheckingRobotCal, setIsCheckingRobotCal] = React.useState(false)
 
   const notConnectable = status !== CONNECTABLE

@@ -25,13 +25,13 @@ export type CreateRobotCalibrationCheckSessionSuccessAction = {|
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  payload: $Shape<{| robotName: string, error: {} |}>,
+  payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
 
 export type DeleteRobotCalibrationCheckSessionAction = {|
   type: DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: $Shape<{| robotName: string, recreate: boolean |}>,
+  payload: {| robotName: string, recreate: boolean |},
   meta: RobotApiRequestMeta,
 |}
 

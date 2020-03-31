@@ -30,7 +30,7 @@ export const {
 >({
   method: POST,
   path: ROBOT_CALIBRATION_CHECK_PATH,
-  successStatus: 200,
+  successStatus: 201,
   successBody: mockRobotCalibrationCheckSessionData,
   failureStatus: 500,
   failureBody: mockFailureBody,
