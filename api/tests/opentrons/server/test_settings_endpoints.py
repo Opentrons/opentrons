@@ -1,11 +1,13 @@
 import json
 import os
+from unittest.mock import patch
 
 import pytest
 
 from opentrons.server import endpoints
 from opentrons.config import pipette_config
 from opentrons import config, types
+from opentrons.config.reset import ResetOptionId
 
 
 @pytest.fixture
@@ -92,72 +94,50 @@ async def test_available_resets(async_client):
         == sorted([item['id'] for item in options_list])
 
 
-@pytest.mark.api1_only
-async def execute_reset_tests_v1(async_client):
-    # Make sure we actually delete the database
+@pytest.fixture
+def mock_reset():
+    with patch("opentrons.server.endpoints.settings.reset_util.reset") as m:
+        yield m
+
+
+@pytest.mark.parametrize(argnames="body,called_with",
+                         argvalues=[
+                             # Empty body
+                             [{}, set()],
+                             # None true
+                             [{
+                                 'labwareCalibration': False,
+                                 'tipProbe': False,
+                                 'bootScripts': False
+                             }, set()],
+                             # All set
+                             [{
+                                 'labwareCalibration': True,
+                                 'tipProbe': True,
+                                 'bootScripts': True
+                             }, set(v for v in ResetOptionId)],
+                             [{'labwareCalibration': True},
+                              {ResetOptionId.labware_calibration}],
+                             [{'tipProbe': True},
+                              {ResetOptionId.tip_probe}],
+                             [{'bootScripts': True},
+                              {ResetOptionId.boot_scripts}],
+                         ])
+async def test_reset_success(async_client, mock_reset, body, called_with):
     cli = async_client
-    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
-    body = await resp.json()
-    assert not os.path.exists(config.CONFIG['labware_database_file'])
-    assert resp.status == 200
-    assert body == {}
-
-    # Make sure this one is idempotent
-    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
+    resp = await cli.post('/settings/reset', json=body)
     body = await resp.json()
     assert resp.status == 200
     assert body == {}
+    mock_reset.assert_called_once_with(called_with)
 
-    # Check that we properly delete only the tip length key
-    resp = await cli.post('/settings/reset', json={'tipProbe': True})
-    body = await resp.json()
-    assert resp.status == 200
-    assert body == {}
 
-    robot_settings = config.CONFIG['robot_settings_file']
-    with open(robot_settings, 'r') as f:
-        data = json.load(f)
-    assert data['tip_length'] == {}
-
+async def test_reset_invalid_option(async_client, mock_reset):
     # Check the inpost validation
-    resp = await cli.post('/settings/reset', json={'aksgjajhadjasl': False})
+    resp = await async_client.post('/settings/reset',
+                                   json={'aksgjajhadjasl': False})
     body = await resp.json()
-    assert resp.status // 100 == 4
-    assert 'message' in body
-    assert 'aksgjajhadjasl' in body['message']
-
-
-async def execute_reset_tests_v2(async_client):
-    cli = async_client
-    # Make sure we actually delete the database
-    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
-    body = await resp.json()
-    assert not os.listdir(config.CONFIG['labware_calibration_offsets_dir_v2'])
-    assert resp.status == 200
-    assert body == {}
-
-    # Make sure this one is idempotent
-    resp = await cli.post('/settings/reset', json={'labwareCalibration': True})
-    body = await resp.json()
-    assert resp.status == 200
-    assert body == {}
-
-    # Check that we properly delete only the tip length key
-    resp = await cli.post('/settings/reset', json={'tipProbe': True})
-    body = await resp.json()
-    assert resp.status == 200
-    assert body == {}
-
-    robot_settings = config.CONFIG['robot_settings_file']
-    with open(robot_settings, 'r') as f:
-        data = json.load(f)
-    assert data['instrument_offset']\
-        == config.robot_configs.build_fallback_instrument_offset({})
-
-    # Check the inpost validation
-    resp = await cli.post('/settings/reset', json={'aksgjajhadjasl': False})
-    body = await resp.json()
-    assert resp.status // 100 == 4
+    assert resp.status == 400
     assert 'message' in body
     assert 'aksgjajhadjasl' in body['message']
 

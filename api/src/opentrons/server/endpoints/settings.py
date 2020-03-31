@@ -1,43 +1,18 @@
 from json import JSONDecodeError
 import logging
-import os
-import shutil
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
                               pipette_config as pc,
-                              IS_ROBOT,
                               ARCHITECTURE,
                               SystemArchitecture)
-from opentrons.data_storage import database as db
-from opentrons.protocol_api import labware
+from opentrons.config import reset as reset_util
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
     from opentrons.system import log_control
 
 log = logging.getLogger(__name__)
-
-_common_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Pipette Calibration',
-        'description':
-        'Clear pipette offset and tip length calibration'
-    },
-    {
-        'id': 'labwareCalibration',
-        'name': 'Labware Calibration',
-        'description':
-        'Clear labware calibration and Protocol API v1 custom labware (created with labware.create())'  # noqa(E501)
-    },
-    {
-        'id': 'bootScripts',
-        'name': 'Boot Scripts',
-        'description': 'Clear custom boot scripts'
-    },
-]
-
 
 _SETTINGS_RESTART_REQUIRED = False
 # This is a bit of global state that indicates whether a setting has changed
@@ -45,10 +20,6 @@ _SETTINGS_RESTART_REQUIRED = False
 # it's catching is global - changing the kind of setting that requires a
 # a restart anywhere, even if you theoretically have two servers running in
 # the same process, will require _all_ of them to be restarted.
-
-
-def reset_options() -> List[Dict[str, str]]:
-    return _common_settings_reset_options
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -145,17 +116,7 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     )
 
 
-def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
-    opts = reset_options()
-    for requested_reset in reset_req.keys():
-        if requested_reset not in [opt['id']
-                                   for opt in opts]:
-            log.error('Bad reset option {} requested'.format(requested_reset))
-            return (False, requested_reset)
-    return (True, '')
-
-
-async def reset(request: web.Request) -> web.Response:  # noqa(C901)
+async def reset(request: web.Request) -> web.Response:
     """ Execute a reset of the requested parts of the user configuration.
 
     POST /settings/reset {resetOption: Any}
@@ -164,40 +125,38 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     -> 400 Bad Request, {"error": error-shortmessage, "message": str}
     """
     data = await request.json()
-    ok, bad_key = _check_reset(data)
-    if not ok:
+
+    try:
+        # Convert to dict of ResetOptionId to value
+        data = {reset_util.ResetOptionId(k): v for k, v in data.items()}
+
+        # We provide the parts that should be reset. Any with a
+        # non-falsey value.
+        reset_util.reset(set(k for k, v in data.items() if v))
+    except ValueError as e:
         return web.json_response(
-            {'error': 'bad-reset-option',
-             'message': f'{bad_key} is not a valid reset option'},
-            status=400)
-    log.info("Reset requested for {}".format(', '.join(data.keys())))
-    if data.get('tipProbe'):
-        config = rc.load()
-        config = config._replace(
-            instrument_offset=rc.build_fallback_instrument_offset({}))
-        config.tip_length.clear()
-        rc.save_robot_settings(config)
+            {
+                'error': 'bad-reset-option',
+                'message': str(e)
+            },
+            status=400
+        )
 
-    if data.get('labwareCalibration'):
-        labware.clear_calibrations()
-        db.reset()
-
-    if data.get('customLabware'):
-        labware.delete_all_custom_labware()
-
-    if data.get('bootScripts'):
-        if IS_ROBOT:
-            if os.path.exists('/data/boot.d'):
-                shutil.rmtree('/data/boot.d')
-        else:
-            log.debug('Not on pi, not removing /data/boot.d')
     return web.json_response({}, status=200)
 
 
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    return web.json_response({'options': reset_options()}, status=200)
+    options = reset_util.reset_options()
+    return web.json_response({
+        'options': [{
+            'id': k.value,
+            'name': v.name,
+            'description': v.description
+        } for k, v in options.items()]
+    },
+        status=200)
 
 
 async def pipette_settings(request: web.Request) -> web.Response:
