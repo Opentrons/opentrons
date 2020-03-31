@@ -9,7 +9,7 @@ log][changelog]
   labware calibration list
   ([#5147](https://github.com/opentrons/opentrons/issues/5147))
 - Fix an issue where custom labware files or Protocol Designer protocols with
-  an all-caps ``.JSON`` exception would not be handled properly
+  an all-caps ``.JSON`` extension would not be handled properly
   ([#5151](https://github.com/opentrons/opentrons/issues/5151))
 - Because module commands now respect protocol pause, module interaction via the
   Opentrons App is now disabled when the protocol is paused.
