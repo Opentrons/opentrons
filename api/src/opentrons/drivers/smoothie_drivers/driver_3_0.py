@@ -1483,7 +1483,7 @@ class SmoothieDriver_3_0_0:
             for ax in split_target.keys():
                 self.current[ax] = cached[ax]
 
-            split_postfix = step_postfix
+            split_postfix = step_postfix.strip()
             split_command = GCODES['MOVE'] + split_command_string
         else:
             split_prefix = ''
