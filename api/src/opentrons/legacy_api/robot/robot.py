@@ -300,7 +300,8 @@ class Robot(CommandPublisher):
                     splits[plunger_axis] = MoveSplit(split_distance=1,
                                                      split_current=1.5,
                                                      split_speed=1,
-                                                     after_time=1800)
+                                                     after_time=1800,
+                                                     fullstep=True)
             else:
                 name_value = None
                 home_current = self.config.high_current[plunger_axis]
