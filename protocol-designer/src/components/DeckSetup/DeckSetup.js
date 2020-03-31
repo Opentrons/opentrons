@@ -14,7 +14,11 @@ import {
   type ModuleRealType,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-import { PSEUDO_DECK_SLOTS, GEN_ONE_MULTI_PIPETTES } from '../../constants'
+import {
+  PSEUDO_DECK_SLOTS,
+  GEN_ONE_MULTI_PIPETTES,
+  MODULES_WITH_COLLISION_ISSUES,
+} from '../../constants'
 import type { TerminalItemId } from '../../steplist'
 import {
   getLabwareIsCompatible,
@@ -208,10 +212,18 @@ const DeckSetupContents = (props: ContentsProps) => {
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
   let multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
     ? compact([
-        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '1') &&
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '1' &&
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
           deckSlotsById?.['4']) ||
           null,
-        (allModules.some(moduleOnDeck => moduleOnDeck.slot === '3') &&
+        (allModules.some(
+          moduleOnDeck =>
+            moduleOnDeck.slot === '3' &&
+            MODULES_WITH_COLLISION_ISSUES.includes(moduleOnDeck.model)
+        ) &&
           deckSlotsById?.['6']) ||
           null,
       ])
