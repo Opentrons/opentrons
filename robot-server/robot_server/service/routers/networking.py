@@ -36,7 +36,7 @@ async def get_networking_status() -> NetworkingStatus:
         log.debug("Interfaces: %s", interfaces)
         return NetworkingStatus(status=connectivity, interfaces=interfaces)
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
-        log.error("Failed calling nmcli")
+        log.exception("Failed calling nmcli")
         raise HTTPException(HTTPStatus.INTERNAL_SERVER_ERROR, str(e))
 
 
