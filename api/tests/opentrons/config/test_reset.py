@@ -1,5 +1,3 @@
-import json
-import os
 from collections import namedtuple
 from unittest.mock import patch, MagicMock
 import pytest
@@ -89,4 +87,3 @@ def test_tip_probe_reset(mock_robot_config):
     mock_robot_config.save_robot_settings.assert_called_once_with(
         FakeRobotConfig(100,
                         obj.tip_length))
-

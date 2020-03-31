@@ -1,12 +1,11 @@
 import json
-import os
 from unittest.mock import patch
 
 import pytest
 
 from opentrons.server import endpoints
 from opentrons.config import pipette_config
-from opentrons import config, types
+from opentrons import types
 from opentrons.config.reset import ResetOptionId
 
 
