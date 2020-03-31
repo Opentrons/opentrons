@@ -2,7 +2,6 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
-import without from 'lodash/without'
 import { HoverTooltip, PrimaryButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -11,7 +10,6 @@ import {
 } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import { actions as stepsActions } from '../ui/steps'
-import { selectors as featureFlagSelectors } from '../feature-flags'
 import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
@@ -21,7 +19,6 @@ import type { BaseState, ThunkDispatch } from '../types'
 import styles from './listButtons.css'
 
 type SP = {|
-  modulesEnabled: ?boolean,
   isStepTypeEnabled: {
     [moduleType: StepType]: boolean,
   },
@@ -59,10 +56,6 @@ class StepCreationButtonComponent extends React.Component<Props, State> {
       'temperature',
       'thermocycler',
     ]
-    const moduleSteps = ['magnet', 'temperature', 'thermocycler']
-    const filteredSteps = this.props.modulesEnabled
-      ? supportedSteps
-      : without(supportedSteps, ...moduleSteps)
     const { isStepTypeEnabled } = this.props
 
     return (
@@ -76,7 +69,7 @@ class StepCreationButtonComponent extends React.Component<Props, State> {
 
         <div className={styles.buttons_popover}>
           {this.state.expanded &&
-            filteredSteps.map(stepType => {
+            supportedSteps.map(stepType => {
               const disabled = !isStepTypeEnabled[stepType]
               const tooltipMessage = disabled
                 ? i18n.t(`tooltip.disabled_module_step`)
@@ -116,7 +109,6 @@ class StepCreationButtonComponent extends React.Component<Props, State> {
 const mapSTP = (state: BaseState): SP => {
   const modules = stepFormSelectors.getInitialDeckSetup(state).modules
   return {
-    modulesEnabled: featureFlagSelectors.getEnableModules(state),
     isStepTypeEnabled: {
       moveLiquid: true,
       mix: true,

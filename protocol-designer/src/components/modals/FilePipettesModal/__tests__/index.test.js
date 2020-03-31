@@ -57,7 +57,6 @@ describe('FilePipettesModal', () => {
       hideModal: false,
       onCancel: jest.fn(),
       onSave: jest.fn(),
-      modulesEnabled: true,
       thermocyclerEnabled: true,
       moduleRestrictionsDisabled: false,
     }
@@ -97,12 +96,10 @@ describe('FilePipettesModal', () => {
       expect(pipetteFields.prop('touched')).toBeNull()
     })
 
-    it('does not render ModuleFields when modules are not enabled', () => {
-      props.modulesEnabled = false
-
+    it('renders ModuleFields', () => {
       const moduleFields = renderFormComponent(props).find(ModuleFields)
 
-      expect(moduleFields).toHaveLength(0)
+      expect(moduleFields).toHaveLength(1)
     })
 
     it('does not render ModuleFields when editing pipettes and showModulesFields is false', () => {
