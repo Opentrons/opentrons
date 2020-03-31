@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.17.0-alpha.1...v3.17.0-alpha.2) (2020-03-31)
+
+
+### Bug Fixes
+
+* **api:** correctly handle magdeck engage kwargs ([#5330](https://github.com/opentrons/opentrons/issues/5330)) ([57c0382](https://github.com/opentrons/opentrons/commit/57c0382))
+* **api:** fix missing arg in v1 move splitting during cache instr models ([#5338](https://github.com/opentrons/opentrons/issues/5338)) ([057bea5](https://github.com/opentrons/opentrons/commit/057bea5))
+* **api:** move splitting: strip step postfix ([#5337](https://github.com/opentrons/opentrons/issues/5337)) ([e36217a](https://github.com/opentrons/opentrons/commit/e36217a))
+
+
+
+
+
 # [3.17.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.17.0-alpha.0...v3.17.0-alpha.1) (2020-03-30)
 
 
