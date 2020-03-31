@@ -7,7 +7,7 @@ export type ValueCaster = (value: mixed) => mixed
  **********************/
 
 // Mask to number now allows for 0 and negative numbers, for decimals use maskToFloat
-export const maskToInteger = (rawValue: mixed): mixed => {
+export const maskToInteger = (rawValue: mixed): string => {
   const rawNumericValue =
     typeof rawValue === 'string'
       ? rawValue.replace(/[^-0-9]/g, '')
