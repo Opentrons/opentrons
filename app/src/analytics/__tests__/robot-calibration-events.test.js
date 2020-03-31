@@ -39,23 +39,24 @@ const SPECS: Array<EventSpec> = [
   },
 ]
 
+const getRobotCalibrationCheckSession: JestMockFn<
+  [State, string],
+  $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
+> = Calibration.getRobotCalibrationCheckSession
+
 const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('robot calibration analytics events', () => {
   beforeEach(() => {
     jest.resetAllMocks()
+    getRobotCalibrationCheckSession.mockReturnValue(
+      CalibrationFixtures.mockRobotCalibrationCheckSessionData
+    )
   })
-  const getRobotCalibrationCheckSession: JestMockFn<
-    [State, string],
-    $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
-  > = Calibration.getRobotCalibrationCheckSession
 
   SPECS.forEach(spec => {
     const { name, action, expected } = spec
     it(name, () => {
-      getRobotCalibrationCheckSession.mockReturnValue(
-        CalibrationFixtures.mockRobotCalibrationCheckSessionData
-      )
       return expect(makeEvent(action, MOCK_STATE)).resolves.toEqual(expected)
     })
   })

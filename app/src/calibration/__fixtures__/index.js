@@ -1,6 +1,15 @@
 // @flow
 
-export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
+import { POST, DELETE } from '../../robot-api'
+import {
+  makeResponseFixtures,
+  mockFailureBody,
+  mockRobot
+} from '../../robot-api/__fixtures__'
+import { ROBOT_CALIBRATION_CHECK_PATH } from '../constants'
+import type { RobotCalibrationCheckSessionData } from '../api-types'
+
+export { mockRobot }
 
 export const mockRobotCalibrationCheckSessionData = {
   instruments: {},
@@ -10,73 +19,36 @@ export const mockRobotCalibrationCheckSessionData = {
   },
 }
 
-export const mockCreateCheckSessionSuccess = {
-  host: mockRobot,
-  method: 'POST',
-  path: '/calibration/check/session',
-  ok: true,
-  status: 200,
-  body: mockRobotCalibrationCheckSessionData,
-}
+export const {
+  successMeta: mockCreateCheckSessionSuccessMeta,
+  failureMeta: mockCreateCheckSessionFailureMeta,
+  success: mockCreateCheckSessionSuccess,
+  failure: mockCreateCheckSessionFailure,
+} = makeResponseFixtures<
+  RobotCalibrationCheckSessionData,
+  {| message: string |}
+>({
+ method: POST,
+ path: ROBOT_CALIBRATION_CHECK_PATH,
+ successStatus: 200,
+ successBody: mockRobotCalibrationCheckSessionData,
+ failureStatus: 500,
+ failureBody: mockFailureBody,
+})
 
-export const mockCreateCheckSessionSuccessMeta = {
-  method: 'POST',
-  path: '/calibration/check/session',
-  ok: true,
-  status: 200,
-}
-
-export const mockCreateCheckSessionFailure = {
-  host: mockRobot,
-  method: 'POST',
-  path: '/calibration/check/session',
-  ok: false,
-  status: 500,
-  body: { message: 'Failed to make a cal check sesh' },
-}
-
-export const mockCreateCheckSessionFailureMeta = {
-  method: 'POST',
-  path: '/calibration/check/session',
-  ok: false,
-  status: 500,
-}
-
-export const mockCreateCheckSessionConflictMeta = {
-  method: 'POST',
-  path: '/calibration/check/session',
-  ok: false,
-  status: 409,
-}
-
-export const mockDeleteCheckSessionSuccess = {
-  host: mockRobot,
-  method: 'DELETE',
-  path: '/calibration/check/session',
-  ok: true,
-  status: 200,
-  body: { message: 'Successfully deleted session' },
-}
-
-export const mockDeleteCheckSessionSuccessMeta = {
-  method: 'DELETE',
-  path: '/calibration/check/session',
-  ok: true,
-  status: 200,
-}
-
-export const mockDeleteCheckSessionFailure = {
-  host: mockRobot,
-  method: 'DELETE',
-  path: '/calibration/check/session',
-  ok: false,
-  status: 500,
-  body: { message: 'Failed to delete cal check sesh' },
-}
-
-export const mockDeleteCheckSessionFailureMeta = {
-  method: 'DELETE',
-  path: '/calibration/check/session',
-  ok: false,
-  status: 500,
-}
+export const {
+  successMeta: mockDeleteCheckSessionSuccessMeta,
+  failureMeta: mockDeleteCheckSessionFailureMeta,
+  success: mockDeleteCheckSessionSuccess,
+  failure: mockDeleteCheckSessionFailure,
+} = makeResponseFixtures<
+  {| message: string |},
+  {| message: string |}
+>({
+ method: DELETE,
+ path: ROBOT_CALIBRATION_CHECK_PATH,
+ successStatus: 200,
+ successBody: { message: 'Successfully deleted session' },
+ failureStatus: 500,
+ failureBody: mockFailureBody,
+})
