@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
-import { getPipetteNameSpecs } from '@opentrons/shared-data'
+import { getPipetteNameSpecs, shouldLevel } from '@opentrons/shared-data'
 
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import { getAttachedPipettes } from '../../pipettes'
@@ -21,6 +21,7 @@ import { ExitAlertModal } from './ExitAlertModal'
 import { Instructions } from './Instructions'
 import { ConfirmPipette } from './ConfirmPipette'
 import { RequestInProgressModal } from './RequestInProgressModal'
+import { LevelPipette } from './LevelPipette'
 
 import { ATTACH, DETACH, CLEAR_DECK, INSTRUCTIONS, CONFIRM } from './constants'
 
@@ -143,21 +144,33 @@ export function ChangePipette(props: Props) {
 
     const attachedWrong = Boolean(!success && wantedPipette && actualPipette)
 
-    return (
-      <ConfirmPipette
-        {...{
-          ...basePropsWithPipettes,
-          success,
-          attachedWrong,
-          tryAgain: () => {
-            setWantedName(null)
-            setWizardStep(INSTRUCTIONS)
-          },
-          back: () => setWizardStep(INSTRUCTIONS),
-          exit: homeAndExit,
-        }}
-      />
-    )
+    if (success && wantedPipette && shouldLevel(wantedPipette)) {
+      return (
+        <LevelPipette
+          {...{
+            ...basePropsWithPipettes,
+            back: () => setWizardStep(INSTRUCTIONS),
+            exit: homeAndExit,
+          }}
+        />
+      )
+    } else {
+      return (
+        <ConfirmPipette
+          {...{
+            ...basePropsWithPipettes,
+            success,
+            attachedWrong,
+            tryAgain: () => {
+              setWantedName(null)
+              setWizardStep(INSTRUCTIONS)
+            },
+            back: () => setWizardStep(INSTRUCTIONS),
+            exit: homeAndExit,
+          }}
+        />
+      )
+    }
   }
 
   // this will never be reached

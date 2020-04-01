@@ -27,6 +27,29 @@
   padding: 2rem 1.25rem;
 }
 
+.leveling_title {
+  display: flex;
+  align-items: center;
+  margin-bottom: 1.5rem;
+  font-weight: var(--fw-semibold);
+}
+
+.leveling_instruction {
+  display: flex;
+  align-items: left;
+  margin-bottom: 1.5rem
+}
+
+.leveling_upper_spacer {
+  display: flex;
+  height: 100px;
+}
+
+.leveling_lower_spacer {
+  display: flex;
+  height: 84px;
+}
+
 .confirm_status {
   display: flex;
   align-items: center;

@@ -116,4 +116,17 @@ module.exports = {
       },
     },
   },
+
+  // videos
+  videos: {
+    test: /\.(?:mp4)$/,
+    use: {
+      loader: 'file-loader',
+      options: {
+        name: '[name].[hash].[ext]',
+        outputPath: 'videos',
+        esModule: false,
+      },
+    },
+  },
 }
