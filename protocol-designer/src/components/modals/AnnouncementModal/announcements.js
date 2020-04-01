@@ -40,7 +40,13 @@ export const announcements: Array<Announcement> = [
           functionality.
         </p>
         {/* TODO IMMEDIATELY (sa, 2020-04-01): Update with the link to support article when provided */}
-        <p>Learn more about Beta releases [here].</p>
+        <p>
+          Learn more about Beta releases{' '}
+          <a href="https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases">
+            here
+          </a>
+          .
+        </p>
       </>
     ),
   },
