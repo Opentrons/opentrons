@@ -1,13 +1,13 @@
+import logging
 import pytest
 from unittest.mock import patch
 from collections import namedtuple
 
-
-# TDOD(isk: 3/20/20): test validation errors after refactor
-# return {message: string}
 from opentrons.config.reset import ResetOptionId
 
 
+# TDOD(isk: 3/20/20): test validation errors after refactor
+# return {message: string}
 @pytest.mark.parametrize(
     "log_level, syslog_level, expected_message",
     [
@@ -222,7 +222,6 @@ def mock_reset():
                          ])
 def test_reset_success(api_client, mock_reset, body, called_with):
     resp = api_client.post('/settings/reset', json=body)
-    body = resp.json()
     assert resp.status_code == 200
     mock_reset.assert_called_once_with(called_with)
 
@@ -234,3 +233,63 @@ def test_reset_invalid_option(api_client, mock_reset):
     # body = resp.json()
     # assert 'message' in body
     # assert 'aksgjajhadjasl' in body['message']
+
+
+@pytest.fixture
+def hardware_log_level(hardware):
+    async def update_config(*args, **kwargs):
+        pass
+
+    hardware.update_config.side_effect = update_config
+    return hardware
+
+
+@pytest.fixture()
+def mock_robot_configs():
+    with patch("robot_server.service.routers.settings.robot_configs") as m:
+        yield m
+
+
+@pytest.fixture()
+def mock_logging_set_level():
+    with patch("logging.Logger.setLevel") as m:
+        yield m
+
+
+@pytest.mark.parametrize(argnames=["body"],
+                         argvalues=[
+                             [{}],
+                             [{'log_level': None}],
+                             [{'log_level': 'oafajhshda'}]
+                         ])
+def test_set_log_level_invalid(api_client, body,
+                               hardware_log_level, mock_logging_set_level,
+                               mock_robot_configs):
+    resp = api_client.post('/settings/log_level/local', json=body)
+    assert resp.status_code == 422
+    mock_logging_set_level.assert_not_called()
+    hardware_log_level.update_config.assert_not_called()
+    mock_robot_configs.save_robot_settings.assert_not_called()
+
+
+@pytest.mark.parametrize(argnames=["body",
+                                   "expected_log_level",
+                                   "expected_log_level_name"],
+                         argvalues=[
+                             [{'log_level': 'debug'}, logging.DEBUG, "DEBUG"],
+                             [{'log_level': 'deBug'}, logging.DEBUG, "DEBUG"],
+                             [{'log_level': 'info'}, logging.INFO, "INFO"],
+                             [{'log_level': 'INFO'}, logging.INFO, "INFO"],
+                             [{'log_level': 'warning'}, logging.WARNING, "WARNING"],
+                             [{'log_level': 'warninG'}, logging.WARNING, "WARNING"],
+                             [{'log_level': 'error'}, logging.ERROR, "ERROR"],
+                             [{'log_level': 'ERROR'}, logging.ERROR, "ERROR"],
+                         ])
+def test_set_log_level(api_client, hardware_log_level,
+                       mock_robot_configs, mock_logging_set_level,
+                       body, expected_log_level, expected_log_level_name):
+    resp = api_client.post('/settings/log_level/local', json=body)
+    assert resp.status_code == 200
+    mock_logging_set_level.assert_called_once_with(expected_log_level)
+    hardware_log_level.update_config.assert_called_once_with(log_level=expected_log_level_name)
+    mock_robot_configs.save_robot_settings.assert_called_once()

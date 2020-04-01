@@ -1,10 +1,12 @@
 import typing
 from enum import Enum
+import logging
 
 from typing import Optional
 
-from opentrons.config.pipette_config import MUTABLE_CONFIGS
 from pydantic import BaseModel, Field, create_model, validator
+
+from opentrons.config.pipette_config import MUTABLE_CONFIGS
 from opentrons.config.reset import ResetOptionId
 
 
@@ -41,15 +43,26 @@ AdvancedSettings = typing.List[AdvancedSetting]
 
 class LogLevels(str, Enum):
     """Valid log levels"""
-    debug = "debug"
-    info = "info"
-    warning = "warning"
-    error = "error"
+    def __new__(cls, value, level):
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj._level_id = level
+        return obj
+
+    debug = ("debug", logging.DEBUG)
+    info = ("info", logging.INFO)
+    warning = ("warning", logging.WARNING)
+    error = ("error", logging.ERROR)
+
+    @property
+    def level_id(self):
+        """The log level id as defined in logging lib"""
+        return self._level_id
 
 
 class LogLevel(BaseModel):
-    log_level: Optional[LogLevels] = \
-        Field(...,
+    log_level: LogLevels = \
+        Field(None,
               description="The value to set (conforming to Python "
                           "log levels)")
 

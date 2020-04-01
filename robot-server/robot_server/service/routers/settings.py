@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException, Depends
 
 from opentrons.hardware_control import HardwareAPILike
 from opentrons.system import log_control
-from opentrons.config import pipette_config, reset as reset_util
+from opentrons.config import pipette_config, reset as reset_util, robot_configs
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
@@ -38,8 +38,24 @@ async def get_settings() -> AdvancedSettings:
 @router.post("/settings/log_level/local",
              description="Set the minimum level of logs saved locally",
              response_model=V1BasicResponse)
-async def post_log_level_local(log_level: LogLevel) -> V1BasicResponse:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+async def post_log_level_local(
+        log_level: LogLevel,
+        hardware: HardwareAPILike = Depends(get_hardware)) -> V1BasicResponse:
+
+    level = log_level.log_level
+
+    if not level:
+        raise V1HandlerError(message="log_level must be set",
+                             status_code=HTTPStatus.UNPROCESSABLE_ENTITY)
+    # Level name is upper case
+    level_name = level.value.upper()
+    # Set the application log level
+    logging.getLogger('opentrons').setLevel(level.level_id)
+    # Update and save settings
+    await hardware.update_config(log_level=level_name)  # type: ignore
+    robot_configs.save_robot_settings(hardware.config)  # type: ignore
+
+    return V1BasicResponse(message=f'log_level set to {log_level}')
 
 
 @router.post("/settings/log_level/upstream",
@@ -78,7 +94,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
         result = "Upstreaming logs disabled"
         log.info(result)
 
-    return V1BasicResponse(status=HTTPStatus.OK, message=result)
+    return V1BasicResponse(message=result)
 
 
 @router.get("/settings/reset/options",
