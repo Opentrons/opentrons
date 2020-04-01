@@ -49,7 +49,7 @@ Module names can be specified in a few different ways. The valid names can be fo
 
 .. note::
 
-    GEN2 Temperature Module and GEN2 Magnetic Module are introduced in Robot Software version 3.17.0. You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`. If you are using these modules, make sure the API level of your protocol is at least 2.3 or higher.
+    The Temperature Module GEN2 and Magnetic Module GEN2 are introduced in Robot Software version 3.17.0. You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`. If you are using these modules, make sure the API level of your protocol (see :ref:`v2-versioning`) is at least 2.3 or higher.
 
 .. versionadded:: 2.0
 
@@ -60,22 +60,22 @@ Module names can be specified in a few different ways. The valid names can be fo
 GEN2 Modules
 ============
 
-Tempearture Module
-------------------
+Temperature Module GEN2
+-----------------------
 
-The GEN2 Temperature Module has a plastic insulating rim around the plate and plastic
+The Temperature Module GEN2 has a plastic insulating rim around the plate and plastic
 insulating shrouds designed to fit over our aluminum blocks, mitigating an issue where the
-Temperature Module Gen1 would not be able to sufficiently cool itself when a Thermocycler
+Temperature Module GEN1 would not be able to sufficiently cool itself when a Thermocycler
 profile was ongoing in the same robot.
 
-Magnetic Module
----------------
+Magnetic Module GEN2
+--------------------
 
-Compared to the older version, the GEN2 Magnetic Module uses smaller magnets. This mitigates an
+Compared to the older version, the Magnetic Module GEN2 uses smaller magnets. This mitigates an
 issue where beads would be attracted even when the magnets were retracted. This also means the
 attraction times for the magnets have increased:
 
-Recommended GEN2 Magnetic Module bead attraction time:
+Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
     - Total liquid volume > 50 uL: 7 minutes
 
