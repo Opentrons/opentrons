@@ -18,8 +18,3 @@ export const getEnableThermocycler: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_THERMOCYCLER
 )
-
-export const getEnableMultiGEN2Pipettes: Selector<?boolean> = createSelector(
-  getFeatureFlagData,
-  flags => flags.OT_PD_ENABLE_MULTI_GEN2_PIPETTES
-)
