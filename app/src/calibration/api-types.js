@@ -1,18 +1,33 @@
 // @flow
 
-// TODO: next BC 2020-03-31 once this enum settles,
-// put the strings in constants
+import {
+  ROBOT_CALIBRATION_STEPS
+} from './constants'
+
+const {
+  SESSION_START,
+  LOAD_LABWARE,
+  PICK_UP_TIP,
+  CHECK_POINT_ONE,
+  CHECK_POINT_TWO,
+  CHECK_POINT_THREE,
+  CHECK_HEIGHT,
+  SESSION_EXIT,
+  BAD_ROBOT_CALIBRATION,
+  NO_PIPETTES_ATTACHED,
+} = ROBOT_CALIBRATION_STEPS
+
 export type RobotCalibrationCheckStep =
-  | 'sessionStart'
-  | 'specifyLabware'
-  | 'pickUpTip'
-  | 'checkPointOne'
-  | 'checkPointTwo'
-  | 'checkPointThree'
-  | 'checkHeight'
-  | 'sessionExit'
-  | 'badRobotCalibration'
-  | 'noPipettesAttached'
+  | SESSION_START
+  | LOAD_LABWARE
+  | PICK_UP_TIP
+  | CHECK_POINT_ONE
+  | CHECK_POINT_TWO
+  | CHECK_POINT_THREE
+  | CHECK_HEIGHT
+  | SESSION_EXIT
+  | BAD_ROBOT_CALIBRATION
+  | NO_PIPETTES_ATTACHED
 
 export type RobotCalibrationCheckSessionData = {|
   instruments: { [string]: string },
