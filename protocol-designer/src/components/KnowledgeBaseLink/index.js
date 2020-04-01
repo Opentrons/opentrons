@@ -9,10 +9,12 @@ export const links = {
   protocolSteps: `${KNOWLEDGEBASE_ROOT_URL}/en/collections/1606688-building-a-protocol#steps`,
   customLabware: `https://support.opentrons.com/en/articles/3136504-creating-custom-labware-definitions`,
   recommendedLabware:
-    'https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules',
+    'https://intercom.help/opentrons-protocol-designer/en/articles/3846942-labware-and-module-compatibility',
   pipetteGen1MultiModuleCollision:
-    'https://docs.google.com/document/d/1kE8qwlx6jVoPmWe0AwNmHVbnDNa4RHnoLCcDTt0SA1s/edit?usp=sharing', // TODO - update before launch with intercom article,
+    'https://intercom.help/opentrons-protocol-designer/en/articles/3846910-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
+  magneticModuleGenerations:
+    ' http://support.opentrons.com/en/articles/1820112-magnetic-module',
 }
 
 type Link = $Keys<typeof links>
