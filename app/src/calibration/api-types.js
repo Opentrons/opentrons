@@ -1,7 +1,7 @@
 // @flow
 
 import {
-  ROBOT_CALIBRATION_STEPS
+  ROBOT_CALIBRATION_CHECK_STEPS
 } from './constants'
 
 const {
@@ -15,7 +15,7 @@ const {
   SESSION_EXIT,
   BAD_ROBOT_CALIBRATION,
   NO_PIPETTES_ATTACHED,
-} = ROBOT_CALIBRATION_STEPS
+} = ROBOT_CALIBRATION_CHECK_STEPS
 
 export type RobotCalibrationCheckStep =
   | typeof SESSION_START

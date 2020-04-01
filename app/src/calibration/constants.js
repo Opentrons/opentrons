@@ -40,7 +40,7 @@ const SESSION_EXIT: 'sessionExit' = 'sessionExit'
 const BAD_ROBOT_CALIBRATION: 'badRobotCalibration' = 'badRobotCalibration'
 const NO_PIPETTES_ATTACHED: 'noPipettesAttached' = 'noPipettesAttached'
 
-export const ROBOT_CALIBRATION_STEPS = {
+export const ROBOT_CALIBRATION_CHECK_STEPS = {
   SESSION_START,
   LOAD_LABWARE,
   PICK_UP_TIP,

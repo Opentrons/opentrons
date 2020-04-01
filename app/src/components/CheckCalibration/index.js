@@ -7,9 +7,12 @@ import {
   createRobotCalibrationCheckSession,
   deleteRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
+  ROBOT_CALIBRATION_CHECK_STEPS,
 } from '../../calibration'
 import { createLogger } from '../../logger'
 
+
+import { Introduction } from './Introduction'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
 
@@ -31,9 +34,30 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatch(createRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
+  function proceed() {
+    log.debug('proceeded to next robot cal check step')
+  }
+
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
+  }
+
+  function getCurrentStepContents() {
+    switch(currentStep) {
+      case ROBOT_CALIBRATION_CHECK_STEPS.SESSION_START:
+        return <Introduction proceed={proceed} />
+      case ROBOT_CALIBRATION_CHECK_STEPS.LOAD_LABWARE:
+      case ROBOT_CALIBRATION_CHECK_STEPS.PICK_UP_TIP:
+      case ROBOT_CALIBRATION_CHECK_STEPS.CHECK_POINT_ONE:
+      case ROBOT_CALIBRATION_CHECK_STEPS.CHECK_POINT_TWO:
+      case ROBOT_CALIBRATION_CHECK_STEPS.CHECK_POINT_THREE:
+      case ROBOT_CALIBRATION_CHECK_STEPS.CHECK_HEIGHT:
+      case ROBOT_CALIBRATION_CHECK_STEPS.SESSION_EXIT:
+      case ROBOT_CALIBRATION_CHECK_STEPS.BAD_ROBOT_CALIBRATION:
+      case ROBOT_CALIBRATION_CHECK_STEPS.NO_PIPETTES_ATTACHED:
+        return <CompleteConfirmation robotName={robotName} exit={exit} />
+    }
   }
 
   return (
@@ -45,7 +69,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         }}
         contentsClassName={styles.modal_contents}
       >
-        <CompleteConfirmation robotName={robotName} exit={exit} />
+        {getCurrentStepContents()}
+
       </ModalPage>
     )
   )
