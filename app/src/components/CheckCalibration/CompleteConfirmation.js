@@ -24,7 +24,7 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
 
   return (
     <>
-      <div className={styles.modal_header}>
+      <div className={styles.modal_icon_wrapper}>
         <Icon name="check-circle" className={styles.status_icon} />
         <h3>{DELETE_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
       </div>

@@ -8,9 +8,15 @@
 
 .modal_header {
   display: flex;
+  text-transform: uppercase;
+}
+
+.modal_icon_wrapper {
+  display: flex;
   align-items: center;
 }
 
+.terminal_modal_contents,
 .modal_contents {
   display: flex;
   flex-direction: column;
@@ -18,6 +24,10 @@
   align-items: flex-start;
   max-width: 48rem;
   min-height: 14rem;
+  padding: 1rem;
+}
+
+.terminal_modal_contents {
   padding: 2rem 3.5rem;
 }
 
@@ -25,4 +35,68 @@
   @apply --font-body-2-dark;
 
   margin: 1rem 0 2rem 0;
+}
+
+.button_row {
+  width: 100%;
+  display: flex;
+}
+
+.continue_button {
+  margin: 3rem 5rem;
+}
+
+.required_tipracks_wrapper {
+  width: 100%;
+  display: flex;
+}
+
+.tiprack_image_container {
+  width: 50%;
+  border: 1px solid var('--c-med-gray');
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.tiprack_image_container:not(:last-child) {
+  margin-right: 0.625rem;
+}
+
+.tiprack_image {
+  width: 100%;
+}
+
+.tiprack_display_name {
+  font-size: var('--fs-body-2');
+}
+
+/*
+TODO: BC 2020-04-01 consider abstracting this to a shared place
+ these styles were mostly copped from PD's VIEW MEASUREMENTs button
+ ideally these would both use the same component
+*/
+.tiprack_measurements_link {
+  padding: 1rem 0.5rem;
+  flex: 0.6;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-size: var('--fs-body-2');
+
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
+}
+
+.tipracks_note_header {
+  text-transform: uppercase;
+}
+
+.tipracks_note_body {
+  font-size: var('--fs-body-1');
 }
