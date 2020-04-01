@@ -25,15 +25,22 @@ export const announcements: Array<Announcement> = [
     message: (
       <>
         <p>
-          Protocol Designer BETA now supports Temperature and Magnetic modules.
+          Protocol Designer now includes Beta support for Temperature and
+          Magnetic modules.
         </p>
-
         <p>
-          Note: Protocols with modules{' '}
-          <strong>may require an app and robot update to run</strong>. You will
-          need to have the OT-2 app and robot on the latest versions (
-          <strong>3.17 and higher</strong>).
+          To use Temperature and Magnetic modules in the Protocol Designer
+          protocols, update your Opentrons App and OT-2 to software version
+          3.17.0 Beta.
         </p>
+        <p>
+          Beta releases provide early access to new software versions and
+          features. While we make a best effort to test each version, Beta
+          features and software versions may include bugs or incomplete
+          functionality.
+        </p>
+        {/* TODO IMMEDIATELY (sa, 2020-04-01): Update with the link to support article when provided */}
+        <p>Learn more about Beta releases [here].</p>
       </>
     ),
   },
