@@ -145,10 +145,16 @@ function getWarningContent({
 
 // TODO (ka 2020-2-26): Update this knowledgebase link when available
 export const v4WarningContent = (
-  <p>
-    {i18n.t(`alert.hint.export_v4_protocol.body`)} <br />
-    <KnowledgeBaseLink to="protocolSteps">Learn more here.</KnowledgeBaseLink>
-  </p>
+  <div>
+    <p>{i18n.t(`alert.hint.export_v4_protocol.body1`)} </p>
+    <p>{i18n.t(`alert.hint.export_v4_protocol.body2`)}</p>
+    <p>{i18n.t(`alert.hint.export_v4_protocol.body3`)}</p>
+    <p>
+      <KnowledgeBaseLink to="betaReleases">
+        Learn more about Beta releases here
+      </KnowledgeBaseLink>
+    </p>
+  </div>
 )
 
 export function FileSidebar(props: Props) {
