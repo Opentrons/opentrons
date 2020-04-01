@@ -24,9 +24,9 @@ type CheckCalibrationProps = {|
 export function CheckCalibration(props: CheckCalibrationProps) {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
-  const robotCalibrationCheckSessionData = useSelector((state: State) =>
+  const { currentStep, nextSteps } = useSelector((state: State) =>
     getRobotCalibrationCheckSession(state, robotName)
-  )
+  ) || {}
   React.useEffect(() => {
     dispatch(createRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
@@ -36,12 +36,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     closeCalibrationCheck()
   }
 
-  log.debug(
-    'robot calibration check session data: ',
-    robotCalibrationCheckSessionData || {}
-  )
   return (
-    robotCalibrationCheckSessionData && (
+    currentStep && (
       <ModalPage
         titleBar={{
           title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
