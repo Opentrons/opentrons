@@ -1,7 +1,8 @@
 Basic usage:
 
 ```js
-<SidePanelGroup title="Side Panel Group Title" iconName="flask-outline">
+import { TitledList, ListItem } from '@opentrons/components'
+;<SidePanelGroup title="Side Panel Group Title" iconName="flask-outline">
   <TitledList title="Titled List 1">
     <ListItem>Something 1</ListItem>
     <ListItem>Something 2</ListItem>
@@ -17,7 +18,8 @@ Basic usage:
 The entire SidePanelGroup may be disabled with the `disabled` prop. Pointer events will be disabled and all children will be lightened.
 
 ```js
-<SidePanelGroup
+import { TitledList, ListItem } from '@opentrons/components'
+;<SidePanelGroup
   title="Disabled Side Panel Group Title"
   iconName="flask-outline"
   disabled

@@ -1,7 +1,7 @@
 Basic usage:
 
 ```js
-initialState = { continue: null }
+const [state, setState] = React.useState({ continue: null })
 ;<div style={{ position: 'relative', width: '48em', height: '24rem' }}>
   {state.continue == null && (
     <ContinueModal

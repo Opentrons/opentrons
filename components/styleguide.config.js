@@ -72,7 +72,7 @@ module.exports = {
   getComponentPathLine(componentPath) {
     const name = path.basename(componentPath, '.js')
 
-    return `import {${name}} from '@opentrons/components'`
+    return `import { ${name} } from '@opentrons/components'`
   },
   getExampleFilename(componentPath) {
     return componentPath.replace(/\.js$/, '.md')

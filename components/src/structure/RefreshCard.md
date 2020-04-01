@@ -1,7 +1,12 @@
 Refreshable info Card with RefreshCard:
 
 ```js
-initialState = { name: 'foo', when: Date.now(), refreshing: false }
+import { LabeledValue, OutlineButton } from '@opentrons/components'
+const [state, setState] = React.useState({
+  name: 'foo',
+  when: Date.now(),
+  refreshing: false,
+})
 
 function refresh() {
   setState({ ...state, refreshing: true })
@@ -28,10 +33,10 @@ function refresh() {
     </div>
     <div style={{ padding: '1rem', textAlign: 'right' }}>
       <OutlineButton onClick={() => setState({ ...state, name: 'foo' })}>
-        Name -> "foo"
+        {'Name -> "foo"'}
       </OutlineButton>
       <OutlineButton onClick={() => setState({ ...state, name: 'bar' })}>
-        Name -> "bar"
+        {'Name -> "bar"'}
       </OutlineButton>
     </div>
   </RefreshCard>

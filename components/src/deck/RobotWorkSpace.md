@@ -1,7 +1,8 @@
 Robot Work Space Visualization:
 
 ```js
-const { getDeckDefinitions } = require('./getDeckDefinitions')
+import { RobotCoordsText, RobotCoordsForeignDiv } from '@opentrons/components'
+import { getDeckDefinitions } from './getDeckDefinitions'
 const deckDef = getDeckDefinitions()['ot2_standard']
 const slotName = '5'
 const divSlot = '3'

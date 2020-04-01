@@ -7,7 +7,7 @@ the selected option.
 To use `SelectField` with `Formik`, pass `formikProps.setFieldValue` to `onValueChange` and `formikProps.setFieldTouched` to `onLoseFocus`.
 
 ```js
-initialState = { selectedValue: null }
+const [state, setState] = React.useState({ selectedValue: null })
 ;<SelectField
   onValueChange={(name, value) => setState({ selectedValue: value })}
   value={state.selectedValue}

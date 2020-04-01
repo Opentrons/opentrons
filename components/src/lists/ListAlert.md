@@ -1,7 +1,8 @@
 ListAlert example:
 
 ```js
-<TitledList title="List with Alert">
+import { TitledList } from '@opentrons/components'
+;<TitledList title="List with Alert">
   <ListAlert>Warning: something you should know about</ListAlert>
 </TitledList>
 ```

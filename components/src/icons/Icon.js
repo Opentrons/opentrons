@@ -33,7 +33,7 @@ export type IconProps = {|
  *
  * If you need access to the IconName type, you can:
  * ```js
- * import {type IconName} from '@opentrons/components'
+ * import type { IconName } from '@opentrons/components'
  * ```
  */
 export function Icon(props: IconProps) {

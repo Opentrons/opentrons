@@ -3,7 +3,7 @@ normal DOM events, but special ones. To make the difference clear, `PipetteSelec
 doesn't have `onChange` and `onBlur` but instead `onPipetteChange`.
 
 ```js
-initialState = { pipetteName: null }
+const [state, setState] = React.useState({ pipetteName: null })
 ;<PipetteSelect
   onPipetteChange={pipetteName => {
     console.log(pipetteName)
@@ -17,7 +17,7 @@ initialState = { pipetteName: null }
 Allow "None" as the default option
 
 ```js
-initialState = { pipetteName: null }
+const [state, setState] = React.useState({ pipetteName: null })
 ;<PipetteSelect
   onPipetteChange={pipetteName => {
     console.log(pipetteName)

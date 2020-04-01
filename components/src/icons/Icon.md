@@ -1,10 +1,9 @@
 All available icons:
 
 ```js
-const iconData = require('./icon-data').default
-
+import { ICON_DATA_BY_NAME } from './icon-data'
 ;<div className="icon-showcase">
-  {Object.keys(iconData)
+  {Object.keys(ICON_DATA_BY_NAME)
     .sort()
     .map(iconName => (
       <span key={iconName}>
