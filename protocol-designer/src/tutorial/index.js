@@ -11,6 +11,7 @@ type HintKey =
   // blocking hints
   | 'custom_labware_with_modules'
   | 'export_v4_protocol'
+  | 'change_magnet_module_model'
 
 export { actions, rootReducer, selectors }
 

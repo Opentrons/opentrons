@@ -24,8 +24,10 @@ import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibi
 import * as labwareIngredActions from '../../../../labware-ingred/actions'
 import { SUPPORTED_MODULE_SLOTS } from '../../../../modules'
 import { PDAlert } from '../../../alerts/PDAlert'
+import { useBlockingHint } from '../../../Hints/useBlockingHint'
 import { EditModulesModal } from '../'
 
+import type { Node } from 'react'
 import type { BaseState } from '../../../../types'
 
 // only mock actions and selectors from step-forms
@@ -34,6 +36,7 @@ jest.mock('../../../../step-forms/selectors')
 jest.mock('../../../../labware-ingred/actions')
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
+jest.mock('../../../Hints/useBlockingHint')
 
 const getInitialDeckSetupMock: JestMockFn<[BaseState], InitialDeckSetup> =
   stepFormSelectors.getInitialDeckSetup
@@ -43,6 +46,7 @@ const getLabwareIsCompatibleMock: JestMockFn<
 > = getLabwareIsCompatible
 const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
   featureSelectors.getDisableModuleRestrictions
+const useBlockingHintMock: JestMockFn<any, ?Node> = useBlockingHint
 
 describe('EditModulesModal', () => {
   const slotDropdownName = 'selectedSlot'
@@ -70,6 +74,8 @@ describe('EditModulesModal', () => {
       subscribe: jest.fn(),
       getState: () => ({}),
     }
+
+    useBlockingHintMock.mockReturnValue(null)
 
     magneticModule = {
       id: 'magnet123',
@@ -365,5 +371,62 @@ describe('EditModulesModal', () => {
     expect(updatedSlotDropdown.prop('value')).toBe(
       SUPPORTED_MODULE_SLOTS[MAGNETIC_MODULE_TYPE][0].value
     )
+  })
+
+  it('renders blocking hint when useBlockingHint returns a component', () => {
+    const WarningModal = () => <div>warning modal</div>
+    useBlockingHintMock.mockReturnValue(<WarningModal />)
+    getDisableModuleRestrictionsMock.mockReturnValue(false)
+    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
+
+    const wrapper = render(addMagneticModuleProps)
+    expect(wrapper.find(WarningModal)).toHaveLength(1)
+  })
+
+  it('uses blocking hint if existing magnetic module model is changed', async () => {
+    getDisableModuleRestrictionsMock.mockReturnValue(false)
+    getInitialDeckSetupMock.mockReturnValue({
+      ...emptyDeckState,
+      modules: {
+        someMagModuleId: {
+          id: 'someMagModuleId',
+          model: MAGNETIC_MODULE_V1,
+          type: MAGNETIC_MODULE_TYPE,
+          slot: '1',
+          moduleState: { engaged: false, type: MAGNETIC_MODULE_TYPE },
+        },
+      },
+    })
+
+    const wrapper = render({
+      ...addMagneticModuleProps,
+      moduleId: 'someMagModuleId',
+    })
+
+    // blocking hint initially NOT 'enabled'
+    expect(useBlockingHintMock).toHaveBeenCalledWith({
+      hintKey: 'change_magnet_module_model',
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+      content: expect.anything(),
+      enabled: false,
+    })
+
+    const modelDropdown = wrapper.find(modelDropdownSelector)
+    modelDropdown.simulate('change', {
+      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V2 },
+    })
+    const saveButton = wrapper.find(OutlineButton).at(1)
+    saveButton.simulate('click')
+    await simulateRunAllAsyncEvents()
+
+    // blocking hint 'enabled' after save
+    expect(useBlockingHintMock).toHaveBeenLastCalledWith({
+      hintKey: 'change_magnet_module_model',
+      handleCancel: expect.any(Function),
+      handleContinue: expect.any(Function),
+      content: expect.anything(),
+      enabled: true,
+    })
   })
 })
