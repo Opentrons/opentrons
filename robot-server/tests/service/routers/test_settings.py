@@ -276,14 +276,22 @@ def test_set_log_level_invalid(api_client, body,
                                    "expected_log_level",
                                    "expected_log_level_name"],
                          argvalues=[
-                             [{'log_level': 'debug'}, logging.DEBUG, "DEBUG"],
-                             [{'log_level': 'deBug'}, logging.DEBUG, "DEBUG"],
-                             [{'log_level': 'info'}, logging.INFO, "INFO"],
-                             [{'log_level': 'INFO'}, logging.INFO, "INFO"],
-                             [{'log_level': 'warning'}, logging.WARNING, "WARNING"],
-                             [{'log_level': 'warninG'}, logging.WARNING, "WARNING"],
-                             [{'log_level': 'error'}, logging.ERROR, "ERROR"],
-                             [{'log_level': 'ERROR'}, logging.ERROR, "ERROR"],
+                             [{'log_level': 'debug'},
+                              logging.DEBUG, "DEBUG"],
+                             [{'log_level': 'deBug'},
+                              logging.DEBUG, "DEBUG"],
+                             [{'log_level': 'info'},
+                              logging.INFO, "INFO"],
+                             [{'log_level': 'INFO'},
+                              logging.INFO, "INFO"],
+                             [{'log_level': 'warning'},
+                              logging.WARNING, "WARNING"],
+                             [{'log_level': 'warninG'},
+                              logging.WARNING, "WARNING"],
+                             [{'log_level': 'error'},
+                              logging.ERROR, "ERROR"],
+                             [{'log_level': 'ERROR'},
+                              logging.ERROR, "ERROR"],
                          ])
 def test_set_log_level(api_client, hardware_log_level,
                        mock_robot_configs, mock_logging_set_level,
@@ -291,5 +299,6 @@ def test_set_log_level(api_client, hardware_log_level,
     resp = api_client.post('/settings/log_level/local', json=body)
     assert resp.status_code == 200
     mock_logging_set_level.assert_called_once_with(expected_log_level)
-    hardware_log_level.update_config.assert_called_once_with(log_level=expected_log_level_name)
+    hardware_log_level.update_config.assert_called_once_with(
+        log_level=expected_log_level_name)
     mock_robot_configs.save_robot_settings.assert_called_once()
