@@ -57,21 +57,20 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       case ROBOT_CALIBRATION_CHECK_STEPS.BAD_ROBOT_CALIBRATION:
       case ROBOT_CALIBRATION_CHECK_STEPS.NO_PIPETTES_ATTACHED:
         return <CompleteConfirmation robotName={robotName} exit={exit} />
+      default:
+        return null
     }
   }
 
   return (
-    currentStep && (
-      <ModalPage
-        titleBar={{
-          title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-          back: { onClick: exit },
-        }}
-        contentsClassName={styles.modal_contents}
-      >
-        {getCurrentStepContents()}
-
-      </ModalPage>
-    )
+    <ModalPage
+      titleBar={{
+        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+        back: { onClick: exit },
+      }}
+      contentsClassName={styles.modal_contents}
+    >
+      {getCurrentStepContents()}
+    </ModalPage>
   )
 }

@@ -29,10 +29,31 @@ export type RobotCalibrationCheckStep =
   | typeof BAD_ROBOT_CALIBRATION
   | typeof NO_PIPETTES_ATTACHED
 
+
+
+export type RobotCalibrationCheckInstrument =  {
+  model: string,
+  name: string,
+  tip_length: number,
+  mount_axis: number,
+  plunger_axis: number,
+  pipette_id: string,
+}
+export type RobotCalibrationCheckLabware = {
+  alternatives: Array<string>,
+  slot: string,
+  id: string,
+  forPipettes:  Array<string>,
+  loadName: string,
+  namespace: string,
+  version: number
+}
+
 export type RobotCalibrationCheckSessionData = {|
-  instruments: { [string]: string },
+  instruments: { [string]: RobotCalibrationCheckInstrument },
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {
     links: { [RobotCalibrationCheckStep]: string },
   },
+  labware: Array<RobotCalibrationCheckLabware>,
 |}
