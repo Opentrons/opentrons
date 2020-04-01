@@ -37,7 +37,7 @@
 .leveling_instruction {
   display: flex;
   align-items: left;
-  margin-bottom: 1.5rem
+  margin-bottom: 1.5rem;
 }
 
 .leveling_upper_spacer {
