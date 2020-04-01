@@ -1,4 +1,4 @@
-# Opentrons App Changes from 3.16.1 to 3.17.0
+# Opentrons App Changes from 3.16.1 to 3.17.0 Beta
 
 For more details about this release, please see the full [technical change
 log][changelog]
@@ -15,7 +15,7 @@ log][changelog]
   Opentrons App is now disabled when the protocol is paused.
   
 ## New Features
-- OT-2s that are on at least version 3.17.0 and connected via USB can now be
+- OT-2s that are on at least version 3.17.0 Beta and connected via USB can now be
   disconnected from the current Wi-Fi network without selecting a different one
   to connect to.
   

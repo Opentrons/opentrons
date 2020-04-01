@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.16.1 to 3.17.0
+# Robot OS Changes from 3.16.1 to 3.17.0 Beta
 
 For more details about this release, please see the full [technical change log][changelog]
 
