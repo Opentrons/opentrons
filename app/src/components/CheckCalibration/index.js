@@ -27,7 +27,12 @@ type CheckCalibrationProps = {|
 export function CheckCalibration(props: CheckCalibrationProps) {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
-  const { currentStep, nextSteps } = useSelector((state: State) =>
+  const {
+    currentStep,
+    nextSteps,
+    instruments,
+    labware,
+  } = useSelector((state: State) =>
     getRobotCalibrationCheckSession(state, robotName)
   ) || {}
   React.useEffect(() => {
@@ -46,7 +51,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   function getCurrentStepContents() {
     switch(currentStep) {
       case ROBOT_CALIBRATION_CHECK_STEPS.SESSION_START:
-        return <Introduction proceed={proceed} />
+        return (
+          <Introduction
+            proceed={proceed}
+            labwareLoadNames={labware.map(l => l.loadName)}
+          />
+        )
       case ROBOT_CALIBRATION_CHECK_STEPS.LOAD_LABWARE:
       case ROBOT_CALIBRATION_CHECK_STEPS.PICK_UP_TIP:
       case ROBOT_CALIBRATION_CHECK_STEPS.CHECK_POINT_ONE:

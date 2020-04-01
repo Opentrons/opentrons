@@ -9,10 +9,11 @@ const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
 const INTRO_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Continue'
 
 type IntroductionProps = {|
+  labwareLoadNames: Array<string>,
   proceed: () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
-  const { proceed } = props
+  const { labwareLoadNames, proceed } = props
 
   return (
     <>
@@ -22,6 +23,11 @@ export function Introduction(props: IntroductionProps) {
       <p className={styles.complete_body}>
         {INTRO_ROBOT_CALIBRATION_CHECK_BODY}
       </p>
+      <div className={styles.required_tipracks_wrapper}>
+        {labwareLoadNames.map(loadName => (
+          <span>YOU"RE GONNA NEED A {loadName}</span>
+        ))}
+      </div>
       <PrimaryButton onClick={proceed}>
         {INTRO_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
       </PrimaryButton>
