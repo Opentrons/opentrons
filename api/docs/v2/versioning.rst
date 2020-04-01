@@ -124,7 +124,7 @@ Version 2.2
 Version 2.3
 +++++++++++
 
-- GEN2 Magnetic Modules and GEN2 Temperature Modules are now supported; you can load them with the names ``"magnetic
+- Magnetic Modules GEN2 and Temperature Modules GEN2 are now supported; you can load them with the names ``"magnetic
   module gen2"`` and ``"temperature module gen2"``, respectively
 - All pipettes will return tips to tipracks from a higher position to avoid
   possible collisions
