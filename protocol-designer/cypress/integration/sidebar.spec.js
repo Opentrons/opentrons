@@ -1,7 +1,8 @@
 describe('Desktop Navigation', () => {
-  before(() => {
+  beforeEach(() => {
     cy.visit('/')
     cy.viewport('macbook-15')
+    cy.closeAnnouncementModal()
   })
 
   it('contains a working file button', () => {

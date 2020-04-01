@@ -24,3 +24,12 @@ import 'cypress-file-upload'
 //
 // -- This will overwrite an existing command --
 // Cypress.Commands.overwrite("visit", (originalFn, url, options) => { ... })
+
+//
+// General Custom Commands
+//
+Cypress.Commands.add('closeAnnouncementModal', () => {
+  cy.get('button')
+    .contains('Got It!')
+    .click()
+})

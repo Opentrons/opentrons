@@ -4,9 +4,7 @@ describe('The Settings Page', () => {
   })
 
   it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
-    cy.get('button')
-      .contains('Got It!')
-      .click()
+    cy.closeAnnouncementModal()
   })
 
   it('contains a working settings button', () => {
