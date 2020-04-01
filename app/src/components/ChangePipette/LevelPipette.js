@@ -65,16 +65,18 @@ export function LevelPipette(props: Props) {
         back: { onClick: back, disabled: false },
       }}
     >
-      <Status {...props} />
-      <div className={styles.leveling_upper_spacer} />
-      <div className={styles.leveling_instruction}>
-        Next, level the {displayName}
+      <div className={styles.leveling_modal_wrapper}>
+        <Status {...props} />
+        <div className={styles.leveling_instruction}>
+          Next, level the {displayName}
+        </div>
+        <div className={styles.leveling_video_wrapper}>
+          <video width="100%" autoPlay={true} loop={true}>
+            <source src={require('./videos/calibration.webm')} />
+          </video>
+        </div>
+        <ExitButton {...props} />
       </div>
-      <video width="100%" autoPlay={true} loop={true}>
-        <source src={require('./videos/clouds.mp4')} type="video/mp4" />
-      </video>
-      <div className={styles.leveling_lower_spacer} />
-      <ExitButton {...props} />
     </ModalPage>
   )
 }

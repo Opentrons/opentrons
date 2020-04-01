@@ -28,26 +28,28 @@
 }
 
 .leveling_title {
+  width: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 1.5rem;
+  margin-bottom: 100px;
   font-weight: var(--fw-semibold);
 }
 
 .leveling_instruction {
-  display: flex;
-  align-items: left;
+  width: 100%;
   margin-bottom: 1.5rem;
 }
 
-.leveling_upper_spacer {
-  display: flex;
-  height: 100px;
+.leveling_video_wrapper {
+  max-height: 480px;
+  margin-bottom: 84x;
 }
 
-.leveling_lower_spacer {
+.leveling_modal_wrapper {
   display: flex;
-  height: 84px;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
 }
 
 .confirm_status {

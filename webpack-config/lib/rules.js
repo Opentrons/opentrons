@@ -119,7 +119,7 @@ module.exports = {
 
   // videos
   videos: {
-    test: /\.(?:mp4)$/,
+    test: /\.(?:mp4|webm)$/,
     use: {
       loader: 'file-loader',
       options: {
