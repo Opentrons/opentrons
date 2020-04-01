@@ -126,7 +126,7 @@
 .alert_modal_heading {
   @apply --font-header-dark;
 
-  font-weight: normal;
+  font-weight: var(--fw-semibold);
   position: absolute;
   top: 0;
   left: 0;
