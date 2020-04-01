@@ -3,30 +3,39 @@
 import * as persist from '../persist'
 
 describe('persist', () => {
+  let getItemSpy
+  let setItemSpy
+
+  beforeEach(() => {
+    const LocalStorageProto = Object.getPrototypeOf(global.localStorage)
+    getItemSpy = jest.spyOn(LocalStorageProto, 'getItem')
+    setItemSpy = jest.spyOn(LocalStorageProto, 'setItem')
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    localStorage.clear()
+  })
+
   describe('getLocalStorageItem', () => {
-    let getItemMock
-    beforeEach(() => {
-      getItemMock = jest.spyOn(
-        Object.getPrototypeOf(global.localStorage),
-        'getItem'
-      )
-    })
-
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-
     it('retrieves localStorage data by key and parses data when it exists', () => {
       const value = { test: 'some value' }
-      getItemMock.mockReturnValue(JSON.stringify(value))
+
+      localStorage.setItem('root.key', JSON.stringify(value))
 
       const result = persist.getLocalStorageItem('key')
 
       expect(result).toEqual(value)
     })
 
-    it('returns undefined when localStorage could not be retrieved for key given', () => {
-      getItemMock.mockImplementation(() => {
+    it('returns undefined when localStorage key does not exist', () => {
+      const result = persist.getLocalStorageItem('not-a-key')
+
+      expect(result).toBeUndefined()
+    })
+
+    it('returns undefined when localStorage access throws', () => {
+      getItemSpy.mockImplementationOnce(() => {
         throw new Error('something went wrong!')
       })
 
@@ -37,29 +46,21 @@ describe('persist', () => {
   })
 
   describe('setLocalStorageItem', () => {
-    let setItemMock
-    beforeEach(() => {
-      jest.clearAllMocks()
-      setItemMock = jest.spyOn(
-        Object.getPrototypeOf(global.localStorage),
-        'setItem'
-      )
-    })
-
-    afterEach(() => {
-      jest.clearAllMocks()
-    })
-
     it('adds prefix to key sets localStorage item by key', () => {
       const value = { a: 'a', b: 'b' }
-      setItemMock.mockReturnValue(undefined)
 
       persist.setLocalStorageItem('key', value)
+      expect(localStorage.getItem('root.key')).toBe(JSON.stringify(value))
+    })
 
-      expect(setItemMock).toHaveBeenCalledWith(
-        'root.key',
-        JSON.stringify(value)
-      )
+    it('catches errors from setItem', () => {
+      setItemSpy.mockImplementationOnce(() => {
+        throw new Error('something went wrong!')
+      })
+
+      expect(() => {
+        persist.setLocalStorageItem('key', { value: true })
+      }).not.toThrow()
     })
   })
 })
