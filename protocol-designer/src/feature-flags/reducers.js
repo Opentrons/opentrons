@@ -21,8 +21,6 @@ const initialFlags: Flags = {
   PRERELEASE_MODE: process.env.OT_PD_PRERELEASE_MODE === '1' || false,
   OT_PD_DISABLE_MODULE_RESTRICTIONS:
     process.env.OT_PD_DISABLE_MODULE_RESTRICTIONS === '1' || false,
-  OT_PD_ENABLE_MULTI_GEN2_PIPETTES:
-    process.env.OT_PD_ENABLE_MULTI_GEN2_PIPETTES === '1' || false,
   OT_PD_ENABLE_THERMOCYCLER:
     process.env.OT_PD_ENABLE_THERMOCYCLER === '1' || false,
 }

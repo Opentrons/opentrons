@@ -6,23 +6,17 @@ import { mount } from 'enzyme'
 import { PipetteSelect, DropdownField } from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
-import { getEnableMultiGEN2Pipettes } from '../../../../feature-flags/selectors'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields } from '../PipetteFields'
 import { TiprackDiagram } from '../TiprackDiagram'
 import { PipetteDiagram } from '../PipetteDiagram'
 
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
-import type { BaseState } from '../../../../types'
 
 jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/utils.js')
 jest.mock('../TiprackDiagram')
 
-const getEnableMultiGEN2PipettesMock: JestMockFn<
-  [BaseState],
-  ?boolean
-> = getEnableMultiGEN2Pipettes
 const getOnlyLatestDefsMock: JestMockFn<
   [],
   LabwareDefByDefURI
@@ -69,7 +63,6 @@ describe('PipetteFields', () => {
       touched: null,
     }
 
-    getEnableMultiGEN2PipettesMock.mockReturnValue(true)
     getOnlyLatestDefsMock.mockReturnValue({
       tiprack_300: fixture_tiprack_300_ul,
       tiprack_1000: fixture_tiprack_1000_ul,

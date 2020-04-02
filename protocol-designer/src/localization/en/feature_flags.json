@@ -3,10 +3,6 @@
     "title": "Use prerelease mode",
     "description": "Show in-progress features for testing & internal use"
   },
-  "OT_PD_ENABLE_MODULES": {
-    "title": "Enable modules in PD",
-    "description": "!"
-  },
   "OT_PD_DISABLE_MODULE_RESTRICTIONS": {
     "title": "Disable module placement restrictions",
     "description_1": "Turn off all restrictions on module placement and related pipette crash guidance.",
@@ -15,9 +11,5 @@
   "OT_PD_ENABLE_THERMOCYCLER": {
     "title": "Enable thermocycler module",
     "description": "Allow adding thermocycler modules and steps to protocols."
-  },
-  "OT_PD_ENABLE_MULTI_GEN2_PIPETTES": {
-    "title": "Enable multi GEN2 pipettes in PD",
-    "description": "Allow multi GEN2 pipettes to be specified from Pipette Selection"
   }
 }
