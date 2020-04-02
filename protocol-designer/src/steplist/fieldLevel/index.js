@@ -135,8 +135,8 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(
       maskToFloat,
       onlyPositiveNumbers,
-      defaultTo(0),
-      trimDecimals(1)
+      trimDecimals(1),
+      defaultTo(0)
     ),
     castValue: Number,
   },
