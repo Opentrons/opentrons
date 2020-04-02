@@ -37,7 +37,7 @@ export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
 // For the sake of simplicity and flow happiness, they are equipped to deal with parameters of type `mixed`
 
 export const onlyPositiveNumbers = (value: mixed) =>
-  value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : null
+  value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : ''
 export const defaultTo = (defaultValue: mixed) => (value: mixed) =>
   value === null || Number.isNaN(value) ? defaultValue : value
 
