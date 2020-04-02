@@ -43,7 +43,12 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   const blob = new Blob([JSON.stringify(downloadData.fileData)], {
     type: 'application/json',
   })
-  saveAs(blob, downloadData.fileName)
+  if (global.Cypress) {
+    // HACK(IL, 2020-04-02): can't figure out a better way to do this yet
+    global.Cypress.env('__lastSavedFile', downloadData.fileData)
+  } else {
+    saveAs(blob, downloadData.fileName)
+  }
 }
 
 type WarningContent = {|
