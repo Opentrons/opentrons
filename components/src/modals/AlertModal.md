@@ -1,8 +1,9 @@
 AlertModal example:
 
 ```js
-initialState = { alert: 'foo' }
+import { FlatButton } from '@opentrons/components'
 
+const [state, setState] = React.useState({ alert: 'foo' })
 const alertContents = {
   foo:
     'Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.',
@@ -31,7 +32,8 @@ const alertContents = {
 Optional heading icon override:
 
 ```js
-initialState = { alert: 'foo' }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ alert: 'foo' })
 
 const alertContents = {
   foo:
@@ -62,7 +64,8 @@ const alertContents = {
 Optional alertOverlay prop to lighten background
 
 ```js
-initialState = { alert: 'foo' }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ alert: 'foo' })
 
 const alertContents = {
   foo:
@@ -93,7 +96,8 @@ const alertContents = {
 Alert modal without heading prop:
 
 ```js
-initialState = { alert: 'foo' }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ alert: 'foo' })
 
 const alertContents = {
   foo:

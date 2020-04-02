@@ -1,5 +1,6 @@
 ```js
-initialState = { checkbox1: true, inputfield1: '' }
+import { CheckboxField, InputField } from '@opentrons/components'
+const [state, setState] = React.useState({ checkbox1: true, inputfield1: '' })
 
 function getError(state) {
   return state.inputfield1 === '' || parseFloat(state.inputfield1) > 0

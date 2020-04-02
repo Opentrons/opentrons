@@ -13,7 +13,8 @@ With optional subtitle:
 With optional back button:
 
 ```js
-initialState = { subtitle: 'Subpage' }
+import { FlatButton } from '@opentrons/components'
+const [state, setState] = React.useState({ subtitle: 'Subpage' })
 ;<div>
   <TitleBar
     title="Page"

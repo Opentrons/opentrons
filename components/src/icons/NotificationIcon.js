@@ -22,7 +22,7 @@ const SCALE_FACTOR = 3
  *
  * If you need access to the IconName type, you can:
  * ```js
- * import {type IconName} from '@opentrons/components'
+ * import type { IconName } from '@opentrons/components'
  * ```
  */
 

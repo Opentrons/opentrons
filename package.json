@@ -99,7 +99,7 @@
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-snap": "^1.23.0",
-    "react-styleguidist": "^8.0.1",
+    "react-styleguidist": "^11.0.5",
     "react-test-renderer": "^16.8.6",
     "redux-mock-store": "^1.5.3",
     "rehype": "^9.0.0",

@@ -3,10 +3,11 @@ Note that `LabwareRender` is in robot coordinates, we transform it to view it us
 **Normal Labware**
 
 ```js
-const fixture_96_plate = require('@opentrons/shared-data/labware/fixtures/2/fixture_96_plate')
-const fixture_24_tuberack = require('@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack')
-const fixture_12_trough = require('@opentrons/shared-data/labware/fixtures/2/fixture_12_trough')
-const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul')
+import { RobotWorkSpace } from '@opentrons/components'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
+import fixture_24_tuberack from '@opentrons/shared-data/labware/fixtures/2/fixture_24_tuberack'
+import fixture_12_trough from '@opentrons/shared-data/labware/fixtures/2/fixture_12_trough'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
 
 // Change this to view different labware fixtures
 let definition = fixture_96_plate
@@ -28,7 +29,8 @@ let definition = fixture_96_plate
 **Tiprack**
 
 ```js
-const fixture_tiprack_300_ul = require('@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul')
+import { RobotWorkSpace } from '@opentrons/components'
+import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul'
 
 let definition = fixture_tiprack_300_ul
 

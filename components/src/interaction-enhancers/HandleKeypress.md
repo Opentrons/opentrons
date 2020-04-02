@@ -1,7 +1,7 @@
 Use `<HandleKeypress>` to register listeners for keypress events:
 
 ```js
-initialState = { key: '' }
+const [state, setState] = React.useState({ key: '' })
 ;<HandleKeypress
   handlers={[
     { key: 'q', onPress: () => setState({ key: 'q' }) },
