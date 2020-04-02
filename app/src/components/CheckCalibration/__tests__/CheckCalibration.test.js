@@ -3,10 +3,6 @@ import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 
-import * as RobotControls from '../../../robot-controls'
-import * as RobotAdmin from '../../../robot-admin'
-import * as RobotSelectors from '../../../robot/selectors'
-
 import * as Calibration from '../../../calibration'
 import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
 
@@ -15,7 +11,6 @@ import { Introduction } from '../Introduction'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
 import type { State } from '../../../types'
-import type { ViewableRobot } from '../../../discovery/types'
 
 jest.mock('../../../calibration/selectors')
 
@@ -28,30 +23,10 @@ describe('CheckCalibration', () => {
   let mockStore
   let render
 
-  const getIntroduction = wrapper =>
-    wrapper
-      .find(Introduction)
+  const getBackButton = wrapper =>
+    wrapper.find({ title: 'Back' }).find('button')
 
-  const getRobotCalibrationCheckButton = wrapper =>
-    wrapper
-      .find({ label: 'Check deck calibration' })
-      .find(LabeledButton)
-      .find('button')
-
-  const getHomeButton = wrapper =>
-    wrapper
-      .find({ label: 'Home all axes' })
-      .find(LabeledButton)
-      .find('button')
-
-  const getRestartButton = wrapper =>
-    wrapper
-      .find({ label: 'Restart robot' })
-      .find(LabeledButton)
-      .find('button')
-
-  const getLightsButton = wrapper =>
-    wrapper.find({ label: 'Lights' }).find(LabeledToggle)
+  const mockCloseCalibrationCheck = () => {}
 
   beforeEach(() => {
     mockStore = {
@@ -62,9 +37,12 @@ describe('CheckCalibration', () => {
       dispatch: jest.fn(),
     }
 
-    render = (robot: ViewableRobot = mockRobot) => {
+    render = () => {
       return mount(
-        <CheckCalibration robotName="robot-name" closeCalibrationCheck={() => {}} />,
+        <CheckCalibration
+          robotName="robot-name"
+          closeCalibrationCheck={mockCloseCalibrationCheck}
+        />,
         {
           wrappingComponent: Provider,
           wrappingComponentProps: { store: mockStore },
@@ -77,49 +55,36 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
+  it('creates a robot cal check session on mount', () => {
+    getRobotCalibrationCheckSession.mockReturnValue(
+      mockRobotCalibrationCheckSessionData
+    )
+    render()
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.createRobotCalibrationCheckSession('robot-name')
+    )
+  })
+
   it('renders Introduction contents when currentStep is sessionStart', () => {
     getRobotCalibrationCheckSession.mockReturnValue({
       ...mockRobotCalibrationCheckSessionData,
       currentStep: 'sessionStart',
     })
-    render()
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      RobotControls.fetchLights(mockRobot.name)
-    )
-  })
-
-  it('calls updateLights with toggle on button click', () => {
-    mockGetLightsOn.mockReturnValue(true)
-
     const wrapper = render()
 
-    getLightsButton(wrapper).invoke('onClick')()
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      RobotControls.updateLights(mockRobot.name, false)
-    )
+    expect(wrapper.exists(Introduction)).toBe(true)
+    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
   })
 
-  it('calls restartRobot on button click', () => {
+  it('calls deleteRobotCalibrationCheckSession on exit click', () => {
     const wrapper = render()
 
-    getRestartButton(wrapper).invoke('onClick')()
+    getBackButton(wrapper).invoke('onClick')()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      RobotAdmin.restartRobot(mockRobot.name)
+      Calibration.deleteRobotCalibrationCheckSession('robot-name')
     )
+    expect(mockCloseCalibrationCheck).toHaveBeenCalled()
   })
-
-  it('calls home on button click', () => {
-    const wrapper = render()
-
-    getHomeButton(wrapper).invoke('onClick')()
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      RobotControls.home(mockRobot.name, RobotControls.ROBOT)
-    )
-  })
-
-
 })
