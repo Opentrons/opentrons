@@ -3,36 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.17.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.17.0-alpha.1...v3.17.0-alpha.2) (2020-03-31)
-
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
 
 ### Bug Fixes
 
 * **api:** correctly handle magdeck engage kwargs ([#5330](https://github.com/Opentrons/opentrons/issues/5330)) ([57c0382](https://github.com/Opentrons/opentrons/commit/57c0382))
 * **api:** fix missing arg in v1 move splitting during cache instr models ([#5338](https://github.com/Opentrons/opentrons/issues/5338)) ([057bea5](https://github.com/Opentrons/opentrons/commit/057bea5))
 * **api:** move splitting: strip step postfix ([#5337](https://github.com/Opentrons/opentrons/issues/5337)) ([e36217a](https://github.com/Opentrons/opentrons/commit/e36217a))
-
-
-
-
-
-# [3.17.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.17.0-alpha.0...v3.17.0-alpha.1) (2020-03-30)
-
-
-### Bug Fixes
-
 * **api:** fix blocking module tasks ([#5315](https://github.com/Opentrons/opentrons/issues/5315)) ([0f4e2c1](https://github.com/Opentrons/opentrons/commit/0f4e2c1)), closes [#5312](https://github.com/Opentrons/opentrons/issues/5312)
 * **api:** fix update module firmware ([#5317](https://github.com/Opentrons/opentrons/issues/5317)) ([63808c2](https://github.com/Opentrons/opentrons/commit/63808c2)), closes [#5314](https://github.com/Opentrons/opentrons/issues/5314)
-
-
-
-
-
-# [3.17.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-alpha.0) (2020-03-27)
-
-
-### Bug Fixes
-
 * **api:** Avoid Python 3.8 unsupported `str in Enum` expression ([#5088](https://github.com/Opentrons/opentrons/issues/5088)) ([6f399ba](https://github.com/Opentrons/opentrons/commit/6f399ba))
 * **api:** call module functions across threads ([#5194](https://github.com/Opentrons/opentrons/issues/5194)) ([ba1afe2](https://github.com/Opentrons/opentrons/commit/ba1afe2))
 * **api:** compare smoothie version before hardware controller on boot ([#5165](https://github.com/Opentrons/opentrons/issues/5165)) ([285211f](https://github.com/Opentrons/opentrons/commit/285211f))
