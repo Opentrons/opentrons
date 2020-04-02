@@ -29,14 +29,13 @@ type Props = {|
   exit: () => mixed,
 |}
 
-function Status(props: Props) {
-  const { displayName } = props
+function Status(props: { pipetteName: string }) {
   const iconName = 'check-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: true,
     [styles.failure]: false,
   })
-  const message = `${displayName} connected`
+  const message = `${props.pipetteName} connected`
   return (
     <div className={styles.leveling_title}>
       <Icon name={iconName} className={iconClass} />
@@ -45,18 +44,34 @@ function Status(props: Props) {
   )
 }
 
-function ExitButton(props: Props) {
-  const { exit } = props
-
+function ExitButton(props: { exit: () => mixed }) {
   return (
-    <PrimaryButton className={styles.confirm_button} onClick={exit}>
+    <PrimaryButton className={styles.confirm_button} onClick={props.exit}>
       {EXIT_BUTTON_MESSAGE}
     </PrimaryButton>
   )
 }
 
+function LevelingInstruction(props: { pipetteName: string }) {
+  return (
+    <div className={styles.leveling_instruction}>
+      Next, level the {props.pipetteName}
+    </div>
+  )
+}
+
+function LevelingVideo() {
+  return (
+    <div className={styles.leveling_video_wrapper}>
+      <video width="100%" autoPlay={true} loop={true}>
+        <source src={require('./videos/calibration.webm')} />
+      </video>
+    </div>
+  )
+}
+
 export function LevelPipette(props: Props) {
-  const { title, subtitle, displayName, back } = props
+  const { title, subtitle, displayName, back, exit } = props
   return (
     <ModalPage
       titleBar={{
@@ -64,19 +79,12 @@ export function LevelPipette(props: Props) {
         subtitle: subtitle,
         back: { onClick: back, disabled: false },
       }}
+      contentsClassName={styles.leveling_modal}
     >
-      <div className={styles.leveling_modal_wrapper}>
-        <Status {...props} />
-        <div className={styles.leveling_instruction}>
-          Next, level the {displayName}
-        </div>
-        <div className={styles.leveling_video_wrapper}>
-          <video width="100%" autoPlay={true} loop={true}>
-            <source src={require('./videos/calibration.webm')} />
-          </video>
-        </div>
-        <ExitButton {...props} />
-      </div>
+      <Status pipetteName={displayName} />
+      <LevelingInstruction pipetteName={displayName} />
+      <LevelingVideo />
+      <ExitButton exit={exit} />
     </ModalPage>
   )
 }

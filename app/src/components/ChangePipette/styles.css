@@ -45,7 +45,7 @@
   margin-bottom: 50px;
 }
 
-.leveling_modal_wrapper {
+.leveling_modal {
   display: flex;
   flex-direction: column;
   align-items: center;
