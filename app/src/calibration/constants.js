@@ -22,12 +22,10 @@ export const DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE: 'calibration:DELETE
 export const COMPLETE_ROBOT_CALIBRATION_CHECK: 'calibration:COMPLETE_ROBOT_CALIBRATION_CHECK' =
   'calibration:COMPLETE_ROBOT_CALIBRATION_CHECK'
 
-
 // api constants
 
 export const ROBOT_CALIBRATION_CHECK_PATH: '/calibration/check/session' =
   '/calibration/check/session'
-
 
 const SESSION_START: 'sessionStart' = 'sessionStart'
 const LOAD_LABWARE: 'loadLabware' = 'loadLabware'

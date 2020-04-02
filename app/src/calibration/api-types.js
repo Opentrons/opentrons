@@ -1,8 +1,6 @@
 // @flow
 
-import {
-  ROBOT_CALIBRATION_CHECK_STEPS
-} from './constants'
+import { ROBOT_CALIBRATION_CHECK_STEPS } from './constants'
 
 const {
   SESSION_START,
@@ -29,9 +27,7 @@ export type RobotCalibrationCheckStep =
   | typeof BAD_ROBOT_CALIBRATION
   | typeof NO_PIPETTES_ATTACHED
 
-
-
-export type RobotCalibrationCheckInstrument =  {
+export type RobotCalibrationCheckInstrument = {
   model: string,
   name: string,
   tip_length: number,
@@ -43,10 +39,10 @@ export type RobotCalibrationCheckLabware = {
   alternatives: Array<string>,
   slot: string,
   id: string,
-  forPipettes:  Array<string>,
+  forPipettes: Array<string>,
   loadName: string,
   namespace: string,
-  version: number
+  version: number,
 }
 
 export type RobotCalibrationCheckSessionData = {|

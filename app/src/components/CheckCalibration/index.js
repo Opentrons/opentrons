@@ -11,7 +11,6 @@ import {
 } from '../../calibration'
 import { createLogger } from '../../logger'
 
-
 import { Introduction } from './Introduction'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
@@ -27,21 +26,16 @@ type CheckCalibrationProps = {|
 export function CheckCalibration(props: CheckCalibrationProps) {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
-  const {
-    currentStep,
-    nextSteps,
-    instruments,
-    labware,
-  } = useSelector((state: State) =>
-    getRobotCalibrationCheckSession(state, robotName)
-  ) || {}
-  // TODO IMMEDIATELY uncomment for debugging
+  const { currentStep, nextSteps, labware } =
+    useSelector((state: State) =>
+      getRobotCalibrationCheckSession(state, robotName)
+    ) || {}
   React.useEffect(() => {
     dispatch(createRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
   function proceed() {
-    log.debug('proceeded to next robot cal check step')
+    log.debug('proceeded to next robot cal check step', nextSteps)
   }
 
   function exit() {
@@ -52,15 +46,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   let stepContents
   let modalContentsClassName = styles.modal_contents
 
-  console.log('SWITCH', currentStep)
-  switch(currentStep) {
+  switch (currentStep) {
     case ROBOT_CALIBRATION_CHECK_STEPS.SESSION_START: {
-      console.log('MADE IT TO INTRO CASE')
       stepContents = (
         <Introduction
           proceed={proceed}
-          labwareLoadNames={[labware[0].loadName, labware[0].loadName]}
-            // labware.map(l => l.loadName)}
+          labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
       break
@@ -79,13 +70,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       break
     }
     default: {
-      console.log('MADE IT TO DEFAULT', currentStep )
       stepContents = null
     }
   }
 
-
-  console.log('AFTER SWITCH', stepContents)
   return (
     <ModalPage
       titleBar={{

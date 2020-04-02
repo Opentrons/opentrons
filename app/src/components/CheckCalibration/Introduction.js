@@ -9,13 +9,14 @@ const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
 const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Check deck calibration'
 const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
-  "Testing your deck calibration builds confidence that the robot is working correctly and accurately. If at any point the robot does not go to the points as expected, exit this process and re-calibrate your robot deck."
-const TIPRACK_REQS = "For this process you will require:"
-const VIEW_TIPRACK_MEASUREMENTS= 'View measurements'
+  'Testing your deck calibration builds confidence that the robot is working correctly and accurately. If at any point the robot does not go to the points as expected, exit this process and re-calibrate your robot deck.'
+const TIPRACK_REQS = 'For this process you will require:'
+const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const NOTE_HEADER = 'Please note: '
 const IMPORTANCE_MODIFIER = 'extremely'
 const NOTE_BODY_1 = "It's "
-const NOTE_BODY_2 = ' important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips.'
+const NOTE_BODY_2 =
+  ' important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips.'
 const INTRO_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Continue'
 
 type IntroductionProps = {|
@@ -37,8 +38,13 @@ export function Introduction(props: IntroductionProps) {
       <div className={styles.required_tipracks_wrapper}>
         {labwareLoadNames.map(loadName => (
           <div key={loadName} className={styles.tiprack_image_container}>
-            <img className={styles.tiprack_image} src={tiprackImages[loadName]} />
-            <p className={styles.tiprack_display_name}>{getLatestLabwareDef(loadName)?.metadata.displayName}</p>
+            <img
+              className={styles.tiprack_image}
+              src={tiprackImages[loadName]}
+            />
+            <p className={styles.tiprack_display_name}>
+              {getLatestLabwareDef(loadName)?.metadata.displayName}
+            </p>
             <a
               className={styles.tiprack_measurements_link}
               target="_blank"
