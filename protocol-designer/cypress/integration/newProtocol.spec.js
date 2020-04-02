@@ -6,9 +6,7 @@ describe('Desktop Navigation', () => {
 
   describe('the setup form', () => {
     it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
-      cy.get('button')
-        .contains('Got It!')
-        .click()
+      cy.closeAnnouncementModal()
     })
 
     it('clicks the "CREATE NEW" button', () => {
