@@ -24,11 +24,11 @@ describe('useTooltip hook', () => {
   const render = (options: TestUseTooltipProps) => {
     const TestUseTooltip = (props: TestUseTooltipProps) => {
       const { visible, ...hookOptions } = props
-      const { targetRef, ...tooltipProps } = useTooltip(hookOptions)
+      const [targetProps, tooltipProps] = useTooltip(hookOptions)
 
       return (
         <>
-          <div ref={targetRef} data-test="target">
+          <div {...targetProps} data-test="target">
             Target!
           </div>
           <Tooltip visible={props.visible} {...tooltipProps}>
@@ -101,7 +101,7 @@ describe('useTooltip hook', () => {
     const tooltip = wrapper.find(Tooltip)
 
     expect(tooltip.prop('placement')).toEqual('top-end')
-    expect(tooltip.prop('tooltipStyle')).toEqual({
+    expect(tooltip.prop('style')).toEqual({
       position: 'absolute',
       left: '42px',
     })
@@ -115,8 +115,8 @@ describe('useTooltip hook', () => {
     const tooltip1 = render({ visible: true }).find(Tooltip)
     const tooltip2 = render({ visible: true }).find(Tooltip)
 
-    expect(tooltip1.prop('tooltipId')).toEqual(expect.any(String))
-    expect(tooltip2.prop('tooltipId')).toEqual(expect.any(String))
-    expect(tooltip1.prop('tooltipId')).not.toEqual(tooltip2.prop('tooltipId'))
+    expect(tooltip1.prop('id')).toEqual(expect.any(String))
+    expect(tooltip2.prop('id')).toEqual(expect.any(String))
+    expect(tooltip1.prop('id')).not.toEqual(tooltip2.prop('id'))
   })
 })

@@ -44,11 +44,19 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
     onStateUpdate,
   })
 
-  return {
-    ...tooltipState,
-    tooltipId,
-    targetRef,
-    tooltipRef,
+  const targetProps = {
+    ref: targetRef,
+    'aria-describedby': tooltipId,
+  }
+
+  const tooltipProps = {
+    id: tooltipId,
+    ref: tooltipRef,
+    style: tooltipState.tooltipStyle,
+    arrowStyle: tooltipState.arrowStyle,
+    placement: tooltipState.placement,
     arrowRef,
   }
+
+  return [targetProps, tooltipProps]
 }

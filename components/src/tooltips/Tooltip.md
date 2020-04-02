@@ -2,12 +2,10 @@ Basic usage with the `useTooltip` hook
 
 ```js
 import { useTooltip } from '@opentrons/components'
-const { targetRef, ...tooltipProps } = useTooltip()
+const [targetProps, tooltipProps] = useTooltip()
 
 ;<>
-  <span ref={targetRef} aria-describedby={tooltipProps.tooltipId}>
-    Target!
-  </span>
+  <span {...targetProps}>Target!</span>
   <Tooltip visible={true} {...tooltipProps}>
     Something Explanatory!
   </Tooltip>
@@ -26,12 +24,10 @@ import {
 } from '@opentrons/components'
 
 const [placement, setPlacement] = React.useState(TOOLTIP_RIGHT)
-const { targetRef, ...tooltipProps } = useTooltip({ placement })
+const [targetProps, tooltipProps] = useTooltip({ placement })
 
 ;<>
-  <span ref={targetRef} aria-describedby={tooltipProps.tooltipId}>
-    Target!
-  </span>
+  <span {...targetProps}>Target!</span>
   <Tooltip visible={true} {...tooltipProps}>
     Something Explanatory!
   </Tooltip>

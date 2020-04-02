@@ -38,12 +38,21 @@ export type UseTooltipOptions = $Shape<{|
   offset?: number,
 |}>
 
-export type UseTooltipResult = {|
-  targetRef: (HTMLElement | null) => mixed,
+export type UseTooltipResultTargetProps = {|
+  ref: (HTMLElement | null) => mixed,
+  'aria-describedby': string,
+|}
+
+export type UseTooltipResultTooltipProps = {|
+  id: string,
+  ref: (HTMLElement | null) => mixed,
   placement: Placement | null,
-  tooltipId: string,
-  tooltipRef: (HTMLElement | null) => mixed,
-  tooltipStyle: $Shape<CSSStyleDeclaration>,
+  style: $Shape<CSSStyleDeclaration>,
   arrowRef: (HTMLElement | null) => mixed,
   arrowStyle: $Shape<CSSStyleDeclaration>,
 |}
+
+export type UseTooltipResult = [
+  UseTooltipResultTargetProps,
+  UseTooltipResultTooltipProps
+]

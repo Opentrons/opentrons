@@ -23,17 +23,15 @@ export type TooltipProps = {|
   visible: boolean,
   /** Contents of the tooltip */
   children?: React.Node,
+  /**
+   * Tooltip element ID (provided by useTooltip). Will match
+   * targetProps.aria-describedby
+   */
+  id: string,
   /** Actual tooltip placement, if known (provided by useTooltip) */
   placement: Placement | null,
-  /**
-   * Tooltip element ID (provided by useTooltip). Should match
-   * aria-describedby on target element
-   */
-  tooltipId: string,
-  /** React function ref for tooltip element (provided by useTooltip) */
-  tooltipRef: (HTMLElement | null) => mixed,
   /** Inline styles to apply to the tooltip element (provided by useTooltip) */
-  tooltipStyle: $Shape<CSSStyleDeclaration>,
+  style: $Shape<CSSStyleDeclaration>,
   /** React function ref for tooltip's arrow element (provided by useTooltip) */
   arrowRef: (HTMLElement | null) => mixed,
   /** Inline styles to apply to arrow element (provided by useTooltip) */
@@ -44,31 +42,26 @@ export type TooltipProps = {|
  * Tooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` hook; see examples in `Tooltip.md`.
  */
-export function Tooltip(props: TooltipProps) {
-  const {
-    visible,
-    placement,
-    tooltipId,
-    tooltipRef,
-    tooltipStyle,
-    arrowRef,
-    arrowStyle,
-    children,
-  } = props
+export const Tooltip = React.forwardRef<TooltipProps, _>(
+  function TooltipComponent(props: TooltipProps, ref) {
+    const {
+      visible,
+      placement,
+      id,
+      style,
+      arrowRef,
+      arrowStyle,
+      children,
+    } = props
 
-  return visible ? (
-    <div
-      role="tooltip"
-      id={tooltipId}
-      style={tooltipStyle}
-      ref={tooltipRef}
-      css={TOOLTIP_CSS}
-    >
-      {children}
-      <Arrow {...{ arrowRef, arrowStyle, placement }} />
-    </div>
-  ) : null
-}
+    return visible ? (
+      <div role="tooltip" id={id} style={style} ref={ref} css={TOOLTIP_CSS}>
+        {children}
+        <Arrow {...{ arrowRef, arrowStyle, placement }} />
+      </div>
+    ) : null
+  }
+)
 
 // shift arrows off the element
 const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`

@@ -15,20 +15,24 @@ const arrowStyle = { position: 'absolute', left: '8px' }
 const TOOLTIP_SELECTOR = 'div[role="tooltip"]'
 
 const render = (visible = true, children = <></>) => {
+  // NOTE(mc): redundant fragement necessary for enzyme issue with forwardRef
+  // https://github.com/enzymejs/enzyme/issues/1852
   return mount(
-    <Tooltip
-      {...{
-        visible,
-        placement,
-        tooltipId,
-        tooltipRef,
-        tooltipStyle,
-        arrowRef,
-        arrowStyle,
-      }}
-    >
-      {children}
-    </Tooltip>
+    <>
+      <Tooltip
+        {...{
+          visible,
+          placement,
+          id: tooltipId,
+          ref: tooltipRef,
+          style: tooltipStyle,
+          arrowRef,
+          arrowStyle,
+        }}
+      >
+        {children}
+      </Tooltip>
+    </>
   )
 }
 
@@ -51,6 +55,7 @@ describe('hook-based Tooltip', () => {
     expect(tooltip.html()).toContain('hello world')
   })
 
+  // NOTE(mc): this test fails if redundant fragment in `render` is removed
   it('attaches the tooltip ref to the tooltip', () => {
     const wrapper = render(true)
     const tooltip = wrapper.find(TOOLTIP_SELECTOR)
