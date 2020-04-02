@@ -212,16 +212,18 @@ export const getRunSeconds = createSelector(
   }
 )
 
+export function formatSeconds(runSeconds: number): string {
+  const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
+  const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
+  const seconds = padStart(`${runSeconds % 60}`, 2, '0')
+
+  return `${hours}:${minutes}:${seconds}`
+}
+
 // $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
 export const getRunTime = createSelector(
   getRunSeconds,
-  (runSeconds): string => {
-    const hours = padStart(`${Math.floor(runSeconds / 3600)}`, 2, '0')
-    const minutes = padStart(`${Math.floor(runSeconds / 60) % 60}`, 2, '0')
-    const seconds = padStart(`${runSeconds % 60}`, 2, '0')
-
-    return `${hours}:${minutes}:${seconds}`
-  }
+  formatSeconds
 )
 
 export function getCalibrationRequest(state: State) {
@@ -479,8 +481,20 @@ export const getTipracksByMount: (
   state: State
 ) => TiprackByMountMap = createSelector(
   getTipracks,
-  tipracks => ({
-    left: tipracks.find(tr => tr.calibratorMount === 'left') || null,
-    right: tipracks.find(tr => tr.calibratorMount === 'right') || null,
-  })
+  getPipettesByMount,
+  (tipracks, pipettesMap) => {
+    return PIPETTE_MOUNTS.reduce<TiprackByMountMap>(
+      (tiprackMap, mount) => {
+        const byCalibrator = tipracks.find(tr => tr.calibratorMount === mount)
+        const byTiprackList = tipracks.find(tr =>
+          (pipettesMap[mount]?.tipRacks ?? []).includes(tr._id)
+        )
+
+        tiprackMap[mount] = byCalibrator ?? byTiprackList ?? null
+
+        return tiprackMap
+      },
+      { left: null, right: null }
+    )
+  }
 )

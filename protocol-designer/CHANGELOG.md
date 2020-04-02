@@ -3,6 +3,51 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Bug Fixes
+
+* **protocol-designer:** fix bug with selecting magnet > disengage step ([#5257](https://github.com/Opentrons/opentrons/issues/5257)) ([42e6a65](https://github.com/Opentrons/opentrons/commit/42e6a65)), closes [#5247](https://github.com/Opentrons/opentrons/issues/5247)
+* **protocol-designer:** fix failing action test ([#5002](https://github.com/Opentrons/opentrons/issues/5002)) ([46f6d3f](https://github.com/Opentrons/opentrons/commit/46f6d3f))
+* **protocol-designer:** fix tests for FileSidebar after merging [#5029](https://github.com/Opentrons/opentrons/issues/5029) ([#5077](https://github.com/Opentrons/opentrons/issues/5077)) ([62a4461](https://github.com/Opentrons/opentrons/commit/62a4461))
+* **protocol-designer:** fix typo in deck setup explanation modal ([#5104](https://github.com/Opentrons/opentrons/issues/5104)) ([5a70562](https://github.com/Opentrons/opentrons/commit/5a70562)), closes [#5102](https://github.com/Opentrons/opentrons/issues/5102)
+* **protocol-designer:** null out deleted module IDs from step forms ([#5017](https://github.com/Opentrons/opentrons/issues/5017)) ([5a94de5](https://github.com/Opentrons/opentrons/commit/5a94de5)), closes [#4883](https://github.com/Opentrons/opentrons/issues/4883)
+* **protocol-designer:** removes error when fn cannot find temperature or thermocycler on deck ([#4994](https://github.com/Opentrons/opentrons/issues/4994)) ([951a3e1](https://github.com/Opentrons/opentrons/commit/951a3e1)), closes [#4841](https://github.com/Opentrons/opentrons/issues/4841)
+* **protocol-designer:** round caption under engage height to match input box ([#4993](https://github.com/Opentrons/opentrons/issues/4993)) ([f5c2c47](https://github.com/Opentrons/opentrons/commit/f5c2c47)), closes [#4912](https://github.com/Opentrons/opentrons/issues/4912)
+* **protocol-designer:** set magnetic module params for both pristine … ([#4990](https://github.com/Opentrons/opentrons/issues/4990)) ([9b3fef1](https://github.com/Opentrons/opentrons/commit/9b3fef1)), closes [#4908](https://github.com/Opentrons/opentrons/issues/4908)
+* **protocol-designer:** Update conditional experimental settings warning text ([#4978](https://github.com/Opentrons/opentrons/issues/4978)) ([cd3d645](https://github.com/Opentrons/opentrons/commit/cd3d645)), closes [#4911](https://github.com/Opentrons/opentrons/issues/4911)
+* **protocol-designer:** Update SlotMap and CrashInfoBox styles ([#4996](https://github.com/Opentrons/opentrons/issues/4996)) ([845b465](https://github.com/Opentrons/opentrons/commit/845b465)), closes [#4989](https://github.com/Opentrons/opentrons/issues/4989)
+* **protocol-designer:** Update temperature modules disengage text ([#5159](https://github.com/Opentrons/opentrons/issues/5159)) ([bc9d503](https://github.com/Opentrons/opentrons/commit/bc9d503)), closes [#5111](https://github.com/Opentrons/opentrons/issues/5111)
+
+
+### Features
+
+* **app:** enable gen2 multi pipettes ([#5297](https://github.com/Opentrons/opentrons/issues/5297)) ([707f0ab](https://github.com/Opentrons/opentrons/commit/707f0ab)), closes [#4698](https://github.com/Opentrons/opentrons/issues/4698)
+* **app, components:** Support gen2 modules ([#5177](https://github.com/Opentrons/opentrons/issues/5177)) ([3a938ff](https://github.com/Opentrons/opentrons/commit/3a938ff)), closes [#4960](https://github.com/Opentrons/opentrons/issues/4960)
+* **js:** update Formik to v2 ([#5190](https://github.com/Opentrons/opentrons/issues/5190)) ([b15d360](https://github.com/Opentrons/opentrons/commit/b15d360))
+* **protocol-designer:** add border to module tag when hovering over step ([#5161](https://github.com/Opentrons/opentrons/issues/5161)) ([b04ee69](https://github.com/Opentrons/opentrons/commit/b04ee69)), closes [#5110](https://github.com/Opentrons/opentrons/issues/5110)
+* **protocol-designer:** add modal to add a pause after set temp ([#5182](https://github.com/Opentrons/opentrons/issues/5182)) ([dbae680](https://github.com/Opentrons/opentrons/commit/dbae680)), closes [#5117](https://github.com/Opentrons/opentrons/issues/5117)
+* **protocol-designer:** Add module prefix to labware ([#5205](https://github.com/Opentrons/opentrons/issues/5205)) ([1f979dd](https://github.com/Opentrons/opentrons/commit/1f979dd)), closes [#5119](https://github.com/Opentrons/opentrons/issues/5119)
+* **protocol-designer:** Add V4 export warning modal ([#5092](https://github.com/Opentrons/opentrons/issues/5092)) ([e63577b](https://github.com/Opentrons/opentrons/commit/e63577b)), closes [#4934](https://github.com/Opentrons/opentrons/issues/4934)
+* **protocol-designer:** allow custom labware on modules ([#5175](https://github.com/Opentrons/opentrons/issues/5175)) ([1c4e1b5](https://github.com/Opentrons/opentrons/commit/1c4e1b5)), closes [#4910](https://github.com/Opentrons/opentrons/issues/4910)
+* **protocol-designer:** allow modules to be placed on compatble labware ([#4972](https://github.com/Opentrons/opentrons/issues/4972)) ([5abd33f](https://github.com/Opentrons/opentrons/commit/5abd33f)), closes [#4726](https://github.com/Opentrons/opentrons/issues/4726)
+* **protocol-designer:** allow selection of gen 2 modules and use formik ([#5265](https://github.com/Opentrons/opentrons/issues/5265)) ([71b59ce](https://github.com/Opentrons/opentrons/commit/71b59ce)), closes [#5150](https://github.com/Opentrons/opentrons/issues/5150)
+* **protocol-designer:** allow setting initial settings w env vars ([#5268](https://github.com/Opentrons/opentrons/issues/5268)) ([ba52ae4](https://github.com/Opentrons/opentrons/commit/ba52ae4))
+* **protocol-designer:** allow user to bypass typeform modal ([#5169](https://github.com/Opentrons/opentrons/issues/5169)) ([e7ecaf6](https://github.com/Opentrons/opentrons/commit/e7ecaf6)), closes [#5126](https://github.com/Opentrons/opentrons/issues/5126)
+* **protocol-designer:** clear out engageHeight ([#5254](https://github.com/Opentrons/opentrons/issues/5254)) ([2417071](https://github.com/Opentrons/opentrons/commit/2417071)), closes [#5225](https://github.com/Opentrons/opentrons/issues/5225)
+* **protocol-designer:** create modal component to show announcements ([#5091](https://github.com/Opentrons/opentrons/issues/5091)) ([225c12a](https://github.com/Opentrons/opentrons/commit/225c12a)), closes [#4995](https://github.com/Opentrons/opentrons/issues/4995)
+* **protocol-designer:** disambiguate module model vs type ([#5029](https://github.com/Opentrons/opentrons/issues/5029)) ([a1f4740](https://github.com/Opentrons/opentrons/commit/a1f4740)), closes [#4897](https://github.com/Opentrons/opentrons/issues/4897)
+* **protocol-designer:** remove warnings and display correct version for gen 2 modules ([#5224](https://github.com/Opentrons/opentrons/issues/5224)) ([a24a544](https://github.com/Opentrons/opentrons/commit/a24a544)), closes [#5152](https://github.com/Opentrons/opentrons/issues/5152)
+* **protocol-designer:** reset time fields in pause step ([#4950](https://github.com/Opentrons/opentrons/issues/4950)) ([4297a54](https://github.com/Opentrons/opentrons/commit/4297a54)), closes [#4949](https://github.com/Opentrons/opentrons/issues/4949)
+* **protocol-designer:** save v3/v4 files correctly ([#5100](https://github.com/Opentrons/opentrons/issues/5100)) ([53e8ddf](https://github.com/Opentrons/opentrons/commit/53e8ddf)), closes [#4919](https://github.com/Opentrons/opentrons/issues/4919)
+* **protocol-designer:** unify "button row" styles ([#5056](https://github.com/Opentrons/opentrons/issues/5056)) ([06c74d9](https://github.com/Opentrons/opentrons/commit/06c74d9))
+* **protocol-designer:** use different ranges for gen1 vs gen2 engageHeight ([#5262](https://github.com/Opentrons/opentrons/issues/5262)) ([434ca61](https://github.com/Opentrons/opentrons/commit/434ca61)), closes [#5230](https://github.com/Opentrons/opentrons/issues/5230)
+* **shared-data:** correct existing labware defs engageHeight ([#5261](https://github.com/Opentrons/opentrons/issues/5261)) ([767054d](https://github.com/Opentrons/opentrons/commit/767054d)), closes [#5226](https://github.com/Opentrons/opentrons/issues/5226)
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 **Note:** Version bump only for package protocol-designer

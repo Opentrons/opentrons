@@ -742,7 +742,7 @@ describe('robot selectors', () => {
       })
     })
 
-    it('getTipracksByMount', () => {
+    it('returns tipracks by calibratorMount with getTipracksByMount', () => {
       expect(getTipracksByMount(state)).toEqual({
         left: {
           slot: '2',
@@ -760,6 +760,65 @@ describe('robot selectors', () => {
           isTiprack: true,
           isMoving: true,
           calibration: 'moving-to-slot',
+          confirmed: false,
+          calibratorMount: 'right',
+          definition: null,
+        },
+      })
+    })
+
+    it('uses tiprack lists from pipettes in getTipracksByMount if no calibratorMount', () => {
+      state = makeState({
+        session: {
+          labwareBySlot: {
+            1: {
+              _id: 1,
+              slot: '1',
+              type: 's',
+              isTiprack: true,
+              calibratorMount: 'right',
+            },
+            2: {
+              _id: 2,
+              slot: '2',
+              type: 'm',
+              isTiprack: true,
+              calibratorMount: 'right',
+            },
+          },
+          pipettesByMount: {
+            left: { name: 'p200', mount: 'left', tipRacks: [2] },
+            right: { name: 'p50', mount: 'right', tipRacks: [1, 2] },
+          },
+        },
+        calibration: {
+          labwareBySlot: {},
+          confirmedBySlot: {},
+          calibrationRequest: { type: '', inProgress: false, error: null },
+          probedByMount: {},
+          tipOnByMount: {},
+        },
+      })
+
+      expect(getTipracksByMount(state)).toEqual({
+        left: {
+          _id: 2,
+          slot: '2',
+          type: 'm',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
+          confirmed: false,
+          calibratorMount: 'right',
+          definition: null,
+        },
+        right: {
+          _id: 1,
+          slot: '1',
+          type: 's',
+          isTiprack: true,
+          isMoving: false,
+          calibration: 'unconfirmed',
           confirmed: false,
           calibratorMount: 'right',
           definition: null,

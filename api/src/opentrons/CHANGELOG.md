@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
+
+### Bug Fixes
+
+* **api:** correctly handle magdeck engage kwargs ([#5330](https://github.com/Opentrons/opentrons/issues/5330)) ([57c0382](https://github.com/Opentrons/opentrons/commit/57c0382))
+* **api:** fix missing arg in v1 move splitting during cache instr models ([#5338](https://github.com/Opentrons/opentrons/issues/5338)) ([057bea5](https://github.com/Opentrons/opentrons/commit/057bea5))
+* **api:** move splitting: strip step postfix ([#5337](https://github.com/Opentrons/opentrons/issues/5337)) ([e36217a](https://github.com/Opentrons/opentrons/commit/e36217a))
+* **api:** fix blocking module tasks ([#5315](https://github.com/Opentrons/opentrons/issues/5315)) ([0f4e2c1](https://github.com/Opentrons/opentrons/commit/0f4e2c1)), closes [#5312](https://github.com/Opentrons/opentrons/issues/5312)
+* **api:** fix update module firmware ([#5317](https://github.com/Opentrons/opentrons/issues/5317)) ([63808c2](https://github.com/Opentrons/opentrons/commit/63808c2)), closes [#5314](https://github.com/Opentrons/opentrons/issues/5314)
+* **api:** Avoid Python 3.8 unsupported `str in Enum` expression ([#5088](https://github.com/Opentrons/opentrons/issues/5088)) ([6f399ba](https://github.com/Opentrons/opentrons/commit/6f399ba))
+* **api:** call module functions across threads ([#5194](https://github.com/Opentrons/opentrons/issues/5194)) ([ba1afe2](https://github.com/Opentrons/opentrons/commit/ba1afe2))
+* **api:** compare smoothie version before hardware controller on boot ([#5165](https://github.com/Opentrons/opentrons/issues/5165)) ([285211f](https://github.com/Opentrons/opentrons/commit/285211f))
+* **api:** exec protocol contents in module mode ([#5292](https://github.com/Opentrons/opentrons/issues/5292)) ([0174ab3](https://github.com/Opentrons/opentrons/commit/0174ab3)), closes [#4982](https://github.com/Opentrons/opentrons/issues/4982) [#4981](https://github.com/Opentrons/opentrons/issues/4981)
+* **api:** fix recent change breaking api server init ([#5003](https://github.com/Opentrons/opentrons/issues/5003)) ([01fccdf](https://github.com/Opentrons/opentrons/commit/01fccdf))
+* **api:** fix server crash due to unresponsive motor controller at boot ([#5277](https://github.com/Opentrons/opentrons/issues/5277)) ([103e3d1](https://github.com/Opentrons/opentrons/commit/103e3d1))
+* **api:** make api coroutine properties sync for polls during pause ([#5166](https://github.com/Opentrons/opentrons/issues/5166)) ([e9dcd9e](https://github.com/Opentrons/opentrons/commit/e9dcd9e))
+* **api:** make hardware control gantry fns observe execution manager ([#5180](https://github.com/Opentrons/opentrons/issues/5180)) ([c143bcf](https://github.com/Opentrons/opentrons/commit/c143bcf))
+* **api:** make sure we move plunger to bottom after home ([#5253](https://github.com/Opentrons/opentrons/issues/5253)) ([f298b6e](https://github.com/Opentrons/opentrons/commit/f298b6e)), closes [#5164](https://github.com/Opentrons/opentrons/issues/5164)
+* **api:** properly parse escaped nmcli responses ([#5246](https://github.com/Opentrons/opentrons/issues/5246)) ([91178f0](https://github.com/Opentrons/opentrons/commit/91178f0))
+* **api:** remove unnecessary pipette movement during mix ([#5128](https://github.com/Opentrons/opentrons/issues/5128)) ([88e1893](https://github.com/Opentrons/opentrons/commit/88e1893)), closes [#4640](https://github.com/Opentrons/opentrons/issues/4640)
+* **api:** reset location cache before tip probe ([#5269](https://github.com/Opentrons/opentrons/issues/5269)) ([53977ec](https://github.com/Opentrons/opentrons/commit/53977ec)), closes [#4793](https://github.com/Opentrons/opentrons/issues/4793)
+* **api:** return tips to tipracks from the same height as drop tip ([#5187](https://github.com/Opentrons/opentrons/issues/5187)) ([82187ed](https://github.com/Opentrons/opentrons/commit/82187ed)), closes [#5186](https://github.com/Opentrons/opentrons/issues/5186)
+* **api:** ThreadManager hides builder exceptions ([#5108](https://github.com/Opentrons/opentrons/issues/5108)) ([9c50a79](https://github.com/Opentrons/opentrons/commit/9c50a79))
+
+
+### Features
+
+* **api:** Add API calibration check session ([#5197](https://github.com/Opentrons/opentrons/issues/5197)) ([6fa9346](https://github.com/Opentrons/opentrons/commit/6fa9346))
+* **api:** add start set temperature to api ([#5179](https://github.com/Opentrons/opentrons/issues/5179)) ([cdf0c8a](https://github.com/Opentrons/opentrons/commit/cdf0c8a)), closes [#5176](https://github.com/Opentrons/opentrons/issues/5176)
+* **api:** add v4 JSON executor ([#5221](https://github.com/Opentrons/opentrons/issues/5221)) ([e81cb56](https://github.com/Opentrons/opentrons/commit/e81cb56))
+* **api:** add wifi disconnect capability ([#4957](https://github.com/Opentrons/opentrons/issues/4957)) ([67155a8](https://github.com/Opentrons/opentrons/commit/67155a8))
+* **api:** create a centralized hw execution manager ([#5138](https://github.com/Opentrons/opentrons/issues/5138)) ([af10af2](https://github.com/Opentrons/opentrons/commit/af10af2)), closes [#4871](https://github.com/Opentrons/opentrons/issues/4871)
+* **api:** Define existing endpoints using FastAPI/Pydantic ([#4962](https://github.com/Opentrons/opentrons/issues/4962)) ([6ec838f](https://github.com/Opentrons/opentrons/commit/6ec838f)), closes [#4917](https://github.com/Opentrons/opentrons/issues/4917)
+* **api:** invert management of hw control thread ([#5078](https://github.com/Opentrons/opentrons/issues/5078)) ([b8f543a](https://github.com/Opentrons/opentrons/commit/b8f543a)), closes [#4870](https://github.com/Opentrons/opentrons/issues/4870)
+* **api:** robot server replaces api ([#5139](https://github.com/Opentrons/opentrons/issues/5139)) ([ab7905d](https://github.com/Opentrons/opentrons/commit/ab7905d)), closes [#5049](https://github.com/Opentrons/opentrons/issues/5049)
+* **api:** support gen2 modules ([#5039](https://github.com/Opentrons/opentrons/issues/5039)) ([fa7a320](https://github.com/Opentrons/opentrons/commit/fa7a320)), closes [#4960](https://github.com/Opentrons/opentrons/issues/4960)
+* **api:** use instrument max achievable height in plan_moves ([#5193](https://github.com/Opentrons/opentrons/issues/5193)) ([65425da](https://github.com/Opentrons/opentrons/commit/65425da)), closes [#5156](https://github.com/Opentrons/opentrons/issues/5156)
+
+
+
+
+
 ## [3.16.1](https://github.com/opentrons/opentrons/compare/v3.16.0...v3.16.1) (2020-02-25)
 
 ### Bug Fixes

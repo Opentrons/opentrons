@@ -584,12 +584,19 @@ export function client(dispatch) {
         })
         .map(t => t._id)
 
+      // ensure IDs are actually present in containers list
+      // RPC API as of 3.16 may return bogus tipracks in pipette tipracks list
+      const tipRacks = union(
+        tipRacksFromInstrument,
+        tipRacksFromContainers
+      ).filter(id => containers.some(c => c._id === id))
+
       update.pipettesByMount[mount] = {
         _id,
         mount,
         name,
         channels,
-        tipRacks: union(tipRacksFromInstrument, tipRacksFromContainers),
+        tipRacks,
         requestedAs: requested_as,
       }
     }
