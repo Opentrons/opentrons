@@ -40,7 +40,7 @@ export type TooltipProps = {|
 
 /**
  * Tooltip component that renders based on its `visible` prop. For use with the
- * `useTooltip` hook; see examples in `Tooltip.md`.
+ * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
 export const Tooltip = React.forwardRef<TooltipProps, _>(
   function TooltipComponent(props: TooltipProps, ref) {

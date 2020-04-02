@@ -33,6 +33,8 @@ type HoverTooltipState = {| isOpen: boolean |}
  *   onMouseLeave: (SyntheticMouseEvent<*>) => void,
  * |}
  * ```
+ *
+ * @deprecated Use `Tooltip` and `useHoverTooltip` instead
  */
 export class HoverTooltip extends React.Component<
   HoverTooltipProps,

@@ -14,6 +14,35 @@ type TooltipState = {|
 
 const TOOLTIP_ID_PREFIX = 'Tooltip__'
 
+/**
+ * Hook to position a tooltip component relative to a target component
+ *
+ * @param {UseTooltipOptions} [options={}] (change the default `position`, `strategy`, or `offset` of the tooltip)
+ * @returns {UseTooltipResult}
+ * @example
+ * ```js
+ * import {
+ *   useTooltip,
+ *   Tooltip,
+ *   TOOLTIP_TOP,
+ *   TOOLTIP_FIXED
+ * } from '@opentrons/components'
+ *
+ * export function HelloWorld() {
+ *   const [targetProps, tooltipProps] = useTooltip({
+ *     position: TOOLTIP_TOP,
+ *     strategy: TOOLTIP_FIXED
+ *   })
+ *
+ *   return (
+ *     <>
+ *       <span {...targetProps}>Hello</span>
+ *       <Tooltip visible={true} {...tooltipProps}>World</Tooltip>
+ *     </>
+ *   )
+ * }
+ * ```
+ */
 export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   const { placement, strategy, offset = Styles.TOOLTIP_OFFSET_PX } = options
   const tooltipId = useRef(uniqueId(TOOLTIP_ID_PREFIX)).current
