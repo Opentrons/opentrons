@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryButton, AlertModal } from '@opentrons/components'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 import { tiprackImages } from './tiprackImages'
@@ -17,14 +17,19 @@ const IMPORTANCE_MODIFIER = 'extremely'
 const NOTE_BODY_1 = "It's "
 const NOTE_BODY_2 =
   ' important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips.'
-const INTRO_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Continue'
+const CANCEL = 'Cancel'
+const CONTINUE = 'Continue'
+const CLEAR_DECK_HEADER = 'Clear the deck'
+const CLEAR_DECK_BODY = 'Before continuing to check deck calibration, please remove all labware and modules from the deck.'
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
   proceed: () => mixed,
+  exit : () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
-  const { labwareLoadNames, proceed } = props
+  const { labwareLoadNames, proceed, exit } = props
+  const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
 
   return (
     <>
@@ -65,10 +70,27 @@ export function Introduction(props: IntroductionProps) {
         {NOTE_BODY_2}
       </p>
       <div className={styles.button_row}>
-        <PrimaryButton onClick={proceed} className={styles.continue_button}>
-          {INTRO_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
+        <PrimaryButton
+          onClick={() => setClearDeckWarningOpen(true)}
+          className={styles.continue_button}
+        >
+          {CONTINUE}
         </PrimaryButton>
       </div>
+      {
+        clearDeckWarningOpen && (
+          <AlertModal
+            alertOverlay
+            heading={CLEAR_DECK_HEADER}
+            buttons={[
+              { children: CANCEL, onClick: exit, },
+              { children: CONTINUE, onClick: proceed },
+            ]}
+          >
+            {CLEAR_DECK_BODY}
+          </AlertModal>
+        )
+      }
     </>
   )
 }

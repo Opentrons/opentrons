@@ -51,6 +51,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <Introduction
           proceed={proceed}
+          exit={exit}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
