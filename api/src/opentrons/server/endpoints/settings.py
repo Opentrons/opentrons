@@ -161,14 +161,14 @@ async def available_resets(request: web.Request) -> web.Response:
 
 async def pipette_settings(request: web.Request) -> web.Response:
     res = {}
-    for id in pc.known_pipettes():
-        whole_config = pc.load_config_dict(id)
-        res[id] = {
+    for pipette_id in pc.known_pipettes():
+        whole_config = pc.load_config_dict(pipette_id)
+        res[pipette_id] = {
             'info': {
                 'name': whole_config.get('name'),
                 'model': whole_config.get('model')
             },
-            'fields': pc.list_mutable_configs(pipette_id=id)
+            'fields': pc.list_mutable_configs(pipette_id=pipette_id)
         }
     return web.json_response(res, status=200)
 
@@ -209,19 +209,14 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     pipette_id = request.match_info['id']
 
     data = await request.json()
-    fields = data.get('fields')
+    fields = data.get('fields', {})
+    # Convert fields to dict of field name to value
+    fields = {k: v.get('value') for k, v in fields.items()}
     if fields:
-        config_match = pc.list_mutable_configs(pipette_id)
-        whole_config = pc.load_config_dict(pipette_id)
-        for key, value in fields.items():
-            if value and not isinstance(value['value'], bool):
-                config = value['value']
-                default = config_match[key]
-                if config < default['min'] or config > default['max']:
-                    return web.json_response(
-                        {'message': '{} out of range with {}'.format(key, config)},
-                        status=412)
-        pc.save_overrides(pipette_id, fields, whole_config.get('model'))
+        try:
+            pc.override(fields=fields, pipette_id=pipette_id)
+        except ValueError as e:
+            return web.json_response({'message': str(e)}, status=412)
 
     updated_configs = {'fields': pc.list_mutable_configs(pipette_id)}
     return web.json_response(updated_configs, status=200)

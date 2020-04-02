@@ -1,6 +1,7 @@
 import copy
 import logging
 import json
+import numbers
 from collections import namedtuple
 from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
 
@@ -225,17 +226,71 @@ def piecewise_volume_conversion(
     return i[1]*ul + i[2]
 
 
-def save_overrides(
-        pipette_id: str, overrides: Dict[str, Any], model: Optional[str]):
+TypeOverrides = Dict[str, Union[float, bool, None]]
+
+
+def validate_overrides(data: TypeOverrides,
+                       config_model: Dict) -> None:
+    """
+    Check that override fields are valid.
+
+    :param data: a dict of field name to value
+    :param config_model: the configuration for the chosen model
+    :raises ValueError: If a value is invalid
+    """
+    for key, value in data.items():
+        field_config = config_model.get(key)
+        is_quirk = key in config_model['quirks']
+
+        if is_quirk:
+            # If it's a quirk it must be a bool or None
+            if value is not None and not isinstance(value, bool):
+                raise ValueError(f'{value} is invalid for {key}')
+        elif not field_config:
+            # If it's not a quirk we must have a field config
+            raise ValueError(f'Unknown field {key}')
+        elif value is not None:
+            # If value is not None it must be numeric and between min and max
+            if not isinstance(value, numbers.Number):
+                raise ValueError(f'{value} is invalid for {key}')
+            elif value < field_config['min'] or value > field_config['max']:
+                raise ValueError(f'{key} out of range with {value}')
+
+
+def override(pipette_id: str, fields: TypeOverrides):
+    """
+    Override configuration for pipette. Validate then save.
+
+    :param pipette_id: The pipette id
+    :param fields: Dict of field name to override value
+    """
+    config_match = list_mutable_configs(pipette_id)
+    whole_config = load_config_dict(pipette_id)
+    validate_overrides(data=fields, config_model=config_match)
+    save_overrides(pipette_id, fields, whole_config.get('model'))
+
+
+def save_overrides(pipette_id: str,
+                   overrides: TypeOverrides,
+                   model: Optional[str]):
+    """
+    Save overrides for the pipette.
+
+    :param pipette_id: The pipette id
+    :param overrides: The incoming values
+    :param model: The model of pipette
+    :return: None
+    """
     override_dir = CONFIG['pipette_config_overrides_dir']
     model_configs = configs[model]
+    model_configs_quirks = {key: True for key in model_configs['quirks']}
     try:
         existing = load_overrides(pipette_id)
         # Add quirks setting for pipettes already with a pipette id file
         if 'quirks' not in existing.keys():
-            existing['quirks'] = {key: True for key in model_configs['quirks']}
+            existing['quirks'] = model_configs_quirks
     except FileNotFoundError:
-        existing = {key: True for key in model_configs['quirks']}
+        existing = model_configs_quirks
 
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
@@ -243,13 +298,13 @@ def save_overrides(
         if value is None:
             if existing.get(key):
                 del existing[key]
-        elif isinstance(value['value'], bool):
+        elif isinstance(value, bool):
             existing, model_configs = change_quirks(
-                {key: value['value']}, existing, model_configs)
+                {key: value}, existing, model_configs)
         else:
             if not model_configs[key].get('default'):
                 model_configs[key]['default'] = model_configs[key]['value']
-            model_configs[key]['value'] = value['value']
+            model_configs[key]['value'] = value
             existing[key] = model_configs[key]
     assert model in config_models
     existing['model'] = model
@@ -362,7 +417,7 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
     if pipette_id in known_pipettes():
         config = load_config_dict(pipette_id)
     else:
-        log.info('Pipette id {} not found'.format(pipette_id))
+        log.info('Pipette id %s not found', pipette_id)
         return cfg
 
     for key in config:

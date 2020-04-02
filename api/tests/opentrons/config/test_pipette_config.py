@@ -1,7 +1,9 @@
 import json
+from unittest.mock import patch
 from numpy import isclose
 
 import pytest
+from opentrons import types
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
 from opentrons.system.shared_data import load_shared_data
@@ -137,11 +139,9 @@ def test_override_save(config_tempdir):
     cdir = CONFIG['pipette_config_overrides_dir']
 
     overrides = {
-        'pickUpCurrent': {
-            'value': 1231.213},
-        'dropTipSpeed': {
-            'value': 121},
-        'dropTipShake': {'value': False}
+        'pickUpCurrent': 1231.213,
+        'dropTipSpeed': 121,
+        'dropTipShake': False
     }
 
     new_id = 'aoa2109j09cj2a'
@@ -158,9 +158,9 @@ def test_override_save(config_tempdir):
     loaded = pipette_config.load_overrides(new_id)
 
     assert loaded['pickUpCurrent']['value'] == \
-        overrides['pickUpCurrent']['value']
+        overrides['pickUpCurrent']
     assert loaded['dropTipSpeed']['value'] == \
-        overrides['dropTipSpeed']['value']
+        overrides['dropTipSpeed']
 
     new_pconf = pipette_config.load('p300_multi_v1.4', new_id)
     assert new_pconf.quirks == []
@@ -184,3 +184,135 @@ def test_mutable_configs_only(monkeypatch):
         set(pipette_config.MUTABLE_CONFIGS)
     # ensure empty
     assert bool(difference) is False
+
+
+def test_mutable_configs_unknown_pipette_id():
+    with patch("opentrons.config.pipette_config.known_pipettes",
+               return_val={}):
+        config = pipette_config.list_mutable_configs("a")
+        assert config == {}
+
+
+@pytest.fixture
+def mock_pipette_config_model():
+    return {
+        'fieldName': {
+            "min": 1,
+            "max": 2,
+        },
+        "quirks": {
+            "quirk1": True,
+            "quirk2": True
+        }
+    }
+
+
+@pytest.mark.parametrize(argnames=["override_field", "expected_error"],
+                         argvalues=[
+                            [{'unknown': 123}, 'Unknown field'],
+                            [{'unknown': True}, 'Unknown field'],
+                            [{'unknown': None}, 'Unknown field'],
+                            [{'quirk1': 321}, 'is invalid for'],
+                            [{'fieldName': "hello"}, 'is invalid for'],
+                            [{'fieldName': 0}, 'out of range'],
+                            [{'fieldName': 5}, 'out of range'],
+                         ])
+def test_validate_overrides_fail(override_field,
+                                 expected_error,
+                                 mock_pipette_config_model):
+    with pytest.raises(ValueError, match=expected_error):
+        pipette_config.validate_overrides(override_field,
+                                          mock_pipette_config_model)
+
+
+@pytest.mark.parametrize(argnames=["override_field"],
+                         argvalues=[
+                            [{'quirk1': False}],
+                            [{'quirk1': None}],
+                            [{'fieldName': None}],
+                            [{'fieldName': 1}],
+                            [{'fieldName': 2}],
+                         ])
+def test_validate_overrides_pass(override_field,
+                                 mock_pipette_config_model):
+    assert pipette_config.validate_overrides(override_field,
+                                             mock_pipette_config_model) is None
+
+
+@pytest.fixture
+async def attached_pipettes(async_client, request):
+    """ Fixture the robot to have attached pipettes
+
+    Mark the node with
+    'attach_left_model': model_name for left (default: p300_single_v1)
+    'attach_right_model': model_name for right (default: p50_multi_v1)
+    'attach_left_id': id for left (default: 'abc123')
+    'attach_right_id': id for right (default: 'acbcd123')
+
+    Returns the model by mount style dict of
+    {'left': {'name': str, 'model': str, 'id': str}, 'right'...}
+    """
+    def marker_with_default(marker: str, default: str) -> str:
+        return request.node.get_closest_marker(marker) or default
+    left_mod = marker_with_default('attach_left_model', 'p300_multi_v1')
+    left_name = left_mod.split('_v')[0]
+    right_mod = marker_with_default('attach_right_model', 'p50_multi_v1')
+    right_name = right_mod.split('_v')[0]
+    left_id = marker_with_default('attach_left_id', 'abc123')
+    right_id = marker_with_default('attach_right_id', 'abcd123')
+    hw = async_client.app['com.opentrons.hardware']
+    hw._backend._attached_instruments = {
+        types.Mount.RIGHT: {
+            'model': right_mod, 'id': right_id, 'name': right_name
+        },
+        types.Mount.LEFT: {
+            'model': left_mod, 'id': left_id, 'name': left_name
+            }
+    }
+    await hw.cache_instruments()
+    return {k.name.lower(): v
+            for k, v in hw._backend._attached_instruments.items()}
+
+
+async def test_override(attached_pipettes):
+    # This test will check that setting modified pipette configs
+    # works as expected
+    changes = {
+        'pickUpCurrent': 1
+    }
+
+    test_id = attached_pipettes['left']['id']
+    # Check data has not been changed yet
+    c = pipette_config.load_config_dict(test_id)
+    assert c['pickUpCurrent'] == \
+        pipette_config.list_mutable_configs(
+            pipette_id=test_id)['pickUpCurrent']
+
+    # Check that data is changed and matches the changes specified
+    pipette_config.override(pipette_id=test_id, fields=changes)
+
+    c = pipette_config.load_config_dict(test_id)
+    assert c['pickUpCurrent']['value'] == changes['pickUpCurrent']
+
+    # Check that None reverts a setting to default
+    changes2 = {
+        'pickUpCurrent': None
+    }
+    # Check that data is changed and matches the changes specified
+    pipette_config.override(pipette_id=test_id, fields=changes2)
+
+    c = pipette_config.load_config_dict(test_id)
+    assert c['pickUpCurrent']['value'] == \
+        pipette_config.list_mutable_configs(
+            pipette_id=test_id)['pickUpCurrent']['default']
+
+
+async def test_incorrect_modify_pipette_settings(attached_pipettes):
+    out_of_range = {
+        'pickUpCurrent': 1000
+    }
+    with pytest.raises(ValueError,
+                       match='pickUpCurrent out of range with 1000'):
+        # check over max fails
+        pipette_config.override(pipette_id=attached_pipettes['left']['id'],
+                                fields=out_of_range)
