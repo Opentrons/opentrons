@@ -207,21 +207,22 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     }
     """
     pipette_id = request.match_info['id']
-    whole_config = pc.load_config_dict(pipette_id)
-    config_match = pc.list_mutable_configs(pipette_id)
-    data = await request.json()
-    if not data.get('fields'):
-        return web.json_response(config_match, status=200)
 
-    for key, value in data['fields'].items():
-        if value and not isinstance(value['value'], bool):
-            config = value['value']
-            default = config_match[key]
-            if config < default['min'] or config > default['max']:
-                return web.json_response(
-                    {'message': '{} out of range with {}'.format(key, config)},
-                    status=412)
-    pc.save_overrides(pipette_id, data['fields'], whole_config.get('model'))
+    data = await request.json()
+    fields = data.get('fields')
+    if fields:
+        config_match = pc.list_mutable_configs(pipette_id)
+        whole_config = pc.load_config_dict(pipette_id)
+        for key, value in fields.items():
+            if value and not isinstance(value['value'], bool):
+                config = value['value']
+                default = config_match[key]
+                if config < default['min'] or config > default['max']:
+                    return web.json_response(
+                        {'message': '{} out of range with {}'.format(key, config)},
+                        status=412)
+        pc.save_overrides(pipette_id, fields, whole_config.get('model'))
+
     updated_configs = {'fields': pc.list_mutable_configs(pipette_id)}
     return web.json_response(updated_configs, status=200)
 
