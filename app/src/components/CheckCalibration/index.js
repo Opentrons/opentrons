@@ -35,7 +35,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }, [dispatch, robotName])
 
   function proceed() {
-    log.debug('proceeded to next robot cal check step', nextSteps)
+    log.debug('TODO: proceed to next robot cal check step', nextSteps)
   }
 
   function exit() {
