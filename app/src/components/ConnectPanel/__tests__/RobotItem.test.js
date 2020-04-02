@@ -18,7 +18,7 @@ import type { State } from '../../../types'
 jest.mock('../../../buildroot/selectors')
 jest.mock('../../../robot/selectors')
 
-const getBuildrotUpdateAvailable: JestMockFn<
+const getBuildrootUpdateAvailable: JestMockFn<
   [State, any],
   $Call<typeof Buildroot.getBuildrootUpdateAvailable, State, any>
 > = Buildroot.getBuildrootUpdateAvailable
@@ -54,7 +54,7 @@ describe('ConnectPanel RobotItem', () => {
   }
 
   beforeEach(() => {
-    getBuildrotUpdateAvailable.mockReturnValue(null)
+    getBuildrootUpdateAvailable.mockReturnValue(null)
     getConnectRequest.mockReturnValue({
       inProgress: false,
       error: null,
@@ -106,7 +106,7 @@ describe('ConnectPanel RobotItem', () => {
   })
 
   it('renders an upgradable robot if buildroot upgrade available', () => {
-    getBuildrotUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
+    getBuildrootUpdateAvailable.mockReturnValue(Buildroot.UPGRADE)
 
     const robot = Fixtures.mockConnectableRobot
     const wrapper = render(robot)
@@ -116,7 +116,7 @@ describe('ConnectPanel RobotItem', () => {
   })
 
   it('renders not upgradable robot if buildroot downgrade available', () => {
-    getBuildrotUpdateAvailable.mockReturnValue(Buildroot.DOWNGRADE)
+    getBuildrootUpdateAvailable.mockReturnValue(Buildroot.DOWNGRADE)
 
     const robot = Fixtures.mockConnectableRobot
     const wrapper = render(robot)
