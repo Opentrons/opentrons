@@ -20,12 +20,13 @@ const NOTE_BODY_2 =
 const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'
 const CLEAR_DECK_HEADER = 'Clear the deck'
-const CLEAR_DECK_BODY = 'Before continuing to check deck calibration, please remove all labware and modules from the deck.'
+const CLEAR_DECK_BODY =
+  'Before continuing to check deck calibration, please remove all labware and modules from the deck.'
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
   proceed: () => mixed,
-  exit : () => mixed,
+  exit: () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
   const { labwareLoadNames, proceed, exit } = props
@@ -77,20 +78,18 @@ export function Introduction(props: IntroductionProps) {
           {CONTINUE}
         </PrimaryButton>
       </div>
-      {
-        clearDeckWarningOpen && (
-          <AlertModal
-            alertOverlay
-            heading={CLEAR_DECK_HEADER}
-            buttons={[
-              { children: CANCEL, onClick: exit, },
-              { children: CONTINUE, onClick: proceed },
-            ]}
-          >
-            {CLEAR_DECK_BODY}
-          </AlertModal>
-        )
-      }
+      {clearDeckWarningOpen && (
+        <AlertModal
+          alertOverlay
+          heading={CLEAR_DECK_HEADER}
+          buttons={[
+            { children: CANCEL, onClick: exit },
+            { children: CONTINUE, onClick: proceed },
+          ]}
+        >
+          {CLEAR_DECK_BODY}
+        </AlertModal>
+      )}
     </>
   )
 }

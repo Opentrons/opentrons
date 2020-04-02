@@ -1,21 +1,14 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
 
-import * as Calibration from '../../../calibration'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
-
 import { Introduction } from '../Introduction'
-
-import type { State } from '../../../types'
 
 jest.mock('../../../calibration/selectors')
 
 describe('Introduction', () => {
-  let mockStore
   let render
 
   const mockExit = jest.fn()
@@ -23,6 +16,18 @@ describe('Introduction', () => {
 
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="Continue"]').find('button')
+
+  const getClearDeckContinueButton = wrapper =>
+    wrapper
+      .find(AlertModal)
+      .find('OutlineButton[children="Continue"]')
+      .find('button')
+
+  const getClearDeckCancelButton = wrapper =>
+    wrapper
+      .find(AlertModal)
+      .find('OutlineButton[children="Cancel"]')
+      .find('button')
 
   const tiprackLoadnames = [
     'opentrons_96_tiprack_20ul',
@@ -59,5 +64,19 @@ describe('Introduction', () => {
     wrapper.update()
 
     expect(wrapper.exists('AlertModal[heading="Clear the deck"]')).toBe(true)
+  })
+
+  it('clicking continue in clear deck warning proceeds to next step and cancel exits', () => {
+    const wrapper = render()
+    act(() => getContinueButton(wrapper).invoke('onClick')())
+    wrapper.update()
+
+    act(() => getClearDeckContinueButton(wrapper).invoke('onClick')())
+    wrapper.update()
+    expect(mockProceed).toHaveBeenCalled()
+
+    act(() => getClearDeckCancelButton(wrapper).invoke('onClick')())
+    wrapper.update()
+    expect(mockExit).toHaveBeenCalled()
   })
 })

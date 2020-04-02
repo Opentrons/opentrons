@@ -28,7 +28,6 @@ describe('CheckCalibration', () => {
   const getBackButton = wrapper =>
     wrapper.find({ title: 'Back' }).find('button')
 
-
   beforeEach(() => {
     mockStore = {
       subscribe: () => {},
