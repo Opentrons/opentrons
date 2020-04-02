@@ -18,10 +18,7 @@ const makeUpdateStateModifier = (handleStateUpdate: HandleStateUpdate) => ({
   name: 'updateUsePopperState',
   enabled: true,
   phase: 'write',
-  fn: ({ state }) => {
-    console.log('applyStyles', state)
-    handleStateUpdate(state.placement, state.styles)
-  },
+  fn: ({ state }) => handleStateUpdate(state.placement, state.styles),
 })
 
 const makeOffsetModifier = (offset: number) => ({

@@ -14,14 +14,19 @@ const { targetRef, ...tooltipProps } = useTooltip()
 </>
 ```
 
-Getting a little fancier and overriding the position:
+Getting a little fancier and overriding the placement:
 
 ```js
-import { useTooltip } from '@opentrons/components'
-const [placement, setPlacement] = React.useState(null)
-const { targetRef, ...tooltipProps } = useTooltip({ placement })
+import {
+  useTooltip,
+  TOOLTIP_TOP,
+  TOOLTIP_RIGHT,
+  TOOLTIP_BOTTOM,
+  TOOLTIP_LEFT,
+} from '@opentrons/components'
 
-const handleChange = e => setPlacement(e.target.value)
+const [placement, setPlacement] = React.useState(TOOLTIP_RIGHT)
+const { targetRef, ...tooltipProps } = useTooltip({ placement })
 
 ;<>
   <span ref={targetRef} aria-describedby={tooltipProps.tooltipId}>
@@ -31,22 +36,18 @@ const handleChange = e => setPlacement(e.target.value)
     Something Explanatory!
   </Tooltip>
   <div style={{ float: 'left', marginRight: '8rem' }}>
-    <label style={{ display: 'block' }}>
-      <input type="radio" name="place" value="top" onChange={handleChange} />
-      top
-    </label>
-    <label style={{ display: 'block' }}>
-      <input type="radio" name="place" value="right" onChange={handleChange} />
-      right
-    </label>
-    <label style={{ display: 'block' }}>
-      <input type="radio" name="place" value="bottom" onChange={handleChange} />
-      bottom
-    </label>
-    <label style={{ display: 'block' }}>
-      <input type="radio" name="place" value="left" onChange={handleChange} />
-      left
-    </label>
+    {[TOOLTIP_TOP, TOOLTIP_RIGHT, TOOLTIP_BOTTOM, TOOLTIP_LEFT].map(p => (
+      <label style={{ display: 'block' }}>
+        <input
+          type="radio"
+          name="place"
+          value={p}
+          onChange={() => setPlacement(p)}
+          checked={placement === p}
+        />
+        {p}
+      </label>
+    ))}
   </div>
 </>
 ```

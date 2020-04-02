@@ -7,7 +7,7 @@ import * as Styles from './styles'
 import type { UseTooltipOptions, UseTooltipResult, Placement } from './types'
 
 type TooltipState = {|
-  placement: Placement | '',
+  placement: Placement | null,
   tooltipStyle: $Shape<CSSStyleDeclaration>,
   arrowStyle: $Shape<CSSStyleDeclaration>,
 |}
@@ -21,7 +21,7 @@ export function useTooltip(options: UseTooltipOptions = {}): UseTooltipResult {
   const [tooltip, tooltipRef] = useState<HTMLElement | null>(null)
   const [arrow, arrowRef] = useState<HTMLElement | null>(null)
   const [tooltipState, setTooltipState] = useState<TooltipState>({
-    placement: '',
+    placement: null,
     tooltipStyle: Styles.INITIAL_TOOLTIP_STYLE,
     arrowStyle: Styles.INITIAL_ARROW_STYLE,
   })

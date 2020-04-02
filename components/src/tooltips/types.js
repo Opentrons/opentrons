@@ -40,7 +40,7 @@ export type UseTooltipOptions = $Shape<{|
 
 export type UseTooltipResult = {|
   targetRef: (HTMLElement | null) => mixed,
-  placement: Placement | '',
+  placement: Placement | null,
   tooltipId: string,
   tooltipRef: (HTMLElement | null) => mixed,
   tooltipStyle: $Shape<CSSStyleDeclaration>,

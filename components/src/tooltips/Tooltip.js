@@ -19,20 +19,30 @@ const TOOLTIP_CSS = css`
 `
 
 export type TooltipProps = {|
+  /** Whether or not the tooltip should be rendered */
   visible: boolean,
-  placement: Placement | '',
-  tooltipId: string,
-  tooltipRef: (HTMLElement | null) => mixed,
-  tooltipStyle: $Shape<CSSStyleDeclaration>,
-  arrowRef: (HTMLElement | null) => mixed,
-  arrowStyle: $Shape<CSSStyleDeclaration>,
+  /** Contents of the tooltip */
   children?: React.Node,
+  /** Actual tooltip placement, if known (provided by useTooltip) */
+  placement: Placement | null,
+  /**
+   * Tooltip element ID (provided by useTooltip). Should match
+   * aria-describedby on target element
+   */
+  tooltipId: string,
+  /** React function ref for tooltip element (provided by useTooltip) */
+  tooltipRef: (HTMLElement | null) => mixed,
+  /** Inline styles to apply to the tooltip element (provided by useTooltip) */
+  tooltipStyle: $Shape<CSSStyleDeclaration>,
+  /** React function ref for tooltip's arrow element (provided by useTooltip) */
+  arrowRef: (HTMLElement | null) => mixed,
+  /** Inline styles to apply to arrow element (provided by useTooltip) */
+  arrowStyle: $Shape<CSSStyleDeclaration>,
 |}
 
 /**
  * Tooltip component that renders based on its `visible` prop. For use with the
- * `useTooltip` hook; see examples below.
- * ```
+ * `useTooltip` hook; see examples in `Tooltip.md`.
  */
 export function Tooltip(props: TooltipProps) {
   const {
@@ -111,13 +121,13 @@ const ARROW_CSS_BY_PLACEMENT_BASE: { [string]: CSSRules | void } = {
 }
 
 export type ArrowProps = {|
-  placement: Placement | '',
+  placement: Placement | null,
   arrowRef: (HTMLElement | null) => mixed,
   arrowStyle: $Shape<CSSStyleDeclaration>,
 |}
 
 export function Arrow(props: ArrowProps) {
-  const { placement = '' } = props
+  const placement = props.placement ?? ''
   const placementBase = placement.split('-')[0]
   const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]
 
