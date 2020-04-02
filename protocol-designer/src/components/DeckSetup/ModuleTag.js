@@ -6,6 +6,7 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  type ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
 import { timelineFrameBeforeActiveItem } from '../../top-selectors/timelineFrames'
@@ -91,9 +92,9 @@ const ModuleTagComponent = (props: Props) => {
   const moduleEntity = useSelector(stepFormSelectors.getModuleEntities)[
     props.id
   ]
-  const moduleState: ?* =
+  const moduleState: ?$PropertyType<ModuleTemporalProperties, 'moduleState'> =
     timelineFrame.robotState.modules[props.id]?.moduleState
-  const moduleType: ?* = moduleEntity?.type
+  const moduleType: ?ModuleRealType = moduleEntity?.type
 
   const hoveredLabwares = useSelector(uiSelectors.getHoveredStepLabware)
   const initialDeck = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -128,6 +129,7 @@ const ModuleTagComponent = (props: Props) => {
       height={TAG_HEIGHT}
       width={TAG_WIDTH}
       innerDivProps={{
+        'data-test': `ModuleTag_${moduleType}`,
         className: cx(styles.module_info_tag, {
           [styles.highlighted_border_right_none]:
             isHoveredModuleStep && props.orientation === 'left',
