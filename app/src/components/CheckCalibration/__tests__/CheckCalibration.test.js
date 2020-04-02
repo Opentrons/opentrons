@@ -23,10 +23,11 @@ describe('CheckCalibration', () => {
   let mockStore
   let render
 
+  const mockCloseCalibrationCheck = jest.fn()
+
   const getBackButton = wrapper =>
     wrapper.find({ title: 'Back' }).find('button')
 
-  const mockCloseCalibrationCheck = () => {}
 
   beforeEach(() => {
     mockStore = {
