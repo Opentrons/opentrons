@@ -2,7 +2,7 @@
 // labware load name with copy button
 import * as React from 'react'
 
-import { IconButton, Tooltip } from '@opentrons/components'
+import { IconButton, DeprecatedTooltip } from '@opentrons/components'
 import { LabelText, LABEL_TOP } from '../ui'
 
 import { API_NAME, COPIED_TO_CLIPBOARD } from '../../localization'
@@ -58,7 +58,7 @@ export function LoadName(props: LoadNameProps) {
           readOnly
         />
       </label>
-      <Tooltip open={success} tooltipComponent={COPIED_TO_CLIPBOARD}>
+      <DeprecatedTooltip open={success} tooltipComponent={COPIED_TO_CLIPBOARD}>
         {tooltipProps => (
           <IconButton
             onClick={handleCopyButtonClick}
@@ -68,7 +68,7 @@ export function LoadName(props: LoadNameProps) {
             inverted
           />
         )}
-      </Tooltip>
+      </DeprecatedTooltip>
     </div>
   )
 }
