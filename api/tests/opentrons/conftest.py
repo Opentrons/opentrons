@@ -352,6 +352,7 @@ async def hardware(request, loop, virtual_smoothie_env):
     try:
         yield hw_sim
     finally:
+        config.robot_configs.clear()
         hw_sim.set_config(old_config)
         hw_sim.clean_up()
 
