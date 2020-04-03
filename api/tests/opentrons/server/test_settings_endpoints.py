@@ -3,14 +3,7 @@ from unittest.mock import patch
 
 import pytest
 
-from opentrons.server import endpoints
 from opentrons.config.reset import ResetOptionId
-
-
-@pytest.fixture
-def restore_restart_required():
-    yield
-    endpoints.settings._SETTINGS_RESTART_REQUIRED = False
 
 
 def validate_response_body(body):

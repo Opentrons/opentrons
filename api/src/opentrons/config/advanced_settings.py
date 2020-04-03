@@ -60,7 +60,7 @@ class SettingDefinition:
         return get_setting_with_env_overload(self.show_if[0]) == \
             self.show_if[1]
 
-    def on_change(self, value: bool):
+    def on_change(self, value: Optional[bool]):
         """
         An opportunity for side effects as a result of change a setting
         value
@@ -78,7 +78,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
                         ' for analysis. Opentrons uses these logs to'
                         ' troubleshoot robot issues and spot error trends.')
 
-    def on_change(self, value: bool):
+    def on_change(self, value: Optional[bool]):
         """Special side effect for this setting"""
         if ARCHITECTURE == SystemArchitecture.BUILDROOT:
             code, stdout, stderr = asyncio.get_event_loop().run_until_complete(
@@ -91,6 +91,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
                 raise SettingException(
                     f'Failed to set log upstreaming: {code}'
                 )
+        super().on_change(value)
 
 
 class Setting(NamedTuple):
@@ -159,7 +160,7 @@ if ARCHITECTURE == SystemArchitecture.BUILDROOT:
 settings_by_id: Dict[str, SettingDefinition] = \
     {s.id: s for s in settings}
 settings_by_old_id: Dict[str, SettingDefinition] = \
-    {s.old_id: s for s in settings}
+    {s.old_id: s for s in settings if s.old_id}
 
 
 # TODO: LRU cache?
@@ -188,8 +189,7 @@ def set_adv_setting(_id: str, value: Optional[bool]):
     if _id not in setting_data.settings_map:
         raise ValueError(f"{_id} is not recognized")
     # Side effecting
-    xx = settings_by_id[_id]
-    xx.on_change(value)
+    settings_by_id[_id].on_change(value)
 
     setting_data.settings_map[_id] = value
     _write_settings_file(setting_data.settings_map,

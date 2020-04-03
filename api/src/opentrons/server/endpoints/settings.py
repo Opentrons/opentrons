@@ -4,13 +4,8 @@ from typing import Dict, List, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
-                              pipette_config as pc,
-                              ARCHITECTURE,
-                              SystemArchitecture)
+                              pipette_config as pc)
 from opentrons.config import reset as reset_util
-
-if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-    from opentrons.system import log_control
 
 log = logging.getLogger(__name__)
 
@@ -36,8 +31,8 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
 
 
 def _get_adv_settings_response() -> Dict[
-        str, Union[Dict[str, str],
-                   List[Dict[str, Union[str, bool, None]]]]]:
+    str, Union[Dict[str, str],
+               List[Dict[str, Union[str, bool, None]]]]]:
     data = advs.get_all_adv_settings()
 
     if advs.restart_required():
@@ -47,14 +42,14 @@ def _get_adv_settings_response() -> Dict[
 
     return {
         'links': links,
-        'settings': [
-            {"id":s.definition.id,
+        'settings': [{
+            "id": s.definition.id,
             "old_id": s.definition.old_id,
             "title": s.definition.title,
             "description": s.definition.description,
-            "restart_required": s.definition.restart_required
-             } for s in data.values()
-        ]
+            "restart_required": s.definition.restart_required,
+            "value": s.value
+        } for s in data.values()]
     }
 
 
@@ -77,11 +72,11 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     -> 200 OK {"settings": (as GET /settings),
                "links": {"restart": uri if restart required}}
     """
-    global _SETTINGS_RESTART_REQUIRED
     data = await request.json()
     key = data.get('id')
     value = data.get('value')
     log.info(f'set_advanced_setting: {key} -> {value}')
+
     setting = advs.settings_by_id.get(key)
     if not setting:
         log.warning(f'set_advanced_setting: bad request: {key} invalid')
@@ -91,24 +86,14 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
              'links': {}},
             status=400)
 
-    old_val = advs.get_adv_setting(key)
-    advs.set_adv_setting(key, value)
+    try:
+        advs.set_adv_setting(key, value)
+    except ValueError as e:
+        return web.json_response({
+            'error': 'no-such-advanced-setting',
+            'message': str(e),
+            'links': {}}, status=400)
 
-    if key == 'disableLogAggregation'\
-       and ARCHITECTURE == SystemArchitecture.BUILDROOT:
-        code, stdout, stderr = await log_control.set_syslog_level(
-            'emerg' if value else 'info')
-        if code != 0:
-            log.error(
-                f"Could not set log control: {code}: stdout={stdout}"
-                f" stderr={stderr}")
-            return web.json_response(
-                {'error': 'log-config-failure',
-                 'message': 'Failed to set log upstreaming: {code}'},
-                status=500)
-
-    _SETTINGS_RESTART_REQUIRED = _SETTINGS_RESTART_REQUIRED or (
-        setting.restart_required and old_val != value)
     return web.json_response(
         _get_adv_settings_response(),
         status=200,

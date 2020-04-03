@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import patch, MagicMock
+from unittest.mock import patch
 
 from opentrons.config import advanced_settings, CONFIG
 
@@ -65,7 +65,8 @@ def test_get_all_adv_settings(mock_read_settings_file,
 
 
 def test_get_all_adv_settings_empty(mock_read_settings_file):
-    mock_read_settings_file.return_value = advanced_settings.SettingsData({}, 1)
+    mock_read_settings_file.return_value = \
+        advanced_settings.SettingsData({}, 1)
     s = advanced_settings.get_all_adv_settings()
     assert s == {}
 
@@ -80,7 +81,8 @@ def test_set_adv_setting(mock_read_settings_file,
         advanced_settings.set_adv_setting(k, not v)
         mock_write_settings_file.assert_called_with(
             # Only the current key is toggled
-            {nk: nv if nk != k else not v for nk, nv in mock_settings_values.items()},
+            {nk: nv if nk != k else not v
+             for nk, nv in mock_settings_values.items()},
             mock_settings_version,
             CONFIG['feature_flags_file']
         )
@@ -88,7 +90,8 @@ def test_set_adv_setting(mock_read_settings_file,
 
 def test_set_adv_setting_unknown(mock_read_settings_file,
                                  mock_write_settings_file):
-    mock_read_settings_file.return_value = advanced_settings.SettingsData({}, 1)
+    mock_read_settings_file.return_value = \
+        advanced_settings.SettingsData({}, 1)
     with pytest.raises(ValueError, match="is not recognized"):
         advanced_settings.set_adv_setting("no", False)
 
