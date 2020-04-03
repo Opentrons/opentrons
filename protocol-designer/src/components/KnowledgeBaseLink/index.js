@@ -14,7 +14,7 @@ export const links = {
     'https://intercom.help/opentrons-protocol-designer/en/articles/3846910-module-placement',
   betaReleases: `https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases`,
   magneticModuleGenerations:
-    ' http://support.opentrons.com/en/articles/1820112-magnetic-module',
+    'http://support.opentrons.com/en/articles/1820112-magnetic-module',
 }
 
 type Link = $Keys<typeof links>
