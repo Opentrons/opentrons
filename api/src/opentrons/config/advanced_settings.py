@@ -1,21 +1,33 @@
 import json
+import asyncio
 import logging
 import os
 import sys
-from typing import Any, Dict, Mapping, Tuple, Union, Optional, TYPE_CHECKING
+from typing import Any, Dict, Mapping, Tuple, Union, \
+    Optional, TYPE_CHECKING, NamedTuple
 
 from opentrons.config import CONFIG, ARCHITECTURE, SystemArchitecture
+from opentrons.system import log_control
 
 if TYPE_CHECKING:
     from pathlib import Path  # noqa(F401) - imported for types
 
-SettingsMap = Dict[str, Optional[bool]]
-SettingsData = Tuple[SettingsMap, int]
-
 log = logging.getLogger(__name__)
 
 
-class Setting:
+SettingsMap = Dict[str, Optional[bool]]
+
+
+class SettingException(Exception):
+    pass
+
+
+class SettingsData(NamedTuple):
+    settings_map: SettingsMap
+    version: int
+
+
+class SettingDefinition:
     def __init__(self, _id: str, title: str, description: str,
                  old_id: str = None,
                  restart_required: bool = False,
@@ -38,43 +50,90 @@ class Setting:
     def __repr__(self):
         return '{}: {}'.format(self.__class__, self.id)
 
+    def should_show(self) -> bool:
+        """
+        Use show_if attribute to determine if setting should be presented
+        to users
+        """
+        if not self.show_if:
+            return True
+        return get_setting_with_env_overload(self.show_if[0]) == \
+            self.show_if[1]
+
+    def on_change(self, value: bool):
+        """
+        An opportunity for side effects as a result of change a setting
+        value
+        """
+        if self.restart_required:
+            set_restart_required()
+
+
+class DisableLogIntegrationSettingDefinition(SettingDefinition):
+    def __init__(self):
+        super().__init__(
+            _id='disableLogAggregation',
+            title='Disable Opentrons Log Collection',
+            description='Prevent the robot from sending its logs to Opentrons'
+                        ' for analysis. Opentrons uses these logs to'
+                        ' troubleshoot robot issues and spot error trends.')
+
+    def on_change(self, value: bool):
+        """Special side effect for this setting"""
+        if ARCHITECTURE == SystemArchitecture.BUILDROOT:
+            code, stdout, stderr = asyncio.get_event_loop().run_until_complete(
+                log_control.set_syslog_level('emerg' if value else 'info')
+            )
+            if code != 0:
+                log.error(
+                    f"Could not set log control: {code}: stdout={stdout}"
+                    f" stderr={stderr}")
+                raise SettingException(
+                    f'Failed to set log upstreaming: {code}'
+                )
+
+
+class Setting(NamedTuple):
+    value: Optional[bool]
+    definition: SettingDefinition
+
 
 # If you add or remove any settings here BE SURE TO ADD A MIGRATION below.
 # You will also need to update the migration tests in:
 # api/tests/opentrons/config/test_advanced_settings_migration.py
 settings = [
-    Setting(
+    SettingDefinition(
         _id='shortFixedTrash',
         old_id='short-fixed-trash',
         title='Short (55mm) fixed trash',
         description='Trash box is 55mm tall (rather than the 77mm default)'
     ),
-    Setting(
+    SettingDefinition(
         _id='calibrateToBottom',
         old_id='calibrate-to-bottom',
         title='Calibrate to bottom',
         description='Calibrate using the bottom-center of well A1 for each'
                     ' labware (rather than the top-center)'
     ),
-    Setting(
+    SettingDefinition(
         _id='deckCalibrationDots',
         old_id='dots-deck-type',
         title='Deck calibration to dots',
         description='Perform deck calibration to dots rather than crosses, for'
                     ' robots that do not have crosses etched on the deck'
     ),
-    Setting(
+    SettingDefinition(
         _id='useProtocolApi2',
         title='Use Protocol API version 2',
         description='Deprecated feature flag'
     ),
-    Setting(
+    SettingDefinition(
         _id='disableHomeOnBoot',
         old_id='disable-home-on-boot',
         title='Disable home on boot',
         description='Prevent robot from homing motors on boot'
     ),
-    Setting(
+    SettingDefinition(
         _id='useOldAspirationFunctions',
         title='Use older aspirate behavior',
         description='Aspirate with the less accurate volumetric calibrations'
@@ -82,7 +141,7 @@ settings = [
                     ' need consistency with pre-v3.7.0 results. This only'
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     ),
-    Setting(
+    SettingDefinition(
         _id='useFastApi',
         title='Enable experimental HTTP API v2',
         description='Tells the OT-2 to run a newer, highly experimental '
@@ -94,38 +153,30 @@ settings = [
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-    settings.append(
-        Setting(
-            _id='disableLogAggregation',
-            title='Disable Opentrons Log Collection',
-            description='Prevent the robot from sending its logs to Opentrons'
-                        ' for analysis. Opentrons uses these logs to'
-                        ' troubleshoot robot issues and spot error trends.'))
+    settings.append(DisableLogIntegrationSettingDefinition())
 
-settings_by_id = {s.id: s for s in settings}
-settings_by_old_id = {s.old_id: s for s in settings}
+
+settings_by_id: Dict[str, SettingDefinition] = \
+    {s.id: s for s in settings}
+settings_by_old_id: Dict[str, SettingDefinition] = \
+    {s.old_id: s for s in settings}
 
 
 # TODO: LRU cache?
-def get_adv_setting(setting: str) -> Optional[bool]:
+def get_adv_setting(setting: str) -> Optional[Setting]:
     setting = _clean_id(setting)
     s = get_all_adv_settings()
-    return s.get(setting, {}).get('value')  # type: ignore
+    return s.get(setting, None)
 
 
-def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
-    """
-    :return: a dict of settings keyed by setting ID, where each value is a
-        dict with keys "id", "title", "description", "value",
-        "restart_required", and "show_if"
-    """
+def get_all_adv_settings() -> Dict[str, Setting]:
+    """Get all the advanced setting values and definitions"""
     settings_file = CONFIG['feature_flags_file']
 
     values, _ = _read_settings_file(settings_file)
 
     return {
-        key: {**settings_by_id[key].__dict__,
-              'value': value}
+        key: Setting(value=value, definition=settings_by_id[key])
         for key, value in values.items() if key in settings_by_id
     }
 
@@ -133,9 +184,17 @@ def get_all_adv_settings() -> Dict[str, Dict[str, Union[str, bool, None]]]:
 def set_adv_setting(_id: str, value: Optional[bool]):
     _id = _clean_id(_id)
     settings_file = CONFIG['feature_flags_file']
-    settings, version = _read_settings_file(settings_file)
-    settings[_id] = value
-    _write_settings_file(settings, version, settings_file)
+    setting_data = _read_settings_file(settings_file)
+    if _id not in setting_data.settings_map:
+        raise ValueError(f"{_id} is not recognized")
+    # Side effecting
+    xx = settings_by_id[_id]
+    xx.on_change(value)
+
+    setting_data.settings_map[_id] = value
+    _write_settings_file(setting_data.settings_map,
+                         setting_data.version,
+                         settings_file)
 
 
 def _clean_id(_id: str) -> str:
@@ -167,7 +226,7 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
     :param settings_file: the path to the settings file
     :return: a dict with all new settings IDs as the keys, and boolean values
         (the values stored in the settings file, or `False` if the key was not
-        found).
+        found). Along with the version.
     """
     # Read settings from persistent file
     data = _read_json_file(settings_file)
@@ -177,7 +236,7 @@ def _read_settings_file(settings_file: 'Path') -> SettingsData:
     if data.get('_version') != version:
         _write_settings_file(settings, version, settings_file)
 
-    return settings, version
+    return SettingsData(settings_map=settings, version=version)
 
 
 def _write_settings_file(data: Mapping[str, Any],
@@ -262,7 +321,7 @@ def _migrate(data: Mapping[str, Any]) -> SettingsData:
     for m in migrations:
         next = m(next)
 
-    return next, target_version
+    return SettingsData(settings_map=next, version=target_version)
 
 
 def _ensure(data: Mapping[str, Any]) -> SettingsMap:
@@ -283,3 +342,22 @@ def get_setting_with_env_overload(setting_name):
         return os.environ[env_name].lower() in {'1', 'true', 'on'}
     else:
         return get_adv_setting(setting_name) is True
+
+
+_SETTINGS_RESTART_REQUIRED = False
+# This is a bit of global state that indicates whether a setting has changed
+# that requires a restart. It's OK for this to be global because the behavior
+# it's catching is global - changing the kind of setting that requires a
+# a restart anywhere, even if you theoretically have two servers running in
+# the same process, will require _all_ of them to be restarted.
+
+
+def restart_required() -> bool:
+    return _SETTINGS_RESTART_REQUIRED
+
+
+def set_restart_required() -> bool:
+    """Set the restart required flag."""
+    global _SETTINGS_RESTART_REQUIRED
+    _SETTINGS_RESTART_REQUIRED = True
+    return _SETTINGS_RESTART_REQUIRED

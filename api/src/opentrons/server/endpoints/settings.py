@@ -40,13 +40,7 @@ def _get_adv_settings_response() -> Dict[
                    List[Dict[str, Union[str, bool, None]]]]]:
     data = advs.get_all_adv_settings()
 
-    def _should_show(setting_dict):
-        if not setting_dict['show_if']:
-            return True
-        return advs.get_setting_with_env_overload(setting_dict['show_if'][0])\
-            == setting_dict['show_if'][1]
-
-    if _SETTINGS_RESTART_REQUIRED:
+    if advs.restart_required():
         links = {'restart': '/server/restart'}
     else:
         links = {}
@@ -54,9 +48,14 @@ def _get_adv_settings_response() -> Dict[
     return {
         'links': links,
         'settings': [
-            {k: v for k, v in setting.items() if k != 'show_if'}
-            for setting in data.values()
-            if _should_show(setting)]}
+            {"id":s.definition.id,
+            "old_id": s.definition.old_id,
+            "title": s.definition.title,
+            "description": s.definition.description,
+            "restart_required": s.definition.restart_required
+             } for s in data.values()
+        ]
+    }
 
 
 async def set_advanced_setting(request: web.Request) -> web.Response:
