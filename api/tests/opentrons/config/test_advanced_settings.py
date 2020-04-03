@@ -113,3 +113,21 @@ def test_restart_required(restore_restart_required):
     _id = 'useFastApi'
     advanced_settings.set_adv_setting(_id, True)
     assert advanced_settings.restart_required() is True
+
+
+def test_get_setting_use_env_overload(mock_read_settings_file,
+                                      mock_settings_values):
+    with patch("os.environ",
+               new={
+                   "OT_API_FF_useProtocolApi2": "FALSE"
+               }):
+        v = advanced_settings.get_setting_with_env_overload("useProtocolApi2")
+        assert v is not mock_settings_values['useProtocolApi2']
+
+
+def test_get_setting_with_env_overload(mock_read_settings_file,
+                                       mock_settings_values):
+    with patch("os.environ",
+               new={}):
+        v = advanced_settings.get_setting_with_env_overload("useProtocolApi2")
+        assert v is mock_settings_values['useProtocolApi2']

@@ -341,7 +341,8 @@ def get_setting_with_env_overload(setting_name):
     if env_name in os.environ:
         return os.environ[env_name].lower() in {'1', 'true', 'on'}
     else:
-        return get_adv_setting(setting_name) is True
+        s = get_adv_setting(setting_name)
+        return s.value is True if s is not None else False
 
 
 _SETTINGS_RESTART_REQUIRED = False
