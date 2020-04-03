@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import styles from './MagneticModuleWarningModalContent.css'
+import { KnowledgeBaseLink } from '../../KnowledgeBaseLink'
 
 export const MagneticModuleWarningModalContent = () => (
   <div className={styles.content}>
@@ -30,8 +31,8 @@ export const MagneticModuleWarningModalContent = () => (
       magnet is engaged.
     </p>
     <p>
-      Read more about the difference between GEN1 and GEN2 magnetic modules
-      here.{/* TODO IMMEDIATELY add KnowledgeBaseLink */}
+      Read more about the difference between GEN1 and GEN2 magnetic modules{' '}
+      <KnowledgeBaseLink to="magneticModuleGenerations">here</KnowledgeBaseLink>
     </p>
   </div>
 )
