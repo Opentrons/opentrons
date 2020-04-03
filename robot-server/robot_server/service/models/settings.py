@@ -15,7 +15,7 @@ class AdvancedSetting(BaseModel):
     id: str = \
         Field(...,
               description="The machine-readable property ID")
-    old_id: str = \
+    old_id: Optional[str] = \
         Field(...,
               description="The ID by which the property used to be known; not"
                           " useful now and may contain spaces or hyphens")
@@ -38,7 +38,29 @@ class AdvancedSetting(BaseModel):
                           "has never been altered (null)")
 
 
-AdvancedSettings = typing.List[AdvancedSetting]
+class Links(BaseModel):
+    restart: Optional[str] = Field(
+        None,
+        description="A URI to POST to restart the robot. If this is present,"
+                    " it must be requested for any settings changes to take "
+                    "effect")
+
+
+class AdvancedSettingsResponse(BaseModel):
+    """A dump of advanced settings and suitable links for next action"""
+    settings: typing.List[AdvancedSetting]
+    links: Links
+
+
+class AdvancedSettingRequest(BaseModel):
+    """Configure the setting to change and the new value"""
+    id: str = Field(
+        ...,
+        description="The ID of the setting to change (something returned by"
+                    " GET /settings)")
+    value: Optional[bool] = Field(
+        None,
+        description="The new value to set. If null, reset to default")
 
 
 class LogLevels(str, Enum):

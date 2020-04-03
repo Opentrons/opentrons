@@ -4,6 +4,7 @@ from unittest.mock import patch
 from collections import namedtuple
 
 from opentrons.config.reset import ResetOptionId
+from opentrons.config import advanced_settings
 
 
 # TDOD(isk: 3/20/20): test validation errors after refactor
@@ -364,3 +365,90 @@ def test_set_log_level(api_client, hardware_log_level,
     hardware_log_level.update_config.assert_called_once_with(
         log_level=expected_log_level_name)
     mock_robot_configs.save_robot_settings.assert_called_once()
+
+
+@pytest.fixture
+def mock_get_all_adv_settings():
+    with patch("robot_server.service.routers.settings.advanced_settings.get_all_adv_settings") as p:   # noqa: E501
+        p.return_value = {
+            s.id: advanced_settings.Setting(value=False, definition=s)
+            for s in advanced_settings.settings
+        }
+        yield p
+
+
+@pytest.fixture
+def mock_restart_required():
+    with patch("robot_server.service.routers.settings.advanced_settings.restart_required") as p:   # noqa: E501
+        yield p
+
+
+@pytest.fixture
+def mock_set_adv_setting():
+    with patch("robot_server.service.routers.settings.advanced_settings.set_adv_setting") as p:  # noqa: E501
+        yield p
+
+
+def validate_response_body(body, restart):
+    settings_list = body.get('settings')
+    assert type(settings_list) == list
+    for obj in settings_list:
+        assert 'id' in obj, '"id" field not found in settings object'
+        assert 'title' in obj, '"title" not found for {}'.format(obj['id'])
+        assert 'description' in obj, '"description" not found for {}'.format(
+            obj['id'])
+        assert 'value' in obj, '"value" not found for {}'.format(obj['id'])
+        assert 'restart_required' in obj
+    assert 'links' in body
+    assert isinstance(body['links'], dict)
+    assert body['links'].get('restart') == restart
+
+
+@pytest.mark.parametrize(argnames=["restart_required", "link"],
+                         argvalues=[
+                             [False, None],
+                             [True, "/server/restart"]
+                         ])
+def test_get(api_client, mock_get_all_adv_settings, mock_restart_required,
+             restart_required, link):
+    mock_restart_required.return_value = restart_required
+    resp = api_client.get('/settings')
+    body = resp.json()
+    assert resp.status_code == 200
+    validate_response_body(body, link)
+
+
+@pytest.mark.parametrize(argnames=["exc", "expected_status"],
+                         argvalues=[
+                             [ValueError("Failure"), 400],
+                             [advanced_settings.SettingException("Fail", "e"),
+                              500]
+                         ])
+def test_set_err(api_client, mock_restart_required,
+                 mock_set_adv_setting, exc, expected_status):
+    mock_restart_required.return_value = False
+
+    def raiser(i, v):
+        raise exc
+    mock_set_adv_setting.side_effect = raiser
+
+    test_id = 'disableHomeOnBoot'
+
+    resp = api_client.post(
+        '/settings', json={"id": test_id, "value": True})
+    body = resp.json()
+    assert resp.status_code == expected_status
+    assert body == {"message": str(exc)}
+
+
+def test_set(api_client, mock_set_adv_setting, mock_restart_required):
+    mock_restart_required.return_value = False
+
+    test_id = 'disableHomeOnBoot'
+
+    resp = api_client.post(
+        '/settings', json={"id": test_id, "value": True})
+    body = resp.json()
+    assert resp.status_code == 200
+    validate_response_body(body, None)
+    mock_set_adv_setting.assert_called_once_with(test_id, True)

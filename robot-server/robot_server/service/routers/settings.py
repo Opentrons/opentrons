@@ -1,19 +1,22 @@
 import logging
 from typing import Union, Dict
 from http import HTTPStatus
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, Depends
 
 from opentrons.hardware_control import HardwareAPILike
 from opentrons.system import log_control
-from opentrons.config import pipette_config, reset as reset_util, robot_configs
+from opentrons.config import pipette_config, reset as reset_util, \
+    robot_configs, advanced_settings
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
-from robot_server.service.models.settings import AdvancedSettings, LogLevel, \
+from robot_server.service.models.settings import AdvancedSettingsResponse, \
+    LogLevel, \
     LogLevels, FactoryResetOptions, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
-    PipetteSettingsInfo, PipetteSettingsFields, FactoryResetOption
+    PipetteSettingsInfo, PipetteSettingsFields, FactoryResetOption, \
+    AdvancedSettingRequest, Links, AdvancedSetting
 
 log = logging.getLogger(__name__)
 
@@ -22,17 +25,51 @@ router = APIRouter()
 
 @router.post("/settings",
              description="Change an advanced setting (feature flag)",
-             response_model=AdvancedSettings)
-async def post_settings() -> AdvancedSettings:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+             response_model=AdvancedSettingsResponse)
+async def post_settings(update: AdvancedSettingRequest)\
+        -> AdvancedSettingsResponse:
+    """Update advanced setting (feature flag)"""
+    try:
+        advanced_settings.set_adv_setting(update.id, update.value)
+    except ValueError as e:
+        raise V1HandlerError(message=str(e),
+                             status_code=HTTPStatus.BAD_REQUEST)
+    except advanced_settings.SettingException as e:
+        # Severe internal error
+        raise V1HandlerError(message=str(e),
+                             status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+    return _create_settings_response()
 
 
 @router.get("/settings",
             description="Get a list of available advanced settings (feature "
                         "flags) and their values",
-            response_model=AdvancedSettings)
-async def get_settings() -> AdvancedSettings:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+            response_model=AdvancedSettingsResponse)
+async def get_settings() -> AdvancedSettingsResponse:
+    """Get advanced setting (feature flags)"""
+    return _create_settings_response()
+
+
+def _create_settings_response() -> AdvancedSettingsResponse:
+    """Create the feature flag settings response object"""
+    data = advanced_settings.get_all_adv_settings()
+
+    if advanced_settings.restart_required():
+        links = Links(restart='/server/restart')
+    else:
+        links = Links()
+
+    return AdvancedSettingsResponse(
+        links=links,
+        settings=[
+            AdvancedSetting(id=s.definition.id,
+                            old_id=s.definition.old_id,
+                            title=s.definition.title,
+                            description=s.definition.description,
+                            restart_required=s.definition.restart_required,
+                            value=s.value
+                            ) for s in data.values()]
+    )
 
 
 @router.post("/settings/log_level/local",
