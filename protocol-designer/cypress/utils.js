@@ -25,7 +25,6 @@ export const expectDeepEqual = (a, b) => {
     // visualize undefineds
     const replacer = (key, value) =>
       typeof value === 'undefined' ? '__undefined__' : value
-    // TODO IMMEDIATELY: try cy.log(message, args)
     throw Error(
       'Expected deep equal: ' +
         JSON.stringify({ a, b, difference: difference(a, b) }, replacer, 4)
