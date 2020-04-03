@@ -162,14 +162,7 @@ async def available_resets(request: web.Request) -> web.Response:
 async def pipette_settings(request: web.Request) -> web.Response:
     res = {}
     for pipette_id in pc.known_pipettes():
-        whole_config = pc.load_config_dict(pipette_id)
-        res[pipette_id] = {
-            'info': {
-                'name': whole_config.get('name'),
-                'model': whole_config.get('model')
-            },
-            'fields': pc.list_mutable_configs(pipette_id=pipette_id)
-        }
+        res[pipette_id] = _make_pipette_response_body(pipette_id)
     return web.json_response(res, status=200)
 
 
@@ -179,6 +172,11 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
         return web.json_response(
             {'message': '{} is not a valid pipette id'.format(pipette_id)},
             status=404)
+    res = _make_pipette_response_body(pipette_id)
+    return web.json_response(res, status=200)
+
+
+def _make_pipette_response_body(pipette_id):
     whole_config = pc.load_config_dict(pipette_id)
     res = {
         'info': {
@@ -187,7 +185,7 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
         },
         'fields': pc.list_mutable_configs(pipette_id)
     }
-    return web.json_response(res, status=200)
+    return res
 
 
 async def modify_pipette_settings(request: web.Request) -> web.Response:
