@@ -1,7 +1,7 @@
 import omit from 'lodash/omit'
 import mapValues from 'lodash/mapValues'
 import each from 'lodash/each'
-import oldProtocol from '../../__tests__/fixtures/throughMigrationV0/doItAll.json'
+import oldProtocol from '../../../../fixtures/1/doItAll.json'
 import {
   renameOrderedSteps,
   addInitialDeckSetupStep,

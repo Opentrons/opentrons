@@ -1,41 +1,6 @@
 import 'cypress-file-upload'
 import cloneDeep from 'lodash/cloneDeep'
-import isEqual from 'lodash/isEqual'
-import isObject from 'lodash/isObject'
-import transform from 'lodash/transform'
-
-// TODO IMMEDIATELY: put this somewhere
-const difference = (object, base) => {
-  const changes = (object, base) => {
-    return transform(object, function(result, value, key) {
-      if (!isEqual(value, base[key])) {
-        result[key] =
-          isObject(value) && isObject(base[key])
-            ? changes(value, base[key])
-            : value
-      }
-    })
-  }
-  return changes(object, base)
-}
-
-// TODO IMMEDIATELY: put this somewhere
-// deepEqual won't always return a diff, Cypress doesn't fully support object diffs :(
-// also Cypress doesn't seem to support logging to the console? So throwing the diff as an error instead
-const expectDeepEqual = (a, b) => {
-  try {
-    assert.deepEqual(a, b)
-  } catch (e) {
-    // visualize undefineds
-    const replacer = (key, value) =>
-      typeof value === 'undefined' ? '__undefined__' : value
-    // TODO IMMEDIATELY: try cy.log(message, args)
-    throw Error(
-      'Expected deep equal: ' +
-        JSON.stringify({ a, b, difference: difference(a, b) }, replacer, 4)
-    )
-  }
-}
+import { expectDeepEqual } from '../utils'
 
 describe('Protocol fixtures migrate and match snapshots', () => {
   beforeEach(() => {
@@ -43,25 +8,41 @@ describe('Protocol fixtures migrate and match snapshots', () => {
     cy.closeAnnouncementModal()
   })
 
-  // TODO IMMEDIATELY: move fixtures from PD to shared-data
   const testCases = [
     {
       title: 'preFlexGrandfatheredProtocol 1.0.0 -> 3.0.x',
       importFixture:
-        '../../src/load-file/__tests__/fixtures/throughMigrationV0/preFlexGrandfatheredProtocol.json',
+        '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
-        '../../../shared-data/protocol/fixtures/3/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
+        '../../fixtures/protocol/3/preFlexGrandfatheredProtocolMigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: false,
+      apiUpdateRequiredMigrationModal: false,
     },
     {
       title: 'example_1_1_0 -> 3.0.x',
-      importFixture:
-        '../../../protocol-designer/src/load-file/__tests__/fixtures/v1_1_0/example_1_1_0.json',
+      importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
-        '../../../shared-data/protocol/fixtures/3/example_1_1_0MigratedFromV1_0_0.json',
+        '../../fixtures/protocol/3/example_1_1_0MigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: true,
+      apiUpdateRequiredMigrationModal: false,
+    },
+    {
+      title: 'doItAllV3 -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/3/doItAllV3.json',
+      expectedExportFixture: '../../fixtures/protocol/3/doItAllV3.json',
+      newLabwareDefsMigrationModal: false,
+      unusedPipettes: false,
+      apiUpdateRequiredMigrationModal: false,
+    },
+    {
+      title: 'doItAllV4 -> import and re-export should preserve data',
+      importFixture: '../../fixtures/protocol/4/doItAllV4.json',
+      expectedExportFixture: '../../fixtures/protocol/4/doItAllV4.json',
+      newLabwareDefsMigrationModal: false,
+      unusedPipettes: false,
+      apiUpdateRequiredMigrationModal: true,
     },
   ]
 
@@ -72,6 +53,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       expectedExportFixture,
       newLabwareDefsMigrationModal,
       unusedPipettes,
+      apiUpdateRequiredMigrationModal,
     }) => {
       it(title, () => {
         cy.fixture(importFixture).then(fileContent => {
@@ -108,7 +90,18 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               .contains('Unused pipette')
               .should('exist')
             cy.get('button')
-              .contains('CONTINUE WITH EXPORT')
+              .contains('continue with export', { matchCase: false })
+              .click()
+          }
+
+          if (apiUpdateRequiredMigrationModal) {
+            cy.get('div')
+              .contains(
+                'Robot requirements for running module inclusive JSON protocols'
+              )
+              .should('exist')
+            cy.get('button')
+              .contains('continue', { matchCase: false })
               .click()
           }
 
@@ -116,6 +109,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
             const savedFile = cloneDeep(window.__lastSavedFile__)
             const expected = cloneDeep(expectedExportProtocol)
 
+            // TODO(IL. 2020-04-03): this will change to 4.0.x soon
             assert.match(
               savedFile.designerApplication.version,
               /^3\.0\.\d+$/,
