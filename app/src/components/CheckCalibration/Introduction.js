@@ -43,11 +43,13 @@ export function Introduction(props: IntroductionProps) {
       <h5>{TIPRACK_REQS}</h5>
       <div className={styles.required_tipracks_wrapper}>
         {labwareLoadNames.map(loadName => (
-          <div key={loadName} className={styles.tiprack_image_container}>
-            <img
-              className={styles.tiprack_image}
-              src={tiprackImages[loadName]}
-            />
+          <div key={loadName} className={styles.required_tiprack}>
+            <div key={loadName} className={styles.tiprack_image_container}>
+              <img
+                className={styles.tiprack_image}
+                src={tiprackImages[loadName]}
+              />
+            </div>
             <p className={styles.tiprack_display_name}>
               {getLatestLabwareDef(loadName)?.metadata.displayName}
             </p>

@@ -27,26 +27,15 @@ export const COMPLETE_ROBOT_CALIBRATION_CHECK: 'calibration:COMPLETE_ROBOT_CALIB
 export const ROBOT_CALIBRATION_CHECK_PATH: '/calibration/check/session' =
   '/calibration/check/session'
 
-const SESSION_START: 'sessionStart' = 'sessionStart'
-const LOAD_LABWARE: 'loadLabware' = 'loadLabware'
-const PICK_UP_TIP: 'pickUpTip' = 'pickUpTip'
-const CHECK_POINT_ONE: 'checkPointOne' = 'checkPointOne'
-const CHECK_POINT_TWO: 'checkPointTwo' = 'checkPointTwo'
-const CHECK_POINT_THREE: 'checkPointThree' = 'checkPointThree'
-const CHECK_HEIGHT: 'checkHeight' = 'checkHeight'
-const SESSION_EXIT: 'sessionExit' = 'sessionExit'
-const BAD_ROBOT_CALIBRATION: 'badRobotCalibration' = 'badRobotCalibration'
-const NO_PIPETTES_ATTACHED: 'noPipettesAttached' = 'noPipettesAttached'
-
-export const ROBOT_CALIBRATION_CHECK_STEPS = {
-  SESSION_START,
-  LOAD_LABWARE,
-  PICK_UP_TIP,
-  CHECK_POINT_ONE,
-  CHECK_POINT_TWO,
-  CHECK_POINT_THREE,
-  CHECK_HEIGHT,
-  SESSION_EXIT,
-  BAD_ROBOT_CALIBRATION,
-  NO_PIPETTES_ATTACHED,
-}
+export const CHECK_STEP_SESSION_START: 'sessionStart' = 'sessionStart'
+export const CHECK_STEP_LOAD_LABWARE: 'loadLabware' = 'loadLabware'
+export const CHECK_STEP_PICK_UP_TIP: 'pickUpTip' = 'pickUpTip'
+export const CHECK_STEP_CHECK_POINT_ONE: 'checkPointOne' = 'checkPointOne'
+export const CHECK_STEP_CHECK_POINT_TWO: 'checkPointTwo' = 'checkPointTwo'
+export const CHECK_STEP_CHECK_POINT_THREE: 'checkPointThree' = 'checkPointThree'
+export const CHECK_STEP_CHECK_HEIGHT: 'checkHeight' = 'checkHeight'
+export const CHECK_STEP_SESSION_EXIT: 'sessionExit' = 'sessionExit'
+export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badRobotCalibration' =
+  'badRobotCalibration'
+export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
+  'noPipettesAttached'
