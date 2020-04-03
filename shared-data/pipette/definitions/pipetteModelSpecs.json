@@ -1607,7 +1607,7 @@
         "min": 0,
         "max": 100
       },
-      "quirks": ["needsUnstick"]
+      "quirks": []
     },
     "p50_single_v1": {
       "name": "p50_single",
