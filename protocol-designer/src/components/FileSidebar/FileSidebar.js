@@ -45,7 +45,8 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   })
   if (global.Cypress) {
     // HACK(IL, 2020-04-02): can't figure out a better way to do this yet
-    global.Cypress.env('__lastSavedFile', downloadData.fileData)
+    // https://docs.cypress.io/faq/questions/using-cypress-faq.html#Can-my-tests-interact-with-Redux-Vuex-data-store
+    global.__lastSavedFile__ = downloadData.fileData
   } else {
     saveAs(blob, downloadData.fileName)
   }

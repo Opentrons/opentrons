@@ -303,6 +303,9 @@ export function updateStepFormKeys(fileData: PDProtocolFile): PDProtocolFile {
         ...omitBy(updatedFields, isUndefined),
         ...omit(formData, MIX_DEPRECATED_FIELD_NAMES),
       }
+    } else if (formData.stepType === 'manualIntervention') {
+      // no step-name / step-details
+      return formData
     } else {
       return {
         stepName: formData['step-name'],
