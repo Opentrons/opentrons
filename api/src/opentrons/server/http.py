@@ -103,7 +103,7 @@ class HTTPServer(object):
         self.app.router.add_post(
             '/calibration/{type}/session', check.create_session)
         self.app.router.add_post(
-            '/calibration/{type}/session/move', check.move)
+            '/calibration/{type}/session/move', check.move, name="move")
         self.app.router.add_post(
             '/calibration/{type}/session/loadLabware',
             check.load_labware,
@@ -121,7 +121,7 @@ class HTTPServer(object):
             check.drop_tip,
             name="dropTip")
         self.app.router.add_post(
-            '/calibration/{type}/session/jog', check.jog)
+            '/calibration/{type}/session/jog', check.jog, name="jog")
         self.app.router.add_delete(
             '/calibration/{type}/session',
             check.delete_session,

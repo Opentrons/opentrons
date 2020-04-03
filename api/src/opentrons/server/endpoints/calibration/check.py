@@ -19,7 +19,7 @@ def _fetch_type_and_session(request: web.Request) -> TypeSession:
 def _format_status(
         session: 'CheckCalibrationSession',
         router: UrlDispatcher) -> 'CalibrationSessionStatus':
-    pips = session.pipettes
+    pips = session.pipette_status
     # pydantic restricts dictionary keys that can be evaluated. Since
     # the session pipettes dictionary has a UUID as a key, we must first
     # convert the UUID to a hex string.
@@ -29,7 +29,7 @@ def _format_status(
     if next:
         path = router.get(next.name, '')
         if path:
-            url = path.url_for()
+            url = str(path.url_for(type=session.session_type))
         else:
             url = path
         links = {'links': {next.name: url}}
@@ -40,12 +40,7 @@ def _format_status(
         instruments=instruments,
         currentStep=current,
         nextSteps=links,
-<<<<<<< HEAD
         labware=[LabwareStatus(**data) for data in lw_status])
-=======
-        sessionToken=session.token,
-        labware=[LabwareStatus(**lw) for lw in session.labware.values()])
->>>>>>> feat(api): Add labware required to session status
     return status
 
 
@@ -108,54 +103,109 @@ async def delete_session(request):
 
     Endpoint to delete a session if it exists.
     """
-    session_type, current_session = _fetch_type_and_session(request)
+    session_type = request.match_info['type']
+    session_storage = request.app['com.opentrons.session_manager']
+    current_session = session_storage.sessions.get(session_type)
     if not current_session:
         response = {"message": f"A {session_type} session does not exist."}
         return web.json_response(response, status=404)
     else:
-        await current_session.hardware.home()
+        await current_session.delete_session()
         del session_storage.sessions[session_type]
-<<<<<<< HEAD
         response = {'message': f"Successfully deleted {session_type} session."}
         return web.json_response(response, status=200)
-=======
-        return web.json_response(status=200)
+
+
+async def load_labware(request: web.Request) -> web.Response:
+    _, session = _fetch_type_and_session(request)
+    if not session:
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
+    response = _format_status(session, request.app.router)
+    return web.json_response(response, status=200)
 
 
 async def move(request: web.Request) -> web.Response:
+    session_type, session = _fetch_type_and_session(request)
+    if not session:
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
     req = await request.json()
     pipette = req.get("pipetteId")
     position = req.get("location")
-    _, session = _fetch_type_and_session(request)
+
     session.move(pipette, position)
     response = _format_status(session, request.app.router)
     return web.json_response(response, status=200)
 
 
 async def jog(request):
-    _, session = _fetch_type_and_session(request)
-    session.jog()
+    session_type, session = _fetch_type_and_session(request)
+    if not session:
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
+    req = await request.json()
+    pipette = req.get("pipetteId")
+    vector = req.get("vector")
+    session.jog(pipette, vector)
     response = _format_status(session, request.app.router)
     return web.json_response(response, status=200)
 
 
 async def pick_up_tip(request):
-    return web.json_response()
+    session_type, session = _fetch_type_and_session(request)
+    if not session:
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
+    req = await request.json()
+    pipette = req.get("pipetteId")
+    vector = req.get("vector")
+    try:
+        session.pick_up_tip(pipette)
+        response = _format_status(session, request.app.router)
+        return web.json_response(response, status=200)
+    except AssertionError:
+        error_response = {
+            "message": "Tip is already attached.",
+            "links": {
+                "dropTip": f"/calibration/{session_type}/session/dropTip",
+                "invalidateTip": f"/calibration/{session_type}/session/invalidateTip"
+            }
+        }
+        return web.json_response(error_response, status=409)
 
 
 async def invalidate_tip(request):
     session_type, session = _fetch_type_and_session(request)
     if not session:
-        response = {'message': f'A {session_type} session does not exist.'}
-        return web.json_response(response, status=404)
-    else:
-        req = await request.json()
-        pipette_id = req.get("pipetteId")
-        session.invalidate_tip(pipette_id)
-        session.state_machine.update_state(session.state_machine.current_state)
-        return web.json_response(response, status=200)
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
+    req = await request.json()
+    pipette_id = req.get("pipetteId")
+    session.invalidate_tip(pipette_id)
+    response = _format_status(session, request.app.router)
+    return web.json_response(response, status=200)
 
 
 async def drop_tip(request):
-    return web.json_response()
->>>>>>> feat(api): Allow move, jog and tip handling for a cal session
+    session_type, session = _fetch_type_and_session(request)
+    if not session:
+        error_response = {
+            "message": f"No {session_type} session exists. Please create one.",
+            "links": {"createSession": f"/calibration/{session_type}/session"}}
+        return web.json_response(error_response, status=404)
+    req = await request.json()
+    pipette = req.get("pipetteId")
+    session.return_tip(pipette)
+    response = _format_status(session, request.app.router)
+    return web.json_response(response, status=200)

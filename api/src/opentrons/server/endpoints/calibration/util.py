@@ -25,7 +25,6 @@ check_normal_relationship_dict = {
     CalibrationCheckState.checkPointTwo: CalibrationCheckState.checkPointThree,
     CalibrationCheckState.checkPointThree: CalibrationCheckState.checkHeight,
     CalibrationCheckState.checkHeight: CalibrationCheckState.sessionStart
-
 }
 
 exit = CalibrationCheckState.sessionExit
