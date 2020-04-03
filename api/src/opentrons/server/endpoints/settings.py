@@ -9,13 +9,6 @@ from opentrons.config import reset as reset_util
 
 log = logging.getLogger(__name__)
 
-_SETTINGS_RESTART_REQUIRED = False
-# This is a bit of global state that indicates whether a setting has changed
-# that requires a restart. It's OK for this to be global because the behavior
-# it's catching is global - changing the kind of setting that requires a
-# a restart anywhere, even if you theoretically have two servers running in
-# the same process, will require _all_ of them to be restarted.
-
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
     """
@@ -77,22 +70,20 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     value = data.get('value')
     log.info(f'set_advanced_setting: {key} -> {value}')
 
-    setting = advs.settings_by_id.get(key)
-    if not setting:
-        log.warning(f'set_advanced_setting: bad request: {key} invalid')
-        return web.json_response(
-            {'error': 'no-such-advanced-setting',
-             'message': f'ID {key} not found in settings list',
-             'links': {}},
-            status=400)
-
     try:
         advs.set_adv_setting(key, value)
     except ValueError as e:
+        log.warning(f'set_advanced_setting: bad request: {key} invalid')
         return web.json_response({
             'error': 'no-such-advanced-setting',
             'message': str(e),
             'links': {}}, status=400)
+    except advs.SettingException as e:
+        # Severe internal error
+        return web.json_response({
+            'error': e.error,
+            'message': str(e),
+            'links': {}}, status=500)
 
     return web.json_response(
         _get_adv_settings_response(),

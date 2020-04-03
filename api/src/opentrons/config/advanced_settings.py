@@ -19,7 +19,9 @@ SettingsMap = Dict[str, Optional[bool]]
 
 
 class SettingException(Exception):
-    pass
+    def __init__(self, message, error):
+        super(Exception, self).__init__(message)
+        self.error = error
 
 
 class SettingsData(NamedTuple):
@@ -89,7 +91,8 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
                     f"Could not set log control: {code}: stdout={stdout}"
                     f" stderr={stderr}")
                 raise SettingException(
-                    f'Failed to set log upstreaming: {code}'
+                    f'Failed to set log upstreaming: {code}',
+                    'log-config-failure'
                 )
         super().on_change(value)
 
