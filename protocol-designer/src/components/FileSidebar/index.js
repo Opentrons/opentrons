@@ -72,11 +72,6 @@ function mergeProps(
   const { dispatch } = dispatchProps
   return {
     loadFile: fileChangeEvent => {
-      console.log(
-        'loadFile',
-        fileChangeEvent,
-        fileChangeEvent.currentTarget.value
-      )
       if (
         !_hasUnsavedChanges ||
         window.confirm(i18n.t('alert.window.confirm_import'))
