@@ -178,5 +178,5 @@ class PipetteUpdateField(BaseModel):
 
 
 class PipetteSettingsUpdate(BaseModel):
-    setting_fields: typing.Dict[str, PipetteUpdateField] = \
-        Field(..., alias="fields")
+    setting_fields: typing.Optional[typing.Dict[str, PipetteUpdateField]] = \
+        Field(None, alias="fields")

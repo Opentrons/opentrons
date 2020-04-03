@@ -182,6 +182,68 @@ def test_receive_pipette_settings_found(api_client,
     assert resp.json() == mock_pipette_data['p1']
 
 
+def test_modify_pipette_settings_call_override(api_client,
+                                               mock_pipette_config,
+                                               mock_pipette_data):
+    pipette_id = 'p1'
+    changes = {
+        'fields': {
+            'pickUpCurrent': {'value': 1},
+            'otherField': {'value': True},
+            'noneField': {'value': None}
+        }
+    }
+
+    # Check that data is changed and matches the changes specified
+    resp = api_client.patch(
+        f'/settings/pipettes/{pipette_id}',
+        json=changes)
+    mock_pipette_config.override.assert_called_once_with(
+        fields={'pickUpCurrent': 1, 'otherField': True, 'noneField': None},
+        pipette_id=pipette_id)
+    patch_body = resp.json()
+    assert resp.status_code == 200
+    assert patch_body == {'fields': mock_pipette_data[pipette_id]['fields'],
+                          'info': mock_pipette_data[pipette_id]["info"]}
+
+
+@pytest.mark.parametrize(argnames=["body"],
+                         argvalues=[
+                             [{}],
+                             [{'fields': {}}]
+                         ])
+def test_modify_pipette_settings_do_not_call_override(
+        api_client, mock_pipette_config, mock_pipette_data, body):
+    pipette_id = 'p1'
+
+    resp = api_client.patch(
+        f'/settings/pipettes/{pipette_id}',
+        json=body)
+    mock_pipette_config.override.assert_not_called()
+    patch_body = resp.json()
+    assert resp.status_code == 200
+    assert patch_body == {'fields': mock_pipette_data[pipette_id]['fields'],
+                          'info': mock_pipette_data[pipette_id]["info"]}
+
+
+def test_modify_pipette_settings_failure(api_client, mock_pipette_config):
+    test_id = 'p1'
+
+    def mock_override(pipette_id, fields):
+        raise ValueError("Failed!")
+
+    mock_pipette_config.override.side_effect = mock_override
+
+    resp = api_client.patch(
+        f'/settings/pipettes/{test_id}',
+        json={'fields': {'a': {'value': 1}}})
+    mock_pipette_config.override.assert_called_once_with(pipette_id=test_id,
+                                                         fields={'a': 1})
+    patch_body = resp.json()
+    assert resp.status_code == 412
+    assert patch_body == {'message': "Failed!"}
+
+
 def test_available_resets(api_client):
     resp = api_client.get('/settings/reset/options')
     body = resp.json()

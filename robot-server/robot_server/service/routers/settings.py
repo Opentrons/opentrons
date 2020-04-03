@@ -173,14 +173,33 @@ async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
     return r
 
 
-@router.patch("/settings/pipettes/{pipetteId}",
+@router.patch("/settings/pipettes/{pipette_id}",
               description="Change the settings of a specific pipette",
-              response_model=PipetteSettings)
-async def post_pipette_setting(
+              response_model=PipetteSettings,
+              response_model_by_alias=True,
+              response_model_exclude_unset=True)
+async def patch_pipette_setting(
         pipette_id: str,
         settings_update: PipetteSettingsUpdate) \
-        -> PipetteSettings:
-    raise HTTPException(HTTPStatus.NOT_IMPLEMENTED, "not implemented")
+        -> Union[Dict, PipetteSettings]:
+
+    # Convert fields to dict of field name to value
+    fields = settings_update.setting_fields or {}
+    field_values = {k: v.value for k, v in fields.items()}
+    if field_values:
+        try:
+            pipette_config.override(fields=field_values, pipette_id=pipette_id)
+        except ValueError as e:
+            raise V1HandlerError(status_code=HTTPStatus.PRECONDITION_FAILED,
+                                 message=str(e))
+    # Have to convert to dict using by_alias due to bug in fastapi
+    r = _pipette_settings_from_config(
+        pipette_config, pipette_id
+    ).dict(
+        by_alias=True,
+        exclude_unset=True,
+    )
+    return r
 
 
 def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
