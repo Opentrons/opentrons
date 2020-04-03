@@ -6,6 +6,8 @@ import type {
   Options as PopperOptions,
 } from '@popperjs/core/lib/types'
 
+import type { UseHoverOptions, HoverHandlers } from '../interaction-enhancers'
+
 export type Placement = $PropertyType<PopperOptions, 'placement'>
 
 export type Strategy = $PropertyType<PopperOptions, 'strategy'>
@@ -55,4 +57,14 @@ export type UseTooltipResultTooltipProps = {|
 export type UseTooltipResult = [
   UseTooltipResultTargetProps,
   UseTooltipResultTooltipProps
+]
+
+export type UseHoverTooltipOptions = $Shape<{|
+  ...UseTooltipOptions,
+  ...UseHoverOptions,
+|}>
+
+export type UseHoverTooltipResult = [
+  {| ...UseTooltipResultTargetProps, ...HoverHandlers |},
+  {| ...UseTooltipResultTooltipProps, visible: boolean |}
 ]

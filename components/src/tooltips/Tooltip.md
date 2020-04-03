@@ -1,4 +1,4 @@
-Basic usage with the `useTooltip` hook
+Basic usage with the `useTooltip` hook:
 
 ```js
 import { useTooltip } from '@opentrons/components'
@@ -45,5 +45,39 @@ const [targetProps, tooltipProps] = useTooltip({ placement })
       </label>
     ))}
   </div>
+</>
+```
+
+Basic usage with the `useHoverTooltip` hook:
+
+```js
+import { useHoverTooltip } from '@opentrons/components'
+const [targetProps, tooltipProps] = useHoverTooltip()
+
+;<>
+  <span {...targetProps}>Hover me!</span>
+  <Tooltip {...tooltipProps}>Something Explanatory!</Tooltip>
+</>
+```
+
+`useHoverTooltip` can take `useTooltip` and `useHover` options:
+
+```js
+import {
+  useHoverTooltip,
+  TOOLTIP_RIGHT,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
+
+const [targetProps, tooltipProps] = useHoverTooltip({
+  placement: TOOLTIP_RIGHT,
+  strategy: TOOLTIP_FIXED,
+  enterDelay: 2000,
+  leaveDelay: 1000,
+})
+
+;<>
+  <span {...targetProps}>Hover me!</span>
+  <Tooltip {...tooltipProps}>Something Explanatory!</Tooltip>
 </>
 ```
