@@ -11,12 +11,32 @@ import type { RobotCalibrationCheckSessionData } from '../api-types'
 
 export { mockRobot }
 
-export const mockRobotCalibrationCheckSessionData = {
-  instruments: {},
+export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionData = {
+  instruments: {
+    abc123_pipette_uuid: {
+      model: 'fake_pipette_model',
+      name: 'fake_pipette_name',
+      tip_length: 42,
+      mount_axis: 2,
+      plunger_axis: 4,
+      pipette_id: 'abc123_pipette_uuid',
+    },
+  },
   currentStep: 'sessionStart',
   nextSteps: {
-    links: { specifyLabware: '/fake/route' },
+    links: { loadLabware: '/fake/route' },
   },
+  labware: [
+    {
+      alternatives: ['fake_tiprack_load_name'],
+      slot: '8',
+      id: 'abc123_labware_uuid',
+      forPipettes: ['abc123_pipette_uuid'],
+      loadName: 'opentrons_96_tiprack_300ul',
+      namespace: 'opentrons',
+      version: 1,
+    },
+  ],
 }
 
 export const {
