@@ -184,7 +184,8 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     data = await request.json()
     fields = data.get('fields', {})
     # Convert fields to dict of field name to value
-    fields = {k: v.get('value') for k, v in fields.items()}
+    fields = {k: None if v is None else v.get('value')
+              for k, v in fields.items()}
     if fields:
         try:
             pc.override(fields=fields, pipette_id=pipette_id)

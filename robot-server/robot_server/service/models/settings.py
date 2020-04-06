@@ -1,8 +1,7 @@
-import typing
 from enum import Enum
 import logging
 
-from typing import Optional
+from typing import Optional, List, Dict, Any, Union
 
 from pydantic import BaseModel, Field, create_model, validator
 
@@ -31,7 +30,7 @@ class AdvancedSetting(BaseModel):
         Field(...,
               description="Whether a robot restart is required to make this "
                           "change take effect")
-    value: typing.Optional[bool] =\
+    value: Optional[bool] =\
         Field(...,
               description="Whether the setting is off by previous user choice"
                           " (false), true by user choice (true), or off and "
@@ -48,7 +47,7 @@ class Links(BaseModel):
 
 class AdvancedSettingsResponse(BaseModel):
     """A dump of advanced settings and suitable links for next action"""
-    settings: typing.List[AdvancedSetting]
+    settings: List[AdvancedSetting]
     links: Links
 
 
@@ -105,10 +104,10 @@ class FactoryResetOption(BaseModel):
 
 class FactoryResetOptions(BaseModel):
     """Available values to reset as factory reset"""
-    options: typing.List[FactoryResetOption]
+    options: List[FactoryResetOption]
 
 
-RobotConfigs = typing.Dict[str, typing.Any]
+RobotConfigs = Dict[str, Any]
 
 
 class PipetteSettingsFieldType(str, Enum):
@@ -149,7 +148,7 @@ class PipetteSettingsInfo(BaseModel):
 
 
 class BasePipetteSettingFields(BaseModel):
-    quirks: typing.Dict[str, bool] = \
+    quirks: Dict[str, bool] = \
         Field(None,
               description="Quirks are behavioral changes associated with "
                           "pipettes. For instance, some models of pipette "
@@ -188,11 +187,11 @@ class PipetteSettings(BaseModel):
         fields = {'setting_fields': 'fields'}
 
 
-MultiPipetteSettings = typing.Dict[str, PipetteSettings]
+MultiPipetteSettings = Dict[str, PipetteSettings]
 
 
 class PipetteUpdateField(BaseModel):
-    value: typing.Union[None, bool, float] = \
+    value: Union[None, bool, float] = \
         Field(...,
               description="Boolean if the format if this is a quirk.  The "
                           "format if this is not a quirk. Must be between max "
@@ -200,5 +199,5 @@ class PipetteUpdateField(BaseModel):
 
 
 class PipetteSettingsUpdate(BaseModel):
-    setting_fields: typing.Optional[typing.Dict[str, PipetteUpdateField]] = \
+    setting_fields: Optional[Dict[str, Optional[PipetteUpdateField]]] = \
         Field(None, alias="fields")

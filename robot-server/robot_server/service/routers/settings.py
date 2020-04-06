@@ -224,7 +224,8 @@ async def patch_pipette_setting(
 
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
-    field_values = {k: v.value for k, v in fields.items()}
+    field_values = {k: None if v is None else v.value
+                    for k, v in fields.items()}
     if field_values:
         try:
             pipette_config.override(fields=field_values, pipette_id=pipette_id)

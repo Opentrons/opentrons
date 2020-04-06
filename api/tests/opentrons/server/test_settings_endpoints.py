@@ -181,7 +181,8 @@ async def test_modify_pipette_settings_call_override(async_client,
         'fields': {
             'pickUpCurrent': {'value': 1},
             'otherField': {'value': True},
-            'noneField': {'value': None}
+            'noneField': {'value': None},
+            'otherNoneField': None
         }
     }
 
@@ -190,7 +191,8 @@ async def test_modify_pipette_settings_call_override(async_client,
         f'/settings/pipettes/{pipette_id}',
         json=changes)
     mock_pipette_config.override.assert_called_once_with(
-        fields={'pickUpCurrent': 1, 'otherField': True, 'noneField': None},
+        fields={'pickUpCurrent': 1, 'otherField': True,
+                'noneField': None, 'otherNoneField': None},
         pipette_id=pipette_id)
     patch_body = await resp.json()
     assert resp.status == 200
