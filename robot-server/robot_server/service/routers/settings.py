@@ -25,7 +25,8 @@ router = APIRouter()
 
 @router.post("/settings",
              description="Change an advanced setting (feature flag)",
-             response_model=AdvancedSettingsResponse)
+             response_model=AdvancedSettingsResponse,
+             response_model_exclude_unset=True)
 async def post_settings(update: AdvancedSettingRequest)\
         -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
@@ -44,7 +45,8 @@ async def post_settings(update: AdvancedSettingRequest)\
 @router.get("/settings",
             description="Get a list of available advanced settings (feature "
                         "flags) and their values",
-            response_model=AdvancedSettingsResponse)
+            response_model=AdvancedSettingsResponse,
+            response_model_exclude_unset=True)
 async def get_settings() -> AdvancedSettingsResponse:
     """Get advanced setting (feature flags)"""
     return _create_settings_response()
