@@ -7,6 +7,7 @@ import { connect } from 'react-redux'
 import { DropTarget } from 'react-dnd'
 import noop from 'lodash/noop'
 import { i18n } from '../../../localization'
+import { DND_TYPES } from '../../../constants'
 import {
   getLabwareIsCompatible,
   getLabwareIsCustom,
@@ -18,7 +19,6 @@ import {
 } from '../../../labware-ingred/actions'
 import { selectors as labwareDefSelectors } from '../../../labware-defs'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
-import { DND_TYPES } from './constants'
 
 import type { DeckSlot, ThunkDispatch, BaseState } from '../../../types'
 import type { LabwareDefByDefURI } from '../../../labware-defs'

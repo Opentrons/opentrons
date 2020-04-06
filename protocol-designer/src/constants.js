@@ -158,3 +158,8 @@ export const MODULES_WITH_COLLISION_ISSUES = [
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'
+
+export const DND_TYPES = {
+  LABWARE: 'LABWARE',
+  STEP_ITEM: 'STEP_ITEM',
+}

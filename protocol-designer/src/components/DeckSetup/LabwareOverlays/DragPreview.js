@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { DragLayer } from 'react-dnd'
 import { LabwareOnDeck } from '../LabwareOnDeck'
-import { DND_TYPES } from './constants'
+import { DND_TYPES } from '../../../constants'
 import type { LabwareOnDeck as LabwareOnDeckType } from '../../../step-forms'
 import type { RobotWorkSpaceRenderProps } from '@opentrons/components'
 import styles from './DragPreview.css'
