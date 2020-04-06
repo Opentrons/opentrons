@@ -63,7 +63,7 @@ function LevelingInstruction(props: { pipetteName: string }) {
 function LevelingVideo() {
   return (
     <div className={styles.leveling_video_wrapper}>
-      <video width="100%" autoPlay={true} loop={true}>
+      <video width="100%" autoPlay={true} loop={true} controls={true}>
         <source src={require('./videos/calibration.webm')} />
       </video>
     </div>
