@@ -4,8 +4,9 @@ import { connect } from 'react-redux'
 import { DragSource, DropTarget, DragLayer } from 'react-dnd'
 import isEqual from 'lodash/isEqual'
 
-import { PDTitledList } from '../lists'
+import { DND_TYPES } from '../../constants'
 import { ConnectedStepItem } from '../../containers/ConnectedStepItem'
+import { PDTitledList } from '../lists'
 import {
   stepIconsByType,
   type StepIdType,
@@ -15,10 +16,6 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import type { BaseState } from '../../types'
 import { ContextMenu } from './ContextMenu'
 import styles from './StepItem.css'
-
-const DND_TYPES: { STEP_ITEM: 'STEP_ITEM' } = {
-  STEP_ITEM: 'STEP_ITEM',
-}
 
 type DragDropStepItemProps = {|
   ...$Exact<React.ElementProps<typeof ConnectedStepItem>>,
