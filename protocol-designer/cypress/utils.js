@@ -26,8 +26,8 @@ export const expectDeepEqual = (a, b) => {
     const replacer = (key, value) =>
       typeof value === 'undefined' ? '__undefined__' : value
     throw Error(
-      'Expected deep equal: ' +
-        JSON.stringify({ a, b, difference: difference(a, b) }, replacer, 4)
+      'Expected deep equal. Diff is: ' +
+        JSON.stringify(difference(a, b), replacer, 4)
     )
   }
 }

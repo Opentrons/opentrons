@@ -10,7 +10,7 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "3.0.8",
+    "version": "4.0.0",
     "data": {
       "_internalAppBuildDate": "Thu, 02 Apr 2020 20:21:23 GMT",
       "defaultValues": {
@@ -109,7 +109,7 @@
           "stepType": "pause",
           "stepName": "pause",
           "stepDetails": "",
-          "pauseForAmountOfTime": "untilResume",
+          "pauseAction": "untilResume",
           "pauseHour": null,
           "pauseMinute": null,
           "pauseSecond": null,
@@ -122,7 +122,7 @@
           "stepType": "pause",
           "stepName": "pause",
           "stepDetails": "",
-          "pauseForAmountOfTime": "untilTime",
+          "pauseAction": "untilTime",
           "pauseHour": null,
           "pauseMinute": "1",
           "pauseSecond": "2",

@@ -10,7 +10,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
 
   const testCases = [
     {
-      title: 'preFlexGrandfatheredProtocol 1.0.0 -> 3.0.x',
+      title: 'preFlexGrandfatheredProtocol 1.0.0 -> 4.0.x, schema 3',
       importFixture:
         '../../fixtures/protocol/1/preFlexGrandfatheredProtocol.json',
       expectedExportFixture:
@@ -18,15 +18,17 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       newLabwareDefsMigrationModal: true,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: false,
+      genericMigrationModal: false,
     },
     {
-      title: 'example_1_1_0 -> 3.0.x',
+      title: 'example_1_1_0 -> 4.0.x, schema 3',
       importFixture: '../../fixtures/protocol/1/example_1_1_0.json',
       expectedExportFixture:
         '../../fixtures/protocol/3/example_1_1_0MigratedFromV1_0_0.json',
       newLabwareDefsMigrationModal: true,
       unusedPipettes: true,
       apiUpdateRequiredMigrationModal: false,
+      genericMigrationModal: false,
     },
     {
       title: 'doItAllV3 -> import and re-export should preserve data',
@@ -35,6 +37,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: false,
+      genericMigrationModal: false,
     },
     {
       title: 'doItAllV4 -> import and re-export should preserve data',
@@ -43,6 +46,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       newLabwareDefsMigrationModal: false,
       unusedPipettes: false,
       apiUpdateRequiredMigrationModal: true,
+      genericMigrationModal: false,
     },
   ]
 
@@ -54,6 +58,7 @@ describe('Protocol fixtures migrate and match snapshots', () => {
       newLabwareDefsMigrationModal,
       unusedPipettes,
       apiUpdateRequiredMigrationModal,
+      genericMigrationModal,
     }) => {
       it(title, () => {
         cy.fixture(importFixture).then(fileContent => {
@@ -70,13 +75,24 @@ describe('Protocol fixtures migrate and match snapshots', () => {
           })
         })
 
+        if (genericMigrationModal) {
+          cy.get('div')
+            .contains(
+              'Your protocol was made in an older version of Protocol Designer'
+            )
+            .should('exist')
+          cy.get('button')
+            .contains('ok', { matchCase: false })
+            .click()
+        }
+
         if (newLabwareDefsMigrationModal) {
           // close migration announcement modal
           cy.get('div')
             .contains('Update protocol to use new labware definitions')
             .should('exist')
           cy.get('button')
-            .contains('update protocol')
+            .contains('update protocol', { matchCase: false })
             .click()
         }
 
@@ -109,11 +125,10 @@ describe('Protocol fixtures migrate and match snapshots', () => {
             const savedFile = cloneDeep(window.__lastSavedFile__)
             const expected = cloneDeep(expectedExportProtocol)
 
-            // TODO(IL. 2020-04-03): this will change to 4.0.x soon
             assert.match(
               savedFile.designerApplication.version,
-              /^3\.0\.\d+$/,
-              'designerApplication.version is 3.0.x'
+              /^4\.0\.\d+$/,
+              'designerApplication.version is 4.0.x'
             )
             ;[savedFile, expected].forEach(f => {
               // Homogenize fields we don't want to compare

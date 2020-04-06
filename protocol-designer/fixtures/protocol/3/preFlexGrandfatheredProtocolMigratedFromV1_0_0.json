@@ -11,9 +11,9 @@
   },
   "designerApplication": {
     "name": "opentrons/protocol-designer",
-    "version": "3.0.8",
+    "version": "4.0.0",
     "data": {
-      "_internalAppBuildDate": "Thu, 02 Apr 2020 18:14:04 GMT",
+      "_internalAppBuildDate": "Mon, 06 Apr 2020 20:49:00 GMT",
       "defaultValues": {
         "aspirate_mmFromBottom": 1,
         "dispense_mmFromBottom": 0.5,
@@ -1293,7 +1293,7 @@
           "times": 2
         },
         "9cafddc0-1812-11e9-9608-8bed9be8868f": {
-          "pauseForAmountOfTime": "true",
+          "pauseAction": "untilTime",
           "pauseHour": null,
           "pauseMinute": null,
           "pauseSecond": 3,
@@ -1306,7 +1306,7 @@
           "stepType": "pause"
         },
         "a5ffbf30-1812-11e9-9608-8bed9be8868f": {
-          "pauseForAmountOfTime": "false",
+          "pauseAction": "untilResume",
           "pauseHour": null,
           "pauseMinute": null,
           "pauseSecond": null,
@@ -7619,6 +7619,11 @@
         "labware": "trashId",
         "well": "A1"
       }
+    },
+    { "command": "delay", "params": { "message": "", "wait": 3 } },
+    {
+      "command": "delay",
+      "params": { "message": "OK HOPEFULLY YOU ARE DONE", "wait": true }
     }
   ]
 }
