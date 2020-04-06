@@ -108,3 +108,78 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .tipracks_note_body {
   font-size: var('--fs-body-1');
 }
+/* end copped styles */
+
+.prompt {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.prompt_text {
+  @apply --font-header-light;
+
+  font-weight: normal;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.prompt_button {
+  display: block;
+  width: auto;
+  margin: 0.5rem 0 1rem 0;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.page_content_dark {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  align-items: center;
+  background-color: transparent;
+  height: 100%;
+}
+
+.deck_map_wrapper {
+  flex: 1 1 0;
+  align-self: stretch;
+  display: flex;
+  background-color: var(--c-bg-light);
+  border-radius: 6px;
+}
+
+.deck_map {
+  flex: 1;
+}
+
+.labware_ui_wrapper {
+  height: 100%;
+  width: 100%;
+}
+
+.labware_ui_content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.name_overlay {
+  font-size: 0.5rem;
+  color: var(--c-font-light);
+  background-color: color-mod(var(--c-black) alpha(0.75));
+  padding: 0.25rem;
+  border-radius: 0 0 3px 3px;
+}
+
+.display_name {
+  @apply --truncate;
+
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-light);
+  text-transform: uppercase;
+}
