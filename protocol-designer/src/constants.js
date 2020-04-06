@@ -155,6 +155,7 @@ export const MODULES_WITH_COLLISION_ISSUES = [
   TEMPERATURE_MODULE_V1,
 ]
 
+// Values for pauseAction field
 export const PAUSE_UNTIL_RESUME: 'untilResume' = 'untilResume'
 export const PAUSE_UNTIL_TIME: 'untilTime' = 'untilTime'
 export const PAUSE_UNTIL_TEMP: 'untilTemperature' = 'untilTemperature'

@@ -37,9 +37,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
 
   const pauseUntilTempTooltip = (
     <div>
-      {i18n.t(
-        `tooltip.step_fields.pauseForAmountOfTime.disabled.wait_until_temp`
-      )}
+      {i18n.t(`tooltip.step_fields.pauseAction.disabled.wait_until_temp`)}
     </div>
   )
 
@@ -62,11 +60,11 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
         <div className={styles.section_column}>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseForAmountOfTime"
+              name="pauseAction"
               options={[
                 {
                   name: i18n.t(
-                    'form.step_edit_form.field.pauseForAmountOfTime.options.untilResume'
+                    'form.step_edit_form.field.pauseAction.options.untilResume'
                   ),
                   value: PAUSE_UNTIL_RESUME,
                 },
@@ -76,11 +74,11 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
           </div>
           <div className={styles.checkbox_row}>
             <RadioGroupField
-              name="pauseForAmountOfTime"
+              name="pauseAction"
               options={[
                 {
                   name: i18n.t(
-                    'form.step_edit_form.field.pauseForAmountOfTime.options.untilTime'
+                    'form.step_edit_form.field.pauseAction.options.untilTime'
                   ),
                   value: PAUSE_UNTIL_TIME,
                 },
@@ -89,7 +87,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
             />
           </div>
           <ConditionalOnField
-            name={'pauseForAmountOfTime'}
+            name={'pauseAction'}
             condition={val => val === PAUSE_UNTIL_TIME}
           >
             <div className={styles.form_row}>
@@ -130,11 +128,11 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                     className={cx({
                       [styles.disabled]: !pauseUntilTempEnabled,
                     })}
-                    name="pauseForAmountOfTime"
+                    name="pauseAction"
                     options={[
                       {
                         name: i18n.t(
-                          'form.step_edit_form.field.pauseForAmountOfTime.options.untilTemperature'
+                          'form.step_edit_form.field.pauseAction.options.untilTemperature'
                         ),
                         value: PAUSE_UNTIL_TEMP,
                       },
@@ -143,7 +141,7 @@ export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
                   />
                 </div>
                 <ConditionalOnField
-                  name={'pauseForAmountOfTime'}
+                  name={'pauseAction'}
                   condition={val => val === PAUSE_UNTIL_TEMP}
                 >
                   <div className={styles.form_row}>

@@ -10,7 +10,7 @@ describe('pauseFormToArgs', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',
-      pauseForAmountOfTime: PAUSE_UNTIL_TEMP,
+      pauseAction: PAUSE_UNTIL_TEMP,
       pauseTemperature: '20',
       pauseMessage: 'pause message',
       moduleId: 'some_id',
@@ -27,7 +27,7 @@ describe('pauseFormToArgs', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',
-      pauseForAmountOfTime: PAUSE_UNTIL_RESUME,
+      pauseAction: PAUSE_UNTIL_RESUME,
       description: 'some description',
       pauseMessage: 'some message',
     }
@@ -50,7 +50,7 @@ describe('pauseFormToArgs', () => {
     const formData = {
       stepType: 'pause',
       id: 'test_id',
-      pauseForAmountOfTime: PAUSE_UNTIL_TIME,
+      pauseAction: PAUSE_UNTIL_TIME,
       description: 'some description',
       pauseMessage: 'some message',
       pauseHour: 1,

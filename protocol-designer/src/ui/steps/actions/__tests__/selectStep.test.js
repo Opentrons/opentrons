@@ -223,7 +223,7 @@ describe('selectStep', () => {
         id: 'existingStepId',
         stepName: 'Example pause',
         stepDetails: 'details',
-        pauseForAmountOfTime: PAUSE_UNTIL_RESUME,
+        pauseAction: PAUSE_UNTIL_RESUME,
       }
       mock_getStepFormData.mockReturnValue(existingStep)
       const store = mockStore({})

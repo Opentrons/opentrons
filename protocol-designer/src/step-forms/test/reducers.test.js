@@ -20,7 +20,11 @@ import {
 } from '../selectors'
 import { handleFormChange } from '../../steplist/formLevel/handleFormChange'
 import { moveDeckItem } from '../../labware-ingred/actions'
-import { INITIAL_DECK_SETUP_STEP_ID, SPAN7_8_10_11_SLOT } from '../../constants'
+import {
+  INITIAL_DECK_SETUP_STEP_ID,
+  SPAN7_8_10_11_SLOT,
+  PAUSE_UNTIL_TEMP,
+} from '../../constants'
 import type { DeckSlot } from '../../types'
 
 jest.mock('../../labware-defs/utils')
@@ -842,7 +846,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           stepType: 'pause',
           stepName: 'pause until 4C',
           stepDetails: 'some details',
-          pauseForAmountOfTime: 'untilTemperature',
+          pauseAction: PAUSE_UNTIL_TEMP,
           pauseHour: null,
           pauseMinute: null,
           pauseSecond: null,

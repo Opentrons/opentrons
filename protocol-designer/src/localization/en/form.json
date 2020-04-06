@@ -72,7 +72,7 @@
       "step_name": { "label": "Step Name" },
       "step_notes": { "label": "Step Notes" },
       "mix": { "label": "mix" },
-      "pauseForAmountOfTime": {
+      "pauseAction": {
         "options": {
           "untilResume": "Pause until told to resume",
           "untilTime": "Delay for an amount of time",
