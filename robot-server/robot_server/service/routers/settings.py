@@ -92,7 +92,7 @@ async def post_log_level_local(
     await hardware.update_config(log_level=level_name)  # type: ignore
     robot_configs.save_robot_settings(hardware.config)  # type: ignore
 
-    return V1BasicResponse(message=f'log_level set to {log_level}')
+    return V1BasicResponse(message=f'log_level set to {level}')
 
 
 @router.post("/settings/log_level/upstream",
