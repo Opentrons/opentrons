@@ -33,6 +33,7 @@ type DNDP = {|
   isOver: boolean,
   connectDropTarget: Node => Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
+  itemType: string,
 |}
 type OP = {|
   slot: {| ...DeckSlotDefinition, id: DeckSlot |}, // NOTE: Ian 2019-10-22 make slot `id` more restrictive when used in PD
@@ -58,9 +59,14 @@ export const SlotControlsComponent = (props: Props) => {
     connectDropTarget,
     moduleType,
     draggedItem,
+    itemType,
     customLabwareDefs,
   } = props
-  if (selectedTerminalItemId !== START_TERMINAL_ITEM_ID) return null
+  if (
+    selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
+    itemType !== DND_TYPES.LABWARE
+  )
+    return null
 
   const draggedDef = draggedItem?.labwareOnDeck?.def
   const isCustomLabware = draggedItem
@@ -158,6 +164,7 @@ const collectSlotTarget = (connect, monitor) => ({
   connectDropTarget: connect.dropTarget(),
   isOver: monitor.isOver(),
   draggedItem: monitor.getItem(),
+  itemType: monitor.getItemType(),
 })
 
 export const SlotControls = connect<{| ...OP, ...DP, ...SP |}, OP, _, DP, _, _>(
