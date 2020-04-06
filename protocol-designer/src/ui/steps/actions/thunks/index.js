@@ -6,6 +6,7 @@ import {
 } from '../../../../step-forms/selectors'
 import { changeFormInput } from '../../../../steplist/actions/actions'
 
+import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import { getSelectedStepId } from '../../selectors'
@@ -173,11 +174,11 @@ export const saveSetTempFormWithAddedPauseUntilTemp = () => (
   addStep({ stepType: 'pause' })(dispatch, getState)
 
   // NOTE: fields should be set one at a time b/c dependentFieldsUpdate fns can filter out inputs
-  // contingent on other inputs (eg changing the pauseForAmountOfTime radio button may clear the pauseTemperature).
+  // contingent on other inputs (eg changing the pauseAction radio button may clear the pauseTemperature).
   dispatch(
     changeFormInput({
       update: {
-        pauseForAmountOfTime: 'untilTemperature',
+        pauseAction: PAUSE_UNTIL_TEMP,
       },
     })
   )

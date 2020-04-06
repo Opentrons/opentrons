@@ -47,7 +47,7 @@ export type StepFieldName = any
 // | 'mix_mmFromBottom'
 // | 'mix_touchTip_mmFromBottom'
 // | 'path'
-// | 'pauseForAmountOfTime'
+// | 'pauseAction'
 // | 'pauseHour'
 // | 'pauseMessage'
 // | 'pauseMinute'
@@ -121,7 +121,7 @@ export type PauseForm = {|
   stepType: 'pause',
   id: StepIdType,
 
-  pauseForAmountOfTime?:
+  pauseAction?:
     | typeof PAUSE_UNTIL_RESUME
     | typeof PAUSE_UNTIL_TIME
     | typeof PAUSE_UNTIL_TEMP,

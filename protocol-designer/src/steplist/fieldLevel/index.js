@@ -135,7 +135,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
-  pauseForAmountOfTime: { getErrors: composeErrors(requiredField) },
+  pauseAction: { getErrors: composeErrors(requiredField) },
   pauseTemperature: {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),

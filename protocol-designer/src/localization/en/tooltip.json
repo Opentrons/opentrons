@@ -42,7 +42,7 @@
         "blowout_checkbox": "Redundant with disposal volume"
       }
     },
-    "pauseForAmountOfTime": {
+    "pauseAction": {
       "disabled": {
         "wait_until_temp": "There are no temperature or thermocycler modules on the deck"
       }

@@ -54,20 +54,15 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   PAUSE_TYPE_REQUIRED: {
     title:
       'Must either pause for amount of time, until told to resume, or until temperature reached',
-    dependentFields: ['pauseForAmountOfTime'],
+    dependentFields: ['pauseAction'],
   },
   TIME_PARAM_REQUIRED: {
     title: 'Must include hours, minutes, or seconds',
-    dependentFields: [
-      'pauseForAmountOfTime',
-      'pauseHour',
-      'pauseMinute',
-      'pauseSecond',
-    ],
+    dependentFields: ['pauseAction', 'pauseHour', 'pauseMinute', 'pauseSecond'],
   },
   PAUSE_TEMP_PARAM_REQUIRED: {
     title: 'Temperature is required',
-    dependentFields: ['pauseForAmountOfTime', 'pauseTemperature'],
+    dependentFields: ['pauseAction', 'pauseTemperature'],
   },
   WELL_RATIO_MOVE_LIQUID: {
     title: 'Well selection must be 1 to many, many to 1, or N to N',
@@ -141,21 +136,21 @@ export const pauseForTimeOrUntilTold = (
   fields: HydratedFormData
 ): ?FormError => {
   const {
-    pauseForAmountOfTime,
+    pauseAction,
     pauseHour,
     pauseMinute,
     pauseSecond,
     moduleId,
     pauseTemperature,
   } = fields
-  if (pauseForAmountOfTime === PAUSE_UNTIL_TIME) {
+  if (pauseAction === PAUSE_UNTIL_TIME) {
     // user selected pause for amount of time
     const hours = parseFloat(pauseHour) || 0
     const minutes = parseFloat(pauseMinute) || 0
     const seconds = parseFloat(pauseSecond) || 0
     const totalSeconds = hours * 3600 + minutes * 60 + seconds
     return totalSeconds <= 0 ? FORM_ERRORS.TIME_PARAM_REQUIRED : null
-  } else if (pauseForAmountOfTime === PAUSE_UNTIL_TEMP) {
+  } else if (pauseAction === PAUSE_UNTIL_TEMP) {
     // user selected pause until temperature reached
     if (moduleId == null) {
       // missing module field (reached by deleting a module from deck)
@@ -166,7 +161,7 @@ export const pauseForTimeOrUntilTold = (
       return FORM_ERRORS.PAUSE_TEMP_PARAM_REQUIRED
     }
     return null
-  } else if (pauseForAmountOfTime === PAUSE_UNTIL_RESUME) {
+  } else if (pauseAction === PAUSE_UNTIL_RESUME) {
     // user selected pause until resume
     return null
   } else {

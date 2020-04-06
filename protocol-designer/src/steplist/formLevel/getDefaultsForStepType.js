@@ -66,7 +66,7 @@ export function getDefaultsForStepType(
       }
     case 'pause':
       return {
-        pauseForAmountOfTime: null,
+        pauseAction: null,
         pauseHour: null,
         pauseMinute: null,
         pauseSecond: null,
