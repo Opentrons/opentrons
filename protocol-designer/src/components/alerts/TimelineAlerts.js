@@ -9,9 +9,10 @@ import { actions as dismissActions } from '../../dismiss'
 import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as fileDataSelectors } from '../../file-data'
+import { Alerts, type Props } from './Alerts'
+import type { CommandCreatorError } from '../../step-generation/types'
 import type { BaseState } from '../../types'
 import type { StepIdType } from '../../form-types'
-import { Alerts, type Props } from './Alerts'
 
 type SP = {|
   errors: $PropertyType<Props, 'errors'>,
@@ -30,10 +31,12 @@ type SP = {|
 
 function mapStateToProps(state: BaseState): SP {
   const timeline = fileDataSelectors.getRobotStateTimeline(state)
-  const errors = (timeline.errors || []).map(error => ({
-    title: i18n.t(`alert.timeline.error.${error.type}.title`),
-    description: <ErrorContents level="timeline" errorType={error.type} />,
-  }))
+  const errors = (timeline.errors || []: Array<CommandCreatorError>).map(
+    error => ({
+      title: i18n.t(`alert.timeline.error.${error.type}.title`, error.message),
+      description: <ErrorContents level="timeline" errorType={error.type} />,
+    })
+  )
   const warnings = timelineWarningSelectors
     .getTimelineWarningsForSelectedStep(state)
     .map(warning => ({
