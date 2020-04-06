@@ -1,25 +1,22 @@
 // @flow
 import * as React from 'react'
-import map from  'lodash/map'
+import map from 'lodash/map'
 import {
-  PrimaryButton,
   OutlineButton,
   RobotWorkSpace,
   LabwareRender,
-  RobotCoordsForeignDiv
+  RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import {
   type LabwareDefinition2,
   type DeckSlot,
-  getLabwareDisplayName
+  getLabwareDisplayName,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
-import { DeckMap } from '../DeckMap'
 import styles from './styles.css'
-import { tiprackImages } from './tiprackImages'
 
 const DECK_SETUP_PROMPT =
   'Place full tiprack(s) on the deck, in their designated slots, as illustrated below.'
@@ -28,10 +25,9 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm tiprack placement and continue'
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
   proceed: () => mixed,
-  exit: () => mixed,
 |}
 export function DeckSetup(props: DeckSetupProps) {
-  const { labware, proceed, exit } = props
+  const { labware, proceed } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   return (
     <>
@@ -65,12 +61,13 @@ export function DeckSetup(props: DeckSetupProps) {
               (slot: $Values<typeof deckSlotsById>, slotId) => {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareForSlot = labware.find(l => l.slot === slotId)
-
-                return labwareForSlot ? (
+                const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
+                return labwareDef ? (
                   <TiprackRender
                     key={slotId}
                     slotDef={slot}
-                    labwareDef={getLatestLabwareDef(labwareForSlot.loadName)} />
+                    labwareDef={labwareDef}
+                  />
                 ) : null
               }
             )
@@ -81,12 +78,12 @@ export function DeckSetup(props: DeckSetupProps) {
   )
 }
 
-type TiprackRenderProp = {labwareDef: LabwareDefinition2, slotDef: DeckSlot}
+type TiprackRenderProps = { labwareDef: LabwareDefinition2, slotDef: DeckSlot }
 export function TiprackRender(props: TiprackRenderProps) {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   return (
-    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`} >
+    <g transform={`translate(${slotDef.position[0]}, ${slotDef.position[1]})`}>
       <LabwareRender definition={labwareDef} />
       <RobotCoordsForeignDiv
         width={labwareDef.dimensions.xDimension}
