@@ -2,6 +2,7 @@ import logging
 import os
 import shutil
 from enum import Enum
+from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
 from opentrons.config import (robot_configs as rc,
@@ -9,7 +10,7 @@ from opentrons.config import (robot_configs as rc,
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
-DATA_BOOT_D = '/data/boot.d'
+DATA_BOOT_D = Path('/data/boot.d')
 
 log = logging.getLogger(__name__)
 
@@ -75,7 +76,7 @@ def reset_boot_scripts():
         if os.path.exists(DATA_BOOT_D):
             shutil.rmtree(DATA_BOOT_D)
     else:
-        log.debug('Not on pi, not removing %s', DATA_BOOT_D)
+        log.debug(f'Not on pi, not removing {DATA_BOOT_D}')
 
 
 def reset_labware_calibration():

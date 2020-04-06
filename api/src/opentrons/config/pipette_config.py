@@ -417,7 +417,7 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
     if pipette_id in known_pipettes():
         config = load_config_dict(pipette_id)
     else:
-        log.info('Pipette id %s not found', pipette_id)
+        log.info(f'Pipette id {pipette_id} not found')
         return cfg
 
     for key in config:
