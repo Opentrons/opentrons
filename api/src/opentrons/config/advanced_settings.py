@@ -1,5 +1,4 @@
 import json
-import asyncio
 import logging
 import os
 import sys
@@ -62,7 +61,7 @@ class SettingDefinition:
         return get_setting_with_env_overload(self.show_if[0]) == \
             self.show_if[1]
 
-    def on_change(self, value: Optional[bool]):
+    async def on_change(self, value: Optional[bool]):
         """
         An opportunity for side effects as a result of change a setting
         value
@@ -80,11 +79,11 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
                         ' for analysis. Opentrons uses these logs to'
                         ' troubleshoot robot issues and spot error trends.')
 
-    def on_change(self, value: Optional[bool]):
+    async def on_change(self, value: Optional[bool]):
         """Special side effect for this setting"""
         if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-            code, stdout, stderr = asyncio.get_event_loop().run_until_complete(
-                log_control.set_syslog_level('emerg' if value else 'info')
+            code, stdout, stderr = await log_control.set_syslog_level(
+                'emerg' if value else 'info'
             )
             if code != 0:
                 log.error(
@@ -94,7 +93,7 @@ class DisableLogIntegrationSettingDefinition(SettingDefinition):
                     f'Failed to set log upstreaming: {code}',
                     'log-config-failure'
                 )
-        super().on_change(value)
+        await super().on_change(value)
 
 
 class Setting(NamedTuple):
@@ -185,14 +184,14 @@ def get_all_adv_settings() -> Dict[str, Setting]:
     }
 
 
-def set_adv_setting(_id: str, value: Optional[bool]):
+async def set_adv_setting(_id: str, value: Optional[bool]):
     _id = _clean_id(_id)
     settings_file = CONFIG['feature_flags_file']
     setting_data = _read_settings_file(settings_file)
     if _id not in setting_data.settings_map:
         raise ValueError(f"{_id} is not recognized")
     # Side effecting
-    settings_by_id[_id].on_change(value)
+    await settings_by_id[_id].on_change(value)
 
     setting_data.settings_map[_id] = value
     _write_settings_file(setting_data.settings_map,

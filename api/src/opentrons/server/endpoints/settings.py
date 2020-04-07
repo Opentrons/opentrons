@@ -71,7 +71,7 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     log.info(f'set_advanced_setting: {key} -> {value}')
 
     try:
-        advs.set_adv_setting(key, value)
+        await advs.set_adv_setting(key, value)
     except ValueError as e:
         log.warning(f'set_advanced_setting: bad request: {key} invalid')
         return web.json_response({

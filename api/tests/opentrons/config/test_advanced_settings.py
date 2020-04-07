@@ -6,12 +6,7 @@ from opentrons.config import advanced_settings, CONFIG
 
 @pytest.fixture
 def mock_settings_values():
-    return {
-        "disableHomeOnBoot": True,
-        "useOldAspirationFunctions": False,
-        "useFastApi": False,
-        "useProtocolApi2": True
-    }
+    return {s.id: False for s in advanced_settings.settings}
 
 
 @pytest.fixture
@@ -71,14 +66,15 @@ def test_get_all_adv_settings_empty(mock_read_settings_file):
     assert s == {}
 
 
-def test_set_adv_setting(mock_read_settings_file,
-                         mock_settings_values,
-                         mock_write_settings_file,
-                         mock_settings_version,
-                         restore_restart_required):
+async def test_set_adv_setting(loop,
+                               mock_read_settings_file,
+                               mock_settings_values,
+                               mock_write_settings_file,
+                               mock_settings_version,
+                               restore_restart_required):
     for k, v in mock_settings_values.items():
         # Toggle the advanced setting
-        advanced_settings.set_adv_setting(k, not v)
+        await advanced_settings.set_adv_setting(k, not v)
         mock_write_settings_file.assert_called_with(
             # Only the current key is toggled
             {nk: nv if nk != k else not v
@@ -88,30 +84,35 @@ def test_set_adv_setting(mock_read_settings_file,
         )
 
 
-def test_set_adv_setting_unknown(mock_read_settings_file,
-                                 mock_write_settings_file):
+async def test_set_adv_setting_unknown(loop,
+                                       mock_read_settings_file,
+                                       mock_write_settings_file):
     mock_read_settings_file.return_value = \
         advanced_settings.SettingsData({}, 1)
     with pytest.raises(ValueError, match="is not recognized"):
-        advanced_settings.set_adv_setting("no", False)
+        await advanced_settings.set_adv_setting("no", False)
 
 
-def test_on_change_called(mock_read_settings_file,
-                          mock_settings_values,
-                          mock_write_settings_file,
-                          restore_restart_required):
+async def test_on_change_called(loop,
+                                mock_read_settings_file,
+                                mock_settings_values,
+                                mock_write_settings_file,
+                                restore_restart_required):
     _id = 'useProtocolApi2'
     with patch(
         "opentrons.config.advanced_settings.SettingDefinition.on_change"
     ) as m:
-        advanced_settings.set_adv_setting(_id, True)
+        async def on_change(v):
+            pass
+        m.side_effect = on_change
+        await advanced_settings.set_adv_setting(_id, True)
         m.assert_called_once_with(True)
 
 
-def test_restart_required(restore_restart_required):
+async def test_restart_required(loop, restore_restart_required):
     assert advanced_settings.restart_required() is False
     _id = 'useFastApi'
-    advanced_settings.set_adv_setting(_id, True)
+    await advanced_settings.set_adv_setting(_id, True)
     assert advanced_settings.restart_required() is True
 
 
@@ -119,7 +120,7 @@ def test_get_setting_use_env_overload(mock_read_settings_file,
                                       mock_settings_values):
     with patch("os.environ",
                new={
-                   "OT_API_FF_useProtocolApi2": "FALSE"
+                   "OT_API_FF_useProtocolApi2": "TRUE"
                }):
         v = advanced_settings.get_setting_with_env_overload("useProtocolApi2")
         assert v is not mock_settings_values['useProtocolApi2']
@@ -131,3 +132,40 @@ def test_get_setting_with_env_overload(mock_read_settings_file,
                new={}):
         v = advanced_settings.get_setting_with_env_overload("useProtocolApi2")
         assert v is mock_settings_values['useProtocolApi2']
+
+
+@pytest.mark.parametrize(argnames=["v", "expected_level"],
+                         argvalues=[
+                             [True, "emerg"],
+                             [False, "info"],
+                         ])
+async def test_disable_log_integration_side_effect(loop,
+                                                   v,
+                                                   expected_level):
+    with patch("opentrons.config.advanced_settings.log_control") \
+            as mock_log_control:
+        async def set_syslog_level(level):
+            return 0, "", ""
+
+        mock_log_control.set_syslog_level.side_effect = set_syslog_level
+        with patch("opentrons.config.advanced_settings.ARCHITECTURE",
+                   new=advanced_settings.ARCHITECTURE.BUILDROOT):
+            s = advanced_settings.DisableLogIntegrationSettingDefinition()
+            await s.on_change(v)
+            mock_log_control.set_syslog_level.assert_called_once_with(
+                expected_level
+            )
+
+
+async def test_disable_log_integration_side_effect_error(loop):
+    with patch("opentrons.config.advanced_settings.log_control") \
+            as mock_log_control:
+        async def set_syslog_level(level):
+            return 1, "", ""
+
+        mock_log_control.set_syslog_level.side_effect = set_syslog_level
+        with patch("opentrons.config.advanced_settings.ARCHITECTURE",
+                   new=advanced_settings.ARCHITECTURE.BUILDROOT):
+            s = advanced_settings.DisableLogIntegrationSettingDefinition()
+            with pytest.raises(advanced_settings.SettingException):
+                await s.on_change(True)
