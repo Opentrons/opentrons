@@ -6,6 +6,7 @@ import {
   composeErrors,
   minFieldValue,
   maxFieldValue,
+  realNumber,
 } from './errors'
 import {
   maskToInteger,
@@ -13,6 +14,7 @@ import {
   onlyPositiveNumbers,
   defaultTo,
   composeMaskers,
+  trimDecimals,
   type ValueMasker,
   type ValueCaster,
 } from './processing'
@@ -45,7 +47,11 @@ type StepFieldHelpers = {|
 |}
 const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   aspirate_airGap_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_labware: {
@@ -57,7 +63,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     castValue: Number,
   },
   aspirate_mix_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   aspirate_mmFromBottom: {
@@ -76,7 +86,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     castValue: Number,
   },
   dispense_mix_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   dispense_mmFromBottom: {
@@ -87,7 +101,11 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: defaultTo([]),
   },
   disposalVolume_volume: {
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
     castValue: Number,
   },
   labware: {
@@ -114,7 +132,12 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   volume: {
     getErrors: composeErrors(requiredField, nonZero),
-    maskValue: composeMaskers(maskToFloat, onlyPositiveNumbers, defaultTo(0)),
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1),
+      defaultTo(0)
+    ),
     castValue: Number,
   },
   wells: {
@@ -123,7 +146,8 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   magnetAction: { getErrors: composeErrors(requiredField) },
   engageHeight: {
-    maskValue: composeMaskers(maskToFloat),
+    getErrors: composeErrors(realNumber),
+    maskValue: composeMaskers(maskToFloat, trimDecimals(1)),
     castValue: Number,
   },
   setTemperature: { getErrors: composeErrors(requiredField) },
