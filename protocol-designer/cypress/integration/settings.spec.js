@@ -3,7 +3,6 @@ describe('The Settings Page', () => {
 
   before(() => {
     cy.visit('/')
-    localStorage.setItem('root.featureFlags.flags', '{"PRERELEASE_MODE":true}')
   })
 
   it('displays the announcement modal and clicks "GOT IT!" to close it', () => {
