@@ -2,6 +2,7 @@
 import React from 'react'
 import { useSelector } from 'react-redux'
 import { Formik } from 'formik'
+import cx from 'classnames'
 import { i18n } from '../../../localization'
 import {
   getSlotsBlockedBySpanning,
@@ -18,6 +19,9 @@ import {
   getAllModuleSlotsByType,
   SUPPORTED_MODULE_SLOTS,
 } from '../../../modules'
+import modalStyles from '../modal.css'
+import styles from './EditModules.css'
+import { Modal } from '@opentrons/components'
 
 type EditModulesModalProps = {
   moduleType: ModuleRealType,
@@ -38,31 +42,41 @@ export const EditModulesModalNew = (props: EditModulesModalProps) => {
   }
 
   return (
-    <Formik onSubmit={() => null} initialValues={initialValues}>
-      {({ values, handleChange }) => {
-        const selectedSlot = values.selectedSlot
-        const previousModuleSlot = moduleOnDeck?.slot
+    <Modal
+      heading={i18n.t(`modules.module_long_names.${moduleType}`)}
+      className={cx(modalStyles.modal, styles.edit_module_modal)}
+      contentsClassName={styles.modal_contents}
+    >
+      <Formik onSubmit={() => null} initialValues={initialValues}>
+        {({ values, handleChange }) => {
+          const selectedSlot = values.selectedSlot
+          const previousModuleSlot = moduleOnDeck?.slot
 
-        const slotError: boolean = showSlotError({
-          initialDeckSetup,
-          moduleType,
-          selectedSlot,
-          previousModuleSlot,
-        })
+          const slotError: boolean = showSlotError({
+            initialDeckSetup,
+            moduleType,
+            selectedSlot,
+            previousModuleSlot,
+          })
 
-        return (
-          <>
-            {slotError && (
-              <PDAlert
-                alertType="warning"
-                title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-                description={''}
-              />
-            )}
-          </>
-        )
-      }}
-    </Formik>
+          return (
+            <>
+              {slotError && (
+                <PDAlert
+                  alertType="warning"
+                  title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+                  description={''}
+                />
+              )}
+              {/* <ModelDropdown /> */}
+              {/* <SlotDropdown /> */}
+              {/* <SlotMap /> */}
+              {/* <Buttons /> */}
+            </>
+          )
+        }}
+      </Formik>
+    </Modal>
   )
 }
 //  WHY does this work? shouldn't this not get hoisted???
