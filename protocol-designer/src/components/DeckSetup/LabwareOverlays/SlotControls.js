@@ -64,7 +64,7 @@ export const SlotControlsComponent = (props: Props) => {
   } = props
   if (
     selectedTerminalItemId !== START_TERMINAL_ITEM_ID ||
-    itemType !== DND_TYPES.LABWARE
+    (itemType !== DND_TYPES.LABWARE && itemType !== null)
   )
     return null
 
