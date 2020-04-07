@@ -479,7 +479,7 @@ export const getTipracksByMount: (
   getTipracks,
   getPipettesByMount,
   (tipracks, pipettesMap) => {
-    return PIPETTE_MOUNTS.reduce<TiprackByMountMap>(
+    return Constants.PIPETTE_MOUNTS.reduce<TiprackByMountMap>(
       (tiprackMap, mount) => {
         const byCalibrator = tipracks.find(tr => tr.calibratorMount === mount)
         const byTiprackList = tipracks.find(tr =>
