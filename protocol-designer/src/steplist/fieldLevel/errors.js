@@ -21,7 +21,7 @@ const FIELD_ERRORS: { [FieldError]: string } = {
   NON_ZERO: 'Must be greater than zero',
   UNDER_RANGE_MINIMUM: 'Min is',
   OVER_RANGE_MAXIMUM: 'Max is',
-  NOT_A_REAL_NUMBER: 'Must be a real number',
+  NOT_A_REAL_NUMBER: 'Must be a number',
 }
 
 // TODO: test these
