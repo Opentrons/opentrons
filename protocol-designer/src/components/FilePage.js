@@ -15,8 +15,9 @@ import cx from 'classnames'
 import { i18n } from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
-import { EditModulesModal } from './modals/EditModulesModal'
+// import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
+import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
@@ -38,7 +39,7 @@ export type Props = {|
 
 type State = {|
   isEditPipetteModalOpen: boolean,
-  isEditModulesModalOpen: boolean,
+  isEditModulesOpen: boolean,
   currentModule: {|
     moduleType: ?ModuleRealType,
     moduleId: ?string,
@@ -53,7 +54,7 @@ const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 export class FilePage extends React.Component<Props, State> {
   state = {
     isEditPipetteModalOpen: false,
-    isEditModulesModalOpen: false,
+    isEditModulesOpen: false,
     currentModule: {
       moduleType: null,
       moduleId: null,
@@ -77,14 +78,14 @@ export class FilePage extends React.Component<Props, State> {
   handleEditModule = (moduleType: ModuleRealType, moduleId?: string) => {
     this.scrollToTop()
     this.setState({
-      isEditModulesModalOpen: true,
+      isEditModulesOpen: true, //  before they checked if module type was not null, idk why but keeping this comment just in case
       currentModule: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
   closeEditModulesModal = () => {
     this.setState({
-      isEditModulesModalOpen: false,
+      isEditModulesOpen: false,
       currentModule: { moduleType: null, moduleId: null },
     })
   }
@@ -226,15 +227,21 @@ export class FilePage extends React.Component<Props, State> {
           {this.state.isEditPipetteModalOpen && (
             <EditPipettesModal closeModal={this.closeEditPipetteModal} />
           )}
-
-          {this.state.isEditModulesModalOpen &&
+          {/* render the edit modules modal OR render the module change modal */}
+          {this.state.isEditModulesOpen && (
+            <EditModules
+              currentModule={this.state.currentModule}
+              onCloseClick={this.closeEditModulesModal}
+            />
+          )}
+          {/* {this.state.isEditModulesModalOpen &&
             this.state.currentModule.moduleType && (
               <EditModulesModal
                 moduleType={this.state.currentModule.moduleType}
                 moduleId={this.state.currentModule.moduleId}
                 onCloseClick={this.closeEditModulesModal}
               />
-            )}
+            )} */}
         </Portal>
       </div>
     )
