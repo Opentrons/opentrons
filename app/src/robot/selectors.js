@@ -6,19 +6,19 @@ import { createSelector } from 'reselect'
 import { format } from 'date-fns'
 
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import { getLatestLabwareDef } from '../getLabware'
-import { PIPETTE_MOUNTS, DECK_SLOTS } from './constants'
-import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../custom-labware/selectors'
+import { getLabwareDefBySlot } from '../protocol/selectors'
+import { getLatestLabwareDef } from '../getLabware'
+import * as Constants from './constants'
 
 import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
-import type { ConnectionStatus } from './constants'
 import type {
   Mount,
   Slot,
   Pipette,
   Labware,
+  ConnectionStatus,
   LabwareCalibrationStatus,
   LabwareType,
   SessionStatus,
@@ -33,11 +33,11 @@ const sessionRequest = (state: State) => session(state).sessionRequest
 const cancelRequest = (state: State) => session(state).cancelRequest
 
 export function isMount(target: ?string): boolean {
-  return PIPETTE_MOUNTS.indexOf(target) > -1
+  return Constants.PIPETTE_MOUNTS.indexOf(target) > -1
 }
 
 export function isSlot(target: ?string): boolean {
-  return DECK_SLOTS.indexOf(target) > -1
+  return Constants.DECK_SLOTS.indexOf(target) > -1
 }
 
 export function labwareType(labware: Labware): LabwareType {
@@ -52,22 +52,18 @@ export function getConnectedRobotName(state: State): string | null {
   return connection(state).connectedTo || null
 }
 
-export const getConnectionStatus: OutputSelector<
-  State,
-  void,
-  ConnectionStatus
-> = createSelector(
+export const getConnectionStatus: State => ConnectionStatus = createSelector(
   getConnectedRobotName,
   state => getConnectRequest(state).inProgress,
   state => connection(state).disconnectRequest.inProgress,
   state => connection(state).unexpectedDisconnect,
   (connectedTo, isConnecting, isDisconnecting, unexpectedDisconnect) => {
-    if (unexpectedDisconnect) return 'disconnected'
-    if (!connectedTo && isConnecting) return 'connecting'
-    if (connectedTo && !isDisconnecting) return 'connected'
-    if (connectedTo && isDisconnecting) return 'disconnecting'
+    if (unexpectedDisconnect) return Constants.DISCONNECTED
+    if (!connectedTo && isConnecting) return Constants.CONNECTING
+    if (connectedTo && !isDisconnecting) return Constants.CONNECTED
+    if (connectedTo && isDisconnecting) return Constants.DISCONNECTING
 
-    return 'disconnected'
+    return Constants.DISCONNECTED
   }
 )
 
@@ -239,21 +235,21 @@ export const getPipettes: State => Array<Pipette> = createSelector(
   (state: State) => calibration(state).probedByMount,
   (state: State) => calibration(state).tipOnByMount,
   (pipettesByMount, probedByMount, tipOnByMount): Array<Pipette> => {
-    return PIPETTE_MOUNTS.filter(mount => pipettesByMount[mount] != null).map(
-      mount => {
-        const pipette = pipettesByMount[mount]
-        const probed = probedByMount[mount] || false
-        const tipOn = tipOnByMount[mount] || false
+    return Constants.PIPETTE_MOUNTS.filter(
+      mount => pipettesByMount[mount] != null
+    ).map(mount => {
+      const pipette = pipettesByMount[mount]
+      const probed = probedByMount[mount] || false
+      const tipOn = tipOnByMount[mount] || false
 
-        return {
-          ...pipette,
-          probed,
-          tipOn,
-          modelSpecs: getPipetteModelSpecs(pipette.name) || null,
-          requestedAs: pipette.requestedAs || null,
-        }
+      return {
+        ...pipette,
+        probed,
+        tipOn,
+        modelSpecs: getPipetteModelSpecs(pipette.name) || null,
+        requestedAs: pipette.requestedAs || null,
       }
-    )
+    })
   }
 )
 

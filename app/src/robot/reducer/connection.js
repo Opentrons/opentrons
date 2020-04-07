@@ -68,7 +68,9 @@ function handleConnect(
     payload: { name },
   } = action
 
-  return { ...state, connectRequest: { inProgress: true, error: null, name } }
+  return !state.connectRequest.inProgress
+    ? { ...state, connectRequest: { inProgress: true, error: null, name } }
+    : state
 }
 
 function handleConnectResponse(

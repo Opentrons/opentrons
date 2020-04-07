@@ -1,13 +1,38 @@
 // @flow
 // common robot types
-import {
-  type PipetteModelSpecs,
-  type PipetteChannels,
-  type LabwareDefinition2,
+
+import type {
+  PipetteModelSpecs,
+  PipetteChannels,
+  LabwareDefinition2,
 } from '@opentrons/shared-data'
+
 import type { Mount } from '@opentrons/components'
 
+import typeof {
+  DISCONNECTED,
+  CONNECTING,
+  CONNECTED,
+  DISCONNECTING,
+  LOADED,
+  RUNNING,
+  FINISHED,
+  STOPPED,
+  PAUSED,
+  ERROR,
+  UNCONFIRMED,
+  MOVING_TO_SLOT,
+  JOGGING,
+  DROPPING_TIP,
+  OVER_SLOT,
+  PICKING_UP,
+  PICKED_UP,
+  CONFIRMING,
+  CONFIRMED,
+} from './constants'
+
 import * as ApiTypes from './api-types'
+
 export * from './api-types'
 
 // TODO Ian 2018-02-27 files that import from here should just import from @opentrons/components directly
@@ -34,17 +59,16 @@ export type RobotService = {
   port: number,
 }
 
-// TODO(mc, 2018-01-11): collapse a bunch of these into something like MOVING
 export type LabwareCalibrationStatus =
-  | 'unconfirmed'
-  | 'moving-to-slot'
-  | 'jogging'
-  | 'dropping-tip'
-  | 'over-slot'
-  | 'picking-up'
-  | 'picked-up'
-  | 'confirming'
-  | 'confirmed'
+  | UNCONFIRMED
+  | MOVING_TO_SLOT
+  | JOGGING
+  | DROPPING_TIP
+  | OVER_SLOT
+  | PICKING_UP
+  | PICKED_UP
+  | CONFIRMING
+  | CONFIRMED
 
 // protocol command as returned by the API
 export type Command = {
@@ -120,12 +144,18 @@ export type SessionModule = $Diff<ApiTypes.ApiSessionModule, {| name: mixed |}>
 
 export type SessionStatus =
   | ''
-  | 'loaded'
-  | 'running'
-  | 'paused'
-  | 'error'
-  | 'finished'
-  | 'stopped'
+  | LOADED
+  | RUNNING
+  | FINISHED
+  | STOPPED
+  | PAUSED
+  | ERROR
+
+export type ConnectionStatus =
+  | DISCONNECTED
+  | CONNECTING
+  | CONNECTED
+  | DISCONNECTING
 
 export type SessionUpdate = {|
   state: SessionStatus,

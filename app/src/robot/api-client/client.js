@@ -99,6 +99,7 @@ export function client(dispatch) {
   }
 
   function connect(state, action) {
+    if (selectors.getConnectRequest(state).inProgress) return
     if (rpcClient) disconnect()
 
     const name = action.payload.name

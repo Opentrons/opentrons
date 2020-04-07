@@ -91,6 +91,7 @@ describe('api client', () => {
     [NAME]: {
       connection: {
         connectedTo: '',
+        connectRequest: { inProgress: false },
       },
     },
     discovery: {
@@ -213,6 +214,20 @@ describe('api client', () => {
       return sendConnect().then(() =>
         expect(dispatch).toHaveBeenCalledWith(expected)
       )
+    })
+
+    it('will not try to connect multiple RpcClients at one time', () => {
+      const state = {
+        ...STATE,
+        robot: {
+          ...STATE.robot,
+          connection: { connectRequest: { inProgress: true } },
+        },
+      }
+
+      return sendToClient(state, actions.connect(ROBOT_NAME)).then(() => {
+        expect(RpcClient).toHaveBeenCalledTimes(0)
+      })
     })
   })
 
