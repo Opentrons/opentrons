@@ -1,8 +1,8 @@
 import typing
 from uuid import uuid4, UUID
-from dataclasses import dataclass, asdict, field
+from dataclasses import dataclass, asdict, field, fields
 
-from opentrons.types import Mount, Point
+from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.types import Axis
 
 # from .models import AttachedPipette
@@ -19,6 +19,12 @@ offset or a robot deck transform.
 
 ALTERNATIVE_LABWARE = ['opentrons_96_filtertiprack_{}ul']
 LOAD_NAME = 'opentrons_96_tiprack_{}ul'
+
+_KT = typing.TypeVar('_KT')
+_VT = typing.TypeVar('_VT')
+MoveType = typing.Optional[typing.Dict[_KT, _VT]]
+PositionType =\
+    typing.Dict[str, typing.Union[typing.Optional[UUID], typing.List]]
 
 
 class SessionManager:
@@ -40,6 +46,7 @@ class Pipette:
     model: typing.Optional[str]
     name: typing.Optional[str]
     tip_length: typing.Optional[float]
+    fallback_tip_length: typing.Optional[float]
     mount_axis: Axis
     plunger_axis: typing.Optional[Axis]
     pipette_id: typing.Optional[str]
@@ -48,7 +55,11 @@ class Pipette:
     channels: int
     tip_overlap: typing.Dict[str, int]
     return_tip_height: int
-    tiprack_id: typing.Optional[UUID]
+    tiprack_id: typing.Optional[UUID] = field(default_factory=UUID)
+
+    @classmethod
+    def list_fields(self):
+        return [obj.name for obj in fields(self)]
 
 
 @dataclass
@@ -60,6 +71,11 @@ class PipetteStatus:
     plunger_axis: Axis
     pipette_uuid: Axis
     has_tip: bool
+    tiprack_id: UUID
+
+    @classmethod
+    def list_fields(self):
+        return [obj.name for obj in fields(self)]
 
 
 @dataclass
@@ -86,18 +102,18 @@ class Moves:
     """
     This class is meant to encapsulate the different moves
     """
-    moveToTipRack: typing.Optional[typing.Dict[UUID, Point]] = field(default_factory=dict)
-    checkPointOne: typing.Optional[typing.Dict[UUID, Point]] = field(default_factory=dict)
-    checkPointTwo: typing.Optional[typing.Dict[UUID, Point]] = field(default_factory=dict)
-    checkPointThree: typing.Optional[typing.Dict[UUID, Point]] = field(default_factory=dict)
-    checkHeight: typing.Optional[typing.Dict[UUID, Point]] = field(default_factory=dict)
+    moveToTipRack: MoveType = field(default_factory=dict)
+    checkPointOne: MoveType = field(default_factory=dict)
+    checkPointTwo: MoveType = field(default_factory=dict)
+    checkPointThree: MoveType = field(default_factory=dict)
+    checkHeight: MoveType = field(default_factory=dict)
 
 
 class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
     def __init__(self, hardware: ThreadManager):
-        self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._hardware = hardware
+        self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
         self._deck = geometry.Deck()
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
@@ -109,16 +125,18 @@ class CalibrationSession:
             # This is to ensure during testing that two pipettes are
             # attached -- for now.
             assert data, "Please attach pipettes before proceeding"
-            fields = list(Pipette.__dataclass_fields__.keys())
+            fields = Pipette.list_fields()
 
             updated_data = {
                 key: value for key, value in data.items() if key in fields}
             token = uuid4()
+            instr = self.hardware._attached_instruments[mount]
             pipette_dict[token] = Pipette(
-                **updated_data,
                 mount_axis=Axis.by_mount(mount),
                 plunger_axis=Axis.of_plunger(mount),
-                tiprack_id=None)
+                fallback_tip_length=instr._fallback_tip_length,
+                tiprack_id=None,
+                **updated_data)
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -171,37 +189,43 @@ class CalibrationSession:
         else:
             return Mount.RIGHT
 
-    def _jog(self, pipette: UUID, vector: Point):
+    async def _jog(self, pipette: UUID, vector: Point):
         """
         General function that can be used by all session types to jog around
         a specified pipette.
         """
         pip = self.get_pipette(pipette)
-        self._hardware.move_rel(self._convert_to_mount(pip.mount_axis), vector)
+        await self.hardware.move_rel(
+            self._convert_to_mount(pip.mount_axis), vector)
 
     def _add_tip(self, pipette: UUID, tip_length: float):
-        self._pipettes[pipette].hasTip = True
+        self._pipettes[pipette].has_tip = True
         self._pipettes[pipette].tip_length = tip_length
 
     def _remove_tip(self, pipette: UUID):
-        self._pipettes[pipette].hasTip = False
+        self._pipettes[pipette].has_tip = False
         self._pipettes[pipette].tip_length = 0.0
 
     def _has_tip(self, pipette: UUID) -> bool:
-        return self._pipettes[pipette].hasTip
+        return self._pipettes[pipette].has_tip
 
-    def _pick_up_tip(self, pipette: UUID, tiprack: UUID):
+    async def _pick_up_tip(self, pipette: UUID):
         pip = self.get_pipette(pipette)
         mount = self._convert_to_mount(pip.mount_axis)
-        lw_info = self.get_tiprack(tiprack)
-        tip_length = self._deck[lw_info.slot].tip_length
-        self._hardware.pick_up_tip(mount, tip_length)
+        if pip.tiprack_id:
+            lw_info = self.get_tiprack(pip.tiprack_id)
+            # TODO: Figure out how to cleanly handle this scenario.
+            # ABC DeckItem cannot have tiplength b/c of mod geometry contexts.
+            tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
+        else:
+            tip_length = pip.fallback_tip_length
+        await self.hardware.pick_up_tip(mount, tip_length)
         self._add_tip(pipette, tip_length)
 
-    def _return_tip(self, pipette: UUID):
+    async def _return_tip(self, pipette: UUID):
         pip = self.get_pipette(pipette)
-        self._hardware.drop_tip(pip.mount_axis)
-        self._remove_tip
+        await self.hardware.drop_tip(self._convert_to_mount(pip.mount_axis))
+        self._remove_tip(pipette)
 
     async def cache_instruments(self):
         await self.hardware.cache_instruments()
@@ -225,7 +249,7 @@ class CalibrationSession:
 
     @property
     def pipette_status(self) -> typing.Dict:
-        fields = list(PipetteStatus.__dataclass_fields__.keys())
+        fields = PipetteStatus.list_fields()
         to_dict = {}
         for name, value in self.pipettes.items():
             data = asdict(value)
@@ -249,76 +273,131 @@ class CheckCalibrationSession(CalibrationSession):
         self.state_machine = CalibrationCheckMachine()
         self.session_type = 'check'
         self._moves = Moves()
-        self._load_labware_objects()
 
-    def _load_labware_objects(self):
+    def load_labware_objects(self):
         """
         A function that takes tiprack information and loads them onto the deck.
         """
-        # curr_state = self.state_machine.current_state.name
-        # assert curr_state == 'loadLabware',\
-        #     f'You cannot build a labware object during {curr_state} state.'
+        full_dict = {}
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
-            self._deck[data.slot] = labware.Labware(data.definition, parent)
-            self._moves.moveToTipRack[data.id] = Point(0, 0, 0)
-        # self.state_machine.update_state()
+            lw = labware.Labware(data.definition, parent)
+            self._deck[data.slot] = lw
+            build_dict = {}
+            for id in data.forPipettes:
+                pip = self.get_pipette(id)
+                if pip.channels == 8:
+                    well = lw.wells_by_name()['H1']
+                else:
+                    well = lw.wells_by_name()['A1']
+                build_dict[id] = {'offset': Point(0, 0, 10), 'well': well}
+            full_dict[data.id] = build_dict
+        self._moves.moveToTipRack = full_dict
+        self.state_machine.update_state()
 
-    def _update_tiprack_offset(self, pipette: UUID) -> UUID:
+    def _update_tiprack_offset(
+            self, pipette: UUID, old_pos: Point, new_pos: Point):
         pip = self.get_pipette(pipette)
         tiprack_id = pip.tiprack_id
-        mount = self._convert_to_mount(pip.mount_axis)
-        old_offset = self._moves.moveToTipRack[tiprack_id]
-        self._moves.moveToTipRack[tiprack_id] =\
-            self._hardware.gantry_position(mount) + old_offset
-        return tiprack_id
+        update_dict = getattr(self._moves, 'moveToTipRack')
+        old_offset = update_dict[tiprack_id][pipette]['offset']
+        updated_offset = (new_pos - old_pos) + old_offset
+        update_dict[tiprack_id][pipette].update(offset=updated_offset)
+        self._moves.moveToTipRack = {tiprack_id: update_dict}
 
     async def delete_session(self):
         for name, data in self.pipettes.items():
-            state1 = self.state_machine.get_state('moveToTipRack')
-            self.state_machine.update_state(state1)
-            position = {
-                "location": Point(0, 0, 0), "locationId": data.tiprack_id}
-            self.move(name, position)
-            state2 = self.state_machine.get_state('dropTip')
-            self.state_machine.update_state(state2)
-            self.return_tip(name)
-        await current_session.hardware.home()
+            if self._has_tip(name):
+                await self.return_tip(name)
+        await self.hardware.home()
+        await self.hardware.set_lights(rails=False)
 
-    def pick_up_tip(self, pipette: UUID):
-        tiprack_id = self._update_tiprack_offset(pipette)
+    async def pick_up_tip(self, pipette: UUID):
+        """
+        Function to pick up tip. It will attempt to pick up a tip in
+        the current location, and save any offset it might have from the
+        original position.
+        """
+        self.state_machine.update_state()
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'pickUpTip',\
             f'You cannot pick up tip during {curr_state} state'
-        self._pick_up_tip(pipette, tiprack_id)
-        self.state_machine.update_state()
+        await self._pick_up_tip(pipette)
 
     def invalidate_tip(self, pipette: UUID):
-        self.state_machine.update_state(self.state_machine.get_state('invalidateTip'))
+        to_state = self.state_machine.get_state('invalidateTip')
+        self.state_machine.update_state(to_state)
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'invalidateTip',\
             f'You cannot remove a tip during {curr_state} state'
         self._remove_tip(pipette)
 
-    def return_tip(self, pipette: UUID):
-        curr_state = self.state_machine.current_state.name
-        assert curr_state == 'dropTip',\
-            f'You cannot drop a tip during {curr_state} state'
-        self._return_tip(pipette)
-        self.state_machine.update_state()
+    async def _move_to_tiprack(self, pipette: UUID):
+        pip = self.get_pipette(pipette)
+        get_position = getattr(self._moves, 'moveToTipRack')
+        offset_dict = get_position[pip.tiprack_id]
+        if offset_dict:
+            loc = offset_dict[pipette]['offset']
+        else:
+            loc = Point(0, 0, 0)
+        state = self.state_machine.get_state('moveToTipRack')
+        self.state_machine.update_state(state)
+        await self.move(pipette, {"offset": loc, "locationId": pip.tiprack_id})
 
-    def move(self, pipette: UUID,
-             position: typing.Dict[str, typing.Union[UUID, typing.List]]):
+    async def return_tip(self, pipette: UUID):
+        await self._move_to_tiprack(pipette)
+        await self._return_tip(pipette)
+        state = self.state_machine.get_state('dropTip')
+        self.state_machine.update_state(state)
+
+    def format_move_params(self, next_state: str) -> typing.Dict:
+        get_position = getattr(self._moves, next_state)
+        new_dict = {}
+        for loc, data in get_position.items():
+            for id, values in data.items():
+                offset = list(values['offset'])
+                new_dict[id.hex] = {"offset": offset, "locationId": loc.hex}
+        return new_dict
+
+    def _determine_move_location(
+            self, pos: typing.Dict, pip: UUID, offset: Point) -> Location:
+        loc_to_move = pos[pip].get('well')
+        if loc_to_move:
+            pt, well = pos[pip]['well'].top()
+            updated_pt = pt + offset
+            return Location(updated_pt, well)
+        else:
+            # TODO Placeholder until cross moves are added in.
+            return Location(Point(0, 0, 0), None)
+
+    async def move(self, pipette: UUID,
+                   position: PositionType):
+
+        check_state = self.state_machine.current_state
+        if not self.state_machine.requires_move(check_state):
+            self.state_machine.update_state()
         curr_state = self.state_machine.current_state.name
-        print(curr_state)
         get_position = getattr(self._moves, curr_state)
-        print(get_position)
-        print(type(get_position))
-        offset = get_position[position["locationId"]]
-        pt = Point(*position["location"]) + offset
-        self.hardware.move(pipette, pt)
-        self.state_machine.update_state()
+        loc_id = position['locationId']
+        # You have to unpack a list into a NamedTuple, but mypy does not
+        # recognize this.
+        offset = Point(*position['offset'])  # type: ignore
+        to_loc = self._determine_move_location(
+            get_position[loc_id], pipette, offset)
 
-    def jog(self, pipette: UUID, vector: typing.List):
-        self._jog(pipette, Point(*vector))
-        self.state_machine.update_state()
+        # determine current location
+        mount = self._convert_to_mount(self.get_pipette(pipette).mount_axis)
+        from_pt = await self.hardware.gantry_position(mount)
+        from_loc = Location(from_pt, None)
+
+        max_height = self.hardware.get_instrument_max_height(mount)
+        moves = geometry.plan_moves(from_loc, to_loc, self._deck, max_height)
+        for move in moves:
+            await self.hardware.move_to(mount, move[0], move[1])
+
+    async def jog(self, pipette: UUID, vector: typing.List):
+        mount = self._convert_to_mount(self.get_pipette(pipette).mount_axis)
+        old_pos = await self.hardware.gantry_position(mount)
+        await self._jog(pipette, Point(*vector))
+        new_pos = await self.hardware.gantry_position(mount)
+        self._update_tiprack_offset(pipette, old_pos, new_pos)

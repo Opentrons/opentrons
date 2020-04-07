@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
 from pydantic import BaseModel, Field, UUID4
 
 from opentrons.hardware_control.types import Axis
@@ -26,7 +26,10 @@ class AttachedPipette(BaseModel):
         Field(None, description="The axis that moves plunger of this pipette")
     pipette_id: Optional[str] =\
         Field(None, description="The serial number of the attached pipette")
-    has_tip: bool
+    has_tip: Optional[bool]=\
+        Field(None, description="Whether a tip is attached.")
+    tiprack_id: Optional[UUID4]=\
+        Field(None, description="Id of tiprack associated with this pip.")
 
     class Config:
         json_encoders = {
@@ -57,7 +60,7 @@ class CalibrationSessionStatus(BaseModel):
     """
     instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
-    nextSteps: Dict[str, Dict[str, str]] =\
+    nextSteps: Dict[str, Dict[str, Dict[str, Any]]] =\
         Field(..., description="Next Available Step in Session")
     labware: List[LabwareStatus]
 
@@ -87,7 +90,7 @@ class CalibrationSessionStatus(BaseModel):
                     "currentStep": "sessionStart",
                     "nextSteps": {
                         "links": {
-                            "loadLabware": ""
+                            "loadLabware": {"url": "", "params": {}}
                         }
                     }
 

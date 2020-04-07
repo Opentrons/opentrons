@@ -27,7 +27,10 @@ async def test_start_session(async_client, test_setup):
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text["currentStep"] == "sessionStart"
     assert text["nextSteps"] ==\
-        {"links": {"loadLabware": "/calibration/check/session/loadLabware"}}
+        {'links': {
+            'loadLabware': {
+                'params': {}, 'url': '/calibration/check/session/loadLabware'}
+                }}
 
     first_lw = text["labware"][0]
     second_lw = text["labware"][1]
@@ -57,7 +60,10 @@ async def test_check_session(async_client, test_setup):
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text2["currentStep"] == "sessionStart"
     assert text2["nextSteps"] ==\
-        {"links": {"loadLabware": "/calibration/check/session/loadLabware"}}
+        {'links': {
+            'loadLabware': {
+                'params': {}, 'url': '/calibration/check/session/loadLabware'}
+                }}
 
 
 async def test_delete_session(async_client, async_server, test_setup):
@@ -78,11 +84,8 @@ async def test_create_lw_object(async_client, async_server, test_setup):
     # Create a session
     await async_client.post('/calibration/check/session')
     sess = async_server['com.opentrons.session_manager'].sessions['check']
-    sess.state_machine.update_state(sess.state_machine.current_state)
-    assert sess.state_machine.current_state ==\
-        util.CalibrationCheckState.loadLabware
-
-    sess._load_labware_objects()
+    sess.state_machine.update_state()
+    sess.load_labware_objects()
     assert sess._deck['8']
     assert sess._deck['8'].name == 'opentrons_96_tiprack_10ul'
     assert sess._deck['6']
@@ -125,14 +128,14 @@ def test_state_machine():
     state5 = sm.get_state('DecideToDoWork')
 
     assert sm.current_state.name == state1.name
-    sm.update_state(state1)
+    sm.update_state()
     assert sm.current_state.name == state2.name
-    sm.update_state(state2)
+    sm.update_state()
     assert sm.current_state.name == state1.name
-    sm.update_state(state1)
     sm.update_state(state3)
+    sm.update_state()
     assert sm.current_state.name == state4.name
-    sm.update_state(state4)
+    sm.update_state()
     assert sm.current_state.name == state5.name
-    sm.update_state(state5)
+    sm.update_state()
     assert sm.current_state.name == state1.name
