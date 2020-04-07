@@ -131,6 +131,9 @@ async def initialize_robot() -> ThreadManager:
         log.info("Homing Z axes")
         await hardware.home_z()
 
+    if hardware._backend.gpio_chardev:
+        await hardware._backend.gpio_chardev.setup_blue_button()
+
     return hardware
 
 

@@ -1,6 +1,16 @@
+import asyncio
 import os
 from sys import platform
-from typing import Tuple
+import logging
+from typing import Dict, Tuple
+
+try:
+    import gpiod
+except ImportError:
+    gpiod = None  # type: ignore
+
+import systemd.daemon
+
 """
 Raspberry Pi GPIO control module
 
@@ -22,13 +32,9 @@ to set up all pins correctly, and then providing `set_low` and `set_high`
 functions that accept a pin number. The OUTPUT_PINS and INPUT_PINS dicts
 provide pin-mappings so calling code does not need to use raw integers.
 """
-import time
 
-IN = "in"
-OUT = "out"
-
-LOW = "0"
-HIGH = "1"
+LOW = 0
+HIGH = 1
 
 # Note: in test pins are sorted by value, so listing them in that order here
 #   makes it easier to read the tests. Pin numbers defined by bridge wiring
@@ -49,171 +55,121 @@ INPUT_PINS = {
     'WINDOW_INPUT': 20
 }
 
-_path_prefix = "/sys/class/gpio"
+MODULE_LOG = logging.getLogger(__name__)
 
 
-def _enable_pin(pin, direction):
-    """
-    In order to enable a GPIO pin, the pin number must be written into
-    /sys/class/gpio/export, and then the direction ("in" or "out" must be
-    written to /sys/class/gpio/gpio<number>/direction
+class GPIOCharDev:
+    def __init__(self, chip_name: str):
+        self._chip = gpiod.Chip(chip_name)
+        self._lines = self._initialize()
 
-    :param pin: An integer corresponding to the GPIO number of the pin in RPi
-      GPIO board numbering (not physical pin numbering)
+    @property
+    def chip(self):
+        return self._chip
 
-    :param direction: "in" or "out"
-    """
-    _write_value(pin, "{}/export".format(_path_prefix))
-    _write_value(direction, "{0}/gpio{1}/direction".format(_path_prefix, pin))
+    @property
+    def lines(self) -> Dict:
+        return self._lines
 
+    def _request_line(self, offset, name, request_type):
+        line = self.chip.get_line(offset)
+        try:
+            line.request(consumer=name, type=request_type, default_vals=[0])
+        except OSError:
+            MODULE_LOG.error(f'Line {offset} is busy. Cannot establish {name}')
+        return line
 
-def _write_value(value, path):
-    """
-    Writes specified value into path. Note that the value is wrapped in single
-    quotes in the command, to prevent injecting bash commands.
-    :param value: The value to write (usually a number or string)
-    :param path: A valid system path
-    """
-    base_command = "echo '{0}' > {1}"
-    # There is no common method for redirecting stderr to a null sink, so the
-    # command string is platform-dependent
-    if platform == 'win32':
-        command = "{0} > NUL".format(base_command)
-    else:
-        command = "exec 2> /dev/null; {0}".format(base_command)
-    os.system(command.format(value, path))
+    def _initialize(self):
+        lines = {}
+        # setup input lines
+        for name, offset in INPUT_PINS.items():
+            lines[offset] = self._request_line(offset, name, gpiod.LINE_REQ_DIR_IN)
+        # setup output lines
+        for name, offset in OUTPUT_PINS.items():
+            if name is not 'BLUE_BUTTON':
+                lines[offset] = self._request_line(offset, name, gpiod.LINE_REQ_DIR_OUT)
+        MODULE_LOG.info(f'{lines}')
+        return lines
 
+    async def setup_blue_button(self):
+        systemd.daemon.notify("READY=1")
+        await asyncio.sleep(0.25)
+        target = 'BLUE_BUTTON'
+        line = self._request_line(OUTPUT_PINS[target], target, gpiod.LINE_REQ_DIR_OUT)
+        self.lines[OUTPUT_PINS[target]] = line
+        self.set_button_light(blue=True)
+            
+    async def setup(self):
+        # smoothieware programming pins, must be in a known state (HIGH)
+        self.set_halt_pin(True)
+        self.set_isp_pin(True)
+        self.set_reset_pin(False)
+        await asyncio.sleep(0.25)
+        self.set_reset_pin(True)
+        await asyncio.sleep(0.25)
 
-def _read_value(path):
-    """
-    Reads value of specified path.
-    :param path: A valid system path
-    """
-    read_value = 0
-    if not os.path.exists(path):
-        # Path will generally only exist on a Raspberry Pi
-        pass
-    else:
-        with open(path) as f:
-            read_value = int(f.read())
-    return read_value
+    def set_high(self, offset):
+        self.lines[offset].set_value(HIGH)
 
+    def set_low(self, offset):
+        self.lines[offset].set_value(LOW)
 
-def set_high(pin):
-    """
-    Sets a pin high by number. This pin must have been previously initialized
-    and set up as with direction of OUT, otherwise this operation will not
-    behave as expected.
+    def set_button_light(self,
+                         red: bool = False,
+                         green: bool = False,
+                         blue: bool = False):
+        color_pins = {
+            OUTPUT_PINS['RED_BUTTON']: red,
+            OUTPUT_PINS['GREEN_BUTTON']: green,
+            OUTPUT_PINS['BLUE_BUTTON']: blue}
+        for pin, state in color_pins.items():
+            if state:
+                self.set_high(pin)
+            else:
+                self.set_low(pin)
 
-    High represents "on" for lights, and represents normal running state for
-    HALT and RESET pins.
-
-    :param pin: An integer corresponding to the GPIO number of the pin in RPi
-      GPIO board numbering (not physical pin numbering)
-    """
-    _write_value(HIGH, "{0}/gpio{1}/value".format(_path_prefix, pin))
-
-
-def set_low(pin):
-    """
-    Sets a pin low by number. This pin must have been previously initialized
-    and set up as with direction of OUT, otherwise this operation will not
-    behave as expected.
-
-    Low represents "off" for lights, and writing the RESET or HALT pins low
-    will terminate Smoothie operation until written high again.
-
-    :param pin: An integer corresponding to the GPIO number of the pin in RPi
-      GPIO board numbering (not physical pin numbering)
-    """
-    _write_value(LOW, "{0}/gpio{1}/value".format(_path_prefix, pin))
-
-
-def read(pin):
-    """
-    Reads a pin's value. If the pin has been previously initialized with
-    a direction of IN, the value will be the input signal. If pin is configured
-    as OUT, the value will be the current output state.
-
-    :param pin: An integer corresponding to the GPIO number of the pin in RPi
-      GPIO board numbering (not physical pin numbering)
-    """
-    return _read_value("{0}/gpio{1}/value".format(_path_prefix, pin))
-
-
-def initialize():
-    """
-    All named pins in OUTPUT_PINS and INPUT_PINS are exported, and set the
-    HALT pin high (normal running state), since the default value after export
-    is low.
-    """
-    for pin in sorted(OUTPUT_PINS.values()):
-        _enable_pin(pin, OUT)
-
-    for pin in sorted(INPUT_PINS.values()):
-        _enable_pin(pin, IN)
-
-
-def robot_startup_sequence():
-    """
-    Gets the robot ready for operation by initializing GPIO pins, resetting
-    the Smoothie and enabling the audio pin. This only needs to be done
-    after power cycling the machine.
-    """
-    initialize()
-
-    # audio-enable pin can stay HIGH always, unless there is noise coming
-    # from the amplifier, then we can set to LOW to disable the amplifier
-    set_high(OUTPUT_PINS['AUDIO_ENABLE'])
-
-    # smoothieware programming pins, must be in a known state (HIGH)
-    set_high(OUTPUT_PINS['HALT'])
-    set_high(OUTPUT_PINS['ISP'])
-    set_low(OUTPUT_PINS['RESET'])
-    time.sleep(0.25)
-    set_high(OUTPUT_PINS['RESET'])
-    time.sleep(0.25)
-
-
-def turn_on_blue_button_light():
-    set_button_light(blue=True)
-
-
-def set_button_light(red=False, green=False, blue=False):
-    color_pins = {
-        OUTPUT_PINS['RED_BUTTON']: red,
-        OUTPUT_PINS['GREEN_BUTTON']: green,
-        OUTPUT_PINS['BLUE_BUTTON']: blue
-    }
-    for pin, state in color_pins.items():
-        if state:
-            set_high(pin)
+    def set_rail_lights(self, on: bool = True):
+        if on:
+            self.set_high(OUTPUT_PINS['FRAME_LEDS'])
         else:
-            set_low(pin)
+            self.set_low(OUTPUT_PINS['FRAME_LEDS'])
 
+    def set_reset_pin(self, on: bool = True):
+        if on:
+            self.set_high(OUTPUT_PINS['RESET'])
+        else:
+            self.set_low(OUTPUT_PINS['RESET'])
 
-def get_button_light() -> Tuple[bool, bool, bool]:
-    return (read(OUTPUT_PINS['RED_BUTTON']) == 1,
-            read(OUTPUT_PINS['GREEN_BUTTON']) == 1,
-            read(OUTPUT_PINS['BLUE_BUTTON']) == 1)
+    def set_isp_pin(self, on: bool = True):
+        if on:
+            self.set_high(OUTPUT_PINS['ISP'])
+        else:
+            self.set_low(OUTPUT_PINS['ISP'])
 
+    def set_halt_pin(self, on: bool = True):
+        if on:
+            self.set_high(OUTPUT_PINS['HALT'])
+        else:
+            self.set_low(OUTPUT_PINS['HALT'])
 
-def set_rail_lights(on=True):
-    if on:
-        set_high(OUTPUT_PINS['FRAME_LEDS'])
-    else:
-        set_low(OUTPUT_PINS['FRAME_LEDS'])
+    def _read(self, offset):
+        return self.lines[offset].get_value()
 
+    def get_button_light(self) -> Tuple[bool, bool, bool]:
+        return (bool(self._read(OUTPUT_PINS['RED_BUTTON'])),
+                bool(self._read(OUTPUT_PINS['GREEN_BUTTON'])),
+                bool(self._read(OUTPUT_PINS['BLUE_BUTTON'])))
 
-def get_rail_lights() -> bool:
-    value = read(OUTPUT_PINS['FRAME_LEDS'])
-    return True if value == 1 else False
+    def get_rail_lights(self) -> bool:
+        return bool(self._read(OUTPUT_PINS['FRAME_LEDS']))
 
+    def read_button(self) -> bool:
+        # button is normal-HIGH, so invert
+        return not bool(self._read(INPUT_PINS['BUTTON_INPUT']))
 
-def read_button():
-    # button is normal-HIGH, so invert
-    return not bool(read(INPUT_PINS['BUTTON_INPUT']))
+    def read_window_switches(self) -> bool:
+        return bool(self._read(INPUT_PINS['WINDOW_INPUT']))
 
-
-def read_window_switches():
-    return bool(read(INPUT_PINS['WINDOW_INPUT']))
+    def release_line(self, offset):
+        self.lines[offset].release()
+        self.lines.pop(offset)

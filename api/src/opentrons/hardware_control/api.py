@@ -20,7 +20,6 @@ from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
 from . import modules
 
-
 mod_log = logging.getLogger(__name__)
 
 
@@ -92,6 +91,7 @@ class API(HardwareAPILike):
         """
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
+        await backend.setup_gpio_chardev()
         await backend.connect(port)
 
         api_instance = cls(backend, loop=checked_loop, config=config)

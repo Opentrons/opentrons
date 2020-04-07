@@ -308,7 +308,7 @@ def _parse_homing_status_values(raw_homing_status_values):
 
 
 class SmoothieDriver_3_0_0:
-    def __init__(self, config, handle_locks=True):
+    def __init__(self, config, gpio_chardev=None, handle_locks=True):
         self.run_flag = Event()
         self.run_flag.set()
 
@@ -321,6 +321,8 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
+
+        self._gpio_chardev = gpio_chardev
 
         # Current settings:
         # The amperage of each axis, has been organized into three states:
@@ -1826,38 +1828,39 @@ class SmoothieDriver_3_0_0:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
     def turn_on_blue_button_light(self):
-        gpio.set_button_light(blue=True)
+        self._gpio_chardev.set_button_light(blue=True)
 
     def turn_on_red_button_light(self):
-        gpio.set_button_light(red=True)
+        self._gpio_chardev.set_button_light(red=True)
 
     def turn_off_button_light(self):
-        gpio.set_button_light(red=False, green=False, blue=False)
+        self._gpio_chardev.set_button_light(
+            red=False, green=False, blue=False)
 
     def turn_on_rail_lights(self):
-        gpio.set_rail_lights(True)
+        self._gpio_chardev.set_rail_lights(True)
 
     def turn_off_rail_lights(self):
-        gpio.set_rail_lights(False)
+        self._gpio_chardev.set_rail_lights(False)
 
     def get_rail_lights_on(self):
-        return gpio.get_rail_lights()
+        return self._gpio_chardev.get_rail_lights()
 
     def read_button(self):
-        return gpio.read_button()
+        return self._gpio_chardev.read_button()
 
     def read_window_switches(self):
-        return gpio.read_window_switches()
+        return self._gpio_chardev.read_window_switches()
 
     def set_lights(self, button: bool = None, rails: bool = None):
         if button is not None:
-            gpio.set_button_light(blue=button)
+            self._gpio_chardev.set_button_light(blue=button)
         if rails is not None:
-            gpio.set_rail_lights(rails)
+            self._gpio_chardev.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        return {'button': gpio.get_button_light()[2],
-                'rails': gpio.get_rail_lights()}
+        return {'button': self._gpio_chardev.get_button_light()[2],
+                'rails': self._gpio_chardev.get_rail_lights()}
 
     def kill(self):
         """
@@ -1892,10 +1895,10 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
-            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_reset_pin(False)
+            self._gpio_chardev.set_isp_pin(True)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            self._gpio_chardev.set_reset_pin(True)
             sleep(0.25)
             self._wait_for_ack()
             self._reset_from_error()
@@ -1906,12 +1909,12 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
-            gpio.set_low(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_reset_pin(False)
+            self._gpio_chardev.set_isp_pin(False)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            self._gpio_chardev.set_reset_pin(True)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_isp_pin(True)
             sleep(0.25)
 
     def hard_halt(self):
@@ -1921,9 +1924,9 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             self._is_hard_halting.set()
-            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
+            self._gpio_chardev.set_halt_pin(False)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
+            self._gpio_chardev.set_halt_pin(True)
             sleep(0.25)
             self.run_flag.set()
 
