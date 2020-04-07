@@ -39,7 +39,6 @@ export const announcements: Array<Announcement> = [
           features and software versions may include bugs or incomplete
           functionality.
         </p>
-        {/* TODO IMMEDIATELY (sa, 2020-04-01): Update with the link to support article when provided */}
         <p>
           Learn more about Beta releases{' '}
           <a href="https://support.opentrons.com/en/articles/3854833-opentrons-beta-software-releases">
