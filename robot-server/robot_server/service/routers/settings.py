@@ -31,7 +31,7 @@ async def post_settings(update: AdvancedSettingRequest)\
         -> AdvancedSettingsResponse:
     """Update advanced setting (feature flag)"""
     try:
-        advanced_settings.set_adv_setting(update.id, update.value)
+        await advanced_settings.set_adv_setting(update.id, update.value)
     except ValueError as e:
         raise V1HandlerError(message=str(e),
                              status_code=HTTPStatus.BAD_REQUEST)
