@@ -108,6 +108,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .tipracks_note_body {
   font-size: var('--fs-body-1');
 }
+
 /* end copped styles */
 
 .prompt {
