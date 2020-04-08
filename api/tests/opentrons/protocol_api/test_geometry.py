@@ -1,7 +1,8 @@
 import pytest
 
 from opentrons.types import Location, Point
-from opentrons.protocol_api.geometry import Deck, plan_moves
+from opentrons.protocol_api.geometry import (
+    Deck, plan_moves, first_parent, should_dodge_thermocycler)
 from opentrons.protocol_api import labware, module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.definitions import MAX_SUPPORTED_VERSION
@@ -353,3 +354,48 @@ def test_instr_max_height():
         plan_moves(
             trough.wells()[0].top(), trough2.wells()[0].top(),
             deck, round(instr_max_height, 2), 7.0, 15.0)
+
+
+def test_first_parent():
+    deck = Deck()
+    trough = labware.load(trough_name, deck.position_for(1))
+    assert first_parent(trough) == '1'
+    assert first_parent(trough['A2']) == '1'
+    assert first_parent(None) is None
+    assert first_parent('6') == '6'
+    mod = module_geometry.load_module(
+        module_geometry.TemperatureModuleModel.TEMPERATURE_V2,
+        deck.position_for('6'),
+        MAX_SUPPORTED_VERSION)
+    mod_trough = mod.add_labware(labware.load(trough_name, mod.location))
+    assert first_parent(mod_trough['A5']) == '6'
+    assert first_parent(mod_trough) == '6'
+    assert first_parent(mod) == '6'
+
+    mod_trough._parent = mod_trough
+    with pytest.raises(RuntimeError):
+        # make sure we catch cycles
+        first_parent(mod_trough)
+
+
+def test_should_dodge():
+    deck = Deck()
+    # with no tc loaded, doesn't matter what the positions are
+    assert not should_dodge_thermocycler(
+        deck, deck.position_for(4), deck.position_for(9))
+    deck[7] = module_geometry.load_module(
+        module_geometry.ThermocyclerModuleModel.THERMOCYCLER_V1,
+        deck.position_for(7))
+    # with a tc loaded, some positions should require dodging
+    assert should_dodge_thermocycler(
+        deck, deck.position_for(12), deck.position_for(1))
+    # but ones that weren't explicitly marked shouldn't
+    assert not should_dodge_thermocycler(
+        deck, deck.position_for(1), deck.position_for(2))
+    # including a situation where we might have some messed up locations
+    # with no parent
+    assert not should_dodge_thermocycler(
+        deck,
+        deck.position_for(1)._replace(labware=None),
+        deck.position_for(12)
+    )

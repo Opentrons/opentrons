@@ -2,7 +2,7 @@ from collections import UserDict
 import functools
 import logging
 import json
-from typing import Any, List, Optional, Tuple, Dict
+from typing import Any, List, Optional, Set, Tuple, Dict
 
 from opentrons import types
 from .labware import (Labware, Well,
@@ -34,7 +34,56 @@ def split_loc_labware(
         return None, None
 
 
-def plan_moves(
+def first_parent(loc: types.LocationLabware) -> Optional[str]:
+    """ Return the topmost parent of this location. It should be
+    either a string naming a slot or a None if the location isn't
+    associated with a slot """
+
+    # cycle-detecting recursive climnbing
+    seen: Set[types.LocationLabware] = set()
+
+    # internal function to have the cycle detector different per call
+    def _fp_recurse(location: types.LocationLabware):
+        if location in seen:
+            raise RuntimeError('Cycle in labware parent')
+        seen.add(location)
+        if location is None or isinstance(location, str):
+            return location
+        else:
+            return first_parent(location.parent)
+
+    return _fp_recurse(loc)
+
+
+BAD_PAIRS = [('1', '12'),
+             ('12', '1'),
+             ('4', '12'),
+             ('12', '4'),
+             ('4', '9'),
+             ('9, 4')]
+
+
+def should_dodge_thermocycler(
+        deck: 'Deck',
+        from_loc: types.Location,
+        to_loc: types.Location) -> bool:
+    """
+    Decide if the requested path would cross the thermocycler, if
+    installed.
+
+    Returns True if we need to dodge, False otherwise
+    """
+    if any([isinstance(item, ThermocyclerGeometry) for item in deck.values()]):
+        transit = (first_parent(from_loc.labware),
+                   first_parent(to_loc.labware))
+        # mypy doesn't like this because transit could be none, but it's
+        # checked by value in BAD_PAIRS which has only strings
+        return transit in BAD_PAIRS
+
+    return False
+
+
+def plan_moves(  # noqa(C901)
         from_loc: types.Location,
         to_loc: types.Location,
         deck: 'Deck',
@@ -141,12 +190,18 @@ def plan_moves(
         to_safety,
         from_safety,
         minimum_z_height or 0)
-
+    must_dodge = should_dodge_thermocycler(deck, from_loc, to_loc)
     # We should use the origin’s cp for the first move since it should
     # move only in z and the destination’s cp subsequently
-    return [(from_point._replace(z=safe), origin_cp_override),
-            (to_point._replace(z=safe), dest_cp_override),
-            (to_point, dest_cp_override)]
+    up = (from_point._replace(z=safe), origin_cp_override)
+    over = (to_point._replace(z=safe), dest_cp_override)
+    down = (to_point, dest_cp_override)
+    if not must_dodge:
+        return [up, over, down]
+    else:
+        extra = (
+            deck.get_slot_center('5')._replace(z=safe), dest_cp_override)
+        return [up, extra, over, down]
 
 
 class Deck(UserDict):
@@ -247,6 +302,13 @@ class Deck(UserDict):
             raise ValueError(f'slot {slot_name} could not be found,'
                              f'valid deck slots are: {slot_ids}')
         return slot_def
+
+    def get_slot_center(self, slot_name) -> types.Point:
+        defn = self.get_slot_definition(slot_name)
+        return types.Point(
+            defn['position'][0] + defn['boundingBox']['xDimension']/2,
+            defn['position'][1] + defn['boundingBox']['yDimension']/2,
+            defn['position'][2] + defn['boundingBox']['yDimension']/2)
 
     def resolve_module_location(
             self, module_type: ModuleType,
