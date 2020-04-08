@@ -1,4 +1,6 @@
 describe('The Settings Page', () => {
+  const exptlSettingText = 'Disable module placement restrictions'
+
   before(() => {
     cy.visit('/')
   })
@@ -68,14 +70,14 @@ describe('The Settings Page', () => {
       .should('exist')
   })
 
-  it("contains a 'enable multi gen2 pipettes' button in the pivacy section", () => {
+  it("contains a 'disable module placement restrictions' experimental feature", () => {
     // It's toggled off by default
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
     // Click it
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .click()
     // We have to confirm this one
@@ -91,24 +93,24 @@ describe('The Settings Page', () => {
       .contains('Cancel')
       .click()
     // Still toggled off
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
     // Click it again and confirm
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .click()
     cy.get('button')
       .contains('Continue')
       .click()
     // Now it's toggled on
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_on/)
     // Click it again
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .click()
     // We have to confirm to turn it off?
@@ -117,7 +119,7 @@ describe('The Settings Page', () => {
       .contains('Continue')
       .click()
     // Now it's toggled off again
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
@@ -128,7 +130,7 @@ describe('The Settings Page', () => {
     // We're not using the privacy button because that
     // interacts with analytics libraries, which might
     // not be accessible in a headless environment
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .click()
     cy.get('button')
@@ -141,7 +143,7 @@ describe('The Settings Page', () => {
       .contains('Settings')
       .click()
     // The toggle is still on
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_on/)
@@ -152,7 +154,7 @@ describe('The Settings Page', () => {
     // We're not using the privacy button because that
     // interacts with analytics libraries, which might
     // not be accessible in a headless environment
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .click()
     cy.get('button')
@@ -165,7 +167,7 @@ describe('The Settings Page', () => {
       .contains('Settings')
       .click()
     // The toggle is still off
-    cy.contains('Enable multi')
+    cy.contains(exptlSettingText)
       .next()
       .should('have.attr', 'class')
       .and('match', /toggled_off/)
