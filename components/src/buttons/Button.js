@@ -3,7 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import omit from 'lodash/omit'
 
-import type { HoverTooltipHandlers } from '../tooltips'
+// import type { HoverTooltipHandlers } from '../tooltips'
 import { Icon, type IconName } from '../icons'
 import styles from './buttons.css'
 
@@ -40,7 +40,13 @@ export type ButtonProps = {
   /** custom element or component to use instead of `<button>` */
   Component?: string | React.AbstractComponent<any>,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: ?$Shape<{
+    ref: (Element | null) => mixed,
+    'aria-describedby': string,
+    onMouseEnter: () => mixed,
+    onMouseLeave: () => mixed,
+    ...
+  }>,
   /** html tabindex property */
   tabIndex?: number,
 }
