@@ -35,6 +35,64 @@ export const createRobotCalibrationCheckSessionFailure = (
   meta: meta,
 })
 
+export const fetchRobotCalibrationCheckSession = (
+  robotName: string
+): Types.FetchRobotCalibrationCheckSessionAction => ({
+  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  payload: { robotName },
+  meta: {},
+})
+
+export const fetchRobotCalibrationCheckSessionSuccess = (
+  robotName: string,
+  body: RobotCalibrationCheckSessionData,
+  meta: RobotApiRequestMeta
+): Types.FetchRobotCalibrationCheckSessionSuccessAction => ({
+  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: { robotName, ...body },
+  meta: meta,
+})
+
+export const fetchRobotCalibrationCheckSessionFailure = (
+  robotName: string,
+  error: RobotApiErrorResponse,
+  meta: RobotApiRequestMeta
+): Types.FetchRobotCalibrationCheckSessionFailureAction => ({
+  type: Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: { robotName, error },
+  meta: meta,
+})
+
+// TODO: BC: type params
+export const updateRobotCalibrationCheckSession = (
+  robotName: string,
+  params: {} = {},
+): Types.UpdateRobotCalibrationCheckSessionAction => ({
+  type: Constants.UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
+  payload: { robotName, params },
+  meta: {},
+})
+
+export const updateRobotCalibrationCheckSessionSuccess = (
+  robotName: string,
+  body: RobotCalibrationCheckSessionData,
+  meta: RobotApiRequestMeta
+): Types.UpdateRobotCalibrationCheckSessionSuccessAction => ({
+  type: Constants.UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: { robotName, ...body },
+  meta: meta,
+})
+
+export const updateRobotCalibrationCheckSessionFailure = (
+  robotName: string,
+  error: RobotApiErrorResponse,
+  meta: RobotApiRequestMeta
+): Types.UpdateRobotCalibrationCheckSessionFailureAction => ({
+  type: Constants.UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: { robotName, error },
+  meta: meta,
+})
+
 export const deleteRobotCalibrationCheckSession = (
   robotName: string,
   recreate: boolean = false

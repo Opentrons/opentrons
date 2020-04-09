@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ModalPage } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import {
-  createRobotCalibrationCheckSession,
+  fetchRobotCalibrationCheckSession,
   deleteRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
   CHECK_STEP_SESSION_START,
@@ -45,16 +45,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       getRobotCalibrationCheckSession(state, robotName)
     ) || {}
   React.useEffect(() => {
-    dispatch(createRobotCalibrationCheckSession(robotName))
+    dispatch(fetchRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
   const [activeMount, setActiveMount] = React.useState(RIGHT)
 
   const activeInstrumentId = React.useMemo(() => (
-    Object.keys(instruments).find((id) => instruments[id].mount_axis === AXIS_BY_MOUNT[activeMount])
+    instruments && Object.keys(instruments).find((id) => instruments[id].mount_axis === AXIS_BY_MOUNT[activeMount])
   ), [instruments, activeMount])
   const activeLabware = React.useMemo(() => (
-    labware.find(l => (
+    labware && labware.find(l => (
       l.forPipettes.includes(activeInstrumentId)
     ))
   ), [labware, activeInstrumentId])

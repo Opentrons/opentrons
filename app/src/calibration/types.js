@@ -4,6 +4,12 @@ import typeof {
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
+  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -25,6 +31,42 @@ export type CreateRobotCalibrationCheckSessionSuccessAction = {|
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionSuccessAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionFailureAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateRobotCalibrationCheckSessionAction = {|
+  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
+  payload: {| robotName: string, params: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateRobotCalibrationCheckSessionSuccessAction = {|
+  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateRobotCalibrationCheckSessionFailureAction = {|
+  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
