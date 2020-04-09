@@ -71,7 +71,7 @@ function StepCreationButtonComponent(props: Props) {
 
             const buttonProps = {
               disabled: disabled,
-              onClick: () => onClick,
+              onClick: onClick,
               stepType: stepType,
             }
             return <StepButtonItem {...buttonProps} key={stepType} />
@@ -82,7 +82,7 @@ function StepCreationButtonComponent(props: Props) {
 }
 
 type ItemProps = {
-  onClick: () => mixed,
+  onClick?: (SyntheticMouseEvent<>) => mixed,
   disabled: boolean,
   stepType: string,
 }
@@ -108,9 +108,7 @@ function StepButtonItem(props: ItemProps) {
       >
         {i18n.t(`application.stepType.${stepType}`, stepType)}
       </PrimaryButton>
-      <Tooltip key={stepType} {...tooltipProps}>
-        {tooltipMessage}
-      </Tooltip>
+      <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
     </>
   )
 }
