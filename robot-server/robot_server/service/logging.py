@@ -41,7 +41,7 @@ def _robot_log_config(log_level: int):
                 'level': log_level,
                 'propagate': False
             },
-            'uvicorn': {
+            'uvicorn.error': {
                 'handlers': ['robot_server'],
                 'level': log_level,
                 'propagate': False

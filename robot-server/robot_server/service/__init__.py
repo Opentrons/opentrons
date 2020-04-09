@@ -21,4 +21,4 @@ def run(hardware: ThreadManager,
     #  to play nice with existing aiohttp application bootstrap.
     app.extra[HARDWARE_APP_KEY] = hardware  # type: ignore
 
-    uvicorn.run(app, host=hostname, port=port, uds=path)
+    uvicorn.run(app, host=hostname, port=port, uds=path, access_log=False)

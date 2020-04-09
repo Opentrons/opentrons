@@ -27,7 +27,7 @@ First, read the `top-level contributing guide section on setup <https://github.c
 Configuration
 -------------
 
-The configuration is defined in this [json schema] (./settings_schema.json). The default configuration is for the robot environment. Configuration can be changed by creating environment variables.
+The configuration is defined in this [json schema](./settings_schema.json). The default configuration is for the robot environment. Configuration can be changed by creating environment variables.
 
 
 Updating A Robot
