@@ -61,26 +61,7 @@ def test_create_item_with_attribute_validation_error(api_client):
     )
     assert response.status_code == HTTP_422_UNPROCESSABLE_ENTITY
     assert response.json() == {
-      'errors': [{
-          'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-          'title': 'value_error.missing',
-          'detail': 'field required',
-          'source': {
-            'pointer': '/body/item_request/data/attributes/name',
-          }
-      }, {
-          'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-          'title': 'value_error.missing',
-          'detail': 'field required',
-          'source': {
-            'pointer': '/body/item_request/data/attributes/quantity',
-          }
-      }, {
-          'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-          'title': 'value_error.missing',
-          'detail': 'field required',
-          'source': {
-            'pointer': '/body/item_request/data/attributes/price',
-          }
-      }]
+      'message': "item_request.data.attributes.name: field required. "
+                 "item_request.data.attributes.quantity: field required. "
+                 "item_request.data.attributes.price: field required"
     }

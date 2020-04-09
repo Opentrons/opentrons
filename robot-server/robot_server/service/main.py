@@ -10,13 +10,10 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .routers import health, networking, control, settings, deck_calibration, \
     modules, pipettes, motors, camera, logs, rpc, item
-from .models.json_api.errors import \
-    transform_validation_error_to_json_api_errors, \
-    transform_http_exception_to_json_api_errors
 from .models import V1BasicResponse
 from .exceptions import V1HandlerError
 from .dependencies import get_rpc_server
-
+from typing import List, Dict, Any
 
 app = FastAPI(
     title="Opentrons OT-2 HTTP API Spec",
@@ -70,17 +67,43 @@ async def v1_exception_handler(request: Request, exc: V1HandlerError):
     )
 
 
+def consolidate_fastapi_response(
+        all_exceptions: List[Dict[str, Any]]) -> str:
+    """
+    Consolidate the default fastAPI response so it can be returned as a string.
+    Default schema of fastAPI exception response is:
+    {
+        'loc': ('body',
+                '<outer_scope1>',
+                '<outer_scope2>',
+                '<inner_param>'),
+        'msg': '<the_error_message>',
+        'type': '<expected_type>'
+    }
+    In order to create a meaningful V1-style response, we consolidate the
+    above response into a string of shape:
+    '<outer_scope1>.<outer_scope2>.<inner_param>: <the_error_message>'
+    """
+
+    # Pick just the error message while discarding v2 response items
+    def error_to_str(error: dict) -> str:
+        err_node = ".".join(str(loc) for loc in error['loc'] if loc != 'body')
+        res = ": ".join([err_node, error["msg"]])
+        return res
+
+    all_errs = ". ".join(error_to_str(exc) for exc in all_exceptions)
+    return all_errs
+
+
 @app.exception_handler(RequestValidationError)
 async def custom_request_validation_exception_handler(
     request: Request,
     exception: RequestValidationError
 ) -> JSONResponse:
-    errors = transform_validation_error_to_json_api_errors(
-        HTTP_422_UNPROCESSABLE_ENTITY, exception
-    ).dict(exclude_unset=True)
+    response = consolidate_fastapi_response(exception.errors())
     return JSONResponse(
         status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-        content=errors,
+        content=V1BasicResponse(message=response).dict(),
      )
 
 
@@ -89,10 +112,7 @@ async def custom_http_exception_handler(
     request: Request,
     exception: StarletteHTTPException
 ) -> JSONResponse:
-    errors = transform_http_exception_to_json_api_errors(
-        exception
-    ).dict(exclude_unset=True)
     return JSONResponse(
         status_code=exception.status_code,
-        content=errors,
+        content=V1BasicResponse(message=exception.detail).dict(),
      )
