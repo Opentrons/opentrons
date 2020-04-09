@@ -90,6 +90,10 @@ export const EditModulesModal = (props: EditModulesProps) => {
     setEnqueuedModuleModel,
   ] = useState<null | ModuleModel>(null)
 
+  const [enqueuedModuleSlot, setEnqueuedModuleSlot] = useState<null | string>(
+    null
+  )
+
   const editModule = (selectedModel: ModuleModel) => {
     if (moduleOnDeck?.id != null) {
       dispatch(
@@ -104,25 +108,11 @@ export const EditModulesModal = (props: EditModulesProps) => {
       )
     }
   }
-  const moduleChangeModal = useBlockingHint({
-    hintKey: 'change_magnet_module_model',
-    handleCancel: () => {
-      setEnqueuedModuleModel(null)
-    },
-    handleContinue: () => {
-      if (enqueuedModuleModel) {
-        editModule(enqueuedModuleModel)
-      } else {
-        console.error('no enqueuedModuleModel, could not edit module')
-      }
-      setEnqueuedModuleModel(null)
-      onCloseClick()
-    },
-    content: <MagneticModuleWarningModalContent />,
-    enabled: enqueuedModuleModel != null,
-  })
 
-  const onSaveClick = (values: EditModulesState): void => {
+  const onSaveClick = (
+    values: EditModulesState,
+    skipBlockingModal: any
+  ): void => {
     const { selectedModel, selectedSlot } = values
 
     // validator from formik should never let onSaveClick be called
@@ -133,9 +123,13 @@ export const EditModulesModal = (props: EditModulesProps) => {
       // disabled if something lives in the slot selected in local state
       // if previous moduleOnDeck.model is different, edit module
       if (moduleOnDeck.model !== selectedModel) {
-        if (moduleOnDeck.type === MAGNETIC_MODULE_TYPE) {
+        if (
+          skipBlockingModal !== true && // this is an awful hack to reuse onSaveClick
+          moduleOnDeck.type === MAGNETIC_MODULE_TYPE // inside of the blocking modal's continue callback
+        ) {
           // we're changing Magnetic Module's model, show the blocking hint modal
           setEnqueuedModuleModel(selectedModel)
+          setEnqueuedModuleSlot(selectedSlot)
           // bail out of the rest of the submit (avoid onCloseClick call)
           return
         } else {
@@ -160,6 +154,30 @@ export const EditModulesModal = (props: EditModulesProps) => {
     // only close modal if there's no blocking hints enqueued
     onCloseClick()
   }
+  const moduleChangeModal = useBlockingHint({
+    hintKey: 'change_magnet_module_model',
+    handleCancel: () => {
+      setEnqueuedModuleModel(null)
+      setEnqueuedModuleSlot(null)
+    },
+    handleContinue: () => {
+      if (enqueuedModuleModel && enqueuedModuleSlot) {
+        onSaveClick(
+          {
+            selectedModel: enqueuedModuleModel,
+            selectedSlot: enqueuedModuleSlot,
+          },
+          true
+        )
+      } else {
+        console.error(
+          `cannot save module without model and slot selections. This shouldn't be able to happen`
+        )
+      }
+    },
+    content: <MagneticModuleWarningModalContent />,
+    enabled: enqueuedModuleModel !== null && enqueuedModuleSlot !== null,
+  })
 
   const heading = i18n.t(`modules.module_long_names.${moduleType}`)
 
