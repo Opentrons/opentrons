@@ -215,7 +215,13 @@ class API(HardwareAPILike):
     async def delay(self, duration_s: int):
         """ Delay execution by pausing and sleeping.
         """
-        await self._backend.delay(duration_s)
+        self.pause()
+        if not self.is_simulator:
+            async def sleep_for_seconds(seconds: int):
+                await asyncio.sleep(seconds)
+            delay_task = self._loop.create_task(sleep_for_seconds(duration_s))
+            await self._execution_manager.register_cancellable_task(delay_task)
+        self.resume()
 
     async def cache_instruments(self,
                                 require:

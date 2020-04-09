@@ -275,6 +275,8 @@ class Simulator:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
 
+    # NOTE: this function is here for legacy support, delays are now
+    # handled at the hardware control api level
     async def delay(self, duration_s: int):
         """ Pause and unpause, but without the actual delay """
         self.pause()
