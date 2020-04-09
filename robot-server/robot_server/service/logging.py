@@ -1,10 +1,15 @@
 import logging
 from logging.config import dictConfig
-from opentrons.config import IS_ROBOT
+from opentrons.config import IS_ROBOT, robot_configs
 
 
-def init_logging(level: int):
+def initialize_logging():
     """Initialize logging"""
+    # TODO Amit 2019/04/08 Move the logging level from robot configs to
+    #  robot server mutable configs.
+    robot_conf = robot_configs.load()
+    level = logging._nameToLevel.get(robot_conf.log_level, logging.INFO)
+
     if IS_ROBOT:
         c = _robot_log_config(level)
     else:
@@ -14,7 +19,7 @@ def init_logging(level: int):
 
 def _robot_log_config(log_level: int):
     """Logging configuration for robot deployment"""
-    return  {
+    return {
         'version': 1,
         'disable_existing_loggers': False,
         'formatters': {
