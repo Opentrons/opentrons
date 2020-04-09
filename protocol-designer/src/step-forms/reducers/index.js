@@ -33,6 +33,7 @@ import {
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
 } from '../selectors'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 
@@ -366,7 +367,8 @@ export const savedStepForms = (
       const { sourceSlot, destSlot } = action.payload
       return mapValues(savedStepForms, (savedForm: FormData): FormData => {
         if (savedForm.stepType === 'manualIntervention') {
-          // swap labware slots from all manualIntervention steps
+          // swap labware/module slots from all manualIntervention steps
+          // (or place compatible labware in dest slot onto module)
           const sourceLabwareId = getDeckItemIdInSlot(
             savedForm.labwareLocationUpdate,
             sourceSlot
@@ -384,6 +386,40 @@ export const savedStepForms = (
             savedForm.moduleLocationUpdate,
             destSlot
           )
+
+          if (sourceModuleId && destLabwareId) {
+            // moving module to a destination slot with labware
+            const prevInitialDeckSetup = _getInitialDeckSetupRootState(
+              rootState
+            )
+            const moduleEntity = prevInitialDeckSetup.modules[sourceModuleId]
+            const labwareEntity = prevInitialDeckSetup.labware[destLabwareId]
+
+            const isCompat = getLabwareIsCompatible(
+              labwareEntity.def,
+              moduleEntity.type
+            )
+            const moduleIsOccupied =
+              getDeckItemIdInSlot(
+                savedForm.labwareLocationUpdate,
+                sourceModuleId
+              ) != null
+
+            if (isCompat && !moduleIsOccupied) {
+              // only in this special case, we put module under the labware
+              return {
+                ...savedForm,
+                labwareLocationUpdate: {
+                  ...savedForm.labwareLocationUpdate,
+                  [destLabwareId]: sourceModuleId,
+                },
+                moduleLocationUpdate: {
+                  ...savedForm.moduleLocationUpdate,
+                  [sourceModuleId]: destSlot,
+                },
+              }
+            }
+          }
 
           const labwareLocationUpdate: { [labwareId: string]: string } = {
             ...savedForm.labwareLocationUpdate,

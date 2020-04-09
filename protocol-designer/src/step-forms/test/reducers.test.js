@@ -4,6 +4,7 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
   legacySteps as steps,
@@ -25,16 +26,22 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
+import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import type { DeckSlot } from '../../types'
-
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
+jest.mock('../../utils/labwareModuleCompatibility')
 
 const handleFormChangeMock: JestMockFn<
   [{ [string]: any }, { [string]: any }, any, any],
   { [string]: any }
 > = handleFormChange
+
+const getLabwareIsCompatibleMock: JestMockFn<
+  [any],
+  boolean
+> = getLabwareIsCompatible
 
 const mock_getPipetteEntitiesRootState: JestMockFn<
   [any],
@@ -445,19 +452,69 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       },
       {
         testName:
-          'move empty module to slot with labware -> swap slots, do not add labware to module',
+          'move empty module to slot with incompatible labware -> swap slots, do not add labware to module',
         sourceSlot: '1',
         destSlot: '3',
         makeStateArgs: {
           labwareLocationUpdate: { [existingLabwareId]: '3' },
           moduleLocationUpdate: { [moduleId]: '1' },
         },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: false,
         expectedLabwareLocations: { [existingLabwareId]: '1' },
         expectedModuleLocations: { [moduleId]: '3' },
       },
       {
         testName:
-          'move occupied module to slot with labware -> swap slots, do not change labware on module',
+          'move empty module to slot with compatible labware -> put module under labware',
+        sourceSlot: '1',
+        destSlot: '3',
+        makeStateArgs: {
+          labwareLocationUpdate: { [existingLabwareId]: '3' },
+          moduleLocationUpdate: { [moduleId]: '1' },
+        },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: true,
+        expectedLabwareLocations: { [existingLabwareId]: moduleId },
+        expectedModuleLocations: { [moduleId]: '3' },
+      },
+      {
+        testName:
+          'move occupied module to slot with labware -> swap slots, do not change labware on module (even if compatible)',
         sourceSlot: '1',
         destSlot: '3',
         makeStateArgs: {
@@ -467,6 +524,30 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
           moduleLocationUpdate: { [moduleId]: '1' },
         },
+        deckSetup: {
+          labware: {
+            [existingLabwareId]: {
+              id: existingLabwareId,
+              slot: '3',
+              def: { foo: 'fake def' },
+            },
+            [labwareOnModuleId]: {
+              id: labwareOnModuleId,
+              slot: moduleId,
+              def: { foo: 'fake def' },
+            },
+          },
+          pipettes: {},
+          modules: {
+            [moduleId]: {
+              id: moduleId,
+              type: MAGNETIC_MODULE_TYPE,
+              model: MAGNETIC_MODULE_V2,
+              slot: '1',
+            },
+          },
+        },
+        labwareIsCompatible: true,
         expectedLabwareLocations: {
           [existingLabwareId]: '1',
           [labwareOnModuleId]: moduleId,
@@ -575,10 +656,14 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         sourceSlot,
         destSlot,
         makeStateArgs,
+        deckSetup,
+        labwareIsCompatible,
         expectedLabwareLocations,
         expectedModuleLocations,
       }) => {
         it(testName, () => {
+          mock_getInitialDeckSetupRootState.mockReturnValue(deckSetup)
+          getLabwareIsCompatibleMock.mockReturnValue(labwareIsCompatible)
           const prevRootState = makePrevRootState(makeStateArgs)
           const action = moveDeckItem(sourceSlot, destSlot)
           const result = savedStepForms(prevRootState, action)
