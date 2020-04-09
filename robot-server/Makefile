@@ -139,3 +139,10 @@ change-left:
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: docs
+docs: settings_schema.json
+
+settings_schema.json: robot_server/settings.py
+	$(python) settings_schema.py
+

@@ -24,6 +24,12 @@ Setting Up For Development
 First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make install`` in this subdirectory.
 
 
+Configuration
+-------------
+
+The configuration is defined in this [json schema] (./settings_schema.json). The default configuration is for the robot environment. Configuration can be changed by creating environment variables.
+
+
 Updating A Robot
 ----------------
 
