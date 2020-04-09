@@ -1,6 +1,7 @@
 // @flow
 
 import React from 'react'
+import * as Formik from 'formik'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { ModelDropdown } from '../ModelDropdown'
@@ -13,7 +14,7 @@ describe('Model Dropdown', () => {
     props = {
       moduleType: '',
       selectedModule: '',
-      onChange: () => null,
+      onChange: jest.fn(),
     }
     mockStore = {
       dispatch: jest.fn(),

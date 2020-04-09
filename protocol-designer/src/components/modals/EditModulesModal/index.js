@@ -49,7 +49,7 @@ const validationSchema = Yup.object().shape({
   selectedSlot: Yup.string().required(),
 })
 
-type EditModulesState = {
+export type EditModulesState = {
   selectedModel: ModuleModel | null,
   selectedSlot: string,
 }
