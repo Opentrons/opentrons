@@ -132,7 +132,6 @@ docs-clean:
 	$(SHX) rm -rf docs/dist docs/build
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
 	echo "Command will be deprecated. Use \"make -C robot-server dev\""
 	$(MAKE) -C ../robot-server dev

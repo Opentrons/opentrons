@@ -1,3 +1,4 @@
+import logging
 from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
@@ -5,15 +6,18 @@ from fastapi.exceptions import RequestValidationError
 from starlette.responses import JSONResponse
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
-# https://github.com/encode/starlette/blob/master/starlette/status.py
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
+from .logging import initialize_logging
 from .routers import health, networking, control, settings, deck_calibration, \
     modules, pipettes, motors, camera, logs, rpc, item
 from .models import V1BasicResponse
 from .exceptions import V1HandlerError
 from .dependencies import get_rpc_server
 from typing import List, Dict, Any
+
+log = logging.getLogger(__name__)
+
 
 app = FastAPI(
     title="Opentrons OT-2 HTTP API Spec",
@@ -25,36 +29,44 @@ app = FastAPI(
     version=__version__
 )
 
+
 app.include_router(router=health.router,
-                   tags=["health"])
+                   tags=["Health"])
 app.include_router(router=networking.router,
-                   tags=["networking"])
+                   tags=["Networking"])
 app.include_router(router=control.router,
-                   tags=["control"])
+                   tags=["Control"])
 app.include_router(router=settings.router,
-                   tags=["settings"])
+                   tags=["Settings"])
 app.include_router(router=deck_calibration.router,
-                   tags=["deckCalibration"])
+                   tags=["Deck Calibration"])
 app.include_router(router=modules.router,
-                   tags=["modules"])
+                   tags=["Modules"])
 app.include_router(router=pipettes.router,
-                   tags=["pipettes"])
+                   tags=["Pipettes"])
 app.include_router(router=motors.router,
-                   tags=["motors"])
+                   tags=["Motors"])
 app.include_router(router=camera.router,
-                   tags=["camera"])
+                   tags=["Camera"])
 app.include_router(router=logs.router,
-                   tags=["logs"])
+                   tags=["Logs"])
 app.include_router(router=rpc.router,
-                   tags=["rpc"])
+                   tags=["RPC"])
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
 app.include_router(router=item.router,
-                   tags=["item"])
+                   tags=["Item"])
+
+
+@app.on_event("startup")
+async def on_startup():
+    """App startup handler"""
+    initialize_logging()
 
 
 @app.on_event("shutdown")
 async def on_shutdown():
+    """App shutfown handler"""
     s = await get_rpc_server()
     await s.on_shutdown()
 
@@ -100,11 +112,14 @@ async def custom_request_validation_exception_handler(
     request: Request,
     exception: RequestValidationError
 ) -> JSONResponse:
+    """Custom handling of fastapi request validation errors"""
+    log.error(f'{request.method} {request.url.path} : {str(exception)}')
+
     response = consolidate_fastapi_response(exception.errors())
     return JSONResponse(
         status_code=HTTP_422_UNPROCESSABLE_ENTITY,
         content=V1BasicResponse(message=response).dict(),
-     )
+    )
 
 
 @app.exception_handler(StarletteHTTPException)
@@ -112,7 +127,11 @@ async def custom_http_exception_handler(
     request: Request,
     exception: StarletteHTTPException
 ) -> JSONResponse:
+    """Custom handling of http exception"""
+    log.error(f'{request.method} {request.url.path} : '
+              f'{exception.status_code}, {exception.detail}')
+
     return JSONResponse(
         status_code=exception.status_code,
         content=V1BasicResponse(message=exception.detail).dict(),
-     )
+    )

@@ -85,9 +85,8 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
 dev:
-	$(python) -m robot_server.main -P 31950
+	$(python) -m robot_server.main
 
 .PHONY: local-shell
 local-shell:
