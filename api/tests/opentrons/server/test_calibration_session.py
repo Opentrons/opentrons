@@ -13,6 +13,8 @@ def test_setup(async_server):
         'model': 'p10_single_v1', 'id': 'fake10pip'}
     hw._attached_instruments[types.Mount.RIGHT] = {
         'model': 'p300_single_v1', 'id': 'fake300pip'}
+    cal_app = async_server['calibration']
+    yield cal_app['com.opentrons.session_manager']
 
 
 async def test_start_session(async_client, test_setup):
@@ -26,10 +28,16 @@ async def test_start_session(async_client, test_setup):
     assert list(text.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text["currentStep"] == "sessionStart"
+
+    params = {}
+    for id in text["instruments"].keys():
+        params[id] = {'pipetteId': id}
+
     assert text["nextSteps"] ==\
         {'links': {
             'loadLabware': {
-                'params': {}, 'url': '/calibration/check/session/loadLabware'}
+                'params': params,
+                'url': '/calibration/check/session/loadLabware'}
                 }}
 
     first_lw = text["labware"][0]
@@ -59,31 +67,38 @@ async def test_check_session(async_client, test_setup):
     assert list(text2.keys()) ==\
         ["instruments", "currentStep", "nextSteps", "labware"]
     assert text2["currentStep"] == "sessionStart"
+
+    params = {}
+    for id in text2["instruments"].keys():
+        params[id] = {'pipetteId': id}
     assert text2["nextSteps"] ==\
         {'links': {
             'loadLabware': {
-                'params': {}, 'url': '/calibration/check/session/loadLabware'}
+                'params': params,
+                'url': '/calibration/check/session/loadLabware'}
                 }}
 
 
-async def test_delete_session(async_client, async_server, test_setup):
+async def test_delete_session(async_client, test_setup):
+    app_storage = test_setup
     resp = await async_client.delete('/calibration/check/session')
     assert resp.status == 404
     await async_client.post('/calibration/check/session')
-    assert async_server['com.opentrons.session_manager'].sessions.get('check')
+    assert app_storage.sessions.get('check')
     resp = await async_client.delete('/calibration/check/session')
-    sess = async_server['com.opentrons.session_manager'].sessions.get('check')
+    sess = app_storage.sessions.get('check')
     assert not sess
 
 
-async def test_create_lw_object(async_client, async_server, test_setup):
+async def test_create_lw_object(async_client, test_setup):
     """
     A test to check that a labware object was successfully created if
     the current session state is set to loadLabware.
     """
+    app_storage = test_setup
     # Create a session
     await async_client.post('/calibration/check/session')
-    sess = async_server['com.opentrons.session_manager'].sessions['check']
+    sess = app_storage.sessions['check']
     sess.state_machine.update_state()
     sess.load_labware_objects()
     assert sess._deck['8']

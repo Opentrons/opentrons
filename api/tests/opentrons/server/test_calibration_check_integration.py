@@ -16,12 +16,7 @@ def _interpret_status_results(status, next_step, curr_pip):
     next_request = status['nextSteps']['links'][next_step]
     next_data = next_request.get('params', {})
     next_url = next_request.get('url', '')
-    if next_url == '/calibration/check/session/move':
-        formatted_data = {
-            'pipetteId': curr_pip, 'location': next_data[curr_pip]}
-        return formatted_data, next_url
-    next_data['pipetteId'] = curr_pip
-    return next_data, next_url
+    return next_data[curr_pip], next_url
 
 
 def _get_pipette(instruments, pip_name):
@@ -49,6 +44,8 @@ async def test_integrated_calibration_check(async_client, test_setup):
     next_data, url = _interpret_status_results(
         status, 'moveToTipRack', curr_pip)
 
+    print(url)
+    print(next_data)
     resp = await async_client.post(url, json=next_data)
     status = await resp.json()
     assert list(status['nextSteps']['links'].keys())[0] == 'jog'

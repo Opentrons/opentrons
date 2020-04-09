@@ -3,10 +3,12 @@ from uuid import uuid4, UUID
 from dataclasses import dataclass, asdict, field, fields
 
 from opentrons.types import Mount, Point, Location
+from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 
-# from .models import AttachedPipette
+from .constants import LOOKUP_LABWARE
 from .util import CalibrationCheckMachine
+from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -17,14 +19,17 @@ offset or a robot deck transform.
 """
 
 
-ALTERNATIVE_LABWARE = ['opentrons_96_filtertiprack_{}ul']
-LOAD_NAME = 'opentrons_96_tiprack_{}ul'
+class TipAttachError(Exception):
+    pass
 
-_KT = typing.TypeVar('_KT')
-_VT = typing.TypeVar('_VT')
-MoveType = typing.Optional[typing.Dict[_KT, _VT]]
-PositionType =\
-    typing.Dict[str, typing.Union[typing.Optional[UUID], typing.List]]
+
+_MoveKey = typing.TypeVar('_MoveKey')
+_MoveValue = typing.TypeVar('_MoveValue')
+MoveType = typing.Optional[typing.Dict[_MoveKey, _MoveValue]]
+# Note, tried to restrict PositionType to
+# typing.Dict[str, typing.Union[UUID, Point]], but mypy would not allow
+# typing of individual keys at that point (after indexing)
+PositionType = typing.Dict[str, typing.Any]
 
 
 class SessionManager:
@@ -39,27 +44,6 @@ class SessionManager:
     @sessions.setter
     def sessions(self, key: str, value: 'CalibrationSession'):
         self._sessions[key] = value
-
-
-@dataclass
-class Pipette:
-    model: typing.Optional[str]
-    name: typing.Optional[str]
-    tip_length: typing.Optional[float]
-    fallback_tip_length: typing.Optional[float]
-    mount_axis: Axis
-    plunger_axis: typing.Optional[Axis]
-    pipette_id: typing.Optional[str]
-    has_tip: bool
-    max_volume: int
-    channels: int
-    tip_overlap: typing.Dict[str, int]
-    return_tip_height: int
-    tiprack_id: typing.Optional[UUID] = field(default_factory=UUID)
-
-    @classmethod
-    def list_fields(self):
-        return [obj.name for obj in fields(self)]
 
 
 @dataclass
@@ -113,10 +97,17 @@ class CalibrationSession:
     """Class that controls state of the current deck calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._hardware = hardware
-        self._pipettes = self._key_by_uuid(hardware.get_attached_instruments())
+        self._relate_mount =\
+            self._key_by_uuid(hardware.get_attached_instruments())
         self._deck = geometry.Deck()
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
+
+    @classmethod
+    async def build(self, hardware: ThreadManager):
+        await hardware.cache_instruments()
+        await hardware.set_lights(rails=True)
+        await hardware.home()
 
     def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
@@ -125,18 +116,9 @@ class CalibrationSession:
             # This is to ensure during testing that two pipettes are
             # attached -- for now.
             assert data, "Please attach pipettes before proceeding"
-            fields = Pipette.list_fields()
 
-            updated_data = {
-                key: value for key, value in data.items() if key in fields}
             token = uuid4()
-            instr = self.hardware._attached_instruments[mount]
-            pipette_dict[token] = Pipette(
-                mount_axis=Axis.by_mount(mount),
-                plunger_axis=Axis.of_plunger(mount),
-                fallback_tip_length=instr._fallback_tip_length,
-                tiprack_id=None,
-                **updated_data)
+            pipette_dict[token] = {'mount': mount, 'tiprack_id': None}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -148,33 +130,34 @@ class CalibrationSession:
         lw: typing.Dict[UUID, LabwareInfo] = {}
         _uuid: typing.Optional[UUID] = None
 
-        for id, data in self._pipettes.items():
-            max_vol = data.max_volume
-            # Gross workaround for the p50 pipette to use a 300ul tiprack.
-            vol = 300 if max_vol == 50 else max_vol
-            load_name = LOAD_NAME.format(vol)
+        for id in self._relate_mount.keys():
+            mount = self._get_mount(id)
+            pip_vol = self.get_pipette(mount)['max_volume']
+
+            _lookup = LOOKUP_LABWARE[str(pip_vol)]
+            load_name: str = _lookup['load_name']  # type: ignore
+
             if_labware = None
             if _uuid:
                 if_labware = lw.get(_uuid)
             if _uuid and if_labware and if_labware.loadName == load_name:
                 lw[_uuid].forPipettes.append(id)
-                self._pipettes[id].tiprack_id = _uuid
+                self._relate_mount[id]['tiprack_id'] = _uuid
             else:
-                lw_def = labware.get_labware_definition(load_name)
-                alt_lw = [name.format(vol) for name in ALTERNATIVE_LABWARE]
+                lw_def = labware.get_labware_definition(load_name)  # type: ignore  # NOQA(E501)
                 new_uuid: UUID = uuid4()
                 _uuid = new_uuid
                 slot = self._available_slot_options()
                 lw[new_uuid] = LabwareInfo(
-                    alternatives=alt_lw,
+                    alternatives=list(_lookup['alternatives']),
                     forPipettes=[id],
-                    loadName=load_name,
+                    loadName=load_name,  # type: ignore
                     slot=slot,
                     namespace=lw_def['namespace'],
                     version=lw_def['version'],
                     id=new_uuid,
                     definition=lw_def)
-                self._pipettes[id].tiprack_id = new_uuid
+                self._relate_mount[id]['tiprack_id'] = new_uuid
         return lw
 
     def _available_slot_options(self) -> str:
@@ -183,87 +166,97 @@ class CalibrationSession:
         else:
             raise KeyError("No available slots remaining")
 
-    def _convert_to_mount(self, mount: Axis) -> Mount:
-        if mount == Axis.Z:
-            return Mount.LEFT
-        else:
-            return Mount.RIGHT
+    def _get_mount(self, pipette: UUID) -> Mount:
+        return self._relate_mount[pipette]['mount']
 
-    async def _jog(self, pipette: UUID, vector: Point):
+    async def _jog(self, mount: Mount, vector: Point):
         """
         General function that can be used by all session types to jog around
         a specified pipette.
         """
-        pip = self.get_pipette(pipette)
-        await self.hardware.move_rel(
-            self._convert_to_mount(pip.mount_axis), vector)
-
-    def _add_tip(self, pipette: UUID, tip_length: float):
-        self._pipettes[pipette].has_tip = True
-        self._pipettes[pipette].tip_length = tip_length
-
-    def _remove_tip(self, pipette: UUID):
-        self._pipettes[pipette].has_tip = False
-        self._pipettes[pipette].tip_length = 0.0
+        await self.hardware.move_rel(mount, vector)
 
     def _has_tip(self, pipette: UUID) -> bool:
-        return self._pipettes[pipette].has_tip
+        pip = self.get_pipette(self._get_mount(pipette))
+        return bool(pip['has_tip'])
 
-    async def _pick_up_tip(self, pipette: UUID):
-        pip = self.get_pipette(pipette)
-        mount = self._convert_to_mount(pip.mount_axis)
-        if pip.tiprack_id:
-            lw_info = self.get_tiprack(pip.tiprack_id)
-            # TODO: Figure out how to cleanly handle this scenario.
-            # ABC DeckItem cannot have tiplength b/c of mod geometry contexts.
+    async def _pick_up_tip(self, mount: Mount, tiprack_id: UUID):
+        pip = self.get_pipette(mount)
+        if tiprack_id:
+            lw_info = self.get_tiprack(tiprack_id)
+            # Note: ABC DeckItem cannot have tiplength b/c of
+            # mod geometry contexts. Ignore type checking error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
         else:
-            tip_length = pip.fallback_tip_length
+            tip_length = pip['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
-        self._add_tip(pipette, tip_length)
 
-    async def _return_tip(self, pipette: UUID):
-        pip = self.get_pipette(pipette)
-        await self.hardware.drop_tip(self._convert_to_mount(pip.mount_axis))
-        self._remove_tip(pipette)
+    async def _return_tip(self, mount: Mount):
+        await self.hardware.drop_tip(mount)
 
     async def cache_instruments(self):
         await self.hardware.cache_instruments()
         new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
-        self._pipettes.clear()
-        self._pipettes.update(new_dict)
+        self._relate_mount.clear()
+        self._relate_mount.update(new_dict)
 
     @property
     def hardware(self) -> ThreadManager:
         return self._hardware
 
-    def get_pipette(self, uuid: UUID) -> Pipette:
-        return self._pipettes[uuid]
+    def get_pipette(self, mount: Mount) -> Pipette.DictType:
+        return self.pipettes[mount]
 
-    def get_tiprack(self, uuid: UUID):
+    def get_tiprack(self, uuid: UUID) -> LabwareInfo:
         return self._labware_info[uuid]
 
     @property
-    def pipettes(self) -> typing.Dict:
-        return self._pipettes
+    def pipettes(self) -> typing.Dict[Mount, Pipette.DictType]:
+        return self.hardware.attached_instruments
 
     @property
-    def pipette_status(self) -> typing.Dict:
+    def pipette_status(self) -> typing.Dict[str, AttachedPipette]:
+        """
+        Public property to help format the current labware status of a given
+        session for the client.
+
+        Note:
+        Pydantic restricts dictionary keys that can be evaluated. Since
+        the session pipettes dictionary has a UUID as a key, we must first
+        convert the UUID to a hex string.
+        """
+        # pydantic restricts dictionary keys that can be evaluated. Since
+        # the session pipettes dictionary has a UUID as a key, we must first
+        # convert the UUID to a hex string.
         fields = PipetteStatus.list_fields()
         to_dict = {}
-        for name, value in self.pipettes.items():
-            data = asdict(value)
-            to_dict[name] = {
-                key: value for key, value in data.items() if key in fields}
+        for id, data in self._relate_mount.items():
+            pip = self.get_pipette(data['mount'])
+            tip_id = data['tiprack_id']
+            temp_dict = {
+                key: value for key, value in pip.items() if key in fields}
+            if tip_id:
+                temp_dict['tiprack_id'] = tip_id.hex
+            to_dict[id.hex] = AttachedPipette(**temp_dict)
         return to_dict
 
     @property
     def labware_status(self) -> typing.Dict:
+        """
+        Public property to help format the current labware status of a given
+        session for the client.
+
+        Note:
+        Pydantic restricts dictionary keys that can be evaluated. Since
+        the session labware dictionary has a UUID as a key, we must first
+        convert the UUID to a hex string.
+        """
+
         to_dict = {}
         for name, value in self._labware_info.items():
             temp_dict = asdict(value)
             del temp_dict['definition']
-            to_dict[name] = temp_dict
+            to_dict[name.hex] = temp_dict
         return to_dict
 
 
@@ -285,8 +278,9 @@ class CheckCalibrationSession(CalibrationSession):
             self._deck[data.slot] = lw
             build_dict = {}
             for id in data.forPipettes:
-                pip = self.get_pipette(id)
-                if pip.channels == 8:
+                mount = self._get_mount(id)
+                pip = self.get_pipette(mount)
+                if pip['channels'] == 8:
                     well = lw.wells_by_name()['H1']
                 else:
                     well = lw.wells_by_name()['A1']
@@ -297,18 +291,19 @@ class CheckCalibrationSession(CalibrationSession):
 
     def _update_tiprack_offset(
             self, pipette: UUID, old_pos: Point, new_pos: Point):
-        pip = self.get_pipette(pipette)
-        tiprack_id = pip.tiprack_id
-        update_dict = getattr(self._moves, 'moveToTipRack')
-        old_offset = update_dict[tiprack_id][pipette]['offset']
-        updated_offset = (new_pos - old_pos) + old_offset
-        update_dict[tiprack_id][pipette].update(offset=updated_offset)
-        self._moves.moveToTipRack = {tiprack_id: update_dict}
+        id = self._relate_mount[pipette]['tiprack_id']
+
+        if self._moves.moveToTipRack:
+            old_offset = self._moves.moveToTipRack[id][pipette]['offset']
+            updated_offset = (new_pos - old_pos) + old_offset
+            self._moves.moveToTipRack[id][pipette].update(offset=updated_offset)  # NOQA(E501)
 
     async def delete_session(self):
-        for name, data in self.pipettes.items():
-            if self._has_tip(name):
-                await self.return_tip(name)
+        for id in self._relate_mount.keys():
+            try:
+                await self.return_tip(id)
+            except TipAttachError:
+                pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
@@ -318,45 +313,74 @@ class CheckCalibrationSession(CalibrationSession):
         the current location, and save any offset it might have from the
         original position.
         """
+        if self._has_tip(pipette):
+            raise TipAttachError()
         self.state_machine.update_state()
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'pickUpTip',\
             f'You cannot pick up tip during {curr_state} state'
-        await self._pick_up_tip(pipette)
+        id = self._relate_mount[pipette]['tiprack_id']
+        mount = self._get_mount(pipette)
+        await self._pick_up_tip(mount, id)
 
-    def invalidate_tip(self, pipette: UUID):
+    async def invalidate_tip(self, pipette: UUID):
+        if not self._has_tip(pipette):
+            raise TipAttachError()
         to_state = self.state_machine.get_state('invalidateTip')
         self.state_machine.update_state(to_state)
         curr_state = self.state_machine.current_state.name
         assert curr_state == 'invalidateTip',\
             f'You cannot remove a tip during {curr_state} state'
-        self._remove_tip(pipette)
+        await self.hardware.remove_tip(self._get_mount(pipette))
 
     async def _move_to_tiprack(self, pipette: UUID):
-        pip = self.get_pipette(pipette)
-        get_position = getattr(self._moves, 'moveToTipRack')
-        offset_dict = get_position[pip.tiprack_id]
+        id = self._relate_mount[pipette]['tiprack_id']
+        offset_dict = None
+        if self._moves.moveToTipRack:
+            offset_dict = self._moves.moveToTipRack[id]
         if offset_dict:
             loc = offset_dict[pipette]['offset']
         else:
             loc = Point(0, 0, 0)
         state = self.state_machine.get_state('moveToTipRack')
         self.state_machine.update_state(state)
-        await self.move(pipette, {"offset": loc, "locationId": pip.tiprack_id})
+        await self.move(pipette, {"offset": loc, "locationId": id})
 
     async def return_tip(self, pipette: UUID):
+        if not self._has_tip(pipette):
+            raise TipAttachError()
         await self._move_to_tiprack(pipette)
-        await self._return_tip(pipette)
+        await self._return_tip(self._get_mount(pipette))
         state = self.state_machine.get_state('dropTip')
         self.state_machine.update_state(state)
 
-    def format_move_params(self, next_state: str) -> typing.Dict:
-        get_position = getattr(self._moves, next_state)
+    def _format_move_params(self, position: typing.Dict):
         new_dict = {}
-        for loc, data in get_position.items():
+        for loc, data in position.items():
             for id, values in data.items():
                 offset = list(values['offset'])
-                new_dict[id.hex] = {"offset": offset, "locationId": loc.hex}
+                pos_dict = {"offset": offset, "locationId": loc.hex}
+                new_dict[id.hex] = {'pipetteId': id.hex, 'location': pos_dict}
+        return new_dict
+
+    def _format_other_params(self, template: typing.Dict):
+        new_dict = {}
+        for id in self._relate_mount.keys():
+            blank = template.copy()
+            blank.update(pipetteId=id.hex)
+            new_dict[id.hex] = blank
+        return new_dict
+
+    def format_params(self, next_state: str) -> typing.Dict:
+        if hasattr(self._moves, next_state):
+            move_dict = getattr(self._moves, next_state)
+            new_dict = self._format_move_params(move_dict)
+        else:
+            if next_state == 'jog':
+                template_dict = dict(pipetteId=None, vector=[0, 0, 0])
+            else:
+                template_dict = dict(pipetteId=None)
+            new_dict = self._format_other_params(template_dict)
         return new_dict
 
     def _determine_move_location(
@@ -379,14 +403,12 @@ class CheckCalibrationSession(CalibrationSession):
         curr_state = self.state_machine.current_state.name
         get_position = getattr(self._moves, curr_state)
         loc_id = position['locationId']
-        # You have to unpack a list into a NamedTuple, but mypy does not
-        # recognize this.
-        offset = Point(*position['offset'])  # type: ignore
+        offset = position['offset']
         to_loc = self._determine_move_location(
             get_position[loc_id], pipette, offset)
 
         # determine current location
-        mount = self._convert_to_mount(self.get_pipette(pipette).mount_axis)
+        mount = self._get_mount(pipette)
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
 
@@ -395,9 +417,9 @@ class CheckCalibrationSession(CalibrationSession):
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
-    async def jog(self, pipette: UUID, vector: typing.List):
-        mount = self._convert_to_mount(self.get_pipette(pipette).mount_axis)
+    async def jog(self, pipette: UUID, vector: Point):
+        mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
-        await self._jog(pipette, Point(*vector))
+        await self._jog(mount, vector)
         new_pos = await self.hardware.gantry_position(mount)
         self._update_tiprack_offset(pipette, old_pos, new_pos)

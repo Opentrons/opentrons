@@ -13,8 +13,9 @@ async def test_setup(async_server, async_client):
     hw._attached_instruments[types.Mount.RIGHT] = {
         'model': 'p300_single_v1', 'id': 'fake300pip'}
     resp = await async_client.post('/calibration/check/session')
-    sess = async_server['com.opentrons.session_manager'].sessions['check']
-    # await sess.hardware.home()
+    cal_app = async_server['calibration']
+    sess = cal_app['com.opentrons.session_manager'].sessions['check']
+
     return await resp.json(), sess
 
 

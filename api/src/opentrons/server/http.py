@@ -98,31 +98,38 @@ class HTTPServer(object):
         )
         self.app.router.add_get(
             '/settings/robot', settings.get_robot_settings)
+
+
+class CalibrationRoutes(object):
+    def __init__(self, app):
+        self.app = app
         self.app.router.add_get(
-            '/calibration/{type}/session', check.get_session)
+            '/{type}/session', check.get_session)
         self.app.router.add_post(
-            '/calibration/{type}/session', check.create_session)
+            '/{type}/session',
+            check.create_session,
+            name="sessionStart")
         self.app.router.add_post(
-            '/calibration/{type}/session/move', check.move, name="move")
+            '/{type}/session/move', check.move, name="move")
         self.app.router.add_post(
-            '/calibration/{type}/session/loadLabware',
+            '/{type}/session/loadLabware',
             check.load_labware,
             name="loadLabware")
         self.app.router.add_post(
-            '/calibration/{type}/session/pickUpTip',
+            '/{type}/session/pickUpTip',
             check.pick_up_tip,
             name="pickUpTip")
         self.app.router.add_post(
-            '/calibration/{type}/session/invalidateTip',
+            '/{type}/session/invalidateTip',
             check.invalidate_tip,
             name="invalidateTip")
         self.app.router.add_post(
-            '/calibration/{type}/session/dropTip',
+            '/{type}/session/dropTip',
             check.drop_tip,
             name="dropTip")
         self.app.router.add_post(
-            '/calibration/{type}/session/jog', check.jog, name="jog")
+            '/{type}/session/jog', check.jog, name="jog")
         self.app.router.add_delete(
-            '/calibration/{type}/session',
+            '/{type}/session',
             check.delete_session,
             name="sessionExit")

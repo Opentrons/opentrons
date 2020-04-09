@@ -24,11 +24,9 @@ class AttachedPipette(BaseModel):
         Field(None, description="The axis that moves this pipette up and down")
     plunger_axis: Optional[Axis] =\
         Field(None, description="The axis that moves plunger of this pipette")
-    pipette_id: Optional[str] =\
-        Field(None, description="The serial number of the attached pipette")
-    has_tip: Optional[bool]=\
+    has_tip: Optional[bool] =\
         Field(None, description="Whether a tip is attached.")
-    tiprack_id: Optional[UUID4]=\
+    tiprack_id: Optional[UUID4] =\
         Field(None, description="Id of tiprack associated with this pip.")
 
     class Config:

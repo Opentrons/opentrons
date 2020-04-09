@@ -130,11 +130,7 @@ class StateMachine(Generic[StateEnumType]):
         return self._iterate_thru_relationships(self.current_state)
 
     def requires_move(self, state: StateEnumType) -> bool:
-        move_state = self._move_relationship.get(state)
-        if move_state:
-            return True
-        else:
-            return False
+        return bool(self._move_relationship.get(state))
 
 
 class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
