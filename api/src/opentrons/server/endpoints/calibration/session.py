@@ -130,7 +130,7 @@ class CalibrationSession:
             pip_vol = self.get_pipette(mount)['max_volume']
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
-            load_name: str = _lookup['load_name']  # type: ignore
+            load_name: str = _lookup.load_name
 
             if_labware = None
             if _uuid:
@@ -139,14 +139,14 @@ class CalibrationSession:
                 lw[_uuid].forPipettes.append(id)
                 self._relate_mount[id]['tiprack_id'] = _uuid
             else:
-                lw_def = labware.get_labware_definition(load_name)  # type: ignore  # NOQA(E501)
+                lw_def = labware.get_labware_definition(load_name)
                 new_uuid: UUID = uuid4()
                 _uuid = new_uuid
                 slot = self._available_slot_options()
                 lw[new_uuid] = LabwareInfo(
-                    alternatives=list(_lookup['alternatives']),
+                    alternatives=list(_lookup.alternatives),
                     forPipettes=[id],
-                    loadName=load_name,  # type: ignore
+                    loadName=load_name,
                     slot=slot,
                     namespace=lw_def['namespace'],
                     version=lw_def['version'],
