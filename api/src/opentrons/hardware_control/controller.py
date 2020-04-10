@@ -242,13 +242,6 @@ class Controller:
         """
         return self._smoothie_driver.probe_axis(axis, distance)
 
-    async def delay(self, duration_s: int):
-        """ Pause and sleep
-        """
-        self.pause()
-        await asyncio.sleep(duration_s)
-        self.resume()
-
     def __del__(self):
         if hasattr(self, '_module_watcher'):
             loop = asyncio.get_event_loop()
