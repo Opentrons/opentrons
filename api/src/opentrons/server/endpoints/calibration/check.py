@@ -1,41 +1,11 @@
 from aiohttp import web
-from aiohttp.web_urldispatcher import UrlDispatcher
 
+from opentrons import types
 from .session import CheckCalibrationSession
-from .models import CalibrationSessionStatus, LabwareStatus
-
-ALLOWED_SESSIONS = ['check']
+from .models import SpecificPipette, MoveLocation, JogPosition
 
 
-def _format_status(
-        session: 'CheckCalibrationSession',
-        router: UrlDispatcher) -> 'CalibrationSessionStatus':
-    pips = session.pipettes
-    # pydantic restricts dictionary keys that can be evaluated. Since
-    # the session pipettes dictionary has a UUID as a key, we must first
-    # convert the UUID to a hex string.
-    instruments = {token.hex: data for token, data in pips.items() if token}
-    current = session.state_machine.current_state.name
-    next = session.state_machine.next_state
-    if next:
-        path = router.get(next.name, '')
-        if path:
-            url = path.url_for()
-        else:
-            url = path
-        links = {'links': {next.name: url}}
-    else:
-        links = {'links': {}}
-    lw_status = session.labware_status.values()
-    status = CalibrationSessionStatus(
-        instruments=instruments,
-        currentStep=current,
-        nextSteps=links,
-        labware=[LabwareStatus(**data) for data in lw_status])
-    return status
-
-
-async def get_session(request):
+async def get_session(request: web.Request, session) -> web.Response:
     """
     GET /calibration/check/session
 
@@ -43,17 +13,7 @@ async def get_session(request):
 
     Otherwise, this endpoint will return a 404 with links to the post request.
     """
-    session_type = request.match_info['type']
-    session_storage = request.app['com.opentrons.session_manager']
-    current_session = session_storage.sessions.get(session_type)
-    if current_session:
-        response = _format_status(current_session, request.app.router)
-        return web.json_response(text=response.json(), status=200)
-    else:
-        error_response = {
-            "message": f"No {session_type} session exists. Please create one.",
-            "links": {"createSession": f"/calibration/{session_type}/session"}}
-        return web.json_response(error_response, status=404)
+    return web.json_response(status=200)
 
 
 async def create_session(request):
@@ -66,29 +26,25 @@ async def create_session(request):
     :py:class:`.models.CalibrationSessionStatus`
     """
     session_type = request.match_info['type']
-    if session_type not in ALLOWED_SESSIONS:
-        message = f"Session of type {session_type} is not supported."
-        return web.json_response(message, status=403)
-
     session_storage = request.app['com.opentrons.session_manager']
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
-        hardware = request.app['com.opentrons.hardware']
-        await hardware.cache_instruments()
+        hardware = request.config_dict['com.opentrons.hardware']
+        await CheckCalibrationSession.build(hardware)
         new_session = CheckCalibrationSession(hardware)
         session_storage.sessions[session_type] = new_session
-
-        response = _format_status(new_session, request.app.router)
-        return web.json_response(text=response.json(), status=201)
+        return web.json_response(status=201)
     else:
+        router = request.app.router
+        path = router.get('sessionExit')
         error_response = {
             "message": f"A {session_type} session exists."
                        "Please delete to proceed.",
-            "links": {"deleteSession": f"/calibration/{session_type}/session"}}
+            "links": {"deleteSession": str(path.url_for(type=session_type))}}
         return web.json_response(error_response, status=409)
 
 
-async def delete_session(request):
+async def delete_session(request: web.Request, session):
     """
     DELETE /calibration/check/session
 
@@ -96,12 +52,53 @@ async def delete_session(request):
     """
     session_type = request.match_info['type']
     session_storage = request.app['com.opentrons.session_manager']
-    current_session = session_storage.sessions.get(session_type)
-    if not current_session:
-        response = {"message": f"A {session_type} session does not exist."}
-        return web.json_response(response, status=404)
-    else:
-        await current_session.hardware.home()
-        del session_storage.sessions[session_type]
-        response = {'message': f"Successfully deleted {session_type} session."}
-        return web.json_response(response, status=200)
+
+    await session.delete_session()
+    del session_storage.sessions[session_type]
+    response = {'message': f"Successfully deleted {session_type} session."}
+    return web.json_response(response, status=200)
+
+
+async def load_labware(request: web.Request, session) -> web.Response:
+    session.load_labware_objects()
+    return web.json_response(status=200)
+
+
+async def move(request: web.Request, session) -> web.Response:
+    req = await request.json()
+    moveloc = MoveLocation(**req)
+    location = {
+        "locationId": moveloc.location.locationId,
+        "offset": types.Point(*moveloc.location.offset)}
+    await session.move(moveloc.pipetteId, location)
+    return web.json_response(status=200)
+
+
+async def jog(request: web.Request, session: 'CheckCalibrationSession'):
+    req = await request.json()
+    jog = JogPosition(**req)
+    await session.jog(jog.pipetteId, types.Point(*jog.vector))
+    return web.json_response(status=200)
+
+
+async def pick_up_tip(
+        request: web.Request, session: 'CheckCalibrationSession'):
+    req = await request.json()
+    pipette = SpecificPipette(**req)
+    await session.pick_up_tip(pipette.pipetteId)
+    return web.json_response(status=200)
+
+
+async def invalidate_tip(
+        request: web.Request, session: 'CheckCalibrationSession'):
+    req = await request.json()
+    pipette = SpecificPipette(**req)
+    await session.invalidate_tip(pipette.pipetteId)
+    return web.json_response(status=200)
+
+
+async def drop_tip(request: web.Request, session: 'CheckCalibrationSession'):
+    req = await request.json()
+    pipette = SpecificPipette(**req)
+    await session.return_tip(pipette.pipetteId)
+    return web.json_response(status=200)

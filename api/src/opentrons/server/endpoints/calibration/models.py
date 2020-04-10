@@ -1,11 +1,60 @@
-from typing import Dict, Optional, List
+from typing import Dict, Optional, List, Any
+from functools import partial
 from pydantic import BaseModel, Field, UUID4
+from uuid import UUID
 
 from opentrons.hardware_control.types import Axis
 
 
-def convert_uuid(obj: UUID4):
+def convert_from_uuid(obj: UUID4):
     return obj.hex
+
+
+def convert_to_uuid(obj: str):
+    return UUID(obj)
+
+
+Point = List[float]
+
+# Commonly used Point type description and constraints
+PointField = partial(Field, ...,
+                     description="A point in deck coordinates (x, y, z)",
+                     min_items=3, max_items=3)
+
+
+class Position(BaseModel):
+    locationId: UUID4
+    offset: Point = PointField()
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_to_uuid}
+
+
+class SpecificPipette(BaseModel):
+    pipetteId: UUID4
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_to_uuid}
+
+
+class MoveLocation(BaseModel):
+    pipetteId: UUID4
+    location: Position
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_to_uuid}
+
+
+class JogPosition(BaseModel):
+    pipetteId: UUID4
+    vector: Point = PointField()
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_to_uuid}
 
 
 class AttachedPipette(BaseModel):
@@ -24,13 +73,15 @@ class AttachedPipette(BaseModel):
         Field(None, description="The axis that moves this pipette up and down")
     plunger_axis: Optional[Axis] =\
         Field(None, description="The axis that moves plunger of this pipette")
-    pipette_id: Optional[str] =\
-        Field(None, description="The serial number of the attached pipette")
+    has_tip: Optional[bool] =\
+        Field(None, description="Whether a tip is attached.")
+    tiprack_id: Optional[UUID4] =\
+        Field(None, description="Id of tiprack associated with this pip.")
 
     class Config:
         json_encoders = {
             Axis: str,
-            UUID4: convert_uuid}
+            UUID4: convert_from_uuid}
 
 
 class LabwareStatus(BaseModel):
@@ -47,7 +98,7 @@ class LabwareStatus(BaseModel):
 
     class Config:
         json_encoders = {
-            UUID4: convert_uuid}
+            UUID4: convert_from_uuid}
 
 
 class CalibrationSessionStatus(BaseModel):
@@ -56,12 +107,12 @@ class CalibrationSessionStatus(BaseModel):
     """
     instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
-    nextSteps: Dict[str, Dict[str, str]] =\
+    nextSteps: Dict[str, Dict[str, Dict[str, Any]]] =\
         Field(..., description="Next Available Step in Session")
     labware: List[LabwareStatus]
 
     class Config:
-        json_encoders = {UUID4: convert_uuid}
+        json_encoders = {UUID4: convert_from_uuid}
         schema_extra = {
             "examples": [
                 {
@@ -86,7 +137,7 @@ class CalibrationSessionStatus(BaseModel):
                     "currentStep": "sessionStart",
                     "nextSteps": {
                         "links": {
-                            "loadLabware": ""
+                            "loadLabware": {"url": "", "params": {}}
                         }
                     }
 

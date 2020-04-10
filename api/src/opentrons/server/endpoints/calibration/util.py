@@ -1,35 +1,43 @@
 import enum
-from typing import TypeVar, Generic, Type, Dict
+from typing import TypeVar, Generic, Type, Dict, Optional
 
 
 class CalibrationCheckState(enum.Enum):
     sessionStart = enum.auto()
     loadLabware = enum.auto()
+    moveToTipRack = enum.auto()
     pickUpTip = enum.auto()
     checkPointOne = enum.auto()
     checkPointTwo = enum.auto()
     checkPointThree = enum.auto()
     checkHeight = enum.auto()
+    dropTip = enum.auto()
+    jog = enum.auto()
+    move = enum.auto()
     sessionExit = enum.auto()
+    invalidateTip = enum.auto()
     badDeckCalibration = enum.auto()
     noPipettesAttached = enum.auto()
 
 
 check_normal_relationship_dict = {
     CalibrationCheckState.sessionStart: CalibrationCheckState.loadLabware,
-    CalibrationCheckState.loadLabware: CalibrationCheckState.pickUpTip,
+    CalibrationCheckState.loadLabware: CalibrationCheckState.moveToTipRack,
+    CalibrationCheckState.moveToTipRack: CalibrationCheckState.jog,
+    CalibrationCheckState.jog: CalibrationCheckState.pickUpTip,
+    CalibrationCheckState.pickUpTip: CalibrationCheckState.checkPointOne,
     CalibrationCheckState.checkPointOne: CalibrationCheckState.checkPointTwo,
     CalibrationCheckState.checkPointTwo: CalibrationCheckState.checkPointThree,
     CalibrationCheckState.checkPointThree: CalibrationCheckState.checkHeight,
     CalibrationCheckState.checkHeight: CalibrationCheckState.sessionStart
-
 }
 
 exit = CalibrationCheckState.sessionExit
 check_exit_relationship_dict = {
     CalibrationCheckState.badDeckCalibration: exit,
     CalibrationCheckState.checkHeight: exit,
-    CalibrationCheckState.noPipettesAttached: exit
+    CalibrationCheckState.noPipettesAttached: exit,
+    CalibrationCheckState.dropTip: exit
 }
 
 nopips = CalibrationCheckState.noPipettesAttached
@@ -40,9 +48,17 @@ check_error_relationship_dict = {
     CalibrationCheckState.checkPointOne: badcal,
     CalibrationCheckState.checkPointTwo: badcal,
     CalibrationCheckState.checkPointThree: badcal,
-    CalibrationCheckState.checkHeight: badcal
+    CalibrationCheckState.checkHeight: badcal,
+    CalibrationCheckState.invalidateTip: CalibrationCheckState.pickUpTip
 }
 
+check_relationship_requires_move_dict = {
+    CalibrationCheckState.moveToTipRack: CalibrationCheckState.move,
+    CalibrationCheckState.checkPointOne: CalibrationCheckState.move,
+    CalibrationCheckState.checkPointTwo: CalibrationCheckState.move,
+    CalibrationCheckState.checkPointThree: CalibrationCheckState.move,
+    CalibrationCheckState.checkHeight: CalibrationCheckState.move
+}
 
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
@@ -56,18 +72,26 @@ class StateMachine(Generic[StateEnumType]):
     def __init__(
             self, states: Type[StateEnumType], rel: Relationship,
             exit: Relationship, error: Relationship,
-            first_state: StateEnumType):
+            first_state: StateEnumType, move: Relationship = None):
         self._states = states
         self._relationship = rel
         self._exit_relationship = exit
         self._error_relationship = error
+        self._move_relationship = move if move else {}
         self._current_state = first_state
 
     def get_state(self, state_name: str) -> StateEnumType:
         return getattr(self._states, state_name)
 
-    def update_state(self, state_name: StateEnumType):
-        self._current_state = self._iterate_thru_relationships(state_name)
+    def update_state(
+            self,
+            state_name: Optional[StateEnumType] = None, next: bool = False):
+        if state_name and next:
+            self._current_state = self._iterate_thru_relationships(state_name)
+        elif state_name:
+            self._current_state = state_name
+        else:
+            self._current_state = self.next_state
 
     def _iterate_thru_relationships(
             self, state_name: StateEnumType) -> StateEnumType:
@@ -105,6 +129,9 @@ class StateMachine(Generic[StateEnumType]):
         """
         return self._iterate_thru_relationships(self.current_state)
 
+    def requires_move(self, state: StateEnumType) -> bool:
+        return bool(self._move_relationship.get(state))
+
 
 class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
     def __init__(self) -> None:
@@ -112,4 +139,5 @@ class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
                          check_normal_relationship_dict,
                          check_exit_relationship_dict,
                          check_error_relationship_dict,
-                         CalibrationCheckState.sessionStart)
+                         CalibrationCheckState.sessionStart,
+                         check_relationship_requires_move_dict)
