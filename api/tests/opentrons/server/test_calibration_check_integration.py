@@ -44,8 +44,6 @@ async def test_integrated_calibration_check(async_client, test_setup):
     next_data, url = _interpret_status_results(
         status, 'moveToTipRack', curr_pip)
 
-    print(url)
-    print(next_data)
     resp = await async_client.post(url, json=next_data)
     status = await resp.json()
     assert list(status['nextSteps']['links'].keys())[0] == 'jog'

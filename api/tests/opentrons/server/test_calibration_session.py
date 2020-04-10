@@ -3,7 +3,7 @@ import enum
 
 from opentrons import types
 
-from opentrons.server.endpoints.calibration import util
+from opentrons.server.endpoints.calibration import util, constants
 
 
 @pytest.fixture
@@ -105,6 +105,9 @@ async def test_create_lw_object(async_client, test_setup):
     assert sess._deck['8'].name == 'opentrons_96_tiprack_10ul'
     assert sess._deck['6']
     assert sess._deck['6'].name == 'opentrons_96_tiprack_300ul'
+
+    with pytest.raises(constants.LabwareLoaded):
+        sess.load_labware_objects()
 
 
 def test_state_machine():

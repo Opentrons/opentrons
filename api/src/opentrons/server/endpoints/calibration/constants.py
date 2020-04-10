@@ -1,6 +1,6 @@
 from typing import Dict, Union, List
 
-ALLOWED_SESSIONS = ['check']
+ALLOWED_SESSIONS = set(['check'])
 
 LOOKUP_LABWARE: Dict[str, Dict[str, Union[List[str], str]]] = {
     '10': {
@@ -40,3 +40,11 @@ LOOKUP_LABWARE: Dict[str, Dict[str, Union[List[str], str]]] = {
         ]
     }
 }
+
+
+class LabwareLoaded(Exception):
+    pass
+
+
+class TipAttachError(Exception):
+    pass

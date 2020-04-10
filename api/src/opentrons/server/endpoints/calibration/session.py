@@ -6,7 +6,7 @@ from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 
-from .constants import LOOKUP_LABWARE
+from .constants import LOOKUP_LABWARE, LabwareLoaded, TipAttachError
 from .util import CalibrationCheckMachine
 from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
@@ -17,11 +17,6 @@ A set of endpoints that can be used to create a session for any robot
 calibration tasks such as checking your calibration data, performing mount
 offset or a robot deck transform.
 """
-
-
-class TipAttachError(Exception):
-    pass
-
 
 _MoveKey = typing.TypeVar('_MoveKey')
 _MoveValue = typing.TypeVar('_MoveValue')
@@ -271,6 +266,8 @@ class CheckCalibrationSession(CalibrationSession):
         """
         A function that takes tiprack information and loads them onto the deck.
         """
+        if self._moves.moveToTipRack:
+            raise LabwareLoaded()
         full_dict = {}
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
@@ -402,8 +399,8 @@ class CheckCalibrationSession(CalibrationSession):
             self.state_machine.update_state()
         curr_state = self.state_machine.current_state.name
         get_position = getattr(self._moves, curr_state)
-        loc_id = position['locationId']
-        offset = position['offset']
+        loc_id = position["locationId"]
+        offset = position["offset"]
         to_loc = self._determine_move_location(
             get_position[loc_id], pipette, offset)
 

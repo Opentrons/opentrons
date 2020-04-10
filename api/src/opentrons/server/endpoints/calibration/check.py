@@ -1,8 +1,8 @@
-from uuid import UUID
 from aiohttp import web
 
 from opentrons import types
-from .session import CheckCalibrationSession, TipAttachError
+from .session import CheckCalibrationSession
+from .models import SpecificPipette, MoveLocation, JogPosition
 
 
 async def get_session(request: web.Request, session) -> web.Response:
@@ -66,78 +66,39 @@ async def load_labware(request: web.Request, session) -> web.Response:
 
 async def move(request: web.Request, session) -> web.Response:
     req = await request.json()
-    pipette = req.get("pipetteId")
-    loc = req.get("location")
-    position = {
-        "locationId": UUID(loc["locationId"]),
-        "offset": types.Point(*loc["offset"])}
-    await session.move(UUID(pipette), position)
+    moveloc = MoveLocation(**req)
+    location = {
+        "locationId": moveloc.location.locationId,
+        "offset": types.Point(*moveloc.location.offset)}
+    await session.move(moveloc.pipetteId, location)
     return web.json_response(status=200)
 
 
 async def jog(request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
-    pipette = req.get("pipetteId")
-    vector = req.get("vector")
-    await session.jog(UUID(pipette), types.Point(*vector))
+    jog = JogPosition(**req)
+    await session.jog(jog.pipetteId, types.Point(*jog.vector))
     return web.json_response(status=200)
 
 
 async def pick_up_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    session_type = request.match_info['type']
-
     req = await request.json()
-    pipette = UUID(req.get("pipetteId"))
-    try:
-        await session.pick_up_tip(pipette)
-        return web.json_response(status=200)
-    except TipAttachError:
-        router = request.app.router
-        invalidate = router.get('invalidateTip')
-        drop = router.get('dropTip')
-        error_response = {
-            "message": "Tip is already attached.",
-            "links": {
-                "dropTip": str(drop.url_for(type=session_type)),
-                "invalidateTip": str(invalidate.url_for(type=session_type))
-            }
-        }
-        return web.json_response(error_response, status=409)
+    pipette = SpecificPipette(**req)
+    await session.pick_up_tip(pipette.pipetteId)
+    return web.json_response(status=200)
 
 
 async def invalidate_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    session_type = request.match_info['type']
-
     req = await request.json()
-    pipette = UUID(req.get("pipetteId"))
-    try:
-        await session.invalidate_tip(pipette)
-        return web.json_response(status=200)
-    except TipAttachError:
-        router = request.app.router
-        path = router.get('pickUpTip')
-        error_response = {
-            "message": f"No tip attached to {pipette} pipette.",
-            "links": {
-                "pickUpTip": str(path.url_for(type=session_type))}}
-        return web.json_response(error_response, status=409)
+    pipette = SpecificPipette(**req)
+    await session.invalidate_tip(pipette.pipetteId)
+    return web.json_response(status=200)
 
 
 async def drop_tip(request: web.Request, session: 'CheckCalibrationSession'):
-    session_type = request.match_info['type']
-
     req = await request.json()
-    pipette = UUID(req.get("pipetteId"))
-    try:
-        await session.return_tip(pipette)
-        return web.json_response(status=200)
-    except TipAttachError:
-        router = request.app.router
-        pickup = router.get('pickUpTip')
-        error_response = {
-            "message": f"No tip attached to {pipette} pipette.",
-            "links": {
-                "pickUpTip": str(pickup.url_for(type=session_type))}}
-        return web.json_response(error_response, status=409)
+    pipette = SpecificPipette(**req)
+    await session.return_tip(pipette.pipetteId)
+    return web.json_response(status=200)

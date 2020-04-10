@@ -18,7 +18,8 @@ from .http import HTTPServer, CalibrationRoutes
 from opentrons.api.routers import MainRouter
 from opentrons.hardware_control import ThreadManager
 
-from .endpoints.calibration.constants import ALLOWED_SESSIONS
+from .endpoints.calibration.constants import (
+    ALLOWED_SESSIONS, LabwareLoaded, TipAttachError)
 from .endpoints.calibration.session import (
     SessionManager, CheckCalibrationSession)
 from .endpoints.calibration.util import CalibrationCheckState
@@ -43,6 +44,31 @@ def _format_links(
     else:
         url = path
     return {'links': {next.name: {'url': url, 'params': params}}}
+
+
+def _determine_error_message(
+        request: web.Request,
+        router: UrlDispatcher, type: str, pipette: str) -> typing.Dict:
+    """
+    Helper function to determine the exact error messaging for any
+    TipAttachError thrown by a calibration session.
+    """
+    invalidate = router['invalidateTip'].url_for(type=type)
+    drop = router['dropTip'].url_for(type=type)
+    pickup = router['pickUpTip'].url_for(type=type)
+    if request.path == pickup:
+        msg = f"Tip is already attached to {pipette} pipette."
+        links = {
+            "dropTip": str(drop),
+            "invalidateTip": str(invalidate)
+        }
+    elif request.path == drop or request.path == invalidate:
+        msg = f"No tip attached to {pipette} pipette."
+        links = {"pickUpTip": str(pickup)}
+    else:
+        msg = "Conflict with server."
+        links = {}
+    return {"message": msg, "links": links}
 
 
 def status_response(
@@ -71,8 +97,37 @@ def no_session_error_response(start_url: str, type: str) -> web.Response:
     return web.json_response(error_response, status=404)
 
 
+async def misc_error_handling(
+        request: web.Request,
+        session: 'CheckCalibrationSession',
+        handler: typing.Callable) -> web.Response:
+    """
+    Miscellaneous error handling for calibration sessions. Specifically, it
+    handles all responses that might require a 409 error response.
+    """
+    try:
+        response = await handler(request, session)
+    except (TipAttachError, LabwareLoaded) as e:
+        router = request.app.router
+        if isinstance(e, TipAttachError):
+            type = request.match_info['type']
+            req = await request.json()
+
+            error_response = _determine_error_message(
+                request, router, type, req.get('pipetteId', ''))
+        else:
+            next = session.state_machine.next_state
+            links = _format_links(session, next, router)
+            error_response = {
+                "message": "Labware Already Loaded.",
+                **links}
+        response = web.json_response(error_response, status=409)
+    return response
+
+
 @web.middleware
-async def error_middleware(request, handler):
+async def error_middleware(
+        request: web.Request, handler: typing.Callable) -> web.Response:
     try:
         response = await handler(request)
     except web.HTTPNotFound:
@@ -93,7 +148,8 @@ async def error_middleware(request, handler):
 
 
 @web.middleware
-async def session_middleware(request, handler):
+async def session_middleware(
+        request: web.Request, handler: typing.Callable) -> web.Response:
     """
     Middleware used for the calibration sub-app. This includes all routes
     found in the :py:class:`.http:CalibrationRoutes` class.
@@ -116,7 +172,7 @@ async def session_middleware(request, handler):
     elif not session:
         response = no_session_error_response(start_url, session_type)
     else:
-        response = await handler(request, session)
+        response = await misc_error_handling(request, session, handler)
 
     if response.text:
         return response
