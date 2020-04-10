@@ -35,7 +35,6 @@ class GPIOCharDev:
     def __init__(self, chip_name: str):
         self._chip = gpiod.Chip(chip_name)
         self._lines = self._initialize()
-        self._blink_flag = True
 
     @property
     def chip(self) -> gpiod.Chip:
