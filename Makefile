@@ -112,8 +112,7 @@ test-e2e:
 test-py:
 	$(MAKE) -C api test
 	$(MAKE) -C robot-server test
-	$(MAKE) -C update-server test tests=tests/buildroot/
-	$(MAKE) -C update-server test tests=tests/migration/
+	$(MAKE) -C update-server test
 
 .PHONY: test-js
 test-js:
