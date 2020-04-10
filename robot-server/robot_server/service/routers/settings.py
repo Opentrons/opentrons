@@ -88,8 +88,9 @@ async def post_log_level_local(
                              status_code=HTTPStatus.UNPROCESSABLE_ENTITY)
     # Level name is upper case
     level_name = level.value.upper()
-    # Set the application log level
-    logging.getLogger('opentrons').setLevel(level.level_id)
+    # Set the log levels
+    for logger_name in ('opentrons', 'robot_server', 'uvicorn'):
+        logging.getLogger(logger_name).setLevel(level.level_id)
     # Update and save settings
     await hardware.update_config(log_level=level_name)  # type: ignore
     robot_configs.save_robot_settings(hardware.config)  # type: ignore

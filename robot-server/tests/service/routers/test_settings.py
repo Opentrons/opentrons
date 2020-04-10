@@ -1,6 +1,6 @@
 import logging
 import pytest
-from unittest.mock import patch
+from unittest.mock import patch, call
 from collections import namedtuple
 
 from opentrons.config.reset import ResetOptionId
@@ -363,7 +363,10 @@ def test_set_log_level(api_client, hardware_log_level,
                        body, expected_log_level, expected_log_level_name):
     resp = api_client.post('/settings/log_level/local', json=body)
     assert resp.status_code == 200
-    mock_logging_set_level.assert_called_once_with(expected_log_level)
+    # Three calls for opentrons, robot_server, and uvicorn loggers
+    mock_logging_set_level.assert_has_calls([call(expected_log_level),
+                                             call(expected_log_level),
+                                             call(expected_log_level)])
     hardware_log_level.update_config.assert_called_once_with(
         log_level=expected_log_level_name)
     mock_robot_configs.save_robot_settings.assert_called_once()
