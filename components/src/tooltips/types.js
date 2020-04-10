@@ -41,7 +41,7 @@ export type UseTooltipOptions = $Shape<{|
 |}>
 
 export type UseTooltipResultTargetProps = {|
-  ref: (HTMLElement | null) => mixed,
+  ref: (Element | null) => mixed,
   'aria-describedby': string,
 |}
 

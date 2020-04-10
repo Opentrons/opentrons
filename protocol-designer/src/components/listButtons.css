@@ -1,7 +1,7 @@
 @import '@opentrons/components';
 
 .list_item_button {
-  z-index: 5;
+  z-index: 11;
   position: relative;
   padding: 1rem 2rem 1.25rem 2rem;
 }

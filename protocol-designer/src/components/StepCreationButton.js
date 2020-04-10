@@ -2,7 +2,14 @@
 import * as React from 'react'
 import { connect } from 'react-redux'
 import cx from 'classnames'
-import { HoverTooltip, PrimaryButton } from '@opentrons/components'
+import {
+  Tooltip,
+  PrimaryButton,
+  useHoverTooltip,
+  TOOLTIP_RIGHT,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
+
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -33,77 +40,77 @@ type Props = {|
   ...DP,
 |}
 
-type State = { expanded?: boolean }
+function StepCreationButtonComponent(props: Props) {
+  const [expanded, setExpanded] = React.useState(false)
 
-class StepCreationButtonComponent extends React.Component<Props, State> {
-  state = { expanded: false }
+  // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
+  const supportedSteps = [
+    'moveLiquid',
+    'mix',
+    'pause',
+    'magnet',
+    'temperature',
+    'thermocycler',
+  ]
+  const { isStepTypeEnabled } = props
 
-  handleExpandClick = (e: SyntheticEvent<>) => {
-    this.setState({ expanded: !this.state.expanded })
-  }
+  return (
+    <div
+      className={styles.list_item_button}
+      onMouseLeave={() => setExpanded(false)}
+    >
+      <PrimaryButton onClick={() => setExpanded(true)}>
+        {i18n.t('button.add_step')}
+      </PrimaryButton>
 
-  handleMouseLeave = (e: SyntheticEvent<>) => {
-    this.setState({ expanded: false })
-  }
+      <div className={styles.buttons_popover}>
+        {expanded &&
+          supportedSteps.map(stepType => {
+            const disabled = !isStepTypeEnabled[stepType]
+            const onClick = !disabled ? props.makeAddStep(stepType) : () => null
 
-  render() {
-    // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-    const supportedSteps = [
-      'moveLiquid',
-      'mix',
-      'pause',
-      'magnet',
-      'temperature',
-      'thermocycler',
-    ]
-    const { isStepTypeEnabled } = this.props
-
-    return (
-      <div
-        className={styles.list_item_button}
-        onMouseLeave={this.handleMouseLeave}
-      >
-        <PrimaryButton onClick={this.handleExpandClick}>
-          {i18n.t('button.add_step')}
-        </PrimaryButton>
-
-        <div className={styles.buttons_popover}>
-          {this.state.expanded &&
-            supportedSteps.map(stepType => {
-              const disabled = !isStepTypeEnabled[stepType]
-              const tooltipMessage = disabled
-                ? i18n.t(`tooltip.disabled_module_step`)
-                : i18n.t(`tooltip.step_description.${stepType}`)
-              const onClick = !disabled
-                ? this.props.makeAddStep(stepType)
-                : () => null
-              return (
-                <HoverTooltip
-                  key={stepType}
-                  placement="right"
-                  modifiers={{ preventOverflow: { enabled: false } }}
-                  positionFixed
-                  tooltipComponent={tooltipMessage}
-                >
-                  {hoverTooltipHandlers => (
-                    <PrimaryButton
-                      hoverTooltipHandlers={hoverTooltipHandlers}
-                      onClick={onClick}
-                      iconName={stepIconsByType[stepType]}
-                      className={cx({
-                        [styles.step_button_disabled]: disabled,
-                      })}
-                    >
-                      {i18n.t(`application.stepType.${stepType}`, stepType)}
-                    </PrimaryButton>
-                  )}
-                </HoverTooltip>
-              )
-            })}
-        </div>
+            const buttonProps = {
+              disabled: disabled,
+              onClick: onClick,
+              stepType: stepType,
+            }
+            return <StepButtonItem {...buttonProps} key={stepType} />
+          })}
       </div>
-    )
-  }
+    </div>
+  )
+}
+
+type ItemProps = {
+  onClick?: (SyntheticMouseEvent<>) => mixed,
+  disabled: boolean,
+  stepType: string,
+}
+
+function StepButtonItem(props: ItemProps) {
+  const { onClick, disabled, stepType } = props
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_RIGHT,
+    strategy: TOOLTIP_FIXED,
+  })
+  const tooltipMessage = disabled
+    ? i18n.t(`tooltip.disabled_module_step`)
+    : i18n.t(`tooltip.step_description.${stepType}`)
+  return (
+    <>
+      <PrimaryButton
+        hoverTooltipHandlers={targetProps}
+        onClick={onClick}
+        iconName={stepIconsByType[stepType]}
+        className={cx({
+          [styles.step_button_disabled]: disabled,
+        })}
+      >
+        {i18n.t(`application.stepType.${stepType}`, stepType)}
+      </PrimaryButton>
+      <Tooltip {...tooltipProps}>{tooltipMessage}</Tooltip>
+    </>
+  )
 }
 
 const mapSTP = (state: BaseState): SP => {
