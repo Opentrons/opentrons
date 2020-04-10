@@ -1,5 +1,17 @@
-import os
+"""
+ opentrons: python package with opentrons ot-2 protocol simulation
+and execution support, as well as backing code for running the ot-2.
+"""
+
+# we use python3.7-only stuff later on in this file, so let's make sure we're on 3.7
 import sys
+version = sys.version_info[0:2]
+if version < (3, 7):
+    raise RuntimeError(
+        'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
+            version[0], version[1]))
+
+import os
 import json
 HERE = os.path.abspath(os.path.dirname(__file__))
 from opentrons import config  # noqa(E402)
@@ -7,7 +19,6 @@ from opentrons.data_storage import database_migration  # noqa(E402)
 
 if os.environ.get('OT_UPDATE_SERVER') != 'true':
     database_migration.check_version_and_perform_full_migration()
-
 
 from .legacy_api.api import (robot,   # noqa(E402)
                              reset,
@@ -26,7 +37,7 @@ except (FileNotFoundError, OSError):
     __version__ = 'unknown'
 
 version = sys.version_info[0:2]
-if version < (3, 5):
+if version < (3, 7):
     raise RuntimeError(
         'opentrons requires Python 3.5 or above, this is {0}.{1}'.format(
             version[0], version[1]))

@@ -108,7 +108,7 @@ def main():
     hostname = loop.run_until_complete(name_management.setup_hostname())
     LOG.info(f"Set hostname to {hostname}")
 
-    LOG.info(f'Building buildroot update server')
+    LOG.info('Building buildroot update server')
     app = get_app(args.version_file, args.config_file)
 
     name = app[constants.DEVICE_NAME_VARNAME]
