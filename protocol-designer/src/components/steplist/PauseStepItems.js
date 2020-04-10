@@ -23,13 +23,13 @@ export function PauseStepItems(props: Props) {
             <span>Pause for Time</span>
           </li>
           <li className={styles.substep_content}>
-            <span>
+            <span className={styles.substep_time}>
               {hours} {i18n.t('application.units.hours')}
             </span>
-            <span>
+            <span className={styles.substep_time}>
               {minutes} {i18n.t('application.units.minutes')}
             </span>
-            <span>
+            <span className={styles.substep_time}>
               {seconds} {i18n.t('application.units.seconds')}
             </span>
           </li>

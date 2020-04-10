@@ -58,6 +58,10 @@
   font-size: var(--fs-caption);
   text-transform: uppercase;
   justify-content: space-between;
+
+  &:last-child {
+    padding-bottom: 1.25rem;
+  }
 }
 
 .substep_content {
@@ -73,6 +77,10 @@
   &:last-child {
     padding-bottom: 1.25rem;
   }
+}
+
+.substep_time {
+  margin-right: 1rem;
 }
 
 .module_substep_value {
