@@ -7,6 +7,7 @@ from time import time, sleep
 from typing import List, Dict, Any, Optional
 from uuid import uuid4
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
 from opentrons.broker import Broker
 from opentrons.commands import tree, types as command_types
@@ -267,6 +268,7 @@ class Session(object):
     def prepare(self):
         if not self._use_v2:
             robot.discover_modules()
+        
         self.refresh()
 
     def get_instruments(self):
@@ -372,6 +374,7 @@ class Session(object):
                 robot.broker = self._broker
                 # we don't rely on being connected anymore so make sure we are
                 robot.connect()
+                robot._driver.gpio_chardev = SimulatingGPIOCharDev('sim_chip')
                 robot.cache_instrument_models()
                 robot.disconnect()
 
@@ -504,6 +507,7 @@ class Session(object):
                     'Internal error: v1 should only be used for python'
                 if not robot.is_connected():
                     robot.connect()
+                robot._driver.gpio_chardev = self._hardware._backend.gpio_chardev
                 self.resume()
                 self._pre_run_hooks()
                 robot.cache_instrument_models()

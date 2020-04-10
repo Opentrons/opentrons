@@ -132,7 +132,8 @@ class Robot(CommandPublisher):
         """
         super().__init__(broker)
         self.config = config or load()
-        self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
+        self._driver = driver_3_0.SmoothieDriver_3_0_0(
+            config=self.config)
         self._attached_modules: Dict[str, Any] = {}  # key is port + model
         self.fw_version = self._driver.get_fw_version()
 

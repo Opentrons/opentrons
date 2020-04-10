@@ -8,7 +8,7 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import gpio
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.types import Mount
 
@@ -42,12 +42,7 @@ class Controller:
 
         self.config = config or opentrons.config.robot_configs.load()
 
-        try:
-            self._gpio_chardev = gpio.GPIOCharDev('gpiochip0')
-        except AttributeError:
-            self._gpio_chardev = None
-            MODULE_LOG.warning(
-                'Failed to initialize character device, cannot control gpios')
+        self._gpio_chardev = build_gpio_chardev('gpiochip0')
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, gpio_chardev=self._gpio_chardev,

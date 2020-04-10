@@ -11,7 +11,6 @@ from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
-from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers.utils import AxisMoveTimestamp
 from opentrons.system import smoothie_update
 '''
@@ -392,6 +391,14 @@ class SmoothieDriver_3_0_0:
         self._move_split_config: MoveSplits = {}
         #: Cache of currently configured splits from callers
         self._axes_moved_at = AxisMoveTimestamp(AXES)
+
+    @property
+    def gpio_chardev(self):
+        return self._gpio_chardev
+
+    @gpio_chardev.setter
+    def gpio_chardev(self, gpio_chardev):
+        self._gpio_chardev = gpio_chardev
 
     @property
     def homed_position(self):
@@ -1829,6 +1836,9 @@ class SmoothieDriver_3_0_0:
 
     def turn_on_blue_button_light(self):
         self._gpio_chardev.set_button_light(blue=True)
+
+    def turn_on_green_button_light(self):
+        self._gpio_chardev.set_button_light(green=True)
 
     def turn_on_red_button_light(self):
         self._gpio_chardev.set_button_light(red=True)

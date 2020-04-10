@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "6d496a60682121b84dbd2195738cf1b85c6be1e896d1e3bdd7630bdbb162f08b"
+            "sha256": "d1b4b6902cb4d08125ee1cc2de8c4eb93272646ff4bf91c5121829df05db3209"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -87,12 +87,10 @@
             "version": "==1.0.2"
         },
         "gpiod": {
-            "hashes": [
-                "sha256:86c651283f2af74036fccb8f9cec65af0bbccf140a4605d1e1b81c66e510b33f"
-            ],
+            "hashes": [],
             "index": "pypi",
             "markers": "sys_platform == 'linux'",
-            "version": "==0.6.0"
+            "version": "==1.2"
         },
         "idna": {
             "hashes": [
@@ -171,20 +169,6 @@
             ],
             "index": "pypi",
             "version": "==1.15.1"
-        },
-        "pkgconfig": {
-            "hashes": [
-                "sha256:97bfe3d981bab675d5ea3ef259045d7919c93897db7d3b59d4e8593cba8d354f",
-                "sha256:cddf2d7ecadb272178a942eb852a9dee46bda2adcc36c3416b0fef47a4ed9f38"
-            ],
-            "version": "==1.5.1"
-        },
-        "pybind11": {
-            "hashes": [
-                "sha256:205d9f9615eac190811cb8c3c2b2f95f6844ddba0fa0a1d45d00793338741601",
-                "sha256:ea5a4e7a880112915463826f1acbec5892df36dfe102ecb249229ac514fb54ad"
-            ],
-            "version": "==2.5.0"
         },
         "pydantic": {
             "hashes": [
@@ -437,14 +421,6 @@
             "editable": true,
             "path": "."
         },
-        "gpiod": {
-            "hashes": [
-                "sha256:86c651283f2af74036fccb8f9cec65af0bbccf140a4605d1e1b81c66e510b33f"
-            ],
-            "index": "pypi",
-            "markers": "sys_platform == 'linux'",
-            "version": "==0.6.0"
-        },
         "idna": {
             "hashes": [
                 "sha256:7588d1c14ae4c77d74036e8c22ff447b26d0fde8f007354fd48a7814db15b7cb",
@@ -640,13 +616,6 @@
             ],
             "version": "==20.3"
         },
-        "pkgconfig": {
-            "hashes": [
-                "sha256:97bfe3d981bab675d5ea3ef259045d7919c93897db7d3b59d4e8593cba8d354f",
-                "sha256:cddf2d7ecadb272178a942eb852a9dee46bda2adcc36c3416b0fef47a4ed9f38"
-            ],
-            "version": "==1.5.1"
-        },
         "pkginfo": {
             "hashes": [
                 "sha256:7424f2c8511c186cd5424bbf31045b77435b37a8d604990b79d4e70d741148bb",
@@ -668,13 +637,6 @@
             ],
             "version": "==1.8.1"
         },
-        "pybind11": {
-            "hashes": [
-                "sha256:205d9f9615eac190811cb8c3c2b2f95f6844ddba0fa0a1d45d00793338741601",
-                "sha256:ea5a4e7a880112915463826f1acbec5892df36dfe102ecb249229ac514fb54ad"
-            ],
-            "version": "==2.5.0"
-        },
         "pycodestyle": {
             "hashes": [
                 "sha256:95a2219d12372f05704562a14ec30bc76b05a5b297b21a5dfe3f6fac3491ae56",
@@ -691,10 +653,10 @@
         },
         "pyflakes": {
             "hashes": [
-                "sha256:17dbeb2e3f4d772725c777fabc446d5634d1038f234e77343108ce445ea69ce0",
-                "sha256:d976835886f8c5b31d47970ed689944a0262b5f3afa00a5a7b4dc81e5449f8a2"
+                "sha256:0d94e0e05a19e57a99444b6ddcf9a6eb2e5c68d3ca1e98e90707af8152c90a92",
+                "sha256:35b2d75ee967ea93b55750aa9edbbf72813e06a66ba54438df2cfac9e3c27fc8"
             ],
-            "version": "==2.1.1"
+            "version": "==2.2.0"
         },
         "pygments": {
             "hashes": [

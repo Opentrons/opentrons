@@ -9,7 +9,6 @@ Author: Carlos Fernandez
 """
 import logging
 
-from opentrons.drivers.rpi_drivers import gpio
 from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
     SmoothieError, DEFAULT_AXES_SPEED
@@ -137,7 +136,7 @@ if __name__ == '__main__':
                    hardware, driver)
         run_y_axis(num_cycles, b_x_max, b_y_max, tolerance_mm,
                    hardware, driver)
-        gpio.set_button_light(red=False, green=True, blue=False)
+        driver.turn_on_green_button_light()
         print("PASS")
         _exit_test(driver)
     except KeyboardInterrupt:

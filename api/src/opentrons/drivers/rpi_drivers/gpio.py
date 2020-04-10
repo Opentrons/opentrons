@@ -1,40 +1,13 @@
 import asyncio
-import os
-from sys import platform
 import logging
 from typing import Dict, Tuple
+import time
 
-try:
-    import gpiod
-except ImportError:
-    gpiod = None  # type: ignore
-
-import systemd.daemon
+import gpiod  # type: ignore
 
 """
 Raspberry Pi GPIO control module
-
-Read/Write from RPi GPIO pins is performed by exporting a pin by number,
-writing the direction for the pin, and then writing a high or low signal
-to the pin value.
-
-To export a pin, find the desired pin in OUTPUT_PINS or INPUT_PINS, and write
-the corresponding number to `/sys/class/gpio/export`.
-
-After export, set pin direction by writing either "in" or "out" to
-`/sys/class/gpio/gpio<pin_number>/direction`.
-
-After direction is set, set a pin high by writing a "1" or set the pin low by
-writing "0" (zero) to `/sys/class/gpio/gpio<pin_number>/value`.
-
-This library abstracts those operations by providing an `initialize` function
-to set up all pins correctly, and then providing `set_low` and `set_high`
-functions that accept a pin number. The OUTPUT_PINS and INPUT_PINS dicts
-provide pin-mappings so calling code does not need to use raw integers.
 """
-
-LOW = 0
-HIGH = 1
 
 # Note: in test pins are sorted by value, so listing them in that order here
 #   makes it easier to read the tests. Pin numbers defined by bridge wiring
@@ -62,44 +35,53 @@ class GPIOCharDev:
     def __init__(self, chip_name: str):
         self._chip = gpiod.Chip(chip_name)
         self._lines = self._initialize()
+        self._blink_flag = True
 
     @property
-    def chip(self):
+    def chip(self) -> gpiod.Chip:
         return self._chip
 
     @property
-    def lines(self) -> Dict:
+    def lines(self) -> Dict[int, gpiod.Line]:
         return self._lines
 
-    def _request_line(self, offset, name, request_type):
+    def _request_line(
+            self,
+            offset: int, name: str, request_type) -> gpiod.Line:
         line = self.chip.get_line(offset)
-        try:
-            line.request(consumer=name, type=request_type, default_vals=[0])
-        except OSError:
-            MODULE_LOG.error(f'Line {offset} is busy. Cannot establish {name}')
-        return line
 
-    def _initialize(self):
+        def _retry_request_line(retries: int = 0):
+            try:
+                line.request(
+                    consumer=name, type=request_type, default_vals=[0])
+            except OSError as e:
+                retries -= 1
+                if retries <= 0:
+                    raise e
+                time.sleep(0.25)
+                return _retry_request_line(retries)
+            return line
+
+        if name == 'BLUE_BUTTON':
+            return _retry_request_line(3)
+        else:
+            return _retry_request_line()
+
+    def _initialize(self) -> Dict[int, gpiod.Line]:
+        MODULE_LOG.info("Initializing GPIOs")
         lines = {}
         # setup input lines
         for name, offset in INPUT_PINS.items():
-            lines[offset] = self._request_line(offset, name, gpiod.LINE_REQ_DIR_IN)
+            lines[offset] = self._request_line(
+                offset, name, gpiod.LINE_REQ_DIR_IN)
         # setup output lines
         for name, offset in OUTPUT_PINS.items():
-            if name is not 'BLUE_BUTTON':
-                lines[offset] = self._request_line(offset, name, gpiod.LINE_REQ_DIR_OUT)
-        MODULE_LOG.info(f'{lines}')
+            lines[offset] = self._request_line(
+                offset, name, gpiod.LINE_REQ_DIR_OUT)
         return lines
 
-    async def setup_blue_button(self):
-        systemd.daemon.notify("READY=1")
-        await asyncio.sleep(0.25)
-        target = 'BLUE_BUTTON'
-        line = self._request_line(OUTPUT_PINS[target], target, gpiod.LINE_REQ_DIR_OUT)
-        self.lines[OUTPUT_PINS[target]] = line
-        self.set_button_light(blue=True)
-            
     async def setup(self):
+        MODULE_LOG.info("Setting up GPIOs")
         # smoothieware programming pins, must be in a known state (HIGH)
         self.set_halt_pin(True)
         self.set_isp_pin(True)
@@ -108,11 +90,18 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         await asyncio.sleep(0.25)
 
-    def set_high(self, offset):
-        self.lines[offset].set_value(HIGH)
+    async def set_blinking_light(self):
+        while True:
+            self.set_button_light(blue=True)
+            await asyncio.sleep(0.25)
+            self.set_button_light()
+            await asyncio.sleep(0.25)
 
-    def set_low(self, offset):
-        self.lines[offset].set_value(LOW)
+    def set_high(self, offset: int):
+        self.lines[offset].set_value(1)
+
+    def set_low(self, offset: int):
+        self.lines[offset].set_value(0)
 
     def set_button_light(self,
                          red: bool = False,
@@ -170,6 +159,6 @@ class GPIOCharDev:
     def read_window_switches(self) -> bool:
         return bool(self._read(INPUT_PINS['WINDOW_INPUT']))
 
-    def release_line(self, offset):
+    def release_line(self, offset: int):
         self.lines[offset].release()
         self.lines.pop(offset)

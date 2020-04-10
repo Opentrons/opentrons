@@ -25,6 +25,11 @@ except ImportError:
 
 log = logging.getLogger(__name__)
 
+try:
+    import systemd.daemon  # type: ignore
+except ImportError:
+    log.info("Systemd couldn't be imported, not notifying")
+
 SMOOTHIE_HEX_RE = re.compile('smoothie-(.*).hex')
 
 
@@ -125,14 +130,19 @@ async def initialize_robot() -> ThreadManager:
 
     await check_for_smoothie_update()
 
+    systemd.daemon.notify("READY=1")
     hardware = ThreadManager(API.build_hardware_controller)
+
+    loop = asyncio.get_event_loop()
+    blink_task = loop.create_task(
+        hardware._backend.gpio_chardev.set_blinking_light())
 
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")
         await hardware.home_z()
 
-    if hardware._backend.gpio_chardev:
-        await hardware._backend.gpio_chardev.setup_blue_button()
+    blink_task.cancel()
+    hardware._backend.gpio_chardev.set_button_light(blue=True)
 
     return hardware
 

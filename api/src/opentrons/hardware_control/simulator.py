@@ -9,6 +9,8 @@ from opentrons.config.pipette_config import (config_models,
                                              config_names,
                                              configs)
 from opentrons.drivers.smoothie_drivers import SimulatingDriver
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
+
 from . import modules
 from .execution_manager import ExecutionManager
 if TYPE_CHECKING:
@@ -101,6 +103,14 @@ class Simulator:
         self._run_flag.set()
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
+        self._gpio_chardev = SimulatingGPIOCharDev('gpiochip0')
+
+    @property
+    def gpio_chardev(self):
+        return self._gpio_chardev
+
+    async def setup_gpio_chardev(self):
+        await self.gpio_chardev.setup()
 
     def update_position(self) -> Dict[str, float]:
         return self._position
