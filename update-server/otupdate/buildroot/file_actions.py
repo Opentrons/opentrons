@@ -230,7 +230,7 @@ def verify_signature(message_path: str,
     else:
         LOG.error(
             f"Verification failed with cert {cert_path}: {verification!r}")
-        raise SignatureMismatch(f'Signature check failed')
+        raise SignatureMismatch('Signature check failed')
 
 
 def validate_update(filepath: str,

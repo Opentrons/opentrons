@@ -48,7 +48,7 @@ build: false
 test: off
 
 build_script:
-  - cmd: '%MAKE% test'
+  - cmd: '%MAKE% test-windows'
   # build app
   - cmd: '%MAKE% -C app-shell dist-win'
 

@@ -103,17 +103,23 @@ term:
 .PHONY: test
 test: test-py test-js
 
+# tests that may be run on windows
+.PHONY: test-windows
+test-windows: test-js test-py-windows
+
 .PHONY: test-e2e
 test-e2e:
 	$(MAKE) -C $(LABWARE_LIBRARY_DIR) test-e2e
 	$(MAKE) -C $(PROTOCOL_DESIGNER_DIR) test-e2e
 
-.PHONY: test-py
-test-py:
+.PHONY: test-py-windows
+test-py-windows:
 	$(MAKE) -C api test
 	$(MAKE) -C robot-server test
-	$(MAKE) -C update-server test tests=tests/buildroot/
-	$(MAKE) -C update-server test tests=tests/migration/
+
+.PHONY: test-py
+test-py: test-py-windows
+	$(MAKE) -C update-server test
 
 .PHONY: test-js
 test-js:
