@@ -7,7 +7,7 @@ from unittest import mock
 import pytest
 
 from opentrons import execute, types
-from opentrons.hardware_control import controller
+from opentrons.hardware_control import controller, api
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 HERE = Path(__file__).parent
@@ -23,7 +23,7 @@ def mock_get_attached_instr(monkeypatch, virtual_smoothie_env):
     monkeypatch.setattr(controller.Controller,
                         'get_attached_instruments',
                         gai_mock)
-    monkeypatch.setattr(controller.Controller, 'delay', dummy_delay)
+    monkeypatch.setattr(api.API, 'delay', dummy_delay)
     gai_mock.return_value = {types.Mount.RIGHT: {'model': None, 'id': None},
                              types.Mount.LEFT: {'model': None, 'id': None}}
     return gai_mock
