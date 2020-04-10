@@ -290,7 +290,9 @@ export const EditModulesModal = (props: EditModulesProps) => {
                       <>
                         <HoverTooltip
                           placement="top"
-                          tooltipComponent={slotOptionTooltip}
+                          tooltipComponent={
+                            !enableSlotSelection ? slotOptionTooltip : null
+                          }
                         >
                           {hoverTooltipHandlers => (
                             <div
