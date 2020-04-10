@@ -97,11 +97,11 @@ def test_save_and_clear_config(mock_config, sync_hardware, loop):
     hardware.config.gantry_calibration[0][3] = 0
 
 
-def test_new_deck_points():
+async def test_new_deck_points():
     # Checks that the correct deck calibration points are being used
     # if feature_flag is set (or not)
 
-    advs.set_adv_setting('deckCalibrationDots', True)
+    await advs.set_adv_setting('deckCalibrationDots', True)
     calibration_points = get_calibration_points()
     expected_points1 = expected_points()
     # Check that old calibration points are used in cli
@@ -113,7 +113,7 @@ def test_new_deck_points():
     assert expected_points1['2'] == (380.87, 6.0)
     assert expected_points1['3'] == (12.13, 261.0)
 
-    advs.set_adv_setting('deckCalibrationDots', False)
+    await advs.set_adv_setting('deckCalibrationDots', False)
     calibration_points2 = get_calibration_points()
     expected_points2 = expected_points()
     # Check that new calibration points are used

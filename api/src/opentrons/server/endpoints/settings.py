@@ -1,54 +1,13 @@
 from json import JSONDecodeError
 import logging
-import os
-import shutil
-from typing import Dict, List, Tuple, Union
+from typing import Dict, List, Union
 from aiohttp import web
 from opentrons.config import (advanced_settings as advs,
                               robot_configs as rc,
-                              pipette_config as pc,
-                              IS_ROBOT,
-                              ARCHITECTURE,
-                              SystemArchitecture)
-from opentrons.data_storage import database as db
-from opentrons.protocol_api import labware
-
-if ARCHITECTURE == SystemArchitecture.BUILDROOT:
-    from opentrons.system import log_control
+                              pipette_config as pc)
+from opentrons.config import reset as reset_util
 
 log = logging.getLogger(__name__)
-
-_common_settings_reset_options = [
-    {
-        'id': 'tipProbe',
-        'name': 'Pipette Calibration',
-        'description':
-        'Clear pipette offset and tip length calibration'
-    },
-    {
-        'id': 'labwareCalibration',
-        'name': 'Labware Calibration',
-        'description':
-        'Clear labware calibration and Protocol API v1 custom labware (created with labware.create())'  # noqa(E501)
-    },
-    {
-        'id': 'bootScripts',
-        'name': 'Boot Scripts',
-        'description': 'Clear custom boot scripts'
-    },
-]
-
-
-_SETTINGS_RESTART_REQUIRED = False
-# This is a bit of global state that indicates whether a setting has changed
-# that requires a restart. It's OK for this to be global because the behavior
-# it's catching is global - changing the kind of setting that requires a
-# a restart anywhere, even if you theoretically have two servers running in
-# the same process, will require _all_ of them to be restarted.
-
-
-def reset_options() -> List[Dict[str, str]]:
-    return _common_settings_reset_options
 
 
 async def get_advanced_settings(request: web.Request) -> web.Response:
@@ -65,27 +24,26 @@ async def get_advanced_settings(request: web.Request) -> web.Response:
 
 
 def _get_adv_settings_response() -> Dict[
-        str, Union[Dict[str, str],
-                   List[Dict[str, Union[str, bool, None]]]]]:
+    str, Union[Dict[str, str],
+               List[Dict[str, Union[str, bool, None]]]]]:
     data = advs.get_all_adv_settings()
 
-    def _should_show(setting_dict):
-        if not setting_dict['show_if']:
-            return True
-        return advs.get_setting_with_env_overload(setting_dict['show_if'][0])\
-            == setting_dict['show_if'][1]
-
-    if _SETTINGS_RESTART_REQUIRED:
+    if advs.restart_required():
         links = {'restart': '/server/restart'}
     else:
         links = {}
 
     return {
         'links': links,
-        'settings': [
-            {k: v for k, v in setting.items() if k != 'show_if'}
-            for setting in data.values()
-            if _should_show(setting)]}
+        'settings': [{
+            "id": s.definition.id,
+            "old_id": s.definition.old_id,
+            "title": s.definition.title,
+            "description": s.definition.description,
+            "restart_required": s.definition.restart_required,
+            "value": s.value
+        } for s in data.values()]
+    }
 
 
 async def set_advanced_setting(request: web.Request) -> web.Response:
@@ -107,55 +65,33 @@ async def set_advanced_setting(request: web.Request) -> web.Response:
     -> 200 OK {"settings": (as GET /settings),
                "links": {"restart": uri if restart required}}
     """
-    global _SETTINGS_RESTART_REQUIRED
     data = await request.json()
     key = data.get('id')
     value = data.get('value')
     log.info(f'set_advanced_setting: {key} -> {value}')
-    setting = advs.settings_by_id.get(key)
-    if not setting:
+
+    try:
+        await advs.set_adv_setting(key, value)
+    except ValueError as e:
         log.warning(f'set_advanced_setting: bad request: {key} invalid')
-        return web.json_response(
-            {'error': 'no-such-advanced-setting',
-             'message': f'ID {key} not found in settings list',
-             'links': {}},
-            status=400)
+        return web.json_response({
+            'error': 'no-such-advanced-setting',
+            'message': str(e),
+            'links': {}}, status=400)
+    except advs.SettingException as e:
+        # Severe internal error
+        return web.json_response({
+            'error': e.error,
+            'message': str(e),
+            'links': {}}, status=500)
 
-    old_val = advs.get_adv_setting(key)
-    advs.set_adv_setting(key, value)
-
-    if key == 'disableLogAggregation'\
-       and ARCHITECTURE == SystemArchitecture.BUILDROOT:
-        code, stdout, stderr = await log_control.set_syslog_level(
-            'emerg' if value else 'info')
-        if code != 0:
-            log.error(
-                f"Could not set log control: {code}: stdout={stdout}"
-                f" stderr={stderr}")
-            return web.json_response(
-                {'error': 'log-config-failure',
-                 'message': 'Failed to set log upstreaming: {code}'},
-                status=500)
-
-    _SETTINGS_RESTART_REQUIRED = _SETTINGS_RESTART_REQUIRED or (
-        setting.restart_required and old_val != value)
     return web.json_response(
         _get_adv_settings_response(),
         status=200,
     )
 
 
-def _check_reset(reset_req: Dict[str, str]) -> Tuple[bool, str]:
-    opts = reset_options()
-    for requested_reset in reset_req.keys():
-        if requested_reset not in [opt['id']
-                                   for opt in opts]:
-            log.error('Bad reset option {} requested'.format(requested_reset))
-            return (False, requested_reset)
-    return (True, '')
-
-
-async def reset(request: web.Request) -> web.Response:  # noqa(C901)
+async def reset(request: web.Request) -> web.Response:
     """ Execute a reset of the requested parts of the user configuration.
 
     POST /settings/reset {resetOption: Any}
@@ -164,53 +100,44 @@ async def reset(request: web.Request) -> web.Response:  # noqa(C901)
     -> 400 Bad Request, {"error": error-shortmessage, "message": str}
     """
     data = await request.json()
-    ok, bad_key = _check_reset(data)
-    if not ok:
+
+    try:
+        # Convert to dict of ResetOptionId to value
+        data = {reset_util.ResetOptionId(k): v for k, v in data.items()}
+
+        # We provide the parts that should be reset. Any with a
+        # non-falsey value.
+        reset_util.reset(set(k for k, v in data.items() if v))
+    except ValueError as e:
         return web.json_response(
-            {'error': 'bad-reset-option',
-             'message': f'{bad_key} is not a valid reset option'},
-            status=400)
-    log.info("Reset requested for {}".format(', '.join(data.keys())))
-    if data.get('tipProbe'):
-        config = rc.load()
-        config = config._replace(
-            instrument_offset=rc.build_fallback_instrument_offset({}))
-        config.tip_length.clear()
-        rc.save_robot_settings(config)
+            {
+                'error': 'bad-reset-option',
+                'message': str(e)
+            },
+            status=400
+        )
 
-    if data.get('labwareCalibration'):
-        labware.clear_calibrations()
-        db.reset()
-
-    if data.get('customLabware'):
-        labware.delete_all_custom_labware()
-
-    if data.get('bootScripts'):
-        if IS_ROBOT:
-            if os.path.exists('/data/boot.d'):
-                shutil.rmtree('/data/boot.d')
-        else:
-            log.debug('Not on pi, not removing /data/boot.d')
     return web.json_response({}, status=200)
 
 
 async def available_resets(request: web.Request) -> web.Response:
     """ Indicate what parts of the user configuration are available for reset.
     """
-    return web.json_response({'options': reset_options()}, status=200)
+    options = reset_util.reset_options()
+    return web.json_response({
+        'options': [{
+            'id': k.value,
+            'name': v.name,
+            'description': v.description
+        } for k, v in options.items()]
+    },
+        status=200)
 
 
 async def pipette_settings(request: web.Request) -> web.Response:
     res = {}
-    for id in pc.known_pipettes():
-        whole_config = pc.load_config_dict(id)
-        res[id] = {
-            'info': {
-                'name': whole_config.get('name'),
-                'model': whole_config.get('model')
-            },
-            'fields': pc.list_mutable_configs(pipette_id=id)
-        }
+    for pipette_id in pc.known_pipettes():
+        res[pipette_id] = _make_pipette_response_body(pipette_id)
     return web.json_response(res, status=200)
 
 
@@ -220,6 +147,11 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
         return web.json_response(
             {'message': '{} is not a valid pipette id'.format(pipette_id)},
             status=404)
+    res = _make_pipette_response_body(pipette_id)
+    return web.json_response(res, status=200)
+
+
+def _make_pipette_response_body(pipette_id):
     whole_config = pc.load_config_dict(pipette_id)
     res = {
         'info': {
@@ -228,7 +160,7 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
         },
         'fields': pc.list_mutable_configs(pipette_id)
     }
-    return web.json_response(res, status=200)
+    return res
 
 
 async def modify_pipette_settings(request: web.Request) -> web.Response:
@@ -248,21 +180,18 @@ async def modify_pipette_settings(request: web.Request) -> web.Response:
     }
     """
     pipette_id = request.match_info['id']
-    whole_config = pc.load_config_dict(pipette_id)
-    config_match = pc.list_mutable_configs(pipette_id)
-    data = await request.json()
-    if not data.get('fields'):
-        return web.json_response(config_match, status=200)
 
-    for key, value in data['fields'].items():
-        if value and not isinstance(value['value'], bool):
-            config = value['value']
-            default = config_match[key]
-            if config < default['min'] or config > default['max']:
-                return web.json_response(
-                    {'message': '{} out of range with {}'.format(key, config)},
-                    status=412)
-    pc.save_overrides(pipette_id, data['fields'], whole_config.get('model'))
+    data = await request.json()
+    fields = data.get('fields', {})
+    # Convert fields to dict of field name to value
+    fields = {k: None if v is None else v.get('value')
+              for k, v in fields.items()}
+    if fields:
+        try:
+            pc.override(fields=fields, pipette_id=pipette_id)
+        except ValueError as e:
+            return web.json_response({'message': str(e)}, status=412)
+
     updated_configs = {'fields': pc.list_mutable_configs(pipette_id)}
     return web.json_response(updated_configs, status=200)
 

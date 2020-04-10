@@ -1,9 +1,12 @@
-import typing
 from enum import Enum
+import logging
 
-from typing import Optional
+from typing import Optional, List, Dict, Any, Union
+
 from pydantic import BaseModel, Field, create_model, validator
-from opentrons.server.endpoints.settings import _common_settings_reset_options
+
+from opentrons.config.pipette_config import MUTABLE_CONFIGS
+from opentrons.config.reset import ResetOptionId
 
 
 class AdvancedSetting(BaseModel):
@@ -11,7 +14,7 @@ class AdvancedSetting(BaseModel):
     id: str = \
         Field(...,
               description="The machine-readable property ID")
-    old_id: str = \
+    old_id: Optional[str] = \
         Field(...,
               description="The ID by which the property used to be known; not"
                           " useful now and may contain spaces or hyphens")
@@ -27,27 +30,60 @@ class AdvancedSetting(BaseModel):
         Field(...,
               description="Whether a robot restart is required to make this "
                           "change take effect")
-    value: typing.Optional[bool] =\
+    value: Optional[bool] =\
         Field(...,
               description="Whether the setting is off by previous user choice"
                           " (false), true by user choice (true), or off and "
                           "has never been altered (null)")
 
 
-AdvancedSettings = typing.List[AdvancedSetting]
+class Links(BaseModel):
+    restart: Optional[str] = Field(
+        None,
+        description="A URI to POST to restart the robot. If this is present,"
+                    " it must be requested for any settings changes to take "
+                    "effect")
+
+
+class AdvancedSettingsResponse(BaseModel):
+    """A dump of advanced settings and suitable links for next action"""
+    settings: List[AdvancedSetting]
+    links: Links
+
+
+class AdvancedSettingRequest(BaseModel):
+    """Configure the setting to change and the new value"""
+    id: str = Field(
+        ...,
+        description="The ID of the setting to change (something returned by"
+                    " GET /settings)")
+    value: Optional[bool] = Field(
+        None,
+        description="The new value to set. If null, reset to default")
 
 
 class LogLevels(str, Enum):
     """Valid log levels"""
-    debug = "debug"
-    info = "info"
-    warning = "warning"
-    error = "error"
+    def __new__(cls, value, level):
+        obj = str.__new__(cls, value)
+        obj._value_ = value
+        obj._level_id = level
+        return obj
+
+    debug = ("debug", logging.DEBUG)
+    info = ("info", logging.INFO)
+    warning = ("warning", logging.WARNING)
+    error = ("error", logging.ERROR)
+
+    @property
+    def level_id(self):
+        """The log level id as defined in logging lib"""
+        return self._level_id
 
 
 class LogLevel(BaseModel):
-    log_level: Optional[LogLevels] = \
-        Field(...,
+    log_level: LogLevels = \
+        Field(None,
               description="The value to set (conforming to Python "
                           "log levels)")
 
@@ -57,7 +93,7 @@ class LogLevel(BaseModel):
 
 
 class FactoryResetOption(BaseModel):
-    id: str = \
+    id: ResetOptionId = \
         Field(..., description="A short machine-readable id for the setting")
     name: str = \
         Field(..., description="A short human-readable name for the setting")
@@ -68,21 +104,10 @@ class FactoryResetOption(BaseModel):
 
 class FactoryResetOptions(BaseModel):
     """Available values to reset as factory reset"""
-    options: typing.List[FactoryResetOption]
+    options: List[FactoryResetOption]
 
 
-FactoryResetCommands = create_model("FactoryResetCommands",
-                                    __config__=None,
-                                    __base__=None,
-                                    __module__=None,
-                                    __validators__=None,
-                                    **{x['id']: (typing.Optional[bool], None)
-                                       for x in _common_settings_reset_options}
-                                    )
-FactoryResetCommands.__doc__ = "The specific elements of robot data to reset"
-
-
-RobotConfigs = typing.Dict[str, typing.Any]
+RobotConfigs = Dict[str, Any]
 
 
 class PipetteSettingsFieldType(str, Enum):
@@ -94,9 +119,9 @@ class PipetteSettingsFieldType(str, Enum):
 class PipetteSettingsField(BaseModel):
     """A pipette config element identified by the property's name"""
     units: str = \
-        Field(...,
+        Field(None,
               description="The physical units this value is in (e.g. mm, uL)")
-    type: PipetteSettingsFieldType
+    type: Optional[PipetteSettingsFieldType]
     min: float = \
         Field(...,
               description="The minimum acceptable value of the property")
@@ -122,14 +147,9 @@ class PipetteSettingsInfo(BaseModel):
                           "p300_single_v1.5\")")
 
 
-class PipetteSettings(BaseModel):
-    info: PipetteSettingsInfo
-    setting_fields: typing.Dict[str, PipetteSettingsField] = \
-        Field(...,
-              alias="fields",
-              description="The fields of the pipette settings")
-    quirks: typing.Dict[str, bool] = \
-        Field(...,
+class BasePipetteSettingFields(BaseModel):
+    quirks: Dict[str, bool] = \
+        Field(None,
               description="Quirks are behavioral changes associated with "
                           "pipettes. For instance, some models of pipette "
                           "might need to run their drop tip behavior twice. "
@@ -142,11 +162,36 @@ class PipetteSettings(BaseModel):
                           "the default value for all quirks is true.")
 
 
-MultiPipetteSettings = typing.Dict[str, PipetteSettings]
+# A dynamic model of the possible fields in pipette configuration. It's
+# generated from pipette_config module. It's derived from an object with the
+# 'quirks` member.
+PipetteSettingsFields = create_model(
+    'PipetteSettingsFields',
+    __base__=BasePipetteSettingFields,
+    __config__=None,
+    __module__=None,
+    __validators__=None,
+    **{
+        conf: (PipetteSettingsField, None) for conf in MUTABLE_CONFIGS
+        if conf != 'quirks'
+    }
+)
+PipetteSettingsFields.__doc__ = "The fields of the pipette settings"
+
+
+class PipetteSettings(BaseModel):
+    info: PipetteSettingsInfo
+    setting_fields: PipetteSettingsFields   # type: ignore
+
+    class Config:
+        fields = {'setting_fields': 'fields'}
+
+
+MultiPipetteSettings = Dict[str, PipetteSettings]
 
 
 class PipetteUpdateField(BaseModel):
-    value: typing.Union[None, bool, float] = \
+    value: Union[None, bool, float] = \
         Field(...,
               description="Boolean if the format if this is a quirk.  The "
                           "format if this is not a quirk. Must be between max "
@@ -154,5 +199,5 @@ class PipetteUpdateField(BaseModel):
 
 
 class PipetteSettingsUpdate(BaseModel):
-    setting_fields: typing.Dict[str, PipetteUpdateField] = \
-        Field(..., alias="fields")
+    setting_fields: Optional[Dict[str, Optional[PipetteUpdateField]]] = \
+        Field(None, alias="fields")

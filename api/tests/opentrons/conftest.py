@@ -169,24 +169,25 @@ def wifi_keys_tempdir():
 
 # -------feature flag fixtures-------------
 @pytest.fixture
-def calibrate_bottom_flag():
-    config.advanced_settings.set_adv_setting('calibrateToBottom', True)
+async def calibrate_bottom_flag():
+    await config.advanced_settings.set_adv_setting('calibrateToBottom', True)
     yield
-    config.advanced_settings.set_adv_setting('calibrateToBottom', False)
+    await config.advanced_settings.set_adv_setting('calibrateToBottom', False)
 
 
 @pytest.fixture
-def short_trash_flag():
-    config.advanced_settings.set_adv_setting('shortFixedTrash', True)
+async def short_trash_flag():
+    await config.advanced_settings.set_adv_setting('shortFixedTrash', True)
     yield
-    config.advanced_settings.set_adv_setting('shortFixedTrash', False)
+    await config.advanced_settings.set_adv_setting('shortFixedTrash', False)
 
 
 @pytest.fixture
-def old_aspiration(monkeypatch):
-    config.advanced_settings.set_adv_setting('useOldAspirationFunctions', True)
+async def old_aspiration(monkeypatch):
+    await config.advanced_settings.set_adv_setting(
+        'useOldAspirationFunctions', True)
     yield
-    config.advanced_settings.set_adv_setting(
+    await config.advanced_settings.set_adv_setting(
         'useOldAspirationFunctions', False)
 
 
