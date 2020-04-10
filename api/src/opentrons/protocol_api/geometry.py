@@ -39,7 +39,7 @@ def first_parent(loc: types.LocationLabware) -> Optional[str]:
     either a string naming a slot or a None if the location isn't
     associated with a slot """
 
-    # cycle-detecting recursive climnbing
+    # cycle-detecting recursive climbing
     seen: Set[types.LocationLabware] = set()
 
     # internal function to have the cycle detector different per call
