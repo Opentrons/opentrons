@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-alpha.4](https://github.com/opentrons/opentrons/compare/v3.17.0-alpha.3...v3.17.0-alpha.4) (2020-04-13)
+
+
+### Bug Fixes
+
+* **api:** allow protocol delay to be cancelled ([#5403](https://github.com/opentrons/opentrons/issues/5403)) ([67d090e](https://github.com/opentrons/opentrons/commit/67d090e)), closes [#5400](https://github.com/opentrons/opentrons/issues/5400)
+
+
+
+
+
 # [3.17.0-alpha.3](https://github.com/opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-alpha.3) (2020-04-13)
 
 
