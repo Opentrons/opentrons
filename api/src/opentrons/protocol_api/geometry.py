@@ -2,6 +2,7 @@ from collections import UserDict
 import functools
 import logging
 import json
+from dataclasses import dataclass
 from typing import Any, List, Optional, Set, Tuple, Dict
 
 from opentrons import types
@@ -11,11 +12,21 @@ from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
-from .types import CalibrationPosition
 
 
 MODULE_LOG = logging.getLogger(__name__)
 
+
+@dataclass
+class CalibrationPosition:
+    """
+    A point on the deck of a robot that is used to calibrate
+    aspects of the robot's movement system as defined by
+    opentrons/shared-data/deck/schemas/2.json
+    """
+    id: str
+    position: List[float]
+    displayName: str
 
 class LabwareHeightError(Exception):
     pass
@@ -354,7 +365,8 @@ class Deck(UserDict):
 
     @property
     def calibration_positions(self) -> List[CalibrationPosition]:
-        return self._definition['locations']['calibrationPoints']
+        raw_positions = self._definition['locations']['calibrationPoints']
+        return [CalibrationPosition(**pos) for pos in raw_positions]
 
     def get_calibration_position(self, id: str) -> CalibrationPosition:
         calibration_position = next(
