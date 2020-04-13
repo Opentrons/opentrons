@@ -5,12 +5,13 @@ import json
 from typing import Any, List, Optional, Set, Tuple, Dict
 
 from opentrons import types
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.system.shared_data import load_shared_data
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.system.shared_data import load_shared_data
+from .types import CalibrationPosition
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -352,19 +353,18 @@ class Deck(UserDict):
         return self._definition['locations']['orderedSlots']
 
     @property
-    def calibration_positions(self) -> List[Dict]:
+    def calibration_positions(self) -> List[CalibrationPosition]:
         return self._definition['locations']['calibrationPoints']
 
-    def get_calibration_position(self, pos_name: str):
-        positions = list(filter(lambda pos: 'C' in pos['id'],
-                                self.calibration_positions))
+    def get_calibration_position(self, id: str) -> CalibrationPosition:
         calibration_position = next(
-            (pos for pos in positions if pos['id'].startswith(pos_name)),
+            (pos for pos in self.calibration_positions if pos['id'] == id),
             None)
         if not calibration_position:
-            pos_ids = [pos['id'] for pos in positions]
-            raise ValueError(f'position {pos_name} could not be found,'
-                             f'valid deck slots are: {pos_ids}')
+            pos_ids = [pos['id'] for pos in self.calibration_positions]
+            raise ValueError(f'calibration position {pos_name} '
+                             'could not be found, '
+                             f'valid calibration position ids are: {pos_ids}')
         return calibration_position
 
     def get_collisions_for_item(self,

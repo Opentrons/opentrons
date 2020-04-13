@@ -157,18 +157,18 @@ class CalibrationSession:
         return lw
 
     def _build_deck_moves(self) -> Moves:
-        checkone = self._build_cross_dict('1')
-        checktwo = self._build_cross_dict('3')
-        checkthree = self._build_cross_dict('7')
+        checkone = self._build_cross_dict('1BLC')
+        checktwo = self._build_cross_dict('3BRC')
+        checkthree = self._build_cross_dict('7TLC')
         height = self._build_height_dict('5')
         return Moves(checkPointOne=checkone,
                      checkPointTwo=checktwo,
                      checkPointThree=checkthree,
                      checkHeight=height)
 
-    def _build_cross_dict(self, slot: str) -> typing.Dict:
-        pos = self._deck.get_calibration_position(slot)['position']
-        return {'position': Point(*pos), 'locationId': uuid4()}
+    def _build_cross_dict(self, pos_id: str) -> typing.Dict:
+        cross_coords = self._deck.get_calibration_position(pos_id)['position']
+        return {'position': Point(*cross_coords), 'locationId': uuid4()}
 
     def _build_height_dict(self, slot: str) -> typing.Dict:
         pos = Point(*self._deck.get_slot_center(slot))
