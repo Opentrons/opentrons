@@ -85,6 +85,7 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
+dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
 dev:
 	$(python) -m robot_server.main
 

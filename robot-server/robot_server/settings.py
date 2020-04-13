@@ -7,7 +7,7 @@ from pathlib import Path
 from pydantic import BaseSettings, Field
 from dotenv import load_dotenv
 
-from opentrons.config import IS_ROBOT
+from opentrons.config import infer_config_base_dir
 
 log = logging.getLogger(__name__)
 
@@ -21,8 +21,15 @@ def get_settings() -> 'RobotServerSettings':
 
 def get_dotenv_path() -> Path:
     """Get the location of the settings file"""
-    environment = "robot" if IS_ROBOT else "dev"
-    return Path(os.path.dirname(__file__)) / f'{environment}.env'
+    return Environment().dot_env_path
+
+
+class Environment(BaseSettings):
+    """Environment related settings"""
+    dot_env_path: Path = infer_config_base_dir() / 'robot.env'
+
+    class Config:
+        env_prefix = "OT_ROBOT_SERVER_"
 
 
 class RobotServerSettings(BaseSettings):
