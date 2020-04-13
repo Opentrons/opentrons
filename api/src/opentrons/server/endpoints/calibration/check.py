@@ -67,13 +67,13 @@ async def load_labware(request: web.Request, session) -> web.Response:
 async def move(request: web.Request, session) -> web.Response:
     req = await request.json()
     moveloc = MoveLocation(**req)
-    if req.get('offset'):
+    if hasattr(moveloc.location, 'offset'):
         # using getattr to avoid error raised by Union of deck position and
         # tiprack position having different attributes.
         offset = getattr(moveloc.location, 'offset')
         location = {
             "locationId": moveloc.location.locationId,
-            "offset": types.Point(offset)}
+            "offset": types.Point(*offset)}
     else:
         position = getattr(moveloc.location, 'position')
         location = {

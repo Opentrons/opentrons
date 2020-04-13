@@ -349,7 +349,7 @@ class CheckCalibrationSession(CalibrationSession):
             f'You cannot remove a tip during {curr_state} state'
         await self.hardware.remove_tip(self._get_mount(pipette))
 
-    async def _move_to_tiprack(self, pipette: UUID):
+    async def _return_to_tiprack(self, pipette: UUID):
         id = self._relate_mount[pipette]['tiprack_id']
         offset_dict = None
         if self._moves.moveToTipRack:
@@ -360,12 +360,12 @@ class CheckCalibrationSession(CalibrationSession):
             loc = Point(0, 0, 0)
         state = self.state_machine.get_state('moveToTipRack')
         self.state_machine.update_state(state)
-        await self.move(pipette, {"offset": loc, "locationId": id})
+        await self.move(pipette, {"offset": loc, "locationId": id}, True)
 
     async def return_tip(self, pipette: UUID):
         if not self._has_tip(pipette):
             raise TipAttachError()
-        await self._move_to_tiprack(pipette)
+        await self._return_to_tiprack(pipette)
         await self._return_tip(self._get_mount(pipette))
         state = self.state_machine.get_state('dropTip')
         self.state_machine.update_state(state)
@@ -428,12 +428,12 @@ class CheckCalibrationSession(CalibrationSession):
             loc_to_move = input['position']
             return Location(loc_to_move, None)
 
-    async def move(self, pipette: UUID,
-                   position: PositionType):
+    async def move(self,
+                   pipette: UUID,
+                   position: PositionType,
+                   if_return: bool = False):
 
-        check_state = self.state_machine.current_state
-
-        if not check_state.name == 'moveToTipRack':
+        if not if_return:
             # move to tiprack repeats in return tip. To prevent the state
             # machine from updating state to jog, instead check whether the
             # current state is moving to a tiprack (*Note*) there is
