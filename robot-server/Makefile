@@ -144,5 +144,4 @@ term:
 docs: settings_schema.json
 
 settings_schema.json: robot_server/settings.py
-	$(python) settings_schema.py
-
+	$(python) -m scripts.settings_schema $@
