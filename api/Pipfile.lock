@@ -1,7 +1,7 @@
 {
     "_meta": {
         "hash": {
-            "sha256": "8917b64f8cfc4c0ba738065211db28d6d87013bfed766cc26dbf987c63f1d601"
+            "sha256": "ce1f50ab611e98587b1d1656beca77590d4a9a8f166d22f72cc74b2831f6ddd0"
         },
         "pipfile-spec": 6,
         "requires": {
@@ -85,12 +85,6 @@
                 "sha256:a7bb0f2cf3a3fd1ab2732cb49eba4252c2af4240442415b4abce3b87022a8f50"
             ],
             "version": "==1.0.2"
-        },
-        "gpiod": {
-            "hashes": [],
-            "index": "pypi",
-            "markers": "sys_platform == 'linux'",
-            "version": "==1.2"
         },
         "idna": {
             "hashes": [
@@ -445,10 +439,10 @@
         },
         "jinja2": {
             "hashes": [
-                "sha256:93187ffbc7808079673ef52771baa950426fd664d3aad1d0fa3e95644360e250",
-                "sha256:b0eaf100007721b5c16c1fc1eecb87409464edc10469ddc9a22a27a99123be49"
+                "sha256:89aab215427ef59c34ad58735269eb58b1a5808103067f7bb9d5836c651b3bb0",
+                "sha256:f0a4641d3cf955324a89c04f3d94663aa4d638abe8f733ecd3582848e1c37035"
             ],
-            "version": "==2.11.1"
+            "version": "==2.11.2"
         },
         "jsonschema": {
             "hashes": [
