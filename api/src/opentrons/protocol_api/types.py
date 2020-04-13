@@ -20,6 +20,7 @@ TemperatureModuleHandler = Callable[[TemperatureModuleContext, Any], None]
 
 # Deck definition types
 
+
 @dataclass
 class CalibrationPosition:
     """

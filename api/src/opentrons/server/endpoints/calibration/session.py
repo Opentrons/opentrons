@@ -167,7 +167,7 @@ class CalibrationSession:
                      checkHeight=height)
 
     def _build_cross_dict(self, pos_id: str) -> typing.Dict:
-        cross_coords = self._deck.get_calibration_position(pos_id)['position']
+        cross_coords = self._deck.get_calibration_position(pos_id).position
         return {'position': Point(*cross_coords), 'locationId': uuid4()}
 
     def _build_height_dict(self, slot: str) -> typing.Dict:

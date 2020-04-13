@@ -358,11 +358,11 @@ class Deck(UserDict):
 
     def get_calibration_position(self, id: str) -> CalibrationPosition:
         calibration_position = next(
-            (pos for pos in self.calibration_positions if pos['id'] == id),
+            (pos for pos in self.calibration_positions if pos.id == id),
             None)
         if not calibration_position:
-            pos_ids = [pos['id'] for pos in self.calibration_positions]
-            raise ValueError(f'calibration position {pos_name} '
+            pos_ids = [pos.id for pos in self.calibration_positions]
+            raise ValueError(f'calibration position {id} '
                              'could not be found, '
                              f'valid calibration position ids are: {pos_ids}')
         return calibration_position
