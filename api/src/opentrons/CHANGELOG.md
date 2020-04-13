@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.17.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.0...v3.17.0-alpha.3) (2020-04-13)
+
+
+### Bug Fixes
+
+* **api:** correctly set magdeck offsets ([#5416](https://github.com/Opentrons/opentrons/issues/5416)) ([5c121cf](https://github.com/Opentrons/opentrons/commit/5c121cf))
+
+
+
+
+
 # [3.17.0-beta.0](https://github.com/Opentrons/opentrons/compare/v3.16.1...v3.17.0-beta.0) (2020-04-01)
 
 ### Bug Fixes
