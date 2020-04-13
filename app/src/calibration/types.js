@@ -98,6 +98,12 @@ export type CalibrationAction =
   | CreateRobotCalibrationCheckSessionAction
   | CreateRobotCalibrationCheckSessionSuccessAction
   | CreateRobotCalibrationCheckSessionFailureAction
+  | FetchRobotCalibrationCheckSessionAction
+  | FetchRobotCalibrationCheckSessionSuccessAction
+  | FetchRobotCalibrationCheckSessionFailureAction
+  | UpdateRobotCalibrationCheckSessionAction
+  | UpdateRobotCalibrationCheckSessionSuccessAction
+  | UpdateRobotCalibrationCheckSessionFailureAction
   | DeleteRobotCalibrationCheckSessionAction
   | DeleteRobotCalibrationCheckSessionSuccessAction
   | DeleteRobotCalibrationCheckSessionFailureAction
