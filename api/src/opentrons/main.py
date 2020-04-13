@@ -134,15 +134,21 @@ async def initialize_robot() -> ThreadManager:
     hardware = ThreadManager(API.build_hardware_controller)
 
     loop = asyncio.get_event_loop()
-    blink_task = loop.create_task(
-        hardware._backend.gpio_chardev.set_blinking_light())
+
+    async def blink():
+        hardware.set_lights(button=True)
+        await asyncio.sleep(0.5)
+        hardware.set_lights(button=False)
+        await asyncio.sleep(0.5)
+
+    blink_task = loop.create_task(blink())
 
     if not ff.disable_home_on_boot():
         log.info("Homing Z axes")
         await hardware.home_z()
 
     blink_task.cancel()
-    hardware._backend.gpio_chardev.set_button_light(blue=True)
+    hardware.set_lights(button=True)
 
     return hardware
 

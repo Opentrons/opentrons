@@ -89,13 +89,6 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         await asyncio.sleep(0.25)
 
-    async def set_blinking_light(self):
-        while True:
-            self.set_button_light(blue=True)
-            await asyncio.sleep(0.5)
-            self.set_button_light()
-            await asyncio.sleep(0.5)
-
     def set_high(self, offset: int):
         self.lines[offset].set_value(1)
 

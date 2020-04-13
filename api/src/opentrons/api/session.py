@@ -268,7 +268,7 @@ class Session(object):
     def prepare(self):
         if not self._use_v2:
             robot.discover_modules()
-        
+
         self.refresh()
 
     def get_instruments(self):
@@ -507,7 +507,11 @@ class Session(object):
                     'Internal error: v1 should only be used for python'
                 if not robot.is_connected():
                     robot.connect()
-                robot._driver.gpio_chardev = self._hardware._backend.gpio_chardev
+                # backcompat patch: gpiod can only be used from one place so
+                # we have to give the instance of the smoothie driver used by
+                # the apiv1 singletons a reference to the main gpio driver
+                robot._driver.gpio_chardev\
+                    = self._hardware._backend.gpio_chardev
                 self.resume()
                 self._pre_run_hooks()
                 robot.cache_instrument_models()

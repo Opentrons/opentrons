@@ -48,9 +48,6 @@ class SimulatingGPIOCharDev:
     async def setup(self):
         pass
 
-    async def set_blinking_light(self):
-        pass
-
     def set_high(self, offset: int):
         self._values[offset] = 1
 
