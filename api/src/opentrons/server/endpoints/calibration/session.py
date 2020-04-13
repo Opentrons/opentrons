@@ -97,6 +97,7 @@ class CalibrationSession:
         self._deck = geometry.Deck()
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
+        self._moves = self._build_deck_moves()
 
     @classmethod
     async def build(self, hardware: ThreadManager):
@@ -154,6 +155,25 @@ class CalibrationSession:
                     definition=lw_def)
                 self._relate_mount[id]['tiprack_id'] = new_uuid
         return lw
+
+    def _build_deck_moves(self) -> Moves:
+        checkone = self._build_cross_dict('1')
+        checktwo = self._build_cross_dict('3')
+        checkthree = self._build_cross_dict('7')
+        height = self._build_height_dict('5')
+        return Moves(checkPointOne=checkone,
+                     checkPointTwo=checktwo,
+                     checkPointThree=checkthree,
+                     checkHeight=height)
+
+    def _build_cross_dict(self, slot: str) -> typing.Dict:
+        pos = self._deck.get_calibration_position(slot)['position']
+        return {'position': Point(*pos), 'locationId': uuid4()}
+
+    def _build_height_dict(self, slot: str) -> typing.Dict:
+        pos = Point(*self._deck.get_slot_center(slot))
+        updated_pos = pos - Point(20, 0, pos.z)
+        return {'position': updated_pos, 'locationId': uuid4()}
 
     def _available_slot_options(self) -> str:
         if self._slot_options:
@@ -260,7 +280,6 @@ class CheckCalibrationSession(CalibrationSession):
         super().__init__(hardware)
         self.state_machine = CalibrationCheckMachine()
         self.session_type = 'check'
-        self._moves = Moves()
 
     def load_labware_objects(self):
         """
@@ -351,16 +370,28 @@ class CheckCalibrationSession(CalibrationSession):
         state = self.state_machine.get_state('dropTip')
         self.state_machine.update_state(state)
 
-    def _format_move_params(self, position: typing.Dict):
+    def _create_tiprack_param(self, position: typing.Dict):
         new_dict = {}
         for loc, data in position.items():
             for id, values in data.items():
                 offset = list(values['offset'])
-                pos_dict = {"offset": offset, "locationId": loc.hex}
+                pos_dict = {'offset': offset, 'locationId': loc.hex}
                 new_dict[id.hex] = {'pipetteId': id.hex, 'location': pos_dict}
         return new_dict
 
-    def _format_other_params(self, template: typing.Dict):
+    def _format_move_params(
+            self, position: typing.Dict, next_state: str) -> typing.Dict:
+        if next_state == 'moveToTipRack':
+            new_dict = self._create_tiprack_param(position)
+        else:
+            new_dict = {}
+            for id in self._relate_mount.keys():
+                pos_dict = {'position': list(position['position']),
+                            'locationId': position['locationId'].hex}
+                new_dict[id.hex] = {'location': pos_dict, 'pipetteId': id.hex}
+        return new_dict
+
+    def _format_other_params(self, template: typing.Dict) -> typing.Dict:
         new_dict = {}
         for id in self._relate_mount.keys():
             blank = template.copy()
@@ -371,7 +402,7 @@ class CheckCalibrationSession(CalibrationSession):
     def format_params(self, next_state: str) -> typing.Dict:
         if hasattr(self._moves, next_state):
             move_dict = getattr(self._moves, next_state)
-            new_dict = self._format_move_params(move_dict)
+            new_dict = self._format_move_params(move_dict, next_state)
         else:
             if next_state == 'jog':
                 template_dict = dict(pipetteId=None, vector=[0, 0, 0])
@@ -381,28 +412,37 @@ class CheckCalibrationSession(CalibrationSession):
         return new_dict
 
     def _determine_move_location(
-            self, pos: typing.Dict, pip: UUID, offset: Point) -> Location:
-        loc_to_move = pos[pip].get('well')
-        if loc_to_move:
-            pt, well = pos[pip]['well'].top()
+            self,
+            pos: typing.Dict,
+            input: PositionType,
+            pip_id: UUID) -> Location:
+        loc_id = input['locationId']
+        if input.get('offset'):
+            single_location = pos[loc_id]
+            loc_to_move = single_location[pip_id].get('well')
+            pt, well = loc_to_move.top()
+            offset = input['offset']
             updated_pt = pt + offset
             return Location(updated_pt, well)
         else:
-            # TODO Placeholder until cross moves are added in.
-            return Location(Point(0, 0, 0), None)
+            loc_to_move = input['position']
+            return Location(loc_to_move, None)
 
     async def move(self, pipette: UUID,
                    position: PositionType):
 
         check_state = self.state_machine.current_state
-        if not self.state_machine.requires_move(check_state):
+
+        if not check_state.name == 'moveToTipRack':
+            # move to tiprack repeats in return tip. To prevent the state
+            # machine from updating state to jog, instead check whether the
+            # current state is moving to a tiprack (*Note*) there is
+            # definitely a better way to do this that I currently cannot
+            # think of.
             self.state_machine.update_state()
         curr_state = self.state_machine.current_state.name
         get_position = getattr(self._moves, curr_state)
-        loc_id = position["locationId"]
-        offset = position["offset"]
-        to_loc = self._determine_move_location(
-            get_position[loc_id], pipette, offset)
+        to_loc = self._determine_move_location(get_position, position, pipette)
 
         # determine current location
         mount = self._get_mount(pipette)
@@ -415,6 +455,10 @@ class CheckCalibrationSession(CalibrationSession):
             await self.hardware.move_to(mount, move[0], move[1])
 
     async def jog(self, pipette: UUID, vector: Point):
+        check_state = self.state_machine.current_state.name
+        if check_state != 'jog':
+            # Only update state once even if jog is called multiple times.
+            self.state_machine.update_state()
         mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
         await self._jog(mount, vector)

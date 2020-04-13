@@ -351,6 +351,22 @@ class Deck(UserDict):
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
 
+    @property
+    def calibration_positions(self) -> List[Dict]:
+        return self._definition['locations']['calibrationPoints']
+
+    def get_calibration_position(self, pos_name: str):
+        positions = list(filter(lambda pos: 'C' in pos['id'],
+                                self.calibration_positions))
+        calibration_position = next(
+            (pos for pos in positions if pos['id'].startswith(pos_name)),
+            None)
+        if not calibration_position:
+            pos_ids = [pos['id'] for pos in positions]
+            raise ValueError(f'position {pos_name} could not be found,'
+                             f'valid deck slots are: {pos_ids}')
+        return calibration_position
+
     def get_collisions_for_item(self,
                                 slot_key: types.DeckLocation,
                                 item: DeckItem) -> Dict[types.DeckLocation,
