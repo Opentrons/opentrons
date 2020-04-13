@@ -20,7 +20,8 @@ async def create_session(request):
     """
     POST /calibration/check/session
 
-    If a session exists, this endpoint will return the current status.
+    If a session exists, this endpoint will return a 409 with links to delete.
+    If none exists, this will create a session and return its status.
 
     The status message is in the shape of:
     :py:class:`.models.CalibrationSessionStatus`

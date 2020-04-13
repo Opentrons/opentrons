@@ -177,6 +177,7 @@ async def session_middleware(
     if response.text:
         return response
     else:
+        session = session_storage.sessions.get(session_type)
         return status_response(session, request, response)
 
 
