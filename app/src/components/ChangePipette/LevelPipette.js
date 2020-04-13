@@ -25,6 +25,7 @@ type Props = {|
   actualPipette: PipetteModelSpecs | null,
   displayName: string,
   displayCategory: PipetteDisplayCategory | null,
+  pipetteModelName: string,
   back: () => mixed,
   exit: () => mixed,
 |}
@@ -60,18 +61,27 @@ function LevelingInstruction(props: { pipetteName: string }) {
   )
 }
 
-function LevelingVideo() {
+function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
+  const { pipetteName, mount } = props
   return (
     <div className={styles.leveling_video_wrapper}>
       <video width="100%" autoPlay={true} loop={true} controls={true}>
-        <source src={require('./videos/calibration.webm')} />
+        <source src={require(`./videos/${pipetteName}-${mount}.webm`)} />
       </video>
     </div>
   )
 }
 
 export function LevelPipette(props: Props) {
-  const { title, subtitle, displayName, back, exit } = props
+  const {
+    title,
+    subtitle,
+    pipetteModelName,
+    displayName,
+    mount,
+    back,
+    exit,
+  } = props
   return (
     <ModalPage
       titleBar={{
@@ -83,7 +93,7 @@ export function LevelPipette(props: Props) {
     >
       <Status pipetteName={displayName} />
       <LevelingInstruction pipetteName={displayName} />
-      <LevelingVideo />
+      <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
       <ExitButton exit={exit} />
     </ModalPage>
   )

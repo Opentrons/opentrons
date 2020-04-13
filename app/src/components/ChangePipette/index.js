@@ -148,6 +148,7 @@ export function ChangePipette(props: Props) {
       return (
         <LevelPipette
           {...{
+            pipetteModelName: actualPipette ? actualPipette.name : '',
             ...basePropsWithPipettes,
             back: () => setWizardStep(INSTRUCTIONS),
             exit: homeAndExit,
