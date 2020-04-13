@@ -24,6 +24,14 @@ Setting Up For Development
 First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make install`` in this subdirectory.
 
 
+Configuration
+-------------
+
+The configuration is defined in this `json schema <./settings_schema.json>`_  file. The default configuration is for the robot environment.
+
+Besides the usual methods, environment variables can be defined in a dotenv file located in ``/data/robot.env`` on robot or ``~/.opentrons/robot.env`` (``C:\Users\%USERNAME%\.opentrons\robot.env`` on Windows). The location of the dotenv file can be customized by defining `OT_ROBOT_SERVER_DOT_ENV_PATH` environment variable.
+
+
 Updating A Robot
 ----------------
 

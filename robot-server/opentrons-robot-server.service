@@ -5,7 +5,7 @@ After=nginx.service
 
 [Service]
 Type=exec
-ExecStart=python -m robot_server.main -U /run/aiohttp.sock --hardware-server
+ExecStart=python -m robot_server.main
 # Stop the button blinking
 ExecStartPost=systemctl stop opentrons-gpio-setup.service
 Environment=OT_SMOOTHIE_ID=AMA RUNNING_ON_PI=true

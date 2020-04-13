@@ -1,0 +1,53 @@
+{
+  "title": "RobotServerSettings",
+  "description": "Robot server settings.\n\nTo override any of these create an environment variable with prefix\nOT_ROBOT_SERVER_.",
+  "type": "object",
+  "properties": {
+    "ws_host_name": {
+      "title": "Ws Host Name",
+      "description": "TCP/IP hostname to serve on. Will be ignored if domain socket is defined.",
+      "default": "localhost",
+      "env_names": [
+        "ot_robot_server_ws_host_name"
+      ],
+      "type": "string"
+    },
+    "ws_port": {
+      "title": "Ws Port",
+      "description": "TCP/IP port to serve on. Will be ignored if domain socket is defined.",
+      "default": 31950,
+      "env_names": [
+        "ot_robot_server_ws_port"
+      ],
+      "type": "integer"
+    },
+    "ws_domain_socket": {
+      "title": "Ws Domain Socket",
+      "description": "Unix file system path to serve on. This value supersedes the port and host name settings.",
+      "default": "/run/aiohttp.sock",
+      "env_names": [
+        "ot_robot_server_ws_domain_socket"
+      ],
+      "type": "string"
+    },
+    "hardware_server_enable": {
+      "title": "Hardware Server Enable",
+      "description": "Run a jsonrpc server allowing rpc to the  hardware controller. Only works on buildroot because extra dependencies are required.",
+      "default": false,
+      "env_names": [
+        "ot_robot_server_hardware_server_enable"
+      ],
+      "type": "boolean"
+    },
+    "hardware_server_socket_path": {
+      "title": "Hardware Server Socket Path",
+      "description": "Unix file system path used by the hardware server.",
+      "default": "/var/run/opentrons-hardware.sock",
+      "env_names": [
+        "ot_robot_server_hardware_server_socket_path"
+      ],
+      "type": "string"
+    }
+  },
+  "additionalProperties": false
+}

@@ -85,9 +85,9 @@ lint: $(ot_py_sources)
 	$(python) -m pylama $(SRC_PATH) tests
 
 .PHONY: dev
-dev: export ENABLE_VIRTUAL_SMOOTHIE := true
+dev: export OT_ROBOT_SERVER_DOT_ENV_PATH := dev.env
 dev:
-	$(python) -m robot_server.main -P 31950
+	$(python) -m robot_server.main
 
 .PHONY: local-shell
 local-shell:
@@ -140,3 +140,9 @@ change-left:
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: docs
+docs: settings_schema.json
+
+settings_schema.json: robot_server/settings.py
+	$(python) -m scripts.settings_schema $@
