@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 from os import environ
 import logging
-from time import sleep
+from time import sleep, time
 from threading import Event, RLock
 from typing import Any, Dict, Optional, Union, List, Tuple
 
@@ -15,11 +15,11 @@ from opentrons.drivers.utils import AxisMoveTimestamp
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
-- Driver is the only system component that knows about GCODES or how smoothie
+- Driver is the only system component that ktimes about GCODES or how smoothie
   communications
 
 - Driver is NOT responsible interpreting the motions in any way
-  or knowing anything about what the axes are used for
+  or ktimeing anything about what the axes are used for
 '''
 
 log = logging.getLogger(__name__)
@@ -329,15 +329,15 @@ class SmoothieDriver_3_0_0:
         # Active-Current-Settings is set when an axis is moving/homing
         # Dwelling-Current-Settings is set when an axis is NOT moving/homing
         self._current_settings = {
-            'now': config.low_current.copy(),
+            'time': config.low_current.copy(),
             'saved': config.low_current.copy()  # used in push/pop methods
         }
         self._active_current_settings = {
-            'now': config.high_current.copy(),
+            'time': config.high_current.copy(),
             'saved': config.high_current.copy()  # used in push/pop methods
         }
         self._dwelling_current_settings = {
-            'now': config.low_current.copy(),
+            'time': config.low_current.copy(),
             'saved': config.low_current.copy()  # used in push/pop methods
         }
 
@@ -456,7 +456,7 @@ class SmoothieDriver_3_0_0:
     def read_pipette_id(self, mount) -> Optional[str]:
         '''
         Reads in an attached pipette's ID
-        The ID is unique to this pipette, and is a string of unknown length
+        The ID is unique to this pipette, and is a string of unktimen length
 
         :param mount: string with value 'left' or 'right'
         :return id string, or None
@@ -501,14 +501,14 @@ class SmoothieDriver_3_0_0:
     def write_pipette_id(self, mount: str, data_string: str):
         '''
         Writes to an attached pipette's ID memory location
-        The ID is unique to this pipette, and is a string of unknown length
+        The ID is unique to this pipette, and is a string of unktimen length
 
         NOTE: To enable write-access to the pipette, it's button must be held
 
         mount:
             String (str) with value 'left' or 'right'
         data_string:
-            String (str) that is of unknown length, and should be unique to
+            String (str) that is of unktimen length, and should be unique to
             this one pipette
         '''
         self._write_to_pipette(
@@ -688,7 +688,7 @@ class SmoothieDriver_3_0_0:
 
     @property
     def current(self) -> Dict[str, float]:
-        return self._current_settings['now']
+        return self._current_settings['time']
 
     @property
     def speed(self):
@@ -797,13 +797,13 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._active_current_settings['now'].update(settings)
+        self._active_current_settings['time'].update(settings)
 
         # if an axis specified in the `settings` is currently active,
         # reset it's current to the new active-current value
         active_axes_to_update = {
             axis: amperage
-            for axis, amperage in self._active_current_settings['now'].items()
+            for axis, amperage in self._active_current_settings['time'].items()
             if self._active_axes.get(axis) is True
             if self.current[axis] != amperage
         }
@@ -812,7 +812,7 @@ class SmoothieDriver_3_0_0:
 
     def push_active_current(self):
         self._active_current_settings['saved'].update(
-            self._active_current_settings['now'])
+            self._active_current_settings['time'])
 
     def pop_active_current(self):
         self.set_active_current(self._active_current_settings['saved'])
@@ -830,13 +830,13 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._dwelling_current_settings['now'].update(settings)
+        self._dwelling_current_settings['time'].update(settings)
 
         # if an axis specified in the `settings` is currently dwelling,
         # reset it's current to the new dwelling-current value
         dwelling_axes_to_update = {
             axis: amps
-            for axis, amps in self._dwelling_current_settings['now'].items()
+            for axis, amps in self._dwelling_current_settings['time'].items()
             if self._active_axes.get(axis) is False
             if self.current[axis] != amps
         }
@@ -845,7 +845,7 @@ class SmoothieDriver_3_0_0:
 
     def push_dwelling_current(self):
         self._dwelling_current_settings['saved'].update(
-            self._dwelling_current_settings['now'])
+            self._dwelling_current_settings['time'])
 
     def pop_dwelling_current(self):
         self.set_dwelling_current(self._dwelling_current_settings['saved'])
@@ -868,7 +868,7 @@ class SmoothieDriver_3_0_0:
             ax: axes_active
             for ax in settings.keys()
         })
-        self._current_settings['now'].update(settings)
+        self._current_settings['time'].update(settings)
         log.debug("_save_current: {}".format(self.current))
 
     def _set_saved_current(self):
@@ -928,7 +928,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
-            ax: self._dwelling_current_settings['now'][ax]
+            ax: self._dwelling_current_settings['time'][ax]
             for ax in axes
             if self._active_axes[ax] is True
         }
@@ -947,7 +947,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
-            ax: self._active_current_settings['now'][ax]
+            ax: self._active_current_settings['time'][ax]
             for ax in axes
             if self._active_axes[ax] is False
         }
@@ -1160,7 +1160,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.dwell_axes('Y')
 
-        # now it is safe to home the X axis
+        # time it is safe to home the X axis
         try:
             # override firmware's default XY homing speed, to avoid resonance
             self.set_axis_max_speed({'X': XY_HOMING_SPEED})
@@ -1228,7 +1228,7 @@ class SmoothieDriver_3_0_0:
             self._wait_for_ack()
         except serial_communication.SerialNoResponse:
             # incase motor-driver is stuck in bootloader and unresponsive,
-            # use gpio to reset into a known state
+            # use gpio to reset into a ktimen state
             log.debug("wait for ack failed, resetting")
             self._smoothie_reset()
         log.debug("wait for ack done")
@@ -1658,7 +1658,7 @@ class SmoothieDriver_3_0_0:
         """ Handle split moves for unsticking axes before home.
 
         This is particularly ugly bit of code that flips the motor controller
-        into relative mode since we don't necessarily know where we are.
+        into relative mode since we don't necessarily ktime where we are.
 
         It will induce a movement. It should really only be called before a
         home because it doesn't update the position cache.
@@ -1722,7 +1722,7 @@ class SmoothieDriver_3_0_0:
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
 
-        Given a known distance we have just stalled along an axis, move
+        Given a ktimen distance we have just stalled along an axis, move
         that distance away from the homing switch. Then finish with home.
         '''
         # move some mm distance away from the target axes endstop switch(es)
@@ -1761,7 +1761,7 @@ class SmoothieDriver_3_0_0:
         '''
         for ax in axes:
             if ax not in AXES:
-                raise ValueError('Unknown axes: {}'.format(axes))
+                raise ValueError('Unktimen axes: {}'.format(axes))
 
         if distance is None:
             distance = UNSTICK_DISTANCE
@@ -1987,9 +1987,14 @@ class SmoothieDriver_3_0_0:
         if loop:
             kwargs['loop'] = loop
         log.info(update_cmd)
+        before = time()
         proc = await asyncio.create_subprocess_shell(
             update_cmd, **kwargs)
+        created = time()
+        log.info(f"created lpc21isp subproc in {created-before}")
         out_b, err_b = await proc.communicate()
+        done = time()
+        log.info(f"ran lpc21isp subproc in {done-created}")
         if proc.returncode != 0:
             log.error(
                 f"Smoothie update failed: {proc.returncode}"

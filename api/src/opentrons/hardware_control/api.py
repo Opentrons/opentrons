@@ -1,8 +1,9 @@
 import asyncio
 import contextlib
 import logging
+import pathlib
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -76,7 +77,8 @@ class API(HardwareAPILike):
     async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
             port: str = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            firmware: Tuple[pathlib.Path, str] = None) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
@@ -92,14 +94,45 @@ class API(HardwareAPILike):
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
         await backend.setup_gpio_chardev()
-        await backend.connect(port)
+        backend.set_lights(button=None, rails=False)
 
-        api_instance = cls(backend, loop=checked_loop, config=config)
-        await api_instance.cache_instruments()
-        checked_loop.create_task(backend.watch_modules(
+        async def blink():
+            while True:
+                backend.set_lights(button=True, rails=None)
+                await asyncio.sleep(0.5)
+                backend.set_lights(button=False, rails=None)
+                await asyncio.sleep(0.5)
+
+        blink_task = checked_loop.create_task(blink())
+        try:
+            try:
+                await backend.connect(port)
+                fw_version = backend.fw_version
+            except Exception:
+                mod_log.exception(
+                    'Motor driver could not connect, reprogramming if possible'
+                )
+                fw_version = None
+
+            if firmware is not None:
+                if fw_version != firmware[1]:
+                    await backend.update_firmware(
+                        str(firmware[0]), checked_loop, True)
+                    await backend.connect(port)
+            elif firmware is None and fw_version is None:
+                msg = 'Motor controller could not be connected and no '\
+                    'firmware was provided for (re)programming'
+                mod_log.error(msg)
+                raise RuntimeError(msg)
+
+            api_instance = cls(backend, loop=checked_loop, config=config)
+            await api_instance.cache_instruments()
+            checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
-        return api_instance
+            return api_instance
+        finally:
+            blink_task.cancel()
 
     @classmethod
     async def build_hardware_simulator(
