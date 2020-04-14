@@ -38,7 +38,7 @@ Cypress.Commands.add('closeAnnouncementModal', () => {
 // File Page Actions
 //
 Cypress.Commands.add('openFilePage', () => {
-  cy.get('button')
+  cy.get('button[class*="navbar__tab__"]')
     .contains('FILE')
     .click()
 })
@@ -46,6 +46,7 @@ Cypress.Commands.add('openFilePage', () => {
 //
 // Pipette Page Actions
 //
+// TODO(SA 2020/04/14): Update this command to use better pipette selectors
 Cypress.Commands.add('choosePipettes', (left, right) => {
   cy.contains('Left Pipette')
     .next()
@@ -82,6 +83,7 @@ Cypress.Commands.add(
     cy.get("input[name='name']").type(liquidName)
     cy.get("input[name='description']").type(liquidDesc)
     if (serializeLiquid) {
+      // force option used because checkbox is hidden
       cy.get("input[name='serialize']").check({ force: true })
     }
     cy.get('button')
@@ -94,7 +96,7 @@ Cypress.Commands.add(
 // Design Page Actions
 //
 Cypress.Commands.add('openDesignPage', () => {
-  cy.get("button[class*='navbar__tab__']")
+  cy.get('button[class*="navbar__tab__"]')
     .contains('DESIGN')
     .parent()
     .click()
@@ -112,7 +114,7 @@ Cypress.Commands.add('addStep', stepName => {
 // Settings Page Actions
 //
 Cypress.Commands.add('openSettingsPage', () => {
-  cy.get('button')
+  cy.get('button[class*="navbar__tab__"]')
     .contains('Settings')
     .click()
 })

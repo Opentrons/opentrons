@@ -50,12 +50,14 @@ describe('Protocols with Modules', () => {
       // Add modules
       cy.contains('Magnetic').should('exist')
       cy.contains('Temperature').should('exist')
+      // force option used because checkbox is hidden
       cy.get('input[name="modulesByType.magneticModuleType.onDeck"]').click({
         force: true,
       })
       cy.get('select[name="modulesByType.magneticModuleType.model"]').select(
         'GEN1'
       )
+      // force option used because checkbox is hidden
       cy.get('input[name="modulesByType.temperatureModuleType.onDeck"]').click({
         force: true,
       })
@@ -130,6 +132,7 @@ describe('Protocols with Modules', () => {
       cy.openDesignPage()
       // close "setting up" modal
       cy.contains('Setting up your protocol').should('exist')
+      // force option used because checkbox is hidden
       cy.get('input[type="checkbox"]').click({ force: true })
       cy.get('button')
         .contains('ok')
@@ -325,6 +328,7 @@ describe('Protocols with Modules', () => {
         .contains('pause')
         .should('exist')
       cy.get(designPageModal).within(() => {
+        // force option used because this radio input is hidden
         cy.get('input[value="untilTemperature"]').click({ force: true })
         cy.contains('Module', { matchCase: false }).should('exist')
         cy.contains('Temp', { matchCase: false }).should('exist')
@@ -392,7 +396,7 @@ describe('Protocols with Modules', () => {
           [class*="StepEditForm__section_column"]:nth-child(2)`
         )
           .contains('mix', { matchCase: false })
-          .click({ force: true })
+          .click({ force: true }) // force option used because checkbox is hidden
         cy.get('input[name="dispense_wells"]').click()
         cy.get('[data-wellname="A1"]').click()
         cy.get('button')
@@ -446,6 +450,7 @@ describe('Protocols with Modules', () => {
       // Add Pause Step for Time
       cy.addStep('pause')
       cy.get(designPageModal).within(() => {
+        // force option used because radio input is hidden
         cy.get('input[value="untilTime"]').click({ force: true })
         cy.contains('h').should('exist')
         cy.contains('m').should('exist')
@@ -503,7 +508,7 @@ describe('Protocols with Modules', () => {
           [class*="StepEditForm__section_column"]:nth-child(2)`
         )
           .contains('mix', { matchCase: false })
-          .click({ force: true })
+          .click({ force: true }) // force option used because checkbox is hidden
         cy.get('input[name="dispense_wells"]').click()
         cy.get('[data-wellname="A2"]').click()
         cy.get('button')

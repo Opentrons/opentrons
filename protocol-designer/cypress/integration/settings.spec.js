@@ -10,9 +10,7 @@ describe('The Settings Page', () => {
   })
 
   it('contains a working settings button', () => {
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .click()
+    cy.openSettingsPage()
     cy.contains('App Settings')
   })
 
@@ -195,9 +193,7 @@ describe('The Settings Page', () => {
       .contains('FILE')
       .click()
     // Go back to settings
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .click()
+    cy.openSettingsPage()
     // The toggle is still on
     cy.contains(exptlSettingText)
       .next()
@@ -219,9 +215,7 @@ describe('The Settings Page', () => {
     // Leave the settings page
     cy.get("button[class*='navbar__tab__']").contains('FILE')
     // Go back to settings
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .click()
+    cy.openSettingsPage()
     // The toggle is still off
     cy.contains(exptlSettingText)
       .next()
