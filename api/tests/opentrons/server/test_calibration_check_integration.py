@@ -49,6 +49,87 @@ async def test_integrated_calibration_check(async_client, test_setup):
     assert list(status['nextSteps']['links'].keys())[0] == 'jog'
 
     next_data, url = _interpret_status_results(status, 'jog', curr_pip)
-    await async_client.post(url, json=next_data)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'pickUpTip'
+
+    next_data, url = _interpret_status_results(status, 'pickUpTip', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointOne'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointOne', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointTwo'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointTwo', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointThree'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointThree', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkHeight'
+
+    next_data, url = _interpret_status_results(status, 'checkHeight', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'dropTip'
+
+    next_data, url = _interpret_status_results(status, 'dropTip', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'moveToTipRack'
+
+    curr_pip = _get_pipette(status['instruments'], 'p10_single_v1')
+
+    next_data, url = _interpret_status_results(
+        status, 'moveToTipRack', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'jog'
+
+    next_data, url = _interpret_status_results(status, 'jog', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'pickUpTip'
+
+    next_data, url = _interpret_status_results(status, 'pickUpTip', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointOne'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointOne', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointTwo'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointTwo', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkPointThree'
+
+    next_data, url = _interpret_status_results(
+        status, 'checkPointThree', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'checkHeight'
+
+    next_data, url = _interpret_status_results(status, 'checkHeight', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'dropTip'
+
+    next_data, url = _interpret_status_results(status, 'dropTip', curr_pip)
+    resp = await async_client.post(url, json=next_data)
+    status = await resp.json()
+    assert list(status['nextSteps']['links'].keys())[0] == 'moveToTipRack'
 
     await async_client.delete('/calibration/check/session')

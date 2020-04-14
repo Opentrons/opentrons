@@ -1,4 +1,4 @@
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, List, Any, Union
 from functools import partial
 from pydantic import BaseModel, Field, UUID4
 from uuid import UUID
@@ -22,9 +22,18 @@ PointField = partial(Field, ...,
                      min_items=3, max_items=3)
 
 
-class Position(BaseModel):
+class TiprackPosition(BaseModel):
     locationId: UUID4
     offset: Point = PointField()
+
+    class Config:
+        json_encoders = {
+            UUID4: convert_to_uuid}
+
+
+class DeckPosition(BaseModel):
+    locationId: UUID4
+    position: Point = PointField()
 
     class Config:
         json_encoders = {
@@ -41,7 +50,7 @@ class SpecificPipette(BaseModel):
 
 class MoveLocation(BaseModel):
     pipetteId: UUID4
-    location: Position
+    location: Union[TiprackPosition, DeckPosition]
 
     class Config:
         json_encoders = {

@@ -20,7 +20,8 @@ async def create_session(request):
     """
     POST /calibration/check/session
 
-    If a session exists, this endpoint will return the current status.
+    If a session exists, this endpoint will return a 409 with links to delete.
+    If none exists, this will create a session and return its status.
 
     The status message is in the shape of:
     :py:class:`.models.CalibrationSessionStatus`
@@ -67,9 +68,18 @@ async def load_labware(request: web.Request, session) -> web.Response:
 async def move(request: web.Request, session) -> web.Response:
     req = await request.json()
     moveloc = MoveLocation(**req)
-    location = {
-        "locationId": moveloc.location.locationId,
-        "offset": types.Point(*moveloc.location.offset)}
+    if hasattr(moveloc.location, 'offset'):
+        # using getattr to avoid error raised by Union of deck position and
+        # tiprack position having different attributes.
+        offset = getattr(moveloc.location, 'offset')
+        location = {
+            "locationId": moveloc.location.locationId,
+            "offset": types.Point(*offset)}
+    else:
+        position = getattr(moveloc.location, 'position')
+        location = {
+            "locationId": moveloc.location.locationId,
+            "position": types.Point(*position)}
     await session.move(moveloc.pipetteId, location)
     return web.json_response(status=200)
 

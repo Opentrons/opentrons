@@ -2,18 +2,31 @@ from collections import UserDict
 import functools
 import logging
 import json
+from dataclasses import dataclass
 from typing import Any, List, Optional, Set, Tuple, Dict
 
 from opentrons import types
+from opentrons.hardware_control.types import CriticalPoint
+from opentrons.system.shared_data import load_shared_data
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
-from opentrons.hardware_control.types import CriticalPoint
-from opentrons.system.shared_data import load_shared_data
 
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+@dataclass
+class CalibrationPosition:
+    """
+    A point on the deck of a robot that is used to calibrate
+    aspects of the robot's movement system as defined by
+    opentrons/shared-data/deck/schemas/2.json
+    """
+    id: str
+    position: List[float]
+    displayName: str
 
 
 class LabwareHeightError(Exception):
@@ -350,6 +363,22 @@ class Deck(UserDict):
     def slots(self) -> List[Dict]:
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
+
+    @property
+    def calibration_positions(self) -> List[CalibrationPosition]:
+        raw_positions = self._definition['locations']['calibrationPoints']
+        return [CalibrationPosition(**pos) for pos in raw_positions]
+
+    def get_calibration_position(self, id: str) -> CalibrationPosition:
+        calibration_position = next(
+            (pos for pos in self.calibration_positions if pos.id == id),
+            None)
+        if not calibration_position:
+            pos_ids = [pos.id for pos in self.calibration_positions]
+            raise ValueError(f'calibration position {id} '
+                             'could not be found, '
+                             f'valid calibration position ids are: {pos_ids}')
+        return calibration_position
 
     def get_collisions_for_item(self,
                                 slot_key: types.DeckLocation,
