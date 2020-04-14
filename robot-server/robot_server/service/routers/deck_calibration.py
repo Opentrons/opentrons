@@ -1,3 +1,5 @@
+from uuid import UUID
+
 from starlette import status
 from fastapi import APIRouter, Depends
 from opentrons.hardware_control import HardwareAPILike
@@ -7,7 +9,7 @@ from robot_server.service.dependencies import get_hardware
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.deck_calibration import DeckStart, \
-    DeckStartResponse, DeckCalibrationDispatch
+    DeckStartResponse, DeckCalibrationDispatch, PipetteDeckCalibration
 
 router = APIRouter()
 
@@ -26,7 +28,8 @@ async def post_calibration_deck_start(
         -> DeckStartResponse:
     try:
         res = await dc.create_session(command.force, hardware)
-        return DeckStartResponse(token=res.token, pipette=res.pipette)
+        return DeckStartResponse(token=UUID(res.token),
+                                 pipette=PipetteDeckCalibration(**res.pipette))
     except dc.SessionForbidden as e:
         raise V1HandlerError(status_code=status.HTTP_403_FORBIDDEN,
                              message=str(e))

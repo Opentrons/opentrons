@@ -33,7 +33,7 @@ async def post_picture_capture() -> StreamingResponse:
 
     try:
         await camera.take_picture(filename)
-        log.info("Image taken at %s", filename)
+        log.info(f"Image taken at {filename}")
         # Open the file. It will be closed and deleted when the response is
         # finished.
         fd = filename.open('rb')
@@ -50,7 +50,7 @@ async def post_picture_capture() -> StreamingResponse:
 def _cleanup(filename: Path, fd: io.IOBase) -> None:
     """Clean up after sending the response"""
     try:
-        log.info("Closing and deleting image at %s", filename)
+        log.info(f"Closing and deleting image at {filename}")
         fd.close()
         os.remove(filename)
     except OSError:

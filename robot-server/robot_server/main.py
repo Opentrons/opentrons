@@ -20,12 +20,10 @@ def run(hardware: ThreadManager,
     be specified; you have to specify one.
     """
     if path:
-        log.debug("Starting Opentrons application on {}".format(
-            path))
+        log.debug(f"Starting Opentrons application on {path}")
         hostname, port = None, None
     else:
-        log.debug("Starting Opentrons application on {}:{}".format(
-            hostname, port))
+        log.debug(f"Starting Opentrons application on {hostname}:{port}")
         path = None
 
     if ff.use_fast_api():

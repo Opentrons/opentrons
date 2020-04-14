@@ -95,7 +95,7 @@ class RPCServer(object):
             while True:
                 payload = await queue_.get()
                 if socket_.client_state == WebSocketState.DISCONNECTED:
-                    log.debug('Websocket %s closed', _id)
+                    log.debug(f'Websocket {_id} closed')
                     break
 
                 await socket_.send_json(payload)
@@ -103,7 +103,7 @@ class RPCServer(object):
         queue: asyncio.Queue = asyncio.Queue(loop=self.loop)
         task = self.loop.create_task(send_task(socket, queue))
         task.add_done_callback(task_done)
-        log.debug('Send task for %s started', _id)
+        log.debug(f'Send task for {_id} started')
 
         return ClientWriterTask(socket=socket, queue=queue, task=task)
 

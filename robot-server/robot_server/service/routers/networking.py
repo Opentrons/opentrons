@@ -12,7 +12,8 @@ from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.networking import NetworkingStatus, \
     WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \
     WifiKeyFiles, WifiKeyFile, EapOptions, EapVariant, EapConfigOption, \
-    EapConfigOptionType, WifiNetworkFull, AddWifiKeyFileResponse
+    EapConfigOptionType, WifiNetworkFull, AddWifiKeyFileResponse, \
+    ConnectivityStatus
 
 log = logging.getLogger(__name__)
 
@@ -31,9 +32,10 @@ async def get_networking_status() -> NetworkingStatus:
         connectivity = await nmcli.is_connected()
         interfaces = {i.value: await nmcli.iface_info(i)
                       for i in nmcli.NETWORK_IFACES}
-        log.debug("Connectivity: %s", connectivity)
-        log.debug("Interfaces: %s", interfaces)
-        return NetworkingStatus(status=connectivity, interfaces=interfaces)
+        log.debug(f"Connectivity: {connectivity}")
+        log.debug(f"Interfaces: {interfaces}")
+        return NetworkingStatus(status=ConnectivityStatus(connectivity),
+                                interfaces=interfaces)
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
         log.exception("Failed calling nmcli")
         raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
@@ -71,7 +73,7 @@ async def post_wifi_configure(configuration: WifiConfiguration)\
             hidden=configuration.hidden is True,
             psk=psk
         )
-        log.debug("Wifi configure result: %s", message)
+        log.debug(f"Wifi configure result: {message}")
     except (ValueError, TypeError) as e:
         # Indicates an unexpected kwarg; check is done here to avoid keeping
         # the _check_configure_args signature up to date with nmcli.configure
