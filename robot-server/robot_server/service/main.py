@@ -9,12 +9,17 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .logging import initialize_logging
-from .routers import health, networking, control, settings, deck_calibration, \
-    modules, pipettes, motors, camera, logs, rpc, item
 from .models import V1BasicResponse
 from .exceptions import V1HandlerError
 from .dependencies import get_rpc_server
 from typing import List, Dict, Any
+
+from .models.json_api.errors import \
+    transform_validation_error_to_json_api_errors, \
+    transform_http_exception_to_json_api_errors
+from .routers import item, routes
+
+V1_TAG = "v1"
 
 log = logging.getLogger(__name__)
 
@@ -30,28 +35,8 @@ app = FastAPI(
 )
 
 
-app.include_router(router=health.router,
-                   tags=["Health"])
-app.include_router(router=networking.router,
-                   tags=["Networking"])
-app.include_router(router=control.router,
-                   tags=["Control"])
-app.include_router(router=settings.router,
-                   tags=["Settings"])
-app.include_router(router=deck_calibration.router,
-                   tags=["Deck Calibration"])
-app.include_router(router=modules.router,
-                   tags=["Modules"])
-app.include_router(router=pipettes.router,
-                   tags=["Pipettes"])
-app.include_router(router=motors.router,
-                   tags=["Motors"])
-app.include_router(router=camera.router,
-                   tags=["Camera"])
-app.include_router(router=logs.router,
-                   tags=["Logs"])
-app.include_router(router=rpc.router,
-                   tags=["RPC"])
+app.include_router(router=routes, tags=[V1_TAG])
+
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
 app.include_router(router=item.router,
@@ -115,10 +100,18 @@ async def custom_request_validation_exception_handler(
     """Custom handling of fastapi request validation errors"""
     log.error(f'{request.method} {request.url.path} : {str(exception)}')
 
-    response = consolidate_fastapi_response(exception.errors())
+    if route_has_tag(request, V1_TAG):
+        response = V1BasicResponse(
+            message=consolidate_fastapi_response(exception.errors())
+        ).dict()
+    else:
+        response = transform_validation_error_to_json_api_errors(
+            HTTP_422_UNPROCESSABLE_ENTITY, exception
+        ).dict(exclude_unset=True)
+
     return JSONResponse(
         status_code=HTTP_422_UNPROCESSABLE_ENTITY,
-        content=V1BasicResponse(message=response).dict(),
+        content=response
     )
 
 
@@ -131,7 +124,25 @@ async def custom_http_exception_handler(
     log.error(f'{request.method} {request.url.path} : '
               f'{exception.status_code}, {exception.detail}')
 
+    if route_has_tag(request, V1_TAG):
+        response = V1BasicResponse(message=exception.detail).dict()
+    else:
+        response = transform_http_exception_to_json_api_errors(
+            exception
+        ).dict(exclude_unset=True)
+
     return JSONResponse(
         status_code=exception.status_code,
-        content=V1BasicResponse(message=exception.detail).dict(),
+        content=response,
     )
+
+
+def route_has_tag(request: Request, tag: str) -> bool:
+    """Check if router handling the request has the tag."""
+    router = request.scope.get('router')
+    if router:
+        for route in router.routes:
+            if route.endpoint == request.scope.get('endpoint'):
+                return tag in route.tags
+
+    return False
