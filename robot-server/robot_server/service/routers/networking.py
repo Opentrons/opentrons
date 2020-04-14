@@ -1,11 +1,11 @@
 import logging
 import os
 import subprocess
-from http import HTTPStatus
 
+from starlette import status
+from starlette.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile
 from opentrons.system import nmcli, wifi
-from starlette.responses import JSONResponse
 
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models import V1BasicResponse
@@ -27,7 +27,6 @@ router = APIRouter()
                     "addresses, and their networking info",
             response_model=NetworkingStatus)
 async def get_networking_status() -> NetworkingStatus:
-
     try:
         connectivity = await nmcli.is_connected()
         interfaces = {i.value: await nmcli.iface_info(i)
@@ -37,7 +36,7 @@ async def get_networking_status() -> NetworkingStatus:
         return NetworkingStatus(status=connectivity, interfaces=interfaces)
     except (subprocess.CalledProcessError, FileNotFoundError, ValueError) as e:
         log.exception("Failed calling nmcli")
-        raise HTTPException(HTTPStatus.INTERNAL_SERVER_ERROR, str(e))
+        raise HTTPException(status.HTTP_500_INTERNAL_SERVER_ERROR, str(e))
 
 
 @router.get("/wifi/list",
@@ -56,7 +55,10 @@ async def get_wifi_networks() -> WifiNetworks:
              summary="Configures the wireless network interface to connect to"
                      " a network",
              response_model=WifiConfigurationResponse,
-             status_code=HTTPStatus.CREATED)
+             responses={
+                 status.HTTP_401_UNAUTHORIZED: {"model": V1BasicResponse}
+             },
+             status_code=status.HTTP_201_CREATED)
 async def post_wifi_configure(configuration: WifiConfiguration)\
         -> WifiConfigurationResponse:
     try:
@@ -73,10 +75,11 @@ async def post_wifi_configure(configuration: WifiConfiguration)\
     except (ValueError, TypeError) as e:
         # Indicates an unexpected kwarg; check is done here to avoid keeping
         # the _check_configure_args signature up to date with nmcli.configure
-        raise V1HandlerError(HTTPStatus.BAD_REQUEST, str(e))
+        raise V1HandlerError(status.HTTP_400_BAD_REQUEST, str(e))
 
     if not ok:
-        raise V1HandlerError(HTTPStatus.UNAUTHORIZED, message=message)
+        raise V1HandlerError(status.HTTP_401_UNAUTHORIZED,
+                             message=message)
 
     return WifiConfigurationResponse(message=message, ssid=configuration.ssid)
 
@@ -105,9 +108,11 @@ async def get_wifi_keys():
 
 @router.post("/wifi/keys",
              description="Send a new key file to the OT-2",
-             responses={HTTPStatus.OK: {"model": AddWifiKeyFileResponse}},
+             responses={
+                 status.HTTP_200_OK: {"model": AddWifiKeyFileResponse}
+             },
              response_model=AddWifiKeyFileResponse,
-             status_code=HTTPStatus.CREATED,
+             status_code=status.HTTP_201_CREATED,
              response_model_exclude_unset=True)
 async def post_wifi_key(key: UploadFile = File(...)):
     add_key_result = wifi.add_key(key.filename, key.file.read())
@@ -127,18 +132,19 @@ async def post_wifi_key(key: UploadFile = File(...)):
 
 @router.delete("/wifi/keys/{key_uuid}",
                description="Delete a key file from the OT-2",
-               responses={HTTPStatus.NOT_FOUND: {"model": V1BasicResponse}},
+               responses={
+                   status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}
+               },
                response_model=V1BasicResponse)
 async def delete_wifi_key(
-        key_uuid: str = Path(...,
-                             description="The ID of key to delete, as "
-                                         "determined by a previous call to GET"
-                                         " /wifi/keys"))\
-        -> V1BasicResponse:
-
+        key_uuid: str = Path(
+            ...,
+            description="The ID of key to delete, as determined by a previous"
+                        " call to GET /wifi/keys")) -> V1BasicResponse:
+    """Delete wifi key handler"""
     deleted_file = wifi.remove_key(key_uuid)
     if not deleted_file:
-        raise V1HandlerError(HTTPStatus.NOT_FOUND,
+        raise V1HandlerError(status.HTTP_404_NOT_FOUND,
                              message=f"No such key file {key_uuid}")
     return V1BasicResponse(message=f'Key file {deleted_file} deleted')
 
@@ -168,10 +174,8 @@ async def get_eap_options() -> EapOptions:
              summary="Deactivates the wifi connection and removes it from "
                      "known connections",
              response_model=V1BasicResponse,
-             responses={HTTPStatus.OK: {
-                 "model": V1BasicResponse
-             }},
-             status_code=HTTPStatus.MULTI_STATUS)
+             responses={status.HTTP_200_OK: {"model": V1BasicResponse}},
+             status_code=status.HTTP_207_MULTI_STATUS)
 async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
     ok, message = await nmcli.wifi_disconnect(wifi_ssid.ssid)
 
@@ -179,7 +183,8 @@ async def post_wifi_disconnect(wifi_ssid: WifiNetwork):
     if ok:
         # TODO have nmcli interpret error messages rather than exposing them
         #  all the way up here.
-        stat = 200 if 'successfully deleted' in message else 207
+        stat = status.HTTP_200_OK if 'successfully deleted' in message\
+            else status.HTTP_207_MULTI_STATUS
     else:
-        stat = 500
+        stat = status.HTTP_500_INTERNAL_SERVER_ERROR
     return JSONResponse(status_code=stat, content=result.dict())

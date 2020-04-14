@@ -1,9 +1,11 @@
 import asyncio
 
+from fastapi import APIRouter, Query, Depends
+from starlette import status
+
 from opentrons.hardware_control import HardwareAPILike, ThreadedAsyncLock
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
-from fastapi import APIRouter, Query, Depends
 
 from robot_server.service.dependencies import get_hardware, get_motion_lock
 from robot_server.service.exceptions import V1HandlerError
@@ -108,7 +110,7 @@ async def post_home_robot(
             message = "Homing robot."
         else:
             raise V1HandlerError(message=f"{target} is invalid",
-                                 status_code=400)
+                                 status_code=status.HTTP_400_BAD_REQUEST)
 
         return V1BasicResponse(message=message)
 

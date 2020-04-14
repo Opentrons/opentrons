@@ -1,8 +1,7 @@
 from fastapi import APIRouter, Query
 
 from opentrons.system import log_control
-from robot_server.service.models.logs import LogIdentifier, \
-    LogFormat
+from robot_server.service.models.logs import LogIdentifier, LogFormat
 
 router = APIRouter()
 

@@ -3,9 +3,9 @@ import os
 import io
 import tempfile
 from pathlib import Path
-from http import HTTPStatus
 
 from fastapi import APIRouter, HTTPException
+from starlette import status
 from starlette.background import BackgroundTask
 from starlette.responses import StreamingResponse
 from opentrons.system import camera
@@ -19,10 +19,10 @@ JPG = "image/jpg"
 
 
 @router.post("/camera/picture",
-             description="Capture an image from the OT-2's onboard camera "
+             description="Capture an image from the OT-2's on-board camera "
                          "and return it",
              responses={
-                 HTTPStatus.OK: {
+                 status.HTTP_200_OK: {
                      "content": {JPG: {}},
                      "description": "The image"
                  }
@@ -43,7 +43,7 @@ async def post_picture_capture() -> StreamingResponse:
                                                            filename=filename,
                                                            fd=fd))
     except camera.CameraException as e:
-        raise HTTPException(status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+        raise HTTPException(status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                             detail=str(e))
 
 

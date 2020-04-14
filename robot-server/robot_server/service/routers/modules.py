@@ -1,7 +1,9 @@
 import typing
 import asyncio
-from http import HTTPStatus
+
+from starlette import status
 from fastapi import Path, APIRouter, Depends
+
 from opentrons.hardware_control import HardwareAPILike, modules
 from opentrons.hardware_control.modules import AbstractModule
 
@@ -44,7 +46,9 @@ async def get_modules(hardware: HardwareAPILike = Depends(get_hardware))\
             description="Get live data for a specific module",
             summary="This is similar to the values in GET /modules, but for "
                     "only a specific currently-attached module",
-            response_model=ModuleSerial)
+            response_model=ModuleSerial,
+            responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
+            )
 async def get_module_serial(
         serial: str = Path(...,
                            description="Serial number of the module"),
@@ -58,8 +62,8 @@ async def get_module_serial(
         res = matching_module.live_data
 
     if not res:
-        raise V1HandlerError(status_code=404, message="Module not found")
-
+        raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
+                             message="Module not found")
     return ModuleSerial(status=res.get('status'), data=res.get('data'))
 
 
@@ -68,7 +72,10 @@ async def get_module_serial(
              summary="Command a module to take an action. Valid actions depend"
                      " on the specific module attached, which is the model "
                      "value from GET /modules/{serial}/data or GET /modules",
-             response_model=SerialCommandResponse)
+             response_model=SerialCommandResponse,
+             responses={
+                 status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}
+             })
 async def post_serial_command(
         command: SerialCommand,
         serial: str = Path(...,
@@ -79,14 +86,14 @@ async def post_serial_command(
     attached_modules = hardware.attached_modules     # type: ignore
     if not attached_modules:
         raise V1HandlerError(message="No connected modules",
-                             status_code=HTTPStatus.NOT_FOUND)
+                             status_code=status.HTTP_404_NOT_FOUND)
 
     # Search for the module
     matching_mod = find_matching_module(serial, attached_modules)
 
     if not matching_mod:
         raise V1HandlerError(message="Specified module not found",
-                             status_code=HTTPStatus.NOT_FOUND)
+                             status_code=status.HTTP_404_NOT_FOUND)
 
     if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
@@ -100,14 +107,16 @@ async def post_serial_command(
     else:
         raise V1HandlerError(
             message=f'Module does not have command: {command.command_type}',
-            status_code=HTTPStatus.BAD_REQUEST)
+            status_code=status.HTTP_400_BAD_REQUEST)
 
 
 @router.post("/modules/{serial}/update",
              description="Initiate a firmware update on a specific module",
              summary="Command robot to flash its bundled firmware file for "
                      "this module's type to this specific module",
-             response_model=V1BasicResponse)
+             response_model=V1BasicResponse,
+             responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}}
+             )
 async def post_serial_update(
         serial: str = Path(...,
                            description="Serial number of the module"),
@@ -119,7 +128,7 @@ async def post_serial_update(
 
     if not matching_module:
         raise V1HandlerError(message=f'Module {serial} not found',
-                             status_code=404)
+                             status_code=status.HTTP_404_NOT_FOUND)
 
     try:
         if matching_module.bundled_fw:
@@ -135,14 +144,14 @@ async def post_serial_update(
         else:
             res = (f'Bundled fw file not found for module of '
                    f'type: {matching_module.name()}')
-            status = 500
+            status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     except modules.UpdateError as e:
         res = f'Update error: {e}'
-        status = 500
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
     except asyncio.TimeoutError:
         res = 'Module not responding'
-        status = 500
-    raise V1HandlerError(message=res, status_code=status)
+        status_code = status.HTTP_500_INTERNAL_SERVER_ERROR
+    raise V1HandlerError(message=res, status_code=status_code)
 
 
 def find_matching_module(serial: str,

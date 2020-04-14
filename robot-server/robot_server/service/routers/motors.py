@@ -1,7 +1,9 @@
+from starlette import status
 from fastapi import APIRouter, Depends
+from pydantic import ValidationError
+
 from opentrons.hardware_control import HardwareAPILike
 from opentrons.hardware_control.types import Axis
-from pydantic import ValidationError
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.exceptions import V1HandlerError
@@ -13,8 +15,7 @@ router = APIRouter()
 
 @router.get("/motors/engaged",
             description="Query which motors are engaged and holding",
-            response_model=model.EngagedMotors
-            )
+            response_model=model.EngagedMotors)
 async def get_engaged_motors(hardware: HardwareAPILike = Depends(get_hardware)
                              ) -> model.EngagedMotors:  # type: ignore
     try:
@@ -23,7 +24,9 @@ async def get_engaged_motors(hardware: HardwareAPILike = Depends(get_hardware)
                      for k, v in engaged_axes.items()}
         return model.EngagedMotors(**axes_dict)
     except ValidationError as e:
-        raise V1HandlerError(500, str(e))
+        raise V1HandlerError(
+            status.HTTP_500_INTERNAL_SERVER_ERROR, str(e)
+        )
 
 
 @router.post("/motors/disengage",
