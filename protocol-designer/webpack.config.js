@@ -25,7 +25,7 @@ const ERROR_HTML = path.join(__dirname, 'src/error.html')
 
 const passThruEnvVars = Object.keys(process.env)
   .filter(v => v.startsWith(PROTOCOL_DESIGNER_ENV_VAR_PREFIX))
-  .concat(['NODE_ENV'])
+  .concat(['NODE_ENV', 'CYPRESS'])
 
 const envVarsWithDefaults = {
   OT_PD_VERSION,

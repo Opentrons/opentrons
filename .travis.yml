@@ -84,13 +84,14 @@ jobs:
 
     # test, build, and upload for JavaScript projects
     - stage: test
-      name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
+      name: 'JS unit & E2E tests; build Protocol Designer, Labware Library, Components Library'
       # node version pulled from .nvmrc
       language: node_js
       install:
         - make install-js
       script:
         - make test-js
+        - make test-e2e
         - make lint-js
         - make circular-dependencies-js
         - make lint-css
