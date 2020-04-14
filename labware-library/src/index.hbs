@@ -9,14 +9,16 @@
   <title>{{htmlWebpackPlugin.options.title}}</title>
   <link rel="icon" href="https://s3.amazonaws.com/opentrons-images/website/OTfavicon.ico">
   <!-- Google Tag Manager -->
+  {{#if htmlWebpackPlugin.options.gtmId}}
   <script>(function (w, d, s, l, i) {
-    w[l] = w[l] || []; w[l].push({
-      'gtm.start':
-        new Date().getTime(), event: 'gtm.js'
-    }); var f = d.getElementsByTagName(s)[0],
-      j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
-        'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
+      w[l] = w[l] || []; w[l].push({
+        'gtm.start':
+          new Date().getTime(), event: 'gtm.js'
+      }); var f = d.getElementsByTagName(s)[0],
+        j = d.createElement(s), dl = l != 'dataLayer' ? '&l=' + l : ''; j.async = true; j.src =
+          'https://www.googletagmanager.com/gtm.js?id=' + i + dl; f.parentNode.insertBefore(j, f);
     })(window, document, 'script', 'dataLayer', '{{htmlWebpackPlugin.options.gtmId}}');</script>
+  {{/if}}
   <!-- End Google Tag Manager -->
 </head>
 
