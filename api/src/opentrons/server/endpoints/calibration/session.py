@@ -7,7 +7,7 @@ from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 
 from .constants import LOOKUP_LABWARE, LabwareLoaded, TipAttachError
-from .util import CalibrationCheckMachine
+from .util import StateMachine
 from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
@@ -278,7 +278,34 @@ class CalibrationSession:
 class CheckCalibrationSession(CalibrationSession):
     def __init__(self, hardware: 'ThreadManager'):
         super().__init__(hardware)
-        self.state_machine = CalibrationCheckMachine()
+
+        states = ['sessionStarted', 'labwareLoaded', 'preparingPipette',
+                  'inspectingTip', 'checkingPointOne', 'checkingPointTwo',
+                  'checkingPointThree', 'checkingHeight', 'returningTip',
+                  'sessionExited', 'badCalibrationData', 'noPipettesAttached']
+
+        transitions = [
+            {"trigger": "load_labware", "from_state": "sessionStarted", "to_state": "labwareLoaded"},
+            {"trigger": "jog", "from_state": "preparingPipette", "to_state": "preparingPipette"},
+            {"trigger": "pick_up_tip", "from_state": "preparingPipette", "to_state": "inspectingTip"},
+            {"trigger": "confirm_tip_attached", "from_state": "inspectingTip", "to_state": "checkingPointOne"},
+            {"trigger": "invalidate_tip_attached", "from_state": "inspectingTip", "to_state": "preparingPipette"},
+            {"trigger": "jog", "from_state": "checkingPointOne", "to_state": "checkingPointOne"},
+            {"trigger": "confirm_point_one", "from_state": "checkingPointOne", "to_state": "checkingPointTwo"},
+            {"trigger": "jog", "from_state": "checkingPointTwo", "to_state": "checkingPointTwo"},
+            {"trigger": "confirm_point_two", "from_state": "checkingPointTwo", "to_state": "checkingPointThree"},
+            {"trigger": "jog", "from_state": "checkingPointThree", "to_state": "checkingPointThree"},
+            {"trigger": "confirm_point_three", "from_state": "checkingPointThree", "to_state": "checkingHeight"},
+            {"trigger": "jog", "from_state": "checkingHeight", "to_state": "checkingHeight"},
+            {"trigger": "confirm_height", "from_state": "checkingHeight", "to_state": "returningTip"},
+            {"trigger": "exit", "from_state": "*", "to_state": "sessionExited"},
+            {"trigger": "reject_calibration", "from_state": "*", "to_state": "badCalibrationData"},
+            {"trigger": "no_pipettes", "from_state": "*", "to_state": "noPipettesAttached"},
+        ]
+
+        self.state_machine = StateMachine(states=states,
+                                          transitions=transitions,
+                                          initial_state_name="sessionStarted")
         self.session_type = 'check'
 
     def load_labware_objects(self):

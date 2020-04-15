@@ -1,7 +1,8 @@
 import enum
 from dataclasses import dataclass
+from functools import partial
 from typing import (TypeVar, Generic, Type, Dict,
-                    Optional, Callable, Set, Any)
+                    Optional, Callable, Set, Any, List)
 
 
 class CalibrationCheckState(enum.Enum):
@@ -18,11 +19,11 @@ class CalibrationCheckState(enum.Enum):
     noPipettesAttached = enum.auto()
 
 
-calibration_check_transitions = {
+# calibration_check_transitions = {
 
-}
-def leaveStateUnchanged(currentState: CalibrationCheckState) -> CalibrationCheckState:
-    return currentState
+# }
+# def leaveStateUnchanged(currentState: CalibrationCheckState) -> CalibrationCheckState:
+#     return currentState
 
 jog = leaveStateUnchanged
 move = leaveStateUnchanged
@@ -64,60 +65,60 @@ def promptNoPipettesAttached(currentState: CalibrationCheckState) -> Calibration
 
 
 
-class CalibrationCheckVerbsForState:
-    sessionStarted: {loadLabware}
-    labwareLoaded = {preparePipette}
-    preparingPipette = {jog, pickUpTip, checkPointOne}
-    checkingPointOne = {jog, checkPointTwo}
-    checkingPointTwo = {jog, checkPointThree}
-    checkingPointThree = {jog, checkHeight}
-    checkingHeight = {jog, cleanUp}
-    cleaningUp = {dropTip, exitSession}
-    badCalibrationData = {exitSession}
-    noPipettesAttached = {exitSession}
-    sessionExited = {}
+# class CalibrationCheckVerbsForState:
+#     sessionStarted: {loadLabware}
+#     labwareLoaded = {preparePipette}
+#     preparingPipette = {jog, pickUpTip, checkPointOne}
+#     checkingPointOne = {jog, checkPointTwo}
+#     checkingPointTwo = {jog, checkPointThree}
+#     checkingPointThree = {jog, checkHeight}
+#     checkingHeight = {jog, cleanUp}
+#     cleaningUp = {dropTip, exitSession}
+#     badCalibrationData = {exitSession}
+#     noPipettesAttached = {exitSession}
+#     sessionExited = {}
 
 
 
 
-check_normal_relationship_dict = {
-    CalibrationCheckState.sessionStarted: CalibrationCheckState.labwareLoaded,
-    CalibrationCheckState.labwareLoaded: CalibrationCheckState.pickingUpTip,
-    CalibrationCheckState.pickingUpTip: CalibrationCheckState.checkingPointOne,
-    CalibrationCheckState.checkingPointOne: CalibrationCheckState.checkingPointTwo,
-    CalibrationCheckState.checkingPointTwo: CalibrationCheckState.checkingPointThree,
-    CalibrationCheckState.checkingPointThree: CalibrationCheckState.checkingHeight,
-    CalibrationCheckState.checkingHeight: CalibrationCheckState.droppingTip,
-    CalibrationCheckState.droppingTip: CalibrationCheckState.sessionExited
-}
+# check_normal_relationship_dict = {
+#     CalibrationCheckState.sessionStarted: CalibrationCheckState.labwareLoaded,
+#     CalibrationCheckState.labwareLoaded: CalibrationCheckState.pickingUpTip,
+#     CalibrationCheckState.pickingUpTip: CalibrationCheckState.checkingPointOne,
+#     CalibrationCheckState.checkingPointOne: CalibrationCheckState.checkingPointTwo,
+#     CalibrationCheckState.checkingPointTwo: CalibrationCheckState.checkingPointThree,
+#     CalibrationCheckState.checkingPointThree: CalibrationCheckState.checkingHeight,
+#     CalibrationCheckState.checkingHeight: CalibrationCheckState.droppingTip,
+#     CalibrationCheckState.droppingTip: CalibrationCheckState.sessionExited
+# }
 
-exit = CalibrationCheckState.sessionExit
-check_exit_relationship_dict = {
-    CalibrationCheckState.badCalibrationData: exit,
-    CalibrationCheckState.checkHeight: exit,
-    CalibrationCheckState.noPipettesAttached: exit,
-    CalibrationCheckState.dropTip: exit
-}
+# exit = CalibrationCheckState.sessionExit
+# check_exit_relationship_dict = {
+#     CalibrationCheckState.badCalibrationData: exit,
+#     CalibrationCheckState.checkHeight: exit,
+#     CalibrationCheckState.noPipettesAttached: exit,
+#     CalibrationCheckState.dropTip: exit
+# }
 
-nopips = CalibrationCheckState.noPipettesAttached
-badcal = CalibrationCheckState.badCalibratioData
-check_error_relationship_dict = {
-    CalibrationCheckState.sessionStart: nopips,
-    CalibrationCheckState.loadLabware: badcal,
-    CalibrationCheckState.checkPointOne: badcal,
-    CalibrationCheckState.checkPointTwo: badcal,
-    CalibrationCheckState.checkPointThree: badcal,
-    CalibrationCheckState.checkHeight: badcal,
-    CalibrationCheckState.invalidateTip: CalibrationCheckState.pickUpTip
-}
+# nopips = CalibrationCheckState.noPipettesAttached
+# badcal = CalibrationCheckState.badCalibratioData
+# check_error_relationship_dict = {
+#     CalibrationCheckState.sessionStart: nopips,
+#     CalibrationCheckState.loadLabware: badcal,
+#     CalibrationCheckState.checkPointOne: badcal,
+#     CalibrationCheckState.checkPointTwo: badcal,
+#     CalibrationCheckState.checkPointThree: badcal,
+#     CalibrationCheckState.checkHeight: badcal,
+#     CalibrationCheckState.invalidateTip: CalibrationCheckState.pickUpTip
+# }
 
-check_relationship_requires_move_dict = {
-    CalibrationCheckState.moveToTipRack: CalibrationCheckState.move,
-    CalibrationCheckState.checkPointOne: CalibrationCheckState.move,
-    CalibrationCheckState.checkPointTwo: CalibrationCheckState.move,
-    CalibrationCheckState.checkPointThree: CalibrationCheckState.move,
-    CalibrationCheckState.checkHeight: CalibrationCheckState.move
-}
+# check_relationship_requires_move_dict = {
+#     CalibrationCheckState.moveToTipRack: CalibrationCheckState.move,
+#     CalibrationCheckState.checkPointOne: CalibrationCheckState.move,
+#     CalibrationCheckState.checkPointTwo: CalibrationCheckState.move,
+#     CalibrationCheckState.checkPointThree: CalibrationCheckState.move,
+#     CalibrationCheckState.checkHeight: CalibrationCheckState.move
+# }
 
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
@@ -133,31 +134,38 @@ class State():
         self._on_exit = on_exit
 
     def enter(self) -> str:
-        return self._on_enter()
+        if self._on_enter:
+            return self._on_enter()
 
     def exit(self) -> str:
-        return self._on_exit()
+        if self._on_exit:
+            return self._on_exit()
 
     @property
     def name(self) -> str:
         return self._name
 
 class Transition:
-    trigger: str
-    from_state_name: str
-    to_state_name: str
-    before: Callable = None
-    after: Callable = None
-    condition: Callable[Any, boolean] = None
+    def __init__(self,
+                 from_state_name: str,
+                 to_state_name: str,
+                 condition: Callable[[Any], bool] = None,
+                 before: Callable = None,
+                 after: Callable = None):
+        self.from_state_name = from_state_name
+        self.to_state_name = to_state_name
+        self.before = before
+        self.after = after
+        self.condition = condition
 
     def execute(self, get_state_by_name, set_current_state):
-        if not self.condition():
+        if self.condition and not self.condition():
             return False
-        self.before()
+        if self.before: self.before()
         get_state_by_name(self.from_state_name).exit()
         set_current_state(self.to_state_name)
         get_state_by_name(self.to_state_name).enter()
-        self.after()
+        if self.after: self.after()
         return True
 
 class StateMachineError(Exception):
@@ -171,16 +179,17 @@ class StateMachineError(Exception):
     def __str__(self):
         return f'StateMachineError: {self.msg}'
 
-class NewStateMachine():
+class StateMachine():
     def __init__(self,
                  states: Set[State],
                  transitions: Set[Transition],
                  initial_state_name: str):
-        self._states = states
+        self._states = set()
         self._current_state = None
-        self._set_current_state(initial_state_name)
         self._events = {}
-        self._transitions = {}
+        for s in states:
+            self.add_state(s)
+        self._set_current_state(initial_state_name)
         for t in transitions:
             self.add_transition(**t)
 
@@ -189,49 +198,56 @@ class NewStateMachine():
                      if state.name == name), None)
 
     def _set_current_state(self, state_name: str):
-        goal_state = self._find_state_by_name(state_name)
+        goal_state = self._get_state_by_name(state_name)
         assert goal_state, f"state {state_name} doesn't exist in machine"
-        self._current_state = stat
+        self._current_state = goal_state
         return None
 
-    def _dispatch_trigger(self, triggger, *args, **kwargs):
-        if self._current_state.name not in self._events[trigger]:
+    def _dispatch_trigger(self, trigger, *args, **kwargs):
+        if trigger in self._events and \
+                self._current_state.name not in self._events[trigger]:
             raise StateMachineError(f'cannot trigger event {trigger}' \
                                     f' from state {self._current_state.name}')
         try:
-            for transition in self._events[trigger][self._current_state.name]:
+            from_state = '*' if '*' in self._events[trigger] \
+                          else self._current_state.name
+            for transition in self._events[trigger][from_state]:
                 if transition.execute(self._get_state_by_name, self._set_current_state,
                                       *args, **kwargs):
                     break
         except Exception:
-            raise StateMachineError(f'event {trigger} failed to'
+            raise StateMachineError(f'event {trigger} failed to '
                                     f'transition from {self._current_state.name}')
 
-    def add_state(self, state: State):
-        self._states.add(state)
+    def add_state(self, state_name: str):
+        self._states.add(State(state_name))
 
     def add_transition(self,
                        trigger: str,
                        from_state: State,
                        to_state: State,
-                       conditions: Callable[Any, boolean] = None):
-        assert self._find_state_by_name(from_state),\
-            f"state {from_state} doesn't exist in machine"
-        assert self._find_state_by_name(to_state),\
-            f"state {to_state} doesn't exist in machine"
+                       condition: Callable[[Any], bool] = None):
+        if from_state is not '*':
+            assert self._get_state_by_name(from_state),\
+                f"state {from_state} doesn't exist in machine"
+            assert self._get_state_by_name(to_state),\
+                f"state {to_state} doesn't exist in machine"
         if trigger not in self._events:
             setattr(self, trigger,
-                    partial(self._dispatch_trigger(trigger)))
-        self._events[trigger] = {**self._events[trigger],
-                                 transition.from_state: [
-                                        *self._events[trigger][from_state],
+                    partial(self._dispatch_trigger, trigger))
+        self._events[trigger] = {**self._events.get(trigger, {}),
+                                 from_state: [
+                                        *self._events.get(trigger, {}).get(from_state, []),
                                         Transition(from_state,
                                                    to_state,
-                                                   conditions)
+                                                   condition)
                                         ]
                                 }
+    @property
+    def current_state(self) -> State:
+        return self._current_state
 
-class StateMachine(Generic[StateEnumType]):
+class OldStateMachine(Generic[StateEnumType]):
     """
     A class for building a mealy state machine pattern based on
     steps provided to this class.
@@ -302,9 +318,9 @@ class StateMachine(Generic[StateEnumType]):
 
 class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
     def __init__(self) -> None:
-        super().__init__(CalibrationCheckState,
-                         check_normal_relationship_dict,
-                         check_exit_relationship_dict,
-                         check_error_relationship_dict,
-                         CalibrationCheckState.sessionStart,
-                         check_relationship_requires_move_dict)
+        super().__init__(CalibrationCheckState,{},{}, {},'s',{})
+                        #  check_normal_relationship_dict,
+                        #  check_exit_relationship_dict,
+                        #  check_error_relationship_dict,
+                        #  CalibrationCheckState.sessionStart,
+                        #  check_relationship_requires_move_dict)
