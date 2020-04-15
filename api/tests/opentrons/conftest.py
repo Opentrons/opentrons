@@ -5,10 +5,8 @@ from opentrons.config import robot_configs
 
 try:
     import aionotify
-    import gpiod
 except OSError:
     aionotify = None  # type: ignore
-    gpiod = None  # type: ignore
 import asyncio
 import os
 import io
