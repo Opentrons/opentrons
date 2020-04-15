@@ -275,24 +275,74 @@ class CalibrationSession:
         return to_dict
 
 # TODO: BC: move the check specific stuff to the check sub dir
-CHECK_STATES = ['sessionStarted', 'labwareLoaded', 'preparingPipette',
-            'inspectingTip', 'checkingPointOne', 'checkingPointTwo',
-            'checkingPointThree', 'checkingHeight', 'returningTip',
-            'sessionExited', 'badCalibrationData', 'noPipettesAttached']
+CHECK_STATES = [
+    'sessionStarted',
+    'labwareLoaded',
+    'preparingPipette',
+    'inspectingTip',
+    'checkingPointOne',
+    'checkingPointTwo',
+    'checkingPointThree',
+    'checkingHeight',
+    {'name': 'returningTip', on_enter: '_return_tip'},
+    'sessionExited',
+    'badCalibrationData',
+    'noPipettesAttached'
+]
 
 CHECK_TRANSITIONS= [
-    {"trigger": "load_labware", "from_state": "sessionStarted", "to_state": "labwareLoaded"},
-    {"trigger": "jog", "from_state": "preparingPipette", "to_state": "preparingPipette"},
-    {"trigger": "pick_up_tip", "from_state": "preparingPipette", "to_state": "inspectingTip"},
+    {
+        "trigger": "load_labware",
+        "from_state": "sessionStarted",
+        "to_state": "labwareLoaded",
+        "before": "_load_labware_objects"
+    },
+    {
+        "trigger": "jog",
+        "from_state": "preparingPipette",
+        "to_state": "preparingPipette",
+        "before": "_jog"
+    },
+    {
+        "trigger": "pick_up_tip",
+        "from_state": "preparingPipette",
+        "to_state": "inspectingTip",
+        "before": "_pick_up_tip"
+    },
     {"trigger": "confirm_tip_attached", "from_state": "inspectingTip", "to_state": "checkingPointOne"},
-    {"trigger": "invalidate_tip_attached", "from_state": "inspectingTip", "to_state": "preparingPipette"},
-    {"trigger": "jog", "from_state": "checkingPointOne", "to_state": "checkingPointOne"},
+    {
+        "trigger": "invalidate_tip_attached",
+        "from_state": "inspectingTip",
+        "to_state": "preparingPipette",
+        "before": "_invalidate_tip"
+    },
+    {
+        "trigger": "jog",
+        "from_state": "checkingPointOne",
+        "to_state": "checkingPointOne",
+        "before": "_jog"
+    },
     {"trigger": "confirm_point_one", "from_state": "checkingPointOne", "to_state": "checkingPointTwo"},
-    {"trigger": "jog", "from_state": "checkingPointTwo", "to_state": "checkingPointTwo"},
+    {
+        "trigger": "jog",
+        "from_state": "checkingPointTwo",
+        "to_state": "checkingPointTwo",
+        "before": "_jog"
+    },
     {"trigger": "confirm_point_two", "from_state": "checkingPointTwo", "to_state": "checkingPointThree"},
-    {"trigger": "jog", "from_state": "checkingPointThree", "to_state": "checkingPointThree"},
+    {
+        "trigger": "jog",
+        "from_state": "checkingPointThree",
+        "to_state": "checkingPointThree",
+        "before": "_jog"
+    },
     {"trigger": "confirm_point_three", "from_state": "checkingPointThree", "to_state": "checkingHeight"},
-    {"trigger": "jog", "from_state": "checkingHeight", "to_state": "checkingHeight"},
+    {
+        "trigger": "jog",
+        "from_state": "checkingHeight",
+        "to_state": "checkingHeight",
+        "before": "_jog"
+    },
     {"trigger": "confirm_height", "from_state": "checkingHeight", "to_state": "returningTip"},
     {"trigger": "exit", "from_state": "*", "to_state": "sessionExited"},
     {"trigger": "reject_calibration", "from_state": "*", "to_state": "badCalibrationData"},
@@ -306,10 +356,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                               initial_state_name="sessionStarted")
         self.session_type = 'check'
 
-    def load_labware_objects(self):
+    def _load_labware_objects(self):
         """
         A function that takes tiprack information and loads them onto the deck.
         """
+        # TODO: BC: remove this exception and cover in via state machine transition
         if self._moves.moveToTipRack:
             raise LabwareLoaded()
         full_dict = {}
@@ -328,7 +379,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 build_dict[id] = {'offset': Point(0, 0, 10), 'well': well}
             full_dict[data.id] = build_dict
         self._moves.moveToTipRack = full_dict
-        self.state_machine.update_state()
 
     def _update_tiprack_offset(
             self, pipette: UUID, old_pos: Point, new_pos: Point):
@@ -348,7 +398,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    async def pick_up_tip(self, pipette: UUID):
+    async def _pick_up_tip(self, pipette: UUID):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
@@ -356,22 +406,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         """
         if self._has_tip(pipette):
             raise TipAttachError()
-        self.state_machine.update_state()
-        curr_state = self.state_machine.current_state.name
-        assert curr_state == 'pickUpTip',\
-            f'You cannot pick up tip during {curr_state} state'
         id = self._relate_mount[pipette]['tiprack_id']
         mount = self._get_mount(pipette)
         await self._pick_up_tip(mount, id)
 
-    async def invalidate_tip(self, pipette: UUID):
+    async def _invalidate_tip(self, pipette: UUID):
         if not self._has_tip(pipette):
             raise TipAttachError()
-        to_state = self.state_machine.get_state('invalidateTip')
-        self.state_machine.update_state(to_state)
-        curr_state = self.state_machine.current_state.name
-        assert curr_state == 'invalidateTip',\
-            f'You cannot remove a tip during {curr_state} state'
         await self.hardware.remove_tip(self._get_mount(pipette))
 
     async def _return_to_tiprack(self, pipette: UUID):
@@ -383,17 +424,17 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             loc = offset_dict[pipette]['offset']
         else:
             loc = Point(0, 0, 0)
-        state = self.state_machine.get_state('moveToTipRack')
-        self.state_machine.update_state(state)
+        # state = self.state_machine.get_state('moveToTipRack')
+        # self.state_machine.update_state(state)
         await self.move(pipette, {"offset": loc, "locationId": id}, True)
 
-    async def return_tip(self, pipette: UUID):
+    async def _return_tip(self, pipette: UUID):
         if not self._has_tip(pipette):
             raise TipAttachError()
         await self._return_to_tiprack(pipette)
         await self._return_tip(self._get_mount(pipette))
-        state = self.state_machine.get_state('dropTip')
-        self.state_machine.update_state(state)
+        # state = self.state_machine.get_state('dropTip')
+        # self.state_machine.update_state(state)
 
     def _create_tiprack_param(self, position: typing.Dict):
         new_dict = {}
@@ -464,8 +505,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             # current state is moving to a tiprack (*Note*) there is
             # definitely a better way to do this that I currently cannot
             # think of.
-            self.state_machine.update_state()
-        curr_state = self.state_machine.current_state.name
+            # self.state_machine.update_state()
+        # curr_state = self.state_machine.current_state.name
         get_position = getattr(self._moves, curr_state)
         to_loc = self._determine_move_location(get_position, position, pipette)
 
@@ -479,11 +520,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
-    async def jog(self, pipette: UUID, vector: Point):
-        check_state = self.state_machine.current_state.name
-        if check_state != 'jog':
-            # Only update state once even if jog is called multiple times.
-            self.state_machine.update_state()
+    async def _jog(self, pipette: UUID, vector: Point):
         mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
         await self._jog(mount, vector)

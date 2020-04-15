@@ -123,7 +123,6 @@ def promptNoPipettesAttached(currentState: CalibrationCheckState) -> Calibration
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
 
-
 class State():
     def __init__(self,
                  name: str,
@@ -181,14 +180,14 @@ class StateMachineError(Exception):
 
 class StateMachine():
     def __init__(self,
-                 states: Set[State],
+                 states: List[StateParams],
                  transitions: Set[Transition],
                  initial_state_name: str):
         self._states = set()
         self._current_state = None
         self._events = {}
-        for s in states:
-            self.add_state(s)
+        for *args, **kwargs in states:
+            self.add_state(*args, kwargs)
         self._set_current_state(initial_state_name)
         for t in transitions:
             self.add_transition(**t)
@@ -219,8 +218,8 @@ class StateMachine():
             raise StateMachineError(f'event {trigger} failed to '
                                     f'transition from {self._current_state.name}')
 
-    def add_state(self, state_name: str):
-        self._states.add(State(state_name))
+    def add_state(self, *args, **kwargs):
+        self._states.add(State(*args, **kwargs))
 
     def add_transition(self,
                        trigger: str,

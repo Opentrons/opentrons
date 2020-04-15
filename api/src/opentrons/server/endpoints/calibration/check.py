@@ -61,7 +61,7 @@ async def delete_session(request: web.Request, session):
 
 
 async def load_labware(request: web.Request, session) -> web.Response:
-    session.load_labware_objects()
+    session.load_labware()
     return web.json_response(status=200)
 
 
