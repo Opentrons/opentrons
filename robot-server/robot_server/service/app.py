@@ -35,7 +35,13 @@ app = FastAPI(
 )
 
 
-app.include_router(router=routes, tags=[V1_TAG])
+app.include_router(router=routes,
+                   tags=[V1_TAG],
+                   responses={
+                       HTTP_422_UNPROCESSABLE_ENTITY: {
+                           "model": V1BasicResponse
+                       }
+                   })
 
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers

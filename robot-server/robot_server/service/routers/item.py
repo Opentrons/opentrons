@@ -1,4 +1,6 @@
 from fastapi import APIRouter, HTTPException
+from starlette.status import HTTP_400_BAD_REQUEST, \
+    HTTP_422_UNPROCESSABLE_ENTITY
 from pydantic import ValidationError
 
 from robot_server.service.models.item import Item, ItemData
@@ -6,10 +8,6 @@ from robot_server.service.models.json_api.factory import \
     generate_json_api_models
 from robot_server.service.models.json_api.errors import ErrorResponse
 from robot_server.service.models.json_api import ResourceTypes
-
-# https://github.com/encode/starlette/blob/master/starlette/status.py
-from starlette.status import HTTP_400_BAD_REQUEST, \
-    HTTP_422_UNPROCESSABLE_ENTITY
 
 router = APIRouter()
 

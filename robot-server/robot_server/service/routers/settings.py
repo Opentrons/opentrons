@@ -1,6 +1,7 @@
 import logging
 from typing import Union, Dict
-from http import HTTPStatus
+
+from starlette import status
 from fastapi import APIRouter, Depends
 
 from opentrons.hardware_control import HardwareAPILike
@@ -12,8 +13,7 @@ from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.exceptions import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettingsResponse, \
-    LogLevel, \
-    LogLevels, FactoryResetOptions, PipetteSettings, \
+    LogLevel, LogLevels, FactoryResetOptions, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \
     PipetteSettingsInfo, PipetteSettingsFields, FactoryResetOption, \
     AdvancedSettingRequest, Links, AdvancedSetting
@@ -34,11 +34,12 @@ async def post_settings(update: AdvancedSettingRequest)\
         await advanced_settings.set_adv_setting(update.id, update.value)
     except ValueError as e:
         raise V1HandlerError(message=str(e),
-                             status_code=HTTPStatus.BAD_REQUEST)
+                             status_code=status.HTTP_400_BAD_REQUEST)
     except advanced_settings.SettingException as e:
         # Severe internal error
-        raise V1HandlerError(message=str(e),
-                             status_code=HTTPStatus.INTERNAL_SERVER_ERROR)
+        raise V1HandlerError(
+            message=str(e),
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
     return _create_settings_response()
 
 
@@ -80,12 +81,12 @@ def _create_settings_response() -> AdvancedSettingsResponse:
 async def post_log_level_local(
         log_level: LogLevel,
         hardware: HardwareAPILike = Depends(get_hardware)) -> V1BasicResponse:
-
+    """Update local log level"""
     level = log_level.log_level
-
     if not level:
-        raise V1HandlerError(message="log_level must be set",
-                             status_code=HTTPStatus.UNPROCESSABLE_ENTITY)
+        raise V1HandlerError(
+            message="log_level must be set",
+            status_code=status.HTTP_422_UNPROCESSABLE_ENTITY)
     # Level name is upper case
     level_name = level.value.upper()
     # Set the log levels
@@ -123,7 +124,7 @@ async def post_log_level_upstream(log_level: LogLevel) -> V1BasicResponse:
         msg = f"Could not reload config: {stdout} {stderr}"
         log.error(msg)
         raise V1HandlerError(
-                status_code=HTTPStatus.INTERNAL_SERVER_ERROR,
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
                 message=msg
         )
 
@@ -198,10 +199,11 @@ async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
             description="Get the settings of a specific pipette by ID",
             response_model=PipetteSettings,
             response_model_by_alias=True,
-            response_model_exclude_unset=True)
+            response_model_exclude_unset=True,
+            responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}})
 async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
     if pipette_id not in pipette_config.known_pipettes():
-        raise V1HandlerError(status_code=HTTPStatus.NOT_FOUND,
+        raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
                              message=f'{pipette_id} is not a valid pipette id')
     # Have to convert to dict using by_alias due to bug in fastapi
     r = _pipette_settings_from_config(
@@ -217,7 +219,12 @@ async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
               description="Change the settings of a specific pipette",
               response_model=PipetteSettings,
               response_model_by_alias=True,
-              response_model_exclude_unset=True)
+              response_model_exclude_unset=True,
+              responses={
+                  status.HTTP_412_PRECONDITION_FAILED: {
+                      "model": V1BasicResponse
+                  }
+              })
 async def patch_pipette_setting(
         pipette_id: str,
         settings_update: PipetteSettingsUpdate) \
@@ -231,8 +238,9 @@ async def patch_pipette_setting(
         try:
             pipette_config.override(fields=field_values, pipette_id=pipette_id)
         except ValueError as e:
-            raise V1HandlerError(status_code=HTTPStatus.PRECONDITION_FAILED,
-                                 message=str(e))
+            raise V1HandlerError(
+                status_code=status.HTTP_412_PRECONDITION_FAILED,
+                message=str(e))
     # Have to convert to dict using by_alias due to bug in fastapi
     r = _pipette_settings_from_config(
         pipette_config, pipette_id

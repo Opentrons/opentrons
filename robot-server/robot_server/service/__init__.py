@@ -15,7 +15,7 @@ def run(hardware: ThreadManager,
     #  Ideally we would start the application using uvicorn command line, but
     #  that can only happen once we have parity with aiohttp endpoints.
 
-    from .main import app
+    from .app import app
     # todo Amit 2/11/2020.
     #  This is not the long term approach for accessing hardware. It is here
     #  to play nice with existing aiohttp application bootstrap.

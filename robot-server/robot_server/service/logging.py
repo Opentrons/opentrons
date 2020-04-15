@@ -8,7 +8,8 @@ def initialize_logging():
     # TODO Amit 2019/04/08 Move the logging level from robot configs to
     #  robot server mutable configs.
     robot_conf = robot_configs.load()
-    level = logging._nameToLevel.get(robot_conf.log_level, logging.INFO)
+    level = logging._nameToLevel.get(robot_conf.log_level.upper(),
+                                     logging.INFO)
 
     if IS_ROBOT:
         c = _robot_log_config(level)
