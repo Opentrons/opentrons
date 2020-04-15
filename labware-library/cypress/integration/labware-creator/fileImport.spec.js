@@ -1,3 +1,9 @@
+import jszip from 'jszip'
+import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
+
+const importedLabwareFile = 'TestLabwareDefinition.json'
+const pythonFileFixture = 'TestLabwareProtocol.py'
+
 context('File Import', () => {
   before(() => {
     cy.visit('/create')
@@ -6,14 +12,12 @@ context('File Import', () => {
   })
 
   it('drags in a file', () => {
-    const fileName = 'TestLabwareDefinition.json'
-
-    cy.fixture(fileName, 'utf8').then(fileJson => {
+    cy.fixture(importedLabwareFile, 'utf8').then(fileJson => {
       const fileContent = JSON.stringify(fileJson)
       cy.get('[class*="_file_drop__"]').upload(
         {
           fileContent,
-          fileName,
+          fileName: importedLabwareFile,
           mimeType: 'application/json',
           encoding: 'utf8',
         },
@@ -101,7 +105,7 @@ context('File Import', () => {
 
     // Test pipette
     cy.contains('Select...').click({ force: true })
-    cy.contains('P10 Single').click({ force: true })
+    cy.contains('P10 Single GEN1').click({ force: true })
 
     // All fields present
     cy.get('button[class*="_export_button_"]').click({ force: true })
@@ -109,7 +113,29 @@ context('File Import', () => {
       'Please resolve all invalid fields in order to export the labware definition'
     ).should('not.exist')
 
-    // Wait for the file to finish downloading. We can't control this.
-    cy.wait(1500) // eslint-disable-line cypress/no-unnecessary-waiting
+    cy.window()
+      .its('__lastSavedBlobZip__')
+      .should('be.a', 'blob') // wait until we get the blob
+      .then(blob => jszip.loadAsync(blob)) // load blob into ZipObject
+      .then(zipObject => {
+        const jsonFiles = zipObject.file(/.*\.json$/)
+        expect(jsonFiles).to.have.lengthOf(1)
+        cy.wrap(jsonFiles[0])
+          .invoke('async', 'string')
+          .then(jsonFile => {
+            cy.fixture(importedLabwareFile).then(expected => {
+              // TODO(IL, 2020/04/13): use deep equal util from PD cypress tests
+              expectDeepEqual(assert, JSON.parse(jsonFile), expected)
+            })
+          })
+
+        const pythonFiles = zipObject.file(/.*\.py$/)
+        expect(pythonFiles).to.have.lengthOf(1)
+        cy.wrap(pythonFiles[0].async('string')).then(contents => {
+          cy.fixture(pythonFileFixture).then(expected => {
+            expect(contents).to.equal(expected)
+          })
+        })
+      })
   })
 })

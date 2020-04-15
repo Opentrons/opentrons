@@ -1,3 +1,4 @@
+// @flow
 import isEqual from 'lodash/isEqual'
 import isObject from 'lodash/isObject'
 import transform from 'lodash/transform'
@@ -18,7 +19,7 @@ const difference = (object, base) => {
 
 // deepEqual won't always return a diff, Cypress doesn't fully support object diffs :(
 // also Cypress doesn't seem to support logging to the console? So throwing the diff as an error instead
-export const expectDeepEqual = (a, b) => {
+export const expectDeepEqual = (assert: any, a: any, b: any): void => {
   try {
     assert.deepEqual(a, b)
   } catch (e) {
