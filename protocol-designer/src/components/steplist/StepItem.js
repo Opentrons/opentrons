@@ -22,8 +22,8 @@ import type {
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {
-  stepId: StepIdType,
+type CommonProps = {|
+  stepId: StepIdType, // TODO IMMEDIATELY don't pass in stepId
   stepNumber: number,
   stepType: StepType,
   title: string,
@@ -36,18 +36,28 @@ export type StepItemProps = {
   warning?: ?boolean,
   selected?: boolean,
   hovered?: boolean,
-  hoveredSubstep: ?SubstepIdentifier,
   ingredNames: WellIngredientNames,
 
   labwareNicknamesById: { [labwareId: string]: string },
   labwareDefDisplayNamesById: { [labwareId: string]: ?string },
-  highlightSubstep: SubstepIdentifier => mixed,
   selectStep: (stepId: StepIdType) => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
   toggleStepCollapsed: (stepId: StepIdType) => mixed,
   highlightStep: (stepId: StepIdType) => mixed,
-  unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
-}
+  unhighlightStep: (event?: SyntheticEvent<>) => mixed,
+|}
+
+export type StepItemProps =
+  | {|
+      ...CommonProps,
+      isPresavedStep: true,
+    |}
+  | {|
+      ...CommonProps,
+      isPresavedStep: false,
+      highlightSubstep: SubstepIdentifier => mixed,
+      hoveredSubstep: ?SubstepIdentifier,
+    |}
 
 export const StepItem = (props: StepItemProps) => {
   const {
@@ -92,12 +102,40 @@ export const StepItem = (props: StepItemProps) => {
       onCollapseToggle={() => toggleStepCollapsed(stepId)}
       {...{ selected, collapsed, hovered }}
     >
-      <StepItemContents {...props} />
+      {props.isPresavedStep ? null : <StepItemContents {...props} />}
     </PDTitledList>
   )
 }
 
-export const StepItemContents = (stepItemProps: StepItemProps) => {
+export type StepItemContentsProps = {|
+  isPresavedStep: false,
+  stepId: StepIdType, // TODO IMMEDIATELY don't pass in stepId
+  stepNumber: number,
+  stepType: StepType,
+  title: string,
+  description: ?string,
+  substeps: ?SubstepItemData,
+  rawForm: ?FormData,
+
+  collapsed?: boolean,
+  error?: ?boolean,
+  warning?: ?boolean,
+  selected?: boolean,
+  hovered?: boolean,
+  hoveredSubstep: ?SubstepIdentifier,
+  ingredNames: WellIngredientNames,
+
+  labwareNicknamesById: { [labwareId: string]: string },
+  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
+  selectStep: (stepId: StepIdType) => mixed,
+  onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
+  toggleStepCollapsed: (stepId: StepIdType) => mixed,
+  highlightStep: (stepId: StepIdType) => mixed,
+  unhighlightStep: (event?: SyntheticEvent<>) => mixed,
+  highlightSubstep: SubstepIdentifier => mixed,
+|}
+
+export const StepItemContents = (props: StepItemContentsProps) => {
   const {
     rawForm,
     stepType,
@@ -107,7 +145,7 @@ export const StepItemContents = (stepItemProps: StepItemProps) => {
     hoveredSubstep,
     highlightSubstep,
     ingredNames,
-  } = stepItemProps
+  } = props
 
   if (!rawForm) {
     return null

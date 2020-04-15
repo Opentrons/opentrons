@@ -10,6 +10,7 @@ describe('StepItemContents', () => {
   let props
   beforeEach(() => {
     props = {
+      isPresavedStep: false,
       stepId: 'stepId',
       stepNumber: 1,
       title: 'test',

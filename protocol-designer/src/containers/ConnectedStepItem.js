@@ -79,6 +79,7 @@ export const ConnectedStepItem = (props: Props) => {
   const unhighlightStep = stepId => dispatch(stepsActions.hoverOnStep(null))
 
   const childProps: StepItemProps = {
+    isPresavedStep: false,
     stepNumber,
     stepId,
     stepType: step.stepType,
