@@ -26,7 +26,13 @@ For more details about this release, please see the full [technical change log][
   character (':') in their name
 - Fix an issue where the robot would be unable to move to tall labware (such as
   a 2 mL tube rack on top of a Temperature Module) even though there was enough
-  physical space to do so 
+  physical space to do so
+- Fix an issue in 3.17.0-beta.0 where magnetic module positions were incorrect
+  when using the ``height_from_base`` argument to
+  ``MagneticModuleContext.engage``
+  ([#5416](https://github.com/Opentrons/opentrons/pull/5416))
+- Fix an issue in 3.17.0-beta.0 where ``ProtocolContext.delay()`` could not be
+  canceled ([#5403](https://github.com/Opentrons/opentrons/pull/5403))
   
 ## New Features
 
