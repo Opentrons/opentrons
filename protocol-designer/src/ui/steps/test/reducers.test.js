@@ -6,18 +6,27 @@ jest.mock('../../../labware-defs/utils')
 const { collapsedSteps, selectedItem } = _allReducers
 
 describe('collapsedSteps reducer', () => {
-  it('add step', () => {
-    const state = {}
+  it('should add a collapsed step when a new step is saved for the first time', () => {
+    const state = { '1': true, '2': false }
     const action = {
-      type: 'ADD_STEP',
-      payload: { id: '1', stepType: 'moveLiquid' },
+      type: 'SAVE_STEP_FORM',
+      payload: { id: '3' },
     }
     expect(collapsedSteps(state, action)).toEqual({
-      '1': false, // default is false: not collapsed
+      '1': true,
+      '2': false,
+      '3': false,
     })
   })
-
-  it('toggle step on->off', () => {
+  it('should not update when an existing step form is saved', () => {
+    const state = { '1': true, '2': false }
+    const action = {
+      type: 'SAVE_STEP_FORM',
+      payload: { id: '1' },
+    }
+    expect(collapsedSteps(state, action)).toBe(state)
+  })
+  it('should toggle step on->off upon TOGGLE_STEP_COLLAPSED', () => {
     const state = {
       '1': true,
       '2': false,
@@ -36,7 +45,7 @@ describe('collapsedSteps reducer', () => {
     })
   })
 
-  it('toggle step off-> on', () => {
+  it('should toggle step off-> on upon TOGGLE_STEP_COLLAPSED', () => {
     const state = {
       '1': true,
       '2': false,

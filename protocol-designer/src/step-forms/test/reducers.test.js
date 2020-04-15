@@ -60,22 +60,22 @@ beforeEach(() => {
 })
 
 describe('orderedStepIds reducer', () => {
-  it('initial add step', () => {
-    const state = []
+  it('should add a saved step when that step is new', () => {
+    const state = ['99']
     const action = {
-      type: 'ADD_STEP',
+      type: 'SAVE_STEP_FORM',
       payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123'])
+    expect(orderedStepIds(state, action)).toEqual(['99', '123'])
   })
 
-  it('second add step', () => {
-    const state = ['123']
+  it('should not update when an existing step is saved', () => {
+    const state = ['99', '123', '11']
     const action = {
-      type: 'ADD_STEP',
-      payload: { id: '22', stepType: 'moveLiquid' },
+      type: 'SAVE_STEP_FORM',
+      payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123', '22'])
+    expect(orderedStepIds(state, action)).toBe(state)
   })
 
   describe('reorder steps', () => {

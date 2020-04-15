@@ -877,10 +877,16 @@ type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
 export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   {
-    ADD_STEP: (state: OrderedStepIdsState, action: AddStepAction) => [
-      ...state,
-      action.payload.id,
-    ],
+    SAVE_STEP_FORM: (
+      state: OrderedStepIdsState,
+      action: SaveStepFormAction
+    ) => {
+      const id = action.payload.id
+      if (!state.includes(id)) {
+        return [...state, id]
+      }
+      return state
+    },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
       state.filter(stepId => stepId !== action.payload),
     LOAD_FILE: (
