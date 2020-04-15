@@ -1,7 +1,7 @@
 import enum
 from dataclasses import dataclass
 from typing import (TypeVar, Generic, Type, Dict,
-                    Optional, Callable, Set)
+                    Optional, Callable, Set, Any)
 
 
 class CalibrationCheckState(enum.Enum):
@@ -149,20 +149,45 @@ class Transition:
     to_state_name: str
     before: Callable = None
     after: Callable = None
-    condition: Callable[Any, Boolean] = None
+    condition: Callable[Any, boolean] = None
 
-class StateTransitionError(Exception):
-    def __init__(self, transition: Transition = None) -> None:
-        self.transition = transition or {}
+class StateMachineError(Exception):
+    def __init__(self, msg: str) -> None:
+        self.msg = msg or ''
         super().__init__()
 
     def __repr__(self):
-        return '<StateTransitionError: cannot trigger event' \
-               f'{self.transition.trigger} from {self.transition.from_state}>'
+        return f'<StateMachineError: {self.msg}'
 
     def __str__(self):
-        return 'StateTransitionError: cannot trigger event' \
-               f'{self.transition.trigger} from {self.transition.from_state}'
+        return f'StateMachineError: {self.msg}'
+
+
+class Event():
+    def __init__(self, name):
+        self.name = name
+        self.transitions = defaultdict(list)
+
+    def add_transition(self, transition):
+        self.transitions[transition.from_state].append(transition)
+
+    def trigger(self, *args, **kwargs):
+        func = partial(self._trigger, *args, **kwargs)
+        # return self.machine._process(func)
+
+    def _trigger(self, current_state, *args, **kwargs):
+        if current_state.name not in self.transitions:
+            msg = f'cannot trigger event {self.name} from state {current_state.name}'
+            raise StateMachineError(msg)
+        return self._process(current_state, args=args, kwargs=kwargs)
+
+    def _process(self, current_state: State, *args, **kwargs):
+        try:
+            for trans in self.transitions[current_state]:
+                if trans.execute():
+                    break
+        except Exception:
+            raise StateMachineError(f'event {name} failed to transition from {current_state}')
 
 class NewStateMachine():
     def __init__(self,
@@ -170,28 +195,35 @@ class NewStateMachine():
                  transitions: Set[Transition],
                  initial_state_name: str):
         self._states = states
-        self._transitions = transitions
-        self._register_triggers()
         self._current_state = None
         self._set_current_state(initial_state_name)
+        self._transitions = {}
+        for t in transitions:
+            self._register_transition(t)
 
-    def _register_triggers(self):
-        for transition in self._transitions:
-            setattr(self, transition.trigger, )
+    def _register_transition(self, transition):
+        assert self._find_state_by_name(transistion.from_state_name),\
+            f'{transition.from_state_name} is not a valid state name'
+        assert self._find_state_by_name(transistion.to_state_name),\
+            f'{transition.from_state_name} is not a valid state name'
+        setattr(self,
+                transition.trigger,
+                lambda: self._register_trigger(transition.trigger))
+        self._transitions.add(transition)
 
     def _find_state_by_name(self, name: str) -> State:
         return next((state for state in self._states
                      if state.name == name), None)
 
-    def _execute_transition(self, transition)):
-        from_state = self._find_state_by_name(transition.from_state_name)
-        to_state = self._find_state_by_name(transition.to_state_name)
-        for t in self._transitions if t.trigger == transition.trigger \
-                and t.from_state == self._current_state:
+    def _register_trigger(self, trigger: str):
+        for t in self._transitions:
+            if t.trigger == trigger and t.from_state == self._current_state:
+
+           self._set_current_state(t.)
 
 
         if not from_state or not to_state:
-           raise StateTransitionError(transition)
+           raise StateMachineError(transition)
 
     self._set_current_state(self, state_name: str):
         # TODO: check if state name exists
@@ -202,7 +234,8 @@ class NewStateMachine():
         self._states.add(state)
 
     def add_transition(self, transition: Transition):
-        self._transitions.add(transition)
+        self._register_transition(transition)
+
 
 class StateMachine(Generic[StateEnumType]):
     """
