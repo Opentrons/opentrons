@@ -14,13 +14,11 @@ import {
   handleFormChange,
 } from '../../../../steplist/formLevel'
 import type { FormPatch } from '../../../../steplist/actions'
-import type { FormData, MagnetAction } from '../../../../form-types'
+import type { MagnetAction } from '../../../../form-types'
 jest.mock('../../../../step-forms')
 jest.mock('../../../modules')
 jest.mock('../../../../steplist/formLevel')
 
-const mock_getStepFormData: JestMockFn<[any, string, string], ?FormData> =
-  stepFormSelectors._getStepFormData
 const mockGetSavedStepForms: JestMockFn<[any], any> =
   stepFormSelectors.getSavedStepForms
 const mockGetOrderedStepIds: JestMockFn<[any], any> =
@@ -53,10 +51,9 @@ const mockHandleFormChange: JestMockFn<any, FormPatch> = handleFormChange
 beforeEach(() => {
   jest.clearAllMocks()
 
-  mock_getStepFormData.mockReturnValue(null)
+  mockGetSavedStepForms.mockReturnValue({})
   // NOTE: selectStep doesn't use the results of these selectors directly,
   // it just passes their results into steplist/formLevel fns that we also mock
-  mockGetSavedStepForms.mockReturnValue('getSaveStepFormsMockReturn')
   mockGetOrderedStepIds.mockReturnValue('getOrderedStepIdsMockReturn')
   mockGetInitialDeckSetup.mockReturnValue('getInitialDeckSetupMockReturn')
 
@@ -78,7 +75,7 @@ describe('selectStep', () => {
   describe('new (never before saved) step', () => {
     it('should select a pristine pause step & populate initial values', () => {
       const mockedInitialFormData = { id: '123', stepType: 'pause' }
-      mock_getStepFormData.mockReturnValue(mockedInitialFormData)
+      mockGetSavedStepForms.mockReturnValue({ '123': mockedInitialFormData })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch
@@ -101,7 +98,9 @@ describe('selectStep', () => {
         pipette: 'somePipette',
       })
       mockGetNextDefaultPipetteId.mockReturnValue('somePipette')
-      mock_getStepFormData.mockReturnValue(mockedInitialFormData)
+      mockGetSavedStepForms.mockReturnValue({
+        newStepid: mockedInitialFormData,
+      })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch
@@ -138,7 +137,9 @@ describe('selectStep', () => {
         stepType: 'magnet',
         moduleId: null,
       }
-      mock_getStepFormData.mockReturnValue(mockedInitialFormData)
+      mockGetSavedStepForms.mockReturnValue({
+        newStepId: mockedInitialFormData,
+      })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch
@@ -167,7 +168,9 @@ describe('selectStep', () => {
         stepType: 'magnet',
         moduleId: null,
       }
-      mock_getStepFormData.mockReturnValue(mockedInitialFormData)
+      mockGetSavedStepForms.mockReturnValue({
+        newStepId: mockedInitialFormData,
+      })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch
@@ -197,7 +200,9 @@ describe('selectStep', () => {
         stepType: 'temperature',
         moduleId: null,
       }
-      mock_getStepFormData.mockReturnValue(mockedInitialFormData)
+      mockGetSavedStepForms.mockReturnValue({
+        newStepId: mockedInitialFormData,
+      })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch
@@ -225,7 +230,7 @@ describe('selectStep', () => {
         stepDetails: 'details',
         pauseAction: PAUSE_UNTIL_RESUME,
       }
-      mock_getStepFormData.mockReturnValue(existingStep)
+      mockGetSavedStepForms.mockReturnValue({ existingStepId: existingStep })
       const store = mockStore({})
 
       // $FlowFixMe(IL, 2020-03-10): problem dispatching a thunk with mock dispatch

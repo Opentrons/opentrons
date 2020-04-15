@@ -92,7 +92,7 @@ export const selectStep = (
   dispatch(selectStepAction)
 
   const state = getState()
-  let formData = stepFormSelectors._getStepFormData(state, stepId, newStepType)
+  let formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
 
   const defaultPipetteId = getNextDefaultPipetteId(
     stepFormSelectors.getSavedStepForms(state),

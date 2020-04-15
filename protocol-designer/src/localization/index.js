@@ -6,7 +6,6 @@ import { en } from './en'
 export const i18n = i18next.init(
   {
     lng: 'en',
-    debug: true,
     resources: {
       en,
     },

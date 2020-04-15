@@ -65,7 +65,6 @@ import type {
   ReorderSelectedStepAction,
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,
   NormalizedLabware,
@@ -927,66 +926,12 @@ export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   initialOrderedStepIdsState
 )
 
-// TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
-// move to not having "pristine" steps
-type LegacyStepsState = { [StepIdType]: StepItemData }
-const initialLegacyStepState: LegacyStepsState = {}
-export const legacySteps = handleActions<LegacyStepsState, *>(
-  {
-    ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
-      ...state,
-      [action.payload.id]: action.payload,
-    }),
-    DELETE_STEP: (state, action: DeleteStepAction) =>
-      omit(state, action.payload.toString()),
-    LOAD_FILE: (
-      state: LegacyStepsState,
-      action: LoadFileAction
-    ): LegacyStepsState => {
-      const { savedStepForms, orderedStepIds } = getPDMetadata(
-        action.payload.file
-      )
-      return orderedStepIds.reduce(
-        (acc: LegacyStepsState, stepId) => {
-          const stepForm = savedStepForms[stepId]
-          if (!stepForm) {
-            console.warn(
-              `Step id ${stepId} found in orderedStepIds but not in savedStepForms`
-            )
-            return acc
-          }
-          return {
-            ...acc,
-            [stepId]: {
-              id: stepId,
-              stepType: stepForm.stepType,
-            },
-          }
-        },
-        { ...initialLegacyStepState }
-      )
-    },
-    DUPLICATE_STEP: (
-      state: LegacyStepsState,
-      action: DuplicateStepAction
-    ): LegacyStepsState => ({
-      ...state,
-      [action.payload.duplicateStepId]: {
-        ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
-        id: action.payload.duplicateStepId,
-      },
-    }),
-  },
-  initialLegacyStepState
-)
-
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
   labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
   moduleInvariantProperties: ModuleEntities,
-  legacySteps: LegacyStepsState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
@@ -1011,7 +956,6 @@ export const rootReducer = (state: RootState, action: any) => {
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
-    legacySteps: legacySteps(prevStateFallback.legacySteps, action),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),

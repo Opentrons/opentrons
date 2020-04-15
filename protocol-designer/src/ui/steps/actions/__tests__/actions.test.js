@@ -13,13 +13,16 @@ const mockStore = configureMockStore([thunk])
 describe('steps actions', () => {
   describe('selectStep', () => {
     const pipetteId = 'pipetteId'
+    const stepId = 'stepId'
     beforeEach(() => {
       stepFormSelectors.getInitialDeckSetup.mockReturnValue({
         pipettes: { mount: 'left' },
       })
       formLevel.getNextDefaultPipetteId.mockReturnValue(pipetteId)
-      stepFormSelectors._getStepFormData.mockReturnValue({
-        stepType: 'magnet',
+      stepFormSelectors.getSavedStepForms.mockReturnValue({
+        [stepId]: {
+          stepType: 'magnet',
+        },
       })
     })
 
@@ -37,10 +40,10 @@ describe('steps actions', () => {
       formLevel.getNextDefaultEngageHeight.mockReturnValue(null)
       const store = mockStore({})
 
-      store.dispatch(actions.selectStep(magnetModule, 'magnet'))
+      store.dispatch(actions.selectStep(stepId, 'magnet'))
 
       expect(store.getActions()).toEqual([
-        { type: 'SELECT_STEP', payload: magnetModule },
+        { type: 'SELECT_STEP', payload: stepId },
         {
           type: 'POPULATE_FORM',
           payload: {
@@ -67,10 +70,10 @@ describe('steps actions', () => {
       formLevel.getNextDefaultEngageHeight.mockReturnValue(null)
       const store = mockStore({})
 
-      store.dispatch(actions.selectStep(magnetModule, 'magnet'))
+      store.dispatch(actions.selectStep(stepId, 'magnet'))
 
       expect(store.getActions()).toEqual([
-        { type: 'SELECT_STEP', payload: magnetModule },
+        { type: 'SELECT_STEP', payload: stepId },
         {
           type: 'POPULATE_FORM',
           payload: {

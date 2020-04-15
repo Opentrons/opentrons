@@ -7,7 +7,6 @@ import {
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  legacySteps as steps,
   orderedStepIds,
   labwareInvariantProperties,
   moduleInvariantProperties,
@@ -58,47 +57,6 @@ const mock_getInitialDeckSetupRootState: JestMockFn<
 
 beforeEach(() => {
   jest.clearAllMocks()
-})
-
-describe('steps reducer', () => {
-  it('initial add step', () => {
-    const state = {}
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
-
-  it('second add step', () => {
-    const state = {
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-    }
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
 })
 
 describe('orderedStepIds reducer', () => {

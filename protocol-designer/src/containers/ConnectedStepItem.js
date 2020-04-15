@@ -1,9 +1,8 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { BaseState, ThunkDispatch } from '../types'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import * as substepSelectors from '../top-selectors/substeps'
@@ -24,99 +23,88 @@ import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
 import { StepItem } from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
+import type { StepIdType } from '../form-types'
 
-type Props = React.ElementProps<typeof StepItem>
-
-type OP = {|
-  stepId: $PropertyType<Props, 'stepId'>,
-  stepNumber: $PropertyType<Props, 'stepNumber'>,
+type StepItemProps = React.ElementProps<typeof StepItem>
+type Props = {|
+  stepId: StepIdType,
+  stepNumber: number,
 |}
 
-type SP = {|
-  stepType: $PropertyType<Props, 'stepType'>,
-  title: $PropertyType<Props, 'title'>,
-  description: $PropertyType<Props, 'description'>,
-  rawForm: $PropertyType<Props, 'rawForm'>,
-  substeps: $PropertyType<Props, 'substeps'>,
-  collapsed: $PropertyType<Props, 'collapsed'>,
-  error: $PropertyType<Props, 'error'>,
-  warning: $PropertyType<Props, 'warning'>,
-  selected: $PropertyType<Props, 'selected'>,
-  hovered: $PropertyType<Props, 'hovered'>,
-  hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  labwareNicknamesById: $PropertyType<Props, 'labwareNicknamesById'>,
-  labwareDefDisplayNamesById: $PropertyType<
-    Props,
-    'labwareDefDisplayNamesById'
-  >,
-  ingredNames: $PropertyType<Props, 'ingredNames'>,
-|}
+export const ConnectedStepItem = (props: Props) => {
+  const { stepId, stepNumber } = props
 
-type DP = $Diff<$Diff<$Exact<Props>, SP>, OP>
+  const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
+  const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
+    stepId
+  ]
+  const errorStepId = useSelector(fileDataSelectors.getErrorStepId)
+  const hasError = errorStepId === stepId || argsAndErrors.errors !== undefined
+  const hasTimelineWarningsPerStep = useSelector(
+    timelineWarningSelectors.getHasTimelineWarningsPerStep
+  )
+  const hasFormLevelWarningsPerStep = useSelector(
+    dismissSelectors.getHasFormLevelWarningsPerStep
+  )
 
-const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
-  const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrorsWithId()
-  const getStep = stepFormSelectors.makeGetStepWithId()
+  const hasWarnings =
+    hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
 
-  return (state, ownProps) => {
-    const { stepId } = ownProps
+  const collapsed = useSelector(getCollapsedSteps)[stepId]
+  const hoveredSubstep = useSelector(getHoveredSubstep)
+  const hoveredStep = useSelector(getHoveredStepId)
+  const selected = useSelector(getSelectedStepId) === stepId
 
-    const argsAndErrors = getArgsAndErrors(state, { stepId })
-    const step = getStep(state, { stepId })
+  const substeps = useSelector(substepSelectors.allSubsteps)[stepId]
 
-    const hasError =
-      fileDataSelectors.getErrorStepId(state) === stepId ||
-      argsAndErrors.errors !== undefined
+  const ingredNames = useSelector(labwareIngredSelectors.getLiquidNamesById)
+  const labwareNicknamesById = useSelector(
+    uiLabwareSelectors.getLabwareNicknamesById
+  )
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const labwareDefDisplayNamesById = mapValues(
+    labwareEntities,
+    (l: LabwareEntity) => getLabwareDisplayName(l.def)
+  )
 
-    const hasWarnings =
-      timelineWarningSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
-      dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
+  // Actions
+  const dispatch = useDispatch()
 
-    const collapsed = getCollapsedSteps(state)[stepId]
+  const highlightSubstep = (payload: SubstepIdentifier) =>
+    dispatch(stepsActions.hoverOnSubstep(payload))
+  const selectStep = stepId => dispatch(stepsActions.selectStep(stepId))
+  const toggleStepCollapsed = stepId =>
+    dispatch(stepsActions.toggleStepCollapsed(stepId))
+  const highlightStep = stepId => dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = stepId => dispatch(stepsActions.hoverOnStep(null))
 
-    const hoveredSubstep = getHoveredSubstep(state)
-    const hoveredStep = getHoveredStepId(state)
-    const selected = getSelectedStepId(state) === stepId
+  const childProps: StepItemProps = {
+    stepNumber,
+    stepId,
+    stepType: step.stepType,
+    title: step.stepName,
+    description: step.description,
+    rawForm: step,
+    substeps,
+    hoveredSubstep,
+    collapsed,
+    selected,
+    error: hasError,
+    warning: hasWarnings,
 
-    return {
-      stepType: step.stepType,
-      title: step.title,
-      description: step.description,
-      rawForm: step.formData,
-      substeps: substepSelectors.allSubsteps(state)[stepId],
-      hoveredSubstep,
-      collapsed,
-      selected,
-      error: hasError,
-      warning: hasWarnings,
+    // no double-highlighting: whole step is only "hovered" when
+    // user is not hovering on substep.
+    hovered: hoveredStep === stepId && !hoveredSubstep,
 
-      // no double-highlighting: whole step is only "hovered" when
-      // user is not hovering on substep.
-      hovered: hoveredStep === stepId && !hoveredSubstep,
-
-      labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
-      labwareDefDisplayNamesById: mapValues(
-        stepFormSelectors.getLabwareEntities(state),
-        (l: LabwareEntity) => getLabwareDisplayName(l.def)
-      ),
-      ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
-    }
+    labwareNicknamesById,
+    labwareDefDisplayNamesById,
+    ingredNames,
+    highlightSubstep,
+    selectStep,
+    toggleStepCollapsed,
+    highlightStep,
+    unhighlightStep,
   }
-}
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
-  return {
-    highlightSubstep: (payload: SubstepIdentifier) =>
-      dispatch(stepsActions.hoverOnSubstep(payload)),
-    selectStep: stepId => dispatch(stepsActions.selectStep(stepId)),
-    toggleStepCollapsed: stepId =>
-      dispatch(stepsActions.toggleStepCollapsed(stepId)),
-    highlightStep: stepId => dispatch(stepsActions.hoverOnStep(stepId)),
-    unhighlightStep: stepId => dispatch(stepsActions.hoverOnStep(null)),
-  }
+  return <StepItem {...childProps} />
 }
-
-export const ConnectedStepItem = connect<Props, OP, SP, DP, _, _>(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(StepItem)
