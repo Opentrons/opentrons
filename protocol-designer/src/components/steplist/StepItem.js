@@ -49,57 +49,55 @@ export type StepItemProps = {
   unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
 }
 
-export class StepItem extends React.PureComponent<StepItemProps> {
-  render() {
-    const {
-      stepType,
-      title,
-      description,
-      stepId,
-      stepNumber,
+export const StepItem = (props: StepItemProps) => {
+  const {
+    stepType,
+    title,
+    description,
+    stepId,
+    stepNumber,
 
-      collapsed,
-      error,
-      warning,
-      selected,
-      hovered,
+    collapsed,
+    error,
+    warning,
+    selected,
+    hovered,
 
-      unhighlightStep,
-      selectStep,
-      onStepContextMenu,
-      toggleStepCollapsed,
-      highlightStep,
-    } = this.props
+    unhighlightStep,
+    selectStep,
+    onStepContextMenu,
+    toggleStepCollapsed,
+    highlightStep,
+  } = props
 
-    const iconName = stepIconsByType[stepType]
-    let iconClassName = ''
-    if (error) {
-      iconClassName = styles.error_icon
-    } else if (warning) {
-      iconClassName = styles.warning_icon
-    }
-    const Description = <StepDescription description={description} />
-
-    return (
-      <PDTitledList
-        description={Description}
-        iconName={error || warning ? 'alert-circle' : iconName}
-        iconProps={{ className: iconClassName }}
-        title={title ? `${stepNumber}. ${title}` : ''}
-        onClick={() => selectStep(stepId)}
-        onContextMenu={onStepContextMenu}
-        onMouseEnter={() => highlightStep(stepId)}
-        onMouseLeave={unhighlightStep}
-        onCollapseToggle={() => toggleStepCollapsed(stepId)}
-        {...{ selected, collapsed, hovered }}
-      >
-        {getStepItemContents(this.props)}
-      </PDTitledList>
-    )
+  const iconName = stepIconsByType[stepType]
+  let iconClassName = ''
+  if (error) {
+    iconClassName = styles.error_icon
+  } else if (warning) {
+    iconClassName = styles.warning_icon
   }
+  const Description = <StepDescription description={description} />
+
+  return (
+    <PDTitledList
+      description={Description}
+      iconName={error || warning ? 'alert-circle' : iconName}
+      iconProps={{ className: iconClassName }}
+      title={title ? `${stepNumber}. ${title}` : ''}
+      onClick={() => selectStep(stepId)}
+      onContextMenu={onStepContextMenu}
+      onMouseEnter={() => highlightStep(stepId)}
+      onMouseLeave={unhighlightStep}
+      onCollapseToggle={() => toggleStepCollapsed(stepId)}
+      {...{ selected, collapsed, hovered }}
+    >
+      <StepItemContents {...props} />
+    </PDTitledList>
+  )
 }
 
-export function getStepItemContents(stepItemProps: StepItemProps) {
+export const StepItemContents = (stepItemProps: StepItemProps) => {
   const {
     rawForm,
     stepType,

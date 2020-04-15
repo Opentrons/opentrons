@@ -1,16 +1,12 @@
 // @flow
 import React from 'react'
 import { shallow } from 'enzyme'
-import { getStepItemContents } from '../StepItem'
+import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
 
 import type { StepItemProps } from '../StepItem'
 
-function renderWrapper(Component) {
-  return shallow(<div>{Component}</div>)
-}
-
-describe('getStepItemContents', () => {
+describe('StepItemContents', () => {
   let props
   beforeEach(() => {
     props = {
@@ -56,8 +52,7 @@ describe('getStepItemContents', () => {
     })
 
     it('module rendered with engage when engage is true', () => {
-      const StepItemContents = getStepItemContents(magnetProps)
-      const wrapper = renderWrapper(StepItemContents)
+      const wrapper = shallow(<StepItemContents {...magnetProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('engage')
@@ -65,8 +60,7 @@ describe('getStepItemContents', () => {
 
     it('module rendered with disengage when type is disengage', () => {
       magnetProps.substeps.engage = false
-      const StepItemContents = getStepItemContents(magnetProps)
-      const wrapper = renderWrapper(StepItemContents)
+      const wrapper = shallow(<StepItemContents {...magnetProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('disengage')
@@ -104,8 +98,7 @@ describe('getStepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
-      const Component = getStepItemContents(temperatureProps)
-      const wrapper = renderWrapper(Component)
+      const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('45 °C')
@@ -119,8 +112,7 @@ describe('getStepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
-      const Component = getStepItemContents(temperatureProps)
-      const wrapper = renderWrapper(Component)
+      const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('actionText')).toEqual('Deactivated')
@@ -158,8 +150,7 @@ describe('getStepItemContents', () => {
         labwareNickname: 'temperature nickname',
         message: 'message',
       }
-      const Component = getStepItemContents(awaitTemperatureProps)
-      const wrapper = renderWrapper(Component)
+      const wrapper = shallow(<StepItemContents {...awaitTemperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
       expect(component.prop('action')).toEqual('pause until')
