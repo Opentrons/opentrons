@@ -1,4 +1,5 @@
 import jszip from 'jszip'
+import { expectDeepEqual } from '@opentrons/shared-data/js/cypressUtils'
 
 const importedLabwareFile = 'TestLabwareDefinition.json'
 const pythonFileFixture = 'TestLabwareProtocol.py'
@@ -124,7 +125,7 @@ context('File Import', () => {
           .then(jsonFile => {
             cy.fixture(importedLabwareFile).then(expected => {
               // TODO(IL, 2020/04/13): use deep equal util from PD cypress tests
-              expect(JSON.parse(jsonFile)).to.deep.equal(expected)
+              expectDeepEqual(assert, JSON.parse(jsonFile), expected)
             })
           })
 
