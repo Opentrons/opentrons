@@ -11,7 +11,7 @@ from opentrons.config import pipette_config, reset as reset_util, \
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models.settings import AdvancedSettingsResponse, \
     LogLevel, LogLevels, FactoryResetOptions, PipetteSettings, \
     PipetteSettingsUpdate, RobotConfigs, MultiPipetteSettings, \

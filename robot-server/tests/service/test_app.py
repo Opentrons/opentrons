@@ -1,4 +1,5 @@
 from http import HTTPStatus
+from robot_server.service.app import RESPONSE_HEADERS
 
 
 def test_custom_http_exception_handler(api_client):
@@ -34,3 +35,10 @@ def test_custom_request_validation_exception_handler(api_client):
     text = resp.json()
     assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
     assert text == expected
+
+
+def test_response_headers(api_client):
+    resp = api_client.get('/openapi')
+    for k, v in RESPONSE_HEADERS.items():
+        assert k.lower() in resp.headers
+        assert resp.headers[k.lower()] == v.lower()

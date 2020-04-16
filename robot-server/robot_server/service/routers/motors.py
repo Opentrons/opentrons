@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareAPILike
 from opentrons.hardware_control.types import Axis
 
 from robot_server.service.dependencies import get_hardware
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models import motors as model, V1BasicResponse
 
 

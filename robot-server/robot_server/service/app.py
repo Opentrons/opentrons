@@ -1,24 +1,24 @@
 import logging
+
 from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-
-from starlette.responses import JSONResponse
+from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .logging import initialize_logging
 from .models import V1BasicResponse
-from .exceptions import V1HandlerError
+from .errors import V1HandlerError, \
+    transform_http_exception_to_json_api_errors, \
+    transform_validation_error_to_json_api_errors, consolidate_fastapi_response
 from .dependencies import get_rpc_server
-from typing import List, Dict, Any
+from robot_server import API_VERSION
 
-from .models.json_api.errors import \
-    transform_validation_error_to_json_api_errors, \
-    transform_http_exception_to_json_api_errors
 from .routers import item, routes
 
+# Tag applied to legacy api endpoints
 V1_TAG = "v1"
 
 log = logging.getLogger(__name__)
@@ -57,9 +57,22 @@ async def on_startup():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    """App shutfown handler"""
+    """App shutdown handler"""
     s = await get_rpc_server()
     await s.on_shutdown()
+
+
+RESPONSE_HEADERS = {
+    'X-Opentrons-Media-Type': f'opentrons.robot-server.{API_VERSION}'
+}
+
+
+@app.middleware("http")
+async def response_headers(request: Request, call_next) -> Response:
+    """Middleware to add various response headers."""
+    response: Response = await call_next(request)
+    response.headers.update(RESPONSE_HEADERS)
+    return response
 
 
 @app.exception_handler(V1HandlerError)
@@ -68,34 +81,6 @@ async def v1_exception_handler(request: Request, exc: V1HandlerError):
         status_code=exc.status_code,
         content=V1BasicResponse(message=exc.message).dict()
     )
-
-
-def consolidate_fastapi_response(
-        all_exceptions: List[Dict[str, Any]]) -> str:
-    """
-    Consolidate the default fastAPI response so it can be returned as a string.
-    Default schema of fastAPI exception response is:
-    {
-        'loc': ('body',
-                '<outer_scope1>',
-                '<outer_scope2>',
-                '<inner_param>'),
-        'msg': '<the_error_message>',
-        'type': '<expected_type>'
-    }
-    In order to create a meaningful V1-style response, we consolidate the
-    above response into a string of shape:
-    '<outer_scope1>.<outer_scope2>.<inner_param>: <the_error_message>'
-    """
-
-    # Pick just the error message while discarding v2 response items
-    def error_to_str(error: dict) -> str:
-        err_node = ".".join(str(loc) for loc in error['loc'] if loc != 'body')
-        res = ": ".join([err_node, error["msg"]])
-        return res
-
-    all_errs = ". ".join(error_to_str(exc) for exc in all_exceptions)
-    return all_errs
 
 
 @app.exception_handler(RequestValidationError)

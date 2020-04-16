@@ -1,14 +1,8 @@
 from functools import reduce
 
 import pytest
-from pytest import raises
-from pydantic import ValidationError
-from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
-from robot_server.service.models.json_api.errors import ErrorResponse, \
-    transform_validation_error_to_json_api_errors
-
-from tests.service.helpers import ItemRequest
+from robot_server.service.models.json_api.errors import ErrorResponse
 
 
 def errors_wrapper(d):
@@ -50,36 +44,3 @@ def test_empty_error_response_valid():
     error_response = {'errors': []}
     validated = ErrorResponse(**error_response)
     assert validated.dict(exclude_unset=True) == error_response
-
-
-def test_transform_validation_error_to_json_api_errors():
-    with raises(ValidationError) as e:
-        ItemRequest(**{
-            'data': {
-                'type': 'invalid'
-            }
-        })
-    assert transform_validation_error_to_json_api_errors(
-        HTTP_422_UNPROCESSABLE_ENTITY,
-        e.value
-    ).dict(exclude_unset=True) == {
-        'errors': [
-            {
-                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-                'detail': "value is not a valid enumeration member; permitted:"
-                          " 'item'",
-                'source': {
-                    'pointer': '/data/type'
-                },
-                'title': 'type_error.enum'
-            },
-            {
-                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-                'detail': 'field required',
-                'source': {
-                    'pointer': '/data/attributes'
-                },
-                'title': 'value_error.missing'
-            },
-        ]
-    }
