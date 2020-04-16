@@ -432,6 +432,7 @@ describe('Desktop Navigation', () => {
       cy.contains('Liquid name is required').should('not.exist')
       // Fill out the rest of the form
       cy.get("input[name='description']").type('It is just water')
+      // force option used because checkbox is hidden
       cy.get("input[name='serialize']").check({ force: true })
       cy.get('button')
         .contains('save')

@@ -33,3 +33,88 @@ Cypress.Commands.add('closeAnnouncementModal', () => {
     .contains('Got It!')
     .click()
 })
+
+//
+// File Page Actions
+//
+Cypress.Commands.add('openFilePage', () => {
+  cy.get('button[class*="navbar__tab__"]')
+    .contains('FILE')
+    .click()
+})
+
+//
+// Pipette Page Actions
+//
+// TODO(SA 2020/04/14): Update this command to use better pipette selectors
+Cypress.Commands.add('choosePipettes', (left, right) => {
+  cy.contains('Left Pipette')
+    .next()
+    .contains('None')
+    .click()
+  cy.contains('Left Pipette')
+    .next()
+    .contains(left)
+    .click()
+  cy.contains('Right Pipette')
+    .next()
+    .contains('None')
+    .click()
+  cy.contains('Right Pipette')
+    .next()
+    .contains(right)
+    .click()
+})
+
+Cypress.Commands.add('selectTipRacks', (left, right) => {
+  cy.get("select[name*='left.tiprack']").select(left)
+  cy.get("select[name*='right.tiprack']").select(right)
+})
+
+//
+// Liquid Page Actions
+//
+Cypress.Commands.add(
+  'addLiquid',
+  (liquidName, liquidDesc, serializeLiquid = false) => {
+    cy.get('button')
+      .contains('New Liquid')
+      .click()
+    cy.get("input[name='name']").type(liquidName)
+    cy.get("input[name='description']").type(liquidDesc)
+    if (serializeLiquid) {
+      // force option used because checkbox is hidden
+      cy.get("input[name='serialize']").check({ force: true })
+    }
+    cy.get('button')
+      .contains('save')
+      .click()
+  }
+)
+
+//
+// Design Page Actions
+//
+Cypress.Commands.add('openDesignPage', () => {
+  cy.get('button[class*="navbar__tab__"]')
+    .contains('DESIGN')
+    .parent()
+    .click()
+})
+Cypress.Commands.add('addStep', stepName => {
+  cy.get('button')
+    .contains('Add Step')
+    .click()
+  cy.get('button')
+    .contains(stepName, { matchCase: false })
+    .click()
+})
+
+//
+// Settings Page Actions
+//
+Cypress.Commands.add('openSettingsPage', () => {
+  cy.get('button[class*="navbar__tab__"]')
+    .contains('Settings')
+    .click()
+})

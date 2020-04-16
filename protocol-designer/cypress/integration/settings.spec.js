@@ -10,9 +10,7 @@ describe('The Settings Page', () => {
   })
 
   it('contains a working settings button', () => {
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .click()
+    cy.openSettingsPage()
     cy.contains('App Settings')
   })
 
@@ -125,6 +123,60 @@ describe('The Settings Page', () => {
       .and('match', /toggled_off/)
   })
 
+  it("contains a 'disable module placement restrictions' toggle in the experimental settings card", () => {
+    // It's toggled off by default
+    cy.contains('Disable module')
+      .next()
+      .should('have.attr', 'class')
+      .and('match', /toggled_off/)
+    // Click it
+    cy.contains('Disable module')
+      .next()
+      .click()
+    // We have to confirm this one
+    cy.contains('Switching on an experimental feature').should('exist')
+    cy.get('button')
+      .contains('Cancel')
+      .should('exist')
+    cy.get('button')
+      .contains('Continue')
+      .should('exist')
+    // Abort!
+    cy.get('button')
+      .contains('Cancel')
+      .click()
+    // Still toggled off
+    cy.contains('Disable module')
+      .next()
+      .should('have.attr', 'class')
+      .and('match', /toggled_off/)
+    // Click it again and confirm
+    cy.contains('Disable module')
+      .next()
+      .click()
+    cy.get('button')
+      .contains('Continue')
+      .click()
+    // Now it's toggled on
+    cy.contains('Disable module')
+      .next()
+      .should('have.attr', 'class')
+      .and('match', /toggled_on/)
+    // Click it again
+    cy.contains('Disable module')
+      .next()
+      .click()
+    // We have to confirm to turn it off
+    cy.get('button')
+      .contains('Continue')
+      .click()
+    // Now it's toggled off again
+    cy.contains('Disable module')
+      .next()
+      .should('have.attr', 'class')
+      .and('match', /toggled_off/)
+  })
+
   it('remembers when we enable things', () => {
     // Enable a button
     // We're not using the privacy button because that
@@ -137,11 +189,11 @@ describe('The Settings Page', () => {
       .contains('Continue')
       .click()
     // Leave the settings page
-    cy.get("button[class*='navbar__tab__']").contains('FILE')
-    // Go back to settings
     cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
+      .contains('FILE')
       .click()
+    // Go back to settings
+    cy.openSettingsPage()
     // The toggle is still on
     cy.contains(exptlSettingText)
       .next()
@@ -163,9 +215,7 @@ describe('The Settings Page', () => {
     // Leave the settings page
     cy.get("button[class*='navbar__tab__']").contains('FILE')
     // Go back to settings
-    cy.get("button[class*='navbar__tab__']")
-      .contains('Settings')
-      .click()
+    cy.openSettingsPage()
     // The toggle is still off
     cy.contains(exptlSettingText)
       .next()
