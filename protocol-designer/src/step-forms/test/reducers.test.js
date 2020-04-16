@@ -10,6 +10,7 @@ import {
   orderedStepIds,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  presavedStepForm,
   savedStepForms,
   unsavedForm,
 } from '../reducers'
@@ -25,6 +26,7 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
@@ -1101,6 +1103,42 @@ describe('unsavedForm reducer', () => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
       const result = unsavedForm(someState, { type: actionType })
       expect(result).toEqual(null)
+    })
+  })
+})
+
+describe('presavedStepForm reducer', () => {
+  it('should populate when a new step is added', () => {
+    const addStepAction: AddStepAction = {
+      type: 'ADD_STEP',
+      payload: { id: 'someId', stepType: 'transfer' },
+    }
+    const result = presavedStepForm(null, addStepAction)
+    expect(result).toEqual({ stepType: 'transfer' })
+  })
+
+  it('should not update when the PRESAVED_STEP_ID terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: PRESAVED_STEP_ID }
+    expect(presavedStepForm(prevState, action)).toBe(prevState)
+  })
+
+  it('should clear when a different terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: 'otherId' }
+    expect(presavedStepForm(prevState, action)).toEqual(null)
+  })
+
+  const clearingActions = [
+    'CANCEL_STEP_FORM',
+    'DELETE_STEP',
+    'SAVE_STEP_FORM',
+    'SELECT_STEP',
+  ]
+  clearingActions.forEach(actionType => {
+    it(`should clear upon ${actionType}`, () => {
+      const prevState = { id: 'someId', stepType: 'transfer' }
+      expect(presavedStepForm(prevState, { type: actionType })).toEqual(null)
     })
   })
 })

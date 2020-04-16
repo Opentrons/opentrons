@@ -25,9 +25,10 @@ import {
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
+  generateNewForm,
   handleFormChange,
 } from '../../steplist/formLevel'
-import { cancelStepForm } from '../../steplist/actions'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
@@ -37,7 +38,6 @@ import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 
-import type { ActionType } from 'redux-actions'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -46,7 +46,7 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type { FormData, StepIdType } from '../../form-types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
   FileLabware,
   FilePipette,
@@ -54,6 +54,7 @@ import type {
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
   AddStepAction,
+  CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
@@ -63,6 +64,8 @@ import type {
 import type {
   DuplicateStepAction,
   ReorderSelectedStepAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
 import type {
@@ -85,11 +88,15 @@ type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
+  | AddStepAction
   | ChangeFormInputAction
   | PopulateFormAction
-  | ActionType<typeof cancelStepForm>
+  | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | SelectTerminalItemAction
+  | EditModuleAction
+  | SubstituteStepFormPipettesAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -98,6 +105,12 @@ export const unsavedForm = (
     ? rootState.unsavedForm
     : unsavedFormInitialState
   switch (action.type) {
+    case 'ADD_STEP': {
+      return generateNewForm({
+        stepId: action.payload.id,
+        stepType: action.payload.stepType,
+      })
+    }
     case 'CHANGE_FORM_INPUT': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
@@ -932,12 +945,42 @@ export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   initialOrderedStepIdsState
 )
 
+export type PresavedStepFormState = {|
+  stepType: StepType,
+|} | null
+type PresavedStepFormAction =
+  | AddStepAction
+  | CancelStepFormAction
+  | DeleteStepAction
+  | SaveStepFormAction
+  | SelectTerminalItemAction
+  | SelectStepAction
+export const presavedStepForm = (
+  state: PresavedStepFormState = null,
+  action: PresavedStepFormAction
+): PresavedStepFormState => {
+  switch (action.type) {
+    case 'ADD_STEP':
+      return { stepType: action.payload.stepType }
+    case 'SELECT_TERMINAL_ITEM':
+      return action.payload === PRESAVED_STEP_ID ? state : null
+    case 'CANCEL_STEP_FORM':
+    case 'DELETE_STEP':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_STEP':
+      return null
+    default:
+      return state
+  }
+}
+
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
   labwareDefs: LabwareDefsRootState,
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
   moduleInvariantProperties: ModuleEntities,
+  presavedStepForm: PresavedStepFormState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
@@ -965,6 +1008,10 @@ export const rootReducer = (state: RootState, action: any) => {
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),
+    presavedStepForm: presavedStepForm(
+      prevStateFallback.presavedStepForm,
+      action
+    ),
   }
   if (
     state &&

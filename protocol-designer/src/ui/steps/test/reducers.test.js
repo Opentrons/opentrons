@@ -1,4 +1,5 @@
 // @flow
+import { PRESAVED_STEP_ID } from '../../../steplist/types'
 import { _allReducers } from '../reducers.js'
 
 jest.mock('../../../labware-defs/utils')
@@ -87,6 +88,17 @@ describe('selectedItem reducer', () => {
     expect(selectedItem(null, action)).toEqual({
       isStep: false,
       id: terminalId,
+    })
+  })
+
+  it('should select the presaved step item on ADD_STEP', () => {
+    const action = {
+      type: 'SELECT_TERMINAL_ITEM',
+      payload: PRESAVED_STEP_ID,
+    }
+    expect(selectedItem(null, action)).toEqual({
+      isStep: false,
+      id: PRESAVED_STEP_ID,
     })
   })
 })

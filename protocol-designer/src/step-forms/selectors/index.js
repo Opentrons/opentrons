@@ -20,7 +20,7 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
-  // generateNewForm, TODO IMMEDIATELY
+  generateNewForm,
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
@@ -32,6 +32,7 @@ import {
   type LabwareDefByDefURI,
 } from '../../labware-defs'
 
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import type {
   DropdownOption,
@@ -64,7 +65,11 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type { RootState, SavedStepFormState } from '../reducers'
+import type {
+  RootState,
+  SavedStepFormState,
+  PresavedStepFormState,
+} from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
@@ -554,6 +559,23 @@ export const getFormLevelWarningsPerStep: Selector<{
       const hydratedForm = _getHydratedForm(form, contextualState)
       return getFormWarnings(form.stepType, hydratedForm)
     })
+)
+
+const _getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
+  rootSelector(state).presavedStepForm
+
+// TODO IMMED add test
+export const getPresavedStepForm: Selector<FormData | null> = createSelector(
+  _getPresavedStepForm,
+  presavedForm => {
+    if (presavedForm === null) {
+      return null
+    }
+    return generateNewForm({
+      stepId: PRESAVED_STEP_ID,
+      stepType: presavedForm.stepType,
+    })
+  }
 )
 
 // TODO IMMEDIATELY

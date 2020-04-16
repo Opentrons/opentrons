@@ -5,6 +5,7 @@ import omit from 'lodash/omit'
 import { getPDMetadata } from '../../file-types'
 import {
   START_TERMINAL_ITEM_ID,
+  PRESAVED_STEP_ID,
   type SubstepIdentifier,
   type TerminalItemId,
 } from '../../steplist/types'
@@ -20,7 +21,7 @@ import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type { DeleteStepAction } from '../../steplist/actions'
+import type { AddStepAction, DeleteStepAction } from '../../steplist/actions'
 import type {
   SelectStepAction,
   SelectTerminalItemAction,
@@ -87,8 +88,14 @@ export const initialSelectedItemState = {
   id: START_TERMINAL_ITEM_ID,
 }
 
+// TODO IMMEDIATELY update + add tests
 const selectedItem: Reducer<SelectedItemState, *> = handleActions(
   {
+    ADD_STEP: (state: SelectedItemState, action: AddStepAction) =>
+      terminalItemIdHelper(PRESAVED_STEP_ID),
+    SAVE_STEP_FORM: (state: SelectedItemState, action: SaveStepFormAction) => {
+      return stepIdHelper(action.payload.id)
+    },
     SELECT_STEP: (state: SelectedItemState, action: SelectStepAction) =>
       stepIdHelper(action.payload),
     SELECT_TERMINAL_ITEM: (

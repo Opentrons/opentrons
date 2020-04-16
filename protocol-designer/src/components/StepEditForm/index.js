@@ -41,8 +41,8 @@ const STEP_FORM_MAP: { [StepType]: * } = {
 }
 
 type SP = {|
-  formData?: ?FormData,
-  isNewStep?: boolean,
+  formData: ?FormData,
+  isNewStep: boolean,
 |}
 
 type DP = {| deleteStep: StepIdType => mixed |}
@@ -84,7 +84,10 @@ const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 
-class StepEditFormComponent extends React.Component<Props, StepEditFormState> {
+export class StepEditFormComponent extends React.Component<
+  Props,
+  StepEditFormState
+> {
   constructor(props: Props) {
     super(props)
     const { isNewStep, formData } = props

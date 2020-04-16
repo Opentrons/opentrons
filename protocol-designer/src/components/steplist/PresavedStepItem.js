@@ -3,31 +3,19 @@ import React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { StepItem } from './StepItem'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
-// import * as substepSelectors from '../../top-selectors/substeps'
-// import * as timelineWarningSelectors from '../../top-selectors/timelineWarnings'
-// import { selectors as dismissSelectors } from '../../dismiss'
-// import {
-//   selectors as stepFormSelectors,
-//   type LabwareEntity,
-// } from '../../step-forms'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../ui/steps'
-// import { selectors as fileDataSelectors } from '../../file-data'
-// import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
-// import { selectors as uiLabwareSelectors } from '../../ui/labware'
+
+const itemId = PRESAVED_STEP_ID // TODO make this a prop, rename this component PresavedStepTerminalItem ???
 
 export const PresavedStepItem = () => {
-  const itemId = PRESAVED_STEP_ID // TODO make this a prop, rename this component PresavedStepTerminalItem
+  const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
   const hovered = useSelector(getHoveredTerminalItemId) === itemId
   const selected = useSelector(getSelectedTerminalItemId) === itemId
-
-  // TODO placeholders, need a presaved step reducer
-  const stepNumber = 123
-  const stepType = 'transfer'
-  const title = 'title todo'
 
   // Actions
   const dispatch = useDispatch()
@@ -37,14 +25,19 @@ export const PresavedStepItem = () => {
   const highlightStep = () => dispatch(stepsActions.hoverOnTerminalItem(itemId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnTerminalItem(null))
 
-  // TODO IMMEDIATELY: return null if there's no presaved step
+  if (presavedStepForm === null) {
+    return null
+  }
+
+  // TODO placeholders, need a presaved step reducer
+  const { stepType } = presavedStepForm
+  const stepNumber = 123
 
   const stepItemProps = {
     isPresavedStep: true,
     stepId: PRESAVED_STEP_ID, // TODO immediately don't pass in
     stepNumber,
     stepType,
-    title,
     description: null,
     substeps: null,
     rawForm: null, // TODO IMMEDIATELY initial values? Actually I don't think it needs it

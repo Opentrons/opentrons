@@ -26,7 +26,6 @@ type CommonProps = {|
   stepId: StepIdType, // TODO IMMEDIATELY don't pass in stepId
   stepNumber: number,
   stepType: StepType,
-  title: string,
   description: ?string,
   substeps: ?SubstepItemData,
   rawForm: ?FormData,
@@ -55,6 +54,7 @@ export type StepItemProps =
   | {|
       ...CommonProps,
       isPresavedStep: false,
+      title: string,
       highlightSubstep: SubstepIdentifier => mixed,
       hoveredSubstep: ?SubstepIdentifier,
     |}
@@ -62,7 +62,6 @@ export type StepItemProps =
 export const StepItem = (props: StepItemProps) => {
   const {
     stepType,
-    title,
     description,
     stepId,
     stepNumber,
@@ -94,7 +93,8 @@ export const StepItem = (props: StepItemProps) => {
       description={Description}
       iconName={error || warning ? 'alert-circle' : iconName}
       iconProps={{ className: iconClassName }}
-      title={title ? `${stepNumber}. ${title}` : ''}
+      title={`${stepNumber}. ${props.title ||
+        i18n.t(`application.stepType.${stepType}`)}`}
       onClick={() => selectStep(stepId)}
       onContextMenu={onStepContextMenu}
       onMouseEnter={() => highlightStep(stepId)}
