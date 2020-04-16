@@ -56,10 +56,10 @@ function ExitButton(props: { exit: () => mixed }) {
   )
 }
 
-function LevelingInstruction(props: { pipetteName: string }) {
+function LevelingInstruction(props: { displayName: string }) {
   return (
     <div className={styles.leveling_instruction}>
-      {LEVEL_MESSAGE(props.pipetteName)}
+      {LEVEL_MESSAGE(props.displayName)}
     </div>
   )
 }
@@ -100,7 +100,7 @@ export function LevelPipette(props: Props) {
       contentsClassName={styles.leveling_modal}
     >
       <Status displayName={displayName} />
-      <LevelingInstruction pipetteName={displayName} />
+      <LevelingInstruction displayName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
       <ExitButton exit={exit} />
     </ModalPage>
