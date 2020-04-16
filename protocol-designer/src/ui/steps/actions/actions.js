@@ -82,7 +82,7 @@ export const clearWellSelectionLabwareKey = (): ClearWellSelectionLabwareKeyActi
 // NOTE: 'newStepType' arg is only used when generating a new step
 export const selectStep = (
   stepId: StepIdType,
-  newStepType?: StepType
+  newStepType?: StepType // TODO IMMEDIATELY remove this arg
 ): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
   const selectStepAction: SelectStepAction = {
     type: 'SELECT_STEP',

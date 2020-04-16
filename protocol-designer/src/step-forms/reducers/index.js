@@ -25,7 +25,6 @@ import {
 import { getPDMetadata } from '../../file-types'
 import {
   getDefaultsForStepType,
-  generateNewForm,
   handleFormChange,
 } from '../../steplist/formLevel'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
@@ -35,7 +34,11 @@ import {
   _getInitialDeckSetupRootState,
 } from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 
 import type { LoadFileAction } from '../../load-file'
@@ -106,9 +109,15 @@ export const unsavedForm = (
     : unsavedFormInitialState
   switch (action.type) {
     case 'ADD_STEP': {
-      return generateNewForm({
-        stepId: action.payload.id,
+      console.log('adding step')
+      return createPresavedStepForm({
         stepType: action.payload.stepType,
+        stepId: action.payload.id,
+        pipetteEntities: _getPipetteEntitiesRootState(rootState),
+        labwareEntities: _getLabwareEntitiesRootState(rootState),
+        savedStepForms: rootState.savedStepForms,
+        orderedStepIds: rootState.orderedStepIds,
+        initialDeckSetup: _getInitialDeckSetupRootState(rootState),
       })
     }
     case 'CHANGE_FORM_INPUT': {
@@ -886,7 +895,7 @@ export const pipetteInvariantProperties = handleActions<
   initialPipetteState
 )
 
-type OrderedStepIdsState = Array<StepIdType>
+export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
 export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   {

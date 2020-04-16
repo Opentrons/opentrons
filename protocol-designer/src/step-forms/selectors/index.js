@@ -20,7 +20,6 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
-  generateNewForm,
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
@@ -32,7 +31,6 @@ import {
   type LabwareDefByDefURI,
 } from '../../labware-defs'
 
-import { PRESAVED_STEP_ID } from '../../steplist/types'
 import { typeof InstrumentGroup as InstrumentGroupProps } from '@opentrons/components'
 import type {
   DropdownOption,
@@ -66,9 +64,9 @@ import type {
   ThermocyclerModuleState,
 } from '../types'
 import type {
+  PresavedStepFormState,
   RootState,
   SavedStepFormState,
-  PresavedStepFormState,
 } from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
@@ -561,54 +559,7 @@ export const getFormLevelWarningsPerStep: Selector<{
     })
 )
 
-const _getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
-  rootSelector(state).presavedStepForm
-
-// TODO IMMED add test
-export const getPresavedStepForm: Selector<FormData | null> = createSelector(
-  _getPresavedStepForm,
-  presavedForm => {
-    if (presavedForm === null) {
-      return null
-    }
-    return generateNewForm({
-      stepId: PRESAVED_STEP_ID,
-      stepType: presavedForm.stepType,
-    })
-  }
-)
-
 // TODO IMMEDIATELY
-// // TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
-// const getSteps = (state: BaseState) => rootSelector(state).legacySteps
-// export function _getStepFormData(
-//   state: BaseState,
-//   stepId: StepIdType,
-//   newStepType?: StepType
-// ): ?FormData {
-//   const existingStep = getSavedStepForms(state)[stepId]
-
-//   if (existingStep) {
-//     return existingStep
-//   }
-
-//   const steps = getSteps(state)
-//   const stepTypeFromStepReducer = steps[stepId] && steps[stepId].stepType
-//   const stepType = newStepType || stepTypeFromStepReducer
-
-//   if (!stepType) {
-//     console.error(
-//       `New step with id "${stepId}" was added with no stepType, could not generate form`
-//     )
-//     return null
-//   }
-
-//   return generateNewForm({
-//     stepId,
-//     stepType: stepType,
-//   })
-// }
-
 // TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
 export const getAllSteps: Selector<{
   [stepId: StepIdType]: StepItemData,
@@ -623,7 +574,7 @@ export const getAllSteps: Selector<{
           id,
           stepType: savedForm.stepType,
           formData: savedForm,
-          title: savedForm // TODO IMMEDIATELY
+          title: savedForm // TODO IMMEDIATELY this is responsibility of StepItem, just omit title
             ? savedForm.stepName
             : i18n.t(`application.stepType.${step.stepType}`),
           description: savedForm ? savedForm.stepDetails : null,
@@ -632,3 +583,6 @@ export const getAllSteps: Selector<{
     )
   }
 )
+
+export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
+  rootSelector(state).presavedStepForm
