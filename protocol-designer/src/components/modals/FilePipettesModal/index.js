@@ -72,6 +72,7 @@ export type Props = {|
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
   thermocyclerEnabled: ?boolean,
+  customTipracksEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
