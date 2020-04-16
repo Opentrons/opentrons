@@ -6,15 +6,12 @@ import sys
 from threading import Event, Semaphore
 from uuid import uuid4 as uuid
 
-from fastapi.routing import APIWebSocketRoute
-from starlette.testclient import WebSocketTestSession, TestClient
-from fastapi import FastAPI, APIRouter
+from starlette.testclient import WebSocketTestSession
 
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 from robot_server.service.dependencies import get_rpc_server
 from robot_server.service.rpc import rpc
-from robot_server.service.routers.rpc import router
 
 
 class Session(typing.NamedTuple):
