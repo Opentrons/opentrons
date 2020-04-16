@@ -14,12 +14,9 @@ from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, consolidate_fastapi_response
 from .dependencies import get_rpc_server
-from robot_server import API_VERSION
+from robot_server import constants
 
 from .routers import item, routes
-
-# Tag applied to legacy api endpoints
-V1_TAG = "v1"
 
 log = logging.getLogger(__name__)
 
@@ -31,12 +28,12 @@ app = FastAPI(
                 "/openapi. Some schemas used in requests and responses use "
                 "the `x-patternProperties` key to mean the JSON Schema "
                 "`patternProperties` behavior.",
-    version=__version__
+    version=__version__,
 )
 
 
 app.include_router(router=routes,
-                   tags=[V1_TAG],
+                   tags=[constants.V1_TAG],
                    responses={
                        HTTP_422_UNPROCESSABLE_ENTITY: {
                            "model": V1BasicResponse
@@ -62,16 +59,24 @@ async def on_shutdown():
     await s.on_shutdown()
 
 
-RESPONSE_HEADERS = {
-    'X-Opentrons-Media-Type': f'opentrons.robot-server.{API_VERSION}'
-}
-
-
 @app.middleware("http")
-async def response_headers(request: Request, call_next) -> Response:
-    """Middleware to add various response headers."""
+async def api_version_check(request: Request, call_next) -> Response:
+    """Middleware to perform version check."""
+    try:
+        # Get the maximum version accepted by client
+        api_version = int(request.headers.get(constants.API_VERSION_HEADER,
+                                              constants.API_VERSION))
+        # We use the server version if api_version is too big
+        api_version = min(constants.API_VERSION, api_version)
+    except ValueError:
+        # Wasn't an integer, just use server version.
+        api_version = constants.API_VERSION
+    # Attach the api version to request's state dict.
+    request.state.api_version = api_version
+
     response: Response = await call_next(request)
-    response.headers.update(RESPONSE_HEADERS)
+    # Put the api version in the response header
+    response.headers[constants.API_VERSION_HEADER] = str(api_version)
     return response
 
 
@@ -91,7 +96,7 @@ async def custom_request_validation_exception_handler(
     """Custom handling of fastapi request validation errors"""
     log.error(f'{request.method} {request.url.path} : {str(exception)}')
 
-    if route_has_tag(request, V1_TAG):
+    if route_has_tag(request, constants.V1_TAG):
         response = V1BasicResponse(
             message=consolidate_fastapi_response(exception.errors())
         ).dict()
@@ -115,7 +120,7 @@ async def custom_http_exception_handler(
     log.error(f'{request.method} {request.url.path} : '
               f'{exception.status_code}, {exception.detail}')
 
-    if route_has_tag(request, V1_TAG):
+    if route_has_tag(request, constants.V1_TAG):
         response = V1BasicResponse(message=exception.detail).dict()
     else:
         response = transform_http_exception_to_json_api_errors(
