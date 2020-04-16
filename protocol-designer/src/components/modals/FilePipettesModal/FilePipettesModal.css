@@ -71,8 +71,34 @@
   flex-grow: 1;
 }
 
+.mount_diagram {
+  display: flex;
+  justify-content: space-around;
+  flex: 1 1 4rem;
+  margin-right: 0.5rem;
+
+  & img {
+    margin-top: 1rem;
+    max-height: 5.25rem;
+  }
+
+  & .left_pipette {
+    padding-right: 0.5rem;
+  }
+
+  & .right_pipette {
+    padding-left: 0.5rem;
+  }
+}
+
 .mount_column:first-child {
   margin-right: 0.5rem;
+}
+
+.upload_custom_btn {
+  display: block;
+  width: 50%;
+  margin: 1.25rem auto;
 }
 
 .protocol_modules_group {

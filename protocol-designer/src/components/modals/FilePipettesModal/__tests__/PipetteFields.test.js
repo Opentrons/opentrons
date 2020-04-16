@@ -61,6 +61,7 @@ describe('PipetteFields', () => {
       },
       errors: null,
       touched: null,
+      customTipracksEnabled: false,
     }
 
     getOnlyLatestDefsMock.mockReturnValue({
@@ -167,6 +168,7 @@ describe('PipetteFields', () => {
     expect(pipetteDiagram.props()).toEqual({
       leftPipette: leftPipette.pipetteName,
       rightPipette: rightPipette.pipetteName,
+      customTipracksEnabled: false,
     })
   })
 })
