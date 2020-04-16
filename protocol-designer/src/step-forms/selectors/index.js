@@ -43,7 +43,6 @@ import type { FormData, StepIdType } from '../../form-types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
-  StepItemData,
 } from '../../steplist/types'
 import type {
   InitialDeckSetup,
@@ -557,31 +556,6 @@ export const getFormLevelWarningsPerStep: Selector<{
       const hydratedForm = _getHydratedForm(form, contextualState)
       return getFormWarnings(form.stepType, hydratedForm)
     })
-)
-
-// TODO IMMEDIATELY
-// TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
-export const getAllSteps: Selector<{
-  [stepId: StepIdType]: StepItemData,
-}> = createSelector(
-  getSavedStepForms,
-  savedForms => {
-    return mapValues(
-      savedForms,
-      (step: StepItemData, id: StepIdType): StepItemData => {
-        const savedForm = (savedForms && savedForms[id]) || null
-        return {
-          id,
-          stepType: savedForm.stepType,
-          formData: savedForm,
-          title: savedForm // TODO IMMEDIATELY this is responsibility of StepItem, just omit title
-            ? savedForm.stepName
-            : i18n.t(`application.stepType.${step.stepType}`),
-          description: savedForm ? savedForm.stepDetails : null,
-        }
-      }
-    )
-  }
 )
 
 export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>

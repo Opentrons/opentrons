@@ -140,14 +140,6 @@ export type SubstepItemData =
   | TemperatureSubstepItem
   | AwaitTemperatureSubstepItem
 
-export type StepItemData = {
-  id: StepIdType,
-  title: string,
-  stepType: StepType,
-  description?: ?string,
-  formData: ?FormData,
-}
-
 export type SubSteps = { [StepIdType]: ?SubstepItemData }
 
 export type StepFormAndFieldErrors = {

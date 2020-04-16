@@ -109,7 +109,6 @@ export const unsavedForm = (
     : unsavedFormInitialState
   switch (action.type) {
     case 'ADD_STEP': {
-      console.log('adding step')
       return createPresavedStepForm({
         stepType: action.payload.stepType,
         stepId: action.payload.id,
