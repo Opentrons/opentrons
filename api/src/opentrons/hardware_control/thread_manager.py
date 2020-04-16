@@ -7,7 +7,6 @@ import functools
 from typing import Generic, TypeVar, Any
 from .adapters import SynchronousAdapter
 from .modules.mod_abc import AbstractModule
-from opentrons import config
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -114,8 +113,10 @@ class ThreadManager:
         # https://docs.python.org/3/library/asyncio-subprocess.html#subprocess-and-threads  # noqa
         # On windows, the event loop and system interface is different and
         # this won't work.
-        if not config.IS_WIN:
+        try:
             asyncio.get_child_watcher()
+        except NotImplementedError:
+            pass
         blocking = not kwargs.pop('threadmanager_nonblocking', False)
         target = object.__getattribute__(self, '_build_and_start_loop')
         thread = threading.Thread(target=target, name='ManagedThread',
