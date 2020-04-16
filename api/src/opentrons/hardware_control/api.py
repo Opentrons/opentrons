@@ -918,7 +918,7 @@ class API(HardwareAPILike):
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
-        self._config = self._config._replace(**kwargs)
+        self._config = self._config._replace(**kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):
         pass

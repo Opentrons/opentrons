@@ -440,7 +440,7 @@ def load_module_from_definition(
                 " are not supported in this robot software release.")
     log.error(f"Bad module definition (schema specifier {schema})")
     raise RuntimeError(
-        f'The specified module definition is not valid.')
+        'The specified module definition is not valid.')
 
 
 def _load_v1_module_def(module_model: ModuleModel) -> Dict[str, Any]:
