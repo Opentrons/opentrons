@@ -1682,7 +1682,7 @@ class SmoothieDriver_3_0_0:
                 split_moves += f'{axis}{-msc.split_distance}'
                 applicable_speeds.append(msc.split_speed)
         if not split_moves:
-            log.debug(f"no unstick needed")
+            log.debug("no unstick needed")
             # nothing to do
             return
 

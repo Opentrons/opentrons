@@ -302,7 +302,7 @@ class JsonRpcProtocol(asyncio.Protocol):
         task.add_done_callback(done_callback)
 
     def eof_received(self):
-        self._log.info(f'eof received')
+        self._log.info('eof received')
         for task in self._inflight:
             task.cancel()
 

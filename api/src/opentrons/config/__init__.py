@@ -391,7 +391,7 @@ def _do_migrate(index: Dict[str, str]):
             sys.stdout.write(f"config migration: {old}->{new}\n")
             if new_path.is_dir():
                 shutil.rmtree(new_path)
-            shutil.move(old_path, new_path)
+            shutil.move(str(old_path), str(new_path))
         else:
             sys.stdout.write(f"config migration: not moving {old}:")
             sys.stdout.write(f" exists={old_path.exists()}")
