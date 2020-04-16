@@ -284,7 +284,7 @@ CHECK_STATES = [
     'checkingPointTwo',
     'checkingPointThree',
     'checkingHeight',
-    {'name': 'returningTip', on_enter: '_return_tip'},
+    {'name': 'returningTip', 'on_enter': '_return_tip'},
     'sessionExited',
     'badCalibrationData',
     'noPipettesAttached'
@@ -499,7 +499,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                    position: PositionType,
                    if_return: bool = False):
 
-        if not if_return:
+        # if not if_return:
             # move to tiprack repeats in return tip. To prevent the state
             # machine from updating state to jog, instead check whether the
             # current state is moving to a tiprack (*Note*) there is

@@ -1,7 +1,8 @@
 import enum
+import asyncio
 from dataclasses import dataclass
 from functools import partial
-from typing import (TypeVar, Generic, Type, Dict,
+from typing import (TypeVar, Generic, Type, Dict, Union,
                     Optional, Callable, Set, Any, List)
 
 
@@ -25,10 +26,10 @@ class CalibrationCheckState(enum.Enum):
 # def leaveStateUnchanged(currentState: CalibrationCheckState) -> CalibrationCheckState:
 #     return currentState
 
-jog = leaveStateUnchanged
-move = leaveStateUnchanged
-pickUpTip = leaveStateUnchanged
-dropTip = leaveStateUnchanged
+# jog = leaveStateUnchanged
+# move = leaveStateUnchanged
+# pickUpTip = leaveStateUnchanged
+# dropTip = leaveStateUnchanged
 
 def loadLabware(currentState: CalibrationCheckState) -> CalibrationCheckState:
     return CalibrationCheckState.labwareLoaded
@@ -120,6 +121,13 @@ def promptNoPipettesAttached(currentState: CalibrationCheckState) -> Calibration
 #     CalibrationCheckState.checkHeight: CalibrationCheckState.move
 # }
 
+def call_func_blocking(func):
+    if asyncio.iscoroutinefunction(func):
+        loop = asyncio.get_event_loop()
+        return loop.run_until_complete(func())
+    else:
+        return func()
+
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
 
@@ -134,11 +142,11 @@ class State():
 
     def enter(self) -> str:
         if self._on_enter:
-            return self._on_enter()
+            return call_func_blocking(self._on_enter)
 
     def exit(self) -> str:
         if self._on_exit:
-            return self._on_exit()
+            return call_func_blocking(self._on_exit)
 
     @property
     def name(self) -> str:
@@ -160,11 +168,13 @@ class Transition:
     def execute(self, get_state_by_name, set_current_state):
         if self.condition and not self.condition():
             return False
-        if self.before: self.before()
+        if self.before:
+            call_func_blocking(self.before)
         get_state_by_name(self.from_state_name).exit()
         set_current_state(self.to_state_name)
         get_state_by_name(self.to_state_name).enter()
-        if self.after: self.after()
+        if self.after:
+            call_func_blocking(self.after())
         return True
 
 class StateMachineError(Exception):
@@ -178,6 +188,8 @@ class StateMachineError(Exception):
     def __str__(self):
         return f'StateMachineError: {self.msg}'
 
+
+StateParams = Union[str, Dict[str, str]]
 class StateMachine():
     def __init__(self,
                  states: List[StateParams],
@@ -186,8 +198,11 @@ class StateMachine():
         self._states = set()
         self._current_state = None
         self._events = {}
-        for *args, **kwargs in states:
-            self.add_state(*args, kwargs)
+        for params in states:
+            if isinstance(params, dict):
+                self.add_state(**params)
+            else:
+                self.add_state(params)
         self._set_current_state(initial_state_name)
         for t in transitions:
             self.add_transition(**t)
@@ -315,7 +330,7 @@ class OldStateMachine(Generic[StateEnumType]):
         return bool(self._move_relationship.get(state))
 
 
-class CalibrationCheckMachine(StateMachine[CalibrationCheckState]):
+class CalibrationCheckMachine(OldStateMachine[CalibrationCheckState]):
     def __init__(self) -> None:
         super().__init__(CalibrationCheckState,{},{}, {},'s',{})
                         #  check_normal_relationship_dict,

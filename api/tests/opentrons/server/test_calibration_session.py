@@ -1,4 +1,5 @@
 import pytest
+import asyncio
 import enum
 
 from opentrons import types
@@ -158,13 +159,13 @@ from opentrons.server.endpoints.calibration import util, constants
 #     sm.update_state()
 #     assert sm.current_state.name == state1.name
 
-def test_new_state_machine():
+async def test_new_state_machine():
 
     states = ["Working",
               "ThinkingAboutCats",
               "BrowsingCatPictures",
               "LookingAtTime",
-              "Sleeping"]
+              {'name': "Sleeping", 'on_enter': 'reach_rem_async'}]
     transitions = [
        {"trigger": "start_thinking_about_cats", "from_state": "Working","to_state": "ThinkingAboutCats"},
        {"trigger": "look_at_time", "from_state": "ThinkingAboutCats", "to_state": "Working"},
@@ -176,16 +177,19 @@ def test_new_state_machine():
        {"trigger": "dream_about_code", "from_state": "Sleeping", "to_state": "Working"}
     ]
 
+    class TestModelWithMachine(util.StateMachine):
+        def __init__(self):
+            super().__init__(states=states,
+                             transitions=transitions,
+                             initial_state_name="Working")
+            self.reached_rem = False
 
-    sm = util.NewStateMachine(states=states,
-                              transitions=transitions,
-                              initial_state_name="Working")
 
-    state1 = sm._get_state_by_name('Working')
-    state2 = sm._get_state_by_name('ThinkingAboutCats')
-    state3 = sm._get_state_by_name('BrowsingCatPictures')
-    state4 = sm._get_state_by_name('LookingAtTime')
-    state5 = sm._get_state_by_name('Sleeping')
+        async def reach_rem_async(self):
+            self.reached_rem = True
+            return await asyncio.sleep(0.1)
+
+    sm = TestModelWithMachine()
 
     assert sm.current_state.name == 'Working'
     sm.start_thinking_about_cats()
@@ -197,7 +201,9 @@ def test_new_state_machine():
     sm.look_at_cats()
     assert sm.current_state.name == 'BrowsingCatPictures'
     sm.become_exhausted()
+    assert not sm.reached_rem
     assert sm.current_state.name == 'Sleeping'
+    assert sm.reached_rem
     sm.dream_about_code()
     assert sm.current_state.name == 'Working'
     sm.become_exhausted()
