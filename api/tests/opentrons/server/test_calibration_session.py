@@ -159,7 +159,7 @@ from opentrons.server.endpoints.calibration import util, constants
 #     sm.update_state()
 #     assert sm.current_state.name == state1.name
 
-async def test_new_state_machine():
+async def test_new_state_machine(loop):
 
     states = ["Working",
               "ThinkingAboutCats",
@@ -186,25 +186,26 @@ async def test_new_state_machine():
 
 
         async def reach_rem_async(self):
+            print('CALLED REACHED REM\n\n\n')
             self.reached_rem = True
-            return await asyncio.sleep(0.1)
+            await asyncio.sleep(0.1)
 
     sm = TestModelWithMachine()
 
     assert sm.current_state.name == 'Working'
-    sm.start_thinking_about_cats()
+    await sm.start_thinking_about_cats()
     assert sm.current_state.name == 'ThinkingAboutCats'
-    sm.look_at_time()
+    await sm.look_at_time()
     assert sm.current_state.name == 'Working'
-    sm.start_thinking_about_cats()
+    await sm.start_thinking_about_cats()
     assert sm.current_state.name == 'ThinkingAboutCats'
-    sm.look_at_cats()
+    await sm.look_at_cats()
     assert sm.current_state.name == 'BrowsingCatPictures'
-    sm.become_exhausted()
     assert not sm.reached_rem
+    await sm.become_exhausted()
     assert sm.current_state.name == 'Sleeping'
     assert sm.reached_rem
-    sm.dream_about_code()
+    await sm.dream_about_code()
     assert sm.current_state.name == 'Working'
-    sm.become_exhausted()
+    await sm.become_exhausted()
     assert sm.current_state.name == 'Sleeping'

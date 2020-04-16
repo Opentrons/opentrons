@@ -2,7 +2,7 @@ import enum
 import asyncio
 from dataclasses import dataclass
 from functools import partial
-from typing import (TypeVar, Generic, Type, Dict, Union,
+from typing import (TypeVar, Generic, Type, Dict, Union, Awaitable,
                     Optional, Callable, Set, Any, List)
 
 
@@ -121,32 +121,29 @@ def promptNoPipettesAttached(currentState: CalibrationCheckState) -> Calibration
 #     CalibrationCheckState.checkHeight: CalibrationCheckState.move
 # }
 
-def call_func_blocking(func):
-    if asyncio.iscoroutinefunction(func):
-        loop = asyncio.get_event_loop()
-        return loop.run_until_complete(func())
-    else:
-        return func()
-
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
+
+
+SideEffectCallback = Callable[[Any], Awaitable[Any]]
+ConditionCallback = Callable[[Any], Awaitable[bool]]
 
 class State():
     def __init__(self,
                  name: str,
-                 on_enter: Callable = None,
-                 on_exit: Callable = None):
+                 on_enter: SideEffectCallback = None,
+                 on_exit: SideEffectCallback = None):
         self._name = name
         self._on_enter = on_enter
         self._on_exit = on_exit
 
-    def enter(self) -> str:
+    async def enter(self) -> str:
         if self._on_enter:
-            return call_func_blocking(self._on_enter)
+           return await self._on_enter()
 
-    def exit(self) -> str:
+    async def exit(self) -> str:
         if self._on_exit:
-            return call_func_blocking(self._on_exit)
+            return await self._on_exit()
 
     @property
     def name(self) -> str:
@@ -156,25 +153,25 @@ class Transition:
     def __init__(self,
                  from_state_name: str,
                  to_state_name: str,
-                 condition: Callable[[Any], bool] = None,
-                 before: Callable = None,
-                 after: Callable = None):
+                 before: SideEffectCallback = None,
+                 after: SideEffectCallback = None,
+                 condition: ConditionCallback = None):
         self.from_state_name = from_state_name
         self.to_state_name = to_state_name
         self.before = before
         self.after = after
         self.condition = condition
 
-    def execute(self, get_state_by_name, set_current_state):
-        if self.condition and not self.condition():
+    async def execute(self, get_state_by_name, set_current_state):
+        if self.condition and not await self.condition():
             return False
         if self.before:
-            call_func_blocking(self.before)
-        get_state_by_name(self.from_state_name).exit()
+            await self.before()
+        await get_state_by_name(self.from_state_name).exit()
         set_current_state(self.to_state_name)
-        get_state_by_name(self.to_state_name).enter()
+        await get_state_by_name(self.to_state_name).enter()
         if self.after:
-            call_func_blocking(self.after())
+            await self.after()
         return True
 
 class StateMachineError(Exception):
@@ -189,11 +186,36 @@ class StateMachineError(Exception):
         return f'StateMachineError: {self.msg}'
 
 
-StateParams = Union[str, Dict[str, str]]
+def enum_to_set(enum) -> set:
+    return set(item.name for item in enum)
+
+class StateKeys(enum.Enum):
+    name = enum.auto()
+    on_enter = enum.auto()
+    on_exit = enum.auto()
+
+StateParams = Union[str, Dict[StateKeys, str]]
+
+class TransitionKeys(enum.Enum):
+    from_state_name = enum.auto()
+    to_state_name = enum.auto()
+    before = enum.auto()
+    after = enum.auto()
+    condition = enum.auto()
+
+class CallbackKeys(enum.Enum):
+    on_enter = enum.auto()
+    on_exit = enum.auto()
+    before = enum.auto()
+    after = enum.auto()
+    condition = enum.auto()
+
+TransitionKwargs = Dict[TransitionKeys, str]
+
 class StateMachine():
     def __init__(self,
                  states: List[StateParams],
-                 transitions: Set[Transition],
+                 transitions: List[TransitionKwargs],
                  initial_state_name: str):
         self._states = set()
         self._current_state = None
@@ -202,7 +224,7 @@ class StateMachine():
             if isinstance(params, dict):
                 self.add_state(**params)
             else:
-                self.add_state(params)
+                self.add_state(name=params)
         self._set_current_state(initial_state_name)
         for t in transitions:
             self.add_transition(**t)
@@ -217,7 +239,7 @@ class StateMachine():
         self._current_state = goal_state
         return None
 
-    def _dispatch_trigger(self, trigger, *args, **kwargs):
+    async def _dispatch_trigger(self, trigger, *args, **kwargs):
         if trigger in self._events and \
                 self._current_state.name not in self._events[trigger]:
             raise StateMachineError(f'cannot trigger event {trigger}' \
@@ -226,21 +248,33 @@ class StateMachine():
             from_state = '*' if '*' in self._events[trigger] \
                           else self._current_state.name
             for transition in self._events[trigger][from_state]:
-                if transition.execute(self._get_state_by_name, self._set_current_state,
-                                      *args, **kwargs):
+                if await transition.execute(self._get_state_by_name,
+                                            self._set_current_state,
+                                            *args, **kwargs):
                     break
         except Exception:
             raise StateMachineError(f'event {trigger} failed to '
                                     f'transition from {self._current_state.name}')
 
+    def _get_cb(self, method_name: Optional[str]):
+        print(f'GOT CALLBACK {method_name}, {getattr(self,method_name)}\n\n')
+        return getattr(self, method_name) if method_name else None
+
+    def _bind_cb_kwarg(self, key, value):
+        print(f'BOUND CALLBACK {key}, {value} \n\n')
+        if key in enum_to_set(CallbackKeys):
+            return self._get_cb(value)
+        return value
+
     def add_state(self, *args, **kwargs):
-        self._states.add(State(*args, **kwargs))
+        bound_kwargs = {k: self._bind_cb_kwarg(k,v) for k,v in kwargs.items()}
+        self._states.add(State(*args, **bound_kwargs))
 
     def add_transition(self,
                        trigger: str,
-                       from_state: State,
-                       to_state: State,
-                       condition: Callable[[Any], bool] = None):
+                       from_state: str,
+                       to_state: str,
+                       **kwargs):
         if from_state is not '*':
             assert self._get_state_by_name(from_state),\
                 f"state {from_state} doesn't exist in machine"
@@ -249,12 +283,15 @@ class StateMachine():
         if trigger not in self._events:
             setattr(self, trigger,
                     partial(self._dispatch_trigger, trigger))
+        bound_kwargs = {k: self._bind_cb_kwarg(k,v) for k,v in kwargs.items()}
         self._events[trigger] = {**self._events.get(trigger, {}),
                                  from_state: [
-                                        *self._events.get(trigger, {}).get(from_state, []),
-                                        Transition(from_state,
-                                                   to_state,
-                                                   condition)
+                                        *self._events.get(trigger,
+                                                          {}).get(from_state,
+                                                                  []),
+                                        Transition(from_state_name=from_state,
+                                                   to_state_name=to_state,
+                                                   **bound_kwargs)
                                         ]
                                 }
     @property
