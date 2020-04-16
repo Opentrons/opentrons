@@ -125,8 +125,17 @@ StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
 
 
-SideEffectCallback = Callable[[Any], Awaitable[Any]]
+# State Side Effect callbacks take no params other than self
+SideEffectCallback = Callable[['StateMachine'], Awaitable[Any]]
+
+# Transition callbacks pass through all params from trigger call
+TransitionCallback = Callable[[Any], Awaitable[Any]]
+
+# Condition callbacks pass through all params from trigger call,
+# and must return bool
 ConditionCallback = Callable[[Any], Awaitable[bool]]
+
+WILDCARD = '*'
 
 class State():
     def __init__(self,
@@ -153,8 +162,8 @@ class Transition:
     def __init__(self,
                  from_state_name: str,
                  to_state_name: str,
-                 before: SideEffectCallback = None,
-                 after: SideEffectCallback = None,
+                 before: TransitionCallback = None,
+                 after: TransitionCallback = None,
                  condition: ConditionCallback = None):
         self.from_state_name = from_state_name
         self.to_state_name = to_state_name
@@ -162,16 +171,18 @@ class Transition:
         self.after = after
         self.condition = condition
 
-    async def execute(self, get_state_by_name, set_current_state):
+    async def execute(self, get_state_by_name, set_current_state,
+                      *args, **kwargs):
         if self.condition and not await self.condition():
             return False
         if self.before:
-            await self.before()
-        await get_state_by_name(self.from_state_name).exit()
+            await self.before(*args, **kwargs)
+        if self.from_state_name is not WILDCARD:
+            await get_state_by_name(self.from_state_name).exit()
         set_current_state(self.to_state_name)
         await get_state_by_name(self.to_state_name).enter()
         if self.after:
-            await self.after()
+            await self.after(*args, **kwargs)
         return True
 
 class StateMachineError(Exception):
@@ -241,11 +252,12 @@ class StateMachine():
 
     async def _dispatch_trigger(self, trigger, *args, **kwargs):
         if trigger in self._events and \
+                WILDCARD not in self._events[trigger] and \
                 self._current_state.name not in self._events[trigger]:
             raise StateMachineError(f'cannot trigger event {trigger}' \
                                     f' from state {self._current_state.name}')
         try:
-            from_state = '*' if '*' in self._events[trigger] \
+            from_state = WILDCARD if WILDCARD in self._events[trigger] \
                           else self._current_state.name
             for transition in self._events[trigger][from_state]:
                 if await transition.execute(self._get_state_by_name,
@@ -275,7 +287,7 @@ class StateMachine():
                        from_state: str,
                        to_state: str,
                        **kwargs):
-        if from_state is not '*':
+        if from_state is not WILDCARD:
             assert self._get_state_by_name(from_state),\
                 f"state {from_state} doesn't exist in machine"
             assert self._get_state_by_name(to_state),\
