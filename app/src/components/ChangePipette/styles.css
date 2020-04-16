@@ -31,7 +31,7 @@
   width: 100%;
   display: flex;
   align-items: center;
-  margin-bottom: 50px;
+  margin-bottom: 3rem;
   font-weight: var(--fw-semibold);
 }
 
@@ -41,8 +41,12 @@
 }
 
 .leveling_video_wrapper {
-  max-height: 480px;
-  margin-bottom: 50px;
+  max-height: 30rem;
+  margin-bottom: 3rem;
+}
+
+.leveling_video {
+  max-width: 100%;
 }
 
 .leveling_modal {

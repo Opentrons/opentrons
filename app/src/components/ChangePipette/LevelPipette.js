@@ -14,7 +14,10 @@ import type {
 
 import type { Mount } from '../../pipettes/types'
 
+// TODO: i18n
 const EXIT_BUTTON_MESSAGE = 'confirm pipette is leveled'
+const LEVEL_MESSAGE = (displayName: string) => `Next, level the ${displayName}`
+const CONNECTED_MESSAGE = (displayName: string) => `${displayName} connected`
 
 type Props = {|
   robotName: string,
@@ -30,17 +33,17 @@ type Props = {|
   exit: () => mixed,
 |}
 
-function Status(props: { pipetteName: string }) {
+function Status(props: { displayName: string }) {
   const iconName = 'check-circle'
   const iconClass = cx(styles.confirm_icon, {
     [styles.success]: true,
     [styles.failure]: false,
   })
-  const message = `${props.pipetteName} connected`
+
   return (
     <div className={styles.leveling_title}>
       <Icon name={iconName} className={iconClass} />
-      {message}
+      {CONNECTED_MESSAGE(props.displayName)}
     </div>
   )
 }
@@ -56,7 +59,7 @@ function ExitButton(props: { exit: () => mixed }) {
 function LevelingInstruction(props: { pipetteName: string }) {
   return (
     <div className={styles.leveling_instruction}>
-      Next, level the {props.pipetteName}
+      {LEVEL_MESSAGE(props.pipetteName)}
     </div>
   )
 }
@@ -65,7 +68,12 @@ function LevelingVideo(props: { pipetteName: string, mount: Mount }) {
   const { pipetteName, mount } = props
   return (
     <div className={styles.leveling_video_wrapper}>
-      <video width="100%" autoPlay={true} loop={true} controls={true}>
+      <video
+        className={styles.leveling_video}
+        autoPlay={true}
+        loop={true}
+        controls={true}
+      >
         <source src={require(`./videos/${pipetteName}-${mount}.webm`)} />
       </video>
     </div>
@@ -91,7 +99,7 @@ export function LevelPipette(props: Props) {
       }}
       contentsClassName={styles.leveling_modal}
     >
-      <Status pipetteName={displayName} />
+      <Status displayName={displayName} />
       <LevelingInstruction pipetteName={displayName} />
       <LevelingVideo pipetteName={pipetteModelName} mount={mount} />
       <ExitButton exit={exit} />
