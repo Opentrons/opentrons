@@ -213,7 +213,9 @@ const EditModulesModalNewComponent = (
               <>
                 <HoverTooltip
                   placement="top"
-                  tooltipComponent={slotOptionTooltip}
+                  tooltipComponent={
+                    !enableSlotSelection ? slotOptionTooltip : null
+                  }
                 >
                   {hoverTooltipHandlers => (
                     <div
