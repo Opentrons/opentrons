@@ -4,11 +4,10 @@ import { useFormikContext } from 'formik'
 import { isModuleWithCollisionIssue } from '../../modules/utils'
 import { usePrevious } from '@opentrons/components'
 
-export const useResetSlotOnModelChange = () => {
+export const useResetSlotOnModelChange = (supportedModuleSlot: string) => {
   const { values, setValues } = useFormikContext()
 
   const selectedModel = values.selectedModel
-  const selectedSlot = values.selectedSlot
   const prevSelectedModel = usePrevious(selectedModel)
   useEffect(() => {
     if (
@@ -16,7 +15,7 @@ export const useResetSlotOnModelChange = () => {
       prevSelectedModel !== selectedModel &&
       isModuleWithCollisionIssue(selectedModel)
     ) {
-      setValues({ selectedModel, selectedSlot })
+      setValues({ selectedModel, selectedSlot: supportedModuleSlot })
     }
   })
 }

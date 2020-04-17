@@ -56,8 +56,13 @@ type EditModulesModalProps = {
 
 type DeckInfo = {
   initialDeckSetup: InitialDeckSetup,
-  moduleOnDeck: ModuleOnDeck | null,
 }
+
+type ModuleInfo = {
+  moduleOnDeck: ModuleOnDeck | null,
+  supportedModuleSlot: string,
+}
+
 export type EditModulesFormValues = {|
   selectedModel: ModuleModel | null,
   selectedSlot: string,
@@ -135,15 +140,22 @@ export const EditModulesModalNew = (props: EditModulesModalProps) => {
         {...props}
         initialDeckSetup={initialDeckSetup}
         moduleOnDeck={moduleOnDeck}
+        supportedModuleSlot={supportedModuleSlot}
       />
     </Formik>
   )
 }
 
 const EditModulesModalNewComponent = (
-  props: EditModulesModalProps & DeckInfo
+  props: EditModulesModalProps & DeckInfo & ModuleInfo
 ) => {
-  const { initialDeckSetup, moduleOnDeck, moduleType, onCloseClick } = props
+  const {
+    initialDeckSetup,
+    moduleOnDeck,
+    moduleType,
+    onCloseClick,
+    supportedModuleSlot,
+  } = props
   const { values } = useFormikContext()
   const { selectedSlot, selectedModel } = values
   const previousModuleSlot = moduleOnDeck?.slot
@@ -190,7 +202,7 @@ const EditModulesModalNewComponent = (
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
 
-  useResetSlotOnModelChange()
+  useResetSlotOnModelChange(supportedModuleSlot)
 
   return (
     <Modal
