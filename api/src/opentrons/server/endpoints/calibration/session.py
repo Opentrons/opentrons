@@ -81,7 +81,7 @@ class Moves:
     """
     This class is meant to encapsulate the different moves
     """
-    moveToTipRack: MoveType = field(default_factory=dict)
+    preparingPipette: MoveType = field(default_factory=dict)
     checkingPointOne: MoveType = field(default_factory=dict)
     checkingPointTwo: MoveType = field(default_factory=dict)
     checkingPointThree: MoveType = field(default_factory=dict)
@@ -301,7 +301,7 @@ CHECK_TRANSITIONS= [
         "trigger": "prepare_pipette",
         "from_state": "labwareLoaded",
         "to_state": "preparingPipette",
-        "before": "_move_to_tiprack_for_pipette"
+        "before": "_move"
     },
     {
         "trigger": "jog",
@@ -319,7 +319,7 @@ CHECK_TRANSITIONS= [
         "trigger": "confirm_tip_attached",
         "from_state": "inspectingTip",
         "to_state": "checkingPointOne",
-        "before": "_move",
+        "before": "_move"
     },
     {
         "trigger": "invalidate_tip",
@@ -375,25 +375,35 @@ CHECK_TRANSITIONS= [
         "to_state": "returningTip",
         "after": "_return_tip_for_pipette"
     },
-    {"trigger": "exit", "from_state": "*", "to_state": "sessionExited"},
-    {"trigger": "reject_calibration", "from_state": "*", "to_state": "badCalibrationData"},
-    {"trigger": "no_pipettes", "from_state": "*", "to_state": "noPipettesAttached"},
+    {
+        "trigger": "exit",
+        "from_state": "*",
+        "to_state": "sessionExited"
+    },
+    {
+        "trigger": "reject_calibration",
+        "from_state": "*",
+        "to_state": "badCalibrationData"
+    },
+    {
+        "trigger": "no_pipettes",
+        "from_state": "*",
+        "to_state": "noPipettesAttached"
+    }
 ]
 
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
         CalibrationSession.__init__(self, hardware)
-        StateMachine.__init__(self, states=CHECK_STATES, transitions=CHECK_TRANSITIONS,
-                              initial_state_name="sessionStarted")
+        StateMachine.__init__(self, states=CHECK_STATES,
+                              transitions=CHECK_TRANSITIONS,
+                              initial_state="sessionStarted")
         self.session_type = 'check'
 
-    async def _load_labware_objects(self):
+    async def _load_labware_objects(self, **kwargs):
         """
         A function that takes tiprack information and loads them onto the deck.
         """
-        # # TODO: BC: remove this exception and cover in via state machine transition
-        # if self._moves.moveToTipRack:
-        #     raise LabwareLoaded()
         full_dict = {}
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
@@ -409,16 +419,15 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     well = lw.wells_by_name()['A1']
                 build_dict[id] = {'offset': Point(0, 0, 10), 'well': well}
             full_dict[data.id] = build_dict
-        self._moves.moveToTipRack = full_dict
+        self._moves.preparingPipette = full_dict
 
-    def _update_tiprack_offset(
-            self, pipette: UUID, old_pos: Point, new_pos: Point):
+    def _update_tiprack_offset(self, pipette: UUID, old_pos: Point, new_pos: Point):
         id = self._relate_mount[pipette]['tiprack_id']
 
-        if self._moves.moveToTipRack:
-            old_offset = self._moves.moveToTipRack[id][pipette]['offset']
+        if self._moves.preparingPipette:
+            old_offset = self._moves.preparingPipette[id][pipette]['offset']
             updated_offset = (new_pos - old_pos) + old_offset
-            self._moves.moveToTipRack[id][pipette].update(offset=updated_offset)  # NOQA(E501)
+            self._moves.preparingPipette[id][pipette].update(offset=updated_offset)  # NOQA(E501)
 
     async def delete_session(self):
         for id in self._relate_mount.keys():
@@ -429,7 +438,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    async def _pick_up_tip(self, pipette: UUID):
+    async def _pick_up_tip(self, pipette: UUID, **kwargs):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
@@ -441,23 +450,20 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         mount = self._get_mount(pipette)
         await self._pick_up_tip(mount, id)
 
-    async def _invalidate_tip(self, pipette: UUID):
+    async def _invalidate_tip(self, pipette: UUID, **kwargs):
         if not self._has_tip(pipette):
             raise TipAttachError()
         await self.hardware.remove_tip(self._get_mount(pipette))
 
-    async def _move_to_tiprack_for_pipette(self, pipette: UUID):
-        id = self._relate_mount[pipette]['tiprack_id']
-        offset_dict = None
-        if self._moves.moveToTipRack:
-            offset_dict = self._moves.moveToTipRack[id]
-        if offset_dict:
-            loc = offset_dict[pipette]['offset']
-        else:
-            loc = Point(0, 0, 0)
-        await self.move(pipette, {"offset": loc, "locationId": id}, True)
+    async def _move_to_tiprack_for_pipette(self, pipette_id: UUID):
+        print(f'FROM move to tiprack for pip {pipette_id}')
+        # id = self._relate_mount[pipette_id]['tiprack_id']
+        # offset_dict = self._moves.moveToTipRack[id]
+        # loc = offset_dict[pipette_id]['offset']
+        # await self._move(pipette_id=pipette_id),
+        #                  request_location={"offset": loc, "locationId": id})
 
-    async def _return_tip_for_pipette(self, pipette: UUID):
+    async def _return_tip_for_pipette(self, pipette: UUID, **kwargs):
         if not self._has_tip(pipette):
             raise TipAttachError()
         await self._move_to_tiprack_for_pipette(pipette)
@@ -517,18 +523,25 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             offset = input['offset']
             updated_pt = pt + offset
             return Location(updated_pt, well)
-        else:
+        elif input.get('position'):
             loc_to_move = input['position']
             return Location(loc_to_move, None)
+        else:
+            return Location(pos, None)
 
-    async def _move(self, pipette_id: UUID,
-                    to_state: str, request_location: PositionType):
-        to_loc = self._determine_move_location(pos=self._moves[to_state],
-                                               input=request_location,
-                                               pip_id=pipette_id)
+    async def _move(self,
+                    pipette_id: UUID,
+                    to_state: str,
+                    request_location: PositionType = None,
+                    **kwargs):
+        print(f'FROM _MOVE pip id {pipette_id}')
+        print(f'FROM _MOVE {getattr(self._moves, to_state)}')
+        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+        to_loc = Location(getattr(self._moves, to_state)[tiprack_id][pipette_id]['offset'], None)
+        print(f'FROM _MOVE loc === {to_loc}')
 
         # determine current location
-        mount = self._get_mount(pipette)
+        mount = self._get_mount(pipette_id)
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
 
@@ -537,7 +550,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
-    async def _jog(self, pipette: UUID, vector: Point):
+    async def _jog(self, pipette: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
         await self._jog(mount, vector)

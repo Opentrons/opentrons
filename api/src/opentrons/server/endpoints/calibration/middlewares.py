@@ -9,19 +9,17 @@ from .util import CalibrationCheckState
 
 def _format_links(
         session: 'CheckCalibrationSession',
-        next: CalibrationCheckState,
+        potential_triggers: typing.Set[str],
         router: UrlDispatcher) -> typing.Dict:
-    if session.state_machine.requires_move(next):
-        path = router.get('move', '')
-    else:
-        path = router.get(next.name, '')
-
-    params = session.format_params(next.name)
-    if path:
-        url = str(path.url_for(type=session.session_type))
-    else:
-        url = path
-    return {'links': {next.name: {'url': url, 'params': params}}}
+    #TODO: BC: return route names and not bind them to trigger func names
+    # path = router.get(next.name, '')
+    # params = session.format_params(next.name)
+    # if path:
+    #     url = str(path.url_for(type=session.session_type))
+    # else:
+    #     url = path
+    # return {'links': {next.name: {'url': url, 'params': params}}}
+    return {}
 
 
 def _determine_error_message(
@@ -54,15 +52,15 @@ def status_response(
         request: web.Request,
         response: web.Response) -> web.Response:
 
-    current = session.state_machine.current_state.name
-    next = session.state_machine.next_state
-    links = _format_links(session, next, request.app.router)
+    current_state = session.current_state.name
+    potential_triggers = session.potential_triggers
+    links = _format_links(session, potential_triggers, request.app.router)
 
     lw_status = session.labware_status.values()
 
     sess_status = CalibrationSessionStatus(
         instruments=session.pipette_status,
-        currentStep=current,
+        currentStep=current_state,
         nextSteps=links,
         labware=[LabwareStatus(**data) for data in lw_status])
     return web.json_response(text=sess_status.json(), status=response.status)
@@ -94,8 +92,8 @@ async def misc_error_handling(
             error_response = _determine_error_message(
                 request, router, type, req.get('pipetteId', ''))
         else:
-            next = session.state_machine.next_state
-            links = _format_links(session, next, router)
+            potential_triggers = session.potential_triggers
+            links = _format_links(session, potential_triggers, router)
             error_response = {
                 "message": "Labware Already Loaded.",
                 **links}

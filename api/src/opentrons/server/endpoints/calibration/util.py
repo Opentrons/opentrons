@@ -160,13 +160,13 @@ class State():
 
 class Transition:
     def __init__(self,
-                 from_state_name: str,
-                 to_state_name: str,
+                 from_state: str,
+                 to_state: str,
                  before: TransitionCallback = None,
                  after: TransitionCallback = None,
                  condition: ConditionCallback = None):
-        self.from_state_name = from_state_name
-        self.to_state_name = to_state_name
+        self.from_state = from_state
+        self.to_state = to_state
         self.before = before
         self.after = after
         self.condition = condition
@@ -176,13 +176,19 @@ class Transition:
         if self.condition and not await self.condition():
             return False
         if self.before:
-            await self.before(*args, **kwargs)
-        if self.from_state_name is not WILDCARD:
-            await get_state_by_name(self.from_state_name).exit()
-        set_current_state(self.to_state_name)
-        await get_state_by_name(self.to_state_name).enter()
+            await self.before(*args,
+                             to_state=self.to_state,
+                             from_state=self.from_state,
+                              **kwargs)
+        if self.from_state is not WILDCARD:
+            await get_state_by_name(self.from_state).exit()
+        set_current_state(self.to_state)
+        await get_state_by_name(self.to_state).enter()
         if self.after:
-            await self.after(*args, **kwargs)
+            await self.after(*args,
+                             to_state=self.to_state,
+                             from_state=self.from_state,
+                             **kwargs)
         return True
 
 class StateMachineError(Exception):
@@ -208,8 +214,8 @@ class StateKeys(enum.Enum):
 StateParams = Union[str, Dict[StateKeys, str]]
 
 class TransitionKeys(enum.Enum):
-    from_state_name = enum.auto()
-    to_state_name = enum.auto()
+    from_state = enum.auto()
+    to_state = enum.auto()
     before = enum.auto()
     after = enum.auto()
     condition = enum.auto()
@@ -227,7 +233,7 @@ class StateMachine():
     def __init__(self,
                  states: List[StateParams],
                  transitions: List[TransitionKwargs],
-                 initial_state_name: str):
+                 initial_state: str):
         self._states = set()
         self._current_state = None
         self._events = {}
@@ -236,7 +242,7 @@ class StateMachine():
                 self.add_state(**params)
             else:
                 self.add_state(name=params)
-        self._set_current_state(initial_state_name)
+        self._set_current_state(initial_state)
         for t in transitions:
             self.add_transition(**t)
 
@@ -244,6 +250,8 @@ class StateMachine():
         return next((state for state in self._states
                      if state.name == name), None)
 
+    # This method should only be called implicitly
+    # via transitions, or inside a test
     def _set_current_state(self, state_name: str):
         goal_state = self._get_state_by_name(state_name)
         assert goal_state, f"state {state_name} doesn't exist in machine"
@@ -269,11 +277,9 @@ class StateMachine():
                                     f'transition from {self._current_state.name}')
 
     def _get_cb(self, method_name: Optional[str]):
-        print(f'GOT CALLBACK {method_name}, {getattr(self,method_name)}\n\n')
         return getattr(self, method_name) if method_name else None
 
     def _bind_cb_kwarg(self, key, value):
-        print(f'BOUND CALLBACK {key}, {value} \n\n')
         if key in enum_to_set(CallbackKeys):
             return self._get_cb(value)
         return value
@@ -301,14 +307,23 @@ class StateMachine():
                                         *self._events.get(trigger,
                                                           {}).get(from_state,
                                                                   []),
-                                        Transition(from_state_name=from_state,
-                                                   to_state_name=to_state,
+                                        Transition(from_state=from_state,
+                                                   to_state=to_state,
                                                    **bound_kwargs)
                                         ]
                                 }
     @property
     def current_state(self) -> State:
         return self._current_state
+
+    @property
+    def potential_triggers(self) -> State:
+        potential_triggers = set()
+        for trigger in self._events:
+            if WILDCARD in self._events[trigger] or \
+                self._current_state.name in self._events[trigger]:
+                potential_triggers.add(trigger)
+        return potential_triggers
 
 class OldStateMachine(Generic[StateEnumType]):
     """
