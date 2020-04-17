@@ -537,7 +537,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         print(f'FROM _MOVE pip id {pipette_id}')
         print(f'FROM _MOVE {getattr(self._moves, to_state)}')
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        to_loc = Location(getattr(self._moves, to_state)[tiprack_id][pipette_id]['offset'], None)
+        to_loc= getattr(self._moves, to_state)[tiprack_id][pipette_id]
         print(f'FROM _MOVE loc === {to_loc}')
 
         # determine current location
