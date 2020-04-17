@@ -284,7 +284,7 @@ CHECK_STATES = [
     'checkingPointTwo',
     'checkingPointThree',
     'checkingHeight',
-    {'name': 'returningTip', 'on_enter': '_return_tip'},
+    'returningTip',
     'sessionExited',
     'badCalibrationData',
     'noPipettesAttached'
@@ -296,6 +296,12 @@ CHECK_TRANSITIONS= [
         "from_state": "sessionStarted",
         "to_state": "labwareLoaded",
         "before": "_load_labware_objects"
+    },
+    {
+        "trigger": "prepare_pipette",
+        "from_state": "labwareLoaded",
+        "to_state": "preparingPipette",
+        "before": "_move_to_tiprack_for_pipette"
     },
     {
         "trigger": "jog",
@@ -343,7 +349,12 @@ CHECK_TRANSITIONS= [
         "to_state": "checkingHeight",
         "before": "_jog"
     },
-    {"trigger": "confirm_height", "from_state": "checkingHeight", "to_state": "returningTip"},
+    {
+        "trigger": "confirm_height",
+        "from_state": "checkingHeight",
+        "to_state": "returningTip",
+        "after": "_return_tip_for_pipette"
+    },
     {"trigger": "exit", "from_state": "*", "to_state": "sessionExited"},
     {"trigger": "reject_calibration", "from_state": "*", "to_state": "badCalibrationData"},
     {"trigger": "no_pipettes", "from_state": "*", "to_state": "noPipettesAttached"},
@@ -356,13 +367,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                               initial_state_name="sessionStarted")
         self.session_type = 'check'
 
-    def _load_labware_objects(self):
+    async def _load_labware_objects(self):
         """
         A function that takes tiprack information and loads them onto the deck.
         """
-        # TODO: BC: remove this exception and cover in via state machine transition
-        if self._moves.moveToTipRack:
-            raise LabwareLoaded()
+        # # TODO: BC: remove this exception and cover in via state machine transition
+        # if self._moves.moveToTipRack:
+        #     raise LabwareLoaded()
         full_dict = {}
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
@@ -415,7 +426,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             raise TipAttachError()
         await self.hardware.remove_tip(self._get_mount(pipette))
 
-    async def _return_to_tiprack(self, pipette: UUID):
+    async def _move_to_tiprack_for_pipette(self, pipette: UUID):
         id = self._relate_mount[pipette]['tiprack_id']
         offset_dict = None
         if self._moves.moveToTipRack:
@@ -424,11 +435,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             loc = offset_dict[pipette]['offset']
         else:
             loc = Point(0, 0, 0)
-        # state = self.state_machine.get_state('moveToTipRack')
-        # self.state_machine.update_state(state)
         await self.move(pipette, {"offset": loc, "locationId": id}, True)
 
-    async def _return_tip(self, pipette: UUID):
+    async def _return_tip_for_pipette(self, pipette: UUID):
         if not self._has_tip(pipette):
             raise TipAttachError()
         await self._return_to_tiprack(pipette)
