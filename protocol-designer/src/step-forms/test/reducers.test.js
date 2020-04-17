@@ -27,13 +27,22 @@ import {
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
+import {
+  createPresavedStepForm,
+  type CreatePresavedStepFormArgs,
+} from '../utils/createPresavedStepForm'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
+jest.mock('../utils/createPresavedStepForm')
 jest.mock('../../utils/labwareModuleCompatibility')
 
+const mockCreatePresavedStepForm: JestMockFn<
+  [CreatePresavedStepFormArgs],
+  any
+> = createPresavedStepForm // TODO IMMEDIATELY use correct types
 const handleFormChangeMock: JestMockFn<
   [{ [string]: any }, { [string]: any }, any, any],
   { [string]: any }
@@ -1104,6 +1113,35 @@ describe('unsavedForm reducer', () => {
       const result = unsavedForm(someState, { type: actionType })
       expect(result).toEqual(null)
     })
+  })
+
+  it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
+    mockCreatePresavedStepForm.mockReturnValue(
+      'createPresavedStepFormMockResult'
+    )
+    mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
+    const stateMock = {
+      savedStepForms: 'savedStepFormsValue',
+      orderedStepIds: 'orderedStepIdsValue',
+    }
+    const result = unsavedForm(stateMock, {
+      type: 'ADD_STEP',
+      payload: { id: 'stepId123', stepType: 'moveLiquid' },
+    })
+    expect(result).toEqual('createPresavedStepFormMockResult')
+    expect(mockCreatePresavedStepForm.mock.calls).toEqual([
+      [
+        {
+          stepId: 'stepId123',
+          stepType: 'moveLiquid',
+          pipetteEntities: 'pipetteEntitiesPlaceholder',
+          labwareEntities: 'labwareEntitiesPlaceholder',
+          savedStepForms: 'savedStepFormsValue',
+          orderedStepIds: 'orderedStepIdsValue',
+          initialDeckSetup: 'initalDeckSetupValue',
+        },
+      ],
+    ])
   })
 })
 
