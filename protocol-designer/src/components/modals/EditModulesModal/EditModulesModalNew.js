@@ -4,6 +4,17 @@ import * as Yup from 'yup'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
 import cx from 'classnames'
+import {
+  Modal,
+  FormGroup,
+  BUTTON_TYPE_SUBMIT,
+  OutlineButton,
+  HoverTooltip,
+} from '@opentrons/components'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
   getSlotsBlockedBySpanning,
@@ -15,30 +26,24 @@ import {
   selectors as stepFormSelectors,
   actions as stepFormActions,
 } from '../../../step-forms'
+import {
+  SUPPORTED_MODULE_SLOTS,
+  getAllModuleSlotsByType,
+} from '../../../modules/moduleData'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
 import { PDAlert } from '../../alerts/PDAlert'
-import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
+import { isModuleWithCollisionIssue } from '../../modules'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import { ModelDropdown } from './ModelDropdown'
 import { SlotDropdown } from './SlotDropdown'
 import { ConnectedSlotMap } from './ConnectedSlotMap'
-import { isModuleWithCollisionIssue } from '../../modules'
-import {
-  SUPPORTED_MODULE_SLOTS,
-  getAllModuleSlotsByType,
-} from '../../../modules/moduleData'
 import { useResetSlotOnModelChange } from './form-state'
-import { selectors as featureFlagSelectors } from '../../../feature-flags'
-import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
-import { Modal, FormGroup, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
+
+import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import type { InitialDeckSetup, ModuleOnDeck } from '../../../step-forms/types'
-import { HoverTooltip } from '../../../../../components/src/tooltips/HoverTooltip'
-import {
-  THERMOCYCLER_MODULE_TYPE,
-  MAGNETIC_MODULE_TYPE,
-} from '../../../../../shared-data/js/constants'
 import type { ModelModuleInfo } from '../../EditModules'
-import { OutlineButton } from '../../../../../components/src/buttons/OutlineButton'
 
 type EditModulesModalProps = {
   moduleType: ModuleRealType,

@@ -4,8 +4,8 @@ import React from 'react'
 import * as Formik from 'formik'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { DropdownField } from '@opentrons/components'
 import { SlotDropdown } from '../SlotDropdown'
-import { DropdownField } from '../../../../../../components/src/forms/DropdownField'
 
 jest.mock('formik')
 

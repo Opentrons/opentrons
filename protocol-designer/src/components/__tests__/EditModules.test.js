@@ -6,13 +6,13 @@ import { EditModules } from '../EditModules'
 import { Provider } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
-import { EditModulesModalNew } from '../modals/EditModulesModal/EditModulesModalNew'
 import {
   getLabwareOnSlot,
   getSlotsBlockedBySpanning,
 } from '../../step-forms/utils'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { Portal } from '../portals/MainPageModalPortal'
+import { EditModulesModalNew } from '../modals/EditModulesModal/EditModulesModalNew'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../step-forms/actions')

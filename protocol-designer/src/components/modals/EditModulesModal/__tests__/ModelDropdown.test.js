@@ -4,10 +4,10 @@ import React from 'react'
 import * as Formik from 'formik'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { DropdownField } from '@opentrons/components'
+import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import { ModelDropdown } from '../ModelDropdown'
 import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
-import { DropdownField } from '../../../../../../components/src/forms/DropdownField'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('formik')
 

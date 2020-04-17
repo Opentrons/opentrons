@@ -2,44 +2,42 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 import * as Formik from 'formik'
-import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModalNew } from '../EditModulesModalNew'
+import { OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
-  type LabwareDefinition2,
-  type ModuleRealType,
-} from '@opentrons/shared-data'
-import {
-  selectors as stepFormSelectors,
-  type InitialDeckSetup,
-} from '../../../../step-forms'
-import { selectors as featureSelectors } from '../../../../feature-flags'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
-import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import type { BaseState } from '../../../../types'
-import { SlotDropdown } from '../SlotDropdown'
-import { isModuleWithCollisionIssue } from '../../../modules/utils'
-import {
-  getLabwareOnSlot,
-  getSlotsBlockedBySpanning,
-  getSlotIsEmpty,
-} from '../../../../step-forms/utils'
-import {
-  MODELS_FOR_MODULE_TYPE,
-  TEMPERATURE_DEACTIVATED,
-} from '../../../../constants'
-import { ModelDropdown } from '../ModelDropdown'
-import {
   TEMPERATURE_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
-} from '../../../../../../shared-data/js/constants'
+} from '@opentrons/shared-data'
+import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
+import {
+  selectors as stepFormSelectors,
+  type InitialDeckSetup,
+} from '../../../../step-forms'
+import {
+  getLabwareOnSlot,
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+} from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
-import { OutlineButton } from '../../../../../../components/src/buttons/OutlineButton'
-import { act } from 'react-dom/test-utils'
+import {
+  MODELS_FOR_MODULE_TYPE,
+  TEMPERATURE_DEACTIVATED,
+} from '../../../../constants'
+import { selectors as featureSelectors } from '../../../../feature-flags'
+import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
+import type { BaseState } from '../../../../types'
+import { isModuleWithCollisionIssue } from '../../../modules/utils'
+import { PDAlert } from '../../../alerts/PDAlert'
+import { EditModulesModalNew } from '../EditModulesModalNew'
+import { ModelDropdown } from '../ModelDropdown'
+import { SlotDropdown } from '../SlotDropdown'
+
+import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
 
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
