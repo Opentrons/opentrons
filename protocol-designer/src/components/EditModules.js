@@ -53,10 +53,6 @@ export const EditModules = (props: EditModulesProps) => {
   const editModuleSlot = (selectedSlot: string) => {
     if (selectedSlot && moduleOnDeck && moduleOnDeck.slot !== selectedSlot) {
       dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
-    } else {
-      console.error(
-        `cannot edit module slot without module slot. This shouldn't be able to happen`
-      )
     }
   }
 
