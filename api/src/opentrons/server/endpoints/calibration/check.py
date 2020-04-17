@@ -64,7 +64,7 @@ async def load_labware(request: web.Request, session) -> web.Response:
     session.load_labware()
     return web.json_response(status=200)
 
-
+#TODO: BC: make this function idea "confirm point" instead of "move"
 async def move(request: web.Request, session) -> web.Response:
     req = await request.json()
     moveloc = MoveLocation(**req)
@@ -80,7 +80,8 @@ async def move(request: web.Request, session) -> web.Response:
         location = {
             "locationId": moveloc.location.locationId,
             "position": types.Point(*position)}
-    await session.move(moveloc.pipetteId, location)
+    await session.confirm_step(pipette_id=moveloc.pipetteId,
+                                request_location=location)
     return web.json_response(status=200)
 
 
@@ -107,8 +108,9 @@ async def invalidate_tip(
     return web.json_response(status=200)
 
 
-async def drop_tip(request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.return_tip(pipette.pipetteId)
-    return web.json_response(status=200)
+# TODO: cover confirm last step for pipette which should result in return tip under the hood
+# async def confirm_step(request: web.Request, session: 'CheckCalibrationSession'):
+#     req = await request.json()
+#     pipette = SpecificPipette(**req)
+#     await session.confirm_step(pipette.pipetteId)
+#     return web.json_response(status=200)

@@ -82,14 +82,14 @@ class Moves:
     This class is meant to encapsulate the different moves
     """
     moveToTipRack: MoveType = field(default_factory=dict)
-    checkPointOne: MoveType = field(default_factory=dict)
-    checkPointTwo: MoveType = field(default_factory=dict)
-    checkPointThree: MoveType = field(default_factory=dict)
-    checkHeight: MoveType = field(default_factory=dict)
+    checkingPointOne: MoveType = field(default_factory=dict)
+    checkingPointTwo: MoveType = field(default_factory=dict)
+    checkingPointThree: MoveType = field(default_factory=dict)
+    checkingHeight: MoveType = field(default_factory=dict)
 
 
 class CalibrationSession:
-    """Class that controls state of the current deck calibration session"""
+    """Class that controls state of the current robot calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._hardware = hardware
         self._relate_mount =\
@@ -161,10 +161,10 @@ class CalibrationSession:
         checktwo = self._build_cross_dict('3BRC')
         checkthree = self._build_cross_dict('7TLC')
         height = self._build_height_dict('5')
-        return Moves(checkPointOne=checkone,
-                     checkPointTwo=checktwo,
-                     checkPointThree=checkthree,
-                     checkHeight=height)
+        return Moves(checkingPointOne=self._build_cross_dict('1BLC'),
+                     checkingPointTwo=self._build_cross_dict('3BRC'),
+                     checkingPointThree=self._build_cross_dict('7TLC'),
+                     checkingHeight=self._build_height_dict('5'))
 
     def _build_cross_dict(self, pos_id: str) -> typing.Dict:
         cross_coords = self._deck.get_calibration_position(pos_id).position
@@ -315,9 +315,14 @@ CHECK_TRANSITIONS= [
         "to_state": "inspectingTip",
         "before": "_pick_up_tip"
     },
-    {"trigger": "confirm_tip_attached", "from_state": "inspectingTip", "to_state": "checkingPointOne"},
     {
-        "trigger": "invalidate_tip_attached",
+        "trigger": "confirm_tip_attached",
+        "from_state": "inspectingTip",
+        "to_state": "checkingPointOne",
+        "before": "_move",
+    },
+    {
+        "trigger": "invalidate_tip",
         "from_state": "inspectingTip",
         "to_state": "preparingPipette",
         "before": "_invalidate_tip"
@@ -328,21 +333,36 @@ CHECK_TRANSITIONS= [
         "to_state": "checkingPointOne",
         "before": "_jog"
     },
-    {"trigger": "confirm_point_one", "from_state": "checkingPointOne", "to_state": "checkingPointTwo"},
+    {
+        "trigger": "confirm_step",
+        "from_state": "checkingPointOne",
+        "to_state": "checkingPointTwo",
+        "before": "_move",
+    },
     {
         "trigger": "jog",
         "from_state": "checkingPointTwo",
         "to_state": "checkingPointTwo",
         "before": "_jog"
     },
-    {"trigger": "confirm_point_two", "from_state": "checkingPointTwo", "to_state": "checkingPointThree"},
+    {
+        "trigger": "confirm_step",
+        "from_state": "checkingPointTwo",
+        "to_state": "checkingPointThree",
+        "before": "_move",
+    },
     {
         "trigger": "jog",
         "from_state": "checkingPointThree",
         "to_state": "checkingPointThree",
         "before": "_jog"
     },
-    {"trigger": "confirm_point_three", "from_state": "checkingPointThree", "to_state": "checkingHeight"},
+    {
+        "trigger": "confirm_step",
+        "from_state": "checkingPointThree",
+        "to_state": "checkingHeight",
+        "before": "_move"
+    },
     {
         "trigger": "jog",
         "from_state": "checkingHeight",
@@ -350,7 +370,7 @@ CHECK_TRANSITIONS= [
         "before": "_jog"
     },
     {
-        "trigger": "confirm_height",
+        "trigger": "confirm_step",
         "from_state": "checkingHeight",
         "to_state": "returningTip",
         "after": "_return_tip_for_pipette"
@@ -440,10 +460,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _return_tip_for_pipette(self, pipette: UUID):
         if not self._has_tip(pipette):
             raise TipAttachError()
-        await self._return_to_tiprack(pipette)
+        await self._move_to_tiprack_for_pipette(pipette)
         await self._return_tip(self._get_mount(pipette))
-        # state = self.state_machine.get_state('dropTip')
-        # self.state_machine.update_state(state)
 
     def _create_tiprack_param(self, position: typing.Dict):
         new_dict = {}
@@ -503,21 +521,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             loc_to_move = input['position']
             return Location(loc_to_move, None)
 
-    async def move(self,
-                   pipette: UUID,
-                   position: PositionType,
-                   if_return: bool = False):
-
-        # if not if_return:
-            # move to tiprack repeats in return tip. To prevent the state
-            # machine from updating state to jog, instead check whether the
-            # current state is moving to a tiprack (*Note*) there is
-            # definitely a better way to do this that I currently cannot
-            # think of.
-            # self.state_machine.update_state()
-        # curr_state = self.state_machine.current_state.name
-        get_position = getattr(self._moves, curr_state)
-        to_loc = self._determine_move_location(get_position, position, pipette)
+    async def _move(self, pipette_id: UUID,
+                    to_state: str, request_location: PositionType):
+        to_loc = self._determine_move_location(pos=self._moves[to_state],
+                                               input=request_location,
+                                               pip_id=pipette_id)
 
         # determine current location
         mount = self._get_mount(pipette)
