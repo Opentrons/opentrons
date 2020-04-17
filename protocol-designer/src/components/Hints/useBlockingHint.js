@@ -19,7 +19,7 @@ export type HintProps = {|
 |}
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
-const BlockingHint = (props: HintProps) => {
+export const BlockingHint = (props: HintProps) => {
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
 
