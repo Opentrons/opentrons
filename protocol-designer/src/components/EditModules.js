@@ -8,7 +8,7 @@ import {
 import { moveDeckItem } from '../labware-ingred/actions/actions'
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
-import { EditModulesModalNew } from './modals/EditModulesModal/EditModulesModalNew'
+import { EditModulesModal } from './modals/EditModulesModal'
 import type { ModuleModel, ModuleRealType } from '@opentrons/shared-data'
 
 type EditModulesProps = {
@@ -77,7 +77,7 @@ export const EditModules = (props: EditModulesProps) => {
 
   return (
     changeModuleWarning || (
-      <EditModulesModalNew
+      <EditModulesModal
         moduleId={moduleId}
         moduleType={moduleType}
         onCloseClick={onCloseClick}

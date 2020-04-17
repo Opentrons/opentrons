@@ -33,7 +33,7 @@ import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibi
 import type { BaseState } from '../../../../types'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModalNew } from '../EditModulesModalNew'
+import { EditModulesModal } from '../'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
 
@@ -148,7 +148,7 @@ describe('Edit Modules Modal', () => {
   const render = props =>
     mount(
       <Provider store={mockStore}>
-        <EditModulesModalNew {...props} />
+        <EditModulesModal {...props} />
       </Provider>
     )
 

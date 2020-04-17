@@ -12,7 +12,7 @@ import {
 } from '../../step-forms/utils'
 import { BlockingHint } from '../Hints/useBlockingHint'
 import { Portal } from '../portals/MainPageModalPortal'
-import { EditModulesModalNew } from '../modals/EditModulesModal/EditModulesModalNew'
+import { EditModulesModal } from '../modals/EditModulesModal'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../step-forms/actions')
@@ -76,7 +76,7 @@ describe('Edit Modules', () => {
     getSlotsBlockedBySpanningMock.mockReturnValue([])
     getDismissedHintsMock.mockReturnValue([])
     const wrapper = render(props)
-    expect(wrapper.find(EditModulesModalNew)).toHaveLength(1)
+    expect(wrapper.find(EditModulesModal)).toHaveLength(1)
   })
   it('should render the module change warning when setChangeModuleWarningInfo is called from EditModulesModal', () => {
     getInitialDeckSetupMock.mockReturnValue({
@@ -87,7 +87,7 @@ describe('Edit Modules', () => {
     getDismissedHintsMock.mockReturnValue([])
     mockPortal.mockReturnValue(<div></div>)
     const wrapper = render(props)
-    const editModulesModal = wrapper.find(EditModulesModalNew)
+    const editModulesModal = wrapper.find(EditModulesModal)
     expect(editModulesModal).toHaveLength(1)
 
     act(() => {
@@ -97,7 +97,7 @@ describe('Edit Modules', () => {
       })
     })
     wrapper.update()
-    expect(wrapper.find(EditModulesModalNew)).toHaveLength(0)
+    expect(wrapper.find(EditModulesModal)).toHaveLength(0)
     expect(wrapper.find(BlockingHint)).toHaveLength(1)
   })
 })

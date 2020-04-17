@@ -68,7 +68,7 @@ export type EditModulesFormValues = {|
   selectedSlot: string,
 |}
 
-export const EditModulesModalNew = (props: EditModulesModalProps) => {
+export const EditModulesModal = (props: EditModulesModalProps) => {
   const {
     moduleType,
     setChangeModuleWarningInfo,
@@ -136,7 +136,7 @@ export const EditModulesModalNew = (props: EditModulesModalProps) => {
       initialValues={initialValues}
       validationSchema={validationSchema}
     >
-      <EditModulesModalNewComponent
+      <EditModulesModalComponent
         {...props}
         initialDeckSetup={initialDeckSetup}
         moduleOnDeck={moduleOnDeck}
@@ -146,7 +146,7 @@ export const EditModulesModalNew = (props: EditModulesModalProps) => {
   )
 }
 
-const EditModulesModalNewComponent = (
+const EditModulesModalComponent = (
   props: EditModulesModalProps & DeckInfo & ModuleInfo
 ) => {
   const {
