@@ -1,60 +1,89 @@
 // @flow
-import { connect } from 'react-redux'
-import * as React from 'react'
-import type { BaseState, ThunkDispatch } from '../../../types'
-
-import type { TerminalItemId } from '../../../steplist'
+import React, { type Node } from 'react'
+import { useConditionalConfirm } from '../../useConditionalConfirm'
+import { useSelector, useDispatch } from 'react-redux'
+import { ContinueModal } from '@opentrons/components'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../../ui/steps'
+import { Portal } from '../../portals/MainPageModalPortal'
+import { getCurrentFormIsPresaved } from '../../../step-forms/selectors'
 import { PDTitledList } from '../../lists'
+import type { TerminalItemId } from '../../../steplist'
+
 export { TerminalItemLink } from './TerminalItemLink'
 
-type Props = React.ElementProps<typeof PDTitledList>
+type ConfirmModalProps = {|
+  onCancelClick: () => mixed,
+  onContinueClick: () => mixed,
+|}
 
-type OP = {|
+// TODO IMMEDIATELY do we not have anything like this already??? If not, factor it out :(
+const ConfirmModal = (props: ConfirmModalProps) => {
+  const { onCancelClick, onContinueClick } = props
+
+  return (
+    <Portal>
+      <ContinueModal
+        heading="TODO are you sure?"
+        onCancelClick={onCancelClick}
+        onContinueClick={onContinueClick}
+      >
+        foo
+      </ContinueModal>
+    </Portal>
+  )
+}
+
+type Props = {|
+  children?: Node,
   id: TerminalItemId,
   title: string,
-  children?: React.Node,
 |}
 
-type SP = {|
-  hovered: $ElementType<Props, 'hovered'>,
-  selected: $ElementType<Props, 'selected'>,
-|}
+export const TerminalItem = (props: Props) => {
+  const { id, title, children } = props
+  // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 
-function mapStateToProps(state: BaseState, ownProps: OP): SP {
-  const { id } = ownProps
-  const hovered = getHoveredTerminalItemId(state) === id
-  const selected = getSelectedTerminalItemId(state) === id
-  return {
-    hovered,
-    selected,
-  }
+  const hovered = useSelector(getHoveredTerminalItemId) === id
+  const selected = useSelector(getSelectedTerminalItemId) === id
+  const currentFormIsPresaved = useSelector(getCurrentFormIsPresaved)
+
+  const dispatch = useDispatch()
+
+  const selectItem = () => dispatch(stepsActions.selectTerminalItem(id))
+
+  const onMouseEnter = () => dispatch(stepsActions.hoverOnTerminalItem(id))
+  const onMouseLeave = () => dispatch(stepsActions.hoverOnTerminalItem(null))
+
+  const {
+    conditionalContinue,
+    requiresConfirmation,
+    confirmAndContinue,
+    cancelConfirm,
+  } = useConditionalConfirm(selectItem, currentFormIsPresaved)
+
+  return (
+    <>
+      {requiresConfirmation && (
+        <ConfirmModal
+          onContinueClick={confirmAndContinue}
+          onCancelClick={cancelConfirm}
+        />
+      )}
+      <PDTitledList
+        {...{
+          hovered,
+          selected,
+          title,
+          children,
+          onClick: conditionalContinue,
+          onMouseEnter,
+          onMouseLeave,
+        }}
+      />
+    </>
+  )
 }
-
-// TODO Ian: 2018-07-31 annotate type of mergeProps correctly. Related to https://github.com/flow-typed/flow-typed/issues/1269 ?
-function mergeProps(
-  stateProps: SP,
-  dispatchProps: { dispatch: ThunkDispatch<*> },
-  ownProps: OP
-): * {
-  const { id, title, children } = ownProps
-  const { dispatch } = dispatchProps
-  return {
-    ...stateProps,
-    title,
-    children,
-    onClick: () => dispatch(stepsActions.selectTerminalItem(id)),
-    onMouseEnter: () => dispatch(stepsActions.hoverOnTerminalItem(id)),
-    onMouseLeave: () => dispatch(stepsActions.hoverOnTerminalItem(null)),
-  }
-}
-
-export const TerminalItem = connect<Props, OP, SP, {||}, _, _>(
-  mapStateToProps,
-  null,
-  mergeProps
-)(PDTitledList)

@@ -20,7 +20,6 @@ export const PresavedStepItem = () => {
 
   // Actions
   const dispatch = useDispatch()
-  const selectStep = () => dispatch(stepsActions.selectTerminalItem(itemId))
   const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(itemId))
   const highlightStep = () => dispatch(stepsActions.hoverOnTerminalItem(itemId))
@@ -38,7 +37,6 @@ export const PresavedStepItem = () => {
     selected,
     hovered,
 
-    selectStep,
     toggleStepCollapsed,
     highlightStep,
     unhighlightStep,
