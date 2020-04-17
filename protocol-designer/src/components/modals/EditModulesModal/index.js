@@ -98,7 +98,12 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     const { selectedModel, selectedSlot } = values
     // validator from formik should never let onSaveClick be called
     // this case might never be true but still need to handle for flow
-    if (!selectedModel) return
+    if (!selectedModel || !moduleOnDeck) {
+      console.warn(
+        'Cannot edit module without a module on the deck. This should not happen'
+      )
+      return
+    }
 
     if (moduleOnDeck) {
       // disabled if something lives in the slot selected in local state
@@ -117,14 +122,6 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
         }
       }
       editModuleSlot(selectedSlot)
-    } else {
-      dispatch(
-        stepFormActions.createModule({
-          slot: selectedSlot,
-          type: moduleType,
-          model: selectedModel,
-        })
-      )
     }
 
     onCloseClick()
