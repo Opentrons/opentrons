@@ -14,6 +14,7 @@ const itemId = PRESAVED_STEP_ID // TODO make this a prop, rename this component 
 
 export const PresavedStepItem = () => {
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
+  const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
   const hovered = useSelector(getHoveredTerminalItemId) === itemId
   const selected = useSelector(getSelectedTerminalItemId) === itemId
 
@@ -29,30 +30,15 @@ export const PresavedStepItem = () => {
     return null
   }
 
-  // TODO placeholders, need a presaved step reducer
-  const { stepType } = presavedStepForm
-  const stepNumber = 123
-
   const stepItemProps = {
-    isPresavedStep: true,
-    stepId: PRESAVED_STEP_ID, // TODO immediately don't pass in
+    rawForm: null,
     stepNumber,
-    stepType,
-    description: null,
-    substeps: null,
-    rawForm: null, // TODO IMMEDIATELY initial values? Actually I don't think it needs it
+    stepType: presavedStepForm.stepType,
 
-    //   collapsed?: boolean,
-    //   error?: ?boolean,
-    //   warning?: ?boolean,
     selected,
     hovered,
-    ingredNames: {}, // TODO IMMEDIATELY make optional prop?
-    labwareNicknamesById: {}, // TODO IMMEDIATELY make optional prop?
-    labwareDefDisplayNamesById: {}, // TODO IMMEDIATELY make optional prop?
-    // highlightSubstep, // TODO IMMEDIATELY make optional
+
     selectStep,
-    //   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
     toggleStepCollapsed,
     highlightStep,
     unhighlightStep,

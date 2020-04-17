@@ -1,5 +1,5 @@
 // @flow
-import type { StepType, StepIdType, FormData } from '../../form-types'
+import type { StepIdType, FormData } from '../../form-types'
 import type { ChangeFormPayload } from './types'
 
 export type ChangeSavedStepFormAction = {|
@@ -27,11 +27,6 @@ export const changeFormInput = (
 export type PopulateFormAction = {| type: 'POPULATE_FORM', payload: FormData |}
 
 // Create new step
-
-export type AddStepAction = {|
-  type: 'ADD_STEP',
-  payload: {| id: StepIdType, stepType: StepType |},
-|}
 
 export type DeleteStepAction = {| type: 'DELETE_STEP', payload: StepIdType |}
 export const deleteStep = (stepId: StepIdType) => ({

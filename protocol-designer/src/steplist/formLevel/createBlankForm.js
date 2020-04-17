@@ -14,7 +14,7 @@ type NewFormArgs = {
 }
 
 // Add default values to a new step form
-export function generateNewForm(args: NewFormArgs): FormData {
+export function createBlankForm(args: NewFormArgs): FormData {
   const { stepId, stepType } = args
   const baseForm: BlankForm = {
     id: stepId,

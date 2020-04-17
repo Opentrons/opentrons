@@ -10,7 +10,7 @@ import { PAUSE_UNTIL_TEMP } from '../../../../constants'
 import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import { getSelectedStepId } from '../../selectors'
-import { addStep } from './addStep'
+import { addStep } from '../actions'
 import { actions as tutorialActions } from '../../../../tutorial'
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'

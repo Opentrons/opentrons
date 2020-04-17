@@ -56,7 +56,6 @@ import type {
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
-  AddStepAction,
   CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
@@ -65,6 +64,7 @@ import type {
   ReorderStepsAction,
 } from '../../steplist/actions'
 import type {
+  AddStepAction,
   DuplicateStepAction,
   ReorderSelectedStepAction,
   SelectStepAction,

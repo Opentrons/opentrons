@@ -4,23 +4,15 @@ import { shallow } from 'enzyme'
 import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
 
-import type { StepItemProps } from '../StepItem'
+import type { StepItemContentsProps } from '../StepItem'
 
 describe('StepItemContents', () => {
   let props
   beforeEach(() => {
     props = {
-      isPresavedStep: false,
-      stepId: 'stepId',
-      stepNumber: 1,
-      title: 'test',
-      description: null,
       hoveredSubstep: null,
       ingredNames: {},
       highlightSubstep: jest.fn(),
-      selectStep: jest.fn(),
-      toggleStepCollapsed: jest.fn(),
-      highlightStep: jest.fn(),
     }
   })
 
@@ -35,6 +27,7 @@ describe('StepItemContents', () => {
           id: stepType,
           StepFieldName: stepType,
         },
+        stepType: stepType,
         substeps: {
           substepType: stepType,
           engage: true,
@@ -42,7 +35,6 @@ describe('StepItemContents', () => {
           labwareNickname: 'magnet nickname',
           message: 'message',
         },
-        stepType: stepType,
         labwareNicknamesById: {
           magnetId: 'magnet nickname',
         },
@@ -69,7 +61,7 @@ describe('StepItemContents', () => {
   })
 
   describe('temperature step type', () => {
-    let temperatureProps: StepItemProps
+    let temperatureProps: StepItemContentsProps
     const stepType: 'temperature' = 'temperature'
 
     beforeEach(() => {
@@ -121,7 +113,7 @@ describe('StepItemContents', () => {
   })
 
   describe('awaitTemperature step type', () => {
-    let awaitTemperatureProps: StepItemProps
+    let awaitTemperatureProps: StepItemContentsProps
     const stepType: 'awaitTemperature' = 'awaitTemperature'
 
     beforeEach(() => {

@@ -21,8 +21,9 @@ import type { Action } from '../../types'
 import type { LoadFileAction } from '../../load-file'
 import type { StepIdType } from '../../form-types'
 import type { SaveStepFormAction } from '../steps/actions/thunks'
-import type { AddStepAction, DeleteStepAction } from '../../steplist/actions'
+import type { DeleteStepAction } from '../../steplist/actions'
 import type {
+  AddStepAction,
   SelectStepAction,
   SelectTerminalItemAction,
 } from './actions/types'

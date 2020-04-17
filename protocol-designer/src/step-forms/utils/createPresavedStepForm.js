@@ -1,7 +1,7 @@
 // @flow
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import {
-  generateNewForm,
+  createBlankForm,
   getNextDefaultEngageHeight,
   getNextDefaultMagnetAction,
   getNextDefaultPipetteId,
@@ -39,8 +39,7 @@ export const createPresavedStepForm = ({
   orderedStepIds,
   initialDeckSetup,
 }: CreatePresavedStepFormArgs): FormData => {
-  let formData = generateNewForm({
-    // TODO IMMEDIATELY this should  be 'default values'
+  let formData = createBlankForm({
     stepId,
     stepType,
   })
@@ -86,7 +85,6 @@ export const createPresavedStepForm = ({
       orderedStepIds,
       initialDeckSetup.modules
     )
-    console.log({ moduleId })
     formData = {
       ...formData,
       moduleId,

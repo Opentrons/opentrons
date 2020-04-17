@@ -42,7 +42,7 @@ jest.mock('../../utils/labwareModuleCompatibility')
 const mockCreatePresavedStepForm: JestMockFn<
   [CreatePresavedStepFormArgs],
   any
-> = createPresavedStepForm // TODO IMMEDIATELY use correct types
+> = createPresavedStepForm
 const handleFormChangeMock: JestMockFn<
   [{ [string]: any }, { [string]: any }, any, any],
   { [string]: any }

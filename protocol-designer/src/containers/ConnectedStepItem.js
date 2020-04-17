@@ -22,13 +22,13 @@ import {
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as uiLabwareSelectors } from '../ui/labware'
-import { StepItem } from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
+import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import type { StepIdType } from '../form-types'
 
-type StepItemProps = React.ElementProps<typeof StepItem>
 type Props = {|
   stepId: StepIdType,
   stepNumber: number,
+  onStepContextMenu?: () => mixed,
 |}
 
 export const ConnectedStepItem = (props: Props) => {
@@ -72,40 +72,49 @@ export const ConnectedStepItem = (props: Props) => {
 
   const highlightSubstep = (payload: SubstepIdentifier) =>
     dispatch(stepsActions.hoverOnSubstep(payload))
-  const selectStep = stepId => dispatch(stepsActions.selectStep(stepId))
-  const toggleStepCollapsed = stepId =>
+  const selectStep = () => dispatch(stepsActions.selectStep(stepId))
+  const toggleStepCollapsed = () =>
     dispatch(stepsActions.toggleStepCollapsed(stepId))
-  const highlightStep = stepId => dispatch(stepsActions.hoverOnStep(stepId))
-  const unhighlightStep = stepId => dispatch(stepsActions.hoverOnStep(null))
+  const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  const childProps: StepItemProps = {
-    isPresavedStep: false,
+  const stepItemProps = {
+    description: step.stepDetails,
+    rawForm: step,
     stepNumber,
-    stepId,
     stepType: step.stepType,
     title: step.stepName,
-    description: step.description,
-    rawForm: step,
-    substeps,
-    hoveredSubstep,
+
     collapsed,
-    selected,
     error: hasError,
     warning: hasWarnings,
-
+    selected,
     // no double-highlighting: whole step is only "hovered" when
     // user is not hovering on substep.
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
-    labwareNicknamesById,
-    labwareDefDisplayNamesById,
-    ingredNames,
-    highlightSubstep,
+    highlightStep,
     selectStep,
     toggleStepCollapsed,
-    highlightStep,
     unhighlightStep,
   }
 
-  return <StepItem {...childProps} />
+  const stepItemContentsProps = {
+    rawForm: step,
+    stepType: step.stepType,
+    substeps,
+
+    ingredNames,
+    labwareDefDisplayNamesById,
+    labwareNicknamesById,
+
+    highlightSubstep,
+    hoveredSubstep,
+  }
+
+  return (
+    <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
+      <StepItemContents {...stepItemContentsProps} />
+    </StepItem>
+  )
 }

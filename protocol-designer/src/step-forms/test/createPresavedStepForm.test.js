@@ -9,7 +9,7 @@ import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
-} from '../utils'
+} from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'
 let defaultArgs
