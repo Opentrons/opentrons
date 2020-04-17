@@ -56,11 +56,11 @@ type StepEditFormState = {
 
 type Props = { ...SP, ...DP }
 
-// TODO: type fieldNames, don't use `any`
+// TODO: type fieldNames, don't use `string`
 const getDirtyFields = (
   isNewStep: ?boolean,
   formData: ?FormData
-): Array<any> => {
+): Array<string> => {
   let dirtyFields = []
   if (!isNewStep && formData) {
     dirtyFields = Object.keys(formData)
@@ -194,7 +194,7 @@ export class StepEditFormComponent extends React.Component<
 
 const mapStateToProps = (state: BaseState): SP => ({
   formData: stepFormSelectors.getHydratedUnsavedForm(state),
-  isNewStep: stepFormSelectors.getIsNewStepForm(state),
+  isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
 })
 
 const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({

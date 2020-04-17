@@ -71,6 +71,14 @@ import type { InvariantContext } from '../../step-generation'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
 
+export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
+  rootSelector(state).presavedStepForm
+
+export const getCurrentFormIsPresaved: Selector<boolean> = createSelector(
+  getPresavedStepForm,
+  presavedStepForm => presavedStepForm != null
+)
+
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
 // the labware entity in its denormalized representation, in which case you ought
 // to use `getLabwareEntities` instead.
@@ -144,25 +152,6 @@ export const getInitialDeckSetupStepForm: Selector<FormData> = createSelector(
   rootSelector,
   _getInitialDeckSetupStepFormRootState
 )
-
-// TODO: BC: 2019-05-06 currently not being used, but should be used as the interface
-// for presenting labware locations on the deck for a given step
-export const getLabwareLocationsForStep = (
-  state: BaseState,
-  stepId: StepIdType = INITIAL_DECK_SETUP_STEP_ID
-) => {
-  const { orderedStepIds, savedStepForms } = rootSelector(state)
-  const allOrderedStepIds = [INITIAL_DECK_SETUP_STEP_ID, ...orderedStepIds]
-  const relevantStepIds = allOrderedStepIds.slice(
-    0,
-    allOrderedStepIds.indexOf(stepId) + 1
-  )
-  return relevantStepIds.reduce((acc, stepId) => {
-    const { labwareLocationUpdate } = savedStepForms[stepId]
-    if (labwareLocationUpdate) return { ...acc, ...labwareLocationUpdate }
-    return acc
-  }, {})
-}
 
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
   type: MAGNETIC_MODULE_TYPE,
@@ -513,23 +502,14 @@ export const getArgsAndErrorsByStepId: Selector<{
   }
 )
 
-// TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
-// this should only be computed once when a form is opened
-export const getIsNewStepForm: Selector<boolean> = createSelector(
-  getUnsavedForm,
-  getSavedStepForms,
-  (formData, savedForms) =>
-    formData && formData.id != null ? !savedForms[formData.id] : true
-)
-
 export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSelector(
   getUnsavedForm,
-  getIsNewStepForm,
-  (unsavedForm, isNewStepForm) => {
+  getCurrentFormIsPresaved,
+  (unsavedForm, isPresaved) => {
     const isSetTempForm =
       unsavedForm?.stepType === 'temperature' &&
       unsavedForm?.setTemperature === 'true'
-    return isNewStepForm && isSetTempForm
+    return isPresaved && isSetTempForm
   }
 )
 
@@ -557,6 +537,3 @@ export const getFormLevelWarningsPerStep: Selector<{
       return getFormWarnings(form.stepType, hydratedForm)
     })
 )
-
-export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
-  rootSelector(state).presavedStepForm
