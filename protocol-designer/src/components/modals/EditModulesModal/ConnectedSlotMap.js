@@ -11,11 +11,9 @@ type ConnectedSlotMapProps = {
 export const ConnectedSlotMap = (props: ConnectedSlotMapProps) => {
   const { fieldName, isError } = props
   const [field] = useField(fieldName)
-  return (
-    field.value && (
-      <div className={styles.slot_map_container}>
-        <SlotMap occupiedSlots={[`${field.value}`]} isError={isError} />
-      </div>
-    )
-  )
+  return field.value ? (
+    <div className={styles.slot_map_container}>
+      <SlotMap occupiedSlots={[`${field.value}`]} isError={isError} />
+    </div>
+  ) : null
 }
