@@ -3,15 +3,15 @@ import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { FilePage } from '../FilePage'
-import '../modals/EditModulesModal/EditModules.css'
 import { EditModules } from '../EditModules'
+import { Portal } from '../portals/MainPageModalPortal'
 
-jest.mock('../../step-forms/actions')
 jest.mock('../../step-forms/utils')
 jest.mock('../../step-forms/selectors')
-jest.mock('../../labware-ingred/actions')
-jest.mock('../../utils/labwareModuleCompatibility')
 jest.mock('../../feature-flags')
+jest.mock('../portals/MainPageModalPortal')
+
+const mockPortal: JestMockFn<[any], any> = Portal
 
 describe('File Page', () => {
   let props
@@ -31,6 +31,7 @@ describe('File Page', () => {
       subscribe: jest.fn(),
       getState: () => ({ mock: 'this is a mocked out getState' }),
     }
+    mockPortal.mockReturnValue(<div></div>)
   })
   it('renders a file page with Edit Modules closed', () => {
     const wrapper = mount(
