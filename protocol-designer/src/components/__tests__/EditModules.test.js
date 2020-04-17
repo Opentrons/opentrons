@@ -15,10 +15,8 @@ import { Portal } from '../portals/MainPageModalPortal'
 import { EditModulesModal } from '../modals/EditModulesModal'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
-jest.mock('../../step-forms/actions')
 jest.mock('../../step-forms/utils')
 jest.mock('../../step-forms/selectors')
-jest.mock('../../labware-ingred/actions')
 jest.mock('../../utils/labwareModuleCompatibility')
 jest.mock('../../feature-flags')
 jest.mock('../../tutorial')
