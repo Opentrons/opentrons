@@ -1,7 +1,8 @@
 // @flow
 import React from 'react'
-import { useSelector } from 'react-redux'
-import { Formik } from 'formik'
+import * as Yup from 'yup'
+import { useSelector, useDispatch } from 'react-redux'
+import { Form, Formik, useFormikContext } from 'formik'
 import cx from 'classnames'
 import { i18n } from '../../../localization'
 import {
@@ -10,39 +11,181 @@ import {
   getLabwareOnSlot,
 } from '../../../step-forms/utils'
 import { getLabwareIsCompatible } from '../../../utils/labwareModuleCompatibility'
-import { selectors as stepFormSelectors } from '../../../step-forms'
+import {
+  selectors as stepFormSelectors,
+  actions as stepFormActions,
+} from '../../../step-forms'
 import { PDAlert } from '../../alerts/PDAlert'
-import type { ModuleRealType } from '@opentrons/shared-data'
+import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import modalStyles from '../modal.css'
 import styles from './EditModules.css'
 import { ModelDropdown } from './ModelDropdown'
-import { SUPPORTED_MODULE_SLOTS } from '../../../modules/moduleData'
-import { Modal } from '@opentrons/components'
-import type { FormikProps } from 'formik/@flow-typed'
+import { SlotDropdown } from './SlotDropdown'
+import { ConnectedSlotMap } from './ConnectedSlotMap'
+import { isModuleWithCollisionIssue } from '../../modules'
+import {
+  SUPPORTED_MODULE_SLOTS,
+  getAllModuleSlotsByType,
+} from '../../../modules/moduleData'
+import { useResetSlotOnModelChange } from './form-state'
+import { selectors as featureFlagSelectors } from '../../../feature-flags'
+import { MODELS_FOR_MODULE_TYPE } from '../../../constants'
+import { Modal, FormGroup, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
+import type { InitialDeckSetup, ModuleOnDeck } from '../../../step-forms/types'
+import { HoverTooltip } from '../../../../../components/src/tooltips/HoverTooltip'
+import {
+  THERMOCYCLER_MODULE_TYPE,
+  MAGNETIC_MODULE_TYPE,
+} from '../../../../../shared-data/js/constants'
+import type { ModelModuleInfo } from '../../EditModules'
+import { OutlineButton } from '../../../../../components/src/buttons/OutlineButton'
 
 type EditModulesModalProps = {
   moduleType: ModuleRealType,
   moduleId: ?string,
   onCloseClick: () => mixed,
+  editModuleModel: (model: ModuleModel) => mixed,
+  editModuleSlot: (slot: string) => mixed,
+  setChangeModuleWarningInfo: (module: ModelModuleInfo) => mixed,
 }
 
-export type EditModulesFormValues = {
+type DeckInfo = {
+  initialDeckSetup: InitialDeckSetup,
+  moduleOnDeck: ModuleOnDeck | null,
+}
+export type EditModulesFormValues = {|
   selectedModel: ModuleModel | null,
   selectedSlot: string,
-}
+|}
 
 export const EditModulesModalNew = (props: EditModulesModalProps) => {
-  const { moduleType } = props
-  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
-  const moduleOnDeck = props.moduleId
-    ? initialDeckSetup.modules[props.moduleId]
-    : null
+  const {
+    moduleType,
+    setChangeModuleWarningInfo,
+    editModuleModel,
+    editModuleSlot,
+    onCloseClick,
+    moduleId,
+  } = props
   const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
+  const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
+  const dispatch = useDispatch()
+
+  const moduleOnDeck = moduleId ? initialDeckSetup.modules[moduleId] : null
 
   const initialValues = {
     selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
     selectedModel: moduleOnDeck?.model || null,
   }
+  const validationSchema = Yup.object().shape({
+    selectedModel: Yup.string()
+      .nullable()
+      .required('This field is required'),
+    selectedSlot: Yup.string().required(),
+  })
+
+  const onSaveClick = (values: EditModulesFormValues): void => {
+    const { selectedModel, selectedSlot } = values
+    // validator from formik should never let onSaveClick be called
+    // this case might never be true but still need to handle for flow
+    if (!selectedModel) return
+
+    if (moduleOnDeck) {
+      // disabled if something lives in the slot selected in local state
+      // if previous moduleOnDeck.model is different, edit module
+      if (moduleOnDeck.model !== selectedModel) {
+        if (moduleOnDeck.type === MAGNETIC_MODULE_TYPE) {
+          // we're changing Magnetic Module's model, show the blocking hint modal
+          setChangeModuleWarningInfo({
+            model: selectedModel,
+            slot: selectedSlot,
+          })
+          // bail out of the rest of the submit (avoid onCloseClick call)
+          return
+        } else {
+          editModuleModel(selectedModel)
+        }
+      }
+      editModuleSlot(selectedSlot)
+    } else {
+      dispatch(
+        stepFormActions.createModule({
+          slot: selectedSlot,
+          type: moduleType,
+          model: selectedModel,
+        })
+      )
+    }
+
+    onCloseClick()
+  }
+
+  return (
+    <Formik
+      onSubmit={onSaveClick}
+      initialValues={initialValues}
+      validationSchema={validationSchema}
+    >
+      <EditModulesModalNewComponent
+        {...props}
+        initialDeckSetup={initialDeckSetup}
+        moduleOnDeck={moduleOnDeck}
+      />
+    </Formik>
+  )
+}
+
+const EditModulesModalNewComponent = (
+  props: EditModulesModalProps & DeckInfo
+) => {
+  const { initialDeckSetup, moduleOnDeck, moduleType, onCloseClick } = props
+  const { values } = useFormikContext()
+  const { selectedSlot, selectedModel } = values
+  const previousModuleSlot = moduleOnDeck?.slot
+
+  const disabledModuleRestriction = useSelector(
+    featureFlagSelectors.getDisableModuleRestrictions
+  )
+
+  const hasSlotIssue = (): boolean => {
+    const hasModuleMoved = previousModuleSlot !== selectedSlot
+    const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
+      selectedSlot
+    )
+    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
+    const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
+    const isLabwareCompatible =
+      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+
+    if (!hasModuleMoved || (isSlotEmpty && !isSlotBlocked)) {
+      return false
+    }
+
+    return !isLabwareCompatible
+  }
+
+  const slotIssue: boolean = hasSlotIssue()
+
+  const slotError = slotIssue
+    ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
+    : null
+
+  const moduleHasCollisionIssue =
+    selectedModel && !isModuleWithCollisionIssue(selectedModel)
+  isModuleWithCollisionIssue(selectedModel)
+
+  const enableSlotSelection =
+    disabledModuleRestriction || moduleHasCollisionIssue
+
+  const slotOptionTooltip = (
+    <div className={styles.slot_tooltip}>
+      {i18n.t('tooltip.edit_module_modal.slot_selection')}
+    </div>
+  )
+
+  const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
+
+  useResetSlotOnModelChange()
 
   return (
     <Modal
@@ -50,65 +193,68 @@ export const EditModulesModalNew = (props: EditModulesModalProps) => {
       className={cx(modalStyles.modal, styles.edit_module_modal)}
       contentsClassName={styles.modal_contents}
     >
-      <Formik onSubmit={() => null} initialValues={initialValues}>
-        {({ values, handleChange }: FormikProps<EditModulesFormValues>) => {
-          const { selectedSlot, selectedModel } = values
-          const previousModuleSlot = moduleOnDeck?.slot
-
-          const slotError: boolean = showSlotError({
-            initialDeckSetup,
-            moduleType,
-            selectedSlot,
-            previousModuleSlot,
-          })
-
-          return (
-            <>
-              {slotError && (
-                <PDAlert
-                  alertType="warning"
-                  title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
-                  description={''}
+      <>
+        {slotIssue && (
+          <PDAlert
+            alertType="warning"
+            title={i18n.t('alert.module_placement.SLOT_OCCUPIED.title')}
+            description={''}
+          />
+        )}
+        <Form>
+          <div className={styles.form_row}>
+            <FormGroup label="Model*" className={styles.option_model}>
+              <ModelDropdown
+                fieldName={'selectedModel'}
+                options={MODELS_FOR_MODULE_TYPE[moduleType]}
+              />
+            </FormGroup>
+            {showSlotOption && (
+              <>
+                <HoverTooltip
+                  placement="top"
+                  tooltipComponent={slotOptionTooltip}
+                >
+                  {hoverTooltipHandlers => (
+                    <div
+                      {...hoverTooltipHandlers}
+                      className={styles.option_slot}
+                    >
+                      <FormGroup label="Position">
+                        <SlotDropdown
+                          fieldName={'selectedSlot'}
+                          options={getAllModuleSlotsByType(moduleType)}
+                          error={slotError}
+                          disabled={!enableSlotSelection}
+                        />
+                      </FormGroup>
+                    </div>
+                  )}
+                </HoverTooltip>
+                <ConnectedSlotMap
+                  fieldName={'selectedSlot'}
+                  isError={slotIssue}
                 />
-              )}
-              <form>
-                <div className={styles.form_row}>
-                  <ModelDropdown
-                    moduleType={moduleType}
-                    selectedModel={selectedModel}
-                  />
-                </div>
-              </form>
-              {/* <SlotDropdown /> */}
-              {/* <SlotMap /> */}
-              {/* <Buttons />  use type=[submit] here rather than passing down submit handler */}
-            </>
-          )
-        }}
-      </Formik>
+              </>
+            )}
+          </div>
+          <div className={modalStyles.button_row}>
+            <OutlineButton
+              className={styles.button_margin}
+              onClick={onCloseClick}
+            >
+              {i18n.t('button.cancel')}
+            </OutlineButton>
+            <OutlineButton
+              className={styles.button_margin}
+              disabled={slotIssue}
+              type={BUTTON_TYPE_SUBMIT}
+            >
+              {i18n.t('button.save')}
+            </OutlineButton>
+          </div>
+        </Form>
+      </>
     </Modal>
   )
-}
-//  WHY does this work? shouldn't this not get hoisted since its a function expression???
-const showSlotError = ({
-  initialDeckSetup,
-  moduleType,
-  selectedSlot,
-  previousModuleSlot,
-}): boolean => {
-  const slotsBlockedBySpanning = getSlotsBlockedBySpanning(initialDeckSetup)
-  const slotIsEmpty =
-    !slotsBlockedBySpanning.includes(selectedSlot) &&
-    (getSlotIsEmpty(initialDeckSetup, selectedSlot) ||
-      previousModuleSlot === selectedSlot)
-
-  if (slotIsEmpty) {
-    return false
-  } else {
-    const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
-    const labwareIsCompatible =
-      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
-
-    return !labwareIsCompatible
-  }
 }

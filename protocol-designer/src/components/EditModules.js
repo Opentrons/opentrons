@@ -9,25 +9,34 @@ import {
 import { useBlockingHint } from './Hints/useBlockingHint'
 import { MagneticModuleWarningModalContent } from './modals/EditModulesModal/MagneticModuleWarningModalContent'
 import { EditModulesModalNew } from './modals/EditModulesModal/EditModulesModalNew'
+import { moveDeckItem } from '../labware-ingred/actions/actions'
 
 type EditModulesProps = {
-  currentModule: {
+  moduleToEdit: {
     moduleId: ?string,
     moduleType: ModuleRealType,
   },
   onCloseClick: () => mixed,
 }
 
+export type ModelModuleInfo = {|
+  model: ModuleModel,
+  slot: string,
+|}
+
 export const EditModules = (props: EditModulesProps) => {
-  const { onCloseClick, currentModule } = props
-  const { moduleId, moduleType } = currentModule
+  const { onCloseClick, moduleToEdit } = props
+  const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
 
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
-  const [moduleModel, setModuleModel] = useState<null | ModuleModel>(null)
+  const [
+    changeModuleWarningInfo,
+    setChangeModuleWarningInfo,
+  ] = useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
-  const editModule = (selectedModel: ModuleModel) => {
+  const editModuleModel = (selectedModel: ModuleModel) => {
     if (moduleOnDeck?.id != null) {
       dispatch(
         stepFormActions.editModule({
@@ -37,7 +46,16 @@ export const EditModules = (props: EditModulesProps) => {
       )
     } else {
       console.error(
-        `cannot edit module without module id. This shouldn't be able to happen`
+        `cannot edit module model without module id. This shouldn't be able to happen`
+      )
+    }
+  }
+  const editModuleSlot = (selectedSlot: string) => {
+    if (selectedSlot && moduleOnDeck && moduleOnDeck.slot !== selectedSlot) {
+      dispatch(moveDeckItem(moduleOnDeck.slot, selectedSlot))
+    } else {
+      console.error(
+        `cannot edit module slot without module slot. This shouldn't be able to happen`
       )
     }
   }
@@ -45,19 +63,20 @@ export const EditModules = (props: EditModulesProps) => {
   const changeModuleWarning = useBlockingHint({
     hintKey: 'change_magnet_module_model',
     handleCancel: () => {
-      setModuleModel(null)
+      setChangeModuleWarningInfo(null)
     },
     handleContinue: () => {
-      if (moduleModel) {
-        editModule(moduleModel)
+      if (changeModuleWarningInfo) {
+        editModuleModel(changeModuleWarningInfo.model)
+        editModuleSlot(changeModuleWarningInfo.slot)
       } else {
-        console.error('no enqueuedModuleModel, could not edit module')
+        console.error('no module info set, could not edit module')
       }
-      setModuleModel(null)
+      setChangeModuleWarningInfo(null)
       onCloseClick()
     },
     content: <MagneticModuleWarningModalContent />,
-    enabled: moduleModel !== null,
+    enabled: changeModuleWarningInfo !== null,
   })
 
   return (
@@ -65,7 +84,10 @@ export const EditModules = (props: EditModulesProps) => {
       <EditModulesModalNew
         moduleId={moduleId}
         moduleType={moduleType}
-        onCloseClick={() => null}
+        onCloseClick={onCloseClick}
+        editModuleSlot={editModuleSlot}
+        editModuleModel={editModuleModel}
+        setChangeModuleWarningInfo={setChangeModuleWarningInfo}
       />
     )
   )

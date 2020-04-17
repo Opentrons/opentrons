@@ -4,17 +4,15 @@ import React from 'react'
 import * as Formik from 'formik'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { ModelDropdown } from '../ModelDropdown'
-import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
+import { SlotDropdown } from '../SlotDropdown'
 import { DropdownField } from '../../../../../../components/src/forms/DropdownField'
-import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('formik')
 
 const useField: JestMockFn<[any], $Call<typeof Formik.useField, any>> =
   Formik.useField
 
-describe('Model Dropdown', () => {
+describe('Slot Dropdown', () => {
   let mockStore
   let props
 
@@ -33,7 +31,15 @@ describe('Model Dropdown', () => {
   beforeEach(() => {
     props = {
       fieldName: 'selectedModule',
-      options: MODELS_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
+      options: [
+        {
+          name: 'name',
+          value: 'value',
+          disabled: false,
+        },
+      ],
+      error: 'mockError',
+      disabled: false,
     }
     mockStore = {
       dispatch: jest.fn(),
@@ -44,15 +50,15 @@ describe('Model Dropdown', () => {
   const render = props =>
     mount(
       <Provider store={mockStore}>
-        <ModelDropdown {...props} />
+        <SlotDropdown {...props} />
       </Provider>
     )
 
   it('should render a DropdownField with the appropriate props', () => {
-    mockFieldOnce('mockVal', 'mockError', false)
+    mockFieldOnce('mockVal', '', false)
     const wrapper = render(props)
     const dropdownField = wrapper.find(DropdownField)
-    expect(dropdownField.prop('tabIndex')).toBe(0)
+    expect(dropdownField.prop('tabIndex')).toBe(1)
     expect(dropdownField.prop('options')).toBe(props.options)
     expect(dropdownField.prop('name')).toBe(props.fieldName)
     expect(dropdownField.prop('value')).toBe('mockVal')

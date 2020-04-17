@@ -3,11 +3,10 @@ import { useEffect } from 'react'
 import { useField, useFormikContext } from 'formik'
 import { isModuleWithCollisionIssue } from '../../modules/utils'
 import { usePrevious } from '@opentrons/components'
-import type { EditModulesState } from './'
 
 export const useResetSlotOnModelChange = () => {
   // not sure why flow doesn't like values since I am passing type to the hook
-  const { values, setValues } = useFormikContext<EditModulesState>()
+  const { values, setValues } = useFormikContext()
 
   const selectedModel = values.selectedModel
   const selectedSlot = values.selectedSlot

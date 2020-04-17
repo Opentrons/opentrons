@@ -5,24 +5,28 @@ import { useField } from 'formik'
 
 type ModelDropdownProps = {
   fieldName: string,
+  error: string | null,
+  disabled: boolean,
   options: Array<{|
     name: string,
     value: string,
     disabled?: boolean,
   |}>,
 }
-export const ModelDropdown = (props: ModelDropdownProps) => {
-  const { fieldName, options } = props
-  const [field, meta] = useField(fieldName)
+
+export const SlotDropdown = (props: ModelDropdownProps) => {
+  const { fieldName, options, error, disabled } = props
+  const [field] = useField(props.fieldName)
   return (
     <DropdownField
-      tabIndex={0}
+      tabIndex={1}
       options={options}
       name={fieldName}
       value={field.value}
+      disabled={disabled}
       onChange={field.onChange}
       onBlur={field.onBlur}
-      error={meta.error}
+      error={error}
     />
   )
 }
