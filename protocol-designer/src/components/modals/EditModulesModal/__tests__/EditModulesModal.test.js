@@ -8,15 +8,17 @@ import { OutlineButton } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
-  MAGNETIC_MODULE_V1,
   MAGNETIC_MODULE_V2,
-  TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import {
+  mockDeckSetup,
+  mockMagneticModule,
+  mockTemperatureModule,
+} from '../../../../../fixtures/state/deck'
+import {
+  actions as stepFormActions,
   selectors as stepFormSelectors,
-  type InitialDeckSetup,
 } from '../../../../step-forms'
 import {
   getLabwareOnSlot,
@@ -24,24 +26,19 @@ import {
   getSlotIsEmpty,
 } from '../../../../step-forms/utils'
 import * as moduleData from '../../../../modules/moduleData'
-import {
-  MODELS_FOR_MODULE_TYPE,
-  TEMPERATURE_DEACTIVATED,
-} from '../../../../constants'
+import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import type { BaseState } from '../../../../types'
 import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { EditModulesModal } from '../'
+import { EditModulesModal } from '..'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
-
-import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
 
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
 jest.mock('../../../../step-forms/selectors')
+jest.mock('../../../../step-forms/actions')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
@@ -49,15 +46,14 @@ jest.mock('../form-state')
 const MODEL_FIELD = 'selectedModel'
 const SLOT_FIELD = 'selectedSlot'
 
-const getInitialDeckSetupMock: JestMockFn<[BaseState], InitialDeckSetup> =
+const getInitialDeckSetupMock: JestMockFn<any, any> =
   stepFormSelectors.getInitialDeckSetup
 
-const getLabwareIsCompatibleMock: JestMockFn<
-  [LabwareDefinition2, ModuleRealType],
-  boolean
-> = getLabwareIsCompatible
+const createModuleMock: JestMockFn<any, any> = stepFormActions.createModule
 
-const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
+const getLabwareIsCompatibleMock: JestMockFn<any, any> = getLabwareIsCompatible
+
+const getDisableModuleRestrictionsMock: JestMockFn<any, any> =
   featureSelectors.getDisableModuleRestrictions
 
 const isModuleWithCollisionIssueMock: JestMockFn<
@@ -74,8 +70,6 @@ const getSlotIsEmptyMock: JestMockFn<any, any> = getSlotIsEmpty
 
 const getLabwareOnSlotMock: JestMockFn<any, any> = getLabwareOnSlot
 
-// const getAllModuleSlotsByTypeMock: JestMockFn<any, any> = getAllModuleSlotsByType
-
 const mockFormikValueChange = () => {
   const values = {
     [MODEL_FIELD]: 'some_model',
@@ -83,52 +77,17 @@ const mockFormikValueChange = () => {
   }
   jest.spyOn(Formik, 'useFormikContext').mockImplementation(() => ({ values }))
 }
-const mockInitialDeckSetup = () => {
-  getInitialDeckSetupMock.mockReturnValue({
-    labware: {
-      well96Id: {
-        ...fixture_96_plate,
-        slot: '1',
-      },
-    },
-    modules: {
-      mag_mod: {
-        id: 'mag_mod',
-        moduleState: {
-          type: MAGNETIC_MODULE_TYPE,
-          engaged: false,
-        },
-        type: MAGNETIC_MODULE_TYPE,
-        slot: '7',
-        model: MAGNETIC_MODULE_V1,
-      },
-      temp_mod: {
-        id: 'temp_mod',
-        moduleState: {
-          type: TEMPERATURE_MODULE_TYPE,
-          status: TEMPERATURE_DEACTIVATED,
-          targetTemperature: null,
-        },
-        type: TEMPERATURE_MODULE_TYPE,
-        slot: '8',
-        model: TEMPERATURE_MODULE_V1,
-      },
-    },
-    pipettes: {},
-  })
-}
 
 describe('Edit Modules Modal', () => {
   let mockStore
   let props
   beforeEach(() => {
-    mockInitialDeckSetup()
     mockFormikValueChange()
+    getInitialDeckSetupMock.mockReturnValue(mockDeckSetup)
     getSlotsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValueOnce({})
-
     props = {
-      moduleId: 'mag_mod',
+      moduleOnDeck: mockMagneticModule,
       moduleType: MAGNETIC_MODULE_TYPE,
       onCloseClick: jest.fn(),
       editModuleModel: jest.fn(),
@@ -173,10 +132,6 @@ describe('Edit Modules Modal', () => {
   })
 
   describe('Slot Dropdown', () => {
-    afterEach(() => {
-      isModuleWithCollisionIssueMock.mockReset()
-    })
-
     it('should pass the correct options', () => {
       const mockSlots = [{ value: 'mockSlots', name: 'mockSlots' }]
       jest
@@ -269,8 +224,8 @@ describe('Edit Modules Modal', () => {
       })
     })
 
-    it('edits the model  and changes slot when model changes but is not magnetic module ', () => {
-      props.moduleId = 'temp_mod'
+    it('edits the model and slot if module is not magnetic module', () => {
+      props.moduleOnDeck = mockTemperatureModule
       const wrapper = render(props)
       const formik = wrapper.find(Formik.Formik)
       const mockValues = {
@@ -282,6 +237,27 @@ describe('Edit Modules Modal', () => {
       })
       expect(props.editModuleModel).toHaveBeenCalledWith(TEMPERATURE_MODULE_V2)
       expect(props.editModuleSlot).toHaveBeenCalledWith('1')
+    })
+
+    it('creates a new module if no module is registered', () => {
+      props.moduleOnDeck = null
+      const wrapper = render(props)
+      const formik = wrapper.find(Formik.Formik)
+      const mockValues = {
+        selectedSlot: '1',
+        selectedModel: MAGNETIC_MODULE_V2,
+      }
+      act(() => {
+        formik.invoke('onSubmit')(mockValues)
+      })
+
+      const expectedParams = {
+        slot: '1',
+        type: MAGNETIC_MODULE_TYPE,
+        model: MAGNETIC_MODULE_V2,
+      }
+
+      expect(createModuleMock).toHaveBeenCalledWith(expectedParams)
     })
   })
 })
