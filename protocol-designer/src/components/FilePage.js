@@ -15,7 +15,6 @@ import cx from 'classnames'
 import { i18n } from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
-// import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
 import { EditModules } from './EditModules'
 import styles from './FilePage.css'
@@ -220,7 +219,6 @@ export class FilePage extends React.Component<Props, State> {
           {this.state.isEditPipetteModalOpen && (
             <EditPipettesModal closeModal={this.closeEditPipetteModal} />
           )}
-          {/* render the edit modules modal OR render the module change modal */}
           {this.state.moduleToEdit && (
             <EditModules
               moduleToEdit={this.state.moduleToEdit}
