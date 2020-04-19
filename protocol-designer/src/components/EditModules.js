@@ -78,8 +78,8 @@ export const EditModules = (props: EditModulesProps) => {
   return (
     changeModuleWarning || (
       <EditModulesModal
-        moduleId={moduleId}
         moduleType={moduleType}
+        moduleOnDeck={moduleOnDeck}
         onCloseClick={onCloseClick}
         editModuleSlot={editModuleSlot}
         editModuleModel={editModuleModel}

@@ -47,7 +47,7 @@ import type { ModelModuleInfo } from '../../EditModules'
 
 type EditModulesModalProps = {
   moduleType: ModuleRealType,
-  moduleId: ?string,
+  moduleOnDeck: ModuleOnDeck | null,
   onCloseClick: () => mixed,
   editModuleModel: (model: ModuleModel) => mixed,
   editModuleSlot: (slot: string) => mixed,
@@ -75,13 +75,11 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     editModuleModel,
     editModuleSlot,
     onCloseClick,
-    moduleId,
+    moduleOnDeck,
   } = props
   const supportedModuleSlot = SUPPORTED_MODULE_SLOTS[moduleType][0].value
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
-
-  const moduleOnDeck = moduleId ? initialDeckSetup.modules[moduleId] : null
 
   const initialValues = {
     selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
