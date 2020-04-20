@@ -301,7 +301,7 @@ CHECK_TRANSITIONS= [
         "trigger": "prepare_pipette",
         "from_state": "labwareLoaded",
         "to_state": "preparingPipette",
-        "before": "_move_to_tiprack_for_pipette"
+        "before": "_move"
     },
     {
         "trigger": "jog",
@@ -455,13 +455,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             raise TipAttachError()
         await self.hardware.remove_tip(self._get_mount(pipette))
 
-    async def _move_to_tiprack_for_pipette(self, pipette_id: UUID):
-        print(f'FROM move to tiprack for pip {pipette_id}')
-        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        loc = self._moves.moveToTipRack[tiprack_id][pipette_id]['offset']
-        await self._move(pipette_id=pipette_id,
-                         request_location={"offset": loc,
-                                           "locationId": tiprack_id})
+    # async def _move_to_tiprack_for_pipette(self, pipette_id: UUID):
+    #     print(f'FROM move to tiprack for pip {pipette_id}')
+    #     tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+    #     loc = self._moves.moveToTipRack[tiprack_id][pipette_id]['offset']
+    #     await self._move(pipette_id=pipette_id,
+    #                      request_location={"offset": loc,
+    #                                        "locationId": tiprack_id})
 
     async def _return_tip_for_pipette(self, pipette: UUID, **kwargs):
         if not self._has_tip(pipette):
@@ -529,15 +529,43 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         else:
             return Location(pos, None)
 
+    # async def _move(self,
+    #                 pipette_id: UUID,
+    #                 request_location: PositionType = None,
+    #                 **kwargs):
+    #     print(f'FROM _MOVE pip id {pipette_id}')
+    #     print(f'FROM _MOVE {getattr(self._moves, to_state)}')
+    #     tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+    #     to_loc= getattr(self._moves, to_state)[tiprack_id][pipette_id]
+    #     print(f'FROM _MOVE loc === {to_loc}')
+
+    #     # determine current location
+    #     mount = self._get_mount(pipette_id)
+    #     from_pt = await self.hardware.gantry_position(mount)
+    #     from_loc = Location(from_pt, None)
+
+    #     max_height = self.hardware.get_instrument_max_height(mount)
+    #     moves = geometry.plan_moves(from_loc, to_loc, self._deck, max_height)
+    #     for move in moves:
+    #         await self.hardware.move_to(mount, move[0], move[1])
+
     async def _move(self,
                     pipette_id: UUID,
-                    request_location: PositionType = None,
-                    **kwargs):
-        print(f'FROM _MOVE pip id {pipette_id}')
-        print(f'FROM _MOVE {getattr(self._moves, to_state)}')
-        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        to_loc= getattr(self._moves, to_state)[tiprack_id][pipette_id]
-        print(f'FROM _MOVE loc === {to_loc}')
+                    from_state: str,
+                    to_state: str,
+                    request_location: PositionType = None):
+
+        if to_state == 'preparingPipette':
+            tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+            offset = self._moves.preparingPipette[tiprack_id][pipette_id]['offset']
+            loc = {"offset": offset, "locationId": tiprack_id}
+        else:
+            loc = request_location
+
+        moves_for_step= getattr(self._moves, to_state)
+        to_loc = self._determine_move_location(moves_for_step,
+                                               loc,
+                                               pipette_id)
 
         # determine current location
         mount = self._get_mount(pipette_id)
