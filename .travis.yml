@@ -84,14 +84,13 @@ jobs:
 
     # test, build, and upload for JavaScript projects
     - stage: test
-      name: 'JS unit & E2E tests; build Protocol Designer, Labware Library, Components Library'
+      name: 'JS unit; build Protocol Designer, Labware Library, Components Library'
       # node version pulled from .nvmrc
       language: node_js
       install:
         - make install-js
       script:
         - make test-js
-        - make test-e2e
         - make lint-js
         - make circular-dependencies-js
         - make lint-css
@@ -121,6 +120,15 @@ jobs:
           local-dir: components/dist
           bucket: opentrons-components
           upload-dir: $TRAVIS_BRANCH
+
+    # E2E tests for FE JavaScript projects
+    - stage: test
+      name: 'JS E2E tests'
+      language: node_js
+      install:
+        - make install-js
+      script:
+        - make test-e2e
 
     # typecheck JavaScript projects
     - stage: test
