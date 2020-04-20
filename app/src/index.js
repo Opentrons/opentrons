@@ -9,7 +9,7 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
 import { createLogger } from './logger'
-import { checkShellUpdate } from './shell'
+import { uiInitialized, checkShellUpdate } from './shell'
 
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
 import { initializeAnalytics } from './analytics'
@@ -52,7 +52,8 @@ if (config.devtools) window.store = store
 store.dispatch(initializeAnalytics())
 store.dispatch(initializeSupport())
 
-// kickoff an initial update check at launch
+// kickoff shell initializations and initial app update check at launch
+store.dispatch(uiInitialized())
 store.dispatch(checkShellUpdate())
 
 // kickoff a discovery run immediately

@@ -50,6 +50,7 @@ install-py:
 .PHONY: install-js
 install-js:
 	yarn
+	electron-rebuild
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
 	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR)
 

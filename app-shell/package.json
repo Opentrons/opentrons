@@ -33,6 +33,7 @@
     "electron-dl": "^1.14.0",
     "electron-store": "^4.0.0",
     "electron-updater": "^4.1.2",
+    "execa": "^4.0.0",
     "form-data": "^2.5.0",
     "fs-extra": "^6.0.1",
     "get-stream": "^5.1.0",
@@ -42,6 +43,7 @@
     "pump": "^3.0.0",
     "semver": "^5.5.0",
     "tempy": "^0.3.0",
+    "usb-detection": "^4.7.0",
     "uuid": "^3.2.1",
     "winston": "^3.1.0",
     "yargs-parser": "^10.0.0"

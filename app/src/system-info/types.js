@@ -15,6 +15,7 @@ export type UsbDevice = {|
   manufacturer: string,
   serialNumber: string,
   deviceAddress: number,
+  windowsDriverVersion?: string | null,
 |}
 
 // TODO(mc, 2020-04-17): add other system info

@@ -50,4 +50,7 @@ export type UiInitializedAction = {|
   meta: {| shell: true |},
 |}
 
-export type ShellAction = ShellUpdateAction | RobotLogsAction
+export type ShellAction =
+  | UiInitializedAction
+  | ShellUpdateAction
+  | RobotLogsAction
