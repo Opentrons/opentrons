@@ -54,10 +54,12 @@ async def test_move_to_position(async_client, async_server, test_setup):
 
     well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette]['well']
 
-    pos_dict = {'locationId': tiprack_id, 'offset': [0, 1, 0]}
+    # pos_dict = {'locationId': tiprack_id, 'offset': [0, 1, 0]}
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
         json={'pipetteId': pip_id})
+
+    assert resp.status == 200
 
     curr_pos = await sess.hardware.gantry_position(mount)
     assert curr_pos == (well.top()[0] + types.Point(0, 1, 0))
@@ -72,9 +74,11 @@ async def test_jog_pipette(async_client, async_server, test_setup):
     mount = types.Mount.LEFT
 
     old_pos = await sess.hardware.gantry_position(mount)
-    await async_client.post(
+    resp = await async_client.post(
         '/calibration/check/session/jog',
         json={'pipetteId': id, 'vector': [0, -1, 0]})
+
+    assert resp.status == 200
 
     new_pos = await sess.hardware.gantry_position(mount)
 
@@ -91,7 +95,9 @@ async def test_pickup_tip(async_client, async_server, test_setup):
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
         json={'pipetteId': id})
+
     text = await resp.json()
+    assert resp.status == 200
     assert text['instruments'][id]['has_tip'] is True
     assert text['instruments'][id]['tip_length'] > 0.0
 
@@ -124,15 +130,22 @@ async def test_drop_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
 
+    id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
         json={'pipetteId': id})
+    assert resp.status == 200
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
         json={'pipetteId': id})
+    assert resp.status == 200
     resp = await async_client.post(
         '/calibration/check/session/confirmTip',
         json={'pipetteId': id})
+    assert resp.status == 200
+
+    text = await resp.json()
+
     assert text['instruments'][id]['has_tip'] is True
 
     sess._set_current_state('checkingHeight')

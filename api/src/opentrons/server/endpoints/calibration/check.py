@@ -98,7 +98,7 @@ async def move(request: web.Request, session) -> web.Response:
             "locationId": moveloc.location.locationId,
             "position": types.Point(*position)}
     await session.confirm_step(pipette_id=moveloc.pipetteId,
-                                request_location=location)
+                               request_location=location)
     return web.json_response(status=200)
 
 

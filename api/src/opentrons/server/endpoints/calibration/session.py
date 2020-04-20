@@ -392,6 +392,7 @@ CHECK_TRANSITIONS= [
     }
 ]
 
+
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
         CalibrationSession.__init__(self, hardware)
@@ -448,7 +449,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             raise TipAttachError()
         id = self._relate_mount[pipette]['tiprack_id']
         mount = self._get_mount(pipette)
-        await self._pick_up_tip(mount, id)
+        await super(self.__class__, self)._pick_up_tip(mount, id)
 
     async def _invalidate_tip(self, pipette: UUID, **kwargs):
         if not self._has_tip(pipette):
@@ -531,7 +532,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             offset = position['offset']
             updated_pt = pt + offset
             return Location(updated_pt, well)
-        else position.get('position'):
+        else:
+            position.get('position')
             loc_to_move = position['position']
             return Location(loc_to_move, None)
 
@@ -542,7 +544,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     request_position: PositionType = None):
 
         to_loc = self._get_move_to_location(to_state,
-                                            requested_position,
+                                            request_position,
                                             pipette_id)
 
         # determine current location
@@ -558,6 +560,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _jog(self, pipette: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
-        await self._jog(mount, vector)
+        await super(self.__class__, self)._jog(mount, vector)
         new_pos = await self.hardware.gantry_position(mount)
         self._update_tiprack_offset(pipette, old_pos, new_pos)

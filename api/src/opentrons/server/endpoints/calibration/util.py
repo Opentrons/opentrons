@@ -177,8 +177,8 @@ class Transition:
             return False
         if self.before:
             await self.before(*args,
-                             to_state=self.to_state,
-                             from_state=self.from_state,
+                              to_state=self.to_state,
+                              from_state=self.from_state,
                               **kwargs)
         if self.from_state is not WILDCARD:
             await get_state_by_name(self.from_state).exit()
@@ -229,6 +229,7 @@ class CallbackKeys(enum.Enum):
 
 TransitionKwargs = Dict[TransitionKeys, str]
 
+
 class StateMachine():
     def __init__(self,
                  states: List[StateParams],
@@ -272,9 +273,10 @@ class StateMachine():
                                             self._set_current_state,
                                             *args, **kwargs):
                     break
-        except Exception:
+        except Exception as e:
             raise StateMachineError(f'event {trigger} failed to '
-                                    f'transition from {self._current_state.name}')
+                                    f'transition from {self._current_state.name}'
+                                    f': {str(e)}')
 
     def _get_cb(self, method_name: Optional[str]):
         return getattr(self, method_name) if method_name else None

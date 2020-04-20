@@ -196,16 +196,15 @@ def machine(loop):
         def __init__(self):
             super().__init__(states=states,
                              transitions=transitions,
-                             initial_state_name="Working")
+                             initial_state="Working")
             self.reached_rem = False
             self.code_written = ''
             self.tabs_open = {'github'}
 
-
         async def reach_rem(self):
             self.reached_rem = True
 
-        async def update_written_code(self, code: str):
+        async def update_written_code(self, code: str, to_state: str, from_state: str):
             self.code_written = code
 
         async def open_reddit_tab(self):
@@ -215,6 +214,7 @@ def machine(loop):
             self.tabs_open.remove('reddit')
 
     return TestModelWithMachine()
+
 
 async def test_state_machine(machine):
     # normal transitions update state
