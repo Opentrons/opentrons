@@ -17,6 +17,8 @@ from .execution_manager import ExecutionManager
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
+    from opentrons.drivers.rpi_drivers.dev_types\
+        import GPIODriverLike  # noqa(F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -60,12 +62,11 @@ class Controller:
                 'likely because not running on linux')
 
     @property
-    def gpio_chardev(self):
+    def gpio_chardev(self) -> 'GPIODriverLike':
         return self._gpio_chardev
 
     async def setup_gpio_chardev(self):
-        if self._gpio_chardev:
-            await self.gpio_chardev.setup()
+        await self.gpio_chardev.setup()
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()

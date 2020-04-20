@@ -15,6 +15,8 @@ from . import modules
 from .execution_manager import ExecutionManager
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
+    from opentrons.drivers.rpi_drivers.dev_types\
+        import GPIODriverLike  # noqa(F501)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -106,7 +108,7 @@ class Simulator:
         self._gpio_chardev = SimulatingGPIOCharDev('gpiochip0')
 
     @property
-    def gpio_chardev(self):
+    def gpio_chardev(self) -> 'GPIODriverLike':
         return self._gpio_chardev
 
     async def setup_gpio_chardev(self):
