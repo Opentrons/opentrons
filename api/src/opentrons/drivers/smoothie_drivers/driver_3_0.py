@@ -12,6 +12,7 @@ from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
 from opentrons.drivers.utils import AxisMoveTimestamp
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
@@ -321,7 +322,7 @@ class SmoothieDriver_3_0_0:
         self._connection = None
         self._config = config
 
-        self._gpio_chardev = gpio_chardev
+        self._gpio_chardev = gpio_chardev or SimulatingGPIOCharDev('simulated')
 
         # Current settings:
         # The amperage of each axis, has been organized into three states:
