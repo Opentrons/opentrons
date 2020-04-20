@@ -4,7 +4,7 @@ from aiohttp.web_urldispatcher import UrlDispatcher
 from .session import CheckCalibrationSession
 from .models import CalibrationSessionStatus, LabwareStatus
 from .constants import ALLOWED_SESSIONS, LabwareLoaded, TipAttachError
-from .util import CalibrationCheckState
+from .util import CalibrationCheckState, StateMachineError
 
 
 def _format_links(
@@ -83,7 +83,7 @@ async def misc_error_handling(
     """
     try:
         response = await handler(request, session)
-    except (TipAttachError, LabwareLoaded) as e:
+    except (TipAttachError, LabwareLoaded, StateMachineError) as e:
         router = request.app.router
         if isinstance(e, TipAttachError):
             type = request.match_info['type']
