@@ -18,3 +18,8 @@ export const getEnableThermocycler: Selector<?boolean> = createSelector(
   getFeatureFlagData,
   flags => flags.OT_PD_ENABLE_THERMOCYCLER
 )
+
+export const getEnableCustomTipracks: Selector<?boolean> = createSelector(
+  getFeatureFlagData,
+  flags => flags.OT_PD_ENABLE_CUSTOM_TIPRACKS
+)
