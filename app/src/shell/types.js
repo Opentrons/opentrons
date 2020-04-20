@@ -45,4 +45,9 @@ export type ShellState = {|
   robotLogs: RobotLogsState,
 |}
 
+export type UiInitializedAction = {|
+  type: 'shell:UI_INITIALIZED',
+  meta: {| shell: true |},
+|}
+
 export type ShellAction = ShellUpdateAction | RobotLogsAction
