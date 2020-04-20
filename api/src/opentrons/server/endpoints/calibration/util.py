@@ -191,6 +191,7 @@ class Transition:
                              **kwargs)
         return True
 
+
 class StateMachineError(Exception):
     def __init__(self, msg: str) -> None:
         self.msg = msg or ''
@@ -203,15 +204,18 @@ class StateMachineError(Exception):
         return f'StateMachineError: {self.msg}'
 
 
-def enum_to_set(enum) -> set:
-    return set(item.name for item in enum)
+def enum_to_set(e) -> set:
+    return set(item.name for item in e)
+
 
 class StateKeys(enum.Enum):
     name = enum.auto()
     on_enter = enum.auto()
     on_exit = enum.auto()
 
+
 StateParams = Union[str, Dict[StateKeys, str]]
+
 
 class TransitionKeys(enum.Enum):
     from_state = enum.auto()
@@ -220,6 +224,7 @@ class TransitionKeys(enum.Enum):
     after = enum.auto()
     condition = enum.auto()
 
+
 class CallbackKeys(enum.Enum):
     on_enter = enum.auto()
     on_exit = enum.auto()
@@ -227,10 +232,11 @@ class CallbackKeys(enum.Enum):
     after = enum.auto()
     condition = enum.auto()
 
+
 TransitionKwargs = Dict[TransitionKeys, str]
 
 
-class StateMachine():
+class StateMachine:
     def __init__(self,
                  states: List[StateParams],
                  transitions: List[TransitionKwargs],
@@ -287,7 +293,7 @@ class StateMachine():
         return value
 
     def add_state(self, *args, **kwargs):
-        bound_kwargs = {k: self._bind_cb_kwarg(k,v) for k,v in kwargs.items()}
+        bound_kwargs = {k: self._bind_cb_kwarg(k, v) for k, v in kwargs.items()}
         self._states.add(State(*args, **bound_kwargs))
 
     def add_transition(self,
@@ -303,29 +309,30 @@ class StateMachine():
         if trigger not in self._events:
             setattr(self, trigger,
                     partial(self._dispatch_trigger, trigger))
-        bound_kwargs = {k: self._bind_cb_kwarg(k,v) for k,v in kwargs.items()}
-        self._events[trigger] = {**self._events.get(trigger, {}),
-                                 from_state: [
-                                        *self._events.get(trigger,
-                                                          {}).get(from_state,
-                                                                  []),
-                                        Transition(from_state=from_state,
-                                                   to_state=to_state,
-                                                   **bound_kwargs)
-                                        ]
-                                }
+        bound_kwargs = {k: self._bind_cb_kwarg(k, v) for k, v in kwargs.items()}
+        self._events[trigger] = {
+            **self._events.get(trigger, {}),
+            from_state: [
+                *self._events.get(trigger, {}).get(from_state, []),
+                Transition(from_state=from_state,
+                           to_state=to_state,
+                           **bound_kwargs)
+            ]
+        }
+
     @property
     def current_state(self) -> State:
         return self._current_state
 
     @property
-    def potential_triggers(self) -> State:
+    def potential_triggers(self) -> Set[str]:
+        """Return a set of currently available triggers"""
         potential_triggers = set()
-        for trigger in self._events:
-            if WILDCARD in self._events[trigger] or \
-                self._current_state.name in self._events[trigger]:
+        for trigger, events in self._events.items():
+            if WILDCARD in events or self._current_state.name in events:
                 potential_triggers.add(trigger)
         return potential_triggers
+
 
 class OldStateMachine(Generic[StateEnumType]):
     """

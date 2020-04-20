@@ -36,10 +36,6 @@ class SessionManager:
     def sessions(self):
         return self._sessions
 
-    @sessions.setter
-    def sessions(self, key: str, value: 'CalibrationSession'):
-        self._sessions[key] = value
-
 
 @dataclass
 class PipetteStatus:
@@ -53,8 +49,8 @@ class PipetteStatus:
     tiprack_id: UUID
 
     @classmethod
-    def list_fields(self):
-        return [obj.name for obj in fields(self)]
+    def list_fields(cls):
+        return [obj.name for obj in fields(cls)]
 
 
 @dataclass
@@ -100,7 +96,7 @@ class CalibrationSession:
         self._moves = self._build_deck_moves()
 
     @classmethod
-    async def build(self, hardware: ThreadManager):
+    async def build(cls, hardware: ThreadManager):
         await hardware.cache_instruments()
         await hardware.set_lights(rails=True)
         await hardware.home()
@@ -157,10 +153,6 @@ class CalibrationSession:
         return lw
 
     def _build_deck_moves(self) -> Moves:
-        checkone = self._build_cross_dict('1BLC')
-        checktwo = self._build_cross_dict('3BRC')
-        checkthree = self._build_cross_dict('7TLC')
-        height = self._build_height_dict('5')
         return Moves(checkingPointOne=self._build_cross_dict('1BLC'),
                      checkingPointTwo=self._build_cross_dict('3BRC'),
                      checkingPointThree=self._build_cross_dict('7TLC'),
@@ -274,6 +266,7 @@ class CalibrationSession:
             to_dict[name.hex] = temp_dict
         return to_dict
 
+
 # TODO: BC: move the check specific stuff to the check sub dir
 CHECK_STATES = [
     'sessionStarted',
@@ -290,7 +283,7 @@ CHECK_STATES = [
     'noPipettesAttached'
 ]
 
-CHECK_TRANSITIONS= [
+CHECK_TRANSITIONS = [
     {
         "trigger": "load_labware",
         "from_state": "sessionStarted",
@@ -431,9 +424,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             self._moves.preparingPipette[id][pipette].update(offset=updated_offset)  # NOQA(E501)
 
     async def delete_session(self):
-        for id in self._relate_mount.keys():
+        for mount_id in self._relate_mount.keys():
             try:
-                await self.return_tip(id)
+                await self.return_tip(mount_id)
             except TipAttachError:
                 pass
         await self.hardware.home()

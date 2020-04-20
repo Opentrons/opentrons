@@ -64,7 +64,9 @@ async def load_labware(request: web.Request, session) -> web.Response:
     await session.load_labware()
     return web.json_response(status=200)
 
-#TODO: BC: make this function use SpecificPipette, as it shouldn't need locations
+
+# TODO: BC: make this function use SpecificPipette, as it
+#  shouldn't need locations
 async def prepare_pipette(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
@@ -73,7 +75,8 @@ async def prepare_pipette(request: web.Request, session) -> web.Response:
     await session.prepare_pipette(pipette_id=pipette.pipetteId)
     return web.json_response(status=200)
 
-#TODO: BC: make this function idea "confirm point" instead of "move"
+
+# TODO: BC: make this function idea "confirm point" instead of "move"
 async def confirm_step(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
@@ -81,7 +84,7 @@ async def confirm_step(request: web.Request, session) -> web.Response:
     return web.json_response(status=200)
 
 
-#TODO: BC: make this function idea "confirm point" instead of "move"
+# TODO: BC: make this function idea "confirm point" instead of "move"
 async def move(request: web.Request, session) -> web.Response:
     req = await request.json()
     moveloc = MoveLocation(**req)
