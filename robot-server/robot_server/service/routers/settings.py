@@ -1,5 +1,5 @@
 import logging
-from typing import Union, Dict
+from typing import Dict
 
 from starlette import status
 from fastapi import APIRouter, Depends
@@ -182,16 +182,14 @@ async def get_robot_settings(
             response_model=MultiPipetteSettings,
             response_model_by_alias=True,
             response_model_exclude_unset=True)
-async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
+async def get_pipette_settings() -> MultiPipetteSettings:
     res = {}
     for pipette_id in pipette_config.known_pipettes():
         # Have to convert to dict using by_alias due to bug in fastapi
         res[pipette_id] = _pipette_settings_from_config(
             pipette_config,
             pipette_id,
-        ).dict(by_alias=True,
-               exclude_unset=True)
-
+        )
     return res
 
 
@@ -201,16 +199,12 @@ async def get_pipette_settings() -> Union[Dict, MultiPipetteSettings]:
             response_model_by_alias=True,
             response_model_exclude_unset=True,
             responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}})
-async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
+async def get_pipette_setting(pipette_id: str) -> PipetteSettings:
     if pipette_id not in pipette_config.known_pipettes():
         raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
                              message=f'{pipette_id} is not a valid pipette id')
-    # Have to convert to dict using by_alias due to bug in fastapi
     r = _pipette_settings_from_config(
         pipette_config, pipette_id
-    ).dict(
-        by_alias=True,
-        exclude_unset=True,
     )
     return r
 
@@ -228,7 +222,7 @@ async def get_pipette_setting(pipette_id: str) -> Union[Dict, PipetteSettings]:
 async def patch_pipette_setting(
         pipette_id: str,
         settings_update: PipetteSettingsUpdate) \
-        -> Union[Dict, PipetteSettings]:
+        -> PipetteSettings:
 
     # Convert fields to dict of field name to value
     fields = settings_update.setting_fields or {}
@@ -241,12 +235,8 @@ async def patch_pipette_setting(
             raise V1HandlerError(
                 status_code=status.HTTP_412_PRECONDITION_FAILED,
                 message=str(e))
-    # Have to convert to dict using by_alias due to bug in fastapi
     r = _pipette_settings_from_config(
         pipette_config, pipette_id
-    ).dict(
-        by_alias=True,
-        exclude_unset=True,
     )
     return r
 

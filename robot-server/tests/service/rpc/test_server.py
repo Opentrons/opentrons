@@ -6,15 +6,12 @@ import sys
 from threading import Event, Semaphore
 from uuid import uuid4 as uuid
 
-from fastapi.routing import APIWebSocketRoute
-from starlette.testclient import WebSocketTestSession, TestClient
-from fastapi import FastAPI, APIRouter
+from starlette.testclient import WebSocketTestSession
 
 from opentrons.protocol_api.execute import ExceptionInProtocolError
 
 from robot_server.service.dependencies import get_rpc_server
 from robot_server.service.rpc import rpc
-from robot_server.service.routers.rpc import router
 
 
 class Session(typing.NamedTuple):
@@ -25,38 +22,7 @@ class Session(typing.NamedTuple):
 
 
 @pytest.fixture
-def rpc_client():
-    """Create an starlette TestClient to communicate with rpc"""
-
-    # We should be able to just use api_client fixture but can't due to a bug
-    # in fastapi.
-    # Fastapi does not allow overriding dependencies on websocket endpoints.
-    # See https://github.com/tiangolo/fastapi/issues/998
-    # We've submitted a PR to fix this:
-    # https://github.com/tiangolo/fastapi/pull/1122 but in the meantime we
-    # have to hack monkey patch a solution
-    app = FastAPI()
-
-    def add_api_websocket_route(
-            self, path: str, endpoint: typing.Callable, name: str = None
-    ) -> None:
-        route = APIWebSocketRoute(
-            path,
-            endpoint=endpoint,
-            name=name,
-            dependency_overrides_provider=self.dependency_overrides_provider,
-        )
-        self.routes.append(route)
-
-    APIRouter.add_api_websocket_route = add_api_websocket_route  # type: ignore
-
-    app.include_router(router)
-
-    return TestClient(app)
-
-
-@pytest.fixture
-def session(loop, rpc_client, request) -> Session:
+def session(loop, api_client, request) -> Session:
     """
     Create testing session. Tests using this fixture are expected
     to have @pytest.mark.parametrize('root', [value]) decorator set.
@@ -74,10 +40,10 @@ def session(loop, rpc_client, request) -> Session:
         return _internal_server
 
     # Override the RPC server dependency
-    rpc_client.app.dependency_overrides[get_rpc_server] = get_server
+    api_client.app.dependency_overrides[get_rpc_server] = get_server
 
     # Connect
-    socket = rpc_client.websocket_connect("/")
+    socket = api_client.websocket_connect("/")
     token = str(uuid())
 
     def call(**kwargs):
