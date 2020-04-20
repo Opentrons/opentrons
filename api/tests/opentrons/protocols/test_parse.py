@@ -10,7 +10,8 @@ from opentrons.protocols.parse import (extract_metadata,
                                        version_from_metadata)
 from opentrons.protocols.types import (JsonProtocol,
                                        PythonProtocol,
-                                       APIVersion)
+                                       APIVersion,
+                                       MalformedProtocolError)
 
 
 def test_extract_metadata():
@@ -295,3 +296,22 @@ def test_extra_contents(
                    extra_data=extra_data)
     assert parsed.extra_labware == bundled_labware
     assert parsed.bundled_data == extra_data
+
+
+# noqa(E122)
+@pytest.mark.parametrize('bad_protocol', [
+    '''
+from opentrons import robot
+metadata={"apiLevel": "2.0"}
+print("hi")''',
+    '''
+def run(ctx):
+  pass
+
+def run(blahblah):
+  pass
+    '''
+])
+def test_bad_structure(bad_protocol):
+    with pytest.raises(MalformedProtocolError):
+        parse(bad_protocol)

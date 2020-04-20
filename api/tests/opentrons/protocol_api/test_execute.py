@@ -19,17 +19,20 @@ def test_api2_runfunc():
     def two_with_default(a, b=2):
         pass
 
-    assert execute._runfunc_ok(two_with_default) == two_with_default
+    # making sure this doesn't raise
+    execute._runfunc_ok(two_with_default)
 
     def one_with_default(a=2):
         pass
 
-    assert execute._runfunc_ok(one_with_default) == one_with_default
+    # shouldn't raise
+    execute._runfunc_ok(one_with_default)
 
     def starargs(*args):
         pass
 
-    assert execute._runfunc_ok(starargs) == starargs
+    # shouldn't raise
+    execute._runfunc_ok(starargs)
 
 
 @pytest.mark.parametrize('protocol_file', ['testosaur_v2.py'])
@@ -41,13 +44,6 @@ def test_execute_ok(protocol, protocol_file, loop):
 
 def test_bad_protocol(loop):
     ctx = ProtocolContext(loop)
-    no_run = parse('''
-metadata={"apiLevel": "2.0"}
-print("hi")
-''')
-    with pytest.raises(execute.MalformedProtocolError) as e:
-        execute.run_protocol(no_run, context=ctx)
-        assert "No function 'run" in str(e.value)
 
     no_args = parse('''
 metadata={"apiLevel": "2.0"}
