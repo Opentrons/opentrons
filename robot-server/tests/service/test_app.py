@@ -1,4 +1,7 @@
+import pytest
 from http import HTTPStatus
+
+from robot_server.constants import API_VERSION_HEADER, API_VERSION
 
 
 def test_custom_http_exception_handler(api_client):
@@ -34,3 +37,32 @@ def test_custom_request_validation_exception_handler(api_client):
     text = resp.json()
     assert resp.status_code == HTTPStatus.UNPROCESSABLE_ENTITY
     assert text == expected
+
+
+@pytest.mark.parametrize(
+    argnames=["headers", "expected_version"],
+    argvalues=[
+        [
+            {API_VERSION_HEADER: str(API_VERSION)},
+            API_VERSION,
+        ],
+        [
+            {API_VERSION_HEADER: str(API_VERSION + 3)},
+            API_VERSION,
+        ],
+        [
+            {API_VERSION_HEADER: str(API_VERSION - 1)},
+            API_VERSION - 1,
+        ],
+        [
+            {},
+            API_VERSION,
+        ],
+        [
+            {API_VERSION_HEADER: "not a number"},
+            API_VERSION,
+        ],
+    ])
+def test_api_versioning(api_client, headers, expected_version):
+    resp = api_client.get('/openapi', headers=headers)
+    assert resp.headers.get(API_VERSION_HEADER) == str(expected_version)

@@ -8,7 +8,7 @@ from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
 from robot_server.service.dependencies import get_hardware, get_motion_lock
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models import control
 

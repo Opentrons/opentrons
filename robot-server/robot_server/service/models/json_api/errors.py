@@ -59,35 +59,3 @@ class ErrorResponse(BaseModel):
     errors: List[Error] = \
         Field(...,
               description="a list containing one of more error objects.")
-
-
-# Note(isk: 3/13/20): object marshalling for http exceptions
-# (these errors come back differently than validation errors).
-# e.g. invalid json in request body
-def transform_http_exception_to_json_api_errors(exception) -> ErrorResponse:
-    request_error = Error(
-        status=exception.status_code,
-        detail=exception.detail,
-        title='Bad Request'
-    )
-    return ErrorResponse(errors=[request_error])
-
-
-# Note(isk: 3/13/20): object marshalling for validation errors.
-# format pydantic validation errors to expected json:api response shape.
-def transform_validation_error_to_json_api_errors(
-    status_code,
-    exception
-) -> ErrorResponse:
-    def transform_error(error):
-        return Error(
-            status=status_code,
-            detail=error.get('msg'),
-            source=ErrorSource(pointer='/' + '/'.join(
-                str(node) for node in error['loc'])),
-            title=error.get('type')
-        )
-
-    return ErrorResponse(
-        errors=[transform_error(error) for error in exception.errors()]
-    )

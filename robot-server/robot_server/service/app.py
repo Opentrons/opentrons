@@ -1,25 +1,22 @@
 import logging
+
 from opentrons import __version__
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
-
-from starlette.responses import JSONResponse
+from starlette.responses import Response, JSONResponse
 from starlette.requests import Request
 from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .logging import initialize_logging
 from .models import V1BasicResponse
-from .exceptions import V1HandlerError
+from .errors import V1HandlerError, \
+    transform_http_exception_to_json_api_errors, \
+    transform_validation_error_to_json_api_errors, consolidate_fastapi_response
 from .dependencies import get_rpc_server
-from typing import List, Dict, Any
+from robot_server import constants
 
-from .models.json_api.errors import \
-    transform_validation_error_to_json_api_errors, \
-    transform_http_exception_to_json_api_errors
 from .routers import item, routes
-
-V1_TAG = "v1"
 
 log = logging.getLogger(__name__)
 
@@ -31,12 +28,12 @@ app = FastAPI(
                 "/openapi. Some schemas used in requests and responses use "
                 "the `x-patternProperties` key to mean the JSON Schema "
                 "`patternProperties` behavior.",
-    version=__version__
+    version=__version__,
 )
 
 
 app.include_router(router=routes,
-                   tags=[V1_TAG],
+                   tags=[constants.V1_TAG],
                    responses={
                        HTTP_422_UNPROCESSABLE_ENTITY: {
                            "model": V1BasicResponse
@@ -57,9 +54,30 @@ async def on_startup():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    """App shutfown handler"""
+    """App shutdown handler"""
     s = await get_rpc_server()
     await s.on_shutdown()
+
+
+@app.middleware("http")
+async def api_version_check(request: Request, call_next) -> Response:
+    """Middleware to perform version check."""
+    try:
+        # Get the maximum version accepted by client
+        api_version = int(request.headers.get(constants.API_VERSION_HEADER,
+                                              constants.API_VERSION))
+        # We use the server version if api_version is too big
+        api_version = min(constants.API_VERSION, api_version)
+    except ValueError:
+        # Wasn't an integer, just use server version.
+        api_version = constants.API_VERSION
+    # Attach the api version to request's state dict.
+    request.state.api_version = api_version
+
+    response: Response = await call_next(request)
+    # Put the api version in the response header
+    response.headers[constants.API_VERSION_HEADER] = str(api_version)
+    return response
 
 
 @app.exception_handler(V1HandlerError)
@@ -70,34 +88,6 @@ async def v1_exception_handler(request: Request, exc: V1HandlerError):
     )
 
 
-def consolidate_fastapi_response(
-        all_exceptions: List[Dict[str, Any]]) -> str:
-    """
-    Consolidate the default fastAPI response so it can be returned as a string.
-    Default schema of fastAPI exception response is:
-    {
-        'loc': ('body',
-                '<outer_scope1>',
-                '<outer_scope2>',
-                '<inner_param>'),
-        'msg': '<the_error_message>',
-        'type': '<expected_type>'
-    }
-    In order to create a meaningful V1-style response, we consolidate the
-    above response into a string of shape:
-    '<outer_scope1>.<outer_scope2>.<inner_param>: <the_error_message>'
-    """
-
-    # Pick just the error message while discarding v2 response items
-    def error_to_str(error: dict) -> str:
-        err_node = ".".join(str(loc) for loc in error['loc'] if loc != 'body')
-        res = ": ".join([err_node, error["msg"]])
-        return res
-
-    all_errs = ". ".join(error_to_str(exc) for exc in all_exceptions)
-    return all_errs
-
-
 @app.exception_handler(RequestValidationError)
 async def custom_request_validation_exception_handler(
     request: Request,
@@ -106,7 +96,7 @@ async def custom_request_validation_exception_handler(
     """Custom handling of fastapi request validation errors"""
     log.error(f'{request.method} {request.url.path} : {str(exception)}')
 
-    if route_has_tag(request, V1_TAG):
+    if route_has_tag(request, constants.V1_TAG):
         response = V1BasicResponse(
             message=consolidate_fastapi_response(exception.errors())
         ).dict()
@@ -130,7 +120,7 @@ async def custom_http_exception_handler(
     log.error(f'{request.method} {request.url.path} : '
               f'{exception.status_code}, {exception.detail}')
 
-    if route_has_tag(request, V1_TAG):
+    if route_has_tag(request, constants.V1_TAG):
         response = V1BasicResponse(message=exception.detail).dict()
     else:
         response = transform_http_exception_to_json_api_errors(
