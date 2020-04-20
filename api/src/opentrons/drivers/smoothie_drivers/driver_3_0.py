@@ -15,11 +15,11 @@ from opentrons.drivers.utils import AxisMoveTimestamp
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
-- Driver is the only system component that ktimes about GCODES or how smoothie
+- Driver is the only system component that knows about GCODES or how smoothie
   communications
 
 - Driver is NOT responsible interpreting the motions in any way
-  or ktimeing anything about what the axes are used for
+  or knowing anything about what the axes are used for
 '''
 
 log = logging.getLogger(__name__)
@@ -329,15 +329,15 @@ class SmoothieDriver_3_0_0:
         # Active-Current-Settings is set when an axis is moving/homing
         # Dwelling-Current-Settings is set when an axis is NOT moving/homing
         self._current_settings = {
-            'time': config.low_current.copy(),
+            'now': config.low_current.copy(),
             'saved': config.low_current.copy()  # used in push/pop methods
         }
         self._active_current_settings = {
-            'time': config.high_current.copy(),
+            'now': config.high_current.copy(),
             'saved': config.high_current.copy()  # used in push/pop methods
         }
         self._dwelling_current_settings = {
-            'time': config.low_current.copy(),
+            'now': config.low_current.copy(),
             'saved': config.low_current.copy()  # used in push/pop methods
         }
 
@@ -688,7 +688,7 @@ class SmoothieDriver_3_0_0:
 
     @property
     def current(self) -> Dict[str, float]:
-        return self._current_settings['time']
+        return self._current_settings['now']
 
     @property
     def speed(self):
@@ -797,13 +797,13 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._active_current_settings['time'].update(settings)
+        self._active_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently active,
         # reset it's current to the new active-current value
         active_axes_to_update = {
             axis: amperage
-            for axis, amperage in self._active_current_settings['time'].items()
+            for axis, amperage in self._active_current_settings['now'].items()
             if self._active_axes.get(axis) is True
             if self.current[axis] != amperage
         }
@@ -812,7 +812,7 @@ class SmoothieDriver_3_0_0:
 
     def push_active_current(self):
         self._active_current_settings['saved'].update(
-            self._active_current_settings['time'])
+            self._active_current_settings['now'])
 
     def pop_active_current(self):
         self.set_active_current(self._active_current_settings['saved'])
@@ -830,13 +830,13 @@ class SmoothieDriver_3_0_0:
             Dict with axes as valies (e.g.: 'X', 'Y', 'Z', 'A', 'B', or 'C')
             and floating point number for current (generally between 0.1 and 2)
         '''
-        self._dwelling_current_settings['time'].update(settings)
+        self._dwelling_current_settings['now'].update(settings)
 
         # if an axis specified in the `settings` is currently dwelling,
         # reset it's current to the new dwelling-current value
         dwelling_axes_to_update = {
             axis: amps
-            for axis, amps in self._dwelling_current_settings['time'].items()
+            for axis, amps in self._dwelling_current_settings['now'].items()
             if self._active_axes.get(axis) is False
             if self.current[axis] != amps
         }
@@ -845,7 +845,7 @@ class SmoothieDriver_3_0_0:
 
     def push_dwelling_current(self):
         self._dwelling_current_settings['saved'].update(
-            self._dwelling_current_settings['time'])
+            self._dwelling_current_settings['now'])
 
     def pop_dwelling_current(self):
         self.set_dwelling_current(self._dwelling_current_settings['saved'])
@@ -868,7 +868,7 @@ class SmoothieDriver_3_0_0:
             ax: axes_active
             for ax in settings.keys()
         })
-        self._current_settings['time'].update(settings)
+        self._current_settings['now'].update(settings)
         log.debug("_save_current: {}".format(self.current))
 
     def _set_saved_current(self):
@@ -928,7 +928,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         dwelling_currents = {
-            ax: self._dwelling_current_settings['time'][ax]
+            ax: self._dwelling_current_settings['now'][ax]
             for ax in axes
             if self._active_axes[ax] is True
         }
@@ -947,7 +947,7 @@ class SmoothieDriver_3_0_0:
         '''
         axes = ''.join(set(axes) & set(AXES) - set(DISABLE_AXES))
         active_currents = {
-            ax: self._active_current_settings['time'][ax]
+            ax: self._active_current_settings['now'][ax]
             for ax in axes
             if self._active_axes[ax] is False
         }
