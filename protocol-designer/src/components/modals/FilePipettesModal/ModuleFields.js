@@ -72,7 +72,11 @@ export function ModuleFields(props: Props) {
     const targetToClear = `modulesByType.${type}.model`
 
     onFieldChange(e)
-    onSetFieldValue(targetToClear, null)
+
+    // only clear model dropdown if not TC
+    if (targetToClear !== 'modulesByType.thermocyclerModuleType.model') {
+      onSetFieldValue(targetToClear, null)
+    }
     onSetFieldTouched(targetToClear, false)
   }
 
