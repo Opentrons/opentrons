@@ -102,8 +102,9 @@
     }
   },
   "auto_add_pause_until_temp_step": {
-    "title": "Pause until module is {{temperature}}°C?",
-    "body": "Should your protocol pause until the module is {{temperature}}°C? Or should the protocol continue while the module changes temperature?",
+    "title": "Pause protocol until temperature module is at {{temperature}}°C?",
+    "body1": "Pause protocol now to wait until module reaches {{temperature}}°C before continuing on to the next step.",
+    "body2": "Build a pause later if you want your protocol to proceed to the next steps while the temperature module ramps up to {{temperature}}°C.",
     "now_button": "Pause protocol now",
     "later_button": "I will build a pause later"
   }
