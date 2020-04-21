@@ -75,9 +75,11 @@ restart:
 .PHONY: push
 push: wheel
 	scp -i $(br_ssh_key) $(br_ssh_opts) $(wheel_file) root@$(host):/data/
+	scp -i $(br_ssh_key) $(br_ssh_opts) ./opentrons-update-server.service root@$(host):/data/
 	ssh -i $(br_ssh_key) $(br_ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/otupdate*.whl && mount -o remount,ro / && systemctl start opentrons-update-server; } ;\
+"function cleanup () { rm -f /data/otupdate*.whl && mount -o remount,ro / && systemctl daemon-reload && systemctl start opentrons-update-server; } ;\
 systemctl stop opentrons-update-server &&\
 mount -o remount,rw / &&\
+cp /data/opentrons-update-server.service /etc/systemd/system/ &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/otupdate-*.whl && cleanup || cleanup"
