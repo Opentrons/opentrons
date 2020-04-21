@@ -1607,6 +1607,7 @@
         "min": 0,
         "max": 100
       },
+      "idleCurrent": 0.3,
       "quirks": []
     },
     "p50_single_v1": {
@@ -4005,6 +4006,7 @@
         "max": 100
       },
       "returnTipHeight": 0.4,
+      "idleCurrent": 0.3,
       "quirks": ["needsUnstick"]
     },
     "p1000_single_v1": {

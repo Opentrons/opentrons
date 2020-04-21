@@ -43,7 +43,8 @@ pipette_config = namedtuple(
         'blow_out_flow_rate',
         'max_travel',
         'home_position',
-        'steps_per_mm'
+        'steps_per_mm',
+        'idle_current'
     ]
 )
 
@@ -67,6 +68,8 @@ Z_OFFSET_P10 = -13  # longest single-channel pipette
 Z_OFFSET_P50 = 0
 Z_OFFSET_P300 = 0
 Z_OFFSET_P1000 = 20  # shortest single-channel pipette
+
+LOW_CURRENT_DEFAULT = 0.05
 
 
 def model_config() -> Dict[str, Any]:
@@ -199,7 +202,8 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
             cfg, 'defaultBlowOutFlowRate', MUTABLE_CONFIGS),
         max_travel=smoothie_configs['travelDistance'],
         home_position=smoothie_configs['homePosition'],
-        steps_per_mm=smoothie_configs['stepsPerMM']
+        steps_per_mm=smoothie_configs['stepsPerMM'],
+        idle_current=cfg.get('idleCurrent', LOW_CURRENT_DEFAULT)
     )
 
     return res

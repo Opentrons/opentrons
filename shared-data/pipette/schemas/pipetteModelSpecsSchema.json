@@ -118,6 +118,7 @@
               "type": "object",
               "value": { "$ref": "#/definitions/positiveNumber" }
             },
+            "idleCurrent": { "$ref": "#/definitions/editConfigurations" },
             "returnTipHeight": { "$ref": "#/definitions/returnTipHeightRange" },
             "tipOverlap": {
               "type": "object",

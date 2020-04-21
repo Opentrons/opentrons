@@ -301,6 +301,7 @@ class API(HardwareAPILike):
                 home_pos = p.config.home_position
                 max_travel = p.config.max_travel
                 steps_mm = p.config.steps_per_mm
+                idle_current = p.config.idle_current
                 if 'needsUnstick' in p.config.quirks:
                     splits[plunger_axis.name.upper()] = MoveSplit(
                         split_distance=1,
@@ -326,6 +327,7 @@ class API(HardwareAPILike):
                 home_pos = self._config.default_pipette_configs['homePosition']
                 max_travel = self._config.default_pipette_configs['maxTravel']
                 steps_mm = self._config.default_pipette_configs['stepsPerMM']
+                idle_current = self._config.low_current[plunger_axis.name]
 
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
@@ -333,6 +335,8 @@ class API(HardwareAPILike):
                 mount_axis.name, {'home': home_pos})
             self._backend._smoothie_driver.update_pipette_config(
                 plunger_axis.name, {'max_travel': max_travel})
+            self._backend._smoothie_driver.set_dwelling_current(
+                {plunger_axis.name: idle_current})
             self._backend._smoothie_driver.configure_splits_for(splits)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))
