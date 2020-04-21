@@ -63,13 +63,11 @@ export const fetchRobotCalibrationCheckSessionFailure = (
   meta: meta,
 })
 
-// TODO: BC: type params
-export const updateRobotCalibrationCheckSession = (
+export const loadRobotCalibrationCheckLabware = (
   robotName: string,
-  params: {} = {},
-): Types.UpdateRobotCalibrationCheckSessionAction => ({
-  type: Constants.UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: { robotName, params },
+): Types.RobotCalibrationCheckLoadLabwareAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  payload: { robotName },
   meta: {},
 })
 

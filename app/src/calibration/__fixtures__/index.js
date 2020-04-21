@@ -90,22 +90,21 @@ export const {
   failureBody: mockFailureBody,
 })
 
-export const {
-  successMeta: mockUpdateCheckSessionSuccessMeta,
-  failureMeta: mockUpdateCheckSessionFailureMeta,
-  success: mockUpdateCheckSessionSuccess,
-  failure: mockUpdateCheckSessionFailure,
-} = makeResponseFixtures<
-  RobotCalibrationCheckSessionData,
-  {| message: string |}
->({
-  method: POST,
-  path: ROBOT_CALIBRATION_CHECK_PATH,
-  successStatus: 200,
-  successBody: mockRobotCalibrationCheckSessionData,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
+export const makeUpdateCheckSessionResponseFixtures = (
+  pathExtension: string,
+) => (
+  makeResponseFixtures<
+    RobotCalibrationCheckSessionData,
+    {| message: string |}
+  >({
+    method: POST,
+    path: `${ROBOT_CALIBRATION_CHECK_PATH}/${pathExtension}`,
+    successStatus: 200,
+    successBody: mockRobotCalibrationCheckSessionData,
+    failureStatus: 500,
+    failureBody: mockFailureBody,
+  })
+)
 
 export const {
   successMeta: mockDeleteCheckSessionSuccessMeta,

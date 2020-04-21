@@ -53,9 +53,9 @@ export type FetchRobotCalibrationCheckSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type UpdateRobotCalibrationCheckSessionAction = {|
-  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
-  payload: {| robotName: string, params: {} |},
+export type RobotCalibrationCheckLoadLabwareAction = {|
+  type: ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 

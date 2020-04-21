@@ -16,11 +16,17 @@ import type {
 
 import type { UpdateRobotCalibrationCheckSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => ({
-  method: POST,
-  path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
-  ...action.payload.params
-})
+import { ROBOT_CALIBRATION_CHECK_LOAD_LABWARE } from '../constants'
+
+
+const UPDATE_ACTION_TYPE_TO_PATH_EXT = {
+  [ROBOT_CALIBRATION_CHECK_LOAD_LABWARE]: 'loadLabware'
+}
+
+const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
+  const path = `${Constants.ROBOT_CALIBRATION_CHECK_PATH}/${UPDATE_ACTION_TYPE_TO_PATH_EXT[action.type]}`
+  return { method: POST, path, ...action.payload.params }
+}
 
 const mapResponseToAction: ResponseToActionMapper<UpdateRobotCalibrationCheckSessionAction> = (
   response,
@@ -39,7 +45,9 @@ export const updateRobotCalibrationCheckSessionEpic: Epic = (
   state$
 ) => {
   return action$.pipe(
-    ofType(Constants.UPDATE_ROBOT_CALIBRATION_CHECK_SESSION),
+    ofType(
+      Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+    ),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,
