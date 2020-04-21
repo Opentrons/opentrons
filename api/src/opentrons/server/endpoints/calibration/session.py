@@ -502,7 +502,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             requested_position: PositionType,
             pip_id: UUID) -> Location:
 
-        if to_state in ['preparingPipette', 'returningTip']:
+        if to_state in {'preparingPipette', 'returningTip'}:
             tiprack_id = self._relate_mount[pip_id]['tiprack_id']
             offset = self._moves.preparingPipette[tiprack_id][pip_id]['offset']
             position = {"offset": offset, "locationId": tiprack_id}
@@ -510,7 +510,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             position = requested_position
 
         if position.get('offset'):
-            moves_for_step= getattr(self._moves, to_state)
+            moves_for_step = getattr(self._moves, to_state)
             single_location = moves_for_step[position['locationId']]
             loc_to_move = single_location[pip_id].get('well')
             pt, well = loc_to_move.top()

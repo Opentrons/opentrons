@@ -126,6 +126,10 @@ class CalibrationRoutes(object):
             check.pick_up_tip,
             name="pickUpTip")
         self.app.router.add_post(
+            '/{type}/session/confirmTip',
+            check.confirm_tip,
+            name='confirmTip')
+        self.app.router.add_post(
             '/{type}/session/invalidateTip',
             check.invalidate_tip,
             name="invalidateTip")

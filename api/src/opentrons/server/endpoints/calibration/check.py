@@ -125,6 +125,14 @@ async def invalidate_tip(
     return web.json_response(status=200)
 
 
+async def confirm_tip(
+        request: web.Request, session: 'CheckCalibrationSession'):
+    req = await request.json()
+    pipette = SpecificPipette(**req)
+    await session.confirm_tip_attached(pipette.pipetteId)
+    return web.json_response(status=200)
+
+
 # TODO: cover confirm last step for pipette which should result in return tip under the hood
 # async def confirm_step(request: web.Request, session: 'CheckCalibrationSession'):
 #     req = await request.json()

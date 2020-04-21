@@ -124,39 +124,25 @@ def promptNoPipettesAttached(currentState: CalibrationCheckState) -> Calibration
 StateEnumType = TypeVar('StateEnumType', bound=enum.Enum)
 Relationship = Dict[StateEnumType, StateEnumType]
 
-
-# State Side Effect callbacks take no params other than self
-SideEffectCallback = Callable[['StateMachine'], Awaitable[Any]]
-
 # Transition callbacks pass through all params from trigger call
-TransitionCallback = Callable[[Any], Awaitable[Any]]
+TransitionCallback = Callable[..., Awaitable[Any]]
 
 # Condition callbacks pass through all params from trigger call,
 # and must return bool
-ConditionCallback = Callable[[Any], Awaitable[bool]]
+ConditionCallback = Callable[..., Awaitable[bool]]
 
 WILDCARD = '*'
 
-class State():
+
+class State:
     def __init__(self,
-                 name: str,
-                 on_enter: SideEffectCallback = None,
-                 on_exit: SideEffectCallback = None):
+                 name: str):
         self._name = name
-        self._on_enter = on_enter
-        self._on_exit = on_exit
-
-    async def enter(self) -> str:
-        if self._on_enter:
-           return await self._on_enter()
-
-    async def exit(self) -> str:
-        if self._on_exit:
-            return await self._on_exit()
 
     @property
     def name(self) -> str:
         return self._name
+
 
 class Transition:
     def __init__(self,
@@ -180,10 +166,7 @@ class Transition:
                               to_state=self.to_state,
                               from_state=self.from_state,
                               **kwargs)
-        if self.from_state is not WILDCARD:
-            await get_state_by_name(self.from_state).exit()
         set_current_state(self.to_state)
-        await get_state_by_name(self.to_state).enter()
         if self.after:
             await self.after(*args,
                              to_state=self.to_state,
@@ -269,7 +252,7 @@ class StateMachine:
         if trigger in self._events and \
                 WILDCARD not in self._events[trigger] and \
                 self._current_state.name not in self._events[trigger]:
-            raise StateMachineError(f'cannot trigger event {trigger}' \
+            raise StateMachineError(f'cannot trigger event {trigger}'
                                     f' from state {self._current_state.name}')
         try:
             from_state = WILDCARD if WILDCARD in self._events[trigger] \
