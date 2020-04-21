@@ -121,6 +121,15 @@ jobs:
           bucket: opentrons-components
           upload-dir: $TRAVIS_BRANCH
 
+    # E2E tests for FE JavaScript projects
+    - stage: test
+      name: 'JS E2E tests'
+      language: node_js
+      install:
+        - make install-js
+      script:
+        - make test-e2e
+
     # typecheck JavaScript projects
     - stage: test
       name: 'JS type checks'
