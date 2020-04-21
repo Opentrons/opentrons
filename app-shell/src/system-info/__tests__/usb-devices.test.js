@@ -16,7 +16,10 @@ jest.mock('usb-detection', () => {
   return detector
 })
 
+const usbDetectionFind: JestMockFn<[], any> = (usbDetection.find: any)
+
 describe('app-shell::system-info::usb-devices', () => {
+  const { windowsDriverVersion: _, ...mockDevice } = Fixtures.mockUsbDevice
   afterEach(() => {
     jest.resetAllMocks()
   })
@@ -34,9 +37,13 @@ describe('app-shell::system-info::usb-devices', () => {
   })
 
   it('can return the list of all devices', () => {
-    const mockDevices = [{ foo: 'foo' }, { bar: 'bar' }, { baz: 'baz' }]
+    const mockDevices = [
+      { ...mockDevice, deviceName: 'foo' },
+      { ...mockDevice, deviceName: 'bar' },
+      { ...mockDevice, deviceName: 'baz' },
+    ]
 
-    usbDetection.find.mockResolvedValueOnce(mockDevices)
+    usbDetectionFind.mockResolvedValueOnce(mockDevices)
 
     const monitor = createUsbDeviceMonitor()
     const result = monitor.getAllDevices()
@@ -48,27 +55,27 @@ describe('app-shell::system-info::usb-devices', () => {
     const onDeviceAdd = jest.fn()
     createUsbDeviceMonitor({ onDeviceAdd })
 
-    usbDetection.emit('add', { mockDevice: true })
+    usbDetection.emit('add', mockDevice)
 
-    expect(onDeviceAdd).toHaveBeenCalledWith({ mockDevice: true })
+    expect(onDeviceAdd).toHaveBeenCalledWith(mockDevice)
   })
 
   it('can notify when devices are removed', () => {
     const onDeviceRemove = jest.fn()
     createUsbDeviceMonitor({ onDeviceRemove })
 
-    usbDetection.emit('remove', { mockDevice: true })
+    usbDetection.emit('remove', mockDevice)
 
-    expect(onDeviceRemove).toHaveBeenCalledWith({ mockDevice: true })
+    expect(onDeviceRemove).toHaveBeenCalledWith(mockDevice)
   })
 
   it('can get the Windows driver version of a device', () => {
     execa.command.mockResolvedValue('1.2.3')
 
     const device = {
-      ...Fixtures.mockUsbDevice,
-      // 4660 == 0x1234
-      vendorId: 4660,
+      ...mockDevice,
+      // 291 == 0x0123
+      vendorId: 291,
       // 43981 == 0xABCD
       productId: 43981,
       // plain string for serial
@@ -77,7 +84,7 @@ describe('app-shell::system-info::usb-devices', () => {
 
     return getWindowsDriverVersion(device).then(version => {
       expect(execa.command).toHaveBeenCalledWith(
-        'Get-PnpDeviceProperty -InstanceID "USB\\VID_1234&PID_ABCD\\abcdefg" -KeyName "DEVPKEY_Device_DriverVersion" | % { $_.Data }',
+        'Get-PnpDeviceProperty -InstanceID "USB\\VID_0123&PID_ABCD\\abcdefg" -KeyName "DEVPKEY_Device_DriverVersion" | % { $_.Data }',
         { shell: 'PowerShell.exe' }
       )
       expect(version).toBe('1.2.3')
@@ -87,17 +94,7 @@ describe('app-shell::system-info::usb-devices', () => {
   it('returns null for unknown if command errors out', () => {
     execa.command.mockRejectedValue('AH!')
 
-    const device = {
-      ...Fixtures.mockUsbDevice,
-      // 4660 == 0x1234
-      vendorId: 4660,
-      // 43981 == 0xABCD
-      productId: 43981,
-      // plain string for serial
-      serialNumber: 'abcdefg',
-    }
-
-    return getWindowsDriverVersion(device).then(version => {
+    return getWindowsDriverVersion(mockDevice).then(version => {
       expect(version).toBe(null)
     })
   })

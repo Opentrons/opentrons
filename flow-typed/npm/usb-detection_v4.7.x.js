@@ -28,7 +28,9 @@ declare module 'usb-detection' {
 
   declare function find(vid: number): Promise<Device[]>
 
-  declare function find(callback: (error: any, devices: Device[]) => any): void
+  declare function find(
+    callback: (error: any, devices: Device[]) => mixed
+  ): void
 
   declare function find(): Promise<Device[]>
 
@@ -36,18 +38,20 @@ declare module 'usb-detection' {
 
   declare function stopMonitoring(): void
 
-  declare function on(event: string, callback: (device: Device) => void): void
+  declare function on(event: string, callback: (device: Device) => mixed): void
+
+  declare function emit(event: string, Device): void
 
   declare var version: number
 
   declare export type Detector = {|
-    find: find,
-    on: on,
-    startMonitoring: startMonitoring,
-    stopMonitoring: stopMonitoring,
-    version: version,
+    find: typeof find,
+    on: typeof on,
+    emit: typeof emit,
+    startMonitoring: typeof startMonitoring,
+    stopMonitoring: typeof stopMonitoring,
+    version: typeof version,
   |}
 
-  declare var detector: Dectector
-  declare module.exports: detector
+  declare export default Detector
 }
