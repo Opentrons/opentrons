@@ -89,7 +89,7 @@ def _parse_python(
     protocol = compile(parsed, filename=ast_filename, mode='exec')
     version = get_version(metadata, parsed)
 
-    if version > APIVersion(2, 0):
+    if version >= APIVersion(2, 0):
         _validate_v2_ast(parsed)
 
     result = PythonProtocol(

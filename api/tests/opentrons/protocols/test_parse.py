@@ -74,6 +74,7 @@ metadata = {
   }
 
 p = instruments.P10_Single(mount='right')
+def run(ctx): pass
 """, APIVersion(2, 0)),
     ("""
 from opentrons import types
@@ -305,6 +306,7 @@ from opentrons import robot
 metadata={"apiLevel": "2.0"}
 print("hi")''',
     '''
+metadata = {"apiLevel": "2.0"}
 def run(ctx):
   pass
 
