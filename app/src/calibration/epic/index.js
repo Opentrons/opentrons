@@ -10,6 +10,6 @@ import type { Epic } from '../../types'
 export const calibrationEpic: Epic = combineEpics(
   createRobotCalibrationCheckSessionEpic,
   fetchRobotCalibrationCheckSessionEpic,
-  udpateRobotCalibrationCheckSessionEpic,
+  updateRobotCalibrationCheckSessionEpic,
   deleteRobotCalibrationCheckSessionEpic
 )

@@ -1,6 +1,6 @@
 // @flow
 
-import { POST, DELETE } from '../../robot-api'
+import { POST, GET, DELETE } from '../../robot-api'
 import {
   makeResponseFixtures,
   mockFailureBody,
@@ -68,6 +68,40 @@ export const {
   method: POST,
   path: ROBOT_CALIBRATION_CHECK_PATH,
   successStatus: 201,
+  successBody: mockRobotCalibrationCheckSessionData,
+  failureStatus: 500,
+  failureBody: mockFailureBody,
+})
+
+export const {
+  successMeta: mockFetchCheckSessionSuccessMeta,
+  failureMeta: mockFetchCheckSessionFailureMeta,
+  success: mockFetchCheckSessionSuccess,
+  failure: mockFetchCheckSessionFailure,
+} = makeResponseFixtures<
+  RobotCalibrationCheckSessionData,
+  {| message: string |}
+>({
+  method: GET,
+  path: ROBOT_CALIBRATION_CHECK_PATH,
+  successStatus: 200,
+  successBody: mockRobotCalibrationCheckSessionData,
+  failureStatus: 500,
+  failureBody: mockFailureBody,
+})
+
+export const {
+  successMeta: mockUpdateCheckSessionSuccessMeta,
+  failureMeta: mockUpdateCheckSessionFailureMeta,
+  success: mockUpdateCheckSessionSuccess,
+  failure: mockUpdateCheckSessionFailure,
+} = makeResponseFixtures<
+  RobotCalibrationCheckSessionData,
+  {| message: string |}
+>({
+  method: POST,
+  path: ROBOT_CALIBRATION_CHECK_PATH,
+  successStatus: 200,
   successBody: mockRobotCalibrationCheckSessionData,
   failureStatus: 500,
   failureBody: mockFailureBody,
