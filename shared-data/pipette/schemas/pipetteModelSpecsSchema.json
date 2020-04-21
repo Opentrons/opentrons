@@ -11,6 +11,11 @@
       "minimum": 0.25,
       "maximum": 1.25
     },
+    "idleCurrentRange": {
+      "type": "number",
+      "minimum": 0.01,
+      "maximum": 1.0
+    },
     "xyzArray": {
       "type": "array",
       "description": "Array of 3 numbers, [x, y, z]",
@@ -118,7 +123,7 @@
               "type": "object",
               "value": { "$ref": "#/definitions/positiveNumber" }
             },
-            "idleCurrent": { "$ref": "#/definitions/editConfigurations" },
+            "idleCurrent": { "$ref": "#/definitions/idleCurrentRange" },
             "returnTipHeight": { "$ref": "#/definitions/returnTipHeightRange" },
             "tipOverlap": {
               "type": "object",
