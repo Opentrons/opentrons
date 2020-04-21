@@ -26,6 +26,7 @@ const mockGetRobotByName: JestMockFn<[any, string], mixed> =
 
 const mockRobot = Fixtures.mockRobot
 const mockState = { state: true }
+const mockPipetteId = 'abc123_pipette'
 
 describe('updateRobotCalibrationCheckSessionEpic', () => {
   let testScheduler
@@ -44,17 +45,22 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
 
   const updateTriggers = [
     {
-      action: Actions.loadRobotCalibrationCheckLabware(mockRobot.name),
+      action: Actions.loadLabwareRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'loadLabware',
+    },
+    {
+      action: Actions.pickUpTipRobotCalibrationCheck(mockRobot.name, mockPipetteId),
+      pathExtension: 'pickUpTip',
+      body: {pipetteId: mockPipetteId},
     }
   ]
 
-  updateTriggers.forEach(trigger => {
-    const {action, pathExtension} = trigger
+  updateTriggers.forEach(({action, pathExtension, body})=> {
     describe(`handles ${action.type}`, () => {
       const expectedRequest = {
         method: 'POST',
         path: `/calibration/check/session/${pathExtension}`,
+        body,
       }
       const {
         successMeta,

@@ -35,6 +35,50 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
+    name: 'handles calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+    action: {
+      type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      payload: {
+        robotName: 'terpentine-martini',
+        ...Fixtures.mockRobotCalibrationCheckSessionData,
+      },
+      meta: {},
+    },
+    state: {
+      'terpentine-martini': {
+        robotCalibrationCheck: null,
+      },
+    },
+    expected: {
+      'terpentine-martini': {
+        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
+      },
+    },
+  },
+  {
+    name: 'handles calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+    action: {
+      type: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      payload: {
+        robotName: 'terpentine-martini',
+        ...Fixtures.mockRobotCalibrationCheckSessionData,
+        currentStep: 'arbitraryOtherStep'
+      },
+      meta: {},
+    },
+    state: {
+      'terpentine-martini': Fixtures.mockRobotCalibrationCheckSessionData,
+    },
+    expected: {
+      'terpentine-martini': {
+        robotCalibrationCheck: {
+          ...Fixtures.mockRobotCalibrationCheckSessionData,
+          currentStep: 'arbitraryOtherStep'
+        },
+      },
+    },
+  },
+  {
     name: 'handles calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
     action: {
       type: 'calibration:DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',

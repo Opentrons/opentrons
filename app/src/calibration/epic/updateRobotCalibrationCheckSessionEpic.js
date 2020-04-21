@@ -16,16 +16,34 @@ import type {
 
 import type { UpdateRobotCalibrationCheckSessionAction } from '../types'
 
-import { ROBOT_CALIBRATION_CHECK_LOAD_LABWARE } from '../constants'
+import {
+  ROBOT_CALIBRATION_CHECK_PATH,
+  ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  CHECK_UPDATE_PATH_LOAD_LABWARE,
+  CHECK_UPDATE_PATH_PICK_UP_TIP,
+} from '../constants'
 
-
-const UPDATE_ACTION_TYPE_TO_PATH_EXT = {
-  [ROBOT_CALIBRATION_CHECK_LOAD_LABWARE]: 'loadLabware'
-}
 
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
-  const path = `${Constants.ROBOT_CALIBRATION_CHECK_PATH}/${UPDATE_ACTION_TYPE_TO_PATH_EXT[action.type]}`
-  return { method: POST, path, ...action.payload.params }
+  let requestParams = {}
+  switch (action.type){
+    case ROBOT_CALIBRATION_CHECK_LOAD_LABWARE:
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_LOAD_LABWARE}`
+      }
+      break
+    case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP:
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
+        body: {
+          pipetteId: action.payload.pipetteId
+        },
+      }
+      break
+  }
+  console.log('inmap',  requestParams)
+  return { method: POST, ...requestParams }
 }
 
 const mapResponseToAction: ResponseToActionMapper<UpdateRobotCalibrationCheckSessionAction> = (
@@ -47,6 +65,7 @@ export const updateRobotCalibrationCheckSessionEpic: Epic = (
   return action$.pipe(
     ofType(
       Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+      Constants.ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
     ),
     mapToRobotApiRequest(
       state$,

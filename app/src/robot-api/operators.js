@@ -42,7 +42,9 @@ export function mapToRobotApiRequest<A>(
 ): rxjs$OperatorFunction<A, Action> {
   return pipe(
     withRobotHost(state$, getRobotName),
-    map(([a, s, host]) => [host, mapActionToRequest(a, s), a]),
+    map(([a, s, host]) => {
+      console.log('IN MIDDLE', a, mapActionToRequest(a, s))
+      return [host, mapActionToRequest(a, s), a]}),
     // TODO(mc, 2019-11-15): this is a mergeMap rather than switchMap because:
     // - Our vanilla fetch usage means switchMap won't cancel inflight requests
     // - Our request lifecycle state can't handle a cancelled request

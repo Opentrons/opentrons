@@ -59,6 +59,12 @@ export type RobotCalibrationCheckLoadLabwareAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type RobotCalibrationCheckPickUpTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type UpdateRobotCalibrationCheckSessionSuccessAction = {|
   type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},

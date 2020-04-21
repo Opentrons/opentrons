@@ -63,11 +63,20 @@ export const fetchRobotCalibrationCheckSessionFailure = (
   meta: meta,
 })
 
-export const loadRobotCalibrationCheckLabware = (
+export const loadLabwareRobotCalibrationCheck = (
   robotName: string,
 ): Types.RobotCalibrationCheckLoadLabwareAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
   payload: { robotName },
+  meta: {},
+})
+
+export const pickUpTipRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string,
+): Types.RobotCalibrationCheckPickUpTipAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  payload: { robotName, pipetteId },
   meta: {},
 })
 
