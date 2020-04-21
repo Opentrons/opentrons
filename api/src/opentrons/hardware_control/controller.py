@@ -8,7 +8,7 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import gpio
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.types import Mount
 
@@ -17,6 +17,8 @@ from .execution_manager import ExecutionManager
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
+    from opentrons.drivers.rpi_drivers.dev_types\
+        import GPIODriverLike  # noqa(F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -41,9 +43,12 @@ class Controller:
                 'will fail')
 
         self.config = config or opentrons.config.robot_configs.load()
+
+        self._gpio_chardev = build_gpio_chardev('gpiochip0')
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
-            config=self.config, handle_locks=False)
+            config=self.config, gpio_chardev=self._gpio_chardev,
+            handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         try:
             self._module_watcher = aionotify.Watcher()
@@ -55,6 +60,13 @@ class Controller:
             MODULE_LOG.warning(
                 'Failed to initiate aionotify, cannot watch modules,'
                 'likely because not running on linux')
+
+    @property
+    def gpio_chardev(self) -> 'GPIODriverLike':
+        return self._gpio_chardev
+
+    async def setup_gpio_chardev(self):
+        await self.gpio_chardev.setup()
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
@@ -215,15 +227,15 @@ class Controller:
     def set_lights(self, button: Optional[bool], rails: Optional[bool]):
         if opentrons.config.IS_ROBOT:
             if button is not None:
-                gpio.set_button_light(blue=button)
+                self.gpio_chardev.set_button_light(blue=button)
             if rails is not None:
-                gpio.set_rail_lights(rails)
+                self.gpio_chardev.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
         if not opentrons.config.IS_ROBOT:
             return {}
-        return {'button': gpio.get_button_light()[2],
-                'rails': gpio.get_rail_lights()}
+        return {'button': self.gpio_chardev.get_button_light()[2],
+                'rails': self.gpio_chardev.get_rail_lights()}
 
     def pause(self):
         self._smoothie_driver.pause()
