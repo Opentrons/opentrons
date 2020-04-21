@@ -30,6 +30,20 @@ export function calibrationReducer(
       }
     }
 
+    // TODO: BC REMOVE THIS SHIM WITH FEATURE FLAG REMOVAL
+    case 'calibration:TEMPORARY_SHIM_SET_CURRENT_STEP': {
+      const { robotName, currentStep } = action.payload
+      const robotState = state[robotName] || INITIAL_CALIBRATION_STATE
+
+      return {
+        ...state,
+        [robotName]: {
+          ...state[robotName],
+          currentStep: currentStep,
+        },
+      }
+    }
+
     case Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
       const { robotName } = action.payload
       const robotState = state[robotName] || INITIAL_CALIBRATION_STATE

@@ -42,7 +42,6 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
       }
       break
   }
-  console.log('inmap',  requestParams)
   return { method: POST, ...requestParams }
 }
 

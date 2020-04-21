@@ -13,7 +13,14 @@ import {
   getLabwareDisplayName,
 } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { useDispatch } from 'react-redux'
 
+import type { Dispatch } from '../../types'
+import {
+  preparePipetteRobotCalibrationCheckSession,
+  shimCurrentStep,
+  CHECK_STEP_PREPARING_PIPETTE,
+} from '../../calibration'
 import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
@@ -24,11 +31,17 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm tiprack placement and continue'
 
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
-  proceed: () => mixed,
 |}
 export function DeckSetup(props: DeckSetupProps) {
   const { labware, proceed } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const dispatch = useDispatch<Dispatch>()
+
+  function proceed() {
+    dispatch(preparePipetteRobotCalibrationCheckSession(robotName))
+    dispatch(shimCurrentStep(CHECK_STEP_PREPARING_PIPETTE))
+  }
+
   return (
     <>
       <div className={styles.prompt}>

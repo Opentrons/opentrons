@@ -48,14 +48,15 @@ export const COMPLETE_ROBOT_CALIBRATION_CHECK: 'calibration:COMPLETE_ROBOT_CALIB
 export const ROBOT_CALIBRATION_CHECK_PATH: '/calibration/check/session' =
   '/calibration/check/session'
 
-export const CHECK_STEP_SESSION_START: 'sessionStarted' = 'sessionStarted'
-export const CHECK_STEP_LOAD_LABWARE: 'labwareLoaded' = 'labwareLoaded'
-export const CHECK_STEP_PICK_UP_TIP: 'pickingUpTip' = 'pickingUpTip'
-export const CHECK_STEP_CHECK_POINT_ONE: 'checkingPointOne' = 'checkingPointOne'
-export const CHECK_STEP_CHECK_POINT_TWO: 'checkingPointTwo' = 'checkingPointTwo'
-export const CHECK_STEP_CHECK_POINT_THREE: 'checkingPointThree' = 'checkingPointThree'
-export const CHECK_STEP_CHECK_HEIGHT: 'checkingHeight' = 'checkingHeight'
-export const CHECK_STEP_SESSION_EXIT: 'sessionExited' = 'sessionExited'
+export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
+export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
+export const CHECK_STEP_PREPARING_PIPETTE: 'preparingPipette' = 'preparingPipette'
+export const CHECK_STEP_INSPECTING_TIP: 'pickingUpTip' = 'pickingUpTip'
+export const CHECK_STEP_CHECKING_POINT_ONE: 'checkingPointOne' = 'checkingPointOne'
+export const CHECK_STEP_CHECKING_POINT_TWO: 'checkingPointTwo' = 'checkingPointTwo'
+export const CHECK_STEP_CHECKING_POINT_THREE: 'checkingPointThree' = 'checkingPointThree'
+export const CHECK_STEP_CHECKING_HEIGHT: 'checkingHeight' = 'checkingHeight'
+export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badRobotCalibration' =
   'badRobotCalibration'
 export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =

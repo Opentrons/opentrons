@@ -7,16 +7,18 @@ import {
   fetchRobotCalibrationCheckSession,
   deleteRobotCalibrationCheckSession,
   getRobotCalibrationCheckSession,
-  CHECK_STEP_SESSION_START,
-  CHECK_STEP_LOAD_LABWARE,
-  CHECK_STEP_PICK_UP_TIP,
-  CHECK_STEP_CHECK_POINT_ONE,
-  CHECK_STEP_CHECK_POINT_TWO,
-  CHECK_STEP_CHECK_POINT_THREE,
-  CHECK_STEP_CHECK_HEIGHT,
-  CHECK_STEP_SESSION_EXIT,
+  CHECK_STEP_SESSION_STARTED,
+  CHECK_STEP_LABWARE_LOADED,
+  CHECK_STEP_PREPARING_PIPETTE,
+  CHECK_STEP_INSPECTING_TIP,
+  CHECK_STEP_CHECKING_POINT_ONE,
+  CHECK_STEP_CHECKING_POINT_TWO,
+  CHECK_STEP_CHECKING_POINT_THREE,
+  CHECK_STEP_CHECKING_HEIGHT,
+  CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
+  CHECK_STEP_PREPARING_PIPETTE,
 } from '../../calibration'
 import { RIGHT, LEFT } from '../../pipettes'
 import { createLogger } from '../../logger'
@@ -58,18 +60,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       l.forPipettes.includes(activeInstrumentId)
     ))
   ), [labware, activeInstrumentId])
-  console.table({
-    activeInstrumentId,
-    activeLabware,
-    labware
-  })
-  function proceed() {
-    log.debug('Proceed to next step', {
-      instruments,
-      labware,
-      currentStep,
-    })
-  }
 
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
@@ -80,36 +70,35 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   let modalContentsClassName = styles.modal_contents
 
   switch (currentStep) {
-    case CHECK_STEP_SESSION_START: {
+    case CHECK_STEP_SESSION_STARTED: {
       stepContents = (
         <Introduction
-          proceed={proceed}
           exit={exit}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
       break
     }
-    case CHECK_STEP_LOAD_LABWARE: {
-      stepContents = <DeckSetup proceed={proceed} labware={labware} />
+    case CHECK_STEP_LABWARE_LOADED: {
+      stepContents = <DeckSetup labware={labware} />
       modalContentsClassName = styles.page_content_dark
       break
     }
-    case CHECK_STEP_PICK_UP_TIP: {
+    case CHECK_STEP_PREPARING_PIPETTE: {
       stepContents = activeInstrumentId && activeLabware ? (
         <TipPickUp
-          proceed={proceed}
           tiprack={activeLabware}
           pipette={instruments[activeInstrumentId]}
         />
       ) : null
       break
     }
-    case CHECK_STEP_CHECK_POINT_ONE:
-    case CHECK_STEP_CHECK_POINT_TWO:
-    case CHECK_STEP_CHECK_POINT_THREE:
-    case CHECK_STEP_CHECK_HEIGHT:
-    case CHECK_STEP_SESSION_EXIT:
+    case CHECK_STEP_INSPECTING_TIP:
+    case CHECK_STEP_CHECKING_POINT_ONE:
+    case CHECK_STEP_CHECKING_POINT_TWO:
+    case CHECK_STEP_CHECKING_POINT_THREE:
+    case CHECK_STEP_CHECKING_HEIGHT:
+    case CHECK_STEP_SESSION_EXITED:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:
     case CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />

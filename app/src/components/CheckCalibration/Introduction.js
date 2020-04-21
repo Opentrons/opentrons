@@ -4,6 +4,11 @@ import { PrimaryButton, AlertModal } from '@opentrons/components'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 import { tiprackImages } from './tiprackImages'
+import {
+  loadLabwareRobotCalibrationCheckSession,
+  shimCurrentStep,
+  CHECK_STEP_LABWARE_LOADED
+} from '../../calibration'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
@@ -31,6 +36,12 @@ type IntroductionProps = {|
 export function Introduction(props: IntroductionProps) {
   const { labwareLoadNames, proceed, exit } = props
   const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
+  const dispatch = useDispatch<Dispatch>()
+
+  function proceed() {
+    dispatch(loadLabwareRobotCalibrationCheckSession(robotName))
+    dispatch(shimCurrentStep(CHECK_STEP_LABWARE_LOADED))
+  }
 
   return (
     <>
