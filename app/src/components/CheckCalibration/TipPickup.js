@@ -31,12 +31,11 @@ const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, move to first check'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 
 type TipPickUpProps = {|
-  proceed: () => mixed,
   pipette: RobotCalibrationCheckInstrument,
   tiprack: RobotCalibrationCheckLabware,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { proceed, pipette, tiprack} = props
+  const { pipette, tiprack} = props
   const [isConfirmingTip, setIsConfirmingTip] = React.useState(false)
   const tiprackDef = React.useMemo(() => getLatestLabwareDef(tiprack?.loadName), [tiprack])
   const isMulti = React.useMemo(() => {

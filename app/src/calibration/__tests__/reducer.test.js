@@ -67,7 +67,9 @@ const SPECS: Array<ReducerSpec> = [
       meta: {},
     },
     state: {
-      'terpentine-martini': Fixtures.mockRobotCalibrationCheckSessionData,
+      'terpentine-martini': {
+        robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
+      }
     },
     expected: {
       'terpentine-martini': {

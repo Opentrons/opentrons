@@ -18,7 +18,6 @@ import {
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
-  CHECK_STEP_PREPARING_PIPETTE,
 } from '../../calibration'
 import { RIGHT, LEFT } from '../../pipettes'
 import { createLogger } from '../../logger'

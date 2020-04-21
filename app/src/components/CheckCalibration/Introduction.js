@@ -30,11 +30,10 @@ const CLEAR_DECK_BODY =
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
-  proceed: () => mixed,
   exit: () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
-  const { labwareLoadNames, proceed, exit } = props
+  const { labwareLoadNames, exit } = props
   const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
 
