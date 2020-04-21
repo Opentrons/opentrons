@@ -84,7 +84,7 @@ jobs:
 
     # test, build, and upload for JavaScript projects
     - stage: test
-      name: 'JS unit; build Protocol Designer, Labware Library, Components Library'
+      name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
       # node version pulled from .nvmrc
       language: node_js
       install:
