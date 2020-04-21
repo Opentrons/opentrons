@@ -70,7 +70,7 @@ describe('app-shell::system-info::usb-devices', () => {
   })
 
   it('can get the Windows driver version of a device', () => {
-    execa.command.mockResolvedValue('1.2.3')
+    execa.command.mockResolvedValue({ stdout: '1.2.3' })
 
     const device = {
       ...mockDevice,

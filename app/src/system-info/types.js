@@ -18,6 +18,15 @@ export type UsbDevice = {|
   windowsDriverVersion?: string | null,
 |}
 
+export type U2EAnalyticsProps = {|
+  'U2E Vendor ID': number,
+  'U2E Product ID': number,
+  'U2E Serial Number': string,
+  'U2E Device Name': string,
+  'U2E Manufacturer': string,
+  'U2E Windows Driver Version'?: string | null,
+|}
+
 // TODO(mc, 2020-04-17): add other system info
 export type SystemInfoState = {|
   usbDevices: Array<UsbDevice>,

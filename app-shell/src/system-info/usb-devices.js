@@ -62,6 +62,7 @@ export function getWindowsDriverVersion(
       `Get-PnpDeviceProperty -InstanceID "USB\\VID_${vid}&PID_${pid}\\${serialNumber}" -KeyName "DEVPKEY_Device_DriverVersion" | % { $_.Data }`,
       { shell: 'PowerShell.exe' }
     )
+    .then(result => result.stdout.trim())
     .catch(error => {
       logger.warn('unable to read Windows USB driver version', {
         device,

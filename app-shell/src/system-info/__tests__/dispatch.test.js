@@ -16,6 +16,11 @@ import type {
 jest.mock('../../os')
 jest.mock('../usb-devices')
 
+// TODO(mc, 2020-04-21): remove feature flag
+jest.mock('../../config', () => ({
+  getFullConfig: () => ({ devInternal: { enableSystemInfo: true } }),
+}))
+
 const createUsbDeviceMonitor: JestMockFn<
   [UsbDeviceMonitorOptions | void],
   UsbDeviceMonitor
