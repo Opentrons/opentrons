@@ -96,10 +96,12 @@ local-shell:
 .PHONY: push
 push: wheel
 	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
+	scp -i $(br_ssh_key) $(ssh_opts) ./opentrons-robot-server.service root@$(host):/data/
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/robotserver*.whl && mount -o remount,ro / && systemctl start opentrons-robot-server; } ;\
+"function cleanup () { rm -f /data/robotserver*.whl && mount -o remount,ro / && systemctl daemon-reload && systemctl start opentrons-robot-server; } ;\
 systemctl stop opentrons-robot-server &&\
 mount -o remount,rw / &&\
+cp /data/opentrons-robot-server.service /etc/systemd/system/ &&\
 cd /usr/lib/python3.7/site-packages &&\
 unzip -o /data/robotserver*.whl && cleanup || cleanup"
 
