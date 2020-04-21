@@ -15,13 +15,30 @@ import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
 from opentrons.system.shared_data import load_shared_data
-from .types import Protocol, PythonProtocol, JsonProtocol, Metadata, APIVersion
+from .types import (Protocol, PythonProtocol, JsonProtocol,
+                    Metadata, APIVersion, MalformedProtocolError)
 from .bundle import extract_bundle
 
 MODULE_LOG = logging.getLogger(__name__)
 
 # match e.g. "2.0" but not "hi", "2", "2.0.1"
 API_VERSION_RE = re.compile(r'^(\d+)\.(\d+)$')
+
+
+def _validate_v2_ast(protocol_ast: ast.Module):
+    defs = [fdef for fdef in protocol_ast.body
+            if isinstance(fdef, ast.FunctionDef)]
+    rundefs = [fdef for fdef in defs
+               if fdef.name == 'run']
+    # There must be precisely 1 one run function
+    if len(rundefs) > 1:
+        lines = [str(d.lineno) for d in rundefs]
+        linestr = ', '.join(lines)
+        raise MalformedProtocolError(
+            f'More than one run function is defined (lines {linestr})')
+    if not rundefs:
+        raise MalformedProtocolError(
+            "No function 'run(ctx)' defined")
 
 
 def version_from_string(vstr: str) -> APIVersion:
@@ -71,6 +88,9 @@ def _parse_python(
     metadata = extract_metadata(parsed)
     protocol = compile(parsed, filename=ast_filename, mode='exec')
     version = get_version(metadata, parsed)
+
+    if version >= APIVersion(2, 0):
+        _validate_v2_ast(parsed)
 
     result = PythonProtocol(
         text=protocol_contents,

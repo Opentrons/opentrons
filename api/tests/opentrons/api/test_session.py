@@ -55,12 +55,15 @@ async def test_async_notifications(main_router):
 
 @pytest.mark.parametrize(
     'proto_with_error', [
-        'metadata={"apiLevel": "2.0"}; blah',
+        '''
+metadata={"apiLevel": "2.0"}
+blah
+def run(ctx): pass''',
         'metadata={"apiLevel": "1.0"}; blah',
     ])
 def test_load_protocol_with_error(session_manager, hardware,
                                   proto_with_error):
-    with pytest.raises(Exception) as e:
+    with pytest.raises(NameError) as e:
         session = session_manager.create(
             name='<blank>', contents=proto_with_error)
         assert session is None

@@ -40,3 +40,29 @@ class BundleContents(NamedTuple):
     bundled_labware: Dict[str, Dict[str, Any]]
     bundled_data: Dict[str, bytes]
     bundled_python: Dict[str, str]
+
+
+PROTOCOL_MALFORMED = """
+
+A Python protocol for the OT2 must define a function called 'run' that takes a
+single argument: the protocol context to call functions on. For instance, a run
+function might look like this:
+
+def run(ctx):
+    ctx.comment('hello, world')
+
+This function is called by the robot when the robot executes the protol.
+This function is not present in the current protocol and must be added.
+"""
+
+
+class MalformedProtocolError(Exception):
+    def __init__(self, message):
+        self.message = message
+        super().__init__(message)
+
+    def __str__(self):
+        return self.message + PROTOCOL_MALFORMED
+
+    def __repr__(self):
+        return '<{}: {}>'.format(self.__class__.__name__, self.message)
