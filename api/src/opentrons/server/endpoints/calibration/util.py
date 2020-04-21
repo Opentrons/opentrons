@@ -163,14 +163,10 @@ class Transition:
             return False
         if self.before:
             await self.before(*args,
-                              to_state=self.to_state,
-                              from_state=self.from_state,
                               **kwargs)
         set_current_state(self.to_state)
         if self.after:
             await self.after(*args,
-                             to_state=self.to_state,
-                             from_state=self.from_state,
                              **kwargs)
         return True
 

@@ -294,7 +294,7 @@ CHECK_TRANSITIONS = [
         "trigger": "prepare_pipette",
         "from_state": "labwareLoaded",
         "to_state": "preparingPipette",
-        "before": "_move"
+        "before": "_prepare_pipette"
     },
     {
         "trigger": "jog",
@@ -312,7 +312,7 @@ CHECK_TRANSITIONS = [
         "trigger": "confirm_tip_attached",
         "from_state": "inspectingTip",
         "to_state": "checkingPointOne",
-        "before": "_move"
+        "before": "_check_point_one"
     },
     {
         "trigger": "invalidate_tip",
@@ -330,7 +330,7 @@ CHECK_TRANSITIONS = [
         "trigger": "confirm_step",
         "from_state": "checkingPointOne",
         "to_state": "checkingPointTwo",
-        "before": "_move",
+        "before": "_check_point_two",
     },
     {
         "trigger": "jog",
@@ -342,7 +342,7 @@ CHECK_TRANSITIONS = [
         "trigger": "confirm_step",
         "from_state": "checkingPointTwo",
         "to_state": "checkingPointThree",
-        "before": "_move",
+        "before": "_check_point_three",
     },
     {
         "trigger": "jog",
@@ -354,7 +354,7 @@ CHECK_TRANSITIONS = [
         "trigger": "confirm_step",
         "from_state": "checkingPointThree",
         "to_state": "checkingHeight",
-        "before": "_move"
+        "before": "_check_height"
     },
     {
         "trigger": "jog",
@@ -452,8 +452,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _return_tip_for_pipette(self, pipette_id: UUID, **kwargs):
         if not self._has_tip(pipette_id):
             raise TipAttachError()
-        await self._move(pipette_id=pipette_id, **kwargs)
-        await self._return_tip(self._get_mount(pipette))
+        await self._prepare_pipette(pipette_id=pipette_id)
+        await self._return_tip(self._get_mount(pipette_id))
 
     def _create_tiprack_param(self, position: typing.Dict):
         new_dict = {}
@@ -496,41 +496,40 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             new_dict = self._format_other_params(template_dict)
         return new_dict
 
-    def _get_move_to_location(
-            self,
-            to_state: str,
-            requested_position: PositionType,
-            pip_id: UUID) -> Location:
+    async def _prepare_pipette(self, pipette_id: UUID):
+        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+        offset = self._moves.preparingPipette[tiprack_id][pipette_id]['offset']
 
-        if to_state in {'preparingPipette', 'returningTip'}:
-            tiprack_id = self._relate_mount[pip_id]['tiprack_id']
-            offset = self._moves.preparingPipette[tiprack_id][pip_id]['offset']
-            position = {"offset": offset, "locationId": tiprack_id}
-        else:
-            position = requested_position
+        moves_for_step = self._moves.preparingPipette
+        single_location = moves_for_step[tiprack_id]
+        loc_to_move = single_location[pipette_id].get('well')
+        pt, well = loc_to_move.top()
+        updated_pt = pt + offset
+        await self._move(pipette_id, Location(updated_pt, well))
 
-        if position.get('offset'):
-            moves_for_step = getattr(self._moves, to_state)
-            single_location = moves_for_step[position['locationId']]
-            loc_to_move = single_location[pip_id].get('well')
-            pt, well = loc_to_move.top()
-            offset = position['offset']
-            updated_pt = pt + offset
-            return Location(updated_pt, well)
-        else:
-            position.get('position')
-            loc_to_move = position['position']
-            return Location(loc_to_move, None)
+    async def _check_point_one(self, pipette_id: UUID):
+        await self._move(pipette_id,
+                         Location(self._moves.checkingPointOne['position'],
+                                  None))
+
+    async def _check_point_two(self, pipette_id: UUID):
+        await self._move(pipette_id,
+                         Location(self._moves.checkingPointTwo['position'],
+                                  None))
+
+    async def _check_point_three(self, pipette_id: UUID):
+        await self._move(pipette_id,
+                         Location(self._moves.checkingPointThree['position'],
+                                  None))
+
+    async def _check_height(self, pipette_id: UUID):
+        await self._move(pipette_id,
+                         Location(self._moves.checkingHeight['position'],
+                                  None))
 
     async def _move(self,
                     pipette_id: UUID,
-                    from_state: str,
-                    to_state: str,
-                    request_position: PositionType = None):
-
-        to_loc = self._get_move_to_location(to_state,
-                                            request_position,
-                                            pipette_id)
+                    request_position: Location):
 
         # determine current location
         mount = self._get_mount(pipette_id)
@@ -538,7 +537,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         from_loc = Location(from_pt, None)
 
         max_height = self.hardware.get_instrument_max_height(mount)
-        moves = geometry.plan_moves(from_loc, to_loc, self._deck, max_height)
+        moves = geometry.plan_moves(from_loc, request_position,
+                                    self._deck, max_height)
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
