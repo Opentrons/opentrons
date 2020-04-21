@@ -88,8 +88,9 @@ class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._hardware = hardware
-        self._relate_mount =\
-            self._key_by_uuid(hardware.get_attached_instruments())
+        self._relate_mount = self._key_by_uuid(
+            hardware.get_attached_instruments()
+        )
         self._deck = geometry.Deck()
         self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
@@ -101,7 +102,8 @@ class CalibrationSession:
         await hardware.set_lights(rails=True)
         await hardware.home()
 
-    def _key_by_uuid(self, new_pipettes: typing.Dict) -> typing.Dict:
+    @staticmethod
+    def _key_by_uuid(new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
         for mount, data in new_pipettes.items():
             # TODO: Adding in error state is out of scope for this PR.

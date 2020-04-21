@@ -27,7 +27,6 @@ def _get_pipette(instruments, pip_name):
 
 
 async def test_integrated_calibration_check(async_client, test_setup):
-    curr_pip = None
     # TODO: Add in next move steps once they are completed
     resp = await async_client.post('/calibration/check/session')
 

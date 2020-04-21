@@ -166,29 +166,33 @@ def machine(loop):
               'ThinkingAboutCats',
               {
                 'name': 'BrowsingCatPictures',
-                'on_enter': 'open_reddit_tab',
-                'on_exit': 'close_reddit_tab'
               },
               'LookingAtTime',
-              {'name': "Sleeping", 'on_enter': 'reach_rem'},
+              {'name': "Sleeping"},
               'Dreaming',
               'OnVacation']
     transitions = [
-       {"trigger": "start_thinking_about_cats", "from_state": "Working","to_state": "ThinkingAboutCats"},
-       {"trigger": "look_at_time", "from_state": "ThinkingAboutCats", "to_state": "Working"},
-       {
-           "trigger": "write_some_code",
-           "from_state": "Working",
-           "to_state": "Working",
-           "after": "update_written_code"
-        },
-       {"trigger": "look_at_cats", "from_state": "ThinkingAboutCats","to_state": "BrowsingCatPictures"},
-       {"trigger": "look_at_time", "from_state": "BrowsingCatPictures", "to_state": "Working"},
-       {"trigger": "become_exhausted", "from_state": "Working", "to_state": "Sleeping"},
-       {"trigger": "become_exhausted", "from_state": "ThinkingAboutCats", "to_state": "Sleeping"},
-       {"trigger": "become_exhausted", "from_state": "BrowsingCatPictures", "to_state": "Sleeping"},
-       {"trigger": "start_dreaming", "from_state": "*", "to_state": "Dreaming"},
-       {"trigger": "dream_about_code", "from_state": "Dreaming", "to_state": "Working"},
+       {"trigger": "start_thinking_about_cats", "from_state": "Working",
+        "to_state": "ThinkingAboutCats"},
+       {"trigger": "look_at_time", "from_state": "ThinkingAboutCats",
+        "to_state": "Working"},
+       {"trigger": "write_some_code", "from_state": "Working",
+        "to_state": "Working", "after": "update_written_code"},
+       {"trigger": "look_at_cats", "from_state": "ThinkingAboutCats",
+        "to_state": "BrowsingCatPictures", "after": "open_reddit_tab"},
+       {"trigger": "look_at_time", "from_state": "BrowsingCatPictures",
+        "to_state": "Working"},
+       {"trigger": "become_exhausted", "from_state": "Working",
+        "to_state": "Sleeping"},
+       {"trigger": "become_exhausted", "from_state": "ThinkingAboutCats",
+        "to_state": "Sleeping"},
+       {"trigger": "become_exhausted", "from_state": "BrowsingCatPictures",
+        "to_state": "Sleeping", "before": "close_reddit_tab",
+        "after": "reach_rem"},
+       {"trigger": "start_dreaming", "from_state": "*",
+        "to_state": "Dreaming"},
+       {"trigger": "dream_about_code", "from_state": "Dreaming",
+        "to_state": "Working"},
        {"trigger": "go_on_a_trip", "from_state": "*", "to_state": "OnVacation"}
     ]
 
@@ -204,7 +208,7 @@ def machine(loop):
         async def reach_rem(self):
             self.reached_rem = True
 
-        async def update_written_code(self, code: str, to_state: str, from_state: str):
+        async def update_written_code(self, code: str):
             self.code_written = code
 
         async def open_reddit_tab(self):
