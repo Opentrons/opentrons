@@ -54,7 +54,6 @@ async def test_move_to_position(async_client, async_server, test_setup):
 
     well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette]['well']
 
-    # pos_dict = {'locationId': tiprack_id, 'offset': [0, 1, 0]}
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
         json={'pipetteId': pip_id})
@@ -62,7 +61,7 @@ async def test_move_to_position(async_client, async_server, test_setup):
     assert resp.status == 200
 
     curr_pos = await sess.hardware.gantry_position(mount)
-    assert curr_pos == (well.top()[0] + types.Point(0, 1, 0))
+    assert curr_pos == (well.top()[0] + types.Point(0, 0, 10))
 
 
 async def test_jog_pipette(async_client, async_server, test_setup):

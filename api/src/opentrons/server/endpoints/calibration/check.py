@@ -70,13 +70,10 @@ async def load_labware(request: web.Request, session) -> web.Response:
 async def prepare_pipette(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
-    print(f'FROM check prepare_pipette {pipette.pipetteId}')
-    print(f'FROM check prepare_pipette state {session.current_state.name}')
     await session.prepare_pipette(pipette_id=pipette.pipetteId)
     return web.json_response(status=200)
 
 
-# TODO: BC: make this function idea "confirm point" instead of "move"
 async def confirm_step(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)

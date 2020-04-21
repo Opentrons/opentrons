@@ -449,18 +449,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             raise TipAttachError()
         await self.hardware.remove_tip(self._get_mount(pipette))
 
-    # async def _move_to_tiprack_for_pipette(self, pipette_id: UUID):
-    #     print(f'FROM move to tiprack for pip {pipette_id}')
-    #     tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-    #     loc = self._moves.moveToTipRack[tiprack_id][pipette_id]['offset']
-    #     await self._move(pipette_id=pipette_id,
-    #                      request_location={"offset": loc,
-    #                                        "locationId": tiprack_id})
-
-    async def _return_tip_for_pipette(self, pipette: UUID, **kwargs):
-        if not self._has_tip(pipette):
+    async def _return_tip_for_pipette(self, pipette_id: UUID, **kwargs):
+        if not self._has_tip(pipette_id):
             raise TipAttachError()
-        await self._move_to_tiprack_for_pipette(pipette)
+        await self._move(pipette_id=pipette_id, **kwargs)
         await self._return_tip(self._get_mount(pipette))
 
     def _create_tiprack_param(self, position: typing.Dict):
@@ -510,7 +502,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             requested_position: PositionType,
             pip_id: UUID) -> Location:
 
-        if to_state == 'preparingPipette':
+        if to_state in ['preparingPipette', 'returningTip']:
             tiprack_id = self._relate_mount[pip_id]['tiprack_id']
             offset = self._moves.preparingPipette[tiprack_id][pip_id]['offset']
             position = {"offset": offset, "locationId": tiprack_id}
