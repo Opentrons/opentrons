@@ -252,10 +252,11 @@ class CalibrationSession:
             pip = self.get_pipette(data['mount'])
             tip_id = data['tiprack_id']
             temp_dict = {
-                key: value for key, value in pip.items() if key in fields}
+                key: value for key, value in pip.items() if key in fields
+            }
             if tip_id:
-                temp_dict['tiprack_id'] = tip_id.hex
-            to_dict[id.hex] = AttachedPipette(**temp_dict)
+                temp_dict['tiprack_id'] = str(tip_id)
+            to_dict[str(id)] = AttachedPipette(**temp_dict)
         return to_dict
 
     @property
@@ -274,7 +275,7 @@ class CalibrationSession:
         for name, value in self._labware_info.items():
             temp_dict = asdict(value)
             del temp_dict['definition']
-            to_dict[name.hex] = temp_dict
+            to_dict[str(name)] = temp_dict
         return to_dict
 
 
@@ -443,12 +444,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     def _update_tiprack_offset(self, pipette: UUID, old_pos: Point,
                                new_pos: Point):
-        id = self._relate_mount[pipette]['tiprack_id']
-
+        tiprack_id = self._relate_mount[pipette]['tiprack_id']
         if self._moves.preparingPipette:
-            old_offset = self._moves.preparingPipette[id][pipette].offset
+            old_offset = \
+                self._moves.preparingPipette[tiprack_id][pipette].offset
             updated_offset = (new_pos - old_pos) + old_offset
-            self._moves.preparingPipette[id][pipette].offset = updated_offset
+            self._moves.preparingPipette[tiprack_id][pipette].offset =\
+                updated_offset
 
     async def delete_session(self):
         for mount_id in self._relate_mount.keys():
@@ -488,9 +490,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for loc, data in position.items():
             for loc_id, values in data.items():
                 offset = list(values['offset'])
-                pos_dict = {'offset': offset, 'locationId': loc.hex}
-                new_dict[loc_id.hex] = {'pipetteId': loc_id.hex,
-                                        'location': pos_dict}
+                pos_dict = {'offset': offset, 'locationId': str(loc)}
+                new_dict[str(loc_id)] = {'pipetteId': str(loc_id),
+                                         'location': pos_dict}
         return new_dict
 
     def _format_move_params(
@@ -499,18 +501,20 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             new_dict = self._create_tiprack_param(position)
         else:
             new_dict = {}
-            for id in self._relate_mount.keys():
+            for _id in self._relate_mount.keys():
                 pos_dict = {'position': list(position['position']),
-                            'locationId': position['locationId'].hex}
-                new_dict[id.hex] = {'location': pos_dict, 'pipetteId': id.hex}
+                            'locationId': str(position['locationId'])}
+                _id_str = str(_id)
+                new_dict[_id_str] = {'location': pos_dict,
+                                     'pipetteId': _id_str}
         return new_dict
 
     def _format_other_params(self, template: typing.Dict) -> typing.Dict:
         new_dict = {}
         for id in self._relate_mount.keys():
             blank = template.copy()
-            blank.update(pipetteId=id.hex)
-            new_dict[id.hex] = blank
+            blank.update(pipetteId=str(id))
+            new_dict[str(id)] = blank
         return new_dict
 
     def format_params(self, next_state: str) -> typing.Dict:
