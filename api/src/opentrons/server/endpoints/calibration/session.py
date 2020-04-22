@@ -392,6 +392,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.confirm_step,
         "from_state": CalibrationCheckState.checkingHeight,
         "to_state": CalibrationCheckState.calibrationComplete,
+        "after": "_return_tip_for_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.exit,
