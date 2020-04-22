@@ -48,22 +48,25 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatch(fetchRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
-  const [activeMount] = React.useState(RIGHT)
-
+  // TODO: BC: once robot keeps track of active pipette, grab that
+  // from the cal check session status instead of arbitrarily
+  // defaulting to the first pipette
   const activeInstrumentId = React.useMemo(
-    () =>
-      instruments &&
-      Object.keys(instruments).find(
-        id => instruments[id].mount_axis === AXIS_BY_MOUNT[activeMount]
-      ),
-    [instruments, activeMount]
+    () => instruments && Object.keys(instruments)[0],
+    [instruments]
   )
   const activeLabware = React.useMemo(
     () =>
-      labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
+      labware &&
+      labware.find(l =>
+        l.forPipettes.some(
+          raw_pipette_id =>
+            raw_pipette_id.replace('-', '') == activeInstrumentId
+        )
+      ),
     [labware, activeInstrumentId]
   )
-
+  console.table({ activeInstrumentId, activeLabware })
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
@@ -84,7 +87,13 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       break
     }
     case CHECK_STEP_LABWARE_LOADED: {
-      stepContents = <DeckSetup robotName={robotName} labware={labware} />
+      stepContents = (
+        <DeckSetup
+          robotName={robotName}
+          activeInstrumentId={activeInstrumentId}
+          labware={labware}
+        />
+      )
       modalContentsClassName = styles.page_content_dark
       break
     }

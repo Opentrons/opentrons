@@ -22,6 +22,7 @@ import {
   ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   CHECK_UPDATE_PATH_LOAD_LABWARE,
+  CHECK_UPDATE_PATH_PREPARE_PIPETTE,
   CHECK_UPDATE_PATH_PICK_UP_TIP,
 } from '../constants'
 
@@ -34,6 +35,13 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
       }
       break
     case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE:
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
+        body: {
+          pipetteId: action.payload.pipetteId,
+        },
+      }
+      break
     case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP:
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,

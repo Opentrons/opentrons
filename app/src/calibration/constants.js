@@ -72,6 +72,9 @@ export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 
 export const CHECK_UPDATE_PATH_LOAD_LABWARE: 'loadLabware' = 'loadLabware'
+export const CHECK_UPDATE_PATH_PREPARE_PIPETTE: 'preparePipette' =
+  'preparePipette'
+export const CHECK_UPDATE_PATH_JOG: 'jog' = 'jog'
 export const CHECK_UPDATE_PATH_PICK_UP_TIP: 'pickUpTip' = 'pickUpTip'
 export const CHECK_UPDATE_PATH_CONFIRM_TIP: 'confirmTip' = 'confirmTip'
 export const CHECK_UPDATE_PATH_INVALIDATE_TIP: 'invalidateTip' = 'invalidateTip'
