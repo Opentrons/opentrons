@@ -1,6 +1,6 @@
 // @flow
-import React, { memo, useState, type ComponentType } from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import React, { useState, type ComponentType } from 'react'
+import { useDispatch, connect } from 'react-redux'
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
@@ -9,13 +9,10 @@ import cx from 'classnames'
 import { useConditionalConfirm } from '../useConditionalConfirm'
 import { actions } from '../../steplist'
 import { selectors as stepFormSelectors } from '../../step-forms'
-import type { FormData, StepType, StepFieldName } from '../../form-types'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
 import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
-import styles from './StepEditForm.css'
-
 import {
   MixForm,
   MoveLiquidForm,
@@ -23,9 +20,12 @@ import {
   MagnetForm,
   TemperatureForm,
 } from './forms'
-
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
+import styles from './StepEditForm.css'
+
+import type { BaseState } from '../../types'
+import type { FormData, StepType, StepFieldName } from '../../form-types'
 
 const STEP_FORM_MAP: { [StepType]: ?ComponentType<any> } = {
   mix: MixForm,
@@ -46,7 +46,7 @@ type Props = {|
   dirtyFields: Array<string>,
 |}
 
-const StepEditFormComponent = (props: Props) => {
+export const StepEditFormComponent = (props: Props) => {
   const {
     formData,
     deleteStep,
@@ -57,20 +57,6 @@ const StepEditFormComponent = (props: Props) => {
     onFieldFocus,
     onFieldBlur,
   } = props
-
-  // TODO IMMEDIATELY: this old behavior made sure to unfocus any focusedField
-  // and to reset the dirty fields. Is it still needed?
-  //
-  //   componentDidUpdate(prevProps: Props) {
-  //     // NOTE: formData is sometimes undefined between steps
-  //     if (get(this.props, 'formData.id') !== get(prevProps, 'formData.id')) {
-  //       const { isNewStep, formData } = this.props
-  //       this.setState({
-  //         focusedField: null,
-  //         dirtyFields: getDirtyFields(isNewStep, formData),
-  //       })
-  //     }
-  //   }
 
   const formHasChanges = true // TODO IMMEDIATELY make stateful, maybe set to true on onFieldBlur??
   const {
@@ -155,13 +141,14 @@ const getDirtyFields = (
   return without(dirtyFields, 'stepType', 'id')
 }
 
-export const StepEditForm = () => {
+type StepEditFormManagerProps = {|
   // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
-  const formData: ?FormData = useSelector(
-    stepFormSelectors.getHydratedUnsavedForm
-  )
-  const isNewStep = useSelector(stepFormSelectors.getCurrentFormIsPresaved)
+  formData: ?FormData,
+  isNewStep: boolean,
+|}
 
+const StepEditFormManager = (props: StepEditFormManagerProps) => {
+  const { isNewStep, formData } = props
   const [showMoreOptionsModal, setShowMoreOptionsModal] = useState<boolean>(
     false
   )
@@ -191,7 +178,6 @@ export const StepEditForm = () => {
 
   // no form selected
   if (formData == null) {
-    console.log('No form data!') // TODO IMMEDIATELY
     return null
   }
 
@@ -213,3 +199,22 @@ export const StepEditForm = () => {
     />
   )
 }
+
+const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
+  return {
+    formData: stepFormSelectors.getHydratedUnsavedForm(state),
+    isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
+  }
+}
+
+// NOTE(IL, 2020-04-22): This is using connect instead of useSelector in order to
+// avoid zombie children in the many connected field components.
+// (Children of a useSelector parent must always be written to use selectors defensively
+// if their parent (StepEditForm) is NOT using connect.
+// It doesn't matter if the children are using connect or useSelector,
+// only the parent matters.)
+// https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
+export const StepEditForm = connect<StepEditFormManagerProps, {||}, _, _, _, _>(
+  mapStateToProps,
+  () => ({}) // no `dispatch` prop
+)(StepEditFormManager)
