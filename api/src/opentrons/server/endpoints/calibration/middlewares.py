@@ -52,7 +52,7 @@ def status_response(
         request: web.Request,
         response: web.Response) -> web.Response:
 
-    current_state = session.current_state.name
+    current_state = session.current_state_name
     potential_triggers = session.potential_triggers
     links = _format_links(session, potential_triggers, request.app.router)
 

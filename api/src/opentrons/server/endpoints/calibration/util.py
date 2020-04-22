@@ -203,7 +203,7 @@ class CallbackKeys(enum.Enum):
     condition = enum.auto()
 
 
-TransitionKwargs = Dict[TransitionKeys, str]
+TransitionKwargs = Dict[str, Any]
 
 
 class StateMachine:
@@ -220,7 +220,7 @@ class StateMachine:
         """
         self._states: Dict[str, State] = {}
         self._current_state: Optional[State] = None
-        self._events = {}
+        self._events: Dict[str, Dict[str, List[Transition]]] = {}
         for params in states:
             if isinstance(params, dict):
                 self.add_state(**params)
@@ -230,8 +230,8 @@ class StateMachine:
         for t in transitions:
             self.add_transition(**t)
 
-    def _get_state_by_name(self, name: str) -> State:
-        return self._states.get(name, None)
+    def _get_state_by_name(self, name: str) -> Optional[State]:
+        return self._states.get(name)
 
     def _set_current_state(self, state_name: str):
         """
@@ -251,21 +251,21 @@ class StateMachine:
         :param kwargs: keyword args passed to transition callbacks
         :return: None
         """
-        if trigger in self._events and \
-                WILDCARD not in self._events[trigger] and \
-                self._current_state.name not in self._events[trigger]:
+        events = self._events.get(trigger, {})
+        if events and WILDCARD not in events and \
+                self.current_state_name not in events:
             raise StateMachineError(f'cannot trigger event {trigger}'
-                                    f' from state {self._current_state.name}')
+                                    f' from state {self.current_state_name}')
         try:
-            from_state = WILDCARD if WILDCARD in self._events[trigger] \
-                          else self._current_state.name
-            for transition in self._events[trigger][from_state]:
+            from_state = WILDCARD if WILDCARD in events \
+                else self.current_state_name
+            for transition in events[from_state]:
                 if await transition.execute(self._set_current_state,
                                             *args, **kwargs):
                     break
         except Exception as e:
             raise StateMachineError(f'event {trigger} failed to transition '
-                                    f'from {self._current_state.name}: '
+                                    f'from {self.current_state_name}: '
                                     f'{str(e)}')
 
     def _get_cb(self, method_name: Optional[str]):
@@ -311,15 +311,19 @@ class StateMachine:
         }
 
     @property
-    def current_state(self) -> State:
+    def current_state(self) -> Optional[State]:
         return self._current_state
+
+    @property
+    def current_state_name(self) -> str:
+        return self._current_state.name if self._current_state else ""
 
     @property
     def potential_triggers(self) -> Set[str]:
         """Return a set of currently available triggers"""
         potential_triggers = set()
         for trigger, events in self._events.items():
-            if WILDCARD in events or self._current_state.name in events:
+            if WILDCARD in events or self.current_state_name in events:
                 potential_triggers.add(trigger)
         return potential_triggers
 

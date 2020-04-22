@@ -3,6 +3,7 @@ from uuid import uuid4, UUID
 from enum import Enum
 from dataclasses import dataclass, asdict, field, fields
 
+from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
@@ -18,14 +19,6 @@ A set of endpoints that can be used to create a session for any robot
 calibration tasks such as checking your calibration data, performing mount
 offset or a robot deck transform.
 """
-
-_MoveKey = typing.TypeVar('_MoveKey')
-_MoveValue = typing.TypeVar('_MoveValue')
-MoveType = typing.Optional[typing.Dict[_MoveKey, _MoveValue]]
-# Note, tried to restrict PositionType to
-# typing.Dict[str, typing.Union[UUID, Point]], but mypy would not allow
-# typing of individual keys at that point (after indexing)
-PositionType = typing.Dict[str, typing.Any]
 
 
 class SessionManager:
@@ -74,15 +67,30 @@ class LabwareInfo:
 
 
 @dataclass
+class CheckMove:
+    position: Point = Point(0, 0, 0)
+    locationId: UUID = uuid4()
+
+
+@dataclass
+class PreparingPipetteMoveOffset:
+    offset: Point
+    well: Well
+
+
+PreparingPipetteMove = typing.Dict[
+    UUID, typing.Dict[UUID, PreparingPipetteMoveOffset]
+]
+
+
+@dataclass
 class Moves:
-    """
-    This class is meant to encapsulate the different moves
-    """
-    preparingPipette: MoveType = field(default_factory=dict)
-    checkingPointOne: MoveType = field(default_factory=dict)
-    checkingPointTwo: MoveType = field(default_factory=dict)
-    checkingPointThree: MoveType = field(default_factory=dict)
-    checkingHeight: MoveType = field(default_factory=dict)
+    """This class is meant to encapsulate the different moves"""
+    preparingPipette: PreparingPipetteMove = field(default_factory=dict)
+    checkingPointOne: CheckMove = CheckMove()
+    checkingPointTwo: CheckMove = CheckMove()
+    checkingPointThree: CheckMove = CheckMove()
+    checkingHeight: CheckMove = CheckMove()
 
 
 class CalibrationSession:
@@ -161,14 +169,14 @@ class CalibrationSession:
                      checkingPointThree=self._build_cross_dict('7TLC'),
                      checkingHeight=self._build_height_dict('5'))
 
-    def _build_cross_dict(self, pos_id: str) -> typing.Dict:
+    def _build_cross_dict(self, pos_id: str) -> CheckMove:
         cross_coords = self._deck.get_calibration_position(pos_id).position
-        return {'position': Point(*cross_coords), 'locationId': uuid4()}
+        return CheckMove(position=Point(*cross_coords), locationId=uuid4())
 
-    def _build_height_dict(self, slot: str) -> typing.Dict:
+    def _build_height_dict(self, slot: str) -> CheckMove:
         pos = Point(*self._deck.get_slot_center(slot))
         updated_pos = pos - Point(20, 0, pos.z)
-        return {'position': updated_pos, 'locationId': uuid4()}
+        return CheckMove(position=updated_pos, locationId=uuid4())
 
     def _available_slot_options(self) -> str:
         if self._slot_options:
@@ -317,13 +325,13 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.preparingPipette,
         "to_state": CalibrationCheckState.preparingPipette,
-        "before": "_jog"
+        "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
         "from_state": CalibrationCheckState.preparingPipette,
         "to_state": CalibrationCheckState.inspectingTip,
-        "before": "_pick_up_tip"
+        "before": "_pick_up_pipette_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -341,7 +349,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.checkingPointOne,
         "to_state": CalibrationCheckState.checkingPointOne,
-        "before": "_jog"
+        "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_step,
@@ -353,7 +361,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.checkingPointTwo,
         "to_state": CalibrationCheckState.checkingPointTwo,
-        "before": "_jog"
+        "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_step,
@@ -365,7 +373,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.checkingPointThree,
         "to_state": CalibrationCheckState.checkingPointThree,
-        "before": "_jog"
+        "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_step,
@@ -377,7 +385,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.checkingHeight,
         "to_state": CalibrationCheckState.checkingHeight,
-        "before": "_jog"
+        "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_step,
@@ -424,11 +432,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             for id in data.forPipettes:
                 mount = self._get_mount(id)
                 pip = self.get_pipette(mount)
-                if pip['channels'] == 8:
-                    well = lw.wells_by_name()['H1']
-                else:
-                    well = lw.wells_by_name()['A1']
-                build_dict[id] = {'offset': Point(0, 0, 10), 'well': well}
+                well_name = 'H1' if pip['channels'] == 8 else 'A1'
+                well = lw.wells_by_name()[well_name]
+                build_dict[id] = PreparingPipetteMoveOffset(
+                    offset=Point(0, 0, 10), well=well
+                )
             full_dict[data.id] = build_dict
         self._moves.preparingPipette = full_dict
 
@@ -436,20 +444,20 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         id = self._relate_mount[pipette]['tiprack_id']
 
         if self._moves.preparingPipette:
-            old_offset = self._moves.preparingPipette[id][pipette]['offset']
+            old_offset = self._moves.preparingPipette[id][pipette].offset
             updated_offset = (new_pos - old_pos) + old_offset
-            self._moves.preparingPipette[id][pipette].update(offset=updated_offset)  # NOQA(E501)
+            self._moves.preparingPipette[id][pipette].offset = updated_offset
 
     async def delete_session(self):
         for mount_id in self._relate_mount.keys():
             try:
-                await self.return_tip(mount_id)
+                await self._return_tip(mount_id)
             except TipAttachError:
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    async def _pick_up_tip(self, pipette: UUID, **kwargs):
+    async def _pick_up_pipette_tip(self, pipette: UUID, **kwargs):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
@@ -457,9 +465,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         """
         if self._has_tip(pipette):
             raise TipAttachError()
-        id = self._relate_mount[pipette]['tiprack_id']
+        tiprack_id = self._relate_mount[pipette]['tiprack_id']
         mount = self._get_mount(pipette)
-        await super(self.__class__, self)._pick_up_tip(mount, id)
+        await self._pick_up_tip(mount, tiprack_id)
 
     async def _invalidate_tip(self, pipette: UUID, **kwargs):
         if not self._has_tip(pipette):
@@ -472,13 +480,15 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self._prepare_pipette(pipette_id=pipette_id)
         await self._return_tip(self._get_mount(pipette_id))
 
-    def _create_tiprack_param(self, position: typing.Dict):
+    @staticmethod
+    def _create_tiprack_param(position: typing.Dict):
         new_dict = {}
         for loc, data in position.items():
-            for id, values in data.items():
+            for loc_id, values in data.items():
                 offset = list(values['offset'])
                 pos_dict = {'offset': offset, 'locationId': loc.hex}
-                new_dict[id.hex] = {'pipetteId': id.hex, 'location': pos_dict}
+                new_dict[loc_id.hex] = {'pipetteId': loc_id.hex,
+                                        'location': pos_dict}
         return new_dict
 
     def _format_move_params(
@@ -515,33 +525,32 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     async def _prepare_pipette(self, pipette_id: UUID):
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        offset = self._moves.preparingPipette[tiprack_id][pipette_id]['offset']
-
         moves_for_step = self._moves.preparingPipette
         single_location = moves_for_step[tiprack_id]
-        loc_to_move = single_location[pipette_id].get('well')
+        offset = single_location[pipette_id].offset
+        loc_to_move = single_location[pipette_id].well
         pt, well = loc_to_move.top()
         updated_pt = pt + offset
         await self._move(pipette_id, Location(updated_pt, well))
 
     async def _check_point_one(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointOne['position'],
+                         Location(self._moves.checkingPointOne.position,
                                   None))
 
     async def _check_point_two(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointTwo['position'],
+                         Location(self._moves.checkingPointTwo.position,
                                   None))
 
     async def _check_point_three(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointThree['position'],
+                         Location(self._moves.checkingPointThree.position,
                                   None))
 
     async def _check_height(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingHeight['position'],
+                         Location(self._moves.checkingHeight.position,
                                   None))
 
     async def _move(self,
@@ -559,7 +568,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
-    async def _jog(self, pipette: UUID, vector: Point, **kwargs):
+    async def _jog_pipette(self, pipette: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette)
         old_pos = await self.hardware.gantry_position(mount)
         await super(self.__class__, self)._jog(mount, vector)
