@@ -2,40 +2,17 @@
 import React, { type Node } from 'react'
 import { useConditionalConfirm } from '../../useConditionalConfirm'
 import { useSelector, useDispatch } from 'react-redux'
-import { ContinueModal } from '@opentrons/components'
+import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../../ui/steps'
-import { Portal } from '../../portals/MainPageModalPortal'
 import { getCurrentFormIsPresaved } from '../../../step-forms/selectors'
 import { PDTitledList } from '../../lists'
 import type { TerminalItemId } from '../../../steplist'
 
 export { TerminalItemLink } from './TerminalItemLink'
-
-type ConfirmModalProps = {|
-  onCancelClick: () => mixed,
-  onContinueClick: () => mixed,
-|}
-
-// TODO IMMEDIATELY do we not have anything like this already??? If not, factor it out :(
-const ConfirmModal = (props: ConfirmModalProps) => {
-  const { onCancelClick, onContinueClick } = props
-
-  return (
-    <Portal>
-      <ContinueModal
-        heading="TODO are you sure?"
-        onCancelClick={onCancelClick}
-        onContinueClick={onContinueClick}
-      >
-        foo
-      </ContinueModal>
-    </Portal>
-  )
-}
 
 type Props = {|
   children?: Node,
@@ -68,7 +45,7 @@ export const TerminalItem = (props: Props) => {
   return (
     <>
       {requiresConfirmation && (
-        <ConfirmModal
+        <ConfirmDeleteStepModal
           onContinueClick={confirmAndContinue}
           onCancelClick={cancelConfirm}
         />
