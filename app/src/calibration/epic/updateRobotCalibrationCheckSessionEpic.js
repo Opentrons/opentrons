@@ -19,25 +19,26 @@ import type { UpdateRobotCalibrationCheckSessionAction } from '../types'
 import {
   ROBOT_CALIBRATION_CHECK_PATH,
   ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   CHECK_UPDATE_PATH_LOAD_LABWARE,
   CHECK_UPDATE_PATH_PICK_UP_TIP,
 } from '../constants'
 
-
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
   let requestParams = {}
-  switch (action.type){
+  switch (action.type) {
     case ROBOT_CALIBRATION_CHECK_LOAD_LABWARE:
       requestParams = {
-        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_LOAD_LABWARE}`
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_LOAD_LABWARE}`,
       }
       break
+    case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE:
     case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP:
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
         body: {
-          pipetteId: action.payload.pipetteId
+          pipetteId: action.payload.pipetteId,
         },
       }
       break
@@ -63,8 +64,9 @@ export const updateRobotCalibrationCheckSessionEpic: Epic = (
 ) => {
   return action$.pipe(
     ofType(
-      Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
-      Constants.ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+      ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+      ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+      ROBOT_CALIBRATION_CHECK_PICK_UP_TIP
     ),
     mapToRobotApiRequest(
       state$,

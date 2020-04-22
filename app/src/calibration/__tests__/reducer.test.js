@@ -62,20 +62,20 @@ const SPECS: Array<ReducerSpec> = [
       payload: {
         robotName: 'terpentine-martini',
         ...Fixtures.mockRobotCalibrationCheckSessionData,
-        currentStep: 'arbitraryOtherStep'
+        currentStep: 'arbitraryOtherStep',
       },
       meta: {},
     },
     state: {
       'terpentine-martini': {
         robotCalibrationCheck: Fixtures.mockRobotCalibrationCheckSessionData,
-      }
+      },
     },
     expected: {
       'terpentine-martini': {
         robotCalibrationCheck: {
           ...Fixtures.mockRobotCalibrationCheckSessionData,
-          currentStep: 'arbitraryOtherStep'
+          currentStep: 'arbitraryOtherStep',
         },
       },
     },

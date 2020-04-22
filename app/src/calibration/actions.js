@@ -11,8 +11,8 @@ import * as Constants from './constants'
 export const shimCurrentStep = (
   robotName: string,
   currentStep: string
-): Types.CreateRobotCalibrationCheckSessionAction => ({
-  type: 'calibration:TEMPORARY_SHIM_SET_CURRENT_STEP',
+): Types.TemporarySHimSetCurrentStepAction => ({
+  type: Constants.TEMPORARY_SHIM_SET_CURRENT_STEP,
   payload: { robotName, currentStep },
   meta: {},
 })
@@ -74,16 +74,25 @@ export const fetchRobotCalibrationCheckSessionFailure = (
 })
 
 export const loadLabwareRobotCalibrationCheck = (
-  robotName: string,
+  robotName: string
 ): Types.RobotCalibrationCheckLoadLabwareAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
   payload: { robotName },
   meta: {},
 })
 
+export const preparePipetteRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string
+): Types.RobotCalibrationCheckPickUpTipAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  payload: { robotName, pipetteId },
+  meta: {},
+})
+
 export const pickUpTipRobotCalibrationCheck = (
   robotName: string,
-  pipetteId: string,
+  pipetteId: string
 ): Types.RobotCalibrationCheckPickUpTipAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   payload: { robotName, pipetteId },

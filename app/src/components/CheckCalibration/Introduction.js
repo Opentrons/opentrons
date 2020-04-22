@@ -1,13 +1,16 @@
 // @flow
 import * as React from 'react'
 import { PrimaryButton, AlertModal } from '@opentrons/components'
+import { useDispatch } from 'react-redux'
+
+import type { Dispatch } from '../../types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 import { tiprackImages } from './tiprackImages'
 import {
-  loadLabwareRobotCalibrationCheckSession,
+  loadLabwareRobotCalibrationCheck,
   shimCurrentStep,
-  CHECK_STEP_LABWARE_LOADED
+  CHECK_STEP_LABWARE_LOADED,
 } from '../../calibration'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
@@ -30,16 +33,17 @@ const CLEAR_DECK_BODY =
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
+  robotName: string,
   exit: () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
-  const { labwareLoadNames, exit } = props
+  const { labwareLoadNames, exit, robotName } = props
   const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
 
   function proceed() {
-    dispatch(loadLabwareRobotCalibrationCheckSession(robotName))
-    dispatch(shimCurrentStep(CHECK_STEP_LABWARE_LOADED))
+    dispatch(loadLabwareRobotCalibrationCheck(robotName))
+    dispatch(shimCurrentStep(robotName, CHECK_STEP_LABWARE_LOADED))
   }
 
   return (

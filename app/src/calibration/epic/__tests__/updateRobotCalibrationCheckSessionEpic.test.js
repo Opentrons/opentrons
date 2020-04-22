@@ -49,13 +49,16 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
       pathExtension: 'loadLabware',
     },
     {
-      action: Actions.pickUpTipRobotCalibrationCheck(mockRobot.name, mockPipetteId),
+      action: Actions.pickUpTipRobotCalibrationCheck(
+        mockRobot.name,
+        mockPipetteId
+      ),
       pathExtension: 'pickUpTip',
-      body: {pipetteId: mockPipetteId},
-    }
+      body: { pipetteId: mockPipetteId },
+    },
   ]
 
-  updateTriggers.forEach(({action, pathExtension, body})=> {
+  updateTriggers.forEach(({ action, pathExtension, body }) => {
     describe(`handles ${action.type}`, () => {
       const expectedRequest = {
         method: 'POST',
@@ -89,9 +92,7 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
 
       it('maps successful response to UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS', () => {
         testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-          mockFetchRobotApi.mockReturnValue(
-            cold('r', { r: success })
-          )
+          mockFetchRobotApi.mockReturnValue(cold('r', { r: success }))
 
           const action$ = hot('--a', { a: action })
           const state$ = hot('a-a', { a: {} })
@@ -109,9 +110,7 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
 
       it('maps failed response to UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE', () => {
         testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-          mockFetchRobotApi.mockReturnValue(
-            cold('r', { r: failure })
-          )
+          mockFetchRobotApi.mockReturnValue(cold('r', { r: failure }))
 
           const action$ = hot('--a', { a: action })
           const state$ = hot('a-a', { a: {} })

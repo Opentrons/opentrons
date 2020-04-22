@@ -17,7 +17,7 @@ import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
 import {
-  preparePipetteRobotCalibrationCheckSession,
+  preparePipetteRobotCalibrationCheck,
   shimCurrentStep,
   CHECK_STEP_PREPARING_PIPETTE,
 } from '../../calibration'
@@ -31,15 +31,16 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm tiprack placement and continue'
 
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
+  robotName: string,
 |}
 export function DeckSetup(props: DeckSetupProps) {
-  const { labware, proceed } = props
+  const { labware, robotName } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   const dispatch = useDispatch<Dispatch>()
 
   function proceed() {
-    dispatch(preparePipetteRobotCalibrationCheckSession(robotName))
-    dispatch(shimCurrentStep(CHECK_STEP_PREPARING_PIPETTE))
+    dispatch(preparePipetteRobotCalibrationCheck(robotName))
+    dispatch(shimCurrentStep(robotName, CHECK_STEP_PREPARING_PIPETTE))
   }
 
   return (

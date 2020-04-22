@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
+import { PrimaryButton, AlertModal, type Mount } from '@opentrons/components'
 import {
-  PrimaryButton,
-  AlertModal,
-  type Mount,
-} from '@opentrons/components'
-import { getLabwareDisplayName, getPipetteModelSpecs } from '@opentrons/shared-data'
+  getLabwareDisplayName,
+  getPipetteModelSpecs,
+} from '@opentrons/shared-data'
 import findKey from 'lodash/find'
 import { useDispatch } from 'react-redux'
 
@@ -16,8 +15,9 @@ import type {
 } from '../../calibration/api-types'
 import {
   pickUpTipRobotCalibrationCheckSession,
+  jogRobotCalibrationCheckSession,
   shimCurrentStep,
-  CHECK_STEP_INSPECTING_TIP
+  CHECK_STEP_INSPECTING_TIP,
 } from '../../calibration'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
@@ -33,11 +33,15 @@ const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 type TipPickUpProps = {|
   pipette: RobotCalibrationCheckInstrument,
   tiprack: RobotCalibrationCheckLabware,
+  robotName: string,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { pipette, tiprack} = props
+  const { pipette, tiprack, robotName } = props
   const [isConfirmingTip, setIsConfirmingTip] = React.useState(false)
-  const tiprackDef = React.useMemo(() => getLatestLabwareDef(tiprack?.loadName), [tiprack])
+  const tiprackDef = React.useMemo(
+    () => getLatestLabwareDef(tiprack?.loadName),
+    [tiprack]
+  )
   const isMulti = React.useMemo(() => {
     const spec = getPipetteModelSpecs(pipette.model)
     return spec ? spec.channels > 1 : false
@@ -50,7 +54,7 @@ export function TipPickUp(props: TipPickUpProps) {
 
   function proceed() {
     dispatch(pickUpTipRobotCalibrationCheckSession(robotName, pipette))
-    dispatch(shimCurrentStep(CHECK_STEP_INSPECTING_TIP))
+    dispatch(shimCurrentStep(robotName, CHECK_STEP_INSPECTING_TIP))
   }
 
   const reset = () => {
@@ -58,9 +62,11 @@ export function TipPickUp(props: TipPickUpProps) {
     console.debug('TODO: reset tip pick to try again')
   }
 
-  const demoVisual = isMulti
-    ? <span>I'm the GIF for multi channel pipettes</span>
-    : <span>I'm the GIF for single channel pipettes</span>
+  const demoVisual = isMulti ? (
+    <span>I'm the GIF for multi channel pipettes</span>
+  ) : (
+    <span>I'm the GIF for single channel pipettes</span>
+  )
 
   return (
     <>
@@ -83,9 +89,7 @@ export function TipPickUp(props: TipPickUpProps) {
         </>
       ) : (
         <>
-          <div className={styles.tip_pick_up_demo_wrapper}>
-            {demoVisual}
-          </div>
+          <div className={styles.tip_pick_up_demo_wrapper}>{demoVisual}</div>
           <div className={styles.tip_pick_up_controls_wrapper}>
             <JogControls jog={jog} />
           </div>

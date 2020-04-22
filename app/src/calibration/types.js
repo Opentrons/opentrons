@@ -1,13 +1,16 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import typeof {
+  TEMPORARY_SHIM_SET_CURRENT_STEP,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
-  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION,
+  ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
@@ -16,7 +19,13 @@ import typeof {
   COMPLETE_ROBOT_CALIBRATION_CHECK,
 } from './constants'
 import type { RobotCalibrationCheckSessionData } from './api-types'
+import {} from './constants'
 
+export type TemporaryShimSetCurrentStepAction = {|
+  type: TEMPORARY_SHIM_SET_CURRENT_STEP,
+  payload: {| robotName: string, currentStep: string |},
+  meta: RobotApiRequestMeta,
+|}
 export type CreateRobotCalibrationCheckSessionAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
@@ -59,11 +68,22 @@ export type RobotCalibrationCheckLoadLabwareAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type RobotCalibrationCheckPreparePipetteAction = {|
+  type: ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type RobotCalibrationCheckPickUpTipAction = {|
   type: ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   payload: {| robotName: string, pipetteId: string |},
   meta: RobotApiRequestMeta,
 |}
+
+export type UpdateRobotCalibrationCheckSessionAction =
+  | RobotCalibrationCheckLoadLabwareAction
+  | RobotCalibrationCheckPreparePipetteAction
+  | RobotCalibrationCheckPickUpTipAction
 
 export type UpdateRobotCalibrationCheckSessionSuccessAction = {|
   type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
@@ -101,13 +121,15 @@ export type CompleteRobotCalibrationCheckAction = {|
 |}
 
 export type CalibrationAction =
+  | TemporaryShimSetCurrentStepAction
   | CreateRobotCalibrationCheckSessionAction
   | CreateRobotCalibrationCheckSessionSuccessAction
   | CreateRobotCalibrationCheckSessionFailureAction
   | FetchRobotCalibrationCheckSessionAction
   | FetchRobotCalibrationCheckSessionSuccessAction
   | FetchRobotCalibrationCheckSessionFailureAction
-  | UpdateRobotCalibrationCheckSessionAction
+  | RobotCalibrationCheckLoadLabwareAction
+  | RobotCalibrationCheckPickUpTipAction
   | UpdateRobotCalibrationCheckSessionSuccessAction
   | UpdateRobotCalibrationCheckSessionFailureAction
   | DeleteRobotCalibrationCheckSessionAction
