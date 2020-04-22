@@ -97,6 +97,7 @@ class SessionManager:
         self.pipette_id = None
         self.adapter = hardware.sync
         self.current_transform = identity_deck_transform()
+        self.backup_gantry_cal = self.adapter.config.gantry_calibration
 
         robot_configs.backup_configuration(self.adapter.config)
         # Start from fresh identity matrix every calibration session
@@ -546,6 +547,9 @@ async def save_transform(data) -> CommandResult:
             gantry_calibration=list(
                 list(i) for i in session_wrapper.session.current_transform)
         )
+        new_gantry_cal =\
+            session_wrapper.session.adapter.config.gantry_calibration
+        session_wrapper.session.backup_gantry_cal = new_gantry_cal
 
         robot_configs.save_deck_calibration(
             session_wrapper.session.adapter.config)
@@ -570,6 +574,9 @@ async def release(data) -> CommandResult:
         session_wrapper.session.adapter.remove_instrument('right')
     else:
         session_wrapper.session.adapter.cache_instruments()
+        full_gantry_cal = session_wrapper.session.backup_gantry_cal
+        session_wrapper.session.adapter.update_config(
+            gantry_calibration=full_gantry_cal)
     session_wrapper.session = None
 
     return CommandResult(success=True, message="calibration session released")
