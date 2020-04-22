@@ -11,7 +11,7 @@ import * as Constants from './constants'
 export const shimCurrentStep = (
   robotName: string,
   currentStep: string
-): Types.TemporarySHimSetCurrentStepAction => ({
+): Types.TemporaryShimSetCurrentStepAction => ({
   type: Constants.TEMPORARY_SHIM_SET_CURRENT_STEP,
   payload: { robotName, currentStep },
   meta: {},
@@ -92,10 +92,11 @@ export const preparePipetteRobotCalibrationCheck = (
 
 export const jogRobotCalibrationCheck = (
   robotName: string,
-  pipetteId: string
+  pipetteId: string,
+  vector: JogVector
 ): Types.RobotCalibrationCheckJogAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_JOG,
-  payload: { robotName, pipetteId },
+  payload: { robotName, pipetteId, vector },
   meta: {},
 })
 

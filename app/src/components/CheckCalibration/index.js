@@ -62,7 +62,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     [labware, activeInstrumentId]
   )
   const isActiveInstrumentMultiChannel = React.useMemo(() => {
-    const spec = getPipetteModelSpecs(instruments[activeInstrumentId].model)
+    const spec =
+      instruments &&
+      getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
     return spec ? spec.channels > 1 : false
   }, [activeInstrumentId])
 

@@ -21,6 +21,7 @@ import {
 } from '../../calibration'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
@@ -45,8 +46,15 @@ export function TipPickUp(props: TipPickUpProps) {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  function jog() {
-    dispatch(jogRobotCalibrationCheck(robotName, pipetteId))
+  const ORDERED_AXES: Array<JogAxis> = ['x', 'y', 'z']
+  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
+    // e.g. reformat from ['x', -1, 0.1] to [-0.1, 0, 0]
+    let vector = [0, 0, 0]
+    const index = ORDERED_AXES.findIndex(a => a === axis)
+    if (index >= 0) {
+      vector[index] = step * direction
+    }
+    dispatch(jogRobotCalibrationCheck(robotName, pipetteId, vector))
   }
 
   function proceed() {

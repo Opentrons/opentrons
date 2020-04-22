@@ -77,7 +77,7 @@ export type RobotCalibrationCheckPreparePipetteAction = {|
 
 export type RobotCalibrationCheckJogAction = {|
   type: ROBOT_CALIBRATION_CHECK_JOG,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string, pipetteId: string, vector: JogVector |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -154,3 +154,5 @@ export type CalibrationState = $Shape<
     [robotName: string]: void | PerRobotCalibrationState,
   |}>
 >
+
+export type JogVector = Array<number>

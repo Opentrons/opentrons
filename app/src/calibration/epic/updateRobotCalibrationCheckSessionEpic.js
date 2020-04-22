@@ -51,6 +51,7 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_JOG}`,
         body: {
           pipetteId: action.payload.pipetteId,
+          vector: action.payload.vector,
         },
       }
       break
