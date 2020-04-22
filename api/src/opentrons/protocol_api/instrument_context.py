@@ -419,6 +419,12 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager.hardware.blow_out(self._mount)
         return self
 
+    def _determine_speed(self, speed: float):
+        if self._api_version < APIVersion(2, 4):
+            return clamp_value(speed, 80, 20, 'touch_tip:')
+        else:
+            return clamp_value(speed, 80, 1, 'touch_tip:')
+
     @cmds.publish.both(command=cmds.touch_tip)
     @requires_version(2, 0)
     def touch_tip(self,
@@ -477,7 +483,7 @@ class InstrumentContext(CommandPublisher):
                 where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
             ]
 
-        checked_speed = clamp_value(speed, 80, 20, 'touch_tip:')
+        checked_speed = self._determine_speed(speed)
 
         # If location is a valid well, move to the well first
         if location is None:
