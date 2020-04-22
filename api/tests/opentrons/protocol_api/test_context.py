@@ -586,7 +586,11 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
     speed = 60                  # default speed
     edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+<<<<<<< HEAD
              lw.wells()[0]._from_center_cartesian(0, 0, 1) - z_offset,
+=======
+             lw.wells()[0].center().point - z_offset,
+>>>>>>> refactor(api): Remove diagonal movement from touch tip
              lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
