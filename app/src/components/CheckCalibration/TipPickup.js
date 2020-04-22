@@ -14,8 +14,8 @@ import type {
   RobotCalibrationCheckLabware,
 } from '../../calibration/api-types'
 import {
-  pickUpTipRobotCalibrationCheckSession,
-  jogRobotCalibrationCheckSession,
+  pickUpTipRobotCalibrationCheck,
+  jogRobotCalibrationCheck,
   shimCurrentStep,
   CHECK_STEP_INSPECTING_TIP,
 } from '../../calibration'
@@ -31,29 +31,26 @@ const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, move to first check'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
 
 type TipPickUpProps = {|
-  pipette: RobotCalibrationCheckInstrument,
+  pipetteId: string,
+  isMulti: boolean,
   tiprack: RobotCalibrationCheckLabware,
   robotName: string,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { pipette, tiprack, robotName } = props
+  const { pipetteId, tiprack, robotName, isMulti } = props
   const [isConfirmingTip, setIsConfirmingTip] = React.useState(false)
   const tiprackDef = React.useMemo(
     () => getLatestLabwareDef(tiprack?.loadName),
     [tiprack]
   )
-  const isMulti = React.useMemo(() => {
-    const spec = getPipetteModelSpecs(pipette.model)
-    return spec ? spec.channels > 1 : false
-  }, [tiprack])
   const dispatch = useDispatch<Dispatch>()
 
   function jog() {
-    dispatch(jogRobotCalibrationCheckSession(robotName, pipette))
+    dispatch(jogRobotCalibrationCheck(robotName, pipetteId))
   }
 
   function proceed() {
-    dispatch(pickUpTipRobotCalibrationCheckSession(robotName, pipette))
+    dispatch(pickUpTipRobotCalibrationCheck(robotName, pipetteId))
     dispatch(shimCurrentStep(robotName, CHECK_STEP_INSPECTING_TIP))
   }
 

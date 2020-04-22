@@ -10,6 +10,7 @@ import typeof {
   FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
   ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  ROBOT_CALIBRATION_CHECK_JOG,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -74,6 +75,12 @@ export type RobotCalibrationCheckPreparePipetteAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type RobotCalibrationCheckJogAction = {|
+  type: ROBOT_CALIBRATION_CHECK_JOG,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type RobotCalibrationCheckPickUpTipAction = {|
   type: ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   payload: {| robotName: string, pipetteId: string |},
@@ -83,6 +90,7 @@ export type RobotCalibrationCheckPickUpTipAction = {|
 export type UpdateRobotCalibrationCheckSessionAction =
   | RobotCalibrationCheckLoadLabwareAction
   | RobotCalibrationCheckPreparePipetteAction
+  | RobotCalibrationCheckJogAction
   | RobotCalibrationCheckPickUpTipAction
 
 export type UpdateRobotCalibrationCheckSessionSuccessAction = {|

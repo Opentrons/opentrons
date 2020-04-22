@@ -20,9 +20,11 @@ import {
   ROBOT_CALIBRATION_CHECK_PATH,
   ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
   ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  ROBOT_CALIBRATION_CHECK_JOG,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   CHECK_UPDATE_PATH_LOAD_LABWARE,
   CHECK_UPDATE_PATH_PREPARE_PIPETTE,
+  CHECK_UPDATE_PATH_JOG,
   CHECK_UPDATE_PATH_PICK_UP_TIP,
 } from '../constants'
 
@@ -38,6 +40,15 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
     case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
+        body: {
+          pipetteId: action.payload.pipetteId,
+        },
+      }
+      break
+    }
+    case ROBOT_CALIBRATION_CHECK_JOG: {
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_JOG}`,
         body: {
           pipetteId: action.payload.pipetteId,
         },
@@ -77,6 +88,7 @@ export const updateRobotCalibrationCheckSessionEpic: Epic = (
     ofType(
       ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
       ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+      ROBOT_CALIBRATION_CHECK_JOG,
       ROBOT_CALIBRATION_CHECK_PICK_UP_TIP
     ),
     mapToRobotApiRequest(

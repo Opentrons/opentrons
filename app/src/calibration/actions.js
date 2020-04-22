@@ -84,8 +84,17 @@ export const loadLabwareRobotCalibrationCheck = (
 export const preparePipetteRobotCalibrationCheck = (
   robotName: string,
   pipetteId: string
-): Types.RobotCalibrationCheckPickUpTipAction => ({
+): Types.RobotCalibrationCheckPreparePipetteAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  payload: { robotName, pipetteId },
+  meta: {},
+})
+
+export const jogRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string
+): Types.RobotCalibrationCheckJogAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_JOG,
   payload: { robotName, pipetteId },
   meta: {},
 })

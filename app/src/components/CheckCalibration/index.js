@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { ModalPage, PrimaryButton } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import {
   fetchRobotCalibrationCheckSession,
@@ -57,16 +58,14 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   )
   const activeLabware = React.useMemo(
     () =>
-      labware &&
-      labware.find(l =>
-        l.forPipettes.some(
-          raw_pipette_id =>
-            raw_pipette_id.replace('-', '') == activeInstrumentId
-        )
-      ),
+      labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
     [labware, activeInstrumentId]
   )
-  console.table({ activeInstrumentId, activeLabware })
+  const isActiveInstrumentMultiChannel = React.useMemo(() => {
+    const spec = getPipetteModelSpecs(instruments[activeInstrumentId].model)
+    return spec ? spec.channels > 1 : false
+  }, [activeInstrumentId])
+
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
@@ -103,7 +102,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           <TipPickUp
             tiprack={activeLabware}
             robotName={robotName}
-            pipette={instruments[activeInstrumentId]}
+            pipetteId={activeInstrumentId}
+            isMulti={isActiveInstrumentMultiChannel}
           />
         ) : null
       break
