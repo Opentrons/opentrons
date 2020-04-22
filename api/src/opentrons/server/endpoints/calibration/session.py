@@ -8,7 +8,7 @@ from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 
-from .constants import LOOKUP_LABWARE, LabwareLoaded, TipAttachError
+from .constants import LOOKUP_LABWARE, TipAttachError
 from .util import StateMachine, WILDCARD
 from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
@@ -440,7 +440,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             full_dict[data.id] = build_dict
         self._moves.preparingPipette = full_dict
 
-    def _update_tiprack_offset(self, pipette: UUID, old_pos: Point, new_pos: Point):
+    def _update_tiprack_offset(self, pipette: UUID, old_pos: Point,
+                               new_pos: Point):
         id = self._relate_mount[pipette]['tiprack_id']
 
         if self._moves.preparingPipette:

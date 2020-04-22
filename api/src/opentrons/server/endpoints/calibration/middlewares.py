@@ -4,14 +4,14 @@ from aiohttp.web_urldispatcher import UrlDispatcher
 from .session import CheckCalibrationSession
 from .models import CalibrationSessionStatus, LabwareStatus
 from .constants import ALLOWED_SESSIONS, LabwareLoaded, TipAttachError
-from .util import CalibrationCheckState, StateMachineError
+from .util import StateMachineError
 
 
 def _format_links(
         session: 'CheckCalibrationSession',
         potential_triggers: typing.Set[str],
         router: UrlDispatcher) -> typing.Dict:
-    #TODO: BC: return route names and not bind them to trigger func names
+    # TODO: BC: return route names and not bind them to trigger func names
     # path = router.get(next.name, '')
     # params = session.format_params(next.name)
     # if path:

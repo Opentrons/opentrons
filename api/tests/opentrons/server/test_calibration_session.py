@@ -1,10 +1,6 @@
 import pytest
-import asyncio
-import enum
 
-from opentrons import types
-
-from opentrons.server.endpoints.calibration import util, constants
+from opentrons.server.endpoints.calibration import util
 
 
 # @pytest.fixture

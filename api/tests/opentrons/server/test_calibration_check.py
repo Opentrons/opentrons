@@ -2,7 +2,6 @@ import pytest
 from uuid import UUID
 
 from opentrons import types
-from opentrons.server.endpoints.calibration.util import CalibrationCheckState
 
 
 @pytest.fixture
@@ -23,7 +22,8 @@ async def test_load_labware(async_client, async_server, test_setup):
     _, sess = test_setup
 
     resp = await async_client.post('/calibration/check/session/loadLabware')
-    text = await resp.json()
+    assert resp.status == 200
+    # text = await resp.json()
 
     # # check that URL is for the move endpoint
     # assert text['nextSteps']['links']['moveToTipRack']['url'] ==\
@@ -52,7 +52,7 @@ async def test_move_to_position(async_client, async_server, test_setup):
     uuid_tiprack = UUID(tiprack_id)
     uuid_pipette = UUID(pip_id)
 
-    well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette]['well']
+    well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette].well
 
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
@@ -69,13 +69,13 @@ async def test_jog_pipette(async_client, async_server, test_setup):
 
     sess._set_current_state('preparingPipette')
 
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     mount = types.Mount.LEFT
 
     old_pos = await sess.hardware.gantry_position(mount)
     resp = await async_client.post(
         '/calibration/check/session/jog',
-        json={'pipetteId': id, 'vector': [0, -1, 0]})
+        json={'pipetteId': pipette_id, 'vector': [0, -1, 0]})
 
     assert resp.status == 200
 
@@ -90,15 +90,15 @@ async def test_pickup_tip(async_client, async_server, test_setup):
 
     sess._set_current_state('preparingPipette')
 
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
 
     text = await resp.json()
     assert resp.status == 200
-    assert text['instruments'][id]['has_tip'] is True
-    assert text['instruments'][id]['tip_length'] > 0.0
+    assert text['instruments'][pipette_id]['has_tip'] is True
+    assert text['instruments'][pipette_id]['tip_length'] > 0.0
 
 
 async def test_invalidate_tip(async_client, async_server, test_setup):
@@ -106,22 +106,22 @@ async def test_invalidate_tip(async_client, async_server, test_setup):
     await async_client.post('/calibration/check/session/loadLabware')
 
     sess._set_current_state('preparingPipette')
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/invalidateTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 409
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is True
+    assert text['instruments'][pipette_id]['has_tip'] is True
 
     resp = await async_client.post(
         '/calibration/check/session/invalidateTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is False
+    assert text['instruments'][pipette_id]['has_tip'] is False
     assert resp.status == 200
 
 
@@ -129,28 +129,28 @@ async def test_drop_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
 
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 200
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 200
     resp = await async_client.post(
         '/calibration/check/session/confirmTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 200
 
     text = await resp.json()
 
-    assert text['instruments'][id]['has_tip'] is True
+    assert text['instruments'][pipette_id]['has_tip'] is True
 
     sess._set_current_state('checkingHeight')
     resp = await async_client.post(
         '/calibration/check/session/confirmStep',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 200
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is False
+    assert text['instruments'][pipette_id]['has_tip'] is False
