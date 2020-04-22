@@ -29,12 +29,13 @@ import {
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
   let requestParams = {}
   switch (action.type) {
-    case ROBOT_CALIBRATION_CHECK_LOAD_LABWARE:
+    case ROBOT_CALIBRATION_CHECK_LOAD_LABWARE: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_LOAD_LABWARE}`,
       }
       break
-    case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE:
+    }
+    case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
         body: {
@@ -42,7 +43,8 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
         },
       }
       break
-    case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP:
+    }
+    case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
         body: {
@@ -50,6 +52,7 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
         },
       }
       break
+    }
   }
   return { method: POST, ...requestParams }
 }
