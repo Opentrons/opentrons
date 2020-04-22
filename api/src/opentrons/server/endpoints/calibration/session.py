@@ -133,8 +133,8 @@ class CalibrationSession:
         lw: typing.Dict[UUID, LabwareInfo] = {}
         _uuid: typing.Optional[UUID] = None
 
-        for id in self._relate_mount.keys():
-            mount = self._get_mount(id)
+        for pipette_id in self._relate_mount.keys():
+            mount = self._get_mount(pipette_id)
             pip_vol = self.get_pipette(mount)['max_volume']
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
@@ -144,8 +144,8 @@ class CalibrationSession:
             if _uuid:
                 if_labware = lw.get(_uuid)
             if _uuid and if_labware and if_labware.loadName == load_name:
-                lw[_uuid].forPipettes.append(id)
-                self._relate_mount[id]['tiprack_id'] = _uuid
+                lw[_uuid].forPipettes.append(pipette_id)
+                self._relate_mount[pipette_id]['tiprack_id'] = _uuid
             else:
                 lw_def = labware.get_labware_definition(load_name)
                 new_uuid: UUID = uuid4()
@@ -153,14 +153,14 @@ class CalibrationSession:
                 slot = self._available_slot_options()
                 lw[new_uuid] = LabwareInfo(
                     alternatives=list(_lookup.alternatives),
-                    forPipettes=[id],
+                    forPipettes=[pipette_id],
                     loadName=load_name,
                     slot=slot,
                     namespace=lw_def['namespace'],
                     version=lw_def['version'],
                     id=new_uuid,
                     definition=lw_def)
-                self._relate_mount[id]['tiprack_id'] = new_uuid
+                self._relate_mount[pipette_id]['tiprack_id'] = new_uuid
         return lw
 
     def _build_deck_moves(self) -> Moves:
@@ -293,6 +293,7 @@ class CalibrationCheckState(str, Enum):
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
     noPipettesAttached = "noPipettesAttached"
+    calibrationComplete = "calibrationComplete"
 
 
 class CalibrationCheckTrigger(str, Enum):
@@ -390,8 +391,7 @@ CHECK_TRANSITIONS = [
     {
         "trigger": CalibrationCheckTrigger.confirm_step,
         "from_state": CalibrationCheckState.checkingHeight,
-        "to_state": CalibrationCheckState.returningTip,
-        "after": "_return_tip_for_pipette"
+        "to_state": CalibrationCheckState.calibrationComplete,
     },
     {
         "trigger": CalibrationCheckTrigger.exit,

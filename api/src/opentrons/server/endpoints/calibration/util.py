@@ -196,8 +196,7 @@ class StateMachine:
     def current_state_name(self) -> str:
         return self._current_state.name if self._current_state else ""
 
-    @property
-    def potential_triggers(self) -> Set[str]:
+    def get_potential_triggers(self) -> Set[str]:
         """Return a set of currently available triggers"""
         potential_triggers = set()
         for trigger, events in self._events.items():

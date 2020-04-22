@@ -1,10 +1,24 @@
 import typing
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
-from .session import CheckCalibrationSession
+from .session import CheckCalibrationSession, CalibrationCheckTrigger
 from .models import CalibrationSessionStatus, LabwareStatus
 from .constants import ALLOWED_SESSIONS, LabwareLoaded, TipAttachError
 from .util import StateMachineError
+
+
+TRIGGER_TO_PATH = {
+    CalibrationCheckTrigger.load_labware: "loadLabware",
+    CalibrationCheckTrigger.prepare_pipette: "preparePipette",
+    CalibrationCheckTrigger.jog: "jog",
+    CalibrationCheckTrigger.pick_up_tip: "pickUpTip",
+    CalibrationCheckTrigger.confirm_tip_attached: "confirmTip",
+    CalibrationCheckTrigger.invalidate_tip: "invalidateTip",
+    CalibrationCheckTrigger.confirm_step: "confirmStep",
+    CalibrationCheckTrigger.exit: "sessionExit",
+    # CalibrationCheckTrigger.reject_calibration: "reject_calibration",
+    # CalibrationCheckTrigger.no_pipettes: "no_pipettes",
+}
 
 
 def _format_links(
@@ -12,14 +26,21 @@ def _format_links(
         potential_triggers: typing.Set[str],
         router: UrlDispatcher) -> typing.Dict:
     # TODO: BC: return route names and not bind them to trigger func names
-    # path = router.get(next.name, '')
-    # params = session.format_params(next.name)
-    # if path:
-    #     url = str(path.url_for(type=session.session_type))
-    # else:
-    #     url = path
-    # return {'links': {next.name: {'url': url, 'params': params}}}
-    return {}
+    def _gen_triggers(triggers):
+        links = {}
+        for p in triggers:
+            route_name = TRIGGER_TO_PATH.get(p)
+            path = router.get(route_name, '')
+            params = session.format_params(p)
+            if path:
+                url = str(path.url_for(type=session.session_type))
+            else:
+                url = path
+            if url:
+                links[route_name] = {'url': url, 'params': params}
+        return links
+
+    return {'links': _gen_triggers(potential_triggers)}
 
 
 def _determine_error_message(
@@ -53,7 +74,7 @@ def status_response(
         response: web.Response) -> web.Response:
 
     current_state = session.current_state_name
-    potential_triggers = session.potential_triggers
+    potential_triggers = session.get_potential_triggers()
     links = _format_links(session, potential_triggers, request.app.router)
 
     lw_status = session.labware_status.values()
@@ -92,7 +113,7 @@ async def misc_error_handling(
             error_response = _determine_error_message(
                 request, router, type, req.get('pipetteId', ''))
         else:
-            potential_triggers = session.potential_triggers
+            potential_triggers = session.get_potential_triggers()
             links = _format_links(session, potential_triggers, router)
             error_response = {
                 "message": "Labware Already Loaded.",
