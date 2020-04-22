@@ -4,9 +4,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import type { SubstepIdentifier } from '../steplist/types'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as substepSelectors from '../top-selectors/substeps'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as dismissSelectors } from '../dismiss'
 import {
   selectors as stepFormSelectors,
@@ -20,9 +21,12 @@ import {
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as uiLabwareSelectors } from '../ui/labware'
+
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
+import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
+import { useConditionalConfirm } from '../components/useConditionalConfirm'
+
+import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
 
 type Props = {|
@@ -62,6 +66,9 @@ export const ConnectedStepItem = (props: Props) => {
     uiLabwareSelectors.getLabwareNicknamesById
   )
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const currentFormIsPresaved = useSelector(
+    stepFormSelectors.getCurrentFormIsPresaved
+  )
   const labwareDefDisplayNamesById = mapValues(
     labwareEntities,
     (l: LabwareEntity) => getLabwareDisplayName(l.def)
@@ -77,6 +84,14 @@ export const ConnectedStepItem = (props: Props) => {
     dispatch(stepsActions.toggleStepCollapsed(stepId))
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
+
+  // step selection is gated when requiresConfirmation is true
+  const {
+    conditionalContinue,
+    requiresConfirmation,
+    confirmAndContinue,
+    cancelConfirm,
+  } = useConditionalConfirm(selectStep, currentFormIsPresaved)
 
   const stepItemProps = {
     description: step.stepDetails,
@@ -94,7 +109,7 @@ export const ConnectedStepItem = (props: Props) => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    selectStep,
+    selectStep: conditionalContinue,
     toggleStepCollapsed,
     unhighlightStep,
   }
@@ -113,8 +128,16 @@ export const ConnectedStepItem = (props: Props) => {
   }
 
   return (
-    <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
-      <StepItemContents {...stepItemContentsProps} />
-    </StepItem>
+    <>
+      {requiresConfirmation && (
+        <ConfirmDeleteStepModal
+          onContinueClick={confirmAndContinue}
+          onCancelClick={cancelConfirm}
+        />
+      )}
+      <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
+        <StepItemContents {...stepItemContentsProps} />
+      </StepItem>
+    </>
   )
 }

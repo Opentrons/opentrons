@@ -8,11 +8,14 @@ import cx from 'classnames'
 
 import { useConditionalConfirm } from '../useConditionalConfirm'
 import { actions } from '../../steplist'
+import { actions as stepsActions } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { getDefaultsForStepType } from '../../steplist/formLevel/getDefaultsForStepType.js'
 import formStyles from '../forms/forms.css'
 import { MoreOptionsModal } from '../modals/MoreOptionsModal'
+import { AutoAddPauseUntilTempStepModal } from '../modals/AutoAddPauseUntilTempStepModal'
 import { ConfirmDeleteStepModal } from '../modals/ConfirmDeleteStepModal'
+
 import {
   MixForm,
   MoveLiquidForm,
@@ -37,7 +40,10 @@ const STEP_FORM_MAP: { [StepType]: ?ComponentType<any> } = {
 
 type Props = {|
   formData: FormData,
-  deleteStep: () => mixed,
+  handleClose: () => mixed,
+  canSave: boolean,
+  handleDelete: () => mixed,
+  handleSave: () => mixed,
   showMoreOptionsModal: boolean,
   focusedField: string | null,
   onFieldBlur: StepFieldName => mixed,
@@ -49,22 +55,17 @@ type Props = {|
 export const StepEditFormComponent = (props: Props) => {
   const {
     formData,
-    deleteStep,
+    canSave,
+    handleClose,
+    handleDelete,
     dirtyFields,
+    handleSave,
     showMoreOptionsModal,
     toggleMoreOptionsModal,
     focusedField,
     onFieldFocus,
     onFieldBlur,
   } = props
-
-  const formHasChanges = true // TODO IMMEDIATELY make stateful, maybe set to true on onFieldBlur??
-  const {
-    conditionalContinue: conditionalDelete,
-    requiresConfirmation: showConfirmDeleteModal, // TODO IMMEDIATELY Rename this property to make it clearer, on useConditionalConfirm
-    confirmAndContinue: confirmDelete,
-    cancelConfirm: cancelConfirmDelete,
-  } = useConditionalConfirm(deleteStep, formHasChanges)
 
   const FormComponent: $Values<typeof STEP_FORM_MAP> = get(
     STEP_FORM_MAP,
@@ -79,13 +80,7 @@ export const StepEditFormComponent = (props: Props) => {
     )
   }
   return (
-    <React.Fragment>
-      {showConfirmDeleteModal && (
-        <ConfirmDeleteStepModal
-          onCancelClick={cancelConfirmDelete}
-          onContinueClick={confirmDelete}
-        />
-      )}
+    <>
       {showMoreOptionsModal && (
         <MoreOptionsModal formData={formData} close={toggleMoreOptionsModal} />
       )}
@@ -102,11 +97,14 @@ export const StepEditFormComponent = (props: Props) => {
           }}
         />
         <ButtonRow
-          onClickMoreOptions={toggleMoreOptionsModal}
-          onDelete={conditionalDelete}
+          handleClickMoreOptions={toggleMoreOptionsModal}
+          handleClose={handleClose}
+          handleSave={handleSave}
+          handleDelete={handleDelete}
+          canSave={canSave}
         />
       </div>
-    </React.Fragment>
+    </>
   )
 }
 
@@ -145,10 +143,12 @@ type StepEditFormManagerProps = {|
   // TODO(IL, 2020-04-22): use HydratedFormData type see #3161
   formData: ?FormData,
   isNewStep: boolean,
+  canSave: boolean,
+  isPristineSetTempForm: boolean,
 |}
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
-  const { isNewStep, formData } = props
+  const { canSave, formData, isNewStep, isPristineSetTempForm } = props
   const [showMoreOptionsModal, setShowMoreOptionsModal] = useState<boolean>(
     false
   )
@@ -175,28 +175,90 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   }
 
   const dispatch = useDispatch()
+  const stepId = formData?.id
+  const handleDelete = () => {
+    if (stepId != null) {
+      dispatch(actions.deleteStep(stepId))
+    } else {
+      console.error(
+        `StepEditForm: tried to delete step with no step id, this should not happen`
+      )
+    }
+  }
+  const handleClose = () => dispatch(actions.cancelStepForm())
+  const saveSetTempFormWithAddedPauseUntilTemp = () =>
+    dispatch(stepsActions.saveSetTempFormWithAddedPauseUntilTemp())
+  const saveStepForm = () => dispatch(stepsActions.saveStepForm())
+
+  const {
+    conditionalContinue: conditionalDelete,
+    requiresConfirmation: showConfirmDeleteModal,
+    confirmAndContinue: confirmDelete,
+    cancelConfirm: cancelConfirmDelete,
+  } = useConditionalConfirm(handleDelete, true)
+
+  const {
+    conditionalContinue: conditionalClose,
+    requiresConfirmation: showConfirmCancelModal,
+    confirmAndContinue: confirmClose,
+    cancelConfirm: cancelConfirmClose,
+  } = useConditionalConfirm(handleClose, isNewStep)
+
+  const {
+    conditionalContinue: conditionalAddPauseUntilTempStep,
+    requiresConfirmation: showAddPauseUntilTempStepModal,
+    confirmAndContinue: confirmAddPauseUntilTempStep,
+    cancelConfirm: cancelContirmAddPauseUntilTemp,
+  } = useConditionalConfirm(
+    saveSetTempFormWithAddedPauseUntilTemp,
+    isPristineSetTempForm
+  )
 
   // no form selected
   if (formData == null) {
     return null
   }
 
-  const stepId = formData.id
-  const deleteStep = () => dispatch(actions.deleteStep(stepId))
-
   return (
-    <StepEditFormComponent
-      {...{
-        formData,
-        dirtyFields,
-        deleteStep,
-        focusedField,
-        onFieldBlur,
-        onFieldFocus,
-        showMoreOptionsModal,
-        toggleMoreOptionsModal,
-      }}
-    />
+    <>
+      {showConfirmDeleteModal && (
+        <ConfirmDeleteStepModal
+          onCancelClick={cancelConfirmDelete}
+          onContinueClick={confirmDelete}
+        />
+      )}
+      {showConfirmCancelModal && (
+        <ConfirmDeleteStepModal
+          close
+          onCancelClick={cancelConfirmClose}
+          onContinueClick={confirmClose}
+        />
+      )}
+      {showAddPauseUntilTempStepModal && (
+        <AutoAddPauseUntilTempStepModal
+          displayTemperature={formData?.targetTemperature ?? '?'}
+          handleCancelClick={cancelContirmAddPauseUntilTemp}
+          handleContinueClick={confirmAddPauseUntilTempStep}
+        />
+      )}
+      <StepEditFormComponent
+        {...{
+          canSave,
+          formData,
+          dirtyFields,
+          handleClose: conditionalClose,
+          handleDelete: conditionalDelete,
+          handleSave: isPristineSetTempForm
+            ? conditionalAddPauseUntilTempStep
+            : saveStepForm,
+          focusedField,
+          onFieldBlur,
+          onFieldFocus,
+          showMoreOptionsModal,
+          toggleMoreOptionsModal,
+        }}
+      />
+    </>
   )
 }
 
@@ -204,6 +266,10 @@ const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
   return {
     formData: stepFormSelectors.getHydratedUnsavedForm(state),
     isNewStep: stepFormSelectors.getCurrentFormIsPresaved(state),
+    canSave: stepFormSelectors.getCurrentFormCanBeSaved(state),
+    isPristineSetTempForm: stepFormSelectors.getUnsavedFormIsPristineSetTempForm(
+      state
+    ),
   }
 }
 
