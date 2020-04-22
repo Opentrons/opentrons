@@ -164,4 +164,5 @@ async def test_integrated_calibration_check(async_client, test_setup):
     # status = await resp.json()
     # assert set(status['nextSteps']['links'].keys()) == {'moveToTipRack'}
 
-    await async_client.delete('/calibration/check/session')
+    resp = await async_client.delete('/calibration/check/session')
+    assert resp.status == 200

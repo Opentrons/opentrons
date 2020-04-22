@@ -453,10 +453,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 updated_offset
 
     async def delete_session(self):
-        for mount_id in self._relate_mount.keys():
+        for mount in self._relate_mount.values():
             try:
-                await self._return_tip(mount_id)
-            except TipAttachError:
+                await self._return_tip(mount['mount'])
+            except (TipAttachError, AssertionError) as e:
+
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
