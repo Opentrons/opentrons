@@ -1,5 +1,6 @@
 import typing
 from uuid import uuid4, UUID
+from enum import Enum
 from dataclasses import dataclass, asdict, field, fields
 
 from opentrons.types import Mount, Point, Location
@@ -7,7 +8,7 @@ from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
 
 from .constants import LOOKUP_LABWARE, LabwareLoaded, TipAttachError
-from .util import StateMachine
+from .util import StateMachine, WILDCARD
 from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
@@ -270,120 +271,134 @@ class CalibrationSession:
 
 
 # TODO: BC: move the check specific stuff to the check sub dir
-CHECK_STATES = [
-    'sessionStarted',
-    'labwareLoaded',
-    'preparingPipette',
-    'inspectingTip',
-    'checkingPointOne',
-    'checkingPointTwo',
-    'checkingPointThree',
-    'checkingHeight',
-    'returningTip',
-    'sessionExited',
-    'badCalibrationData',
-    'noPipettesAttached'
-]
+
+class CalibrationCheckState(str, Enum):
+    sessionStarted = "sessionStarted"
+    labwareLoaded = "labwareLoaded"
+    preparingPipette = "preparingPipette"
+    inspectingTip = "inspectingTip"
+    checkingPointOne = "checkingPointOne"
+    checkingPointTwo = "checkingPointTwo"
+    checkingPointThree = "checkingPointThree"
+    checkingHeight = "checkingHeight"
+    returningTip = "returningTip"
+    sessionExited = "sessionExited"
+    badCalibrationData = "badCalibrationData"
+    noPipettesAttached = "noPipettesAttached"
+
+
+class CalibrationCheckTrigger(str, Enum):
+    load_labware = "load_labware"
+    prepare_pipette = "prepare_pipette"
+    jog = "jog"
+    pick_up_tip = "pick_up_tip"
+    confirm_tip_attached = "confirm_tip_attached"
+    invalidate_tip = "invalidate_tip"
+    confirm_step = "confirm_step"
+    exit = "exit"
+    reject_calibration = "reject_calibration"
+    no_pipettes = "no_pipettes"
+
 
 CHECK_TRANSITIONS = [
     {
-        "trigger": "load_labware",
-        "from_state": "sessionStarted",
-        "to_state": "labwareLoaded",
+        "trigger": CalibrationCheckTrigger.load_labware,
+        "from_state": CalibrationCheckState.sessionStarted,
+        "to_state": CalibrationCheckState.labwareLoaded,
         "before": "_load_labware_objects"
     },
     {
-        "trigger": "prepare_pipette",
-        "from_state": "labwareLoaded",
-        "to_state": "preparingPipette",
+        "trigger": CalibrationCheckTrigger.prepare_pipette,
+        "from_state": CalibrationCheckState.labwareLoaded,
+        "to_state": CalibrationCheckState.preparingPipette,
         "before": "_prepare_pipette"
     },
     {
-        "trigger": "jog",
-        "from_state": "preparingPipette",
-        "to_state": "preparingPipette",
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.preparingPipette,
+        "to_state": CalibrationCheckState.preparingPipette,
         "before": "_jog"
     },
     {
-        "trigger": "pick_up_tip",
-        "from_state": "preparingPipette",
-        "to_state": "inspectingTip",
+        "trigger": CalibrationCheckTrigger.pick_up_tip,
+        "from_state": CalibrationCheckState.preparingPipette,
+        "to_state": CalibrationCheckState.inspectingTip,
         "before": "_pick_up_tip"
     },
     {
-        "trigger": "confirm_tip_attached",
-        "from_state": "inspectingTip",
-        "to_state": "checkingPointOne",
+        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
+        "from_state": CalibrationCheckState.inspectingTip,
+        "to_state": CalibrationCheckState.checkingPointOne,
         "before": "_check_point_one"
     },
     {
-        "trigger": "invalidate_tip",
-        "from_state": "inspectingTip",
-        "to_state": "preparingPipette",
+        "trigger": CalibrationCheckTrigger.invalidate_tip,
+        "from_state": CalibrationCheckState.inspectingTip,
+        "to_state": CalibrationCheckState.preparingPipette,
         "before": "_invalidate_tip"
     },
     {
-        "trigger": "jog",
-        "from_state": "checkingPointOne",
-        "to_state": "checkingPointOne",
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.checkingPointOne,
+        "to_state": CalibrationCheckState.checkingPointOne,
         "before": "_jog"
     },
     {
-        "trigger": "confirm_step",
-        "from_state": "checkingPointOne",
-        "to_state": "checkingPointTwo",
+        "trigger": CalibrationCheckTrigger.confirm_step,
+        "from_state": CalibrationCheckState.checkingPointOne,
+        "to_state": CalibrationCheckState.checkingPointTwo,
         "before": "_check_point_two",
     },
     {
-        "trigger": "jog",
-        "from_state": "checkingPointTwo",
-        "to_state": "checkingPointTwo",
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.checkingPointTwo,
+        "to_state": CalibrationCheckState.checkingPointTwo,
         "before": "_jog"
     },
     {
-        "trigger": "confirm_step",
-        "from_state": "checkingPointTwo",
-        "to_state": "checkingPointThree",
+        "trigger": CalibrationCheckTrigger.confirm_step,
+        "from_state": CalibrationCheckState.checkingPointTwo,
+        "to_state": CalibrationCheckState.checkingPointThree,
         "before": "_check_point_three",
     },
     {
-        "trigger": "jog",
-        "from_state": "checkingPointThree",
-        "to_state": "checkingPointThree",
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.checkingPointThree,
+        "to_state": CalibrationCheckState.checkingPointThree,
         "before": "_jog"
     },
     {
-        "trigger": "confirm_step",
-        "from_state": "checkingPointThree",
-        "to_state": "checkingHeight",
+        "trigger": CalibrationCheckTrigger.confirm_step,
+        "from_state": CalibrationCheckState.checkingPointThree,
+        "to_state": CalibrationCheckState.checkingHeight,
         "before": "_check_height"
     },
     {
-        "trigger": "jog",
-        "from_state": "checkingHeight",
-        "to_state": "checkingHeight",
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.checkingHeight,
+        "to_state": CalibrationCheckState.checkingHeight,
         "before": "_jog"
     },
     {
-        "trigger": "confirm_step",
-        "from_state": "checkingHeight",
-        "to_state": "returningTip",
+        "trigger": CalibrationCheckTrigger.confirm_step,
+        "from_state": CalibrationCheckState.checkingHeight,
+        "to_state": CalibrationCheckState.returningTip,
         "after": "_return_tip_for_pipette"
     },
     {
-        "trigger": "exit",
-        "from_state": "*",
-        "to_state": "sessionExited"
+        "trigger": CalibrationCheckTrigger.exit,
+        "from_state": WILDCARD,
+        "to_state": CalibrationCheckState.sessionExited
     },
     {
-        "trigger": "reject_calibration",
-        "from_state": "*",
-        "to_state": "badCalibrationData"
+        "trigger": CalibrationCheckTrigger.reject_calibration,
+        "from_state": WILDCARD,
+        "to_state": CalibrationCheckState.badCalibrationData
     },
     {
-        "trigger": "no_pipettes",
-        "from_state": "*",
-        "to_state": "noPipettesAttached"
+        "trigger": CalibrationCheckTrigger.no_pipettes,
+        "from_state": WILDCARD,
+        "to_state": CalibrationCheckState.noPipettesAttached
     }
 ]
 
@@ -391,7 +406,7 @@ CHECK_TRANSITIONS = [
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
         CalibrationSession.__init__(self, hardware)
-        StateMachine.__init__(self, states=CHECK_STATES,
+        StateMachine.__init__(self, states=[s for s in CalibrationCheckState],
                               transitions=CHECK_TRANSITIONS,
                               initial_state="sessionStarted")
         self.session_type = 'check'

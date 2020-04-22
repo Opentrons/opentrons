@@ -223,41 +223,41 @@ def machine(loop):
 async def test_state_machine(machine):
     # normal transitions update state
     assert machine.current_state.name == 'Working'
-    await machine.start_thinking_about_cats()
+    await machine.trigger_transition("start_thinking_about_cats")
     assert machine.current_state.name == 'ThinkingAboutCats'
-    await machine.look_at_time()
+    await machine.trigger_transition("look_at_time")
     assert machine.current_state.name == 'Working'
 
     # transitions with enter/exit callback
     # receives params and updates state
     assert machine.code_written == ''
-    await machine.write_some_code('fake_code')
+    await machine.trigger_transition("write_some_code", 'fake_code')
     assert machine.code_written == 'fake_code'
     assert machine.current_state.name == 'Working'
 
     # states with enter/exit callbacks updates state and side effects
-    await machine.start_thinking_about_cats()
+    await machine.trigger_transition("start_thinking_about_cats")
     assert machine.current_state.name == 'ThinkingAboutCats'
     assert 'reddit' not in machine.tabs_open
-    await machine.look_at_cats()
+    await machine.trigger_transition("look_at_cats")
     assert machine.current_state.name == 'BrowsingCatPictures'
     assert 'reddit' in machine.tabs_open
     assert not machine.reached_rem
-    await machine.become_exhausted()
+    await machine.trigger_transition("become_exhausted")
     assert machine.current_state.name == 'Sleeping'
     assert 'reddit' not in machine.tabs_open
     assert machine.reached_rem
 
     # wild card from_state transitions
-    await machine.start_dreaming()
+    await machine.trigger_transition("start_dreaming")
     assert machine.current_state.name == 'Dreaming'
-    await machine.dream_about_code()
+    await machine.trigger_transition("dream_about_code")
     assert machine.current_state.name == 'Working'
-    await machine.go_on_a_trip()
+    await machine.trigger_transition("go_on_a_trip")
     assert machine.current_state.name == 'OnVacation'
 
     # trigger fails if no transition from current state
     try:
-        await machine.write_some_code('other_fake_code')
+        await machine.trigger_transition("write_some_code", 'other_fake_code')
     except util.StateMachineError:
         pass
