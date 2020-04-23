@@ -1,38 +1,39 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, type Mount } from '@opentrons/components'
-import {
-  getLabwareDisplayName,
-  getPipetteModelSpecs,
-} from '@opentrons/shared-data'
-import findKey from 'lodash/find'
+import { PrimaryButton } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
-import type {
-  RobotCalibrationCheckInstrument,
-  RobotCalibrationCheckLabware,
-} from '../../calibration/api-types'
 import {
-  pickUpTipRobotCalibrationCheck,
   jogRobotCalibrationCheck,
-  confirmTipRobotCalibrationCheck,
-  invalidateTipRobotCalibrationCheck,
-  shimCurrentStep,
-  CHECK_STEP_INSPECTING_TIP,
+  confirmStepRobotCalibrationCheck,
   CHECK_STEP_CHECKING_POINT_ONE,
   CHECK_STEP_CHECKING_POINT_TWO,
   CHECK_STEP_CHECKING_POINT_THREE,
 } from '../../calibration'
-import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import multiDemoAsset from './videos/A1-Multi-Channel-SEQ.gif'
-import singleDemoAsset from './videos/A1-Single-Channel-SEQ.gif'
 import { formatJogVector } from './utils'
 
-type XYPointStep =
+import slot1LeftMultiDemoAsset from '/videos/SLOT 1 LEFT MULTI X-Y (640X480)_REV1.webm'
+import slot1LeftSingleDemoAsset from '/videos/SLOT 1 LEFT SINGLE X-Y (640X480)_REV1.webm'
+import slot1RightMultiDemoAsset from '/videos/SLOT 1 RIGHT MULTI X-Y (640X480)_REV1.webm'
+import slot1RightSingleDemoAsset from '/videos/SLOT 1 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+import slot3LeftMultiDemoAsset from '/videos/SLOT 3 LEFT MULTI X-Y (640X480)_REV1.webm'
+import slot3LeftSingleDemoAsset from '/videos/SLOT 3 LEFT SINGLE X-Y (640X480)_REV1.webm'
+import slot3RightMultiDemoAsset from '/videos/SLOT 3 RIGHT MULTI X-Y (640X480)_REV1.webm'
+import slot3RightSingleDemoAsset from '/videos/SLOT 3 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+import slot5LeftMultiDemoAsset from '/videos/SLOT 5 LEFT MULTI Z (640X480)_REV1.webm'
+import slot5LeftSingleDemoAsset from '/videos/SLOT 5 LEFT SINGLE Z (640X480)_REV1.webm'
+import slot5RightMultiDemoAsset from '/videos/SLOT 5 RIGHT MULTI Z (640X480)_REV1.webm'
+import slot5RightSingleDemoAsset from '/videos/SLOT 5 RIGHT SINGLE Z (640X480)_REV1.webm'
+import slot7LeftMultiDemoAsset from '/videos/SLOT 7 LEFT MULTI X-Y (640X480)_REV1.webm'
+import slot7LeftSingleDemoAsset from '/videos/SLOT 7 LEFT SINGLE X-Y (640X480)_REV1.webm'
+import slot7RightMultiDemoAsset from '/videos/SLOT 7 RIGHT MULTI X-Y (640X480)_REV1.webm'
+import slot7RightSingleDemoAsset from '/videos/SLOT 7 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+
+'type XYPointStep =
   | typeof CHECK_STEP_CHECKING_POINT_ONE
   | typeof CHECK_STEP_CHECKING_POINT_TWO
   | typeof CHECK_STEP_CHECKING_POINT_THREE
