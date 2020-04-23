@@ -13,8 +13,8 @@ AttributesT = TypeVar('AttributesT')
 class ResponseDataModel(GenericModel, Generic[AttributesT]):
     """
     """
-    id: str = \
-        Field(...,
+    id: Optional[str] = \
+        Field(None,
               description="id member represents a resource object.")
     type: ResourceTypes = \
         Field(...,

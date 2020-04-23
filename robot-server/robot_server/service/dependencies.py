@@ -2,6 +2,9 @@ from functools import lru_cache
 
 from opentrons.api import MainRouter
 from opentrons.hardware_control import HardwareAPILike, ThreadedAsyncLock
+from opentrons.server.endpoints.calibration.session import SessionManager \
+    as CalibrationSessionManager
+
 from .rpc.rpc import RPCServer
 from . import HARDWARE_APP_KEY
 
@@ -36,3 +39,8 @@ async def get_rpc_server() -> RPCServer:
         root = MainRouter(h, lock=get_motion_lock())
         _rpc_server_instance = RPCServer(None, root)
     return _rpc_server_instance
+
+
+@lru_cache(maxsize=1)
+def get_calibration_session_manager() -> CalibrationSessionManager:
+    return CalibrationSessionManager()
