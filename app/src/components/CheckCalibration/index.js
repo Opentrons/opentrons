@@ -121,6 +121,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           robotName={robotName}
           pipetteId={activeInstrumentId}
           currentStep={currentStep}
+          isMulti={isActiveInstrumentMultiChannel}
         />
       ) : null
       break

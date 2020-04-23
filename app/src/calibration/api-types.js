@@ -31,8 +31,8 @@ export type RobotCalibrationCheckInstrument = {
   model: string,
   name: string,
   tip_length: number,
-  mount_axis: number,
-  plunger_axis: number,
+  mount_axis: string,
+  plunger_axis: string,
   pipette_id: string,
 }
 export type RobotCalibrationCheckLabware = {

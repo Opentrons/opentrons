@@ -174,18 +174,18 @@ export class JogControls extends React.Component<
             Jump Size
             <span className={styles.jog_label_keys}>Change with + and -</span>
           </span>
-          {hasAcrossControls ?? (
+          {hasAcrossControls ? (
             <span className={styles.jog_label_xy}>
               Across Deck
               <span className={styles.jog_label_keys}>Arrow keys</span>
             </span>
-          )}
-          {this.props.axes.includes('z') ?? (
+          ) : null}
+          {this.props.axes.includes('z') ? (
             <span className={styles.jog_label_z}>
               Up & Down
               <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
             </span>
-          )}
+          ) : null}
           {this.renderJogControls()}
         </div>
       </div>

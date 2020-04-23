@@ -16,24 +16,24 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import { formatJogVector } from './utils'
 
-import slot1LeftMultiDemoAsset from '/videos/SLOT 1 LEFT MULTI X-Y (640X480)_REV1.webm'
-import slot1LeftSingleDemoAsset from '/videos/SLOT 1 LEFT SINGLE X-Y (640X480)_REV1.webm'
-import slot1RightMultiDemoAsset from '/videos/SLOT 1 RIGHT MULTI X-Y (640X480)_REV1.webm'
-import slot1RightSingleDemoAsset from '/videos/SLOT 1 RIGHT SINGLE X-Y (640X480)_REV1.webm'
-import slot3LeftMultiDemoAsset from '/videos/SLOT 3 LEFT MULTI X-Y (640X480)_REV1.webm'
-import slot3LeftSingleDemoAsset from '/videos/SLOT 3 LEFT SINGLE X-Y (640X480)_REV1.webm'
-import slot3RightMultiDemoAsset from '/videos/SLOT 3 RIGHT MULTI X-Y (640X480)_REV1.webm'
-import slot3RightSingleDemoAsset from '/videos/SLOT 3 RIGHT SINGLE X-Y (640X480)_REV1.webm'
-import slot5LeftMultiDemoAsset from '/videos/SLOT 5 LEFT MULTI Z (640X480)_REV1.webm'
-import slot5LeftSingleDemoAsset from '/videos/SLOT 5 LEFT SINGLE Z (640X480)_REV1.webm'
-import slot5RightMultiDemoAsset from '/videos/SLOT 5 RIGHT MULTI Z (640X480)_REV1.webm'
-import slot5RightSingleDemoAsset from '/videos/SLOT 5 RIGHT SINGLE Z (640X480)_REV1.webm'
-import slot7LeftMultiDemoAsset from '/videos/SLOT 7 LEFT MULTI X-Y (640X480)_REV1.webm'
-import slot7LeftSingleDemoAsset from '/videos/SLOT 7 LEFT SINGLE X-Y (640X480)_REV1.webm'
-import slot7RightMultiDemoAsset from '/videos/SLOT 7 RIGHT MULTI X-Y (640X480)_REV1.webm'
-import slot7RightSingleDemoAsset from '/videos/SLOT 7 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+// import slot1LeftMultiDemoAsset from './videos/SLOT 1 LEFT MULTI X-Y (640X480)_REV1.webm'
+// import slot1LeftSingleDemoAsset from './videos/SLOT 1 LEFT SINGLE X-Y (640X480)_REV1.webm'
+// import slot1RightMultiDemoAsset from './videos/SLOT 1 RIGHT MULTI X-Y (640X480)_REV1.webm'
+// import slot1RightSingleDemoAsset from './videos/SLOT 1 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+// import slot3LeftMultiDemoAsset from './videos/SLOT 3 LEFT MULTI X-Y (640X480)_REV1.webm'
+// import slot3LeftSingleDemoAsset from './videos/SLOT 3 LEFT SINGLE X-Y (640X480)_REV1.webm'
+// import slot3RightMultiDemoAsset from './videos/SLOT 3 RIGHT MULTI X-Y (640X480)_REV1.webm'
+// import slot3RightSingleDemoAsset from './videos/SLOT 3 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+// import slot5LeftMultiDemoAsset from './videos/SLOT 5 LEFT MULTI Z (640X480)_REV1.webm'
+// import slot5LeftSingleDemoAsset from './videos/SLOT 5 LEFT SINGLE Z (640X480)_REV1.webm'
+// import slot5RightMultiDemoAsset from './videos/SLOT 5 RIGHT MULTI Z (640X480)_REV1.webm'
+// import slot5RightSingleDemoAsset from './videos/SLOT 5 RIGHT SINGLE Z (640X480)_REV1.webm'
+// import slot7LeftMultiDemoAsset from './videos/SLOT 7 LEFT MULTI X-Y (640X480)_REV1.webm'
+// import slot7LeftSingleDemoAsset from './videos/SLOT 7 LEFT SINGLE X-Y (640X480)_REV1.webm'
+// import slot7RightMultiDemoAsset from './videos/SLOT 7 RIGHT MULTI X-Y (640X480)_REV1.webm'
+// import slot7RightSingleDemoAsset from './videos/SLOT 7 RIGHT SINGLE X-Y (640X480)_REV1.webm'
 
-'type XYPointStep =
+type XYPointStep =
   | typeof CHECK_STEP_CHECKING_POINT_ONE
   | typeof CHECK_STEP_CHECKING_POINT_TWO
   | typeof CHECK_STEP_CHECKING_POINT_THREE
@@ -57,6 +57,7 @@ type CheckXYPointProps = {|
   pipetteId: string,
   robotName: string,
   currentStep: XYPointStep,
+  isMulti: boolean,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
   const { pipetteId, robotName, currentStep } = props
@@ -78,7 +79,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
 
-  const demoAsset = singleDemoAsset
+  const demoAsset = null
 
   return (
     <>
