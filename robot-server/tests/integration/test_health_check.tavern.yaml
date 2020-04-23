@@ -1,5 +1,8 @@
 ---
 test_name: GET Health
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Health GET request returns correct info
     request:

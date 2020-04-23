@@ -21,3 +21,20 @@ def api_client(hardware) -> TestClient:
 
     app.dependency_overrides[get_hardware] = get_hardware_override
     return TestClient(app)
+
+
+@pytest.fixture
+def run_server():
+    import multiprocessing as mp
+    import os
+    os.environ['OT_ROBOT_SERVER_DOT_ENV_PATH'] = "dev.env"
+    os.environ['OT_API_FF_useFastApi'] = "true"
+
+    def runner():
+        from robot_server.main import main
+        main()
+
+    thread = mp.Process(target=runner)
+    thread.start()
+    yield thread
+    thread.terminate()
