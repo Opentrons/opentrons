@@ -1,5 +1,8 @@
 ---
 test_name: GET Settings Reset Options
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Reset Options GET request returns correct option
     request:
@@ -20,6 +23,9 @@ stages:
           description: Clear custom boot scripts
 ---
 test_name: POST Reset tipProbe option
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: POST Reset tipProbe true
     request:
@@ -43,6 +49,9 @@ stages:
         message: "Nothing to do"
 ---
 test_name: POST Reset labwareCalibration option
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: POST Reset labwareCalibration true
     request:
@@ -66,6 +75,9 @@ stages:
         message: "Nothing to do"
 ---
 test_name: POST Reset bootScripts option
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: POST Reset bootScripts true
     request:
@@ -89,6 +101,9 @@ stages:
         message: "Nothing to do"
 ---
 test_name: POST Reset all options
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: POST Reset all options
     request:
@@ -104,6 +119,9 @@ stages:
         message: "Options 'labware_calibration, boot_scripts, tip_probe' were reset"
 ---
 test_name: POST Reset non existant option
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: POST Reset non existant option
     request:

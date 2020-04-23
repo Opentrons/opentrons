@@ -1,6 +1,8 @@
 ---
 test_name: POST Acceptable Log Level
 marks:
+  - usefixtures:
+      - run_server
   - parametrize:
       key: log_level
       vals:
@@ -22,6 +24,9 @@ stages:
 ---
 # Incorect Log Level Requests
 test_name: POST Set log level to invalid value
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Set log_level to error 
     request:
@@ -35,6 +40,9 @@ stages:
         message: "log_level.log_level: '{tavern.request_vars.json.log_level}' is not a valid LogLevels"
 ---
 test_name: POST Set log level to nothing
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Set log_level to nothing 
     request:

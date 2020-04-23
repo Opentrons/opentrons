@@ -1,5 +1,8 @@
 ---
 test_name: GET Settings
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Settings GET request returns correct info 
     request:
@@ -58,6 +61,8 @@ stages:
 # All Possible Settings with bool values
 test_name: POST Setting and value
 marks:
+  - usefixtures:
+      - run_server
   - parametrize:
       key: id
       vals: 
@@ -84,7 +89,7 @@ stages:
     response:
       status_code: 200
       verify_response_with:
-        function: utils:verify_settings_value
+        function: .utils:verify_settings_value
         extra_kwargs:
           id: "{id}"
           value: "{value}"
@@ -93,6 +98,8 @@ stages:
 # All Possible Settings with no values
 test_name: POST Settings with no values
 marks:
+  - usefixtures:
+      - run_server
   - parametrize:
       key: id
       vals: 
@@ -113,7 +120,7 @@ stages:
     response:
       status_code: 200
       verify_response_with:
-        function: utils:verify_settings_value
+        function: .utils:verify_settings_value
         extra_kwargs:
           id: "{id}"
           value: Null
@@ -121,6 +128,9 @@ stages:
 ---
 # POST Incorrect Values
 test_name: POST With incorrect ID
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Post with incorrect ID
     request:

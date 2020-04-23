@@ -1,5 +1,8 @@
 ---
 test_name: GET Robot Settings
+marks:
+  - usefixtures:
+      - run_server
 stages:
   - name: Settings Robot GET request returns correct settings
     request:
