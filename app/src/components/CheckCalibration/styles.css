@@ -184,3 +184,28 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   color: var(--c-font-light);
   text-transform: uppercase;
 }
+
+.tip_pick_up_demo_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--c-lightest-gray);
+  padding: 1rem 0;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.tip_pick_up_demo_body {
+  @apply --font-body-2-dark;
+
+  margin: 0 2rem;
+}
+
+.tip_pick_up_demo_image {
+  margin-top: 1rem;
+}
+
+.pick_up_tip_button {
+  margin: 0 5rem;
+}

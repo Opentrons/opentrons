@@ -23,6 +23,8 @@ import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
+import multiDemoAsset from './videos/A1-Multi-Channel-SEQ.gif'
+import singleDemoAsset from './videos/A1-Single-Channel-SEQ.gif'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
@@ -30,6 +32,11 @@ const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
 const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
 const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, move to first check'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
+const JOG_UNTIL_AT = 'Jog pipette until nozzle is centered above'
+const WELL_NAME = 'A1'
+const POSITION_AND = 'position and'
+const FLUSH = 'flush'
+const WITH_TOP_OF_TIP = 'with the top of the tip.'
 
 type TipPickUpProps = {|
   pipetteId: string,
@@ -67,11 +74,7 @@ export function TipPickUp(props: TipPickUpProps) {
     console.debug('TODO: reset tip pick to try again')
   }
 
-  const demoVisual = isMulti ? (
-    <span>I'm the GIF for multi channel pipettes</span>
-  ) : (
-    <span>I'm the GIF for single channel pipettes</span>
-  )
+  const demoAsset = isMulti ? multiDemoAsset : singleDemoAsset
 
   return (
     <>
@@ -94,14 +97,23 @@ export function TipPickUp(props: TipPickUpProps) {
         </>
       ) : (
         <>
-          <div className={styles.tip_pick_up_demo_wrapper}>{demoVisual}</div>
+          <div className={styles.tip_pick_up_demo_wrapper}>
+            <p className={styles.tip_pick_up_demo_body}>
+              {JOG_UNTIL_AT}
+              <b>&nbsp;{WELL_NAME}&nbsp;</b>
+              {POSITION_AND}
+              <b>&nbsp;{FLUSH}&nbsp;</b>
+              {WITH_TOP_OF_TIP}
+            </p>
+            <img src={demoAsset} className={styles.tip_pick_up_demo_image} />
+          </div>
           <div className={styles.tip_pick_up_controls_wrapper}>
             <JogControls jog={jog} />
           </div>
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={() => setIsConfirmingTip(true)}
-              className={styles.continue_button}
+              className={styles.pick_up_tip_button}
             >
               {TIP_PICK_UP_BUTTON_TEXT}
             </PrimaryButton>
