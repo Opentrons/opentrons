@@ -1,5 +1,9 @@
+import logging
 import enum
 from typing import (Dict, Union, Awaitable, Optional, Callable, Set, Any, List)
+
+log = logging.getLogger(__name__)
+
 
 # Transition callbacks pass through all params from trigger call
 TransitionCallback = Callable[..., Awaitable[Any]]
@@ -127,6 +131,8 @@ class StateMachine:
         :param kwargs: keyword args passed to transition callbacks
         :return: None
         """
+        log.debug(f"trigger_transition for {trigger} "
+                  f"in {self.current_state_name}")
         events = self._events.get(trigger, {})
         if events and WILDCARD not in events and \
                 self.current_state_name not in events:
@@ -140,6 +146,8 @@ class StateMachine:
                                             *args, **kwargs):
                     break
         except Exception as e:
+            log.exception(f"exception raised processing trigger {trigger}"
+                          f"in state {self.current_state_name}")
             raise StateMachineError(f'event {trigger} failed to transition '
                                     f'from {self.current_state_name}: '
                                     f'{str(e)}')

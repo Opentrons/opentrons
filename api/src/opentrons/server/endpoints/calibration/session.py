@@ -456,8 +456,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for mount in self._relate_mount.values():
             try:
                 await self._return_tip(mount['mount'])
-            except (TipAttachError, AssertionError) as e:
-
+            except (TipAttachError, AssertionError):
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
