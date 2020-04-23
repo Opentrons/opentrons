@@ -22,10 +22,14 @@ import {
   ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
   ROBOT_CALIBRATION_CHECK_JOG,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
   CHECK_UPDATE_PATH_LOAD_LABWARE,
   CHECK_UPDATE_PATH_PREPARE_PIPETTE,
   CHECK_UPDATE_PATH_JOG,
   CHECK_UPDATE_PATH_PICK_UP_TIP,
+  CHECK_UPDATE_PATH_CONFIRM_TIP,
+  CHECK_UPDATE_PATH_INVALIDATE_TIP,
 } from '../constants'
 
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
@@ -40,9 +44,7 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
     case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
-        body: {
-          pipetteId: action.payload.pipetteId,
-        },
+        body: { pipetteId: action.payload.pipetteId },
       }
       break
     }
@@ -59,9 +61,21 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
     case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP: {
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
-        body: {
-          pipetteId: action.payload.pipetteId,
-        },
+        body: { pipetteId: action.payload.pipetteId },
+      }
+      break
+    }
+    case ROBOT_CALIBRATION_CHECK_CONFIRM_TIP: {
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_TIP}`,
+        body: { pipetteId: action.payload.pipetteId },
+      }
+      break
+    }
+    case ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP: {
+      requestParams = {
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_INVALIDATE_TIP}`,
+        body: { pipetteId: action.payload.pipetteId },
       }
       break
     }

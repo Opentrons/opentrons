@@ -16,6 +16,8 @@ import type {
 import {
   pickUpTipRobotCalibrationCheck,
   jogRobotCalibrationCheck,
+  confirmTipRobotCalibrationCheck,
+  invalidateTipRobotCalibrationCheck,
   shimCurrentStep,
   CHECK_STEP_INSPECTING_TIP,
 } from '../../calibration'
@@ -74,7 +76,7 @@ export function TipPickUp(props: TipPickUpProps) {
 
   function rejectPickUpAttempt() {
     console.log('TODO: implement domain layer of invalidateTip')
-    // dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
   }
 
   const demoAsset = isMulti ? multiDemoAsset : singleDemoAsset

@@ -12,6 +12,8 @@ import typeof {
   ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
   ROBOT_CALIBRATION_CHECK_JOG,
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
@@ -87,11 +89,25 @@ export type RobotCalibrationCheckPickUpTipAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type RobotCalibrationCheckConfirmTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckInvalidateTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type UpdateRobotCalibrationCheckSessionAction =
   | RobotCalibrationCheckLoadLabwareAction
   | RobotCalibrationCheckPreparePipetteAction
   | RobotCalibrationCheckJogAction
   | RobotCalibrationCheckPickUpTipAction
+  | RobotCalibrationCheckConfirmTipAction
+  | RobotCalibrationCheckInvalidateTipAction
 
 export type UpdateRobotCalibrationCheckSessionSuccessAction = {|
   type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,

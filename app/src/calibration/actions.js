@@ -109,6 +109,24 @@ export const pickUpTipRobotCalibrationCheck = (
   meta: {},
 })
 
+export const confirmTipRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string
+): Types.RobotCalibrationCheckConfirmTipAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  payload: { robotName, pipetteId },
+  meta: {},
+})
+
+export const invalidateTipRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string
+): Types.RobotCalibrationCheckInvalidateTipAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  payload: { robotName, pipetteId },
+  meta: {},
+})
+
 export const updateRobotCalibrationCheckSessionSuccess = (
   robotName: string,
   body: RobotCalibrationCheckSessionData,
