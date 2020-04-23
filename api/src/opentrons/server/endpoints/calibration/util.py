@@ -170,7 +170,7 @@ class StateMachine:
                        to_state: str,
                        **kwargs):
         """
-        Create a transition form state to state
+        Create a transition from state to state
 
         :param trigger: name of the trigger
         :param from_state: name of source state
