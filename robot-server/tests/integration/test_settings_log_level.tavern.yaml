@@ -1,59 +1,24 @@
 ---
-# Log Legel Debug
-test_name: POST Set log level to debug
+test_name: POST Acceptable Log Level
+marks:
+- parametrize:
+    key: log_level
+    vals:
+    - debug
+    - info
+    - warning
+    - error
 stages:
-- name: Set log_level to debug 
+- name: Set log_level to acceptable values 
   request:
     method: POST
     url: "{host:s}:{port:d}/settings/log_level/local"
     json: 
-      log_level: debug
+      log_level: "{log_level}"
   response:
     status_code: 200
     json:
-      message: log_level set to debug
----
-# Log Level Info
-test_name: POST Set log level to info
-stages:
-- name: Set log_level to info 
-  request:
-    method: POST
-    url: "{host:s}:{port:d}/settings/log_level/local"
-    json: 
-      log_level: info
-  response:
-    status_code: 200
-    json:
-      message: log_level set to info
----
-# Log Level Warning
-test_name: POST Set log level to warning
-stages:
-- name: Set log_level to warning 
-  request:
-    method: POST
-    url: "{host:s}:{port:d}/settings/log_level/local"
-    json: 
-      log_level: warning
-  response:
-    status_code: 200
-    json:
-      message: log_level set to warning
----
-# Log Level Error
-test_name: POST Set log level to error
-stages:
-- name: Set log_level to error 
-  request:
-    method: POST
-    url: "{host:s}:{port:d}/settings/log_level/local"
-    json: 
-      log_level: error
-  response:
-    status_code: 200
-    json:
-      message: log_level set to error
+      message: "log_level set to {log_level}"
 ---
 # Incorect Log Level Requests
 test_name: POST Set log level to invalid value
