@@ -101,6 +101,9 @@ class SimulatingGPIOCharDev:
         else:
             raise RevisionPinsError
 
+    def read_revision_bits(self) -> Tuple[bool, bool]:
+        pass
+
     def release_line(self, offset: int):
         self.lines.pop(offset)
         self._values.pop(offset)
