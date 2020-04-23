@@ -1,0 +1,26 @@
+---
+test_name: GET Health
+stages:
+  - name: Health GET request returns correct info
+    request:
+      url: "{host:s}:{port:d}/health"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        name: opentrons-dev
+        # starts with semantic version
+        api_version: !re_match "\\d+\\.\\d+\\.\\d+"
+        fw_version: Virtual Smoothie
+        logs:
+        - /logs/serial.log
+        - /logs/api.log
+        system_version: 0.0.0
+        protocol_api_version:
+          - 2
+          - 3
+        links:
+          apiLog: /logs/api.log
+          serialLog: /logs/serial.log
+          # Specific link can change.
+          apiSpec: !re_match "/openapi.*"

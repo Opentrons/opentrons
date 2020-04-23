@@ -1,0 +1,104 @@
+---
+test_name: GET Robot Settings
+stages:
+  - name: Settings Robot GET request returns correct settings
+    request:
+      url: "{host:s}:{port:d}/settings/robot"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        name: !anystr
+        version: !anyint
+        steps_per_mm: !re_match "M\\d+ X\\d+\\.\\d+ Y\\d+\\.\\d+ Z\\d+ A\\d+ B\\d+ C\\d+"
+        gantry_steps_per_mm:
+          X: !anyfloat
+          Y: !anyfloat
+          Z: !anyint
+          A: !anyint
+        acceleration:
+          A: !anyint
+          B: !anyint
+          C: !anyint
+          X: !anyint
+          Y: !anyint
+          Z: !anyint
+        gantry_calibration:
+        - - 1.0
+          - 0.0
+          - 0.0
+          - 0.0
+        - - 0.0
+          - 1.0
+          - 0.0
+          - 0.0
+        - - 0.0
+          - 0.0
+          - 1.0
+          - 0.0
+        - - 0.0
+          - 0.0
+          - 0.0
+          - 1.0
+        instrument_offset:
+          right:
+            single:
+            - 0.0
+            - 0.0
+            - 0.0
+            multi:
+            - 0.0
+            - 0.0
+            - 0.0
+          left:
+            single:
+            - 0.0
+            - 0.0
+            - 0.0
+            multi:
+            - 0.0
+            - 0.0
+            - 0.0
+        serial_speed: !anyint
+        tip_length:
+          Pipette: !anyfloat
+        default_current:
+          A: !anyfloat
+          B: !anyfloat
+          C: !anyfloat
+          X: !anyfloat
+          Y: !anyfloat
+          Z: !anyfloat
+        low_current:
+          A: !anyfloat
+          B: !anyfloat
+          C: !anyfloat
+          X: !anyfloat
+          Y: !anyfloat
+          Z: !anyfloat
+        high_current:
+          A: !anyfloat
+          B: !anyfloat
+          C: !anyfloat
+          X: !anyfloat
+          Y: !anyfloat
+          Z: !anyfloat
+        default_max_speed:
+          A: 125
+          B: 40
+          C: 40
+          X: 600
+          Y: 400
+          Z: 125
+        mount_offset:
+        - !anyint
+        - !anyint
+        - !anyint
+        log_level: !re_match "DEBUG|INFO|WARNING|ERROR"
+        tip_probe: !anylist
+        default_pipette_configs:
+          homePosition: 220
+          maxTravel: 30
+          stepsPerMM: 768
+        z_retract_distance: 2
+

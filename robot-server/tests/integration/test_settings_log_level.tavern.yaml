@@ -1,0 +1,83 @@
+---
+# Log Legel Debug
+test_name: POST Set log level to debug
+stages:
+- name: Set log_level to debug 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: debug
+  response:
+    status_code: 200
+    json:
+      message: log_level set to debug
+---
+# Log Level Info
+test_name: POST Set log level to info
+stages:
+- name: Set log_level to info 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: info
+  response:
+    status_code: 200
+    json:
+      message: log_level set to info
+---
+# Log Level Warning
+test_name: POST Set log level to warning
+stages:
+- name: Set log_level to warning 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: warning
+  response:
+    status_code: 200
+    json:
+      message: log_level set to warning
+---
+# Log Level Error
+test_name: POST Set log level to error
+stages:
+- name: Set log_level to error 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: error
+  response:
+    status_code: 200
+    json:
+      message: log_level set to error
+---
+# Incorect Log Level Requests
+test_name: POST Set log level to invalid value
+stages:
+- name: Set log_level to error 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: bad_level
+  response:
+    status_code: 422
+    json:
+      message: "log_level.log_level: '{tavern.request_vars.json.log_level}' is not a valid LogLevels"
+---
+test_name: POST Set log level to nothing
+stages:
+- name: Set log_level to error 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings/log_level/local"
+    json: 
+      log_level: null
+  response:
+    status_code: 422
+    json:
+      message: "log_level must be set"

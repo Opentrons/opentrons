@@ -1,0 +1,394 @@
+---
+test_name: GET Settings
+stages:
+- name: Settings GET request returns correct info 
+  request:
+    method: GET
+    url: "{host:s}:{port:d}/settings"
+  response:
+    status_code: 200
+    json:
+      settings:
+      - id: shortFixedTrash
+        old_id: short-fixed-trash
+        title: Short (55mm) fixed trash
+        description: !re_search "Trash box is 55mm tall"
+        restart_required: false
+        value: !anything
+      - id: calibrateToBottom
+        old_id: calibrate-to-bottom
+        title: Calibrate to bottom
+        description: !re_search "Calibrate using the bottom-center"
+        restart_required: false
+        value: !anything
+      - id: deckCalibrationDots
+        old_id: dots-deck-type
+        title: Deck calibration to dots
+        description: !re_search "Perform deck calibration to dots"
+        restart_required: false
+        value: !anything
+      - id: useProtocolApi2
+        old_id: Null
+        title: Use Protocol API version 2
+        description: Deprecated feature flag
+        restart_required: false
+        value: !anything
+      - id: disableHomeOnBoot
+        old_id: disable-home-on-boot
+        title: Disable home on boot
+        description: Prevent robot from homing motors on boot
+        restart_required: false
+        value: !anything
+      - id: useOldAspirationFunctions
+        old_id: Null
+        title: Use older aspirate behavior
+        description: !re_search "Aspirate with the less accurate volumetric calibrations"
+        restart_required: false
+        value: !anything
+      - id: useFastApi
+        old_id: Null
+        title: Enable experimental HTTP API v2
+        description: !re_match "Tells the OT-2 to run a newer.*version of its HTTP
+          API.*"
+        restart_required: true
+        value: !anything
+      links: {}
+    strict: false
+
+---
+# Short Fixed Trash
+test_name: POST Set shortFixedTrash
+stages:
+- name: Set shortFixedTrash to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: shortFixedTrash
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set shortFixedTrash to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: shortFixedTrash
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Clear shortFixedTrash value
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: shortFixedTrash
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Calibrate to Bottom
+test_name: POST Set calibrateToBottom
+stages:
+- name: Set calibrateToBottom to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: calibrateToBottom
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set calibrateToBottom to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: calibrateToBottom
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Clear calibrateToBottom value
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: calibrateToBottom
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Deck Calibration Dots
+test_name: POST Set deckCalibrationDots
+stages:
+- name: Set deckCalibrationDots to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: deckCalibrationDots
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set deckCalibrationDots to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: deckCalibrationDots
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Clear deckCalibrationDots value 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: deckCalibrationDots
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Use Protocol Api V2
+test_name: POST Set useProtocolApi2
+stages:
+- name: Set useProtocolApi2 to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useProtocolApi2
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set useProtocolApi2 to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useProtocolApi2
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Clear useProtocolApi2 value 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useProtocolApi2
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Disable Home on Boot
+test_name: POST Set disableHomeOnBoot
+stages:
+- name: Set disableHomeOnBoot to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: disableHomeOnBoot
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set disableHomeOnBoot to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: disableHomeOnBoot
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set disableHomeOnBoot to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: disableHomeOnBoot
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Use Old Aspiration Functions
+test_name: POST Set useOldAspirationFunctions
+stages:
+- name: Set useOldAspirationFunctions to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useOldAspirationFunctions
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set useOldAspirationFunctions to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useOldAspirationFunctions
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set useOldAspirationFunctions to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useOldAspirationFunctions
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# Use Fast API
+test_name: POST Set useFastApi
+stages:
+- name: Set useFastApi to true 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useFastApi
+      value: true
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set useFastApi to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useFastApi
+      value: false
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: "{tavern.request_vars.json.value}"
+- name: Set useFastApi to false 
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: useFastApi
+  response:
+    status_code: 200
+    verify_response_with:
+      function: utils:verify_settings_value
+      extra_kwargs:
+        id: "{tavern.request_vars.json.id}"
+        value: Null
+
+---
+# POST Incorrect Values
+test_name: POST With incorrect JSON values
+stages:
+- name: Post with incorrect ID
+  request:
+    method: POST
+    url: "{host:s}:{port:d}/settings"
+    json: 
+      id: notARealID
+      value: true
+  response:
+    status_code: 400
+    json:
+      message: "{tavern.request_vars.json.id} is not recognized"

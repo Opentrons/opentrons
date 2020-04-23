@@ -1,0 +1,117 @@
+---
+test_name: GET Settings Reset Options
+stages:
+  - name: Reset Options GET request returns correct option
+    request:
+      url: "{host:s}:{port:d}/settings/reset/options"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        options:
+        - id: tipProbe
+          name: Pipette Calibration
+          description: Clear pipette offset and tip length calibration
+        - id: labwareCalibration
+          name: Labware Calibration
+          description: !re_search "Clear labware calibration and Protocol API v1 custom labware"
+        - id: bootScripts
+          name: Boot Scripts
+          description: Clear custom boot scripts
+---
+test_name: POST Reset tipProbe option
+stages:
+  - name: POST Reset tipProbe true
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        tipProbe: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'tip_probe' were reset"
+  - name: POST Reset tipProbe false
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        tipProbe: false
+    response:
+      status_code: 200
+      json:
+        message: "Nothing to do"
+---
+test_name: POST Reset labwareCalibration option
+stages:
+  - name: POST Reset labwareCalibration true
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        labwareCalibration: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'labware_calibration' were reset"
+  - name: POST Reset labwareCalibration false
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        labwareCalibration: false
+    response:
+      status_code: 200
+      json:
+        message: "Nothing to do"
+---
+test_name: POST Reset bootScripts option
+stages:
+  - name: POST Reset bootScripts true
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        bootScripts: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'boot_scripts' were reset"
+  - name: POST Reset bootScripts false
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        bootScripts: false
+    response:
+      status_code: 200
+      json:
+        message: "Nothing to do"
+---
+test_name: POST Reset all options
+stages:
+  - name: POST Reset all options
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        tipProbe: true
+        labwareCalibration: true
+        bootScripts: true
+    response:
+      status_code: 200
+      json:
+        message: "Options 'labware_calibration, boot_scripts, tip_probe' were reset"
+---
+test_name: POST Reset non existant option
+stages:
+  - name: POST Reset non existant option
+    request:
+      url: "{host:s}:{port:d}/settings/reset"
+      method: POST
+      json:
+        doesNotExist: true
+    response:
+      status_code: 422
+      json:
+        message: !re_search "value is not a valid enumeration member"
