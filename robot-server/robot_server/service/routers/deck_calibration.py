@@ -6,7 +6,7 @@ from opentrons.hardware_control import HardwareAPILike
 import opentrons.deck_calibration.endpoints as dc
 
 from robot_server.service.dependencies import get_hardware
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.deck_calibration import DeckStart, \
     DeckStartResponse, DeckCalibrationDispatch, PipetteDeckCalibration

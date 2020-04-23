@@ -30,9 +30,9 @@
     },
     "export_v4_protocol": {
       "title": "Robot requirements for running module inclusive JSON protocols",
-      "body1": "This protocol includes Temperature and Magnetic modules.",
-      "body2": "Modules support is currently a Beta feature. To run this protocol, update your Opentrons App and OT-2 to software version 3.17.0 Beta.",
-      "body3": "Beta releases provide early access to new software versions and features. While we make a best effort to test each version, Beta features and software versions may include bugs or incomplete functionality."
+      "body1": "This protocol utilizes modules and can only run on app and robot server version",
+      "body2": "3.17 or higher",
+      "body3": ". Please ensure your OT-2 is updated to the correct version."
     },
     "change_magnet_module_model": {
       "title": "All existing engage heights will be cleared"

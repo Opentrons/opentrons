@@ -1,7 +1,13 @@
 // @flow
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { HoverTooltip, FormGroup, InputField } from '@opentrons/components'
+import {
+  FormGroup,
+  InputField,
+  Tooltip,
+  useHoverTooltip,
+  type UseHoverTooltipResult,
+} from '@opentrons/components'
 import { getWellsDepth } from '@opentrons/shared-data'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
@@ -38,74 +44,84 @@ type SP = {|
 
 type Props = { ...OP, ...SP }
 
-type TipPositionInputState = { isModalOpen: boolean }
+function TipPositionInput(props: Props) {
+  const [isModalOpen, setModalOpen] = React.useState(false)
 
-class TipPositionInput extends React.Component<Props, TipPositionInputState> {
-  state: TipPositionInputState = { isModalOpen: false }
-
-  handleOpen = () => {
-    if (this.props.wellDepthMm) {
-      this.setState({ isModalOpen: true })
+  const handleOpen = () => {
+    if (props.wellDepthMm) {
+      setModalOpen(true)
     }
   }
-  handleClose = () => {
-    this.setState({ isModalOpen: false })
+  const handleClose = () => {
+    setModalOpen(false)
   }
 
-  render() {
-    const { disabled, fieldName, mmFromBottom, wellDepthMm } = this.props
-    const isTouchTipField = getIsTouchTipField(this.props.fieldName)
+  const { disabled, fieldName, mmFromBottom, wellDepthMm } = props
+  const isTouchTipField = getIsTouchTipField(props.fieldName)
 
-    const Wrapper = ({ children, hoverTooltipHandlers }) =>
-      isTouchTipField ? (
-        <div {...hoverTooltipHandlers}>{children}</div>
-      ) : (
-        <FormGroup
-          label={i18n.t('form.step_edit_form.field.tip_position.label')}
-          disabled={disabled}
-          className={styles.well_order_input}
-          hoverTooltipHandlers={hoverTooltipHandlers}
-        >
-          {children}
-        </FormGroup>
-      )
+  let value = ''
+  if (wellDepthMm != null) {
+    // show default value for field in parens if no mmFromBottom value is selected
+    value =
+      mmFromBottom != null
+        ? mmFromBottom
+        : getDefaultMmFromBottom({ fieldName, wellDepthMm })
+  }
 
-    let value = ''
-    if (wellDepthMm != null) {
-      // show default value for field in parens if no mmFromBottom value is selected
-      value =
-        mmFromBottom != null
-          ? mmFromBottom
-          : getDefaultMmFromBottom({ fieldName, wellDepthMm })
-    }
+  const [targetProps, tooltipProps] = useHoverTooltip()
 
-    return (
-      <HoverTooltip
-        tooltipComponent={i18n.t('tooltip.step_fields.defaults.tipPosition')}
+  return (
+    <>
+      <Tooltip {...tooltipProps}>
+        {i18n.t('tooltip.step_fields.defaults.tipPosition')}
+      </Tooltip>
+
+      <TipPositionModal
+        fieldName={fieldName}
+        closeModal={handleClose}
+        wellDepthMm={wellDepthMm}
+        // $FlowFixMe: mmFromBottom is typed as a number in TipPositionModal
+        mmFromBottom={mmFromBottom}
+        isOpen={isModalOpen}
+      />
+      <Wrapper
+        targetProps={targetProps}
+        disabled={disabled}
+        isTouchTipField={isTouchTipField}
       >
-        {hoverTooltipHandlers => (
-          <Wrapper hoverTooltipHandlers={hoverTooltipHandlers}>
-            <TipPositionModal
-              fieldName={fieldName}
-              closeModal={this.handleClose}
-              wellDepthMm={wellDepthMm}
-              // $FlowFixMe: mmFromBottom is typed as a number in TipPositionModal
-              mmFromBottom={mmFromBottom}
-              isOpen={this.state.isModalOpen}
-            />
-            <InputField
-              className={this.props.className || stepFormStyles.small_field}
-              readOnly
-              onClick={this.handleOpen}
-              value={String(value)}
-              units={i18n.t('application.units.millimeter')}
-            />
-          </Wrapper>
-        )}
-      </HoverTooltip>
-    )
-  }
+        <InputField
+          className={props.className || stepFormStyles.small_field}
+          readOnly
+          onClick={handleOpen}
+          value={String(value)}
+          units={i18n.t('application.units.millimeter')}
+        />
+      </Wrapper>
+    </>
+  )
 }
+
+type WrapperProps = {
+  isTouchTipField: boolean,
+  children: React.Node,
+  disabled: boolean,
+  targetProps: $ElementType<UseHoverTooltipResult, 0>,
+}
+
+const Wrapper = (props: WrapperProps) =>
+  props.isTouchTipField ? (
+    <div {...props.targetProps}>{props.children}</div>
+  ) : (
+    <span {...props.targetProps}>
+      <FormGroup
+        label={i18n.t('form.step_edit_form.field.tip_position.label')}
+        disabled={props.disabled}
+        className={styles.well_order_input}
+      >
+        {props.children}
+      </FormGroup>
+    </span>
+  )
 
 const mapSTP = (state: BaseState, ownProps: OP): SP => {
   const rawForm = stepFormSelectors.getUnsavedForm(state)

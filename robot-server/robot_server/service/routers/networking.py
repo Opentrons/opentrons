@@ -7,7 +7,7 @@ from starlette.responses import JSONResponse
 from fastapi import APIRouter, HTTPException, File, Path, UploadFile
 from opentrons.system import nmcli, wifi
 
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models import V1BasicResponse
 from robot_server.service.models.networking import NetworkingStatus, \
     WifiNetworks, WifiNetwork, WifiConfiguration, WifiConfigurationResponse, \

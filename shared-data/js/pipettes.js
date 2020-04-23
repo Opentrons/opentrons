@@ -53,3 +53,7 @@ function comparePipettes(sortBy: Array<SortableProps>) {
     return 0
   }
 }
+
+export function shouldLevel(specs: PipetteNameSpecs) {
+  return specs.displayCategory === 'GEN2' && specs.channels === 8
+}

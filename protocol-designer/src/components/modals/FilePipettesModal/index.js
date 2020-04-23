@@ -17,6 +17,7 @@ import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import { SPAN7_8_10_11_SLOT } from '../../../constants'
@@ -72,6 +73,7 @@ export type Props = {|
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
   thermocyclerEnabled: ?boolean,
+  customTipracksEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -94,7 +96,7 @@ const initialFormState: FormState = {
     },
     [THERMOCYCLER_MODULE_TYPE]: {
       onDeck: false,
-      model: null,
+      model: THERMOCYCLER_MODULE_V1, // Default to GEN1 for TC only
       slot: SPAN7_8_10_11_SLOT,
     },
   },
@@ -342,6 +344,9 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           errors={errors.pipettesByMount ?? null}
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
+                          customTipracksEnabled={
+                            this.props.customTipracksEnabled
+                          }
                         />
 
                         {this.props.showModulesFields && (

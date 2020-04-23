@@ -13,6 +13,7 @@ import type {
   PipetteModelSpecs,
   PipetteDisplayCategory,
 } from '@opentrons/shared-data'
+import { shouldLevel } from '@opentrons/shared-data'
 import type { Mount } from '../../pipettes/types'
 import type { Direction } from './types'
 
@@ -113,11 +114,20 @@ function Steps(props: Props) {
       </div>
     )
   } else {
-    stepOne = (
-      <p>
-        Attach pipette to mount, <strong>starting with screw 1</strong>.
-      </p>
-    )
+    if (wantedPipette && shouldLevel(wantedPipette)) {
+      stepOne = (
+        <p>
+          <em>Loosely</em> attach pipette to carriage,{' '}
+          <strong>starting with screw 1</strong>
+        </p>
+      )
+    } else {
+      stepOne = (
+        <p>
+          Attach pipette to mount, <strong>starting with screw 1</strong>.
+        </p>
+      )
+    }
     stepTwo =
       'Connect the pipette to robot by pushing in the white connector tab.'
   }

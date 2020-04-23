@@ -4,6 +4,7 @@ import {
   DropdownField,
   FormGroup,
   PipetteSelect,
+  OutlineButton,
   type Mount,
 } from '@opentrons/components'
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
@@ -49,6 +50,7 @@ export type Props = {|
   onSetFieldValue: (field: string, value: string | null) => void,
   onSetFieldTouched: (field: string, touched: boolean) => void,
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
+  customTipracksEnabled: ?boolean,
 |}
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
@@ -63,6 +65,7 @@ export function PipetteFields(props: Props) {
     onBlur,
     errors,
     touched,
+    customTipracksEnabled,
   } = props
 
   const tiprackOptions = useMemo(() => {
@@ -151,6 +154,13 @@ export function PipetteFields(props: Props) {
             />
           </FormGroup>
         </div>
+        {customTipracksEnabled && (
+          <PipetteDiagram
+            leftPipette={values.left.pipetteName}
+            rightPipette={values.right.pipetteName}
+            customTipracksEnabled={customTipracksEnabled}
+          />
+        )}
         <div className={styles.mount_column}>
           <FormGroup
             key="rightPipetteModel"
@@ -193,15 +203,27 @@ export function PipetteFields(props: Props) {
           </FormGroup>
         </div>
       </div>
+      {!customTipracksEnabled ? (
+        <div className={styles.diagrams}>
+          <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
 
-      <div className={styles.diagrams}>
-        <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
-        <PipetteDiagram
-          leftPipette={values.left.pipetteName}
-          rightPipette={values.right.pipetteName}
-        />
-        <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
-      </div>
+          <PipetteDiagram
+            leftPipette={values.left.pipetteName}
+            rightPipette={values.right.pipetteName}
+            customTipracksEnabled={customTipracksEnabled}
+          />
+          <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
+        </div>
+      ) : (
+        <div>
+          <OutlineButton
+            className={styles.upload_custom_btn}
+            onClick={() => console.log('TODO: Open Upload Modal')}
+          >
+            upload custom tip rack
+          </OutlineButton>
+        </div>
+      )}
     </React.Fragment>
   )
 }

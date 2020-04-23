@@ -30,6 +30,7 @@ type SP = {|
   hideModal: $PropertyType<Props, 'hideModal'>,
   _hasUnsavedChanges: ?boolean,
   thermocyclerEnabled: ?boolean,
+  customTipracksEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -49,6 +50,7 @@ function mapStateToProps(state: BaseState): SP {
     hideModal: !selectors.getNewProtocolModal(state),
     _hasUnsavedChanges: loadFileSelectors.getHasUnsavedChanges(state),
     thermocyclerEnabled: featureFlagSelectors.getEnableThermocycler(state),
+    customTipracksEnabled: featureFlagSelectors.getEnableCustomTipracks(state),
     moduleRestrictionsDisabled: featureFlagSelectors.getDisableModuleRestrictions(
       state
     ),
@@ -114,6 +116,7 @@ function mergeProps(stateProps: SP, dispatchProps: DP, ownProps: OP): Props {
   return {
     ...ownProps,
     thermocyclerEnabled: stateProps.thermocyclerEnabled,
+    customTipracksEnabled: stateProps.customTipracksEnabled,
     moduleRestrictionsDisabled: stateProps.moduleRestrictionsDisabled,
     showModulesFields: true,
     hideModal: stateProps.hideModal,

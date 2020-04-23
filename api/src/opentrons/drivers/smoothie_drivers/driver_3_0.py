@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 from os import environ
 import logging
-from time import sleep
+from time import sleep, time
 from threading import Event, RLock
 from typing import Any, Dict, Optional, Union, List, Tuple
 
@@ -11,8 +11,8 @@ from serial.serialutil import SerialException  # type: ignore
 
 from opentrons.drivers import serial_communication
 from opentrons.drivers.types import MoveSplits
-from opentrons.drivers.rpi_drivers import gpio
 from opentrons.drivers.utils import AxisMoveTimestamp
+from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons.system import smoothie_update
 '''
 - Driver is responsible for providing an interface for motion control
@@ -308,7 +308,7 @@ def _parse_homing_status_values(raw_homing_status_values):
 
 
 class SmoothieDriver_3_0_0:
-    def __init__(self, config, handle_locks=True):
+    def __init__(self, config, gpio_chardev=None, handle_locks=True):
         self.run_flag = Event()
         self.run_flag.set()
 
@@ -321,6 +321,8 @@ class SmoothieDriver_3_0_0:
         self.simulating = True
         self._connection = None
         self._config = config
+
+        self._gpio_chardev = gpio_chardev or SimulatingGPIOCharDev('simulated')
 
         # Current settings:
         # The amperage of each axis, has been organized into three states:
@@ -392,6 +394,14 @@ class SmoothieDriver_3_0_0:
         self._axes_moved_at = AxisMoveTimestamp(AXES)
 
     @property
+    def gpio_chardev(self):
+        return self._gpio_chardev
+
+    @gpio_chardev.setter
+    def gpio_chardev(self, gpio_chardev):
+        self._gpio_chardev = gpio_chardev
+
+    @property
     def homed_position(self):
         return self._homed_position.copy()
 
@@ -447,7 +457,7 @@ class SmoothieDriver_3_0_0:
     def read_pipette_id(self, mount) -> Optional[str]:
         '''
         Reads in an attached pipette's ID
-        The ID is unique to this pipette, and is a string of unknown length
+        The ID is unique to this pipette, and is a string of unktimen length
 
         :param mount: string with value 'left' or 'right'
         :return id string, or None
@@ -492,14 +502,14 @@ class SmoothieDriver_3_0_0:
     def write_pipette_id(self, mount: str, data_string: str):
         '''
         Writes to an attached pipette's ID memory location
-        The ID is unique to this pipette, and is a string of unknown length
+        The ID is unique to this pipette, and is a string of unktimen length
 
         NOTE: To enable write-access to the pipette, it's button must be held
 
         mount:
             String (str) with value 'left' or 'right'
         data_string:
-            String (str) that is of unknown length, and should be unique to
+            String (str) that is of unktimen length, and should be unique to
             this one pipette
         '''
         self._write_to_pipette(
@@ -1151,7 +1161,7 @@ class SmoothieDriver_3_0_0:
         self._send_command(command)
         self.dwell_axes('Y')
 
-        # now it is safe to home the X axis
+        # time it is safe to home the X axis
         try:
             # override firmware's default XY homing speed, to avoid resonance
             self.set_axis_max_speed({'X': XY_HOMING_SPEED})
@@ -1219,7 +1229,7 @@ class SmoothieDriver_3_0_0:
             self._wait_for_ack()
         except serial_communication.SerialNoResponse:
             # incase motor-driver is stuck in bootloader and unresponsive,
-            # use gpio to reset into a known state
+            # use gpio to reset into a ktimen state
             log.debug("wait for ack failed, resetting")
             self._smoothie_reset()
         log.debug("wait for ack done")
@@ -1649,7 +1659,7 @@ class SmoothieDriver_3_0_0:
         """ Handle split moves for unsticking axes before home.
 
         This is particularly ugly bit of code that flips the motor controller
-        into relative mode since we don't necessarily know where we are.
+        into relative mode since we don't necessarily ktime where we are.
 
         It will induce a movement. It should really only be called before a
         home because it doesn't update the position cache.
@@ -1713,7 +1723,7 @@ class SmoothieDriver_3_0_0:
     def fast_home(self, axis, safety_margin):
         ''' home after a controlled motor stall
 
-        Given a known distance we have just stalled along an axis, move
+        Given a ktimen distance we have just stalled along an axis, move
         that distance away from the homing switch. Then finish with home.
         '''
         # move some mm distance away from the target axes endstop switch(es)
@@ -1752,7 +1762,7 @@ class SmoothieDriver_3_0_0:
         '''
         for ax in axes:
             if ax not in AXES:
-                raise ValueError('Unknown axes: {}'.format(axes))
+                raise ValueError('Unktimen axes: {}'.format(axes))
 
         if distance is None:
             distance = UNSTICK_DISTANCE
@@ -1826,38 +1836,42 @@ class SmoothieDriver_3_0_0:
             raise RuntimeError("Cant probe axis {}".format(axis))
 
     def turn_on_blue_button_light(self):
-        gpio.set_button_light(blue=True)
+        self._gpio_chardev.set_button_light(blue=True)
+
+    def turn_on_green_button_light(self):
+        self._gpio_chardev.set_button_light(green=True)
 
     def turn_on_red_button_light(self):
-        gpio.set_button_light(red=True)
+        self._gpio_chardev.set_button_light(red=True)
 
     def turn_off_button_light(self):
-        gpio.set_button_light(red=False, green=False, blue=False)
+        self._gpio_chardev.set_button_light(
+            red=False, green=False, blue=False)
 
     def turn_on_rail_lights(self):
-        gpio.set_rail_lights(True)
+        self._gpio_chardev.set_rail_lights(True)
 
     def turn_off_rail_lights(self):
-        gpio.set_rail_lights(False)
+        self._gpio_chardev.set_rail_lights(False)
 
     def get_rail_lights_on(self):
-        return gpio.get_rail_lights()
+        return self._gpio_chardev.get_rail_lights()
 
     def read_button(self):
-        return gpio.read_button()
+        return self._gpio_chardev.read_button()
 
     def read_window_switches(self):
-        return gpio.read_window_switches()
+        return self._gpio_chardev.read_window_switches()
 
     def set_lights(self, button: bool = None, rails: bool = None):
         if button is not None:
-            gpio.set_button_light(blue=button)
+            self._gpio_chardev.set_button_light(blue=button)
         if rails is not None:
-            gpio.set_rail_lights(rails)
+            self._gpio_chardev.set_rail_lights(rails)
 
     def get_lights(self) -> Dict[str, bool]:
-        return {'button': gpio.get_button_light()[2],
-                'rails': gpio.get_rail_lights()}
+        return {'button': self._gpio_chardev.get_button_light()[2],
+                'rails': self._gpio_chardev.get_rail_lights()}
 
     def kill(self):
         """
@@ -1892,10 +1906,10 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
-            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_reset_pin(False)
+            self._gpio_chardev.set_isp_pin(True)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            self._gpio_chardev.set_reset_pin(True)
             sleep(0.25)
             self._wait_for_ack()
             self._reset_from_error()
@@ -1906,12 +1920,12 @@ class SmoothieDriver_3_0_0:
         if self.simulating:
             pass
         else:
-            gpio.set_low(gpio.OUTPUT_PINS['RESET'])
-            gpio.set_low(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_reset_pin(False)
+            self._gpio_chardev.set_isp_pin(False)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['RESET'])
+            self._gpio_chardev.set_reset_pin(True)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['ISP'])
+            self._gpio_chardev.set_isp_pin(True)
             sleep(0.25)
 
     def hard_halt(self):
@@ -1921,9 +1935,9 @@ class SmoothieDriver_3_0_0:
             pass
         else:
             self._is_hard_halting.set()
-            gpio.set_low(gpio.OUTPUT_PINS['HALT'])
+            self._gpio_chardev.set_halt_pin(False)
             sleep(0.25)
-            gpio.set_high(gpio.OUTPUT_PINS['HALT'])
+            self._gpio_chardev.set_halt_pin(True)
             sleep(0.25)
             self.run_flag.set()
 
@@ -1974,9 +1988,14 @@ class SmoothieDriver_3_0_0:
         if loop:
             kwargs['loop'] = loop
         log.info(update_cmd)
+        before = time()
         proc = await asyncio.create_subprocess_shell(
             update_cmd, **kwargs)
+        created = time()
+        log.info(f"created lpc21isp subproc in {created-before}")
         out_b, err_b = await proc.communicate()
+        done = time()
+        log.info(f"ran lpc21isp subproc in {done-created}")
         if proc.returncode != 0:
             log.error(
                 f"Smoothie update failed: {proc.returncode}"

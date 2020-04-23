@@ -3,7 +3,7 @@ import inspect
 import logging
 import traceback
 import sys
-from typing import Any, Callable, Dict
+from typing import Any, Dict
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
@@ -12,23 +12,11 @@ from .json_dispatchers import pipette_command_map, \
     temperature_module_command_map, magnetic_module_command_map
 from . import execute_v3, execute_v4
 
-from opentrons.protocols.types import PythonProtocol, Protocol, APIVersion
+from opentrons.protocols.types import (PythonProtocol, Protocol,
+                                       APIVersion, MalformedProtocolError)
 from opentrons.hardware_control import ExecutionCancelledError
 
 MODULE_LOG = logging.getLogger(__name__)
-
-PROTOCOL_MALFORMED = """
-
-A Python protocol for the OT2 must define a function called 'run' that takes a
-single argument: the protocol context to call functions on. For instance, a run
-function might look like this:
-
-def run(ctx):
-    ctx.comment('hello, world')
-
-This function is called by the robot when the robot executes the protol.
-This function is not present in the current protocol and must be added.
-"""
 
 
 class ExceptionInProtocolError(Exception):
@@ -51,19 +39,7 @@ class ExceptionInProtocolError(Exception):
             self.message)
 
 
-class MalformedProtocolError(Exception):
-    def __init__(self, message):
-        self.message = message
-        super().__init__(message)
-
-    def __str__(self):
-        return self.message + PROTOCOL_MALFORMED
-
-    def __repr__(self):
-        return '<{}: {}>'.format(self.__class__.__name__, self.message)
-
-
-def _runfunc_ok(run_func: Any) -> Callable[[ProtocolContext], None]:
+def _runfunc_ok(run_func: Any):
     if not callable(run_func):
         raise SyntaxError("No function 'run(ctx)' defined")
     sig = inspect.Signature.from_callable(run_func)
@@ -76,7 +52,6 @@ def _runfunc_ok(run_func: Any) -> Callable[[ProtocolContext], None]:
                     "Function 'run{}' must be called with more than one "
                     "argument but would be called as 'run(ctx)'"
                     .format(str(sig)))
-    return run_func  # type: ignore
 
 
 def _find_protocol_error(tb, proto_name):

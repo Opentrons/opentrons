@@ -132,7 +132,8 @@ class Robot(CommandPublisher):
         """
         super().__init__(broker)
         self.config = config or load()
-        self._driver = driver_3_0.SmoothieDriver_3_0_0(config=self.config)
+        self._driver = driver_3_0.SmoothieDriver_3_0_0(
+            config=self.config)
         self._attached_modules: Dict[str, Any] = {}  # key is port + model
         self.fw_version = self._driver.get_fw_version()
 
@@ -311,15 +312,18 @@ class Robot(CommandPublisher):
                 home_pos = cfg.home_position
                 max_travel = cfg.max_travel
                 steps_mm = cfg.steps_per_mm
+                idle_current = cfg.idle_current
             else:
                 home_pos = self.config.default_pipette_configs['homePosition']
                 max_travel = self.config.default_pipette_configs['maxTravel']
                 steps_mm = self.config.default_pipette_configs['stepsPerMM']
+                idle_current = self.config.low_current[plunger_axis]
 
             self._driver.update_steps_per_mm({plunger_axis: steps_mm})
             self._driver.update_pipette_config(mount_axis, {'home': home_pos})
             self._driver.update_pipette_config(
                 plunger_axis, {'max_travel': max_travel})
+            self._driver.set_dwelling_current({plunger_axis: idle_current})
             self._driver.configure_splits_for(splits)
 
             if model_value:

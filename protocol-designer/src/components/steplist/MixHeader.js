@@ -1,11 +1,10 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { HoverTooltip } from '@opentrons/components'
+import { Tooltip, useHoverTooltip, TOOLTIP_FIXED } from '@opentrons/components'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { LabwareTooltipContents } from './LabwareTooltipContents'
-import { Portal } from './TooltipPortal'
 
 type Props = {
   volume: ?string,
@@ -16,27 +15,29 @@ type Props = {
 
 export function MixHeader(props: Props) {
   const { volume, times, labwareNickname, labwareDefDisplayName } = props
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'bottom-start',
+    strategy: TOOLTIP_FIXED,
+  })
   return (
-    <PDListItem className={styles.step_subitem}>
-      <HoverTooltip
-        portal={Portal}
-        tooltipComponent={
-          <LabwareTooltipContents
-            {...{ labwareNickname, labwareDefDisplayName }}
-          />
-        }
-      >
-        {hoverTooltipHandlers => (
-          <span
-            {...hoverTooltipHandlers}
-            className={cx(styles.emphasized_cell, styles.labware_display_name)}
-          >
-            {labwareNickname}
-          </span>
-        )}
-      </HoverTooltip>
-      <span>{volume} uL</span>
-      <span>{times}x</span>
-    </PDListItem>
+    <>
+      <Tooltip {...tooltipProps}>
+        <LabwareTooltipContents
+          {...{ labwareNickname, labwareDefDisplayName }}
+        />
+      </Tooltip>
+
+      <PDListItem className={styles.step_subitem}>
+        <span
+          {...targetProps}
+          className={cx(styles.emphasized_cell, styles.labware_display_name)}
+        >
+          {labwareNickname}
+        </span>
+
+        <span>{volume} uL</span>
+        <span>{times}x</span>
+      </PDListItem>
+    </>
   )
 }

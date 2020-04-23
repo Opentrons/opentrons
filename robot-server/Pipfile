@@ -18,7 +18,7 @@ requests = "*"
 
 [packages]
 uvicorn = "==0.11.3"
-fastapi = "==0.49.0"
+fastapi = "==0.54.1"
 python-multipart = "==0.0.5"
 aiohttp = "==3.4.4"
 python-dotenv = "*"

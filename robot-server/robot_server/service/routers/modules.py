@@ -9,7 +9,7 @@ from opentrons.hardware_control.modules import AbstractModule
 
 from robot_server.service.dependencies import get_hardware
 from robot_server.service.models import V1BasicResponse
-from robot_server.service.exceptions import V1HandlerError
+from robot_server.service.errors import V1HandlerError
 from robot_server.service.models.modules import Module, ModuleSerial,\
     Modules, SerialCommandResponse, SerialCommand
 

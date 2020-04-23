@@ -11,5 +11,9 @@
   "OT_PD_ENABLE_THERMOCYCLER": {
     "title": "Enable thermocycler module",
     "description": "Allow adding thermocycler modules and steps to protocols."
+  },
+  "OT_PD_ENABLE_CUSTOM_TIPRACKS": {
+    "title": "Enable Custom Tipracks",
+    "description": "Allow custom tiprack uploads in new file modal and edit pipettes modal."
   }
 }

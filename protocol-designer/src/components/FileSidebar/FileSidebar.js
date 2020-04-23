@@ -43,7 +43,7 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   const blob = new Blob([JSON.stringify(downloadData.fileData)], {
     type: 'application/json',
   })
-  if (global.Cypress) {
+  if (process.env.CYPRESS === '1') {
     // HACK(IL, 2020-04-02): can't figure out a better way to do this yet
     // https://docs.cypress.io/faq/questions/using-cypress-faq.html#Can-my-tests-interact-with-Redux-Vuex-data-store
     global.__lastSavedFile__ = downloadData.fileData
@@ -152,14 +152,17 @@ function getWarningContent({
 // TODO (ka 2020-2-26): Update this knowledgebase link when available
 export const v4WarningContent = (
   <div>
-    <p>{i18n.t(`alert.hint.export_v4_protocol.body1`)} </p>
-    <p>{i18n.t(`alert.hint.export_v4_protocol.body2`)}</p>
-    <p>{i18n.t(`alert.hint.export_v4_protocol.body3`)}</p>
+    <p>
+      {i18n.t(`alert.hint.export_v4_protocol.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v4_protocol.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v4_protocol.body3`)}
+    </p>
+    {/* 
     <p>
       <KnowledgeBaseLink to="betaReleases">
         Learn more about Beta releases here
       </KnowledgeBaseLink>
-    </p>
+    </p> */}
   </div>
 )
 

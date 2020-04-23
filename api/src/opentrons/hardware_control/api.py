@@ -1,8 +1,9 @@
 import asyncio
 import contextlib
 import logging
+import pathlib
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional
+from typing import Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -19,7 +20,6 @@ from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError)
 from . import modules
-
 
 mod_log = logging.getLogger(__name__)
 
@@ -77,7 +77,8 @@ class API(HardwareAPILike):
     async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
             port: str = None,
-            loop: asyncio.AbstractEventLoop = None) -> 'API':
+            loop: asyncio.AbstractEventLoop = None,
+            firmware: Tuple[pathlib.Path, str] = None) -> 'API':
         """ Build a hardware controller that will actually talk to hardware.
 
         This method should not be used outside of a real robot, and on a
@@ -92,14 +93,46 @@ class API(HardwareAPILike):
         """
         checked_loop = use_or_initialize_loop(loop)
         backend = Controller(config)
-        await backend.connect(port)
+        await backend.setup_gpio_chardev()
+        backend.set_lights(button=None, rails=False)
 
-        api_instance = cls(backend, loop=checked_loop, config=config)
-        await api_instance.cache_instruments()
-        checked_loop.create_task(backend.watch_modules(
+        async def blink():
+            while True:
+                backend.set_lights(button=True, rails=None)
+                await asyncio.sleep(0.5)
+                backend.set_lights(button=False, rails=None)
+                await asyncio.sleep(0.5)
+
+        blink_task = checked_loop.create_task(blink())
+        try:
+            try:
+                await backend.connect(port)
+                fw_version = backend.fw_version
+            except Exception:
+                mod_log.exception(
+                    'Motor driver could not connect, reprogramming if possible'
+                )
+                fw_version = None
+
+            if firmware is not None:
+                if fw_version != firmware[1]:
+                    await backend.update_firmware(
+                        str(firmware[0]), checked_loop, True)
+                    await backend.connect(port)
+            elif firmware is None and fw_version is None:
+                msg = 'Motor controller could not be connected and no '\
+                    'firmware was provided for (re)programming'
+                mod_log.error(msg)
+                raise RuntimeError(msg)
+
+            api_instance = cls(backend, loop=checked_loop, config=config)
+            await api_instance.cache_instruments()
+            checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
-        return api_instance
+            return api_instance
+        finally:
+            blink_task.cancel()
 
     @classmethod
     async def build_hardware_simulator(
@@ -268,6 +301,7 @@ class API(HardwareAPILike):
                 home_pos = p.config.home_position
                 max_travel = p.config.max_travel
                 steps_mm = p.config.steps_per_mm
+                idle_current = p.config.idle_current
                 if 'needsUnstick' in p.config.quirks:
                     splits[plunger_axis.name.upper()] = MoveSplit(
                         split_distance=1,
@@ -293,6 +327,7 @@ class API(HardwareAPILike):
                 home_pos = self._config.default_pipette_configs['homePosition']
                 max_travel = self._config.default_pipette_configs['maxTravel']
                 steps_mm = self._config.default_pipette_configs['stepsPerMM']
+                idle_current = self._config.low_current[plunger_axis.name]
 
             self._backend._smoothie_driver.update_steps_per_mm(
                 {plunger_axis.name: steps_mm})
@@ -300,6 +335,8 @@ class API(HardwareAPILike):
                 mount_axis.name, {'home': home_pos})
             self._backend._smoothie_driver.update_pipette_config(
                 plunger_axis.name, {'max_travel': max_travel})
+            self._backend._smoothie_driver.set_dwelling_current(
+                {plunger_axis.name: idle_current})
             self._backend._smoothie_driver.configure_splits_for(splits)
         mod_log.info("Instruments found: {}".format(
             self._attached_instruments))

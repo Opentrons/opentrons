@@ -518,6 +518,7 @@ def cntrlr_mock_connect(monkeypatch):
     async def mock_connect(obj, port=None):
         return
     monkeypatch.setattr(hc.Controller, 'connect', mock_connect)
+    monkeypatch.setattr(hc.Controller, 'fw_version', 'virtual')
 
 
 @pytest.fixture
