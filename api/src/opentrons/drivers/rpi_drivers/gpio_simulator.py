@@ -14,7 +14,9 @@ OUTPUT_PINS = {
 
 INPUT_PINS = {
     'BUTTON_INPUT': 5,
-    'WINDOW_INPUT': 20
+    'WINDOW_INPUT': 20,
+    'REV_0': 17,
+    'REV_1': 27
 }
 
 
@@ -87,6 +89,9 @@ class SimulatingGPIOCharDev:
         pass
 
     def read_window_switches(self) -> bool:
+        pass
+
+    def read_revision_bits(self) -> Tuple[bool, bool]:
         pass
 
     def release_line(self, offset: int):

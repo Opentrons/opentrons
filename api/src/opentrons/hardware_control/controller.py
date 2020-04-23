@@ -45,6 +45,7 @@ class Controller:
         self.config = config or opentrons.config.robot_configs.load()
 
         self._gpio_chardev = build_gpio_chardev('gpiochip0')
+        self._board_revision: Optional[str] = None
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, gpio_chardev=self._gpio_chardev,
@@ -65,8 +66,24 @@ class Controller:
     def gpio_chardev(self) -> 'GPIODriverLike':
         return self._gpio_chardev
 
+    @property
+    def board_revision(self) -> Optional[str]:
+        return self._board_revision
+
     async def setup_gpio_chardev(self):
         await self.gpio_chardev.setup()
+        self._board_revision = self.determine_board_revision()
+
+    def determine_board_revision(self) -> str:
+        rev_0, rev_1 = self.gpio_chardev.read_revision_bits()
+        if rev_0 and rev_1:
+            return '2.1'
+        elif not rev_0 and rev_1:
+            return 'A'
+        elif rev_0 and not rev_1:
+            return 'B'
+        else:
+            return 'C'
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
