@@ -28,6 +28,7 @@ import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
+import { CheckXYPoint } from './CheckXYPoint'
 
 const AXIS_BY_MOUNT = { left: 'z', right: 'a' }
 
@@ -114,7 +115,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     }
     case CHECK_STEP_CHECKING_POINT_ONE:
     case CHECK_STEP_CHECKING_POINT_TWO:
-    case CHECK_STEP_CHECKING_POINT_THREE:
+    case CHECK_STEP_CHECKING_POINT_THREE: {
+      stepContents = activeInstrumentId ? (
+        <CheckXYPoint
+          robotName={robotName}
+          pipetteId={activeInstrumentId}
+          currentStep={currentStep}
+        />
+      ) : null
+      break
+    }
     case CHECK_STEP_CHECKING_HEIGHT:
     case CHECK_STEP_SESSION_EXITED:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:

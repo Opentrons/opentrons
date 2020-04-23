@@ -27,6 +27,7 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import multiDemoAsset from './videos/A1-Multi-Channel-SEQ.gif'
 import singleDemoAsset from './videos/A1-Single-Channel-SEQ.gif'
+import { formatJogVector } from './utils'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
@@ -55,15 +56,14 @@ export function TipPickUp(props: TipPickUpProps) {
   )
   const dispatch = useDispatch<Dispatch>()
 
-  const ORDERED_AXES: Array<JogAxis> = ['x', 'y', 'z']
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    // e.g. reformat from ['x', -1, 0.1] to [-0.1, 0, 0]
-    let vector = [0, 0, 0]
-    const index = ORDERED_AXES.findIndex(a => a === axis)
-    if (index >= 0) {
-      vector[index] = step * direction
-    }
-    dispatch(jogRobotCalibrationCheck(robotName, pipetteId, vector))
+    dispatch(
+      jogRobotCalibrationCheck(
+        robotName,
+        pipetteId,
+        formatJogVector(axis, direction, step)
+      )
+    )
   }
 
   function pickUpTip() {
