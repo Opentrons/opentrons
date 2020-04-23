@@ -25,7 +25,6 @@ def _format_links(
         session: 'CheckCalibrationSession',
         potential_triggers: typing.Set[str],
         router: UrlDispatcher) -> typing.Dict:
-    # TODO: BC: return route names and not bind them to trigger func names
     def _gen_triggers(triggers):
         links = {}
         for p in triggers:
