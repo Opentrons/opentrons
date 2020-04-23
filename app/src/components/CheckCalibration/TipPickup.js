@@ -91,15 +91,23 @@ export function TipPickUp(props: TipPickUpProps) {
       </div>
 
       {isInspecting ? (
-        <>
-          <p>{CONFIRM_TIP_BODY}</p>
-          <PrimaryButton onClick={rejectPickUpAttempt}>
+        <div className={styles.tip_pick_up_confirmation_wrapper}>
+          <p className={styles.pick_up_tip_confirmation_body}>
+            {CONFIRM_TIP_BODY}
+          </p>
+          <PrimaryButton
+            className={styles.pick_up_tip_confirmation_button}
+            onClick={rejectPickUpAttempt}
+          >
             {CONFIRM_TIP_NO_BUTTON_TEXT}
           </PrimaryButton>
-          <PrimaryButton onClick={confirmTipPickedUp}>
+          <PrimaryButton
+            className={styles.pick_up_tip_confirmation_button}
+            onClick={confirmTipPickedUp}
+          >
             {CONFIRM_TIP_YES_BUTTON_TEXT}
           </PrimaryButton>
-        </>
+        </div>
       ) : (
         <>
           <div className={styles.tip_pick_up_demo_wrapper}>
