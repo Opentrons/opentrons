@@ -227,3 +227,12 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   margin-top: 1rem;
   width: 80%;
 }
+
+.step_check_video_wrapper {
+  max-height: 30rem;
+  margin-bottom: 1rem;
+}
+
+.step_check_video {
+  max-width: 100%;
+}

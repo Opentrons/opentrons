@@ -16,22 +16,22 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import { formatJogVector } from './utils'
 
-// import slot1LeftMultiDemoAsset from './videos/SLOT 1 LEFT MULTI X-Y (640X480)_REV1.webm'
-// import slot1LeftSingleDemoAsset from './videos/SLOT 1 LEFT SINGLE X-Y (640X480)_REV1.webm'
-// import slot1RightMultiDemoAsset from './videos/SLOT 1 RIGHT MULTI X-Y (640X480)_REV1.webm'
-// import slot1RightSingleDemoAsset from './videos/SLOT 1 RIGHT SINGLE X-Y (640X480)_REV1.webm'
-// import slot3LeftMultiDemoAsset from './videos/SLOT 3 LEFT MULTI X-Y (640X480)_REV1.webm'
-// import slot3LeftSingleDemoAsset from './videos/SLOT 3 LEFT SINGLE X-Y (640X480)_REV1.webm'
-// import slot3RightMultiDemoAsset from './videos/SLOT 3 RIGHT MULTI X-Y (640X480)_REV1.webm'
-// import slot3RightSingleDemoAsset from './videos/SLOT 3 RIGHT SINGLE X-Y (640X480)_REV1.webm'
-// import slot5LeftMultiDemoAsset from './videos/SLOT 5 LEFT MULTI Z (640X480)_REV1.webm'
-// import slot5LeftSingleDemoAsset from './videos/SLOT 5 LEFT SINGLE Z (640X480)_REV1.webm'
-// import slot5RightMultiDemoAsset from './videos/SLOT 5 RIGHT MULTI Z (640X480)_REV1.webm'
-// import slot5RightSingleDemoAsset from './videos/SLOT 5 RIGHT SINGLE Z (640X480)_REV1.webm'
-// import slot7LeftMultiDemoAsset from './videos/SLOT 7 LEFT MULTI X-Y (640X480)_REV1.webm'
-// import slot7LeftSingleDemoAsset from './videos/SLOT 7 LEFT SINGLE X-Y (640X480)_REV1.webm'
-// import slot7RightMultiDemoAsset from './videos/SLOT 7 RIGHT MULTI X-Y (640X480)_REV1.webm'
-// import slot7RightSingleDemoAsset from './videos/SLOT 7 RIGHT SINGLE X-Y (640X480)_REV1.webm'
+import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
+import slot1RightMultiDemoAsset from './videos/SLOT_1_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot1RightSingleDemoAsset from './videos/SLOT_1_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
+import slot3LeftMultiDemoAsset from './videos/SLOT_3_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot3LeftSingleDemoAsset from './videos/SLOT_3_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
+import slot3RightMultiDemoAsset from './videos/SLOT_3_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot3RightSingleDemoAsset from './videos/SLOT_3_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
+import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z_(640X480)_REV1.webm'
+import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z_(640X480)_REV1.webm'
+import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z_(640X480)_REV1.webm'
+import slot5RightSingleDemoAsset from './videos/SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV1.webm'
+import slot7LeftMultiDemoAsset from './videos/SLOT_7_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot7LeftSingleDemoAsset from './videos/SLOT_7_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
+import slot7RightMultiDemoAsset from './videos/SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
+import slot7RightSingleDemoAsset from './videos/SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
 
 type XYPointStep =
   | typeof CHECK_STEP_CHECKING_POINT_ONE
@@ -79,7 +79,18 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
 
-  const demoAsset = null
+  const demoAsset = (
+    <div className={styles.step_check_video_wrapper}>
+      <video
+        className={styles.step_check_video}
+        autoPlay={true}
+        loop={true}
+        controls={true}
+      >
+        <source src={slot1LeftMultiDemoAsset} />
+      </video>
+    </div>
+  )
 
   return (
     <>
@@ -100,7 +111,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           <b>&nbsp;{CHECK_AXES}&nbsp;</b>
           {TO_DETERMINE_MATCH}
         </p>
-        <img src={demoAsset} className={styles.tip_pick_up_demo_image} />
+        {demoAsset}
       </div>
       <div className={styles.tip_pick_up_controls_wrapper}>
         <JogControls jog={jog} stepSizes={[0.1, 2]} axes={['x', 'y']} />
