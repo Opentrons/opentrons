@@ -25,7 +25,7 @@ export const announcements: Array<Announcement> = [
     message: (
       <>
         <p>
-          Protocol Designer now includes Beta support for Temperature and
+          Protocol Designer Beta now includes support for Temperature and
           Magnetic modules.
         </p>
         <p>
