@@ -36,5 +36,9 @@ def run_server():
 
     thread = mp.Process(target=runner)
     thread.start()
+    # TODO find a better way to know when we're ready
+    import time
+    time.sleep(0.1)
     yield thread
     thread.terminate()
+    thread.join()
