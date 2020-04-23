@@ -560,6 +560,11 @@ def test_touch_tip_default_args(loop, monkeypatch):
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
+    # Check that the old api version initial well move has the same z height
+    # as the calculated edges.
+    total_hw_moves.clear()
+    instr.touch_tip(v_offset=1)
+    assert total_hw_moves[0][0].z != total_hw_moves[1][0].z
 
 
 def test_touch_tip_new_default_args(loop, monkeypatch):
@@ -591,6 +596,12 @@ def test_touch_tip_new_default_args(loop, monkeypatch):
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
         assert total_hw_moves[i] == (edges[i - 1], speed)
+
+    # Check that the new api version initial well move has the same z height
+    # as the calculated edges.
+    total_hw_moves.clear()
+    instr.touch_tip(v_offset=1)
+    assert total_hw_moves[0][0].z == total_hw_moves[1][0].z
 
 
 def test_touch_tip_disabled(loop, monkeypatch, get_labware_fixture):
