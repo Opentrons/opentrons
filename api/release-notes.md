@@ -1,6 +1,9 @@
-# Robot OS Changes from 3.16.1 to 3.17.0 Beta
+# Robot OS Changes from 3.16.1 to 3.17.0
 
-For more details about this release, please see the full [technical change log][changelog]
+For more details about this release, please see the full [technical change
+log][changelog]
+
+Note: This release is the exact same as the 3.17.0 beta.
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
