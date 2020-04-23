@@ -150,6 +150,7 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
     # With nothing specified at init or expected, we should have nothing
     sim._backend._smoothie_driver.update_steps_per_mm = mock.Mock(fake_func1)
     sim._backend._smoothie_driver.update_pipette_config = mock.Mock(fake_func2)
+    sim._backend._smoothie_driver.set_dwelling_current = mock.Mock(fake_func1)
 
     await sim.cache_instruments()
     attached = sim.attached_instruments
@@ -161,10 +162,13 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         mock.call('A', {'home': 220}),
         mock.call('B', {'max_travel': 30}),
         mock.call('C', {'max_travel': 30})]
+    current_calls = [mock.call({'B': 0.05}), mock.call({'C': 0.05})]
     sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
         steps_mm_calls, any_order=True)
     sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
         pip_config_calls, any_order=True)
+    sim._backend._smoothie_driver.set_dwelling_current.assert_has_calls(
+        current_calls, any_order=True)
 
     sim._backend._smoothie_driver.update_steps_per_mm.reset_mock()
     sim._backend._smoothie_driver.update_pipette_config.reset_mock()
@@ -185,10 +189,18 @@ async def test_cache_instruments_sim(loop, dummy_instruments):
         mock.call('A', {'home': 172.15}),
         mock.call('B', {'max_travel': 30}),
         mock.call('C', {'max_travel': 60})]
+    current_calls = [mock.call({'B': 0.05}), mock.call({'C': 0.05})]
     sim._backend._smoothie_driver.update_steps_per_mm.assert_has_calls(
         steps_mm_calls, any_order=True)
     sim._backend._smoothie_driver.update_pipette_config.assert_has_calls(
         pip_config_calls, any_order=True)
+
+    await sim.cache_instruments(
+        {types.Mount.LEFT: 'p10_single_v1.3',
+         types.Mount.RIGHT: 'p300_multi_v2.0'})
+    current_calls = [mock.call({'B': 0.05}), mock.call({'C': 0.3})]
+    sim._backend._smoothie_driver.set_dwelling_current.assert_has_calls(
+        current_calls, any_order=True)
     # If we use prefixes, that should work too
     await sim.cache_instruments({types.Mount.RIGHT: 'p300_single'})
     attached = sim.attached_instruments
