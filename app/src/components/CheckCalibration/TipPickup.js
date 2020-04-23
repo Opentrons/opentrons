@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, AlertModal, type Mount } from '@opentrons/components'
+import { PrimaryButton, type Mount } from '@opentrons/components'
 import {
   getLabwareDisplayName,
   getPipetteModelSpecs,
@@ -43,10 +43,10 @@ type TipPickUpProps = {|
   isMulti: boolean,
   tiprack: RobotCalibrationCheckLabware,
   robotName: string,
+  isInspecting: boolean,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { pipetteId, tiprack, robotName, isMulti } = props
-  const [isConfirmingTip, setIsConfirmingTip] = React.useState(false)
+  const { pipetteId, tiprack, robotName, isMulti, isInspecting } = props
   const tiprackDef = React.useMemo(
     () => getLatestLabwareDef(tiprack?.loadName),
     [tiprack]
@@ -64,14 +64,17 @@ export function TipPickUp(props: TipPickUpProps) {
     dispatch(jogRobotCalibrationCheck(robotName, pipetteId, vector))
   }
 
-  function proceed() {
+  function pickUpTip() {
     dispatch(pickUpTipRobotCalibrationCheck(robotName, pipetteId))
-    dispatch(shimCurrentStep(robotName, CHECK_STEP_INSPECTING_TIP))
   }
 
-  const reset = () => {
-    setIsConfirmingTip(false)
-    console.debug('TODO: reset tip pick to try again')
+  function confirmTipPickedUp() {
+    dispatch(confirmTipRobotCalibrationCheck(robotName, pipetteId))
+  }
+
+  function rejectPickUpAttempt() {
+    console.log('TODO: implement domain layer of invalidateTip')
+    // dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
   }
 
   const demoAsset = isMulti ? multiDemoAsset : singleDemoAsset
@@ -85,13 +88,13 @@ export function TipPickUp(props: TipPickUpProps) {
         </h3>
       </div>
 
-      {isConfirmingTip ? (
+      {isInspecting ? (
         <>
           <p>{CONFIRM_TIP_BODY}</p>
-          <PrimaryButton onClick={reset}>
+          <PrimaryButton onClick={rejectPickUpAttempt}>
             {CONFIRM_TIP_NO_BUTTON_TEXT}
           </PrimaryButton>
-          <PrimaryButton onClick={proceed}>
+          <PrimaryButton onClick={confirmTipPickedUp}>
             {CONFIRM_TIP_YES_BUTTON_TEXT}
           </PrimaryButton>
         </>
@@ -112,7 +115,7 @@ export function TipPickUp(props: TipPickUpProps) {
           </div>
           <div className={styles.button_row}>
             <PrimaryButton
-              onClick={() => setIsConfirmingTip(true)}
+              onClick={pickUpTip}
               className={styles.pick_up_tip_button}
             >
               {TIP_PICK_UP_BUTTON_TEXT}

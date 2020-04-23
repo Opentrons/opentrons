@@ -93,7 +93,7 @@ export const preparePipetteRobotCalibrationCheck = (
 export const jogRobotCalibrationCheck = (
   robotName: string,
   pipetteId: string,
-  vector: JogVector
+  vector: Types.JogVector
 ): Types.RobotCalibrationCheckJogAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_JOG,
   payload: { robotName, pipetteId, vector },

@@ -60,7 +60,7 @@ export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
 export const CHECK_STEP_PREPARING_PIPETTE: 'preparingPipette' =
   'preparingPipette'
-export const CHECK_STEP_INSPECTING_TIP: 'pickingUpTip' = 'pickingUpTip'
+export const CHECK_STEP_INSPECTING_TIP: 'inspectingTip' = 'inspectingTip'
 export const CHECK_STEP_CHECKING_POINT_ONE: 'checkingPointOne' =
   'checkingPointOne'
 export const CHECK_STEP_CHECKING_POINT_TWO: 'checkingPointTwo' =

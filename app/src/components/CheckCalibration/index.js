@@ -98,6 +98,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       modalContentsClassName = styles.page_content_dark
       break
     }
+    case CHECK_STEP_INSPECTING_TIP:
     case CHECK_STEP_PREPARING_PIPETTE: {
       stepContents =
         activeInstrumentId && activeLabware ? (
@@ -106,11 +107,11 @@ export function CheckCalibration(props: CheckCalibrationProps) {
             robotName={robotName}
             pipetteId={activeInstrumentId}
             isMulti={isActiveInstrumentMultiChannel}
+            isInspecting={CHECK_STEP_INSPECTING_TIP === currentStep}
           />
         ) : null
       break
     }
-    case CHECK_STEP_INSPECTING_TIP:
     case CHECK_STEP_CHECKING_POINT_ONE:
     case CHECK_STEP_CHECKING_POINT_TWO:
     case CHECK_STEP_CHECKING_POINT_THREE:
