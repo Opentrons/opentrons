@@ -65,7 +65,6 @@ async def load_labware(request: web.Request, session) -> web.Response:
     return web.json_response(status=200)
 
 
-#  shouldn't need locations
 async def prepare_pipette(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
