@@ -116,7 +116,7 @@ stages:
     response:
       status_code: 200
       json:
-        message: "Options 'labware_calibration, boot_scripts, tip_probe' were reset"
+        message: !re_match "(?=.*?(labware_calibration))(?=.*?(tip_probe))(?=.*?(boot_scripts))"
 ---
 test_name: POST Reset non existant option
 marks:

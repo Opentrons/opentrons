@@ -76,6 +76,7 @@ $(wheel_pattern): setup.py $(ot_sources)
 wheel: $(wheel_file)
 
 .PHONY: test
+test: export PIPENV_DOTENV_LOCATION=test.env
 test:
 	$(pytest) $(tests) $(test_opts)
 

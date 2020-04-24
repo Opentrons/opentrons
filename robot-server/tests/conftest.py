@@ -38,7 +38,7 @@ def run_server():
     thread.start()
     # TODO find a better way to know when we're ready
     import time
-    time.sleep(0.1)
+    time.sleep(.2)
     yield thread
     thread.terminate()
     thread.join()

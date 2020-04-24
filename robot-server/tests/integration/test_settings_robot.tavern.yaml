@@ -63,8 +63,7 @@ stages:
             - 0.0
             - 0.0
         serial_speed: !anyint
-        tip_length:
-          Pipette: !anyfloat
+        tip_length: !anydict
         default_current:
           A: !anyfloat
           B: !anyfloat
@@ -104,4 +103,3 @@ stages:
           maxTravel: 30
           stepsPerMM: 768
         z_retract_distance: 2
-
