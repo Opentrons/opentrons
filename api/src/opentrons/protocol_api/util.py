@@ -69,8 +69,8 @@ def determine_edge_path(
     right_pip_criteria = mount is r_mount and where in l_col
     left_pip_criteria = mount is l_mount and where in r_col
 
-    next_to_mod = deck.check_labware_next_to_module(mount, labware)
-    if where.parent.parent in ['3', '6', '9'] and left_pip_criteria:
+    next_to_mod = deck.is_edge_move_unsafe(mount, labware)
+    if labware.parent in ['3', '6', '9'] and left_pip_criteria:
         return left_path
     elif left_pip_criteria and next_to_mod:
         return left_path
@@ -96,9 +96,9 @@ def build_edges(
     if version < APIVersion(2, 4):
         edge_list.center = None
         # Add the center value before switching axes
-        return list(filter(None, astuple(edge_list)))
+        return [edge for edge in astuple(edge_list) if edge]
     new_edges = determine_edge_path(where, mount, edge_list, deck)
-    return list(filter(None, astuple(new_edges)))
+    return [edge for edge in astuple(new_edges) if edge]
 
 
 class FlowRates:
