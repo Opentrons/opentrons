@@ -6,7 +6,8 @@ from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
 from opentrons.hardware_control.types import CriticalPoint
 from .util import (
-    FlowRates, PlungerSpeeds, Clearances, clamp_value, requires_version)
+    FlowRates, PlungerSpeeds, Clearances,
+    clamp_value, requires_version, build_edges)
 from opentrons.protocols.types import APIVersion
 from .labware import (
     filter_tipracks_to_start, Labware, OutOfTipsError, quirks_from_any_parent,
@@ -469,20 +470,6 @@ class InstrumentContext(CommandPublisher):
         if not self.hw_pipette['has_tip']:
             raise hc.NoTipAttachedError('Pipette has no tip to touch_tip()')
 
-        def _build_edges(where: Well, offset: float) -> List[types.Point]:
-            # Determine the touch_tip edges/points
-            offset_pt = types.Point(0, 0, offset)
-            return [
-                # right edge
-                where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-                # left edge
-                where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-                # back edge
-                where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-                # front edge
-                where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
-            ]
-
         checked_speed = self._determine_speed(speed)
 
         # If location is a valid well, move to the well first
@@ -505,7 +492,7 @@ class InstrumentContext(CommandPublisher):
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
 
-        for edge in _build_edges(location, v_offset):
+        for edge in build_edges(location, v_offset, self._api_version, radius):
             self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
         return self
 

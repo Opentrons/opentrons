@@ -2,13 +2,15 @@
 from collections import UserDict
 import functools
 import logging
-from typing import Any, Callable, Optional, TYPE_CHECKING, Union
+from typing import Any, Callable, Optional, TYPE_CHECKING, Union, List
 
+from opentrons import types as top_types
 from opentrons.protocols.types import APIVersion
 from opentrons.hardware_control import (types, SynchronousAdapter, API,
                                         HardwareAPILike, ThreadManager)
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
+    from opentrons.protocol_api.labware import Well
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
 
 
@@ -29,6 +31,28 @@ def _assert_gzero(val: Any, message: str) -> float:
         return new_val
     except (TypeError, ValueError, AssertionError):
         raise AssertionError(message)
+
+
+def build_edges(
+        where: 'Well', offset: float,
+        version: APIVersion, radius: float = 1.0) -> List[top_types.Point]:
+    # Determine the touch_tip edges/points
+    offset_pt = top_types.Point(0, 0, offset)
+    edge_list = [
+        # right edge
+        where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+        # left edge
+        where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+        # back edge
+        where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
+        # front edge
+        where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
+        ]
+    if version >= APIVersion(2, 4):
+        center_value = where._from_center_cartesian(x=0, y=0, z=1) + offset_pt
+        # Add the center value before switching axes
+        edge_list.insert(2, center_value)
+    return edge_list
 
 
 class FlowRates:

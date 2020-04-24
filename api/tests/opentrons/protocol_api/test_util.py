@@ -1,6 +1,10 @@
 import pytest
 
-from opentrons.protocol_api.util import HardwareManager, AxisMaxSpeeds
+from opentrons.types import Point, Location
+from opentrons.protocols.types import APIVersion
+from opentrons.protocol_api.labware import Labware, get_labware_definition
+from opentrons.protocol_api.util import (
+    HardwareManager, AxisMaxSpeeds, build_edges)
 from opentrons.hardware_control import API, adapters, types, ThreadManager
 
 
@@ -74,3 +78,27 @@ def test_max_speeds_userdict():
 
     defaults['x'] = None
     assert 'x' not in defaults
+
+
+def test_build_edges():
+    lw_def = get_labware_definition('corning_96_wellplate_360ul_flat')
+    test_lw = Labware(lw_def, Location(Point(0, 0, 0), None))
+    off = Point(0, 0, 1.0)
+    old_correct_edges = [
+        test_lw['A1']._from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+    ]
+    res = build_edges(test_lw['A1'], 1.0, APIVersion(2, 2))
+    assert res == old_correct_edges
+
+    new_correct_edges = [
+        test_lw['A1']._from_center_cartesian(x=1.0, y=0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=-1.0, y=0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=0, y=0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=0, y=1.0, z=1) + off,
+        test_lw['A1']._from_center_cartesian(x=0, y=-1.0, z=1) + off,
+    ]
+    res2 = build_edges(test_lw['A1'], 1.0, APIVersion(2, 4))
+    assert res2 == new_correct_edges

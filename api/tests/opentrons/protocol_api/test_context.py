@@ -533,6 +533,36 @@ def test_mix(loop, monkeypatch):
 
 
 def test_touch_tip_default_args(loop, monkeypatch):
+    ctx = papi.ProtocolContext(loop, api_version=APIVersion(2, 3))
+    ctx.home()
+    lw = ctx.load_labware(
+        'opentrons_24_tuberack_eppendorf_1.5ml_safelock_snapcap', 1)
+    tiprack = ctx.load_labware('opentrons_96_tiprack_300ul', 3)
+    instr = ctx.load_instrument('p300_single', Mount.RIGHT,
+                                tip_racks=[tiprack])
+
+    instr.pick_up_tip()
+    total_hw_moves = []
+
+    async def fake_hw_move(self, mount, abs_position, speed=None,
+                           critical_point=None, max_speeds=None):
+        nonlocal total_hw_moves
+        total_hw_moves.append((abs_position, speed))
+
+    instr.aspirate(10, lw.wells()[0])
+    monkeypatch.setattr(API, 'move_to', fake_hw_move)
+    instr.touch_tip()
+    z_offset = Point(0, 0, 1)   # default z offset of 1mm
+    speed = 60                  # default speed
+    edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
+    for i in range(1, 5):
+        assert total_hw_moves[i] == (edges[i - 1], speed)
+
+
+def test_touch_tip_new_default_args(loop, monkeypatch):
     ctx = papi.ProtocolContext(loop)
     ctx.home()
     lw = ctx.load_labware(
@@ -556,6 +586,7 @@ def test_touch_tip_default_args(loop, monkeypatch):
     speed = 60                  # default speed
     edges = [lw.wells()[0]._from_center_cartesian(1, 0, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(-1, 0, 1) - z_offset,
+             lw.wells()[0]._from_center_cartesian(0, 0, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, 1, 1) - z_offset,
              lw.wells()[0]._from_center_cartesian(0, -1, 1) - z_offset]
     for i in range(1, 5):
