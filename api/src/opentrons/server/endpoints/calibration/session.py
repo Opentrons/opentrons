@@ -184,8 +184,8 @@ class CalibrationSession:
         else:
             raise KeyError("No available slots remaining")
 
-    def _get_mount(self, pipette: UUID) -> Mount:
-        return self._relate_mount[pipette]['mount']
+    def _get_mount(self, pipette_id: UUID) -> Mount:
+        return self._relate_mount[pipette_id]['mount']
 
     async def _jog(self, mount: Mount, vector: Point):
         """
@@ -194,8 +194,8 @@ class CalibrationSession:
         """
         await self.hardware.move_rel(mount, vector)
 
-    def _has_tip(self, pipette: UUID) -> bool:
-        pip = self.get_pipette(self._get_mount(pipette))
+    def _has_tip(self, pipette_id: UUID) -> bool:
+        pip = self.get_pipette(self._get_mount(pipette_id))
         return bool(pip['has_tip'])
 
     async def _pick_up_tip(self, mount: Mount, tiprack_id: UUID):
@@ -339,7 +339,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
         "from_state": CalibrationCheckState.inspectingTip,
         "to_state": CalibrationCheckState.checkingPointOne,
-        "before": "_check_point_one"
+        "before": "_move_to_check_point_one"
     },
     {
         "trigger": CalibrationCheckTrigger.invalidate_tip,
@@ -357,7 +357,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.confirm_step,
         "from_state": CalibrationCheckState.checkingPointOne,
         "to_state": CalibrationCheckState.checkingPointTwo,
-        "before": "_check_point_two",
+        "before": "_move_to_check_point_two",
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -369,7 +369,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.confirm_step,
         "from_state": CalibrationCheckState.checkingPointTwo,
         "to_state": CalibrationCheckState.checkingPointThree,
-        "before": "_check_point_three",
+        "before": "_move_to_check_point_three",
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -381,7 +381,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.confirm_step,
         "from_state": CalibrationCheckState.checkingPointThree,
         "to_state": CalibrationCheckState.checkingHeight,
-        "before": "_check_height"
+        "before": "_move_to_check_height"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -442,14 +442,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             full_dict[data.id] = build_dict
         self._moves.preparingPipette = full_dict
 
-    def _update_tiprack_offset(self, pipette: UUID, old_pos: Point,
+    def _update_tiprack_offset(self, pipette_id: UUID, old_pos: Point,
                                new_pos: Point):
-        tiprack_id = self._relate_mount[pipette]['tiprack_id']
+        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
         if self._moves.preparingPipette:
             old_offset = \
-                self._moves.preparingPipette[tiprack_id][pipette].offset
+                self._moves.preparingPipette[tiprack_id][pipette_id].offset
             updated_offset = (new_pos - old_pos) + old_offset
-            self._moves.preparingPipette[tiprack_id][pipette].offset =\
+            self._moves.preparingPipette[tiprack_id][pipette_id].offset =\
                 updated_offset
 
     async def delete_session(self):
@@ -461,22 +461,22 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    async def _pick_up_pipette_tip(self, pipette: UUID, **kwargs):
+    async def _pick_up_pipette_tip(self, pipette_id: UUID, **kwargs):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
         original position.
         """
-        if self._has_tip(pipette):
+        if self._has_tip(pipette_id):
             raise TipAttachError()
-        tiprack_id = self._relate_mount[pipette]['tiprack_id']
-        mount = self._get_mount(pipette)
+        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+        mount = self._get_mount(pipette_id)
         await self._pick_up_tip(mount, tiprack_id)
 
-    async def _invalidate_tip(self, pipette: UUID, **kwargs):
-        if not self._has_tip(pipette):
+    async def _invalidate_tip(self, pipette_id: UUID, **kwargs):
+        if not self._has_tip(pipette_id):
             raise TipAttachError()
-        await self.hardware.remove_tip(self._get_mount(pipette))
+        await self.hardware.remove_tip(self._get_mount(pipette_id))
 
     async def _return_tip_for_pipette(self, pipette_id: UUID, **kwargs):
         if not self._has_tip(pipette_id):
@@ -539,22 +539,22 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         updated_pt = pt + offset
         await self._move(pipette_id, Location(updated_pt, well))
 
-    async def _check_point_one(self, pipette_id: UUID):
+    async def _move_to_check_point_one(self, pipette_id: UUID):
         await self._move(pipette_id,
                          Location(self._moves.checkingPointOne.position,
                                   None))
 
-    async def _check_point_two(self, pipette_id: UUID):
+    async def _move_to_check_point_two(self, pipette_id: UUID):
         await self._move(pipette_id,
                          Location(self._moves.checkingPointTwo.position,
                                   None))
 
-    async def _check_point_three(self, pipette_id: UUID):
+    async def _move_to_check_point_three(self, pipette_id: UUID):
         await self._move(pipette_id,
                          Location(self._moves.checkingPointThree.position,
                                   None))
 
-    async def _check_height(self, pipette_id: UUID):
+    async def _move_to_check_height(self, pipette_id: UUID):
         await self._move(pipette_id,
                          Location(self._moves.checkingHeight.position,
                                   None))
@@ -574,9 +574,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
 
-    async def _jog_pipette(self, pipette: UUID, vector: Point, **kwargs):
-        mount = self._get_mount(pipette)
+    async def _jog_pipette(self, pipette_id: UUID, vector: Point, **kwargs):
+        mount = self._get_mount(pipette_id)
         old_pos = await self.hardware.gantry_position(mount)
         await super(self.__class__, self)._jog(mount, vector)
         new_pos = await self.hardware.gantry_position(mount)
-        self._update_tiprack_offset(pipette, old_pos, new_pos)
+        self._update_tiprack_offset(pipette_id, old_pos, new_pos)

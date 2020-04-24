@@ -76,8 +76,6 @@ class TransitionKeys(enum.Enum):
 
 
 class CallbackKeys(enum.Enum):
-    on_enter = enum.auto()
-    on_exit = enum.auto()
     before = enum.auto()
     after = enum.auto()
     condition = enum.auto()
