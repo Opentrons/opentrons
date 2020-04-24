@@ -24,19 +24,29 @@ const logger = createLogger('usb-devices')
 export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
 ): UsbDeviceMonitor {
+  const { onDeviceAdd, onDeviceRemove } = options
   usbDetection.startMonitoring()
 
-  if (typeof options.onDeviceAdd === 'function') {
-    usbDetection.on('add', options.onDeviceAdd)
+  if (typeof onDeviceAdd === 'function') {
+    usbDetection.on('add', onDeviceAdd)
   }
 
-  if (typeof options.onDeviceRemove === 'function') {
-    usbDetection.on('remove', options.onDeviceRemove)
+  if (typeof onDeviceRemove === 'function') {
+    usbDetection.on('remove', onDeviceRemove)
   }
 
   return {
     getAllDevices: () => usbDetection.find(),
-    stop: () => usbDetection.stopMonitoring(),
+    stop: () => {
+      if (typeof onDeviceAdd === 'function') {
+        usbDetection.off('add', onDeviceAdd)
+      }
+      if (typeof onDeviceRemove === 'function') {
+        usbDetection.off('remove', onDeviceRemove)
+      }
+
+      usbDetection.stopMonitoring()
+    },
   }
 }
 

@@ -40,6 +40,8 @@ declare module 'usb-detection' {
 
   declare function on(event: string, callback: (device: Device) => mixed): void
 
+  declare function off(event: string, callback: (device: Device) => mixed): void
+
   declare function emit(event: string, Device): void
 
   declare var version: number
@@ -47,6 +49,7 @@ declare module 'usb-detection' {
   declare export type Detector = {|
     find: typeof find,
     on: typeof on,
+    off: typeof off,
     emit: typeof emit,
     startMonitoring: typeof startMonitoring,
     stopMonitoring: typeof stopMonitoring,
