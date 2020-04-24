@@ -297,6 +297,33 @@ class Deck(UserDict):
             return False
         return key_int in self.data
 
+    def check_labware_next_to_module(
+            self, mount: types.Mount, target: 'Labware') -> bool:
+        """
+        Check if slot next to target labware contains a slot. Only relevant
+        depending on the mount you are using and the column you are moving
+        to inside of the labware.
+        """
+        deck_groups = [
+            ['1', '2', '3'], ['4', '5', '6'],
+            ['7', '8', '9'], ['11', '10', '12']]
+        # We should check the slot either to the left or the right of
+        # the target slot depending on the pipette mount.
+        add_to_index = 1 if mount is types.Mount.LEFT else -1
+        for deck_set in deck_groups:
+            if target.parent in deck_set:
+                curr_idx = deck_set.index(target.parent)
+                search_idx = curr_idx + add_to_index
+                if search_idx < 0 or search_idx >= len(deck_set):
+                    return False
+                other_labware = self[deck_set[search_idx]]
+                if other_labware:
+                    mod_in_spot = isinstance(other_labware, ModuleGeometry)
+                    return mod_in_spot
+                else:
+                    return False
+        return False
+
     def position_for(self, key: types.DeckLocation) -> types.Location:
         key_int = self._check_name(key)
         return types.Location(self._positions[key_int], str(key))

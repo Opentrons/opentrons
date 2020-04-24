@@ -2,6 +2,7 @@
 from collections import UserDict
 import functools
 import logging
+from dataclasses import dataclass, field, astuple
 from typing import Any, Callable, Optional, TYPE_CHECKING, Union, List
 
 from opentrons import types as top_types
@@ -11,6 +12,7 @@ from opentrons.hardware_control import (types, SynchronousAdapter, API,
 if TYPE_CHECKING:
     from .contexts import InstrumentContext
     from opentrons.protocol_api.labware import Well
+    from opentrons.protocol_api.geometry import Deck
     from opentrons.hardware_control.dev_types import HasLoop # noqa (F501)
 
 
@@ -33,26 +35,70 @@ def _assert_gzero(val: Any, message: str) -> float:
         raise AssertionError(message)
 
 
+@dataclass
+class EdgeList:
+    right: Optional[top_types.Point] = field(default_factory=top_types.Point)
+    left: Optional[top_types.Point] = field(default_factory=top_types.Point)
+    center: Optional[top_types.Point] = field(default_factory=top_types.Point)
+    up: top_types.Point = field(default_factory=top_types.Point)
+    down: top_types.Point = field(default_factory=top_types.Point)
+
+
+def determine_edge_path(
+        where: 'Well', mount: top_types.Mount,
+        default_edges: EdgeList, deck: 'Deck') -> EdgeList:
+    left_path = EdgeList(
+        left=default_edges.left,
+        right=None,
+        center=default_edges.center,
+        up=default_edges.up,
+        down=default_edges.down)
+    right_path = EdgeList(
+        left=None,
+        right=default_edges.right,
+        center=default_edges.center,
+        up=default_edges.up,
+        down=default_edges.down
+    )
+    labware = where.parent
+
+    r_mount = top_types.Mount.RIGHT
+    l_mount = top_types.Mount.LEFT
+    l_col = labware.columns()[0]
+    r_col = labware.columns()[-1]
+    right_pip_criteria = mount is r_mount and where in l_col
+    left_pip_criteria = mount is l_mount and where in r_col
+
+    next_to_mod = deck.check_labware_next_to_module(mount, labware)
+    if where.parent.parent in ['3', '6', '9'] and left_pip_criteria:
+        return left_path
+    elif left_pip_criteria and next_to_mod:
+        return left_path
+    elif right_pip_criteria and next_to_mod:
+        return right_path
+    return default_edges
+
+
 def build_edges(
         where: 'Well', offset: float,
-        version: APIVersion, radius: float = 1.0) -> List[top_types.Point]:
+        version: APIVersion, mount: top_types.Mount, deck: 'Deck',
+        radius: float = 1.0) -> List[top_types.Point]:
     # Determine the touch_tip edges/points
     offset_pt = top_types.Point(0, 0, offset)
-    edge_list = [
-        # right edge
-        where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
-        # left edge
-        where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
-        # back edge
-        where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
-        # front edge
-        where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
-        ]
-    if version >= APIVersion(2, 4):
-        center_value = where._from_center_cartesian(x=0, y=0, z=1) + offset_pt
+    edge_list = EdgeList(
+        right=where._from_center_cartesian(x=radius, y=0, z=1) + offset_pt,
+        left=where._from_center_cartesian(x=-radius, y=0, z=1) + offset_pt,
+        center=where._from_center_cartesian(x=0, y=0, z=1) + offset_pt,
+        up=where._from_center_cartesian(x=0, y=radius, z=1) + offset_pt,
+        down=where._from_center_cartesian(x=0, y=-radius, z=1) + offset_pt
+    )
+
+    if version < APIVersion(2, 4):
+        edge_list.center = None
         # Add the center value before switching axes
-        edge_list.insert(2, center_value)
-    return edge_list
+        return list(filter(None, astuple(edge_list)))
+    new_edges = determine_edge_path(where, mount, edge_list, deck)
+    return list(filter(None, astuple(new_edges)))
 
 
 class FlowRates:
