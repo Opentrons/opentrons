@@ -59,7 +59,6 @@ export function CheckHeight(props: CheckHeightProps) {
     [mount, isMulti]
   )
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    console.table({ axis, direction, step })
     dispatch(
       jogRobotCalibrationCheck(
         robotName,

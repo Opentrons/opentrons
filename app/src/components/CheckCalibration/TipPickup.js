@@ -23,8 +23,10 @@ import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import multiDemoAsset from './videos/A1-Multi-Channel-SEQ.gif'
-import singleDemoAsset from './videos/A1-Single-Channel-SEQ.gif'
+import multiA1DemoAsset from './videos/A1-Multi-Channel-SEQ.webm'
+import singleA1DemoAsset from './videos/A1-Single-Channel-SEQ.webm'
+import multiB1DemoAsset from './videos/B1-Multi-Channel-SEQ.webm'
+import singleB1DemoAsset from './videos/B1-Single-Channel-SEQ.webm'
 import { formatJogVector } from './utils'
 
 const TIP_PICK_UP_HEADER = 'Position pipette over '
@@ -39,6 +41,16 @@ const POSITION_AND = 'position and'
 const FLUSH = 'flush'
 const WITH_TOP_OF_TIP = 'with the top of the tip.'
 
+const ASSET_MAP = {
+  A1: {
+    multi: multiA1DemoAsset,
+    single: singleA1DemoAsset,
+  },
+  B1: {
+    multi: multiB1DemoAsset,
+    single: singleB1DemoAsset,
+  },
+}
 type TipPickUpProps = {|
   pipetteId: string,
   isMulti: boolean,
@@ -76,7 +88,10 @@ export function TipPickUp(props: TipPickUpProps) {
     dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
   }
 
-  const demoAsset = isMulti ? multiDemoAsset : singleDemoAsset
+  // TODO: BC: once both pipettes are usable in flow,
+  // pull this well name from session data and receive as prop
+  const tiprackWellName = 'A1'
+  const demoAsset = ASSET_MAP[tiprackWellName][isMulti ? 'multi' : 'single']
 
   return (
     <>
@@ -115,7 +130,17 @@ export function TipPickUp(props: TipPickUpProps) {
               <b>&nbsp;{FLUSH}&nbsp;</b>
               {WITH_TOP_OF_TIP}
             </p>
-            <img src={demoAsset} className={styles.tip_pick_up_demo_image} />
+            <div className={styles.step_check_video_wrapper}>
+              <video
+                key={demoAsset}
+                className={styles.step_check_video}
+                autoPlay={true}
+                loop={true}
+                controls={false}
+              >
+                <source src={demoAsset} />
+              </video>
+            </div>
           </div>
           <div className={styles.tip_pick_up_controls_wrapper}>
             <JogControls jog={jog} />

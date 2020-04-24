@@ -202,10 +202,6 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   margin: 0 1rem;
 }
 
-.tip_pick_up_demo_image {
-  margin-top: 1rem;
-}
-
 .pick_up_tip_button {
   margin: 0 5rem;
 }
