@@ -1,18 +1,11 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, type Mount } from '@opentrons/components'
-import {
-  getLabwareDisplayName,
-  getPipetteModelSpecs,
-} from '@opentrons/shared-data'
-import findKey from 'lodash/find'
+import { PrimaryButton } from '@opentrons/components'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
-import type {
-  RobotCalibrationCheckInstrument,
-  RobotCalibrationCheckLabware,
-} from '../../calibration/api-types'
+import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import {
   pickUpTipRobotCalibrationCheck,
   jogRobotCalibrationCheck,

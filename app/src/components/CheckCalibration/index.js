@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ModalPage, PrimaryButton, Icon } from '@opentrons/components'
+import { ModalPage, Icon } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import {
@@ -20,7 +20,6 @@ import {
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
 } from '../../calibration'
-import { RIGHT } from '../../pipettes'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
@@ -29,8 +28,6 @@ import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
-
-const AXIS_BY_MOUNT = { left: 'z', right: 'a' }
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
@@ -67,7 +64,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       instruments &&
       getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
     return spec ? spec.channels > 1 : false
-  }, [activeInstrumentId])
+  }, [activeInstrumentId, instruments])
   // TODO: BC: once api returns real values for instrument.mount_axis
   // infer active mount from activeInstrument
   const activeMount = 'left'

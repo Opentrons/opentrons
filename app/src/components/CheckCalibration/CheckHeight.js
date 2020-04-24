@@ -7,9 +7,6 @@ import type { Dispatch } from '../../types'
 import {
   jogRobotCalibrationCheck,
   confirmStepRobotCalibrationCheck,
-  CHECK_STEP_CHECKING_POINT_ONE,
-  CHECK_STEP_CHECKING_POINT_TWO,
-  CHECK_STEP_CHECKING_POINT_THREE,
 } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'

@@ -22,8 +22,8 @@ import typeof {
   COMPLETE_ROBOT_CALIBRATION_CHECK,
 } from './constants'
 import type { RobotCalibrationCheckSessionData } from './api-types'
-import {} from './constants'
 
+export type JogVector = Array<number>
 export type CreateRobotCalibrationCheckSessionAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
@@ -171,5 +171,3 @@ export type CalibrationState = $Shape<
     [robotName: string]: void | PerRobotCalibrationState,
   |}>
 >
-
-export type JogVector = Array<number>

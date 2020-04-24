@@ -36,7 +36,11 @@ export type JogControlsProps = {|
 
 type JogControlsState = {| step: JogStep |}
 
-const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
+const JOG_BUTTON_NAMES_BY_AXIS: { [JogAxis]: Array<string> } = {
+  x: ['left', 'right'],
+  y: ['back', 'forward'],
+  z: ['up', 'down'],
+}
 
 const JOG_ICONS_BY_NAME = {
   left: 'ot-arrow-left',
@@ -125,11 +129,7 @@ export class JogControls extends React.Component<
         { key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down },
       ],
     }
-    const buttonNamesForAxes: { [JogAxis]: Array<string> } = {
-      x: ['left', 'right'],
-      y: ['back', 'forward'],
-      z: ['up', 'down'],
-    }
+
     return (
       <HandleKeypress
         preventDefault
@@ -142,7 +142,7 @@ export class JogControls extends React.Component<
         ]}
       >
         {axes
-          .map(a => buttonNamesForAxes[a])
+          .map(a => JOG_BUTTON_NAMES_BY_AXIS[a])
           .flat()
           .map(name => (
             <JogButton
