@@ -1,7 +1,9 @@
-# Opentrons App Changes from 3.16.1 to 3.17.0 Beta
+# Opentrons App Changes from 3.16.1 to 3.17.0
 
 For more details about this release, please see the full [technical change
 log][changelog]
+
+Note: This release is the exact same as the 3.17.0 beta.
 
 ## Bug Fixes
 - Fix an issue with Python Protocol API V1 protocols that did not supply a
