@@ -119,14 +119,13 @@ const getDirtyFields = (
   }
   if (!isNewStep) {
     dirtyFields = Object.keys(formData)
-  } else if (formData.stepType) {
+  } else {
     const data = formData
     // new step, but may have auto-populated fields.
     // "Dirty" any fields that differ from default new form values
     const defaultFormData = getDefaultsForStepType(formData.stepType)
     dirtyFields = Object.keys(defaultFormData).reduce(
       (acc, fieldName: StepFieldName) => {
-        // formData is no longer a Maybe type b/c of the `if` above, but flow forgets
         const currentValue = data[fieldName]
         const initialValue = defaultFormData[fieldName]
 
@@ -283,4 +282,7 @@ const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
 export const StepEditForm = connect<StepEditFormManagerProps, {||}, _, _, _, _>(
   mapStateToProps,
   () => ({}) // no `dispatch` prop
-)(StepEditFormManager)
+)((props: StepEditFormManagerProps) => (
+  // key by ID so manager state doesn't persist across different forms
+  <StepEditFormManager key={props.formData?.id ?? 'empty'} {...props} />
+))

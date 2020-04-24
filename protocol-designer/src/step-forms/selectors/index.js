@@ -400,7 +400,7 @@ function _getHydratedForm(
   // It's confusing that pipette is an ID string before this,
   // but a PipetteEntity object after this.
   // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'hydrated' key,
+  // Consider nesting all additional fields under 'meta' key,
   // following what we're doing with 'module'.
   // See #3161
   hydratedForm.meta = {}
