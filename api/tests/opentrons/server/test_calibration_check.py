@@ -2,7 +2,6 @@ import pytest
 from uuid import UUID
 
 from opentrons import types
-from opentrons.server.endpoints.calibration.util import CalibrationCheckState
 
 
 @pytest.fixture
@@ -23,14 +22,16 @@ async def test_load_labware(async_client, async_server, test_setup):
     _, sess = test_setup
 
     resp = await async_client.post('/calibration/check/session/loadLabware')
-    text = await resp.json()
+    assert resp.status == 200
+    # text = await resp.json()
 
-    # check that URL is for the move endpoint
-    assert text['nextSteps']['links']['moveToTipRack']['url'] ==\
-        '/calibration/check/session/move'
+    # # check that URL is for the move endpoint
+    # assert text['nextSteps']['links']['moveToTipRack']['url'] ==\
+    #     '/calibration/check/session/move'
+
+    # assert text['nextSteps']['links']['moveToTipRack']['params']
 
     # check that params exist
-    assert text['nextSteps']['links']['moveToTipRack']['params']
     assert sess._deck['8']
     assert sess._deck['8'].name == 'opentrons_96_tiprack_10ul'
     assert sess._deck['6']
@@ -43,37 +44,40 @@ async def test_move_to_position(async_client, async_server, test_setup):
     resp = await async_client.post('/calibration/check/session/loadLabware')
     status = await resp.json()
 
-    id = list(status['instruments'].keys())[0]
+    pip_id = list(status['instruments'].keys())[0]
 
     mount = types.Mount.LEFT
-    tiprack_id = status['instruments'][id]['tiprack_id']
+    tiprack_id = status['instruments'][pip_id]['tiprack_id']
     # temporarily convert back to UUID to access well location
     uuid_tiprack = UUID(tiprack_id)
-    uuid_pipette = UUID(id)
+    uuid_pipette = UUID(pip_id)
 
-    well = sess._moves.moveToTipRack[uuid_tiprack][uuid_pipette]['well']
+    well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette].well
 
-    pos_dict = {'locationId': tiprack_id, 'offset': [0, 1, 0]}
     resp = await async_client.post(
-        '/calibration/check/session/move',
-        json={'pipetteId': id, 'location': pos_dict})
+        '/calibration/check/session/preparePipette',
+        json={'pipetteId': pip_id})
+
+    assert resp.status == 200
 
     curr_pos = await sess.hardware.gantry_position(mount)
-    assert curr_pos == (well.top()[0] + types.Point(0, 1, 0))
+    assert curr_pos == (well.top()[0] + types.Point(0, 0, 10))
 
 
 async def test_jog_pipette(async_client, async_server, test_setup):
     status, sess = test_setup
 
-    sess.state_machine.update_state(CalibrationCheckState.jog)
+    sess._set_current_state('preparingPipette')
 
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     mount = types.Mount.LEFT
 
     old_pos = await sess.hardware.gantry_position(mount)
-    await async_client.post(
+    resp = await async_client.post(
         '/calibration/check/session/jog',
-        json={'pipetteId': id, 'vector': [0, -1, 0]})
+        json={'pipetteId': pipette_id, 'vector': [0, -1, 0]})
+
+    assert resp.status == 200
 
     new_pos = await sess.hardware.gantry_position(mount)
 
@@ -84,38 +88,40 @@ async def test_pickup_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
 
-    sess.state_machine.update_state(CalibrationCheckState.jog)
+    sess._set_current_state('preparingPipette')
 
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
+
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is True
-    assert text['instruments'][id]['tip_length'] > 0.0
+    assert resp.status == 200
+    assert text['instruments'][pipette_id]['has_tip'] is True
+    assert text['instruments'][pipette_id]['tip_length'] > 0.0
 
 
 async def test_invalidate_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
 
-    sess.state_machine.update_state(CalibrationCheckState.jog)
-    id = list(status['instruments'].keys())[0]
+    sess._set_current_state('preparingPipette')
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
         '/calibration/check/session/invalidateTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     assert resp.status == 409
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is True
+    assert text['instruments'][pipette_id]['has_tip'] is True
 
     resp = await async_client.post(
         '/calibration/check/session/invalidateTip',
-        json={'pipetteId': id})
+        json={'pipetteId': pipette_id})
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is False
+    assert text['instruments'][pipette_id]['has_tip'] is False
     assert resp.status == 200
 
 
@@ -123,24 +129,28 @@ async def test_drop_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
 
-    sess.state_machine.update_state(CalibrationCheckState.dropTip)
-    id = list(status['instruments'].keys())[0]
+    pipette_id = list(status['instruments'].keys())[0]
     resp = await async_client.post(
-        '/calibration/check/session/dropTip',
-        json={'pipetteId': id})
-    assert resp.status == 409
-
-    sess.state_machine.update_state(CalibrationCheckState.jog)
+        '/calibration/check/session/preparePipette',
+        json={'pipetteId': pipette_id})
+    assert resp.status == 200
     resp = await async_client.post(
         '/calibration/check/session/pickUpTip',
-        json={'pipetteId': id})
-    text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is True
-
-    sess.state_machine.update_state(CalibrationCheckState.dropTip)
+        json={'pipetteId': pipette_id})
+    assert resp.status == 200
     resp = await async_client.post(
-        '/calibration/check/session/dropTip',
-        json={'pipetteId': id})
+        '/calibration/check/session/confirmTip',
+        json={'pipetteId': pipette_id})
+    assert resp.status == 200
+
+    text = await resp.json()
+
+    assert text['instruments'][pipette_id]['has_tip'] is True
+
+    sess._set_current_state('checkingHeight')
+    resp = await async_client.post(
+        '/calibration/check/session/confirmStep',
+        json={'pipetteId': pipette_id})
     assert resp.status == 200
     text = await resp.json()
-    assert text['instruments'][id]['has_tip'] is False
+    assert text['instruments'][pipette_id]['has_tip'] is False
