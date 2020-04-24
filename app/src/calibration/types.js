@@ -1,7 +1,6 @@
 // @flow
 import type { RobotApiRequestMeta } from '../robot-api/types'
 import typeof {
-  TEMPORARY_SHIM_SET_CURRENT_STEP,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -25,11 +24,6 @@ import typeof {
 import type { RobotCalibrationCheckSessionData } from './api-types'
 import {} from './constants'
 
-export type TemporaryShimSetCurrentStepAction = {|
-  type: TEMPORARY_SHIM_SET_CURRENT_STEP,
-  payload: {| robotName: string, currentStep: string |},
-  meta: RobotApiRequestMeta,
-|}
 export type CreateRobotCalibrationCheckSessionAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},

@@ -7,16 +7,6 @@ import * as Types from './types'
 import type { RobotCalibrationCheckSessionData } from './api-types'
 import * as Constants from './constants'
 
-// TODO: BC REMOVE THIS SHIM AND ALL CALLS TO IT WITH FEATURE FLAG REMOVAL
-export const shimCurrentStep = (
-  robotName: string,
-  currentStep: string
-): Types.TemporaryShimSetCurrentStepAction => ({
-  type: Constants.TEMPORARY_SHIM_SET_CURRENT_STEP,
-  payload: { robotName, currentStep },
-  meta: {},
-})
-
 export const createRobotCalibrationCheckSession = (
   robotName: string
 ): Types.CreateRobotCalibrationCheckSessionAction => ({

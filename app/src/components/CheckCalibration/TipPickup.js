@@ -18,8 +18,6 @@ import {
   jogRobotCalibrationCheck,
   confirmTipRobotCalibrationCheck,
   invalidateTipRobotCalibrationCheck,
-  shimCurrentStep,
-  CHECK_STEP_INSPECTING_TIP,
 } from '../../calibration'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'

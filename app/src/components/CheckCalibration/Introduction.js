@@ -7,11 +7,7 @@ import type { Dispatch } from '../../types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 import { tiprackImages } from './tiprackImages'
-import {
-  loadLabwareRobotCalibrationCheck,
-  shimCurrentStep,
-  CHECK_STEP_LABWARE_LOADED,
-} from '../../calibration'
+import { loadLabwareRobotCalibrationCheck } from '../../calibration'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
@@ -43,7 +39,6 @@ export function Introduction(props: IntroductionProps) {
 
   function proceed() {
     dispatch(loadLabwareRobotCalibrationCheck(robotName))
-    dispatch(shimCurrentStep(robotName, CHECK_STEP_LABWARE_LOADED))
   }
 
   return (

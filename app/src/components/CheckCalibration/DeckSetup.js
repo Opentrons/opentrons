@@ -16,11 +16,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
-import {
-  preparePipetteRobotCalibrationCheck,
-  shimCurrentStep,
-  CHECK_STEP_PREPARING_PIPETTE,
-} from '../../calibration'
+import { preparePipetteRobotCalibrationCheck } from '../../calibration'
 import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
@@ -45,7 +41,6 @@ export function DeckSetup(props: DeckSetupProps) {
         preparePipetteRobotCalibrationCheck(robotName, activeInstrumentId)
       )
     }
-    dispatch(shimCurrentStep(robotName, CHECK_STEP_PREPARING_PIPETTE))
   }
 
   return (
