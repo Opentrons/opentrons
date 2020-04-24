@@ -1,11 +1,6 @@
 // @flow
 import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
-import type {
-  FormData,
-  StepIdType,
-  StepFieldName,
-  StepType,
-} from '../form-types'
+import type { StepIdType, StepFieldName } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end

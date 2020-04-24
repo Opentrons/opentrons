@@ -1,5 +1,4 @@
 // @flow
-import assert from 'assert'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
@@ -16,7 +15,6 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-
 import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
@@ -117,8 +115,8 @@ export const WellSelectionModal = (props: WellSelectionModalProps) => {
   const dispatch = useDispatch()
 
   // selector data
-  const allWellContentsForSteps = useSelector(
-    wellContentsSelectors.getAllWellContentsForAllSteps
+  const allWellContentsForStep = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
   )
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
   const ingredNames = useSelector(selectors.getLiquidNamesById)
@@ -138,13 +136,6 @@ export const WellSelectionModal = (props: WellSelectionModalProps) => {
     initialSelectedPrimaryWells
   )
   const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
-
-  const stepId = formData?.id
-  if (stepId == null) {
-    assert(false, `WellSelectionModal got no unsavedForm`)
-    return null
-  }
-  const allWellContentsForStep = allWellContentsForSteps[stepId]
 
   // actions
   const saveWellSelection = (wells: WellGroup) =>
