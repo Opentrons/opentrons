@@ -14,6 +14,7 @@ import { PipetteDiagram } from '../PipetteDiagram'
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
 
 jest.mock('../../../../feature-flags/selectors')
+jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils.js')
 jest.mock('../TiprackDiagram')
 
