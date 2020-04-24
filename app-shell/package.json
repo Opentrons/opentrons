@@ -43,7 +43,7 @@
     "pump": "^3.0.0",
     "semver": "^5.5.0",
     "tempy": "^0.3.0",
-    "usb-detection": "^4.7.0",
+    "usb-detection": "^4.9.0",
     "uuid": "^3.2.1",
     "winston": "^3.1.0",
     "yargs-parser": "^10.0.0"

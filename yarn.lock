@@ -14776,10 +14776,10 @@ preact@^8.2.7:
   version "8.4.2"
   resolved "https://registry.yarnpkg.com/preact/-/preact-8.4.2.tgz#1263b974a17d1ea80b66590e41ef786ced5d6a23"
 
-prebuild-install@^5.1.0:
-  version "5.3.3"
-  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.3.tgz#ef4052baac60d465f5ba6bf003c9c1de79b9da8e"
-  integrity sha512-GV+nsUXuPW2p8Zy7SarF/2W/oiK8bFQgJcncoJ0d7kRpekEA0ftChjfEaF9/Y+QJEc/wFR7RAEa8lYByuUIe2g==
+prebuild-install@^5.3.0:
+  version "5.3.2"
+  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.2.tgz#6392e9541ac0b879ef0f22b3d65037417eb2035e"
+  integrity sha512-INDfXzTPnhT+WYQemqnAXlP7SvfiFMopMozSgXCZ+RDLb279gKfIuLk4o7PgEawLp3WrMgIYGBpkxpraROHsSA==
   dependencies:
     detect-libc "^1.0.3"
     expand-template "^2.0.3"
@@ -14797,10 +14797,10 @@ prebuild-install@^5.1.0:
     tunnel-agent "^0.6.0"
     which-pm-runs "^1.0.0"
 
-prebuild-install@^5.3.0:
-  version "5.3.2"
-  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.2.tgz#6392e9541ac0b879ef0f22b3d65037417eb2035e"
-  integrity sha512-INDfXzTPnhT+WYQemqnAXlP7SvfiFMopMozSgXCZ+RDLb279gKfIuLk4o7PgEawLp3WrMgIYGBpkxpraROHsSA==
+prebuild-install@^5.3.3:
+  version "5.3.3"
+  resolved "https://registry.yarnpkg.com/prebuild-install/-/prebuild-install-5.3.3.tgz#ef4052baac60d465f5ba6bf003c9c1de79b9da8e"
+  integrity sha512-GV+nsUXuPW2p8Zy7SarF/2W/oiK8bFQgJcncoJ0d7kRpekEA0ftChjfEaF9/Y+QJEc/wFR7RAEa8lYByuUIe2g==
   dependencies:
     detect-libc "^1.0.3"
     expand-template "^2.0.3"
@@ -19119,15 +19119,15 @@ urlgrey@^0.4.4:
   version "0.4.4"
   resolved "https://registry.yarnpkg.com/urlgrey/-/urlgrey-0.4.4.tgz#892fe95960805e85519f1cd4389f2cb4cbb7652f"
 
-usb-detection@^4.7.0:
-  version "4.7.0"
-  resolved "https://registry.yarnpkg.com/usb-detection/-/usb-detection-4.7.0.tgz#2a740888e5043fcebf1fcbd7511dd0bc2c5408a4"
-  integrity sha512-HE9y5uYfA2ebVo64BrIB0OVNaVKZ2oWkadpTItCi4YQXyZ9vD0705iqQ3B7Rz8xevcrW/RNg/85E2o2JoPFmsQ==
+usb-detection@^4.9.0:
+  version "4.9.0"
+  resolved "https://registry.yarnpkg.com/usb-detection/-/usb-detection-4.9.0.tgz#52467fd0b5d511860ebe649d19d3a8d4a40e73c5"
+  integrity sha512-Ez9mmMz20+jD3ckdCkd0vYvcr88h4ijR9XXFt0o7+TvUijktxC07r8D/HlcHVFP+kbi8V2+iMXTqq7Rfwjh60g==
   dependencies:
     bindings "^1.3.0"
     eventemitter2 "^5.0.1"
     nan "^2.13.2"
-    prebuild-install "^5.1.0"
+    prebuild-install "^5.3.3"
 
 use@^2.0.0:
   version "2.0.2"
