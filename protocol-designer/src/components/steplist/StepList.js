@@ -9,7 +9,6 @@ import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
 import { StepCreationButton } from '../StepCreationButton'
 import type { StepIdType } from '../../form-types'
-import { PortalRoot } from './TooltipPortal'
 import { DraggableStepItems } from './DraggableStepItems'
 
 type Props = {
@@ -56,7 +55,6 @@ export class StepList extends React.Component<Props> {
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>
-        <PortalRoot />
       </React.Fragment>
     )
   }

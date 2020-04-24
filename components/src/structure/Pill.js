@@ -4,7 +4,7 @@ import cx from 'classnames'
 
 import styles from './Pill.css'
 
-import type { HoverTooltipHandlers } from '../tooltips'
+import type { UseHoverTooltipResult } from '../tooltips'
 
 export type PillProps = {|
   /** background color of pill (any CSS color string) */
@@ -16,7 +16,7 @@ export type PillProps = {|
   /** contents of the pill */
   children?: React.Node,
   /** handlers for HoverTooltipComponent */
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  hoverTooltipHandlers?: ?$ElementType<UseHoverTooltipResult, 0>,
 |}
 
 /**

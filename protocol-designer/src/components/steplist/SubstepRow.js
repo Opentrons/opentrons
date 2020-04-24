@@ -5,7 +5,7 @@ import noop from 'lodash/noop'
 import reduce from 'lodash/reduce'
 import omitBy from 'lodash/omitBy'
 
-import { HoverTooltip, swatchColors } from '@opentrons/components'
+import { swatchColors, Tooltip, useHoverTooltip } from '@opentrons/components'
 import type { LocationLiquidState } from '../../step-generation'
 import type {
   SubstepIdentifier,
@@ -17,7 +17,6 @@ import { IngredPill } from './IngredPill'
 import { PDListItem } from '../lists'
 import styles from './StepItem.css'
 import { formatVolume, formatPercentage } from './utils'
-import { Portal } from './TooltipPortal'
 
 type SubstepRowProps = {|
   volume?: ?number | ?string,
@@ -96,64 +95,64 @@ function SubstepRowComponent(props: SubstepRowProps) {
       )
     : {}
   const selectSubstep = props.selectSubstep || noop
+
+  const [sourceTargetProps, sourceTooltipProps] = useHoverTooltip({
+    placement: 'bottom-start',
+  })
+  const [destTargetProps, destTooltipProps] = useHoverTooltip({
+    placement: 'bottom-end',
+  })
   return (
-    <PDListItem
-      border
-      className={props.className}
-      onMouseEnter={() =>
-        selectSubstep({
-          stepId: props.stepId,
-          substepIndex: props.substepIndex,
-        })
-      }
-      onMouseLeave={() => selectSubstep(null)}
-    >
-      <HoverTooltip
-        portal={Portal}
-        tooltipComponent={
-          <PillTooltipContents
-            well={props.source ? props.source.well : ''}
-            ingredNames={props.ingredNames}
-            ingreds={compactedSourcePreIngreds}
-          />
+    <>
+      <Tooltip {...sourceTooltipProps}>
+        <PillTooltipContents
+          well={props.source ? props.source.well : ''}
+          ingredNames={props.ingredNames}
+          ingreds={compactedSourcePreIngreds}
+        />
+      </Tooltip>
+
+      <Tooltip {...destTooltipProps}>
+        <PillTooltipContents
+          well={props.dest ? props.dest.well : ''}
+          ingredNames={props.ingredNames}
+          ingreds={compactedDestPreIngreds}
+        />
+      </Tooltip>
+      <PDListItem
+        border
+        className={props.className}
+        onMouseEnter={() =>
+          selectSubstep({
+            stepId: props.stepId,
+            substepIndex: props.substepIndex,
+          })
         }
+        onMouseLeave={() => selectSubstep(null)}
       >
-        {hoverTooltipHandlers => (
-          <IngredPill
-            hoverTooltipHandlers={hoverTooltipHandlers}
-            ingredNames={props.ingredNames}
-            ingreds={compactedSourcePreIngreds}
-          />
-        )}
-      </HoverTooltip>
-      <span className={styles.emphasized_cell}>
-        {props.source && props.source.well}
-      </span>
-      <span className={styles.volume_cell}>{`${formatVolume(
-        props.volume
-      )} μL`}</span>
-      <span className={styles.emphasized_cell}>
-        {props.dest && props.dest.well}
-      </span>
-      <HoverTooltip
-        portal={Portal}
-        tooltipComponent={
-          <PillTooltipContents
-            well={props.dest ? props.dest.well : ''}
-            ingredNames={props.ingredNames}
-            ingreds={compactedDestPreIngreds}
-          />
-        }
-      >
-        {hoverTooltipHandlers => (
-          <IngredPill
-            hoverTooltipHandlers={hoverTooltipHandlers}
-            ingredNames={props.ingredNames}
-            ingreds={compactedDestPreIngreds}
-          />
-        )}
-      </HoverTooltip>
-    </PDListItem>
+        <IngredPill
+          targetProps={sourceTargetProps}
+          ingredNames={props.ingredNames}
+          ingreds={compactedSourcePreIngreds}
+        />
+
+        <span className={styles.emphasized_cell}>
+          {props.source && props.source.well}
+        </span>
+        <span className={styles.volume_cell}>{`${formatVolume(
+          props.volume
+        )} μL`}</span>
+        <span className={styles.emphasized_cell}>
+          {props.dest && props.dest.well}
+        </span>
+
+        <IngredPill
+          targetProps={destTargetProps}
+          ingredNames={props.ingredNames}
+          ingreds={compactedDestPreIngreds}
+        />
+      </PDListItem>
+    </>
   )
 }
 

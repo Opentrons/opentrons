@@ -4,7 +4,7 @@ import {
   Pill,
   swatchColors,
   MIXED_WELL_COLOR,
-  type HoverTooltipHandlers,
+  type UseHoverTooltipResult,
 } from '@opentrons/components'
 import styles from './StepItem.css'
 import type {
@@ -15,11 +15,11 @@ import type {
 type Props = {
   ingreds: WellIngredientVolumeData,
   ingredNames: WellIngredientNames,
-  hoverTooltipHandlers?: ?HoverTooltipHandlers,
+  targetProps?: ?$ElementType<UseHoverTooltipResult, 0>,
 }
 
 export function IngredPill(props: Props) {
-  const { ingreds, ingredNames, hoverTooltipHandlers } = props
+  const { ingreds, ingredNames, targetProps } = props
   if (!ingreds || Object.keys(ingreds).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing
     return <Pill />
@@ -34,7 +34,7 @@ export function IngredPill(props: Props) {
     <Pill
       color={color}
       className={styles.ingred_pill}
-      hoverTooltipHandlers={hoverTooltipHandlers}
+      hoverTooltipHandlers={targetProps}
     >
       {Object.keys(ingreds)
         .map(groupId => ingredNames[groupId])
