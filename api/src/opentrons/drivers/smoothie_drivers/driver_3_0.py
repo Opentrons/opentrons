@@ -1296,8 +1296,8 @@ class SmoothieDriver_3_0_0:
             # EMI interference from both plunger motors has been found to
             # prevent the I2C lines from communicating between Smoothieware and
             # pipette's onboard EEPROM. To avoid, turn off both plunger motors
-            self.disengage_axis('ZABC')
-            self.delay(PIPETTE_READ_DELAY)
+            #self.disengage_axis('ZABC')
+            #self.delay(PIPETTE_READ_DELAY)
             # request from Smoothieware the information from that pipette
             res = self._send_command(
                 gcode + allowed_mount, suppress_error_msg=True)
