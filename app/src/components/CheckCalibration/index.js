@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ModalPage, PrimaryButton } from '@opentrons/components'
+import { ModalPage, PrimaryButton, Icon } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import {
@@ -144,7 +144,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     }
     case CHECK_STEP_SESSION_EXITED:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case CHECK_STEP_NO_PIPETTES_ATTACHED: {
+    case CHECK_STEP_NO_PIPETTES_ATTACHED:
+    case 'calibrationComplete': {
+      // TODO: get real complete state name after updated
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents
       break
@@ -156,13 +158,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       // both should probably be handled with some sort of UI
       // affordance in the future.
       stepContents = (
-        <PrimaryButton
-          onClick={() =>
-            dispatch(shimCurrentStep(robotName, CHECK_STEP_SESSION_STARTED))
-          }
-        >
-          'StartSession'
-        </PrimaryButton>
+        <div className={styles.modal_contents}>
+          <Icon name="ot-spinner" className={styles.loading_spinner} spin />
+        </div>
       )
     }
   }
