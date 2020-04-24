@@ -13,7 +13,7 @@ The examples in this section would be added to the following:
 
     from opentrons import protocol_api
 
-    metadata = {'apiLevel': '2.2'}
+    metadata = {'apiLevel': '2.4'}
 
     def run(protocol: protocol_api.ProtocolContext):
         tiprack = protocol.load_labware('corning_96_wellplate_360ul_flat', 2)
@@ -318,6 +318,15 @@ When calling :py:meth:`.InstrumentContext.touch_tip` on a pipette, you have the 
 
 
 .. versionadded:: 2.0
+
+.. note:
+
+    It is recommended that you change your API version to 2.4 to take advantage of new
+    features added into `touch_tip` such as:
+        - A lower minimum speed (1 mm/s)
+        - Better handling around near by geometry considerations
+        - Removed certain extraneous behaviors such as a diagonal move from X -> Y and
+        moving directly to the height offset specified.
 
 .. _mix:
 
