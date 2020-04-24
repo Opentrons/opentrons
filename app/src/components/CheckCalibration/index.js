@@ -68,6 +68,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
     return spec ? spec.channels > 1 : false
   }, [activeInstrumentId])
+  // TODO: BC: once api returns real values for instrument.mount_axis
+  // infer active mount from activeInstrument
+  const activeMount = 'left'
 
   function exit() {
     dispatch(deleteRobotCalibrationCheckSession(robotName))
@@ -122,6 +125,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           pipetteId={activeInstrumentId}
           currentStep={currentStep}
           isMulti={isActiveInstrumentMultiChannel}
+          mount={activeMount}
         />
       ) : null
       break

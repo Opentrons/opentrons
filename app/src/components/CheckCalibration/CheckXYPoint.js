@@ -33,6 +33,48 @@ import slot7LeftSingleDemoAsset from './videos/SLOT_7_LEFT_SINGLE_X-Y_(640X480)_
 import slot7RightMultiDemoAsset from './videos/SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
 import slot7RightSingleDemoAsset from './videos/SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
 
+const assetMap = {
+  checkingPointOne: {
+    left: {
+      multi: slot1LeftMultiDemoAsset,
+      single: slot1LeftSingleDemoAsset,
+    },
+    right: {
+      multi: slot1RightMultiDemoAsset,
+      single: slot1RightSingleDemoAsset,
+    },
+  },
+  checkingPointTwo: {
+    left: {
+      multi: slot3LeftMultiDemoAsset,
+      single: slot3LeftSingleDemoAsset,
+    },
+    right: {
+      multi: slot3RightMultiDemoAsset,
+      single: slot3RightSingleDemoAsset,
+    },
+  },
+  checkingHeight: {
+    left: {
+      multi: slot5LeftMultiDemoAsset,
+      single: slot5LeftSingleDemoAsset,
+    },
+    right: {
+      multi: slot5RightMultiDemoAsset,
+      single: slot5RightSingleDemoAsset,
+    },
+  },
+  checkingPointThree: {
+    left: {
+      multi: slot7LeftMultiDemoAsset,
+      single: slot7LeftSingleDemoAsset,
+    },
+    right: {
+      multi: slot7RightMultiDemoAsset,
+      single: slot7RightSingleDemoAsset,
+    },
+  },
+}
 type XYPointStep =
   | typeof CHECK_STEP_CHECKING_POINT_ONE
   | typeof CHECK_STEP_CHECKING_POINT_TWO
@@ -58,12 +100,16 @@ type CheckXYPointProps = {|
   robotName: string,
   currentStep: XYPointStep,
   isMulti: boolean,
+  mount: Mount,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
-  const { pipetteId, robotName, currentStep } = props
+  const { pipetteId, robotName, currentStep, isMulti, mount } = props
 
   const dispatch = useDispatch<Dispatch>()
-
+  const demoAsset = React.useMemo(
+    () => assetMap[currentStep][mount][isMulti ? 'multi' : 'single'],
+    [currentStep, mount, isMulti]
+  )
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
     console.table({ axis, direction, step })
     dispatch(
@@ -76,23 +122,13 @@ export function CheckXYPoint(props: CheckXYPointProps) {
   }
 
   function confirmStep() {
-    dispatch(
-      confirmStepRobotCalibrationCheck(robotName, pipetteId, currentStep)
-    )
+    dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
 
-  const demoAsset = (
-    <div className={styles.step_check_video_wrapper}>
-      <video
-        className={styles.step_check_video}
-        autoPlay={true}
-        loop={true}
-        controls={true}
-      >
-        <source src={slot1LeftMultiDemoAsset} />
-      </video>
-    </div>
-  )
+  const getDemoAsset = () => {
+    const channels = isMulti ? 'multi' : 'single'
+    return assetMap[currentStep][mount][channels]
+  }
 
   return (
     <>
@@ -113,7 +149,17 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           <b>&nbsp;{CHECK_AXES}&nbsp;</b>
           {TO_DETERMINE_MATCH}
         </p>
-        {demoAsset}
+        <div className={styles.step_check_video_wrapper}>
+          <video
+            key={demoAsset}
+            className={styles.step_check_video}
+            autoPlay={true}
+            loop={true}
+            controls={true}
+          >
+            <source src={demoAsset} />
+          </video>
+        </div>
       </div>
       <div className={styles.tip_pick_up_controls_wrapper}>
         <JogControls jog={jog} stepSizes={[0.1, 2]} axes={['x', 'y']} />

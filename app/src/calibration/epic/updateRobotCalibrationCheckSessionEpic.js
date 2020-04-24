@@ -29,10 +29,7 @@ import {
   CHECK_UPDATE_PATH_PREPARE_PIPETTE,
   CHECK_UPDATE_PATH_JOG,
   CHECK_UPDATE_PATH_PICK_UP_TIP,
-  CHECK_UPDATE_PATH_CHECK_POINT_ONE,
-  CHECK_UPDATE_PATH_CHECK_POINT_TWO,
-  CHECK_UPDATE_PATH_CHECK_POINT_THREE,
-  CHECK_UPDATE_PATH_CHECK_HEIGHT,
+  CHECK_UPDATE_PATH_CONFIRM_TIP,
   CHECK_UPDATE_PATH_INVALIDATE_TIP,
   CHECK_UPDATE_PATH_CONFIRM_STEP,
 } from '../constants'
@@ -85,14 +82,6 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
       break
     }
     case ROBOT_CALIBRATION_CHECK_CONFIRM_STEP: {
-      console.log(action)
-      const { currentStep, pipetteId } = action.payload
-      const CONFIRM_STEP_PATH_BY_CURRENT_STEP = {
-        checkingPointOne: CHECK_UPDATE_PATH_CHECK_POINT_ONE,
-        checkingPointTwo: CHECK_UPDATE_PATH_CHECK_POINT_TWO,
-        checkingPointThree: CHECK_UPDATE_PATH_CHECK_POINT_THREE,
-      }
-      const path = CONFIRM_STEP_PATH_BY_CURRENT_STEP[currentStep]
       requestParams = {
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_STEP}`,
         body: { pipetteId: action.payload.pipetteId },

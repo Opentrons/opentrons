@@ -120,11 +120,10 @@ export const confirmTipRobotCalibrationCheck = (
 
 export const confirmStepRobotCalibrationCheck = (
   robotName: string,
-  pipetteId: string,
-  currentStep: string
+  pipetteId: string
 ): Types.RobotCalibrationCheckConfirmStepAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
-  payload: { robotName, pipetteId, currentStep },
+  payload: { robotName, pipetteId },
   meta: {},
 })
 

@@ -104,7 +104,7 @@ export type RobotCalibrationCheckInvalidateTipAction = {|
 
 export type RobotCalibrationCheckConfirmStepAction = {|
   type: ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
-  payload: {| robotName: string, pipetteId: string, currentStep: string |},
+  payload: {| robotName: string, pipetteId: string |},
   meta: RobotApiRequestMeta,
 |}
 
