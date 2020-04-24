@@ -199,7 +199,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .tip_pick_up_demo_body {
   @apply --font-body-2-dark;
 
-  margin: 0 2rem;
+  margin: 0 1rem;
 }
 
 .tip_pick_up_demo_image {
@@ -229,10 +229,10 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 }
 
 .step_check_video_wrapper {
-  max-height: 30rem;
-  margin-bottom: 1rem;
+  margin-top: 1rem;
 }
 
 .step_check_video {
   max-width: 100%;
+  max-height: 15rem;
 }

@@ -75,7 +75,6 @@ export function TipPickUp(props: TipPickUpProps) {
   }
 
   function rejectPickUpAttempt() {
-    console.log('TODO: implement domain layer of invalidateTip')
     dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
   }
 

@@ -39,13 +39,13 @@ type XYPointStep =
   | typeof CHECK_STEP_CHECKING_POINT_THREE
 
 const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
-const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
+const CHECK_XY_BUTTON_TEXT = 'check x and y-axis'
 const SLOT_NAME_BY_STEP: { XYPointStep: string } = {
   [CHECK_STEP_CHECKING_POINT_ONE]: 'slot 1',
   [CHECK_STEP_CHECKING_POINT_TWO]: 'slot 3',
   [CHECK_STEP_CHECKING_POINT_THREE]: 'slot 7',
 }
-const JOG_UNTIL = 'Jog the pipette until thie tip is'
+const JOG_UNTIL = 'Jog pipette until tip is'
 const JUST_BARELY = 'just barely'
 const TOUCHING_THE_CROSS = 'touching the cross in'
 const THEN = 'Then'
@@ -76,7 +76,9 @@ export function CheckXYPoint(props: CheckXYPointProps) {
   }
 
   function confirmStep() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(
+      confirmStepRobotCalibrationCheck(robotName, pipetteId, currentStep)
+    )
   }
 
   const demoAsset = (
@@ -106,7 +108,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           {JOG_UNTIL}
           <b>&nbsp;{JUST_BARELY}&nbsp;</b>
           {TOUCHING_THE_CROSS}
-          <b>&nbsp;{SLOT_NAME_BY_STEP[currentStep]}&nbsp;</b>
+          <b>&nbsp;{SLOT_NAME_BY_STEP[currentStep]}.&nbsp;</b>
           {THEN}
           <b>&nbsp;{CHECK_AXES}&nbsp;</b>
           {TO_DETERMINE_MATCH}
@@ -121,7 +123,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           onClick={confirmStep}
           className={styles.pick_up_tip_button}
         >
-          {TIP_PICK_UP_BUTTON_TEXT}
+          {CHECK_XY_BUTTON_TEXT}
         </PrimaryButton>
       </div>
     </>
