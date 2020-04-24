@@ -103,6 +103,99 @@ describe('robot calibration check actions', () => {
       },
     },
     {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_LOAD_LABWARE',
+      creator: Actions.loadLabwareRobotCalibrationCheck,
+      args: ['robot-name'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_LOAD_LABWARE',
+        payload: {
+          robotName: 'robot-name',
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE',
+      creator: Actions.preparePipetteRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_JOG',
+      creator: Actions.jogRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid', [1, 0, 0]],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_JOG',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+          vector: [1, 0, 0],
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_PICK_UP_TIP',
+      creator: Actions.pickUpTipRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_PICK_UP_TIP',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
+
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP',
+      creator: Actions.confirmTipRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
+
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP',
+      creator: Actions.confirmStepRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP',
+      creator: Actions.invalidateTipRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
+    {
       name: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
       creator: Actions.updateRobotCalibrationCheckSessionSuccess,
       args: [
