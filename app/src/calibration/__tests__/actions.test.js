@@ -12,7 +12,7 @@ type ActionSpec = {|
   expected: CalibrationAction,
 |}
 
-describe('robot modules actions', () => {
+describe('robot calibration check actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
       name: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION',
@@ -51,6 +51,84 @@ describe('robot modules actions', () => {
       ],
       expected: {
         type: 'calibration:CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          error: { message: 'Heck, your deck check wrecked!' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION',
+      creator: Actions.fetchRobotCalibrationCheckSession,
+      args: ['robot-name'],
+      expected: {
+        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION',
+        payload: { robotName: 'robot-name' },
+        meta: {},
+      },
+    },
+    {
+      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      creator: Actions.fetchRobotCalibrationCheckSessionSuccess,
+      args: [
+        'robot-name',
+        Fixtures.mockRobotCalibrationCheckSessionData,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          ...Fixtures.mockRobotCalibrationCheckSessionData,
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+      creator: Actions.fetchRobotCalibrationCheckSessionFailure,
+      args: [
+        'robot-name',
+        { message: 'Heck, your deck check wrecked!' },
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+        payload: {
+          robotName: 'robot-name',
+          error: { message: 'Heck, your deck check wrecked!' },
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+      creator: Actions.updateRobotCalibrationCheckSessionSuccess,
+      args: [
+        'robot-name',
+        Fixtures.mockRobotCalibrationCheckSessionData,
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS',
+        payload: {
+          robotName: 'robot-name',
+          ...Fixtures.mockRobotCalibrationCheckSessionData,
+        },
+        meta: { requestId: 'abc' },
+      },
+    },
+    {
+      name: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
+      creator: Actions.updateRobotCalibrationCheckSessionFailure,
+      args: [
+        'robot-name',
+        { message: 'Heck, your deck check wrecked!' },
+        { requestId: 'abc' },
+      ],
+      expected: {
+        type: 'calibration:UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE',
         payload: {
           robotName: 'robot-name',
           error: { message: 'Heck, your deck check wrecked!' },
