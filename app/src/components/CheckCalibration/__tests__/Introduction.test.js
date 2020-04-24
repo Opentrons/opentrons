@@ -4,6 +4,7 @@ import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
 
+import { mockRobot } from '../../../calibration/__fixtures__'
 import { Introduction } from '../Introduction'
 
 jest.mock('../../../calibration/selectors')
@@ -39,8 +40,8 @@ describe('Introduction', () => {
       return mount(
         <Introduction
           labwareLoadNames={labwareLoadNames}
+          robotName={mockRobot.name}
           exit={mockExit}
-          proceed={mockProceed}
         />
       )
     }

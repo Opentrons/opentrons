@@ -30,9 +30,9 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       pipette_id: 'def456_pipette_uuid',
     },
   },
-  currentStep: 'sessionStart',
+  currentStep: 'sessionStarted',
   nextSteps: {
-    links: { loadLabware: '/fake/route' },
+    links: { labwareLoaded: '/fake/route' },
   },
   labware: [
     {

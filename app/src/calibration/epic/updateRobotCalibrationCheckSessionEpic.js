@@ -4,6 +4,8 @@ import { ofType } from 'redux-observable'
 import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 
+import { createLogger } from '../../logger'
+
 import * as Actions from '../actions'
 
 import type { Epic } from '../../types'
@@ -33,62 +35,68 @@ import {
   CHECK_UPDATE_PATH_CONFIRM_STEP,
 } from '../constants'
 
+const log = createLogger(__filename)
+
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessionAction> = action => {
-  let requestParams = {}
   switch (action.type) {
     case ROBOT_CALIBRATION_CHECK_LOAD_LABWARE: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_LOAD_LABWARE}`,
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
         body: { pipetteId: action.payload.pipetteId },
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_JOG: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_JOG}`,
         body: {
           pipetteId: action.payload.pipetteId,
           vector: action.payload.vector,
         },
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
         body: { pipetteId: action.payload.pipetteId },
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_CONFIRM_TIP: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_TIP}`,
         body: { pipetteId: action.payload.pipetteId },
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_INVALIDATE_TIP}`,
         body: { pipetteId: action.payload.pipetteId },
       }
-      break
     }
     case ROBOT_CALIBRATION_CHECK_CONFIRM_STEP: {
-      requestParams = {
+      return {
+        method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_STEP}`,
         body: { pipetteId: action.payload.pipetteId },
       }
-      break
+    }
+    default: {
+      log.error(
+        'Update Robot Calibration Check Session Epic failed to handle action',
+        { action }
+      )
     }
   }
-  return { method: POST, ...requestParams }
 }
 
 const mapResponseToAction: ResponseToActionMapper<UpdateRobotCalibrationCheckSessionAction> = (

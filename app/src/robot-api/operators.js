@@ -12,7 +12,7 @@ import type { State, Action } from '../types'
 export type ActionToRequestMapper<TriggerAction> = (
   TriggerAction,
   State
-) => Types.RobotApiRequestOptions
+) => ?Types.RobotApiRequestOptions
 
 export type ResponseToActionMapper<TriggerAction> = (
   Types.RobotApiResponse,
@@ -43,6 +43,7 @@ export function mapToRobotApiRequest<A>(
   return pipe(
     withRobotHost(state$, getRobotName),
     map(([a, s, host]) => [host, mapActionToRequest(a, s), a]),
+    filter(request => request == null),
     // TODO(mc, 2019-11-15): this is a mergeMap rather than switchMap because:
     // - Our vanilla fetch usage means switchMap won't cancel inflight requests
     // - Our request lifecycle state can't handle a cancelled request

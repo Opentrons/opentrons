@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import assert from 'assert'
 import { ModalPage, Icon } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
@@ -30,7 +31,10 @@ import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
-
+type XYCheckStep =
+  | typeof CHECK_STEP_CHECKING_POINT_ONE
+  | typeof CHECK_STEP_CHECKING_POINT_TWO
+  | typeof CHECK_STEP_CHECKING_POINT_THREE
 type CheckCalibrationProps = {|
   robotName: string,
   closeCalibrationCheck: () => mixed,
@@ -116,15 +120,22 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case CHECK_STEP_CHECKING_POINT_ONE:
     case CHECK_STEP_CHECKING_POINT_TWO:
     case CHECK_STEP_CHECKING_POINT_THREE: {
-      stepContents = activeInstrumentId ? (
-        <CheckXYPoint
-          robotName={robotName}
-          pipetteId={activeInstrumentId}
-          currentStep={currentStep}
-          isMulti={isActiveInstrumentMultiChannel}
-          mount={activeMount}
-        />
-      ) : null
+      const xyStepIndex: ?number = [
+        CHECK_STEP_CHECKING_POINT_ONE,
+        CHECK_STEP_CHECKING_POINT_TWO,
+        CHECK_STEP_CHECKING_POINT_THREE,
+      ].findIndex(stepName => stepName === currentStep)
+
+      stepContents =
+        activeInstrumentId && xyStepIndex != null ? (
+          <CheckXYPoint
+            robotName={robotName}
+            pipetteId={activeInstrumentId}
+            xyStepIndex={xyStepIndex}
+            isMulti={isActiveInstrumentMultiChannel}
+            mount={activeMount}
+          />
+        ) : null
       break
     }
     case CHECK_STEP_CHECKING_HEIGHT: {

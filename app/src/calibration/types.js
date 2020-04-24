@@ -147,7 +147,6 @@ export type CompleteRobotCalibrationCheckAction = {|
 |}
 
 export type CalibrationAction =
-  | TemporaryShimSetCurrentStepAction
   | CreateRobotCalibrationCheckSessionAction
   | CreateRobotCalibrationCheckSessionSuccessAction
   | CreateRobotCalibrationCheckSessionFailureAction

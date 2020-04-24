@@ -2,7 +2,10 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
+import {
+  mockRobotCalibrationCheckSessionData,
+  mockRobot,
+} from '../../../calibration/__fixtures__'
 
 import { RobotWorkSpace } from '@opentrons/components'
 import { DeckSetup } from '../DeckSetup'
@@ -31,7 +34,10 @@ describe('DeckSetup', () => {
     const wrapper = mount(
       <DeckSetup
         labware={mockRobotCalibrationCheckSessionData.labware}
-        proceed={mockProceed}
+        robotName={mockRobot.name}
+        activeInstrumentId={
+          Object.keys(mockRobotCalibrationCheckSessionData.instruments)[0]
+        }
       />
     )
     act(() => wrapper.find('button').invoke('onClick')())

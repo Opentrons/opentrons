@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryButton, type Mount } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'

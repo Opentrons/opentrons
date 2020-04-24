@@ -55,22 +55,21 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
-  // TODO: BC: ONCE BACKEND SETTLES UNCOMMENT
-  // it('creates a robot cal check session on mount', () => {
-  //   getRobotCalibrationCheckSession.mockReturnValue(
-  //     mockRobotCalibrationCheckSessionData
-  //   )
-  //   render()
+  it('creates a robot cal check session on mount', () => {
+    getRobotCalibrationCheckSession.mockReturnValue(
+      mockRobotCalibrationCheckSessionData
+    )
+    render()
 
-  //   expect(mockStore.dispatch).toHaveBeenCalledWith(
-  //     Calibration.createRobotCalibrationCheckSession('robot-name')
-  //   )
-  // })
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.createRobotCalibrationCheckSession('robot-name')
+    )
+  })
 
-  it('renders Introduction contents when currentStep is sessionStart', () => {
+  it('renders Introduction contents when currentStep is sessionStarted', () => {
     getRobotCalibrationCheckSession.mockReturnValue({
       ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'sessionStart',
+      currentStep: 'sessionStarted',
     })
     const wrapper = render()
 

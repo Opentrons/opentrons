@@ -58,7 +58,7 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
     },
   ]
 
-  updateTriggers.forEach(({ action, pathExtension, body }) => {
+  updateTriggers.forEach(({ action, pathExtension, body = {} }) => {
     describe(`handles ${action.type}`, () => {
       const expectedRequest = {
         method: 'POST',

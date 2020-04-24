@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton } from '@opentrons/components'
+import { PrimaryButton, type Mount } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
@@ -33,8 +33,8 @@ import slot7LeftSingleDemoAsset from './videos/SLOT_7_LEFT_SINGLE_X-Y_(640X480)_
 import slot7RightMultiDemoAsset from './videos/SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
 import slot7RightSingleDemoAsset from './videos/SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
 
-const assetMap = {
-  checkingPointOne: {
+const assetMap = [
+  {
     left: {
       multi: slot1LeftMultiDemoAsset,
       single: slot1LeftSingleDemoAsset,
@@ -44,7 +44,7 @@ const assetMap = {
       single: slot1RightSingleDemoAsset,
     },
   },
-  checkingPointTwo: {
+  {
     left: {
       multi: slot3LeftMultiDemoAsset,
       single: slot3LeftSingleDemoAsset,
@@ -54,17 +54,7 @@ const assetMap = {
       single: slot3RightSingleDemoAsset,
     },
   },
-  checkingHeight: {
-    left: {
-      multi: slot5LeftMultiDemoAsset,
-      single: slot5LeftSingleDemoAsset,
-    },
-    right: {
-      multi: slot5RightMultiDemoAsset,
-      single: slot5RightSingleDemoAsset,
-    },
-  },
-  checkingPointThree: {
+  {
     left: {
       multi: slot7LeftMultiDemoAsset,
       single: slot7LeftSingleDemoAsset,
@@ -74,19 +64,11 @@ const assetMap = {
       single: slot7RightSingleDemoAsset,
     },
   },
-}
-type XYPointStep =
-  | typeof CHECK_STEP_CHECKING_POINT_ONE
-  | typeof CHECK_STEP_CHECKING_POINT_TWO
-  | typeof CHECK_STEP_CHECKING_POINT_THREE
+]
 
 const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
 const CHECK_XY_BUTTON_TEXT = 'check x and y-axis'
-const SLOT_NAME_BY_STEP: { XYPointStep: string } = {
-  [CHECK_STEP_CHECKING_POINT_ONE]: 'slot 1',
-  [CHECK_STEP_CHECKING_POINT_TWO]: 'slot 3',
-  [CHECK_STEP_CHECKING_POINT_THREE]: 'slot 7',
-}
+const CHECK_XY_SLOT_NAMES: Array<string> = ['slot 1', 'slot 3', 'slot 7']
 const JOG_UNTIL = 'Jog pipette until tip is'
 const JUST_BARELY = 'just barely'
 const TOUCHING_THE_CROSS = 'touching the cross in'
@@ -98,17 +80,17 @@ const TO_DETERMINE_MATCH =
 type CheckXYPointProps = {|
   pipetteId: string,
   robotName: string,
-  currentStep: XYPointStep,
+  xyStepIndex: number,
   isMulti: boolean,
   mount: Mount,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
-  const { pipetteId, robotName, currentStep, isMulti, mount } = props
+  const { pipetteId, robotName, xyStepIndex, isMulti, mount } = props
 
   const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
-    () => assetMap[currentStep][mount][isMulti ? 'multi' : 'single'],
-    [currentStep, mount, isMulti]
+    () => assetMap[xyStepIndex][mount][isMulti ? 'multi' : 'single'],
+    [xyStepIndex, mount, isMulti]
   )
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
     dispatch(
@@ -130,7 +112,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
         <h3>
           {CHECK_POINT_XY_HEADER}
           &nbsp;
-          {SLOT_NAME_BY_STEP[currentStep]}
+          {CHECK_XY_SLOT_NAMES[xyStepIndex]}
         </h3>
       </div>
       <div className={styles.tip_pick_up_demo_wrapper}>
@@ -138,14 +120,14 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           {JOG_UNTIL}
           <b>&nbsp;{JUST_BARELY}&nbsp;</b>
           {TOUCHING_THE_CROSS}
-          <b>&nbsp;{SLOT_NAME_BY_STEP[currentStep]}.&nbsp;</b>
+          <b>&nbsp;{CHECK_XY_SLOT_NAMES[xyStepIndex]}.&nbsp;</b>
           {THEN}
           <b>&nbsp;{CHECK_AXES}&nbsp;</b>
           {TO_DETERMINE_MATCH}
         </p>
         <div className={styles.step_check_video_wrapper}>
           <video
-            key={demoAsset}
+            key={String(demoAsset)}
             className={styles.step_check_video}
             autoPlay={true}
             loop={true}
