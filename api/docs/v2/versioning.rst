@@ -97,7 +97,9 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.2     |          3.16.0             |
 +-------------+-----------------------------+
-|     2.3     |          3.17.0 (In Beta)   |
+|     2.3     |          3.17.0             |
++-------------+-----------------------------+
+|     2.4     |          3.18.0 (In Beta)   |
 +-------------+-----------------------------+
 
 Changes in API Versions
@@ -131,3 +133,12 @@ Version 2.3
 - During a :ref:`mix`, the pipette will no longer move up to clear the liquid in
   between every dispense and following aspirate
 - You can now access the temperature module's status via the ``status`` property of ```ModuleContext.TemperatureModuleContext```
+
+
+Version 2.4
++++++++++++
+
+- The following improvements were made to the `touch_tip` command:
+    - The speed for `touch_tip` can now be lowered down to 1 mm/s
+    - `touch_tip` no longer moves diagonally from the X direction -> Y direction
+    - Takes into account geometry of the deck and modules
