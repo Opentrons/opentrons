@@ -127,6 +127,8 @@ jobs:
     - stage: test
       name: 'JS E2E tests'
       language: node_js
+      before_install:
+        - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
         - make install-js
       script:
@@ -136,6 +138,8 @@ jobs:
     - stage: test
       name: 'JS type checks'
       language: node_js
+      before_install:
+        - sudo apt-get install -y --no-install-recommends libudev-dev
       before_install:
         - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
