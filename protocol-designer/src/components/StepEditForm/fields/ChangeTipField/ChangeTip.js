@@ -1,6 +1,12 @@
 // @flow
 import * as React from 'react'
-import { FormGroup, HoverTooltip, SelectField } from '@opentrons/components'
+import {
+  FormGroup,
+  SelectField,
+  Tooltip,
+  useHoverTooltip,
+  TOOLTIP_FIXED,
+} from '@opentrons/components'
 import { i18n } from '../../../../localization'
 import { FieldConnector } from '../FieldConnector'
 import styles from '../../StepEditForm.css'
@@ -45,24 +51,28 @@ export const ChangeTip = (props: Props) => {
   )
 }
 
-const ChangeTipOptionLabel = ({ value }: {| value: string |}) => (
-  <HoverTooltip
-    positionFixed
-    tooltipComponent={
-      <div className={styles.tooltip}>
-        {i18n.t(`form.step_edit_form.field.change_tip.option_tooltip.${value}`)}
-      </div>
-    }
-    placement="bottom"
-    modifiers={{
-      offset: { offset: `0, 18` },
-      preventOverflow: { boundariesElement: 'window' },
-    }}
-  >
-    {hoverTooltipHandlers => (
-      <div {...hoverTooltipHandlers}>
+type LabelProps = {
+  value: string,
+}
+
+const ChangeTipOptionLabel = (props: LabelProps) => {
+  const { value } = props
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'bottom-start',
+    strategy: TOOLTIP_FIXED,
+  })
+  return (
+    <>
+      <div {...targetProps}>
         {i18n.t(`form.step_edit_form.field.change_tip.option.${value}`)}
+        <Tooltip {...tooltipProps}>
+          <div className={styles.tooltip}>
+            {i18n.t(
+              `form.step_edit_form.field.change_tip.option_tooltip.${value}`
+            )}
+          </div>
+        </Tooltip>
       </div>
-    )}
-  </HoverTooltip>
-)
+    </>
+  )
+}
