@@ -140,8 +140,6 @@ jobs:
       language: node_js
       before_install:
         - sudo apt-get install -y --no-install-recommends libudev-dev
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
         - make install-js
       script:
