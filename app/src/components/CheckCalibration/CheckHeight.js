@@ -94,7 +94,7 @@ export function CheckHeight(props: CheckHeightProps) {
             className={styles.step_check_video}
             autoPlay={true}
             loop={true}
-            controls={true}
+            controls={false}
           >
             <source src={demoAsset} />
           </video>
