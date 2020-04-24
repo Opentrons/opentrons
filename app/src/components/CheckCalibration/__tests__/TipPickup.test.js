@@ -9,7 +9,7 @@ import {
 } from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
 
-import { TipPickUp, type TipPickUpProps } from '../TipPickUp'
+import { TipPickUp } from '../TipPickUp'
 
 describe('TipPickUp', () => {
   let render
