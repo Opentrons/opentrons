@@ -1,17 +1,8 @@
 from typing import Dict, Optional, List, Any, Union
 from functools import partial
 from pydantic import BaseModel, Field, UUID4
-from uuid import UUID
 
 from opentrons.hardware_control.types import Axis
-
-
-def convert_from_uuid(obj: UUID4):
-    return obj.hex
-
-
-def convert_to_uuid(obj: str):
-    return UUID(obj)
 
 
 Point = List[float]
@@ -26,44 +17,24 @@ class TiprackPosition(BaseModel):
     locationId: UUID4
     offset: Point = PointField()
 
-    class Config:
-        json_encoders = {
-            UUID4: convert_to_uuid}
-
 
 class DeckPosition(BaseModel):
     locationId: UUID4
     position: Point = PointField()
 
-    class Config:
-        json_encoders = {
-            UUID4: convert_to_uuid}
-
 
 class SpecificPipette(BaseModel):
     pipetteId: UUID4
-
-    class Config:
-        json_encoders = {
-            UUID4: convert_to_uuid}
 
 
 class MoveLocation(BaseModel):
     pipetteId: UUID4
     location: Union[TiprackPosition, DeckPosition]
 
-    class Config:
-        json_encoders = {
-            UUID4: convert_to_uuid}
-
 
 class JogPosition(BaseModel):
     pipetteId: UUID4
     vector: Point = PointField()
-
-    class Config:
-        json_encoders = {
-            UUID4: convert_to_uuid}
 
 
 class AttachedPipette(BaseModel):
@@ -87,11 +58,6 @@ class AttachedPipette(BaseModel):
     tiprack_id: Optional[UUID4] =\
         Field(None, description="Id of tiprack associated with this pip.")
 
-    class Config:
-        json_encoders = {
-            Axis: str,
-            UUID4: convert_from_uuid}
-
 
 class LabwareStatus(BaseModel):
     """
@@ -105,10 +71,6 @@ class LabwareStatus(BaseModel):
     namespace: str
     version: int
 
-    class Config:
-        json_encoders = {
-            UUID4: convert_from_uuid}
-
 
 class CalibrationSessionStatus(BaseModel):
     """
@@ -121,7 +83,6 @@ class CalibrationSessionStatus(BaseModel):
     labware: List[LabwareStatus]
 
     class Config:
-        json_encoders = {UUID4: convert_from_uuid}
         schema_extra = {
             "examples": [
                 {

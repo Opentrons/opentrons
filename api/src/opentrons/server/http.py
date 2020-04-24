@@ -118,19 +118,27 @@ class CalibrationRoutes(object):
             check.load_labware,
             name="loadLabware")
         self.app.router.add_post(
+            '/{type}/session/preparePipette',
+            check.prepare_pipette,
+            name="preparePipette")
+        self.app.router.add_post(
             '/{type}/session/pickUpTip',
             check.pick_up_tip,
             name="pickUpTip")
+        self.app.router.add_post(
+            '/{type}/session/confirmTip',
+            check.confirm_tip,
+            name='confirmTip')
         self.app.router.add_post(
             '/{type}/session/invalidateTip',
             check.invalidate_tip,
             name="invalidateTip")
         self.app.router.add_post(
-            '/{type}/session/dropTip',
-            check.drop_tip,
-            name="dropTip")
-        self.app.router.add_post(
             '/{type}/session/jog', check.jog, name="jog")
+        self.app.router.add_post(
+            '/{type}/session/confirmStep',
+            check.confirm_step,
+            name="confirmStep")
         self.app.router.add_delete(
             '/{type}/session',
             check.delete_session,
