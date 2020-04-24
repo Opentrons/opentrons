@@ -207,7 +207,6 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     conditionalContinue: conditionalAddPauseUntilTempStep,
     requiresConfirmation: showAddPauseUntilTempStepModal,
     confirmAndContinue: confirmAddPauseUntilTempStep,
-    cancelConfirm: cancelContirmAddPauseUntilTemp,
   } = useConditionalConfirm(
     saveSetTempFormWithAddedPauseUntilTemp,
     isPristineSetTempForm
@@ -236,7 +235,7 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
       {showAddPauseUntilTempStepModal && (
         <AutoAddPauseUntilTempStepModal
           displayTemperature={formData?.targetTemperature ?? '?'}
-          handleCancelClick={cancelContirmAddPauseUntilTemp}
+          handleCancelClick={saveStepForm}
           handleContinueClick={confirmAddPauseUntilTempStep}
         />
       )}
