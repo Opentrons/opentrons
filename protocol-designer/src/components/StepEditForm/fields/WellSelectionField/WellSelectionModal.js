@@ -1,4 +1,5 @@
 // @flow
+import assert from 'assert'
 import React, { useState } from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
@@ -15,7 +16,6 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getSelectedStepId } from '../../../../ui/steps'
 
 import type { WellGroup } from '@opentrons/components'
 import type {
@@ -114,43 +114,45 @@ const WellSelectionModalComponent = (
 export const WellSelectionModal = (props: WellSelectionModalProps) => {
   const { isOpen, labwareId, name, onCloseClick, pipetteId } = props
 
+  const dispatch = useDispatch()
+
   // selector data
   const allWellContentsForSteps = useSelector(
-    wellContentsSelectors.getAllWellContentsForSteps
+    wellContentsSelectors.getAllWellContentsForAllSteps
   )
   const formData = useSelector(stepFormSelectors.getUnsavedForm)
   const ingredNames = useSelector(selectors.getLiquidNamesById)
   const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
   const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
-  const orderedStepIds = useSelector(stepFormSelectors.getOrderedStepIds)
-  const stepId = useSelector(getSelectedStepId)
 
-  const timelineIdx = orderedStepIds.findIndex(id => id === stepId)
-
-  const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
-
+  // selector-derived data
   const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
-
   const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
 
   const wellFieldData: ?Array<string> = formData?.[name]
   const initialSelectedPrimaryWells =
     wellFieldData != null ? arrayToWellGroup(wellFieldData) : {}
 
+  // component state
+  const [selectedPrimaryWells, setSelectedPrimaryWells] = useState<WellGroup>(
+    initialSelectedPrimaryWells
+  )
+  const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
+
+  const stepId = formData?.id
+  if (stepId == null) {
+    assert(false, `WellSelectionModal got no unsavedForm`)
+    return null
+  }
+  const allWellContentsForStep = allWellContentsForSteps[stepId]
+
   // actions
-  const dispatch = useDispatch()
   const saveWellSelection = (wells: WellGroup) =>
     dispatch(
       changeFormInput({
         update: { [name]: Object.keys(wells).sort(sortWells) },
       })
     )
-
-  // component state
-  const [selectedPrimaryWells, setSelectedPrimaryWells] = useState<WellGroup>(
-    initialSelectedPrimaryWells
-  )
-  const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
 
   const selectWells = (wells: WellGroup) => {
     setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))

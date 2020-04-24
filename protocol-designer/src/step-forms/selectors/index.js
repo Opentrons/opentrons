@@ -14,7 +14,6 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   TEMPERATURE_DEACTIVATED,

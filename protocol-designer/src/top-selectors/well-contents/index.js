@@ -1,8 +1,9 @@
 // @flow
+import assert from 'assert'
 import { createSelector } from 'reselect'
-
 import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
+import last from 'lodash/last'
 import min from 'lodash/min'
 import pick from 'lodash/pick'
 import reduce from 'lodash/reduce'
@@ -70,35 +71,84 @@ export function _wellContentsForLabware(
   )
 }
 
-export const getAllWellContentsForSteps: Selector<
-  Array<WellContentsByLabware>
-> = createSelector(
+export type WellContentsForSteps = {
+  // Maybe-type key because upstream errors will mean there's no well contents for any downstream step.
+  [stepId: string]: ?WellContentsByLabware,
+}
+
+export const _getAllWellContentsForSavedSteps: Selector<WellContentsForSteps> = createSelector(
   fileDataSelectors.getInitialRobotState,
   fileDataSelectors.getRobotStateTimeline,
   stepFormSelectors.getLabwareEntities,
-  (initialRobotState, robotStateTimeline, labwareEntities) => {
-    // Add initial robot state frame, offsetting the timeline.
-    // This is because liquids state for a step shows the
-    // robot state just BEFORE the given step has occurred
-    const timeline = [
-      { robotState: initialRobotState },
-      ...robotStateTimeline.timeline,
-    ]
+  stepFormSelectors.getOrderedStepIds,
+  (initialRobotState, robotStateTimeline, labwareEntities, orderedStepIds) => {
+    const timeline = robotStateTimeline.timeline
+    // if there is a timeline error before the first step (eg no tips on deck),
+    // last valid state is the initial state.
+    const lastValidRobotState =
+      timeline[timeline.length - 1]?.robotState || initialRobotState
 
-    return timeline.map((timelineStep, timelineIndex) => {
-      const liquidState = timelineStep.robotState.liquidState.labware
-      return mapValues(
-        liquidState,
+    assert(
+      lastValidRobotState != null,
+      `_getAllWellContentsForSavedSteps could not get a lastValidRobotState`
+    )
+
+    return orderedStepIds.reduce((acc, stepId, stepIdx) => {
+      // We show the liquid state in the timeline frame before the given step.
+      let robotStateBeforeStep: ?StepGeneration.RobotState =
+        timeline[stepIdx]?.robotState
+
+      if (stepIdx === 0) {
+        // first step. use initialRobotState
+        robotStateBeforeStep = initialRobotState
+      }
+      if (robotStateBeforeStep == null) {
+        // either presaved step, or step downstream of a timeline error
+        robotStateBeforeStep = lastValidRobotState
+      }
+
+      const liquidStateByLabware = robotStateBeforeStep.liquidState.labware
+
+      const wellContentsByLabware: WellContentsByLabware = mapValues(
+        liquidStateByLabware,
         (
           labwareLiquids: StepGeneration.SingleLabwareLiquidState,
           labwareId: string
-        ) =>
+        ): ContentsByWell =>
           _wellContentsForLabware(
             labwareLiquids,
             labwareEntities[labwareId].def
           )
       )
-    })
+
+      return {
+        ...acc,
+        [stepId]: wellContentsByLabware,
+      }
+    }, {})
+  }
+)
+
+export const getAllWellContentsForAllSteps: Selector<WellContentsForSteps> = createSelector(
+  _getAllWellContentsForSavedSteps,
+  stepFormSelectors.getOrderedStepIds,
+  stepFormSelectors.getUnsavedForm,
+  stepFormSelectors.getCurrentFormIsPresaved,
+  (
+    savedStepsWellContents,
+    orderedStepIds,
+    unsavedForm,
+    currentFormIsPresaved
+  ) => {
+    // add the presaved step if it exists
+    if (currentFormIsPresaved && unsavedForm != null) {
+      const lastStepId = last(orderedStepIds)
+      return {
+        ...savedStepsWellContents,
+        [unsavedForm.id]: savedStepsWellContents[lastStepId],
+      }
+    }
+    return savedStepsWellContents
   }
 )
 
