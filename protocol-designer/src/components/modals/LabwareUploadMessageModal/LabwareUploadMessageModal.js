@@ -107,6 +107,12 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
         </p>
       </>
     )
+  } else if (message.messageType === 'ONLY_TIPRACK') {
+    return (
+      <>
+        <p>This labware is not a tiprack. Please upload a tiprack.</p>
+      </>
+    )
   }
   assert(false, `MessageBody got unhandled messageType: ${message.messageType}`)
   return null

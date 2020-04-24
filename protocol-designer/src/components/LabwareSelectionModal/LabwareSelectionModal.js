@@ -171,7 +171,7 @@ export const LabwareSelectionModal = (props: Props) => {
   )
 
   const labwareByCategory = useMemo(() => {
-    const defs = getOnlyLatestDefs()
+    const defs = { ...getOnlyLatestDefs(), ...customLabwareDefs }
     return reduce<
       LabwareDefByDefURI,
       { [category: string]: Array<LabwareDefinition2> }
@@ -194,7 +194,7 @@ export const LabwareSelectionModal = (props: Props) => {
       },
       {}
     )
-  }, [permittedTipracks])
+  }, [permittedTipracks, customLabwareDefs])
 
   const populatedCategories: { [category: string]: boolean } = useMemo(
     () =>

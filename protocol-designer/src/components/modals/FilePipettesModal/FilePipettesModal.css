@@ -95,10 +95,14 @@
   margin-right: 0.5rem;
 }
 
-.upload_custom_btn {
+.upload_button {
   display: block;
   width: 50%;
   margin: 1.25rem auto;
+}
+
+.upload_button input {
+  display: none;
 }
 
 .protocol_modules_group {
