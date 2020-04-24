@@ -29,6 +29,7 @@ import { TipPickUp } from './TipPickUp'
 import { CompleteConfirmation } from './CompleteConfirmation'
 import styles from './styles.css'
 import { CheckXYPoint } from './CheckXYPoint'
+import { CheckHeight } from './CheckHeight'
 
 const AXIS_BY_MOUNT = { left: 'z', right: 'a' }
 
@@ -130,7 +131,17 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       ) : null
       break
     }
-    case CHECK_STEP_CHECKING_HEIGHT:
+    case CHECK_STEP_CHECKING_HEIGHT: {
+      stepContents = activeInstrumentId ? (
+        <CheckHeight
+          robotName={robotName}
+          pipetteId={activeInstrumentId}
+          isMulti={isActiveInstrumentMultiChannel}
+          mount={activeMount}
+        />
+      ) : null
+      break
+    }
     case CHECK_STEP_SESSION_EXITED:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:
     case CHECK_STEP_NO_PIPETTES_ATTACHED: {

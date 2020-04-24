@@ -125,11 +125,6 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
 
-  const getDemoAsset = () => {
-    const channels = isMulti ? 'multi' : 'single'
-    return assetMap[currentStep][mount][channels]
-  }
-
   return (
     <>
       <div className={styles.modal_header}>
