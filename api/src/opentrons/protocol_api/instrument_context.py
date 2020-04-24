@@ -487,7 +487,14 @@ class InstrumentContext(CommandPublisher):
             if location.parent.is_tiprack:
                 self._log.warning('Touch_tip being performed on a tiprack. '
                                   'Please re-check your code')
-            self.move_to(location.top())
+
+            if self._api_version < APIVersion(2, 4):
+                to_loc = location.top()
+            else:
+                move_with_z_offset =\
+                    location.top().point + types.Point(0, 0, v_offset)
+                to_loc = types.Location(move_with_z_offset, location)
+            self.move_to(to_loc)
         else:
             raise TypeError(
                 'location should be a Well, but it is {}'.format(location))
