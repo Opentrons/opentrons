@@ -75,11 +75,13 @@ class Controller:
     async def setup_gpio_chardev(self):
         await self.gpio_chardev.setup()
         self._board_revision = self.determine_board_revision()
+        MODULE_LOG.info(f'-----> BOARD REV is {self._board_revision}')
 
     def determine_board_revision(self) -> BoardRevision:
         try:
             rev_bits = self.gpio_chardev.read_revision_bits()
             return BoardRevision.by_bits(rev_bits)
+<<<<<<< HEAD
         except RevisionPinsError:
             MODULE_LOG.info(
                 'Failed to detect central routing board revision gpio '
@@ -90,6 +92,13 @@ class Controller:
                 'Unexpected error from reading central routing board '
                 'revision bits')
             return BoardRevision.UNKNOWN
+=======
+        except Exception:
+            MODULE_LOG.warning(
+                'Failed to detect central routing board revision gpio '
+                'pins, defaulting to (OG) 2.1')
+            return BoardRevision.OG
+>>>>>>> made requested changes
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
