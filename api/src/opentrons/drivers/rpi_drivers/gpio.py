@@ -1,5 +1,6 @@
 import asyncio
 import logging
+import pathlib
 from typing import Dict, Tuple
 import time
 
@@ -31,6 +32,12 @@ INPUT_PINS = {
 }
 
 MODULE_LOG = logging.getLogger(__name__)
+
+DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
+
+
+class RevisionPinsError(Exception):
+    pass
 
 
 class GPIOCharDev:
@@ -154,8 +161,16 @@ class GPIOCharDev:
         return bool(self._read(INPUT_PINS['WINDOW_INPUT']))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
-        return (bool(self._read(INPUT_PINS['REV_0'])),
-                bool(self._read(INPUT_PINS['REV_1'])))
+        """ Read revision bit GPIO pins
+
+        If the gpio_rev_bit_pins device tree overlay is enabled,
+        returns the pins' values. Otherwise, return None
+        """
+        if pathlib.Path(DTOVERLAY_PATH).exists():
+            return (bool(self._read(INPUT_PINS['REV_0'])),
+                    bool(self._read(INPUT_PINS['REV_1'])))
+        else:
+            raise RevisionPinsError
 
     def release_line(self, offset: int):
         self.lines[offset].release()

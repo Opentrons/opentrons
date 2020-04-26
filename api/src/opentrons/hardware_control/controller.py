@@ -14,6 +14,7 @@ from opentrons.types import Mount
 
 from . import modules
 from .execution_manager import ExecutionManager
+from .types import BoardRevision
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -45,7 +46,7 @@ class Controller:
         self.config = config or opentrons.config.robot_configs.load()
 
         self._gpio_chardev = build_gpio_chardev('gpiochip0')
-        self._board_revision: Optional[str] = None
+        self._board_revision = BoardRevision.UNKNOWN
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, gpio_chardev=self._gpio_chardev,
@@ -67,23 +68,23 @@ class Controller:
         return self._gpio_chardev
 
     @property
-    def board_revision(self) -> Optional[str]:
+    def board_revision(self) -> BoardRevision:
         return self._board_revision
 
     async def setup_gpio_chardev(self):
         await self.gpio_chardev.setup()
         self._board_revision = self.determine_board_revision()
+        MODULE_LOG.info(f'-----> BOARD REV is {self._board_revision}')
 
-    def determine_board_revision(self) -> str:
-        rev_0, rev_1 = self.gpio_chardev.read_revision_bits()
-        if rev_0 and rev_1:
-            return '2.1'
-        elif not rev_0 and rev_1:
-            return 'A'
-        elif rev_0 and not rev_1:
-            return 'B'
-        else:
-            return 'C'
+    def determine_board_revision(self) -> BoardRevision:
+        try:
+            rev_bits = self.gpio_chardev.read_revision_bits()
+            return BoardRevision.by_bits(rev_bits)
+        except Exception:
+            MODULE_LOG.warning(
+                'Failed to detect central routing board revision gpio '
+                'pins, defaulting to (OG) 2.1')
+            return BoardRevision.OG
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
