@@ -49,6 +49,23 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
       pathExtension: 'loadLabware',
     },
     {
+      action: Actions.preparePipetteRobotCalibrationCheck(
+        mockRobot.name,
+        mockPipetteId
+      ),
+      pathExtension: 'preparePipette',
+      body: { pipetteId: mockPipetteId },
+    },
+    {
+      action: Actions.jogRobotCalibrationCheck(mockRobot.name, mockPipetteId, [
+        1,
+        0,
+        0,
+      ]),
+      pathExtension: 'jog',
+      body: { pipetteId: mockPipetteId, vector: [1, 0, 0] },
+    },
+    {
       action: Actions.pickUpTipRobotCalibrationCheck(
         mockRobot.name,
         mockPipetteId
@@ -56,9 +73,33 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
       pathExtension: 'pickUpTip',
       body: { pipetteId: mockPipetteId },
     },
+    {
+      action: Actions.confirmTipRobotCalibrationCheck(
+        mockRobot.name,
+        mockPipetteId
+      ),
+      pathExtension: 'confirmTip',
+      body: { pipetteId: mockPipetteId },
+    },
+    {
+      action: Actions.invalidateTipRobotCalibrationCheck(
+        mockRobot.name,
+        mockPipetteId
+      ),
+      pathExtension: 'invalidateTip',
+      body: { pipetteId: mockPipetteId },
+    },
+    {
+      action: Actions.confirmStepRobotCalibrationCheck(
+        mockRobot.name,
+        mockPipetteId
+      ),
+      pathExtension: 'confirmStep',
+      body: { pipetteId: mockPipetteId },
+    },
   ]
 
-  updateTriggers.forEach(({ action, pathExtension, body = {} }) => {
+  updateTriggers.forEach(({ action, pathExtension, body = undefined }) => {
     describe(`handles ${action.type}`, () => {
       const expectedRequest = {
         method: 'POST',
