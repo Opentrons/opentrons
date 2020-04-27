@@ -45,23 +45,21 @@ import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
 import type { InitialDeckSetup, ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'
 
-type EditModulesModalProps = {
+type EditModulesModalProps = {|
   moduleType: ModuleRealType,
   moduleOnDeck: ModuleOnDeck | null,
   onCloseClick: () => mixed,
   editModuleModel: (model: ModuleModel) => mixed,
   editModuleSlot: (slot: string) => mixed,
   displayModuleWarning: (module: ModelModuleInfo) => mixed,
-}
+|}
 
-type DeckInfo = {
+type EditModulesModalComponentProps = {|
+  ...EditModulesModalProps,
   initialDeckSetup: InitialDeckSetup,
-}
-
-type ModuleInfo = {
   moduleOnDeck: ModuleOnDeck | null,
   supportedModuleSlot: string,
-}
+|}
 
 export type EditModulesFormValues = {|
   selectedModel: ModuleModel | null,
@@ -149,9 +147,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
   )
 }
 
-const EditModulesModalComponent = (
-  props: EditModulesModalProps & DeckInfo & ModuleInfo
-) => {
+const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
   const {
     initialDeckSetup,
     moduleOnDeck,
