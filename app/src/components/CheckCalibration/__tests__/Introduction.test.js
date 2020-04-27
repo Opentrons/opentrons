@@ -1,9 +1,11 @@
 // @flow
 import * as React from 'react'
+import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
 
+import * as Calibration from '../../../calibration'
 import { mockRobot } from '../../../calibration/__fixtures__'
 import { Introduction } from '../Introduction'
 
@@ -11,9 +13,9 @@ jest.mock('../../../calibration/selectors')
 
 describe('Introduction', () => {
   let render
+  let mockStore
 
   const mockExit = jest.fn()
-  const mockProceed = jest.fn()
 
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="Continue"]').find('button')
@@ -36,13 +38,25 @@ describe('Introduction', () => {
   ]
 
   beforeEach(() => {
+    mockStore = {
+      subscribe: () => {},
+      getState: () => ({
+        mockState: true,
+      }),
+      dispatch: jest.fn(),
+    }
+
     render = (labwareLoadNames = tiprackLoadnames) => {
       return mount(
         <Introduction
           labwareLoadNames={labwareLoadNames}
           robotName={mockRobot.name}
           exit={mockExit}
-        />
+        />,
+        {
+          wrappingComponent: Provider,
+          wrappingComponentProps: { store: mockStore },
+        }
       )
     }
   })
@@ -74,7 +88,9 @@ describe('Introduction', () => {
 
     act(() => getClearDeckContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
-    expect(mockProceed).toHaveBeenCalled()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.loadLabwareRobotCalibrationCheck(mockRobot.name)
+    )
 
     act(() => getClearDeckCancelButton(wrapper).invoke('onClick')())
     wrapper.update()
