@@ -1,7 +1,9 @@
 // @flow
 import * as React from 'react'
+import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
+import * as Calibration from '../../../calibration'
 import {
   mockRobotCalibrationCheckSessionData,
   mockRobot,
@@ -19,11 +21,36 @@ const MockRobotWorkSpace: JestMockFn<
 > = RobotWorkSpace
 
 describe('DeckSetup', () => {
-  const mockProceed = jest.fn()
+  let mockStore
+  let render
+
+  const activeInstrumentId = Object.keys(
+    mockRobotCalibrationCheckSessionData.instruments
+  )[0]
 
   beforeEach(() => {
     // NOTE: deliberately not testing RobotWorkSpace internals here
     MockRobotWorkSpace.mockReturnValue(null)
+    mockStore = {
+      subscribe: () => {},
+      getState: () => ({
+        mockState: true,
+      }),
+      dispatch: jest.fn(),
+    }
+    render = () => {
+      return mount(
+        <DeckSetup
+          labware={mockRobotCalibrationCheckSessionData.labware}
+          robotName={mockRobot.name}
+          activeInstrumentId={activeInstrumentId}
+        />,
+        {
+          wrappingComponent: Provider,
+          wrappingComponentProps: { store: mockStore },
+        }
+      )
+    }
   })
 
   afterEach(() => {
@@ -31,18 +58,16 @@ describe('DeckSetup', () => {
   })
 
   it('clicking continue proceeds to next step', () => {
-    const wrapper = mount(
-      <DeckSetup
-        labware={mockRobotCalibrationCheckSessionData.labware}
-        robotName={mockRobot.name}
-        activeInstrumentId={
-          Object.keys(mockRobotCalibrationCheckSessionData.instruments)[0]
-        }
-      />
-    )
+    const wrapper = render()
+
     act(() => wrapper.find('button').invoke('onClick')())
     wrapper.update()
 
-    expect(mockProceed).toHaveBeenCalled()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.preparePipetteRobotCalibrationCheck(
+        mockRobot.name,
+        activeInstrumentId
+      )
+    )
   })
 })

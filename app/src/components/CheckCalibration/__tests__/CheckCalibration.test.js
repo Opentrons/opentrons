@@ -55,14 +55,14 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('creates a robot cal check session on mount', () => {
+  it('fetches robot cal check session on mount', () => {
     getRobotCalibrationCheckSession.mockReturnValue(
       mockRobotCalibrationCheckSessionData
     )
     render()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.createRobotCalibrationCheckSession('robot-name')
+      Calibration.fetchRobotCalibrationCheckSession('robot-name')
     )
   })
 
