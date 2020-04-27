@@ -159,7 +159,7 @@ describe('createPresavedStepForm', () => {
       changeTip: 'always',
       stepDetails: '',
       stepName: 'mix',
-      // TODO IMMEDIATELY: mix defaults are missing volume, etc!!!
+      // TODO(IL, 2020-04-27): mix defaults are missing volume, etc!!! Investigate in #3161
     })
   })
 
@@ -203,7 +203,7 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: '18', // TODO IMMEDIATELY should this be null b/c it's disengage?
+      engageHeight: '18',
       magnetAction: 'disengage',
       stepName: 'magnet',
       stepDetails: '',

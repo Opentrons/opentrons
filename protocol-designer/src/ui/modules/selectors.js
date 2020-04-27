@@ -81,7 +81,7 @@ export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
-// TODO IMMEDIATELY do we really need these as selectors?
+// TODO(IL, 2020-04-27) check if these selectors are used see #5488
 
 /** Get single magnetic module (assumes no multiples) */
 export const getSingleMagneticModuleId: Selector<
@@ -135,7 +135,7 @@ export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector
   }
 )
 
-// TODO IMMEDIATELY no longer needed??
+// TODO(IL, 2020-04-27) check if these selectors are used see #5488
 export const getMagnetLabwareEngageHeight: Selector<
   number | null
 > = createSelector(

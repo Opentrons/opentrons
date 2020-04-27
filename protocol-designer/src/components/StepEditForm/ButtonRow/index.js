@@ -7,7 +7,6 @@ import { i18n } from '../../../localization'
 import modalStyles from '../../modals/modal.css'
 import styles from './styles.css'
 
-// TODO IMMEDIATELY rename the "onFoo" to "handleFoo"
 type ButtonRowProps = {|
   handleClickMoreOptions: () => mixed,
   handleClose: () => mixed,

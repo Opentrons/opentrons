@@ -10,19 +10,18 @@ import {
   actions as stepsActions,
 } from '../../ui/steps'
 
-const itemId = PRESAVED_STEP_ID // TODO make this a prop, rename this component PresavedStepTerminalItem ???
-
 export const PresavedStepItem = () => {
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
   const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
-  const hovered = useSelector(getHoveredTerminalItemId) === itemId
-  const selected = useSelector(getSelectedTerminalItemId) === itemId
+  const hovered = useSelector(getHoveredTerminalItemId) === PRESAVED_STEP_ID
+  const selected = useSelector(getSelectedTerminalItemId) === PRESAVED_STEP_ID
 
   // Actions
   const dispatch = useDispatch()
   const toggleStepCollapsed = () =>
-    dispatch(stepsActions.toggleStepCollapsed(itemId))
-  const highlightStep = () => dispatch(stepsActions.hoverOnTerminalItem(itemId))
+    dispatch(stepsActions.toggleStepCollapsed(PRESAVED_STEP_ID))
+  const highlightStep = () =>
+    dispatch(stepsActions.hoverOnTerminalItem(PRESAVED_STEP_ID))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnTerminalItem(null))
 
   if (presavedStepForm === null) {
