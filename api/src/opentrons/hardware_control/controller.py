@@ -74,7 +74,6 @@ class Controller:
     async def setup_gpio_chardev(self):
         await self.gpio_chardev.setup()
         self._board_revision = self.determine_board_revision()
-        MODULE_LOG.info(f'-----> BOARD REV is {self._board_revision}')
 
     def determine_board_revision(self) -> BoardRevision:
         try:
