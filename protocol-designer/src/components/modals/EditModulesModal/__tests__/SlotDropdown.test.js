@@ -31,6 +31,7 @@ describe('Slot Dropdown', () => {
   beforeEach(() => {
     props = {
       fieldName: 'selectedModule',
+      tabIndex: 1,
       options: [
         {
           name: 'name',

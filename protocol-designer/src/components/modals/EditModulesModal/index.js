@@ -226,6 +226,7 @@ const EditModulesModalComponent = (
             <FormGroup label="Model*" className={styles.option_model}>
               <ModelDropdown
                 fieldName={'selectedModel'}
+                tabIndex={0}
                 options={MODELS_FOR_MODULE_TYPE[moduleType]}
               />
             </FormGroup>
@@ -248,6 +249,7 @@ const EditModulesModalComponent = (
                           options={getAllModuleSlotsByType(moduleType)}
                           error={slotError}
                           disabled={!enableSlotSelection}
+                          tabIndex={1}
                         />
                       </FormGroup>
                     </div>

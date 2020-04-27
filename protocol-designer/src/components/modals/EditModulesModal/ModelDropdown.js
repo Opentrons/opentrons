@@ -5,6 +5,7 @@ import { DropdownField } from '@opentrons/components/src/forms/DropdownField'
 
 type ModelDropdownProps = {
   fieldName: string,
+  tabIndex: number,
   options: Array<{|
     name: string,
     value: string,
@@ -12,11 +13,11 @@ type ModelDropdownProps = {
   |}>,
 }
 export const ModelDropdown = (props: ModelDropdownProps) => {
-  const { fieldName, options } = props
+  const { fieldName, options, tabIndex } = props
   const [field, meta] = useField(fieldName)
   return (
     <DropdownField
-      tabIndex={0}
+      tabIndex={tabIndex}
       options={options}
       name={fieldName}
       value={field.value}

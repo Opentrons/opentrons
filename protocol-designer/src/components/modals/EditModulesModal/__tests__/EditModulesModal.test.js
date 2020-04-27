@@ -183,6 +183,7 @@ describe('Edit Modules Modal', () => {
       const expectedProps = {
         fieldName: MODEL_FIELD,
         options: MODELS_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
+        tabIndex: 0,
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
     })
@@ -192,6 +193,7 @@ describe('Edit Modules Modal', () => {
       const expectedProps = {
         fieldName: MODEL_FIELD,
         options: MODELS_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
+        tabIndex: 0,
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
     })

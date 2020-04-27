@@ -33,6 +33,7 @@ describe('Model Dropdown', () => {
   beforeEach(() => {
     props = {
       fieldName: 'selectedModule',
+      tabIndex: 0,
       options: MODELS_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
     }
     mockStore = {

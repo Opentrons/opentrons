@@ -7,6 +7,7 @@ type ModelDropdownProps = {
   fieldName: string,
   error: string | null,
   disabled: boolean,
+  tabIndex: number,
   options: Array<{|
     name: string,
     value: string,
@@ -15,11 +16,11 @@ type ModelDropdownProps = {
 }
 
 export const SlotDropdown = (props: ModelDropdownProps) => {
-  const { fieldName, options, error, disabled } = props
+  const { fieldName, options, error, disabled, tabIndex } = props
   const [field] = useField(props.fieldName)
   return (
     <DropdownField
-      tabIndex={1}
+      tabIndex={tabIndex}
       options={options}
       name={fieldName}
       value={field.value}
