@@ -4,7 +4,9 @@
     "warning": "warning"
   },
   "dismiss": "dismiss",
-  "field": {},
+  "field": {
+    "required": "This field is required"
+  },
   "form": {},
   "hint": {
     "dont_show_again": "Don't show me again",

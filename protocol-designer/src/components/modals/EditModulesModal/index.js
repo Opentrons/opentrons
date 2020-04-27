@@ -88,7 +88,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
   const validationSchema = Yup.object().shape({
     selectedModel: Yup.string()
       .nullable()
-      .required('This field is required'),
+      .required(i18n.t('alert.field.required')),
     selectedSlot: Yup.string().required(),
   })
 
