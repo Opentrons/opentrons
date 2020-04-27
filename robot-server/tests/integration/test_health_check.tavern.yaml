@@ -21,7 +21,7 @@ stages:
         system_version: 0.0.0
         protocol_api_version:
           - 2
-          - 3
+          - 4
         links:
           apiLog: /logs/api.log
           serialLog: /logs/serial.log

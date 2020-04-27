@@ -55,7 +55,7 @@ stages:
             API.*"
           restart_required: true
           value: !anything
-        links: {}
+        links: !anydict 
 
 ---
 # All Possible Settings with bool values

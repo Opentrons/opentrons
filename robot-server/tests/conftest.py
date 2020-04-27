@@ -42,3 +42,21 @@ def run_server():
     yield thread
     thread.terminate()
     thread.join()
+
+
+@pytest.fixture
+def attach_pipettes():
+    import json
+    import os
+    pipette = {
+        "dropTipShake": True,
+        "model": "p300_multi_v1"
+    }
+    pipette_file_path = os.path.join(
+        os.path.expanduser('~'), '.opentrons/pipettes', 'testpipette01.json'
+    )
+    pipette_file = open(pipette_file_path, 'w')
+    json.dump(pipette, pipette_file)
+    pipette_file.close()
+    yield
+    os.remove(pipette_file_path)
