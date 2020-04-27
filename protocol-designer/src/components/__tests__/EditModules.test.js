@@ -7,16 +7,12 @@ import { Provider } from 'react-redux'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as tutorialSelectors } from '../../tutorial'
 import { BlockingHint } from '../Hints/useBlockingHint'
-import { Portal } from '../portals/MainPageModalPortal'
 import { EditModulesModal } from '../modals/EditModulesModal'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 
 jest.mock('../../step-forms/selectors')
 jest.mock('../../tutorial')
 jest.mock('../modals/EditModulesModal')
-jest.mock('../portals/MainPageModalPortal.js')
-
-const mockPortal: JestMockFn<any, any> = Portal
 
 const mockEditModulesModal: JestMockFn<any, any> = EditModulesModal
 
@@ -49,7 +45,6 @@ describe('Edit Modules', () => {
     getInitialDeckSetupMock.mockReturnValue({
       modules: { [TEST_ID]: {} },
     })
-    mockPortal.mockReturnValue(<div>mock portal</div>)
     mockEditModulesModal.mockReturnValue(<div>mock edit modules modal</div>)
   })
 
