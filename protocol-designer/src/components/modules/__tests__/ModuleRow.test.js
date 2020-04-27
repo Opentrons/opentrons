@@ -57,7 +57,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(Tooltip)).toHaveLength(1)
+    expect(wrapper.find(Tooltip)).toBeTruthy()
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toEqual(['4'])
   })
 
@@ -72,7 +72,7 @@ describe('ModuleRow', () => {
 
     const wrapper = render(props)
 
-    expect(wrapper.find(Tooltip)).toHaveLength(1)
+    expect(wrapper.find(Tooltip)).toBeTruthy()
     expect(wrapper.find(SlotMap).prop('collisionSlots')).toEqual(['6'])
   })
 
