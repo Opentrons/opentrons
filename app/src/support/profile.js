@@ -52,7 +52,8 @@ export function makeProfileUpdate(
   state: State
 ): SupportProfileUpdate | null {
   switch (action.type) {
-    // TODO(mc, 2020-04-21): this code is not covered by unit tests
+    // TODO(mc, 2020-04-21): this code is not covered by unit tests and sets
+    // too much data in one go. Refactor to handle each action individually
     case 'robot:CONNECT_RESPONSE':
     case RobotSettings.FETCH_SETTINGS_SUCCESS:
     case RobotSettings.UPDATE_SETTING_SUCCESS:
