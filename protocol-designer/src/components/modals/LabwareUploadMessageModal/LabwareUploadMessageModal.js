@@ -110,7 +110,7 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   } else if (message.messageType === 'ONLY_TIPRACK') {
     return (
       <>
-        <p>This labware is not a tiprack. Please upload a tiprack.</p>
+        <p>This labware definition is not a Tip Rack.</p>
       </>
     )
   }
