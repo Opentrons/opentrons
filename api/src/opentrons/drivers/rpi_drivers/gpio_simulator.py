@@ -89,10 +89,11 @@ class SimulatingGPIOCharDev:
         pass
 
     def read_window_switches(self) -> bool:
-        pass
+        return (bool(self._read(OUTPUT_PINS['WINDOW_INPUT'])))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
-        pass
+        return (bool(self._read(OUTPUT_PINS['REV_0'])),
+                bool(self._read(OUTPUT_PINS['REV_1'])))
 
     def release_line(self, offset: int):
         self.lines.pop(offset)
