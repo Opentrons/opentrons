@@ -250,6 +250,10 @@ class Simulator:
     async def update_fw_version(self):
         pass
 
+    @property
+    def board_revision(self) -> str:
+        return '2.1'
+
     async def update_firmware(self, filename, loop, modeset) -> str:
         return 'Did nothing (simulating)'
 

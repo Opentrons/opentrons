@@ -209,6 +209,10 @@ class API(HardwareAPILike):
     def fw_version(self) -> Optional[str]:
         return self.get_fw_version()
 
+    @property
+    def board_revision(self) -> str:
+        return str(self._backend.board_revision)
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(self, button: bool = None, rails: bool = None):
