@@ -26,7 +26,7 @@ import {
 import type { StepType } from '../../form-types'
 
 export { handleFormChange } from './handleFormChange'
-export { generateNewForm } from './generateNewForm'
+export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
 export { getDisabledFields } from './getDisabledFields'
 export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'

@@ -28,15 +28,15 @@ export type { StepFieldName }
 const getLabwareEntity = (
   state: InvariantContext,
   id: string
-): LabwareEntity => {
-  return state.labwareEntities[id]
+): LabwareEntity | null => {
+  return state.labwareEntities[id] || null
 }
 
 const getPipetteEntity = (
   state: InvariantContext,
   id: string
-): PipetteEntity => {
-  return state.pipetteEntities[id]
+): PipetteEntity | null => {
+  return state.pipetteEntities[id] || null
 }
 
 type StepFieldHelpers = {|

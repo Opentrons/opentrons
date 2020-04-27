@@ -20,7 +20,7 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
-  generateNewForm,
+  createBlankForm,
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
@@ -634,7 +634,7 @@ export function _getStepFormData(
     return null
   }
 
-  return generateNewForm({
+  return createBlankForm({
     stepId,
     stepType: stepType,
   })
