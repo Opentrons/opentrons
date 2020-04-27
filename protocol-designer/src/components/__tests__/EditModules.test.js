@@ -53,11 +53,11 @@ describe('Edit Modules', () => {
   })
 
   const render = props =>
-    mount(
-      <Provider store={mockStore}>
-        <EditModules {...props} />
-      </Provider>
-    )
+    mount(<EditModules {...props} />, {
+      wrappingComponent: Provider,
+      wrappingComponentProps: { store: mockStore },
+    })
+
   it('should initially render the edit modules modal', () => {
     const wrapper = render(props)
     expect(wrapper.find(EditModulesModal)).toHaveLength(1)

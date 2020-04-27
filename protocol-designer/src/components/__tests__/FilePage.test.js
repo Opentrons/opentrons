@@ -28,12 +28,15 @@ describe('File Page', () => {
       getState: () => ({ mock: 'this is a mocked out getState' }),
     }
   })
+
+  const render = props =>
+    mount(<FilePage {...props} />, {
+      wrappingComponent: Provider,
+      wrappingComponentProps: { store: mockStore },
+    })
+
   it('renders a file page with Edit Modules closed', () => {
-    const wrapper = mount(
-      <Provider store={mockStore}>
-        <FilePage {...props} />
-      </Provider>
-    )
+    const wrapper = render(props)
     expect(wrapper.find(EditModules)).toHaveLength(0)
   })
 })
