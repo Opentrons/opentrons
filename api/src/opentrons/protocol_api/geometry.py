@@ -73,7 +73,15 @@ BAD_PAIRS = [('1', '12'),
              ('4', '12'),
              ('12', '4'),
              ('4', '9'),
-             ('9, 4')]
+             ('9, 4'),
+             ('4', '8'),
+             ('8', '4'),
+             ('1', '8'),
+             ('8', '1'),
+             ('4', '11'),
+             ('11', '4'),
+             ('1', '11'),
+             ('11', '1')]
 
 
 def should_dodge_thermocycler(
@@ -388,7 +396,9 @@ class Deck(UserDict):
             with the given item.
         """
         def get_item_covered_slot_keys(sk, i):
-            if isinstance(i, ThermocyclerGeometry):
+            if isinstance(i, ThermocyclerGeometry) and i.is_semi_configuration:
+                return(set([7, 10]))
+            elif isinstance(i, ThermocyclerGeometry):
                 return(set([7, 8, 10, 11]))
             elif i is not None:
                 return set([sk])

@@ -398,7 +398,8 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def load_module(
             self, module_name: str,
-            location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+            location: Optional[types.DeckLocation] = None,
+            configuration: str = None) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
@@ -418,6 +419,9 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler - it will always be
                          in Slot 7.
+        :param configuration: Used to specify the slot configuration of
+                              the Thermocycler. Only Valid in Python API
+                              Version 2.4 and later.
         :type location: str or int or None
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
@@ -430,7 +434,8 @@ class ProtocolContext(CommandPublisher):
             resolved_model,
             self._deck_layout.position_for(
                 resolved_location),
-            self._api_version)
+            self._api_version,
+            configuration)
         hc_mod_instance = None
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,

@@ -227,7 +227,8 @@ class ThermocyclerGeometry(ModuleGeometry):
                  height_over_labware: float,
                  lid_height: float,
                  parent: Location,
-                 api_level: APIVersion) -> None:
+                 api_level: APIVersion,
+                 configuration: str) -> None:
         """
         Create a Module for tracking the position of a module.
 
@@ -262,9 +263,7 @@ class ThermocyclerGeometry(ModuleGeometry):
             height_over_labware, parent, api_level)
         self._lid_height = lid_height
         self._lid_status = 'open'   # Needs to reflect true status
-        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset
-        # to be from a flag in context, according to drawings, the only
-        # difference is -23.28mm in the x-axis
+        self._configuration = configuration
 
     @property
     def highest_z(self) -> float:
@@ -287,11 +286,15 @@ class ThermocyclerGeometry(ModuleGeometry):
     def lid_status(self, status) -> None:
         self._lid_status = status
 
+    @property
+    def is_semi_configuration(self) -> bool:
+        return bool(self._configuration == 'semi')
+
     # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
         definition = labware._definition
-        definition['ordering'] = definition['ordering'][3::]
+        definition['ordering'] = definition['ordering'][2::]
         return Labware(
             definition, super().location, api_level=self._api_version)
 
@@ -300,13 +303,17 @@ class ThermocyclerGeometry(ModuleGeometry):
             '{} is already on this module'.format(self._labware)
         assert self.lid_status != 'closed', \
             'Cannot place labware in closed module'
-        self._labware = labware
+        if self._configuration == 'semi':
+            self._labware = self.labware_accessor(labware)
+        else:
+            self._labware = labware
         return self._labware
 
 
 def _load_from_v1(definition: Dict[str, Any],
                   parent: Location,
-                  api_level: APIVersion) -> ModuleGeometry:
+                  api_level: APIVersion,
+                  configuration) -> ModuleGeometry:
     """ Load a module geometry from a v1 definition.
 
     The definition should be schema checked before being passed to this
@@ -332,6 +339,8 @@ def _load_from_v1(definition: Dict[str, Any],
 
     if model in ThermocyclerModuleModel:
         lid_height = definition['dimensions']['lidHeight']
+        if configuration == 'semi':
+            offset = offset + Point(-23.28, 0, 0)
         mod: ModuleGeometry = \
             ThermocyclerGeometry(definition["displayName"],
                                  model,
@@ -341,7 +350,8 @@ def _load_from_v1(definition: Dict[str, Any],
                                  height_over_labware,
                                  lid_height,
                                  parent,
-                                 api_level)
+                                 api_level,
+                                 configuration)
     else:
         mod = ModuleGeometry(definition['displayName'],
                              model,
@@ -355,7 +365,8 @@ def _load_from_v1(definition: Dict[str, Any],
 
 def _load_from_v2(definition: Dict[str, Any],
                   parent: Location,
-                  api_level: APIVersion) -> ModuleGeometry:
+                  api_level: APIVersion,
+                  configuration: str) -> ModuleGeometry:
     """ Load a module geometry from a v2 definition.
 
     The definition should be schema checked before being passed to this
@@ -393,8 +404,12 @@ def _load_from_v2(definition: Dict[str, Any],
             ModuleType.TEMPERATURE.value}:
         return ModuleGeometry(**opts)
     elif definition['moduleType'] == ModuleType.THERMOCYCLER.value:
+        if configuration == 'semi':
+            new_offset = opts['offset'] + Point(-23.28, 0, 0)
+            opts.update({'offset': new_offset})
         return ThermocyclerGeometry(
             lid_height=definition['dimensions']['lidHeight'],
+            configuration=configuration,
             **opts)
     else:
         raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
@@ -403,7 +418,8 @@ def _load_from_v2(definition: Dict[str, Any],
 def load_module_from_definition(
         definition: Dict[str, Any],
         parent: Location,
-        api_level: APIVersion = None) -> ModuleGeometry:
+        api_level: APIVersion = None,
+        configuration: str = None) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
     matching the v1 module definition schema
@@ -421,9 +437,10 @@ def load_module_from_definition(
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     schema = definition.get("$otSharedSchema")
+    configuration = configuration if configuration else 'full'
     if not schema:
         # v1 definitions don't have schema versions
-        return _load_from_v1(definition, parent, api_level)
+        return _load_from_v1(definition, parent, api_level, configuration)
     if schema == 'module/schemas/2':
         schema_doc = json.loads(load_shared_data("module/schemas/2.json"))
         try:
@@ -431,7 +448,7 @@ def load_module_from_definition(
         except jsonschema.ValidationError:
             log.exception("Failed to validate module def schema")
             raise RuntimeError('The specified module definition is not valid.')
-        return _load_from_v2(definition, parent, api_level)
+        return _load_from_v2(definition, parent, api_level, configuration)
     elif isinstance(schema, str):
         maybe_schema = re.match('^module/schemas/([0-9]+)$', schema)
         if maybe_schema:
@@ -473,6 +490,7 @@ def _load_module_definition(api_level: APIVersion,
     """
     Load the appropriate module definition for this api version
     """
+
     if api_level < V2_MODULE_DEF_VERSION:
         try:
             return _load_v1_module_def(module_model)
@@ -492,7 +510,8 @@ def _load_module_definition(api_level: APIVersion,
 def load_module(
         model: ModuleModel,
         parent: Location,
-        api_level: APIVersion = None) -> ModuleGeometry:
+        api_level: APIVersion = None,
+        configuration: str = None) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a definition looked up
     by name.
@@ -510,7 +529,14 @@ def load_module(
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     defn = _load_module_definition(api_level, model)
-    return load_module_from_definition(defn, parent, api_level)
+    if api_level < APIVersion(2, 4) and configuration:
+        log.warning(
+                f'You have specified API {api_level}, but you are trying to'
+                'are trying to utilize thermocycler parameters only in 2.4')
+        return load_module_from_definition(defn, parent, api_level)
+    else:
+        return load_module_from_definition(
+            defn, parent, api_level, configuration)
 
 
 def resolve_module_model(module_name: str) -> ModuleModel:
