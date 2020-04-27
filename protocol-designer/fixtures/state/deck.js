@@ -7,7 +7,7 @@ import {
   TEMPERATURE_DEACTIVATED,
 } from '@opentrons/shared-data'
 
-export const mockMagneticModule = {
+const mockMagneticModule = {
   id: 'mag_mod',
   moduleState: {
     type: MAGNETIC_MODULE_TYPE,
@@ -18,7 +18,7 @@ export const mockMagneticModule = {
   model: MAGNETIC_MODULE_V1,
 }
 
-export const mockTemperatureModule = {
+const mockTemperatureModule = {
   id: 'temp_mod',
   moduleState: {
     type: TEMPERATURE_MODULE_TYPE,
@@ -30,7 +30,7 @@ export const mockTemperatureModule = {
   model: TEMPERATURE_MODULE_V1,
 }
 
-export const mockDeckSetup = {
+const mockDeckSetup = {
   labware: {
     well96Id: {
       ...fixture_96_plate,
@@ -43,3 +43,7 @@ export const mockDeckSetup = {
   },
   pipettes: {},
 }
+
+export const getMockMagneticModule = () => mockMagneticModule
+export const getMockTemperatureModule = () => mockTemperatureModule
+export const getMockDeckSetup = () => mockDeckSetup

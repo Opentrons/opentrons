@@ -12,9 +12,9 @@ import {
   TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  mockDeckSetup,
-  mockMagneticModule,
-  mockTemperatureModule,
+  getMockDeckSetup,
+  getMockMagneticModule,
+  getMockTemperatureModule,
 } from '../../../../../fixtures/state/deck'
 import {
   actions as stepFormActions,
@@ -83,11 +83,11 @@ describe('Edit Modules Modal', () => {
   let props
   beforeEach(() => {
     mockFormikValueChange()
-    getInitialDeckSetupMock.mockReturnValue(mockDeckSetup)
+    getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
     getLabwareOnSlotMock.mockReturnValueOnce({})
     props = {
-      moduleOnDeck: mockMagneticModule,
+      moduleOnDeck: getMockMagneticModule(),
       moduleType: MAGNETIC_MODULE_TYPE,
       onCloseClick: jest.fn(),
       editModuleModel: jest.fn(),
@@ -225,7 +225,7 @@ describe('Edit Modules Modal', () => {
     })
 
     it('edits the model and slot if module is not magnetic module', () => {
-      props.moduleOnDeck = mockTemperatureModule
+      props.moduleOnDeck = getMockTemperatureModule()
       const wrapper = render(props)
       const formik = wrapper.find(Formik.Formik)
       const mockValues = {
