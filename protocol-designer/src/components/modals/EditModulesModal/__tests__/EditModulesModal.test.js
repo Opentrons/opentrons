@@ -92,7 +92,7 @@ describe('Edit Modules Modal', () => {
       onCloseClick: jest.fn(),
       editModuleModel: jest.fn(),
       editModuleSlot: jest.fn(),
-      setChangeModuleWarningInfo: jest.fn(),
+      displayModuleWarning: jest.fn(),
     }
     mockStore = {
       dispatch: jest.fn(),
@@ -218,7 +218,7 @@ describe('Edit Modules Modal', () => {
       act(() => {
         formik.invoke('onSubmit')(mockValues)
       })
-      expect(props.setChangeModuleWarningInfo).toHaveBeenCalledWith({
+      expect(props.displayModuleWarning).toHaveBeenCalledWith({
         model: mockValues.selectedModel,
         slot: mockValues.selectedSlot,
       })

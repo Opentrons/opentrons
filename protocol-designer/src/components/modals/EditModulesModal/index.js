@@ -51,7 +51,7 @@ type EditModulesModalProps = {
   onCloseClick: () => mixed,
   editModuleModel: (model: ModuleModel) => mixed,
   editModuleSlot: (slot: string) => mixed,
-  setChangeModuleWarningInfo: (module: ModelModuleInfo) => mixed,
+  displayModuleWarning: (module: ModelModuleInfo) => mixed,
 }
 
 type DeckInfo = {
@@ -71,7 +71,7 @@ export type EditModulesFormValues = {|
 export const EditModulesModal = (props: EditModulesModalProps) => {
   const {
     moduleType,
-    setChangeModuleWarningInfo,
+    displayModuleWarning,
     editModuleModel,
     editModuleSlot,
     onCloseClick,
@@ -109,7 +109,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
       if (moduleOnDeck.model !== selectedModel) {
         if (moduleOnDeck.type === MAGNETIC_MODULE_TYPE) {
           // we're changing Magnetic Module's model, show the blocking hint modal
-          setChangeModuleWarningInfo({
+          displayModuleWarning({
             model: selectedModel,
             slot: selectedSlot,
           })

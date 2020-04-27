@@ -32,7 +32,7 @@ export const EditModules = (props: EditModulesProps) => {
   const moduleOnDeck = moduleId ? _initialDeckSetup.modules[moduleId] : null
   const [
     changeModuleWarningInfo,
-    setChangeModuleWarningInfo,
+    displayModuleWarning,
   ] = useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
@@ -59,7 +59,7 @@ export const EditModules = (props: EditModulesProps) => {
   const changeModuleWarning = useBlockingHint({
     hintKey: 'change_magnet_module_model',
     handleCancel: () => {
-      setChangeModuleWarningInfo(null)
+      displayModuleWarning(null)
     },
     handleContinue: () => {
       if (changeModuleWarningInfo) {
@@ -68,7 +68,7 @@ export const EditModules = (props: EditModulesProps) => {
       } else {
         console.error('no module info set, could not edit module')
       }
-      setChangeModuleWarningInfo(null)
+      displayModuleWarning(null)
       onCloseClick()
     },
     content: <MagneticModuleWarningModalContent />,
@@ -83,7 +83,7 @@ export const EditModules = (props: EditModulesProps) => {
         onCloseClick={onCloseClick}
         editModuleSlot={editModuleSlot}
         editModuleModel={editModuleModel}
-        setChangeModuleWarningInfo={setChangeModuleWarningInfo}
+        displayModuleWarning={displayModuleWarning}
       />
     )
   )

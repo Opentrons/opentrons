@@ -67,13 +67,13 @@ describe('Edit Modules', () => {
     const wrapper = render(props)
     expect(wrapper.find(EditModulesModal)).toHaveLength(1)
   })
-  it('should render the module change warning when setChangeModuleWarningInfo is called from EditModulesModal', () => {
+  it('should render the module change warning when displayModuleWarning is called from EditModulesModal', () => {
     const wrapper = render(props)
     const editModulesModal = wrapper.find(EditModulesModal)
     expect(editModulesModal).toHaveLength(1)
 
     act(() => {
-      editModulesModal.prop('setChangeModuleWarningInfo')({
+      editModulesModal.prop('displayModuleWarning')({
         model: 'some_model',
         slot: 'some_slot',
       })
