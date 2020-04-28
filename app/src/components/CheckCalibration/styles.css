@@ -219,6 +219,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .pick_up_tip_confirmation_body {
   margin: 1rem 0;
 }
+
 .pick_up_tip_confirmation_button {
   margin-top: 1rem;
   width: 80%;
@@ -235,5 +236,5 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 
 .loading_spinner {
   width: 7.5rem;
-  margin-bottom: 3rem
+  margin-bottom: 3rem;
 }
