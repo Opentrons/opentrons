@@ -36,10 +36,6 @@ MODULE_LOG = logging.getLogger(__name__)
 DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 
-class RevisionPinsError(Exception):
-    pass
-
-
 class GPIOCharDev:
     def __init__(self, chip_name: str):
         self._chip = gpiod.Chip(chip_name)

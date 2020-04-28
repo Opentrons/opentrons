@@ -66,10 +66,10 @@ class BoardRevision(enum.Enum):
     @classmethod
     def by_bits(cls, rev_bits: Tuple[bool, bool]):
         br = {
-            (1, 1): cls.OG,
-            (0, 1): cls.A,
-            (1, 0): cls.B,
-            (0, 0): cls.C
+            (True, True): cls.OG,
+            (False, True): cls.A,
+            (True, False): cls.B,
+            (False, False): cls.C
         }
         return br[rev_bits]
 

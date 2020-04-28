@@ -13,6 +13,8 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from . import modules
 from .execution_manager import ExecutionManager
+from .types import BoardRevision
+
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
     from opentrons.drivers.rpi_drivers.dev_types\
@@ -251,8 +253,8 @@ class Simulator:
         pass
 
     @property
-    def board_revision(self) -> str:
-        return '2.1'
+    def board_revision(self) -> BoardRevision:
+        return BoardRevision.OG
 
     async def update_firmware(self, filename, loop, modeset) -> str:
         return 'Did nothing (simulating)'

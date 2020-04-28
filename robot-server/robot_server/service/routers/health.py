@@ -40,7 +40,7 @@ async def get_health(
     return Health(name=config.name(),
                   api_version=__version__,
                   fw_version=fw_version,
-                  board_revision=hardware.board_revision,  # type: ignore
+                  board_revision=hardware.board_revision,
                   logs=static_paths,
                   system_version=config.OT_SYSTEM_VERSION,
                   protocol_api_version=list(max_supported),

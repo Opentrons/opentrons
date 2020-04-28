@@ -8,7 +8,8 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.rpi_drivers import (build_gpio_chardev,
+                                           RevisionPinsError)
 import opentrons.config
 from opentrons.types import Mount
 
@@ -79,11 +80,16 @@ class Controller:
         try:
             rev_bits = self.gpio_chardev.read_revision_bits()
             return BoardRevision.by_bits(rev_bits)
-        except Exception:
-            MODULE_LOG.warning(
+        except RevisionPinsError:
+            MODULE_LOG.info(
                 'Failed to detect central routing board revision gpio '
                 'pins, defaulting to (OG) 2.1')
             return BoardRevision.OG
+        except Exception:
+            MODULE_LOG.exception(
+                'Unexpected error from reading central routing board '
+                'revision bits')
+            return BoardRevision.UNKNOWN
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
