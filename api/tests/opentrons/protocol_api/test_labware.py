@@ -370,7 +370,9 @@ def test_module_load_v1(v1_module_name):
     assert mod.highest_z == high_z + 3
     assert mod.location.point == (offset + Point(1, 2, 3))
     mod2 = module_geometry.load_module_from_definition(
-        module_defs[v1_module_name], Location(Point(3, 2, 1), 'test2'))
+        module_defs[v1_module_name],
+        Location(Point(3, 2, 1), 'test2'),
+        module_geometry.ThermocyclerConfiguration.FULL)
     assert mod2.highest_z == high_z + 1
     assert mod2.location.point == (offset + Point(3, 2, 1))
 

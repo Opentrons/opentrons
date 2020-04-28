@@ -7,7 +7,7 @@ objects on the deck (as opposed to calling commands on them, which is handled
 by :py:mod:`.module_contexts`)
 """
 
-from enum import Enum
+from enum import Enum, auto
 import functools
 import json
 import logging
@@ -25,6 +25,7 @@ from .labware import Labware
 
 
 E = TypeVar('E', bound='_ProvideLookup')
+Configuration = TypeVar('Configuration', bound='GenericConfiguration')
 
 
 class _ProvideLookup(Enum):
@@ -34,6 +35,24 @@ class _ProvideLookup(Enum):
             if m.value == typename:
                 return m
         raise AttributeError(f'No such module type {typename}')
+
+
+class GenericConfiguration(Enum):
+    @classmethod
+    def configuration_type(
+            cls: Type[Configuration], config: str) -> 'Configuration':
+        for m in cls.__members__.values():
+            if m.name == config.upper():
+                return m
+        raise AttributeError(f'{config} not available')
+
+
+class ThermocyclerConfiguration(GenericConfiguration):
+    FULL = auto()
+    SEMI = auto()
+
+    def __str__(self):
+        return self.name
 
 
 class ModuleType(_ProvideLookup):
@@ -227,7 +246,9 @@ class ThermocyclerGeometry(ModuleGeometry):
                  height_over_labware: float,
                  lid_height: float,
                  parent: Location,
-                 api_level: APIVersion) -> None:
+                 api_level: APIVersion,
+                 configuration: GenericConfiguration =
+                 ThermocyclerConfiguration.FULL) -> None:
         """
         Create a Module for tracking the position of a module.
 
@@ -256,15 +277,19 @@ class ThermocyclerGeometry(ModuleGeometry):
                                      :py:class:`ModuleGeometry` instance. The
                                      :py:class:`ModuleGeometry` will
                                      conform to this level.
+        :param configuration: Used to specify the slot configuration of
+                              the Thermocycler. It should by of type
+                              :py:class:`.ThermocyclerConfiguration` and can
+                              either be FULL or SEMI.
         """
         super().__init__(
             display_name, model, module_type, offset, overall_height,
             height_over_labware, parent, api_level)
         self._lid_height = lid_height
         self._lid_status = 'open'   # Needs to reflect true status
-        # TODO: BC 2019-07-25 add affordance for "semi" configuration offset
-        # to be from a flag in context, according to drawings, the only
-        # difference is -23.28mm in the x-axis
+        self._configuration = configuration
+        if self.is_semi_configuration:
+            self._offset = self._offset + Point(-23.28, 0, 0)
 
     @property
     def highest_z(self) -> float:
@@ -287,11 +312,22 @@ class ThermocyclerGeometry(ModuleGeometry):
     def lid_status(self, status) -> None:
         self._lid_status = status
 
+    @property
+    def is_semi_configuration(self) -> bool:
+        return bool(self._configuration == ThermocyclerConfiguration.SEMI)
+
+    @property
+    def covered_slots(self) -> set:
+        if self.is_semi_configuration:
+            return {7, 10}
+        else:
+            return {7, 8, 10, 11}
+
     # NOTE: this func is unused until "semi" configuration
     def labware_accessor(self, labware: Labware) -> Labware:
         # Block first three columns from being accessed
         definition = labware._definition
-        definition['ordering'] = definition['ordering'][3::]
+        definition['ordering'] = definition['ordering'][2::]
         return Labware(
             definition, super().location, api_level=self._api_version)
 
@@ -300,7 +336,10 @@ class ThermocyclerGeometry(ModuleGeometry):
             '{} is already on this module'.format(self._labware)
         assert self.lid_status != 'closed', \
             'Cannot place labware in closed module'
-        self._labware = labware
+        if self.is_semi_configuration:
+            self._labware = self.labware_accessor(labware)
+        else:
+            self._labware = labware
         return self._labware
 
 
@@ -355,7 +394,8 @@ def _load_from_v1(definition: Dict[str, Any],
 
 def _load_from_v2(definition: Dict[str, Any],
                   parent: Location,
-                  api_level: APIVersion) -> ModuleGeometry:
+                  api_level: APIVersion,
+                  configuration: GenericConfiguration) -> ModuleGeometry:
     """ Load a module geometry from a v2 definition.
 
     The definition should be schema checked before being passed to this
@@ -395,6 +435,7 @@ def _load_from_v2(definition: Dict[str, Any],
     elif definition['moduleType'] == ModuleType.THERMOCYCLER.value:
         return ThermocyclerGeometry(
             lid_height=definition['dimensions']['lidHeight'],
+            configuration=configuration,
             **opts)
     else:
         raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
@@ -403,7 +444,9 @@ def _load_from_v2(definition: Dict[str, Any],
 def load_module_from_definition(
         definition: Dict[str, Any],
         parent: Location,
-        api_level: APIVersion = None) -> ModuleGeometry:
+        api_level: APIVersion = None,
+        configuration: GenericConfiguration =
+        ThermocyclerConfiguration.FULL) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
     matching the v1 module definition schema
@@ -431,7 +474,7 @@ def load_module_from_definition(
         except jsonschema.ValidationError:
             log.exception("Failed to validate module def schema")
             raise RuntimeError('The specified module definition is not valid.')
-        return _load_from_v2(definition, parent, api_level)
+        return _load_from_v2(definition, parent, api_level, configuration)
     elif isinstance(schema, str):
         maybe_schema = re.match('^module/schemas/([0-9]+)$', schema)
         if maybe_schema:
@@ -473,6 +516,7 @@ def _load_module_definition(api_level: APIVersion,
     """
     Load the appropriate module definition for this api version
     """
+
     if api_level < V2_MODULE_DEF_VERSION:
         try:
             return _load_v1_module_def(module_model)
@@ -492,7 +536,8 @@ def _load_module_definition(api_level: APIVersion,
 def load_module(
         model: ModuleModel,
         parent: Location,
-        api_level: APIVersion = None) -> ModuleGeometry:
+        api_level: APIVersion = None,
+        configuration: str = None) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a definition looked up
     by name.
@@ -507,10 +552,24 @@ def load_module(
                                  :py:class:`ModuleGeometry` will
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param configuration: Used to specify the slot configuration of
+                        the Thermocycler. Only Valid in Python API
+                        Version 2.4 and later. If you wish to use
+                        the non-full plate configuration, you must
+                        pass in the key word value `semi`
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     defn = _load_module_definition(api_level, model)
-    return load_module_from_definition(defn, parent, api_level)
+    if configuration:
+        # Here we are converting the string passed in to a
+        # configuration type. For now we only have
+        # Thermocycler configurations, but there could be others
+        # in the future
+        return load_module_from_definition(
+            defn, parent, api_level,
+            ThermocyclerConfiguration.configuration_type(configuration))
+    else:
+        return load_module_from_definition(defn, parent, api_level)
 
 
 def resolve_module_model(module_name: str) -> ModuleModel:

@@ -433,3 +433,19 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
         DummyEnum('compatibleGenerationV1'),
         DummyEnum('incompatibleGenerationV1')
     )
+
+
+def test_thermocycler_semi_plate_configuration(loop):
+    ctx = papi.ProtocolContext(loop)
+    labware_name = 'nest_96_wellplate_100ul_pcr_full_skirt'
+    mod = ctx.load_module('thermocycler', configuration='semi')
+    assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
+
+    tc_labware = mod.load_labware(labware_name)
+
+    other_labware = ctx.load_labware(labware_name, 2)
+    without_first_two_cols = other_labware.wells()[16::]
+    for tc_well, other_well in zip(tc_labware.wells(), without_first_two_cols):
+        tc_well_name = tc_well.display_name.split()[0]
+        other_well_name = other_well.display_name.split()[0]
+        assert tc_well_name == other_well_name
