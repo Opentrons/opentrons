@@ -1,25 +1,11 @@
-# Opentrons App Changes from 3.16.1 to 3.17.0
+# Opentrons App Changes from 3.17.0 to 3.17.1
 
 For more details about this release, please see the full [technical change
 log][changelog]
 
-Note: This release is the exact same as the 3.17.0 beta.
-
-## Bug Fixes
-- Fix an issue with Python Protocol API V1 protocols that did not supply a
-  ``tip_racks`` argument where tip racks would not properly appear in the
-  labware calibration list
-  ([#5147](https://github.com/opentrons/opentrons/issues/5147))
-- Fix an issue where custom labware files or Protocol Designer protocols with
-  an all-caps ``.JSON`` extension would not be handled properly
-  ([#5151](https://github.com/opentrons/opentrons/issues/5151))
-- Because module commands now respect protocol pause, module interaction via the
-  Opentrons App is now disabled when the protocol is paused.
   
 ## New Features
-- OT-2s that are on at least version 3.17.0 Beta and connected via USB can now be
-  disconnected from the current Wi-Fi network without selecting a different one
-  to connect to.
+- Guide the user through leveling GEN2 Multichannel pipettes
   
 ## Known Issues
 

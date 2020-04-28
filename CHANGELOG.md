@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.0](https://github.com/opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
+
+
+### Bug Fixes
+
+* **api:** allow protocol delay to be cancelled ([#5403](https://github.com/opentrons/opentrons/issues/5403)) ([c0ed09d](https://github.com/opentrons/opentrons/commit/c0ed09d)), closes [#5400](https://github.com/opentrons/opentrons/issues/5400)
+* **api:** avoid tc lid when pathing ([#5390](https://github.com/opentrons/opentrons/issues/5390)) ([4a7fe0b](https://github.com/opentrons/opentrons/commit/4a7fe0b)), closes [#5263](https://github.com/opentrons/opentrons/issues/5263)
+* **api:** Load the correct gantry calibration upon deck calibration exit ([#5469](https://github.com/opentrons/opentrons/issues/5469)) ([b03038d](https://github.com/opentrons/opentrons/commit/b03038d))
+* **api:** verify the structure of v2 protocol ast ([#5454](https://github.com/opentrons/opentrons/issues/5454)) ([b45af1e](https://github.com/opentrons/opentrons/commit/b45af1e))
+* **app:** ensure only one RPC connect request can go out at once ([#5322](https://github.com/opentrons/opentrons/issues/5322)) ([9465cef](https://github.com/opentrons/opentrons/commit/9465cef)), closes [#5241](https://github.com/opentrons/opentrons/issues/5241) [#5307](https://github.com/opentrons/opentrons/issues/5307)
+* **protocol-designer:** add field level validation for magnetic module engage height ([#5339](https://github.com/opentrons/opentrons/issues/5339)) ([5e2aff6](https://github.com/opentrons/opentrons/commit/5e2aff6)), closes [#5274](https://github.com/opentrons/opentrons/issues/5274)
+* **protocol-designer:** allow adding labware to slots again ([#5378](https://github.com/opentrons/opentrons/issues/5378)) ([e49e162](https://github.com/opentrons/opentrons/commit/e49e162)), closes [#5370](https://github.com/opentrons/opentrons/issues/5370)
+* **protocol-designer:** Default to GEN1 model for TC ([#5443](https://github.com/opentrons/opentrons/issues/5443)) ([14c68c8](https://github.com/opentrons/opentrons/commit/14c68c8)), closes [#5389](https://github.com/opentrons/opentrons/issues/5389)
+* **protocol-designer:** default to non-i18n step-gen errors if no i18n title ([#5360](https://github.com/opentrons/opentrons/issues/5360)) ([644b2db](https://github.com/opentrons/opentrons/commit/644b2db))
+* **protocol-designer:** fix dnd steps vs labware bug ([#5370](https://github.com/opentrons/opentrons/issues/5370)) ([a6f6594](https://github.com/opentrons/opentrons/commit/a6f6594)), closes [#5367](https://github.com/opentrons/opentrons/issues/5367)
+* **protocol-designer:** fix module substep text styling ([#5306](https://github.com/opentrons/opentrons/issues/5306)) ([61b94ab](https://github.com/opentrons/opentrons/commit/61b94ab)), closes [#5305](https://github.com/opentrons/opentrons/issues/5305)
+* **protocol-designer:** Hide CrashInfoBox when module restrictions disabled ([#5295](https://github.com/opentrons/opentrons/issues/5295)) ([692f307](https://github.com/opentrons/opentrons/commit/692f307)), closes [#5276](https://github.com/opentrons/opentrons/issues/5276)
+* **protocol-designer:** Only show slot access warnings for Gen1 modules ([#5313](https://github.com/opentrons/opentrons/issues/5313)) ([74d9d64](https://github.com/opentrons/opentrons/commit/74d9d64)), closes [#5309](https://github.com/opentrons/opentrons/issues/5309)
+* **protocol-designer:** Remove mm unit from engage height field ([#5365](https://github.com/opentrons/opentrons/issues/5365)) ([fc18eea](https://github.com/opentrons/opentrons/commit/fc18eea))
+* **protocol-designer:** rename 'module' variables to something else ([#5308](https://github.com/opentrons/opentrons/issues/5308)) ([e5536da](https://github.com/opentrons/opentrons/commit/e5536da)), closes [#5284](https://github.com/opentrons/opentrons/issues/5284)
+* **protocol-designer:** Unify pause step item spacing ([#5408](https://github.com/opentrons/opentrons/issues/5408)) ([d75f471](https://github.com/opentrons/opentrons/commit/d75f471)), closes [#5387](https://github.com/opentrons/opentrons/issues/5387)
+* **protocol-designer:** Update TC image proportions ([#5442](https://github.com/opentrons/opentrons/issues/5442)) ([0e5f284](https://github.com/opentrons/opentrons/commit/0e5f284)), closes [#5388](https://github.com/opentrons/opentrons/issues/5388)
+* **protocol-designer:** updates module slot placement after warning modal is confirmed ([#5393](https://github.com/opentrons/opentrons/issues/5393)) ([0adc97e](https://github.com/opentrons/opentrons/commit/0adc97e))
+* **protocol-designer e2e:** Add custom command to close the 3.17 announcement modal ([#5355](https://github.com/opentrons/opentrons/issues/5355)) ([77af8ac](https://github.com/opentrons/opentrons/commit/77af8ac))
+* **robot-server:** add robot-server to monorepo's package.json [#5433](https://github.com/opentrons/opentrons/issues/5433) ([705b5cc](https://github.com/opentrons/opentrons/commit/705b5cc))
+* **robot-server:** unavailable is a valid network connection state ([#5316](https://github.com/opentrons/opentrons/issues/5316)) ([7438453](https://github.com/opentrons/opentrons/commit/7438453))
+
+
+### Features
+
+* **api:** Add labware required to session status  ([#5298](https://github.com/opentrons/opentrons/issues/5298)) ([c602cd6](https://github.com/opentrons/opentrons/commit/c602cd6))
+* **api:** Allow move, jog and tip handling for a cal session ([#5402](https://github.com/opentrons/opentrons/issues/5402)) ([d5ff537](https://github.com/opentrons/opentrons/commit/d5ff537))
+* **api:** Allow moves to crosses and slot 5 ([#5415](https://github.com/opentrons/opentrons/issues/5415)) ([98ca207](https://github.com/opentrons/opentrons/commit/98ca207)), closes [#5099](https://github.com/opentrons/opentrons/issues/5099) [#5098](https://github.com/opentrons/opentrons/issues/5098)
+* **api:** Allow Non-Full plate Thermocycler Configuration ([#5498](https://github.com/opentrons/opentrons/issues/5498)) ([60f6b16](https://github.com/opentrons/opentrons/commit/60f6b16))
+* **app:** guide the user through leveling gen2 multis ([#5348](https://github.com/opentrons/opentrons/issues/5348)) ([185d0ad](https://github.com/opentrons/opentrons/commit/185d0ad)), closes [#5344](https://github.com/opentrons/opentrons/issues/5344)
+* **components:** add hooks-based tooltip component to library ([#5362](https://github.com/opentrons/opentrons/issues/5362)) ([7ef3ca9](https://github.com/opentrons/opentrons/commit/7ef3ca9)), closes [#5120](https://github.com/opentrons/opentrons/issues/5120)
+* **components:** add useHover and useHoverTooltip hooks ([#5364](https://github.com/opentrons/opentrons/issues/5364)) ([874d749](https://github.com/opentrons/opentrons/commit/874d749))
+* **protocol-designer:** add PD Pause form migration for 3.0.x -> 4.0.0 ([#5373](https://github.com/opentrons/opentrons/issues/5373)) ([e3ce552](https://github.com/opentrons/opentrons/commit/e3ce552)), closes [#5371](https://github.com/opentrons/opentrons/issues/5371)
+* **protocol-designer:** add warning modal switching mag model ([#5329](https://github.com/opentrons/opentrons/issues/5329)) ([2cfe3e1](https://github.com/opentrons/opentrons/commit/2cfe3e1)), closes [#5251](https://github.com/opentrons/opentrons/issues/5251)
+* **protocol-designer:** allow GEN1 multi pipette access N/S of GEN2 modules ([#5341](https://github.com/opentrons/opentrons/issues/5341)) ([dc6af21](https://github.com/opentrons/opentrons/commit/dc6af21)), closes [#5331](https://github.com/opentrons/opentrons/issues/5331)
+* **protocol-designer:** allow moving empty module under compat labware ([#5396](https://github.com/opentrons/opentrons/issues/5396)) ([57ef5ce](https://github.com/opentrons/opentrons/commit/57ef5ce)), closes [#5384](https://github.com/opentrons/opentrons/issues/5384)
+* **protocol-designer:** allow user to select module model when adding or editing modules ([#5284](https://github.com/opentrons/opentrons/issues/5284)) ([8ad1607](https://github.com/opentrons/opentrons/commit/8ad1607)), closes [#5188](https://github.com/opentrons/opentrons/issues/5188)
+* **protocol-designer:** Enable magnetic and temperature module support ([#5304](https://github.com/opentrons/opentrons/issues/5304)) ([8235e71](https://github.com/opentrons/opentrons/commit/8235e71)), closes [#4968](https://github.com/opentrons/opentrons/issues/4968)
+* **protocol-designer:** hide slot placement tooltip when slot dropdown enabled ([#5405](https://github.com/opentrons/opentrons/issues/5405)) ([8a8b757](https://github.com/opentrons/opentrons/commit/8a8b757)), closes [#5385](https://github.com/opentrons/opentrons/issues/5385)
+* **protocol-designer:** Implement custom tiprack UI behind flag ([#5440](https://github.com/opentrons/opentrons/issues/5440)) ([1fc35fd](https://github.com/opentrons/opentrons/commit/1fc35fd)), closes [#5332](https://github.com/opentrons/opentrons/issues/5332)
+* **protocol-designer:** preserve engage heights if already default ([#5294](https://github.com/opentrons/opentrons/issues/5294)) ([9cac165](https://github.com/opentrons/opentrons/commit/9cac165)), closes [#5232](https://github.com/opentrons/opentrons/issues/5232)
+* **protocol-designer:** Remove multi gen2 feature flag ([#5351](https://github.com/opentrons/opentrons/issues/5351)) ([4a2a1fd](https://github.com/opentrons/opentrons/commit/4a2a1fd)), closes [#5336](https://github.com/opentrons/opentrons/issues/5336)
+* **protocol-designer:** remove unnecessary comment ([#5379](https://github.com/opentrons/opentrons/issues/5379)) ([12277df](https://github.com/opentrons/opentrons/commit/12277df))
+* **protocol-designer:** update export v4 protocol modal copy ([#5356](https://github.com/opentrons/opentrons/issues/5356)) ([81489a0](https://github.com/opentrons/opentrons/commit/81489a0))
+* **protocol-designer:** update intro announcement modal copy ([#5345](https://github.com/opentrons/opentrons/issues/5345)) ([20e2a96](https://github.com/opentrons/opentrons/commit/20e2a96)), closes [#5334](https://github.com/opentrons/opentrons/issues/5334)
+* **protocol-designer:** update pause until temp modal copy ([#5434](https://github.com/opentrons/opentrons/issues/5434)) ([441f30e](https://github.com/opentrons/opentrons/commit/441f30e)), closes [#5432](https://github.com/opentrons/opentrons/issues/5432)
+* **protocol-designer:** use model-specific engageHeight diagram ([#5273](https://github.com/opentrons/opentrons/issues/5273)) ([a85f206](https://github.com/opentrons/opentrons/commit/a85f206)), closes [#5228](https://github.com/opentrons/opentrons/issues/5228)
+* **robot-server:** create middleware to support api versioning ([#5438](https://github.com/opentrons/opentrons/issues/5438)) ([6fed41a](https://github.com/opentrons/opentrons/commit/6fed41a)), closes [#4633](https://github.com/opentrons/opentrons/issues/4633)
+* **robot-server:** make fastapi return v1 style errors ([#5404](https://github.com/opentrons/opentrons/issues/5404)) ([906c399](https://github.com/opentrons/opentrons/commit/906c399)), closes [#5285](https://github.com/opentrons/opentrons/issues/5285)
+* **robot-server:** return correct error format based on endpoint ([e6a98ad](https://github.com/opentrons/opentrons/commit/e6a98ad)), closes [#5401](https://github.com/opentrons/opentrons/issues/5401)
+* **robot-server:** Robot server logging and settings ([#5398](https://github.com/opentrons/opentrons/issues/5398)) ([041c313](https://github.com/opentrons/opentrons/commit/041c313)), closes [#5013](https://github.com/opentrons/opentrons/issues/5013)
+* **robot-server, api:** calibration check overhaul ([#5465](https://github.com/opentrons/opentrons/issues/5465)) ([4feeeba](https://github.com/opentrons/opentrons/commit/4feeeba))
+* **shared-data:** add nest_96_wellplate_2ml_deep ([#5503](https://github.com/opentrons/opentrons/issues/5503)) ([3002453](https://github.com/opentrons/opentrons/commit/3002453))
+
+
+
+
+
 # [3.17.0](https://github.com/opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package opentrons

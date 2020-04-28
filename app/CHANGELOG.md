@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
+
+
+### Bug Fixes
+
+* **app:** ensure only one RPC connect request can go out at once ([#5322](https://github.com/Opentrons/opentrons/issues/5322)) ([9465cef](https://github.com/Opentrons/opentrons/commit/9465cef)), closes [#5241](https://github.com/Opentrons/opentrons/issues/5241) [#5307](https://github.com/Opentrons/opentrons/issues/5307)
+
+
+### Features
+
+* **app:** guide the user through leveling gen2 multis ([#5348](https://github.com/Opentrons/opentrons/issues/5348)) ([185d0ad](https://github.com/Opentrons/opentrons/commit/185d0ad)), closes [#5344](https://github.com/Opentrons/opentrons/issues/5344)
+
+
+
+
+
 # [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package @opentrons/app

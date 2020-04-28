@@ -1,50 +1,35 @@
-# Robot OS Changes from 3.16.1 to 3.17.0
+# Robot OS Changes from 3.17.0 to 3.17.1
 
 For more details about this release, please see the full [technical change
 log][changelog]
 
-Note: This release is the exact same as the 3.17.0 beta.
 
 [changelog]: https://github.com/Opentrons/opentrons/blob/edge/CHANGELOG.md
 
 ## Bugfixes
 
-- Module commands now respect pausing and cancelling. If you pause before a
-  module command, the command will not occur until you resume, and if you cancel
-  before or during a module command the protocol will be cancelled immediately
-  ([#3529](https://github.com/opentrons/opentrons/issues/3529), [#2811](https://github.com/opentrons/opentrons/issues/2811))
-- Fix an issue where variables defined in the file scope of your protocol (not
-  in the run function) were not accessible to each other or to the run function
-  ([#4981](https://github.com/opentrons/opentrons/issues/4981))
-- Fix an issue where after a failed tip probe, the robot would move in a
-  dangerous way when moving the pipette back to the front of the robot ([#4793](https://github.com/opentrons/opentrons/issues/4793))
-- APIv2 protocols now return tips to tipracks from the same height as APIv1
-  ([#5186](https://github.com/opentrons/opentrons/issues/5186)).  To get this
-  behavior in your protocol, request API version 2.3 in your metadata.
-- Fix a behavior where the pipette would move up and down in between mixes
-  during mix() in APIv2
-  ([#4640](https://github.com/opentrons/opentrons/issues/4640)). To get this
-  behavior in your protocol, request API version 2.3 in your metadata.
-- Fix an issue where the robot could not connect to WiFi networks with a colon
-  character (':') in their name
-- Fix an issue where the robot would be unable to move to tall labware (such as
-  a 2 mL tube rack on top of a Temperature Module) even though there was enough
-  physical space to do so
-- Fix an issue in 3.17.0-beta.0 where magnetic module positions were incorrect
-  when using the ``height_from_base`` argument to
-  ``MagneticModuleContext.engage``
-  ([#5416](https://github.com/Opentrons/opentrons/pull/5416))
-- Fix an issue in 3.17.0-beta.0 where ``ProtocolContext.delay()`` could not be
-  canceled ([#5403](https://github.com/Opentrons/opentrons/pull/5403))
+
+- In API Level 2.4, motion in the `touch_tip` command is slightly different; the OT-2 will
+  now move to the center of the well in between touching each side, and will
+  move to the appropriate height before moving to the well sides to avoid
+  diagonal movement
+- Fix an issue that could lead to corrupt deck calibration if the deck
+  calibration process was ended early (issue [#5469](https://github.com/Opentrons/opentrons/pull/5469))
   
 ## New Features
 
-- Support upcoming GEN2 Multichannel pipettes
-- Support upcoming GEN2 Magnetic Modules and Temperature Modules (API version 2.3)
-- Support disconnecting from a WiFi network without selecting another network to
-  connect to
-- Support upcoming Protocol Designer releases that will support modules
-- Introduce [Python Protocol API Version
-  2.3](https://docs.opentrons.com/v2/versioning.html#version-2-3), which
-  includes some behavior-altering bugfixes and support for GEN2 Magnetic and
-  Temperature Modules.
+- Add [NEST's deep well
+ plate](https://labware.opentrons.com/nest_96_wellplate_2ml_deep/)
+ as `nest_96_wellplate_2ml_deep`
+ - New api level: 2.4. Set `'apiLevel': '2.4'` in your protocol's metadata to
+ take advantage of the `touch_tip`-related changes. See [the
+ documentation](https://docs.opentrons.com/v2/versioning.html#version-2-4) for
+ more detailed information.
+- In API Level 2.4, you can now reduce the speed of a `touch_tip` command to 1 mm/s
+- In API Level 2.4, `touch_tip` will now touch only 3 sides of a well if
+  touching the fourth side would cause a collision with an adjacent module or
+  the side of the OT-2. For instance, using the left pipette to `touch_tip` in
+  column 12 of a 96-well plate in slot 2 with a Magnetic Module in slot 3 will
+  touch only the top, left, and bottom sides of the well. 
+ 
+ 
