@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
+
+
+### Features
+
+* **app:** guide the user through leveling gen2 multis ([#5348](https://github.com/Opentrons/opentrons/issues/5348)) ([185d0ad](https://github.com/Opentrons/opentrons/commit/185d0ad)), closes [#5344](https://github.com/Opentrons/opentrons/issues/5344)
+* **shared-data:** add nest_96_wellplate_2ml_deep ([#5503](https://github.com/Opentrons/opentrons/issues/5503)) ([3002453](https://github.com/Opentrons/opentrons/commit/3002453))
+
+
+
+
+
 # [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package @opentrons/shared-data
