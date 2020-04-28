@@ -277,6 +277,10 @@ class ThermocyclerGeometry(ModuleGeometry):
                                      :py:class:`ModuleGeometry` instance. The
                                      :py:class:`ModuleGeometry` will
                                      conform to this level.
+        :param configuration: Used to specify the slot configuration of
+                              the Thermocycler. It should by of type
+                              :py:class:`.ThermocyclerConfiguration` and can
+                              either be FULL or SEMI.
         """
         super().__init__(
             display_name, model, module_type, offset, overall_height,
@@ -548,6 +552,11 @@ def load_module(
                                  :py:class:`ModuleGeometry` will
                                  conform to this level. If not specified,
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
+    :param configuration: Used to specify the slot configuration of
+                        the Thermocycler. Only Valid in Python API
+                        Version 2.4 and later. If you wish to use
+                        the non-full plate configuration, you must
+                        pass in the key word value `semi`
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     defn = _load_module_definition(api_level, model)
