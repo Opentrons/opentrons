@@ -44,7 +44,7 @@ describe('File Page', () => {
     const wrapper = render(props)
     expect(wrapper.find(EditModules)).toHaveLength(0)
   })
-  it('renders a file page with Edit Modules open when handle edit modules is called', () => {
+  it('opens and closes Edit Modules when appropriate handlers are called', () => {
     const wrapper = render(props)
     wrapper
       .find(EditModulesCard)
@@ -52,5 +52,12 @@ describe('File Page', () => {
       .prop('openEditModuleModal')()
     wrapper.update()
     expect(wrapper.find(EditModules)).toHaveLength(1)
+
+    wrapper
+      .find(EditModules)
+      .at(0)
+      .prop('onCloseClick')()
+    wrapper.update()
+    expect(wrapper.find(EditModules)).toHaveLength(0)
   })
 })
