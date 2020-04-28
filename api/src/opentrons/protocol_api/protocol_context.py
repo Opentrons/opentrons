@@ -399,7 +399,7 @@ class ProtocolContext(CommandPublisher):
     def load_module(
             self, module_name: str,
             location: Optional[types.DeckLocation] = None,
-            configuration: str = None) -> ModuleTypes:
+            semi_configuration: bool = False) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
@@ -419,9 +419,11 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler - it will always be
                          in Slot 7.
-        :param configuration: Used to specify the slot configuration of
-                              the Thermocycler. Only Valid in Python API
-                              Version 2.4 and later.
+        :param semi_configuration: Used to specify the slot configuration of
+                                   the Thermocycler. Only Valid in Python API
+                                   Version 2.4 and later. True if semi
+                                   configuration for thermocycler,
+                                   False otherwise.
         :type location: str or int or None
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
@@ -430,12 +432,16 @@ class ProtocolContext(CommandPublisher):
         resolved_type = resolve_module_type(resolved_model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, location)
+        if self._api_version < APIVersion(2, 4) and semi_configuration:
+            self._log.warning(
+                f'You have specified API {self._api_version}, but you are'
+                'using thermocycler parameters only available in 2.4')
         geometry = load_module(
             resolved_model,
             self._deck_layout.position_for(
                 resolved_location),
-            self._api_version,
-            configuration)
+            self._api_version, semi_configuration)
+
         hc_mod_instance = None
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,

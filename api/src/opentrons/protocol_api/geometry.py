@@ -396,10 +396,8 @@ class Deck(UserDict):
             with the given item.
         """
         def get_item_covered_slot_keys(sk, i):
-            if isinstance(i, ThermocyclerGeometry) and i.is_semi_configuration:
-                return(set([7, 10]))
-            elif isinstance(i, ThermocyclerGeometry):
-                return(set([7, 8, 10, 11]))
+            if isinstance(i, ThermocyclerGeometry):
+                return i.covered_slots
             elif i is not None:
                 return set([sk])
             else:
