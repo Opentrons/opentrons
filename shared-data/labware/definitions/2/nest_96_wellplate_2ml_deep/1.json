@@ -1110,7 +1110,7 @@
     "loadName": "nest_96_wellplate_2ml_deep",
     "magneticModuleEngageHeight": 6.8
   },
-  "namespace": "custom_beta",
+  "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
