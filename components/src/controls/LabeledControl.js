@@ -5,7 +5,7 @@ import { ControlInfo } from './ControlInfo'
 import styles from './styles.css'
 
 export type LabeledControlProps = {|
-  label: string,
+  label: React.Node,
   control: React.Node,
   children?: React.Node,
 |}
