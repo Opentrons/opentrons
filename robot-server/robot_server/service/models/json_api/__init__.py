@@ -7,3 +7,4 @@ class ResourceTypes(str, Enum):
     """Resource object types"""
     item = "item"
     a = "a"
+    session = "session"

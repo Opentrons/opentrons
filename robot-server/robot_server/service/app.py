@@ -16,7 +16,6 @@ from .errors import V1HandlerError, \
     consolidate_fastapi_response, RobotServerError, ErrorResponse
 from .dependencies import get_rpc_server
 from robot_server import constants
-
 from .routers import item, legacy_routes, routes
 
 log = logging.getLogger(__name__)
@@ -43,6 +42,7 @@ app.include_router(router=legacy_routes,
 
 # New v2 routes
 app.include_router(router=routes)
+
 
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers

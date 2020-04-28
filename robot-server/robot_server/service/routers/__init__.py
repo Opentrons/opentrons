@@ -1,7 +1,7 @@
 from fastapi import APIRouter
 
 from . import health, networking, control, settings, deck_calibration, \
-    modules, pipettes, motors, camera, logs, rpc, calibration_check
+    modules, pipettes, motors, camera, logs, rpc, calibration_check, session
 
 legacy_routes = APIRouter()
 
@@ -23,3 +23,6 @@ routes = APIRouter()
 routes.include_router(router=calibration_check.router,
                       prefix="/calibration",
                       tags=["Calibration Check"])
+routes.include_router(router=session.router,
+                      tags=["Session Management"])
+
