@@ -6,3 +6,4 @@ from enum import Enum
 class ResourceTypes(str, Enum):
     """Resource object types"""
     item = "item"
+    session = "session"

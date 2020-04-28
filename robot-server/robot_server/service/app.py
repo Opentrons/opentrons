@@ -16,7 +16,7 @@ from .errors import V1HandlerError, \
 from .dependencies import get_rpc_server
 from robot_server import constants
 
-from .routers import item, routes
+from .routers import item, routes, session, calibration_check
 
 log = logging.getLogger(__name__)
 
@@ -39,6 +39,12 @@ app.include_router(router=routes,
                            "model": V1BasicResponse
                        }
                    })
+
+
+app.include_router(router=session.router,
+                   tags=["Session"])
+app.include_router(router=calibration_check.router,
+                   tags=["Calibration Check"])
 
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
