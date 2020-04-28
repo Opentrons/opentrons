@@ -399,3 +399,18 @@ def test_should_dodge():
         deck.position_for(1)._replace(labware=None),
         deck.position_for(12)
     )
+
+
+def test_labware_in_next_slow():
+    deck = Deck()
+    trough = labware.load(trough_name, deck.position_for(4))
+    trough2 = labware.load(trough_name, deck.position_for(1))
+    trough3 = labware.load(trough_name, deck.position_for(3))
+    deck[4] = trough
+    deck[1] = trough2
+    deck[3] = trough3
+    assert deck.right_of('3') is None
+    assert deck.left_of('2') is trough2
+    assert deck.right_of('2') is trough3
+
+    assert deck.right_of('9') is None

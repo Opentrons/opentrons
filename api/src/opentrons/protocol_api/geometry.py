@@ -16,6 +16,9 @@ from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
 
 MODULE_LOG = logging.getLogger(__name__)
 
+# Amount of slots in a single deck row
+ROW_LENGTH = 3
+
 
 @dataclass
 class CalibrationPosition:
@@ -296,6 +299,41 @@ class Deck(UserDict):
         except ValueError:
             return False
         return key_int in self.data
+
+    def is_edge_move_unsafe(
+            self, mount: types.Mount, target: 'Labware') -> bool:
+        """
+        Check if slot next to target labware contains a module. Only relevant
+        depending on the mount you are using and the column you are moving
+        to inside of the labware.
+        """
+        if not target.parent:
+            return False
+        if mount is types.Mount.RIGHT:
+            other_labware = self.left_of(target.parent)
+        else:
+            other_labware = self.right_of(target.parent)
+
+        return isinstance(other_labware, ModuleGeometry)
+
+    def right_of(self, slot: str) -> Optional[DeckItem]:
+        if int(slot) % ROW_LENGTH == 0:
+            # We know we're at the right-most edge
+            # of the given row
+            return None
+        else:
+            idx = int(slot) + 1
+            return self[str(idx)]
+
+    def left_of(self, slot: str) -> Optional[DeckItem]:
+        if int(slot) - 1 % ROW_LENGTH == 0:
+            # We know we're at the left-most edge
+            # of the given row
+            return None
+        idx = int(slot) - 1
+        if idx < 1:
+            return None
+        return self[str(idx)]
 
     def position_for(self, key: types.DeckLocation) -> types.Location:
         key_int = self._check_name(key)
