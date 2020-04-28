@@ -55,6 +55,10 @@ class HardwareAPILike(abc.ABC):
     def loop(self) -> asyncio.AbstractEventLoop:
         ...
 
+    @property
+    def board_revision(self) -> str:
+        ...
+
 
 class BoardRevision(enum.Enum):
     UNKNOWN = enum.auto()

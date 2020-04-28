@@ -3,6 +3,7 @@ import logging
 import pathlib
 from typing import Dict, Tuple
 import time
+from . import RevisionPinsError
 
 import gpiod  # type: ignore
 
@@ -160,7 +161,7 @@ class GPIOCharDev:
         """ Read revision bit GPIO pins
 
         If the gpio_rev_bit_pins device tree overlay is enabled,
-        returns the pins' values. Otherwise, return None
+        returns the pins' values. Otherwise, return RevisionPinsError
         """
         if pathlib.Path(DTOVERLAY_PATH).exists():
             return (bool(self._read(INPUT_PINS['REV_0'])),
