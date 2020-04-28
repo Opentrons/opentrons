@@ -438,7 +438,7 @@ def test_module_compatibility(get_module_fixture, monkeypatch):
 def test_thermocycler_semi_plate_configuration(loop):
     ctx = papi.ProtocolContext(loop)
     labware_name = 'nest_96_wellplate_100ul_pcr_full_skirt'
-    mod = ctx.load_module('thermocycler', semi_configuration=True)
+    mod = ctx.load_module('thermocycler', configuration='semi')
     assert mod._geometry.labware_offset == Point(-23.28, 82.56, 97.8)
 
     tc_labware = mod.load_labware(labware_name)

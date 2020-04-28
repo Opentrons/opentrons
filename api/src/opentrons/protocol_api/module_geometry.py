@@ -25,6 +25,7 @@ from .labware import Labware
 
 
 E = TypeVar('E', bound='_ProvideLookup')
+Configuration = TypeVar('Configuration', bound='GenericConfiguration')
 
 
 class _ProvideLookup(Enum):
@@ -36,7 +37,17 @@ class _ProvideLookup(Enum):
         raise AttributeError(f'No such module type {typename}')
 
 
-class ThermocyclerConfiguration(Enum):
+class GenericConfiguration(Enum):
+    @classmethod
+    def configuration_type(
+            cls: Type[Configuration], config: str) -> 'Configuration':
+        for m in cls.__members__.values():
+            if m.name == config.upper():
+                return m
+        raise AttributeError(f'{config} not available')
+
+
+class ThermocyclerConfiguration(GenericConfiguration):
     FULL = auto()
     SEMI = auto()
 
@@ -236,7 +247,7 @@ class ThermocyclerGeometry(ModuleGeometry):
                  lid_height: float,
                  parent: Location,
                  api_level: APIVersion,
-                 configuration: ThermocyclerConfiguration =
+                 configuration: GenericConfiguration =
                  ThermocyclerConfiguration.FULL) -> None:
         """
         Create a Module for tracking the position of a module.
@@ -380,7 +391,7 @@ def _load_from_v1(definition: Dict[str, Any],
 def _load_from_v2(definition: Dict[str, Any],
                   parent: Location,
                   api_level: APIVersion,
-                  configuration: ThermocyclerConfiguration) -> ModuleGeometry:
+                  configuration: GenericConfiguration) -> ModuleGeometry:
     """ Load a module geometry from a v2 definition.
 
     The definition should be schema checked before being passed to this
@@ -429,8 +440,9 @@ def _load_from_v2(definition: Dict[str, Any],
 def load_module_from_definition(
         definition: Dict[str, Any],
         parent: Location,
-        configuration: ThermocyclerConfiguration,
-        api_level: APIVersion = None) -> ModuleGeometry:
+        api_level: APIVersion = None,
+        configuration: GenericConfiguration =
+        ThermocyclerConfiguration.FULL) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a specified definition
     matching the v1 module definition schema
@@ -521,7 +533,7 @@ def load_module(
         model: ModuleModel,
         parent: Location,
         api_level: APIVersion = None,
-        tc_configuration: bool = False) -> ModuleGeometry:
+        configuration: str = None) -> ModuleGeometry:
     """
     Return a :py:class:`ModuleGeometry` object from a definition looked up
     by name.
@@ -539,11 +551,16 @@ def load_module(
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
     defn = _load_module_definition(api_level, model)
-    configuration =\
-        ThermocyclerConfiguration.SEMI\
-        if tc_configuration else ThermocyclerConfiguration.FULL
-    return load_module_from_definition(
-        defn, parent, configuration, api_level)
+    if configuration:
+        # Here we are converting the string passed in to a
+        # configuration type. For now we only have
+        # Thermocycler configurations, but there could be others
+        # in the future
+        return load_module_from_definition(
+            defn, parent, api_level,
+            ThermocyclerConfiguration.configuration_type(configuration))
+    else:
+        return load_module_from_definition(defn, parent, api_level)
 
 
 def resolve_module_model(module_name: str) -> ModuleModel:
