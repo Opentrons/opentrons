@@ -19,9 +19,9 @@
     "links": ["http://www.cell-nest.com/page94?product_id=101&_l=en"]
   },
   "metadata": {
-    "displayName": "NEST 96 Deep Well Plate 2 mL",
+    "displayName": "NEST 96 Deepwell Plate 2mL",
     "displayCategory": "wellPlate",
-    "displayVolumeUnits": "mL",
+    "displayVolumeUnits": "µL",
     "tags": []
   },
   "dimensions": {
@@ -1103,13 +1103,14 @@
     }
   ],
   "parameters": {
-    "format": "irregular",
+    "format": "96Standard",
     "quirks": [],
     "isTiprack": false,
-    "isMagneticModuleCompatible": false,
-    "loadName": "nest_96_wellplate_2ml_deep"
+    "isMagneticModuleCompatible": true,
+    "loadName": "nest_96_wellplate_2ml_deep",
+    "magneticModuleEngageHeight": 6.8
   },
-  "namespace": "opentrons",
+  "namespace": "custom_beta",
   "version": 1,
   "schemaVersion": 2,
   "cornerOffsetFromSlot": {
