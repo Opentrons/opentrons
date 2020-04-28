@@ -1,5 +1,6 @@
 // @flow
 import noop from 'lodash/noop'
+import { app } from 'electron'
 import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
 import * as SystemInfo from '@opentrons/app/src/system-info'
 import { uiInitialized } from '@opentrons/app/src/shell'
@@ -16,11 +17,6 @@ import type {
 jest.mock('../../os')
 jest.mock('../usb-devices')
 
-// TODO(mc, 2020-04-21): remove feature flag
-jest.mock('../../config', () => ({
-  getFullConfig: () => ({ devInternal: { enableSystemInfo: true } }),
-}))
-
 const createUsbDeviceMonitor: JestMockFn<
   [UsbDeviceMonitorOptions | void],
   UsbDeviceMonitor
@@ -36,7 +32,8 @@ const flush = () => new Promise(resolve => setTimeout(resolve, 0))
 describe('app-shell::system-info module action tests', () => {
   const dispatch = jest.fn()
   const getAllDevices: JestMockFn<[], any> = jest.fn()
-  const monitor: $Shape<UsbDeviceMonitor> = { getAllDevices }
+  const stop = jest.fn()
+  const monitor: $Shape<UsbDeviceMonitor> = { getAllDevices, stop }
   const { windowsDriverVersion: _, ...notRealtek } = Fixtures.mockUsbDevice
   const realtek0 = { ...notRealtek, manufacturer: 'Realtek' }
   const realtek1 = { ...notRealtek, manufacturer: 'realtek' }
@@ -99,6 +96,18 @@ describe('app-shell::system-info module action tests', () => {
         SystemInfo.usbDeviceRemoved(realtek0)
       )
     })
+  })
+
+  it('stops monitoring on app quit', () => {
+    handler(uiInitialized())
+
+    const appQuitHandler = app.once.mock.calls.find(
+      ([event, handler]) => event === 'will-quit'
+    )?.[1]
+
+    expect(typeof appQuitHandler).toBe('function')
+    appQuitHandler()
+    expect(monitor.stop).toHaveBeenCalled()
   })
 
   describe('on windows', () => {

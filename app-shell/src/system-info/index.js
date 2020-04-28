@@ -1,11 +1,9 @@
 // @flow
 // system info module
 import { app } from 'electron'
-import noop from 'lodash/noop'
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as SystemInfo from '@opentrons/app/src/system-info'
 import { isWindows } from '../os'
-import { getFullConfig } from '../config'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
 
 import type { UsbDevice } from '@opentrons/app/src/system-info/types'
@@ -26,12 +24,8 @@ const addDriverVersion = (device: Device): Promise<UsbDevice> => {
 }
 
 export function registerSystemInfo(dispatch: Dispatch) {
-  // TODO(mc, 2020-04-21): remove feature flag
-  if (!getFullConfig().devInternal?.enableSystemInfo) {
-    return noop
-  }
-
   let monitor: UsbDeviceMonitor
+
   const handleDeviceAdd = device => {
     addDriverVersion(device).then(d => dispatch(SystemInfo.usbDeviceAdded(d)))
   }
@@ -39,6 +33,10 @@ export function registerSystemInfo(dispatch: Dispatch) {
   const handleDeviceRemove = d => {
     dispatch(SystemInfo.usbDeviceRemoved({ ...d }))
   }
+
+  app.once('will-quit', () => {
+    if (monitor) monitor.stop()
+  })
 
   return function handleSystemAction(action: Action) {
     switch (action.type) {
@@ -53,8 +51,6 @@ export function registerSystemInfo(dispatch: Dispatch) {
             .getAllDevices()
             .then(devices => Promise.all(devices.map(addDriverVersion)))
             .then(devices => dispatch(SystemInfo.initialized(devices)))
-
-          app.once('will-quit', () => monitor.stop())
         }
       }
     }
