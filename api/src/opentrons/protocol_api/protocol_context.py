@@ -23,7 +23,7 @@ from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
 from .util import (AxisMaxSpeeds, HardwareManager,
-                   requires_version, HardwareToManage)
+                   requires_version, HardwareToManage, APIVersionError)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -398,7 +398,8 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def load_module(
             self, module_name: str,
-            location: Optional[types.DeckLocation] = None) -> ModuleTypes:
+            location: Optional[types.DeckLocation] = None,
+            configuration: str = None) -> ModuleTypes:
         """ Load a module onto the deck given its name.
 
         This is the function to call to use a module in your protocol, like
@@ -418,6 +419,11 @@ class ProtocolContext(CommandPublisher):
                          location. You do not have to specify a location
                          when loading a Thermocycler - it will always be
                          in Slot 7.
+        :param configuration: Used to specify the slot configuration of
+                              the Thermocycler. Only Valid in Python API
+                              Version 2.4 and later. If you wish to use
+                              the non-full plate configuration, you must
+                              pass in the key word value `semi`
         :type location: str or int or None
         :returns ModuleContext: The loaded and initialized
                                 :py:class:`ModuleContext`.
@@ -426,11 +432,17 @@ class ProtocolContext(CommandPublisher):
         resolved_type = resolve_module_type(resolved_model)
         resolved_location = self._deck_layout.resolve_module_location(
             resolved_type, location)
+        if self._api_version < APIVersion(2, 4) and configuration:
+            raise APIVersionError(
+                f'You have specified API {self._api_version}, but you are'
+                'using thermocycler parameters only available in 2.4')
+
         geometry = load_module(
             resolved_model,
             self._deck_layout.position_for(
                 resolved_location),
-            self._api_version)
+            self._api_version, configuration)
+
         hc_mod_instance = None
         mod_class = {
             ModuleType.MAGNETIC: MagneticModuleContext,
