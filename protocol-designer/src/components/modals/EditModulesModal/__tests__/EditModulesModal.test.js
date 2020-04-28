@@ -38,7 +38,6 @@ import { SlotDropdown } from '../SlotDropdown'
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
 jest.mock('../../../../step-forms/selectors')
-jest.mock('../../../../step-forms/actions')
 jest.mock('../../../modules/utils')
 jest.mock('../../../../step-forms/utils')
 jest.mock('../form-state')
@@ -48,8 +47,6 @@ const SLOT_FIELD = 'selectedSlot'
 
 const getInitialDeckSetupMock: JestMockFn<any, any> =
   stepFormSelectors.getInitialDeckSetup
-
-const createModuleMock: JestMockFn<any, any> = stepFormActions.createModule
 
 const getLabwareIsCompatibleMock: JestMockFn<any, any> = getLabwareIsCompatible
 
@@ -253,13 +250,23 @@ describe('Edit Modules Modal', () => {
         formik.invoke('onSubmit')(mockValues)
       })
 
-      const expectedParams = {
+      const params = {
         slot: '1',
         type: MAGNETIC_MODULE_TYPE,
         model: MAGNETIC_MODULE_V2,
       }
 
-      expect(createModuleMock).toHaveBeenCalledWith(expectedParams)
+      const createModuleAction = stepFormActions.createModule(params)
+
+      const expected = {
+        ...createModuleAction,
+        payload: {
+          ...createModuleAction.payload,
+          id: expect.stringContaining(MAGNETIC_MODULE_TYPE), // need to do this because exact id is created on the fly
+        },
+      }
+
+      expect(mockStore.dispatch).toHaveBeenCalledWith(expected)
     })
   })
 })
