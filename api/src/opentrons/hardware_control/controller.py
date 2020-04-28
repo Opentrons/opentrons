@@ -83,12 +83,14 @@ class Controller:
         except RevisionPinsError:
             MODULE_LOG.info(
                 'Failed to detect central routing board revision gpio '
-                'pins, board revision is unknown')
+                'pins, defaulting to (OG) 2.1')
+            return BoardRevision.OG
         except Exception:
+            print('nope')
             MODULE_LOG.exception(
                 'Unexpected error from reading central routing board '
                 'revision bits')
-        return BoardRevision.UNKNOWN
+            return BoardRevision.UNKNOWN
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
