@@ -14,6 +14,7 @@ PROTOCOL_DESIGNER_DIR := protocol-designer
 SHARED_DATA_DIR := shared-data
 UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
+APP_SHELL_DIR := app-shell
 
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
@@ -50,6 +51,7 @@ install-py:
 .PHONY: install-js
 install-js:
 	yarn
+	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
 	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR)
 

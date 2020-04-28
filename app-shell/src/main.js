@@ -11,6 +11,7 @@ import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
+import { registerSystemInfo } from './system-info'
 
 const config = getConfig()
 const log = createLogger('main')
@@ -58,6 +59,7 @@ function startUp() {
     registerUpdate(dispatch),
     registerBuildrootUpdate(dispatch),
     registerLabware(dispatch, mainWindow),
+    registerSystemInfo(dispatch),
   ]
 
   ipcMain.on('dispatch', (_, action) => {

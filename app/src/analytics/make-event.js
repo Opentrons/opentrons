@@ -1,10 +1,12 @@
 // @flow
 // redux action types to analytics events map
+import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
 import { getRobotCalibrationCheckSession } from '../calibration'
 import * as CustomLabware from '../custom-labware'
+import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
 import * as calibrationActions from '../calibration/constants'
 import {
@@ -273,6 +275,21 @@ export function makeEvent(
         name: 'calibrationCheckPass',
         properties: { ...sessionData },
       })
+    }
+
+    case SystemInfo.INITIALIZED:
+    case SystemInfo.USB_DEVICE_ADDED: {
+      const devices = action.payload.usbDevice
+        ? [action.payload.usbDevice]
+        : action.payload.usbDevices
+
+      const superProperties = head(
+        devices
+          .filter(SystemInfo.isRealtekDevice)
+          .map(SystemInfo.deviceToU2EAnalyticsProps)
+      )
+
+      return Promise.resolve(superProperties ? { superProperties } : null)
     }
   }
 

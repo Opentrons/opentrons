@@ -9,11 +9,11 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
 import { createLogger } from './logger'
-import { checkShellUpdate } from './shell'
+import { uiInitialized, checkShellUpdate } from './shell'
 
 import { apiClientMiddleware as robotApiMiddleware } from './robot'
 import { initializeAnalytics } from './analytics'
-import { initializeSupport, supportMiddleware } from './support'
+import { initializeSupport } from './support'
 import { startDiscovery } from './discovery'
 
 import { rootReducer, history } from './reducer'
@@ -30,7 +30,6 @@ const middleware = applyMiddleware(
   thunk,
   epicMiddleware,
   robotApiMiddleware(),
-  supportMiddleware,
   routerMiddleware(history)
 )
 
@@ -50,9 +49,10 @@ if (config.devtools) window.store = store
 
 // initialize analytics and support after first render
 store.dispatch(initializeAnalytics())
-store.dispatch(initializeSupport())
+initializeSupport(config.support)
 
-// kickoff an initial update check at launch
+// kickoff shell initializations and initial app update check at launch
+store.dispatch(uiInitialized())
 store.dispatch(checkShellUpdate())
 
 // kickoff a discovery run immediately

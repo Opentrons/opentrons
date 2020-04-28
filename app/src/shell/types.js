@@ -45,4 +45,12 @@ export type ShellState = {|
   robotLogs: RobotLogsState,
 |}
 
-export type ShellAction = ShellUpdateAction | RobotLogsAction
+export type UiInitializedAction = {|
+  type: 'shell:UI_INITIALIZED',
+  meta: {| shell: true |},
+|}
+
+export type ShellAction =
+  | UiInitializedAction
+  | ShellUpdateAction
+  | RobotLogsAction

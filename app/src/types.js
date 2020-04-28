@@ -35,6 +35,8 @@ import type {
   RobotSettingsAction,
 } from './robot-settings/types'
 
+import type { SystemInfoState, SystemInfoAction } from './system-info/types'
+
 export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
@@ -52,6 +54,7 @@ export type State = $ReadOnly<{|
   labware: CustomLabwareState,
   protocol: ProtocolState,
   shell: ShellState,
+  systemInfo: SystemInfoState,
   router: RouterState,
 |}>
 
@@ -73,6 +76,7 @@ export type Action =
   | ProtocolAction
   | CustomLabwareAction
   | NetworkingAction
+  | SystemInfoAction
 
 export type GetState = () => State
 
