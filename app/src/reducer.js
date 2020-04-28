@@ -53,6 +53,9 @@ import { protocolReducer } from './protocol/reducer'
 // custom labware state
 import { customLabwareReducer } from './custom-labware/reducer'
 
+// system info state
+import { systemInfoReducer } from './system-info/reducer'
+
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
 
@@ -75,5 +78,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   labware: customLabwareReducer,
   protocol: protocolReducer,
   shell: shellReducer,
+  systemInfo: systemInfoReducer,
   router: connectRouter<_, Action>(history),
 })

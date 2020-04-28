@@ -49,9 +49,9 @@ electron := electron . \
 .PHONY: all
 all: package
 
-.PHONY: install
-install:
-	yarn
+.PHONY: setup
+setup:
+	electron-rebuild
 
 .PHONY: clean
 clean:

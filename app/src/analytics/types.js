@@ -36,9 +36,9 @@ export type BuildrootAnalyticsData = {|
 export type AnalyticsEvent =
   | {|
       name: string,
-      properties: {},
-      superProperties?: {},
+      properties: { ... },
+      superProperties?: { ... },
     |}
-  | {| superProperties: {} |}
+  | {| superProperties: { ... } |}
 
 export type TrackEventArgs = [AnalyticsEvent, AnalyticsConfig]
