@@ -22,8 +22,8 @@ import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 
 const DECK_SETUP_PROMPT =
-  'Place full tiprack(s) on the deck, in their designated slots, as illustrated below.'
-const DECK_SETUP_BUTTON_TEXT = 'Confirm tiprack placement and continue'
+  'Place full tip rack(s) on the deck, in their designated slots, as illustrated below.'
+const DECK_SETUP_BUTTON_TEXT = 'Confirm tip rack placement and continue'
 
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
