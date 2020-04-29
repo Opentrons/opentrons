@@ -189,9 +189,7 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const moduleHasCollisionIssue =
-    selectedModel && !isModuleWithCollisionIssue(selectedModel)
-  isModuleWithCollisionIssue(selectedModel)
+  const moduleHasCollisionIssue = !isModuleWithCollisionIssue(selectedModel)
 
   const enableSlotSelection =
     disabledModuleRestriction || moduleHasCollisionIssue
@@ -204,7 +202,7 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
   const slotIssue =
-    errors.selectedSlot && errors.selectedSlot.includes('occupied')
+    errors?.selectedSlot && errors.selectedSlot.includes('occupied')
 
   useResetSlotOnModelChange(supportedModuleSlot)
 

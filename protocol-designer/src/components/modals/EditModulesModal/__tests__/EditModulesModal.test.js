@@ -67,24 +67,15 @@ const getSlotIsEmptyMock: JestMockFn<any, any> = getSlotIsEmpty
 
 const getLabwareOnSlotMock: JestMockFn<any, any> = getLabwareOnSlot
 
-const mockFormikValueChange = () => {
-  const values = {
-    [MODEL_FIELD]: 'some_model',
-    [SLOT_FIELD]: '8',
-  }
-  jest.spyOn(Formik, 'useFormikContext').mockImplementation(() => ({ values }))
-}
-
 describe('Edit Modules Modal', () => {
   let mockStore
   let props
   beforeEach(() => {
-    mockFormikValueChange()
     getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
     getSlotsBlockedBySpanningMock.mockReturnValue([])
-    getLabwareOnSlotMock.mockReturnValueOnce({})
+    getLabwareOnSlotMock.mockReturnValue({})
     props = {
-      moduleOnDeck: getMockMagneticModule(),
+      moduleOnDeck: null,
       moduleType: MAGNETIC_MODULE_TYPE,
       onCloseClick: jest.fn(),
       editModuleModel: jest.fn(),
@@ -153,23 +144,34 @@ describe('Edit Modules Modal', () => {
     it('should error when labware is incompatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(false)
       const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('error')).toMatch(
-        'labware incompatible'
-      )
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toMatch('labware incompatible')
     })
 
     it('should error when slot is empty but blocked', () => {
       getSlotIsEmptyMock.mockReturnValueOnce(true)
-      getSlotsBlockedBySpanningMock.mockReturnValue(['8'])
+      getSlotsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
       const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('error')).toMatch(
-        'labware incompatible'
-      )
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toMatch('labware incompatible')
     })
     it('should NOT error when labware is compatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(true)
       const wrapper = render(props)
-      expect(wrapper.find(SlotDropdown).prop('error')).toBe(null)
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toBeFalsy()
     })
   })
 
@@ -208,6 +210,7 @@ describe('Edit Modules Modal', () => {
   })
   describe('Form Submission', () => {
     it('sets module change warning info when model has changed and is magnetic module', () => {
+      props.moduleOnDeck = getMockMagneticModule()
       const wrapper = render(props)
       const formik = wrapper.find(Formik.Formik)
       const mockValues = {
