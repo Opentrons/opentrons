@@ -130,6 +130,7 @@ describe('Edit Modules Modal', () => {
       expect(wrapper.find(SlotDropdown).prop('options')).toBe(mockSlots)
     })
     it('should be enabled when there is no collision issue', () => {
+      props.moduleOnDeck = getMockMagneticModule()
       isModuleWithCollisionIssueMock.mockReturnValueOnce(false)
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).prop('disabled')).toBe(false)

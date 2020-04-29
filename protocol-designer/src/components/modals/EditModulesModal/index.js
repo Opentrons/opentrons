@@ -189,10 +189,10 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
     featureFlagSelectors.getDisableModuleRestrictions
   )
 
-  const moduleHasCollisionIssue = !isModuleWithCollisionIssue(selectedModel)
+  const noCollisionIssue =
+    selectedModel && !isModuleWithCollisionIssue(selectedModel)
 
-  const enableSlotSelection =
-    disabledModuleRestriction || moduleHasCollisionIssue
+  const enableSlotSelection = disabledModuleRestriction || noCollisionIssue
 
   const slotOptionTooltip = (
     <div className={styles.slot_tooltip}>
