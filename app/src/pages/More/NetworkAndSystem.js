@@ -3,6 +3,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
+import { useFeatureFlag } from '../../config'
 import { Page } from '../../components/Page'
 import { NetworkSettingsCard } from '../../components/NetworkSettingsCard'
 import { SystemInfoCard } from '../../components/SystemInfoCard'
@@ -18,11 +19,16 @@ const CARD_GRID_STYLE = css`
   }
 `
 
-export const NetworkAndSystem = () => (
-  <Page titleBarProps={{ title: NETWORK_AND_SYSTEM }}>
-    <div css={CARD_GRID_STYLE}>
-      <NetworkSettingsCard />
-      <SystemInfoCard />
-    </div>
-  </Page>
-)
+export const NetworkAndSystem = () => {
+  // TODO(mc, 2020-04-28): remove enableSystemInfo feature-flag
+  const showSystemInfo = useFeatureFlag('enableSystemInfo')
+
+  return (
+    <Page titleBarProps={{ title: NETWORK_AND_SYSTEM }}>
+      <div css={CARD_GRID_STYLE}>
+        <NetworkSettingsCard />
+        {showSystemInfo && <SystemInfoCard />}
+      </div>
+    </Page>
+  )
+}

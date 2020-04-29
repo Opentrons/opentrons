@@ -7,6 +7,11 @@ import { NetworkSettingsCard } from '../../../components/NetworkSettingsCard'
 import { SystemInfoCard } from '../../../components/SystemInfoCard'
 import { NetworkAndSystem } from '../NetworkAndSystem'
 
+// TODO(mc, 2020-04-28): remove enableSystemInfo feature-flag
+jest.mock('../../../config/hooks', () => ({
+  useFeatureFlag: flag => flag === 'enableSystemInfo',
+}))
+
 describe('/more/network-and-system page component', () => {
   it('should render a Page with the correct title', () => {
     const wrapper = shallow(<NetworkAndSystem />)
