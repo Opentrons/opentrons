@@ -83,12 +83,21 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
     selectedModel: moduleOnDeck?.model || null,
   }
-  const validationSchema = Yup.object().shape({
-    selectedModel: Yup.string()
-      .nullable()
-      .required(i18n.t('alert.field.required')),
-    selectedSlot: Yup.string().required(),
-  })
+
+  const validator = ({
+    selectedModel,
+    selectedSlot,
+  }: EditModulesFormValues) => {
+    const errors = {}
+    if (!selectedModel) {
+      errors.selectedModel = i18n.t('alert.field.required')
+    }
+    if (!selectedSlot) {
+      errors.selectedSlot = i18n.t('alert.field.required')
+    }
+
+    return errors
+  }
 
   const onSaveClick = (values: EditModulesFormValues): void => {
     const { selectedModel, selectedSlot } = values
@@ -135,7 +144,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={initialValues}
-      validationSchema={validationSchema}
+      validate={validator}
     >
       <EditModulesModalComponent
         {...props}
