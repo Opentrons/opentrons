@@ -34,6 +34,7 @@ import { PDAlert } from '../../../alerts/PDAlert'
 import { EditModulesModal } from '..'
 import { ModelDropdown } from '../ModelDropdown'
 import { SlotDropdown } from '../SlotDropdown'
+import { ConnectedSlotMap } from '../ConnectedSlotMap'
 
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
@@ -120,7 +121,7 @@ describe('Edit Modules Modal', () => {
   })
 
   describe('Slot Dropdown', () => {
-    it('should pass the correct options', () => {
+    it('should pass the correct options and field name', () => {
       const mockSlots = [{ value: 'mockSlots', name: 'mockSlots' }]
       jest
         .spyOn(moduleData, 'getAllModuleSlotsByType')
@@ -128,6 +129,7 @@ describe('Edit Modules Modal', () => {
 
       const wrapper = render(props)
       expect(wrapper.find(SlotDropdown).prop('options')).toBe(mockSlots)
+      expect(wrapper.find(SlotDropdown).prop('fieldName')).toBe(SLOT_FIELD)
     })
     it('should be enabled when there is no collision issue', () => {
       props.moduleOnDeck = getMockMagneticModule()
@@ -196,6 +198,23 @@ describe('Edit Modules Modal', () => {
         tabIndex: 0,
       }
       expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+  })
+
+  describe('Connected Slot Map', () => {
+    it('should pass the selected slot field name', () => {
+      const wrapper = render(props)
+      expect(wrapper.find(ConnectedSlotMap).prop('fieldName')).toBe('selectedSlot')
+    })
+    it('should pass an error if the labware is not compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(false)
+      const wrapper = render(props)
+      expect(wrapper.find(ConnectedSlotMap).prop('isError')).toBeTruthy()
+    })
+    it('should NOT pass an error if the labware is compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(true)
+      const wrapper = render(props)
+      expect(wrapper.find(ConnectedSlotMap).prop('isError')).toBeFalsy()
     })
   })
 
