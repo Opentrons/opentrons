@@ -4,10 +4,18 @@ from opentrons.protocols.parse import parse
 from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
     _disengage_magnet, _temperature_module_set_temp, load_modules_from_json, \
     _temperature_module_deactivate, \
-    _temperature_module_await_temp
+    _temperature_module_await_temp, \
+    _thermocycler_close_lid, \
+    _thermocycler_open_lid, \
+    _thermocycler_deactivate_block, \
+    _thermocycler_deactivate_lid, \
+    _thermocycler_set_block_temperature, \
+    _thermocycler_set_lid_temperature, \
+    _thermocycler_run_profile
 import opentrons.protocol_api.execute_v4 as v4
 from opentrons.protocol_api import MagneticModuleContext, \
-    TemperatureModuleContext, ProtocolContext, execute
+    TemperatureModuleContext, ThermocyclerContext, \
+    ProtocolContext, execute
 from opentrons.protocol_api.constants import JsonCommand
 
 # autouse set to True to setup/teardown mock after each run
@@ -27,7 +35,7 @@ def pipette_command_map(mockObj):
         JsonCommand.aspirate.value: mockObj._aspirate,
         JsonCommand.dispense.value: mockObj._dispense,
         JsonCommand.touchTip.value: mockObj._touch_tip,
-        }
+    }
     return mock_pipette_command_map
 
 
@@ -54,6 +62,36 @@ def temperature_module_command_map(mockObj):
         mockObj._temperature_module_await_temp
     }
     return mock_temperature_module_command_map
+
+
+@pytest.fixture
+def thermocycler_module_command_map(mockObj):
+    mock_thermocycler_module_command_map = {
+        JsonCommand.thermocyclerCloseLid.value:
+            mockObj._thermocycler_close_lid,
+        JsonCommand.thermocyclerOpenLid.value:
+            mockObj._thermocycler_open_lid,
+        JsonCommand.thermocyclerDeactivateBlock.value:
+            mockObj._thermocycler_deactivate_block,
+        JsonCommand.thermocyclerDeactivateLid.value:
+            mockObj._thermocycler_deactivate_lid,
+        JsonCommand.thermocyclerSetTargetBlockTemperature.value:
+            mockObj._thermocycler_set_block_temperature,
+        JsonCommand.thermocyclerSetTargetLidTemperature.value:
+            mockObj._thermocycler_set_lid_temperature,
+        JsonCommand.thermocyclerRunProfile.value:
+            mockObj._thermocycler_run_profile,
+        # NOTE: the thermocyclerAwaitX commands are expected to always
+        # follow a corresponding SetX command, which is implemented as
+        # blocking. Then nothing needs to be done for awaitX commands.
+        JsonCommand.thermocyclerAwaitBlockTemperature.value: \
+            mockObj.tc_do_nothing,
+        JsonCommand.thermocyclerAwaitLidTemperature.value: \
+            mockObj.tc_do_nothing,
+        JsonCommand.thermocyclerAwaitProfileComplete.value: \
+            mockObj.tc_do_nothing
+    }
+    return mock_thermocycler_module_command_map
 
 
 def test_load_modules_from_json():
@@ -120,13 +158,90 @@ def test_temperature_module_await_temp():
     ]
 
 
+def test_thermocycler_close_lid():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"module": "someModuleId"}
+    _thermocycler_close_lid(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.close_lid()
+    ]
+
+
+def test_thermocycler_open_lid():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"module": "someModuleId"}
+    _thermocycler_open_lid(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.open_lid()
+    ]
+
+
+def test_thermocycler_deactivate_block():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"module": "someModuleId"}
+    _thermocycler_deactivate_block(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.deactivate_block()
+    ]
+
+
+def test_thermocycler_deactivate_lid():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"module": "someModuleId"}
+    _thermocycler_deactivate_lid(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.deactivate_lid()
+    ]
+
+
+def test_thermocycler_set_block_temperature():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"temperature": 42, "module": "someModuleId"}
+    _thermocycler_set_block_temperature(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.set_block_temperature(42)
+    ]
+
+
+def test_thermocycler_set_lid_temperature():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {"module": "someModuleId", "temperature": 42}
+    _thermocycler_set_lid_temperature(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.set_lid_temperature(42)
+    ]
+
+
+def test_thermocycler_run_profile():
+    module_mock = mock.create_autospec(ThermocyclerContext)
+    params = {
+        "profile": [
+            {'temperature': 55, 'holdTime': 90},
+            {'temperature': 65, 'holdTime': 30}
+        ],
+        "module": "someModuleId",
+        "volume": 98
+    }
+
+    steps = [
+        {'temperature': 55, 'hold_time_seconds': 90},
+        {'temperature': 65, 'hold_time_seconds': 30}
+    ]
+    _thermocycler_run_profile(module_mock, params)
+    assert module_mock.mock_calls == [
+        mock.call.execute_profile(
+            steps=steps, block_max_volume=98, repetitions=1)
+    ]
+
+
 def test_dispatch_json(
     monkeypatch,
     pipette_command_map,
     magnetic_module_command_map,
     temperature_module_command_map,
+    thermocycler_module_command_map,
     mockObj
-     ):
+):
 
     monkeypatch.setattr(v4, '_delay', mockObj)
     monkeypatch.setattr(v4, '_move_to_slot', mockObj)
@@ -156,6 +271,7 @@ def test_dispatch_json(
             'params': {'module': temperature_module_id}},
         {'command': 'temperatureModule/awaitTemperature',
             'params': {'module': temperature_module_id}},
+        # TODO IMMEIDATELY add TC commands here
     ]}
 
     context = mock.sentinel.context
@@ -165,7 +281,7 @@ def test_dispatch_json(
     modules = {
         magnetic_module_id: mock_magnetic_module,
         temperature_module_id: mock_temperature_module
-        }
+    }
 
     dispatch_json(
         context,
@@ -175,8 +291,9 @@ def test_dispatch_json(
         modules,
         pipette_command_map,
         magnetic_module_command_map,
-        temperature_module_command_map
-        )
+        temperature_module_command_map,
+        thermocycler_module_command_map
+    )
 
     assert mockObj.mock_calls == [
         mock.call._delay(context, 'delay_params'),
@@ -193,27 +310,28 @@ def test_dispatch_json(
         mock.call._move_to_slot(context, instruments, 'moveToSlot_params'),
         mock.call._engage_magnet(
             mock_magnetic_module, {'module': magnetic_module_id}
-            ),
+        ),
         mock.call._disengage_magnet(
             mock_magnetic_module, {'module': magnetic_module_id}
-            ),
+        ),
         mock.call._temperature_module_set_temp(
             mock_temperature_module, {'module': temperature_module_id}
-            ),
+        ),
         mock.call._temperature_module_deactivate(
             mock_temperature_module, {'module': temperature_module_id}
-            ),
+        ),
         mock.call._temperature_module_await_temp(
             mock_temperature_module, {'module': temperature_module_id}
-            )
+        )
     ]
 
 
 def test_dispatch_json_invalid_command(
     pipette_command_map,
     magnetic_module_command_map,
-    temperature_module_command_map
-     ):
+    temperature_module_command_map,
+    thermocycler_module_command_map
+):
     protocol_data = {'commands': [
         {'command': 'no_such_command', 'params': 'foo'},
     ]}
@@ -227,7 +345,8 @@ def test_dispatch_json_invalid_command(
             pipette_command_map=pipette_command_map,
             magnetic_module_command_map=magnetic_module_command_map,
             temperature_module_command_map=temperature_module_command_map,
-            )
+            thermocycler_module_command_map=thermocycler_module_command_map
+        )
 
 
 def test_papi_execute_json_v4(monkeypatch, loop, get_json_protocol_fixture):

@@ -1,10 +1,12 @@
 import logging
 from typing import Any, Dict
 from .contexts import ProtocolContext, \
-    MagneticModuleContext, TemperatureModuleContext, ModuleContext
+    MagneticModuleContext, TemperatureModuleContext, ModuleContext, \
+    ThermocyclerContext
 from .execute_v3 import _delay, _move_to_slot
 from .types import LoadedLabware, Instruments, PipetteHandler, \
-    MagneticModuleHandler, TemperatureModuleHandler
+    MagneticModuleHandler, TemperatureModuleHandler, \
+    ThermocyclerModuleHandler
 from .constants import JsonCommand
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -40,6 +42,7 @@ def load_modules_from_json(
     for module_id, props in module_data.items():
         model = props['model']
         slot = props['slot']
+        # TODO IMMEDIATELY handle weird slot "span7_8_10_11" for TC
         instr = ctx.load_module(model, slot)
         modules_by_id[module_id] = instr
 
@@ -72,6 +75,51 @@ def _temperature_module_await_temp(module: TemperatureModuleContext,
     module.await_temperature(temperature)
 
 
+def _thermocycler_close_lid(module: ThermocyclerContext,
+                            params) -> None:
+    module.close_lid()
+
+
+def _thermocycler_open_lid(module: ThermocyclerContext,
+                           params) -> None:
+    module.open_lid()
+
+
+def _thermocycler_deactivate_block(module: ThermocyclerContext,
+                                   params) -> None:
+    module.deactivate_block()
+
+
+def _thermocycler_deactivate_lid(module: ThermocyclerContext,
+                                 params) -> None:
+    module.deactivate_lid()
+
+
+def _thermocycler_set_block_temperature(module: ThermocyclerContext,
+                                        params) -> None:
+    temperature = params['temperature']
+    module.set_block_temperature(temperature)
+
+
+def _thermocycler_set_lid_temperature(module: ThermocyclerContext,
+                                      params) -> None:
+    temperature = params['temperature']
+    module.set_lid_temperature(temperature)
+
+
+def _thermocycler_run_profile(module: ThermocyclerContext,
+                              params) -> None:
+    volume = params['volume']
+    profile = [{
+        'temperature': p['temperature'],
+        'hold_time_seconds': p['holdTime']
+    } for p in params['profile']]
+    module.execute_profile(
+        steps=profile,
+        block_max_volume=volume,
+        repetitions=1)
+
+
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Instruments,
@@ -81,9 +129,14 @@ def dispatch_json(context: ProtocolContext,
                   magnetic_module_command_map:
                   Dict[str, MagneticModuleHandler],
                   temperature_module_command_map:
-                  Dict[str, TemperatureModuleHandler]
+                  Dict[str, TemperatureModuleHandler],
+                  thermocycler_module_command_map:
+                  Dict[str, ThermocyclerModuleHandler]
                   ) -> None:
     commands = protocol_data['commands']
+    # TODO IMMEDIATELY verify that all must-be-sync commands are sequential
+    # TODO IMMEDIATELY raise error if TC lid/block commands use 'volume',
+    # it's not yet implemented for anything besides profile.
 
     for command_item in commands:
         command_type = command_item['command']
@@ -94,17 +147,21 @@ def dispatch_json(context: ProtocolContext,
                 instruments, loaded_labware, params)
         elif command_type in magnetic_module_command_map:
             handleMagnetCommand(
-                                params,
-                                modules,
-                                command_type,
-                                magnetic_module_command_map
-                                )
+                params,
+                modules,
+                command_type,
+                magnetic_module_command_map
+            )
         elif command_type in temperature_module_command_map:
             handleTemperatureCommand(params,
                                      modules,
                                      command_type,
-                                     temperature_module_command_map
-                                     )
+                                     temperature_module_command_map)
+        elif command_type in thermocycler_module_command_map:
+            handleThermocyclerCommand(params,
+                                      modules,
+                                      command_type,
+                                      thermocycler_module_command_map)
         elif command_type == JsonCommand.delay.value:
             _delay(context, params)
         elif command_type == JsonCommand.moveToSlot.value:
@@ -127,8 +184,26 @@ def handleTemperatureCommand(params,
         )
     else:
         raise RuntimeError(
-         "Temperature Module does not match TemperatureModuleContext interface"
-         )
+            "Temperature Module does not match " +
+            "TemperatureModuleContext interface"
+        )
+
+
+def handleThermocyclerCommand(params,
+                              modules,
+                              command_type,
+                              thermocycler_module_command_map
+                              ) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    if isinstance(module, TemperatureModuleContext):
+        thermocycler_module_command_map[command_type](
+            module, params
+        )
+    else:
+        raise RuntimeError(
+            "Thermocycler Module does not match ThermocyclerContext interface"
+        )
 
 
 def handleMagnetCommand(params,
@@ -144,5 +219,5 @@ def handleMagnetCommand(params,
         )
     else:
         raise RuntimeError(
-         "Magnetic Module does not match MagneticModuleContext interface"
-         )
+            "Magnetic Module does not match MagneticModuleContext interface"
+        )
