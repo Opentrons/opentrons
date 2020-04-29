@@ -9,16 +9,13 @@ import {
   mockRobot,
 } from '../../../calibration/__fixtures__'
 
-import { RobotWorkSpace } from '@opentrons/components'
 import { DeckSetup } from '../DeckSetup'
 
 jest.mock('../../../getLabware')
-jest.mock('@opentrons/components/src/deck/RobotWorkSpace')
 
-const MockRobotWorkSpace: JestMockFn<
-  [any],
-  $Call<typeof RobotWorkSpace, any>
-> = RobotWorkSpace
+jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
+  RobotWorkSpace: () => <></>,
+}))
 
 describe('DeckSetup', () => {
   let mockStore
@@ -29,8 +26,6 @@ describe('DeckSetup', () => {
   )[0]
 
   beforeEach(() => {
-    // NOTE: deliberately not testing RobotWorkSpace internals here
-    MockRobotWorkSpace.mockReturnValue(null)
     mockStore = {
       subscribe: () => {},
       getState: () => ({

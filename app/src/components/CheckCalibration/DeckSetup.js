@@ -92,7 +92,10 @@ export function DeckSetup(props: DeckSetupProps) {
   )
 }
 
-type TiprackRenderProps = { labwareDef: LabwareDefinition2, slotDef: DeckSlot }
+type TiprackRenderProps = {|
+  labwareDef: LabwareDefinition2,
+  slotDef: DeckSlot,
+|}
 export function TiprackRender(props: TiprackRenderProps) {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)

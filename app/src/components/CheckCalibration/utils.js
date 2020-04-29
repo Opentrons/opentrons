@@ -1,7 +1,7 @@
 // @flow
 import type { JogAxis } from '../../http-api-client'
 
-const ORDERED_AXES: Array<JogAxis> = ['x', 'y', 'z']
+const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']
 
 // e.g. reformat from ['x', -1, 0.1] to [-0.1, 0, 0]
 export function formatJogVector(axis: string, direction: number, step: number) {
