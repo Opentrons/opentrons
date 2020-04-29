@@ -95,6 +95,7 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
         'Update Robot Calibration Check Session Epic failed to handle action',
         { action }
       )
+      return null
     }
   }
 }
