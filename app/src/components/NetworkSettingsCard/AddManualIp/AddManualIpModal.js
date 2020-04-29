@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../../portal'
@@ -8,17 +7,17 @@ import { ManualIpForm } from './ManualIpForm'
 import { IpList } from './IpList'
 
 export type AddManualIpProps = {|
-  backUrl: string,
+  closeModal: () => mixed,
 |}
 
-export function AddManualIp(props: AddManualIpProps) {
+export function AddManualIpModal(props: AddManualIpProps) {
   return (
     <Portal>
       <AlertModal
         alertOverlay
         iconName="wifi"
         heading="Manually Add Robot Network Addresses"
-        buttons={[{ Component: Link, to: props.backUrl, children: 'Done' }]}
+        buttons={[{ onClick: props.closeModal, children: 'Done' }]}
       >
         <p>
           Enter an IP address or hostname to connect to your robot if automatic

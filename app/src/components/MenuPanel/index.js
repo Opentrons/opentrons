@@ -9,6 +9,7 @@ const MENU = 'Menu'
 const ITEMS = [
   { label: 'App', url: '/menu/app' },
   { label: 'Custom Labware', url: '/menu/custom-labware' },
+  { label: 'Network & System', url: '/menu/network-and-system' },
   { label: 'Resources', url: '/menu/resources' },
 ]
 

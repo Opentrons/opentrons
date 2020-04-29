@@ -2,7 +2,7 @@
 // app info card with version and updated
 import * as React from 'react'
 import { connect } from 'react-redux'
-import { withRouter, Route, Link } from 'react-router-dom'
+import { withRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 
 import {
@@ -14,14 +14,7 @@ import {
   DEV_INTERNAL_FLAGS,
 } from '../../config'
 
-import {
-  Card,
-  LabeledToggle,
-  LabeledSelect,
-  LabeledButton,
-} from '@opentrons/components'
-
-import { AddManualIp } from './AddManualIp'
+import { Card, LabeledToggle, LabeledSelect } from '@opentrons/components'
 
 import type { ContextRouter } from 'react-router-dom'
 import type { DropdownOption } from '@opentrons/components'
@@ -59,60 +52,41 @@ export const AdvancedSettingsCard = withRouter(
 
 function AdvancedSettingsCardComponent(props: Props) {
   return (
-    <>
-      <Card title={TITLE}>
-        <LabeledSelect
-          label="Update Channel"
-          value={props.channel}
-          options={props.channelOptions}
-          onChange={props.handleChannel}
-        >
-          <p>
-            Sets the update channel of your app. &quot;Stable&quot; receives the
-            latest stable releases. &quot;Beta&quot; is updated more frequently
-            so you can try out new features, but the releases may be less well
-            tested than &quot;Stable&quot;.
-          </p>
-        </LabeledSelect>
-        <LabeledToggle
-          label="Enable Developer Tools"
-          toggledOn={props.devToolsOn}
-          onClick={props.toggleDevTools}
-        >
-          <p>
-            Requires restart. Turns on the app&#39;s developer tools, which
-            provide access to the inner workings of the app and additional
-            logging.
-          </p>
-        </LabeledToggle>
-        <LabeledButton
-          label="Manually Add Robot Network Addresses"
-          buttonProps={{
-            Component: Link,
-            children: 'manage',
-            to: `${props.match.url}/add-ip`,
-          }}
-        >
-          <p>
-            If your app is unable to automatically discover your robot, you can
-            manually add its IP address or hostname here
-          </p>
-        </LabeledButton>
-        {props.devToolsOn &&
-          DEV_INTERNAL_FLAGS.map(flag => (
-            <LabeledToggle
-              key={flag}
-              label={`__DEV__ ${startCase(flag)}`}
-              toggledOn={Boolean(props.devInternal?.[flag])}
-              onClick={() => props.toggleDevInternalFlag(flag)}
-            />
-          ))}
-      </Card>
-      <Route
-        path={`${props.match.path}/add-ip`}
-        render={() => <AddManualIp backUrl={props.match.url} />}
-      />
-    </>
+    <Card title={TITLE}>
+      <LabeledSelect
+        label="Update Channel"
+        value={props.channel}
+        options={props.channelOptions}
+        onChange={props.handleChannel}
+      >
+        <p>
+          Sets the update channel of your app. &quot;Stable&quot; receives the
+          latest stable releases. &quot;Beta&quot; is updated more frequently so
+          you can try out new features, but the releases may be less well tested
+          than &quot;Stable&quot;.
+        </p>
+      </LabeledSelect>
+      <LabeledToggle
+        label="Enable Developer Tools"
+        toggledOn={props.devToolsOn}
+        onClick={props.toggleDevTools}
+      >
+        <p>
+          Requires restart. Turns on the app&#39;s developer tools, which
+          provide access to the inner workings of the app and additional
+          logging.
+        </p>
+      </LabeledToggle>
+      {props.devToolsOn &&
+        DEV_INTERNAL_FLAGS.map(flag => (
+          <LabeledToggle
+            key={flag}
+            label={`__DEV__ ${startCase(flag)}`}
+            toggledOn={Boolean(props.devInternal?.[flag])}
+            onClick={() => props.toggleDevInternalFlag(flag)}
+          />
+        ))}
+    </Card>
   )
 }
 
