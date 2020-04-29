@@ -1,6 +1,5 @@
 // @flow
 import React from 'react'
-import * as Yup from 'yup'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
 import cx from 'classnames'
@@ -42,7 +41,7 @@ import { ConnectedSlotMap } from './ConnectedSlotMap'
 import { useResetSlotOnModelChange } from './form-state'
 
 import type { ModuleRealType, ModuleModel } from '@opentrons/shared-data'
-import type { InitialDeckSetup, ModuleOnDeck } from '../../../step-forms/types'
+import type { ModuleOnDeck } from '../../../step-forms/types'
 import type { ModelModuleInfo } from '../../EditModules'
 
 type EditModulesModalProps = {|
@@ -56,8 +55,6 @@ type EditModulesModalProps = {|
 
 type EditModulesModalComponentProps = {|
   ...EditModulesModalProps,
-  initialDeckSetup: InitialDeckSetup,
-  moduleOnDeck: ModuleOnDeck | null,
   supportedModuleSlot: string,
 |}
 
@@ -79,10 +76,34 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
   const initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
   const dispatch = useDispatch()
 
+  const hasSlotIssue = (selectedSlot): boolean => {
+    const previousModuleSlot = moduleOnDeck?.slot
+    const hasModuleMoved = previousModuleSlot !== selectedSlot
+    const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
+      selectedSlot
+    )
+    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
+    const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
+    const isLabwareCompatible =
+      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
+
+    if (!hasModuleMoved || (isSlotEmpty && !isSlotBlocked)) {
+      return false
+    }
+
+    return !isLabwareCompatible
+  }
+
   const initialValues = {
     selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
     selectedModel: moduleOnDeck?.model || null,
   }
+
+  const initialErrors = hasSlotIssue(initialValues.selectedSlot)
+    ? {
+        selectedSlot: `Slot ${initialValues.selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`,
+      }
+    : null
 
   const validator = ({
     selectedModel,
@@ -92,7 +113,11 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     if (!selectedModel) {
       errors.selectedModel = i18n.t('alert.field.required')
     }
-    if (!selectedSlot) {
+
+    if (hasSlotIssue(selectedSlot)) {
+      errors.selectedSlot = `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
+    } else if (!selectedSlot) {
+      // in the event that we remove auto selecting selected slot
       errors.selectedSlot = i18n.t('alert.field.required')
     }
 
@@ -144,12 +169,11 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={initialValues}
+      initialErrors={initialErrors}
       validate={validator}
     >
       <EditModulesModalComponent
         {...props}
-        initialDeckSetup={initialDeckSetup}
-        moduleOnDeck={moduleOnDeck}
         supportedModuleSlot={supportedModuleSlot}
       />
     </Formik>
@@ -157,43 +181,13 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
 }
 
 const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
-  const {
-    initialDeckSetup,
-    moduleOnDeck,
-    moduleType,
-    onCloseClick,
-    supportedModuleSlot,
-  } = props
-  const { values } = useFormikContext()
-  const { selectedSlot, selectedModel } = values
-  const previousModuleSlot = moduleOnDeck?.slot
+  const { moduleType, onCloseClick, supportedModuleSlot } = props
+  const { values, errors, isValid } = useFormikContext()
+  const { selectedModel } = values
 
   const disabledModuleRestriction = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )
-
-  const hasSlotIssue = (): boolean => {
-    const hasModuleMoved = previousModuleSlot !== selectedSlot
-    const isSlotBlocked = getSlotsBlockedBySpanning(initialDeckSetup).includes(
-      selectedSlot
-    )
-    const isSlotEmpty = getSlotIsEmpty(initialDeckSetup, selectedSlot)
-    const labwareOnSlot = getLabwareOnSlot(initialDeckSetup, selectedSlot)
-    const isLabwareCompatible =
-      labwareOnSlot && getLabwareIsCompatible(labwareOnSlot.def, moduleType)
-
-    if (!hasModuleMoved || (isSlotEmpty && !isSlotBlocked)) {
-      return false
-    }
-
-    return !isLabwareCompatible
-  }
-
-  const slotIssue: boolean = hasSlotIssue()
-
-  const slotError = slotIssue
-    ? `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
-    : null
 
   const moduleHasCollisionIssue =
     selectedModel && !isModuleWithCollisionIssue(selectedModel)
@@ -209,6 +203,8 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
   )
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
+  const slotIssue =
+    errors.selectedSlot && errors.selectedSlot.includes('occupied')
 
   useResetSlotOnModelChange(supportedModuleSlot)
 
@@ -252,7 +248,6 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
                         <SlotDropdown
                           fieldName={'selectedSlot'}
                           options={getAllModuleSlotsByType(moduleType)}
-                          error={slotError}
                           disabled={!enableSlotSelection}
                           tabIndex={1}
                         />
@@ -276,7 +271,7 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
             </OutlineButton>
             <OutlineButton
               className={styles.button_margin}
-              disabled={slotIssue}
+              disabled={!isValid}
               type={BUTTON_TYPE_SUBMIT}
             >
               {i18n.t('button.save')}

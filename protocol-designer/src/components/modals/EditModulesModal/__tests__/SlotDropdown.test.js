@@ -39,7 +39,6 @@ describe('Slot Dropdown', () => {
           disabled: false,
         },
       ],
-      error: 'mockError',
       disabled: false,
     }
     mockStore = {
@@ -56,7 +55,7 @@ describe('Slot Dropdown', () => {
     )
 
   it('should render a DropdownField with the appropriate props', () => {
-    mockFieldOnce('mockVal', '', false)
+    mockFieldOnce('mockVal', 'mockError', false)
     const wrapper = render(props)
     const dropdownField = wrapper.find(DropdownField)
     expect(dropdownField.prop('tabIndex')).toBe(1)
