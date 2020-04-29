@@ -23,7 +23,7 @@ export const ModelDropdown = (props: ModelDropdownProps) => {
       value={field.value}
       onChange={field.onChange}
       onBlur={field.onBlur}
-      error={meta.error}
+      error={meta.touched && meta.error ? meta.error : null}
     />
   )
 }

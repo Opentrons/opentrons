@@ -42,6 +42,11 @@ describe('Model Dropdown', () => {
       getState: () => ({}),
     }
   })
+
+  afterEach(() => {
+    jest.clearAllMocks()
+  })
+
   const render = props =>
     mount(
       <Provider store={mockStore}>
@@ -59,6 +64,18 @@ describe('Model Dropdown', () => {
     expect(dropdownField.prop('value')).toBe('mockVal')
     expect(dropdownField.prop('onChange')).toBe(onChange)
     expect(dropdownField.prop('onBlur')).toBe(onBlur)
+  })
+
+  it('show an error if field touched and error present', () => {
+    mockFieldOnce('mockVal', 'mockError', true)
+    const wrapper = render(props)
+    const dropdownField = wrapper.find(DropdownField)
     expect(dropdownField.prop('error')).toBe('mockError')
+  })
+  it('show NOT show an error if field is not touched', () => {
+    mockFieldOnce('mockVal', 'mockError', false)
+    const wrapper = render(props)
+    const dropdownField = wrapper.find(DropdownField)
+    expect(dropdownField.prop('error')).toBe(null)
   })
 })
