@@ -204,7 +204,9 @@ describe('Edit Modules Modal', () => {
   describe('Connected Slot Map', () => {
     it('should pass the selected slot field name', () => {
       const wrapper = render(props)
-      expect(wrapper.find(ConnectedSlotMap).prop('fieldName')).toBe('selectedSlot')
+      expect(wrapper.find(ConnectedSlotMap).prop('fieldName')).toBe(
+        'selectedSlot'
+      )
     })
     it('should pass an error if the labware is not compatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(false)
