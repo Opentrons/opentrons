@@ -4,7 +4,8 @@ import {
   LabeledValue,
   OutlineButton,
   SlotMap,
-  HoverTooltip,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
 import { useDispatch } from 'react-redux'
@@ -99,6 +100,10 @@ export function ModuleRow(props: Props) {
   const handleEditModule =
     moduleOnDeck && setCurrentModule(type, moduleOnDeck.id)
 
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'bottom',
+  })
+
   return (
     <div>
       <h4 className={styles.row_title}>
@@ -123,22 +128,16 @@ export function ModuleRow(props: Props) {
           {slot && <LabeledValue label="Position" value={slotDisplayName} />}
         </div>
         <div className={styles.slot_map}>
+          {collisionSlots.length > 0 && (
+            <Tooltip {...tooltipProps}>{collisionTooltip}</Tooltip>
+          )}
           {slot && (
-            <HoverTooltip
-              placement="bottom"
-              tooltipComponent={
-                collisionSlots.length > 0 ? collisionTooltip : null
-              }
-            >
-              {hoverTooltipHandlers => (
-                <div {...hoverTooltipHandlers}>
-                  <SlotMap
-                    occupiedSlots={occupiedSlotsForMap}
-                    collisionSlots={collisionSlots}
-                  />
-                </div>
-              )}
-            </HoverTooltip>
+            <div {...targetProps}>
+              <SlotMap
+                occupiedSlots={occupiedSlotsForMap}
+                collisionSlots={collisionSlots}
+              />
+            </div>
           )}
         </div>
         <div className={styles.modules_button_group}>
