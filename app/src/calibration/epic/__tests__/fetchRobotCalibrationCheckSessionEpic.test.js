@@ -1,6 +1,7 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
 
+import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as RobotApiHttp from '../../../robot-api/http'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
@@ -26,6 +27,8 @@ const mockGetRobotByName: JestMockFn<[any, string], mixed> =
 
 const mockRobot = Fixtures.mockRobot
 const mockState = { state: true }
+const makeTriggerAction = robotName =>
+  Actions.fetchRobotCalibrationCheckSession(robotName)
 
 describe('fetchRobotCalibrationCheckSessionEpic', () => {
   let testScheduler
@@ -43,75 +46,83 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
   })
 
   describe('handles fetch calibration check session', () => {
-    const action = Actions.fetchRobotCalibrationCheckSession(mockRobot.name)
-    const expectedRequest = {
-      method: 'GET',
-      path: '/calibration/check/session',
-    }
-
     it('calls GET /calibration/check/session', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchCheckSessionSuccess })
-        )
+      const mocks = setupEpicTestMocks(
+        makeTriggerAction,
+        Fixtures.mockFetchCheckSessionSuccess
+      )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
+      runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$)
         flush()
 
-        expect(mockFetchRobotApi).toHaveBeenCalledWith(
-          mockRobot,
-          expectedRequest
-        )
+        expect(mocks.fetchRobotApi).toHaveBeenCalledWith(mocks.robot, {
+          method: 'GET',
+          path: '/calibration/check/session',
+        })
       })
     })
 
     it('maps successful response to FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchCheckSessionSuccess })
-        )
+      const mocks = setupEpicTestMocks(
+        makeTriggerAction,
+        Fixtures.mockFetchCheckSessionSuccess
+      )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+      runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
           a: Actions.fetchRobotCalibrationCheckSessionSuccess(
-            mockRobot.name,
+            mocks.robot.name,
             Fixtures.mockFetchCheckSessionSuccess.body,
-            { response: Fixtures.mockFetchCheckSessionSuccessMeta }
+            {
+              ...mocks.meta,
+              response: Fixtures.mockFetchCheckSessionSuccessMeta,
+            }
           ),
         })
       })
     })
 
     it('maps failed response to FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchCheckSessionFailure })
-        )
+      const mocks = setupEpicTestMocks(
+        makeTriggerAction,
+        Fixtures.mockFetchCheckSessionFailure
+      )
 
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: {} })
+      runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
           a: Actions.fetchRobotCalibrationCheckSessionFailure(
-            mockRobot.name,
+            mocks.robot.name,
             { message: 'AH' },
-            { response: Fixtures.mockFetchCheckSessionFailureMeta }
+            {
+              ...mocks.meta,
+              response: Fixtures.mockFetchCheckSessionFailureMeta,
+            }
           ),
         })
       })
     })
 
     it('maps not found response to CREATE_ROBOT_CALIBRATION_CHECK_SESSION', () => {
-      testScheduler.run(({ hot, cold, expectObservable, flush }) => {
-        mockFetchRobotApi.mockReturnValue(
+      const mocks = setupEpicTestMocks(
+        makeTriggerAction,
+        Fixtures.mockFetchCheckSessionFailure
+      )
+
+      runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
+        mocks.fetchRobotApi.mockReturnValue(
           cold('r', {
             r: {
               ...Fixtures.mockFetchCheckSessionFailure,
@@ -119,13 +130,12 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
             },
           })
         )
-
-        const action$ = hot('--a', { a: action })
-        const state$ = hot('a-a', { a: mockState })
+        const action$ = hot('--a', { a: mocks.action })
+        const state$ = hot('s-s', { s: mocks.state })
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.createRobotCalibrationCheckSession(mockRobot.name),
+          a: Actions.createRobotCalibrationCheckSession(mocks.robot.name),
         })
       })
     })

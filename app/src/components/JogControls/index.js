@@ -132,9 +132,9 @@ export class JogControls extends React.Component<
 
     // NOTE: must use flatMap identity instead of native .flat()
     // because flow will bail out type to mixed with the latter
-    const handlersForAxes: Array<KeypressHandler> = axes
-      .map(a => handlersByAxis[a])
-      .flatMap(handler => handler)
+    const handlersForAxes: Array<KeypressHandler> = axes.flatMap(
+      a => handlersByAxis[a]
+    )
 
     return (
       <HandleKeypress
@@ -148,8 +148,7 @@ export class JogControls extends React.Component<
         ]}
       >
         {axes
-          .map(a => JOG_BUTTON_NAMES_BY_AXIS[a])
-          .flatMap(name => name)
+          .flatMap(a => JOG_BUTTON_NAMES_BY_AXIS[a])
           .map(name => (
             <JogButton
               key={name}

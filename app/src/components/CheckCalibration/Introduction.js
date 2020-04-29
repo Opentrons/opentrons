@@ -41,6 +41,9 @@ export function Introduction(props: IntroductionProps) {
     dispatch(loadLabwareRobotCalibrationCheck(robotName))
   }
 
+  // TODO: BC: investigate whether we should sub out the warning modal
+  // below for the existing ClearDeckAlertModal
+
   return (
     <>
       <div className={styles.modal_header}>

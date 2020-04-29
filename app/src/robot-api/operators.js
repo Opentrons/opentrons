@@ -12,7 +12,7 @@ import type { State, Action } from '../types'
 export type ActionToRequestMapper<TriggerAction> = (
   TriggerAction,
   State
-) => ?Types.RobotApiRequestOptions
+) => Types.RobotApiRequestOptions | null
 
 export type ResponseToActionMapper<TriggerAction> = (
   Types.RobotApiResponse,
