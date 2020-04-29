@@ -2,6 +2,14 @@
 /* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
 @import '@opentrons/components';
 
+.pauseUserMessage {
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+  font-style: italic;
+  overflow-y: scroll;
+  max-height: 4rem;
+}
+
 .run_page {
   position: relative;
 }

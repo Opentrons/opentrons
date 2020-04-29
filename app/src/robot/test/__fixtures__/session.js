@@ -7,6 +7,12 @@ export function MockSession() {
     commands: [],
     command_log: {},
     state: 'loaded',
+    stateInfo: {
+      message: null,
+      userMessage: null,
+      changedAt: null,
+      estimatedDuration: null,
+    },
     instruments: [],
     containers: [],
 

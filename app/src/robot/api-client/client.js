@@ -453,6 +453,22 @@ export function client(dispatch) {
       clearRunTimerInterval()
     }
 
+    if (apiSession.stateInfo) {
+      update.stateInfo = pick(apiSession.stateInfo, [
+        'message',
+        'userMessage',
+        'changedAt',
+        'estimatedDuration',
+      ])
+    } else {
+      update.stateInfo = {
+        message: null,
+        userMessage: null,
+        changedAt: null,
+        estimatedDuration: null,
+      }
+    }
+
     // both light and full updates may have the errors list
     if (apiSession.errors) {
       update.errors = apiSession.errors.map(e => ({

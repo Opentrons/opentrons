@@ -3,16 +3,27 @@ import * as React from 'react'
 import { useSelector } from 'react-redux'
 import { AlertItem } from '@opentrons/components'
 import { getSessionError } from '../../robot/selectors'
-import type { SessionStatus } from '../../robot'
+import type { SessionStatus, SessionStatusInfo } from '../../robot'
+import styles from './styles.css'
+
+const buildPauseMessage = (message: ?string): string =>
+  message ? `: ${message}` : ''
+
+const buildPause = (message: ?string): string =>
+  `Run paused${buildPauseMessage(message)}`
+
+const buildPauseUserMessage = (message: ?string) =>
+  message && <div className={styles.pauseUserMessage}>{message}</div>
 
 export type SessionAlertProps = {|
   sessionStatus: SessionStatus,
+  sessionStatusInfo: SessionStatusInfo,
   className?: string,
   onResetClick: () => mixed,
 |}
 
 export function SessionAlert(props: SessionAlertProps) {
-  const { sessionStatus, className, onResetClick } = props
+  const { sessionStatus, sessionStatusInfo, className, onResetClick } = props
   const sessionError = useSelector(getSessionError)
 
   switch (sessionStatus) {
@@ -36,8 +47,10 @@ export function SessionAlert(props: SessionAlertProps) {
           className={className}
           type="info"
           icon={{ name: 'pause-circle' }}
-          title="Run paused"
-        />
+          title={buildPause(sessionStatusInfo.message)}
+        >
+          {buildPauseUserMessage(sessionStatusInfo.userMessage)}
+        </AlertItem>
       )
 
     case 'stopped':

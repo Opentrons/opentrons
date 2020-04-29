@@ -12,6 +12,7 @@ import type {
   Mount,
   Slot,
   SessionStatus,
+  SessionStatusInfo,
 } from '../types'
 
 import type { InvalidProtocolFileAction } from '../../protocol/types'
@@ -25,6 +26,7 @@ type Request = {
 export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
+  stateInfo: SessionStatusInfo,
   errors: Array<{|
     timestamp: number,
     line: number,
@@ -72,6 +74,12 @@ const INITIAL_STATE: SessionState = {
   // loading a protocol
   sessionRequest: { inProgress: false, error: null },
   state: '',
+  stateInfo: {
+    message: null,
+    changedAt: null,
+    estimatedDuration: null,
+    userMessage: null,
+  },
   errors: [],
   protocolCommands: [],
   protocolCommandsById: {},
@@ -196,6 +204,7 @@ function handleSessionUpdate(
   return {
     ...state,
     state: sessionState,
+    stateInfo: action.payload.stateInfo,
     remoteTimeCompensation,
     startTime,
     protocolCommandsById,

@@ -353,6 +353,12 @@ describe('api client', () => {
         {
           name: session.name,
           state: session.state,
+          stateInfo: {
+            message: null,
+            userMessage: null,
+            changedAt: null,
+            estimatedDuration: null,
+          },
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -686,7 +692,17 @@ describe('api client', () => {
     })
 
     it('sends SESSION_UPDATE if session notification has lastCommand', () => {
-      const update = { state: 'running', startTime: 1, lastCommand: null }
+      const update = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        stateInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+      }
       const expected = actions.sessionUpdate(update, expect.any(Number))
 
       return sendConnect()

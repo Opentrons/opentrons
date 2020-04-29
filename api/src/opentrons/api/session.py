@@ -4,7 +4,7 @@ from copy import copy
 from functools import reduce, wraps
 import logging
 from time import time, sleep
-from typing import List, Dict, Any, Optional
+from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
@@ -27,9 +27,13 @@ from opentrons.legacy_api.containers.placeable import (
 
 from opentrons.legacy_api.containers import get_container, location_to_list
 
+if TYPE_CHECKING:
+    from .dev_types import State, StateInfo
+
 log = logging.getLogger(__name__)
 
-VALID_STATES = {'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
+VALID_STATES: Set['State'] = {
+    'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
 def _motion_lock(func):
@@ -241,7 +245,10 @@ class Session(object):
         self._simulating_ctx = ProtocolContext.build_using(
             self._protocol, loop=self._loop, broker=self._broker)
 
-        self.state = None
+        self.state: 'State' = None
+        #: The current state
+        self.stateInfo: 'StateInfo' = {}
+        #: A message associated with the current state
         self.commands = []
         self.command_log = {}
         self.errors = []
@@ -256,7 +263,7 @@ class Session(object):
         self.modules = None
         self.protocol_text = protocol.text
 
-        self.startTime = None
+        self.startTime: Optional[float] = None
         self._motion_lock = motion_lock
 
     def _hw_iface(self):
@@ -448,7 +455,10 @@ class Session(object):
         self.set_state('stopped')
         return self
 
-    def pause(self):
+    def pause(self,
+              reason: str = None,
+              user_message: str = None,
+              duration: float = None):
         if self._use_v2:
             self._hardware.pause()
         # robot.pause in the legacy API will publish commands to the broker
@@ -456,7 +466,9 @@ class Session(object):
         else:
             robot.execute_pause()
 
-        self.set_state('paused')
+        self.set_state(
+            'paused', reason=reason,
+            user_message=user_message, duration=duration)
         return self
 
     def resume(self):
@@ -476,7 +488,9 @@ class Session(object):
             if message['$'] == 'before':
                 self.log_append()
             if message['name'] == command_types.PAUSE:
-                self.set_state('paused')
+                self.set_state('paused',
+                               reason='The protocol paused execution',
+                               user_message=message['payload']['userMessage'])
             if message['name'] == command_types.RESUME:
                 self.set_state('running')
 
@@ -553,13 +567,31 @@ class Session(object):
             self._broker.set_logger(self._default_logger)
         return self
 
-    def set_state(self, state):
-        log.debug("State set to {}".format(state))
+    def set_state(self, state: 'State',
+                  reason: str = None,
+                  user_message: str = None,
+                  duration: float = None):
         if state not in VALID_STATES:
             raise ValueError(
                 'Invalid state: {0}. Valid states are: {1}'
                 .format(state, VALID_STATES))
         self.state = state
+        if user_message:
+            self.stateInfo['userMessage'] = user_message
+        else:
+            self.stateInfo.pop('userMessage', None)
+        if reason:
+            self.stateInfo['message'] = reason
+        else:
+            self.stateInfo.pop('message', None)
+        if duration:
+            self.stateInfo.pop('estimatedDuration', None)
+        else:
+            self.stateInfo.pop('estimatedDuration', None)
+        if self.startTime:
+            self.stateInfo['changedAt'] = now()-self.startTime
+        else:
+            self.stateInfo.pop('changedAt', None)
         self._on_state_changed()
 
     def log_append(self):
@@ -593,6 +625,7 @@ class Session(object):
 
             payload = {
                 'state': self.state,
+                'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
                 'errors': self.errors,
                 'lastCommand': last_command
