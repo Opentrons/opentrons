@@ -1,46 +1,16 @@
 // @flow
-import { TestScheduler } from 'rxjs/testing'
-
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
-import * as RobotApiHttp from '../../../robot-api/http'
-import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { calibrationEpic } from '..'
-import type { Observable } from 'rxjs'
-import type {
-  RobotHost,
-  RobotApiRequestOptions,
-  RobotApiResponse,
-} from '../../../robot-api/types'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
 
-const mockFetchRobotApi: JestMockFn<
-  [RobotHost, RobotApiRequestOptions],
-  Observable<RobotApiResponse>
-> = RobotApiHttp.fetchRobotApi
-
-const mockGetRobotByName: JestMockFn<[any, string], mixed> =
-  DiscoverySelectors.getRobotByName
-
-const mockRobot = Fixtures.mockRobot
-const mockState = { state: true }
 const makeTriggerAction = robotName =>
   Actions.fetchRobotCalibrationCheckSession(robotName)
 
 describe('fetchRobotCalibrationCheckSessionEpic', () => {
-  let testScheduler
-
-  beforeEach(() => {
-    mockGetRobotByName.mockReturnValue(mockRobot)
-
-    testScheduler = new TestScheduler((actual, expected) => {
-      expect(actual).toEqual(expected)
-    })
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
