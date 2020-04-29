@@ -91,7 +91,9 @@ export function TipPickUp(props: TipPickUpProps) {
       <div className={styles.modal_header}>
         <h3>
           {TIP_PICK_UP_HEADER}
-          {tiprackDef ? getLabwareDisplayName(tiprackDef) : null}
+          {tiprackDef
+            ? getLabwareDisplayName(tiprackDef).replace('µL', 'uL')
+            : null}
         </h3>
       </div>
 
