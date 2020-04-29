@@ -366,11 +366,13 @@ const updatePatchOnPipetteChannelChange = (
       aspirate_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.aspirate_wells is type ?mixed. Address in #3161
         appliedPatch.aspirate_wells,
+        // $FlowFixMe(mc, 2020-04-29): sourceLabwareDef is not typed properly. Address in #3161
         sourceLabwareDef
       ),
       dispense_wells: getAllWellsFromPrimaryWells(
         // $FlowFixMe(mc, 2020-02-21): appliedPatch.dispense_wells is type ?mixed. Address in #3161
         appliedPatch.dispense_wells,
+        // $FlowFixMe(mc, 2020-04-29): destLabwareDef is not typed properly. Address in #3161
         destLabwareDef
       ),
     }

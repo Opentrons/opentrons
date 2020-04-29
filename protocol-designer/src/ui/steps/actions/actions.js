@@ -115,11 +115,8 @@ export const selectStep = (
       stepFormSelectors.getLabwareEntities(state)
     )
 
-    formData = {
-      ...formData,
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-      ...updatedFields,
-    }
+    // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
+    formData = { ...formData, ...updatedFields }
   }
 
   // For a pristine step, if there is a `moduleId` field in the form
