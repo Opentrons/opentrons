@@ -1,44 +1,45 @@
 from uuid import uuid4
 
 import typing
-from fastapi import APIRouter, Path
-from pydantic.generics import GenericModel
+from fastapi import APIRouter, Query
 from robot_server.service.models import session
-from robot_server.service.models.json_api import ResourceTypes
-from robot_server.service.models.json_api.response import ResponseModel, ResponseDataModel
+from robot_server.service.models.json_api.response import ResponseModel, \
+    ResponseDataModel
 
 SessionResponseData = ResponseDataModel[session.Session]
-SessionResponse = ResponseModel[ResponseDataModel[session.Session]]
-SessionResponse = session.Session
+SessionResponse = ResponseModel[SessionResponseData]
+MultiSessionResponse = ResponseModel[typing.List[SessionResponseData]]
 
 router = APIRouter()
 
 
 @router.post("/sessions",
              description="Create a session",
-             response_model=session.Session)
+             response_model=SessionResponse)
 async def create_session() \
-        -> session.Session:
+        -> SessionResponse:
     """Create a session"""
     pass
 
 
 @router.delete("/sessions/{session_id}",
                description="Delete a session",
-               response_model=session.Session)
-async def delete_session(session_id: str) -> session.Session:
+               response_model=SessionResponse)
+async def delete_session(session_id: str) -> SessionResponse:
     pass
 
 
 @router.get("/sessions/{session_id}",
             description="Get session",
-            response_model=session.Session)
-async def get_session(session_id: str) -> session.Session:
+            response_model=SessionResponse)
+async def get_session(session_id: str) -> SessionResponse:
     pass
 
 
 @router.get("/sessions",
             description="Get all the sessions",
-            response_model=session.Session)
-async def get_sessions() -> session.Session:
+            response_model=MultiSessionResponse)
+async def get_sessions(
+        type_filter: session.SessionType = Query(None, description="Will limit the results to only this session type")) \
+        -> MultiSessionResponse:
     pass

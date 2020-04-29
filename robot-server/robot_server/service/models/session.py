@@ -13,3 +13,5 @@ class Session(BaseModel):
     """Description of session"""
     session_type: SessionType =\
         Field(..., description="The type of the session")
+    session_id: str = \
+        Field(..., description="The unique identifier the session")
