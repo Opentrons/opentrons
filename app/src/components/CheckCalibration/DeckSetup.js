@@ -92,6 +92,9 @@ export function DeckSetup(props: DeckSetupProps) {
   )
 }
 
+// TODO: BC: these tiprack names are not wrapping and the most
+// important part of their name (the tip volume) is being truncated.
+// should wrap onto another line?
 type TiprackRenderProps = {|
   labwareDef: LabwareDefinition2,
   slotDef: DeckSlot,
