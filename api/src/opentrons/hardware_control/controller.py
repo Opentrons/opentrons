@@ -86,7 +86,6 @@ class Controller:
                 'pins, defaulting to (OG) 2.1')
             return BoardRevision.OG
         except Exception:
-            print('nope')
             MODULE_LOG.exception(
                 'Unexpected error from reading central routing board '
                 'revision bits')
