@@ -48,6 +48,16 @@ This table lists the model names, which are passed to :py:meth:`.ProtocolContext
 +---------------------------------------+-------------------------+
 |          Pipette Type                 |     Model Name          |
 +=======================================+=========================+
+| ``P20 Single GEN2`` (1 - 20 µL)       | ``'p20_single_gen2'``   |
++---------------------------------------+-------------------------+
+| ``P300 Single GEN2`` (20 - 300 µL)    | ``'p300_single_gen2'``  |
++---------------------------------------+-------------------------+
+| ``P1000 Single GEN2`` (100 - 1000 µL) | ``'p1000_single_gen2'`` |
++---------------------------------------+-------------------------+
+| ``P300 Multi GEN2`` (20-300 µL)       | ``'p300_multi_gen2'``   |
++---------------------------------------+-------------------------+
+| ``P20 Multi GEN2`` (1-20 µL)          | ``'p20_multi_gen2'``    |
++---------------------------------------+-------------------------+
 | ``P10 Single``   (1 - 10 µL)          | ``'p10_single'``        |
 +---------------------------------------+-------------------------+
 | ``P10 Multi``    (1 - 10 µL)          | ``'p10_multi'``         |
@@ -62,12 +72,6 @@ This table lists the model names, which are passed to :py:meth:`.ProtocolContext
 +---------------------------------------+-------------------------+
 | ``P1000 Single`` (100 - 1000 µL)      | ``'p1000_single'``      |
 +---------------------------------------+-------------------------+
-| ``P20 Single GEN2`` (1 - 20 µL)       | ``'p20_single_gen2'``   |
-+---------------------------------------+-------------------------+
-| ``P300 Single GEN2`` (20 - 300 µL)    | ``'p300_single_gen2'``  |
-+---------------------------------------+-------------------------+
-| ``P1000 Single GEN2`` (100 - 1000 µL) | ``'p1000_single_gen2'`` |
-+---------------------------------------+-------------------------+
 
 
 GEN2 Pipette Backward Compatibility
@@ -75,12 +79,21 @@ GEN2 Pipette Backward Compatibility
 
 GEN2 pipettes have different volume ranges than GEN1 pipettes. However, each GEN2 pipette covers one or two GEN1 pipette volume ranges. For instance, with  a range of 1 - 20 µL, the P20 Single GEN2 covers the P10 Single GEN1 (1 - 10 µL). If your protocol specifies a GEN1 pipette but you have a GEN2 pipette attached to your OT-2  with a compatible volume range, you can still run your protocol. The OT-2 will consider the GEN2 pipette to have the same minimum volume as the GEN1 pipette, so any advanced commands have the same behavior as before.
 
-Specifically, the P20 Single GEN2 covers the entire P10 Single GEN1 range; the P300 Single GEN2 covers the entire P300 Single GEN1 range; and the P1000 Single GEN2 covers the entire P1000 Single GEN1 range.
+Specifically, the P20 GEN2s (single and multi) cover the entire P10 GEN1 range; the P300 Single GEN2 covers the entire P300 Single GEN1 range; and the P1000 Single GEN2 covers the entire P1000 Single GEN1 range.
 
 If you have a P50 Single specified in your protocol, there is no automatic backward compatibility.
 If you want to use a GEN2 Pipette, you must change your protocol to load either a P300 Single GEN2
 (if you are using volumes between 20 and 50 µL) or a P20 Single GEN2 (if you are using volumes
 below 20 µL).
+
+If your protocol specifies a pipette and you attach a compatible
+pipette, the protocol will run, and the pipette will act the same as the pipette
+specified in your protocol - altering parameters like its minimum volume if
+necessary.
+
+For instance, if your protocol specifies a P300
+Multi, and you connect a P300 Multi GEN2, the pipette will act like a P300
+Multi - it will set its minimum volume to 30 µL.
 
 
 Adding Tip Racks
@@ -332,6 +345,46 @@ Defaults
 - Aspirate default: 1mm above the bottom
 - Dispense default: 1mm above the bottom
 
+**p20_single_gen2**
+
+- Aspirate Default: 3.78 µL/s
+- Dispense Default: 3.78 µL/s
+- Blow Out Default: 3.78 µL/s
+- Minimum Volume: 1 µL
+- Maximum Volume: 20 µL
+
+**p300_single_gen2**
+
+- Aspirate Default: 46.43 µL/s
+- Dispense Default: 46.43 µL/s
+- Blow Out Default: 46.43 µL/s
+- Minimum Volume: 20 µL
+- Maximum Volume: 300 µL
+
+**p1000_single_gen2**
+
+- Aspirate Default: 137.35 µL/s
+- Dispense Default: 137.35 µL/s
+- Blow Out Default: 137.35 µL/s
+- Minimum Volume: 100 µL
+- Maximum Volume: 1000 µL
+
+**p20_multi_gen2**
+
+- Aspirate Default: 7.6 µL/s
+- Dispense Default: 7.6 µL/s
+- Blow Out Default: 7.6 µL/s
+- Minimum Volume: 1 µL
+- Maximum Volume: 20 µL
+
+**p300_multi_gen2**
+
+- Aspirate Default: 94 µL/s
+- Dispense Default: 94 µL/s
+- Blow Out Default: 94 µL/s
+- Minimum Volume: 20 µL
+- Maximum Volume: 300 µL
+
 **p10_single**
 
 - Aspirate Default: 5 µL/s
@@ -385,29 +438,5 @@ Defaults
 - Aspirate Default: 500 µL/s
 - Dispense Default: 1000 µL/s
 - Blow Out Default: 1000 µL/s
-- Minimum Volume: 100 µL
-- Maximum Volume: 1000 µL
-
-**p20_single_gen2**
-
-- Aspirate Default: 3.78 µL/s
-- Dispense Default: 3.78 µL/s
-- Blow Out Default: 3.78 µL/s
-- Minimum Volume: 1 µL
-- Maximum Volume: 20 µL
-
-**p300_single_gen2**
-
-- Aspirate Default: 46.43 µL/s
-- Dispense Default: 46.43 µL/s
-- Blow Out Default: 46.43 µL/s
-- Minimum Volume: 20 µL
-- Maximum Volume: 300 µL
-
-**p1000_single_gen2**
-
-- Aspirate Default: 137.35 µL/s
-- Dispense Default: 137.35 µL/s
-- Blow Out Default: 137.35 µL/s
 - Minimum Volume: 100 µL
 - Maximum Volume: 1000 µL
