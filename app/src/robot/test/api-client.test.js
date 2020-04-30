@@ -8,7 +8,7 @@ import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession } from './__fixtures__/session'
+import { MockSession, MockSessionNoStateInfo } from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
@@ -386,6 +386,49 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
     })
 
+    it('handles sessionResponses without status info', () => {
+      session = MockSessionNoStateInfo()
+      sessionManager.session = session
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses with some status info set', () => {
+      session.stateInfo.changedAt = 2
+      session.stateInfo.message = 'test message'
+      const expected = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          statusInfo: {
+            message: 'test message',
+            userMessage: null,
+            changedAt: 2,
+            estimatedDuration: null,
+          },
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+          apiLevel: [1, 0],
+        },
+        false
+      )
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
     it('handles connnect without session', () => {
       const notExpected = actions.sessionResponse(
         null,
@@ -704,6 +747,7 @@ describe('api client', () => {
         .then(() => sendNotification('session', update))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
+
   })
 
   describe('calibration', () => {

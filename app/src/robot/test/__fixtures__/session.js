@@ -21,3 +21,24 @@ export function MockSession() {
     refresh: jest.fn(),
   }
 }
+
+
+export function MockSessionNoStateInfo() {
+   return {
+    name: 'MOCK SESSION',
+    protocol_text: '# mock protocol text',
+    commands: [],
+    command_log: {},
+    state: 'loaded',
+    instruments: [],
+    containers: [],
+
+    modules: [],
+
+    run: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    stop: jest.fn(),
+    refresh: jest.fn(),
+  }
+}

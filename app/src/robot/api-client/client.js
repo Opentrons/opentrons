@@ -456,7 +456,7 @@ export function client(dispatch) {
     if (apiSession.stateInfo) {
       update.statusInfo = {
         message: apiSession.stateInfo?.message ?? null,
-        userMessage: apiSession.stateInfo?.message ?? null,
+        userMessage: apiSession.stateInfo?.userMessage ?? null,
         changedAt: apiSession.stateInfo?.changedAt ?? null,
         estimatedDuration:
           apiSession.stateInfo?.estimatedDuration ?? null,
