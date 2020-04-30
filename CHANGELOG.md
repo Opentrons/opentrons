@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.1](https://github.com/opentrons/opentrons/compare/v3.17.1-alpha.0...v3.17.1-alpha.1) (2020-04-30)
+
+
+### Bug Fixes
+
+* **api:** home only the axis probing after error ([#5525](https://github.com/opentrons/opentrons/issues/5525)) ([c0d640c](https://github.com/opentrons/opentrons/commit/c0d640c))
+
+
+
+
+
 ## [3.17.1-alpha.0](https://github.com/opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
 
 
