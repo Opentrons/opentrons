@@ -585,7 +585,7 @@ class Session(object):
         else:
             self.stateInfo.pop('message', None)
         if duration:
-            self.stateInfo.pop('estimatedDuration', None)
+            self.stateInfo['estimatedDuration'] = duration
         else:
             self.stateInfo.pop('estimatedDuration', None)
         if self.startTime:
