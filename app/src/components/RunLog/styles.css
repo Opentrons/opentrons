@@ -2,7 +2,7 @@
 /* stylelint-disable selector-class-pattern, font-family-no-missing-generic-family-keyword  */
 @import '@opentrons/components';
 
-.pauseUserMessage {
+.pause_user_message {
   margin-left: 0.5rem;
   margin-right: 0.5rem;
   font-style: italic;

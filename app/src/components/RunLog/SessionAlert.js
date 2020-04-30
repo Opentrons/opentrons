@@ -13,7 +13,7 @@ const buildPause = (message: ?string): string =>
   `Run paused${buildPauseMessage(message)}`
 
 const buildPauseUserMessage = (message: ?string) =>
-  message && <div className={styles.pauseUserMessage}>{message}</div>
+  message && <div className={styles.pause_user_message}>{message}</div>
 
 export type SessionAlertProps = {|
   sessionStatus: SessionStatus,
