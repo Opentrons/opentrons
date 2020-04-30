@@ -19,6 +19,7 @@ import type {
   LabwareEntities,
   InitialDeckSetup,
 } from '../types'
+import type { FormPatch } from '../../steplist/actions/types'
 import type { SavedStepFormState, OrderedStepIdsState } from '../reducers'
 
 export type CreatePresavedStepFormArgs = {|
@@ -30,19 +31,23 @@ export type CreatePresavedStepFormArgs = {|
   orderedStepIds: OrderedStepIdsState,
   initialDeckSetup: InitialDeckSetup,
 |}
-export const createPresavedStepForm = ({
-  stepId,
-  stepType,
-  pipetteEntities,
-  labwareEntities,
-  savedStepForms,
-  orderedStepIds,
-  initialDeckSetup,
-}: CreatePresavedStepFormArgs): FormData => {
-  let formData = createBlankForm({
-    stepId,
-    stepType,
-  })
+
+type FormUpdater = FormData => FormPatch | null
+
+const _patchDefaultPipette = (args: {|
+  initialDeckSetup: InitialDeckSetup,
+  labwareEntities: LabwareEntities,
+  orderedStepIds: OrderedStepIdsState,
+  pipetteEntities: PipetteEntities,
+  savedStepForms: SavedStepFormState,
+|}): FormUpdater => formData => {
+  const {
+    initialDeckSetup,
+    labwareEntities,
+    orderedStepIds,
+    pipetteEntities,
+    savedStepForms,
+  } = args
 
   const defaultPipetteId = getNextDefaultPipetteId(
     savedStepForms,
@@ -50,14 +55,13 @@ export const createPresavedStepForm = ({
     initialDeckSetup.pipettes
   )
 
-  // For a pristine step, if there is a `pipette` field in the form
-  // (added by upstream `getDefaultsForStepType` fn),
+  // If there is a `pipette` field in the form,
   // then set `pipette` field of new steps to the next default pipette id.
   //
   // In order to trigger dependent field changes (eg default disposal volume),
   // update the form thru handleFormChange.
   const formHasPipetteField = formData && 'pipette' in formData
-  if (formHasPipetteField && defaultPipetteId) {
+  if (formHasPipetteField && defaultPipetteId !== '') {
     const updatedFields = handleFormChange(
       { pipette: defaultPipetteId },
       formData,
@@ -65,60 +69,131 @@ export const createPresavedStepForm = ({
       labwareEntities
     )
 
-    formData = {
-      ...formData,
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
-      ...updatedFields,
-    }
+    return updatedFields
+  }
+  return null
+}
+
+const _patchDefaultMagnetFields = (args: {|
+  initialDeckSetup: InitialDeckSetup,
+  orderedStepIds: OrderedStepIdsState,
+  savedStepForms: SavedStepFormState,
+  stepType: StepType,
+|}): FormUpdater => () => {
+  const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+  if (stepType !== 'magnet') {
+    return null
   }
 
-  // For a pristine step, if there is a `moduleId` field in the form
-  // (added by upstream `getDefaultsForStepType` fn),
-  // then set `moduleID` field of new steps to the next default module id.
-  const formHasModuleIdField = formData && 'moduleId' in formData
-  if (
-    (stepType === 'pause' || stepType === 'temperature') &&
-    formHasModuleIdField
-  ) {
+  const moduleId =
+    getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
+
+  const magnetAction = getNextDefaultMagnetAction(
+    savedStepForms,
+    orderedStepIds
+  )
+
+  const defaultEngageHeight = getMagnetLabwareEngageHeight(
+    initialDeckSetup,
+    moduleId
+  )
+
+  const stringDefaultEngageHeight = defaultEngageHeight
+    ? maskField('engageHeight', defaultEngageHeight)
+    : null
+
+  const prevEngageHeight = getNextDefaultEngageHeight(
+    savedStepForms,
+    orderedStepIds
+  )
+  // 'magnet' steps only.
+  //
+  // if no previously saved engageHeight, autopopulate with recommended value
+  // recommended value is null when no labware found on module
+  //
+  // Bypass dependent field changes, do not use handleFormChange
+  const engageHeight = prevEngageHeight || stringDefaultEngageHeight
+  return { moduleId, magnetAction, engageHeight }
+}
+
+const _patchTemperatureModuleId = (args: {|
+  initialDeckSetup: InitialDeckSetup,
+  orderedStepIds: OrderedStepIdsState,
+  savedStepForms: SavedStepFormState,
+  stepType: StepType,
+|}): FormUpdater => formData => {
+  const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+
+  const hasTemperatureModuleId =
+    stepType === 'pause' || stepType === 'temperature'
+  // Auto-populate moduleId field of 'pause' and 'temperature' steps.
+  //
+  // Bypass dependent field changes, do not use handleFormChange
+  if (hasTemperatureModuleId) {
     const moduleId = getNextDefaultTemperatureModuleId(
       savedStepForms,
       orderedStepIds,
       initialDeckSetup.modules
     )
-    formData = {
-      ...formData,
-      moduleId,
-    }
+    return { moduleId }
   }
+  return null
+}
 
-  // auto-select magnetic module if it exists (assumes no more than 1 magnetic module)
-  if (stepType === 'magnet') {
-    const moduleId =
-      getModuleOnDeckByType(initialDeckSetup, MAGNETIC_MODULE_TYPE)?.id || null
-    const magnetAction = getNextDefaultMagnetAction(
-      savedStepForms,
-      orderedStepIds
-    )
+export const createPresavedStepForm = ({
+  initialDeckSetup,
+  labwareEntities,
+  orderedStepIds,
+  pipetteEntities,
+  savedStepForms,
+  stepId,
+  stepType,
+}: CreatePresavedStepFormArgs): FormData => {
+  const formData = createBlankForm({
+    stepId,
+    stepType,
+  })
 
-    const defaultEngageHeight = getMagnetLabwareEngageHeight(
-      initialDeckSetup,
-      moduleId
-    )
+  const updateDefaultPipette = _patchDefaultPipette({
+    initialDeckSetup,
+    labwareEntities,
+    orderedStepIds,
+    pipetteEntities,
+    savedStepForms,
+  })
 
-    const stringDefaultEngageHeight = defaultEngageHeight
-      ? maskField('engageHeight', defaultEngageHeight)
-      : null
+  const updateMagneticModuleId = _patchDefaultMagnetFields({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+  })
 
-    const prevEngageHeight = getNextDefaultEngageHeight(
-      savedStepForms,
-      orderedStepIds
-    )
+  const updateTemperatureModuleId = _patchTemperatureModuleId({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+  })
 
-    // if no previously saved engageHeight, autopopulate with recommended value
-    // recommended value is null when no labware found on module
-    const engageHeight = prevEngageHeight || stringDefaultEngageHeight
-    formData = { ...formData, moduleId, magnetAction, engageHeight }
-  }
-
-  return formData
+  // finally, compose and apply all the updaters in order,
+  // passing the applied result from one updater as the input of the next
+  return [
+    updateDefaultPipette,
+    updateTemperatureModuleId,
+    updateMagneticModuleId,
+  ].reduce<FormData>(
+    (acc, updater: FormUpdater) => {
+      const updates = updater(acc)
+      if (updates === null) {
+        return acc
+      }
+      // TODO(IL, 2020-04-30): Flow cannot be sure that spreading FormPatch type will not overwrite
+      // values for the explicitly-typed keys in FormData (`stepType: StepType` for example)
+      // with `[key]: mixed`.
+      // $FlowFixMe - Fix in #3161.
+      return { ...acc, ...updates }
+    },
+    { ...formData }
+  )
 }

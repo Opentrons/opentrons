@@ -12,6 +12,7 @@ import {
 } from '../utils/createPresavedStepForm'
 
 const stepId = 'stepId123'
+const EXAMPLE_ENGAGE_HEIGHT = '18'
 let defaultArgs
 beforeEach(() => {
   const leftPipette = {
@@ -21,7 +22,7 @@ beforeEach(() => {
   }
   const labwareOnMagModule = {
     id: 'labwareOnMagModule',
-    def: { parameters: { magneticModuleEngageHeight: 18 } },
+    def: { parameters: { magneticModuleEngageHeight: EXAMPLE_ENGAGE_HEIGHT } },
   }
   defaultArgs = {
     stepId,
@@ -163,7 +164,7 @@ describe('createPresavedStepForm', () => {
     })
   })
 
-  it('should set a default magnetic module for magnet step, and set engage height and magnetAction=engage, for magnet > engage', () => {
+  it('should set a default magnetic module for magnet step, and set engage height and magnetAction=engage, when it is the first magnet step in the timeline', () => {
     const args = {
       ...defaultArgs,
       stepType: 'magnet',
@@ -173,7 +174,7 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: '18',
+      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'engage',
       // Default values
       stepName: 'magnet',
@@ -189,7 +190,7 @@ describe('createPresavedStepForm', () => {
           id: 'prevStepId',
           stepType: 'magnet',
           moduleId: 'someMagneticModuleId',
-          engageHeight: '18',
+          engageHeight: EXAMPLE_ENGAGE_HEIGHT,
           magnetAction: 'engage',
           stepName: 'magnet',
           stepDetails: '',
@@ -203,8 +204,37 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'magnet',
       moduleId: 'someMagneticModuleId',
-      engageHeight: '18',
+      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
       magnetAction: 'disengage',
+      stepName: 'magnet',
+      stepDetails: '',
+    })
+  })
+
+  it('should set a default magnetic module for magnet step, and set magnetAction=engage, when the previous magnet step is a disengage', () => {
+    const args = {
+      ...defaultArgs,
+      savedStepForms: {
+        prevStepId: {
+          id: 'prevStepId',
+          stepType: 'magnet',
+          moduleId: 'someMagneticModuleId',
+          engageHeight: EXAMPLE_ENGAGE_HEIGHT,
+          magnetAction: 'disengage',
+          stepName: 'magnet',
+          stepDetails: '',
+        },
+      },
+      orderedStepIds: ['prevStepId'],
+      stepType: 'magnet',
+    }
+
+    expect(createPresavedStepForm(args)).toEqual({
+      id: stepId,
+      stepType: 'magnet',
+      moduleId: 'someMagneticModuleId',
+      engageHeight: EXAMPLE_ENGAGE_HEIGHT,
+      magnetAction: 'engage',
       stepName: 'magnet',
       stepDetails: '',
     })
