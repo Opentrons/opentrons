@@ -85,7 +85,7 @@ export function getSessionStatus(state: State): SessionStatus {
 }
 
 export function getSessionStatusInfo(state: State): SessionStatusInfo {
-  return session(state).stateInfo
+  return session(state).statusInfo
 }
 
 export function getSessionIsLoaded(state: State): boolean {

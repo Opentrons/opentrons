@@ -353,7 +353,7 @@ describe('api client', () => {
         {
           name: session.name,
           state: session.state,
-          stateInfo: {
+          statusInfo: {
             message: null,
             userMessage: null,
             changedAt: null,
@@ -696,12 +696,7 @@ describe('api client', () => {
         state: 'running',
         startTime: 1,
         lastCommand: null,
-        stateInfo: {
-          message: null,
-          userMessage: null,
-          changedAt: null,
-          estimatedDuration: null,
-        },
+        statusInfo: { message: null, userMessage: null, changedAt: null, estimatedDuration: null},
       }
       const expected = actions.sessionUpdate(update, expect.any(Number))
 

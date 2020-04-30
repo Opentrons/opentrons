@@ -26,7 +26,7 @@ type Request = {
 export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
-  stateInfo: SessionStatusInfo,
+  statusInfo: SessionStatusInfo,
   errors: Array<{|
     timestamp: number,
     line: number,
@@ -74,7 +74,7 @@ const INITIAL_STATE: SessionState = {
   // loading a protocol
   sessionRequest: { inProgress: false, error: null },
   state: '',
-  stateInfo: {
+  statusInfo: {
     message: null,
     changedAt: null,
     estimatedDuration: null,
@@ -204,7 +204,7 @@ function handleSessionUpdate(
   return {
     ...state,
     state: sessionState,
-    stateInfo: action.payload.stateInfo,
+    statusInfo: action.payload.statusInfo,
     remoteTimeCompensation,
     startTime,
     protocolCommandsById,

@@ -454,14 +454,15 @@ export function client(dispatch) {
     }
 
     if (apiSession.stateInfo) {
-      update.stateInfo = pick(apiSession.stateInfo, [
-        'message',
-        'userMessage',
-        'changedAt',
-        'estimatedDuration',
-      ])
+      update.statusInfo = {
+        message: apiSession.stateInfo?.message ?? null,
+        userMessage: apiSession.stateInfo?.message ?? null,
+        changedAt: apiSession.stateInfo?.changedAt ?? null,
+        estimatedDuration:
+          apiSession.stateInfo?.estimatedDuration ?? null,
+      }
     } else {
-      update.stateInfo = {
+      update.statusInfo = {
         message: null,
         userMessage: null,
         changedAt: null,

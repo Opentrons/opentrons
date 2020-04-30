@@ -158,15 +158,15 @@ export type ConnectionStatus =
   | DISCONNECTING
 
 export type SessionStatusInfo = {|
-  message: ?string,
-  changedAt: ?number,
-  estimatedDuration: ?number,
-  userMessage: ?string,
+  message: string | null,
+  changedAt: number | null,
+  estimatedDuration: number | null,
+  userMessage: string | null,
 |}
 
 export type SessionUpdate = {|
   state: SessionStatus,
-  stateInfo: SessionStatusInfo,
+  statusInfo: SessionStatusInfo,
   startTime: ?number,
   lastCommand: ?{|
     id: number,
