@@ -739,9 +739,72 @@ describe('api client', () => {
         state: 'running',
         startTime: 1,
         lastCommand: null,
-        statusInfo: { message: null, userMessage: null, changedAt: null, estimatedDuration: null},
+        stateInfo: {},
       }
-      const expected = actions.sessionUpdate(update, expect.any(Number))
+
+      const actionInput = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        }
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => sendNotification('session', update))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with no stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null
+      }
+
+      const actionInput = {
+        ...update,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        }
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => sendNotification('session', update))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with values in stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        stateInfo: {message: 'hi and hello football fans',
+                    userMessage: 'whos ready for some FOOTBALL',
+                    changedAt: 2}
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        statusInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+          estimatedDuration: null,
+        }
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
         .then(() => sendNotification('session', update))
