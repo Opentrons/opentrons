@@ -2,7 +2,7 @@ import abc
 import asyncio
 import enum
 import logging
-from typing import Tuple
+from typing import Tuple, Type, TypeVar
 from opentrons import types as top_types
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -96,7 +96,75 @@ class CriticalPoint(enum.Enum):
     """
     The end of the front-most nozzle of a multipipette with a tip attached.
     Only relevant when a multichannel pipette is present.
+    NOTE: This member is now deprecated in favor of utilizing the
+    CriticalPointMultiChannel class.
     """
+
+
+CPMultiChannel = TypeVar('CPMultiChannel', bound='CriticalPointMultiChannel')
+
+
+class CriticalPointMultiChannel(enum.Enum):
+    """
+    This class is meant to encapsulate the critical point of an individual
+    channel on the multi-channel pipette. This will allow for more
+    fine-tuned movement of the multi-channel, including picking up tips
+    with only certain channels.
+    """
+    CHANNEL_1 = enum.auto()
+    """
+    The "first" channel of a multi-channel pipette. This is the backmost
+    channel of a multi-channel pipette. It is closest to the back
+    of the robot.
+    """
+    CHANNEL_2 = enum.auto()
+    """
+    The "second" channel of a multi-channel pipette.
+    """
+    CHANNEL_3 = enum.auto()
+    """
+    The "third" channel of a multi-channel pipette.
+    """
+    CHANNEL_4 = enum.auto()
+    """
+    The "fourth" channel of a multi-channel pipette. This is one of the middle
+    channels of the multi-channel pipette.
+    """
+    CHANNEL_5 = enum.auto()
+    """
+    The "fifth" channel of a multi-channel pipette. This is one of the middle
+    channels of the multi-channel pipette.
+    """
+    CHANNEL_6 = enum.auto()
+    """
+    The "sixth" channel of a multi-channel pipette.
+    """
+    CHANNEL_7 = enum.auto()
+    """
+    The "seventh" channel of a multi-channel pipette.
+    """
+    CHANNEL_8 = enum.auto()
+    """
+    The "eighth" channel of a multi-channel pipette. This is the channel
+    closest to the front of the robot.
+    """
+
+    @classmethod
+    def get_channel(cls: Type[CPMultiChannel], channel: str) -> CPMultiChannel:
+        for m in cls.__members__.values():
+            if m.value == int(channel):
+                return m
+        raise AttributeError(f'Channel {channel} does not exist.')
+
+    def spacing_value(self, offset: int) -> int:
+        return offset - (self.value - 1) * 9
+
+    @property
+    def amount_of_channels(self) -> int:
+        return 8 - self.value
+
+    def __str__(self):
+        return self.name
 
 
 class ExecutionState(enum.Enum):

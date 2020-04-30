@@ -1,10 +1,12 @@
 import logging
-from typing import (Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union)
+from typing import (
+    Any, Dict, List, Tuple, Sequence, TYPE_CHECKING, Union, Optional)
 
 
 from opentrons import types, commands as cmds, hardware_control as hc
 from opentrons.commands import CommandPublisher
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import (
+    CriticalPoint, CriticalPointMultiChannel)
 from .util import (
     FlowRates, PlungerSpeeds, Clearances,
     clamp_value, requires_version, build_edges)
@@ -82,6 +84,8 @@ class InstrumentContext(CommandPublisher):
         self._speeds = PlungerSpeeds(self)
         self._starting_tip: Union[Well, None] = None
         self.requested_as = requested_as
+        self._default_channel = None
+        self._channels = None
 
     @property  # type: ignore
     @requires_version(2, 0)
@@ -122,6 +126,25 @@ class InstrumentContext(CommandPublisher):
     @default_speed.setter
     def default_speed(self, speed: float):
         self._default_speed = speed
+
+    @property
+    def default_channel(self) -> Optional[CriticalPointMultiChannel]:
+        """
+        Method used to keep track of a multichannel's current critical point.
+        """
+        return self._default_channel
+
+    @default_channel.setter  # type: ignore
+    @requires_version(2, 4)
+    def default_channel(self, channel: str):
+        if self.channels == 1:
+            # This method is not valid for single channel pipettes.
+            raise AttributeError(
+                "You cannot change channel locations"
+                "for single channel pipettes.")
+        get_critical_point = CriticalPointMultiChannel.get_channel(channel)
+        self._default_channel = get_critical_point  # type: ignore
+        self.channels = get_critical_point.amount_of_channels
 
     @requires_version(2, 0)
     def aspirate(self,
@@ -503,7 +526,9 @@ class InstrumentContext(CommandPublisher):
             location, v_offset, self._api_version,
             self._mount, self._ctx._deck_layout, radius)
         for edge in edges:
-            self._hw_manager.hardware.move_to(self._mount, edge, checked_speed)
+            self._hw_manager.hardware.move_to(
+                self._mount, edge,
+                checked_speed, critical_point=self.default_channel)
         return self
 
     @cmds.publish.both(command=cmds.air_gap)
@@ -1089,7 +1114,9 @@ class InstrumentContext(CommandPublisher):
 
         from_center = 'centerMultichannelOnWells'\
             in quirks_from_any_parent(from_lw)
-        cp_override = CriticalPoint.XY_CENTER if from_center else None
+        cp_override =\
+            CriticalPoint.XY_CENTER if from_center else self.default_channel
+
         from_loc = types.Location(
             self._hw_manager.hardware.gantry_position(
                 self._mount, critical_point=cp_override),
@@ -1109,9 +1136,14 @@ class InstrumentContext(CommandPublisher):
         self._log.debug("move_to: {}->{} via:\n\t{}"
                         .format(from_loc, location, moves))
         try:
+            CP_Type = Union[
+                Optional[CriticalPoint], Optional[CriticalPointMultiChannel]]
             for move in moves:
+                cp: CP_Type = move[1]
+                if not cp:
+                    cp = self.default_channel
                 self._hw_manager.hardware.move_to(
-                    self._mount, move[0], critical_point=move[1], speed=speed,
+                    self._mount, move[0], critical_point=cp, speed=speed,
                     max_speeds=self._ctx.max_speeds.data)
         except Exception:
             self._ctx.location_cache = None
@@ -1277,7 +1309,13 @@ class InstrumentContext(CommandPublisher):
     @requires_version(2, 0)
     def channels(self) -> int:
         """ The number of channels on the pipette. """
+        if self._channels:
+            return self._channels
         return self.hw_pipette['channels']
+
+    @channels.setter
+    def channels(self, channels: int):
+        self._channels = channels  # type: ignore
 
     @property  # type: ignore
     @requires_version(2, 2)

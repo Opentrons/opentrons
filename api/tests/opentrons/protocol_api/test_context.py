@@ -8,7 +8,7 @@ from opentrons.system.shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPointMultiChannel
 from opentrons.config.pipette_config import config_models, name_for_model
 from opentrons.protocol_api import transfers as tf
 from opentrons.protocols.types import APIVersion
@@ -341,6 +341,25 @@ def test_instrument_trash(loop, get_labware_def):
     instr.trash_container = new_trash
 
     assert instr.trash_container.name == 'usascientific_12_reservoir_22ml'
+
+
+def test_set_separate_channel(loop, get_labware_def):
+    ctx = papi.ProtocolContext(loop)
+    ctx.home()
+
+    instr = ctx.load_instrument('p300_multi', Mount.LEFT)
+    instr.default_channel = '1'
+    assert instr.default_channel == CriticalPointMultiChannel.CHANNEL_1
+
+    instr.default_channel = '8'
+    pip = instr._hw_manager.hardware._attached_instruments[Mount.LEFT]
+    model_offset = pip.model_offset[1]
+    assert instr.default_channel.spacing_value(model_offset)\
+        == model_offset * -1
+
+    instr2 = ctx.load_instrument('p300_single', Mount.RIGHT)
+    with pytest.raises(AttributeError):
+        instr2.default_channel = '2'
 
 
 def test_aspirate(loop, get_labware_def, monkeypatch):

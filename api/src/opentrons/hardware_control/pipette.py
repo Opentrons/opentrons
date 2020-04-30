@@ -5,9 +5,10 @@ from typing import Any, Dict, Optional, Tuple, Union
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
-from .types import CriticalPoint
+from .types import CriticalPoint, CriticalPointMultiChannel
 
 mod_log = logging.getLogger(__name__)
+CP_TYPE = Union[CriticalPointMultiChannel, CriticalPoint]
 
 
 class Pipette:
@@ -73,7 +74,7 @@ class Pipette:
     def pipette_id(self) -> Optional[str]:
         return self._pipette_id
 
-    def critical_point(self, cp_override: CriticalPoint = None) -> Point:
+    def critical_point(self, cp_override: CP_TYPE = None) -> Point:
         """
         The vector from the pipette's origin to its critical point. The
         critical point for a pipette is the end of the nozzle if no tip is
@@ -97,6 +98,13 @@ class Pipette:
             mod_offset_xy = [
                 0, -self.model_offset[1], self.model_offset[2]]
             cp_type = CriticalPoint.FRONT_NOZZLE
+        elif isinstance(cp_override, CriticalPointMultiChannel):
+            mod_offset_xy = [
+                0,
+                cp_override.spacing_value(self.model_offset[1]),
+                self.model_offset[2]]
+            # Channel override should only be used to determine XY offset,
+            # the critical point should still either be tip or nozzle.
         else:
             mod_offset_xy = self.model_offset
         mod_and_tip = Point(mod_offset_xy[0],
