@@ -247,10 +247,7 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
                     </div>
                   )}
                 </HoverTooltip>
-                <ConnectedSlotMap
-                  fieldName={'selectedSlot'}
-                  isError={slotIssue}
-                />
+                <ConnectedSlotMap fieldName={'selectedSlot'} />
               </>
             )}
           </div>

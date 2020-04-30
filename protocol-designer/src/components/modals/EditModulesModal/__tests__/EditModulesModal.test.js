@@ -4,7 +4,7 @@ import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import * as Formik from 'formik'
-import { OutlineButton } from '@opentrons/components'
+import { OutlineButton, SlotMap } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -211,12 +211,12 @@ describe('Edit Modules Modal', () => {
     it('should pass an error if the labware is not compatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(false)
       const wrapper = render(props)
-      expect(wrapper.find(ConnectedSlotMap).prop('isError')).toBeTruthy()
+      expect(wrapper.find(SlotMap).prop('isError')).toBeTruthy()
     })
     it('should NOT pass an error if the labware is compatible', () => {
       getLabwareIsCompatibleMock.mockReturnValue(true)
       const wrapper = render(props)
-      expect(wrapper.find(ConnectedSlotMap).prop('isError')).toBeFalsy()
+      expect(wrapper.find(SlotMap).prop('isError')).toBeFalsy()
     })
   })
 
