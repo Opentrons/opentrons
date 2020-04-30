@@ -15,7 +15,7 @@ from opentrons.types import Mount
 
 from . import modules
 from .execution_manager import ExecutionManager
-from .types import BoardRevision
+from .types import BoardRevision, DoorState
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -73,8 +73,9 @@ class Controller:
         return self._board_revision
 
     async def setup_gpio_chardev(self):
-        await self.gpio_chardev.setup()
         self._board_revision = self.determine_board_revision()
+        self.gpio_chardev.config_by_board_rev(self._board_revision)
+        await self.gpio_chardev.setup()
 
     def determine_board_revision(self) -> BoardRevision:
         try:
@@ -89,6 +90,16 @@ class Controller:
                 'Unexpected error from reading central routing board '
                 'revision bits')
         return BoardRevision.UNKNOWN
+
+    async def monitor_door_switch_state(self, api):
+        while True:
+            await asyncio.sleep(0.5)
+            state = self.gpio_chardev.read_window_switches()
+            if api._door_state.value != state:
+                api._door_state = DoorState.by_bool(state)
+                MODULE_LOG.info(
+                    f'Updating the window switch status: {api._door_state}')
+                # TODO: pause protocol if it's running
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()

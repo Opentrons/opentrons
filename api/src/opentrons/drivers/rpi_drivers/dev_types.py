@@ -19,6 +19,9 @@ class GPIODriverLike(Protocol):
     async def setup(self):
         ...
 
+    def config_by_board_rev(self, BoardRevision):
+        ...
+
     def set_high(self, offset: int):
         ...
 

@@ -3,6 +3,7 @@ import logging
 import pathlib
 from typing import Dict, Tuple
 import time
+from opentrons.hardware_control.types import BoardRevision
 from . import RevisionPinsError
 
 import gpiod  # type: ignore
@@ -25,11 +26,22 @@ OUTPUT_PINS = {
     'RED_BUTTON': 26
 }
 
-INPUT_PINS = {
-    'BUTTON_INPUT': 5,
-    'WINDOW_INPUT': 20,
+REV_PINS = {
     'REV_0': 17,
     'REV_1': 27
+}
+
+INPUT_PINS = {
+    BoardRevision.OG: {
+        'BUTTON_INPUT': 5,
+        'WINDOW_DOOR_SW': 20
+        },
+    BoardRevision.A: {
+        'BUTTON_INPUT': 5,
+        'DOOR_SW_FILT': 12,
+        'WINDOW_SW_FILT': 16,
+        'WINDOW_DOOR_SW': 20
+        }
 }
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -73,17 +85,33 @@ class GPIOCharDev:
             return _retry_request_line()
 
     def _initialize(self) -> Dict[int, gpiod.Line]:
-        MODULE_LOG.info("Initializing GPIOs")
+        MODULE_LOG.info(
+            "Registering Central Routing Board Revision GPIOs")
         lines = {}
-        # setup input lines
-        for name, offset in INPUT_PINS.items():
+        for name, offset in REV_PINS.items():
             lines[offset] = self._request_line(
                 offset, name, gpiod.LINE_REQ_DIR_IN)
+        return lines
+
+    def config_by_board_rev(self, board_rev: BoardRevision):
+        MODULE_LOG.info(
+            "Configuring GPIOs by central routing roard revision")
+        # gpio config is defaulted to 2.1 if board rev is unknown
+        board_rev = BoardRevision.OG if (
+            board_rev == BoardRevision.UNKNOWN) else board_rev
         # setup output lines
         for name, offset in OUTPUT_PINS.items():
-            lines[offset] = self._request_line(
+            self._lines[offset] = self._request_line(
                 offset, name, gpiod.LINE_REQ_DIR_OUT)
-        return lines
+        # setup input lines
+        try:
+            for name, offset in INPUT_PINS[board_rev].items():
+                self._lines[offset] = self._request_line(
+                    offset, name, gpiod.LINE_REQ_DIR_IN)
+        except KeyError:
+            raise RuntimeError(
+                "The input GPIO config for board revision "
+                f"{board_rev} does not exist yet")
 
     async def setup(self):
         MODULE_LOG.info("Setting up GPIOs")
@@ -140,7 +168,12 @@ class GPIOCharDev:
             self.set_low(OUTPUT_PINS['HALT'])
 
     def _read(self, offset):
-        return self.lines[offset].get_value()
+        try:
+            return self.lines[offset].get_value()
+        except KeyError:
+            raise RuntimeError(
+                f"GPIO {offset} is not registered and cannot"
+                "be read")
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:
         return (bool(self._read(OUTPUT_PINS['RED_BUTTON'])),
@@ -152,10 +185,20 @@ class GPIOCharDev:
 
     def read_button(self) -> bool:
         # button is normal-HIGH, so invert
-        return not bool(self._read(INPUT_PINS['BUTTON_INPUT']))
+        return not bool(self._read(
+            INPUT_PINS[BoardRevision.OG]['BUTTON_INPUT']))
 
     def read_window_switches(self) -> bool:
-        return bool(self._read(INPUT_PINS['WINDOW_INPUT']))
+        return bool(self._read(
+            INPUT_PINS[BoardRevision.OG]['WINDOW_DOOR_SW']))
+
+    def read_top_window_switch(self) -> bool:
+        return bool(self._read(
+            INPUT_PINS[BoardRevision.A]['WINDOW_SW_FILT']))
+
+    def read_front_door_switch(self) -> bool:
+        return bool(self._read(
+            INPUT_PINS[BoardRevision.A]['DOOR_SW_FILT']))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
         """ Read revision bit GPIO pins
@@ -164,8 +207,8 @@ class GPIOCharDev:
         returns the pins' values. Otherwise, return RevisionPinsError
         """
         if pathlib.Path(DTOVERLAY_PATH).exists():
-            return (bool(self._read(INPUT_PINS['REV_0'])),
-                    bool(self._read(INPUT_PINS['REV_1'])))
+            return (bool(self._read(REV_PINS['REV_0'])),
+                    bool(self._read(REV_PINS['REV_1'])))
         else:
             raise RevisionPinsError
 

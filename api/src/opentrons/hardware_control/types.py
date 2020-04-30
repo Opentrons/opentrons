@@ -154,6 +154,22 @@ class ExecutionState(enum.Enum):
         return self.name
 
 
+class DoorState(enum.Enum):
+    OPEN = False
+    CLOSED = True
+
+    @classmethod
+    def by_bool(cls, input: bool):
+        ds_dict = {
+            False: cls.OPEN,
+            True: cls.CLOSED
+        }
+        return ds_dict[input]
+
+    def __str__(self):
+        return self.name
+
+
 class ExecutionCancelledError(RuntimeError):
     pass
 

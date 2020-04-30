@@ -18,7 +18,7 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError)
+                    MustHomeError, NoTipAttachedError, DoorState)
 from . import modules
 
 mod_log = logging.getLogger(__name__)
@@ -72,6 +72,15 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._door_state = DoorState.CLOSED
+
+    @property
+    def door_state(self) -> DoorState:
+        return self._door_state
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState):
+        self._door_state = door_state
 
     @classmethod
     async def build_hardware_controller(
@@ -130,6 +139,8 @@ class API(HardwareAPILike):
             checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
+            checked_loop.create_task(
+                backend.monitor_door_switch_state(api_instance))
             return api_instance
         finally:
             blink_task.cancel()
