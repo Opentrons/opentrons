@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.2](https://github.com/opentrons/opentrons/compare/v3.17.1-alpha.1...v3.17.1-alpha.2) (2020-04-30)
+
+
+### Bug Fixes
+
+* **api:** Correctly grab slot from labware object ([#5534](https://github.com/opentrons/opentrons/issues/5534)) ([8a3850a](https://github.com/opentrons/opentrons/commit/8a3850a))
+
+
+
+
+
 ## [3.17.1-alpha.1](https://github.com/opentrons/opentrons/compare/v3.17.1-alpha.0...v3.17.1-alpha.1) (2020-04-30)
 
 
