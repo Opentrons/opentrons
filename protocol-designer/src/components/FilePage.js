@@ -15,8 +15,8 @@ import cx from 'classnames'
 import { i18n } from '../localization'
 import { Portal } from './portals/MainPageModalPortal'
 import { EditPipettesModal } from './modals/EditPipettesModal'
-import { EditModulesModal } from './modals/EditModulesModal'
 import { EditModulesCard } from './modules'
+import { EditModules } from './EditModules'
 import styles from './FilePage.css'
 import modalStyles from '../components/modals/modal.css'
 import formStyles from '../components/forms/forms.css'
@@ -38,11 +38,10 @@ export type Props = {|
 
 type State = {|
   isEditPipetteModalOpen: boolean,
-  isEditModulesModalOpen: boolean,
-  currentModule: {|
-    moduleType: ?ModuleRealType,
+  moduleToEdit: {|
+    moduleType: ModuleRealType,
     moduleId: ?string,
-  |},
+  |} | null,
 |}
 
 // TODO(mc, 2020-02-28): explore l10n for these dates
@@ -53,11 +52,7 @@ const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 export class FilePage extends React.Component<Props, State> {
   state = {
     isEditPipetteModalOpen: false,
-    isEditModulesModalOpen: false,
-    currentModule: {
-      moduleType: null,
-      moduleId: null,
-    },
+    moduleToEdit: null,
   }
 
   // TODO (ka 2019-10-28): This is a workaround, see #4446
@@ -77,15 +72,13 @@ export class FilePage extends React.Component<Props, State> {
   handleEditModule = (moduleType: ModuleRealType, moduleId?: string) => {
     this.scrollToTop()
     this.setState({
-      isEditModulesModalOpen: true,
-      currentModule: { moduleType: moduleType, moduleId: moduleId },
+      moduleToEdit: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
   closeEditModulesModal = () => {
     this.setState({
-      isEditModulesModalOpen: false,
-      currentModule: { moduleType: null, moduleId: null },
+      moduleToEdit: null,
     })
   }
 
@@ -226,15 +219,12 @@ export class FilePage extends React.Component<Props, State> {
           {this.state.isEditPipetteModalOpen && (
             <EditPipettesModal closeModal={this.closeEditPipetteModal} />
           )}
-
-          {this.state.isEditModulesModalOpen &&
-            this.state.currentModule.moduleType && (
-              <EditModulesModal
-                moduleType={this.state.currentModule.moduleType}
-                moduleId={this.state.currentModule.moduleId}
-                onCloseClick={this.closeEditModulesModal}
-              />
-            )}
+          {this.state.moduleToEdit && (
+            <EditModules
+              moduleToEdit={this.state.moduleToEdit}
+              onCloseClick={this.closeEditModulesModal}
+            />
+          )}
         </Portal>
       </div>
     )
