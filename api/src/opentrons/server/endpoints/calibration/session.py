@@ -225,6 +225,10 @@ class CalibrationSession:
     def get_pipette(self, mount: Mount) -> Pipette.DictType:
         return self.pipettes[mount]
 
+    def get_pipette_point(self, pip_id: UUID) -> Point:
+        return Point(**self._hardware.current_position(self._get_mount(
+                                                       pip_id)))
+
     def get_tiprack(self, uuid: UUID) -> LabwareInfo:
         return self._labware_info[uuid]
 
@@ -321,13 +325,20 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.prepare_pipette,
         "from_state": CalibrationCheckState.labwareLoaded,
         "to_state": CalibrationCheckState.preparingPipette,
-        "before": "_prepare_pipette"
+        "before": "_prepare_pipette",
+        "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.preparingPipette,
         "to_state": CalibrationCheckState.preparingPipette,
         "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.pick_up_tip,
+        "from_state": CalibrationCheckState.preparingPipette,
+        "to_state": CalibrationCheckState.badCalibrationData,
+        "condition": "_is_tip_pick_up_dangerous"
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
@@ -412,6 +423,9 @@ CHECK_TRANSITIONS = [
     }
 ]
 
+DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5,5,5)
+P1000_OK_TIP_PICK_UP_VECTOR = Point(10,10,10)
+
 
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
@@ -420,6 +434,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                               transitions=CHECK_TRANSITIONS,
                               initial_state="sessionStarted")
         self.session_type = 'check'
+        self._saved_points = {}
 
     async def _load_labware_objects(self, **kwargs):
         """
@@ -460,6 +475,27 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
+
+    def _get_pipette_point_at_state(self,
+                                    pipette_id: UUID,
+                                    state_name: CalibrationCheckState):
+        return self._saved_points[f'{state_name}_{pipette_id}']
+
+    async def _is_tip_pick_up_dangerous(self, pipette_id: UUID, **kwargs):
+        """
+        Function to determine whether jogged to pick up tip position is
+        outside of the safe threshold for conducting the rest of the check.
+        """
+        current_pt = self.get_pipette_point(pipette_id)
+        prev_pt = self._get_pipette_point_at_state(
+                        pipette_id=pipette_id,
+                        state_name=CalibrationCheckState.preparingPipette)
+
+        threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
+        if self.get_pipette(self._get_mount).model.startsWith('P1000'):
+            threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
+        absolute_diff_vector = abs(current_pt - prev_pt)
+        return absolute_diff_vector > threshold_vector
 
     async def _pick_up_pipette_tip(self, pipette_id: UUID, **kwargs):
         """
@@ -528,6 +564,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 template_dict = dict(pipetteId=None)
             new_dict = self._format_other_params(template_dict)
         return new_dict
+
+    async def _register_current_point(self, pipette_id: UUID, **kwargs):
+        self._saved_points[f'{self.current_state_name}_{pipette_id}'] = \
+                self.get_pipette_point(pipette_id)
 
     async def _prepare_pipette(self, pipette_id: UUID):
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']

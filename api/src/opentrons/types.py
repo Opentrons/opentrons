@@ -34,6 +34,11 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
+    def __abs__(self, other: Any) -> 'Point':
+        if not isinstance(other, Point):
+            return NotImplemented
+        return Point(abs(self.x), abs(self.y), abs(self.z))
+
     def __str__(self):
         return '({}, {}, {})'.format(self.x, self.y, self.z)
 
