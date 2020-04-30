@@ -30,18 +30,21 @@ def run_server():
     os.environ['OT_ROBOT_SERVER_DOT_ENV_PATH'] = "dev.env"
     os.environ['OT_API_FF_useFastApi'] = "true"
 
-    def runner():
+    def runner(event_arg):
         from robot_server.main import main
+        from robot_server.service.app import app
+        app.add_event_handler("startup", lambda: event_arg.set())
         main()
 
-    thread = mp.Process(target=runner)
+    event = mp.Event()
+    thread = mp.Process(target=runner, args=(event,))
     thread.start()
-    # TODO find a better way to know when we're ready
-    import time
-    time.sleep(.2)
+
     yield thread
+
     thread.terminate()
     thread.join()
+    thread.close()
 
 
 @pytest.fixture
