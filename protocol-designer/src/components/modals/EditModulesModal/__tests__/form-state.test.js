@@ -47,7 +47,6 @@ describe('useResetSlotOnModelChange', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
-    jest.clearAllMocks()
   })
 
   it('resets the slot field when model field changes and there is a collision issue', () => {

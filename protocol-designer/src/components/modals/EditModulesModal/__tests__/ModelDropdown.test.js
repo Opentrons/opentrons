@@ -44,7 +44,7 @@ describe('Model Dropdown', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   const render = props =>

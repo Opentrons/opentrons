@@ -47,6 +47,11 @@ describe('Slot Dropdown', () => {
       getState: () => ({}),
     }
   })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
   const render = props =>
     mount(
       <Provider store={mockStore}>
