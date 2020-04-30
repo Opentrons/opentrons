@@ -55,9 +55,7 @@ describe('useResetSlotOnModelChange', () => {
     mockFormOnce({ selectedModel: 'another_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
-    act(() => {
-      wrapper.setProps({})
-    })
+    wrapper.setProps({})
 
     expect(setValues).toHaveBeenCalledTimes(1)
     expect(setValues).toHaveBeenCalledWith({
@@ -72,9 +70,7 @@ describe('useResetSlotOnModelChange', () => {
     mockFormOnce({ selectedModel: 'some_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
-    act(() => {
-      wrapper.setProps({})
-    })
+    wrapper.setProps({})
 
     expect(setValues).toHaveBeenCalledTimes(0)
   })
@@ -85,9 +81,7 @@ describe('useResetSlotOnModelChange', () => {
     mockFormOnce({ selectedModel: 'another_model', selectedSlot: 'some_slot' })
     const wrapper = render()
 
-    act(() => {
-      wrapper.setProps({})
-    })
+    wrapper.setProps({})
 
     expect(setValues).toHaveBeenCalledTimes(0)
   })
