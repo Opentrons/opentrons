@@ -99,12 +99,6 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     selectedModel: moduleOnDeck?.model || null,
   }
 
-  const initialErrors = hasSlotIssue(initialValues.selectedSlot)
-    ? {
-        selectedSlot: `Slot ${initialValues.selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`,
-      }
-    : null
-
   const validator = ({
     selectedModel,
     selectedSlot,
@@ -169,7 +163,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     <Formik
       onSubmit={onSaveClick}
       initialValues={initialValues}
-      initialErrors={initialErrors}
+      initialErrors={validator(initialValues)}
       validate={validator}
     >
       <EditModulesModalComponent
