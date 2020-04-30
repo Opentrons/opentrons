@@ -38,7 +38,7 @@ class Transition:
         self.condition = condition
 
     async def execute(self, set_current_state, *args, **kwargs):
-        if self.condition and not await self.condition():
+        if self.condition and not await self.condition(*args, **kwargs):
             return False
         if self.before:
             await self.before(*args, **kwargs)

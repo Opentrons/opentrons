@@ -225,9 +225,10 @@ class CalibrationSession:
     def get_pipette(self, mount: Mount) -> Pipette.DictType:
         return self.pipettes[mount]
 
-    def get_pipette_point(self, pip_id: UUID) -> Point:
-        return Point(**self._hardware.current_position(self._get_mount(
-                                                       pip_id)))
+    async def get_pipette_point(self, pip_id: UUID) -> Point:
+        pos = await self._hardware.current_position(self._get_mount(
+                                                    pip_id))
+        return Point(*pos)
 
     def get_tiprack(self, uuid: UUID) -> LabwareInfo:
         return self._labware_info[uuid]
@@ -486,13 +487,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         Function to determine whether jogged to pick up tip position is
         outside of the safe threshold for conducting the rest of the check.
         """
-        current_pt = self.get_pipette_point(pipette_id)
+        mount = self._get_mount(pipette_id)
+        current_pt = await self.hardware.gantry_position(mount)
         prev_pt = self._get_pipette_point_at_state(
                         pipette_id=pipette_id,
                         state_name=CalibrationCheckState.preparingPipette)
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
-        if self.get_pipette(self._get_mount).model.startsWith('P1000'):
+        if self.get_pipette(mount)['model'].startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
         absolute_diff_vector = abs(current_pt - prev_pt)
         return absolute_diff_vector > threshold_vector
@@ -567,7 +569,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     async def _register_current_point(self, pipette_id: UUID, **kwargs):
         self._saved_points[f'{self.current_state_name}_{pipette_id}'] = \
-                self.get_pipette_point(pipette_id)
+            await self.hardware.gantry_position(self._get_mount(pipette_id))
 
     async def _prepare_pipette(self, pipette_id: UUID):
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
