@@ -22,9 +22,8 @@ export function MockSession() {
   }
 }
 
-
 export function MockSessionNoStateInfo() {
-   return {
+  return {
     name: 'MOCK SESSION',
     protocol_text: '# mock protocol text',
     commands: [],

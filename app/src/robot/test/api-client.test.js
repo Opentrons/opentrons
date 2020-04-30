@@ -751,7 +751,7 @@ describe('api client', () => {
           userMessage: null,
           changedAt: null,
           estimatedDuration: null,
-        }
+        },
       }
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
@@ -764,7 +764,7 @@ describe('api client', () => {
       const update = {
         state: 'running',
         startTime: 2,
-        lastCommand: null
+        lastCommand: null,
       }
 
       const actionInput = {
@@ -774,7 +774,7 @@ describe('api client', () => {
           userMessage: null,
           changedAt: null,
           estimatedDuration: null,
-        }
+        },
       }
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
@@ -788,9 +788,11 @@ describe('api client', () => {
         state: 'running',
         startTime: 2,
         lastCommand: null,
-        stateInfo: {message: 'hi and hello football fans',
-                    userMessage: 'whos ready for some FOOTBALL',
-                    changedAt: 2}
+        stateInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+        },
       }
 
       const actionInput = {
@@ -802,7 +804,7 @@ describe('api client', () => {
           userMessage: 'whos ready for some FOOTBALL',
           changedAt: 2,
           estimatedDuration: null,
-        }
+        },
       }
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
@@ -810,7 +812,6 @@ describe('api client', () => {
         .then(() => sendNotification('session', update))
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
-
   })
 
   describe('calibration', () => {
