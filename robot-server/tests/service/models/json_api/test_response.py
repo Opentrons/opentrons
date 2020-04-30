@@ -252,13 +252,17 @@ def test_resource_object_constructor__with_list_response():
     ).dict()
 
     assert document == {
-        'id': 'abc123',
-        'type': 'item',
-        'attributes': {
-            'name': 'pear',
-            'price': 1.2,
-            'quantity': 10,
-        }
+        'data': [{
+            'id': 'abc123',
+            'type': 'item',
+            'attributes': {
+                'name': 'pear',
+                'price': 1.2,
+                'quantity': 10,
+            }
+        }],
+        'links': None,
+        'meta': None
     }
 
 

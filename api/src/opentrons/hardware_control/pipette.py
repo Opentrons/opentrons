@@ -17,7 +17,7 @@ class Pipette:
     control API. Its only purpose is to gather state.
     """
 
-    DictType = Dict[str, Union[str, float]]
+    DictType = Dict[str, Union[str, float, bool]]
     #: The type of this data class as a dict
 
     def __init__(self,

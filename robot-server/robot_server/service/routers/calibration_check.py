@@ -9,8 +9,8 @@ from starlette.requests import Request
 from opentrons.server.endpoints.calibration.session import SessionManager, \
     CheckCalibrationSession, CalibrationSession, CalibrationCheckTrigger
 from opentrons import types
-from robot_server.service.dependencies import get_calibration_session_manager, \
-    get_hardware
+from robot_server.service.dependencies import \
+    get_calibration_session_manager, get_hardware
 from robot_server.service.models import calibration_check as model
 from robot_server.service.errors import RobotServerError, Error
 from robot_server.service.models.json_api.resource_links import ResourceLink
@@ -20,7 +20,8 @@ from robot_server.service.models.json_api.response import ResponseDataModel, \
 from robot_server.service.models.json_api import ResourceTypes
 
 
-CalibrationSessionStatusResponse = ResponseModel[model.CalibrationSessionStatus]
+CalibrationSessionStatusResponse = \
+    ResponseModel[model.CalibrationSessionStatus]
 PipetteRequest = RequestModel[model.SpecificPipette]
 JogRequest = RequestModel[model.JogPosition]
 
@@ -57,8 +58,9 @@ def get_check_session() -> CheckCalibrationSession:
     """
     from robot_server.service.app import app
     # Return an upcasted CalibrationSession
-    return get_current_session(session_type=model.SessionType.check,
-                               api_router=app)
+    return get_current_session(  # type: ignore
+        session_type=model.SessionType.check,
+        api_router=app.router)
 
 
 @router.get('/{session_type}/session',
@@ -74,7 +76,7 @@ async def get_session(
     :param session_type: Session type
     """
     session = get_current_session(session_type, request.app)
-    return create_session_response(session, request)
+    return create_session_response(session, request)  # type: ignore
 
 
 @router.post('/{session_type}/session',
@@ -123,13 +125,14 @@ async def create_session(
 async def delete_session(
         request: Request,
         session_type: model.SessionType,
-        session_manager: SessionManager = Depends(get_calibration_session_manager)) \
-        -> CalibrationSessionStatusResponse:
+        session_manager: SessionManager = Depends(
+            get_calibration_session_manager
+        )) -> CalibrationSessionStatusResponse:
     """Delete session handler"""
     session = get_current_session(session_type, request.app)
-    await session.delete_session()
+    await session.delete_session()   # type: ignore
     del session_manager.sessions[session_type]
-    return create_session_response(session, request)
+    return create_session_response(session, request)  # type: ignore
 
 
 @router.post('/{session_type}/session/loadLabware',
@@ -257,7 +260,8 @@ async def trigger_state(request: Request,
             error=Error(
                 title="Exception",
                 detail=str(e),
-                links=create_next_step_links(state_machine, request.app)
+                links=create_next_step_links(
+                    state_machine, request.app)   # type: ignore
             )
         )
 

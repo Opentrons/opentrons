@@ -12,8 +12,8 @@ from .logging import initialize_logging
 from .models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
-    transform_validation_error_to_json_api_errors, consolidate_fastapi_response, \
-    RobotServerError, ErrorResponse
+    transform_validation_error_to_json_api_errors, \
+    consolidate_fastapi_response, RobotServerError, ErrorResponse
 from .dependencies import get_rpc_server
 from robot_server import constants
 

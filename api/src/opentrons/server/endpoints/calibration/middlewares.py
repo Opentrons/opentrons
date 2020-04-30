@@ -1,7 +1,8 @@
 import typing
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
-from .session import CheckCalibrationSession, CalibrationCheckTrigger, CalibrationException
+from .session import CheckCalibrationSession, CalibrationCheckTrigger, \
+    CalibrationException
 from .models import CalibrationSessionStatus, LabwareStatus, AttachedPipette
 from .constants import ALLOWED_SESSIONS
 from .util import StateMachineError

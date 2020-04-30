@@ -2,7 +2,7 @@ from aiohttp import web
 
 from opentrons import types
 from .session import CheckCalibrationSession, CalibrationCheckTrigger
-from .models import SpecificPipette, MoveLocation, JogPosition
+from .models import SpecificPipette, JogPosition
 
 
 async def get_session(request: web.Request, session) -> web.Response:
@@ -31,8 +31,7 @@ async def create_session(request):
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
         hardware = request.config_dict['com.opentrons.hardware']
-        await CheckCalibrationSession.build(hardware)
-        new_session = CheckCalibrationSession(hardware)
+        new_session = await CheckCalibrationSession.build(hardware)
         session_storage.sessions[session_type] = new_session
         return web.json_response(status=201)
     else:

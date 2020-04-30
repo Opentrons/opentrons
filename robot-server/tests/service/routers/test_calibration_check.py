@@ -267,7 +267,7 @@ def cal_check_session(calibration_check_hardware) -> CheckCalibrationSession:
 def test_load_labware(cal_check_api_client, cal_check_session):
     resp = cal_check_api_client.post('/calibration/check/session/loadLabware')
     assert resp.status_code == 200
- 
+
     # check that params exist
     assert cal_check_session._deck['8']
     assert cal_check_session._deck['8'].name == 'opentrons_96_tiprack_10ul'
@@ -290,7 +290,7 @@ def test_move_to_position(cal_check_api_client, cal_check_session):
     uuid_tiprack = UUID(tiprack_id)
     uuid_pipette = UUID(pip_id)
 
-    well = cal_check_session._moves.preparingPipette[uuid_tiprack][uuid_pipette].well
+    well = cal_check_session._moves.preparingPipette[uuid_tiprack][uuid_pipette].well  # noqa: E501
 
     resp = cal_check_api_client.post(
         '/calibration/check/session/preparePipette',
@@ -311,7 +311,7 @@ def test_jog_pipette(cal_check_api_client, cal_check_session):
     pipette_id = list(cal_check_session.pipette_status().keys())[0]
     mount = types.Mount.LEFT
 
-    old_pos = asyncio.get_event_loop().run_until_complete(cal_check_session.hardware.gantry_position(mount))
+    old_pos = asyncio.get_event_loop().run_until_complete(cal_check_session.hardware.gantry_position(mount))  # noqa: E501
     resp = cal_check_api_client.post(
         '/calibration/check/session/jog',
         json=make_request(pipetteId=pipette_id, vector=[0, -1, 0])
@@ -319,7 +319,7 @@ def test_jog_pipette(cal_check_api_client, cal_check_session):
 
     assert resp.status_code == 200
 
-    new_pos = asyncio.get_event_loop().run_until_complete(cal_check_session.hardware.gantry_position(mount))
+    new_pos = asyncio.get_event_loop().run_until_complete(cal_check_session.hardware.gantry_position(mount))  # noqa: E501
 
     assert (new_pos - old_pos) == types.Point(0, -1, 0)
 
@@ -355,13 +355,13 @@ def test_invalidate_tip(cal_check_api_client, cal_check_session):
         '/calibration/check/session/pickUpTip',
         json=make_request(pipetteId=pipette_id))
     response_json = resp.json()
-    assert response_json['data']['attributes']['instruments'][pipette_id]['has_tip'] is True
+    assert response_json['data']['attributes']['instruments'][pipette_id]['has_tip'] is True  # noqa: E501
 
     resp = cal_check_api_client.post(
         '/calibration/check/session/invalidateTip',
         json=make_request(pipetteId=pipette_id))
     response_json = resp.json()
-    assert response_json['data']['attributes']['instruments'][pipette_id]['has_tip'] is False
+    assert response_json['data']['attributes']['instruments'][pipette_id]['has_tip'] is False  # noqa: E501
     assert resp.status_code == 200
 
 
@@ -420,7 +420,7 @@ def test_integrated_calibration_check(cal_check_api_client):
 
     assert set(status['links'].keys()) == \
         {'loadLabware', 'sessionExit'}
-    curr_pip = _get_pipette(status['data']['attributes']['instruments'], 'p300_multi_v1')
+    curr_pip = _get_pipette(status['data']['attributes']['instruments'], 'p300_multi_v1')  # noqa: E501
 
     next_data, url = _interpret_status_results(status, 'loadLabware', curr_pip)
 
