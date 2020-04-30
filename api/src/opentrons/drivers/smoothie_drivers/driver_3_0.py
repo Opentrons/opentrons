@@ -58,7 +58,7 @@ DEFAULT_AXES_SPEED = 400
 
 XY_HOMING_SPEED = 80
 
-HOME_SEQUENCE = ['ZA', 'BC', 'X', 'Y']
+HOME_SEQUENCE = ['ZABC', 'X', 'Y']
 AXES = ''.join(HOME_SEQUENCE)
 # Ignore these axis when sending move or home command
 DISABLE_AXES = ''
