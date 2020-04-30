@@ -131,7 +131,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
         </div>
       </div>
       <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} stepSizes={[0.1, 2]} axes={['x', 'y']} />
+        <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['x', 'y']} />
       </div>
       <div className={styles.button_row}>
         <PrimaryButton
