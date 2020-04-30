@@ -15,7 +15,7 @@ export const ConnectedSlotMap = (props: ConnectedSlotMapProps) => {
     <div className={styles.slot_map_container}>
       <SlotMap
         occupiedSlots={[`${field.value}`]}
-        isError={meta.error?.includes('occupied')}
+        isError={Boolean(meta.error)}
       />
     </div>
   ) : null
