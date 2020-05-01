@@ -1,12 +1,7 @@
 from typing import Dict, Tuple
-<<<<<<< HEAD
-import pathlib
-from . import RevisionPinsError
-=======
 
 from opentrons.hardware_control.types import BoardRevision
 
->>>>>>> refactor(api): update GPIO pins for door/window switch based on CRB revision
 
 OUTPUT_PINS = {
     'FRAME_LEDS': 6,
@@ -24,9 +19,6 @@ REV_PINS = {
     'REV_1': 27
 }
 
-<<<<<<< HEAD
-DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
-=======
 INPUT_PINS = {
     BoardRevision.OG: {
         'BUTTON_INPUT': 5,
@@ -39,7 +31,6 @@ INPUT_PINS = {
         'WINDOW_DOOR_SW': 20
         }
 }
->>>>>>> refactor(api): update GPIO pins for door/window switch based on CRB revision
 
 
 class SimulatingGPIOCharDev:
