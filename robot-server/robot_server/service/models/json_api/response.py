@@ -32,12 +32,13 @@ class ResponseDataModel(GenericModel, Generic[AttributesT]):
 
 
 DataT = TypeVar('DataT', bound=ResponseDataModel)
+MetaT = TypeVar('MetaT')
 
 
-class ResponseModel(GenericModel, Generic[DataT]):
+class ResponseModel(GenericModel, Generic[DataT, MetaT]):
     """
     """
-    meta: Optional[Dict] = \
+    meta: Optional[MetaT] = \
         Field(None,
               description="a meta object that contains non-standard"
                           " meta-information.")
@@ -80,20 +81,20 @@ def json_api_response(
     resource_type: ResourceTypes,
     attributes_model: Any,
     *,
+    meta_data_model: Any = dict,
     use_list: bool = False
-) -> Type[ResponseModel]:
+):
     type_string = resource_type.value
-    response_data_model = ResponseDataModel[attributes_model]    # type: ignore
+    response_data_model = ResponseDataModel[attributes_model]
     if use_list:
-        response_data_model = List[response_data_model]    # type: ignore
+        response_data_model = List[response_data_model]
         response_data_model.__name__ = f'ListResponseData[{type_string}]'
-        response_model_list = ResponseModel[response_data_model]
+        response_model_list = ResponseModel[response_data_model, meta_data_model]
         response_model_list.__name__ = f'ListResponse[{type_string}]'
-        response_model_list._resource_type = type_string     # type: ignore
         return response_model_list
     else:
         response_data_model.__name__ = f'ResponseData[{type_string}]'
-        response_model = ResponseModel[response_data_model]
+        response_model = ResponseModel[response_data_model, meta_data_model]
         response_model.__name__ = f'Response[{type_string}]'
-        response_model._resource_type = type_string     # type: ignore
+        response_model._resource_type = type_string
         return response_model

@@ -298,16 +298,16 @@ class CalibrationCheckState(str, Enum):
 
 
 class CalibrationCheckTrigger(str, Enum):
-    load_labware = "load_labware"
-    prepare_pipette = "prepare_pipette"
+    load_labware = "loadLabware"
+    prepare_pipette = "preparePipette"
     jog = "jog"
-    pick_up_tip = "pick_up_tip"
-    confirm_tip_attached = "confirm_tip_attached"
-    invalidate_tip = "invalidate_tip"
-    confirm_step = "confirm_step"
-    exit = "exit"
-    reject_calibration = "reject_calibration"
-    no_pipettes = "no_pipettes"
+    pick_up_tip = "pickUpTip"
+    confirm_tip_attached = "confirmTipAttached"
+    invalidate_tip = "invalidateTip"
+    confirm_step = "confirmStep"
+    exit = "sessionExit"
+    reject_calibration = "rejectCalibration"
+    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [

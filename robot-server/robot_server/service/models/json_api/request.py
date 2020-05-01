@@ -44,7 +44,7 @@ class RequestModel(GenericModel, Generic[DataT]):
 def json_api_request(
     resource_type: ResourceTypes,
     attributes_model: Any
-) -> Type[RequestModel]:
+):# -> Type[RequestModel]:
     type_string = resource_type.value
     request_data_model = RequestDataModel[attributes_model]    # type: ignore
     request_data_model.__name__ = f'RequestData[{type_string}]'
