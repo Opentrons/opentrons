@@ -6,7 +6,7 @@ from dataclasses import dataclass, asdict, field, fields
 from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 
 from .constants import LOOKUP_LABWARE, TipAttachError
 from .util import StateMachine, WILDCARD
@@ -119,9 +119,12 @@ class CalibrationSession:
             # This is to ensure during testing that two pipettes are
             # attached -- for now.
             assert data, "Please attach pipettes before proceeding"
-
+            cp = None
+            if data['channels'] == 8:
+                cp = CriticalPoint.FRONT_NOZZLE
             token = uuid4()
-            pipette_dict[token] = {'mount': mount, 'tiprack_id': None}
+            pipette_dict[token] = {
+                'mount': mount, 'tiprack_id': None, 'critical_point': cp}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -426,19 +429,19 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         A function that takes tiprack information and loads them onto the deck.
         """
         full_dict = {}
+        prev_lw = None
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
             lw = labware.Labware(data.definition, parent)
             self._deck[data.slot] = lw
             build_dict = {}
             for id in data.forPipettes:
-                mount = self._get_mount(id)
-                pip = self.get_pipette(mount)
-                well_name = 'H1' if pip['channels'] == 8 else 'A1'
+                well_name = 'B1' if prev_lw == lw else 'A1'
                 well = lw.wells_by_name()[well_name]
                 build_dict[id] = PreparingPipetteMoveOffset(
                     offset=Point(0, 0, 10), well=well
                 )
+                prev_lw = lw
             full_dict[data.id] = build_dict
         self._moves.preparingPipette = full_dict
 
@@ -567,12 +570,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         mount = self._get_mount(pipette_id)
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
+        cp = self._relate_mount[pipette_id]['critical_point']
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, request_position,
                                     self._deck, max_height)
         for move in moves:
-            await self.hardware.move_to(mount, move[0], move[1])
+            await self.hardware.move_to(
+                mount, move[0], move[1], critical_point=cp)
 
     async def _jog_pipette(self, pipette_id: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette_id)
