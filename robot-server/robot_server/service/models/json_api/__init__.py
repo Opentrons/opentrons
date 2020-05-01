@@ -8,3 +8,4 @@ class ResourceTypes(str, Enum):
     item = "item"
     a = "a"
     session = "session"
+    command = "command"

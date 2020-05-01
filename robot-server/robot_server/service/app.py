@@ -18,6 +18,7 @@ from .dependencies import get_rpc_server
 from robot_server import constants
 from .routers import item, legacy_routes, routes
 
+
 log = logging.getLogger(__name__)
 
 
