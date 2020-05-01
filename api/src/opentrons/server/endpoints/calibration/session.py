@@ -16,7 +16,7 @@ from opentrons.protocol_api import labware, geometry
 
 """
 A set of endpoints that can be used to create a session for any robot
-calibration tasks such as checking your calibration data, performing mount
+calibration tasks such as joggingTo your calibration data, performing mount
 offset or a robot deck transform.
 """
 
@@ -53,7 +53,7 @@ class LabwareInfo:
     This class purely maps to :py:class:`.models.LabwareStatus` and is
     intended to inform a client about the tipracks required for a session.
 
-    :note: The UUID class is utilized here instead of UUID4 for type checking
+    :note: The UUID class is utilized here instead of UUID4 for type joggingTo
     as UUID4 is only valid in pydantic models.
     """
     alternatives: typing.List[str]
@@ -86,11 +86,12 @@ PreparingPipetteMove = typing.Dict[
 @dataclass
 class Moves:
     """This class is meant to encapsulate the different moves"""
-    preparingPipette: PreparingPipetteMove = field(default_factory=dict)
-    checkingPointOne: CheckMove = CheckMove()
-    checkingPointTwo: CheckMove = CheckMove()
-    checkingPointThree: CheckMove = CheckMove()
-    checkingHeight: CheckMove = CheckMove()
+    preparingFirstPipette: PreparingPipetteMoveOffset = field(default_factory=dict)
+    preparingSecondPipette: PreparingPipetteMoveOffset = field(default_factory=dict)
+    joggingToPointOne: CheckMove = CheckMove()
+    joggingToPointTwo: CheckMove = CheckMove()
+    joggingToPointThree: CheckMove = CheckMove()
+    joggingToHeight: CheckMove = CheckMove()
 
 
 class CalibrationSession:
@@ -164,10 +165,10 @@ class CalibrationSession:
         return lw
 
     def _build_deck_moves(self) -> Moves:
-        return Moves(checkingPointOne=self._build_cross_dict('1BLC'),
-                     checkingPointTwo=self._build_cross_dict('3BRC'),
-                     checkingPointThree=self._build_cross_dict('7TLC'),
-                     checkingHeight=self._build_height_dict('5'))
+        return Moves(joggingToPointOne=self._build_cross_dict('1BLC'),
+                     joggingToPointTwo=self._build_cross_dict('3BRC'),
+                     joggingToPointThree=self._build_cross_dict('7TLC'),
+                     joggingToHeight=self._build_height_dict('5'))
 
     def _build_cross_dict(self, pos_id: str) -> CheckMove:
         cross_coords = self._deck.get_calibration_position(pos_id).position
@@ -203,7 +204,7 @@ class CalibrationSession:
         if tiprack_id:
             lw_info = self.get_tiprack(tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
-            # mod geometry contexts. Ignore type checking error here.
+            # mod geometry contexts. Ignore type joggingTo error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
         else:
             tip_length = pip['fallback_tip_length']
@@ -289,12 +290,22 @@ class CalibrationSession:
 class CalibrationCheckState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
-    preparingPipette = "preparingPipette"
-    inspectingTip = "inspectingTip"
-    checkingPointOne = "checkingPointOne"
-    checkingPointTwo = "checkingPointTwo"
-    checkingPointThree = "checkingPointThree"
-    checkingHeight = "checkingHeight"
+    preparingFirstPipette = "preparingFirstPipette"
+    inspectingFirstTip = "inspectingFirstTip"
+    joggingFirstPipetteToHeight = "joggingFirstPipetteToHeight"
+    comparingFirstPipetteHeight = "comparingFirstPipetteHeight"
+    joggingFirstPipetteToPointOne = "joggingFirstPipetteToPointOne"
+    comparingFirstPipettePointOne = "comparingFirstPipettePointOne"
+    joggingFirstPipetteToPointTwo = "joggingFirstPipetteToPointTwo"
+    comparingFirstPipettePointTwo = "comparingFirstPipettePointTwo"
+    joggingFirstPipetteToPointThree = "joggingFirstPipetteToPointThree"
+    comparingFirstPipettePointThree = "comparingFirstPipettePointThree"
+    preparingSecondPipette = "preparingSecondPipette"
+    inspectingSecondTip = "inspectingSecondTip"
+    joggingSecondPipetteToHeight = "joggingSecondPipetteToHeight"
+    comparingSecondPipetteHeight = "comparingSecondPipetteHeight"
+    joggingSecondPipetteToPointOne = "joggingSecondPipetteToPointOne"
+    comparingSecondPipettePointOne = "comparingSecondPipettePointOne"
     returningTip = "returningTip"
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
@@ -309,7 +320,8 @@ class CalibrationCheckTrigger(str, Enum):
     pick_up_tip = "pick_up_tip"
     confirm_tip_attached = "confirm_tip_attached"
     invalidate_tip = "invalidate_tip"
-    confirm_step = "confirm_step"
+    compare_jogged_point = "compare_jogged_point"
+    go_to_next_check = "go_to_next_check"
     exit = "exit"
     reject_calibration = "reject_calibration"
     no_pipettes = "no_pipettes"
@@ -320,92 +332,200 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.load_labware,
         "from_state": CalibrationCheckState.sessionStarted,
         "to_state": CalibrationCheckState.labwareLoaded,
-        "before": "_load_labware_objects"
+        "before": "_load_tip_rack_objects"
     },
     {
         "trigger": CalibrationCheckTrigger.prepare_pipette,
         "from_state": CalibrationCheckState.labwareLoaded,
-        "to_state": CalibrationCheckState.preparingPipette,
-        "before": "_prepare_pipette",
+        "to_state": CalibrationCheckState.preparingFirstPipette,
+        "before": "_move_tip_rack_for_first_pipette",
         "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.preparingPipette,
-        "to_state": CalibrationCheckState.preparingPipette,
+        "from_state": CalibrationCheckState.preparingFirstPipette,
+        "to_state": CalibrationCheckState.preparingFirstPipette,
         "before": "_jog_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingPipette,
+        "from_state": CalibrationCheckState.preparingFirstPipette,
         "to_state": CalibrationCheckState.badCalibrationData,
         "condition": "_is_tip_pick_up_dangerous"
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingPipette,
-        "to_state": CalibrationCheckState.inspectingTip,
+        "from_state": CalibrationCheckState.preparingFirstPipette,
+        "to_state": CalibrationCheckState.inspectingFirstTip,
         "before": "_pick_up_pipette_tip"
     },
     {
+        "trigger": CalibrationCheckTrigger.invalidate_tip,
+        "from_state": CalibrationCheckState.inspectingFirstTip,
+        "to_state": CalibrationCheckState.preparingFirstPipette,
+        "before": "_invalidate_tip"
+        "after": "_register_current_point"
+    },
+    {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
-        "from_state": CalibrationCheckState.inspectingTip,
-        "to_state": CalibrationCheckState.checkingPointOne,
+        "from_state": CalibrationCheckState.inspectingFirstTip,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
+        "before": "_move_to_check_height"
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToHeight,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToHeight,
+        "to_state": CalibrationCheckState.comparingFirstPipetteHeight,
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingFirstPipetteHeight,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
         "before": "_move_to_check_point_one"
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
+        "to_state": CalibrationCheckState.comparingFirstPipettePointOne,
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingFirstPipettePointOne,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        "before": "_move_to_check_point_two",
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        "to_state": CalibrationCheckState.comparingFirstPipettePointTwo,
+        "before": "_move_to_check_point_three",
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingFirstPipettePointTwo,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
+        "before": "_move_to_check_point_three",
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
+        "to_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
+        "to_state": CalibrationCheckState.comparingFirstPipettePointThree,
+        "before": "_move_to_check_point_three"
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
+        "to_state": CalibrationCheckState.preparingSecondPipette,
+        "condition": "_is_another_pipette_after"
+        "before": "_move_to_tip_rack_for_second_pipette",
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
+        "to_state": CalibrationCheckState.checkComplete,
+        "before": "_return_all_tips"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.preparingSecondPipette,
+        "to_state": CalibrationCheckState.preparingSecondPipette,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.pick_up_tip,
+        "from_state": CalibrationCheckState.preparingSecondPipette,
+        "to_state": CalibrationCheckState.badCalibrationData,
+        "condition": "_is_tip_pick_up_dangerous"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.pick_up_tip,
+        "from_state": CalibrationCheckState.preparingSecondPipette,
+        "to_state": CalibrationCheckState.inspectingSecondTip,
+        "before": "_pick_up_pipette_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.invalidate_tip,
-        "from_state": CalibrationCheckState.inspectingTip,
-        "to_state": CalibrationCheckState.preparingPipette,
+        "from_state": CalibrationCheckState.inspectingSecondTip,
+        "to_state": CalibrationCheckState.preparingSecondPipette,
         "before": "_invalidate_tip"
+        "after": "_register_current_point"
     },
     {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.checkingPointOne,
-        "to_state": CalibrationCheckState.checkingPointOne,
-        "before": "_jog_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_step,
-        "from_state": CalibrationCheckState.checkingPointOne,
-        "to_state": CalibrationCheckState.checkingPointTwo,
-        "before": "_move_to_check_point_two",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.checkingPointTwo,
-        "to_state": CalibrationCheckState.checkingPointTwo,
-        "before": "_jog_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_step,
-        "from_state": CalibrationCheckState.checkingPointTwo,
-        "to_state": CalibrationCheckState.checkingPointThree,
-        "before": "_move_to_check_point_three",
-    },
-    {
-        "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.checkingPointThree,
-        "to_state": CalibrationCheckState.checkingPointThree,
-        "before": "_jog_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.confirm_step,
-        "from_state": CalibrationCheckState.checkingPointThree,
-        "to_state": CalibrationCheckState.checkingHeight,
+        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
+        "from_state": CalibrationCheckState.inspectingSecondTip,
+        "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
         "before": "_move_to_check_height"
+        "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
-        "from_state": CalibrationCheckState.checkingHeight,
-        "to_state": CalibrationCheckState.checkingHeight,
+        "from_state": CalibrationCheckState.joggingSecondPipetteToHeight,
+        "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
         "before": "_jog_pipette"
     },
     {
-        "trigger": CalibrationCheckTrigger.confirm_step,
-        "from_state": CalibrationCheckState.checkingHeight,
-        "to_state": CalibrationCheckState.calibrationComplete,
-        "after": "_return_tip_for_pipette"
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingSecondPipetteToHeight,
+        "to_state": CalibrationCheckState.comparingSecondPipetteHeight,
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingSecondPipetteHeight,
+        "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
+        "before": "_move_to_check_point_one"
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.jog,
+        "from_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
+        "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
+        "before": "_jog_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.compare_jogged_point,
+        "from_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
+        "to_state": CalibrationCheckState.comparingSecondPipettePointOne,
+        "after": "_register_current_point"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.go_to_next_check,
+        "from_state": CalibrationCheckState.comparingSecondPipettePointOne,
+        "to_state": CalibrationCheckState.checkComplete,
+        "before": "_return_all_tips"
     },
     {
         "trigger": CalibrationCheckTrigger.exit,
@@ -424,6 +544,7 @@ CHECK_TRANSITIONS = [
     }
 ]
 
+MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5,5,5)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(10,10,10)
 
@@ -437,36 +558,35 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self.session_type = 'check'
         self._saved_points = {}
 
-    async def _load_labware_objects(self, **kwargs):
+    async def _load_tip_rack_objects(self, **kwargs):
         """
-        A function that takes tiprack information and loads them onto the deck.
+        A function that takes tip rack information and loads them onto the deck.
         """
         full_dict = {}
-        for name, data in self._labware_info.items():
-            parent = self._deck.position_for(data.slot)
-            lw = labware.Labware(data.definition, parent)
-            self._deck[data.slot] = lw
-            build_dict = {}
-            for id in data.forPipettes:
-                mount = self._get_mount(id)
-                pip = self.get_pipette(mount)
-                well_name = 'H1' if pip['channels'] == 8 else 'A1'
-                well = lw.wells_by_name()[well_name]
-                build_dict[id] = PreparingPipetteMoveOffset(
-                    offset=Point(0, 0, 10), well=well
-                )
-            full_dict[data.id] = build_dict
-        self._moves.preparingPipette = full_dict
+        for name, lw_data in self._labware_info.items():
+            parent = self._deck.position_for(lw_data.slot)
+            lw = labware.Labware(lw_data.definition, parent)
+            self._deck[lw_data.slot] = lw
+            has_two_pips = len(self._relate_mount) == 2
 
-    def _update_tiprack_offset(self, pipette_id: UUID, old_pos: Point,
-                               new_pos: Point):
-        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        if self._moves.preparingPipette:
-            old_offset = \
-                self._moves.preparingPipette[tiprack_id][pipette_id].offset
-            updated_offset = (new_pos - old_pos) + old_offset
-            self._moves.preparingPipette[tiprack_id][pipette_id].offset =\
-                updated_offset
+            for index, id in enumerate(lw_data.forPipettes):
+                mount = self._get_mount(id)
+                is_left_mount = mount == top_types.Mount.LEFT
+                is_second_pip = has_two_pips and is_left_mount
+                is_second_pip_for_rack = is_second_pip and \
+                                         len(lw.data.forPipettes) == 2
+                pip = self.get_pipette(mount)
+                well_name = 'B1' if is_second_pip_for_rack else 'A1'
+                well = lw.wells_by_name()[well_name]
+                move = PreparingPipetteMoveOffset(
+                    offset=MOVE_TO_TIP_RACK_SAFETY_BUFFER, well=well
+                )
+
+                if is_second_pip:
+                    self._moves.preparingSecondPipette = move
+                else:
+                    self._moves.preparingFirstPipette = move
+
 
     async def delete_session(self):
         for mount in self._relate_mount.values():
@@ -514,12 +634,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _invalidate_tip(self, pipette_id: UUID, **kwargs):
         if not self._has_tip(pipette_id):
             raise TipAttachError()
+        await self._move_pipette_to_tip_rack(pipette_id=pipette_id)
         await self.hardware.remove_tip(self._get_mount(pipette_id))
 
-    async def _return_tip_for_pipette(self, pipette_id: UUID, **kwargs):
+
+    async def _return_all_tips(self):
+        for pipette_id in self._relate_mount.keys():
+            await _return_tip_for_pipette(pipette_id)
+
+    async def _return_tip_for_pipette(self, pipette_id: UUID):
         if not self._has_tip(pipette_id):
             raise TipAttachError()
-        await self._prepare_pipette(pipette_id=pipette_id)
+        await self._move_pipette_to_tip_rack(pipette_id=pipette_id)
         await self._return_tip(self._get_mount(pipette_id))
 
     @staticmethod
@@ -571,7 +697,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self._saved_points[f'{self.current_state_name}_{pipette_id}'] = \
             await self.hardware.gantry_position(self._get_mount(pipette_id))
 
-    async def _prepare_pipette(self, pipette_id: UUID):
+    async def _move_pipette_to_tip_rack(self, pipette_id: UUID):
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
         moves_for_step = self._moves.preparingPipette
         single_location = moves_for_step[tiprack_id]
@@ -581,24 +707,27 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         updated_pt = pt + offset
         await self._move(pipette_id, Location(updated_pt, well))
 
+    async def _move_to_tip_rack_for_first_pipette(self):
+
+
     async def _move_to_check_point_one(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointOne.position,
+                         Location(self._moves.joggingFirstPipetteToPointOne.position,
                                   None))
 
     async def _move_to_check_point_two(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointTwo.position,
+                         Location(self._moves.joggingToPointTwo.position,
                                   None))
 
     async def _move_to_check_point_three(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingPointThree.position,
+                         Location(self._moves.joggingToPointThree.position,
                                   None))
 
     async def _move_to_check_height(self, pipette_id: UUID):
         await self._move(pipette_id,
-                         Location(self._moves.checkingHeight.position,
+                         Location(self._moves.joggingToHeight.position,
                                   None))
 
     async def _move(self,
@@ -618,7 +747,4 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     async def _jog_pipette(self, pipette_id: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette_id)
-        old_pos = await self.hardware.gantry_position(mount)
         await super(self.__class__, self)._jog(mount, vector)
-        new_pos = await self.hardware.gantry_position(mount)
-        self._update_tiprack_offset(pipette_id, old_pos, new_pos)
