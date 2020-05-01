@@ -310,7 +310,7 @@ class CalibrationCheckState(str, Enum):
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
     noPipettesAttached = "noPipettesAttached"
-    calibrationComplete = "calibrationComplete"
+    checkComplete = "checkComplete"
 
 
 class CalibrationCheckTrigger(str, Enum):
@@ -363,14 +363,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_invalidate_tip"
+        "before": "_invalidate_tip",
         "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
-        "before": "_move_to_check_height"
+        "before": "_move_to_check_height",
         "after": "_register_current_point"
     },
     {
@@ -389,7 +389,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipetteHeight,
         "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
-        "before": "_move_to_check_point_one"
+        "before": "_move_to_check_point_one",
         "after": "_register_current_point"
     },
     {
@@ -441,14 +441,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.compare_jogged_point,
         "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
         "to_state": CalibrationCheckState.comparingFirstPipettePointThree,
-        "before": "_move_to_check_point_three"
+        "before": "_move_to_check_point_three",
         "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "condition": "_is_another_pipette_after"
+        "condition": "_is_another_pipette_after",
         "before": "_move_to_tip_rack_for_second_pipette",
         "after": "_register_current_point"
     },
@@ -480,14 +480,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_invalidate_tip"
+        "before": "_invalidate_tip",
         "after": "_register_current_point"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
-        "before": "_move_to_check_height"
+        "before": "_move_to_check_height",
         "after": "_register_current_point"
     },
     {
@@ -506,7 +506,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingSecondPipetteHeight,
         "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
-        "before": "_move_to_check_point_one"
+        "before": "_move_to_check_point_one",
         "after": "_register_current_point"
     },
     {
@@ -699,15 +699,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     async def _move_pipette_to_tip_rack(self, pipette_id: UUID):
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        moves_for_step = self._moves.preparingPipette
+        moves_for_step = self._moves[self.current_state_name]
         single_location = moves_for_step[tiprack_id]
         offset = single_location[pipette_id].offset
         loc_to_move = single_location[pipette_id].well
         pt, well = loc_to_move.top()
         updated_pt = pt + offset
         await self._move(pipette_id, Location(updated_pt, well))
-
-    async def _move_to_tip_rack_for_first_pipette(self):
 
 
     async def _move_to_check_point_one(self, pipette_id: UUID):
