@@ -1,5 +1,6 @@
 {
   "name": "@opentrons/app-shell",
+  "private": true,
   "productName": "Opentrons",
   "version": "3.17.1-alpha.2",
   "description": "Opentrons desktop application",
@@ -20,10 +21,17 @@
     "url": "https://github.com/Opentrons/opentrons/issues"
   },
   "homepage": "https://github.com/Opentrons/opentrons",
-  "dependencies": {
+  "workspaces": {
+    "nohoist": [
+      "**"
+    ]
+  },
+  "devDependencies": {
     "@opentrons/app": "3.17.1-alpha.2",
     "@opentrons/discovery-client": "3.17.1-alpha.2",
-    "@opentrons/shared-data": "3.17.1-alpha.2",
+    "@opentrons/shared-data": "3.17.1-alpha.2"
+  },
+  "dependencies": {
     "@thi.ng/paths": "^1.6.5",
     "ajv": "^6.10.2",
     "dateformat": "^3.0.3",
