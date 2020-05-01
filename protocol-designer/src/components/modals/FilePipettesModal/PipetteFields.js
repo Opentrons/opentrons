@@ -220,7 +220,7 @@ export function PipetteFields(props: Props) {
       ) : (
         <div>
           <OutlineButton Component="label" className={styles.upload_button}>
-            upload custom tip rack
+            {i18n.t('button.upload_custom_tip_rack')}
             <input
               type="file"
               onChange={e => dispatch(createCustomTiprackDef(e))}

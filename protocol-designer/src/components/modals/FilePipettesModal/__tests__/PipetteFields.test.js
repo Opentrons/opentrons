@@ -189,7 +189,7 @@ describe('PipetteFields', () => {
     props.customTipracksEnabled = true
     const wrapper = render(props)
     const uploadButton = wrapper.find(OutlineButton).at(0)
-    expect(uploadButton.text()).toMatch('upload custom tip rack')
+    expect(uploadButton.text()).toMatch('Upload custom tip rack')
 
     uploadButton
       .find('input')
