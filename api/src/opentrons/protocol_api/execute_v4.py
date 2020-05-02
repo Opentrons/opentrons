@@ -11,6 +11,9 @@ from .constants import JsonCommand
 
 MODULE_LOG = logging.getLogger(__name__)
 
+# Special string for slot used by thermocycler in JSON protocols.
+TC_SPANNING_SLOT = 'span7_8_10_11'
+
 
 def load_labware_from_json_defs(
         ctx: ProtocolContext,
@@ -42,8 +45,10 @@ def load_modules_from_json(
     for module_id, props in module_data.items():
         model = props['model']
         slot = props['slot']
-        # TODO IMMEDIATELY handle weird slot "span7_8_10_11" for TC
-        instr = ctx.load_module(model, slot)
+        if slot == TC_SPANNING_SLOT:
+            instr = ctx.load_module(model)
+        else:
+            instr = ctx.load_module(model, slot)
         modules_by_id[module_id] = instr
 
     return modules_by_id
@@ -120,6 +125,17 @@ def _thermocycler_run_profile(module: ThermocyclerContext,
         repetitions=1)
 
 
+def assert_no_async_tc_behavior(commands) -> None:
+    # TODO IMMEDIATELY verify that all must-be-sync commands are sequential
+    pass
+
+
+def assert_tc_commands_do_not_use_unimplemented_volume(commands) -> None:
+    # TODO IMMEDIATELY raise error if TC lid/block commands use 'volume',
+    # it's not yet implemented for anything besides profile.
+    pass
+
+
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Instruments,
@@ -134,9 +150,9 @@ def dispatch_json(context: ProtocolContext,
                   Dict[str, ThermocyclerModuleHandler]
                   ) -> None:
     commands = protocol_data['commands']
-    # TODO IMMEDIATELY verify that all must-be-sync commands are sequential
-    # TODO IMMEDIATELY raise error if TC lid/block commands use 'volume',
-    # it's not yet implemented for anything besides profile.
+
+    assert_no_async_tc_behavior(commands)
+    assert_tc_commands_do_not_use_unimplemented_volume(commands)
 
     for command_item in commands:
         command_type = command_item['command']
@@ -196,7 +212,7 @@ def handleThermocyclerCommand(params,
                               ) -> None:
     module_id = params['module']
     module = modules[module_id]
-    if isinstance(module, TemperatureModuleContext):
+    if isinstance(module, ThermocyclerContext):
         thermocycler_module_command_map[command_type](
             module, params
         )

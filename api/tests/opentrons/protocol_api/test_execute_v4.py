@@ -11,7 +11,8 @@ from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
     _thermocycler_deactivate_lid, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
-    _thermocycler_run_profile
+    _thermocycler_run_profile, \
+    TC_SPANNING_SLOT
 import opentrons.protocol_api.execute_v4 as v4
 from opentrons.protocol_api import MagneticModuleContext, \
     TemperatureModuleContext, ThermocyclerContext, \
@@ -95,17 +96,22 @@ def thermocycler_module_command_map(mockObj):
 
 
 def test_load_modules_from_json():
-    def fake_module(model, slot):
+    def fake_module(model, slot=None):
         return (model, slot)
     ctx = mock.create_autospec(ProtocolContext)
     ctx.load_module = fake_module
     protocol = {'modules': {
         'aID': {'slot': '1', 'model': 'magneticModuleV1'},
-        'bID': {'slot': '4', 'model': 'temperatureModuleV2'}}}
+        'bID': {'slot': '4', 'model': 'temperatureModuleV2'},
+        'cID': {
+            'slot': TC_SPANNING_SLOT,
+            'model': 'thermocyclerModuleV1'}
+    }}
     result = load_modules_from_json(ctx, protocol)
 
     assert result == {'aID': ('magneticModuleV1', '1'),
-                      'bID': ('temperatureModuleV2', '4')}
+                      'bID': ('temperatureModuleV2', '4'),
+                      'cID': ('thermocyclerModuleV1', None)}
 
 
 def test_engage_magnet():
@@ -248,11 +254,14 @@ def test_dispatch_json(
 
     magnetic_module_id = 'magnetic_module_id'
     temperature_module_id = 'temperature_module_id'
+    thermocycler_module_id = 'thermocycler_module_id'
 
     mock_magnetic_module = mock.create_autospec(MagneticModuleContext)
     mock_temperature_module = mock.create_autospec(TemperatureModuleContext)
+    mock_thermocycler_module = mock.create_autospec(ThermocyclerContext)
 
     protocol_data = {'commands': [
+        # Pipette
         {'command': 'delay', 'params': 'delay_params'},
         {'command': 'blowout', 'params': 'blowout_params'},
         {'command': 'pickUpTip', 'params': 'pickUpTip_params'},
@@ -261,17 +270,84 @@ def test_dispatch_json(
         {'command': 'dispense', 'params': 'dispense_params'},
         {'command': 'touchTip', 'params': 'touchTip_params'},
         {'command': 'moveToSlot', 'params': 'moveToSlot_params'},
+        # Magnetic Module
         {'command': 'magneticModule/engageMagnet',
             'params': {'module': magnetic_module_id}},
         {'command': 'magneticModule/disengageMagnet',
             'params': {'module': magnetic_module_id}},
+        # Temperature Module
         {'command': 'temperatureModule/setTargetTemperature',
             'params': {'module': temperature_module_id}},
         {'command': 'temperatureModule/deactivate',
             'params': {'module': temperature_module_id}},
         {'command': 'temperatureModule/awaitTemperature',
             'params': {'module': temperature_module_id}},
-        # TODO IMMEIDATELY add TC commands here
+        # Thermocycler
+        {
+            "command": "thermocycler/setTargetBlockTemperature",
+            "params": {
+                "module": thermocycler_module_id,
+                "temperature": 55
+            }
+        },
+        {
+            "command": "thermocycler/awaitBlockTemperature",
+            "params": {
+                "module": thermocycler_module_id,
+                "temperature": 55
+            }
+        },
+        {
+            "command": "thermocycler/setTargetLidTemperature",
+            "params": {
+                "module": thermocycler_module_id,
+                "temperature": 60
+            }
+        },
+        {
+            "command": "thermocycler/awaitLidTemperature",
+            "params": {
+                "module": thermocycler_module_id,
+                "temperature": 60
+            }
+        },
+        {
+            "command": "thermocycler/closeLid",
+            "params": {"module": thermocycler_module_id}
+        },
+        {
+            "command": "thermocycler/openLid",
+            "params": {"module": thermocycler_module_id}
+        },
+        {
+            "command": "thermocycler/deactivateBlock",
+            "params": {"module": thermocycler_module_id}
+        },
+        {
+            "command": "thermocycler/deactivateLid",
+            "params": {"module": thermocycler_module_id}
+        },
+        {
+            "command": "thermocycler/closeLid",
+            "params": {"module": thermocycler_module_id}
+        },
+        {
+            "command": "thermocycler/runProfile",
+            "params": {
+                "module": thermocycler_module_id,
+                "profile": [
+                    {"temperature": 70, "holdTime": 60},
+                    {"temperature": 40, "holdTime": 30},
+                    {"temperature": 72, "holdTime": 60},
+                    {"temperature": 38, "holdTime": 30}
+                ],
+                "volume": 123
+            }
+        },
+        {
+            "command": "thermocycler/awaitProfileComplete",
+            "params": {"module": thermocycler_module_id}
+        }
     ]}
 
     context = mock.sentinel.context
@@ -280,7 +356,8 @@ def test_dispatch_json(
 
     modules = {
         magnetic_module_id: mock_magnetic_module,
-        temperature_module_id: mock_temperature_module
+        temperature_module_id: mock_temperature_module,
+        thermocycler_module_id: mock_thermocycler_module
     }
 
     dispatch_json(
@@ -296,6 +373,7 @@ def test_dispatch_json(
     )
 
     assert mockObj.mock_calls == [
+        # Pipette
         mock.call._delay(context, 'delay_params'),
         mock.call._blowout(instruments, loaded_labware, 'blowout_params'),
         mock.call._pick_up_tip(
@@ -308,12 +386,14 @@ def test_dispatch_json(
         mock.call._touch_tip(
             instruments, loaded_labware, 'touchTip_params'),
         mock.call._move_to_slot(context, instruments, 'moveToSlot_params'),
+        # Magnetic module
         mock.call._engage_magnet(
             mock_magnetic_module, {'module': magnetic_module_id}
         ),
         mock.call._disengage_magnet(
             mock_magnetic_module, {'module': magnetic_module_id}
         ),
+        # Temperature module
         mock.call._temperature_module_set_temp(
             mock_temperature_module, {'module': temperature_module_id}
         ),
@@ -322,6 +402,58 @@ def test_dispatch_json(
         ),
         mock.call._temperature_module_await_temp(
             mock_temperature_module, {'module': temperature_module_id}
+        ),
+        # Thermocycler
+        mock.call._thermocycler_set_block_temperature(
+            mock_thermocycler_module,
+            {'module': thermocycler_module_id, 'temperature': 55}
+        ),
+        # await block temp = do nothing (corresponding set is blocking)
+        mock.call.tc_do_nothing(
+            mock_thermocycler_module,
+            {'module': thermocycler_module_id, 'temperature': 55}
+        ),
+        mock.call._thermocycler_set_lid_temperature(
+            mock_thermocycler_module,
+            {'module': thermocycler_module_id, 'temperature': 60}
+        ),
+        # await lid temp = do nothing (corresponding set is blocking)
+        mock.call.tc_do_nothing(
+            mock_thermocycler_module,
+            {'module': thermocycler_module_id, 'temperature': 60}
+        ),
+        mock.call._thermocycler_close_lid(
+            mock_thermocycler_module, {'module': thermocycler_module_id}
+        ),
+        mock.call._thermocycler_open_lid(
+            mock_thermocycler_module, {'module': thermocycler_module_id}
+        ),
+        mock.call._thermocycler_deactivate_block(
+            mock_thermocycler_module, {'module': thermocycler_module_id}
+        ),
+        mock.call._thermocycler_deactivate_lid(
+            mock_thermocycler_module, {'module': thermocycler_module_id}
+        ),
+        mock.call._thermocycler_close_lid(
+            mock_thermocycler_module, {'module': thermocycler_module_id}
+        ),
+        mock.call._thermocycler_run_profile(
+            mock_thermocycler_module, {
+                "module": thermocycler_module_id,
+                "profile": [
+                    {"temperature": 70, "holdTime": 60},
+                    {"temperature": 40, "holdTime": 30},
+                    {"temperature": 72, "holdTime": 60},
+                    {"temperature": 38, "holdTime": 30}
+                ],
+                "volume": 123
+            }
+        ),
+        # await profile complete = do nothing
+        # (corresponding set is blocking)
+        mock.call.tc_do_nothing(
+            mock_thermocycler_module,
+            {'module': thermocycler_module_id}
         )
     ]
 
