@@ -20,13 +20,13 @@ export const TemperatureData = ({
     <div className={styles.data_row}>
       <p className={styles.inline_labeled_value}>Current:</p>
       <p className={styles.inline_labeled_value}>{`${
-        current != null ? current : '-'
+        current != null ? Math.trunc(current) : '-'
       } °C`}</p>
     </div>
     <div className={styles.data_row}>
       <p className={styles.inline_labeled_value}>Target:</p>
       <p className={styles.inline_labeled_value}>{`${
-        target != null ? target : '-'
+        target != null ? Math.trunc(target) : '-'
       } °C`}</p>
     </div>
   </div>
