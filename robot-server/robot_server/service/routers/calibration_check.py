@@ -11,7 +11,7 @@ from opentrons.server.endpoints.calibration.session import SessionManager, \
 from opentrons import types
 from robot_server.service.dependencies import \
     get_calibration_session_manager, get_hardware
-from robot_server.service.models import calibration_check as model
+from opentrons.server.endpoints.calibration import models
 from robot_server.service.errors import RobotServerError, Error
 from robot_server.service.models.json_api.resource_links import ResourceLink
 from robot_server.service.models.json_api.request import RequestModel, \
@@ -21,16 +21,16 @@ from robot_server.service.models.json_api.response import ResponseDataModel, \
 
 
 CalibrationSessionStatusResponse = json_api_response(
-    attributes_model=model.CalibrationSessionStatus)
+    attributes_model=models.CalibrationSessionStatus)
 
-PipetteRequest = json_api_request(attributes_model=model.SpecificPipette)
-JogRequest = json_api_request(attributes_model=model.JogPosition)
+PipetteRequest = json_api_request(attributes_model=models.SpecificPipette)
+JogRequest = json_api_request(attributes_model=models.JogPosition)
 
 
 router = APIRouter()
 
 
-def get_current_session(session_type: model.SessionType,
+def get_current_session(session_type: models.SessionType,
                         api_router: APIRouter) -> CalibrationSession:
     """Get the current session or raise a RobotServerError"""
     manager = get_calibration_session_manager()
@@ -61,7 +61,7 @@ def get_check_session() -> CheckCalibrationSession:
     from robot_server.service.app import app
     # Return an upcasted CalibrationSession
     return get_current_session(  # type: ignore
-        session_type=model.SessionType.check,
+        session_type=models.SessionType.check,
         api_router=app.router)
 
 
@@ -70,7 +70,7 @@ def get_check_session() -> CheckCalibrationSession:
             response_model_exclude_unset=True,)
 async def get_session(
         request: Request,
-        session_type: model.SessionType) -> CalibrationSessionStatusResponse:
+        session_type: models.SessionType) -> CalibrationSessionStatusResponse:
     """
     Get the current session
 
@@ -87,7 +87,7 @@ async def get_session(
              response_model_exclude_unset=True)
 async def create_session(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         session_manager: SessionManager = Depends(
             get_calibration_session_manager),
         hardware=Depends(get_hardware))\
@@ -126,7 +126,7 @@ async def create_session(
                response_model_exclude_unset=True)
 async def delete_session(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         session_manager: SessionManager = Depends(
             get_calibration_session_manager
         )) -> CalibrationSessionStatusResponse:
@@ -142,7 +142,7 @@ async def delete_session(
              response_model_exclude_unset=True)
 async def load_labware(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
     """Load labware handler"""
@@ -155,7 +155,7 @@ async def load_labware(
              response_model_exclude_unset=True)
 async def prepare_pipette(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         pipette: PipetteRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -171,7 +171,7 @@ async def prepare_pipette(
              response_model_exclude_unset=True)
 async def pick_up_tip(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         pipette: PipetteRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -187,7 +187,7 @@ async def pick_up_tip(
              response_model_exclude_unset=True)
 async def invalidate_tip(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         pipette: PipetteRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -203,7 +203,7 @@ async def invalidate_tip(
              response_model_exclude_unset=True)
 async def confirm_tip(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         pipette: PipetteRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -219,7 +219,7 @@ async def confirm_tip(
              response_model_exclude_unset=True)
 async def jog_handler(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         jog: JogRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -238,7 +238,7 @@ async def jog_handler(
              response_model_exclude_unset=True)
 async def confirm_step(
         request: Request,
-        session_type: model.SessionType,
+        session_type: models.SessionType,
         pipette: PipetteRequest,
         session: CheckCalibrationSession = Depends(get_check_session)) \
         -> CalibrationSessionStatusResponse:
@@ -292,7 +292,7 @@ def create_next_step_links(session: CheckCalibrationSession,
         if route_name:
             url = api_router.url_path_for(
                 route_name,
-                session_type=model.SessionType.check.value)
+                session_type=models.SessionType.check.value)
 
             params = session.format_params(trigger)
             if url:
@@ -312,7 +312,7 @@ def create_session_response(session: CheckCalibrationSession,
     links = create_next_step_links(session,
                                    request.app)
     instruments = {
-        str(k): model.AttachedPipette(model=v.model,
+        str(k): models.AttachedPipette(model=v.model,
                                       name=v.name,
                                       tip_length=v.tip_length,
                                       has_tip=v.has_tip,
@@ -320,7 +320,7 @@ def create_session_response(session: CheckCalibrationSession,
         for k, v in session.pipette_status().items()
     }
     labware = [
-            model.LabwareStatus(alternatives=data.alternatives,
+            models.LabwareStatus(alternatives=data.alternatives,
                                 slot=data.slot,
                                 id=data.id,
                                 forPipettes=data.forPipettes,
@@ -330,10 +330,10 @@ def create_session_response(session: CheckCalibrationSession,
             session.labware_status.values()
         ]
 
-    status = model.CalibrationSessionStatus(
+    status = models.CalibrationSessionStatus(
         instruments=instruments,
         currentStep=session.current_state_name,
-        labware=labware
+        labware=labware,
     )
     return CalibrationSessionStatusResponse(
         data=ResponseDataModel.create(status, resource_id="check"),

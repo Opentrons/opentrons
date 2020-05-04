@@ -13,7 +13,7 @@ from opentrons import types
 from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware,\
     get_calibration_session_manager
-from robot_server.service.models.calibration_check import SessionType
+from opentrons.server.endpoints.calibration.models import SessionType
 from robot_server.service.routers import calibration_check
 
 
@@ -172,7 +172,6 @@ def test_create_session_response(mock_cal_session):
                                                          mock_request)
     assert response.dict() == {
         'data': {
-            'id': None,
             'attributes': {
                 'currentStep': 'preparingPipette',
                 'instruments': {
@@ -194,7 +193,8 @@ def test_create_session_response(mock_cal_session):
                     'namespace': lw.namespace,
                     'version': lw.version,
                     'id': lw.id
-                } for lw in labware.values()]
+                } for lw in labware.values()],
+                'nextSteps': None
             },
             'type': 'CalibrationSessionStatus',
             'id': 'check',

@@ -9,7 +9,7 @@ from pydantic import BaseModel, Field, validator
 
 
 class SessionCommands(str, Enum):
-    """The available session commmands"""
+    """The available session commands"""
     load_labware =\
         (CalibrationCheckTrigger.load_labware.value, None)
     prepare_pipette =\

@@ -1,4 +1,5 @@
 import asyncio
+from uuid import UUID
 
 import pytest
 from opentrons import types
@@ -31,9 +32,8 @@ async def in_preparing_pipette(check_calibration_session):
     check_calibration_session = await in_labware_loaded(
         check_calibration_session
     )
-    pipette_id = UUID(
-        tuple(check_calibration_session.pipette_status.keys())[0]
-    )
+    pipette_id = tuple(check_calibration_session.pipette_status().keys())[0]
+
     await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.prepare_pipette,
         pipette_id=pipette_id
