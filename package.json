@@ -47,7 +47,7 @@
     "cypress": "^4.0.2",
     "cypress-file-upload": "3.5.3",
     "cz-conventional-changelog": "2.1.0",
-    "electron": "^6.0.7",
+    "electron": "6.1.10",
     "electron-builder": "^21.2.0",
     "electron-notarize": "^0.1.1",
     "electron-publisher-s3": "^20.17.2",
