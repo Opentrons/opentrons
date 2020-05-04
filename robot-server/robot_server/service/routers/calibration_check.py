@@ -18,17 +18,14 @@ from robot_server.service.models.json_api.request import RequestModel, \
     json_api_request
 from robot_server.service.models.json_api.response import ResponseDataModel, \
     ResponseModel, json_api_response
-from robot_server.service.models.json_api import ResourceTypes
 
 
 CalibrationSessionStatusResponse = json_api_response(
-    resource_type=ResourceTypes.a,
     attributes_model=model.CalibrationSessionStatus)
 
-PipetteRequest = json_api_request(resource_type=ResourceTypes.a,
-                                  attributes_model=model.SpecificPipette)
-JogRequest = json_api_request(resource_type=ResourceTypes.a,
-                              attributes_model=model.JogPosition)
+PipetteRequest = json_api_request(attributes_model=model.SpecificPipette)
+JogRequest = json_api_request(attributes_model=model.JogPosition)
+
 
 router = APIRouter()
 
@@ -220,7 +217,7 @@ async def confirm_tip(
 @router.post('/{session_type}/session/jog',
              response_model=CalibrationSessionStatusResponse,
              response_model_exclude_unset=True)
-async def jog(
+async def jog_handler(
         request: Request,
         session_type: model.SessionType,
         jog: JogRequest,
@@ -274,7 +271,7 @@ async def trigger_state(request: Request,
 TRIGGER_TO_NAME: typing.Dict[str, str] = {
     CalibrationCheckTrigger.load_labware: load_labware.__name__,
     CalibrationCheckTrigger.prepare_pipette: prepare_pipette.__name__,
-    CalibrationCheckTrigger.jog: jog.__name__,
+    CalibrationCheckTrigger.jog: jog_handler.__name__,
     CalibrationCheckTrigger.pick_up_tip: pick_up_tip.__name__,
     CalibrationCheckTrigger.confirm_tip_attached: confirm_tip.__name__,
     CalibrationCheckTrigger.invalidate_tip: invalidate_tip.__name__,
@@ -339,9 +336,6 @@ def create_session_response(session: CheckCalibrationSession,
         labware=labware
     )
     return CalibrationSessionStatusResponse(
-        data=ResponseDataModel[model.CalibrationSessionStatus](
-            attributes=status,
-            type=ResourceTypes.a
-        ),
+        data=ResponseDataModel.create(status, resource_id="check"),
         links=links,
     )

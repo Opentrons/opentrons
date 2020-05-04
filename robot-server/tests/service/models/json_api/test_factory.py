@@ -6,25 +6,21 @@ from robot_server.service.models.json_api.request import RequestModel, \
     RequestDataModel
 from robot_server.service.models.json_api.response import ResponseModel, \
     ResponseDataModel
-from robot_server.service.models.json_api import ResourceTypes
 from tests.service.helpers import ItemModel
-
-ITEM_TYPE = ResourceTypes.item
 
 
 def test_json_api_model():
-    ItemRequest, ItemResponse = generate_json_api_models(ITEM_TYPE, ItemModel)
+    ItemRequest, ItemResponse = generate_json_api_models(ItemModel)
     assert ItemRequest == RequestModel[
         RequestDataModel[ItemModel]
     ]
     assert ItemResponse == ResponseModel[
-        ResponseDataModel[ItemModel]
+        ResponseDataModel[ItemModel], dict
     ]
 
 
 def test_json_api_model__list_response():
     ItemRequest, ItemResponse = generate_json_api_models(
-        ITEM_TYPE,
         ItemModel,
         list_response=True
     )
@@ -32,5 +28,5 @@ def test_json_api_model__list_response():
         RequestDataModel[ItemModel]
     ]
     assert ItemResponse == ResponseModel[
-        List[ResponseDataModel[ItemModel]]
+        List[ResponseDataModel[ItemModel]], dict
     ]

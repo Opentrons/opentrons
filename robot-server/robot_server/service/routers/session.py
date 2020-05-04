@@ -3,22 +3,17 @@ from fastapi import APIRouter, Query
 from opentrons.server.endpoints.calibration.models\
     import CalibrationSessionStatus
 from robot_server.service.models import session
-from robot_server.service.models.json_api import ResourceTypes
 from robot_server.service.models.json_api.response import json_api_response
 from robot_server.service.models.json_api.request import json_api_request
 
 
-SessionResponse = json_api_response(resource_type=ResourceTypes.session,
-                                    attributes_model=session.Session,
+SessionResponse = json_api_response(attributes_model=session.Session,
                                     meta_data_model=CalibrationSessionStatus)
-MultiSessionResponse = json_api_response(resource_type=ResourceTypes.session,
-                                         attributes_model=session.Session,
+MultiSessionResponse = json_api_response(attributes_model=session.Session,
                                          use_list=True)
 
-CommandRequest = json_api_request(resource_type=ResourceTypes.command,
-                                  attributes_model=session.SessionCommand)
-CommandResponse = json_api_request(resource_type=ResourceTypes.command,
-                                   attributes_model=session.SessionCommand)
+CommandRequest = json_api_request(attributes_model=session.SessionCommand)
+CommandResponse = json_api_request(attributes_model=session.SessionCommand)
 
 
 router = APIRouter()

@@ -25,4 +25,3 @@ routes.include_router(router=calibration_check.router,
                       tags=["Calibration Check"])
 routes.include_router(router=session.router,
                       tags=["Session Management"])
-

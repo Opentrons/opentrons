@@ -5,7 +5,6 @@ from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 from starlette.exceptions import HTTPException
 
 from robot_server.service import errors
-from robot_server.service.models.json_api import ResourceTypes
 from tests.service.helpers import ItemRequest
 
 
@@ -13,7 +12,7 @@ def test_transform_validation_error_to_json_api_errors():
     with pytest.raises(ValidationError) as e:
         ItemRequest(**{
             'data': {
-                'type': 'invalid'
+                'type': 'type'
             }
         })
     assert errors.transform_validation_error_to_json_api_errors(
@@ -21,17 +20,6 @@ def test_transform_validation_error_to_json_api_errors():
         e.value
     ).dict(exclude_unset=True) == {
         'errors': [
-            {
-                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-                'detail': "value is not a valid enumeration member; permitted:"
-                          " {}".format(
-                    ', '.join(f"'{i.value}'" for i in ResourceTypes)
-                ),
-                'source': {
-                    'pointer': '/data/type'
-                },
-                'title': 'type_error.enum'
-            },
             {
                 'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
                 'detail': 'field required',

@@ -1,16 +1,13 @@
 from pytest import raises
 from pydantic import BaseModel, ValidationError
 
-from robot_server.service.models.json_api.response import json_api_response
-from robot_server.service.models.json_api import ResourceTypes
-from tests.service.helpers import ItemModel, ItemData
-
-
-ITEM_TYPE = ResourceTypes.item
+from robot_server.service.models.json_api.response import ResponseDataModel, \
+    json_api_response
+from tests.service.helpers import ItemModel
 
 
 def test_attributes_as_dict():
-    MyResponse = json_api_response(ITEM_TYPE, dict)
+    MyResponse = json_api_response(dict)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': {}},
     }
@@ -27,7 +24,7 @@ def test_attributes_as_dict():
 
 
 def test_missing_attributes_dict():
-    MyResponse = json_api_response(ITEM_TYPE, dict)
+    MyResponse = json_api_response(dict)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -47,7 +44,7 @@ def test_missing_attributes_empty_model():
     class EmptyModel(BaseModel):
         pass
 
-    MyResponse = json_api_response(ITEM_TYPE, EmptyModel)
+    MyResponse = json_api_response(EmptyModel)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item'}
     }
@@ -65,7 +62,7 @@ def test_missing_attributes_empty_model():
 
 
 def test_attributes_as_item_model():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel)
+    ItemResponse = json_api_response(ItemModel)
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -96,7 +93,7 @@ def test_attributes_as_item_model():
 
 
 def test_list_item_model():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel, use_list=True)
+    ItemResponse = json_api_response(ItemModel, use_list=True)
     obj_to_validate = {
         'meta': None,
         'links': None,
@@ -148,29 +145,8 @@ def test_list_item_model():
     }
 
 
-def test_type_invalid_string():
-    MyResponse = json_api_response(ITEM_TYPE, dict)
-    obj_to_validate = {
-        'data': {'id': '123', 'type': 'not_an_item', 'attributes': {}}
-    }
-    with raises(ValidationError) as e:
-        MyResponse(**obj_to_validate)
-
-    assert e.value.errors() == [
-        {
-            'loc': ('data', 'type'),
-            'msg': "value is not a valid enumeration member;"
-                   " permitted: {}".format(
-                ', '.join(f"'{i.value}'" for i in ResourceTypes)
-            ),
-            'type': 'type_error.enum',
-            'ctx': {'enum_values': [i for i in ResourceTypes]},
-        },
-    ]
-
-
 def test_attributes_required():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel)
+    ItemResponse = json_api_response(ItemModel)
     obj_to_validate = {
         'data': {'id': '123', 'type': 'item', 'attributes': None}
     }
@@ -187,7 +163,7 @@ def test_attributes_required():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel)
+    ItemResponse = json_api_response(ItemModel)
     obj_to_validate = {
         'data': {
             'id': '123',
@@ -215,17 +191,16 @@ def test_attributes_as_item_model__empty_dict():
     ]
 
 
-def test_resource_object_constructor():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel)
+def test_resource_data_model_create():
     item = ItemModel(name='pear', price=1.2, quantity=10)
-    document = ItemResponse.resource_object(
-        id='abc123',
+    document = ResponseDataModel.create(
+        resource_id='abc123',
         attributes=item
     ).dict()
 
     assert document == {
         'id': 'abc123',
-        'type': 'item',
+        'type': 'ItemModel',
         'attributes': {
             'name': 'pear',
             'price': 1.2,
@@ -234,42 +209,23 @@ def test_resource_object_constructor():
     }
 
 
-def test_resource_object_constructor__no_attributes():
-    IdentifierResponse = json_api_response(ITEM_TYPE, dict)
-    document = IdentifierResponse.resource_object(id='abc123').dict()
+def test_resource_data_model_create_no_attributes():
+    document = ResponseDataModel.create(
+        resource_id='abc123', attributes={}).dict()
 
     assert document == {
         'id': 'abc123',
-        'type': 'item',
+        'type': 'dict',
         'attributes': {},
     }
 
 
-def test_resource_object_constructor__with_list_response():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel, use_list=True)
-    item = ItemModel(name='pear', price=1.2, quantity=10)
-    document = ItemResponse.resource_object(
-        id='abc123',
-        attributes=item
-    ).dict()
-
-    assert document == {
-        'id': 'abc123',
-        'type': 'item',
-        'attributes': {
-            'name': 'pear',
-            'price': 1.2,
-            'quantity': 10,
-        }
-    }
-
-
 def test_response_constructed_with_resource_object():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel)
+    ItemResponse = json_api_response(ItemModel)
     item = ItemModel(name='pear', price=1.2, quantity=10)
-    data = ItemResponse.resource_object(
-        id='abc123',
-        attributes=item
+    data = ResponseDataModel.create(
+            resource_id='abc123',
+            attributes=item
     ).dict()
 
     assert ItemResponse(data=data).dict() == {
@@ -277,7 +233,7 @@ def test_response_constructed_with_resource_object():
         'links': None,
         "data": {
             'id': 'abc123',
-            "type": 'item',
+            "type": 'ItemModel',
             "attributes": {
                 'name': 'pear',
                 'price': 1.2,
@@ -287,16 +243,17 @@ def test_response_constructed_with_resource_object():
     }
 
 
-def test_response_constructed_with_resource_object__list():
-    ItemResponse = json_api_response(ITEM_TYPE, ItemModel, use_list=True)
-    items = [
-        ItemData(id=1, name='apple', price=1.5, quantity=3),
-        ItemData(id=2, name='pear', price=1.2, quantity=10),
-        ItemData(id=3, name='orange', price=2.2, quantity=5)
-    ]
+def test_response_constructed_with_resource_object_list():
+    ItemResponse = json_api_response(ItemModel, use_list=True)
+    items = (
+        (1, ItemModel(name='apple', price=1.5, quantity=3)),
+        (2, ItemModel(name='pear', price=1.2, quantity=10)),
+        (3, ItemModel(name='orange', price=2.2, quantity=5))
+    )
     response = ItemResponse(
         data=[
-            ItemResponse.resource_object(id=item.id, attributes=vars(item))
+            ResponseDataModel.create(resource_id=str(item[0]),
+                                     attributes=item[1])
             for item in items
         ]
     )
@@ -306,7 +263,7 @@ def test_response_constructed_with_resource_object__list():
         'data': [
             {
                 'id': '1',
-                'type': 'item',
+                'type': 'ItemModel',
                 'attributes': {
                     'name': 'apple',
                     'price': 1.5,
@@ -315,7 +272,7 @@ def test_response_constructed_with_resource_object__list():
             },
             {
                 'id': '2',
-                'type': 'item',
+                'type': 'ItemModel',
                 'attributes': {
                     'name': 'pear',
                     'price': 1.2,
@@ -324,7 +281,7 @@ def test_response_constructed_with_resource_object__list():
             },
             {
                 'id': '3',
-                'type': 'item',
+                'type': 'ItemModel',
                 'attributes': {
                     'name': 'orange',
                     'price': 2.2,

@@ -14,7 +14,6 @@ from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware,\
     get_calibration_session_manager
 from robot_server.service.models.calibration_check import SessionType
-from robot_server.service.models.json_api import ResourceTypes
 from robot_server.service.routers import calibration_check
 
 
@@ -117,7 +116,8 @@ def test_api_return_session_status(api_client, mock_cal_session,
                 'instruments': {},
                 'labware': []
             },
-            'type': 'a'
+            'type': 'CalibrationSessionStatus',
+            'id': 'check'
         },
         'links': {
             'sessionExit': {
@@ -196,7 +196,9 @@ def test_create_session_response(mock_cal_session):
                     'id': lw.id
                 } for lw in labware.values()]
             },
-            'type': ResourceTypes.a
+            'type': 'CalibrationSessionStatus',
+            'id': 'check',
+
         },
         'links': {
             'sessionExit': {

@@ -3,15 +3,11 @@ from pytest import raises
 from pydantic import ValidationError
 
 from robot_server.service.models.json_api.request import json_api_request
-from robot_server.service.models.json_api import ResourceTypes
 from tests.service.helpers import ItemModel
 
 
-ITEM_TYPE = ResourceTypes.item
-
-
 def test_attributes_as_dict():
-    DictRequest = json_api_request(ITEM_TYPE, dict)
+    DictRequest = json_api_request(dict)
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': {}}
     }
@@ -26,7 +22,7 @@ def test_attributes_as_dict():
 
 
 def test_attributes_as_item_model():
-    ItemRequest = json_api_request(ITEM_TYPE, ItemModel)
+    ItemRequest = json_api_request(ItemModel)
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -43,7 +39,7 @@ def test_attributes_as_item_model():
 
 
 def test_attributes_as_item_model__empty_dict():
-    ItemRequest = json_api_request(ITEM_TYPE, ItemModel)
+    ItemRequest = json_api_request(ItemModel)
     obj_to_validate = {
         'data': {
             'type': 'item',
@@ -70,29 +66,8 @@ def test_attributes_as_item_model__empty_dict():
     ]
 
 
-def test_type_invalid_string():
-    MyRequest = json_api_request(ITEM_TYPE, dict)
-    obj_to_validate = {
-        'data': {'type': 'not_an_item', 'attributes': {}}
-    }
-    with raises(ValidationError) as e:
-        MyRequest(**obj_to_validate)
-
-    assert e.value.errors() == [
-        {
-            'loc': ('data', 'type'),
-            'msg': "value is not a valid enumeration member;"
-                   " permitted: {}".format(
-                ', '.join(f"'{i.value}'" for i in ResourceTypes)
-            ),
-            'type': 'type_error.enum',
-            'ctx': {'enum_values': [i for i in ResourceTypes]},
-        },
-    ]
-
-
 def test_attributes_required():
-    MyRequest = json_api_request(ITEM_TYPE, dict)
+    MyRequest = json_api_request(dict)
     obj_to_validate = {
         'data': {'type': 'item', 'attributes': None}
     }
@@ -109,7 +84,7 @@ def test_attributes_required():
 
 
 def test_data_required():
-    MyRequest = json_api_request(ITEM_TYPE, dict)
+    MyRequest = json_api_request(dict)
     obj_to_validate = {
         'data': None
     }
@@ -126,7 +101,7 @@ def test_data_required():
 
 
 def test_request_with_id():
-    MyRequest = json_api_request(ITEM_TYPE, dict)
+    MyRequest = json_api_request(dict)
     obj_to_validate = {
         'data': {
             'type': 'item',
