@@ -76,30 +76,8 @@ async def prepare_pipette(request: web.Request, session) -> web.Response:
 async def confirm_step(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
+    await session.trigger_transition(CalibrationCheckTrigger.go_to_next_check,
                                      pipette_id=pipette.pipetteId)
-    return web.json_response(status=200)
-
-
-# TODO: BC: make this function idea "confirm point" instead of "move"
-async def move(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    moveloc = MoveLocation(**req)
-    if hasattr(moveloc.location, 'offset'):
-        # using getattr to avoid error raised by Union of deck position and
-        # tiprack position having different attributes.
-        offset = getattr(moveloc.location, 'offset')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "offset": types.Point(*offset)}
-    else:
-        position = getattr(moveloc.location, 'position')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "position": types.Point(*position)}
-    await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
-                                     pipette_id=moveloc.pipetteId,
-                                     request_location=location)
     return web.json_response(status=200)
 
 

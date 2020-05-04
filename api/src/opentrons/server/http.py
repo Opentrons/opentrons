@@ -112,8 +112,6 @@ class CalibrationRoutes(object):
             check.create_session,
             name="sessionStart")
         self.app.router.add_post(
-            '/{type}/session/move', check.move, name="move")
-        self.app.router.add_post(
             '/{type}/session/loadLabware',
             check.load_labware,
             name="loadLabware")
