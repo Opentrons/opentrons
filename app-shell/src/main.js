@@ -34,7 +34,12 @@ let rendererLogger
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
 app.prependOnceListener('ready', startUp)
 if (config.devtools) app.once('ready', installDevtools)
-app.once('window-all-closed', () => app.quit())
+app.once('window-all-closed', () => {
+  log.debug('all windows closed, quitting the app', {
+    appListeners: app.eventNames(),
+  })
+  app.quit()
+})
 
 function startUp() {
   log.info('Starting App')

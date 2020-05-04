@@ -3,6 +3,7 @@
 import { app } from 'electron'
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as SystemInfo from '@opentrons/app/src/system-info'
+import { createLogger } from '../logger'
 import { isWindows } from '../os'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from './usb-devices'
 
@@ -11,6 +12,8 @@ import type { Action, Dispatch } from '../types'
 import type { UsbDeviceMonitor, Device } from './usb-devices'
 
 const RE_REALTEK = /realtek/i
+
+const log = createLogger('system-info')
 
 const addDriverVersion = (device: Device): Promise<UsbDevice> => {
   if (isWindows() && RE_REALTEK.test(device.manufacturer)) {
@@ -35,7 +38,10 @@ export function registerSystemInfo(dispatch: Dispatch) {
   }
 
   app.once('will-quit', () => {
-    if (monitor) monitor.stop()
+    if (monitor) {
+      log.debug('stopping usb monitoring')
+      monitor.stop()
+    }
   })
 
   return function handleSystemAction(action: Action) {
