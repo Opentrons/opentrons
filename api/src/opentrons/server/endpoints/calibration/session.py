@@ -212,7 +212,9 @@ class CalibrationSession:
             tip_length = pip['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
 
-    async def _return_tip(self, mount: Mount):
+    async def _trash_tip(self, mount: Mount):
+        fixed_trash = self._deck.position_for(12)
+        await self.hardware.move_to(self._current_mount, fixed_trash)
         await self.hardware.drop_tip(mount)
 
     async def cache_instruments(self):
@@ -364,8 +366,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_invalidate_tip",
-        "after": "_register_point_first_pipette"
+        "after": "_move_first_pipette",
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -475,7 +476,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_invalidate_tip",
         "after": "_move_second_pipette",
     },
     {
@@ -626,7 +626,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         absolute_diff_vector = abs(current_pt - prev_pt)
         return absolute_diff_vector > threshold_vector
 
-    async def _pick_up_pipette_tip(self, pipette_id: UUID, **kwargs):
+    async def _pick_up_pipette_tip(self):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
@@ -643,22 +643,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
         await self._pick_up_tip(mount)
 
-    async def _invalidate_tip(self, pipette_id: UUID, **kwargs):
-        if not self._has_tip(pipette_id):
-            raise TipAttachError()
-        await self._move_pipette_to_tip_rack(pipette_id=pipette_id)
-        await self.hardware.remove_tip(self._get_mount(pipette_id))
+    async def _trash_first_pipette_tip(self):
+        await self._trash_tip(self._first_mount)
 
-
-    async def _return_all_tips(self):
-        for pipette_id in self._pip_info_by_id.keys():
-            await _return_tip_for_pipette(pipette_id)
-
-    async def _return_tip_for_pipette(self, pipette_id: UUID):
-        if not self._has_tip(pipette_id):
-            raise TipAttachError()
-        await self._move_pipette_to_tip_rack(pipette_id=pipette_id)
-        await self._return_tip(self._get_mount(pipette_id))
+    async def _trash_second_pipette_tip(self):
+        await self._trash_tip(self._second_mount)
 
     @staticmethod
     def _create_tiprack_param(position: typing.Dict):
