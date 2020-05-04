@@ -12,6 +12,8 @@ from opentrons.protocol_api.execute_v4 import dispatch_json, _engage_magnet, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
     _thermocycler_run_profile, \
+    assert_no_async_tc_behavior, \
+    assert_tc_commands_do_not_use_unimplemented_params, \
     TC_SPANNING_SLOT
 import opentrons.protocol_api.execute_v4 as v4
 from opentrons.protocol_api import MagneticModuleContext, \
@@ -489,3 +491,79 @@ def test_papi_execute_json_v4(monkeypatch, loop, get_json_protocol_fixture):
     ctx.home()
     # Check that we end up executing the protocol ok
     execute.run_protocol(protocol, ctx)
+
+
+def test_assert_no_async_tc_behavior():
+    setBlock = {
+        "command": "thermocycler/setTargetBlockTemperature"}
+    awaitBlock = {
+        "command": "thermocycler/awaitBlockTemperature"}
+    setLid = {
+        "command": "thermocycler/setTargetLidTemperature"}
+    awaitLid = {
+        "command": "thermocycler/awaitLidTemperature"}
+    runProfile = {
+        "command": "thermocycler/runProfile"}
+    awaitProfile = {
+        "command": "thermocycler/awaitProfileComplete"}
+    anything = {"command": "foo"}  # stand-in for some other command
+
+    # no error
+    assert_no_async_tc_behavior([
+        anything,
+        setBlock, awaitBlock,
+        anything,
+        setLid, awaitLid,
+        anything,
+        runProfile, awaitProfile,
+        anything
+    ])
+
+    assert_no_async_tc_behavior([anything, anything])
+
+    setters = [setBlock, setLid, runProfile]
+
+    for setter in setters:
+        # Should raise if anything except the corresponding await
+        # follows a "setter" command
+        with pytest.raises(RuntimeError):
+            assert_no_async_tc_behavior([
+                setter, anything
+            ])
+
+        # Should raise if setter is the last command in the array
+        with pytest.raises(RuntimeError):
+            assert_no_async_tc_behavior([
+                anything, setter
+            ])
+
+    awaiters = [awaitBlock, awaitLid, awaitProfile]
+
+    for awaiter in awaiters:
+        # Should raise if anything except the corresponding set
+        # precedes the await
+        with pytest.raises(RuntimeError):
+            assert_no_async_tc_behavior([
+                anything, awaiter
+            ])
+
+        # Should raise if awaiter is the first command in the array
+        with pytest.raises(RuntimeError):
+            assert_no_async_tc_behavior([
+                awaiter, anything
+            ])
+
+
+def test_assert_tc_commands_do_not_use_unimplemented_params():
+    # should not throw for arbitrary commands
+    assert_tc_commands_do_not_use_unimplemented_params([
+        {'command': 'foo', 'params': {}}])
+
+    fail_cases = [
+        [{
+            'command': 'thermocycler/setTargetBlockTemperature',
+            'params': {'volume': 0}}]
+    ]
+    for cmds in fail_cases:
+        with pytest.raises(RuntimeError):
+            assert_tc_commands_do_not_use_unimplemented_params(cmds)

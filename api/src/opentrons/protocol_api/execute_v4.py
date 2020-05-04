@@ -126,14 +126,68 @@ def _thermocycler_run_profile(module: ThermocyclerContext,
 
 
 def assert_no_async_tc_behavior(commands) -> None:
-    # TODO IMMEDIATELY verify that all must-be-sync commands are sequential
-    pass
+    # awaiters[i] corresponds to setters[i]
+    setters = [
+        "thermocycler/setTargetBlockTemperature",
+        "thermocycler/setTargetLidTemperature",
+        "thermocycler/runProfile"]
+    awaiters = [
+        "thermocycler/awaitBlockTemperature",
+        "thermocycler/awaitLidTemperature",
+        "thermocycler/awaitProfileComplete"]
+
+    command_types = [c['command'] for c in commands]
+
+    first_command = command_types[0]
+    if first_command in awaiters:
+        raise RuntimeError(
+            ("Unsupported behavior. Cannot {} as the " +
+             "first command of a protocol")
+            .format(first_command))
+
+    last_command = command_types[-1]
+    if last_command in setters:
+        raise RuntimeError(
+            ("Unsupported behavior. Cannot {} as the " +
+             "last command of a protocol")
+            .format(last_command))
+
+    # [a, b, c, d] -> [a, b], [b, c], [c, d]
+    for a, b in zip(command_types, command_types[1:]):
+        #  a setter must be immediately followed
+        # by its corresponding awaiter
+        if a in setters:
+            expected_awaiter = awaiters[setters.index(a)]
+            if b != expected_awaiter:
+                raise RuntimeError(
+                    ("Unsupported behavior. {} must be immediately" +
+                     "followed by {}")
+                    .format(a, expected_awaiter))
+        # an awaiter must be preceded by a setter
+        elif b in awaiters:
+            expected_setter = setters[awaiters.index(b)]
+            raise RuntimeError(
+                ("Unsupported behavior. {} must be immediately " +
+                 "preceded by {}").format(b, expected_setter))
 
 
-def assert_tc_commands_do_not_use_unimplemented_volume(commands) -> None:
-    # TODO IMMEDIATELY raise error if TC lid/block commands use 'volume',
-    # it's not yet implemented for anything besides profile.
-    pass
+def assert_tc_commands_do_not_use_unimplemented_params(commands) -> None:
+    # raise errors if commands include optional param keys that
+    # the executor/api does not currently support
+    unsupported_keys_by_command = {
+        "thermocycler/setTargetBlockTemperature": ["volume"]
+    }
+    for c in commands:
+        command_type = c['command']
+        params = c['params']
+        unsupported_keys = unsupported_keys_by_command.get(
+            command_type, [])
+        for k in unsupported_keys:
+            if k in params:
+                raise RuntimeError((
+                    "{} does not support {} param. " +
+                    "This may be implemented in a later version of " +
+                    "the robot server").format(command_type, k))
 
 
 def dispatch_json(context: ProtocolContext,
@@ -152,7 +206,7 @@ def dispatch_json(context: ProtocolContext,
     commands = protocol_data['commands']
 
     assert_no_async_tc_behavior(commands)
-    assert_tc_commands_do_not_use_unimplemented_volume(commands)
+    assert_tc_commands_do_not_use_unimplemented_params(commands)
 
     for command_item in commands:
         command_type = command_item['command']
