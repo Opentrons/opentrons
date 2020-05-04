@@ -82,9 +82,11 @@ def test_type_invalid_string():
         {
             'loc': ('data', 'type'),
             'msg': "value is not a valid enumeration member;"
-                   " permitted: 'item'",
+                   " permitted: {}".format(
+                ', '.join(f"'{i.value}'" for i in ResourceTypes)
+            ),
             'type': 'type_error.enum',
-            'ctx': {'enum_values': [ITEM_TYPE]},
+            'ctx': {'enum_values': [i for i in ResourceTypes]},
         },
     ]
 

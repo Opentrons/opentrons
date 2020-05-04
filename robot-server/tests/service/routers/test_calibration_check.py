@@ -52,7 +52,7 @@ def make_request(pipetteId=None, vector=None):
         data['vector'] = vector
     return {
         'data': {
-            'type': 'SpecificPipette' if not vector else 'JogPosition',
+            'type': 'a',
             'attributes': data
         }
     }

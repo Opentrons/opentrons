@@ -14,16 +14,21 @@ from robot_server.service.dependencies import \
 from robot_server.service.models import calibration_check as model
 from robot_server.service.errors import RobotServerError, Error
 from robot_server.service.models.json_api.resource_links import ResourceLink
-from robot_server.service.models.json_api.request import RequestModel
+from robot_server.service.models.json_api.request import RequestModel, \
+    json_api_request
 from robot_server.service.models.json_api.response import ResponseDataModel, \
-    ResponseModel
+    ResponseModel, json_api_response
 from robot_server.service.models.json_api import ResourceTypes
 
 
-CalibrationSessionStatusResponse = \
-    ResponseModel[model.CalibrationSessionStatus]
-PipetteRequest = RequestModel[model.SpecificPipette]
-JogRequest = RequestModel[model.JogPosition]
+CalibrationSessionStatusResponse = json_api_response(
+    resource_type=ResourceTypes.a,
+    attributes_model=model.CalibrationSessionStatus)
+
+PipetteRequest = json_api_request(resource_type=ResourceTypes.a,
+                                  attributes_model=model.SpecificPipette)
+JogRequest = json_api_request(resource_type=ResourceTypes.a,
+                              attributes_model=model.JogPosition)
 
 router = APIRouter()
 
@@ -334,7 +339,7 @@ def create_session_response(session: CheckCalibrationSession,
         labware=labware
     )
     return CalibrationSessionStatusResponse(
-        data=CalibrationSessionStatusResponseM(
+        data=ResponseDataModel[model.CalibrationSessionStatus](
             attributes=status,
             type=ResourceTypes.a
         ),

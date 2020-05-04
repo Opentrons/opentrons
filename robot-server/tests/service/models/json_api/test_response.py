@@ -160,9 +160,11 @@ def test_type_invalid_string():
         {
             'loc': ('data', 'type'),
             'msg': "value is not a valid enumeration member;"
-                   " permitted: 'item'",
+                   " permitted: {}".format(
+                ', '.join(f"'{i.value}'" for i in ResourceTypes)
+            ),
             'type': 'type_error.enum',
-            'ctx': {'enum_values': [ITEM_TYPE]},
+            'ctx': {'enum_values': [i for i in ResourceTypes]},
         },
     ]
 
@@ -252,17 +254,13 @@ def test_resource_object_constructor__with_list_response():
     ).dict()
 
     assert document == {
-        'data': [{
-            'id': 'abc123',
-            'type': 'item',
-            'attributes': {
-                'name': 'pear',
-                'price': 1.2,
-                'quantity': 10,
-            }
-        }],
-        'links': None,
-        'meta': None
+        'id': 'abc123',
+        'type': 'item',
+        'attributes': {
+            'name': 'pear',
+            'price': 1.2,
+            'quantity': 10,
+        }
     }
 
 
