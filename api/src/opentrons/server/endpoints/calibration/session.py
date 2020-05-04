@@ -98,7 +98,7 @@ class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._hardware = hardware
-        self._relate_mount = self._key_by_uuid(
+        self._pip_info_by_id = self._key_by_uuid(
             hardware.get_attached_instruments()
         )
         self._deck = geometry.Deck()
@@ -134,7 +134,7 @@ class CalibrationSession:
         lw: typing.Dict[UUID, LabwareInfo] = {}
         _uuid: typing.Optional[UUID] = None
 
-        for pipette_id in self._relate_mount.keys():
+        for pipette_id in self._pip_info_by_id.keys():
             mount = self._get_mount(pipette_id)
             pip_vol = self.get_pipette(mount)['max_volume']
 
@@ -146,7 +146,7 @@ class CalibrationSession:
                 if_labware = lw.get(_uuid)
             if _uuid and if_labware and if_labware.loadName == load_name:
                 lw[_uuid].forPipettes.append(pipette_id)
-                self._relate_mount[pipette_id]['tiprack_id'] = _uuid
+                self._pip_info_by_id[pipette_id]['tiprack_id'] = _uuid
             else:
                 lw_def = labware.get_labware_definition(load_name)
                 new_uuid: UUID = uuid4()
@@ -161,7 +161,7 @@ class CalibrationSession:
                     version=lw_def['version'],
                     id=new_uuid,
                     definition=lw_def)
-                self._relate_mount[pipette_id]['tiprack_id'] = new_uuid
+                self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
         return lw
 
     def _build_deck_moves(self) -> Moves:
@@ -186,7 +186,7 @@ class CalibrationSession:
             raise KeyError("No available slots remaining")
 
     def _get_mount(self, pipette_id: UUID) -> Mount:
-        return self._relate_mount[pipette_id]['mount']
+        return self._pip_info_by_id[pipette_id]['mount']
 
     async def _jog(self, mount: Mount, vector: Point):
         """
@@ -216,8 +216,8 @@ class CalibrationSession:
     async def cache_instruments(self):
         await self.hardware.cache_instruments()
         new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
-        self._relate_mount.clear()
-        self._relate_mount.update(new_dict)
+        self._pip_info_by_id.clear()
+        self._pip_info_by_id.update(new_dict)
 
     @property
     def hardware(self) -> ThreadManager:
@@ -254,7 +254,7 @@ class CalibrationSession:
         # convert the UUID to a hex string.
         fields = PipetteStatus.list_fields()
         to_dict = {}
-        for id, data in self._relate_mount.items():
+        for id, data in self._pip_info_by_id.items():
             pip = self.get_pipette(data['mount'])
             tip_id = data['tiprack_id']
             temp_dict = {
@@ -338,8 +338,8 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.prepare_pipette,
         "from_state": CalibrationCheckState.labwareLoaded,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_move_tip_rack_for_first_pipette",
-        "after": "_register_current_point"
+        "before": "_move_first_pipette_to_tip_rack",
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -364,14 +364,14 @@ CHECK_TRANSITIONS = [
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.preparingFirstPipette,
         "before": "_invalidate_tip",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.joggingFirstPipetteToHeight,
         "before": "_move_to_check_height",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -383,14 +383,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.compare_jogged_point,
         "from_state": CalibrationCheckState.joggingFirstPipetteToHeight,
         "to_state": CalibrationCheckState.comparingFirstPipetteHeight,
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipetteHeight,
         "to_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
         "before": "_move_to_check_point_one",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -402,14 +402,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.compare_jogged_point,
         "from_state": CalibrationCheckState.joggingFirstPipetteToPointOne,
         "to_state": CalibrationCheckState.comparingFirstPipettePointOne,
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipettePointOne,
         "to_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
         "before": "_move_to_check_point_two",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -422,14 +422,14 @@ CHECK_TRANSITIONS = [
         "from_state": CalibrationCheckState.joggingFirstPipetteToPointTwo,
         "to_state": CalibrationCheckState.comparingFirstPipettePointTwo,
         "before": "_move_to_check_point_three",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipettePointTwo,
         "to_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
         "before": "_move_to_check_point_three",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -442,15 +442,15 @@ CHECK_TRANSITIONS = [
         "from_state": CalibrationCheckState.joggingFirstPipetteToPointThree,
         "to_state": CalibrationCheckState.comparingFirstPipettePointThree,
         "before": "_move_to_check_point_three",
-        "after": "_register_current_point"
+        "after": "_register_point_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
         "to_state": CalibrationCheckState.preparingSecondPipette,
         "condition": "_is_another_pipette_after",
-        "before": "_move_to_tip_rack_for_second_pipette",
-        "after": "_register_current_point"
+        "before": "_move_second_pipette_to_tip_rack",
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
@@ -481,14 +481,14 @@ CHECK_TRANSITIONS = [
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.preparingSecondPipette,
         "before": "_invalidate_tip",
-        "after": "_register_current_point"
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.joggingSecondPipetteToHeight,
         "before": "_move_to_check_height",
-        "after": "_register_current_point"
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -500,14 +500,14 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.compare_jogged_point,
         "from_state": CalibrationCheckState.joggingSecondPipetteToHeight,
         "to_state": CalibrationCheckState.comparingSecondPipetteHeight,
-        "after": "_register_current_point"
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingSecondPipetteHeight,
         "to_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
         "before": "_move_to_check_point_one",
-        "after": "_register_current_point"
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -519,7 +519,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.compare_jogged_point,
         "from_state": CalibrationCheckState.joggingSecondPipetteToPointOne,
         "to_state": CalibrationCheckState.comparingSecondPipettePointOne,
-        "after": "_register_current_point"
+        "after": "_register_point_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.go_to_next_check,
@@ -557,6 +557,19 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                               initial_state="sessionStarted")
         self.session_type = 'check'
         self._saved_points = {}
+        self._can_distinguish_instr_offset = True
+        if len(self._pip_info_by_id) == 2:
+            self._first_mount = top_types.Mount.LEFT
+            self._second_mount = top_types.Mount.RIGHT
+        else:
+            only_mount = self._pip_info_by_id.keys()[0]['mount']
+            self._first_mount = only_mount
+            self._second_mount = None
+            # if only checking cal with pipette on Right mount we
+            # can't be sure that diffs are due to instrument
+            # offset or deck transform or both
+            if only_mount == top_types.Mount.RIGHT:
+                self._can_distiguish_instr_offset = False
 
     async def _load_tip_rack_objects(self, **kwargs):
         """
@@ -567,29 +580,28 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             parent = self._deck.position_for(lw_data.slot)
             lw = labware.Labware(lw_data.definition, parent)
             self._deck[lw_data.slot] = lw
-            has_two_pips = len(self._relate_mount) == 2
+            has_two_pips = len(self._pip_info_by_id) == 2
 
             for index, id in enumerate(lw_data.forPipettes):
                 mount = self._get_mount(id)
-                is_left_mount = mount == top_types.Mount.LEFT
-                is_second_pip = has_two_pips and is_left_mount
-                is_second_pip_for_rack = is_second_pip and \
-                                         len(lw.data.forPipettes) == 2
+                is_second_mount = mount == self._second_mount
                 pip = self.get_pipette(mount)
-                well_name = 'B1' if is_second_pip_for_rack else 'A1'
+                pips_share_rack = len(lw.data.forPipettes) == 2
+                well_name = 'A1'
+                if is_second_mount and pips_share_rack:
+                    well_name = 'B1'
                 well = lw.wells_by_name()[well_name]
-                move = PreparingPipetteMoveOffset(
-                    offset=MOVE_TO_TIP_RACK_SAFETY_BUFFER, well=well
-                )
+                position = well.top().point + MOVE_TO_TIP_RACK_SAFETY_BUFFER
+                move = CheckMove(position=position, locationId=uuid4())
 
-                if is_second_pip:
+                if is_second_mount:
                     self._moves.preparingSecondPipette = move
                 else:
                     self._moves.preparingFirstPipette = move
 
 
     async def delete_session(self):
-        for mount in self._relate_mount.values():
+        for mount in self._pip_info_by_id.values():
             try:
                 await self._return_tip(mount['mount'])
             except (TipAttachError, AssertionError):
@@ -597,21 +609,23 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    def _get_pipette_point_at_state(self,
-                                    pipette_id: UUID,
-                                    state_name: CalibrationCheckState):
-        return self._saved_points[f'{state_name}_{pipette_id}']
-
-    async def _is_tip_pick_up_dangerous(self, pipette_id: UUID, **kwargs):
+    async def _is_tip_pick_up_dangerous(self):
         """
         Function to determine whether jogged to pick up tip position is
         outside of the safe threshold for conducting the rest of the check.
         """
-        mount = self._get_mount(pipette_id)
+        if self.current_state_name == \
+                CalibrationCheckState.preparingFirstPipette:
+            mount = self._first_mount
+        elif self.current_state_name == \
+                CalibrationCheckState.preparingSecondPipette:
+            mount = self._second_mount
+        assert mount, f'cannot check if tip pick up dangerous from state:' \
+                      f' {self.current_state_name}'
+
         current_pt = await self.hardware.gantry_position(mount)
-        prev_pt = self._get_pipette_point_at_state(
-                        pipette_id=pipette_id,
-                        state_name=CalibrationCheckState.preparingPipette)
+
+        prev_pt = self._saved_points[self.current_state_name]
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
         if self.get_pipette(mount)['model'].startswith('p1000'):
@@ -627,7 +641,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         """
         if self._has_tip(pipette_id):
             raise TipAttachError()
-        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
+        tiprack_id = self._pip_info_by_id[pipette_id]['tiprack_id']
         mount = self._get_mount(pipette_id)
         await self._pick_up_tip(mount, tiprack_id)
 
@@ -639,7 +653,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
 
     async def _return_all_tips(self):
-        for pipette_id in self._relate_mount.keys():
+        for pipette_id in self._pip_info_by_id.keys():
             await _return_tip_for_pipette(pipette_id)
 
     async def _return_tip_for_pipette(self, pipette_id: UUID):
@@ -665,7 +679,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             new_dict = self._create_tiprack_param(position)
         else:
             new_dict = {}
-            for _id in self._relate_mount.keys():
+            for _id in self._pip_info_by_id.keys():
                 pos_dict = {'position': list(position['position']),
                             'locationId': str(position['locationId'])}
                 _id_str = str(_id)
@@ -675,7 +689,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     def _format_other_params(self, template: typing.Dict) -> typing.Dict:
         new_dict = {}
-        for id in self._relate_mount.keys():
+        for id in self._pip_info_by_id.keys():
             blank = template.copy()
             blank.update(pipetteId=str(id))
             new_dict[str(id)] = blank
@@ -693,52 +707,63 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             new_dict = self._format_other_params(template_dict)
         return new_dict
 
-    async def _register_current_point(self, pipette_id: UUID, **kwargs):
-        self._saved_points[f'{self.current_state_name}_{pipette_id}'] = \
-            await self.hardware.gantry_position(self._get_mount(pipette_id))
+    async def _register_point_first_pipette(self):
+        self._saved_points[self.current_state_name] = \
+            await self.hardware.gantry_position(self._first_mount)
 
-    async def _move_pipette_to_tip_rack(self, pipette_id: UUID):
-        tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
-        moves_for_step = self._moves[self.current_state_name]
-        single_location = moves_for_step[tiprack_id]
-        offset = single_location[pipette_id].offset
-        loc_to_move = single_location[pipette_id].well
-        pt, well = loc_to_move.top()
-        updated_pt = pt + offset
-        await self._move(pipette_id, Location(updated_pt, well))
+    async def _register_point_second_pipette(self):
+        self._saved_points[self.current_state_name] = \
+            await self.hardware.gantry_position(self._second_mount)
 
+    # TODO: reduce boiler plate and base move callbacks off of current state?
+    async def _move_first_pipette_to_tip_rack(self):
+        await self._move(pipette_id,
+                         Location(self._moves.preparingFirstPipette.position),
+                                  None))
 
-    async def _move_to_check_point_one(self, pipette_id: UUID):
+    async def _move_first_pipette_to_check_height(self):
+        await self._move(pipette_id,
+                         Location(self._moves.joggingFirstPipetteToHeight.position,
+                                  None))
+
+    async def _move_first_pipette_to_check_point_one(self):
         await self._move(pipette_id,
                          Location(self._moves.joggingFirstPipetteToPointOne.position,
                                   None))
 
-    async def _move_to_check_point_two(self, pipette_id: UUID):
+    async def _move_first_pipette_to_check_point_two(self):
         await self._move(pipette_id,
-                         Location(self._moves.joggingToPointTwo.position,
+                         Location(self._moves.joggingFirstPipetteToPointTwo.position,
                                   None))
 
-    async def _move_to_check_point_three(self, pipette_id: UUID):
+    async def _move_first_pipette_to_check_point_three(self):
         await self._move(pipette_id,
-                         Location(self._moves.joggingToPointThree.position,
+                         Location(self._moves.joggingFirstPipetteToPointThree.position,
                                   None))
 
-    async def _move_to_check_height(self, pipette_id: UUID):
+    async def _move_second_pipette_to_tip_rack(self):
         await self._move(pipette_id,
-                         Location(self._moves.joggingToHeight.position,
+                         Location(self._moves.preparingSecondPipette.position),
+                                  None))
+
+    async def _move_second_pipette_to_check_height(self):
+        await self._move(pipette_id,
+                         Location(self._moves.joggingSecondPipetteToHeight.position,
+                                  None))
+
+    async def _move_second_pipette_to_check_point_one(self):
+        await self._move(pipette_id,
+                         Location(self._moves.joggingSecondPipetteToPointOne.position,
                                   None))
 
     async def _move(self,
-                    pipette_id: UUID,
-                    request_position: Location):
-
-        # determine current location
-        mount = self._get_mount(pipette_id)
+                    mount: top_types.Mount,
+                    to_loc: Location):
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
 
         max_height = self.hardware.get_instrument_max_height(mount)
-        moves = geometry.plan_moves(from_loc, request_position,
+        moves = geometry.plan_moves(from_loc, to_loc,
                                     self._deck, max_height)
         for move in moves:
             await self.hardware.move_to(mount, move[0], move[1])
