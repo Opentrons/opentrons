@@ -241,7 +241,7 @@ class TempDeck(mod_abc.AbstractModule):
                                     "Please contact Opentrons Support.")
 
         if self._poller:
-            self.poller.stop()
+            self._poller.stop()
             self._poller.join()
         del self._poller
         self._poller = None
