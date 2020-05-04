@@ -11,10 +11,10 @@ import {
   SPAN7_8_10_11_SLOT,
   TC_SPAN_SLOTS,
   GEN_ONE_MULTI_PIPETTES,
-} from '../constants'
+} from '../../constants'
 import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../types'
-import type { LabwareDefByDefURI } from '../labware-defs'
+import type { DeckSlot } from '../../types'
+import type { LabwareDefByDefURI } from '../../labware-defs'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,
@@ -25,7 +25,9 @@ import type {
   FormPipettesByMount,
   FormPipette,
   LabwareOnDeck as LabwareOnDeckType,
-} from './types'
+} from '../types'
+
+export { createPresavedStepForm } from './createPresavedStepForm'
 
 export function getIdsInRange<T: string | number>(
   orderedIds: Array<T>,
