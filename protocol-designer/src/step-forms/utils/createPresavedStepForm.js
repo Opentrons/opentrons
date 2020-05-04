@@ -121,7 +121,7 @@ const _patchTemperatureModuleId = (args: {|
   orderedStepIds: OrderedStepIdsState,
   savedStepForms: SavedStepFormState,
   stepType: StepType,
-|}): FormUpdater => formData => {
+|}): FormUpdater => () => {
   const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
 
   const hasTemperatureModuleId =
