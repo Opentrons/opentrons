@@ -29,7 +29,7 @@ init:
 platform: x64
 
 cache:
-  # - "%LOCALAPPDATA%\\Yarn"
+  - "%LOCALAPPDATA%\\Yarn"
 
 install:
   # read node version from the first line of .nvmrc
