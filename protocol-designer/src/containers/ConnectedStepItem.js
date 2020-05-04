@@ -1,13 +1,13 @@
 // @flow
 import * as React from 'react'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
-import type { BaseState, ThunkDispatch } from '../types'
 
-import type { SubstepIdentifier } from '../steplist/types'
+import { selectors as uiLabwareSelectors } from '../ui/labware'
 import * as substepSelectors from '../top-selectors/substeps'
 import * as timelineWarningSelectors from '../top-selectors/timelineWarnings'
+import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
 import { selectors as dismissSelectors } from '../dismiss'
 import {
   selectors as stepFormSelectors,
@@ -21,102 +21,123 @@ import {
   actions as stepsActions,
 } from '../ui/steps'
 import { selectors as fileDataSelectors } from '../file-data'
-import { selectors as labwareIngredSelectors } from '../labware-ingred/selectors'
-import { selectors as uiLabwareSelectors } from '../ui/labware'
-import { StepItem } from '../components/steplist/StepItem' // TODO Ian 2018-05-10 why is importing StepItem from index.js not working?
 
-type Props = React.ElementProps<typeof StepItem>
+import { StepItem, StepItemContents } from '../components/steplist/StepItem'
+import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
+import { useConditionalConfirm } from '../components/useConditionalConfirm'
 
-type OP = {|
-  stepId: $PropertyType<Props, 'stepId'>,
-  stepNumber: $PropertyType<Props, 'stepNumber'>,
+import type { SubstepIdentifier } from '../steplist/types'
+import type { StepIdType } from '../form-types'
+
+type Props = {|
+  stepId: StepIdType,
+  stepNumber: number,
+  onStepContextMenu?: () => mixed,
 |}
 
-type SP = {|
-  stepType: $PropertyType<Props, 'stepType'>,
-  title: $PropertyType<Props, 'title'>,
-  description: $PropertyType<Props, 'description'>,
-  rawForm: $PropertyType<Props, 'rawForm'>,
-  substeps: $PropertyType<Props, 'substeps'>,
-  collapsed: $PropertyType<Props, 'collapsed'>,
-  error: $PropertyType<Props, 'error'>,
-  warning: $PropertyType<Props, 'warning'>,
-  selected: $PropertyType<Props, 'selected'>,
-  hovered: $PropertyType<Props, 'hovered'>,
-  hoveredSubstep: $PropertyType<Props, 'hoveredSubstep'>,
-  labwareNicknamesById: $PropertyType<Props, 'labwareNicknamesById'>,
-  labwareDefDisplayNamesById: $PropertyType<
-    Props,
-    'labwareDefDisplayNamesById'
-  >,
-  ingredNames: $PropertyType<Props, 'ingredNames'>,
-|}
+export const ConnectedStepItem = (props: Props) => {
+  const { stepId, stepNumber } = props
 
-type DP = $Diff<$Diff<$Exact<Props>, SP>, OP>
+  const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]
+  const argsAndErrors = useSelector(stepFormSelectors.getArgsAndErrorsByStepId)[
+    stepId
+  ]
+  const errorStepId = useSelector(fileDataSelectors.getErrorStepId)
+  const hasError = errorStepId === stepId || argsAndErrors.errors !== undefined
+  const hasTimelineWarningsPerStep = useSelector(
+    timelineWarningSelectors.getHasTimelineWarningsPerStep
+  )
+  const hasFormLevelWarningsPerStep = useSelector(
+    dismissSelectors.getHasFormLevelWarningsPerStep
+  )
 
-const makeMapStateToProps: () => (BaseState, OP) => SP = () => {
-  const getArgsAndErrors = stepFormSelectors.makeGetArgsAndErrorsWithId()
-  const getStep = stepFormSelectors.makeGetStepWithId()
+  const hasWarnings =
+    hasTimelineWarningsPerStep[stepId] || hasFormLevelWarningsPerStep[stepId]
 
-  return (state, ownProps) => {
-    const { stepId } = ownProps
+  const collapsed = useSelector(getCollapsedSteps)[stepId]
+  const hoveredSubstep = useSelector(getHoveredSubstep)
+  const hoveredStep = useSelector(getHoveredStepId)
+  const selected = useSelector(getSelectedStepId) === stepId
 
-    const argsAndErrors = getArgsAndErrors(state, { stepId })
-    const step = getStep(state, { stepId })
+  const substeps = useSelector(substepSelectors.allSubsteps)[stepId]
 
-    const hasError =
-      fileDataSelectors.getErrorStepId(state) === stepId ||
-      argsAndErrors.errors !== undefined
+  const ingredNames = useSelector(labwareIngredSelectors.getLiquidNamesById)
+  const labwareNicknamesById = useSelector(
+    uiLabwareSelectors.getLabwareNicknamesById
+  )
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const currentFormIsPresaved = useSelector(
+    stepFormSelectors.getCurrentFormIsPresaved
+  )
+  const labwareDefDisplayNamesById = mapValues(
+    labwareEntities,
+    (l: LabwareEntity) => getLabwareDisplayName(l.def)
+  )
 
-    const hasWarnings =
-      timelineWarningSelectors.getHasTimelineWarningsPerStep(state)[stepId] ||
-      dismissSelectors.getHasFormLevelWarningsPerStep(state)[stepId]
+  // Actions
+  const dispatch = useDispatch()
 
-    const collapsed = getCollapsedSteps(state)[stepId]
+  const highlightSubstep = (payload: SubstepIdentifier) =>
+    dispatch(stepsActions.hoverOnSubstep(payload))
+  const selectStep = () => dispatch(stepsActions.selectStep(stepId))
+  const toggleStepCollapsed = () =>
+    dispatch(stepsActions.toggleStepCollapsed(stepId))
+  const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
+  const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-    const hoveredSubstep = getHoveredSubstep(state)
-    const hoveredStep = getHoveredStepId(state)
-    const selected = getSelectedStepId(state) === stepId
+  // step selection is gated when requiresConfirmation is true
+  const {
+    conditionalContinue,
+    requiresConfirmation,
+    confirmAndContinue,
+    cancelConfirm,
+  } = useConditionalConfirm(selectStep, currentFormIsPresaved)
 
-    return {
-      stepType: step.stepType,
-      title: step.title,
-      description: step.description,
-      rawForm: step.formData,
-      substeps: substepSelectors.allSubsteps(state)[stepId],
-      hoveredSubstep,
-      collapsed,
-      selected,
-      error: hasError,
-      warning: hasWarnings,
+  const stepItemProps = {
+    description: step.stepDetails,
+    rawForm: step,
+    stepNumber,
+    stepType: step.stepType,
+    title: step.stepName,
 
-      // no double-highlighting: whole step is only "hovered" when
-      // user is not hovering on substep.
-      hovered: hoveredStep === stepId && !hoveredSubstep,
+    collapsed,
+    error: hasError,
+    warning: hasWarnings,
+    selected,
+    // no double-highlighting: whole step is only "hovered" when
+    // user is not hovering on substep.
+    hovered: hoveredStep === stepId && !hoveredSubstep,
 
-      labwareNicknamesById: uiLabwareSelectors.getLabwareNicknamesById(state),
-      labwareDefDisplayNamesById: mapValues(
-        stepFormSelectors.getLabwareEntities(state),
-        (l: LabwareEntity) => getLabwareDisplayName(l.def)
-      ),
-      ingredNames: labwareIngredSelectors.getLiquidNamesById(state),
-    }
+    highlightStep,
+    selectStep: conditionalContinue,
+    toggleStepCollapsed,
+    unhighlightStep,
   }
-}
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
-  return {
-    highlightSubstep: (payload: SubstepIdentifier) =>
-      dispatch(stepsActions.hoverOnSubstep(payload)),
-    selectStep: stepId => dispatch(stepsActions.selectStep(stepId)),
-    toggleStepCollapsed: stepId =>
-      dispatch(stepsActions.toggleStepCollapsed(stepId)),
-    highlightStep: stepId => dispatch(stepsActions.hoverOnStep(stepId)),
-    unhighlightStep: stepId => dispatch(stepsActions.hoverOnStep(null)),
+  const stepItemContentsProps = {
+    rawForm: step,
+    stepType: step.stepType,
+    substeps,
+
+    ingredNames,
+    labwareDefDisplayNamesById,
+    labwareNicknamesById,
+
+    highlightSubstep,
+    hoveredSubstep,
   }
-}
 
-export const ConnectedStepItem = connect<Props, OP, SP, DP, _, _>(
-  makeMapStateToProps,
-  mapDispatchToProps
-)(StepItem)
+  return (
+    <>
+      {requiresConfirmation && (
+        <ConfirmDeleteStepModal
+          onContinueClick={confirmAndContinue}
+          onCancelClick={cancelConfirm}
+        />
+      )}
+      <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>
+        <StepItemContents {...stepItemContentsProps} />
+      </StepItem>
+    </>
+  )
+}

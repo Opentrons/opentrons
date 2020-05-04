@@ -5,7 +5,7 @@ import * as _thunks from './actions/thunks'
 export { rootReducer } from './reducers'
 export {
   rootSelector,
-  getSelectedStep,
+  getSelectedStepTitleInfo,
   getSelectedStepId,
   getSelectedTerminalItemId,
   getHoveredTerminalItemId,
