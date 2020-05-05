@@ -14,6 +14,7 @@ import { pipettesEpic } from './pipettes/epic'
 import { modulesEpic } from './modules/epic'
 import { networkingEpic } from './networking/epic'
 import { shellEpic } from './shell/epic'
+import { alertsEpic } from './alerts/epic'
 import { systemInfoEpic } from './system-info/epic'
 
 import type { Epic } from './types'
@@ -31,5 +32,6 @@ export const rootEpic: Epic = combineEpics(
   modulesEpic,
   networkingEpic,
   shellEpic,
+  alertsEpic,
   systemInfoEpic
 )

@@ -38,7 +38,7 @@ describe('alerts reducer', () => {
     })
   })
 
-  it('should handle ALERT_IGNORED if alert is already ignored', () => {
+  it('should handle ALERT_DISMISSED if alert is already ignored', () => {
     const state = { active: [], ignored: [MOCK_ALERT_ID] }
     const action = Actions.alertDismissed(MOCK_ALERT_ID)
 
