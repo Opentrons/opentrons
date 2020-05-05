@@ -8,8 +8,7 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import (build_gpio_chardev,
-                                           RevisionPinsError)
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.types import Mount
 
@@ -54,6 +53,7 @@ class Controller:
             handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         try:
+            self._door_watcher = aionotify.Watcher()
             self._module_watcher = aionotify.Watcher()
             self._module_watcher.watch(
                 alias='modules',
@@ -61,8 +61,8 @@ class Controller:
                 flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
         except AttributeError:
             MODULE_LOG.warning(
-                'Failed to initiate aionotify, cannot watch modules,'
-                'likely because not running on linux')
+                'Failed to initiate aionotify, cannot watch modules '
+                'or door, likely because not running on linux')
 
     @property
     def gpio_chardev(self) -> 'GPIODriverLike':
@@ -73,33 +73,20 @@ class Controller:
         return self._board_revision
 
     async def setup_gpio_chardev(self):
-        self._board_revision = self.determine_board_revision()
-        self.gpio_chardev.config_by_board_rev(self._board_revision)
+        self.gpio_chardev.config_by_board_rev()
+        self._board_revision = self.gpio_chardev.board_rev
         await self.gpio_chardev.setup()
 
-    def determine_board_revision(self) -> BoardRevision:
-        try:
-            rev_bits = self.gpio_chardev.read_revision_bits()
-            return BoardRevision.by_bits(rev_bits)
-        except RevisionPinsError:
-            MODULE_LOG.info(
-                'Failed to detect central routing board revision gpio '
-                'pins, board revision is unknown')
-        except Exception:
-            MODULE_LOG.exception(
-                'Unexpected error from reading central routing board '
-                'revision bits')
-        return BoardRevision.UNKNOWN
-
-    async def monitor_door_switch_state(self, api):
+    async def monitor_door_switch_state(
+            self, api_door_state: DoorState):
         while True:
             await asyncio.sleep(0.5)
-            state = self.gpio_chardev.read_window_switches()
-            if api._door_state.value != state:
-                api._door_state = DoorState.by_bool(state)
+            state = DoorState.by_bool(
+                self.gpio_chardev.read_window_switches())
+            if api_door_state != state:
+                api_door_state = state
                 MODULE_LOG.info(
-                    f'Updating the window switch status: {api._door_state}')
-                # TODO: pause protocol if it's running
+                    f'Updating the window switch status: {api_door_state}')
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()

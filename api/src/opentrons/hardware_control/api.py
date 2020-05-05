@@ -140,7 +140,8 @@ class API(HardwareAPILike):
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
             checked_loop.create_task(
-                backend.monitor_door_switch_state(api_instance))
+                backend.monitor_door_switch_state(
+                    api_door_state=api_instance.door_state))
             return api_instance
         finally:
             blink_task.cancel()

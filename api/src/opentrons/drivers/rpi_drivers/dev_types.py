@@ -1,5 +1,7 @@
 from typing import Dict, Tuple
 from typing_extensions import Protocol
+from opentrons.hardware_control.types import BoardRevision
+from .types import OutputPins
 
 
 class GPIODriverLike(Protocol):
@@ -13,19 +15,27 @@ class GPIODriverLike(Protocol):
         ...
 
     @property
-    def lines(self) -> Dict[int, str]:
+    def lines(self) -> Dict[str, int]:
+        ...
+
+    @property
+    def board_rev(self) -> BoardRevision:
+        ...
+
+    @board_rev.setter
+    def board_rev(self, boardrev: BoardRevision):
         ...
 
     async def setup(self):
         ...
 
-    def config_by_board_rev(self, BoardRevision):
+    def config_by_board_rev(self):
         ...
 
-    def set_high(self, offset: int):
+    def set_high(self, output_pin: OutputPins):
         ...
 
-    def set_low(self, offset: int):
+    def set_low(self, output_pin: OutputPins):
         ...
 
     def set_button_light(self,
@@ -58,8 +68,14 @@ class GPIODriverLike(Protocol):
     def read_window_switches(self) -> bool:
         ...
 
+    def read_top_window_switch(self) -> bool:
+        ...
+
+    def read_front_door_switch(self) -> bool:
+        ...
+
     def read_revision_bits(self) -> Tuple[bool, bool]:
         ...
 
-    def release_line(self, offset: int):
-        ...
+    # def release_line(self, gpio_pins: GPIOPins):
+    #     ...

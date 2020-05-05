@@ -72,9 +72,9 @@ async def initialize_robot() -> ThreadManager:
 
     async def blink():
         while True:
-            await hardware.set_lights(button=True)
+            hardware.set_lights(button=True)
             await asyncio.sleep(0.5)
-            await hardware.set_lights(button=False)
+            hardware.set_lights(button=False)
             await asyncio.sleep(0.5)
 
     blink_task = loop.create_task(blink())
