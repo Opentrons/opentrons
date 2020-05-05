@@ -1,12 +1,12 @@
 // @flow
 
 import typeof {
-  ALERT_U2E_DRIVER_OUTDATTED,
+  ALERT_U2E_DRIVER_OUTDATED,
   ALERT_TRIGGERED,
   ALERT_DISMISSED,
 } from './constants.js'
 
-export type AlertId = ALERT_U2E_DRIVER_OUTDATTED
+export type AlertId = ALERT_U2E_DRIVER_OUTDATED
 
 export type AlertTriggeredAction = {|
   type: ALERT_TRIGGERED,

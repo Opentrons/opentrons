@@ -8,12 +8,12 @@ import { alertsEpic } from '../epic'
 import type { State } from '../../types'
 import type { Config } from '../../config/types'
 import type { AlertId } from '../types'
+
 jest.mock('../../config/selectors')
 
 const getConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
 
 const MOCK_STATE: State = ({ mockState: true }: any)
-
 const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
 const MOCK_ALERT_2: AlertId = ('mockAlert2': any)
 

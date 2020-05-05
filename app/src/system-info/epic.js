@@ -8,12 +8,13 @@ import { getDriverStatus } from './utils'
 
 import type { Epic } from '../types'
 import type { UsbDevice } from './types'
+
 export const systemInfoEpic: Epic = (_, state$) => {
   return state$.pipe(
     map(getU2EAdapterDevice),
     filter<UsbDevice | null, UsbDevice>(
       d => d !== null && getDriverStatus(d) === OUTDATED
     ),
-    mapTo(Alerts.alertTriggered(Alerts.ALERT_U2E_DRIVER_OUTDATTED))
+    mapTo(Alerts.alertTriggered(Alerts.ALERT_U2E_DRIVER_OUTDATED))
   )
 }

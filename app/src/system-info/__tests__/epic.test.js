@@ -68,7 +68,7 @@ describe('system info epic', () => {
     })
 
     expectOutput('-a', {
-      a: Alerts.alertTriggered(Alerts.ALERT_U2E_DRIVER_OUTDATTED),
+      a: Alerts.alertTriggered(Alerts.ALERT_U2E_DRIVER_OUTDATED),
     })
   })
 })

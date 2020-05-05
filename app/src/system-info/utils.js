@@ -7,6 +7,9 @@ import type { UsbDevice, U2EAnalyticsProps, DriverStatus } from './types'
 
 const RE_REALTEK = /realtek/i
 
+// Driver version 10.38.117.2020, latest for Windows 10 as of 2020-04-12
+// NOTE(mc, 2020-05-05): this will cause false alerts on Windows 7; Realtek's
+// versioning scheme seems to be WindowsVersion.Something.Something.Year
 const REALTEK_UP_TO_DATE_VERSION = [10, 38, 117, 2020]
 
 export const deviceToU2EAnalyticsProps = (

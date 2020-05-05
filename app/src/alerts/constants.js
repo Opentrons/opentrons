@@ -1,7 +1,7 @@
 // @flow
 
 // alert types
-export const ALERT_U2E_DRIVER_OUTDATTED: 'u2eDriverOutdated' =
+export const ALERT_U2E_DRIVER_OUTDATED: 'u2eDriverOutdated' =
   'u2eDriverOutdated'
 
 // action types
