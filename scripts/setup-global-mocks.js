@@ -4,7 +4,6 @@
 jest.mock('electron')
 jest.mock('electron-updater')
 jest.mock('electron-store')
-jest.mock('usb-detection', () => {})
 
 jest.mock('../components/src/deck/getDeckDefinitions')
 jest.mock('../app/src/getLabware')
