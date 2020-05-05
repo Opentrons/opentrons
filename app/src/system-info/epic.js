@@ -1,20 +1,17 @@
 // @flow
-import { map, mapTo, filter } from 'rxjs/operators'
+import { map, mapTo, pairwise, filter } from 'rxjs/operators'
 
 import * as Alerts from '../alerts'
 import { OUTDATED } from './constants'
-import { getU2EAdapterDevice } from './selectors'
-import { getDriverStatus } from './utils'
+import { getU2EWindowsDriverStatus } from './selectors'
 
 import type { Epic } from '../types'
-import type { UsbDevice } from './types'
 
 export const systemInfoEpic: Epic = (_, state$) => {
   return state$.pipe(
-    map(getU2EAdapterDevice),
-    filter<UsbDevice | null, UsbDevice>(
-      d => d !== null && getDriverStatus(d) === OUTDATED
-    ),
+    map(getU2EWindowsDriverStatus),
+    pairwise(),
+    filter(([prev, next]) => next !== prev && next === OUTDATED),
     mapTo(Alerts.alertTriggered(Alerts.ALERT_U2E_DRIVER_OUTDATED))
   )
 }
