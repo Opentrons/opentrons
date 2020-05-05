@@ -28,7 +28,7 @@ class SpecificPipette(BaseModel):
     pipetteId: UUID
 
 
-class JogPosition(SpecificPipette):
+class JogPosition(BaseModel):
     vector: Point = PointField()
 
 

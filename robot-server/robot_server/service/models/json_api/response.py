@@ -1,5 +1,5 @@
 from typing import Generic, TypeVar, Optional, List, \
-    Dict, Any, Type, get_type_hints
+    Dict, Any, Type, get_type_hints, Union
 from pydantic import Field, validator
 from pydantic.generics import GenericModel
 
@@ -37,7 +37,7 @@ class ResponseDataModel(GenericModel, Generic[AttributesT]):
             type=attributes.__class__.__name__)
 
 
-DataT = TypeVar('DataT', bound=ResponseDataModel)
+DataT = TypeVar('DataT', bound=Union[ResponseDataModel, List[ResponseDataModel]])
 MetaT = TypeVar('MetaT')
 
 

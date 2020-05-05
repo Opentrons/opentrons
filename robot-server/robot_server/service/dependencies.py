@@ -42,5 +42,6 @@ async def get_rpc_server() -> RPCServer:
 
 
 @lru_cache(maxsize=1)
-def get_calibration_session_manager() -> CalibrationSessionManager:
+def get_session_manager() -> CalibrationSessionManager:
+    """The single session manager instance"""
     return CalibrationSessionManager()

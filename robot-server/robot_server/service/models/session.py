@@ -1,11 +1,18 @@
 from enum import Enum
 import typing
 
-from opentrons.server.endpoints.calibration.models import JogPosition,\
-    SpecificPipette
+from pydantic import BaseModel, Field, validator
+from opentrons.server.endpoints.calibration import \
+    models as calibration_models
 from opentrons.server.endpoints.calibration.session import \
     CalibrationCheckTrigger
-from pydantic import BaseModel, Field, validator
+from robot_server.service.models.json_api.response import ResponseDataModel,\
+    ResponseModel
+from robot_server.service.models.json_api.request import RequestDataModel,\
+    RequestModel
+
+
+SessionDetails = typing.Union[calibration_models.CalibrationSessionStatus]
 
 
 class SessionCommands(str, Enum):
@@ -13,21 +20,21 @@ class SessionCommands(str, Enum):
     load_labware =\
         (CalibrationCheckTrigger.load_labware.value, None)
     prepare_pipette =\
-        (CalibrationCheckTrigger.prepare_pipette.value, SpecificPipette)
+        (CalibrationCheckTrigger.prepare_pipette.value, None)
     jog =\
-        (CalibrationCheckTrigger.jog.value, JogPosition)
+        (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
     pick_up_tip =\
-        (CalibrationCheckTrigger.pick_up_tip.value, SpecificPipette)
+        (CalibrationCheckTrigger.pick_up_tip.value, None)
     confirm_tip_attached = \
-        (CalibrationCheckTrigger.confirm_tip_attached.value, SpecificPipette)
+        (CalibrationCheckTrigger.confirm_tip_attached.value, None)
     invalidate_tip =\
-        (CalibrationCheckTrigger.invalidate_tip.value, SpecificPipette)
+        (CalibrationCheckTrigger.invalidate_tip.value, None)
     confirm_step = \
-        (CalibrationCheckTrigger.confirm_step.value, SpecificPipette)
+        (CalibrationCheckTrigger.confirm_step.value, None)
     exit = \
-        (CalibrationCheckTrigger.exit.value, SpecificPipette)
+        (CalibrationCheckTrigger.exit.value, None)
     reject_calibration = \
-        (CalibrationCheckTrigger.reject_calibration.value, SpecificPipette)
+        (CalibrationCheckTrigger.reject_calibration.value, None)
 
     def __new__(cls, value, model):
         """Create a string enum with the expected model"""
@@ -41,21 +48,22 @@ class SessionCommands(str, Enum):
         return self._model
 
 
-SessionCommandTypes = typing.Union[None, JogPosition, SpecificPipette]
+SessionCommandTypes = typing.Union[
+    None,
+    calibration_models.JogPosition,
+]
 
 
-class SessionType(str, Enum):
-    calibration_check = "calibration_check"
-    deck_calibration = "deck_calibration"
-    protocol = "protocol"
-
-
-class Session(BaseModel):
-    """Description of session"""
-    session_type: SessionType =\
+class BasicSession(BaseModel):
+    """Minimal session description"""
+    session_type: calibration_models.SessionType =\
         Field(..., description="The type of the session")
-    session_id: str = \
-        Field(..., description="The unique identifier the session")
+
+
+class Session(BasicSession):
+    """Full description of session"""
+    details: SessionDetails =\
+        Field(..., description="Detailed session specific status")
 
 
 class SessionCommand(BaseModel):
@@ -69,7 +77,27 @@ class SessionCommand(BaseModel):
     def check_data_type(cls, v, values):
         """Validate that the command and data match"""
         d = values.get('data')
-        if v.model != d:
+        if not isinstance(d, v.model):
             raise ValueError(f"Invalid command data for command type {v}. "
                              f"Expecting {v.model}")
         return v
+
+
+# Session create and query requests/responses
+SessionCreateRequest = RequestModel[
+    RequestDataModel[BasicSession]
+]
+SessionResponse = ResponseModel[
+    ResponseDataModel[Session], dict
+]
+MultiSessionResponse = ResponseModel[
+    typing.List[ResponseDataModel[Session]], dict
+]
+
+# Session command requests/responses
+CommandRequest = RequestModel[
+    RequestDataModel[SessionCommand]
+]
+CommandResponse = ResponseModel[
+    ResponseDataModel[SessionCommand], Session
+]
