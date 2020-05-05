@@ -65,7 +65,7 @@
     },
 
     "slot": {
-      "description": "Slot on the deck of an OT-2 robot if 1-12. Else, a module ID",
+      "description": "string '1'-'12', or special string 'span7_8_10_11' signify it's a slot on the OT-2 deck. If it's a UUID, it's the slot on the module referenced by that ID.",
       "type": "string"
     }
   },
