@@ -120,13 +120,9 @@ class CalibrationSession:
     def _key_by_uuid(new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
         for mount, data in new_pipettes.items():
-            # TODO: Adding in error state is out of scope for this PR.
-            # This is to ensure during testing that two pipettes are
-            # attached -- for now.
-            assert data, "Please attach pipettes before proceeding"
-
-            token = uuid4()
-            pipette_dict[token] = {'mount': mount, 'tiprack_id': None}
+            if data:
+                pipette_id = uuid4()
+                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -594,13 +590,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             self._first_mount = Mount.LEFT
             self._second_mount = Mount.RIGHT
         else:
-            only_mount = self._pip_info_by_id.keys()[0]['mount']
-            self._first_mount = only_mount
+            only_id, only_info = next(iter(self._pip_info_by_id.items()))
+            self._first_mount = only_info['mount']
             self._second_mount = None
             # if only checking cal with pipette on Right mount we
             # can't be sure that diffs are due to instrument
             # offset or deck transform or both
-            if only_mount == Mount.RIGHT:
+            if self._first_mount == Mount.RIGHT:
                 self._can_distiguish_instr_offset = False
 
     async def _is_checking_both_mounts(self):
