@@ -39,6 +39,7 @@ describe('CheckHeight', () => {
         )[0],
         robotName = mockRobot.name,
         isMulti = false,
+        isInspecting = false,
         mountProp = 'left',
       } = props
       return mount(
@@ -46,6 +47,7 @@ describe('CheckHeight', () => {
           pipetteId={pipetteId}
           robotName={robotName}
           isMulti={isMulti}
+          isInspecting={isInspecting}
           mount={mountProp}
         />,
         {

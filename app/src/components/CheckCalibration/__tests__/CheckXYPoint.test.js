@@ -3,6 +3,7 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
+import type { Mount } from '@opentrons/components'
 import {
   mockRobotCalibrationCheckSessionData,
   mockRobot,
@@ -32,23 +33,25 @@ describe('CheckXYPoint', () => {
       dispatch: jest.fn(),
     }
 
-    render = (props = {}) => {
+    render = (props: $Shape<React.ElementProps<typeof CheckXYPoint>> = {}) => {
       const {
         pipetteId = Object.keys(
           mockRobotCalibrationCheckSessionData.instruments
         )[0],
         robotName = mockRobot.name,
-        xyStepIndex = 0,
+        slotNumber = '1',
         isMulti = false,
-        mountProp = 'left',
+        mount: mountProp = 'left',
+        isInspecting = false,
       } = props
       return mount(
         <CheckXYPoint
           pipetteId={pipetteId}
           robotName={robotName}
-          xyStepIndex={xyStepIndex}
+          slotNumber={slotNumber}
           isMulti={isMulti}
           mount={mountProp}
+          isInspecting={isInspecting}
         />,
         {
           wrappingComponent: Provider,
@@ -74,8 +77,8 @@ describe('CheckXYPoint', () => {
     const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
     const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
     const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const assetMap = [
-      {
+    const assetMap: { [string]: { [Mount]: {} } } = {
+      '1': {
         left: {
           multi: slot1LeftMultiSrc,
           single: slot1LeftSingleSrc,
@@ -85,7 +88,7 @@ describe('CheckXYPoint', () => {
           single: slot1RightSingleSrc,
         },
       },
-      {
+      '3': {
         left: {
           multi: slot3LeftMultiSrc,
           single: slot3LeftSingleSrc,
@@ -95,7 +98,7 @@ describe('CheckXYPoint', () => {
           single: slot3RightSingleSrc,
         },
       },
-      {
+      '7': {
         left: {
           multi: slot7LeftMultiSrc,
           single: slot7LeftSingleSrc,
@@ -105,14 +108,15 @@ describe('CheckXYPoint', () => {
           single: slot7RightSingleSrc,
         },
       },
-    ]
-    assetMap.forEach((xyStep, index) => {
+    }
+    Object.keys(assetMap).forEach(slotNumber => {
+      const xyStep = assetMap[slotNumber]
       Object.keys(xyStep).forEach(mountString => {
         Object.keys(xyStep[mountString]).forEach(channelString => {
           const wrapper = render({
-            mountProp: mountString,
+            mount: mountString,
             isMulti: channelString === 'multi',
-            xyStepIndex: index,
+            slotNumber: slotNumber,
           })
           expect(getVideo(wrapper).prop('src')).toEqual(
             xyStep[mountString][channelString]

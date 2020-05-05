@@ -139,7 +139,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
     case CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
     case CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      const slotNumber: { [RobotCalibrationCheckStep]: string } = {
+      // $FlowFixMe(BC, 2020-05-05): flow doesn't understand switch case
+      const slotNumber: string = {
         [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE]: '1',
         [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: '1',
         [CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE]: '1',
