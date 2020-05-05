@@ -551,7 +551,35 @@ CHECK_TRANSITIONS = [
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5,5,5)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(10,10,10)
+OK_HEIGHT_VECTOR = Point(5,5,5)
+OK_XY_VECTOR = Point(5,5,5)
 
+COMPARISON_STATE_MAP = {
+    CalibrationCheckState.comparingFirstPipetteHeight: {
+        'reference_state': CalibrationCheckState.joggingFirstPipetteToHeight,
+        'threshold_vector': OK_HEIGHT_VECTOR,
+    },
+    CalibrationCheckState.comparingFirstPipettePointOne: {
+        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointOne,
+        'threshold_vector': OK_XY_VECTOR,
+    },
+    CalibrationCheckState.comparingFirstPipettePointTwo: {
+        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        'threshold_vector': OK_XY_VECTOR,
+    },
+    CalibrationCheckState.comparingFirstPipettePointThree: {
+        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointThree,
+        'threshold_vector': OK_XY_VECTOR,
+    },
+    CalibrationCheckState.comparingSecondPipetteHeight: {
+        'reference_state': CalibrationCheckState.joggingSecondPipetteToHeight,
+        'threshold_vector': OK_HEIGHT_VECTOR,
+    },
+    CalibrationCheckState.comparingSecondPipettePointOne: {
+        'reference_state': CalibrationCheckState.joggingSecondPipetteToPointOne,
+        'threshold_vector': OK_XY_VECTOR,
+    },
+}
 
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
@@ -615,6 +643,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
+    def _is_jogged_point_dangerous(self,
+                                   ref_pt: Point,
+                                   jogged_pt: Point,
+                                   threshold_vector: Point):
+        absolute_diff_vector = abs(ref_pt - jogged_pt)
+        return absolute_diff_vector > threshold_vector
+
     async def _is_tip_pick_up_dangerous(self):
         """
         Function to determine whether jogged to pick up tip position is
@@ -631,13 +666,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
         current_pt = await self.hardware.gantry_position(mount)
 
-        prev_pt = self._saved_points[self.current_state_name]
+        ref_pt = self._saved_points[self.current_state_name]
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
         if self.get_pipette(mount)['model'].startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
-        absolute_diff_vector = abs(current_pt - prev_pt)
-        return absolute_diff_vector > threshold_vector
+        absolute_diff_vector = abs(current_pt - ref_pt)
+        return self._is_jogged_point_dangerous(ref_pt, current_pt,
+                                               threshold_vector)
 
     async def _pick_up_pipette_tip(self):
         """
@@ -673,39 +709,24 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                          'location': pos_dict}
         return new_dict
 
-    def _format_move_params(
-            self, position: typing.Dict, next_state: str) -> typing.Dict:
-        if next_state == 'moveToTipRack':
-            new_dict = self._create_tiprack_param(position)
-        else:
-            new_dict = {}
-            for _id in self._pip_info_by_id.keys():
-                pos_dict = {'position': list(position['position']),
-                            'locationId': str(position['locationId'])}
-                _id_str = str(_id)
-                new_dict[_id_str] = {'location': pos_dict,
-                                     'pipetteId': _id_str}
-        return new_dict
-
-    def _format_other_params(self, template: typing.Dict) -> typing.Dict:
-        new_dict = {}
-        for id in self._pip_info_by_id.keys():
-            blank = template.copy()
-            blank.update(pipetteId=str(id))
-            new_dict[str(id)] = blank
-        return new_dict
-
     def format_params(self, next_state: str) -> typing.Dict:
-        if hasattr(self._moves, next_state):
-            move_dict = getattr(self._moves, next_state)
-            new_dict = self._format_move_params(move_dict, next_state)
-        else:
-            if next_state == 'jog':
-                template_dict = dict(pipetteId=None, vector=[0, 0, 0])
-            else:
-                template_dict = dict(pipetteId=None)
-            new_dict = self._format_other_params(template_dict)
-        return new_dict
+        template_dict = {}
+        if next_state == 'jog':
+            template_dict['vector'] = [0, 0, 0]
+        return template_dict
+
+    def format_comparisons(self) -> typing.Dict:
+        comparisons = {}
+        for jogged_state, comp in COMPARISON_STATE_MAP:
+            ref_pt = self._saved_points.get(comp['reference_state'], None)
+            jogged_pt = self._saved_points.get(jogged_state, None)
+            if (ref_pt is not None and jogged_pt is not None):
+                is_dangerous = self._is_jogged_point_dangerous(
+                        ref_pt=ref_pt,
+                        jogged_pt=jogged_pt,
+                        threshold=comp['threshold'])
+                comparisons[jogged_pt] = is_dangerous
+        return comparisons
 
     async def _register_point_first_pipette(self):
         self._saved_points[self.current_state_name] = \
