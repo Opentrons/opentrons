@@ -71,12 +71,22 @@ class LabwareStatus(BaseModel):
     version: int
 
 
+class ComparisonStatus(BaseModel):
+    """
+    A model describing the comparison of a checked point to calibrated value
+    """
+    differenceVector: Point = PointField()
+    exceedsThreshold: bool
+
+
+
 class CalibrationSessionStatus(BaseModel):
     """
     The current status of a given session.
     """
     instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
+    comparisonsByStep: Dict[str, ComparisonStatus]
     nextSteps: Dict[str, Dict[str, Dict[str, Any]]] =\
         Field(..., description="Next Available Step in Session")
     labware: List[LabwareStatus]
@@ -103,7 +113,13 @@ class CalibrationSessionStatus(BaseModel):
                             "id": None
                         }
                     },
-                    "currentStep": "sessionStart",
+                    "currentStep": "sessionStarted",
+                    "comparisonsByStep": {
+                        "comparingFirstPipetteHeight": {
+                            "differenceVector": [1,0,0],
+                            "exceedsThreshold": False
+                        }
+                    },
                     "nextSteps": {
                         "links": {
                             "loadLabware": {"url": "", "params": {}}

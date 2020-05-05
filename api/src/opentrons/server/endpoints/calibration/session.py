@@ -10,7 +10,7 @@ from opentrons.hardware_control.types import Axis
 
 from .constants import LOOKUP_LABWARE, TipAttachError
 from .util import StateMachine, WILDCARD
-from .models import AttachedPipette
+from .models import AttachedPipette, ComparisonStatus
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -643,13 +643,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    def _is_jogged_point_dangerous(self,
-                                   ref_pt: Point,
-                                   jogged_pt: Point,
-                                   threshold_vector: Point):
-        absolute_diff_vector = abs(ref_pt - jogged_pt)
-        return absolute_diff_vector > threshold_vector
-
     async def _is_tip_pick_up_dangerous(self):
         """
         Function to determine whether jogged to pick up tip position is
@@ -672,8 +665,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if self.get_pipette(mount)['model'].startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
         absolute_diff_vector = abs(current_pt - ref_pt)
-        return self._is_jogged_point_dangerous(ref_pt, current_pt,
-                                               threshold_vector)
+        return absolute_diff_vector > threshold_vector
 
     async def _pick_up_pipette_tip(self):
         """
@@ -715,17 +707,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
-    def format_comparisons(self) -> typing.Dict:
+    def get_comparisons_by_step(self) -> typing.Dict:
         comparisons = {}
-        for jogged_state, comp in COMPARISON_STATE_MAP:
+        for jogged_state, comp in COMPARISON_STATE_MAP.items():
             ref_pt = self._saved_points.get(comp['reference_state'], None)
             jogged_pt = self._saved_points.get(jogged_state, None)
             if (ref_pt is not None and jogged_pt is not None):
-                is_dangerous = self._is_jogged_point_dangerous(
-                        ref_pt=ref_pt,
-                        jogged_pt=jogged_pt,
-                        threshold=comp['threshold'])
-                comparisons[jogged_pt] = is_dangerous
+
+                absolute_diff_vector = abs(ref_pt - jogged_pt)
+                exceeds = absolute_diff_vector > comp['threshold_vector']
+                comparisons[jogged_state] = ComparisonStatus(
+                        differenceVector=absolute_diff_vector,
+                        exceedsThreshold=exceeds)
         return comparisons
 
     async def _register_point_first_pipette(self):

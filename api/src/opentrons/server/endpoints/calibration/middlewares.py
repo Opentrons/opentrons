@@ -80,10 +80,12 @@ def status_response(
     links = _format_links(session, potential_triggers, request.app.router)
 
     lw_status = session.labware_status.values()
+    comparisons_by_step = session.get_comparisons_by_step()
 
     sess_status = CalibrationSessionStatus(
         instruments=session.pipette_status,
         currentStep=current_state,
+        comparisonsByStep=comparisons_by_step,
         nextSteps=links,
         labware=[LabwareStatus(**data) for data in lw_status])
     return web.json_response(text=sess_status.json(), status=response.status)
