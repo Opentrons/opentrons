@@ -17,26 +17,18 @@ SessionDetails = typing.Union[calibration_models.CalibrationSessionStatus]
 
 class SessionCommands(str, Enum):
     """The available session commands"""
-    load_labware =\
-        (CalibrationCheckTrigger.load_labware.value, None)
-    prepare_pipette =\
-        (CalibrationCheckTrigger.prepare_pipette.value, None)
+    load_labware = CalibrationCheckTrigger.load_labware.value
+    prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
     jog =\
         (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
-    pick_up_tip =\
-        (CalibrationCheckTrigger.pick_up_tip.value, None)
-    confirm_tip_attached = \
-        (CalibrationCheckTrigger.confirm_tip_attached.value, None)
-    invalidate_tip =\
-        (CalibrationCheckTrigger.invalidate_tip.value, None)
-    confirm_step = \
-        (CalibrationCheckTrigger.confirm_step.value, None)
-    exit = \
-        (CalibrationCheckTrigger.exit.value, None)
-    reject_calibration = \
-        (CalibrationCheckTrigger.reject_calibration.value, None)
+    pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
+    confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
+    invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
+    confirm_step = CalibrationCheckTrigger.confirm_step.value
+    exit = CalibrationCheckTrigger.exit.value
+    reject_calibration = CalibrationCheckTrigger.reject_calibration.value
 
-    def __new__(cls, value, model):
+    def __new__(cls, value, model=type(None)):
         """Create a string enum with the expected model"""
         obj = str.__new__(cls, value)
         obj._value_ = value

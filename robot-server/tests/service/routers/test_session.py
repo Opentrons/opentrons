@@ -1,6 +1,7 @@
 import pytest
 from unittest.mock import MagicMock, PropertyMock, patch
 
+import typing
 from pydantic.main import BaseModel
 
 from opentrons.server.endpoints.calibration.session \
@@ -221,14 +222,14 @@ def test_get_sessions(api_client, session_manager_with_session):
     assert response.status_code == 200
 
 
-def command(command_type: str, body: BaseModel):
+def command(command_type: str, body: typing.Optional[BaseModel]):
     """Helper to create command"""
     return {
         "data": {
-            "type": body.__class__.__name__,
+            "type": "SessionCommand",
             "attributes": {
                 "command": command_type,
-                "data": body.dict(exclude_unset=True)
+                "data": body.dict(exclude_unset=True) if body else None
             }
         }
     }
@@ -250,7 +251,6 @@ def test_session_command_create_no_session(api_client):
     assert response.status_code == 404
 
 
-
 def test_session_command_create(api_client,
                                 session_manager_with_session,
                                 mock_cal_session):
@@ -268,6 +268,43 @@ def test_session_command_create(api_client,
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
+                'status': 'accepted'
+            },
+            'type': 'SessionCommand',
+            'id': response.json()['data']['id']
+        },
+        'meta': TYPE_SESSION_ID_CHECK_['attributes'],
+        'links': {
+            'POST': {
+                'href': '/sessions/check/commands',
+            },
+            'GET': {
+                'href': '/sessions/check',
+            },
+            'DELETE': {
+                'href': '/sessions/check',
+            },
+        }
+    }
+    assert response.status_code == 200
+
+
+def test_session_command_create_no_body(api_client,
+                                        session_manager_with_session,
+                                        mock_cal_session):
+    response = api_client.post(
+        "/sessions/check/commands",
+        json=command("loadLabware", None)
+    )
+
+    mock_cal_session.trigger_transition.assert_called_once_with(
+        trigger="loadLabware")
+
+    assert response.json() == {
+        'data': {
+            'attributes': {
+                'command': 'loadLabware',
+                'data': None,
                 'status': 'accepted'
             },
             'type': 'SessionCommand',
