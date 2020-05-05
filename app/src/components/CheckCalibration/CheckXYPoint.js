@@ -141,7 +141,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
               {JOG_UNTIL}
               <b>&nbsp;{JUST_BARELY}&nbsp;</b>
               {TOUCHING_THE_CROSS}
-              <b>&nbsp;{`${SLOT} ${slotNumber}`}.&nbsp;</b>
+              <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
               {THEN}
               <b>&nbsp;{CHECK_AXES}&nbsp;</b>
               {TO_DETERMINE_MATCH}
