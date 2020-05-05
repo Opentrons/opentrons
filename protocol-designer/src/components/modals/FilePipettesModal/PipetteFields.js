@@ -1,5 +1,6 @@
 // @flow
-import React, { useMemo } from 'react'
+import React from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import {
   DropdownField,
   FormGroup,
@@ -10,13 +11,14 @@ import {
 import { getLabwareDefURI, getLabwareDisplayName } from '@opentrons/shared-data'
 import isEmpty from 'lodash/isEmpty'
 import reduce from 'lodash/reduce'
-
 import { i18n } from '../../../localization'
+import { createCustomTiprackDef } from '../../../labware-defs/actions'
+import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
 import { TiprackDiagram } from './TiprackDiagram'
+
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
-import { getOnlyLatestDefs } from '../../../labware-defs/utils'
 
 import type { FormPipettesByMount } from '../../../step-forms'
 
@@ -68,23 +70,24 @@ export function PipetteFields(props: Props) {
     customTipracksEnabled,
   } = props
 
-  const tiprackOptions = useMemo(() => {
-    const defs = getOnlyLatestDefs()
-    return reduce(
-      defs,
-      (acc, def: $Values<typeof defs>) => {
-        if (def.metadata.displayCategory !== 'tipRack') return acc
-        return [
-          ...acc,
-          {
-            name: getLabwareDisplayName(def),
-            value: getLabwareDefURI(def),
-          },
-        ]
-      },
-      []
-    )
-  }, [])
+  const dispatch = useDispatch()
+
+  const allLabware = useSelector(getLabwareDefsByURI)
+
+  const tiprackOptions = reduce(
+    allLabware,
+    (acc, def: $Values<typeof allLabware>) => {
+      if (def.metadata.displayCategory !== 'tipRack') return acc
+      return [
+        ...acc,
+        {
+          name: getLabwareDisplayName(def),
+          value: getLabwareDefURI(def),
+        },
+      ]
+    },
+    []
+  )
 
   const initialTabIndex = props.initialTabIndex || 1
 
@@ -216,11 +219,12 @@ export function PipetteFields(props: Props) {
         </div>
       ) : (
         <div>
-          <OutlineButton
-            className={styles.upload_custom_btn}
-            onClick={() => console.log('TODO: Open Upload Modal')}
-          >
-            upload custom tip rack
+          <OutlineButton Component="label" className={styles.upload_button}>
+            {i18n.t('button.upload_custom_tip_rack')}
+            <input
+              type="file"
+              onChange={e => dispatch(createCustomTiprackDef(e))}
+            />
           </OutlineButton>
         </div>
       )}

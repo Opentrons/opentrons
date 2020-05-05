@@ -35,7 +35,8 @@
       "EXACT_LABWARE_MATCH": "Duplicate labware definition",
       "LABWARE_NAME_CONFLICT": "Duplicate labware name",
       "ASK_FOR_LABWARE_OVERWRITE": "Duplicate labware name",
-      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware"
+      "USES_STANDARD_NAMESPACE": "Standard (non-custom) Opentrons labware",
+      "ONLY_TIPRACK": "Incompatible file type"
     }
   },
   "new_protocol": {

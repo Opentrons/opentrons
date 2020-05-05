@@ -3,24 +3,37 @@
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { PipetteSelect, DropdownField } from '@opentrons/components'
+import {
+  PipetteSelect,
+  DropdownField,
+  OutlineButton,
+} from '@opentrons/components'
 import fixture_tiprack_300_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_300_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import { actions as labwareDefActions } from '../../../../labware-defs'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields } from '../PipetteFields'
 import { TiprackDiagram } from '../TiprackDiagram'
 import { PipetteDiagram } from '../PipetteDiagram'
 
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
+import type { ThunkAction } from '../../../../types'
 
 jest.mock('../../../../feature-flags/selectors')
+jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils.js')
+jest.mock('../../../../labware-defs/actions')
 jest.mock('../TiprackDiagram')
 
 const getOnlyLatestDefsMock: JestMockFn<
   [],
   LabwareDefByDefURI
 > = getOnlyLatestDefs
+
+const createCustomTiprackDefMock: JestMockFn<
+  [SyntheticInputEvent<HTMLInputElement>],
+  ThunkAction<*>
+> = labwareDefActions.createCustomTiprackDef
 
 describe('PipetteFields', () => {
   const leftPipetteKey = 'pipettesByMount.left'
@@ -170,5 +183,18 @@ describe('PipetteFields', () => {
       rightPipette: rightPipette.pipetteName,
       customTipracksEnabled: false,
     })
+  })
+
+  it('allows the user to upload custom tip racks when custom tipracks FF enabled', () => {
+    props.customTipracksEnabled = true
+    const wrapper = render(props)
+    const uploadButton = wrapper.find(OutlineButton).at(0)
+    expect(uploadButton.text()).toMatch('Upload custom tip rack')
+
+    uploadButton
+      .find('input')
+      .at(0)
+      .simulate('change')
+    expect(createCustomTiprackDefMock).toHaveBeenCalled()
   })
 })

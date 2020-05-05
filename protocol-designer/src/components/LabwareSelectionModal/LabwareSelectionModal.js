@@ -199,12 +199,15 @@ export const LabwareSelectionModal = (props: Props) => {
   const populatedCategories: { [category: string]: boolean } = useMemo(
     () =>
       orderedCategories.reduce(
-        (acc, category) => ({
-          ...acc,
-          [category]: labwareByCategory[category].some(
-            def => !getLabwareDisabled(def)
-          ),
-        }),
+        (acc, category) =>
+          labwareByCategory[category]
+            ? {
+                ...acc,
+                [category]: labwareByCategory[category].some(
+                  def => !getLabwareDisabled(def)
+                ),
+              }
+            : acc,
         {}
       ),
     [labwareByCategory, getLabwareDisabled]
