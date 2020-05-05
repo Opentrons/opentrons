@@ -58,8 +58,7 @@ def attach_pipettes():
     pipette_file_path = os.path.join(
         os.path.expanduser('~'), '.opentrons/pipettes', 'testpipette01.json'
     )
-    pipette_file = open(pipette_file_path, 'w')
-    json.dump(pipette, pipette_file)
-    pipette_file.close()
+    with open(pipette_file_path, 'w') as pipette_file:
+        json.dump(pipette, pipette_file)
     yield
     os.remove(pipette_file_path)
