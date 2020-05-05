@@ -4,35 +4,22 @@ import * as Fixtures from '../__fixtures__'
 import * as Selectors from '../selectors'
 import type { State } from '../../types'
 
-type SelectorSpec = {|
-  should: string,
-  selector: State => mixed,
-  state: $Shape<State>,
-  expected: mixed,
-|}
+describe('robot controls selectors', () => {
+  it('should return null by default with getU2EAdapterDevice', () => {
+    const state: State = ({ systemInfo: { usbDevices: [] } }: $Shape<State>)
 
-const SPECS: Array<SelectorSpec> = [
-  {
-    should: 'return null by default with getU2EAdapterDevice',
-    selector: Selectors.getU2EAdapterDevice,
-    state: { systemInfo: { usbDevices: [] } },
-    expected: null,
-  },
-  {
-    should: 'return a Realtek device with getU2EAdapterDevice',
-    selector: Selectors.getU2EAdapterDevice,
-    state: {
+    expect(Selectors.getU2EAdapterDevice(state)).toBe(null)
+  })
+
+  it('should return a Realtek device with getU2EAdapterDevice', () => {
+    const state: State = ({
       systemInfo: {
         usbDevices: [Fixtures.mockUsbDevice, Fixtures.mockRealtekDevice],
       },
-    },
-    expected: Fixtures.mockRealtekDevice,
-  },
-]
+    }: $Shape<State>)
 
-describe('robot controls selectors', () => {
-  SPECS.forEach(spec => {
-    const { should, selector, state, expected } = spec
-    it(`should ${should}`, () => expect(selector(state)).toEqual(expected))
+    expect(Selectors.getU2EAdapterDevice(state)).toBe(
+      Fixtures.mockRealtekDevice
+    )
   })
 })

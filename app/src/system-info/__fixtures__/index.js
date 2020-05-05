@@ -1,4 +1,5 @@
 // @flow
+import { UP_TO_DATE } from '../constants'
 import type { UsbDevice } from '../types'
 
 export const mockUsbDevice: UsbDevice = {
@@ -36,4 +37,5 @@ export const mockWindowsRealtekDevice: UsbDevice = {
   serialNumber: 'Serial Number',
   deviceAddress: 5,
   windowsDriverVersion: '1.2.3',
+  windowsDriverStatus: UP_TO_DATE,
 }

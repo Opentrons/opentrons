@@ -92,6 +92,10 @@ const DEFAULTS: Config = {
   labware: {
     directory: path.join(app.getPath('userData'), 'labware'),
   },
+
+  alerts: {
+    ignored: [],
+  },
 }
 
 // lazy load store, overrides, and log because of config/log interdependency
