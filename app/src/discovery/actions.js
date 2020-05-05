@@ -15,6 +15,8 @@ export const DISCOVERY_UPDATE_LIST: 'discovery:UPDATE_LIST' =
 
 export const DISCOVERY_REMOVE: 'discovery:REMOVE' = 'discovery:REMOVE'
 
+export const CLEAR_CACHE: 'discovery:CLEAR_CACHE' = 'discovery:CLEAR_CACHE'
+
 export function startDiscovery(
   timeout: number | null = null
 ): StartDiscoveryAction {
@@ -27,6 +29,10 @@ export function startDiscovery(
 
 export function finishDiscovery(): FinishDiscoveryAction {
   return { type: DISCOVERY_FINISH, meta: { shell: true } }
+}
+
+export function clearDiscoveryCache(): ClearDiscoveryCacheAction {
+  return {type: CLEAR_CACHE, meta: { shell: true } }
 }
 
 export function removeRobot(robotName: string): RemoveRobotAction {

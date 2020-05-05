@@ -241,4 +241,19 @@ describe('app-shell/discovery', () => {
 
     expect(mockClient.remove).toHaveBeenCalledWith('robot-name')
   })
+
+  it('deletes cached robots', () => {
+    const handleAction = registerDiscovery(dispatch)
+    mockClient.start.mockClear()
+    mockClient.services = [{ name: 'foo', ip: '5.6.7.8' }, { name: 'bar' }]
+    handleAction({
+      type: 'discovery:CLEAR_CACHE',
+      meta: { shell: true },
+    })
+
+    expect(mockClient.stop).toHaveBeenCalled()
+    expect(Store.__store.reset).toHaveBeenCalledWith('services')
+    expect(mockClient.services).toEqual([])
+    expect(mockClient.start).toHaveBeenCalled()
+  })
 })

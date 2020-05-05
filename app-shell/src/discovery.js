@@ -66,6 +66,9 @@ export function registerDiscovery(dispatch: Dispatch) {
 
       case 'discovery:REMOVE':
         return client.remove(action.payload.robotName)
+
+      case 'discovery:CLEAR_CACHE':
+        return clearCache()
     }
   }
 
@@ -90,4 +93,11 @@ function filterServicesToPersist(services: Array<Service>) {
 
   const blacklist = [].concat(candidateOverrides)
   return client.services.filter(s => blacklist.every(ip => ip !== s.ip))
+}
+
+function clearCache() {
+  client.stop()
+  client.services = []
+  store.reset('services')
+  client.start()
 }
