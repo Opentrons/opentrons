@@ -1,6 +1,6 @@
 import enum
 from collections import defaultdict
-from typing import Dict, Union
+from typing import Dict, List, Union
 from opentrons.hardware_control.types import BoardRevision
 
 
@@ -57,11 +57,12 @@ class InputPins(Pins):
                 for input in list(InputPins)}
 
 
-def group_by_gpio(input_dict: Dict[str, int]):
+def group_by_gpio(
+        input_dict: Dict[str, int]) -> Dict[int, List[str]]:
     d = defaultdict(list)
     for key, value in sorted(input_dict.items()):
         d[value].append(key)
-    return dict(d)
+    return d
 
 
 GPIOPins = Union[OutputPins, RevPins, InputPins]
