@@ -83,8 +83,8 @@ def test_create_session_already_present(api_client,
     })
     assert response.json() == {
         'errors': [{
-            'detail': "A session with id 'check' already exists. Please delete "
-                      "to proceed.",
+            'detail': "A session with id 'check' already exists. "
+                      "Please delete to proceed.",
             'links': {'DELETE': '/sessions/check'},
             'status': '409',
             'title': 'Conflict'
@@ -261,6 +261,7 @@ def test_session_command_create(api_client,
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="jog",
+        pipetteId=None,
         vector=[1.0, 2.0, 3.0])
 
     assert response.json() == {

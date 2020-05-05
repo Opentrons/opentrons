@@ -1,6 +1,5 @@
-from typing import Generic, TypeVar, Optional, List, \
-    Dict, Any, Type, get_type_hints, Union
-from pydantic import Field, validator
+from typing import Generic, TypeVar, Optional, List, Any, Union
+from pydantic import Field
 from pydantic.generics import GenericModel
 
 from .resource_links import ResourceLinks
@@ -37,7 +36,8 @@ class ResponseDataModel(GenericModel, Generic[AttributesT]):
             type=attributes.__class__.__name__)
 
 
-DataT = TypeVar('DataT', bound=Union[ResponseDataModel, List[ResponseDataModel]])
+DataT = TypeVar('DataT', bound=Union[ResponseDataModel,
+                                     List[ResponseDataModel]])
 MetaT = TypeVar('MetaT')
 
 
@@ -66,14 +66,22 @@ def json_api_response(
 ):
     type_string = attributes_model.__name__
     if use_list:
-        response_data_model = List[ResponseDataModel[attributes_model]]
+        response_data_model = List[
+            ResponseDataModel[attributes_model]  # type: ignore
+        ]
         response_data_model.__name__ = f'ListResponseData[{type_string}]'
-        response_model_list = ResponseModel[response_data_model, meta_data_model]
+        response_model_list = ResponseModel[
+            response_data_model, meta_data_model  # type: ignore
+        ]
         response_model_list.__name__ = f'ListResponse[{type_string}]'
         return response_model_list
     else:
-        response_data_model = ResponseDataModel[attributes_model]
+        response_data_model = ResponseDataModel[    # type: ignore
+            attributes_model  # type: ignore
+        ]
         response_data_model.__name__ = f'ResponseData[{type_string}]'
-        response_model = ResponseModel[response_data_model, meta_data_model]
+        response_model = ResponseModel[
+            response_data_model, meta_data_model  # type: ignore
+        ]
         response_model.__name__ = f'Response[{type_string}]'
         return response_model

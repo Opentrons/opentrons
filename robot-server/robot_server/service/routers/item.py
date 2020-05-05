@@ -8,7 +8,6 @@ from pydantic import ValidationError
 from robot_server.service.models.item import Item
 from robot_server.service.models.json_api.factory import \
     generate_json_api_models
-from robot_server.service.models.json_api.request import RequestDataModel
 from robot_server.service.models.json_api.response import ResponseDataModel
 from robot_server.service.models.json_api.errors import ErrorResponse
 
@@ -48,11 +47,11 @@ async def get_item(item_id: str) -> ItemResponse:    # type: ignore
                  HTTP_422_UNPROCESSABLE_ENTITY: {"model": ErrorResponse},
              })
 async def create_item(
-    item_request: ItemRequest
-) -> ItemResponse:
+    item_request: ItemRequest  # type: ignore
+) -> ItemResponse:  # type: ignore
     try:
         # NOTE(isk: 3/10/20): mock DB / robot response
-        item = item_request.data.attributes
+        item = item_request.data.attributes  # type: ignore
         data = ResponseDataModel.create(
             resource_id=str(uuid4()),
             attributes=item

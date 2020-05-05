@@ -1,5 +1,4 @@
 import asyncio
-from uuid import UUID
 
 import pytest
 from opentrons import types

@@ -22,14 +22,14 @@ def create_session_details(session: SessionObjectTypes) \
     }
     func = _detail_maker.get(type(session))
     if func:
-        return func(session)
+        return func(session)  # type: ignore
 
     return None
 
 
 def _create_calibration_check_session_details(
         session: CheckCalibrationSession
-) -> calibration_models.CalibrationSessionStatus:
+) -> typing.Optional[SessionDetails]:
     """Create calibration check session status"""
     instruments = {
         str(k): calibration_models.AttachedPipette(
@@ -51,8 +51,6 @@ def _create_calibration_check_session_details(
                 version=data.version) for data in
             session.labware_status.values()
         ]
-
-    s=session.current_state_name
 
     return calibration_models.CalibrationSessionStatus(
         instruments=instruments,

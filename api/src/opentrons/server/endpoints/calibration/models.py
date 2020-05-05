@@ -25,10 +25,10 @@ class SessionType(str, Enum):
 
 
 class SpecificPipette(BaseModel):
-    pipetteId: UUID
+    pipetteId: Optional[UUID] = Field(None)
 
 
-class JogPosition(BaseModel):
+class JogPosition(SpecificPipette):
     vector: Point = PointField()
 
 

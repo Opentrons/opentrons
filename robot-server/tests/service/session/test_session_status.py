@@ -42,7 +42,7 @@ def test_create_session_response(hardware):
     with patch(path, new_callable=PropertyMock) as p:
         p.return_value = labware
         response = create_session_details(session)
-    
+
     assert response.dict() == {
         'currentStep': 'sessionStarted',
         'instruments': {

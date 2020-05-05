@@ -62,7 +62,8 @@ class SessionCommand(BaseModel):
     """A session command"""
     data: SessionCommandTypes
     # For validation, command MUST appear after data
-    command: SessionCommands = Field(..., description="The command description")
+    command: SessionCommands = Field(...,
+                                     description="The command description")
     status: typing.Optional[str]
 
     @validator('command', always=True)
