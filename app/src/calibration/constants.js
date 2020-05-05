@@ -100,6 +100,7 @@ export const CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE: 'joggingSecondPipetteT
   'joggingSecondPipetteToPointOne'
 export const CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: 'comparingSecondPipettePointOne' =
   'comparingSecondPipettePointOne'
+export const CHECK_STEP_CHECK_COMPLETE: 'checkComplete' = 'checkComplete'
 export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badRobotCalibration' =
   'badRobotCalibration'

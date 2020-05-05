@@ -26,6 +26,7 @@ import {
   CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
   CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+  CHECK_STEP_CHECK_COMPLETE,
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
@@ -189,10 +190,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       break
     }
     case CHECK_STEP_SESSION_EXITED:
+    case CHECK_STEP_CHECK_COMPLETE:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case CHECK_STEP_NO_PIPETTES_ATTACHED:
-    case 'calibrationComplete': {
-      // TODO: BC: get real complete state name after it is update on server side
+    case CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents
       break

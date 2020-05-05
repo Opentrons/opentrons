@@ -587,8 +587,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self._saved_points = {}
         self._can_distinguish_instr_offset = True
         if len(self._pip_info_by_id) == 2:
-            self._first_mount = Mount.LEFT
-            self._second_mount = Mount.RIGHT
+            self._first_mount = Mount.RIGHT
+            self._second_mount = Mount.LEFT
         else:
             only_id, only_info = next(iter(self._pip_info_by_id.items()))
             self._first_mount = only_info['mount']
@@ -596,7 +596,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             # if only checking cal with pipette on Right mount we
             # can't be sure that diffs are due to instrument
             # offset or deck transform or both
-            if self._first_mount == Mount.RIGHT:
+            if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
 
     async def _is_checking_both_mounts(self):
