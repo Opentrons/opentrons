@@ -59,7 +59,7 @@ class InputPins(Pins):
 
 def group_by_gpio(
         input_dict: Dict[str, int]) -> Dict[int, List[str]]:
-    d = defaultdict(list)
+    d: Dict[int, List[str]] = defaultdict(list)
     for key, value in sorted(input_dict.items()):
         d[value].append(key)
     return d
