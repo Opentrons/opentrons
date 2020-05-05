@@ -29,7 +29,6 @@ describe('ToggleField', () => {
         labelOn={labelOnText}
         onChange={jest.fn()}
         value={true}
-        disabled
       />
     )
 
@@ -42,7 +41,6 @@ describe('ToggleField', () => {
       />
     )
 
-    expect(wrapperOn.props().disabled).toEqual(true)
     expect(wrapperOn.text()).toEqual(labelOnText)
     expect(wrapperOff.text()).toEqual(labelOffText)
   })
@@ -58,6 +56,6 @@ describe('ToggleField', () => {
       />
     )
 
-    expect(wrapper.props().disabled).toBeTruthy()
+    expect(wrapper.props().disabled).toEqual(true)
   })
 })
