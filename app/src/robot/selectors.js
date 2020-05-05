@@ -22,6 +22,7 @@ import type {
   LabwareCalibrationStatus,
   LabwareType,
   SessionStatus,
+  SessionStatusInfo,
   SessionModule,
   TiprackByMountMap,
 } from './types'
@@ -81,6 +82,10 @@ export function getUploadError(state: State): ?{ message: string } {
 
 export function getSessionStatus(state: State): SessionStatus {
   return session(state).state
+}
+
+export function getSessionStatusInfo(state: State): SessionStatusInfo {
+  return session(state).statusInfo
 }
 
 export function getSessionIsLoaded(state: State): boolean {

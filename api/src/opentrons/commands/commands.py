@@ -533,7 +533,8 @@ def pause(msg):
     return make_command(
         name=command_types.PAUSE,
         payload={
-            'text': text
+            'text': text,
+            'userMessage': msg,
         }
     )
 
