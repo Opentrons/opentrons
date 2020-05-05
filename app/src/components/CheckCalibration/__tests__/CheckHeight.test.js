@@ -18,6 +18,9 @@ describe('CheckHeight', () => {
   const getConfirmButton = wrapper =>
     wrapper.find('PrimaryButton[children="check z-axis"]').find('button')
 
+  const getContinueButton = wrapper =>
+    wrapper.find('PrimaryButton[children="continue"]').find('button')
+
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
@@ -113,10 +116,24 @@ describe('CheckHeight', () => {
     })
   })
 
-  it('confirms check step when primary button is clicked', () => {
-    const wrapper = render({ isInspecting: true })
+  it('compares check step when primary button is clicked', () => {
+    const wrapper = render()
 
     act(() => getConfirmButton(wrapper).invoke('onClick')())
+    wrapper.update()
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.comparePointRobotCalibrationCheck(
+        mockRobot.name,
+        'abc123_pipette_uuid'
+      )
+    )
+  })
+
+  it('confirms check step when isInspecting and primary button is clicked', () => {
+    const wrapper = render({ isInspecting: true })
+
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
