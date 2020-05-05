@@ -36,7 +36,7 @@
   text-transform: capitalize;
 
   &::after {
-    content: ":";
+    content: ':';
   }
 }
 
@@ -56,8 +56,21 @@
   }
 }
 
+.toggle_icon {
+  /* Icon for radiobutton and for checkbox */
+  display: block;
+  width: 2rem;
+  min-width: 2rem;
+  color: var(--c-font-dark);
+
+  &:not(.toggle_disabled):hover {
+    cursor: pointer;
+  }
+}
+
 .dropdown_disabled,
-.checkbox_disabled {
+.checkbox_disabled,
+.toggle_disabled {
   opacity: 0.5;
 }
 
