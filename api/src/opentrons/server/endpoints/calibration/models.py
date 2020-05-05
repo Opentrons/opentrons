@@ -79,7 +79,6 @@ class ComparisonStatus(BaseModel):
     exceedsThreshold: bool
 
 
-
 class CalibrationSessionStatus(BaseModel):
     """
     The current status of a given session.
@@ -116,7 +115,7 @@ class CalibrationSessionStatus(BaseModel):
                     "currentStep": "sessionStarted",
                     "comparisonsByStep": {
                         "comparingFirstPipetteHeight": {
-                            "differenceVector": [1,0,0],
+                            "differenceVector": [1, 0, 0],
                             "exceedsThreshold": False
                         }
                     },

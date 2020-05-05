@@ -69,9 +69,11 @@ async def prepare_pipette(request: web.Request, session) -> web.Response:
     await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette)
     return web.json_response(status=200)
 
+
 async def compare_point(request: web.Request, session) -> web.Response:
     await session.trigger_transition(CalibrationCheckTrigger.compare_point)
     return web.json_response(status=200)
+
 
 async def confirm_step(request: web.Request, session) -> web.Response:
     await session.trigger_transition(CalibrationCheckTrigger.go_to_next_check)
@@ -88,21 +90,18 @@ async def jog(request: web.Request, session: 'CheckCalibrationSession'):
 
 async def pick_up_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
     await session.trigger_transition(CalibrationCheckTrigger.pick_up_tip)
     return web.json_response(status=200)
 
 
 async def invalidate_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
     await session.trigger_transition(CalibrationCheckTrigger.invalidate_tip)
     return web.json_response(status=200)
 
 
 async def confirm_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
     await session.trigger_transition(
         CalibrationCheckTrigger.confirm_tip_attached)
     return web.json_response(status=200)

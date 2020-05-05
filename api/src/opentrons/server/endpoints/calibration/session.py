@@ -1,9 +1,8 @@
 import typing
 from uuid import uuid4, UUID
 from enum import Enum
-from dataclasses import dataclass, asdict, field, fields
+from dataclasses import dataclass, asdict, fields
 
-from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
@@ -73,21 +72,10 @@ class CheckMove:
 
 
 @dataclass
-class PreparingPipetteMoveOffset:
-    offset: Point
-    well: Well
-
-
-PreparingPipetteMove = typing.Dict[
-    UUID, typing.Dict[UUID, PreparingPipetteMoveOffset]
-]
-
-
-@dataclass
 class Moves:
-    """This class is meant to encapsulate the different moves"""
-    preparingFirstPipette: PreparingPipetteMoveOffset = field(default_factory=dict)
-    preparingSecondPipette: PreparingPipetteMoveOffset = field(default_factory=dict)
+    """A mapping of calibration check state to gantry move parameters"""
+    preparingFirstPipette: CheckMove = CheckMove()
+    preparingSecondPipette: CheckMove = CheckMove()
     joggingFirstPipetteToHeight: CheckMove = CheckMove()
     joggingFirstPipetteToPointOne: CheckMove = CheckMove()
     joggingFirstPipetteToPointTwo: CheckMove = CheckMove()
@@ -96,7 +84,8 @@ class Moves:
     joggingSecondPipetteToPointOne: CheckMove = CheckMove()
 
 
-TRASH_TIP_OFFSET = Point(10,10,0) # vector from front bottom left of slot 12
+TRASH_TIP_OFFSET = Point(10, 10, 0)  # vector from front bottom left of slot 12
+
 
 class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
@@ -165,12 +154,13 @@ class CalibrationSession:
         return lw
 
     def _build_deck_moves(self) -> Moves:
-        return Moves(joggingFirstPipetteToHeight=self._build_height_dict('5'),
-                     joggingFirstPipetteToPointOne=self._build_cross_dict('1BLC'),
-                     joggingFirstPipetteToPointTwo=self._build_cross_dict('3BRC'),
-                     joggingFirstPipetteToPointThree=self._build_cross_dict('7TLC'),
-                     joggingSecondPipetteToHeight=self._build_height_dict('5'),
-                     joggingSecondPipetteToPointOne=self._build_cross_dict('1BLC'))
+        return Moves(
+                joggingFirstPipetteToHeight=self._build_height_dict('5'),
+                joggingFirstPipetteToPointOne=self._build_cross_dict('1BLC'),
+                joggingFirstPipetteToPointTwo=self._build_cross_dict('3BRC'),
+                joggingFirstPipetteToPointThree=self._build_cross_dict('7TLC'),
+                joggingSecondPipetteToHeight=self._build_height_dict('5'),
+                joggingSecondPipetteToPointOne=self._build_cross_dict('1BLC'))
 
     def _build_cross_dict(self, pos_id: str) -> CheckMove:
         cross_coords = self._deck.get_calibration_position(pos_id).position
@@ -211,16 +201,17 @@ class CalibrationSession:
             # mod geometry contexts. Ignore type joggingTo error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
         else:
-            tip_length = pip['fallback_tip_length']
+            tip_length = self.get_pipette(mount)['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
 
     async def _trash_tip(self, mount: Mount):
         fixed_trash = self._deck.position_for('12')
         await self.hardware.retract(mount)
         high_point = await self.hardware.current_position(mount)
-        drop_point = fixed_trash.point._replace(x=fixed_trash.point.x + 20,
-                                                y=fixed_trash.point.y + 20,
-                                                z=high_point[Axis.by_mount(mount)] - 20)
+        drop_point = fixed_trash.point._replace(
+                x=fixed_trash.point.x + 20,
+                y=fixed_trash.point.y + 20,
+                z=high_point[Axis.by_mount(mount)] - 20)
         await self.hardware.move_to(mount, drop_point + TRASH_TIP_OFFSET)
         await self.hardware.drop_tip(mount)
 
@@ -545,37 +536,45 @@ CHECK_TRANSITIONS = [
 ]
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5,5,5)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(10,10,10)
-OK_HEIGHT_VECTOR = Point(5,5,5)
-OK_XY_VECTOR = Point(5,5,5)
+DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5, 5, 5)
+P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
+OK_HEIGHT_VECTOR = Point(5, 5, 5)
+OK_XY_VECTOR = Point(5, 5, 5)
 
-COMPARISON_STATE_MAP = {
-    CalibrationCheckState.comparingFirstPipetteHeight: {
-        'reference_state': CalibrationCheckState.joggingFirstPipetteToHeight,
-        'threshold_vector': OK_HEIGHT_VECTOR,
-    },
-    CalibrationCheckState.comparingFirstPipettePointOne: {
-        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointOne,
-        'threshold_vector': OK_XY_VECTOR,
-    },
-    CalibrationCheckState.comparingFirstPipettePointTwo: {
-        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        'threshold_vector': OK_XY_VECTOR,
-    },
-    CalibrationCheckState.comparingFirstPipettePointThree: {
-        'reference_state': CalibrationCheckState.joggingFirstPipetteToPointThree,
-        'threshold_vector': OK_XY_VECTOR,
-    },
-    CalibrationCheckState.comparingSecondPipetteHeight: {
-        'reference_state': CalibrationCheckState.joggingSecondPipetteToHeight,
-        'threshold_vector': OK_HEIGHT_VECTOR,
-    },
-    CalibrationCheckState.comparingSecondPipettePointOne: {
-        'reference_state': CalibrationCheckState.joggingSecondPipetteToPointOne,
-        'threshold_vector': OK_XY_VECTOR,
-    },
+
+@dataclass
+class ComparisonParams:
+    reference_state: CalibrationCheckState
+    threshold_vector: Point
+
+
+COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
+    CalibrationCheckState.comparingFirstPipetteHeight: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingFirstPipetteToHeight,
+        threshold_vector=OK_HEIGHT_VECTOR,
+    ),
+    CalibrationCheckState.comparingFirstPipettePointOne: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingFirstPipetteToPointOne,
+        threshold_vector=OK_XY_VECTOR,
+    ),
+    CalibrationCheckState.comparingFirstPipettePointTwo: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        threshold_vector=OK_XY_VECTOR,
+    ),
+    CalibrationCheckState.comparingFirstPipettePointThree: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingFirstPipetteToPointThree,
+        threshold_vector=OK_XY_VECTOR,
+    ),
+    CalibrationCheckState.comparingSecondPipetteHeight: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingSecondPipetteToHeight,
+        threshold_vector=OK_HEIGHT_VECTOR,
+    ),
+    CalibrationCheckState.comparingSecondPipettePointOne: ComparisonParams(
+        reference_state=CalibrationCheckState.joggingSecondPipetteToPointOne,
+        threshold_vector=OK_XY_VECTOR,
+    ),
 }
+
 
 class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
@@ -584,29 +583,30 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                               transitions=CHECK_TRANSITIONS,
                               initial_state="sessionStarted")
         self.session_type = 'check'
-        self._saved_points = {}
+        self._saved_points: typing.Dict[CalibrationCheckState, Point] = {}
         self._can_distinguish_instr_offset = True
+        self._first_mount: typing.Optional[Mount] = None
+        self._second_mount: typing.Optional[Mount] = None
         if len(self._pip_info_by_id) == 2:
             self._first_mount = Mount.RIGHT
             self._second_mount = Mount.LEFT
         else:
             only_id, only_info = next(iter(self._pip_info_by_id.items()))
             self._first_mount = only_info['mount']
-            self._second_mount = None
-            # if only checking cal with pipette on Right mount we
+            # if only checking cal with pipette on left mount we
             # can't be sure that diffs are due to instrument
             # offset or deck transform or both
             if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
 
     async def _is_checking_both_mounts(self):
-        return self._second_mount != None
+        return self._second_mount is not None
 
-    async def _load_tip_rack_objects(self, **kwargs):
+    async def _load_tip_rack_objects(self):
         """
-        A function that takes tip rack information and loads them onto the deck.
+        A function that takes tip rack information
+        and loads them onto the deck.
         """
-        full_dict = {}
         for name, lw_data in self._labware_info.items():
             parent = self._deck.position_for(lw_data.slot)
             lw = labware.Labware(lw_data.definition, parent)
@@ -615,7 +615,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             for index, id in enumerate(lw_data.forPipettes):
                 mount = self._get_mount(id)
                 is_second_mount = mount == self._second_mount
-                pip = self.get_pipette(mount)
                 pips_share_rack = len(lw_data.forPipettes) == 2
                 well_name = 'A1'
                 if is_second_mount and pips_share_rack:
@@ -628,7 +627,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     self._moves.preparingSecondPipette = move
                 else:
                     self._moves.preparingFirstPipette = move
-
 
     async def delete_session(self):
         for mount in self._pip_info_by_id.values():
@@ -655,10 +653,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
         current_pt = await self.hardware.gantry_position(mount)
 
-        ref_pt = self._saved_points[self.current_state_name]
+        ref_pt = self._saved_points[getattr(CalibrationCheckState,
+                                            self.current_state_name)]
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
-        if self.get_pipette(mount)['model'].startswith('p1000'):
+        if str(self.get_pipette(mount)['model']).startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
         absolute_diff_vector = abs(current_pt - ref_pt)
         return absolute_diff_vector > threshold_vector
@@ -670,7 +669,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         original position.
         """
         if self.current_state_name == \
-            CalibrationCheckState.preparingFirstPipette:
+                CalibrationCheckState.preparingFirstPipette:
             mount = self._first_mount
         elif self.current_state_name == \
                 CalibrationCheckState.preparingSecondPipette:
@@ -681,9 +680,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self._pick_up_tip(mount)
 
     async def _trash_first_pipette_tip(self):
+        assert self._first_mount, \
+                'cannot trash tip from first mount, pipette not present'
         await self._trash_tip(self._first_mount)
 
     async def _trash_second_pipette_tip(self):
+        assert self._second_mount, \
+                'cannot trash tip from first mount, pipette not present'
         await self._trash_tip(self._second_mount)
 
     @staticmethod
@@ -703,37 +706,48 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
-    def get_comparisons_by_step(self) -> typing.Dict:
+    def get_comparisons_by_step(
+            self) -> typing.Dict[CalibrationCheckState, ComparisonStatus]:
         comparisons = {}
         for jogged_state, comp in COMPARISON_STATE_MAP.items():
-            ref_pt = self._saved_points.get(comp['reference_state'], None)
-            jogged_pt = self._saved_points.get(jogged_state, None)
+            ref_pt = self._saved_points.get(getattr(CalibrationCheckState,
+                                                    comp.reference_state),
+                                            None)
+            jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
+                                                       jogged_state), None)
             if (ref_pt is not None and jogged_pt is not None):
-
                 absolute_diff_vector = abs(ref_pt - jogged_pt)
-                exceeds = absolute_diff_vector > comp['threshold_vector']
-                comparisons[jogged_state] = ComparisonStatus(
-                        differenceVector=absolute_diff_vector,
-                        exceedsThreshold=exceeds)
+                exceeds = absolute_diff_vector > comp.threshold_vector
+                comparisons[getattr(CalibrationCheckState, jogged_state)] = \
+                    ComparisonStatus(differenceVector=absolute_diff_vector,
+                                     exceedsThreshold=exceeds)
         return comparisons
 
     async def _register_point_first_pipette(self):
-        self._saved_points[self.current_state_name] = \
+        self._saved_points[getattr(CalibrationCheckState,
+                                   self.current_state_name)] = \
             await self.hardware.gantry_position(self._first_mount)
 
     async def _register_point_second_pipette(self):
-        self._saved_points[self.current_state_name] = \
+        self._saved_points[getattr(CalibrationCheckState,
+                                   self.current_state_name)] = \
             await self.hardware.gantry_position(self._second_mount)
 
     async def _move_first_pipette(self):
+        assert self._first_mount, \
+                'cannot move pipette on first mount, pipette not present'
         await self._move(self._first_mount,
-                         Location(getattr(self._moves, self.current_state_name).position,
+                         Location(getattr(self._moves,
+                                          self.current_state_name).position,
                                   None))
         await self._register_point_first_pipette()
 
     async def _move_second_pipette(self):
+        assert self._second_mount, \
+                'cannot move pipette on second mount, pipette not present'
         await self._move(self._second_mount,
-                         Location(getattr(self._moves, self.current_state_name).position,
+                         Location(getattr(self._moves,
+                                          self.current_state_name).position,
                                   None))
         await self._register_point_second_pipette()
 
@@ -750,7 +764,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             await self.hardware.move_to(mount, move[0], move[1])
 
     async def _jog_first_pipette(self, vector: Point):
+        assert self._first_mount, \
+                'cannot jog pipette on first mount, pipette not present'
         await super(self.__class__, self)._jog(self._first_mount, vector)
 
     async def _jog_second_pipette(self, vector: Point):
+        assert self._second_mount, \
+                'cannot jog pipette on second mount, pipette not present'
         await super(self.__class__, self)._jog(self._second_mount, vector)
