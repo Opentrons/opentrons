@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.2...v3.17.1-alpha.3) (2020-05-05)
+
+
+### Bug Fixes
+
+* **api:** fix tempdeck simulate freeze ([#5563](https://github.com/Opentrons/opentrons/issues/5563)) ([ae2bdcb](https://github.com/Opentrons/opentrons/commit/ae2bdcb)), closes [#5561](https://github.com/Opentrons/opentrons/issues/5561)
+
+
+
+
+
 ## [3.17.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.1...v3.17.1-alpha.2) (2020-04-30)
 
 
