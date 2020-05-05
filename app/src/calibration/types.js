@@ -13,6 +13,7 @@ import typeof {
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
   ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
   ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -96,6 +97,12 @@ export type RobotCalibrationCheckInvalidateTipAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type RobotCalibrationCheckComparePointAction = {|
+  type: ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type RobotCalibrationCheckConfirmStepAction = {|
   type: ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
   payload: {| robotName: string, pipetteId: string |},
@@ -109,6 +116,7 @@ export type UpdateRobotCalibrationCheckSessionAction =
   | RobotCalibrationCheckPickUpTipAction
   | RobotCalibrationCheckConfirmTipAction
   | RobotCalibrationCheckInvalidateTipAction
+  | RobotCalibrationCheckComparePointAction
   | RobotCalibrationCheckConfirmStepAction
 
 export type UpdateRobotCalibrationCheckSessionSuccessAction = {|

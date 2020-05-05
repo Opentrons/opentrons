@@ -25,6 +25,7 @@ import {
   ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
   ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
   ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
   ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
   CHECK_UPDATE_PATH_LOAD_LABWARE,
   CHECK_UPDATE_PATH_PREPARE_PIPETTE,
@@ -32,6 +33,7 @@ import {
   CHECK_UPDATE_PATH_PICK_UP_TIP,
   CHECK_UPDATE_PATH_CONFIRM_TIP,
   CHECK_UPDATE_PATH_INVALIDATE_TIP,
+  CHECK_UPDATE_PATH_COMPARE_POINT,
   CHECK_UPDATE_PATH_CONFIRM_STEP,
 } from '../constants'
 
@@ -66,6 +68,13 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
+        body: { pipetteId: action.payload.pipetteId },
+      }
+    }
+    case ROBOT_CALIBRATION_CHECK_COMPARE_POINT: {
+      return {
+        method: POST,
+        path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_COMPARE_POINT}`,
         body: { pipetteId: action.payload.pipetteId },
       }
     }
@@ -124,6 +133,7 @@ export const updateRobotCalibrationCheckSessionEpic: Epic = (
       ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
       ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
       ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+      ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
       ROBOT_CALIBRATION_CHECK_CONFIRM_STEP
     ),
     mapToRobotApiRequest(

@@ -145,7 +145,7 @@ class StateMachine:
                     break
         except Exception as e:
             log.exception(f"exception raised processing trigger {trigger}"
-                          f"in state {self.current_state_name}")
+                          f" in state {self.current_state_name}")
             raise StateMachineError(f'event {trigger} failed to transition '
                                     f'from {self.current_state_name}: '
                                     f'{str(e)}')

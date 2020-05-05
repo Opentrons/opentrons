@@ -1,4 +1,5 @@
 import typing
+import logging
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 from .session import CheckCalibrationSession, CalibrationCheckTrigger
@@ -6,6 +7,7 @@ from .models import CalibrationSessionStatus, LabwareStatus
 from .constants import ALLOWED_SESSIONS, LabwareLoaded, TipAttachError
 from .util import StateMachineError
 
+MODULE_LOG = logging.getLogger(__name__)
 
 TRIGGER_TO_PATH = {
     CalibrationCheckTrigger.load_labware: "loadLabware",
@@ -14,7 +16,7 @@ TRIGGER_TO_PATH = {
     CalibrationCheckTrigger.pick_up_tip: "pickUpTip",
     CalibrationCheckTrigger.confirm_tip_attached: "confirmTip",
     CalibrationCheckTrigger.invalidate_tip: "invalidateTip",
-    CalibrationCheckTrigger.compare_jogged_point: "comparePoint",
+    CalibrationCheckTrigger.compare_point: "comparePoint",
     CalibrationCheckTrigger.go_to_next_check: "confirmStep",
     CalibrationCheckTrigger.exit: "sessionExit",
     # CalibrationCheckTrigger.reject_calibration: "reject_calibration",
@@ -113,6 +115,7 @@ async def misc_error_handling(
             error_response = _determine_error_message(
                 request, router, type, req.get('pipetteId', ''))
         else:
+            MODULE_LOG.exception("Calibration Check Exception: {}".format(e))
             potential_triggers = session.get_potential_triggers()
             links = _format_links(session, potential_triggers, router)
             error_response = {

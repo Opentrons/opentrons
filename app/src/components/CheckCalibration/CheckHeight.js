@@ -6,6 +6,7 @@ import { useDispatch } from 'react-redux'
 import type { Dispatch } from '../../types'
 import {
   jogRobotCalibrationCheck,
+  comparePointRobotCalibrationCheck,
   confirmStepRobotCalibrationCheck,
 } from '../../calibration'
 import { JogControls } from '../JogControls'
@@ -41,14 +42,17 @@ const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
 
+const CONTINUE = 'continue'
+
 type CheckHeightProps = {|
   pipetteId: string,
   robotName: string,
   isMulti: boolean,
   mount: Mount,
+  isInspecting: boolean,
 |}
 export function CheckHeight(props: CheckHeightProps) {
-  const { pipetteId, robotName, isMulti, mount } = props
+  const { pipetteId, robotName, isMulti, mount, isInspecting } = props
 
   const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
@@ -65,6 +69,9 @@ export function CheckHeight(props: CheckHeightProps) {
     )
   }
 
+  function comparePoint() {
+    dispatch(comparePointRobotCalibrationCheck(robotName, pipetteId))
+  }
   function confirmStep() {
     dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
@@ -74,39 +81,55 @@ export function CheckHeight(props: CheckHeightProps) {
       <div className={styles.modal_header}>
         <h3>{CHECK_Z_HEADER}</h3>
       </div>
-      <div className={styles.tip_pick_up_demo_wrapper}>
-        <p className={styles.tip_pick_up_demo_body}>
-          {JOG_UNTIL}
-          <b>&nbsp;{JUST_BARELY}&nbsp;</b>
-          {TOUCHING}
-          <b>&nbsp;{SLOT_5}.&nbsp;</b>
-          {THEN}
-          <b>&nbsp;{CHECK_AXES}&nbsp;</b>
-          {TO_DETERMINE_MATCH}
-        </p>
-        <div className={styles.step_check_video_wrapper}>
-          <video
-            key={demoAsset}
-            className={styles.step_check_video}
-            autoPlay={true}
-            loop={true}
-            controls={false}
-          >
-            <source src={demoAsset} />
-          </video>
-        </div>
-      </div>
-      <div className={styles.tip_pick_up_controls_wrapper}>
-        <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
-      </div>
-      <div className={styles.button_row}>
-        <PrimaryButton
-          onClick={confirmStep}
-          className={styles.pick_up_tip_button}
-        >
-          {CHECK_Z_BUTTON_TEXT}
-        </PrimaryButton>
-      </div>
+      {isInspecting ? (
+        <>
+          <div>IS INSPECTING!!</div>
+          <div className={styles.button_row}>
+            <PrimaryButton
+              onClick={confirmStep}
+              className={styles.pick_up_tip_button}
+            >
+              {CONTINUE}
+            </PrimaryButton>
+          </div>
+        </>
+      ) : (
+        <>
+          <div className={styles.tip_pick_up_demo_wrapper}>
+            <p className={styles.tip_pick_up_demo_body}>
+              {JOG_UNTIL}
+              <b>&nbsp;{JUST_BARELY}&nbsp;</b>
+              {TOUCHING}
+              <b>&nbsp;{SLOT_5}.&nbsp;</b>
+              {THEN}
+              <b>&nbsp;{CHECK_AXES}&nbsp;</b>
+              {TO_DETERMINE_MATCH}
+            </p>
+            <div className={styles.step_check_video_wrapper}>
+              <video
+                key={demoAsset}
+                className={styles.step_check_video}
+                autoPlay={true}
+                loop={true}
+                controls={false}
+              >
+                <source src={demoAsset} />
+              </video>
+            </div>
+          </div>
+          <div className={styles.tip_pick_up_controls_wrapper}>
+            <JogControls jog={jog} stepSizes={[0.1, 1]} axes={['z']} />
+          </div>
+          <div className={styles.button_row}>
+            <PrimaryButton
+              onClick={comparePoint}
+              className={styles.pick_up_tip_button}
+            >
+              {CHECK_Z_BUTTON_TEXT}
+            </PrimaryButton>
+          </div>
+        </>
+      )}
     </>
   )
 }

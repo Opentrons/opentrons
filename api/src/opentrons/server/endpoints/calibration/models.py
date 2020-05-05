@@ -33,7 +33,6 @@ class MoveLocation(BaseModel):
 
 
 class JogPosition(BaseModel):
-    pipetteId: UUID4
     vector: Point = PointField()
 
 

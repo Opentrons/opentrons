@@ -2,7 +2,7 @@ from aiohttp import web
 
 from opentrons import types
 from .session import CheckCalibrationSession, CalibrationCheckTrigger
-from .models import SpecificPipette, MoveLocation, JogPosition
+from .models import JogPosition
 
 
 async def get_session(request: web.Request, session) -> web.Response:
@@ -66,18 +66,15 @@ async def load_labware(request: web.Request, session) -> web.Response:
 
 
 async def prepare_pipette(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette,
-                                     pipette_id=pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette)
     return web.json_response(status=200)
 
+async def compare_point(request: web.Request, session) -> web.Response:
+    await session.trigger_transition(CalibrationCheckTrigger.compare_point)
+    return web.json_response(status=200)
 
 async def confirm_step(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.go_to_next_check,
-                                     pipette_id=pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.go_to_next_check)
     return web.json_response(status=200)
 
 
@@ -85,7 +82,6 @@ async def jog(request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
     jog_position = JogPosition(**req)
     await session.trigger_transition(CalibrationCheckTrigger.jog,
-                                     jog_position.pipetteId,
                                      types.Point(*jog_position.vector))
     return web.json_response(status=200)
 
@@ -93,26 +89,20 @@ async def jog(request: web.Request, session: 'CheckCalibrationSession'):
 async def pick_up_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.pick_up_tip,
-                                     pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.pick_up_tip)
     return web.json_response(status=200)
 
 
 async def invalidate_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.invalidate_tip,
-                                     pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.invalidate_tip)
     return web.json_response(status=200)
 
 
 async def confirm_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
-    pipette = SpecificPipette(**req)
     await session.trigger_transition(
-        CalibrationCheckTrigger.confirm_tip_attached,
-        pipette.pipetteId)
+        CalibrationCheckTrigger.confirm_tip_attached)
     return web.json_response(status=200)

@@ -10,15 +10,26 @@ import {
   getRobotCalibrationCheckSession,
   CHECK_STEP_SESSION_STARTED,
   CHECK_STEP_LABWARE_LOADED,
-  CHECK_STEP_PREPARING_PIPETTE,
-  CHECK_STEP_INSPECTING_TIP,
-  CHECK_STEP_CHECKING_POINT_ONE,
-  CHECK_STEP_CHECKING_POINT_TWO,
-  CHECK_STEP_CHECKING_POINT_THREE,
-  CHECK_STEP_CHECKING_HEIGHT,
+  CHECK_STEP_PREPARING_FIRST_PIPETTE,
+  CHECK_STEP_INSPECTING_FIRST_TIP,
+  CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+  CHECK_STEP_PREPARING_SECOND_PIPETTE,
+  CHECK_STEP_INSPECTING_SECOND_TIP,
+  CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT,
+  CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+  CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE,
+  CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
+  type RobotCalibrationCheckStep,
 } from '../../calibration'
 
 import { Introduction } from './Introduction'
@@ -99,8 +110,14 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       modalContentsClassName = styles.page_content_dark
       break
     }
-    case CHECK_STEP_INSPECTING_TIP:
-    case CHECK_STEP_PREPARING_PIPETTE: {
+    case CHECK_STEP_INSPECTING_FIRST_TIP:
+    case CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case CHECK_STEP_INSPECTING_SECOND_TIP:
+    case CHECK_STEP_PREPARING_SECOND_PIPETTE: {
+      const isInspecting = [
+        CHECK_STEP_INSPECTING_FIRST_TIP,
+        CHECK_STEP_INSPECTING_SECOND_TIP,
+      ].includes(currentStep)
       stepContents =
         activeInstrumentId && activeLabware ? (
           <TipPickUp
@@ -108,39 +125,65 @@ export function CheckCalibration(props: CheckCalibrationProps) {
             robotName={robotName}
             pipetteId={activeInstrumentId}
             isMulti={isActiveInstrumentMultiChannel}
-            isInspecting={CHECK_STEP_INSPECTING_TIP === currentStep}
+            isInspecting={isInspecting}
           />
         ) : null
       break
     }
-    case CHECK_STEP_CHECKING_POINT_ONE:
-    case CHECK_STEP_CHECKING_POINT_TWO:
-    case CHECK_STEP_CHECKING_POINT_THREE: {
-      const xyStepIndex: ?number = [
-        CHECK_STEP_CHECKING_POINT_ONE,
-        CHECK_STEP_CHECKING_POINT_TWO,
-        CHECK_STEP_CHECKING_POINT_THREE,
-      ].findIndex(stepName => stepName === currentStep)
+    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
+    case CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      const slotNumber: { [RobotCalibrationCheckStep]: string } = {
+        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE]: '1',
+        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: '1',
+        [CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE]: '1',
+        [CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: '1',
+        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO]: '3',
+        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: '3',
+        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE]: '7',
+        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: '7',
+      }[currentStep]
 
+      const isInspecting = [
+        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+        CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+      ].includes(currentStep)
       stepContents =
-        activeInstrumentId && xyStepIndex != null ? (
+        activeInstrumentId && slotNumber != null ? (
           <CheckXYPoint
             robotName={robotName}
             pipetteId={activeInstrumentId}
-            xyStepIndex={xyStepIndex}
+            slotNumber={slotNumber}
             isMulti={isActiveInstrumentMultiChannel}
             mount={activeMount}
+            isInspecting={isInspecting}
           />
         ) : null
       break
     }
-    case CHECK_STEP_CHECKING_HEIGHT: {
+    case CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+      const isInspecting = [
+        CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+        CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+      ].includes(currentStep)
+
       stepContents = activeInstrumentId ? (
         <CheckHeight
           robotName={robotName}
           pipetteId={activeInstrumentId}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
+          isInspecting={isInspecting}
         />
       ) : null
       break
