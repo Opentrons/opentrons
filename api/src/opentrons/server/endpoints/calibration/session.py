@@ -129,20 +129,20 @@ class CalibrationSession:
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
             load_name: str = _lookup.load_name
-                lw_def = labware.get_labware_definition(load_name)
-                new_uuid: UUID = uuid4()
-                _uuid = new_uuid
-                slot = self._available_slot_options()
-                lw[new_uuid] = LabwareInfo(
-                    alternatives=list(_lookup.alternatives),
-                    forPipettes=[pipette_id],
-                    loadName=load_name,
-                    slot=slot,
-                    namespace=lw_def['namespace'],
-                    version=lw_def['version'],
-                    id=new_uuid,
-                    definition=lw_def)
-                self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
+            lw_def = labware.get_labware_definition(load_name)
+            new_uuid: UUID = uuid4()
+            _uuid = new_uuid
+            slot = self._available_slot_options()
+            lw[new_uuid] = LabwareInfo(
+                alternatives=list(_lookup.alternatives),
+                forPipettes=[pipette_id],
+                loadName=load_name,
+                slot=slot,
+                namespace=lw_def['namespace'],
+                version=lw_def['version'],
+                id=new_uuid,
+                definition=lw_def)
+            self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
         return lw
 
     def _build_deck_moves(self) -> Moves:
