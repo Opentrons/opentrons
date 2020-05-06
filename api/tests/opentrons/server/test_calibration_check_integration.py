@@ -12,11 +12,11 @@ async def test_setup(async_server, async_client):
         'model': 'p300_multi_v1', 'id': 'fake300pip'}
 
 
-def _interpret_status_results(status, next_step, curr_pip):
+def _interpret_status_results(status, next_step):
     next_request = status['nextSteps']['links'][next_step]
     next_data = next_request.get('params', {})
     next_url = next_request.get('url', '')
-    return next_data[curr_pip], next_url
+    return next_data, next_url
 
 
 def _get_pipette(instruments, pip_name):
@@ -36,7 +36,7 @@ async def test_integrated_calibration_check(async_client, test_setup):
         {'loadLabware', 'sessionExit'}
     curr_pip = _get_pipette(status['instruments'], 'p300_multi_v1')
 
-    next_data, url = _interpret_status_results(status, 'loadLabware', curr_pip)
+    next_data, url = _interpret_status_results(status, 'loadLabware')
 
     # Load labware
     resp = await async_client.post(url, json=next_data)

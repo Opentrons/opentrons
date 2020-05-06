@@ -752,7 +752,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     to_loc: Location):
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
-        cp = self._pip_info_by_id[pipette_id]['critical_point']
+        cp = next(pip_info['critical_point'] for id, pip_info in
+                          self._pip_info_by_id.items() if
+                          pip_info['mount'] == mount)
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, to_loc,
