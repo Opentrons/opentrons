@@ -16,6 +16,30 @@ import { CheckHeight } from './CheckHeight'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
+const getSlotNumberFromStep = (
+  step: Calibration.RobotCalibrationCheckStep
+): string => {
+  switch (step) {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return '1'
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: {
+      return '3'
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return '7'
+    }
+    default:
+      // should never reach this case, as func only called when currentStep listed above
+      return ''
+  }
+}
+
 type CheckCalibrationProps = {|
   robotName: string,
   closeCalibrationCheck: () => mixed,
@@ -112,17 +136,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
     case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      // $FlowFixMe(BC, 2020-05-05): flow doesn't understand switch case
-      const slotNumber: string = {
-        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE]: '1',
-        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: '1',
-        [Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE]: '1',
-        [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: '1',
-        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO]: '3',
-        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: '3',
-        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE]: '7',
-        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: '7',
-      }[currentStep]
+      const slotNumber = getSlotNumberFromStep(currentStep)
 
       const isInspecting = [
         Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
@@ -166,8 +180,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED:
-    case 'calibrationComplete': {
+    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       // TODO: BC: get real complete state name after it is update on server side
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents

@@ -80,7 +80,7 @@ describe('CheckXYPoint', () => {
     const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
     const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
     const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const assetMap: { [string]: { [Mount]: {} } } = {
+    const assetMap: { [string]: { [Mount]: { ... }, ... }, ... } = {
       '1': {
         left: {
           multi: slot1LeftMultiSrc,
