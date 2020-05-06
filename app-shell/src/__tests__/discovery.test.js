@@ -254,5 +254,9 @@ describe('app-shell/discovery', () => {
     expect(mockClient.stop).toHaveBeenCalled()
     expect(mockClient.services).toEqual([])
     expect(mockClient.start).toHaveBeenCalled()
+    expect(dispatch).toHaveBeenCalledWith({
+      type: 'discovery:UPDATE_LIST',
+      payload: { robots: [] },
+    })
   })
 })
