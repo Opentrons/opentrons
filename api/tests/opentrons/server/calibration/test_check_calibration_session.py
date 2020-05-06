@@ -21,6 +21,19 @@ def check_calibration_session(hardware) -> session.CheckCalibrationSession:
 
 
 @pytest.fixture
+def check_calibration_session_shared_tips(hardware) -> session.CheckCalibrationSession:
+    hw = hardware._backend
+    hw._attached_instruments[types.Mount.LEFT] = {
+        'model': 'p300_multi_v1', 'id': 'fake300multipip'}
+    hw._attached_instruments[types.Mount.RIGHT] = {
+        'model': 'p300_single_v1', 'id': 'fake300pip'}
+    asyncio.get_event_loop().run_until_complete(
+        session.CheckCalibrationSession.build(hardware)
+    )
+    return session.CheckCalibrationSession(hardware)
+
+
+@pytest.fixture
 def check_calibration_session_only_right(hardware) \
         -> session.CheckCalibrationSession:
     hw = hardware._backend
@@ -216,7 +229,7 @@ async def in_comparing_second_pipette_point_one(check_calibration_session):
     )
     return check_calibration_session
 
-# tests
+# START misc session attribute tests
 
 
 def test_session_started(check_calibration_session):
@@ -246,12 +259,81 @@ async def test_session_started_to_end_state(check_calibration_session):
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.sessionExited
 
-# START testing both mounts
+
+async def test_same_diff_pips_diff_tipracks(check_calibration_session):
+    sess = check_calibration_session
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.load_labware)
+    assert len(sess._labware_info.keys()) == 2
+    for tiprack in sess._labware_info.values():
+        assert len(tiprack.forPipettes) == 1
+
+
+async def test_same_size_pips_share_tiprack(
+        check_calibration_session_shared_tips):
+    sess = check_calibration_session_shared_tips
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.load_labware)
+    assert len(sess._labware_info.keys()) == 1
+    assert len(next(iter(sess._labware_info.values())).forPipettes) == 2
+
+    # loads tiprack for right mount in 8
+    # and tiprack for left mount in 6
+    assert sess._deck['8']
+    assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
+    assert sess._deck['6']
+    assert sess._deck['6'].name == 'opentrons_96_tiprack_10ul'
+
+
+async def test_same_size_pips_share_tiprack(
+        check_calibration_session_shared_tips):
+    sess = await in_labware_loaded(
+        check_calibration_session_shared_tips
+    )
+    assert len(sess._labware_info.keys()) == 1
+    assert len(next(iter(sess._labware_info.values())).forPipettes) == 2
+
+    # z and x values should be the same, but y should be different
+    # if accessing different tips (A1, B1) on same tiprack
+    assert sess._moves.preparingFirstPipette.position.x == \
+            sess._moves.preparingSecondPipette.position.x
+    assert sess._moves.preparingFirstPipette.position.z == \
+            sess._moves.preparingSecondPipette.position.z
+    assert sess._moves.preparingFirstPipette.position.y != \
+            sess._moves.preparingSecondPipette.position.y
+
+
+async def test_jog_pipette(check_calibration_session):
+    sess = await in_preparing_first_pipette(check_calibration_session)
+
+    last_pos = await sess.hardware.gantry_position(sess._first_mount)
+
+    jog_vector_map = {
+        'front': types.Point(0, -0.1, 0),
+        'back': types.Point(0, 0.1, 0),
+        'left': types.Point(-0.1, 0, 0),
+        'right': types.Point(0.1, 0, 0),
+        'up': types.Point(0, 0, 0.1),
+        'down': types.Point(0, 0, -0.1)
+    }
+    for dir, vector in jog_vector_map.items():
+        await sess.trigger_transition(
+            session.CalibrationCheckTrigger.jog, vector)
+        jog_pos = await sess.hardware.gantry_position(sess._first_mount)
+        assert jog_pos == vector + last_pos
+        last_pos = jog_pos
+
+
+# START flow testing both mounts
 
 
 async def test_load_labware_to_preparing_first_pipette(
         check_calibration_session):
-    await in_preparing_first_pipette(check_calibration_session)
+    sess = await in_preparing_first_pipette(check_calibration_session)
+    tip_pt = sess._moves.preparingFirstPipette.position
+    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    assert curr_pos == tip_pt
+
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
@@ -283,7 +365,10 @@ async def test_preparing_first_pipette_to_inspecting(
 
 async def test_inspecting_first_pipette_to_jogging_height(
         check_calibration_session):
-    await in_jogging_first_pipette_to_height(check_calibration_session)
+    sess = await in_jogging_first_pipette_to_height(check_calibration_session)
+    tip_pt = sess._moves.joggingFirstPipetteToHeight.position
+    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToHeight
     await check_calibration_session.trigger_transition(
@@ -301,7 +386,11 @@ async def test_jogging_first_pipette_height_to_comparing(
 
 async def test_comparing_first_pipette_height_to_jogging_point_one(
         check_calibration_session):
-    await in_jogging_first_pipette_to_point_one(check_calibration_session)
+    sess = await in_jogging_first_pipette_to_point_one(
+            check_calibration_session)
+    tip_pt = sess._moves.joggingFirstPipetteToPointOne.position
+    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointOne
     await check_calibration_session.trigger_transition(
@@ -319,7 +408,11 @@ async def test_jogging_first_pipette_point_one_to_comparing(
 
 async def test_comparing_first_pipette_point_one_to_jogging_point_two(
         check_calibration_session):
-    await in_jogging_first_pipette_to_point_two(check_calibration_session)
+    sess = await in_jogging_first_pipette_to_point_two(
+            check_calibration_session)
+    tip_pt = sess._moves.joggingFirstPipetteToPointTwo.position
+    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointTwo
     await check_calibration_session.trigger_transition(
@@ -337,7 +430,11 @@ async def test_jogging_first_pipette_point_two_to_comparing(
 
 async def test_comparing_first_pipette_point_two_to_jogging_point_three(
         check_calibration_session):
-    await in_jogging_first_pipette_to_point_three(check_calibration_session)
+    sess = await in_jogging_first_pipette_to_point_three(
+            check_calibration_session)
+    tip_pt = sess._moves.joggingFirstPipetteToPointThree.position
+    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointThree
     await check_calibration_session.trigger_transition(
@@ -355,7 +452,10 @@ async def test_jogging_first_pipette_point_three_to_comparing(
 
 async def test_load_labware_to_preparing_second_pipette(
         check_calibration_session):
-    await in_preparing_second_pipette(check_calibration_session)
+    sess = await in_preparing_second_pipette(check_calibration_session)
+    tip_pt = sess._moves.preparingSecondPipette.position
+    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
     await check_calibration_session.trigger_transition(
@@ -373,7 +473,11 @@ async def test_preparing_second_pipette_to_inspecting(
 
 async def test_inspecting_second_pipette_to_jogging_height(
         check_calibration_session):
-    await in_jogging_second_pipette_to_height(check_calibration_session)
+    sess = await in_jogging_second_pipette_to_height(
+            check_calibration_session)
+    tip_pt = sess._moves.joggingSecondPipetteToHeight.position
+    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingSecondPipetteToHeight
     await check_calibration_session.trigger_transition(
@@ -391,7 +495,11 @@ async def test_jogging_second_pipette_height_to_comparing(
 
 async def test_comparing_second_pipette_height_to_jogging_point_one(
         check_calibration_session):
-    await in_jogging_second_pipette_to_point_one(check_calibration_session)
+    sess = await in_jogging_second_pipette_to_point_one(
+            check_calibration_session)
+    tip_pt = sess._moves.joggingSecondPipetteToPointOne.position
+    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingSecondPipetteToPointOne
     await check_calibration_session.trigger_transition(
@@ -407,9 +515,9 @@ async def test_jogging_second_pipette_point_one_to_comparing(
         session.CalibrationCheckState.comparingSecondPipettePointOne
 
 
-# END testing both mounts
+# END flow testing both mounts
 
-# START testing right only
+# START flow testing right only
 
 
 async def test_right_load_labware_to_preparing_first_pipette(
@@ -502,9 +610,9 @@ async def test_right_jogging_first_pipette_point_three_to_complete(
         session.CalibrationCheckState.checkComplete
 
 
-# END testing right only
+# END flow testing right only
 
-# START testing left only
+# START flow testing left only
 
 
 async def test_left_load_labware_to_preparing_first_pipette(
@@ -595,4 +703,4 @@ async def test_left_jogging_first_pipette_point_three_to_complete(
         session.CalibrationCheckState.checkComplete
 
 
-# END testing left only
+# END flow testing left only
