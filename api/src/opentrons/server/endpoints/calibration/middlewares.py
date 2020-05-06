@@ -62,6 +62,7 @@ def status_response(
         str(k): AttachedPipette(model=v.model,
                                 name=v.name,
                                 tip_length=v.tip_length,
+                                mount=v.mount,
                                 has_tip=v.has_tip,
                                 tiprack_id=v.tiprack_id)
         for k, v in session.pipette_status().items()

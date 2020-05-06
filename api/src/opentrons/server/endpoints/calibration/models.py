@@ -4,6 +4,7 @@ from typing import Dict, Optional, List, Any
 from functools import partial
 from pydantic import BaseModel, Field
 from opentrons.hardware_control.types import Axis
+from opentrons.types import Mount
 
 
 Point = List[float]
@@ -44,10 +45,8 @@ class AttachedPipette(BaseModel):
                                 "generation version")
     tip_length: Optional[float] =\
         Field(None, description="The default tip length for this pipette")
-    mount_axis: Optional[Axis] =\
-        Field(None, description="The axis that moves this pipette up and down")
-    plunger_axis: Optional[Axis] =\
-        Field(None, description="The axis that moves plunger of this pipette")
+    mount: Optional[Mount] =\
+        Field(None, description="The mount this pipette attached to")
     has_tip: Optional[bool] =\
         Field(None, description="Whether a tip is attached.")
     tiprack_id: Optional[UUID] =\
@@ -92,16 +91,14 @@ class CalibrationSessionStatus(BaseModel):
                             "model": "p300_single_v1.5",
                             "name": "p300_single",
                             "tip_length": 51.7,
-                            "mount_axis": "z",
-                            "plunger_axis": "b",
+                            "mount": "left",
                             "id": "P3HS12123041"
                         },
                         "fakeUUID2": {
                             "model": None,
                             "name": None,
                             "tip_length": None,
-                            "mount_axis": "a",
-                            "plunger_axis": "c",
+                            "mount": "right",
                             "id": None
                         }
                     },

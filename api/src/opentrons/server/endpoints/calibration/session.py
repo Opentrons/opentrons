@@ -39,6 +39,7 @@ class PipetteStatus:
     model: str
     name: str
     tip_length: float
+    mount: Mount
     has_tip: bool
     tiprack_id: typing.Optional[UUID]
 
@@ -256,6 +257,7 @@ class CalibrationSession:
             p = PipetteStatus(
                 model=str(pip['model']),
                 name=str(pip['name']),
+                mount=data['mount'],
                 tip_length=float(pip['tip_length']),
                 has_tip=bool(pip['has_tip']),
                 tiprack_id=data['tiprack_id'],

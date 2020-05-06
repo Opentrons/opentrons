@@ -36,6 +36,7 @@ def _create_calibration_check_session_details(
             model=v.model,
             name=v.name,
             tip_length=v.tip_length,
+            mount=v.tip_length,
             has_tip=v.has_tip,
             tiprack_id=v.tiprack_id)
         for k, v in session.pipette_status().items()
@@ -55,5 +56,6 @@ def _create_calibration_check_session_details(
     return calibration_models.CalibrationSessionStatus(
         instruments=instruments,
         currentStep=session.current_state_name,
+        comparisonsByStep=session.get_comparisons_by_step(),
         labware=labware,
     )
