@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Dict, Optional, List, Any
 from functools import partial
 from pydantic import BaseModel, Field
-from opentrons.hardware_control.types import Axis
 from opentrons.types import Mount
 
 

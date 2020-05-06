@@ -24,7 +24,8 @@ class SessionCommands(str, Enum):
     pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
     confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
     invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
-    confirm_step = CalibrationCheckTrigger.confirm_step.value
+    compare_point = CalibrationCheckTrigger.compare_point.value
+    confirm_step = CalibrationCheckTrigger.go_to_next_check.value
     exit = CalibrationCheckTrigger.exit.value
     reject_calibration = CalibrationCheckTrigger.reject_calibration.value
 

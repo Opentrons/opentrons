@@ -729,8 +729,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                             jogged_pt._replace(z=0.0))
                 elif comp.threshold_vector.x == 0.0 and \
                         comp.threshold_vector.y == 0.0:
-                    diff_magnitude = ref_pt._replace(x=0.0, y=0.0).magnitude_to(
-                            jogged_pt._replace(x=0.0, y=0.0))
+                    diff_magnitude = ref_pt._replace(
+                            x=0.0, y=0.0).magnitude_to(jogged_pt._replace(
+                                                       x=0.0, y=0.0))
                 assert diff_magnitude is not None, \
                     'step comparisons must check z or (x and y) magnitude'
 

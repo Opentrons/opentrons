@@ -101,20 +101,13 @@ async def misc_error_handling(
     try:
         response = await handler(request, session)
     except (CalibrationException, StateMachineError) as e:
+        MODULE_LOG.exception("Calibration Check Exception")
         router = request.app.router
-        if isinstance(e, TipAttachError):
-            type = request.match_info['type']
-            req = await request.json()
-
-            error_response = _determine_error_message(
-                request, router, type, req.get('pipetteId', ''))
-        else:
-            MODULE_LOG.exception("Calibration Check Exception")
-            potential_triggers = session.get_potential_triggers()
-            links = _format_links(session, potential_triggers, router)
-            error_response = {
-                "message": "Labware Already Loaded.",
-                **links}
+        potential_triggers = session.get_potential_triggers()
+        links = _format_links(session, potential_triggers, router)
+        error_response = {
+            "message": str(e),
+            **links}
         response = web.json_response(error_response, status=409)
     return response
 

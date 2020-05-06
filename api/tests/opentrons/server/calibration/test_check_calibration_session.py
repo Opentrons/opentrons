@@ -21,7 +21,8 @@ def check_calibration_session(hardware) -> session.CheckCalibrationSession:
 
 
 @pytest.fixture
-def check_calibration_session_shared_tips(hardware) -> session.CheckCalibrationSession:
+def check_calibration_session_shared_tips(hardware) \
+        -> session.CheckCalibrationSession:
     hw = hardware._backend
     hw._attached_instruments[types.Mount.LEFT] = {
         'model': 'p300_multi_v1', 'id': 'fake300multipip'}
@@ -284,23 +285,14 @@ async def test_same_size_pips_share_tiprack(
     assert sess._deck['6']
     assert sess._deck['6'].name == 'opentrons_96_tiprack_10ul'
 
-
-async def test_same_size_pips_share_tiprack(
-        check_calibration_session_shared_tips):
-    sess = await in_labware_loaded(
-        check_calibration_session_shared_tips
-    )
-    assert len(sess._labware_info.keys()) == 1
-    assert len(next(iter(sess._labware_info.values())).forPipettes) == 2
-
     # z and x values should be the same, but y should be different
     # if accessing different tips (A1, B1) on same tiprack
     assert sess._moves.preparingFirstPipette.position.x == \
-            sess._moves.preparingSecondPipette.position.x
+        sess._moves.preparingSecondPipette.position.x
     assert sess._moves.preparingFirstPipette.position.z == \
-            sess._moves.preparingSecondPipette.position.z
+        sess._moves.preparingSecondPipette.position.z
     assert sess._moves.preparingFirstPipette.position.y != \
-            sess._moves.preparingSecondPipette.position.y
+        sess._moves.preparingSecondPipette.position.y
 
 
 async def test_jog_pipette(check_calibration_session):
@@ -365,7 +357,8 @@ async def test_invalidate_second_tip(check_calibration_session):
 
 
 async def test_complete_check_one_pip(check_calibration_session_only_right):
-    sess = await in_comparing_first_pipette_point_three(check_calibration_session_only_right)
+    sess = await in_comparing_first_pipette_point_three(
+            check_calibration_session_only_right)
     first_pip = sess.get_pipette(sess._first_mount)
     assert first_pip['has_tip'] is True
     await sess.trigger_transition(
@@ -376,7 +369,8 @@ async def test_complete_check_one_pip(check_calibration_session_only_right):
 
 
 async def test_complete_check_both_pips(check_calibration_session):
-    sess = await in_comparing_second_pipette_point_one(check_calibration_session)
+    sess = await in_comparing_second_pipette_point_one(
+            check_calibration_session)
     second_pip = sess.get_pipette(sess._second_mount)
     assert second_pip['has_tip'] is True
     await sess.trigger_transition(
@@ -385,7 +379,6 @@ async def test_complete_check_both_pips(check_calibration_session):
         session.CalibrationCheckState.checkComplete
     assert sess.get_pipette(sess._first_mount)['has_tip'] is False
     assert sess.get_pipette(sess._second_mount)['has_tip'] is False
-
 
 
 # START flow testing both mounts
