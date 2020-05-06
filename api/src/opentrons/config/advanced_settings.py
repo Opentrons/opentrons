@@ -145,12 +145,9 @@ settings = [
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     ),
     SettingDefinition(
-        _id='useFastApi',
-        title='Enable experimental HTTP API v2',
-        description='Tells the OT-2 to run a newer, highly experimental '
-                    'version of its HTTP API based on the FastAPI framework. '
-                    'This is an internal setting for Opentrons engineers; '
-                    'do not enable this setting or you will break your OT-2.',
+        _id='useV1HttpApi',
+        title='Revert to legacy HTTP API v1',
+        description='Tells the OT-2 to run the legacy v1 http api.',
         restart_required=True
     ),
 ]
