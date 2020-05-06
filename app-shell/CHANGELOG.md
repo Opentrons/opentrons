@@ -3,36 +3,9 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.17.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.2...v3.17.1-alpha.3) (2020-05-05)
-
-
-### Bug Fixes
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
 
 * **app-shell:** upgrade Electron, avoid hoisting dependencies, and fix devtools ([#5545](https://github.com/Opentrons/opentrons/issues/5545)) ([f993925](https://github.com/Opentrons/opentrons/commit/f993925)), closes [#5537](https://github.com/Opentrons/opentrons/issues/5537) [#5541](https://github.com/Opentrons/opentrons/issues/5541)
-
-
-
-
-
-## [3.17.1-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.1...v3.17.1-alpha.2) (2020-04-30)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-## [3.17.1-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.0...v3.17.1-alpha.1) (2020-04-30)
-
-**Note:** Version bump only for package @opentrons/app-shell
-
-
-
-
-
-## [3.17.1-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
-
-**Note:** Version bump only for package @opentrons/app-shell
 
 
 
