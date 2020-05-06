@@ -6,7 +6,7 @@ from dataclasses import dataclass, field
 from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint
 
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
