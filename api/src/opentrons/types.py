@@ -50,8 +50,6 @@ class Point(NamedTuple):
         return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
-
-
 LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]
 
 

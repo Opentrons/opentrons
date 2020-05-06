@@ -246,8 +246,6 @@ async def test_session_started_to_end_state(check_calibration_session):
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.sessionExited
 
-
-
 # START testing both mounts
 
 

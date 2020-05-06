@@ -3,7 +3,6 @@ from uuid import uuid4, UUID
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
 
-from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis, CriticalPoint
@@ -85,7 +84,8 @@ class Moves:
     joggingSecondPipetteToPointOne: CheckMove = CheckMove()
 
 
-TRASH_TIP_OFFSET = Point(20, 20, -20)  # vector from front bottom left of slot 12
+# vector from front bottom left of slot 12
+TRASH_TIP_OFFSET = Point(20, 20, -20)
 
 
 class CalibrationSession:
@@ -138,9 +138,9 @@ class CalibrationSession:
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
             load_name: str = _lookup.load_name
 
-            prev_lw = lw.get(_prev_lw_uuid, None)
-            if prev_lw and prev_lw.loadName == load_name:
-                #  pipette uses same tiprack as previous, just use same existing
+            prev_lw = lw.get(_prev_lw_uuid, None) if _prev_lw_uuid else None
+            if _prev_lw_uuid and prev_lw and prev_lw.loadName == load_name:
+                #  pipette uses same tiprack as previous, use existing
                 lw[_prev_lw_uuid].forPipettes.append(pipette_id)
                 self._pip_info_by_id[pipette_id]['tiprack_id'] = _prev_lw_uuid
             else:
@@ -549,6 +549,7 @@ P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
 OK_HEIGHT_VECTOR = Point(0, 0, 5)
 OK_XY_VECTOR = Point(5, 5, 0)
 
+
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
@@ -644,7 +645,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    def _get_preparing_state_mount(self) -> Optional[Mount]:
+    def _get_preparing_state_mount(self) -> typing.Optional[Mount]:
         mount = None
         if self.current_state_name == \
                 CalibrationCheckState.preparingFirstPipette:
@@ -653,7 +654,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 CalibrationCheckState.preparingSecondPipette:
             mount = self._second_mount
         return mount
-
 
     async def _is_tip_pick_up_dangerous(self):
         """
@@ -746,7 +746,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
-                    ComparisonStatus(differenceVector=absolute_diff_vector,
+                    ComparisonStatus(differenceVector=abs(ref_pt - jogged_pt),
                                      thresholdVector=comp.threshold_vector,
                                      exceedsThreshold=exceeds)
         return comparisons
@@ -785,8 +785,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
         cp = next(pip_info['critical_point'] for id, pip_info in
-                          self._pip_info_by_id.items() if
-                          pip_info['mount'] == mount)
+                  self._pip_info_by_id.items() if
+                  pip_info['mount'] == mount)
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, to_loc,
