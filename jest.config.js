@@ -13,7 +13,7 @@ module.exports = {
   },
   transform: {
     '^.+\\.js$': 'babel-jest',
-    '\\.(jpg|png|gif|svg|woff|woff2)$':
+    '\\.(jpg|png|gif|svg|woff|woff2|webm)$':
       '@opentrons/components/src/__mocks__/file.js',
   },
   transformIgnorePatterns: ['/node_modules/(?!@opentrons/)'],

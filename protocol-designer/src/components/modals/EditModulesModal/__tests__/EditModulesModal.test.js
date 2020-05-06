@@ -1,432 +1,297 @@
 // @flow
-
 import React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { OutlineButton, DropdownField } from '@opentrons/components'
+import { act } from 'react-dom/test-utils'
+import * as Formik from 'formik'
+import { OutlineButton, SlotMap } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
-  MAGNETIC_MODULE_V2,
-  MAGNETIC_MODULE_V1,
-  TEMPERATURE_MODULE_V1,
   TEMPERATURE_MODULE_TYPE,
-  type LabwareDefinition2,
-  type ModuleRealType,
+  MAGNETIC_MODULE_V2,
+  TEMPERATURE_MODULE_V2,
 } from '@opentrons/shared-data'
-import fixture_96_plate from '@opentrons/shared-data/labware/fixtures/2/fixture_96_plate'
 import {
+  getMockDeckSetup,
+  getMockMagneticModule,
+  getMockTemperatureModule,
+} from '../../../../../fixtures/state/deck'
+import {
+  actions as stepFormActions,
   selectors as stepFormSelectors,
-  type InitialDeckSetup,
 } from '../../../../step-forms'
+import {
+  getLabwareOnSlot,
+  getSlotsBlockedBySpanning,
+  getSlotIsEmpty,
+} from '../../../../step-forms/utils'
+import * as moduleData from '../../../../modules/moduleData'
+import { MODELS_FOR_MODULE_TYPE } from '../../../../constants'
 import { selectors as featureSelectors } from '../../../../feature-flags'
-import * as stepFormActions from '../../../../step-forms/actions'
 import { getLabwareIsCompatible } from '../../../../utils/labwareModuleCompatibility'
-import * as labwareIngredActions from '../../../../labware-ingred/actions'
-import { SUPPORTED_MODULE_SLOTS } from '../../../../modules'
+import { isModuleWithCollisionIssue } from '../../../modules/utils'
 import { PDAlert } from '../../../alerts/PDAlert'
-import { useBlockingHint } from '../../../Hints/useBlockingHint'
-import { EditModulesModal } from '../'
+import { EditModulesModal } from '..'
+import { ModelDropdown } from '../ModelDropdown'
+import { SlotDropdown } from '../SlotDropdown'
+import { ConnectedSlotMap } from '../ConnectedSlotMap'
 
-import type { Node } from 'react'
-import type { BaseState } from '../../../../types'
-
-// only mock actions and selectors from step-forms
-jest.mock('../../../../step-forms/actions')
-jest.mock('../../../../step-forms/selectors')
-jest.mock('../../../../labware-ingred/actions')
 jest.mock('../../../../utils/labwareModuleCompatibility')
 jest.mock('../../../../feature-flags')
-jest.mock('../../../Hints/useBlockingHint')
+jest.mock('../../../../step-forms/selectors')
+jest.mock('../../../modules/utils')
+jest.mock('../../../../step-forms/utils')
+jest.mock('../form-state')
 
-const getInitialDeckSetupMock: JestMockFn<[BaseState], InitialDeckSetup> =
+const MODEL_FIELD = 'selectedModel'
+const SLOT_FIELD = 'selectedSlot'
+
+const getInitialDeckSetupMock: JestMockFn<any, any> =
   stepFormSelectors.getInitialDeckSetup
-const getLabwareIsCompatibleMock: JestMockFn<
-  [LabwareDefinition2, ModuleRealType],
-  boolean
-> = getLabwareIsCompatible
-const getDisableModuleRestrictionsMock: JestMockFn<[BaseState], ?boolean> =
+
+const getLabwareIsCompatibleMock: JestMockFn<any, any> = getLabwareIsCompatible
+
+const getDisableModuleRestrictionsMock: JestMockFn<any, any> =
   featureSelectors.getDisableModuleRestrictions
-const useBlockingHintMock: JestMockFn<any, ?Node> = useBlockingHint
 
-describe('EditModulesModal', () => {
-  const slotDropdownName = 'selectedSlot'
-  const modelDropdownName = 'selectedModel'
-  const modelDropdownSelector = `select[name="${modelDropdownName}"]`
-  const slotDropdownSelector = `select[name="${slotDropdownName}"]`
+const isModuleWithCollisionIssueMock: JestMockFn<
+  any,
+  any
+> = isModuleWithCollisionIssue
+
+const getSlotsBlockedBySpanningMock: JestMockFn<
+  any,
+  any
+> = getSlotsBlockedBySpanning
+
+const getSlotIsEmptyMock: JestMockFn<any, any> = getSlotIsEmpty
+
+const getLabwareOnSlotMock: JestMockFn<any, any> = getLabwareOnSlot
+
+describe('Edit Modules Modal', () => {
   let mockStore
-  function render(props) {
-    return mount(
-      <Provider store={mockStore}>
-        <EditModulesModal {...props} />
-      </Provider>
-    )
-  }
-
-  function simulateRunAllAsyncEvents() {
-    return new Promise(resolve => setTimeout(resolve, 0))
-  }
-
-  let magneticModule, emptyDeckState, addMagneticModuleProps
+  let props
   beforeEach(() => {
-    jest.clearAllMocks()
+    getInitialDeckSetupMock.mockReturnValue(getMockDeckSetup())
+    getSlotsBlockedBySpanningMock.mockReturnValue([])
+    getLabwareOnSlotMock.mockReturnValue({})
+    props = {
+      moduleOnDeck: null,
+      moduleType: MAGNETIC_MODULE_TYPE,
+      onCloseClick: jest.fn(),
+      editModuleModel: jest.fn(),
+      editModuleSlot: jest.fn(),
+      displayModuleWarning: jest.fn(),
+    }
     mockStore = {
       dispatch: jest.fn(),
       subscribe: jest.fn(),
       getState: () => ({}),
     }
-
-    useBlockingHintMock.mockReturnValue(null)
-
-    magneticModule = {
-      id: 'magnet123',
-      slot: '3',
-      type: MAGNETIC_MODULE_TYPE,
-      model: MAGNETIC_MODULE_V1,
-      moduleState: {
-        engaged: false,
-        type: MAGNETIC_MODULE_TYPE,
-      },
-    }
-    emptyDeckState = {
-      labware: {},
-      modules: {},
-      pipettes: {},
-    }
-    addMagneticModuleProps = {
-      moduleType: MAGNETIC_MODULE_TYPE,
-      moduleId: null,
-      onCloseClick: jest.fn(),
-    }
-
-    getDisableModuleRestrictionsMock.mockReturnValue(true)
   })
 
-  it('displays warning and disabled save button when slot is occupied by incompatible labware', () => {
-    const slot = '1'
-    getInitialDeckSetupMock.mockReturnValue({
-      labware: {
-        well96Id: {
-          ...fixture_96_plate,
-          slot,
-        },
-      },
-      modules: {},
-      pipettes: {},
-    })
-    getLabwareIsCompatibleMock.mockReturnValue(false)
-
-    const wrapper = render(addMagneticModuleProps)
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-    slotDropdown.simulate('change', {
-      target: { name: slotDropdownName, value: slot },
-    })
-    const warning = wrapper.find(PDAlert)
-
-    expect(warning).toHaveLength(1)
-    expect(saveButton.prop('disabled')).toBe(true)
+  afterEach(() => {
+    jest.clearAllMocks()
   })
-
-  it('save button is clickable and saves when model is selected and slot is occupied by compatible labware', async () => {
-    const slot = '1'
-    getInitialDeckSetupMock.mockReturnValue({
-      labware: {
-        well96Id: {
-          ...fixture_96_plate,
-          slot,
-        },
-      },
-      modules: {},
-      pipettes: {},
-    })
-    getLabwareIsCompatibleMock.mockReturnValue(true)
-
-    const wrapper = render(addMagneticModuleProps)
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-    slotDropdown.simulate('change', {
-      target: { name: slotDropdownName, value: slot },
-    })
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V1 },
-    })
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    saveButton.simulate('click')
-    await simulateRunAllAsyncEvents()
-    const warning = wrapper.find(PDAlert)
-
-    expect(warning).toHaveLength(0)
-    expect(stepFormActions.createModule).toHaveBeenCalledWith({
-      slot,
-      type: MAGNETIC_MODULE_TYPE,
-      model: MAGNETIC_MODULE_V1,
-    })
-    expect(addMagneticModuleProps.onCloseClick).toHaveBeenCalled()
-  })
-
-  it('save button saves when adding module to empty slot', async () => {
-    getInitialDeckSetupMock.mockReturnValue({
-      labware: {
-        well96Id: fixture_96_plate,
-      },
-      modules: {
-        magnet123: magneticModule,
-      },
-      pipettes: {},
-    })
-    const props = {
-      moduleType: TEMPERATURE_MODULE_TYPE,
-      moduleId: null,
-      onCloseClick: jest.fn(),
-    }
-    const newSlot = '9'
-
-    const wrapper = render(props)
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-    slotDropdown.simulate('change', {
-      target: { name: slotDropdownName, value: newSlot },
-    })
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: 'selectedModel', value: TEMPERATURE_MODULE_V1 },
-    })
-    saveButton.simulate('click')
-    await simulateRunAllAsyncEvents()
-    const warning = wrapper.find(PDAlert)
-
-    expect(warning).toHaveLength(0)
-    expect(stepFormActions.createModule).toHaveBeenCalledWith({
-      slot: newSlot,
-      type: TEMPERATURE_MODULE_TYPE,
-      model: TEMPERATURE_MODULE_V1,
-    })
-    expect(props.onCloseClick).toHaveBeenCalled()
-  })
-
-  it('move deck item when moving module to a different slot', async () => {
-    const currentSlot = '1'
-    const targetSlot = '9'
-    getInitialDeckSetupMock.mockReturnValue({
-      labware: {
-        wellId: {
-          ...fixture_96_plate,
-          slot: currentSlot,
-        },
-      },
-      modules: {
-        magnet123: {
-          ...magneticModule,
-          slot: currentSlot,
-        },
-      },
-      pipettes: {},
-    })
-    getLabwareIsCompatibleMock.mockReturnValue(true)
-    const props = {
-      moduleType: MAGNETIC_MODULE_TYPE,
-      moduleId: 'magnet123',
-      onCloseClick: jest.fn(),
-    }
-
-    const wrapper = render(props)
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-    slotDropdown.simulate('change', {
-      target: { name: slotDropdownName, value: targetSlot },
-    })
-    saveButton.simulate('click')
-    await simulateRunAllAsyncEvents()
-    const warning = wrapper.find(PDAlert)
-
-    expect(warning).toHaveLength(0)
-    expect(labwareIngredActions.moveDeckItem).toHaveBeenCalledWith(
-      currentSlot,
-      targetSlot
+  const render = props =>
+    mount(
+      <Provider store={mockStore}>
+        <EditModulesModal {...props} />
+      </Provider>
     )
-    expect(props.onCloseClick).toHaveBeenCalled()
-  })
 
-  it('no warning when slot is occupied by same module', () => {
-    getInitialDeckSetupMock.mockReturnValue({
-      labware: {
-        wellId: {
-          ...fixture_96_plate,
-          slot: '1',
-        },
-      },
-      modules: {
-        magnet123: magneticModule,
-      },
-      pipettes: {},
+  describe('PD alert', () => {
+    beforeEach(() => {
+      getDisableModuleRestrictionsMock.mockReturnValue(false)
     })
-    const props = {
-      moduleType: MAGNETIC_MODULE_TYPE,
-      moduleId: 'magnet123',
-      onCloseClick: jest.fn(),
-    }
-
-    const wrapper = render(props)
-    const warning = wrapper.find(PDAlert)
-
-    expect(warning).toHaveLength(0)
-  })
-
-  it('cancel calls onCloseClick to close modal', () => {
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-    const cancelButton = wrapper.find(OutlineButton).at(0)
-    cancelButton.simulate('click')
-
-    expect(addMagneticModuleProps.onCloseClick).toHaveBeenCalled()
-  })
-
-  it('slot dropdown is disabled when module restrictions are enabled', () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-
-    expect(wrapper.find(slotDropdownSelector).prop('disabled')).toBe(true)
-  })
-
-  it('allows slot options when module restrictions are disabled', () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(true)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-
-    expect(wrapper.find(slotDropdownSelector).prop('disabled')).toBe(false)
-  })
-
-  it('allows slot options when modules do not have collisions', () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V2 },
+    afterEach(() => {
+      jest.clearAllMocks()
+    })
+    it('does NOT render when labware is compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(true)
+      const wrapper = render(props)
+      expect(wrapper.find(PDAlert)).toHaveLength(0)
     })
 
-    expect(wrapper.find(slotDropdownSelector).prop('disabled')).toBe(false)
+    it('renders when labware is incompatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(false)
+      const wrapper = render(props)
+      expect(wrapper.find(PDAlert)).toHaveLength(1)
+    })
   })
 
-  it('has error when clicking save button when no model is selected', async () => {
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
+  describe('Slot Dropdown', () => {
+    it('should pass the correct options and field name', () => {
+      const mockSlots = [{ value: 'mockSlots', name: 'mockSlots' }]
+      jest
+        .spyOn(moduleData, 'getAllModuleSlotsByType')
+        .mockImplementation(() => mockSlots)
 
-    const wrapper = render(addMagneticModuleProps)
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    saveButton.simulate('click')
-    await simulateRunAllAsyncEvents()
-    wrapper.update()
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).prop('options')).toBe(mockSlots)
+      expect(wrapper.find(SlotDropdown).prop('fieldName')).toBe(SLOT_FIELD)
+    })
+    it('should be enabled when there is no collision issue', () => {
+      props.moduleOnDeck = getMockMagneticModule()
+      isModuleWithCollisionIssueMock.mockReturnValueOnce(false)
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).prop('disabled')).toBe(false)
+    })
 
-    expect(
+    it('should be disabled when there is no collision issue', () => {
+      isModuleWithCollisionIssueMock.mockReturnValue(true)
+      const wrapper = render(props)
+      expect(wrapper.find(SlotDropdown).prop('disabled')).toBe(true)
+    })
+
+    it('should error when labware is incompatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(false)
+      const wrapper = render(props)
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toMatch('labware incompatible')
+    })
+
+    it('should error when slot is empty but blocked', () => {
+      getSlotIsEmptyMock.mockReturnValueOnce(true)
+      getSlotsBlockedBySpanningMock.mockReturnValue(['1']) // 1 is default slot
+      const wrapper = render(props)
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toMatch('labware incompatible')
+    })
+    it('should NOT error when labware is compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(true)
+      const wrapper = render(props)
+      expect(
+        wrapper
+          .find(SlotDropdown)
+          .childAt(0)
+          .prop('error')
+      ).toBeFalsy()
+    })
+  })
+
+  describe('Model Dropdown', () => {
+    it('should pass the correct props for magnetic module', () => {
+      props.moduleType = MAGNETIC_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: MODELS_FOR_MODULE_TYPE[MAGNETIC_MODULE_TYPE],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+    it('should pass the correct props for temperature module', () => {
+      props.moduleType = TEMPERATURE_MODULE_TYPE
+      const wrapper = render(props)
+      const expectedProps = {
+        fieldName: MODEL_FIELD,
+        options: MODELS_FOR_MODULE_TYPE[TEMPERATURE_MODULE_TYPE],
+        tabIndex: 0,
+      }
+      expect(wrapper.find(ModelDropdown).props()).toEqual(expectedProps)
+    })
+  })
+
+  describe('Connected Slot Map', () => {
+    it('should pass the selected slot field name', () => {
+      const wrapper = render(props)
+      expect(wrapper.find(ConnectedSlotMap).prop('fieldName')).toBe(
+        'selectedSlot'
+      )
+    })
+    it('should pass an error if the labware is not compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(false)
+      const wrapper = render(props)
+      expect(wrapper.find(SlotMap).prop('isError')).toBeTruthy()
+    })
+    it('should NOT pass an error if the labware is compatible', () => {
+      getLabwareIsCompatibleMock.mockReturnValue(true)
+      const wrapper = render(props)
+      expect(wrapper.find(SlotMap).prop('isError')).toBeFalsy()
+    })
+  })
+
+  describe('Cancel Button', () => {
+    it('calls onCloseClick when pressed', () => {
+      const wrapper = render(props)
       wrapper
-        .find(DropdownField)
-        .filter({ name: modelDropdownName })
-        .prop('error')
-    ).toBe('This field is required')
-  })
-
-  it('only allows default slot if module has collision issue and module restrictions are enabled', () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V1 },
+        .find(OutlineButton)
+        .at(0)
+        .prop('onClick')()
+      expect(props.onCloseClick).toHaveBeenCalled()
     })
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-
-    expect(slotDropdown.prop('disabled')).toBe(true)
-    expect(slotDropdown.prop('value')).toBe(
-      SUPPORTED_MODULE_SLOTS[MAGNETIC_MODULE_TYPE][0].value
-    )
   })
-
-  it('resets the slot to default when switching from module without collision issue to one that does', async () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
-
-    const wrapper = render(addMagneticModuleProps)
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V2 },
+  describe('Form Submission', () => {
+    it('sets module change warning info when model has changed and is magnetic module', () => {
+      props.moduleOnDeck = getMockMagneticModule()
+      const wrapper = render(props)
+      const formik = wrapper.find(Formik.Formik)
+      const mockValues = {
+        selectedSlot: '1',
+        selectedModel: MAGNETIC_MODULE_V2,
+      }
+      act(() => {
+        formik.invoke('onSubmit')(mockValues)
+      })
+      expect(props.displayModuleWarning).toHaveBeenCalledWith({
+        model: mockValues.selectedModel,
+        slot: mockValues.selectedSlot,
+      })
     })
-    const slotDropdown = wrapper.find(slotDropdownSelector)
-    slotDropdown.simulate('change', {
-      target: { name: slotDropdownName, value: '9' },
+
+    it('edits the model and slot if module is not magnetic module', () => {
+      props.moduleOnDeck = getMockTemperatureModule()
+      const wrapper = render(props)
+      const formik = wrapper.find(Formik.Formik)
+      const mockValues = {
+        selectedSlot: '1',
+        selectedModel: TEMPERATURE_MODULE_V2,
+      }
+      act(() => {
+        formik.invoke('onSubmit')(mockValues)
+      })
+      expect(props.editModuleModel).toHaveBeenCalledWith(TEMPERATURE_MODULE_V2)
+      expect(props.editModuleSlot).toHaveBeenCalledWith('1')
     })
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V1 },
-    })
-    await simulateRunAllAsyncEvents()
-    wrapper.update()
-    const updatedSlotDropdown = wrapper.find(slotDropdownSelector)
 
-    expect(updatedSlotDropdown.prop('disabled')).toBe(true)
-    expect(updatedSlotDropdown.prop('value')).toBe(
-      SUPPORTED_MODULE_SLOTS[MAGNETIC_MODULE_TYPE][0].value
-    )
-  })
+    it('creates a new module if no module is registered', () => {
+      props.moduleOnDeck = null
+      const wrapper = render(props)
+      const formik = wrapper.find(Formik.Formik)
+      const mockValues = {
+        selectedSlot: '1',
+        selectedModel: MAGNETIC_MODULE_V2,
+      }
+      act(() => {
+        formik.invoke('onSubmit')(mockValues)
+      })
 
-  it('renders blocking hint when useBlockingHint returns a component', () => {
-    const WarningModal = () => <div>warning modal</div>
-    useBlockingHintMock.mockReturnValue(<WarningModal />)
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue(emptyDeckState)
+      const params = {
+        slot: '1',
+        type: MAGNETIC_MODULE_TYPE,
+        model: MAGNETIC_MODULE_V2,
+      }
 
-    const wrapper = render(addMagneticModuleProps)
-    expect(wrapper.find(WarningModal)).toHaveLength(1)
-  })
+      const createModuleAction = stepFormActions.createModule(params)
 
-  it('uses blocking hint if existing magnetic module model is changed', async () => {
-    getDisableModuleRestrictionsMock.mockReturnValue(false)
-    getInitialDeckSetupMock.mockReturnValue({
-      ...emptyDeckState,
-      modules: {
-        someMagModuleId: {
-          id: 'someMagModuleId',
-          model: MAGNETIC_MODULE_V1,
-          type: MAGNETIC_MODULE_TYPE,
-          slot: '1',
-          moduleState: { engaged: false, type: MAGNETIC_MODULE_TYPE },
+      const expected = {
+        ...createModuleAction,
+        payload: {
+          ...createModuleAction.payload,
+          id: expect.stringContaining(MAGNETIC_MODULE_TYPE), // need to do this because exact id is created on the fly
         },
-      },
-    })
+      }
 
-    const wrapper = render({
-      ...addMagneticModuleProps,
-      moduleId: 'someMagModuleId',
-    })
-
-    // blocking hint initially NOT 'enabled'
-    expect(useBlockingHintMock).toHaveBeenCalledWith({
-      hintKey: 'change_magnet_module_model',
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
-      content: expect.anything(),
-      enabled: false,
-    })
-
-    const modelDropdown = wrapper.find(modelDropdownSelector)
-    modelDropdown.simulate('change', {
-      target: { name: modelDropdownName, value: MAGNETIC_MODULE_V2 },
-    })
-    const saveButton = wrapper.find(OutlineButton).at(1)
-    saveButton.simulate('click')
-    await simulateRunAllAsyncEvents()
-
-    // blocking hint 'enabled' after save
-    expect(useBlockingHintMock).toHaveBeenLastCalledWith({
-      hintKey: 'change_magnet_module_model',
-      handleCancel: expect.any(Function),
-      handleContinue: expect.any(Function),
-      content: expect.anything(),
-      enabled: true,
+      expect(mockStore.dispatch).toHaveBeenCalledWith(expected)
     })
   })
 })

@@ -12,11 +12,12 @@ from .logging import initialize_logging
 from .models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
-    transform_validation_error_to_json_api_errors, consolidate_fastapi_response
+    transform_validation_error_to_json_api_errors, \
+    consolidate_fastapi_response, RobotServerError, ErrorResponse
 from .dependencies import get_rpc_server
 from robot_server import constants
+from .routers import item, legacy_routes, routes
 
-from .routers import item, routes
 
 log = logging.getLogger(__name__)
 
@@ -31,14 +32,18 @@ app = FastAPI(
     version=__version__,
 )
 
-
-app.include_router(router=routes,
+# Legacy routes
+app.include_router(router=legacy_routes,
                    tags=[constants.V1_TAG],
                    responses={
                        HTTP_422_UNPROCESSABLE_ENTITY: {
                            "model": V1BasicResponse
                        }
                    })
+
+# New v2 routes
+app.include_router(router=routes)
+
 
 # TODO(isk: 3/18/20): this is an example route, remove item route and model
 # once response work is implemented in new route handlers
@@ -80,8 +85,23 @@ async def api_version_check(request: Request, call_next) -> Response:
     return response
 
 
+@app.exception_handler(RobotServerError)
+async def robot_server_exception_handler(request: Request,
+                                         exc: RobotServerError) \
+        -> JSONResponse:
+    """Catch robot server exceptions"""
+    if not exc.error.status:
+        exc.error.status = str(exc.status_code)
+    return JSONResponse(
+        status_code=exc.status_code,
+        content=ErrorResponse(errors=[exc.error]).dict(exclude_unset=True)
+    )
+
+
 @app.exception_handler(V1HandlerError)
-async def v1_exception_handler(request: Request, exc: V1HandlerError):
+async def v1_exception_handler(request: Request, exc: V1HandlerError) \
+        -> JSONResponse:
+    """Catch legacy errors"""
     return JSONResponse(
         status_code=exc.status_code,
         content=V1BasicResponse(message=exc.message).dict()

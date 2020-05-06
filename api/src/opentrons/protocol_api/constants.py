@@ -18,3 +18,23 @@ class JsonCommand(enum.Enum):
         "temperatureModule/deactivate"
     temperatureModuleAwaitTemperature = \
         "temperatureModule/awaitTemperature"
+    thermocyclerSetTargetBlockTemperature = \
+        "thermocycler/setTargetBlockTemperature"
+    thermocyclerSetTargetLidTemperature = \
+        "thermocycler/setTargetLidTemperature"
+    thermocyclerAwaitBlockTemperature = \
+        "thermocycler/awaitBlockTemperature"
+    thermocyclerAwaitLidTemperature = \
+        "thermocycler/awaitLidTemperature"
+    thermocyclerOpenLid = \
+        "thermocycler/openLid"
+    thermocyclerCloseLid = \
+        "thermocycler/closeLid"
+    thermocyclerDeactivateBlock = \
+        "thermocycler/deactivateBlock"
+    thermocyclerDeactivateLid = \
+        "thermocycler/deactivateLid"
+    thermocyclerRunProfile = \
+        "thermocycler/runProfile"
+    thermocyclerAwaitProfileComplete = \
+        "thermocycler/awaitProfileComplete"

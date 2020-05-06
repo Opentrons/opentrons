@@ -16,6 +16,12 @@ describe('robot reducer - session', () => {
       // loading a protocol
       sessionRequest: { inProgress: false, error: null },
       state: '',
+      statusInfo: {
+        message: null,
+        userMessage: null,
+        changedAt: null,
+        estimatedDuration: null,
+      },
       errors: [],
       protocolCommands: [],
       protocolCommandsById: {},

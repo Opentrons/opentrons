@@ -12,6 +12,7 @@ async def health(request: web.Request) -> web.Response:
         'name': config.name(),
         'api_version': __version__,
         'fw_version': request.app['com.opentrons.hardware'].fw_version,
+        'board_revision': request.app['com.opentrons.hardware'].board_revision,
         'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': config.OT_SYSTEM_VERSION,
         'protocol_api_version': list(protocol_api.MAX_SUPPORTED_VERSION),

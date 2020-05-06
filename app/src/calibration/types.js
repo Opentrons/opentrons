@@ -4,6 +4,18 @@ import typeof {
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  ROBOT_CALIBRATION_CHECK_JOG,
+  ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
+  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
   DELETE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
@@ -11,6 +23,7 @@ import typeof {
 } from './constants'
 import type { RobotCalibrationCheckSessionData } from './api-types'
 
+export type JogVector = Array<number>
 export type CreateRobotCalibrationCheckSessionAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: {| robotName: string |},
@@ -25,6 +38,87 @@ export type CreateRobotCalibrationCheckSessionSuccessAction = {|
 
 export type CreateRobotCalibrationCheckSessionFailureAction = {|
   type: CREATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionSuccessAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchRobotCalibrationCheckSessionFailureAction = {|
+  type: FETCH_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
+  payload: {| robotName: string, error: {} |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckLoadLabwareAction = {|
+  type: ROBOT_CALIBRATION_CHECK_LOAD_LABWARE,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckPreparePipetteAction = {|
+  type: ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckJogAction = {|
+  type: ROBOT_CALIBRATION_CHECK_JOG,
+  payload: {| robotName: string, pipetteId: string, vector: JogVector |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckPickUpTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckConfirmTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckInvalidateTipAction = {|
+  type: ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type RobotCalibrationCheckConfirmStepAction = {|
+  type: ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
+  payload: {| robotName: string, pipetteId: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateRobotCalibrationCheckSessionAction =
+  | RobotCalibrationCheckLoadLabwareAction
+  | RobotCalibrationCheckPreparePipetteAction
+  | RobotCalibrationCheckJogAction
+  | RobotCalibrationCheckPickUpTipAction
+  | RobotCalibrationCheckConfirmTipAction
+  | RobotCalibrationCheckInvalidateTipAction
+  | RobotCalibrationCheckConfirmStepAction
+
+export type UpdateRobotCalibrationCheckSessionSuccessAction = {|
+  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS,
+  payload: {| robotName: string, ...RobotCalibrationCheckSessionData |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type UpdateRobotCalibrationCheckSessionFailureAction = {|
+  type: UPDATE_ROBOT_CALIBRATION_CHECK_SESSION_FAILURE,
   payload: {| robotName: string, error: {} |},
   meta: RobotApiRequestMeta,
 |}
@@ -56,6 +150,12 @@ export type CalibrationAction =
   | CreateRobotCalibrationCheckSessionAction
   | CreateRobotCalibrationCheckSessionSuccessAction
   | CreateRobotCalibrationCheckSessionFailureAction
+  | FetchRobotCalibrationCheckSessionAction
+  | FetchRobotCalibrationCheckSessionSuccessAction
+  | FetchRobotCalibrationCheckSessionFailureAction
+  | UpdateRobotCalibrationCheckSessionAction
+  | UpdateRobotCalibrationCheckSessionSuccessAction
+  | UpdateRobotCalibrationCheckSessionFailureAction
   | DeleteRobotCalibrationCheckSessionAction
   | DeleteRobotCalibrationCheckSessionSuccessAction
   | DeleteRobotCalibrationCheckSessionFailureAction

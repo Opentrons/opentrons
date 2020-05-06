@@ -1,5 +1,6 @@
 from typing import Dict, Tuple
-
+import pathlib
+from . import RevisionPinsError
 
 OUTPUT_PINS = {
     'FRAME_LEDS': 6,
@@ -14,8 +15,12 @@ OUTPUT_PINS = {
 
 INPUT_PINS = {
     'BUTTON_INPUT': 5,
-    'WINDOW_INPUT': 20
+    'WINDOW_INPUT': 20,
+    'REV_0': 17,
+    'REV_1': 27
 }
+
+DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 
 class SimulatingGPIOCharDev:
@@ -87,7 +92,14 @@ class SimulatingGPIOCharDev:
         pass
 
     def read_window_switches(self) -> bool:
-        pass
+        return (bool(self._read(OUTPUT_PINS['WINDOW_INPUT'])))
+
+    def read_revision_bits(self) -> Tuple[bool, bool]:
+        if pathlib.Path(DTOVERLAY_PATH).exists():
+            return (bool(self._read(INPUT_PINS['REV_0'])),
+                    bool(self._read(INPUT_PINS['REV_1'])))
+        else:
+            raise RevisionPinsError
 
     def release_line(self, offset: int):
         self.lines.pop(offset)

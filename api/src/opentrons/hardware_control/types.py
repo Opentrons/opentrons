@@ -55,6 +55,31 @@ class HardwareAPILike(abc.ABC):
     def loop(self) -> asyncio.AbstractEventLoop:
         ...
 
+    @property
+    def board_revision(self) -> str:
+        ...
+
+
+class BoardRevision(enum.Enum):
+    UNKNOWN = enum.auto()
+    OG = enum.auto()
+    A = enum.auto()
+    B = enum.auto()
+    C = enum.auto()
+
+    @classmethod
+    def by_bits(cls, rev_bits: Tuple[bool, bool]):
+        br = {
+            (True, True): cls.OG,
+            (False, True): cls.A,
+            (True, False): cls.B,
+            (False, False): cls.C
+        }
+        return br[rev_bits]
+
+    def __str__(self):
+        return '2.1' if self.name == 'OG' else self.name
+
 
 class CriticalPoint(enum.Enum):
     """ Possibilities for the point to move in a move call.

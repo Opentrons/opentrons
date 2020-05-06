@@ -7,7 +7,7 @@ from opentrons.config.reset import ResetOptionId
 from opentrons.config import advanced_settings
 
 
-# TDOD(isk: 3/20/20): test validation errors after refactor
+# TODO(isk: 3/20/20): test validation errors after refactor
 # return {message: string}
 @pytest.mark.parametrize(
     "log_level, syslog_level, expected_message",

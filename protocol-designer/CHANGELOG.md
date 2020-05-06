@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+### Bug Fixes
+
+* **protocol-designer:** add field level validation for magnetic module engage height ([#5339](https://github.com/Opentrons/opentrons/issues/5339)) ([5e2aff6](https://github.com/Opentrons/opentrons/commit/5e2aff6)), closes [#5274](https://github.com/Opentrons/opentrons/issues/5274)
+* **protocol-designer:** allow adding labware to slots again ([#5378](https://github.com/Opentrons/opentrons/issues/5378)) ([e49e162](https://github.com/Opentrons/opentrons/commit/e49e162)), closes [#5370](https://github.com/Opentrons/opentrons/issues/5370)
+* **protocol-designer:** Default to GEN1 model for TC ([#5443](https://github.com/Opentrons/opentrons/issues/5443)) ([14c68c8](https://github.com/Opentrons/opentrons/commit/14c68c8)), closes [#5389](https://github.com/Opentrons/opentrons/issues/5389)
+* **protocol-designer:** default to non-i18n step-gen errors if no i18n title ([#5360](https://github.com/Opentrons/opentrons/issues/5360)) ([644b2db](https://github.com/Opentrons/opentrons/commit/644b2db))
+* **protocol-designer:** fix dnd steps vs labware bug ([#5370](https://github.com/Opentrons/opentrons/issues/5370)) ([a6f6594](https://github.com/Opentrons/opentrons/commit/a6f6594)), closes [#5367](https://github.com/Opentrons/opentrons/issues/5367)
+* **protocol-designer:** fix module substep text styling ([#5306](https://github.com/Opentrons/opentrons/issues/5306)) ([61b94ab](https://github.com/Opentrons/opentrons/commit/61b94ab)), closes [#5305](https://github.com/Opentrons/opentrons/issues/5305)
+* **protocol-designer:** Hide CrashInfoBox when module restrictions disabled ([#5295](https://github.com/Opentrons/opentrons/issues/5295)) ([692f307](https://github.com/Opentrons/opentrons/commit/692f307)), closes [#5276](https://github.com/Opentrons/opentrons/issues/5276)
+* **protocol-designer:** Only show slot access warnings for Gen1 modules ([#5313](https://github.com/Opentrons/opentrons/issues/5313)) ([74d9d64](https://github.com/Opentrons/opentrons/commit/74d9d64)), closes [#5309](https://github.com/Opentrons/opentrons/issues/5309)
+* **protocol-designer:** Remove mm unit from engage height field ([#5365](https://github.com/Opentrons/opentrons/issues/5365)) ([fc18eea](https://github.com/Opentrons/opentrons/commit/fc18eea))
+* **protocol-designer:** rename 'module' variables to something else ([#5308](https://github.com/Opentrons/opentrons/issues/5308)) ([e5536da](https://github.com/Opentrons/opentrons/commit/e5536da)), closes [#5284](https://github.com/Opentrons/opentrons/issues/5284)
+* **protocol-designer:** Unify pause step item spacing ([#5408](https://github.com/Opentrons/opentrons/issues/5408)) ([d75f471](https://github.com/Opentrons/opentrons/commit/d75f471)), closes [#5387](https://github.com/Opentrons/opentrons/issues/5387)
+* **protocol-designer:** Update TC image proportions ([#5442](https://github.com/Opentrons/opentrons/issues/5442)) ([0e5f284](https://github.com/Opentrons/opentrons/commit/0e5f284)), closes [#5388](https://github.com/Opentrons/opentrons/issues/5388)
+* **protocol-designer:** updates module slot placement after warning modal is confirmed ([#5393](https://github.com/Opentrons/opentrons/issues/5393)) ([0adc97e](https://github.com/Opentrons/opentrons/commit/0adc97e))
+* **protocol-designer e2e:** Add custom command to close the 3.17 announcement modal ([#5355](https://github.com/Opentrons/opentrons/issues/5355)) ([77af8ac](https://github.com/Opentrons/opentrons/commit/77af8ac))
+
+
+### Features
+
+* **protocol-designer:** add PD Pause form migration for 3.0.x -> 4.0.0 ([#5373](https://github.com/Opentrons/opentrons/issues/5373)) ([e3ce552](https://github.com/Opentrons/opentrons/commit/e3ce552)), closes [#5371](https://github.com/Opentrons/opentrons/issues/5371)
+* **protocol-designer:** add warning modal switching mag model ([#5329](https://github.com/Opentrons/opentrons/issues/5329)) ([2cfe3e1](https://github.com/Opentrons/opentrons/commit/2cfe3e1)), closes [#5251](https://github.com/Opentrons/opentrons/issues/5251)
+* **protocol-designer:** allow GEN1 multi pipette access N/S of GEN2 modules ([#5341](https://github.com/Opentrons/opentrons/issues/5341)) ([dc6af21](https://github.com/Opentrons/opentrons/commit/dc6af21)), closes [#5331](https://github.com/Opentrons/opentrons/issues/5331)
+* **protocol-designer:** allow moving empty module under compat labware ([#5396](https://github.com/Opentrons/opentrons/issues/5396)) ([57ef5ce](https://github.com/Opentrons/opentrons/commit/57ef5ce)), closes [#5384](https://github.com/Opentrons/opentrons/issues/5384)
+* **protocol-designer:** allow user to select module model when adding or editing modules ([#5284](https://github.com/Opentrons/opentrons/issues/5284)) ([8ad1607](https://github.com/Opentrons/opentrons/commit/8ad1607)), closes [#5188](https://github.com/Opentrons/opentrons/issues/5188)
+* **protocol-designer:** Enable magnetic and temperature module support ([#5304](https://github.com/Opentrons/opentrons/issues/5304)) ([8235e71](https://github.com/Opentrons/opentrons/commit/8235e71)), closes [#4968](https://github.com/Opentrons/opentrons/issues/4968)
+* **protocol-designer:** hide slot placement tooltip when slot dropdown enabled ([#5405](https://github.com/Opentrons/opentrons/issues/5405)) ([8a8b757](https://github.com/Opentrons/opentrons/commit/8a8b757)), closes [#5385](https://github.com/Opentrons/opentrons/issues/5385)
+* **protocol-designer:** Implement custom tiprack UI behind flag ([#5440](https://github.com/Opentrons/opentrons/issues/5440)) ([1fc35fd](https://github.com/Opentrons/opentrons/commit/1fc35fd)), closes [#5332](https://github.com/Opentrons/opentrons/issues/5332)
+* **protocol-designer:** preserve engage heights if already default ([#5294](https://github.com/Opentrons/opentrons/issues/5294)) ([9cac165](https://github.com/Opentrons/opentrons/commit/9cac165)), closes [#5232](https://github.com/Opentrons/opentrons/issues/5232)
+* **protocol-designer:** Remove multi gen2 feature flag ([#5351](https://github.com/Opentrons/opentrons/issues/5351)) ([4a2a1fd](https://github.com/Opentrons/opentrons/commit/4a2a1fd)), closes [#5336](https://github.com/Opentrons/opentrons/issues/5336)
+* **protocol-designer:** remove unnecessary comment ([#5379](https://github.com/Opentrons/opentrons/issues/5379)) ([12277df](https://github.com/Opentrons/opentrons/commit/12277df))
+* **protocol-designer:** update export v4 protocol modal copy ([#5356](https://github.com/Opentrons/opentrons/issues/5356)) ([81489a0](https://github.com/Opentrons/opentrons/commit/81489a0))
+* **protocol-designer:** update intro announcement modal copy ([#5345](https://github.com/Opentrons/opentrons/issues/5345)) ([20e2a96](https://github.com/Opentrons/opentrons/commit/20e2a96)), closes [#5334](https://github.com/Opentrons/opentrons/issues/5334)
+* **protocol-designer:** update pause until temp modal copy ([#5434](https://github.com/Opentrons/opentrons/issues/5434)) ([441f30e](https://github.com/Opentrons/opentrons/commit/441f30e)), closes [#5432](https://github.com/Opentrons/opentrons/issues/5432)
+* **protocol-designer:** use model-specific engageHeight diagram ([#5273](https://github.com/Opentrons/opentrons/issues/5273)) ([a85f206](https://github.com/Opentrons/opentrons/commit/a85f206)), closes [#5228](https://github.com/Opentrons/opentrons/issues/5228)
+
+
+
+
+
 # [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package protocol-designer

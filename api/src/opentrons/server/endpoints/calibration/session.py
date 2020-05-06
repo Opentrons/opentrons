@@ -1,16 +1,15 @@
 import typing
 from uuid import uuid4, UUID
 from enum import Enum
-from dataclasses import dataclass, asdict, field, fields
+from dataclasses import dataclass, field
 
 from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import CriticalPoint
 
-from .constants import LOOKUP_LABWARE, TipAttachError
+from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
-from .models import AttachedPipette
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -19,6 +18,10 @@ A set of endpoints that can be used to create a session for any robot
 calibration tasks such as checking your calibration data, performing mount
 offset or a robot deck transform.
 """
+
+
+class CalibrationException(Exception):
+    pass
 
 
 class SessionManager:
@@ -36,15 +39,8 @@ class PipetteStatus:
     model: str
     name: str
     tip_length: float
-    mount_axis: Axis
-    plunger_axis: Axis
-    pipette_uuid: Axis
     has_tip: bool
-    tiprack_id: UUID
-
-    @classmethod
-    def list_fields(cls):
-        return [obj.name for obj in fields(cls)]
+    tiprack_id: typing.Optional[UUID]
 
 
 @dataclass
@@ -110,6 +106,7 @@ class CalibrationSession:
         await hardware.cache_instruments()
         await hardware.set_lights(rails=True)
         await hardware.home()
+        return cls(hardware=hardware)
 
     @staticmethod
     def _key_by_uuid(new_pipettes: typing.Dict) -> typing.Dict:
@@ -119,9 +116,12 @@ class CalibrationSession:
             # This is to ensure during testing that two pipettes are
             # attached -- for now.
             assert data, "Please attach pipettes before proceeding"
-
+            cp = None
+            if data['channels'] == 8:
+                cp = CriticalPoint.FRONT_NOZZLE
             token = uuid4()
-            pipette_dict[token] = {'mount': mount, 'tiprack_id': None}
+            pipette_dict[token] = {
+                'mount': mount, 'tiprack_id': None, 'critical_point': cp}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -232,51 +232,31 @@ class CalibrationSession:
     def pipettes(self) -> typing.Dict[Mount, Pipette.DictType]:
         return self.hardware.attached_instruments
 
-    @property
-    def pipette_status(self) -> typing.Dict[str, AttachedPipette]:
+    def pipette_status(self) -> typing.Dict[UUID, PipetteStatus]:
         """
         Public property to help format the current labware status of a given
         session for the client.
-
-        Note:
-        Pydantic restricts dictionary keys that can be evaluated. Since
-        the session pipettes dictionary has a UUID as a key, we must first
-        convert the UUID to a hex string.
         """
-        # pydantic restricts dictionary keys that can be evaluated. Since
-        # the session pipettes dictionary has a UUID as a key, we must first
-        # convert the UUID to a hex string.
-        fields = PipetteStatus.list_fields()
         to_dict = {}
-        for id, data in self._relate_mount.items():
+        for inst_id, data in self._relate_mount.items():
             pip = self.get_pipette(data['mount'])
-            tip_id = data['tiprack_id']
-            temp_dict = {
-                key: value for key, value in pip.items() if key in fields
-            }
-            if tip_id:
-                temp_dict['tiprack_id'] = str(tip_id)
-            to_dict[str(id)] = AttachedPipette(**temp_dict)
+            p = PipetteStatus(
+                model=str(pip['model']),
+                name=str(pip['name']),
+                tip_length=float(pip['tip_length']),
+                has_tip=bool(pip['has_tip']),
+                tiprack_id=data['tiprack_id'],
+            )
+            to_dict[inst_id] = p
         return to_dict
 
     @property
-    def labware_status(self) -> typing.Dict:
+    def labware_status(self) -> typing.Dict[UUID, LabwareInfo]:
         """
         Public property to help format the current labware status of a given
         session for the client.
-
-        Note:
-        Pydantic restricts dictionary keys that can be evaluated. Since
-        the session labware dictionary has a UUID as a key, we must first
-        convert the UUID to a hex string.
         """
-
-        to_dict = {}
-        for name, value in self._labware_info.items():
-            temp_dict = asdict(value)
-            del temp_dict['definition']
-            to_dict[str(name)] = temp_dict
-        return to_dict
+        return self._labware_info
 
 
 # TODO: BC: move the check specific stuff to the check sub dir
@@ -298,16 +278,16 @@ class CalibrationCheckState(str, Enum):
 
 
 class CalibrationCheckTrigger(str, Enum):
-    load_labware = "load_labware"
-    prepare_pipette = "prepare_pipette"
+    load_labware = "loadLabware"
+    prepare_pipette = "preparePipette"
     jog = "jog"
-    pick_up_tip = "pick_up_tip"
-    confirm_tip_attached = "confirm_tip_attached"
-    invalidate_tip = "invalidate_tip"
-    confirm_step = "confirm_step"
-    exit = "exit"
-    reject_calibration = "reject_calibration"
-    no_pipettes = "no_pipettes"
+    pick_up_tip = "pickUpTip"
+    confirm_tip_attached = "confirmTip"
+    invalidate_tip = "invalidateTip"
+    confirm_step = "confirmStep"
+    exit = "sessionExit"
+    reject_calibration = "rejectCalibration"
+    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [
@@ -426,19 +406,19 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         A function that takes tiprack information and loads them onto the deck.
         """
         full_dict = {}
+        prev_lw = None
         for name, data in self._labware_info.items():
             parent = self._deck.position_for(data.slot)
             lw = labware.Labware(data.definition, parent)
             self._deck[data.slot] = lw
             build_dict = {}
             for id in data.forPipettes:
-                mount = self._get_mount(id)
-                pip = self.get_pipette(mount)
-                well_name = 'H1' if pip['channels'] == 8 else 'A1'
+                well_name = 'B1' if prev_lw == lw else 'A1'
                 well = lw.wells_by_name()[well_name]
                 build_dict[id] = PreparingPipetteMoveOffset(
                     offset=Point(0, 0, 10), well=well
                 )
+                prev_lw = lw
             full_dict[data.id] = build_dict
         self._moves.preparingPipette = full_dict
 
@@ -456,7 +436,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for mount in self._relate_mount.values():
             try:
                 await self._return_tip(mount['mount'])
-            except (TipAttachError, AssertionError):
+            except (CalibrationException, AssertionError):
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
@@ -468,19 +448,22 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         original position.
         """
         if self._has_tip(pipette_id):
-            raise TipAttachError()
+            raise CalibrationException(f"Tip is already attached "
+                                       f"to {pipette_id} pipette.")
         tiprack_id = self._relate_mount[pipette_id]['tiprack_id']
         mount = self._get_mount(pipette_id)
         await self._pick_up_tip(mount, tiprack_id)
 
     async def _invalidate_tip(self, pipette_id: UUID, **kwargs):
         if not self._has_tip(pipette_id):
-            raise TipAttachError()
+            raise CalibrationException(f"No tip attached to {pipette_id} "
+                                       f"pipette.")
         await self.hardware.remove_tip(self._get_mount(pipette_id))
 
     async def _return_tip_for_pipette(self, pipette_id: UUID, **kwargs):
         if not self._has_tip(pipette_id):
-            raise TipAttachError()
+            raise CalibrationException(f"No tip attached to {pipette_id} "
+                                       f"pipette.")
         await self._prepare_pipette(pipette_id=pipette_id)
         await self._return_tip(self._get_mount(pipette_id))
 
@@ -567,12 +550,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         mount = self._get_mount(pipette_id)
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
+        cp = self._relate_mount[pipette_id]['critical_point']
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, request_position,
                                     self._deck, max_height)
         for move in moves:
-            await self.hardware.move_to(mount, move[0], move[1])
+            await self.hardware.move_to(
+                mount, move[0], move[1], critical_point=cp)
 
     async def _jog_pipette(self, pipette_id: UUID, vector: Point, **kwargs):
         mount = self._get_mount(pipette_id)

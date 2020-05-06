@@ -7,11 +7,12 @@ import { SessionAlert } from './SessionAlert'
 import { Portal } from '../portal'
 import styles from './styles.css'
 
-import type { SessionStatus } from '../../robot'
+import type { SessionStatus, SessionStatusInfo } from '../../robot'
 
 export type CommandListProps = {|
   commands: Array<any>,
   sessionStatus: SessionStatus,
+  sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,
   onResetClick: () => mixed,
 |}
@@ -23,7 +24,13 @@ export class CommandList extends React.Component<CommandListProps> {
   }
 
   render() {
-    const { commands, sessionStatus, showSpinner, onResetClick } = this.props
+    const {
+      commands,
+      sessionStatus,
+      sessionStatusInfo,
+      showSpinner,
+      onResetClick,
+    } = this.props
     const makeCommandToTemplateMapper = depth => command => {
       const {
         id,
@@ -88,6 +95,7 @@ export class CommandList extends React.Component<CommandListProps> {
         {!showSpinner && (
           <SessionAlert
             sessionStatus={sessionStatus}
+            sessionStatusInfo={sessionStatusInfo}
             onResetClick={onResetClick}
             className={styles.alert}
           />
