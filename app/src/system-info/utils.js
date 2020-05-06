@@ -10,6 +10,8 @@ const RE_REALTEK = /realtek/i
 // Driver version 10.38.117.2020, latest for Windows 10 as of 2020-04-12
 // NOTE(mc, 2020-05-05): this will cause false alerts on Windows 7; Realtek's
 // versioning scheme seems to be WindowsVersion.Something.Something.Year
+// TODO(mc, 2020-05-06): move to config once migrations are addressed
+// https://github.com/Opentrons/opentrons/issues/5587
 const REALTEK_UP_TO_DATE_VERSION = [10, 38, 117, 2020]
 
 export const deviceToU2EAnalyticsProps = (
