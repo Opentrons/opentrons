@@ -209,6 +209,10 @@ class API(HardwareAPILike):
     def fw_version(self) -> Optional[str]:
         return self.get_fw_version()
 
+    @property
+    def board_revision(self) -> str:
+        return str(self._backend.board_revision)
+
     # Incidentals (i.e. not motion) API
 
     async def set_lights(self, button: bool = None, rails: bool = None):
@@ -248,6 +252,7 @@ class API(HardwareAPILike):
     async def delay(self, duration_s: int):
         """ Delay execution by pausing and sleeping.
         """
+        await self._wait_for_is_running()
         self.pause()
         if not self.is_simulator:
             async def sleep_for_seconds(seconds: int):

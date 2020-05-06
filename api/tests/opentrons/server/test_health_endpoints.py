@@ -12,6 +12,7 @@ async def test_health(virtual_smoothie_env, loop, async_client):
         'name': 'opentrons-dev',
         'api_version': __version__,
         'fw_version': 'Virtual Smoothie',
+        'board_revision': '2.1',
         'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': '0.0.0',
         'protocol_api_version':

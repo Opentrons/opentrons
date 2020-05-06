@@ -43,10 +43,9 @@ function ProtocolEditorComponent() {
             <AnnouncementModal />
             <NewFileModal showProtocolFields />
             <FileUploadMessageModal />
-            <LabwareUploadMessageModal />
             {/* TODO: Ian 2018-06-28 All main page modals will go here */}
             <MainPageModalPortalRoot />
-
+            <LabwareUploadMessageModal />
             <ConnectedMainPanel />
           </div>
         </div>

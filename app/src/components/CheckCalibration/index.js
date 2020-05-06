@@ -193,7 +193,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case CHECK_STEP_SESSION_EXITED:
     case CHECK_STEP_CHECK_COMPLETE:
     case CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case CHECK_STEP_NO_PIPETTES_ATTACHED: {
+    case CHECK_STEP_NO_PIPETTES_ATTACHED:
+    case 'calibrationComplete': {
+      // TODO: BC: get real complete state name after it is update on server side
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents
       break

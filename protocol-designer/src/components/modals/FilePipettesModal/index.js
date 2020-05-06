@@ -39,12 +39,12 @@ import type {
 } from '../../../step-forms'
 import type { FormikProps } from 'formik/@flow-typed'
 
-type PipetteFieldsData = $Diff<
+export type PipetteFieldsData = $Diff<
   PipetteOnDeck,
   {| id: mixed, spec: mixed, tiprackLabwareDef: mixed |}
 >
 
-type ModuleCreationArgs = {|
+export type ModuleCreationArgs = {|
   type: ModuleRealType,
   model: string,
   slot: DeckSlot,

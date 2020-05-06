@@ -8,12 +8,14 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import build_gpio_chardev
+from opentrons.drivers.rpi_drivers import (build_gpio_chardev,
+                                           RevisionPinsError)
 import opentrons.config
 from opentrons.types import Mount
 
 from . import modules
 from .execution_manager import ExecutionManager
+from .types import BoardRevision
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -45,6 +47,7 @@ class Controller:
         self.config = config or opentrons.config.robot_configs.load()
 
         self._gpio_chardev = build_gpio_chardev('gpiochip0')
+        self._board_revision = BoardRevision.UNKNOWN
         # We handle our own locks in the hardware controller thank you
         self._smoothie_driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config, gpio_chardev=self._gpio_chardev,
@@ -65,8 +68,28 @@ class Controller:
     def gpio_chardev(self) -> 'GPIODriverLike':
         return self._gpio_chardev
 
+    @property
+    def board_revision(self) -> BoardRevision:
+        return self._board_revision
+
     async def setup_gpio_chardev(self):
         await self.gpio_chardev.setup()
+        self._board_revision = self.determine_board_revision()
+
+    def determine_board_revision(self) -> BoardRevision:
+        try:
+            rev_bits = self.gpio_chardev.read_revision_bits()
+            return BoardRevision.by_bits(rev_bits)
+        except RevisionPinsError:
+            MODULE_LOG.info(
+                'Failed to detect central routing board revision gpio '
+                'pins, defaulting to (OG) 2.1')
+            return BoardRevision.OG
+        except Exception:
+            MODULE_LOG.exception(
+                'Unexpected error from reading central routing board '
+                'revision bits')
+            return BoardRevision.UNKNOWN
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()

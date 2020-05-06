@@ -1,13 +1,18 @@
 import logging
 from typing import Any, Dict
 from .contexts import ProtocolContext, \
-    MagneticModuleContext, TemperatureModuleContext, ModuleContext
+    MagneticModuleContext, TemperatureModuleContext, ModuleContext, \
+    ThermocyclerContext
 from .execute_v3 import _delay, _move_to_slot
 from .types import LoadedLabware, Instruments, PipetteHandler, \
-    MagneticModuleHandler, TemperatureModuleHandler
+    MagneticModuleHandler, TemperatureModuleHandler, \
+    ThermocyclerModuleHandler
 from .constants import JsonCommand
 
 MODULE_LOG = logging.getLogger(__name__)
+
+# Special string for slot used by thermocycler in JSON protocols.
+TC_SPANNING_SLOT = 'span7_8_10_11'
 
 
 def load_labware_from_json_defs(
@@ -40,7 +45,10 @@ def load_modules_from_json(
     for module_id, props in module_data.items():
         model = props['model']
         slot = props['slot']
-        instr = ctx.load_module(model, slot)
+        if slot == TC_SPANNING_SLOT:
+            instr = ctx.load_module(model)
+        else:
+            instr = ctx.load_module(model, slot)
         modules_by_id[module_id] = instr
 
     return modules_by_id
@@ -72,6 +80,116 @@ def _temperature_module_await_temp(module: TemperatureModuleContext,
     module.await_temperature(temperature)
 
 
+def _thermocycler_close_lid(module: ThermocyclerContext,
+                            params) -> None:
+    module.close_lid()
+
+
+def _thermocycler_open_lid(module: ThermocyclerContext,
+                           params) -> None:
+    module.open_lid()
+
+
+def _thermocycler_deactivate_block(module: ThermocyclerContext,
+                                   params) -> None:
+    module.deactivate_block()
+
+
+def _thermocycler_deactivate_lid(module: ThermocyclerContext,
+                                 params) -> None:
+    module.deactivate_lid()
+
+
+def _thermocycler_set_block_temperature(module: ThermocyclerContext,
+                                        params) -> None:
+    temperature = params['temperature']
+    module.set_block_temperature(temperature)
+
+
+def _thermocycler_set_lid_temperature(module: ThermocyclerContext,
+                                      params) -> None:
+    temperature = params['temperature']
+    module.set_lid_temperature(temperature)
+
+
+def _thermocycler_run_profile(module: ThermocyclerContext,
+                              params) -> None:
+    volume = params['volume']
+    profile = [{
+        'temperature': p['temperature'],
+        'hold_time_seconds': p['holdTime']
+    } for p in params['profile']]
+    module.execute_profile(
+        steps=profile,
+        block_max_volume=volume,
+        repetitions=1)
+
+
+def assert_no_async_tc_behavior(commands) -> None:
+    # awaiters[i] corresponds to setters[i]
+    setters = [
+        "thermocycler/setTargetBlockTemperature",
+        "thermocycler/setTargetLidTemperature",
+        "thermocycler/runProfile"]
+    awaiters = [
+        "thermocycler/awaitBlockTemperature",
+        "thermocycler/awaitLidTemperature",
+        "thermocycler/awaitProfileComplete"]
+
+    command_types = [c['command'] for c in commands]
+
+    first_command = command_types[0]
+    if first_command in awaiters:
+        raise RuntimeError(
+            ("Unsupported behavior. Cannot {} as the " +
+             "first command of a protocol")
+            .format(first_command))
+
+    last_command = command_types[-1]
+    if last_command in setters:
+        raise RuntimeError(
+            ("Unsupported behavior. Cannot {} as the " +
+             "last command of a protocol")
+            .format(last_command))
+
+    # [a, b, c, d] -> [a, b], [b, c], [c, d]
+    for a, b in zip(command_types, command_types[1:]):
+        #  a setter must be immediately followed
+        # by its corresponding awaiter
+        if a in setters:
+            expected_awaiter = awaiters[setters.index(a)]
+            if b != expected_awaiter:
+                raise RuntimeError(
+                    ("Unsupported behavior. {} must be immediately" +
+                     "followed by {}")
+                    .format(a, expected_awaiter))
+        # an awaiter must be preceded by a setter
+        elif b in awaiters:
+            expected_setter = setters[awaiters.index(b)]
+            raise RuntimeError(
+                ("Unsupported behavior. {} must be immediately " +
+                 "preceded by {}").format(b, expected_setter))
+
+
+def assert_tc_commands_do_not_use_unimplemented_params(commands) -> None:
+    # raise errors if commands include optional param keys that
+    # the executor/api does not currently support
+    unsupported_keys_by_command = {
+        "thermocycler/setTargetBlockTemperature": ["volume"]
+    }
+    for c in commands:
+        command_type = c['command']
+        params = c['params']
+        unsupported_keys = unsupported_keys_by_command.get(
+            command_type, [])
+        for k in unsupported_keys:
+            if k in params:
+                raise RuntimeError((
+                    "{} does not support {} param. " +
+                    "This may be implemented in a later version of " +
+                    "the robot server").format(command_type, k))
+
+
 def dispatch_json(context: ProtocolContext,
                   protocol_data: Dict[Any, Any],
                   instruments: Instruments,
@@ -81,9 +199,14 @@ def dispatch_json(context: ProtocolContext,
                   magnetic_module_command_map:
                   Dict[str, MagneticModuleHandler],
                   temperature_module_command_map:
-                  Dict[str, TemperatureModuleHandler]
+                  Dict[str, TemperatureModuleHandler],
+                  thermocycler_module_command_map:
+                  Dict[str, ThermocyclerModuleHandler]
                   ) -> None:
     commands = protocol_data['commands']
+
+    assert_no_async_tc_behavior(commands)
+    assert_tc_commands_do_not_use_unimplemented_params(commands)
 
     for command_item in commands:
         command_type = command_item['command']
@@ -94,17 +217,21 @@ def dispatch_json(context: ProtocolContext,
                 instruments, loaded_labware, params)
         elif command_type in magnetic_module_command_map:
             handleMagnetCommand(
-                                params,
-                                modules,
-                                command_type,
-                                magnetic_module_command_map
-                                )
+                params,
+                modules,
+                command_type,
+                magnetic_module_command_map
+            )
         elif command_type in temperature_module_command_map:
             handleTemperatureCommand(params,
                                      modules,
                                      command_type,
-                                     temperature_module_command_map
-                                     )
+                                     temperature_module_command_map)
+        elif command_type in thermocycler_module_command_map:
+            handleThermocyclerCommand(params,
+                                      modules,
+                                      command_type,
+                                      thermocycler_module_command_map)
         elif command_type == JsonCommand.delay.value:
             _delay(context, params)
         elif command_type == JsonCommand.moveToSlot.value:
@@ -127,8 +254,26 @@ def handleTemperatureCommand(params,
         )
     else:
         raise RuntimeError(
-         "Temperature Module does not match TemperatureModuleContext interface"
-         )
+            "Temperature Module does not match " +
+            "TemperatureModuleContext interface"
+        )
+
+
+def handleThermocyclerCommand(params,
+                              modules,
+                              command_type,
+                              thermocycler_module_command_map
+                              ) -> None:
+    module_id = params['module']
+    module = modules[module_id]
+    if isinstance(module, ThermocyclerContext):
+        thermocycler_module_command_map[command_type](
+            module, params
+        )
+    else:
+        raise RuntimeError(
+            "Thermocycler Module does not match ThermocyclerContext interface"
+        )
 
 
 def handleMagnetCommand(params,
@@ -144,5 +289,5 @@ def handleMagnetCommand(params,
         )
     else:
         raise RuntimeError(
-         "Magnetic Module does not match MagneticModuleContext interface"
-         )
+            "Magnetic Module does not match MagneticModuleContext interface"
+        )

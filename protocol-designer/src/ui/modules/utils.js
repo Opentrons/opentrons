@@ -1,7 +1,11 @@
 // @flow
 import values from 'lodash/values'
 import { i18n } from '../../localization'
-import type { ModuleRealType } from '@opentrons/shared-data'
+import {
+  MAGNETIC_MODULE_V1,
+  getLabwareDefaultEngageHeight,
+  type ModuleRealType,
+} from '@opentrons/shared-data'
 import type { Options } from '@opentrons/components'
 import type {
   ModuleOnDeck,
@@ -76,4 +80,23 @@ export function getModuleHasLabware(
   const labware =
     moduleOnDeck && getLabwareOnModule(initialDeckSetup, moduleOnDeck.id)
   return Boolean(moduleOnDeck) && Boolean(labware)
+}
+
+export const getMagnetLabwareEngageHeight = (
+  initialDeckSetup: InitialDeckSetup,
+  magnetModuleId: string | null
+): number | null => {
+  if (magnetModuleId == null) return null
+
+  const moduleModel = initialDeckSetup.modules[magnetModuleId]?.model
+  const labware = getLabwareOnModule(initialDeckSetup, magnetModuleId)
+  const engageHeightMm = labware
+    ? getLabwareDefaultEngageHeight(labware.def)
+    : null
+
+  if (engageHeightMm != null && moduleModel === MAGNETIC_MODULE_V1) {
+    // convert to 'short mm' units for GEN1
+    return engageHeightMm * 2
+  }
+  return engageHeightMm
 }

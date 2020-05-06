@@ -3,9 +3,10 @@ from uuid import uuid4, UUID
 from enum import Enum
 from dataclasses import dataclass, asdict, fields
 
+from opentrons.protocol_api.labware import Well
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis
+from opentrons.hardware_control.types import Axis, CriticalPoint
 
 from .constants import LOOKUP_LABWARE, TipAttachError
 from .util import StateMachine, WILDCARD
@@ -125,18 +126,9 @@ class CalibrationSession:
 
         for pipette_id in self._pip_info_by_id.keys():
             mount = self._get_mount(pipette_id)
-            pip_vol = self.get_pipette(mount)['max_volume']
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
             load_name: str = _lookup.load_name
-
-            if_labware = None
-            if _uuid:
-                if_labware = lw.get(_uuid)
-            if _uuid and if_labware and if_labware.loadName == load_name:
-                lw[_uuid].forPipettes.append(pipette_id)
-                self._pip_info_by_id[pipette_id]['tiprack_id'] = _uuid
-            else:
                 lw_def = labware.get_labware_definition(load_name)
                 new_uuid: UUID = uuid4()
                 _uuid = new_uuid
@@ -756,6 +748,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     to_loc: Location):
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
+        cp = self._relate_mount[pipette_id]['critical_point']
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, to_loc,

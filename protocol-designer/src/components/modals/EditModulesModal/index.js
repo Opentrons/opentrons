@@ -8,7 +8,8 @@ import {
   FormGroup,
   BUTTON_TYPE_SUBMIT,
   OutlineButton,
-  HoverTooltip,
+  Tooltip,
+  useHoverTooltip,
 } from '@opentrons/components'
 import {
   THERMOCYCLER_MODULE_TYPE,
@@ -200,6 +201,10 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
 
   useResetSlotOnModelChange(supportedModuleSlot)
 
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top',
+  })
+
   return (
     <Modal
       heading={i18n.t(`modules.module_long_names.${moduleType}`)}
@@ -225,28 +230,21 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
             </FormGroup>
             {showSlotOption && (
               <>
-                <HoverTooltip
-                  placement="top"
-                  tooltipComponent={
-                    !enableSlotSelection ? slotOptionTooltip : null
-                  }
-                >
-                  {hoverTooltipHandlers => (
-                    <div
-                      {...hoverTooltipHandlers}
-                      className={styles.option_slot}
-                    >
-                      <FormGroup label="Position">
-                        <SlotDropdown
-                          fieldName={'selectedSlot'}
-                          options={getAllModuleSlotsByType(moduleType)}
-                          disabled={!enableSlotSelection}
-                          tabIndex={1}
-                        />
-                      </FormGroup>
-                    </div>
-                  )}
-                </HoverTooltip>
+                {!enableSlotSelection && (
+                  <Tooltip {...tooltipProps}>{slotOptionTooltip}</Tooltip>
+                )}
+
+                <div {...targetProps} className={styles.option_slot}>
+                  <FormGroup label="Position">
+                    <SlotDropdown
+                      fieldName={'selectedSlot'}
+                      options={getAllModuleSlotsByType(moduleType)}
+                      disabled={!enableSlotSelection}
+                      tabIndex={1}
+                    />
+                  </FormGroup>
+                </div>
+
                 <ConnectedSlotMap fieldName={'selectedSlot'} />
               </>
             )}

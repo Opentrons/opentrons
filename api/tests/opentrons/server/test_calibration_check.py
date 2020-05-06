@@ -38,6 +38,42 @@ async def test_load_labware(async_client, async_server, test_setup):
     assert sess._deck['6'].name == 'opentrons_96_tiprack_300ul'
 
 
+async def test_load_same_tiprack(async_client, async_server):
+    hw = async_server['com.opentrons.hardware']._backend
+    hw._attached_instruments[types.Mount.LEFT] = {
+        'model': 'p300_multi_v1', 'id': 'fake10pip'}
+    hw._attached_instruments[types.Mount.RIGHT] = {
+        'model': 'p300_single_v1', 'id': 'fake300pip'}
+    resp = await async_client.post('/calibration/check/session')
+    cal_app = async_server['calibration']
+    sess = cal_app['com.opentrons.session_manager'].sessions['check']
+
+    resp = await async_client.post('/calibration/check/session/loadLabware')
+    status = await resp.json()
+
+    pip_info = {}
+    for pip, data in status['instruments'].items():
+        pip_info[data['model']] = pip
+
+    assert sess._deck['8']
+    assert not sess._deck['6']
+
+    assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
+    # there should only be one tiprack uuid here
+    assert len(sess._moves.preparingPipette.keys()) == 1
+
+    tip_id = list(sess._moves.preparingPipette.keys())[0]
+
+    single_id = pip_info['p300_single_v1']
+    multi_id = pip_info['p300_multi_v1']
+
+    loc_dict = sess._moves.preparingPipette[tip_id][UUID(single_id)]
+    loc_dict.well.display_name.split()[0] == 'B1'
+
+    loc_dict2 = sess._moves.preparingPipette[tip_id][UUID(multi_id)]
+    loc_dict2.well.display_name.split()[0] == 'A1'
+
+
 async def test_move_to_position(async_client, async_server, test_setup):
     _, sess = test_setup
     # load labware on deck to enable move

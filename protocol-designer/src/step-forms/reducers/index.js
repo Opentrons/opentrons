@@ -874,7 +874,7 @@ export const pipetteInvariantProperties = handleActions<
   initialPipetteState
 )
 
-type OrderedStepIdsState = Array<StepIdType>
+export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
 export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   {
