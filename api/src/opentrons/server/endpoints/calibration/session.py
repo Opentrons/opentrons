@@ -5,7 +5,7 @@ from dataclasses import dataclass
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint, Axis
 
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
