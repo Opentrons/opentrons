@@ -74,7 +74,7 @@ export type RemoveRobotAction = {|
   meta: {| shell: true |},
 |}
 
-export type ClearDiscoveryCache = {|
+export type ClearDiscoveryCacheAction = {|
   type: 'discovery:CLEAR_CACHE',
   meta: {| shell: true |},
 |}
@@ -84,4 +84,4 @@ export type DiscoveryAction =
   | FinishDiscoveryAction
   | UpdateListAction
   | RemoveRobotAction
-  | ClearDiscoveryCache
+  | ClearDiscoveryCacheAction

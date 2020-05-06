@@ -4,6 +4,7 @@ import type {
   StartDiscoveryAction,
   FinishDiscoveryAction,
   RemoveRobotAction,
+  ClearDiscoveryCacheAction,
 } from './types'
 
 export const DISCOVERY_START: 'discovery:START' = 'discovery:START'
