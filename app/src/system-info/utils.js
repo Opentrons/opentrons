@@ -38,7 +38,10 @@ export const isRealtekDevice = (device: UsbDevice): boolean => {
 
 export const getDriverStatus = (device: UsbDevice): DriverStatus => {
   const { windowsDriverVersion } = device
-  if (typeof windowsDriverVersion === 'undefined') return NOT_APPLICABLE
+  if (!isRealtekDevice(device) || typeof windowsDriverVersion === 'undefined') {
+    return NOT_APPLICABLE
+  }
+
   if (windowsDriverVersion === null) return UNKNOWN
 
   const versionParts = windowsDriverVersion.split('.').map(s => Number(s))
