@@ -348,7 +348,7 @@ async def test_invalidate_first_tip(check_calibration_session):
     assert first_pip['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
-    assert check_calibration_session.current_state.name == \
+    assert sess.current_state.name == \
         session.CalibrationCheckState.preparingFirstPipette
     assert sess.get_pipette(sess._first_mount)['has_tip'] is False
 
@@ -359,9 +359,33 @@ async def test_invalidate_second_tip(check_calibration_session):
     assert second_pip['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
-    assert check_calibration_session.current_state.name == \
+    assert sess.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
     assert sess.get_pipette(sess._second_mount)['has_tip'] is False
+
+
+async def test_complete_check_one_pip(check_calibration_session_only_right):
+    sess = await in_comparing_first_pipette_point_three(check_calibration_session_only_right)
+    first_pip = sess.get_pipette(sess._first_mount)
+    assert first_pip['has_tip'] is True
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.go_to_next_check)
+    assert sess.current_state.name == \
+        session.CalibrationCheckState.checkComplete
+    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
+
+
+async def test_complete_check_both_pips(check_calibration_session):
+    sess = await in_comparing_second_pipette_point_one(check_calibration_session)
+    second_pip = sess.get_pipette(sess._second_mount)
+    assert second_pip['has_tip'] is True
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.go_to_next_check)
+    assert sess.current_state.name == \
+        session.CalibrationCheckState.checkComplete
+    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
+    assert sess.get_pipette(sess._second_mount)['has_tip'] is False
+
 
 
 # START flow testing both mounts
