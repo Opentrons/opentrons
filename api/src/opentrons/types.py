@@ -1,4 +1,5 @@
 import enum
+from math import sqrt
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
@@ -39,6 +40,16 @@ class Point(NamedTuple):
 
     def __str__(self):
         return '({}, {}, {})'.format(self.x, self.y, self.z)
+
+    def magnitude_to(self, other: Any) -> float:
+        if not isinstance(other, Point):
+            return NotImplemented
+        x_diff = self.x - other.x
+        y_diff = self.y - other.y
+        z_diff = self.z - other.z
+        return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
+
+
 
 
 LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]

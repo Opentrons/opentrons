@@ -117,7 +117,7 @@ async def misc_error_handling(
             error_response = _determine_error_message(
                 request, router, type, req.get('pipetteId', ''))
         else:
-            MODULE_LOG.exception("Calibration Check Exception: {}".format(e))
+            MODULE_LOG.exception("Calibration Check Exception")
             potential_triggers = session.get_potential_triggers()
             links = _format_links(session, potential_triggers, router)
             error_response = {

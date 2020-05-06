@@ -76,6 +76,7 @@ class ComparisonStatus(BaseModel):
     A model describing the comparison of a checked point to calibrated value
     """
     differenceVector: Point = PointField()
+    thresholdVector:  Point = PointField()
     exceedsThreshold: bool
 
 

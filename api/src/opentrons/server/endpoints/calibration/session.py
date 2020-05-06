@@ -16,7 +16,7 @@ from opentrons.protocol_api import labware, geometry
 
 """
 A set of endpoints that can be used to create a session for any robot
-calibration tasks such as joggingTo your calibration data, performing mount
+calibration tasks such as checking your calibration data, performing mount
 offset or a robot deck transform.
 """
 
@@ -53,7 +53,7 @@ class LabwareInfo:
     This class purely maps to :py:class:`.models.LabwareStatus` and is
     intended to inform a client about the tipracks required for a session.
 
-    :note: The UUID class is utilized here instead of UUID4 for type joggingTo
+    :note: The UUID class is utilized here instead of UUID4 for type checking
     as UUID4 is only valid in pydantic models.
     """
     alternatives: typing.List[str]
@@ -85,7 +85,7 @@ class Moves:
     joggingSecondPipetteToPointOne: CheckMove = CheckMove()
 
 
-TRASH_TIP_OFFSET = Point(10, 10, 0)  # vector from front bottom left of slot 12
+TRASH_TIP_OFFSET = Point(20, 20, -20)  # vector from front bottom left of slot 12
 
 
 class CalibrationSession:
@@ -106,6 +106,9 @@ class CalibrationSession:
         await hardware.set_lights(rails=True)
         await hardware.home()
 
+    # TODO: BC pipette_id is not very meaningful anymore as the mount is the
+    # main accessor of a pipette inside of the check flow. This dict could
+    # be keyed by mount and should probably have dataclass values.
     @staticmethod
     def _key_by_uuid(new_pipettes: typing.Dict) -> typing.Dict:
         pipette_dict = {}
@@ -115,7 +118,8 @@ class CalibrationSession:
                 pipette_id = uuid4()
                 if data['channels'] == 8:
                     cp = CriticalPoint.FRONT_NOZZLE
-                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None,'critical_point': cp}
+                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None,
+                                            'critical_point': cp}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -201,7 +205,7 @@ class CalibrationSession:
         if tiprack_id:
             lw_info = self.get_tiprack(tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
-            # mod geometry contexts. Ignore type joggingTo error here.
+            # mod geometry contexts. Ignore type checking error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
         else:
             tip_length = self.get_pipette(mount)['fallback_tip_length']
@@ -212,9 +216,9 @@ class CalibrationSession:
         await self.hardware.retract(mount)
         high_point = await self.hardware.current_position(mount)
         drop_point = fixed_trash.point._replace(
-                x=fixed_trash.point.x + 20,
-                y=fixed_trash.point.y + 20,
-                z=high_point[Axis.by_mount(mount)] - 20)
+                x=fixed_trash.point.x,
+                y=fixed_trash.point.y,
+                z=high_point[Axis.by_mount(mount)])
         await self.hardware.move_to(mount, drop_point + TRASH_TIP_OFFSET)
         await self.hardware.drop_tip(mount)
 
@@ -539,16 +543,21 @@ CHECK_TRANSITIONS = [
 ]
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
+
+DEFAULT_OK_TIP_PICK_UP_MAGNITUDE = 5.0
+P1000_OK_TIP_PICK_UP_MAGNITUDE = 10.0
+OK_HEIGHT_MAGNITUDE = 5.0
+OK_XY_MAGNITUDE = 5.0
+
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5, 5, 5)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
-OK_HEIGHT_VECTOR = Point(5, 5, 5)
-OK_XY_VECTOR = Point(5, 5, 5)
-
+OK_HEIGHT_VECTOR = Point(0, 0, 5)
+OK_XY_VECTOR = Point(5, 5, 0)
 
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
-    threshold_vector: Point
+    threshold_vector: float,
 
 
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
@@ -640,17 +649,23 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
-    async def _is_tip_pick_up_dangerous(self):
-        """
-        Function to determine whether jogged to pick up tip position is
-        outside of the safe threshold for conducting the rest of the check.
-        """
+    def _get_preparing_state_mount(self) -> Optional[Mount]:
+        mount = None
         if self.current_state_name == \
                 CalibrationCheckState.preparingFirstPipette:
             mount = self._first_mount
         elif self.current_state_name == \
                 CalibrationCheckState.preparingSecondPipette:
             mount = self._second_mount
+        return mount
+
+
+    async def _is_tip_pick_up_dangerous(self):
+        """
+        Function to determine whether jogged to pick up tip position is
+        outside of the safe threshold for conducting the rest of the check.
+        """
+        mount = self._get_preparing_state_mount()
         assert mount, f'cannot check if tip pick up dangerous from state:' \
                       f' {self.current_state_name}'
 
@@ -662,8 +677,15 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
         if str(self.get_pipette(mount)['model']).startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
-        absolute_diff_vector = abs(current_pt - ref_pt)
-        return absolute_diff_vector > threshold_vector
+        xyThresholdMag = Point(0, 0, 0).magnitude_to(
+                threshold_vector._replace(z=0))
+        zThresholdMag = Point(0, 0, 0).magnitude_to(
+                threshold_vector._replace(x=0, y=0))
+        xyDiffMag = ref_pt._replace(z=0).magnitude_to(
+                current_pt._replace(z=0))
+        zDiffMag = ref_pt._replace(x=0, y=0).magnitude_to(
+                current_pt._replace(x=0, y=0))
+        return xyDiffMag > xyThresholdMag or zDiffMag > zThresholdMag
 
     async def _pick_up_pipette_tip(self):
         """
@@ -671,12 +693,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         the current location, and save any offset it might have from the
         original position.
         """
-        if self.current_state_name == \
-                CalibrationCheckState.preparingFirstPipette:
-            mount = self._first_mount
-        elif self.current_state_name == \
-                CalibrationCheckState.preparingSecondPipette:
-            mount = self._second_mount
+        mount = self._get_preparing_state_mount()
         assert mount, f'cannot pick up tip from state:' \
                       f' {self.current_state_name}'
 
@@ -719,10 +736,23 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
             if (ref_pt is not None and jogged_pt is not None):
-                absolute_diff_vector = abs(ref_pt - jogged_pt)
-                exceeds = absolute_diff_vector > comp.threshold_vector
+                diff_magnitude = None
+                if comp.threshold_vector.z == 0:
+                    diff_magnitude = ref_pt._replace(z=0).magnitude_to(
+                            jogged_pt._replace(z=0))
+                elif comp.threshold_vector.x == 0 and \
+                        comp.threshold_vector.y == 0:
+                    diff_magnitude = ref_pt._replace(x=0, y=0).magnitude_to(
+                            jogged_pt._replace(x=0, y=0))
+                assert diff_magnitude, \
+                    'step comparisons must check z or (x and y) magnitude'
+
+                threshold_mag = Point(0, 0, 0).magnitude_to(
+                        comp.threshold_vector)
+                exceeds = diff_magnitude > threshold_mag
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=absolute_diff_vector,
+                                     thresholdVector=comp.threshold_vector,
                                      exceedsThreshold=exceeds)
         return comparisons
 
