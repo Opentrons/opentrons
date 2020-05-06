@@ -30,7 +30,6 @@ import {
   CHECK_STEP_SESSION_EXITED,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
-  type RobotCalibrationCheckStep,
 } from '../../calibration'
 
 import { Introduction } from './Introduction'
