@@ -544,11 +544,6 @@ CHECK_TRANSITIONS = [
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
-DEFAULT_OK_TIP_PICK_UP_MAGNITUDE = 5.0
-P1000_OK_TIP_PICK_UP_MAGNITUDE = 10.0
-OK_HEIGHT_MAGNITUDE = 5.0
-OK_XY_MAGNITUDE = 5.0
-
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5, 5, 5)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
 OK_HEIGHT_VECTOR = Point(0, 0, 5)
@@ -557,7 +552,7 @@ OK_XY_VECTOR = Point(5, 5, 0)
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
-    threshold_vector: float,
+    threshold_vector: Point
 
 
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {

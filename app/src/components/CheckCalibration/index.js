@@ -4,33 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import { ModalPage, Icon } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
-import {
-  fetchRobotCalibrationCheckSession,
-  deleteRobotCalibrationCheckSession,
-  getRobotCalibrationCheckSession,
-  CHECK_STEP_SESSION_STARTED,
-  CHECK_STEP_LABWARE_LOADED,
-  CHECK_STEP_PREPARING_FIRST_PIPETTE,
-  CHECK_STEP_INSPECTING_FIRST_TIP,
-  CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT,
-  CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
-  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE,
-  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
-  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO,
-  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
-  CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE,
-  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
-  CHECK_STEP_PREPARING_SECOND_PIPETTE,
-  CHECK_STEP_INSPECTING_SECOND_TIP,
-  CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT,
-  CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
-  CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE,
-  CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
-  CHECK_STEP_CHECK_COMPLETE,
-  CHECK_STEP_SESSION_EXITED,
-  CHECK_STEP_BAD_ROBOT_CALIBRATION,
-  CHECK_STEP_NO_PIPETTES_ATTACHED,
-} from '../../calibration'
+import * as Calibration from '../../calibration'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
@@ -52,10 +26,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   const { currentStep, labware, instruments } =
     useSelector((state: State) =>
-      getRobotCalibrationCheckSession(state, robotName)
+      Calibration.getRobotCalibrationCheckSession(state, robotName)
     ) || {}
   React.useEffect(() => {
-    dispatch(fetchRobotCalibrationCheckSession(robotName))
+    dispatch(Calibration.fetchRobotCalibrationCheckSession(robotName))
   }, [dispatch, robotName])
 
   // TODO: BC: once robot keeps track of active pipette, grab that
@@ -81,7 +55,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   const activeMount = 'left'
 
   function exit() {
-    dispatch(deleteRobotCalibrationCheckSession(robotName))
+    dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
   }
 
@@ -89,7 +63,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   let modalContentsClassName = styles.modal_contents
 
   switch (currentStep) {
-    case CHECK_STEP_SESSION_STARTED: {
+    case Calibration.CHECK_STEP_SESSION_STARTED: {
       stepContents = (
         <Introduction
           exit={exit}
@@ -99,7 +73,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       )
       break
     }
-    case CHECK_STEP_LABWARE_LOADED: {
+    case Calibration.CHECK_STEP_LABWARE_LOADED: {
       stepContents = (
         <DeckSetup
           robotName={robotName}
@@ -110,13 +84,13 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       modalContentsClassName = styles.page_content_dark
       break
     }
-    case CHECK_STEP_INSPECTING_FIRST_TIP:
-    case CHECK_STEP_PREPARING_FIRST_PIPETTE:
-    case CHECK_STEP_INSPECTING_SECOND_TIP:
-    case CHECK_STEP_PREPARING_SECOND_PIPETTE: {
+    case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
+    case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE: {
       const isInspecting = [
-        CHECK_STEP_INSPECTING_FIRST_TIP,
-        CHECK_STEP_INSPECTING_SECOND_TIP,
+        Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
+        Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
       ].includes(currentStep)
       stepContents =
         activeInstrumentId && activeLabware ? (
@@ -130,31 +104,31 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         ) : null
       break
     }
-    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
-    case CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
-    case CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
       // $FlowFixMe(BC, 2020-05-05): flow doesn't understand switch case
       const slotNumber: string = {
-        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE]: '1',
-        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: '1',
-        [CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE]: '1',
-        [CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: '1',
-        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO]: '3',
-        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: '3',
-        [CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE]: '7',
-        [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: '7',
+        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE]: '1',
+        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: '1',
+        [Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE]: '1',
+        [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: '1',
+        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO]: '3',
+        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: '3',
+        [Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE]: '7',
+        [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: '7',
       }[currentStep]
 
       const isInspecting = [
-        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
-        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
-        CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
-        CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
       ].includes(currentStep)
       stepContents =
         activeInstrumentId && slotNumber != null ? (
@@ -169,13 +143,13 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         ) : null
       break
     }
-    case CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
-    case CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
-    case CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
-    case CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
       const isInspecting = [
-        CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
-        CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
       ].includes(currentStep)
 
       stepContents = activeInstrumentId ? (
@@ -189,10 +163,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       ) : null
       break
     }
-    case CHECK_STEP_SESSION_EXITED:
-    case CHECK_STEP_CHECK_COMPLETE:
-    case CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case CHECK_STEP_NO_PIPETTES_ATTACHED:
+    case Calibration.CHECK_STEP_SESSION_EXITED:
+    case Calibration.CHECK_STEP_CHECK_COMPLETE:
+    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION:
+    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED:
     case 'calibrationComplete': {
       // TODO: BC: get real complete state name after it is update on server side
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
