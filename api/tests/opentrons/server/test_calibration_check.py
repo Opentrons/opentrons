@@ -60,17 +60,18 @@ async def test_load_same_tiprack(async_client, async_server):
 
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
     # there should only be one tiprack uuid here
-    assert len(sess._moves.preparingPipette.keys()) == 1
+    assert sess._moves.preparingFirstPipette.keys() == \
+            sess._moves.preparingSecondPipette.keys()
 
-    tip_id = list(sess._moves.preparingPipette.keys())[0]
+    tip_id = list(sess._moves.preparingFirstPipette.keys())[0]
 
     single_id = pip_info['p300_single_v1']
     multi_id = pip_info['p300_multi_v1']
 
-    loc_dict = sess._moves.preparingPipette[tip_id][UUID(single_id)]
+    loc_dict = sess._moves.preparingSecondPipette[tip_id][UUID(single_id)]
     loc_dict.well.display_name.split()[0] == 'B1'
 
-    loc_dict2 = sess._moves.preparingPipette[tip_id][UUID(multi_id)]
+    loc_dict2 = sess._moves.preparingFirstPipette[tip_id][UUID(multi_id)]
     loc_dict2.well.display_name.split()[0] == 'A1'
 
 
