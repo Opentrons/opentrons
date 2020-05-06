@@ -32,7 +32,7 @@ export function finishDiscovery(): FinishDiscoveryAction {
 }
 
 export function clearDiscoveryCache(): ClearDiscoveryCacheAction {
-  return {type: CLEAR_CACHE, meta: { shell: true } }
+  return { type: CLEAR_CACHE, meta: { shell: true } }
 }
 
 export function removeRobot(robotName: string): RemoveRobotAction {

@@ -252,7 +252,6 @@ describe('app-shell/discovery', () => {
     })
 
     expect(mockClient.stop).toHaveBeenCalled()
-    expect(Store.__store.reset).toHaveBeenCalledWith('services')
     expect(mockClient.services).toEqual([])
     expect(mockClient.start).toHaveBeenCalled()
   })

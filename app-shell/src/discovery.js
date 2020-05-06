@@ -79,6 +79,13 @@ export function registerDiscovery(dispatch: Dispatch) {
       payload: { robots: client.services },
     })
   }
+
+  function clearCache() {
+    client.stop()
+    client.services = []
+    handleServices()
+    client.start()
+  }
 }
 
 export function getRobots() {
@@ -93,11 +100,4 @@ function filterServicesToPersist(services: Array<Service>) {
 
   const blacklist = [].concat(candidateOverrides)
   return client.services.filter(s => blacklist.every(ip => ip !== s.ip))
-}
-
-function clearCache() {
-  client.stop()
-  client.services = []
-  store.reset('services')
-  client.start()
 }
