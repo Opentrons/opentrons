@@ -1825,11 +1825,15 @@ class SmoothieDriver_3_0_0:
             log.debug("probe_axis: {}".format(command))
             try:
                 self._send_command(
-                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT)
+                    command=command, ack_timeout=DEFAULT_MOVEMENT_TIMEOUT,
+                    suppress_home_after_error=True)
             except SmoothieError as se:
                 log.exception("Tip probe failure")
+                self.home(axis)
                 if 'probe' in str(se).lower():
                     raise TipProbeError(se.ret_code, se.command)
+                else:
+                    raise
             self.update_position(self.position)
             return self.position
         else:

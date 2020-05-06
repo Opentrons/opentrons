@@ -19,7 +19,7 @@ export type UsbDeviceMonitor = {|
   stop: () => void,
 |}
 
-const logger = createLogger('usb-devices')
+const log = createLogger('usb-devices')
 
 export function createUsbDeviceMonitor(
   options: UsbDeviceMonitorOptions = {}
@@ -46,6 +46,7 @@ export function createUsbDeviceMonitor(
       }
 
       usbDetection.stopMonitoring()
+      log.debug('usb detection monitoring stopped')
     },
   }
 }
@@ -74,7 +75,7 @@ export function getWindowsDriverVersion(
     )
     .then(result => result.stdout.trim())
     .catch(error => {
-      logger.warn('unable to read Windows USB driver version', {
+      log.warn('unable to read Windows USB driver version', {
         device,
         error,
       })
