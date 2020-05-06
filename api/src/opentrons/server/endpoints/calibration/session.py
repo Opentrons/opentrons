@@ -1,4 +1,5 @@
 import typing
+import logging
 from uuid import uuid4, UUID
 from enum import Enum
 from dataclasses import dataclass
@@ -12,6 +13,8 @@ from .util import StateMachine, WILDCARD
 from .models import ComparisonStatus
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
+
+MODULE_LOG = logging.getLogger(__name__)
 
 """
 A set of endpoints that can be used to create a session for any robot
@@ -531,8 +534,8 @@ MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(5, 5, 5)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
-OK_HEIGHT_VECTOR = Point(0, 0, 5)
-OK_XY_VECTOR = Point(5, 5, 0)
+OK_HEIGHT_VECTOR = Point(0.0, 0.0, 5.0)
+OK_XY_VECTOR = Point(5.0, 5.0, 0.0)
 
 
 @dataclass
@@ -721,14 +724,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                                        jogged_state), None)
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
-                if comp.threshold_vector.z == 0:
-                    diff_magnitude = ref_pt._replace(z=0).magnitude_to(
-                            jogged_pt._replace(z=0))
-                elif comp.threshold_vector.x == 0 and \
-                        comp.threshold_vector.y == 0:
-                    diff_magnitude = ref_pt._replace(x=0, y=0).magnitude_to(
-                            jogged_pt._replace(x=0, y=0))
-                assert diff_magnitude, \
+                if comp.threshold_vector.z == 0.0:
+                    diff_magnitude = ref_pt._replace(z=0.0).magnitude_to(
+                            jogged_pt._replace(z=0.0))
+                elif comp.threshold_vector.x == 0.0 and \
+                        comp.threshold_vector.y == 0.0:
+                    diff_magnitude = ref_pt._replace(x=0.0, y=0.0).magnitude_to(
+                            jogged_pt._replace(x=0.0, y=0.0))
+                assert diff_magnitude is not None, \
                     'step comparisons must check z or (x and y) magnitude'
 
                 threshold_mag = Point(0, 0, 0).magnitude_to(
