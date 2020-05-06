@@ -138,7 +138,6 @@ const _stepToTitleInfo = (stepForm: FormData) => ({
   stepType: stepForm.stepType,
 })
 
-// TODO IMMEDIATELY test this
 export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> = createSelector(
   stepFormSelectors.getUnsavedForm,
   stepFormSelectors.getSavedStepForms,

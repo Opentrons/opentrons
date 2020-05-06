@@ -68,11 +68,6 @@ export function _wellContentsForLabware(
   )
 }
 
-export type WellContentsForSteps = {
-  // Maybe-type key because upstream errors will mean there's no well contents for any downstream step.
-  [stepId: string]: ?WellContentsByLabware,
-}
-
 export const getAllWellContentsForActiveItem: Selector<WellContentsByLabware> = createSelector(
   stepFormSelectors.getLabwareEntities,
   timelineFrameBeforeActiveItem,

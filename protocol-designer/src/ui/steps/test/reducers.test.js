@@ -67,7 +67,30 @@ describe('collapsedSteps reducer', () => {
 })
 
 describe('selectedItem reducer', () => {
-  it('select step', () => {
+  it('should select the presaved step item on ADD_STEP', () => {
+    const action = {
+      type: 'ADD_STEP',
+      payload: PRESAVED_STEP_ID,
+    }
+    expect(selectedItem(null, action)).toEqual({
+      isStep: false,
+      id: PRESAVED_STEP_ID,
+    })
+  })
+
+  it('should select the saved step item on SAVE_STEP_FORM', () => {
+    const stepId = '123'
+    const action = {
+      type: 'SAVE_STEP_FORM',
+      payload: { id: stepId },
+    }
+    expect(selectedItem(null, action)).toEqual({
+      isStep: true,
+      id: stepId,
+    })
+  })
+
+  it('should select the given step on SELECT_STEP', () => {
     const stepId = '123'
     const action = {
       type: 'SELECT_STEP',
@@ -79,7 +102,7 @@ describe('selectedItem reducer', () => {
     })
   })
 
-  it('select terminal item', () => {
+  it('should select the given select terminal item on SELECT_TERMINAL_ITEM', () => {
     const terminalId = 'test'
     const action = {
       type: 'SELECT_TERMINAL_ITEM',
@@ -91,14 +114,11 @@ describe('selectedItem reducer', () => {
     })
   })
 
-  it('should select the presaved step item on ADD_STEP', () => {
+  it('should deselect on DELETE_STEP', () => {
     const action = {
-      type: 'SELECT_TERMINAL_ITEM',
-      payload: PRESAVED_STEP_ID,
+      type: 'DELETE_STEP',
+      payload: 'someStepId',
     }
-    expect(selectedItem(null, action)).toEqual({
-      isStep: false,
-      id: PRESAVED_STEP_ID,
-    })
+    expect(selectedItem({ isStep: true, id: 'anyId' }, action)).toEqual(null)
   })
 })

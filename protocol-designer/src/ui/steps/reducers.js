@@ -89,7 +89,6 @@ export const initialSelectedItemState = {
   id: START_TERMINAL_ITEM_ID,
 }
 
-// TODO IMMEDIATELY update + add tests
 const selectedItem: Reducer<SelectedItemState, *> = handleActions(
   {
     ADD_STEP: (state: SelectedItemState, action: AddStepAction) =>
