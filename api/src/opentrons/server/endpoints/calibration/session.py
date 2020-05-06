@@ -126,6 +126,7 @@ class CalibrationSession:
 
         for pipette_id in self._pip_info_by_id.keys():
             mount = self._get_mount(pipette_id)
+            pip_vol = self.get_pipette(mount)['max_volume']
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
             load_name: str = _lookup.load_name
