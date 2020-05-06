@@ -749,13 +749,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     to_loc: Location):
         from_pt = await self.hardware.gantry_position(mount)
         from_loc = Location(from_pt, None)
-        cp = self._relate_mount[pipette_id]['critical_point']
+        cp = self._pip_info_by_id[pipette_id]['critical_point']
 
         max_height = self.hardware.get_instrument_max_height(mount)
         moves = geometry.plan_moves(from_loc, to_loc,
                                     self._deck, max_height)
         for move in moves:
-            await self.hardware.move_to(mount, move[0], move[1])
+            await self.hardware.move_to(
+                mount, move[0], move[1], critical_point=cp)
 
     async def _jog_first_pipette(self, vector: Point):
         assert self._first_mount, \
