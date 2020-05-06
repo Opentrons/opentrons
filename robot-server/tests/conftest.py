@@ -1,3 +1,6 @@
+import subprocess
+import time
+import sys
 from unittest.mock import MagicMock
 
 import pytest
@@ -23,28 +26,16 @@ def api_client(hardware) -> TestClient:
     return TestClient(app)
 
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def run_server():
-    import multiprocessing as mp
-    import os
-    os.environ['OT_ROBOT_SERVER_DOT_ENV_PATH'] = "dev.env"
-    os.environ['OT_API_FF_useFastApi'] = "true"
-
-    def runner(event_arg):
-        from robot_server.main import main
-        from robot_server.service.app import app
-        app.add_event_handler("startup", lambda: event_arg.set())
-        main()
-
-    event = mp.Event()
-    thread = mp.Process(target=runner, args=(event,))
-    thread.start()
-
-    yield thread
-
-    thread.terminate()
-    thread.join()
-    thread.close()
+    with subprocess.Popen([sys.executable, "-m", "robot_server.main"],
+                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': 'dev.env',
+                               'OT_API_FF_useFastApi': 'true'},
+                          stdout=subprocess.PIPE,
+                          stderr=subprocess.PIPE) as proc:
+        # Wait for a bit to get started
+        time.sleep(3)
+        yield proc
 
 
 @pytest.fixture
