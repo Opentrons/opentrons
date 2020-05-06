@@ -3,11 +3,10 @@ import logging
 import pathlib
 from typing import Dict, Tuple
 import time
-from opentrons.hardware_control.types import BoardRevision
+from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
 from .types import (OutputPins, RevPins, InputPins, GPIOPins,
                     group_by_gpio)
-
 
 import gpiod  # type: ignore
 
@@ -208,9 +207,16 @@ class GPIOCharDev:
         else:
             raise RevisionPinsError
 
-    def get_door_switches_line(self) -> gpiod.Line:
-        return self.lines[InputPins.window_door_sw.name]
-    # def release_line(self, gpio_pins: GPIOPins):
-    #     name = str(gpio_pins)
-    #     self.lines[name].release()
-    #     self.lines.pop(name)
+    def get_door_switches_fd(self) -> int:
+        name = InputPins.window_door_sw.name
+        return self.lines[name].event_get_fd()
+
+    def get_door_state(self) -> DoorState:
+        name = InputPins.window_door_sw.name
+        event = self.lines[name].event_read()
+        return DoorState.by_event(event)
+
+    def release_line(self, gpio_pins: GPIOPins):
+        name = str(gpio_pins)
+        self.lines[name].release()
+        self.lines.pop(name)

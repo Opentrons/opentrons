@@ -13,7 +13,7 @@ from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from . import modules
 from .execution_manager import ExecutionManager
-from .types import BoardRevision
+from .types import BoardRevision, DoorState
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -108,6 +108,15 @@ class Simulator:
         self._log = MODULE_LOG.getChild(repr(self))
         self._strict_attached = bool(strict_attached_instruments)
         self._gpio_chardev = SimulatingGPIOCharDev('gpiochip0')
+        self._door_state = DoorState.CLOSED
+
+    @property
+    def door_state(self) -> DoorState:
+        return self._door_state
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState):
+        self._door_state = door_state
 
     @property
     def gpio_chardev(self) -> 'GPIODriverLike':

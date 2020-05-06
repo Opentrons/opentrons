@@ -1,6 +1,6 @@
 from typing import Dict, Tuple
 
-from opentrons.hardware_control.types import BoardRevision
+from opentrons.hardware_control.types import BoardRevision, DoorState
 from .types import OutputPins, RevPins, InputPins, GPIOPins
 
 
@@ -101,7 +101,12 @@ class SimulatingGPIOCharDev:
         return (bool(self._read(RevPins.rev_0)),
                 bool(self._read(RevPins.rev_1)))
 
-    # def release_line(self, gpio_pins: GPIOPins):
-    #     name = str(gpio_pins)
-    #     self.lines[name].release()
-    #     self.lines.pop(name)
+    def get_door_switches_fd(self) -> int:
+        return 0
+
+    def get_door_state(self) -> DoorState:
+        return DoorState.CLOSED
+
+    def release_line(self, gpio_pins: GPIOPins):
+        name = str(gpio_pins)
+        self.lines.pop(name)

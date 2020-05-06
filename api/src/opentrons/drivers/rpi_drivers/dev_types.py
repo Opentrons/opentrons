@@ -1,7 +1,7 @@
 from typing import Dict, Tuple
 from typing_extensions import Protocol
-from opentrons.hardware_control.types import BoardRevision
-from .types import OutputPins
+from opentrons.hardware_control.types import BoardRevision, DoorState
+from .types import OutputPins, GPIOPins
 
 
 class GPIODriverLike(Protocol):
@@ -77,5 +77,11 @@ class GPIODriverLike(Protocol):
     def read_revision_bits(self) -> Tuple[bool, bool]:
         ...
 
-    # def release_line(self, gpio_pins: GPIOPins):
-    #     ...
+    def get_door_switches_fd(self) -> int:
+        ...
+
+    def get_door_state(self) -> DoorState:
+        ...
+
+    def release_line(self, gpio_pins: GPIOPins):
+        ...

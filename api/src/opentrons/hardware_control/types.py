@@ -2,8 +2,12 @@ import abc
 import asyncio
 import enum
 import logging
-from typing import Tuple
+from typing import Tuple, TYPE_CHECKING
 from opentrons import types as top_types
+
+if TYPE_CHECKING:
+    import gpiod  # type: ignore
+                  # noqa(F401)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -138,12 +142,12 @@ class DoorState(enum.Enum):
     CLOSED = True
 
     @classmethod
-    def by_bool(cls, input: bool):
+    def by_event(cls, event: 'gpiod.LineEvent'):
         ds_dict = {
-            False: cls.OPEN,
-            True: cls.CLOSED
+            gpiod.LineEvent.FALLING_EDGE: cls.OPEN,
+            gpiod.LineEvent.RISING_EDGE: cls.CLOSED
         }
-        return ds_dict[input]
+        return ds_dict[event.type]
 
     def __str__(self):
         return self.name

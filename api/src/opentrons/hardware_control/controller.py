@@ -1,5 +1,6 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
+import enum
 import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
@@ -22,6 +23,19 @@ if TYPE_CHECKING:
         import GPIODriverLike  # noqa(F501)
 
 MODULE_LOG = logging.getLogger(__name__)
+
+
+def event_callback(q: asyncio.Queue):
+    try:
+        q.put_nowait(QueueEvents.EVENT_RECEIVED)
+    except asyncio.QueueFull:
+        MODULE_LOG.warning(
+            'Event queue is full and can no longer receive new events')
+
+
+class QueueEvents(enum.Enum):
+    EVENT_RECEIVED = enum.auto()
+    QUIT = enum.auto()
 
 
 class Controller:
@@ -53,7 +67,6 @@ class Controller:
             handle_locks=False)
         self._cached_fw_version: Optional[str] = None
         try:
-            self._door_watcher = aionotify.Watcher()
             self._module_watcher = aionotify.Watcher()
             self._module_watcher.watch(
                 alias='modules',
@@ -78,15 +91,26 @@ class Controller:
         await self.gpio_chardev.setup()
 
     async def monitor_door_switch_state(
-            self, api_door_state: DoorState):
+            self, loop: asyncio.AbstractEventLoop,
+            api_door_state: DoorState):
+        event_queue: asyncio.Queue = asyncio.Queue()
+        door_fd = self.gpio_chardev.get_door_switches_fd()
+        loop.add_reader(door_fd, event_callback, event_queue)
         while True:
-            await asyncio.sleep(0.5)
-            state = DoorState.by_bool(
-                self.gpio_chardev.read_window_switches())
-            if api_door_state != state:
-                api_door_state = state
-                MODULE_LOG.info(
-                    f'Updating the window switch status: {api_door_state}')
+            await self._watch_door_switch_event(event_queue)
+
+    async def _watch_door_switch_event(self,
+                                       event_queue: asyncio.Queue):
+        ev = await event_queue.get()
+        if ev == QueueEvents.EVENT_RECEIVED:
+            door_state = self.gpio_chardev.get_door_state()
+            api_door_state = door_state
+            MODULE_LOG.info(
+                f'Updating the window switch status: {api_door_state}')
+        elif ev == QueueEvents.QUIT:
+            return
+        else:
+            raise RuntimeError("Event queue has received an unknown item")
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
