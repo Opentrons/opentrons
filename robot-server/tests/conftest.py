@@ -34,8 +34,9 @@ def run_server():
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
         # Wait for a bit to get started
-        time.sleep(3)
+        time.sleep(2)
         yield proc
+        proc.kill()
 
 
 @pytest.fixture
