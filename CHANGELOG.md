@@ -3,45 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [3.17.1-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.17.1-alpha.2...v3.17.1-alpha.3) (2020-05-05)
-
+## [3.17.1](https://github.com/opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
 
 ### Bug Fixes
 
 * **api:** fix tempdeck simulate freeze ([#5563](https://github.com/Opentrons/opentrons/issues/5563)) ([ae2bdcb](https://github.com/Opentrons/opentrons/commit/ae2bdcb)), closes [#5561](https://github.com/Opentrons/opentrons/issues/5561)
 * **app-shell:** upgrade Electron, avoid hoisting dependencies, and fix devtools ([#5545](https://github.com/Opentrons/opentrons/issues/5545)) ([f993925](https://github.com/Opentrons/opentrons/commit/f993925)), closes [#5537](https://github.com/Opentrons/opentrons/issues/5537) [#5541](https://github.com/Opentrons/opentrons/issues/5541)
-
-
-
-
-
-## [3.17.1-alpha.2](https://github.com/opentrons/opentrons/compare/v3.17.1-alpha.1...v3.17.1-alpha.2) (2020-04-30)
-
-
-### Bug Fixes
-
 * **api:** Correctly grab slot from labware object ([#5534](https://github.com/opentrons/opentrons/issues/5534)) ([8a3850a](https://github.com/opentrons/opentrons/commit/8a3850a))
-
-
-
-
-
-## [3.17.1-alpha.1](https://github.com/opentrons/opentrons/compare/v3.17.1-alpha.0...v3.17.1-alpha.1) (2020-04-30)
-
-
-### Bug Fixes
-
 * **api:** home only the axis probing after error ([#5525](https://github.com/opentrons/opentrons/issues/5525)) ([c0d640c](https://github.com/opentrons/opentrons/commit/c0d640c))
-
-
-
-
-
-## [3.17.1-alpha.0](https://github.com/opentrons/opentrons/compare/v3.17.0...v3.17.1-alpha.0) (2020-04-28)
-
-
-### Bug Fixes
-
 * **api:** allow protocol delay to be cancelled ([#5403](https://github.com/opentrons/opentrons/issues/5403)) ([c0ed09d](https://github.com/opentrons/opentrons/commit/c0ed09d)), closes [#5400](https://github.com/opentrons/opentrons/issues/5400)
 * **api:** avoid tc lid when pathing ([#5390](https://github.com/opentrons/opentrons/issues/5390)) ([4a7fe0b](https://github.com/opentrons/opentrons/commit/4a7fe0b)), closes [#5263](https://github.com/opentrons/opentrons/issues/5263)
 * **api:** Load the correct gantry calibration upon deck calibration exit ([#5469](https://github.com/opentrons/opentrons/issues/5469)) ([b03038d](https://github.com/opentrons/opentrons/commit/b03038d))
