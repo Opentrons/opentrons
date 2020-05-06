@@ -121,9 +121,7 @@ const mapSTP = (state: BaseState): SP => {
       mix: true,
       pause: true,
       magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
-      temperature:
-        getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE) ||
-        getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
+      temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
       thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
     },
   }

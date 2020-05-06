@@ -278,3 +278,11 @@ and when that is implemented.
     background-image: url('../../images/modules/engage_height_animation_gen2.gif');
   }
 }
+
+.tc_step_group {
+  margin: 1rem 0;
+}
+
+.tc_step_option {
+  margin-bottom: 0.5rem;
+}
