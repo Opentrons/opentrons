@@ -45,7 +45,7 @@ function MainPanelComponent(props: Props) {
             <TimelineAlerts />
             <Hints />
             {startTerminalItemSelected && <LabwareSelectionModal />}
-            {!startTerminalItemSelected && <StepEditForm />}
+            <StepEditForm />
             {startTerminalItemSelected && ingredSelectionMode && (
               <LiquidPlacementModal />
             )}

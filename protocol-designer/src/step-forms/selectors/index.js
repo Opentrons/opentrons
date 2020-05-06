@@ -14,13 +14,11 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { i18n } from '../../localization'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   TEMPERATURE_DEACTIVATED,
 } from '../../constants'
 import {
-  createBlankForm,
   getFormWarnings,
   getFormErrors,
   stepFormToArgs,
@@ -40,13 +38,11 @@ import type {
 } from '@opentrons/components'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormData, StepIdType } from '../../form-types'
 import type {
   StepArgsAndErrors,
   StepFormAndFieldErrors,
-  StepItemData,
 } from '../../steplist/types'
-import type { CommandCreatorArgs } from '../../step-generation/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -65,10 +61,22 @@ import type {
   TemperatureModuleState,
   ThermocyclerModuleState,
 } from '../types'
-import type { RootState, SavedStepFormState } from '../reducers'
+import type {
+  PresavedStepFormState,
+  RootState,
+  SavedStepFormState,
+} from '../reducers'
 import type { InvariantContext } from '../../step-generation'
 
 const rootSelector = (state: BaseState): RootState => state.stepForms
+
+export const getPresavedStepForm = (state: BaseState): PresavedStepFormState =>
+  rootSelector(state).presavedStepForm
+
+export const getCurrentFormIsPresaved: Selector<boolean> = createSelector(
+  getPresavedStepForm,
+  presavedStepForm => presavedStepForm != null
+)
 
 // NOTE Ian 2019-04-15: outside of this file, you probably only care about
 // the labware entity in its denormalized representation, in which case you ought
@@ -143,25 +151,6 @@ export const getInitialDeckSetupStepForm: Selector<FormData> = createSelector(
   rootSelector,
   _getInitialDeckSetupStepFormRootState
 )
-
-// TODO: BC: 2019-05-06 currently not being used, but should be used as the interface
-// for presenting labware locations on the deck for a given step
-export const getLabwareLocationsForStep = (
-  state: BaseState,
-  stepId: StepIdType = INITIAL_DECK_SETUP_STEP_ID
-) => {
-  const { orderedStepIds, savedStepForms } = rootSelector(state)
-  const allOrderedStepIds = [INITIAL_DECK_SETUP_STEP_ID, ...orderedStepIds]
-  const relevantStepIds = allOrderedStepIds.slice(
-    0,
-    allOrderedStepIds.indexOf(stepId) + 1
-  )
-  return relevantStepIds.reduce((acc, stepId) => {
-    const { labwareLocationUpdate } = savedStepForms[stepId]
-    if (labwareLocationUpdate) return { ...acc, ...labwareLocationUpdate }
-    return acc
-  }, {})
-}
 
 const MAGNETIC_MODULE_INITIAL_STATE: MagneticModuleState = {
   type: MAGNETIC_MODULE_TYPE,
@@ -410,7 +399,7 @@ function _getHydratedForm(
   // It's confusing that pipette is an ID string before this,
   // but a PipetteEntity object after this.
   // For `moduleId` field, it would be surprising to be a ModuleEntity!
-  // Consider nesting all additional fields under 'hydrated' key,
+  // Consider nesting all additional fields under 'meta' key,
   // following what we're doing with 'module'.
   // See #3161
   hydratedForm.meta = {}
@@ -480,65 +469,12 @@ export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSel
   }
 )
 
-// TODO: BC: 2018-10-26 remove this when we decide to not block save
 export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
   getUnsavedFormErrors,
   formErrors => {
     return Boolean(formErrors && isEmpty(formErrors))
   }
 )
-
-// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
-const getLegacyStepWithId = (
-  state: BaseState,
-  props: { stepId: StepIdType }
-) => {
-  return state.stepForms.legacySteps[props.stepId]
-}
-
-const getStepFormWithId = (state: BaseState, props: { stepId: StepIdType }) => {
-  return state.stepForms.savedStepForms[props.stepId]
-}
-
-export const makeGetArgsAndErrorsWithId = () => {
-  return createSelector<
-    BaseState,
-    { stepId: StepIdType },
-    { stepArgs: CommandCreatorArgs | null, errors?: StepFormAndFieldErrors },
-    _,
-    _
-  >(
-    getStepFormWithId,
-    getInvariantContext,
-    (stepForm, contextualState) => {
-      const hydratedForm = _getHydratedForm(stepForm, contextualState)
-      const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
-      return isEmpty(errors)
-        ? { stepArgs: stepFormToArgs(hydratedForm) }
-        : { errors, stepArgs: null }
-    }
-  )
-}
-
-// TODO: Brian&Ian 2019-04-02 this is TEMPORARY, should be removed once legacySteps reducer is removed
-// only need it because stepType should exist evergreen outside of legacySteps but doesn't yet
-export const makeGetStepWithId = () => {
-  // $FlowFixMe: selector is untyped. hiding error due to TODO above
-  return createSelector(
-    getStepFormWithId,
-    getLegacyStepWithId,
-    (stepForm, legacyStep) => {
-      return {
-        ...legacyStep,
-        formData: stepForm,
-        title: stepForm
-          ? stepForm.stepName
-          : i18n.t(`application.stepType.${legacyStep.stepType}`),
-        description: stepForm ? stepForm.stepDetails : null,
-      }
-    }
-  )
-}
 
 export const getArgsAndErrorsByStepId: Selector<{
   [StepIdType]: StepArgsAndErrors,
@@ -565,23 +501,14 @@ export const getArgsAndErrorsByStepId: Selector<{
   }
 )
 
-// TODO: BC&IL 2019-04-02 this is being recomputed every time any field in unsaved forms is changed
-// this should only be computed once when a form is opened
-export const getIsNewStepForm: Selector<boolean> = createSelector(
-  getUnsavedForm,
-  getSavedStepForms,
-  (formData, savedForms) =>
-    formData && formData.id != null ? !savedForms[formData.id] : true
-)
-
 export const getUnsavedFormIsPristineSetTempForm: Selector<boolean> = createSelector(
   getUnsavedForm,
-  getIsNewStepForm,
-  (unsavedForm, isNewStepForm) => {
+  getCurrentFormIsPresaved,
+  (unsavedForm, isPresaved) => {
     const isSetTempForm =
       unsavedForm?.stepType === 'temperature' &&
       unsavedForm?.setTemperature === 'true'
-    return isNewStepForm && isSetTempForm
+    return isPresaved && isSetTempForm
   }
 )
 
@@ -608,58 +535,4 @@ export const getFormLevelWarningsPerStep: Selector<{
       const hydratedForm = _getHydratedForm(form, contextualState)
       return getFormWarnings(form.stepType, hydratedForm)
     })
-)
-
-// TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
-const getSteps = (state: BaseState) => rootSelector(state).legacySteps
-export function _getStepFormData(
-  state: BaseState,
-  stepId: StepIdType,
-  newStepType?: StepType
-): ?FormData {
-  const existingStep = getSavedStepForms(state)[stepId]
-
-  if (existingStep) {
-    return existingStep
-  }
-
-  const steps = getSteps(state)
-  const stepTypeFromStepReducer = steps[stepId] && steps[stepId].stepType
-  const stepType = newStepType || stepTypeFromStepReducer
-
-  if (!stepType) {
-    console.error(
-      `New step with id "${stepId}" was added with no stepType, could not generate form`
-    )
-    return null
-  }
-
-  return createBlankForm({
-    stepId,
-    stepType: stepType,
-  })
-}
-
-// TODO: Ian 2018-12-19 this is DEPRECATED, should be removed once legacySteps reducer is removed
-export const getAllSteps: Selector<{
-  [stepId: StepIdType]: StepItemData,
-}> = createSelector(
-  getSteps,
-  getSavedStepForms,
-  (steps, savedForms) => {
-    return mapValues(
-      steps,
-      (step: StepItemData, id: StepIdType): StepItemData => {
-        const savedForm = (savedForms && savedForms[id]) || null
-        return {
-          ...steps[id],
-          formData: savedForm,
-          title: savedForm
-            ? savedForm.stepName
-            : i18n.t(`application.stepType.${step.stepType}`),
-          description: savedForm ? savedForm.stepDetails : null,
-        }
-      }
-    )
-  }
 )

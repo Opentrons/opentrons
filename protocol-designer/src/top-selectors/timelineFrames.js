@@ -6,7 +6,7 @@ import assert from 'assert'
 import { selectors as fileDataSelectors } from '../file-data'
 import { selectors as stepFormSelectors } from '../step-forms'
 import { getActiveItem } from '../ui/steps'
-import { START_TERMINAL_ITEM_ID } from '../steplist'
+import { START_TERMINAL_ITEM_ID, PRESAVED_STEP_ID } from '../steplist'
 
 import type { Selector } from '../types'
 import type { CommandsAndRobotState } from '../step-generation'
@@ -27,7 +27,10 @@ const _timelineFrameHelper = (beforeActiveItem: boolean) => (
   const lastValidRobotStateIdx = timeline.length - 1
   let timelineIdx = lastValidRobotStateIdx // default to last valid robot state
 
-  if (beforeActiveItem) {
+  if (!activeItem.isStep && activeItem.id === PRESAVED_STEP_ID) {
+    // presaved step acts the same whether looking at timeline before or after active item
+    timelineIdx = lastValidRobotStateIdx
+  } else if (beforeActiveItem) {
     if (activeItem.isStep) {
       timelineIdx = Math.min(
         orderedStepIds.findIndex(id => id === activeItem.id),
