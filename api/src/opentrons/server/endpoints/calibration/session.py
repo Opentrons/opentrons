@@ -1,15 +1,15 @@
 import typing
 from uuid import uuid4, UUID
 from enum import Enum
-from dataclasses import dataclass, asdict, fields
+from dataclasses import dataclass
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import Axis, CriticalPoint
+from opentrons.hardware_control.types import CriticalPoint
 
-from .constants import LOOKUP_LABWARE, TipAttachError
+from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
-from .models import AttachedPipette, ComparisonStatus
+from .models import ComparisonStatus
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -18,6 +18,10 @@ A set of endpoints that can be used to create a session for any robot
 calibration tasks such as checking your calibration data, performing mount
 offset or a robot deck transform.
 """
+
+
+class CalibrationException(Exception):
+    pass
 
 
 class SessionManager:
@@ -35,15 +39,8 @@ class PipetteStatus:
     model: str
     name: str
     tip_length: float
-    mount_axis: Axis
-    plunger_axis: Axis
-    pipette_uuid: Axis
     has_tip: bool
-    tiprack_id: UUID
-
-    @classmethod
-    def list_fields(cls):
-        return [obj.name for obj in fields(cls)]
+    tiprack_id: typing.Optional[UUID]
 
 
 @dataclass
@@ -105,6 +102,7 @@ class CalibrationSession:
         await hardware.cache_instruments()
         await hardware.set_lights(rails=True)
         await hardware.home()
+        return cls(hardware=hardware)
 
     # TODO: BC pipette_id is not very meaningful anymore as the mount is the
     # main accessor of a pipette inside of the check flow. This dict could
@@ -247,51 +245,31 @@ class CalibrationSession:
     def pipettes(self) -> typing.Dict[Mount, Pipette.DictType]:
         return self.hardware.attached_instruments
 
-    @property
-    def pipette_status(self) -> typing.Dict[str, AttachedPipette]:
+    def pipette_status(self) -> typing.Dict[UUID, PipetteStatus]:
         """
         Public property to help format the current labware status of a given
         session for the client.
-
-        Note:
-        Pydantic restricts dictionary keys that can be evaluated. Since
-        the session pipettes dictionary has a UUID as a key, we must first
-        convert the UUID to a hex string.
         """
-        # pydantic restricts dictionary keys that can be evaluated. Since
-        # the session pipettes dictionary has a UUID as a key, we must first
-        # convert the UUID to a hex string.
-        fields = PipetteStatus.list_fields()
         to_dict = {}
-        for id, data in self._pip_info_by_id.items():
+        for inst_id, data in self._pip_info_by_id.items():
             pip = self.get_pipette(data['mount'])
-            tip_id = data['tiprack_id']
-            temp_dict = {
-                key: value for key, value in pip.items() if key in fields
-            }
-            if tip_id:
-                temp_dict['tiprack_id'] = str(tip_id)
-            to_dict[str(id)] = AttachedPipette(**temp_dict)
+            p = PipetteStatus(
+                model=str(pip['model']),
+                name=str(pip['name']),
+                tip_length=float(pip['tip_length']),
+                has_tip=bool(pip['has_tip']),
+                tiprack_id=data['tiprack_id'],
+            )
+            to_dict[inst_id] = p
         return to_dict
 
     @property
-    def labware_status(self) -> typing.Dict:
+    def labware_status(self) -> typing.Dict[UUID, LabwareInfo]:
         """
         Public property to help format the current labware status of a given
         session for the client.
-
-        Note:
-        Pydantic restricts dictionary keys that can be evaluated. Since
-        the session labware dictionary has a UUID as a key, we must first
-        convert the UUID to a hex string.
         """
-
-        to_dict = {}
-        for name, value in self._labware_info.items():
-            temp_dict = asdict(value)
-            del temp_dict['definition']
-            to_dict[str(name)] = temp_dict
-        return to_dict
+        return self._labware_info
 
 
 # TODO: BC: move the check specific stuff to the check sub dir
@@ -323,17 +301,17 @@ class CalibrationCheckState(str, Enum):
 
 
 class CalibrationCheckTrigger(str, Enum):
-    load_labware = "load_labware"
-    prepare_pipette = "prepare_pipette"
+    load_labware = "loadLabware"
+    prepare_pipette = "preparePipette"
     jog = "jog"
-    pick_up_tip = "pick_up_tip"
-    confirm_tip_attached = "confirm_tip_attached"
-    invalidate_tip = "invalidate_tip"
-    compare_point = "compare_point"
-    go_to_next_check = "go_to_next_check"
-    exit = "exit"
-    reject_calibration = "reject_calibration"
-    no_pipettes = "no_pipettes"
+    pick_up_tip = "pickUpTip"
+    confirm_tip_attached = "confirmTip"
+    invalidate_tip = "invalidateTip"
+    compare_point = "comparePoint"
+    go_to_next_check = "goToNextCheck"
+    exit = "exitSession"
+    reject_calibration = "rejectCalibration"
+    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [
@@ -640,7 +618,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         for mount in self._pip_info_by_id.values():
             try:
                 await self._trash_tip(mount['mount'])
-            except (TipAttachError, AssertionError):
+            except (CalibrationException, AssertionError):
                 pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
@@ -688,6 +666,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         the current location, and save any offset it might have from the
         original position.
         """
+        # TODO: remove this check? is it still relevant given state machine?
+        # if self._has_tip(pipette_id):
+        #     raise CalibrationException(f"Tip is already attached "
+        #                                f"to {pipette_id} pipette.")
         mount = self._get_preparing_state_mount()
         assert mount, f'cannot pick up tip from state:' \
                       f' {self.current_state_name}'

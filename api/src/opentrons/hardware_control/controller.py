@@ -157,9 +157,6 @@ class Controller:
         finally:
             self._smoothie_driver.pop_active_current()
 
-    def set_pipette_speed(self, val: float):
-        self._smoothie_driver.set_speed(val)
-
     async def _handle_watch_event(self, register_modules: 'RegisterModules'):
         event = await self._module_watcher.get_event()
         flags = aionotify.Flags.parse(event.flags)

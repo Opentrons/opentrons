@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+### Bug Fixes
+
+* **api:** fix tempdeck simulate freeze ([#5563](https://github.com/Opentrons/opentrons/issues/5563)) ([ae2bdcb](https://github.com/Opentrons/opentrons/commit/ae2bdcb)), closes [#5561](https://github.com/Opentrons/opentrons/issues/5561)
+* **api:** Correctly grab slot from labware object ([#5534](https://github.com/Opentrons/opentrons/issues/5534)) ([8a3850a](https://github.com/Opentrons/opentrons/commit/8a3850a))
+* **api:** home only the axis probing after error ([#5525](https://github.com/Opentrons/opentrons/issues/5525)) ([c0d640c](https://github.com/Opentrons/opentrons/commit/c0d640c))
+* **api:** allow protocol delay to be cancelled ([#5403](https://github.com/Opentrons/opentrons/issues/5403)) ([c0ed09d](https://github.com/Opentrons/opentrons/commit/c0ed09d)), closes [#5400](https://github.com/Opentrons/opentrons/issues/5400)
+* **api:** avoid tc lid when pathing ([#5390](https://github.com/Opentrons/opentrons/issues/5390)) ([4a7fe0b](https://github.com/Opentrons/opentrons/commit/4a7fe0b)), closes [#5263](https://github.com/Opentrons/opentrons/issues/5263)
+* **api:** Load the correct gantry calibration upon deck calibration exit ([#5469](https://github.com/Opentrons/opentrons/issues/5469)) ([b03038d](https://github.com/Opentrons/opentrons/commit/b03038d))
+* **api:** verify the structure of v2 protocol ast ([#5454](https://github.com/Opentrons/opentrons/issues/5454)) ([b45af1e](https://github.com/Opentrons/opentrons/commit/b45af1e))
+
+
+### Features
+
+* **api:** Add labware required to session status  ([#5298](https://github.com/Opentrons/opentrons/issues/5298)) ([c602cd6](https://github.com/Opentrons/opentrons/commit/c602cd6))
+* **api:** Allow move, jog and tip handling for a cal session ([#5402](https://github.com/Opentrons/opentrons/issues/5402)) ([d5ff537](https://github.com/Opentrons/opentrons/commit/d5ff537))
+* **api:** Allow moves to crosses and slot 5 ([#5415](https://github.com/Opentrons/opentrons/issues/5415)) ([98ca207](https://github.com/Opentrons/opentrons/commit/98ca207)), closes [#5099](https://github.com/Opentrons/opentrons/issues/5099) [#5098](https://github.com/Opentrons/opentrons/issues/5098)
+* **api:** Allow Non-Full plate Thermocycler Configuration ([#5498](https://github.com/Opentrons/opentrons/issues/5498)) ([60f6b16](https://github.com/Opentrons/opentrons/commit/60f6b16))
+* **robot-server, api:** calibration check overhaul ([#5465](https://github.com/Opentrons/opentrons/issues/5465)) ([4feeeba](https://github.com/Opentrons/opentrons/commit/4feeeba))
+
+
+
+
+
 # [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package @opentrons/api-server

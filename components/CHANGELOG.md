@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [3.17.1](https://github.com/Opentrons/opentrons/compare/v3.17.0...v3.17.1) (2020-05-06)
+
+### Features
+
+* **components:** add hooks-based tooltip component to library ([#5362](https://github.com/Opentrons/opentrons/issues/5362)) ([7ef3ca9](https://github.com/Opentrons/opentrons/commit/7ef3ca9)), closes [#5120](https://github.com/Opentrons/opentrons/issues/5120)
+* **components:** add useHover and useHoverTooltip hooks ([#5364](https://github.com/Opentrons/opentrons/issues/5364)) ([874d749](https://github.com/Opentrons/opentrons/commit/874d749))
+
+
+
+
+
 # [3.17.0](https://github.com/Opentrons/opentrons/compare/v3.17.0-beta.1...v3.17.0) (2020-04-23)
 
 **Note:** Version bump only for package @opentrons/components

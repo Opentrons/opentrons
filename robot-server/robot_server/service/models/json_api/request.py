@@ -1,8 +1,7 @@
-from typing import Generic, TypeVar, Optional, Any, Type
+from typing import Generic, TypeVar, Optional, Any
 from pydantic import Field
 from pydantic.generics import GenericModel
 
-from . import ResourceTypes
 
 AttributesT = TypeVar('AttributesT')
 
@@ -16,7 +15,7 @@ class RequestDataModel(GenericModel, Generic[AttributesT]):
                           " required when the resource object originates at"
                           " the client and represents a new resource to be"
                           " created on the server.")
-    type: ResourceTypes = \
+    type: str = \
         Field(...,
               description="type member is used to describe resource objects"
                           " that share common attributes.")
@@ -24,6 +23,13 @@ class RequestDataModel(GenericModel, Generic[AttributesT]):
         Field(...,
               description="an attributes object representing some of the"
                           " resource’s data.")
+
+    @classmethod
+    def create(cls, attributes: AttributesT, resource_id: str = None):
+        return RequestDataModel[AttributesT](
+            id=resource_id,
+            attributes=attributes,
+            type=attributes.__class__.__name__)
 
 
 DataT = TypeVar('DataT', bound=RequestDataModel)
@@ -42,11 +48,10 @@ class RequestModel(GenericModel, Generic[DataT]):
 
 # Note(isk: 3/13/20): formats and returns request model
 def json_api_request(
-    resource_type: ResourceTypes,
     attributes_model: Any
-) -> Type[RequestModel]:
-    type_string = resource_type.value
-    request_data_model = RequestDataModel[attributes_model]    # type: ignore
+):
+    type_string = attributes_model.__name__
+    request_data_model = RequestDataModel[attributes_model]  # type: ignore
     request_data_model.__name__ = f'RequestData[{type_string}]'
     request_model = RequestModel[request_data_model]
     request_model.__name__ = f'Request[{type_string}]'

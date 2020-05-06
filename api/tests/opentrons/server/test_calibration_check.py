@@ -23,13 +23,6 @@ async def test_load_labware(async_client, async_server, test_setup):
 
     resp = await async_client.post('/calibration/check/session/loadLabware')
     assert resp.status == 200
-    # text = await resp.json()
-
-    # # check that URL is for the move endpoint
-    # assert text['nextSteps']['links']['moveToTipRack']['url'] ==\
-    #     '/calibration/check/session/move'
-
-    # assert text['nextSteps']['links']['moveToTipRack']['params']
 
     # check that params exist
     assert sess._deck['8']
