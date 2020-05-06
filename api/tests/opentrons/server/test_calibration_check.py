@@ -59,20 +59,15 @@ async def test_load_same_tiprack(async_client, async_server):
     assert not sess._deck['6']
 
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
-    # there should only be one tiprack uuid here
-    assert sess._moves.preparingFirstPipette.keys() == \
-            sess._moves.preparingSecondPipette.keys()
 
-    tip_id = list(sess._moves.preparingFirstPipette.keys())[0]
-
-    single_id = pip_info['p300_single_v1']
-    multi_id = pip_info['p300_multi_v1']
-
-    loc_dict = sess._moves.preparingSecondPipette[tip_id][UUID(single_id)]
-    loc_dict.well.display_name.split()[0] == 'B1'
-
-    loc_dict2 = sess._moves.preparingFirstPipette[tip_id][UUID(multi_id)]
-    loc_dict2.well.display_name.split()[0] == 'A1'
+    # z and x values should be the same, but y should be different
+    # if accessing different tips (A1, B1) on same tiprack
+    assert sess._moves.preparingFirstPipette.position.x == \
+            sess._moves.preparingSecondPipette.position.x
+    assert sess._moves.preparingFirstPipette.position.z == \
+            sess._moves.preparingSecondPipette.position.z
+    assert sess._moves.preparingFirstPipette.position.y != \
+            sess._moves.preparingSecondPipette.position.y
 
 
 async def test_move_to_position(async_client, async_server, test_setup):
@@ -83,13 +78,8 @@ async def test_move_to_position(async_client, async_server, test_setup):
 
     pip_id = list(status['instruments'].keys())[0]
 
-    mount = types.Mount.LEFT
-    tiprack_id = status['instruments'][pip_id]['tiprack_id']
-    # temporarily convert back to UUID to access well location
-    uuid_tiprack = UUID(tiprack_id)
-    uuid_pipette = UUID(pip_id)
-
-    well = sess._moves.preparingPipette[uuid_tiprack][uuid_pipette].well
+    mount =  sess._first_mount
+    tip_pt = sess._moves.preparingFirstPipette.position
 
     resp = await async_client.post(
         '/calibration/check/session/preparePipette',
@@ -98,21 +88,20 @@ async def test_move_to_position(async_client, async_server, test_setup):
     assert resp.status == 200
 
     curr_pos = await sess.hardware.gantry_position(mount)
-    assert curr_pos == (well.top()[0] + types.Point(0, 0, 10))
+    assert curr_pos == tip_pt
 
 
 async def test_jog_pipette(async_client, async_server, test_setup):
     status, sess = test_setup
 
-    sess._set_current_state('preparingPipette')
+    sess._set_current_state('preparingFirstPipette')
 
-    pipette_id = list(status['instruments'].keys())[0]
-    mount = types.Mount.LEFT
+    mount = sess._first_mount
 
     old_pos = await sess.hardware.gantry_position(mount)
     resp = await async_client.post(
         '/calibration/check/session/jog',
-        json={'pipetteId': pipette_id, 'vector': [0, -1, 0]})
+        json={'vector': [0, -1, 0]})
 
     assert resp.status == 200
 
@@ -124,13 +113,10 @@ async def test_jog_pipette(async_client, async_server, test_setup):
 async def test_pickup_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')
-
-    sess._set_current_state('preparingPipette')
+    await async_client.post('/calibration/check/session/preparePipette')
 
     pipette_id = list(status['instruments'].keys())[0]
-    resp = await async_client.post(
-        '/calibration/check/session/pickUpTip',
-        json={'pipetteId': pipette_id})
+    resp = await async_client.post('/calibration/check/session/pickUpTip')
 
     text = await resp.json()
     assert resp.status == 200

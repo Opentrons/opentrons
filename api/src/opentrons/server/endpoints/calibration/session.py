@@ -125,7 +125,7 @@ class CalibrationSession:
         on the current pipettes attached.
         """
         lw: typing.Dict[UUID, LabwareInfo] = {}
-        _uuid: typing.Optional[UUID] = None
+        _prev_lw_uuid: typing.Optional[UUID] = None
 
         for pipette_id in self._pip_info_by_id.keys():
             mount = self._get_mount(pipette_id)
@@ -133,20 +133,27 @@ class CalibrationSession:
 
             _lookup = LOOKUP_LABWARE[str(pip_vol)]
             load_name: str = _lookup.load_name
-            lw_def = labware.get_labware_definition(load_name)
-            new_uuid: UUID = uuid4()
-            _uuid = new_uuid
-            slot = self._available_slot_options()
-            lw[new_uuid] = LabwareInfo(
-                alternatives=list(_lookup.alternatives),
-                forPipettes=[pipette_id],
-                loadName=load_name,
-                slot=slot,
-                namespace=lw_def['namespace'],
-                version=lw_def['version'],
-                id=new_uuid,
-                definition=lw_def)
-            self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
+
+            prev_lw = lw.get(_prev_lw_uuid, None)
+            if prev_lw and prev_lw.loadName == load_name:
+                #  pipette uses same tiprack as previous, just use same existing
+                lw[_prev_lw_uuid].forPipettes.append(pipette_id)
+                self._pip_info_by_id[pipette_id]['tiprack_id'] = _prev_lw_uuid
+            else:
+                lw_def = labware.get_labware_definition(load_name)
+                new_uuid: UUID = uuid4()
+                _prev_lw_uuid = new_uuid
+                slot = self._available_slot_options()
+                lw[new_uuid] = LabwareInfo(
+                    alternatives=list(_lookup.alternatives),
+                    forPipettes=[pipette_id],
+                    loadName=load_name,
+                    slot=slot,
+                    namespace=lw_def['namespace'],
+                    version=lw_def['version'],
+                    id=new_uuid,
+                    definition=lw_def)
+                self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
         return lw
 
     def _build_deck_moves(self) -> Moves:
