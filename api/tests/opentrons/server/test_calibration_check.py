@@ -6,20 +6,6 @@ from opentrons import types
 
 
 
-async def test_pickup_tip(async_client, async_server, test_setup):
-    status, sess = test_setup
-    await async_client.post('/calibration/check/session/loadLabware')
-    await async_client.post('/calibration/check/session/preparePipette')
-
-    pipette_id = list(status['instruments'].keys())[0]
-    resp = await async_client.post('/calibration/check/session/pickUpTip')
-
-    text = await resp.json()
-    assert resp.status == 200
-    assert text['instruments'][pipette_id]['has_tip'] is True
-    assert text['instruments'][pipette_id]['tip_length'] > 0.0
-
-
 async def test_invalidate_tip(async_client, async_server, test_setup):
     status, sess = test_setup
     await async_client.post('/calibration/check/session/loadLabware')

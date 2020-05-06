@@ -219,6 +219,9 @@ class CalibrationSession:
                 y=fixed_trash.point.y,
                 z=high_point[Axis.by_mount(mount)])
         await self.hardware.move_to(mount, drop_point + TRASH_TIP_OFFSET)
+        await self._drop_tip(mount)
+
+    async def _drop_tip(self, mount: Mount):
         await self.hardware.drop_tip(mount)
 
     async def cache_instruments(self):
@@ -351,7 +354,8 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "after": "_move_first_pipette",
+        "before": "_drop_first_tip",
+        "after": "_move_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -461,7 +465,8 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "after": "_move_second_pipette",
+        "before": "_drop_second_tip",
+        "after": "_move_second_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -788,3 +793,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         assert self._second_mount, \
                 'cannot jog pipette on second mount, pipette not present'
         await super(self.__class__, self)._jog(self._second_mount, vector)
+
+    async def _drop_first_tip(self):
+        assert self._first_mount, \
+                'cannot drop tip on first mount, pipette not present'
+        await self._drop_tip(self._first_mount)
+
+    async def _drop_second_tip(self):
+        assert self._second_mount, \
+                'cannot drop tip on second mount, pipette not present'
+        await self._drop_tip(self._second_mount)

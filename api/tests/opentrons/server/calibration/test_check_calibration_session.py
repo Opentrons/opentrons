@@ -323,6 +323,7 @@ async def test_jog_pipette(check_calibration_session):
         assert jog_pos == vector + last_pos
         last_pos = jog_pos
 
+
 async def test_first_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_first_tip(check_calibration_session)
     first_pip = sess.get_pipette(sess._first_mount)
@@ -331,6 +332,7 @@ async def test_first_pick_up_tip(check_calibration_session):
     assert first_pip['tip_length'] > 0.0
     assert second_pip['has_tip'] is False
 
+
 async def test_second_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_second_tip(check_calibration_session)
     first_pip = sess.get_pipette(sess._first_mount)
@@ -338,6 +340,29 @@ async def test_second_pick_up_tip(check_calibration_session):
     assert second_pip['has_tip'] is True
     assert second_pip['tip_length'] > 0.0
     assert first_pip['has_tip'] is False
+
+
+async def test_invalidate_first_tip(check_calibration_session):
+    sess = await in_inspecting_first_tip(check_calibration_session)
+    first_pip = sess.get_pipette(sess._first_mount)
+    assert first_pip['has_tip'] is True
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.invalidate_tip)
+    assert check_calibration_session.current_state.name == \
+        session.CalibrationCheckState.preparingFirstPipette
+    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
+
+
+async def test_invalidate_second_tip(check_calibration_session):
+    sess = await in_inspecting_second_tip(check_calibration_session)
+    second_pip = sess.get_pipette(sess._second_mount)
+    assert second_pip['has_tip'] is True
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.invalidate_tip)
+    assert check_calibration_session.current_state.name == \
+        session.CalibrationCheckState.preparingSecondPipette
+    assert sess.get_pipette(sess._second_mount)['has_tip'] is False
+
 
 # START flow testing both mounts
 
