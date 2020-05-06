@@ -55,11 +55,3 @@ LOOKUP_LABWARE: Dict[str, LabwareLookUp] = {
               TIPRACK_1000,
               FILTERTIPRACK_1000})
 }
-
-
-class LabwareLoaded(Exception):
-    pass
-
-
-class TipAttachError(Exception):
-    pass

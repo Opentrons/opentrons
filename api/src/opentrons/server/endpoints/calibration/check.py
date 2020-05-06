@@ -2,7 +2,7 @@ from aiohttp import web
 
 from opentrons import types
 from .session import CheckCalibrationSession, CalibrationCheckTrigger
-from .models import SpecificPipette, MoveLocation, JogPosition
+from .models import SpecificPipette, JogPosition
 
 
 async def get_session(request: web.Request, session) -> web.Response:
@@ -31,8 +31,7 @@ async def create_session(request):
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
         hardware = request.config_dict['com.opentrons.hardware']
-        await CheckCalibrationSession.build(hardware)
-        new_session = CheckCalibrationSession(hardware)
+        new_session = await CheckCalibrationSession.build(hardware)
         session_storage.sessions[session_type] = new_session
         return web.json_response(status=201)
     else:
@@ -65,6 +64,8 @@ async def load_labware(request: web.Request, session) -> web.Response:
     return web.json_response(status=200)
 
 
+# TODO: BC: make this function use SpecificPipette, as it
+#  shouldn't need locations
 async def prepare_pipette(request: web.Request, session) -> web.Response:
     req = await request.json()
     pipette = SpecificPipette(**req)
@@ -78,28 +79,6 @@ async def confirm_step(request: web.Request, session) -> web.Response:
     pipette = SpecificPipette(**req)
     await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
                                      pipette_id=pipette.pipetteId)
-    return web.json_response(status=200)
-
-
-# TODO: BC: make this function idea "confirm point" instead of "move"
-async def move(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    moveloc = MoveLocation(**req)
-    if hasattr(moveloc.location, 'offset'):
-        # using getattr to avoid error raised by Union of deck position and
-        # tiprack position having different attributes.
-        offset = getattr(moveloc.location, 'offset')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "offset": types.Point(*offset)}
-    else:
-        position = getattr(moveloc.location, 'position')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "position": types.Point(*position)}
-    await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
-                                     pipette_id=moveloc.pipetteId,
-                                     request_location=location)
     return web.json_response(status=200)
 
 
@@ -138,3 +117,13 @@ async def confirm_tip(
         CalibrationCheckTrigger.confirm_tip_attached,
         pipette.pipetteId)
     return web.json_response(status=200)
+
+
+# TODO: cover confirm last step for pipette which should
+#  result in return tip under the hood
+# async def confirm_step(request: web.Request,
+#                        session: 'CheckCalibrationSession'):
+#     req = await request.json()
+#     pipette = SpecificPipette(**req)
+#     await session.confirm_step(pipette.pipetteId)
+#     return web.json_response(status=200)
