@@ -111,8 +111,11 @@ class CalibrationSession:
         pipette_dict = {}
         for mount, data in new_pipettes.items():
             if data:
+                cp = None
                 pipette_id = uuid4()
-                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None}
+                if data['channels'] == 8:
+                    cp = CriticalPoint.FRONT_NOZZLE
+                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None,'critical_point': cp}
         return pipette_dict
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
