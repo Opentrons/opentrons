@@ -14,7 +14,8 @@ def test_create_session_response(hardware):
     pip1id = uuid4()
     pip2id = uuid4()
     pip1st = PipetteStatus(name="pip1", model="model1", tip_length=1.0,
-                           mount=Mount.RIGHT, has_tip=False, tiprack_id=uuid4())
+                           mount=Mount.RIGHT, has_tip=False,
+                           tiprack_id=uuid4())
     pip2st = PipetteStatus(name="pip2", model="model2", tip_length=2.0,
                            mount=Mount.LEFT, has_tip=True, tiprack_id=None)
 
