@@ -1,5 +1,8 @@
 // @flow
-import pipetteNameSpecs from '../../../pipette/definitions/pipetteNameSpecs.json'
+import {
+  fixtureP10Single,
+  fixtureP10Multi,
+} from '@opentrons/shared-data/pipette/fixtures/name'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
@@ -71,12 +74,12 @@ describe('canPipetteUseLabware', () => {
   })
   it('returns false when wells are too close together for multi channel pipette', () => {
     const labwareDef = { ...fixture_overlappy_wellplate }
-    const pipette = { ...pipetteNameSpecs.p20_multi_gen2 }
+    const pipette = { ...fixtureP10Multi }
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
   })
   it('returns true when pipette is single channel', () => {
     const labwareDef = { ...fixture_overlappy_wellplate }
-    const pipette = { ...pipetteNameSpecs.p20_single_gen2 }
+    const pipette = { ...fixtureP10Single }
     expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })
 })
