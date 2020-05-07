@@ -1,7 +1,9 @@
 // @flow
+import pipetteNameSpecs from '../../../pipette/definitions/pipetteNameSpecs.json'
 import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.json'
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
+import fixture_overlappy_wellplate from '../../../labware/fixtures/2/fixture_overlappy_wellplate'
 import { makeWellSetHelpers } from '../wellSets'
 import { findWellAt } from '../getWellNamePerMultiTip'
 
@@ -46,18 +48,36 @@ describe('findWellAt', () => {
         },
       },
     }
-    const middle = _findWellAt(def, 200, 200)
+    const middle = findWellAt(def, 200, 200)
     expect(middle).toBe('A1')
 
-    const inside = _findWellAt(def, 200 - 1, 200 + 1)
+    const inside = findWellAt(def, 200 - 1, 200 + 1)
     expect(inside).toEqual('A1')
 
     // exactly at an edge doesn't count
-    const exactlyOnWEdge = _findWellAt(def, 200, 200 - 5)
+    const exactlyOnWEdge = findWellAt(def, 200, 200 - 5)
     expect(exactlyOnWEdge).toBeUndefined()
 
-    const justOutsideToEast = _findWellAt(def, 200 + 5.1, 200)
+    const justOutsideToEast = findWellAt(def, 200 + 5.1, 200)
     expect(justOutsideToEast).toBeUndefined()
+  })
+})
+
+describe('canPipetteUseLabware', () => {
+  let canPipetteUseLabware
+  beforeEach(() => {
+    const helpers = makeWellSetHelpers()
+    canPipetteUseLabware = helpers.canPipetteUseLabware
+  })
+  it('returns false when wells are too close together for multi channel pipette', () => {
+    const labwareDef = { ...fixture_overlappy_wellplate }
+    const pipette = { ...pipetteNameSpecs.p20_multi_gen2 }
+    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(false)
+  })
+  it('returns true when pipette is single channel', () => {
+    const labwareDef = { ...fixture_overlappy_wellplate }
+    const pipette = { ...pipetteNameSpecs.p20_single_gen2 }
+    expect(canPipetteUseLabware(pipette, labwareDef)).toBe(true)
   })
 })
 
