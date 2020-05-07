@@ -92,6 +92,15 @@ export function getDefaultsForStepType(
         setTemperature: null,
         targetTemperature: null,
       }
+    case 'thermocycler':
+      return {
+        thermocyclerFormType: 'thermocyclerState',
+        moduleId: null,
+        blockIsActive: false,
+        blockTargetTemp: null,
+        lidIsActive: false,
+        lidOpen: null,
+      }
     default:
       return {}
   }
