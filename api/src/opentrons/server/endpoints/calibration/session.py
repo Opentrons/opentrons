@@ -750,7 +750,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
-                    ComparisonStatus(differenceVector=abs(ref_pt - jogged_pt),
+                    ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=comp.threshold_vector,
                                      exceedsThreshold=exceeds)
         return comparisons
