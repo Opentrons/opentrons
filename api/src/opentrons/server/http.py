@@ -134,6 +134,10 @@ class CalibrationRoutes(object):
         self.app.router.add_post(
             '/{type}/session/jog', check.jog, name="jog")
         self.app.router.add_post(
+            '/{type}/session/comparePoint',
+            check.compare_point,
+            name="comparePoint")
+        self.app.router.add_post(
             '/{type}/session/confirmStep',
             check.confirm_step,
             name="confirmStep")

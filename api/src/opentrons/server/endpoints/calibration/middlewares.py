@@ -1,4 +1,5 @@
 import typing
+import logging
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
 from .session import CheckCalibrationSession, CalibrationCheckTrigger, \
@@ -7,6 +8,7 @@ from .models import CalibrationSessionStatus, LabwareStatus, AttachedPipette
 from .constants import ALLOWED_SESSIONS
 from .util import StateMachineError
 
+MODULE_LOG = logging.getLogger(__name__)
 
 TRIGGER_TO_PATH = {
     CalibrationCheckTrigger.load_labware: "loadLabware",
@@ -15,7 +17,8 @@ TRIGGER_TO_PATH = {
     CalibrationCheckTrigger.pick_up_tip: "pickUpTip",
     CalibrationCheckTrigger.confirm_tip_attached: "confirmTip",
     CalibrationCheckTrigger.invalidate_tip: "invalidateTip",
-    CalibrationCheckTrigger.confirm_step: "confirmStep",
+    CalibrationCheckTrigger.compare_point: "comparePoint",
+    CalibrationCheckTrigger.go_to_next_check: "confirmStep",
     CalibrationCheckTrigger.exit: "sessionExit",
     # CalibrationCheckTrigger.reject_calibration: "reject_calibration",
     # CalibrationCheckTrigger.no_pipettes: "no_pipettes",
@@ -53,11 +56,13 @@ def status_response(
     links = _format_links(session, potential_triggers, request.app.router)
 
     lw_status = session.labware_status.values()
+    comparisons_by_step = session.get_comparisons_by_step()
 
     instruments = {
         str(k): AttachedPipette(model=v.model,
                                 name=v.name,
                                 tip_length=v.tip_length,
+                                mount=v.mount,
                                 has_tip=v.has_tip,
                                 tiprack_id=v.tiprack_id)
         for k, v in session.pipette_status().items()
@@ -66,6 +71,7 @@ def status_response(
     sess_status = CalibrationSessionStatus(
         instruments=instruments,
         currentStep=current_state,
+        comparisonsByStep=comparisons_by_step,
         nextSteps=links,
         labware=[LabwareStatus(alternatives=data.alternatives,
                                slot=data.slot,
@@ -95,6 +101,7 @@ async def misc_error_handling(
     try:
         response = await handler(request, session)
     except (CalibrationException, StateMachineError) as e:
+        MODULE_LOG.exception("Calibration Check Exception")
         router = request.app.router
         potential_triggers = session.get_potential_triggers()
         links = _format_links(session, potential_triggers, router)

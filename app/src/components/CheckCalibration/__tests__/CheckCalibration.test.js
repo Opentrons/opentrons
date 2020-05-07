@@ -21,6 +21,10 @@ import type { State } from '../../../types'
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../calibration/selectors')
 
+type CheckCalibrationSpec = {
+  component: React.AbstractComponent<any>,
+  currentStep: Calibration.RobotCalibrationCheckStep,
+}
 const getRobotCalibrationCheckSession: JestMockFn<
   [State, string],
   $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
@@ -40,6 +44,37 @@ describe('CheckCalibration', () => {
   const getBackButton = wrapper =>
     wrapper.find({ title: 'Back' }).find('button')
 
+  const POSSIBLE_CHILDREN = [
+    Introduction,
+    DeckSetup,
+    TipPickUp,
+    CheckXYPoint,
+    CheckHeight,
+    CompleteConfirmation,
+  ]
+
+  const SPECS: Array<CheckCalibrationSpec> = [
+    { component: Introduction, currentStep: 'sessionStarted' },
+    { component: DeckSetup, currentStep: 'labwareLoaded' },
+    { component: TipPickUp, currentStep: 'preparingFirstPipette' },
+    { component: TipPickUp, currentStep: 'inspectingFirstTip' },
+    { component: TipPickUp, currentStep: 'preparingSecondPipette' },
+    { component: TipPickUp, currentStep: 'inspectingSecondTip' },
+    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointOne' },
+    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointOne' },
+    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointTwo' },
+    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointTwo' },
+    { component: CheckXYPoint, currentStep: 'joggingFirstPipetteToPointThree' },
+    { component: CheckXYPoint, currentStep: 'comparingFirstPipettePointThree' },
+    { component: CheckXYPoint, currentStep: 'joggingSecondPipetteToPointOne' },
+    { component: CheckXYPoint, currentStep: 'comparingSecondPipettePointOne' },
+    { component: CheckHeight, currentStep: 'joggingFirstPipetteToHeight' },
+    { component: CheckHeight, currentStep: 'comparingFirstPipetteHeight' },
+    { component: CheckHeight, currentStep: 'joggingSecondPipetteToHeight' },
+    { component: CheckHeight, currentStep: 'comparingSecondPipetteHeight' },
+    { component: CompleteConfirmation, currentStep: 'checkComplete' },
+  ]
+
   beforeEach(() => {
     mockStore = {
       subscribe: () => {},
@@ -48,6 +83,7 @@ describe('CheckCalibration', () => {
       }),
       dispatch: jest.fn(),
     }
+    mockGetDeckDefinitions.mockReturnValue({})
 
     render = () => {
       return mount(
@@ -78,125 +114,22 @@ describe('CheckCalibration', () => {
     )
   })
 
-  it('renders Introduction contents when currentStep is sessionStarted', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'sessionStarted',
+  SPECS.forEach(spec => {
+    it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
+      getRobotCalibrationCheckSession.mockReturnValue({
+        ...mockRobotCalibrationCheckSessionData,
+        currentStep: spec.currentStep,
+      })
+      const wrapper = render()
+
+      POSSIBLE_CHILDREN.forEach(child => {
+        if (child === spec.component) {
+          expect(wrapper.exists(child)).toBe(true)
+        } else {
+          expect(wrapper.exists(child)).toBe(false)
+        }
+      })
     })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(true)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(false)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders DeckSetup contents when currentStep is labwareLoaded', () => {
-    mockGetDeckDefinitions.mockReturnValue({})
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'labwareLoaded',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(true)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(false)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders TipPickUp contents when currentStep is preparingPipette', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'preparingPipette',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(true)
-    expect(wrapper.exists(CheckXYPoint)).toBe(false)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders TipPickUp contents when currentStep is inspectingTip', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'inspectingTip',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(true)
-    expect(wrapper.exists(CheckXYPoint)).toBe(false)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders CheckXYPoint contents when currentStep is checkingPointOne', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'checkingPointOne',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(true)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders CheckXYPoint contents when currentStep is checkingPointTwo', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'checkingPointTwo',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(true)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders CheckXYPoint contents when currentStep is checkingPointThree', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'checkingPointThree',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(true)
-    expect(wrapper.exists(CheckHeight)).toBe(false)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
-  })
-
-  it('renders CheckHeight contents when currentStep is checkingHeight', () => {
-    getRobotCalibrationCheckSession.mockReturnValue({
-      ...mockRobotCalibrationCheckSessionData,
-      currentStep: 'checkingHeight',
-    })
-    const wrapper = render()
-
-    expect(wrapper.exists(Introduction)).toBe(false)
-    expect(wrapper.exists(DeckSetup)).toBe(false)
-    expect(wrapper.exists(TipPickUp)).toBe(false)
-    expect(wrapper.exists(CheckXYPoint)).toBe(false)
-    expect(wrapper.exists(CheckHeight)).toBe(true)
-    expect(wrapper.exists(CompleteConfirmation)).toBe(false)
   })
 
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {

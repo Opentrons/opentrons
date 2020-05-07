@@ -108,6 +108,15 @@ export const confirmTipRobotCalibrationCheck = (
   meta: {},
 })
 
+export const comparePointRobotCalibrationCheck = (
+  robotName: string,
+  pipetteId: string
+): Types.RobotCalibrationCheckComparePointAction => ({
+  type: Constants.ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
+  payload: { robotName, pipetteId },
+  meta: {},
+})
+
 export const confirmStepRobotCalibrationCheck = (
   robotName: string,
   pipetteId: string

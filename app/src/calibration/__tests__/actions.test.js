@@ -168,7 +168,19 @@ describe('robot calibration check actions', () => {
         meta: {},
       },
     },
-
+    {
+      name: 'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT',
+      creator: Actions.comparePointRobotCalibrationCheck,
+      args: ['robot-name', 'abc123_pipette_uuid'],
+      expected: {
+        type: 'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT',
+        payload: {
+          robotName: 'robot-name',
+          pipetteId: 'abc123_pipette_uuid',
+        },
+        meta: {},
+      },
+    },
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP',
       creator: Actions.confirmStepRobotCalibrationCheck,

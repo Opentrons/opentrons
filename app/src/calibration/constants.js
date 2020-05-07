@@ -34,6 +34,9 @@ export const ROBOT_CALIBRATION_CHECK_PICK_UP_TIP: 'calibration:ROBOT_CALIBRATION
 export const ROBOT_CALIBRATION_CHECK_CONFIRM_TIP: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP' =
   'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP'
 
+export const ROBOT_CALIBRATION_CHECK_COMPARE_POINT: 'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT' =
+  'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT'
+
 export const ROBOT_CALIBRATION_CHECK_CONFIRM_STEP: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP' =
   'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP'
 
@@ -65,16 +68,39 @@ export const ROBOT_CALIBRATION_CHECK_PATH: '/calibration/check/session' =
 
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
-export const CHECK_STEP_PREPARING_PIPETTE: 'preparingPipette' =
-  'preparingPipette'
-export const CHECK_STEP_INSPECTING_TIP: 'inspectingTip' = 'inspectingTip'
-export const CHECK_STEP_CHECKING_POINT_ONE: 'checkingPointOne' =
-  'checkingPointOne'
-export const CHECK_STEP_CHECKING_POINT_TWO: 'checkingPointTwo' =
-  'checkingPointTwo'
-export const CHECK_STEP_CHECKING_POINT_THREE: 'checkingPointThree' =
-  'checkingPointThree'
-export const CHECK_STEP_CHECKING_HEIGHT: 'checkingHeight' = 'checkingHeight'
+export const CHECK_STEP_PREPARING_FIRST_PIPETTE: 'preparingFirstPipette' =
+  'preparingFirstPipette'
+export const CHECK_STEP_INSPECTING_FIRST_TIP: 'inspectingFirstTip' =
+  'inspectingFirstTip'
+export const CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT: 'joggingFirstPipetteToHeight' =
+  'joggingFirstPipetteToHeight'
+export const CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT: 'comparingFirstPipetteHeight' =
+  'comparingFirstPipetteHeight'
+export const CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE: 'joggingFirstPipetteToPointOne' =
+  'joggingFirstPipetteToPointOne'
+export const CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE: 'comparingFirstPipettePointOne' =
+  'comparingFirstPipettePointOne'
+export const CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO: 'joggingFirstPipetteToPointTwo' =
+  'joggingFirstPipetteToPointTwo'
+export const CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: 'comparingFirstPipettePointTwo' =
+  'comparingFirstPipettePointTwo'
+export const CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE: 'joggingFirstPipetteToPointThree' =
+  'joggingFirstPipetteToPointThree'
+export const CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: 'comparingFirstPipettePointThree' =
+  'comparingFirstPipettePointThree'
+export const CHECK_STEP_PREPARING_SECOND_PIPETTE: 'preparingSecondPipette' =
+  'preparingSecondPipette'
+export const CHECK_STEP_INSPECTING_SECOND_TIP: 'inspectingSecondTip' =
+  'inspectingSecondTip'
+export const CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT: 'joggingSecondPipetteToHeight' =
+  'joggingSecondPipetteToHeight'
+export const CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: 'comparingSecondPipetteHeight' =
+  'comparingSecondPipetteHeight'
+export const CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE: 'joggingSecondPipetteToPointOne' =
+  'joggingSecondPipetteToPointOne'
+export const CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: 'comparingSecondPipettePointOne' =
+  'comparingSecondPipettePointOne'
+export const CHECK_STEP_CHECK_COMPLETE: 'checkComplete' = 'checkComplete'
 export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
 export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badRobotCalibration' =
   'badRobotCalibration'
@@ -95,4 +121,5 @@ export const CHECK_UPDATE_PATH_CHECK_POINT_TWO: 'checkPointTwo' =
 export const CHECK_UPDATE_PATH_CHECK_POINT_THREE: 'checkPointThree' =
   'checkPointThree'
 export const CHECK_UPDATE_PATH_CHECK_HEIGHT: 'checkHeight' = 'checkHeight'
+export const CHECK_UPDATE_PATH_COMPARE_POINT: 'comparePoint' = 'comparePoint'
 export const CHECK_UPDATE_PATH_CONFIRM_STEP: 'confirmStep' = 'confirmStep'

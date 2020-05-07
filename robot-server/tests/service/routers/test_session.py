@@ -16,7 +16,8 @@ from robot_server.service.dependencies import get_session_manager
 TYPE_SESSION_ID_CHECK_ = {
     'attributes': {
         'details': {
-            'currentStep': 'preparingPipette',
+            'comparisonsByStep': {},
+            'currentStep': 'preparingFirstPipette',
             'instruments': {},
             'labware': [],
         },
@@ -40,7 +41,7 @@ def mock_cal_session(hardware):
     path = 'opentrons.server.endpoints.calibration.' \
            'session.CheckCalibrationSession.current_state_name'
     with patch(path, new_callable=PropertyMock) as p:
-        p.return_value = CalibrationCheckState.preparingPipette.value
+        p.return_value = CalibrationCheckState.preparingFirstPipette.value
 
         m.get_potential_triggers = MagicMock(return_value={
             CalibrationCheckTrigger.jog,
@@ -261,7 +262,6 @@ def test_session_command_create(api_client,
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="jog",
-        pipetteId=None,
         vector=[1.0, 2.0, 3.0])
 
     assert response.json() == {
