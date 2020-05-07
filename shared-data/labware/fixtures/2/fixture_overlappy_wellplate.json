@@ -126,7 +126,7 @@
         "brandId": []
     },
     "metadata": {
-        "displayName": "Overlappy 96 Well Plate 200 µL",
+        "displayName": "fake labware",
         "displayCategory": "wellPlate",
         "displayVolumeUnits": "µL",
         "tags": []
@@ -1214,9 +1214,9 @@
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "overlappy_96_wellplate_200ul"
+        "loadName": "fixture_overlappy_wellplate"
     },
-    "namespace": "custom_beta",
+    "namespace": "fixture",
     "version": 1,
     "schemaVersion": 2,
     "cornerOffsetFromSlot": {
