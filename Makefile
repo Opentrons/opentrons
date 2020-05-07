@@ -117,7 +117,6 @@ test-e2e:
 .PHONY: test-py-windows
 test-py-windows:
 	$(MAKE) -C api test
-	$(MAKE) -C robot-server test
 
 .PHONY: test-py
 test-py: test-py-windows
