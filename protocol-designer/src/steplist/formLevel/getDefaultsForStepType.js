@@ -6,6 +6,7 @@ import {
   DEFAULT_WELL_ORDER_FIRST_OPTION,
   DEFAULT_WELL_ORDER_SECOND_OPTION,
   FIXED_TRASH_ID,
+  THERMOCYCLER_STATE,
 } from '../../constants'
 import type { StepType, StepFieldName } from '../../form-types'
 
@@ -94,7 +95,7 @@ export function getDefaultsForStepType(
       }
     case 'thermocycler':
       return {
-        thermocyclerFormType: 'thermocyclerState',
+        thermocyclerFormType: THERMOCYCLER_STATE,
         moduleId: null,
         blockIsActive: false,
         blockTargetTemp: null,
