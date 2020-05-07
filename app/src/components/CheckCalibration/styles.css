@@ -48,7 +48,7 @@
   margin: 0.75rem 0;
 }
 
-.bad_cal_wrapper {
+.padded_contents_wrapper {
   margin: 1rem 3rem;
 }
 
@@ -59,6 +59,14 @@
 .button_row {
   width: 100%;
   display: flex;
+}
+
+.button_stack {
+  margin: 1rem 0;
+}
+
+.button_stack > button {
+  margin: 0.5rem 0;
 }
 
 .continue_button {
@@ -268,6 +276,15 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   border-style: solid;
   padding: 0.5rem;
   min-width: 20rem;
+  margin: 1rem 0 2rem 0;
+}
+
+.difference_value_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  min-width: 8rem;
 }
 
 .difference_value.difference_good{
@@ -284,4 +301,10 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 
 .difference_wrapper.difference_bad {
   border-color: var(--c-error);
+}
+
+.difference_body {
+  @apply --font-body-2-dark;
+
+  margin: 1rem 0 ;
 }

@@ -81,7 +81,7 @@ const BAD_INSPECTING_BODY =
   'The jogged and calibrated x and y-axis co-ordinates do not match, and are out of acceptable bounds.'
 const GOOD_INSPECTING_BODY =
   'The jogged and calibrated x and y-axis co-ordinates fall within acceptable bounds.'
-const DIFFERENCE = 'difference'
+const DIFFERENCE = 'Difference'
 
 type CheckXYPointProps = {|
   pipetteId: string,
@@ -195,7 +195,7 @@ type CompareXYProps = {|
 |}
 function CompareXY(props: CompareXYProps) {
   const { comparison, goToNextCheck, exit } = props
-  const { differenceVector, thresholdVector, exceedsThreshold } = comparison
+  const { differenceVector, exceedsThreshold } = comparison
 
   let header = GOOD_INSPECTING_HEADER
   let body = GOOD_INSPECTING_BODY
@@ -210,39 +210,31 @@ function CompareXY(props: CompareXYProps) {
   }
 
   return (
-    <>
+    <div className={styles.padded_contents_wrapper}>
       <div className={styles.modal_icon_wrapper}>
         {icon}
         <h3>{header}</h3>
       </div>
-      <p>{body}</p>
+      <p className={styles.difference_body}>{body}</p>
       <div className={cx(styles.difference_wrapper, differenceClass)}>
         <h5>{DIFFERENCE}</h5>
-        <h5>X</h5>
-        <span className={cx(styles.difference_value, differenceClass)}>
-          {formatOffsetValue(differenceVector[0])}
-        </span>
-        <h5>Y</h5>
-        <span className={cx(styles.difference_value, differenceClass)}>
-          {formatOffsetValue(differenceVector[1])}
-        </span>
-      </div>
-      <div>{thresholdVector}</div>
-      {exceedsThreshold && (
-        <div className={styles.button_row}>
-          <PrimaryButton onClick={exit} className={styles.command_button}>
-            {DROP_TIP_AND_EXIT}
-          </PrimaryButton>
+        <div className={styles.difference_value_wrapper}>
+          <h5>X</h5>
+          <span className={cx(styles.difference_value, differenceClass)}>
+            {formatOffsetValue(differenceVector[0])}
+          </span>
+          <h5>Y</h5>
+          <span className={cx(styles.difference_value, differenceClass)}>
+            {formatOffsetValue(differenceVector[1])}
+          </span>
         </div>
-      )}
-      <div className={styles.button_row}>
-        <PrimaryButton
-          onClick={goToNextCheck}
-          className={styles.command_button}
-        >
-          {MOVE_TO_NEXT}
-        </PrimaryButton>
       </div>
-    </>
+      <div className={styles.button_stack}>
+        {exceedsThreshold && (
+          <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+        )}
+        <PrimaryButton onClick={goToNextCheck}>{MOVE_TO_NEXT}</PrimaryButton>
+      </div>
+    </div>
   )
 }

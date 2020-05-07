@@ -28,7 +28,7 @@ export function BadCalibration(props: CompleteConfirmationProps) {
   const { exit } = props
 
   return (
-    <div className={styles.bad_cal_wrapper}>
+    <div className={styles.padded_contents_wrapper}>
       <div className={styles.modal_icon_wrapper}>
         <Icon name="close-circle" className={styles.error_status_icon} />
         <h3>{BAD_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
