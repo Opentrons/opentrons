@@ -1,6 +1,6 @@
 // @flow
 // logger
-import { useRef, useEffect } from 'react'
+import { useRef } from 'react'
 import { remote } from './shell/remote'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
@@ -69,12 +69,16 @@ function log(level: LogLevel, message: string, label: string, meta?: {}) {
   remote.ipcRenderer.send('log', { ...meta, level, message, label })
 }
 
-// $FlowFixMe(BC, 2019-10-04): ref will never actually be undefined
 export function useLogger(filename: string): Logger {
-  const loggerRef = useRef()
+  const loggerRef = useRef<Logger | null>(null)
 
-  useEffect(() => {
-    loggerRef.current = createLogger(filename)
-  }, [filename])
-  return loggerRef.current
+  const getLogger = (): Logger => {
+    if (loggerRef.current === null) {
+      loggerRef.current = createLogger(filename)
+    }
+
+    return loggerRef.current
+  }
+
+  return getLogger()
 }

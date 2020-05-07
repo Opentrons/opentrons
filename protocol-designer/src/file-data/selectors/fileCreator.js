@@ -70,6 +70,7 @@ export const getIsV4Protocol: Selector<boolean> = createSelector(
   }
 )
 
+// $FlowFixMe(IL, 2020-03-02): presence of non-v3 commands should make 'isV4Protocol' true
 export const createFile: Selector<PDProtocolFile> = createSelector(
   getFileMetadata,
   getInitialRobotState,
@@ -223,7 +224,6 @@ export const createFile: Selector<PDProtocolFile> = createSelector(
       return {
         ...protocolFile,
         schemaVersion: 3,
-        // $FlowFixMe: presence of non-v3 commands should make 'isV4Protocol' true
         commands,
       }
     }

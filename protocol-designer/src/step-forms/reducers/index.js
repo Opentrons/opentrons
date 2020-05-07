@@ -126,9 +126,9 @@ export const unsavedForm = (
         _getPipetteEntitiesRootState(rootState),
         _getLabwareEntitiesRootState(rootState)
       )
+      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return {
         ...unsavedFormState,
-        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         ...fieldUpdate,
       }
     }
@@ -503,9 +503,9 @@ export const savedStepForms = (
           },
           savedForm
         )
+        // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
         return {
           ...savedForm,
-          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           ...deleteLabwareUpdate,
         }
       })
@@ -598,9 +598,9 @@ export const savedStepForms = (
 
         return {
           ...acc,
+          // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
           [stepId]: {
             ...prevStepForm,
-            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             ...updatedFields,
           },
         }
@@ -714,16 +714,15 @@ export const savedStepForms = (
 
           return {
             ...acc,
+            // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
             [stepId]: {
               ...prevStepForm,
-              // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
               ...updatedFields,
             },
           }
         },
         {}
       )
-      // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
       return { ...savedStepForms, ...savedStepsUpdate }
     }
 
