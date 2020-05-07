@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { Icon, PrimaryButton } from '@opentrons/components'
-import type { Dispatch } from '../../types'
-import { completeRobotCalibrationCheck } from '../../calibration'
 import styles from './styles.css'
 
 const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Bad calibration data detected'
@@ -25,15 +22,10 @@ const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2'
 
 type CompleteConfirmationProps = {|
-  robotName: string,
   exit: () => mixed,
 |}
 export function BadCalibration(props: CompleteConfirmationProps) {
-  const { robotName, exit } = props
-  const dispatch = useDispatch<Dispatch>()
-  React.useEffect(() => {
-    dispatch(completeRobotCalibrationCheck(robotName))
-  }, [dispatch, robotName])
+  const { exit } = props
 
   return (
     <div className={styles.bad_cal_wrapper}>

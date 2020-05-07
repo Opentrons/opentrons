@@ -181,7 +181,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       break
     }
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
-      stepContents = <BadCalibration robotName={robotName} exit={exit} />
+      stepContents = <BadCalibration exit={exit} />
       break
     }
     case Calibration.CHECK_STEP_SESSION_EXITED:
