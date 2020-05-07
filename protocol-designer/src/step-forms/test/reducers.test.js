@@ -7,10 +7,10 @@ import {
   MAGNETIC_MODULE_V2,
 } from '@opentrons/shared-data'
 import {
-  legacySteps as steps,
   orderedStepIds,
   labwareInvariantProperties,
   moduleInvariantProperties,
+  presavedStepForm,
   savedStepForms,
   unsavedForm,
 } from '../reducers'
@@ -26,13 +26,23 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
+import {
+  createPresavedStepForm,
+  type CreatePresavedStepFormArgs,
+} from '../utils/createPresavedStepForm'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
+jest.mock('../utils/createPresavedStepForm')
 jest.mock('../../utils/labwareModuleCompatibility')
 
+const mockCreatePresavedStepForm: JestMockFn<
+  [CreatePresavedStepFormArgs],
+  any
+> = createPresavedStepForm
 const handleFormChangeMock: JestMockFn<
   [{ [string]: any }, { [string]: any }, any, any],
   { [string]: any }
@@ -60,64 +70,23 @@ beforeEach(() => {
   jest.clearAllMocks()
 })
 
-describe('steps reducer', () => {
-  it('initial add step', () => {
-    const state = {}
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
-
-  it('second add step', () => {
-    const state = {
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-    }
-    const action = {
-      type: 'ADD_STEP',
-      payload: { id: '123', stepType: 'moveLiquid' },
-    }
-
-    expect(steps(state, action)).toEqual({
-      '333': {
-        id: '333',
-        stepType: 'mix',
-      },
-      '123': {
-        id: '123',
-        stepType: 'moveLiquid',
-      },
-    })
-  })
-})
-
 describe('orderedStepIds reducer', () => {
-  it('initial add step', () => {
-    const state = []
+  it('should add a saved step when that step is new', () => {
+    const state = ['99']
     const action = {
-      type: 'ADD_STEP',
+      type: 'SAVE_STEP_FORM',
       payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123'])
+    expect(orderedStepIds(state, action)).toEqual(['99', '123'])
   })
 
-  it('second add step', () => {
-    const state = ['123']
+  it('should not update when an existing step is saved', () => {
+    const state = ['99', '123', '11']
     const action = {
-      type: 'ADD_STEP',
-      payload: { id: '22', stepType: 'moveLiquid' },
+      type: 'SAVE_STEP_FORM',
+      payload: { id: '123', stepType: 'moveLiquid' },
     }
-    expect(orderedStepIds(state, action)).toEqual(['123', '22'])
+    expect(orderedStepIds(state, action)).toBe(state)
   })
 
   describe('reorder steps', () => {
@@ -1143,6 +1112,71 @@ describe('unsavedForm reducer', () => {
     it(`should clear the unsaved form when any ${actionType} action is dispatched`, () => {
       const result = unsavedForm(someState, { type: actionType })
       expect(result).toEqual(null)
+    })
+  })
+
+  it('should return the result createPresavedStepForm util upon ADD_STEP action', () => {
+    mockCreatePresavedStepForm.mockReturnValue(
+      'createPresavedStepFormMockResult'
+    )
+    mock_getInitialDeckSetupRootState.mockReturnValue('initalDeckSetupValue')
+    const stateMock = {
+      savedStepForms: 'savedStepFormsValue',
+      orderedStepIds: 'orderedStepIdsValue',
+    }
+    const result = unsavedForm(stateMock, {
+      type: 'ADD_STEP',
+      payload: { id: 'stepId123', stepType: 'moveLiquid' },
+    })
+    expect(result).toEqual('createPresavedStepFormMockResult')
+    expect(mockCreatePresavedStepForm.mock.calls).toEqual([
+      [
+        {
+          stepId: 'stepId123',
+          stepType: 'moveLiquid',
+          pipetteEntities: 'pipetteEntitiesPlaceholder',
+          labwareEntities: 'labwareEntitiesPlaceholder',
+          savedStepForms: 'savedStepFormsValue',
+          orderedStepIds: 'orderedStepIdsValue',
+          initialDeckSetup: 'initalDeckSetupValue',
+        },
+      ],
+    ])
+  })
+})
+
+describe('presavedStepForm reducer', () => {
+  it('should populate when a new step is added', () => {
+    const addStepAction: AddStepAction = {
+      type: 'ADD_STEP',
+      payload: { id: 'someId', stepType: 'transfer' },
+    }
+    const result = presavedStepForm(null, addStepAction)
+    expect(result).toEqual({ stepType: 'transfer' })
+  })
+
+  it('should not update when the PRESAVED_STEP_ID terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: PRESAVED_STEP_ID }
+    expect(presavedStepForm(prevState, action)).toBe(prevState)
+  })
+
+  it('should clear when a different terminal item is selected', () => {
+    const prevState = { stepType: 'transfer' }
+    const action = { type: 'SELECT_TERMINAL_ITEM', payload: 'otherId' }
+    expect(presavedStepForm(prevState, action)).toEqual(null)
+  })
+
+  const clearingActions = [
+    'CANCEL_STEP_FORM',
+    'DELETE_STEP',
+    'SAVE_STEP_FORM',
+    'SELECT_STEP',
+  ]
+  clearingActions.forEach(actionType => {
+    it(`should clear upon ${actionType}`, () => {
+      const prevState = { id: 'someId', stepType: 'transfer' }
+      expect(presavedStepForm(prevState, { type: actionType })).toEqual(null)
     })
   })
 })

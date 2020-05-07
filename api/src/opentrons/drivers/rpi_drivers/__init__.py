@@ -7,6 +7,10 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
+class RevisionPinsError(Exception):
+    pass
+
+
 def build_gpio_chardev(chip_name: str) -> 'GPIODriverLike':
     try:
         from .gpio import GPIOCharDev

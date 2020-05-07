@@ -315,12 +315,13 @@ class Deck(UserDict):
         depending on the mount you are using and the column you are moving
         to inside of the labware.
         """
-        if not target.parent:
+        slot = first_parent(target)
+        if not slot:
             return False
         if mount is types.Mount.RIGHT:
-            other_labware = self.left_of(target.parent)
+            other_labware = self.left_of(slot)
         else:
-            other_labware = self.right_of(target.parent)
+            other_labware = self.right_of(slot)
 
         return isinstance(other_labware, ModuleGeometry)
 

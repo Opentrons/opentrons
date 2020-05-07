@@ -1,7 +1,7 @@
 // @flow
-import * as React from 'react'
+import React, { useState } from 'react'
 import cx from 'classnames'
-import { connect } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import omit from 'lodash/omit'
 
 import { Modal, OutlineButton, LabeledValue } from '@opentrons/components'
@@ -15,9 +15,6 @@ import { SelectableLabware, wellFillFromWellContents } from '../../../labware'
 import * as wellContentsSelectors from '../../../../top-selectors/well-contents'
 import { selectors } from '../../../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
-import { getSelectedStepId } from '../../../../ui/steps'
-
-import type { BaseState, ThunkDispatch } from '../../../../types'
 import type { WellGroup } from '@opentrons/components'
 import type {
   LabwareDefinition2,
@@ -30,160 +27,159 @@ import type { StepFieldName } from '../../../../form-types'
 import styles from './WellSelectionModal.css'
 import modalStyles from '../../../modals/modal.css'
 
-type OP = {|
-  pipetteId: ?string,
-  labwareId: ?string,
+type WellSelectionModalProps = {|
   isOpen: boolean,
-  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
+  labwareId: ?string,
   name: StepFieldName,
+  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
+  pipetteId: ?string,
 |}
 
-type SP = {|
-  pipetteSpec: ?PipetteNameSpecs,
-  initialSelectedPrimaryWells: WellGroup,
-  wellContents: ContentsByWell,
-  labwareDef: ?LabwareDefinition2,
+type WellSelectionModalComponentProps = {|
+  deselectWells: WellGroup => mixed,
+  handleSave: () => mixed,
+  highlightedWells: WellGroup,
   ingredNames: WellIngredientNames,
+  labwareDef: ?LabwareDefinition2,
+  onCloseClick: (e: ?SyntheticEvent<*>) => mixed,
+  pipetteSpec: ?PipetteNameSpecs,
+  selectedPrimaryWells: WellGroup,
+  selectWells: WellGroup => mixed,
+  wellContents: ContentsByWell,
+  updateHighlightedWells: WellGroup => mixed,
 |}
 
-type DP = {| saveWellSelection: WellGroup => mixed |}
-
-type Props = {| ...OP, ...SP, ...DP |}
-type State = { selectedWells: WellGroup, highlightedWells: WellGroup }
-
-class WellSelectionModalComponent extends React.Component<Props, State> {
-  state = { selectedWells: {}, highlightedWells: {} }
-  constructor(props: Props) {
-    super(props)
-    this.state = {
-      selectedWells: props.initialSelectedPrimaryWells,
-      highlightedWells: {},
-    }
-  }
-
-  updateHighlightedWells = (wells: WellGroup) => {
-    this.setState({ highlightedWells: wells })
-  }
-
-  selectWells = (wells: WellGroup) => {
-    this.setState({
-      selectedWells: { ...this.state.selectedWells, ...wells },
-      highlightedWells: {},
-    })
-  }
-
-  deselectWells = (deselectedWells: WellGroup) => {
-    this.setState({
-      selectedWells: omit(
-        this.state.selectedWells,
-        Object.keys(deselectedWells)
-      ),
-      highlightedWells: {},
-    })
-  }
-
-  handleSave = () => {
-    this.props.saveWellSelection(this.state.selectedWells)
-    this.props.onCloseClick()
-  }
-
-  render() {
-    if (!this.props.isOpen) return null
-    const { labwareDef, pipetteSpec } = this.props
-
-    return (
-      <Modal
-        className={modalStyles.modal}
-        contentsClassName={cx(
-          modalStyles.modal_contents,
-          modalStyles.transparent_content
-        )}
-        onCloseClick={this.props.onCloseClick}
-      >
-        <div className={styles.top_row}>
-          <LabeledValue
-            label="Pipette"
-            value={pipetteSpec ? pipetteSpec.displayName : ''}
-            className={styles.inverted_text}
-          />
-          <OutlineButton onClick={this.handleSave} inverted>
-            SAVE SELECTION
-          </OutlineButton>
-        </div>
-
-        {labwareDef && (
-          <SelectableLabware
-            labwareProps={{
-              showLabels: true,
-              definition: labwareDef,
-              highlightedWells: this.state.highlightedWells,
-              wellFill: wellFillFromWellContents(this.props.wellContents),
-            }}
-            selectedPrimaryWells={this.state.selectedWells}
-            selectWells={this.selectWells}
-            deselectWells={this.deselectWells}
-            updateHighlightedWells={this.updateHighlightedWells}
-            pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
-            ingredNames={this.props.ingredNames}
-            wellContents={this.props.wellContents}
-          />
-        )}
-
-        <WellSelectionInstructions />
-      </Modal>
-    )
-  }
-}
-
-function mapStateToProps(state: BaseState, ownProps: OP): SP {
-  const { pipetteId, labwareId } = ownProps
-
-  const labwareDef =
-    (labwareId &&
-      stepFormSelectors.getLabwareEntities(state)[labwareId]?.def) ||
-    null
-  const allWellContentsForSteps = wellContentsSelectors.getAllWellContentsForSteps(
-    state
-  )
-
-  const stepId = getSelectedStepId(state)
-  const orderedStepIds = stepFormSelectors.getOrderedStepIds(state)
-  const timelineIdx = orderedStepIds.findIndex(id => id === stepId)
-  const allWellContentsForStep = allWellContentsForSteps[timelineIdx]
-  const formData = stepFormSelectors.getUnsavedForm(state)
-  const ingredNames = selectors.getLiquidNamesById(state)
-
-  const pipette =
-    pipetteId != null
-      ? stepFormSelectors.getPipetteEntities(state)[pipetteId]
-      : null
-
-  return {
-    initialSelectedPrimaryWells: formData
-      ? arrayToWellGroup(formData[ownProps.name])
-      : {},
-    pipetteSpec: pipette && pipette.spec,
-    wellContents:
-      labwareId && allWellContentsForStep
-        ? allWellContentsForStep[labwareId]
-        : {},
-    labwareDef,
+const WellSelectionModalComponent = (
+  props: WellSelectionModalComponentProps
+) => {
+  const {
+    deselectWells,
+    handleSave,
+    highlightedWells,
     ingredNames,
-  }
+    labwareDef,
+    onCloseClick,
+    pipetteSpec,
+    selectedPrimaryWells,
+    selectWells,
+    wellContents,
+    updateHighlightedWells,
+  } = props
+
+  return (
+    <Modal
+      className={modalStyles.modal}
+      contentsClassName={cx(
+        modalStyles.modal_contents,
+        modalStyles.transparent_content
+      )}
+      onCloseClick={onCloseClick}
+    >
+      <div className={styles.top_row}>
+        <LabeledValue
+          label="Pipette"
+          value={pipetteSpec ? pipetteSpec.displayName : ''}
+          className={styles.inverted_text}
+        />
+        <OutlineButton onClick={handleSave} inverted>
+          SAVE SELECTION
+        </OutlineButton>
+      </div>
+
+      {labwareDef && (
+        <SelectableLabware
+          labwareProps={{
+            showLabels: true,
+            definition: labwareDef,
+            highlightedWells,
+            wellFill: wellFillFromWellContents(wellContents),
+          }}
+          selectedPrimaryWells={selectedPrimaryWells}
+          selectWells={selectWells}
+          deselectWells={deselectWells}
+          updateHighlightedWells={updateHighlightedWells}
+          pipetteChannels={pipetteSpec ? pipetteSpec.channels : null}
+          ingredNames={ingredNames}
+          wellContents={wellContents}
+        />
+      )}
+
+      <WellSelectionInstructions />
+    </Modal>
+  )
 }
 
-function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
-  return {
-    saveWellSelection: wells =>
-      dispatch(
-        changeFormInput({
-          update: { [ownProps.name]: Object.keys(wells).sort(sortWells) },
-        })
-      ),
-  }
-}
+export const WellSelectionModal = (props: WellSelectionModalProps) => {
+  const { isOpen, labwareId, name, onCloseClick, pipetteId } = props
 
-export const WellSelectionModal = connect<Props, OP, SP, DP, _, _>(
-  mapStateToProps,
-  mapDispatchToProps
-)(WellSelectionModalComponent)
+  const dispatch = useDispatch()
+
+  // selector data
+  const allWellContentsForStep = useSelector(
+    wellContentsSelectors.getAllWellContentsForActiveItem
+  )
+  const formData = useSelector(stepFormSelectors.getUnsavedForm)
+  const ingredNames = useSelector(selectors.getLiquidNamesById)
+  const labwareEntities = useSelector(stepFormSelectors.getLabwareEntities)
+  const pipetteEntities = useSelector(stepFormSelectors.getPipetteEntities)
+
+  // selector-derived data
+  const labwareDef = (labwareId && labwareEntities[labwareId]?.def) || null
+  const pipette = pipetteId != null ? pipetteEntities[pipetteId] : null
+
+  const wellFieldData: ?Array<string> = formData?.[name]
+  const initialSelectedPrimaryWells =
+    wellFieldData != null ? arrayToWellGroup(wellFieldData) : {}
+
+  // component state
+  const [selectedPrimaryWells, setSelectedPrimaryWells] = useState<WellGroup>(
+    initialSelectedPrimaryWells
+  )
+  const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
+
+  // actions
+  const saveWellSelection = (wells: WellGroup) =>
+    dispatch(
+      changeFormInput({
+        update: { [name]: Object.keys(wells).sort(sortWells) },
+      })
+    )
+
+  const selectWells = (wells: WellGroup) => {
+    setSelectedPrimaryWells(prev => ({ ...prev, ...wells }))
+    setHighlightedWells({})
+  }
+
+  const deselectWells = (deselectedWells: WellGroup) => {
+    setSelectedPrimaryWells(prev => omit(prev, Object.keys(deselectedWells)))
+    setHighlightedWells({})
+  }
+
+  const handleSave = () => {
+    saveWellSelection(selectedPrimaryWells)
+    onCloseClick()
+  }
+
+  if (!isOpen) return null
+
+  return (
+    <WellSelectionModalComponent
+      {...{
+        deselectWells,
+        handleSave,
+        highlightedWells,
+        ingredNames,
+        labwareDef,
+        onCloseClick,
+        pipetteSpec: pipette?.spec,
+        selectWells,
+        selectedPrimaryWells,
+        updateHighlightedWells: setHighlightedWells,
+        wellContents:
+          labwareId != null && allWellContentsForStep != null
+            ? allWellContentsForStep[labwareId]
+            : {},
+      }}
+    />
+  )
+}

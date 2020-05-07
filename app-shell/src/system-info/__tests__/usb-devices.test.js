@@ -7,14 +7,7 @@ import * as Fixtures from '@opentrons/app/src/system-info/__fixtures__'
 import { createUsbDeviceMonitor, getWindowsDriverVersion } from '../usb-devices'
 
 jest.mock('execa')
-jest.mock('usb-detection', () => {
-  const EventEmitter = require('events')
-  const detector = new EventEmitter()
-  detector.startMonitoring = jest.fn()
-  detector.stopMonitoring = jest.fn()
-  detector.find = jest.fn()
-  return detector
-})
+jest.mock('usb-detection')
 
 const usbDetectionFind: JestMockFn<[], any> = (usbDetection.find: any)
 

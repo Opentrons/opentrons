@@ -27,17 +27,20 @@ import {
   getDefaultsForStepType,
   handleFormChange,
 } from '../../steplist/formLevel'
-import { cancelStepForm } from '../../steplist/actions'
+import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   _getPipetteEntitiesRootState,
   _getLabwareEntitiesRootState,
   _getInitialDeckSetupRootState,
 } from '../selectors'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
-import { getIdsInRange, getDeckItemIdInSlot } from '../utils'
+import {
+  createPresavedStepForm,
+  getDeckItemIdInSlot,
+  getIdsInRange,
+} from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 
-import type { ActionType } from 'redux-actions'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -46,14 +49,14 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type { FormData, StepIdType } from '../../form-types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
 import type {
   FileLabware,
   FilePipette,
   FileModule,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type {
-  AddStepAction,
+  CancelStepFormAction,
   ChangeFormInputAction,
   ChangeSavedStepFormAction,
   DeleteStepAction,
@@ -61,11 +64,13 @@ import type {
   ReorderStepsAction,
 } from '../../steplist/actions'
 import type {
+  AddStepAction,
   DuplicateStepAction,
   ReorderSelectedStepAction,
+  SelectStepAction,
+  SelectTerminalItemAction,
 } from '../../ui/steps/actions/types'
 import type { SaveStepFormAction } from '../../ui/steps/actions/thunks'
-import type { StepItemData } from '../../steplist/types'
 import type {
   NormalizedPipetteById,
   NormalizedLabware,
@@ -86,11 +91,15 @@ type FormState = FormData | null
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
+  | AddStepAction
   | ChangeFormInputAction
   | PopulateFormAction
-  | ActionType<typeof cancelStepForm>
+  | CancelStepFormAction
   | SaveStepFormAction
   | DeleteStepAction
+  | SelectTerminalItemAction
+  | EditModuleAction
+  | SubstituteStepFormPipettesAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -99,6 +108,17 @@ export const unsavedForm = (
     ? rootState.unsavedForm
     : unsavedFormInitialState
   switch (action.type) {
+    case 'ADD_STEP': {
+      return createPresavedStepForm({
+        stepType: action.payload.stepType,
+        stepId: action.payload.id,
+        pipetteEntities: _getPipetteEntitiesRootState(rootState),
+        labwareEntities: _getLabwareEntitiesRootState(rootState),
+        savedStepForms: rootState.savedStepForms,
+        orderedStepIds: rootState.orderedStepIds,
+        initialDeckSetup: _getInitialDeckSetupRootState(rootState),
+      })
+    }
     case 'CHANGE_FORM_INPUT': {
       const fieldUpdate = handleFormChange(
         action.payload.update,
@@ -873,14 +893,20 @@ export const pipetteInvariantProperties = handleActions<
   initialPipetteState
 )
 
-type OrderedStepIdsState = Array<StepIdType>
+export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
 export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   {
-    ADD_STEP: (state: OrderedStepIdsState, action: AddStepAction) => [
-      ...state,
-      action.payload.id,
-    ],
+    SAVE_STEP_FORM: (
+      state: OrderedStepIdsState,
+      action: SaveStepFormAction
+    ) => {
+      const id = action.payload.id
+      if (!state.includes(id)) {
+        return [...state, id]
+      }
+      return state
+    },
     DELETE_STEP: (state: OrderedStepIdsState, action: DeleteStepAction) =>
       state.filter(stepId => stepId !== action.payload),
     LOAD_FILE: (
@@ -926,58 +952,34 @@ export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
   initialOrderedStepIdsState
 )
 
-// TODO: Ian 2018-12-19 DEPRECATED. This should be removed soon, but we need it until we
-// move to not having "pristine" steps
-type LegacyStepsState = { [StepIdType]: StepItemData }
-const initialLegacyStepState: LegacyStepsState = {}
-export const legacySteps = handleActions<LegacyStepsState, *>(
-  {
-    ADD_STEP: (state, action: AddStepAction): LegacyStepsState => ({
-      ...state,
-      [action.payload.id]: action.payload,
-    }),
-    DELETE_STEP: (state, action: DeleteStepAction) =>
-      omit(state, action.payload.toString()),
-    LOAD_FILE: (
-      state: LegacyStepsState,
-      action: LoadFileAction
-    ): LegacyStepsState => {
-      const { savedStepForms, orderedStepIds } = getPDMetadata(
-        action.payload.file
-      )
-      return orderedStepIds.reduce(
-        (acc: LegacyStepsState, stepId) => {
-          const stepForm = savedStepForms[stepId]
-          if (!stepForm) {
-            console.warn(
-              `Step id ${stepId} found in orderedStepIds but not in savedStepForms`
-            )
-            return acc
-          }
-          return {
-            ...acc,
-            [stepId]: {
-              id: stepId,
-              stepType: stepForm.stepType,
-            },
-          }
-        },
-        { ...initialLegacyStepState }
-      )
-    },
-    DUPLICATE_STEP: (
-      state: LegacyStepsState,
-      action: DuplicateStepAction
-    ): LegacyStepsState => ({
-      ...state,
-      [action.payload.duplicateStepId]: {
-        ...(action.payload.stepId != null ? state[action.payload.stepId] : {}),
-        id: action.payload.duplicateStepId,
-      },
-    }),
-  },
-  initialLegacyStepState
-)
+export type PresavedStepFormState = {|
+  stepType: StepType,
+|} | null
+type PresavedStepFormAction =
+  | AddStepAction
+  | CancelStepFormAction
+  | DeleteStepAction
+  | SaveStepFormAction
+  | SelectTerminalItemAction
+  | SelectStepAction
+export const presavedStepForm = (
+  state: PresavedStepFormState = null,
+  action: PresavedStepFormAction
+): PresavedStepFormState => {
+  switch (action.type) {
+    case 'ADD_STEP':
+      return { stepType: action.payload.stepType }
+    case 'SELECT_TERMINAL_ITEM':
+      return action.payload === PRESAVED_STEP_ID ? state : null
+    case 'CANCEL_STEP_FORM':
+    case 'DELETE_STEP':
+    case 'SAVE_STEP_FORM':
+    case 'SELECT_STEP':
+      return null
+    default:
+      return state
+  }
+}
 
 export type RootState = {
   orderedStepIds: OrderedStepIdsState,
@@ -985,7 +987,7 @@ export type RootState = {
   labwareInvariantProperties: NormalizedLabwareById,
   pipetteInvariantProperties: NormalizedPipetteById,
   moduleInvariantProperties: ModuleEntities,
-  legacySteps: LegacyStepsState,
+  presavedStepForm: PresavedStepFormState,
   savedStepForms: SavedStepFormState,
   unsavedForm: FormState,
 }
@@ -1010,10 +1012,13 @@ export const rootReducer = (state: RootState, action: any) => {
       action
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
-    legacySteps: legacySteps(prevStateFallback.legacySteps, action),
     // 'forms' reducers get full rootReducer state
     savedStepForms: savedStepForms(state, action),
     unsavedForm: unsavedForm(state, action),
+    presavedStepForm: presavedStepForm(
+      prevStateFallback.presavedStepForm,
+      action
+    ),
   }
   if (
     state &&

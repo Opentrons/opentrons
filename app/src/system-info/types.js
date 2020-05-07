@@ -5,6 +5,10 @@ import typeof {
   INITIALIZED,
   USB_DEVICE_ADDED,
   USB_DEVICE_REMOVED,
+  NOT_APPLICABLE,
+  UNKNOWN,
+  UP_TO_DATE,
+  OUTDATED,
 } from './constants'
 
 export type UsbDevice = {|
@@ -17,6 +21,8 @@ export type UsbDevice = {|
   deviceAddress: number,
   windowsDriverVersion?: string | null,
 |}
+
+export type DriverStatus = NOT_APPLICABLE | UNKNOWN | UP_TO_DATE | OUTDATED
 
 export type U2EAnalyticsProps = {|
   'U2E Vendor ID': number,

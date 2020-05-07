@@ -1,8 +1,9 @@
-from typing import Dict, Optional, List, Any, Union
+from uuid import UUID
+from enum import Enum
+from typing import Dict, Optional, List, Any
 from functools import partial
-from pydantic import BaseModel, Field, UUID4
-
-from opentrons.hardware_control.types import Axis
+from pydantic import BaseModel, Field
+from opentrons.types import Mount
 
 
 Point = List[float]
@@ -14,26 +15,20 @@ PointField = partial(Field, ...,
 
 
 class TiprackPosition(BaseModel):
-    locationId: UUID4
+    locationId: UUID
     offset: Point = PointField()
 
 
-class DeckPosition(BaseModel):
-    locationId: UUID4
-    position: Point = PointField()
+class SessionType(str, Enum):
+    """The available session types"""
+    check = 'check'
 
 
 class SpecificPipette(BaseModel):
-    pipetteId: UUID4
-
-
-class MoveLocation(BaseModel):
-    pipetteId: UUID4
-    location: Union[TiprackPosition, DeckPosition]
+    pipetteId: Optional[UUID] = Field(None)
 
 
 class JogPosition(BaseModel):
-    pipetteId: UUID4
     vector: Point = PointField()
 
 
@@ -49,37 +44,41 @@ class AttachedPipette(BaseModel):
                                 "generation version")
     tip_length: Optional[float] =\
         Field(None, description="The default tip length for this pipette")
-    mount_axis: Optional[Axis] =\
-        Field(None, description="The axis that moves this pipette up and down")
-    plunger_axis: Optional[Axis] =\
-        Field(None, description="The axis that moves plunger of this pipette")
+    mount: Optional[Mount] =\
+        Field(None, description="The mount this pipette attached to")
     has_tip: Optional[bool] =\
         Field(None, description="Whether a tip is attached.")
-    tiprack_id: Optional[UUID4] =\
-        Field(None, description="Id of tiprack associated with this pip.")
+    tiprack_id: Optional[UUID] =\
+        Field(None, description="Id of tiprack associated with this pipette.")
 
 
 class LabwareStatus(BaseModel):
-    """
-    A model describing all tipracks required, based on pipettes attached.
-    """
+    """A model describing all tipracks required, based on pipettes attached."""
     alternatives: List[str]
     slot: Optional[str]
-    id: UUID4
-    forPipettes: List[UUID4]
+    id: UUID
+    forPipettes: List[UUID]
     loadName: str
     namespace: str
-    version: int
+    version: str
+
+
+class ComparisonStatus(BaseModel):
+    """
+    A model describing the comparison of a checked point to calibrated value
+    """
+    differenceVector: Point = PointField()
+    thresholdVector:  Point = PointField()
+    exceedsThreshold: bool
 
 
 class CalibrationSessionStatus(BaseModel):
-    """
-    The current status of a given session.
-    """
+    """The current status of a given session."""
     instruments: Dict[str, AttachedPipette]
     currentStep: str = Field(..., description="Current step of session")
-    nextSteps: Dict[str, Dict[str, Dict[str, Any]]] =\
-        Field(..., description="Next Available Step in Session")
+    comparisonsByStep: Dict[str, ComparisonStatus]
+    nextSteps: Optional[Dict[str, Dict[str, Dict[str, Any]]]] =\
+        Field(None, description="Next Available Step in Session")
     labware: List[LabwareStatus]
 
     class Config:
@@ -87,24 +86,28 @@ class CalibrationSessionStatus(BaseModel):
             "examples": [
                 {
                     "instruments": {
-                        "fakeUUID4": {
+                        "fakeUUID": {
                             "model": "p300_single_v1.5",
                             "name": "p300_single",
                             "tip_length": 51.7,
-                            "mount_axis": "z",
-                            "plunger_axis": "b",
+                            "mount": "left",
                             "id": "P3HS12123041"
                         },
                         "fakeUUID2": {
                             "model": None,
                             "name": None,
                             "tip_length": None,
-                            "mount_axis": "a",
-                            "plunger_axis": "c",
+                            "mount": "right",
                             "id": None
                         }
                     },
-                    "currentStep": "sessionStart",
+                    "currentStep": "sessionStarted",
+                    "comparisonsByStep": {
+                        "comparingFirstPipetteHeight": {
+                            "differenceVector": [1, 0, 0],
+                            "exceedsThreshold": False
+                        }
+                    },
                     "nextSteps": {
                         "links": {
                             "loadLabware": {"url": "", "params": {}}

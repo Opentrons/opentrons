@@ -5,7 +5,7 @@
     "pause": "pause",
     "magnet": "magnet",
     "temperature": "temperature",
-    "thermocycler": "thermocycler profile"
+    "thermocycler": "thermocycler"
   },
   "units": {
     "millimeter": "mm",

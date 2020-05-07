@@ -14,6 +14,12 @@ class V1HandlerError(Exception):
         self.message = message
 
 
+class RobotServerError(Exception):
+    def __init__(self, status_code: int, error: Error):
+        self.status_code = status_code
+        self.error = error
+
+
 def transform_http_exception_to_json_api_errors(exception: HTTPException) \
         -> ErrorResponse:
     """

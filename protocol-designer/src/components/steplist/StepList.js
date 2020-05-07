@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { SidePanel } from '@opentrons/components'
 
+import { PresavedStepItem } from './PresavedStepItem'
 import { StartingDeckStateTerminalItem } from './StartingDeckStateTerminalItem'
 import { TerminalItem } from './TerminalItem'
 import { END_TERMINAL_TITLE } from '../../constants'
@@ -52,6 +53,7 @@ export class StepList extends React.Component<Props> {
             orderedStepIds={this.props.orderedStepIds.slice()}
             reorderSteps={this.props.reorderSteps}
           />
+          <PresavedStepItem />
           <StepCreationButton />
           <TerminalItem id={END_TERMINAL_ITEM_ID} title={END_TERMINAL_TITLE} />
         </SidePanel>

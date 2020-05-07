@@ -9,7 +9,8 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 
 from .contexts import ProtocolContext
 from .json_dispatchers import pipette_command_map, \
-    temperature_module_command_map, magnetic_module_command_map
+    temperature_module_command_map, magnetic_module_command_map, \
+    thermocycler_module_command_map
 from . import execute_v3, execute_v4
 
 from opentrons.protocols.types import (PythonProtocol, Protocol,
@@ -133,7 +134,8 @@ def run_protocol(protocol: Protocol,
             execute_v4.dispatch_json(
                 context, protocol.contents, ins, lw, modules,
                 pipette_command_map, magnetic_module_command_map,
-                temperature_module_command_map)
+                temperature_module_command_map,
+                thermocycler_module_command_map)
         else:
             raise RuntimeError(
                 f'Unsupported JSON protocol schema: {protocol.schema_version}')

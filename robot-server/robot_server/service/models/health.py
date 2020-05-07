@@ -31,6 +31,9 @@ class Health(BaseModel):
               description="The version of the firmware flashed to the OT-2's "
                           "motor controller board. Doesn't follow a pattern, "
                           "suitable only for display or exact matching.")
+    board_revision: str = \
+        Field(...,
+              description="The revision of the OT-2's central routing board.")
     logs: typing.List[str] = \
         Field(...,
               description="List of URL paths at which to find logs")
@@ -50,6 +53,7 @@ class Health(BaseModel):
                   "name": "OT2CEP20190604A02",
                   "api_version": "3.15.2",
                   "fw_version": "v2.15.0",
+                  "board_revision": "2.1",
                   "logs": ["/logs/serial.log", "/logs/api.log"],
                   "system_version": "1.2.1",
                   "protocol_api_version": [2, 0],

@@ -1,19 +1,16 @@
 // @flow
 import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
-import type {
-  FormData,
-  StepIdType,
-  StepFieldName,
-  StepType,
-} from '../form-types'
+import type { StepIdType, StepFieldName } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end
 export const START_TERMINAL_ITEM_ID: '__initial_setup__' = '__initial_setup__'
 export const END_TERMINAL_ITEM_ID: '__end__' = '__end__'
+export const PRESAVED_STEP_ID: '__presaved_step__' = '__presaved_step__'
 export type TerminalItemId =
   | typeof START_TERMINAL_ITEM_ID
   | typeof END_TERMINAL_ITEM_ID
+  | typeof PRESAVED_STEP_ID
 
 export type WellIngredientNames = { [ingredId: string]: string }
 
@@ -137,14 +134,6 @@ export type SubstepItemData =
   | MagnetSubstepItem
   | TemperatureSubstepItem
   | AwaitTemperatureSubstepItem
-
-export type StepItemData = {
-  id: StepIdType,
-  title: string,
-  stepType: StepType,
-  description?: ?string,
-  formData: ?FormData,
-}
 
 export type SubSteps = { [StepIdType]: ?SubstepItemData }
 

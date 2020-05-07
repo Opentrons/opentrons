@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/shared-data",
-  "version": "3.17.0",
+  "version": "3.17.1",
   "description": "Default labware definitions for Opentrons robots",
   "repository": {
     "type": "git",
@@ -10,6 +10,7 @@
   "license": "Apache-2.0",
   "main": "js/index.js",
   "dependencies": {
-    "uuid": "3.3.2"
+    "ajv": "^6.10.2",
+    "lodash": "^4.17.4"
   }
 }
