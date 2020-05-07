@@ -3,9 +3,9 @@ import fixture_12_trough from '../../../labware/fixtures/2/fixture_12_trough.jso
 import fixture_96_plate from '../../../labware/fixtures/2/fixture_96_plate.json'
 import fixture_384_plate from '../../../labware/fixtures/2/fixture_384_plate.json'
 import { makeWellSetHelpers } from '../wellSets'
-import { _findWellAt } from '../getWellNamePerMultiTip'
+import { findWellAt } from '../getWellNamePerMultiTip'
 
-describe('_findWellAt', () => {
+describe('findWellAt', () => {
   it('should determine if given (x, y) is within a rectangular well', () => {
     const def: any = {
       wells: {
@@ -18,20 +18,20 @@ describe('_findWellAt', () => {
         },
       },
     }
-    const middle = _findWellAt(def, 200, 200)
+    const middle = findWellAt(def, 200, 200)
     expect(middle).toBe('A1')
 
-    const insideCornerNE = _findWellAt(def, 200 - 4, 200 + 4)
+    const insideCornerNE = findWellAt(def, 200 - 4, 200 + 4)
     expect(insideCornerNE).toEqual('A1')
 
     // exactly at an edge doesn't count
-    const exactlyOnCornerNE = _findWellAt(def, 200 - 5, 200 + 5)
+    const exactlyOnCornerNE = findWellAt(def, 200 - 5, 200 + 5)
     expect(exactlyOnCornerNE).toBeUndefined()
 
-    const exactlyOnWEdge = _findWellAt(def, 200, 200 - 5)
+    const exactlyOnWEdge = findWellAt(def, 200, 200 - 5)
     expect(exactlyOnWEdge).toBeUndefined()
 
-    const justOutsideToEast = _findWellAt(def, 200 + 5.1, 200)
+    const justOutsideToEast = findWellAt(def, 200 + 5.1, 200)
     expect(justOutsideToEast).toBeUndefined()
   })
 

@@ -7,7 +7,7 @@ import type { LabwareDefinition2 } from '@opentrons/shared-data'
 const OFFSET_8_CHANNEL = 9 // offset in mm between tips
 const MULTICHANNEL_TIP_SPAN = OFFSET_8_CHANNEL * (8 - 1) // length in mm from first to last tip of multichannel
 
-export function _findWellAt(
+export function findWellAt(
   labwareDef: LabwareDefinition2,
   x: number,
   y: number
@@ -61,7 +61,7 @@ export function getWellNamePerMultiTip(
   // Return null for containers with any undefined wells
   const wellsAccessed = offsetYTipPositions.reduce(
     (acc: Array<string> | null, tipPosY) => {
-      const wellForTip = _findWellAt(labwareDef, x, tipPosY)
+      const wellForTip = findWellAt(labwareDef, x, tipPosY)
       if (acc === null || !wellForTip) {
         return null
       }
