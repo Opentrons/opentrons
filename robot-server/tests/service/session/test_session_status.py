@@ -1,6 +1,7 @@
 from unittest.mock import MagicMock, PropertyMock, patch
 from uuid import uuid4
 
+from opentrons.types import Mount
 from opentrons.server.endpoints.calibration.session import \
     CheckCalibrationSession, PipetteStatus, LabwareInfo
 
@@ -8,15 +9,14 @@ from robot_server.service.session.session_status import create_session_details
 
 
 def test_create_session_response(hardware):
-
     session = CheckCalibrationSession(hardware)
 
     pip1id = uuid4()
     pip2id = uuid4()
     pip1st = PipetteStatus(name="pip1", model="model1", tip_length=1.0,
-                           has_tip=False, tiprack_id=uuid4())
+                           mount=Mount.RIGHT, has_tip=False, tiprack_id=uuid4())
     pip2st = PipetteStatus(name="pip2", model="model2", tip_length=2.0,
-                           has_tip=True, tiprack_id=None)
+                           mount=Mount.LEFT, has_tip=True, tiprack_id=None)
 
     pipettes = {
         pip1id: pip1st,
@@ -45,6 +45,7 @@ def test_create_session_response(hardware):
 
     assert response.dict() == {
         'currentStep': 'sessionStarted',
+        'comparisonsByStep': {},
         'instruments': {
             str(k): {
                 'name': v.name,
@@ -52,8 +53,7 @@ def test_create_session_response(hardware):
                 'tip_length': v.tip_length,
                 'tiprack_id': v.tiprack_id,
                 'has_tip': v.has_tip,
-                'mount_axis': None,
-                'plunger_axis': None,
+                'mount': v.mount,
             } for k, v in pipettes.items()
         },
         'labware': [{

@@ -594,7 +594,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if len(self._pip_info_by_id) == 2:
             self._first_mount = Mount.RIGHT
             self._second_mount = Mount.LEFT
-        else:
+        elif len(self._pip_info_by_id) == 1:
             only_id, only_info = next(iter(self._pip_info_by_id.items()))
             self._first_mount = only_info['mount']
             # if only checking cal with pipette on left mount we
@@ -602,6 +602,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             # offset or deck transform or both
             if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
+        else:
+            MODULE_LOG.warning("Cannot start calibration check "
+                               "with fewer than one pipette.")
 
     async def _is_checking_both_mounts(self):
         return self._second_mount is not None
