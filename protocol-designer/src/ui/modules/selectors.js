@@ -59,12 +59,8 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
       nicknamesById,
       TEMPERATURE_MODULE_TYPE
     )
-    const thermocyclerModuleOptions = getModuleLabwareOptions(
-      initialDeckSetup,
-      nicknamesById,
-      THERMOCYCLER_MODULE_TYPE
-    )
-    return temperatureModuleOptions.concat(thermocyclerModuleOptions)
+
+    return temperatureModuleOptions
   }
 )
 
@@ -145,18 +141,15 @@ export const getMagnetLabwareEngageHeight: Selector<
     getMagnetLabwareEngageHeightUtil(initialDeckSetup, magnetModuleId)
 )
 
-/** Returns boolean if TC or Temperature Modules are present on deck  */
-export const getTempModuleOrThermocyclerIsOnDeck: Selector<boolean> = createSelector(
+/** Returns boolean if Temperature Module is present on deck  */
+export const getTempModuleIsOnDeck: Selector<boolean> = createSelector(
   getInitialDeckSetup,
   initialDeckSetup => {
     const tempOnDeck = getModuleOnDeckByType(
       initialDeckSetup,
-      THERMOCYCLER_MODULE_TYPE
-    )
-    const tcOnDeck = getModuleOnDeckByType(
-      initialDeckSetup,
       TEMPERATURE_MODULE_TYPE
     )
-    return Boolean(tempOnDeck || tcOnDeck)
+
+    return Boolean(tempOnDeck)
   }
 )

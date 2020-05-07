@@ -44,7 +44,7 @@
     },
     "pauseAction": {
       "disabled": {
-        "wait_until_temp": "There are no temperature or thermocycler modules on the deck"
+        "wait_until_temp": "There is no temperature module on the deck"
       }
     }
   },

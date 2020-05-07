@@ -22,6 +22,7 @@ import {
   PauseForm,
   MagnetForm,
   TemperatureForm,
+  ThermocyclerForm,
 } from './forms'
 import { FormAlerts } from './FormAlerts'
 import { ButtonRow } from './ButtonRow'
@@ -36,6 +37,7 @@ const STEP_FORM_MAP: { [StepType]: ?ComponentType<any> } = {
   moveLiquid: MoveLiquidForm,
   magnet: MagnetForm,
   temperature: TemperatureForm,
+  thermocycler: ThermocyclerForm,
 }
 
 type Props = {|
