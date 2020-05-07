@@ -18,7 +18,7 @@
     "classnames": "^2.2.5",
     "lodash": "^4.17.4",
     "react": "16.8.6",
-    "react-router-dom": "^5.0.1"
+    "react-router-dom": "5.1.1"
   },
   "dependencies": {
     "@popperjs/core": "2.1.1",
