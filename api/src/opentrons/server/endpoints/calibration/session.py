@@ -157,7 +157,7 @@ class CalibrationSession:
                 self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
         return lw
 
-    def _alt_load_names_for_mount(self, mount: Mount) -> str:
+    def _alt_load_names_for_mount(self, mount: Mount) -> typing.List[str]:
         pip_vol = self.get_pipette(mount)['max_volume']
         return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
 
