@@ -48,11 +48,10 @@ stages:
           description: !re_search "Aspirate with the less accurate volumetric calibrations"
           restart_required: false
           value: !anything
-        - id: useFastApi
+        - id: useV1HttpApi
           old_id: Null
-          title: Enable experimental HTTP API v2
-          description: !re_match "Tells the OT-2 to run a newer.*version of its HTTP
-            API.*"
+          title: Revert to legacy HTTP API v1
+          description: !re_match "Tells the OT-2 to run the legacy v1.*"
           restart_required: true
           value: !anything
         links: !anydict 
@@ -72,7 +71,7 @@ marks:
       - useProtocolApi2
       - disableHomeOnBoot
       - useOldAspirationFunctions
-      - useFastApi
+      - useV1HttpApi
   - parametrize:
       key: value
       vals:
@@ -109,7 +108,7 @@ marks:
       - useProtocolApi2
       - disableHomeOnBoot
       - useOldAspirationFunctions
-      - useFastApi
+      - useV1HttpApi
 stages:
   - name: Set each setting to acceptable values 
     request:
