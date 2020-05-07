@@ -143,7 +143,7 @@ export function TipPickUp(props: TipPickUpProps) {
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={pickUpTip}
-              className={styles.pick_up_tip_button}
+              className={styles.command_button}
             >
               {TIP_PICK_UP_BUTTON_TEXT}
             </PrimaryButton>

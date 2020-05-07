@@ -49,7 +49,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
 
-  const { currentStep, labware, instruments } =
+  const { currentStep, labware, instruments, comparisonsByStep } =
     useSelector((state: State) =>
       Calibration.getRobotCalibrationCheckSession(state, robotName)
     ) || {}
@@ -83,8 +83,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
   }
-  console.log('currentStep', currentStep)
-  console.log('co', Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION)
 
   let stepContents
   let modalContentsClassName = styles.modal_contents
@@ -155,7 +153,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
             slotNumber={slotNumber}
             isMulti={isActiveInstrumentMultiChannel}
             mount={activeMount}
+            exit={exit}
             isInspecting={isInspecting}
+            comparison={comparisonsByStep[currentStep]}
           />
         ) : null
       break

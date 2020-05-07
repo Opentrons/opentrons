@@ -67,11 +67,20 @@ export type RobotCalibrationCheckLabware = {
   version: number,
 }
 
+export type RobotCalibrationCheckComparison = {|
+  differenceVector: [number, number, number],
+  thresholdVector: [number, number, number],
+  exceedsThreshold: boolean,
+|}
+
 export type RobotCalibrationCheckSessionData = {|
   instruments: { [string]: RobotCalibrationCheckInstrument },
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {
     links: { [RobotCalibrationCheckStep]: string },
+  },
+  comparisonsByStep: {
+    [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
   },
   labware: Array<RobotCalibrationCheckLabware>,
 |}

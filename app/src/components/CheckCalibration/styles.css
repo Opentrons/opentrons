@@ -221,7 +221,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   margin: 0 1rem;
 }
 
-.pick_up_tip_button {
+.command_button {
   margin: 0 5rem;
 }
 

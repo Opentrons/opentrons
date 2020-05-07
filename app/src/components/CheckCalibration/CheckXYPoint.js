@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, type Mount } from '@opentrons/components'
+import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
 import type { Dispatch } from '../../types'
@@ -8,6 +8,7 @@ import {
   jogRobotCalibrationCheck,
   comparePointRobotCalibrationCheck,
   confirmStepRobotCalibrationCheck,
+  type RobotCalibrationCheckComparison,
 } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
@@ -70,7 +71,16 @@ const THEN = 'Then'
 const CHECK_AXES = 'check x and y-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
-const CONTINUE = 'continue'
+const MOVE_TO_NEXT = 'move to next check'
+const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
+
+const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
+const GOOD_INSPECTING_HEADER = 'Good calibration'
+const BAD_INSPECTING_BODY =
+  'The jogged and calibrated x and y-axis co-ordinates do not match, and are out of acceptable bounds.'
+const GOOD_INSPECTING_BODY =
+  'The jogged and calibrated x and y-axis co-ordinates fall within acceptable bounds.'
+const DIFFERENCE = 'difference'
 
 type CheckXYPointProps = {|
   pipetteId: string,
@@ -79,6 +89,8 @@ type CheckXYPointProps = {|
   isMulti: boolean,
   mount: Mount,
   isInspecting: boolean,
+  comparison: RobotCalibrationCheckComparison,
+  exit: () => void,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
   const {
@@ -88,6 +100,8 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     isMulti,
     mount,
     isInspecting,
+    comparison,
+    exit,
   } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -109,7 +123,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
   function comparePoint() {
     dispatch(comparePointRobotCalibrationCheck(robotName, pipetteId))
   }
-  function confirmStep() {
+  function goToNextCheck() {
     dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
   }
 
@@ -123,17 +137,11 @@ export function CheckXYPoint(props: CheckXYPointProps) {
         </h3>
       </div>
       {isInspecting ? (
-        <>
-          <div>IS INSPECTING!!</div>
-          <div className={styles.button_row}>
-            <PrimaryButton
-              onClick={confirmStep}
-              className={styles.pick_up_tip_button}
-            >
-              {CONTINUE}
-            </PrimaryButton>
-          </div>
-        </>
+        <CompareXY
+          comparison={comparison}
+          goToNextCheck={goToNextCheck}
+          exit={exit}
+        />
       ) : (
         <>
           <div className={styles.tip_pick_up_demo_wrapper}>
@@ -164,13 +172,68 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={comparePoint}
-              className={styles.pick_up_tip_button}
+              className={styles.command_button}
             >
               {CHECK_XY_BUTTON_TEXT}
             </PrimaryButton>
           </div>
         </>
       )}
+    </>
+  )
+}
+
+type CompareXYProps = {|
+  comparison: RobotCalibrationCheckComparison,
+  goToNextCheck: () => void,
+  exit: () => void,
+|}
+function CompareXY(props: CompareXYProps) {
+  const { comparison, goToNextCheck, exit } = props
+  const { differenceVector, thresholdVector, exceedsThreshold } = comparison
+
+  let header = GOOD_INSPECTING_HEADER
+  let body = GOOD_INSPECTING_BODY
+  let icon = <Icon name="check-circle" className={styles.success_status_icon} />
+  let differenceClass = styles.difference_good
+
+  if (exceedsThreshold) {
+    header = BAD_INSPECTING_HEADER
+    body = BAD_INSPECTING_BODY
+    icon = <Icon name="close-circle" className={styles.error_status_icon} />
+    differenceClass = styles.difference_bad
+  }
+
+  return (
+    <>
+      <div className={styles.modal_icon_wrapper}>
+        {icon}
+        <h3>{header}</h3>
+      </div>
+      <p>{body}</p>
+      <div className={differenceClass}>
+        <h5>{DIFFERENCE}</h5>
+        <h5>X</h5>
+        {differenceVector[0]}
+        <h5>Y</h5>
+        {differenceVector[1]}
+      </div>
+      <div>{thresholdVector}</div>
+      {exceedsThreshold && (
+        <div className={styles.button_row}>
+          <PrimaryButton onClick={exit} className={styles.command_button}>
+            {DROP_TIP_AND_EXIT}
+          </PrimaryButton>
+        </div>
+      )}
+      <div className={styles.button_row}>
+        <PrimaryButton
+          onClick={goToNextCheck}
+          className={styles.command_button}
+        >
+          {MOVE_TO_NEXT}
+        </PrimaryButton>
+      </div>
     </>
   )
 }

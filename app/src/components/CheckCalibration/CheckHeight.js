@@ -87,7 +87,7 @@ export function CheckHeight(props: CheckHeightProps) {
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={confirmStep}
-              className={styles.pick_up_tip_button}
+              className={styles.command_button}
             >
               {CONTINUE}
             </PrimaryButton>
@@ -123,7 +123,7 @@ export function CheckHeight(props: CheckHeightProps) {
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={comparePoint}
-              className={styles.pick_up_tip_button}
+              className={styles.command_button}
             >
               {CHECK_Z_BUTTON_TEXT}
             </PrimaryButton>
