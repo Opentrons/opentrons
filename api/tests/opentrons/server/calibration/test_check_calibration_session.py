@@ -261,13 +261,19 @@ async def test_session_started_to_end_state(check_calibration_session):
         session.CalibrationCheckState.sessionExited
 
 
-async def test_same_diff_pips_diff_tipracks(check_calibration_session):
+async def test_diff_pips_diff_tipracks(check_calibration_session):
     sess = check_calibration_session
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.load_labware)
     assert len(sess._labware_info.keys()) == 2
     for tiprack in sess._labware_info.values():
         assert len(tiprack.forPipettes) == 1
+    # loads tiprack for right mount in 8
+    # and tiprack for left mount in 6
+    assert sess._deck['8']
+    assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
+    assert sess._deck['6']
+    assert sess._deck['6'].name == 'opentrons_96_tiprack_10ul'
 
 
 async def test_same_size_pips_share_tiprack(
@@ -282,8 +288,7 @@ async def test_same_size_pips_share_tiprack(
     # and tiprack for left mount in 6
     assert sess._deck['8']
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
-    assert sess._deck['6']
-    assert sess._deck['6'].name == 'opentrons_96_tiprack_10ul'
+    assert sess._deck['6'] is None
 
     # z and x values should be the same, but y should be different
     # if accessing different tips (A1, B1) on same tiprack

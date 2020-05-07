@@ -97,7 +97,6 @@ class CalibrationSession:
             hardware.get_attached_instruments()
         )
         self._deck = geometry.Deck()
-        self._slot_options = ['8', '6']
         self._labware_info = self._determine_required_labware()
         self._moves = self._build_deck_moves()
 
@@ -135,11 +134,7 @@ class CalibrationSession:
 
         for pipette_id in self._pip_info_by_id.keys():
             mount = self._get_mount(pipette_id)
-            pip_vol = self.get_pipette(mount)['max_volume']
-
-            _lookup = LOOKUP_LABWARE[str(pip_vol)]
-            load_name: str = _lookup.load_name
-
+            load_name: str = self._load_name_for_mount(mount)
             prev_lw = lw.get(_prev_lw_uuid, None) if _prev_lw_uuid else None
             if _prev_lw_uuid and prev_lw and prev_lw.loadName == load_name:
                 #  pipette uses same tiprack as previous, use existing
@@ -149,9 +144,9 @@ class CalibrationSession:
                 lw_def = labware.get_labware_definition(load_name)
                 new_uuid: UUID = uuid4()
                 _prev_lw_uuid = new_uuid
-                slot = self._available_slot_options()
+                slot = self._get_tip_rack_slot_for_mount(mount)
                 lw[new_uuid] = LabwareInfo(
-                    alternatives=list(_lookup.alternatives),
+                    alternatives=self._alt_load_names_for_mount(mount),
                     forPipettes=[pipette_id],
                     loadName=load_name,
                     slot=slot,
@@ -161,6 +156,14 @@ class CalibrationSession:
                     definition=lw_def)
                 self._pip_info_by_id[pipette_id]['tiprack_id'] = new_uuid
         return lw
+
+    def _alt_load_names_for_mount(self, mount: Mount) -> str:
+        pip_vol = self.get_pipette(mount)['max_volume']
+        return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
+
+    def _load_name_for_mount(self, mount: Mount) -> str:
+        pip_vol = self.get_pipette(mount)['max_volume']
+        return LOOKUP_LABWARE[str(pip_vol)].load_name
 
     def _build_deck_moves(self) -> Moves:
         return Moves(
@@ -180,11 +183,16 @@ class CalibrationSession:
         updated_pos = pos - Point(20, 0, pos.z)
         return CheckMove(position=updated_pos, locationId=uuid4())
 
-    def _available_slot_options(self) -> str:
-        if self._slot_options:
-            return self._slot_options.pop(0)
+    def _get_tip_rack_slot_for_mount(self, mount) -> str:
+        if len(self._pip_info_by_id.keys()) == 2:
+            shared_tiprack = self._load_name_for_mount(Mount.LEFT) == \
+                    self._load_name_for_mount(Mount.RIGHT)
+            if mount == Mount.LEFT and not shared_tiprack:
+                return '6'
+            else:
+                return '8'
         else:
-            raise KeyError("No available slots remaining")
+            return '8'
 
     def _get_mount(self, pipette_id: UUID) -> Mount:
         return self._pip_info_by_id[pipette_id]['mount']
