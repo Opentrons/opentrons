@@ -89,7 +89,7 @@ stages:
     response:
       status_code: 200
       verify_response_with:
-        function: utils:verify_settings_value
+        function: tests.integration.utils:verify_settings_value
         extra_kwargs:
           id: "{id}"
           value: "{value}"
@@ -120,7 +120,7 @@ stages:
     response:
       status_code: 200
       verify_response_with:
-        function: utils:verify_settings_value
+        function: tests.integration.utils:verify_settings_value
         extra_kwargs:
           id: "{id}"
           value: Null
