@@ -2,12 +2,8 @@ import abc
 import asyncio
 import enum
 import logging
-from typing import Tuple, TYPE_CHECKING
+from typing import Tuple
 from opentrons import types as top_types
-
-if TYPE_CHECKING:
-    import gpiod  # type: ignore
-                  # noqa(F401)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -52,6 +48,14 @@ class Axis(enum.Enum):
         return self.name
 
 
+class DoorState(enum.Enum):
+    OPEN = False
+    CLOSED = True
+
+    def __str__(self):
+        return self.name
+
+
 class HardwareAPILike(abc.ABC):
     """ A dummy class useful in isinstance checks to accept an API or adapter
     """
@@ -61,6 +65,14 @@ class HardwareAPILike(abc.ABC):
 
     @property
     def board_revision(self) -> str:
+        ...
+
+    @property
+    def door_state(self) -> DoorState:
+        ...
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState) -> DoorState:
         ...
 
 
@@ -132,22 +144,6 @@ class ExecutionState(enum.Enum):
     RUNNING = enum.auto()
     PAUSED = enum.auto()
     CANCELLED = enum.auto()
-
-    def __str__(self):
-        return self.name
-
-
-class DoorState(enum.Enum):
-    OPEN = False
-    CLOSED = True
-
-    @classmethod
-    def by_event(cls, event: 'gpiod.LineEvent'):
-        ds_dict = {
-            gpiod.LineEvent.FALLING_EDGE: cls.OPEN,
-            gpiod.LineEvent.RISING_EDGE: cls.CLOSED
-        }
-        return ds_dict[event.type]
 
     def __str__(self):
         return self.name

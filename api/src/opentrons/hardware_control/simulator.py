@@ -15,6 +15,7 @@ from . import modules
 from .execution_manager import ExecutionManager
 from .types import BoardRevision, DoorState
 
+
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
     from opentrons.drivers.rpi_drivers.dev_types\

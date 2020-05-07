@@ -1,7 +1,9 @@
+import asyncio
 from typing import Dict, Tuple
 from typing_extensions import Protocol
-from opentrons.hardware_control.types import BoardRevision, DoorState
-from .types import OutputPins, GPIOPins
+from opentrons.hardware_control.types import (
+    BoardRevision, HardwareAPILike, DoorState)
+from .types import GPIOPin
 
 
 class GPIODriverLike(Protocol):
@@ -32,10 +34,10 @@ class GPIODriverLike(Protocol):
     def config_by_board_rev(self):
         ...
 
-    def set_high(self, output_pin: OutputPins):
+    def set_high(self, output_pin: GPIOPin):
         ...
 
-    def set_low(self, output_pin: OutputPins):
+    def set_low(self, output_pin: GPIOPin):
         ...
 
     def set_button_light(self,
@@ -83,5 +85,10 @@ class GPIODriverLike(Protocol):
     def get_door_state(self) -> DoorState:
         ...
 
-    def release_line(self, gpio_pins: GPIOPins):
+    async def monitor_door_switch_state(
+            self, loop: asyncio.AbstractEventLoop,
+            api: HardwareAPILike):
+        ...
+
+    def release_line(self, pin: GPIOPin):
         ...

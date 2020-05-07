@@ -1,6 +1,5 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
-import enum
 import logging
 from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
 try:
@@ -15,7 +14,7 @@ from opentrons.types import Mount
 
 from . import modules
 from .execution_manager import ExecutionManager
-from .types import BoardRevision, DoorState
+from .types import BoardRevision
 
 if TYPE_CHECKING:
     from .dev_types import RegisterModules  # noqa (F501)
@@ -23,19 +22,6 @@ if TYPE_CHECKING:
         import GPIODriverLike  # noqa(F501)
 
 MODULE_LOG = logging.getLogger(__name__)
-
-
-def event_callback(q: asyncio.Queue):
-    try:
-        q.put_nowait(QueueEvents.EVENT_RECEIVED)
-    except asyncio.QueueFull:
-        MODULE_LOG.warning(
-            'Event queue is full and can no longer receive new events')
-
-
-class QueueEvents(enum.Enum):
-    EVENT_RECEIVED = enum.auto()
-    QUIT = enum.auto()
 
 
 class Controller:
@@ -89,28 +75,6 @@ class Controller:
         self.gpio_chardev.config_by_board_rev()
         self._board_revision = self.gpio_chardev.board_rev
         await self.gpio_chardev.setup()
-
-    async def monitor_door_switch_state(
-            self, loop: asyncio.AbstractEventLoop,
-            api_door_state: DoorState):
-        event_queue: asyncio.Queue = asyncio.Queue()
-        door_fd = self.gpio_chardev.get_door_switches_fd()
-        loop.add_reader(door_fd, event_callback, event_queue)
-        while True:
-            await self._watch_door_switch_event(event_queue)
-
-    async def _watch_door_switch_event(self,
-                                       event_queue: asyncio.Queue):
-        ev = await event_queue.get()
-        if ev == QueueEvents.EVENT_RECEIVED:
-            door_state = self.gpio_chardev.get_door_state()
-            api_door_state = door_state
-            MODULE_LOG.info(
-                f'Updating the window switch status: {api_door_state}')
-        elif ev == QueueEvents.QUIT:
-            return
-        else:
-            raise RuntimeError("Event queue has received an unknown item")
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
