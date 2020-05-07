@@ -1,9 +1,15 @@
 @import '@opentrons/components';
 
-.status_icon {
+.success_status_icon {
   width: 2.5rem;
   margin-right: 0.75rem;
   color: var(--c-success);
+}
+
+.error_status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-error);
 }
 
 .modal_header {
@@ -35,6 +41,19 @@
   @apply --font-body-2-dark;
 
   margin: 1rem 0 2rem 0;
+}
+
+.error_explanation {
+  @apply --font-body-2-dark;
+  margin: 0.75rem 0;
+}
+
+.bad_cal_wrapper {
+  margin: 1rem 3rem;
+}
+
+.bad_cal_body {
+  margin: 0 0 2rem 0;
 }
 
 .button_row {

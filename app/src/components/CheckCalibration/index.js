@@ -10,9 +10,10 @@ import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
 import { CompleteConfirmation } from './CompleteConfirmation'
-import styles from './styles.css'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
+import { BadCalibration } from './BadCalibration'
+import styles from './styles.css'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 
@@ -82,6 +83,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
   }
+  console.log('currentStep', currentStep)
+  console.log('co', Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION)
 
   let stepContents
   let modalContentsClassName = styles.modal_contents
@@ -177,9 +180,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       ) : null
       break
     }
+    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
+      stepContents = <BadCalibration robotName={robotName} exit={exit} />
+      break
+    }
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
-    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       // TODO: BC: get real complete state name after it is update on server side
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
