@@ -15,6 +15,7 @@ stages:
         # starts with semantic version
         api_version: !re_match "\\d+\\.\\d+\\.\\d+"
         fw_version: Virtual Smoothie
+        board_revision: !re_match "\\d+\\.\\d+"
         logs:
         - /logs/serial.log
         - /logs/api.log
