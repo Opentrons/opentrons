@@ -23,10 +23,9 @@ class Point(NamedTuple):
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Point):
             return False
-        xIs = isclose(self.x, other.x, rel_tol=1e-05, abs_tol=1e-08)
-        yIs = isclose(self.y, other.y, rel_tol=1e-05, abs_tol=1e-08)
-        zIs = isclose(self.z, other.z, rel_tol=1e-05, abs_tol=1e-08)
-        return xIs and yIs and zIs
+        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
+        return all(isclose(s, o,
+                           rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
 
     def __add__(self, other: Any) -> 'Point':
         if not isinstance(other, Point):
