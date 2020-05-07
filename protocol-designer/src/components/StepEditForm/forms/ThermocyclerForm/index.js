@@ -3,6 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
+import {
+  THERMOCYCLER_STATE,
+  THERMOCYCLER_PROFILE,
+} from '../../../../constants.js'
 
 import { RadioGroupField, ConditionalOnField } from '../../fields'
 import { StateFields } from './StateFields'
@@ -31,7 +35,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               name: i18n.t(
                 'form.step_edit_form.field.thermocyclerAction.options.state'
               ),
-              value: 'thermocyclerState',
+              value: THERMOCYCLER_STATE,
             },
           ]}
           {...focusHandlers}
@@ -51,7 +55,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
               name: i18n.t(
                 'form.step_edit_form.field.thermocyclerAction.options.profile'
               ),
-              value: 'thermocyclerProfile',
+              value: THERMOCYCLER_PROFILE,
             },
           ]}
           {...focusHandlers}
