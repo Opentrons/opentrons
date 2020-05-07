@@ -28,7 +28,7 @@ def _get_adv_settings_response() -> Dict[
                List[Dict[str, Union[str, bool, None]]]]]:
     data = advs.get_all_adv_settings()
 
-    if advs.restart_required():
+    if advs.is_restart_required():
         links = {'restart': '/server/restart'}
     else:
         links = {}

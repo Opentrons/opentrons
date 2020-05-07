@@ -383,8 +383,8 @@ def mock_get_all_adv_settings():
 
 
 @pytest.fixture
-def mock_restart_required():
-    with patch("robot_server.service.routers.settings.advanced_settings.restart_required") as p:   # noqa: E501
+def mock_is_restart_required():
+    with patch("robot_server.service.routers.settings.advanced_settings.is_restart_required") as p:   # noqa: E501
         yield p
 
 
@@ -417,9 +417,9 @@ def validate_response_body(body, restart):
                              [False, None],
                              [True, "/server/restart"]
                          ])
-def test_get(api_client, mock_get_all_adv_settings, mock_restart_required,
+def test_get(api_client, mock_get_all_adv_settings, mock_is_restart_required,
              restart_required, link):
-    mock_restart_required.return_value = restart_required
+    mock_is_restart_required.return_value = restart_required
     resp = api_client.get('/settings')
     body = resp.json()
     assert resp.status_code == 200
@@ -432,9 +432,9 @@ def test_get(api_client, mock_get_all_adv_settings, mock_restart_required,
                              [advanced_settings.SettingException("Fail", "e"),
                               500]
                          ])
-def test_set_err(api_client, mock_restart_required,
+def test_set_err(api_client, mock_is_restart_required,
                  mock_set_adv_setting, exc, expected_status):
-    mock_restart_required.return_value = False
+    mock_is_restart_required.return_value = False
 
     def raiser(i, v):
         raise exc
@@ -449,8 +449,8 @@ def test_set_err(api_client, mock_restart_required,
     assert body == {"message": str(exc)}
 
 
-def test_set(api_client, mock_set_adv_setting, mock_restart_required):
-    mock_restart_required.return_value = False
+def test_set(api_client, mock_set_adv_setting, mock_is_restart_required):
+    mock_is_restart_required.return_value = False
 
     test_id = 'disableHomeOnBoot'
 

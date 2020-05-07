@@ -145,12 +145,9 @@ settings = [
                     ' affects GEN1 P10S, P10M, P50S, P50M, and P300S pipettes.'
     ),
     SettingDefinition(
-        _id='useFastApi',
-        title='Enable experimental HTTP API v2',
-        description='Tells the OT-2 to run a newer, highly experimental '
-                    'version of its HTTP API based on the FastAPI framework. '
-                    'This is an internal setting for Opentrons engineers; '
-                    'do not enable this setting or you will break your OT-2.',
+        _id='useV1HttpApi',
+        title='Revert to legacy HTTP API v1',
+        description='Tells the OT-2 to run the legacy v1 http api.',
         restart_required=True
     ),
 ]
@@ -296,7 +293,17 @@ def _migrate2to3(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3]
+def _migrate3to4(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 4 of the feature flags file. Adds the
+    useV1HttpApi config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['useV1HttpApi'] = None
+    return newmap
+
+
+_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should
@@ -355,7 +362,7 @@ _SETTINGS_RESTART_REQUIRED = False
 # the same process, will require _all_ of them to be restarted.
 
 
-def restart_required() -> bool:
+def is_restart_required() -> bool:
     return _SETTINGS_RESTART_REQUIRED
 
 

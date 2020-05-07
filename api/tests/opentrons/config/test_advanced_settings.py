@@ -110,10 +110,10 @@ async def test_on_change_called(loop,
 
 
 async def test_restart_required(loop, restore_restart_required):
-    assert advanced_settings.restart_required() is False
-    _id = 'useFastApi'
+    assert advanced_settings.is_restart_required() is False
+    _id = 'useV1HttpApi'
     await advanced_settings.set_adv_setting(_id, True)
-    assert advanced_settings.restart_required() is True
+    assert advanced_settings.is_restart_required() is True
 
 
 def test_get_setting_use_env_overload(mock_read_settings_file,
