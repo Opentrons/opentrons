@@ -74,7 +74,8 @@
   flex-direction: row;
 }
 
-.checkbox_field {
+.checkbox_field,
+.toggle_field {
   text-transform: capitalize;
 }
 
@@ -285,4 +286,19 @@ and when that is implemented.
 
 .tc_step_option {
   margin-bottom: 0.5rem;
+}
+
+.toggle_form_group {
+  width: 20%;
+  margin: 0 0 1rem 1.75rem;
+}
+
+.toggle_row {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+}
+
+.toggle_field {
+  margin-right: 1rem;
 }
