@@ -10,7 +10,7 @@ import styles from '../../StepEditForm.css'
 import type { FormData } from '../../../../form-types'
 import type { FocusHandlers } from '../../types'
 
-type TCFormProps = { focusHandlers: FocusHandlers, formData: FormData }
+type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 
 export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
   const { focusHandlers } = props

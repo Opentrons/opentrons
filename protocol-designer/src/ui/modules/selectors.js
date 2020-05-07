@@ -147,7 +147,7 @@ export const getTempModuleIsOnDeck: Selector<boolean> = createSelector(
   initialDeckSetup => {
     const tempOnDeck = getModuleOnDeckByType(
       initialDeckSetup,
-      THERMOCYCLER_MODULE_TYPE
+      TEMPERATURE_MODULE_TYPE
     )
 
     return Boolean(tempOnDeck)

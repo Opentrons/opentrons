@@ -22,7 +22,7 @@ import styles from '../StepEditForm.css'
 
 import type { FocusHandlers } from '../types'
 
-type PauseFormProps = { focusHandlers: FocusHandlers }
+type PauseFormProps = {| focusHandlers: FocusHandlers |}
 
 export const PauseForm = (props: PauseFormProps): React.Element<'div'> => {
   const { focusHandlers } = props
