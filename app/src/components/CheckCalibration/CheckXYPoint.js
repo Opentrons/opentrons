@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
 import { useDispatch } from 'react-redux'
 
@@ -183,6 +184,10 @@ export function CheckXYPoint(props: CheckXYPointProps) {
   )
 }
 
+function formatOffsetValue(value: number): string {
+  const rounded = Math.round((value + Number.EPSILON) * 100) / 100
+  return parseFloat(rounded).toFixed(2)
+}
 type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
@@ -211,12 +216,16 @@ function CompareXY(props: CompareXYProps) {
         <h3>{header}</h3>
       </div>
       <p>{body}</p>
-      <div className={differenceClass}>
+      <div className={cx(styles.difference_wrapper, differenceClass)}>
         <h5>{DIFFERENCE}</h5>
         <h5>X</h5>
-        {differenceVector[0]}
+        <span className={cx(styles.difference_value, differenceClass)}>
+          {formatOffsetValue(differenceVector[0])}
+        </span>
         <h5>Y</h5>
-        {differenceVector[1]}
+        <span className={cx(styles.difference_value, differenceClass)}>
+          {formatOffsetValue(differenceVector[1])}
+        </span>
       </div>
       <div>{thresholdVector}</div>
       {exceedsThreshold && (

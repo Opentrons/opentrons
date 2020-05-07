@@ -257,3 +257,31 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   width: 7.5rem;
   margin-bottom: 3rem;
 }
+
+.difference_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: var(--bd-radius-default);
+  border-width: var(--bd-width-default);
+  border-style: solid;
+  padding: 0.5rem;
+  min-width: 20rem;
+}
+
+.difference_value.difference_good{
+  color: var(--c-success);
+}
+
+.difference_value.difference_bad{
+  color: var(--c-error);
+}
+
+.difference_wrapper.difference_good {
+  border-color: var(--c-success);
+}
+
+.difference_wrapper.difference_bad {
+  border-color: var(--c-error);
+}
