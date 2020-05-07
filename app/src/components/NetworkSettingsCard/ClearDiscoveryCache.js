@@ -14,12 +14,12 @@ import type { Dispatch } from '../../types'
 
 export function ClearDiscoveryCache() {
   const dispatch = useDispatch<Dispatch>()
-
   return (
     <LabeledButton
       label={CLEAR_ROBOTS_TITLE}
       buttonProps={{
-        onClick: () => {dispatch(clearDiscoveryCache())}, children: CLEAR
+        onClick: () => dispatch(clearDiscoveryCache()),
+        children: CLEAR,
       }}
     >
       <p>{CLEAR_ROBOTS_DESCRIPTION}</p>
