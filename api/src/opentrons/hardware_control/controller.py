@@ -264,3 +264,4 @@ class Controller:
             loop = asyncio.get_event_loop()
             if loop.is_running() and self._module_watcher:
                 self._module_watcher.close()
+        self.gpio_chardev.quit_monitoring()

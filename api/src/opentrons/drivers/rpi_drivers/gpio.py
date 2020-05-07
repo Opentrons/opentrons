@@ -2,9 +2,8 @@ import asyncio
 import logging
 import pathlib
 import time
-from typing import Dict, Tuple
-from opentrons.hardware_control.types import (
-    BoardRevision, HardwareAPILike, DoorState)
+from typing import Callable, Dict, Tuple
+from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
 from .types import gpio_list, PinDir, GPIOPin, GpioQueueEvents
 
@@ -29,9 +28,9 @@ def _event_callback(q: asyncio.Queue):
 
 class GPIOCharDev:
     def __init__(self, chip_name: str):
+        self._board_rev = BoardRevision.UNKNOWN
         self._chip = gpiod.Chip(chip_name)
         self._lines = self._initialize()
-        self._board_rev = BoardRevision.UNKNOWN
 
     @property
     def chip(self) -> gpiod.Chip:
@@ -228,31 +227,32 @@ class GPIOCharDev:
         else:
             return DoorState.CLOSED
 
-    async def _watch_door_switch_event(
-                self,
-                event_queue: asyncio.Queue,
-                api: HardwareAPILike):
-        ev = await event_queue.get()
-        if ev == GpioQueueEvents.EVENT_RECEIVED:
-            door_state = self.get_door_state()
-            api.door_state = door_state
-            MODULE_LOG.info(
-                f'Updating the window switch status: {api.door_state}')
-        elif ev == GpioQueueEvents.QUIT:
-            return
-        else:
-            raise RuntimeError("Event queue has received an unknown item")
-
     async def monitor_door_switch_state(
             self, loop: asyncio.AbstractEventLoop,
-            api: HardwareAPILike):
-        event_queue: asyncio.Queue = asyncio.Queue()
+            update_door_state: Callable[[DoorState], None]):
+        current_door_value = self.read_window_switches()
+        if current_door_value == 0:
+            update_door_state(DoorState.OPEN)
+        else:
+            update_door_state(DoorState.CLOSED)
+
+        self.event_queue: asyncio.Queue = asyncio.Queue()
         door_fd = self.get_door_switches_fd()
-        loop.add_reader(door_fd, _event_callback, event_queue)
+        loop.add_reader(door_fd, _event_callback, self.event_queue)
         while True:
-            await self._watch_door_switch_event(
-                event_queue, api)
+            ev = await self.event_queue.get()
+            if ev == GpioQueueEvents.EVENT_RECEIVED:
+                door_state = self.get_door_state()
+                update_door_state(door_state)
+            elif ev == GpioQueueEvents.QUIT:
+                return
+            else:
+                raise RuntimeError(
+                    "Event queue has received an unknown item")
 
     def release_line(self, pin: GPIOPin):
         self.lines[pin.name].release()
         self.lines.pop(pin.name)
+
+    def quit_monitoring(self):
+        self.event_queue.put_nowait(GpioQueueEvents.QUIT)

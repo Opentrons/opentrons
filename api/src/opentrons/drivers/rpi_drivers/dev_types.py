@@ -1,8 +1,7 @@
 import asyncio
-from typing import Dict, Tuple
+from typing import Callable, Dict, Tuple
 from typing_extensions import Protocol
-from opentrons.hardware_control.types import (
-    BoardRevision, HardwareAPILike, DoorState)
+from opentrons.hardware_control.types import BoardRevision, DoorState
 from .types import GPIOPin
 
 
@@ -87,8 +86,11 @@ class GPIODriverLike(Protocol):
 
     async def monitor_door_switch_state(
             self, loop: asyncio.AbstractEventLoop,
-            api: HardwareAPILike):
+            update_door_state: Callable[[DoorState], None]):
         ...
 
     def release_line(self, pin: GPIOPin):
+        ...
+
+    def quit_monitoring(self):
         ...

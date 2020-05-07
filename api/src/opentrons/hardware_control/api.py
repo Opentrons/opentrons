@@ -82,6 +82,11 @@ class API(HardwareAPILike):
     def door_state(self, door_state: DoorState):
         self._door_state = door_state
 
+    def _update_door_state(self, door_state: DoorState):
+        mod_log.info(
+            f'Updating the window switch status: {door_state}')
+        self.door_state = door_state
+
     @classmethod
     async def build_hardware_controller(
             cls, config: robot_configs.robot_config = None,
@@ -142,7 +147,7 @@ class API(HardwareAPILike):
             checked_loop.create_task(
                 backend.gpio_chardev.monitor_door_switch_state(
                     loop=checked_loop,
-                    api=api_instance))
+                    update_door_state=api_instance._update_door_state))
             return api_instance
         finally:
             blink_task.cancel()
