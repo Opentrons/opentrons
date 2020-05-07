@@ -17,9 +17,9 @@ export type ToggleFieldProps = {|
   /** name of field in form */
   name?: string,
   /** label text for toggled off */
-  labelOff?: string,
+  offLabel?: string,
   /** label text for toggled on */
-  labelOn?: string,
+  onLabel?: string,
   /** checkbox is disabled if value is true */
   disabled?: boolean,
   /** html tabindex property */
@@ -53,7 +53,7 @@ export function ToggleField(props: ToggleFieldProps) {
         tabIndex={props.tabIndex}
       />
       <div className={cx(props.labelTextClassName, styles.label_text)}>
-        {props.value ? props.labelOn : props.labelOff}
+        {props.value ? props.onLabel : props.offLabel}
       </div>
     </label>
   )

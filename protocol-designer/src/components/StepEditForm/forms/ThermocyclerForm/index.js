@@ -4,7 +4,8 @@ import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 
-import { RadioGroupField } from '../../fields'
+import { RadioGroupField, ConditionalOnField } from '../../fields'
+import { StateFields } from './StateFields'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
@@ -35,6 +36,12 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           ]}
           {...focusHandlers}
         />
+        <ConditionalOnField
+          name={'thermocyclerAction'}
+          condition={val => val === 'tcState'}
+        >
+          <StateFields focusHandlers={focusHandlers} />
+        </ConditionalOnField>
 
         <RadioGroupField
           name="thermocyclerAction"
