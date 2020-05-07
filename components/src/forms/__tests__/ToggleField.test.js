@@ -9,8 +9,8 @@ describe('ToggleField', () => {
   it('renders an Icon', () => {
     const wrapper = shallow(
       <ToggleField
-        labelOff="Toggled Off"
-        labelOn="Toggled On"
+        offLabel="Toggled Off"
+        onLabel="Toggled On"
         onChange={jest.fn()}
         value={true}
       />
@@ -25,8 +25,8 @@ describe('ToggleField', () => {
 
     const wrapperOn = mount(
       <ToggleField
-        labelOff={labelOffText}
-        labelOn={labelOnText}
+        offLabel={labelOffText}
+        onLabel={labelOnText}
         onChange={jest.fn()}
         value={true}
       />
@@ -34,8 +34,8 @@ describe('ToggleField', () => {
 
     const wrapperOff = mount(
       <ToggleField
-        labelOff={labelOffText}
-        labelOn={labelOnText}
+        offLabel={labelOffText}
+        onLabel={labelOnText}
         onChange={jest.fn()}
         value={false}
       />
@@ -48,8 +48,8 @@ describe('ToggleField', () => {
   it('passes disabled prop', () => {
     const wrapper = mount(
       <ToggleField
-        labelOff="on"
-        labelOn="off"
+        offLabel="off"
+        onLabel="on"
         onChange={jest.fn()}
         value={false}
         disabled

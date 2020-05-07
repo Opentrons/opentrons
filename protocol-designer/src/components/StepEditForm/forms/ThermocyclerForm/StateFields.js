@@ -23,10 +23,10 @@ export const StateFields = (props: Props) => {
         <div className={styles.toggle_row}>
           <ToggleRowField
             name="blockIsActive"
-            labelOff={i18n.t(
+            offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.block.toggleOff'
             )}
-            labelOn={i18n.t(
+            onLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.block.toggleOn'
             )}
           />
@@ -51,10 +51,10 @@ export const StateFields = (props: Props) => {
         <div className={styles.toggle_row}>
           <ToggleRowField
             name="lidIsActive"
-            labelOff={i18n.t(
+            offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.lid.toggleOff'
             )}
-            labelOn={i18n.t(
+            onLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.lid.toggleOn'
             )}
           />
@@ -80,10 +80,10 @@ export const StateFields = (props: Props) => {
       >
         <ToggleRowField
           name="lidOpen"
-          labelOff={i18n.t(
+          offLabel={i18n.t(
             'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
           )}
-          labelOn={i18n.t(
+          onLabel={i18n.t(
             'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOn'
           )}
         />

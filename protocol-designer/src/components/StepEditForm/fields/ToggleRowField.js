@@ -1,26 +1,27 @@
 // @flow
 import * as React from 'react'
-import { ToggleField } from '@opentrons/components'
 import cx from 'classnames'
 
-import type { StepFieldName } from '../../../steplist/fieldLevel'
+import { ToggleField } from '@opentrons/components'
+
 import styles from '../StepEditForm.css'
 import { FieldConnector } from './FieldConnector'
+import type { StepFieldName } from '../../../steplist/fieldLevel'
 
-type ToggleRowProps = {
-  labelOff?: string,
-  labelOn?: string,
+type ToggleRowProps = {|
+  offLabel?: string,
+  onLabel?: string,
   name: StepFieldName,
   className?: string,
   disabled?: boolean,
-}
+|}
 export const ToggleRowField = (props: ToggleRowProps) => (
   <FieldConnector
     name={props.name}
     render={({ value, updateValue, disabled }) => (
       <ToggleField
-        labelOff={props.labelOff}
-        labelOn={props.labelOn}
+        offLabel={props.offLabel}
+        onLabel={props.onLabel}
         disabled={disabled || props.disabled}
         className={cx(styles.toggle_field, props.className)}
         value={!!value}
