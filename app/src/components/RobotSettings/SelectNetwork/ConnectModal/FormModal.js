@@ -3,7 +3,7 @@ import * as React from 'react'
 import { Form } from 'formik'
 import styled, { css } from 'styled-components'
 
-import { FS_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
+import { FONT_SIZE_BODY_1, BUTTON_TYPE_SUBMIT } from '@opentrons/components'
 import { ScrollableAlertModal } from '../../../modals'
 import { TextField } from './TextField'
 import { KeyFileField } from './KeyFileField'
@@ -30,7 +30,7 @@ const StyledForm: StyledComponent<
   {||},
   typeof Form
 > = styled(Form)`
-  ${FS_BODY_1}
+  font-size: ${FONT_SIZE_BODY_1};
   display: table;
   width: 80%;
   margin-top: 0.5rem;

@@ -12,7 +12,9 @@ module.exports = {
     },
     test: {
       plugins: [
-        'babel-plugin-styled-components',
+        // NOTE(mc, 2020-05-08): disable ssr, displayName to fix toHaveStyleRule
+        // https://github.com/styled-components/jest-styled-components/issues/294
+        ['babel-plugin-styled-components', { ssr: false, displayName: false }],
         '@babel/plugin-transform-modules-commonjs',
         'babel-plugin-dynamic-import-node',
       ],
