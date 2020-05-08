@@ -110,7 +110,10 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     }
 
     if (hasSlotIssue(selectedSlot)) {
-      errors.selectedSlot = `Slot ${selectedSlot} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue.`
+      errors.selectedSlot = i18n.t(
+        'alert.module_placement.SLOT_OCCUPIED.body',
+        { selectedSlot }
+      )
     } else if (!selectedSlot) {
       // in the event that we remove auto selecting selected slot
       errors.selectedSlot = i18n.t('alert.field.required')
@@ -196,6 +199,8 @@ const EditModulesModalComponent = (props: EditModulesModalComponentProps) => {
   )
 
   const showSlotOption = moduleType !== THERMOCYCLER_MODULE_TYPE
+  // NOTE: selectedSlot error could either be required field (though the field is auto-populated)
+  // or occupied slot error. `slotIssue` is only for occupied slot error.
   const slotIssue =
     errors?.selectedSlot && errors.selectedSlot.includes('occupied')
 
