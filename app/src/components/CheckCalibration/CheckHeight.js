@@ -179,11 +179,13 @@ function CompareZ(props: CompareZProps) {
       <p className={styles.difference_body}>{body}</p>
       <div className={cx(styles.difference_wrapper, differenceClass)}>
         <h5>{DIFFERENCE}</h5>
-        <div className={styles.difference_value_wrapper}>
-          <h5>Z</h5>
-          <span className={cx(styles.difference_value, differenceClass)}>
-            {formatOffsetValue(differenceVector[2])}
-          </span>
+        <div className={styles.difference_values}>
+          <div className={styles.difference_value_wrapper}>
+            <h5>Z</h5>
+            <span className={cx(styles.difference_value, differenceClass)}>
+              {formatOffsetValue(differenceVector[2])}
+            </span>
+          </div>
         </div>
       </div>
       <div className={styles.button_stack}>

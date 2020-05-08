@@ -275,8 +275,16 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   border-width: var(--bd-width-default);
   border-style: solid;
   padding: 0.5rem;
-  min-width: 20rem;
+  max-width: 18rem;
   margin: 1rem 0 2rem 0;
+}
+
+.difference_values {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 8rem;
 }
 
 .difference_value_wrapper {
@@ -284,7 +292,8 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   flex-direction: row;
   justify-content: space-between;
   align-items: center;
-  min-width: 8rem;
+  width: 4rem;
+  margin-left: 2rem;
 }
 
 .difference_value.difference_good{
