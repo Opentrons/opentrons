@@ -12,3 +12,8 @@ export function formatJogVector(axis: string, direction: number, step: number) {
   }
   return vector
 }
+
+export function formatOffsetValue(value: number): string {
+  const rounded = Math.round((value + Number.EPSILON) * 100) / 100
+  return parseFloat(rounded).toFixed(2)
+}

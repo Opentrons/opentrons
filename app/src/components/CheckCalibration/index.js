@@ -175,7 +175,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           pipetteId={activeInstrumentId}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
+          exit={exit}
           isInspecting={isInspecting}
+          comparison={comparisonsByStep[currentStep]}
         />
       ) : null
       break

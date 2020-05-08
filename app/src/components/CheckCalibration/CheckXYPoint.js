@@ -14,7 +14,7 @@ import {
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import { formatJogVector } from './utils'
+import { formatJogVector, formatOffsetValue } from './utils'
 
 import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
 import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
@@ -184,10 +184,6 @@ export function CheckXYPoint(props: CheckXYPointProps) {
   )
 }
 
-function formatOffsetValue(value: number): string {
-  const rounded = Math.round((value + Number.EPSILON) * 100) / 100
-  return parseFloat(rounded).toFixed(2)
-}
 type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
