@@ -47,9 +47,9 @@ DESCRIPTION = (
 PACKAGES = find_packages(where='.', exclude=["tests.*", "tests"])
 INSTALL_REQUIRES = [
     'aiohttp==3.4.4',
-    'fastapi==0.49.0',
+    'fastapi==0.54.1',
     'python-multipart==0.0.5',
-
+    'opentrons',
 ]
 
 

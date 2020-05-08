@@ -1,6 +1,11 @@
 // @flow
 import { TEMPERATURE_MODULE_TYPE } from '@opentrons/shared-data'
-import { getHoveredStepLabware } from '../selectors'
+import {
+  END_TERMINAL_ITEM_ID,
+  PRESAVED_STEP_ID,
+  START_TERMINAL_ITEM_ID,
+} from '../../../steplist/types'
+import { getHoveredStepLabware, getSelectedStepTitleInfo } from '../selectors'
 import * as utils from '../../modules/utils'
 
 function createArgsForStepId(stepId, stepArgs) {
@@ -165,6 +170,54 @@ describe('getHoveredStepLabware', () => {
       )
 
       expect(result).toEqual([])
+    })
+  })
+})
+
+describe('getSelectedStepTitleInfo', () => {
+  it('should return title info of the presaved form when the presaved terminal item is selected', () => {
+    const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
+    const result = getSelectedStepTitleInfo.resultFunc(
+      unsavedForm,
+      {},
+      null,
+      PRESAVED_STEP_ID
+    )
+    expect(result).toEqual({
+      stepName: unsavedForm.stepName,
+      stepType: unsavedForm.stepType,
+    })
+  })
+
+  it('should return null when the start or end terminal item is selected', () => {
+    const terminals = [START_TERMINAL_ITEM_ID, END_TERMINAL_ITEM_ID]
+    terminals.forEach(terminalId => {
+      const unsavedForm = { stepName: 'The Step', stepType: 'transfer' }
+      const result = getSelectedStepTitleInfo.resultFunc(
+        unsavedForm,
+        {},
+        null,
+        PRESAVED_STEP_ID
+      )
+      expect(result).toEqual({
+        stepName: unsavedForm.stepName,
+        stepType: unsavedForm.stepType,
+      })
+    })
+  })
+
+  it('should return title info of the saved step when a saved step is selected', () => {
+    const savedForm = { stepName: 'The Step', stepType: 'transfer' }
+    const stepId = 'selectedAndSavedStepId'
+    const result = getSelectedStepTitleInfo.resultFunc(
+      null,
+      { [stepId]: savedForm },
+      stepId,
+      null
+    )
+    expect(result).toEqual({
+      stepName: savedForm.stepName,
+      stepType: savedForm.stepType,
     })
   })
 })

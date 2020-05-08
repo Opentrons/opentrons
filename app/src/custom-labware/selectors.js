@@ -39,9 +39,9 @@ export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelect
     ])
 )
 
+// $FlowFixMe: flow unable to do type refinements via filter
 export const getValidCustomLabware: State => Array<ValidLabwareFile> = createSelector(
   getCustomLabware,
-  // $FlowFixMe: flow unable to do type refinements via filter
   labware => labware.filter(f => f.type === VALID_LABWARE_FILE)
 )
 

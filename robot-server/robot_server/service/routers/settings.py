@@ -57,7 +57,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
     """Create the feature flag settings response object"""
     data = advanced_settings.get_all_adv_settings()
 
-    if advanced_settings.restart_required():
+    if advanced_settings.is_restart_required():
         links = Links(restart='/server/restart')
     else:
         links = Links()

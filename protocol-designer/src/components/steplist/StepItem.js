@@ -15,101 +15,106 @@ import { stepIconsByType } from '../../form-types'
 import { i18n } from '../../localization'
 import styles from './StepItem.css'
 
-import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { FormData, StepType } from '../../form-types'
 import type {
   SubstepIdentifier,
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
 
-export type StepItemProps = {
-  stepId: StepIdType,
+export type StepItemProps = {|
+  description?: ?string,
+  rawForm: ?FormData,
   stepNumber: number,
   stepType: StepType,
-  title: string,
-  description: ?string,
-  substeps: ?SubstepItemData,
-  rawForm: ?FormData,
+  title?: string,
 
   collapsed?: boolean,
   error?: ?boolean,
   warning?: ?boolean,
   selected?: boolean,
   hovered?: boolean,
-  hoveredSubstep: ?SubstepIdentifier,
-  ingredNames: WellIngredientNames,
 
-  labwareNicknamesById: { [labwareId: string]: string },
-  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
-  highlightSubstep: SubstepIdentifier => mixed,
-  selectStep: (stepId: StepIdType) => mixed,
+  highlightStep: () => mixed,
   onStepContextMenu?: (event?: SyntheticEvent<>) => mixed,
-  toggleStepCollapsed: (stepId: StepIdType) => mixed,
-  highlightStep: (stepId: StepIdType) => mixed,
-  unhighlightStep?: (event?: SyntheticEvent<>) => mixed,
-}
+  selectStep?: () => mixed,
+  toggleStepCollapsed: () => mixed,
+  unhighlightStep: (event?: SyntheticEvent<>) => mixed,
+  children?: React.Node,
+|}
 
-export class StepItem extends React.PureComponent<StepItemProps> {
-  render() {
-    const {
-      stepType,
-      title,
-      description,
-      stepId,
-      stepNumber,
+export const StepItem = (props: StepItemProps) => {
+  const {
+    stepType,
+    stepNumber,
 
-      collapsed,
-      error,
-      warning,
-      selected,
-      hovered,
+    collapsed,
+    error,
+    warning,
+    selected,
+    hovered,
 
-      unhighlightStep,
-      selectStep,
-      onStepContextMenu,
-      toggleStepCollapsed,
-      highlightStep,
-    } = this.props
+    unhighlightStep,
+    selectStep,
+    onStepContextMenu,
+    toggleStepCollapsed,
+    highlightStep,
+  } = props
 
-    const iconName = stepIconsByType[stepType]
-    let iconClassName = ''
-    if (error) {
-      iconClassName = styles.error_icon
-    } else if (warning) {
-      iconClassName = styles.warning_icon
-    }
-    const Description = <StepDescription description={description} />
-
-    return (
-      <PDTitledList
-        description={Description}
-        iconName={error || warning ? 'alert-circle' : iconName}
-        iconProps={{ className: iconClassName }}
-        title={title ? `${stepNumber}. ${title}` : ''}
-        onClick={() => selectStep(stepId)}
-        onContextMenu={onStepContextMenu}
-        onMouseEnter={() => highlightStep(stepId)}
-        onMouseLeave={unhighlightStep}
-        onCollapseToggle={() => toggleStepCollapsed(stepId)}
-        {...{ selected, collapsed, hovered }}
-      >
-        {getStepItemContents(this.props)}
-      </PDTitledList>
-    )
+  const iconName = stepIconsByType[stepType]
+  let iconClassName = ''
+  if (error) {
+    iconClassName = styles.error_icon
+  } else if (warning) {
+    iconClassName = styles.warning_icon
   }
+  const Description = props.description ? (
+    <StepDescription description={props.description} />
+  ) : null
+
+  return (
+    <PDTitledList
+      description={Description}
+      iconName={error || warning ? 'alert-circle' : iconName}
+      iconProps={{ className: iconClassName }}
+      title={`${stepNumber}. ${props.title ||
+        i18n.t(`application.stepType.${stepType}`)}`}
+      onClick={selectStep}
+      onContextMenu={onStepContextMenu}
+      onMouseEnter={highlightStep}
+      onMouseLeave={unhighlightStep}
+      onCollapseToggle={toggleStepCollapsed}
+      {...{ selected, collapsed, hovered }}
+    >
+      {props.children}
+    </PDTitledList>
+  )
 }
 
-export function getStepItemContents(stepItemProps: StepItemProps) {
+export type StepItemContentsProps = {|
+  rawForm: ?FormData,
+  stepType: StepType,
+  substeps: ?SubstepItemData,
+
+  ingredNames: WellIngredientNames,
+  labwareDefDisplayNamesById: { [labwareId: string]: ?string },
+  labwareNicknamesById: { [labwareId: string]: string },
+
+  highlightSubstep: SubstepIdentifier => mixed,
+  hoveredSubstep: ?SubstepIdentifier,
+|}
+
+export const StepItemContents = (props: StepItemContentsProps) => {
   const {
     rawForm,
     stepType,
     substeps,
-    labwareNicknamesById,
-    labwareDefDisplayNamesById,
-    hoveredSubstep,
-    highlightSubstep,
     ingredNames,
-  } = stepItemProps
+    labwareDefDisplayNamesById,
+    labwareNicknamesById,
+    highlightSubstep,
+    hoveredSubstep,
+  } = props
 
   if (!rawForm) {
     return null

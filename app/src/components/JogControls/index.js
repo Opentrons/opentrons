@@ -10,6 +10,7 @@ import {
   RadioGroup,
   Icon,
   HandleKeypress,
+  type KeypressHandler,
   type IconName,
 } from '@opentrons/components'
 
@@ -27,11 +28,19 @@ type JogButtonProps = {|
   onClick: () => mixed,
 |}
 
-export type JogControlsProps = {| jog: Jog |}
+export type JogControlsProps = {|
+  jog: Jog,
+  stepSizes: Array<JogStep>,
+  axes: Array<JogAxis>,
+|}
 
 type JogControlsState = {| step: JogStep |}
 
-const JOG_BUTTON_NAMES = ['left', 'right', 'back', 'forward', 'up', 'down']
+const JOG_BUTTON_NAMES_BY_AXIS: { [JogAxis]: Array<string> } = {
+  x: ['left', 'right'],
+  y: ['back', 'forward'],
+  z: ['up', 'down'],
+}
 
 const JOG_ICONS_BY_NAME = {
   left: 'ot-arrow-left',
@@ -51,26 +60,35 @@ const JOG_PARAMS_BY_NAME = {
   down: ['z', -1],
 }
 
-const STEPS: Array<JogStep> = [0.1, 1, 10]
-const STEP_OPTIONS = STEPS.map(s => ({ name: `${s} mm`, value: `${s}` }))
+const DEFAULT_STEPS: Array<JogStep> = [0.1, 1, 10]
+const stepToOption = (step: JogStep) => ({
+  name: `${step} mm`,
+  value: `${step}`,
+})
 
 export class JogControls extends React.Component<
   JogControlsProps,
   JogControlsState
 > {
+  static defaultProps = {
+    stepSizes: DEFAULT_STEPS,
+    axes: ['x', 'y', 'z'],
+  }
+
   constructor(props: JogControlsProps) {
     super(props)
-    this.state = { step: STEPS[0] }
+    this.state = { step: props.stepSizes[0] }
   }
 
   increaseStepSize = () => {
-    const i = STEPS.indexOf(this.state.step)
-    if (i < STEPS.length - 1) this.setState({ step: STEPS[i + 1] })
+    const i = this.props.stepSizes.indexOf(this.state.step)
+    if (i < this.props.stepSizes.length - 1)
+      this.setState({ step: this.props.stepSizes[i + 1] })
   }
 
   decreaseStepSize = () => {
-    const i = STEPS.indexOf(this.state.step)
-    if (i > 0) this.setState({ step: STEPS[i - 1] })
+    const i = this.props.stepSizes.indexOf(this.state.step)
+    if (i > 0) this.setState({ step: this.props.stepSizes[i - 1] })
   }
 
   handleStepSelect = (event: SyntheticInputEvent<*>) => {
@@ -94,37 +112,56 @@ export class JogControls extends React.Component<
 
   renderJogControls() {
     const { step } = this.state
+    const { axes } = this.props
     const jogHandlers = this.getJogHandlers()
+
+    const handlersByAxis: { [JogAxis]: Array<KeypressHandler> } = {
+      x: [
+        { key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left },
+        { key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right },
+      ],
+      y: [
+        { key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back },
+        { key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward },
+      ],
+      z: [
+        { key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up },
+        { key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down },
+      ],
+    }
+
+    // NOTE: must use flatMap identity instead of native .flat()
+    // because flow will bail out type to mixed with the latter
+    const handlersForAxes: Array<KeypressHandler> = axes.flatMap(
+      a => handlersByAxis[a]
+    )
 
     return (
       <HandleKeypress
         preventDefault
         handlers={[
-          { key: 'ArrowLeft', shiftKey: false, onPress: jogHandlers.left },
-          { key: 'ArrowRight', shiftKey: false, onPress: jogHandlers.right },
-          { key: 'ArrowUp', shiftKey: false, onPress: jogHandlers.back },
-          { key: 'ArrowDown', shiftKey: false, onPress: jogHandlers.forward },
-          { key: 'ArrowUp', shiftKey: true, onPress: jogHandlers.up },
-          { key: 'ArrowDown', shiftKey: true, onPress: jogHandlers.down },
+          ...handlersForAxes,
           { key: '-', onPress: this.decreaseStepSize },
           { key: '_', onPress: this.decreaseStepSize },
           { key: '=', onPress: this.increaseStepSize },
           { key: '+', onPress: this.increaseStepSize },
         ]}
       >
-        {JOG_BUTTON_NAMES.map(name => (
-          <JogButton
-            key={name}
-            name={name}
-            icon={JOG_ICONS_BY_NAME[name]}
-            onClick={jogHandlers[name]}
-          />
-        ))}
+        {axes
+          .flatMap(a => JOG_BUTTON_NAMES_BY_AXIS[a])
+          .map(name => (
+            <JogButton
+              key={name}
+              name={name}
+              icon={JOG_ICONS_BY_NAME[name]}
+              onClick={jogHandlers[name]}
+            />
+          ))}
         <span className={styles.increment_group}>
           <RadioGroup
             className={styles.increment_item}
             value={`${step}`}
-            options={STEP_OPTIONS}
+            options={this.props.stepSizes.map(s => stepToOption(s))}
             onChange={this.handleStepSelect}
           />
         </span>
@@ -133,6 +170,8 @@ export class JogControls extends React.Component<
   }
 
   render() {
+    const hasAcrossControls =
+      this.props.axes.includes('x') || this.props.axes.includes('y')
     return (
       <div className={styles.jog_container}>
         <div className={styles.jog_controls}>
@@ -140,14 +179,18 @@ export class JogControls extends React.Component<
             Jump Size
             <span className={styles.jog_label_keys}>Change with + and -</span>
           </span>
-          <span className={styles.jog_label_xy}>
-            Across Deck
-            <span className={styles.jog_label_keys}>Arrow keys</span>
-          </span>
-          <span className={styles.jog_label_z}>
-            Up & Down
-            <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
-          </span>
+          {hasAcrossControls ? (
+            <span className={styles.jog_label_xy}>
+              Across Deck
+              <span className={styles.jog_label_keys}>Arrow keys</span>
+            </span>
+          ) : null}
+          {this.props.axes.includes('z') ? (
+            <span className={styles.jog_label_z}>
+              Up & Down
+              <span className={styles.jog_label_keys}>Arrow keys + SHIFT</span>
+            </span>
+          ) : null}
           {this.renderJogControls()}
         </div>
       </div>

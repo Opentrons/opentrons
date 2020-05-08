@@ -12,7 +12,7 @@ def test_transform_validation_error_to_json_api_errors():
     with pytest.raises(ValidationError) as e:
         ItemRequest(**{
             'data': {
-                'type': 'invalid'
+                'type': 'type'
             }
         })
     assert errors.transform_validation_error_to_json_api_errors(
@@ -20,15 +20,6 @@ def test_transform_validation_error_to_json_api_errors():
         e.value
     ).dict(exclude_unset=True) == {
         'errors': [
-            {
-                'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
-                'detail': "value is not a valid enumeration member; permitted:"
-                          " 'item'",
-                'source': {
-                    'pointer': '/data/type'
-                },
-                'title': 'type_error.enum'
-            },
             {
                 'status': str(HTTP_422_UNPROCESSABLE_ENTITY),
                 'detail': 'field required',

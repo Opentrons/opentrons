@@ -80,6 +80,8 @@ export function buildrootReducer(
     }
 
     case Constants.BR_STATUS: {
+      if (!state.session) return state
+
       const { stage, progress, message } = action.payload
       const currentError = state.session?.error || null
 
@@ -95,42 +97,54 @@ export function buildrootReducer(
     }
 
     case Constants.BR_USER_FILE_INFO: {
-      return {
-        ...state,
-        session: { ...state.session, userFileInfo: action.payload },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, userFileInfo: action.payload },
+          }
+        : state
     }
 
     case Constants.BR_START_PREMIGRATION: {
-      return {
-        ...state,
-        session: { ...state.session, step: Constants.PREMIGRATION },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, step: Constants.PREMIGRATION },
+          }
+        : state
     }
 
     case Constants.BR_PREMIGRATION_DONE: {
-      return {
-        ...state,
-        session: { ...state.session, step: Constants.PREMIGRATION_RESTART },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, step: Constants.PREMIGRATION_RESTART },
+          }
+        : state
     }
 
     case Constants.BR_UPLOAD_FILE: {
-      return {
-        ...state,
-        session: { ...state.session, step: Constants.UPLOAD_FILE },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, step: Constants.UPLOAD_FILE },
+          }
+        : state
     }
 
     case Constants.BR_FILE_UPLOAD_DONE: {
-      return {
-        ...state,
-        session: { ...state.session, step: Constants.PROCESS_FILE },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, step: Constants.PROCESS_FILE },
+          }
+        : state
     }
 
     case Constants.BR_SET_SESSION_STEP: {
-      return { ...state, session: { ...state.session, step: action.payload } }
+      return state.session
+        ? { ...state, session: { ...state.session, step: action.payload } }
+        : state
     }
 
     case Constants.BR_CLEAR_SESSION: {
@@ -139,10 +153,12 @@ export function buildrootReducer(
 
     case Constants.BR_PREMIGRATION_ERROR:
     case Constants.BR_UNEXPECTED_ERROR: {
-      return {
-        ...state,
-        session: { ...state.session, error: action.payload.message },
-      }
+      return state.session
+        ? {
+            ...state,
+            session: { ...state.session, error: action.payload.message },
+          }
+        : state
     }
   }
 

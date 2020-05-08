@@ -120,6 +120,29 @@
           "false": "Deactivate module",
           "true": "Change to temperature"
         }
+      },
+      "thermocyclerAction": {
+        "options": {
+          "state": "Change Thermocycler state",
+          "profile": "Program a Thermal cycling profile"
+        }
+      },
+      "thermocyclerState": {
+        "block": {
+          "label": "Thermocycler block",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "lid": {
+          "label": "Lid",
+          "toggleOff": "Deactivated",
+          "toggleOn": "Active"
+        },
+        "lidPosition": {
+          "label": "Lid position",
+          "toggleOff": "Closed",
+          "toggleOn": "Open"
+        }
       }
     }
   }

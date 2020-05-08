@@ -16,6 +16,7 @@ from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
 
 
 import opentrons
+from opentrons.protocol_api import execute, MAX_SUPPORTED_VERSION
 import opentrons.commands
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
@@ -23,7 +24,6 @@ from opentrons import protocol_api
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents, APIVersion)
-from opentrons.protocol_api import execute, MAX_SUPPORTED_VERSION
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
 

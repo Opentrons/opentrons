@@ -243,15 +243,16 @@ class API(HardwareAPILike):
         on = False
         for sec in range(count):
             then = self._loop.time()
-            self.set_lights(button=on)
+            await self.set_lights(button=on)
             on = not on
             now = self._loop.time()
             await asyncio.sleep(max(0, 0.25 - (now - then)))
-        self.set_lights(button=True)
+        await self.set_lights(button=True)
 
     async def delay(self, duration_s: int):
         """ Delay execution by pausing and sleeping.
         """
+        await self._wait_for_is_running()
         self.pause()
         if not self.is_simulator:
             async def sleep_for_seconds(seconds: int):

@@ -213,10 +213,12 @@ export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = createSe
         if (pipetteId) {
           const nextStepArgsForPipette = continuousStepArgs
             .slice(stepIndex + 1)
-            .find(stepArgs => stepArgs.pipette === pipetteId)
+            .find(
+              stepArgs => stepArgs.pipette && stepArgs.pipette === pipetteId
+            )
 
           const willReuseTip =
-            nextStepArgsForPipette &&
+            nextStepArgsForPipette?.changeTip &&
             nextStepArgsForPipette.changeTip === 'never'
           if (!willReuseTip) {
             return [

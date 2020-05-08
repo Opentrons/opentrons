@@ -3,20 +3,20 @@ import { createSelector } from 'reselect'
 import last from 'lodash/last'
 
 import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  PRESAVED_STEP_ID,
+  type SubstepIdentifier,
+  type TerminalItemId,
+} from '../../steplist/types'
 import { getLabwareOnModule } from '../modules/utils'
-import type { StepIdType } from '../../form-types'
-import type { BaseState, Selector } from '../../types'
 import {
   initialSelectedItemState,
   type SelectableItem,
   type StepsState,
   type CollapsedStepsState,
 } from './reducers'
-import type {
-  SubstepIdentifier,
-  TerminalItemId,
-  StepItemData,
-} from '../../steplist/types'
+import type { FormData, StepIdType, StepType } from '../../form-types'
+import type { BaseState, Selector } from '../../types'
 
 export const rootSelector = (state: BaseState): StepsState => state.ui.steps
 
@@ -129,17 +129,30 @@ export const getCollapsedSteps: Selector<CollapsedStepsState> = createSelector(
   (state: StepsState) => state.collapsedSteps
 )
 
-export const getSelectedStep: Selector<StepItemData | null> = createSelector(
-  stepFormSelectors.getAllSteps,
-  getSelectedStepId,
-  (allSteps, selectedStepId) => {
-    const stepId = selectedStepId
+type StepTitleInfo = {|
+  stepName: string,
+  stepType: StepType,
+|}
+const _stepToTitleInfo = (stepForm: FormData) => ({
+  stepName: stepForm.stepName,
+  stepType: stepForm.stepType,
+})
 
-    if (!allSteps || stepId == null) {
+export const getSelectedStepTitleInfo: Selector<StepTitleInfo | null> = createSelector(
+  stepFormSelectors.getUnsavedForm,
+  stepFormSelectors.getSavedStepForms,
+  getSelectedStepId,
+  getSelectedTerminalItemId,
+  (unsavedForm, savedStepForms, selectedStepId, terminalItemId) => {
+    if (unsavedForm != null && terminalItemId === PRESAVED_STEP_ID) {
+      return _stepToTitleInfo(unsavedForm)
+    }
+
+    if (selectedStepId == null) {
       return null
     }
 
-    return allSteps[stepId]
+    return _stepToTitleInfo(savedStepForms[selectedStepId])
   }
 )
 

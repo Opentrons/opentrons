@@ -73,9 +73,7 @@ class IngredGroupCard extends React.Component<CardProps, CardState> {
         onClick={() =>
           console.log('TODO: do something with ', { groupId, wellName: null })
         } // TODO: Ian 2018-10-19
-        description={
-          <StepDescription description={description} header="Description:" />
-        }
+        description={<StepDescription description={description} />}
       >
         <PDListItem className={styles.ingredient_row_header}>
           <span>Well</span>

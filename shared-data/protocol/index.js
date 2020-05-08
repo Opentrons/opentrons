@@ -6,8 +6,8 @@ type ProtocolData =
   | $Shape<SchemaV1ProtocolFile<{}>>
   | $Shape<SchemaV3ProtocolFile<{}>>
 
-// $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
 export function getProtocolSchemaVersion(data: ProtocolData): ?number {
+  // $FlowFixMe: (ka, 2019-06-10): cant differentiate which file schema file is needed
   if (data.schemaVersion > 3) {
     console.warn('this is protocol schema version is not yet supported')
   }

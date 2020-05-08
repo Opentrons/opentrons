@@ -38,7 +38,7 @@ class Transition:
         self.condition = condition
 
     async def execute(self, set_current_state, *args, **kwargs):
-        if self.condition and not await self.condition():
+        if self.condition and not await self.condition(*args, **kwargs):
             return False
         if self.before:
             await self.before(*args, **kwargs)
@@ -145,7 +145,7 @@ class StateMachine:
                     break
         except Exception as e:
             log.exception(f"exception raised processing trigger {trigger}"
-                          f"in state {self.current_state_name}")
+                          f" in state {self.current_state_name}")
             raise StateMachineError(f'event {trigger} failed to transition '
                                     f'from {self.current_state_name}: '
                                     f'{str(e)}')
