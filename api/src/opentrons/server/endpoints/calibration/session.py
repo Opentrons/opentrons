@@ -93,10 +93,9 @@ class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
     def __init__(self, hardware: ThreadManager):
         self._hardware = hardware
-        self._pip_info_by_id = self._key_by_uuid(
-            hardware.get_attached_instruments()
-        )
         self._deck = geometry.Deck()
+        self._pip_info_by_mount = self._get_pip_info_by_mount(
+                hardware.get_attached_instruments())
         self._labware_info = self._determine_required_labware()
         self._moves = self._build_deck_moves()
 
@@ -111,17 +110,15 @@ class CalibrationSession:
     # main accessor of a pipette inside of the check flow. This dict could
     # be keyed by mount and should probably have dataclass values.
     @staticmethod
-    def _key_by_uuid(new_pipettes: typing.Dict) -> typing.Dict:
-        pipette_dict = {}
+    def _get_pip_info_by_mount(new_pipettes: typing.Dict) -> typing.Dict:
+        pip_info_by_mount = {}
         for mount, data in new_pipettes.items():
             if data:
                 cp = None
-                pipette_id = uuid4()
                 if data['channels'] == 8:
                     cp = CriticalPoint.FRONT_NOZZLE
-                pipette_dict[pipette_id] = {'mount': mount, 'tiprack_id': None,
-                                            'critical_point': cp}
-        return pipette_dict
+                pip_info_by_mount[mount] = {'tiprack_id': None, 'critical_point': cp}
+        return pip_info_by_mount
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
         """
@@ -237,9 +234,10 @@ class CalibrationSession:
 
     async def cache_instruments(self):
         await self.hardware.cache_instruments()
-        new_dict = self._key_by_uuid(self.hardware.get_attached_instruments())
-        self._pip_info_by_id.clear()
-        self._pip_info_by_id.update(new_dict)
+        new_dict = self._get_pip_info_by_mount(
+                self.hardware.get_attached_instruments())
+        self._pip_info_by_mount.clear()
+        self._pip_info_by_mount.update(new_dict)
 
     @property
     def hardware(self) -> ThreadManager:
@@ -259,25 +257,6 @@ class CalibrationSession:
     @property
     def pipettes(self) -> typing.Dict[Mount, Pipette.DictType]:
         return self.hardware.attached_instruments
-
-    def pipette_status(self) -> typing.Dict[UUID, PipetteStatus]:
-        """
-        Public property to help format the current labware status of a given
-        session for the client.
-        """
-        to_dict = {}
-        for inst_id, data in self._pip_info_by_id.items():
-            pip = self.get_pipette(data['mount'])
-            p = PipetteStatus(
-                model=str(pip['model']),
-                name=str(pip['name']),
-                mount=str(data['mount']),
-                tip_length=float(pip['tip_length']),
-                has_tip=bool(pip['has_tip']),
-                tiprack_id=data['tiprack_id'],
-            )
-            to_dict[inst_id] = p
-        return to_dict
 
     @property
     def labware_status(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -591,6 +570,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self._can_distinguish_instr_offset = True
         self._first_mount: typing.Optional[Mount] = None
         self._second_mount: typing.Optional[Mount] = None
+        self._pip_info_by_mount = self._key_by_mount(
+            self.hardware.get_attached_instruments()
+        )
         if len(self._pip_info_by_id) == 2:
             self._first_mount = Mount.RIGHT
             self._second_mount = Mount.LEFT
@@ -634,6 +616,25 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     self._moves.preparingSecondPipette = move
                 else:
                     self._moves.preparingFirstPipette = move
+
+    def pipette_status(self) -> typing.Dict[UUID, PipetteStatus]:
+        """
+        Public property to help format the current labware status of a given
+        session for the client.
+        """
+        to_dict = {}
+        for inst_id, data in self._pip_info_by_id.items():
+            pip = self.get_pipette(data['mount'])
+            p = PipetteStatus(
+                model=str(pip['model']),
+                name=str(pip['name']),
+                mount=str(data['mount']),
+                tip_length=float(pip['tip_length']),
+                has_tip=bool(pip['has_tip']),
+                tiprack_id=data['tiprack_id'],
+            )
+            to_dict[inst_id] = p
+        return to_dict
 
     async def delete_session(self):
         for mount in self._pip_info_by_id.values():
