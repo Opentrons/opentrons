@@ -6,7 +6,6 @@ import noop from 'lodash/noop'
 
 import * as Fixtures from '../../../system-info/__fixtures__'
 import * as SystemInfo from '../../../system-info'
-import { Text, FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 import { U2EAdapterInfo } from '../U2EAdapterInfo'
 import { U2EDriverWarning } from '../U2EDriverWarning'
 
