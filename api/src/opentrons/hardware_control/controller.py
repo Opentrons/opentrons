@@ -8,8 +8,7 @@ except OSError:
     aionotify = None  # type: ignore
 
 from opentrons.drivers.smoothie_drivers import driver_3_0
-from opentrons.drivers.rpi_drivers import (build_gpio_chardev,
-                                           RevisionPinsError)
+from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
 from opentrons.types import Mount
 
@@ -61,8 +60,8 @@ class Controller:
                 flags=(aionotify.Flags.CREATE | aionotify.Flags.DELETE))
         except AttributeError:
             MODULE_LOG.warning(
-                'Failed to initiate aionotify, cannot watch modules,'
-                'likely because not running on linux')
+                'Failed to initiate aionotify, cannot watch modules '
+                'or door, likely because not running on linux')
 
     @property
     def gpio_chardev(self) -> 'GPIODriverLike':
@@ -73,23 +72,9 @@ class Controller:
         return self._board_revision
 
     async def setup_gpio_chardev(self):
+        self.gpio_chardev.config_by_board_rev()
+        self._board_revision = self.gpio_chardev.board_rev
         await self.gpio_chardev.setup()
-        self._board_revision = self.determine_board_revision()
-
-    def determine_board_revision(self) -> BoardRevision:
-        try:
-            rev_bits = self.gpio_chardev.read_revision_bits()
-            return BoardRevision.by_bits(rev_bits)
-        except RevisionPinsError:
-            MODULE_LOG.info(
-                'Failed to detect central routing board revision gpio '
-                'pins, defaulting to (OG) 2.1')
-            return BoardRevision.OG
-        except Exception:
-            MODULE_LOG.exception(
-                'Unexpected error from reading central routing board '
-                'revision bits')
-            return BoardRevision.UNKNOWN
 
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
@@ -279,3 +264,10 @@ class Controller:
             loop = asyncio.get_event_loop()
             if loop.is_running() and self._module_watcher:
                 self._module_watcher.close()
+        if hasattr(self, 'gpio_chardev'):
+            try:
+                loop = asyncio.get_event_loop()
+                if not loop.is_closed():
+                    self.gpio_chardev.quit_monitoring()
+            except RuntimeError:
+                pass

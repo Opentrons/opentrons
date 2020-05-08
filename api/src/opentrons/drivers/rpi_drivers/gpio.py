@@ -1,9 +1,11 @@
 import asyncio
 import logging
 import pathlib
-from typing import Dict, Tuple
 import time
+from typing import Callable, Dict, Tuple
+from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
+from .types import gpio_group, PinDir, GPIOPin, GpioQueueEvent
 
 import gpiod  # type: ignore
 
@@ -11,34 +13,22 @@ import gpiod  # type: ignore
 Raspberry Pi GPIO control module
 """
 
-# Note: in test pins are sorted by value, so listing them in that order here
-#   makes it easier to read the tests. Pin numbers defined by bridge wiring
-#   the Pi to the Smoothie.
-OUTPUT_PINS = {
-    'FRAME_LEDS': 6,
-    'BLUE_BUTTON': 13,
-    'HALT': 18,
-    'GREEN_BUTTON': 19,
-    'AUDIO_ENABLE': 21,
-    'ISP': 23,
-    'RESET': 24,
-    'RED_BUTTON': 26
-}
-
-INPUT_PINS = {
-    'BUTTON_INPUT': 5,
-    'WINDOW_INPUT': 20,
-    'REV_0': 17,
-    'REV_1': 27
-}
-
 MODULE_LOG = logging.getLogger(__name__)
 
 DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 
+def _event_callback(q: asyncio.Queue):
+    try:
+        q.put_nowait(GpioQueueEvent.EVENT_RECEIVED)
+    except asyncio.QueueFull:
+        MODULE_LOG.warning(
+            'Event queue is full and can no longer receive new events')
+
+
 class GPIOCharDev:
     def __init__(self, chip_name: str):
+        self._board_rev = BoardRevision.UNKNOWN
         self._chip = gpiod.Chip(chip_name)
         self._lines = self._initialize()
 
@@ -47,12 +37,23 @@ class GPIOCharDev:
         return self._chip
 
     @property
-    def lines(self) -> Dict[int, gpiod.Line]:
+    def lines(self) -> Dict[str, gpiod.Line]:
         return self._lines
+
+    @property
+    def board_rev(self) -> BoardRevision:
+        return self._board_rev
+
+    @board_rev.setter
+    def board_rev(self, boardrev: BoardRevision):
+        self._board_rev = boardrev
 
     def _request_line(
             self,
-            offset: int, name: str, request_type) -> gpiod.Line:
+            pin: GPIOPin, request_type) -> gpiod.Line:
+        name = pin.name
+        offset = pin.by_board_rev(self.board_rev)
+
         line = self.chip.get_line(offset)
 
         def _retry_request_line(retries: int = 0):
@@ -67,23 +68,57 @@ class GPIOCharDev:
                 return _retry_request_line(retries)
             return line
 
-        if name == 'BLUE_BUTTON':
+        if name == 'blue_button':
             return _retry_request_line(3)
         else:
             return _retry_request_line()
 
-    def _initialize(self) -> Dict[int, gpiod.Line]:
-        MODULE_LOG.info("Initializing GPIOs")
+    def _initialize(self) -> Dict[str, gpiod.Line]:
+        MODULE_LOG.info(
+            "Registering Central Routing Board Revision GPIOs")
         lines = {}
-        # setup input lines
-        for name, offset in INPUT_PINS.items():
-            lines[offset] = self._request_line(
-                offset, name, gpiod.LINE_REQ_DIR_IN)
-        # setup output lines
-        for name, offset in OUTPUT_PINS.items():
-            lines[offset] = self._request_line(
-                offset, name, gpiod.LINE_REQ_DIR_OUT)
+        rev_pins = gpio_group.by_names(['rev_0', 'rev_1'])
+        for rev in rev_pins.pins:
+            lines[rev.name] = self._request_line(rev, gpiod.LINE_REQ_DIR_IN)
         return lines
+
+    def _determine_board_revision(self):
+        """Read revision bit pins and return the board revision
+        """
+        try:
+            rev_bits = self.read_revision_bits()
+            return BoardRevision.by_bits(rev_bits)
+        except RevisionPinsError:
+            MODULE_LOG.info(
+                'Failed to detect central routing board revision gpio '
+                'pins, defaulting to 2.1 (OG)')
+            return BoardRevision.OG
+        except Exception:
+            MODULE_LOG.exception(
+                'Unexpected error from reading central routing board '
+                'revision bits')
+            return BoardRevision.UNKNOWN
+
+    def config_by_board_rev(self):
+        MODULE_LOG.info(
+            "Configuring GPIOs by central routing roard revision")
+        # get board revision based on rev bits
+        self.board_rev = self._determine_board_revision()
+
+        # setup output lines
+        output_pins = gpio_group.by_type(PinDir.output)
+        for output in output_pins.pins:
+            self._lines[output.name] = self._request_line(
+                output, gpiod.LINE_REQ_DIR_OUT)
+
+        # setup input lines
+        input_pins = gpio_group.by_type(PinDir.input)
+        sorted_inputs = input_pins.group_by_pins(self.board_rev)
+        for pins in sorted_inputs:
+            line = self._request_line(
+                pins[0], gpiod.LINE_REQ_EV_BOTH_EDGES)
+            for pin in pins:
+                self._lines[pin.name] = line
 
     async def setup(self):
         MODULE_LOG.info("Setting up GPIOs")
@@ -95,20 +130,20 @@ class GPIOCharDev:
         self.set_reset_pin(True)
         await asyncio.sleep(0.25)
 
-    def set_high(self, offset: int):
-        self.lines[offset].set_value(1)
+    def set_high(self, output_pin: GPIOPin):
+        self.lines[output_pin.name].set_value(1)
 
-    def set_low(self, offset: int):
-        self.lines[offset].set_value(0)
+    def set_low(self, output_pin: GPIOPin):
+        self.lines[output_pin.name].set_value(0)
 
     def set_button_light(self,
                          red: bool = False,
                          green: bool = False,
                          blue: bool = False):
         color_pins = {
-            OUTPUT_PINS['RED_BUTTON']: red,
-            OUTPUT_PINS['GREEN_BUTTON']: green,
-            OUTPUT_PINS['BLUE_BUTTON']: blue}
+            gpio_group.red_button: red,
+            gpio_group.green_button: green,
+            gpio_group.blue_button: blue}
         for pin, state in color_pins.items():
             if state:
                 self.set_high(pin)
@@ -117,45 +152,56 @@ class GPIOCharDev:
 
     def set_rail_lights(self, on: bool = True):
         if on:
-            self.set_high(OUTPUT_PINS['FRAME_LEDS'])
+            self.set_high(gpio_group.frame_leds)
         else:
-            self.set_low(OUTPUT_PINS['FRAME_LEDS'])
+            self.set_low(gpio_group.frame_leds)
 
     def set_reset_pin(self, on: bool = True):
         if on:
-            self.set_high(OUTPUT_PINS['RESET'])
+            self.set_high(gpio_group.reset)
         else:
-            self.set_low(OUTPUT_PINS['RESET'])
+            self.set_low(gpio_group.reset)
 
     def set_isp_pin(self, on: bool = True):
         if on:
-            self.set_high(OUTPUT_PINS['ISP'])
+            self.set_high(gpio_group.isp)
         else:
-            self.set_low(OUTPUT_PINS['ISP'])
+            self.set_low(gpio_group.isp)
 
     def set_halt_pin(self, on: bool = True):
         if on:
-            self.set_high(OUTPUT_PINS['HALT'])
+            self.set_high(gpio_group.halt)
         else:
-            self.set_low(OUTPUT_PINS['HALT'])
+            self.set_low(gpio_group.halt)
 
-    def _read(self, offset):
-        return self.lines[offset].get_value()
+    def _read(self, input_pin: GPIOPin):
+        try:
+            return self.lines[input_pin.name].get_value()
+        except KeyError:
+            raise RuntimeError(
+                f"GPIO {input_pin.name} is not registered and cannot"
+                "be read")
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:
-        return (bool(self._read(OUTPUT_PINS['RED_BUTTON'])),
-                bool(self._read(OUTPUT_PINS['GREEN_BUTTON'])),
-                bool(self._read(OUTPUT_PINS['BLUE_BUTTON'])))
+        return (bool(self._read(gpio_group.red_button)),
+                bool(self._read(gpio_group.green_button)),
+                bool(self._read(gpio_group.blue_button)))
 
     def get_rail_lights(self) -> bool:
-        return bool(self._read(OUTPUT_PINS['FRAME_LEDS']))
+        return bool(self._read(gpio_group.frame_leds))
 
     def read_button(self) -> bool:
         # button is normal-HIGH, so invert
-        return not bool(self._read(INPUT_PINS['BUTTON_INPUT']))
+        return not bool(self._read(gpio_group.button_input))
 
     def read_window_switches(self) -> bool:
-        return bool(self._read(INPUT_PINS['WINDOW_INPUT']))
+        return bool(self._read(gpio_group.window_door_sw))
+
+    def read_top_window_switch(self) -> bool:
+        return bool(self._read(gpio_group.window_sw_filt))
+
+    def read_front_door_switch(self) -> bool:
+        return bool(self._read(gpio_group.door_sw_filt))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
         """ Read revision bit GPIO pins
@@ -164,11 +210,51 @@ class GPIOCharDev:
         returns the pins' values. Otherwise, return RevisionPinsError
         """
         if pathlib.Path(DTOVERLAY_PATH).exists():
-            return (bool(self._read(INPUT_PINS['REV_0'])),
-                    bool(self._read(INPUT_PINS['REV_1'])))
+            return (bool(self._read(gpio_group.rev_0)),
+                    bool(self._read(gpio_group.rev_1)))
         else:
             raise RevisionPinsError
 
-    def release_line(self, offset: int):
-        self.lines[offset].release()
-        self.lines.pop(offset)
+    def get_door_state(self) -> DoorState:
+        name = gpio_group.window_door_sw.name
+        event = self.lines[name].event_read()
+        if event.type == gpiod.LineEvent.FALLING_EDGE:
+            return DoorState.OPEN
+        else:
+            return DoorState.CLOSED
+
+    async def monitor_door_switch_state(
+            self, loop: asyncio.AbstractEventLoop,
+            update_door_state: Callable[[DoorState], None]):
+        current_door_value = self.read_window_switches()
+        if current_door_value == 0:
+            update_door_state(DoorState.OPEN)
+        else:
+            update_door_state(DoorState.CLOSED)
+
+        self.event_queue: asyncio.Queue = asyncio.Queue()
+        door_fd = self.lines['window_door_sw'].event_get_fd()
+        loop.add_reader(door_fd, _event_callback, self.event_queue)
+        while True:
+            try:
+                ev = await self.event_queue.get()
+            except RuntimeError:
+                break
+            if ev == GpioQueueEvent.EVENT_RECEIVED:
+                door_state = self.get_door_state()
+                update_door_state(door_state)
+            elif ev == GpioQueueEvent.QUIT:
+                return
+            else:
+                raise RuntimeError(
+                    "Event queue has received an unknown item")
+
+    def release_line(self, pin: GPIOPin):
+        self.lines[pin.name].release()
+        self.lines.pop(pin.name)
+
+    def quit_monitoring(self):
+        try:
+            self.event_queue.put_nowait(GpioQueueEvent.QUIT)
+        except RuntimeError:
+            pass
