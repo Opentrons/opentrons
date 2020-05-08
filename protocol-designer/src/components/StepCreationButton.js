@@ -1,6 +1,6 @@
 // @flow
-import * as React from 'react'
-import { connect } from 'react-redux'
+import React, { useState, type Node } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
   Tooltip,
@@ -9,7 +9,6 @@ import {
   TOOLTIP_RIGHT,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
-
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -21,73 +20,50 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
+import { ConfirmDeleteStepModal } from './modals/ConfirmDeleteStepModal'
 import { stepIconsByType, type StepType } from '../form-types'
-import type { BaseState, ThunkDispatch } from '../types'
 import styles from './listButtons.css'
 
-type SP = {|
-  isStepTypeEnabled: {
-    [moduleType: StepType]: boolean,
-  },
+type StepButtonComponentProps = {|
+  children: Node,
+  expanded: boolean,
+  setExpanded: boolean => mixed,
 |}
 
-type DP = {|
-  makeAddStep: StepType => (SyntheticEvent<>) => mixed,
-|}
+// TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
+const getSupportedSteps = () => [
+  'moveLiquid',
+  'mix',
+  'pause',
+  'magnet',
+  'temperature',
+  'thermocycler',
+]
 
-type Props = {|
-  ...SP,
-  ...DP,
-|}
-
-function StepCreationButtonComponent(props: Props) {
-  const [expanded, setExpanded] = React.useState(false)
-
-  // TODO: Ian 2019-01-17 move out to centralized step info file - see #2926
-  const supportedSteps = [
-    'moveLiquid',
-    'mix',
-    'pause',
-    'magnet',
-    'temperature',
-    'thermocycler',
-  ]
-  const { isStepTypeEnabled } = props
+const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
+  const { children, expanded, setExpanded } = props
 
   return (
     <div
       className={styles.list_item_button}
       onMouseLeave={() => setExpanded(false)}
     >
-      <PrimaryButton onClick={() => setExpanded(true)}>
+      <PrimaryButton onClick={() => setExpanded(!expanded)}>
         {i18n.t('button.add_step')}
       </PrimaryButton>
 
-      <div className={styles.buttons_popover}>
-        {expanded &&
-          supportedSteps.map(stepType => {
-            const disabled = !isStepTypeEnabled[stepType]
-            const onClick = !disabled ? props.makeAddStep(stepType) : () => null
-
-            const buttonProps = {
-              disabled: disabled,
-              onClick: onClick,
-              stepType: stepType,
-            }
-            return <StepButtonItem {...buttonProps} key={stepType} />
-          })}
-      </div>
+      <div className={styles.buttons_popover}>{expanded && children}</div>
     </div>
   )
 }
 
-type ItemProps = {
-  onClick?: (SyntheticMouseEvent<>) => mixed,
+type StepButtonItemProps = {
+  onClick: () => mixed,
   disabled: boolean,
   stepType: string,
 }
 
-function StepButtonItem(props: ItemProps) {
+function StepButtonItem(props: StepButtonItemProps) {
   const { onClick, disabled, stepType } = props
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: TOOLTIP_RIGHT,
@@ -113,26 +89,66 @@ function StepButtonItem(props: ItemProps) {
   )
 }
 
-const mapSTP = (state: BaseState): SP => {
-  const modules = stepFormSelectors.getInitialDeckSetup(state).modules
-  return {
-    isStepTypeEnabled: {
-      moveLiquid: true,
-      mix: true,
-      pause: true,
-      magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
-      temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
-      thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
-    },
+export const StepCreationButton = () => {
+  const currentFormIsPresaved = useSelector(
+    stepFormSelectors.getCurrentFormIsPresaved
+  )
+  const modules = useSelector(stepFormSelectors.getInitialDeckSetup).modules
+  const isStepTypeEnabled = {
+    moveLiquid: true,
+    mix: true,
+    pause: true,
+    magnet: getIsModuleOnDeck(modules, MAGNETIC_MODULE_TYPE),
+    temperature: getIsModuleOnDeck(modules, TEMPERATURE_MODULE_TYPE),
+    thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
   }
+
+  const [expanded, setExpanded] = useState<boolean>(false)
+  const [enqueuedStepType, setEnqueuedStepType] = useState<StepType | null>(
+    null
+  )
+  const dispatch = useDispatch()
+
+  const addStep = (stepType: StepType) =>
+    dispatch(stepsActions.addAndSelectStepWithHints({ stepType }))
+
+  const items = getSupportedSteps().map(stepType => (
+    <StepButtonItem
+      key={stepType}
+      stepType={stepType}
+      disabled={!isStepTypeEnabled[stepType]}
+      onClick={() => {
+        setExpanded(false)
+
+        if (currentFormIsPresaved) {
+          setEnqueuedStepType(stepType)
+        } else {
+          addStep(stepType)
+        }
+      }}
+    />
+  ))
+
+  return (
+    <>
+      {enqueuedStepType !== null && (
+        <ConfirmDeleteStepModal
+          onCancelClick={() => setEnqueuedStepType(null)}
+          onContinueClick={() => {
+            const s = enqueuedStepType
+            setEnqueuedStepType(null)
+            if (s != null) {
+              addStep(s)
+            }
+          }}
+        />
+      )}
+      <StepCreationButtonComponent
+        expanded={expanded}
+        setExpanded={setExpanded}
+      >
+        {items}
+      </StepCreationButtonComponent>
+    </>
+  )
 }
-
-const mapDTP = (dispatch: ThunkDispatch<*>): DP => ({
-  makeAddStep: (stepType: StepType) => (e: SyntheticEvent<>) =>
-    dispatch(stepsActions.addAndSelectStepWithHints({ stepType })),
-})
-
-export const StepCreationButton = connect<Props, {||}, SP, DP, _, _>(
-  mapSTP,
-  mapDTP
-)(StepCreationButtonComponent)
