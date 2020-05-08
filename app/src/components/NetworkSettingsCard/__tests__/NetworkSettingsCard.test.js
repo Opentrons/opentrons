@@ -5,6 +5,7 @@ import { shallow } from 'enzyme'
 import { Card } from '@opentrons/components'
 import { AddManualIp } from '../AddManualIp'
 import { NetworkSettingsCard } from '..'
+import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
 
 describe('NetworkSettingsCard', () => {
   it('should render a card with the proper title', () => {
@@ -14,6 +15,11 @@ describe('NetworkSettingsCard', () => {
 
   it('should render an AddManualIp setting component', () => {
     const wrapper = shallow(<NetworkSettingsCard />)
-    expect(wrapper.find(AddManualIp)).toHaveLength(1)
+    expect(wrapper.exists(AddManualIp)).toBe(true)
+  })
+
+  it('should render a ClearDiscoveryCache component', () => {
+    const wrapper = shallow(<NetworkSettingsCard />)
+    expect(wrapper.exists(ClearDiscoveryCache)).toBe(true)
   })
 })
