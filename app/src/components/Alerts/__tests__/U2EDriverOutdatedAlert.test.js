@@ -44,7 +44,7 @@ describe('U2EDriverOutdatedAlert', () => {
 
     link.invoke('onClick')()
 
-    expect(link.prop('children')).toContain('view driver info')
+    expect(link.prop('children')).toContain('view adapter info')
     expect(dismissAlert).toHaveBeenCalledWith(false)
   })
 
