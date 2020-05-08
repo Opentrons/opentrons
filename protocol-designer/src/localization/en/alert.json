@@ -83,7 +83,7 @@
   "module_placement": {
     "SLOT_OCCUPIED": {
       "title": "Cannot place module",
-      "body": "Modules can only be placed in slots that are empty"
+      "body": "Slot {{selectedSlot}} is occupied by another module or by labware incompatible with this module. Remove module or labware from the slot in order to continue."
     }
   },
   "export_warnings": {
