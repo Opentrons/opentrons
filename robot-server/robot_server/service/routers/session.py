@@ -74,6 +74,7 @@ async def create_session_handler(
         return session.SessionResponse(
             data=ResponseDataModel.create(
                 attributes=session.Session(
+                    session_id=session_id,
                     session_type=session_type,
                     details=create_session_details(new_session)),
                 resource_id=session_id),
@@ -114,6 +115,7 @@ async def delete_session_handler(
     return session.SessionResponse(
         data=ResponseDataModel.create(
             attributes=session.Session(
+                session_id=session_id,
                 # TODO support other session types
                 session_type=models.SessionType.check,
                 details=create_session_details(session_obj)),
@@ -141,6 +143,7 @@ async def get_session_handler(
         data=ResponseDataModel.create(
             # TODO use a proper session id rather than the type
             attributes=session.Session(
+                session_id=session_id,
                 session_type=models.SessionType(session_id),
                 details=create_session_details(session_obj)),
             resource_id=session_id),
@@ -161,6 +164,7 @@ async def get_sessions_handler(
 
     sessions = (
         session.Session(
+            session_id=session_id,
             # TODO use a proper session id rather than the type
             session_type=models.SessionType(session_id),
             details=create_session_details(session_obj))
@@ -218,6 +222,7 @@ async def session_command_create_handler(
             resource_id=str(uuid4())
         ),
         meta=session.Session(details=create_session_details(session_obj),
+                             session_id=session_id,
                              # TODO Get type from session
                              session_type=models.SessionType.check),
         links=get_valid_session_links(session_id, router)

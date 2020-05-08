@@ -21,7 +21,8 @@ TYPE_SESSION_ID_CHECK_ = {
             'instruments': {},
             'labware': [],
         },
-        'session_type': 'check'
+        'session_type': 'check',
+        'session_id': 'check',
     },
     'type': 'Session',
     'id': 'check'
