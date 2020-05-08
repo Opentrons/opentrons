@@ -72,7 +72,7 @@ const SPECS: Array<SelectorSpec> = [
       },
     },
     args: ['germanium-cobweb', '1234'],
-    expected: null;//Fixtures.mockRobotSessionData,
+    expected: Fixtures.mockRobotSessionData,
   },
 ]
 
