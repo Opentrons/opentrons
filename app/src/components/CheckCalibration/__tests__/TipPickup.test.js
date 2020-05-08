@@ -40,9 +40,6 @@ describe('TipPickUp', () => {
 
     render = (props = {}) => {
       const {
-        pipetteId = Object.keys(
-          mockRobotCalibrationCheckSessionData.instruments
-        )[0],
         isMulti = false,
         tiprack = mockRobotCalibrationCheckSessionData.labware[0],
         robotName = mockRobot.name,
@@ -50,7 +47,6 @@ describe('TipPickUp', () => {
       } = props
       return mount(
         <TipPickUp
-          pipetteId={pipetteId}
           isMulti={isMulti}
           tiprack={tiprack}
           robotName={robotName}
@@ -86,7 +82,6 @@ describe('TipPickUp', () => {
       expect(mockStore.dispatch).toHaveBeenCalledWith(
         Calibration.jogRobotCalibrationCheck(
           mockRobot.name,
-          'abc123_pipette_uuid',
           jogVectorsByDirection[direction]
         )
       )
@@ -96,10 +91,7 @@ describe('TipPickUp', () => {
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.pickUpTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
+      Calibration.pickUpTipRobotCalibrationCheck(mockRobot.name)
     )
   })
 
@@ -110,20 +102,14 @@ describe('TipPickUp', () => {
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
+      Calibration.confirmTipRobotCalibrationCheck(mockRobot.name)
     )
 
     act(() => getRejectButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.invalidateTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
+      Calibration.invalidateTipRobotCalibrationCheck(mockRobot.name)
     )
   })
 })

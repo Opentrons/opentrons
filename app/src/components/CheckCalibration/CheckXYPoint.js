@@ -63,7 +63,6 @@ const assetMap = {
 }
 
 const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
-const CHECK_XY_BUTTON_TEXT = 'check x and y-axis'
 const SLOT = 'slot'
 const JOG_UNTIL = 'Jog pipette until tip is'
 const JUST_BARELY = 'just barely'
@@ -114,17 +113,16 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName, ''))
+    dispatch(comparePointRobotCalibrationCheck(robotName))
   }
   function goToNextCheck() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, ''))
+    dispatch(confirmStepRobotCalibrationCheck(robotName))
   }
 
   return (

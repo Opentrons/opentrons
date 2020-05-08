@@ -6,6 +6,8 @@ import { act } from 'react-dom/test-utils'
 import {
   mockRobotCalibrationCheckSessionData,
   mockRobot,
+  badZComparison,
+  goodZComparison,
 } from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
 
@@ -37,21 +39,20 @@ describe('CheckHeight', () => {
 
     render = (props = {}) => {
       const {
-        pipetteId = Object.keys(
-          mockRobotCalibrationCheckSessionData.instruments
-        )[0],
         robotName = mockRobot.name,
         isMulti = false,
         isInspecting = false,
         mountProp = 'left',
+        comparison = {},
       } = props
       return mount(
         <CheckHeight
-          pipetteId={pipetteId}
           robotName={robotName}
           isMulti={isMulti}
           isInspecting={isInspecting}
+          comparison={comparison}
           mount={mountProp}
+          nextButtonText="Go To Next Check"
         />,
         {
           wrappingComponent: Provider,
@@ -104,7 +105,6 @@ describe('CheckHeight', () => {
       expect(mockStore.dispatch).toHaveBeenCalledWith(
         Calibration.jogRobotCalibrationCheck(
           mockRobot.name,
-          'abc123_pipette_uuid',
           jogVectorsByDirection[direction]
         )
       )
@@ -123,10 +123,7 @@ describe('CheckHeight', () => {
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.comparePointRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
+      Calibration.comparePointRobotCalibrationCheck(mockRobot.name)
     )
   })
 
@@ -137,10 +134,7 @@ describe('CheckHeight', () => {
     wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmStepRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
+      Calibration.confirmStepRobotCalibrationCheck(mockRobot.name)
     )
   })
 })

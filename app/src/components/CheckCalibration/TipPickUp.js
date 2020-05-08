@@ -62,22 +62,21 @@ export function TipPickUp(props: TipPickUpProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function pickUpTip() {
-    dispatch(pickUpTipRobotCalibrationCheck(robotName, ''))
+    dispatch(pickUpTipRobotCalibrationCheck(robotName))
   }
 
   function confirmTipPickedUp() {
-    dispatch(confirmTipRobotCalibrationCheck(robotName, ''))
+    dispatch(confirmTipRobotCalibrationCheck(robotName))
   }
 
   function rejectPickUpAttempt() {
-    dispatch(invalidateTipRobotCalibrationCheck(robotName, ''))
+    dispatch(invalidateTipRobotCalibrationCheck(robotName))
   }
 
   // TODO: BC: once both pipettes are usable in flow,

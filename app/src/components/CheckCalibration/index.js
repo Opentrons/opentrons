@@ -120,7 +120,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
         Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
       ].includes(currentStep)
-
       const nextButtonText = getNextButtonTextForStep(
         currentStep,
         hasTwoPipettes
@@ -147,7 +146,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
         Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
       ].includes(currentStep)
-
+      const nextButtonText = getNextButtonTextForStep(
+        currentStep,
+        hasTwoPipettes
+      )
       stepContents = (
         <CheckHeight
           robotName={robotName}
@@ -156,6 +158,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
+          nextButtonText={nextButtonText}
         />
       )
       break

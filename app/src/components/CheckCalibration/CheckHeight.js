@@ -33,7 +33,6 @@ const assetMap = {
 }
 
 const CHECK_Z_HEADER = 'Check the Z-axis'
-const CHECK_Z_BUTTON_TEXT = 'check z-axis'
 
 const JOG_UNTIL = 'Jog pipette until tip is'
 const JUST_BARELY = 'just barely'
@@ -44,7 +43,6 @@ const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
 
-const MOVE_TO_NEXT = 'move to next check'
 const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
@@ -62,9 +60,18 @@ type CheckHeightProps = {|
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   exit: () => void,
+  nextButtonText: string,
 |}
 export function CheckHeight(props: CheckHeightProps) {
-  const { robotName, isMulti, mount, isInspecting, comparison, exit } = props
+  const {
+    robotName,
+    isMulti,
+    mount,
+    isInspecting,
+    comparison,
+    exit,
+    nextButtonText,
+  } = props
 
   const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
@@ -75,17 +82,16 @@ export function CheckHeight(props: CheckHeightProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName, ''))
+    dispatch(comparePointRobotCalibrationCheck(robotName))
   }
   function goToNextCheck() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, ''))
+    dispatch(confirmStepRobotCalibrationCheck(robotName))
   }
 
   return (
@@ -98,6 +104,7 @@ export function CheckHeight(props: CheckHeightProps) {
           comparison={comparison}
           goToNextCheck={goToNextCheck}
           exit={exit}
+          nextButtonText={nextButtonText}
         />
       ) : (
         <>
@@ -131,7 +138,7 @@ export function CheckHeight(props: CheckHeightProps) {
               onClick={comparePoint}
               className={styles.command_button}
             >
-              {CHECK_Z_BUTTON_TEXT}
+              {nextButtonText}
             </PrimaryButton>
           </div>
         </>
@@ -144,9 +151,10 @@ type CompareZProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
   exit: () => void,
+  nextButtonText: string,
 |}
 function CompareZ(props: CompareZProps) {
-  const { comparison, goToNextCheck, exit } = props
+  const { comparison, goToNextCheck, exit, nextButtonText } = props
   const { differenceVector, exceedsThreshold } = comparison
 
   let header = GOOD_INSPECTING_HEADER
@@ -183,7 +191,7 @@ function CompareZ(props: CompareZProps) {
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
         )}
-        <PrimaryButton onClick={goToNextCheck}>{MOVE_TO_NEXT}</PrimaryButton>
+        <PrimaryButton onClick={goToNextCheck}>{nextButtonText}</PrimaryButton>
       </div>
     </div>
   )

@@ -17,16 +17,14 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
-      mount_axis: 'z',
-      plunger_axis: 'b',
+      mount: 'left',
       pipette_id: 'abc123_pipette_uuid',
     },
     def456_pipette_uuid: {
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
-      mount_axis: 'a',
-      plunger_axis: 'c',
+      mount: 'right',
       pipette_id: 'def456_pipette_uuid',
     },
   },
@@ -34,6 +32,7 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
   nextSteps: {
     links: { labwareLoaded: '/fake/route' },
   },
+  comparisonsByStep: {},
   labware: [
     {
       alternatives: ['fake_tiprack_load_name'],
@@ -54,6 +53,27 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       version: 1,
     },
   ],
+}
+
+export const badZComparison = {
+  differenceVector: [0, 0, 4],
+  thresholdVector: [0, 0, 1],
+  exceedsThreshold: true,
+}
+export const goodZComparison = {
+  differenceVector: [0, 0, 0.1],
+  thresholdVector: [0, 0, 1],
+  exceedsThreshold: false,
+}
+export const badXYComparison = {
+  differenceVector: [4, 4, 0],
+  thresholdVector: [1, 1, 0],
+  exceedsThreshold: true,
+}
+export const goodXYComparison = {
+  differenceVector: [0.1, 0.1, 0],
+  thresholdVector: [1, 1, 0],
+  exceedsThreshold: false,
 }
 
 export const {
