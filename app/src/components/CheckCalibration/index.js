@@ -16,30 +16,11 @@ import { BadCalibration } from './BadCalibration'
 import styles from './styles.css'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
-
-const getSlotNumberFromStep = (
-  step: Calibration.RobotCalibrationCheckStep
-): string => {
-  switch (step) {
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      return '1'
-    }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: {
-      return '3'
-    }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
-      return '7'
-    }
-    default:
-      // should never reach this case, as func only called when currentStep listed above
-      return ''
-  }
-}
+const MOVE_TO_NEXT = 'move to next check'
+const CONTINUE = 'continue'
+const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip and continue to 2nd pipette'
+const CHECK_X_Y_AXES = 'check x and y-axis'
+const CHECK_Z_AXIS = 'check z-axis'
 
 type CheckCalibrationProps = {|
   robotName: string,
@@ -60,8 +41,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   // TODO: BC: once robot keeps track of active pipette, grab that
   // from the cal check session status instead of arbitrarily
   // defaulting to the first pipette
-  const activeInstrumentId = React.useMemo(
-    () => instruments && Object.keys(instruments)[0],
+  const hasTwoPipettes = React.useMemo(
+    () => instruments && Object.keys(instruments).length == 2,
     [instruments]
   )
   const activeLabware = React.useMemo(
@@ -145,6 +126,11 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
         Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
       ].includes(currentStep)
+
+      const nextButtonText = getNextButtonTextForStep(
+        currentStep,
+        hasTwoPipettes
+      )
       stepContents =
         activeInstrumentId && slotNumber != null ? (
           <CheckXYPoint
@@ -219,4 +205,62 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       {stepContents}
     </ModalPage>
   )
+}
+
+// helpers
+
+const getNextButtonTextForStep = (
+  step: Calibration.RobotCalibrationCheckStep,
+  hasTwoPipettes: boolean
+): string => {
+  switch (step) {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE: {
+      return CHECK_X_Y_AXES
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT: {
+      return CHECK_Z_AXIS
+    }
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+      return MOVE_TO_NEXT
+    }
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return hasTwoPipettes ? DROP_TIP_AND_DO_SECOND_PIPETTE : CONTINUE
+    }
+    default: {
+      // should never reach this case, func only called when currentStep listed above
+      return ''
+    }
+  }
+}
+
+const getSlotNumberFromStep = (
+  step: Calibration.RobotCalibrationCheckStep
+): string => {
+  switch (step) {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return '1'
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: {
+      return '3'
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return '7'
+    }
+    default:
+      // should never reach this case, func only called when currentStep listed above
+      return ''
+  }
 }

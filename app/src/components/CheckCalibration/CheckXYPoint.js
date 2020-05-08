@@ -72,7 +72,6 @@ const THEN = 'Then'
 const CHECK_AXES = 'check x and y-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
-const MOVE_TO_NEXT = 'move to next check'
 const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
@@ -92,6 +91,7 @@ type CheckXYPointProps = {|
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   exit: () => void,
+  nextButtonText: string,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
   const {
@@ -103,6 +103,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     isInspecting,
     comparison,
     exit,
+    nextButtonText,
   } = props
 
   const dispatch = useDispatch<Dispatch>()
@@ -142,6 +143,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           comparison={comparison}
           goToNextCheck={goToNextCheck}
           exit={exit}
+          nextButtonText={nextButtonText}
         />
       ) : (
         <>
@@ -175,7 +177,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
               onClick={comparePoint}
               className={styles.command_button}
             >
-              {CHECK_XY_BUTTON_TEXT}
+              {nextButtonText}
             </PrimaryButton>
           </div>
         </>
@@ -188,9 +190,10 @@ type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
   exit: () => void,
+  nextButtonText: string,
 |}
 function CompareXY(props: CompareXYProps) {
-  const { comparison, goToNextCheck, exit } = props
+  const { comparison, goToNextCheck, exit, nextButtonText } = props
   const { differenceVector, exceedsThreshold } = comparison
 
   let header = GOOD_INSPECTING_HEADER
@@ -233,7 +236,7 @@ function CompareXY(props: CompareXYProps) {
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
         )}
-        <PrimaryButton onClick={goToNextCheck}>{MOVE_TO_NEXT}</PrimaryButton>
+        <PrimaryButton onClick={goToNextCheck}>{nextButtonText}</PrimaryButton>
       </div>
     </div>
   )
