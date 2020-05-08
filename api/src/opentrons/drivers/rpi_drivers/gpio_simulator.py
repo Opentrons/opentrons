@@ -3,7 +3,7 @@ import logging
 from typing import Callable, Dict, Tuple
 
 from opentrons.hardware_control.types import BoardRevision, DoorState
-from .types import gpio_list, GPIOPin
+from .types import gpio_group, GPIOPin, GpioQueueEvent
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -32,7 +32,7 @@ class SimulatingGPIOCharDev:
 
     def _initialize(self) -> Dict[str, int]:
         lines = {}
-        for pin in gpio_list:
+        for pin in gpio_group.pins:
             lines[pin.name] = pin.by_board_rev(self.board_rev)
         self._initialize_values(list(lines.keys()))
         return lines
@@ -77,32 +77,29 @@ class SimulatingGPIOCharDev:
         return self._values[input_pin.name]
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:
-        return (bool(self._read(gpio_list.red_button)),
-                bool(self._read(gpio_list.green_button)),
-                bool(self._read(gpio_list.blue_button)))
+        return (bool(self._read(gpio_group.red_button)),
+                bool(self._read(gpio_group.green_button)),
+                bool(self._read(gpio_group.blue_button)))
 
     def get_rail_lights(self) -> bool:
-        return bool(self._read(gpio_list.frame_leds))
+        return bool(self._read(gpio_group.frame_leds))
 
     def read_button(self) -> bool:
         # button is normal-HIGH, so invert
-        return not bool(self._read(gpio_list.button_input))
+        return not bool(self._read(gpio_group.button_input))
 
     def read_window_switches(self) -> bool:
-        return bool(self._read(gpio_list.window_door_sw))
+        return bool(self._read(gpio_group.window_door_sw))
 
     def read_top_window_switch(self) -> bool:
-        return bool(self._read(gpio_list.window_sw_filt))
+        return bool(self._read(gpio_group.window_sw_filt))
 
     def read_front_door_switch(self) -> bool:
-        return bool(self._read(gpio_list.door_sw_filt))
+        return bool(self._read(gpio_group.door_sw_filt))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
-        return (bool(self._read(gpio_list.rev_0)),
-                bool(self._read(gpio_list.rev_1)))
-
-    def get_door_switches_fd(self) -> int:
-        return 101
+        return (bool(self._read(gpio_group.rev_0)),
+                bool(self._read(gpio_group.rev_1)))
 
     def get_door_state(self) -> DoorState:
         val = self.read_window_switches()
@@ -114,10 +111,26 @@ class SimulatingGPIOCharDev:
     async def monitor_door_switch_state(
             self, loop: asyncio.AbstractEventLoop,
             update_door_state: Callable[[DoorState], None]):
-        update_door_state(self.get_door_state())
+        self.event_queue: asyncio.Queue = asyncio.Queue()
+        while True:
+            try:
+                ev = await self.event_queue.get()
+            except RuntimeError:
+                break
+            if ev == GpioQueueEvent.EVENT_RECEIVED:
+                door_state = self.get_door_state()
+                update_door_state(door_state)
+            elif ev == GpioQueueEvent.QUIT:
+                return
+            else:
+                raise RuntimeError(
+                    "Event queue has received an unknown item")
 
     def release_line(self, pin: GPIOPin):
         self.lines.pop(pin.name)
 
     def quit_monitoring(self):
-        pass
+        try:
+            self.event_queue.put_nowait(GpioQueueEvent.QUIT)
+        except RuntimeError:
+            pass

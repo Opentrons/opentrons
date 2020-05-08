@@ -4,7 +4,7 @@ from typing import List, Optional
 from opentrons.hardware_control.types import BoardRevision
 
 
-class GpioQueueEvents(enum.Enum):
+class GpioQueueEvent(enum.Enum):
     EVENT_RECEIVED = enum.auto()
     QUIT = enum.auto()
 
@@ -51,26 +51,30 @@ class GPIOPin:
         return ref[board_rev]
 
 
-class GPIOList(list):
+class GPIOGroup:
+    def __init__(self, pins: List[GPIOPin]):
+        self.pins = pins
+
     def __getattr__(self, item):
-        return next(filter(lambda x: x.name is item, self), None)
+        return next(filter(lambda x: x.name is item, self.pins), None)
 
     def by_type(self, pin_dir: PinDir):
-        return GPIOList(filter(lambda x: x.in_out is pin_dir, self))
+        return GPIOGroup(list(
+            filter(lambda x: x.in_out is pin_dir, self.pins)))
 
     def by_names(self, names: List[str]):
-        return GPIOList(filter(lambda x: x.name in names, self))
+        return GPIOGroup(list(
+            filter(lambda x: x.name in names, self.pins)))
 
     def group_by_pins(self, board_rev: BoardRevision) -> List:
-        c = groupby(self, key=lambda x: x.by_board_rev(board_rev))
+        c = groupby(self.pins, key=lambda x: x.by_board_rev(board_rev))
         l: list = []
         for k, v in c:
             l.append(list(v))
         return l
 
 
-gpio_list = GPIOList(
-    [
+gpio_group = GPIOGroup([
         # revision pins (input)
         GPIOPin.build('rev_0', PinDir.rev_input, 17),
         GPIOPin.build('rev_1', PinDir.rev_input, 27),
@@ -89,6 +93,4 @@ gpio_list = GPIOList(
                                rev_og=20, rev_a=12),
         GPIOPin.build_with_rev('window_sw_filt', PinDir.input,
                                rev_og=20, rev_a=16),
-        GPIOPin.build('window_door_sw', PinDir.input, 20)
-    ]
-)
+        GPIOPin.build('window_door_sw', PinDir.input, 20)])

@@ -1,6 +1,7 @@
+import asyncio
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import DoorState
-from opentrons.drivers.rpi_drivers.types import gpio_list
+from opentrons.drivers.rpi_drivers.types import gpio_group, GpioQueueEvent
 
 
 async def test_gpio_setup(loop):
@@ -16,15 +17,25 @@ async def test_gpio_door_state(loop):
     # the window_door_sw pin
     hw_api = await hc.API.build_hardware_simulator(
         loop=loop)
+    task = loop.create_task(
+        hw_api._backend.gpio_chardev.monitor_door_switch_state(
+            loop=loop,
+            update_door_state=hw_api._update_door_state))
+    await asyncio.sleep(0.1)
+    gpio_chardev = hw_api._backend.gpio_chardev
 
     # high -> door is open
-    hw_api._backend.gpio_chardev.set_low(gpio_list.window_door_sw)
-    await hw_api._backend.gpio_chardev.monitor_door_switch_state(
-        hw_api.loop, hw_api._update_door_state)
+    gpio_chardev.set_low(gpio_group.window_door_sw)
+    gpio_chardev.event_queue.put_nowait(
+        GpioQueueEvent.EVENT_RECEIVED)
+    await asyncio.sleep(0.1)
     assert hw_api.door_state == DoorState.OPEN
 
     # low -> door is closed
-    hw_api._backend.gpio_chardev.set_high(gpio_list.window_door_sw)
-    await hw_api._backend.gpio_chardev.monitor_door_switch_state(
-        hw_api.loop, hw_api._update_door_state)
+    gpio_chardev.set_high(gpio_group.window_door_sw)
+    gpio_chardev.event_queue.put_nowait(
+        GpioQueueEvent.EVENT_RECEIVED)
+    await asyncio.sleep(0.1)
     assert hw_api.door_state == DoorState.CLOSED
+
+    task.cancel()

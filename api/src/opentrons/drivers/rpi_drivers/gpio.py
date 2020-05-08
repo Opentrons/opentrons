@@ -5,7 +5,7 @@ import time
 from typing import Callable, Dict, Tuple
 from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
-from .types import gpio_list, PinDir, GPIOPin, GpioQueueEvents
+from .types import gpio_group, PinDir, GPIOPin, GpioQueueEvent
 
 import gpiod  # type: ignore
 
@@ -20,7 +20,7 @@ DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 def _event_callback(q: asyncio.Queue):
     try:
-        q.put_nowait(GpioQueueEvents.EVENT_RECEIVED)
+        q.put_nowait(GpioQueueEvent.EVENT_RECEIVED)
     except asyncio.QueueFull:
         MODULE_LOG.warning(
             'Event queue is full and can no longer receive new events')
@@ -77,8 +77,8 @@ class GPIOCharDev:
         MODULE_LOG.info(
             "Registering Central Routing Board Revision GPIOs")
         lines = {}
-        rev_pins = gpio_list.by_names(['rev_0', 'rev_1'])
-        for rev in rev_pins:
+        rev_pins = gpio_group.by_names(['rev_0', 'rev_1'])
+        for rev in rev_pins.pins:
             lines[rev.name] = self._request_line(rev, gpiod.LINE_REQ_DIR_IN)
         return lines
 
@@ -106,13 +106,13 @@ class GPIOCharDev:
         self.board_rev = self._determine_board_revision()
 
         # setup output lines
-        output_pins = gpio_list.by_type(PinDir.output)
-        for output in output_pins:
+        output_pins = gpio_group.by_type(PinDir.output)
+        for output in output_pins.pins:
             self._lines[output.name] = self._request_line(
                 output, gpiod.LINE_REQ_DIR_OUT)
 
         # setup input lines
-        input_pins = gpio_list.by_type(PinDir.input)
+        input_pins = gpio_group.by_type(PinDir.input)
         sorted_inputs = input_pins.group_by_pins(self.board_rev)
         for pins in sorted_inputs:
             line = self._request_line(
@@ -141,9 +141,9 @@ class GPIOCharDev:
                          green: bool = False,
                          blue: bool = False):
         color_pins = {
-            gpio_list.red_button: red,
-            gpio_list.green_button: green,
-            gpio_list.blue_button: blue}
+            gpio_group.red_button: red,
+            gpio_group.green_button: green,
+            gpio_group.blue_button: blue}
         for pin, state in color_pins.items():
             if state:
                 self.set_high(pin)
@@ -152,27 +152,27 @@ class GPIOCharDev:
 
     def set_rail_lights(self, on: bool = True):
         if on:
-            self.set_high(gpio_list.frame_leds)
+            self.set_high(gpio_group.frame_leds)
         else:
-            self.set_low(gpio_list.frame_leds)
+            self.set_low(gpio_group.frame_leds)
 
     def set_reset_pin(self, on: bool = True):
         if on:
-            self.set_high(gpio_list.reset)
+            self.set_high(gpio_group.reset)
         else:
-            self.set_low(gpio_list.reset)
+            self.set_low(gpio_group.reset)
 
     def set_isp_pin(self, on: bool = True):
         if on:
-            self.set_high(gpio_list.isp)
+            self.set_high(gpio_group.isp)
         else:
-            self.set_low(gpio_list.isp)
+            self.set_low(gpio_group.isp)
 
     def set_halt_pin(self, on: bool = True):
         if on:
-            self.set_high(gpio_list.halt)
+            self.set_high(gpio_group.halt)
         else:
-            self.set_low(gpio_list.halt)
+            self.set_low(gpio_group.halt)
 
     def _read(self, input_pin: GPIOPin):
         try:
@@ -183,25 +183,25 @@ class GPIOCharDev:
                 "be read")
 
     def get_button_light(self) -> Tuple[bool, bool, bool]:
-        return (bool(self._read(gpio_list.red_button)),
-                bool(self._read(gpio_list.green_button)),
-                bool(self._read(gpio_list.blue_button)))
+        return (bool(self._read(gpio_group.red_button)),
+                bool(self._read(gpio_group.green_button)),
+                bool(self._read(gpio_group.blue_button)))
 
     def get_rail_lights(self) -> bool:
-        return bool(self._read(gpio_list.frame_leds))
+        return bool(self._read(gpio_group.frame_leds))
 
     def read_button(self) -> bool:
         # button is normal-HIGH, so invert
-        return not bool(self._read(gpio_list.button_input))
+        return not bool(self._read(gpio_group.button_input))
 
     def read_window_switches(self) -> bool:
-        return bool(self._read(gpio_list.window_door_sw))
+        return bool(self._read(gpio_group.window_door_sw))
 
     def read_top_window_switch(self) -> bool:
-        return bool(self._read(gpio_list.window_sw_filt))
+        return bool(self._read(gpio_group.window_sw_filt))
 
     def read_front_door_switch(self) -> bool:
-        return bool(self._read(gpio_list.door_sw_filt))
+        return bool(self._read(gpio_group.door_sw_filt))
 
     def read_revision_bits(self) -> Tuple[bool, bool]:
         """ Read revision bit GPIO pins
@@ -210,17 +210,13 @@ class GPIOCharDev:
         returns the pins' values. Otherwise, return RevisionPinsError
         """
         if pathlib.Path(DTOVERLAY_PATH).exists():
-            return (bool(self._read(gpio_list.rev_0)),
-                    bool(self._read(gpio_list.rev_1)))
+            return (bool(self._read(gpio_group.rev_0)),
+                    bool(self._read(gpio_group.rev_1)))
         else:
             raise RevisionPinsError
 
-    def get_door_switches_fd(self) -> int:
-        name = gpio_list.window_door_sw.name
-        return self.lines[name].event_get_fd()
-
     def get_door_state(self) -> DoorState:
-        name = gpio_list.window_door_sw.name
+        name = gpio_group.window_door_sw.name
         event = self.lines[name].event_read()
         if event.type == gpiod.LineEvent.FALLING_EDGE:
             return DoorState.OPEN
@@ -237,14 +233,17 @@ class GPIOCharDev:
             update_door_state(DoorState.CLOSED)
 
         self.event_queue: asyncio.Queue = asyncio.Queue()
-        door_fd = self.get_door_switches_fd()
+        door_fd = self.lines['window_door_sw'].event_get_fd()
         loop.add_reader(door_fd, _event_callback, self.event_queue)
         while True:
-            ev = await self.event_queue.get()
-            if ev == GpioQueueEvents.EVENT_RECEIVED:
+            try:
+                ev = await self.event_queue.get()
+            except RuntimeError:
+                break
+            if ev == GpioQueueEvent.EVENT_RECEIVED:
                 door_state = self.get_door_state()
                 update_door_state(door_state)
-            elif ev == GpioQueueEvents.QUIT:
+            elif ev == GpioQueueEvent.QUIT:
                 return
             else:
                 raise RuntimeError(
@@ -255,4 +254,7 @@ class GPIOCharDev:
         self.lines.pop(pin.name)
 
     def quit_monitoring(self):
-        self.event_queue.put_nowait(GpioQueueEvents.QUIT)
+        try:
+            self.event_queue.put_nowait(GpioQueueEvent.QUIT)
+        except RuntimeError:
+            pass

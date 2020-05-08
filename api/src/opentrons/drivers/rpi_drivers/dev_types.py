@@ -78,9 +78,6 @@ class GPIODriverLike(Protocol):
     def read_revision_bits(self) -> Tuple[bool, bool]:
         ...
 
-    def get_door_switches_fd(self) -> int:
-        ...
-
     def get_door_state(self) -> DoorState:
         ...
 
