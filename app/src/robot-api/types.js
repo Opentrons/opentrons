@@ -71,3 +71,39 @@ export type RobotApiState = $Shape<
     [requestId: string]: void | RequestState,
   |}>
 >
+
+export type RobotApiV2RequestBody = {
+  data: {|
+    id?: string,
+    type: string,
+    attributes: {...}
+  |}
+}
+
+export type RobotApiV2ResponseBody = {
+  meta?: {...},
+  links?: {...},
+  data: {|
+    id: string,
+    type: string,
+    attributes: {...}
+  |}
+}
+
+export type RobotApiV2Error = {
+  id?: string,
+  links?: {...},
+  status?: string,
+  code?: string,
+  title?: string,
+  detail?: string,
+  source?: {|
+    pointer?: string,
+    parameter?: string
+  |},
+  meta?: {...}
+}
+
+export type RobotApiV2ErrorResponseBody = {
+  errors: Array<RobotApiV2Error>
+}
