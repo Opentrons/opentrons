@@ -14,10 +14,4 @@ export const getRobotSessionById: (
   sessionId: string
 ) => Types.RobotSessionData | null = (state, robotName, sessionId) =>
   getRobotSessions(state, robotName)[sessionId] ?? null
-
-// export const getRobotSessionsByType: (
-//   state: State,
-//   robotName: string,
-//   sessionType: Types.SessionType,
-// ) => Types.SessionsById | null = (state, robotName, sessionType) =>
-//   map(getRobotSessions(state, robotName)) ?? null
+  
