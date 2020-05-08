@@ -45,14 +45,13 @@ const ASSET_MAP = {
   },
 }
 type TipPickUpProps = {|
-  pipetteId: string,
   isMulti: boolean,
   tiprack: RobotCalibrationCheckLabware,
   robotName: string,
   isInspecting: boolean,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { pipetteId, tiprack, robotName, isMulti, isInspecting } = props
+  const { tiprack, robotName, isMulti, isInspecting } = props
   const tiprackDef = React.useMemo(
     () => getLatestLabwareDef(tiprack?.loadName),
     [tiprack]
@@ -63,22 +62,22 @@ export function TipPickUp(props: TipPickUpProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        pipetteId,
+        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function pickUpTip() {
-    dispatch(pickUpTipRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(pickUpTipRobotCalibrationCheck(robotName, ''))
   }
 
   function confirmTipPickedUp() {
-    dispatch(confirmTipRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(confirmTipRobotCalibrationCheck(robotName, ''))
   }
 
   function rejectPickUpAttempt() {
-    dispatch(invalidateTipRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(invalidateTipRobotCalibrationCheck(robotName, ''))
   }
 
   // TODO: BC: once both pipettes are usable in flow,

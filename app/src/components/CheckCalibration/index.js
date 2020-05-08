@@ -42,20 +42,22 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   // from the cal check session status instead of arbitrarily
   // defaulting to the first pipette
   const hasTwoPipettes = React.useMemo(
-    () => instruments && Object.keys(instruments).length == 2,
+    () => instruments && Object.keys(instruments).length === 2,
     [instruments]
   )
-  const activeLabware = React.useMemo(
-    () =>
-      labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
-    [labware, activeInstrumentId]
-  )
-  const isActiveInstrumentMultiChannel = React.useMemo(() => {
-    const spec =
-      instruments &&
-      getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
-    return spec ? spec.channels > 1 : false
-  }, [activeInstrumentId, instruments])
+  const activeLabware = ''
+  // React.useMemo(
+  //   () =>
+  //     labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
+  //   [labware, activeInstrumentId]
+  // )
+  const isActiveInstrumentMultiChannel = false
+  //  React.useMemo(() => {
+  //   const spec =
+  //     instruments &&
+  //     getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
+  //   return spec ? spec.channels > 1 : false
+  // }, [activeInstrumentId, instruments])
   // TODO: BC: once api returns real values for instrument.mount_axis
   // infer active mount from activeInstrument
   const activeMount = 'left'
@@ -80,13 +82,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       break
     }
     case Calibration.CHECK_STEP_LABWARE_LOADED: {
-      stepContents = (
-        <DeckSetup
-          robotName={robotName}
-          activeInstrumentId={activeInstrumentId}
-          labware={labware}
-        />
-      )
+      stepContents = <DeckSetup robotName={robotName} labware={labware} />
       modalContentsClassName = styles.page_content_dark
       break
     }
@@ -98,16 +94,14 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
         Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
       ].includes(currentStep)
-      stepContents =
-        activeInstrumentId && activeLabware ? (
-          <TipPickUp
-            tiprack={activeLabware}
-            robotName={robotName}
-            pipetteId={activeInstrumentId}
-            isMulti={isActiveInstrumentMultiChannel}
-            isInspecting={isInspecting}
-          />
-        ) : null
+      stepContents = activeLabware ? (
+        <TipPickUp
+          tiprack={activeLabware}
+          robotName={robotName}
+          isMulti={isActiveInstrumentMultiChannel}
+          isInspecting={isInspecting}
+        />
+      ) : null
       break
     }
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
@@ -131,19 +125,18 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         currentStep,
         hasTwoPipettes
       )
-      stepContents =
-        activeInstrumentId && slotNumber != null ? (
-          <CheckXYPoint
-            robotName={robotName}
-            pipetteId={activeInstrumentId}
-            slotNumber={slotNumber}
-            isMulti={isActiveInstrumentMultiChannel}
-            mount={activeMount}
-            exit={exit}
-            isInspecting={isInspecting}
-            comparison={comparisonsByStep[currentStep]}
-          />
-        ) : null
+      stepContents = (
+        <CheckXYPoint
+          robotName={robotName}
+          slotNumber={slotNumber}
+          isMulti={isActiveInstrumentMultiChannel}
+          mount={activeMount}
+          exit={exit}
+          isInspecting={isInspecting}
+          comparison={comparisonsByStep[currentStep]}
+          nextButtonText={nextButtonText}
+        />
+      )
       break
     }
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
@@ -155,17 +148,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
       ].includes(currentStep)
 
-      stepContents = activeInstrumentId ? (
+      stepContents = (
         <CheckHeight
           robotName={robotName}
-          pipetteId={activeInstrumentId}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
           exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
         />
-      ) : null
+      )
       break
     }
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {

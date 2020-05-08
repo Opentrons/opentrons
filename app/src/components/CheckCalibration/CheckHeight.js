@@ -56,7 +56,6 @@ const GOOD_INSPECTING_BODY =
 const DIFFERENCE = 'Difference'
 
 type CheckHeightProps = {|
-  pipetteId: string,
   robotName: string,
   isMulti: boolean,
   mount: Mount,
@@ -65,15 +64,7 @@ type CheckHeightProps = {|
   exit: () => void,
 |}
 export function CheckHeight(props: CheckHeightProps) {
-  const {
-    pipetteId,
-    robotName,
-    isMulti,
-    mount,
-    isInspecting,
-    comparison,
-    exit,
-  } = props
+  const { robotName, isMulti, mount, isInspecting, comparison, exit } = props
 
   const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
@@ -84,17 +75,17 @@ export function CheckHeight(props: CheckHeightProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        pipetteId,
+        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(comparePointRobotCalibrationCheck(robotName, ''))
   }
   function goToNextCheck() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(confirmStepRobotCalibrationCheck(robotName, ''))
   }
 
   return (

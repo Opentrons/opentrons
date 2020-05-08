@@ -28,19 +28,14 @@ const DECK_SETUP_BUTTON_TEXT = 'Confirm tip rack placement and continue'
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
   robotName: string,
-  activeInstrumentId: ?string,
 |}
 export function DeckSetup(props: DeckSetupProps) {
-  const { labware, robotName, activeInstrumentId } = props
+  const { labware, robotName } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   const dispatch = useDispatch<Dispatch>()
 
   function proceed() {
-    if (activeInstrumentId) {
-      dispatch(
-        preparePipetteRobotCalibrationCheck(robotName, activeInstrumentId)
-      )
-    }
+    dispatch(preparePipetteRobotCalibrationCheck(robotName, ''))
   }
 
   return (

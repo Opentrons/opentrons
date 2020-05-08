@@ -83,7 +83,6 @@ const GOOD_INSPECTING_BODY =
 const DIFFERENCE = 'Difference'
 
 type CheckXYPointProps = {|
-  pipetteId: string,
   robotName: string,
   slotNumber: string | null,
   isMulti: boolean,
@@ -95,7 +94,6 @@ type CheckXYPointProps = {|
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
   const {
-    pipetteId,
     robotName,
     slotNumber,
     isMulti,
@@ -116,17 +114,17 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     dispatch(
       jogRobotCalibrationCheck(
         robotName,
-        pipetteId,
+        '',
         formatJogVector(axis, direction, step)
       )
     )
   }
 
   function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(comparePointRobotCalibrationCheck(robotName, ''))
   }
   function goToNextCheck() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
+    dispatch(confirmStepRobotCalibrationCheck(robotName, ''))
   }
 
   return (
