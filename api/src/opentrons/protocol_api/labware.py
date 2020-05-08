@@ -408,7 +408,7 @@ class Labware(DeckItem):
                 self._api_version)
             for well in self._ordering]
 
-    def _create_indexed_dictionary(self, group=0):
+    def _create_indexed_dictionary(self, group=0) -> Dict[str, List['Well']]:
         """
         Creates a dict of lists of Wells. Which way the labware is segmented
         determines whether this is a dict of rows or dict of columns. If group
@@ -422,7 +422,8 @@ class Labware(DeckItem):
             match = self._pattern.match(index)
             assert match, 'could not match well name pattern'
             dict_list[match.group(group)].append(well_obj)
-        return dict_list
+        # copy to a non-default-dict
+        return {k: v for k, v in dict_list.items()}
 
     def set_calibration(self, delta: Point):
         """

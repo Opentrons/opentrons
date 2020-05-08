@@ -9,7 +9,7 @@ import {
 import { CommandList } from './CommandList'
 
 import type { State, Dispatch } from '../../types'
-import type { SessionStatus } from '../../robot'
+import type { SessionStatus, SessionStatusInfo } from '../../robot'
 import type { CommandListProps } from './CommandList'
 
 export { ConfirmCancelModal } from './ConfirmCancelModal'
@@ -17,6 +17,7 @@ export { ConfirmCancelModal } from './ConfirmCancelModal'
 type SP = {|
   commands: Array<any>,
   sessionStatus: SessionStatus,
+  sessionStatusInfo: SessionStatusInfo,
   showSpinner: boolean,
 |}
 
@@ -33,6 +34,7 @@ function mapStateToProps(state: State): SP {
   return {
     commands: robotSelectors.getCommands(state),
     sessionStatus: robotSelectors.getSessionStatus(state),
+    sessionStatusInfo: robotSelectors.getSessionStatusInfo(state),
     showSpinner:
       robotSelectors.getCancelInProgress(state) ||
       robotSelectors.getSessionLoadInProgress(state),

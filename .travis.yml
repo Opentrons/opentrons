@@ -87,8 +87,6 @@ jobs:
       name: 'JS unit tests; build Protocol Designer, Labware Library, Components Library'
       # node version pulled from .nvmrc
       language: node_js
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
         - make install-js
       script:
@@ -127,8 +125,6 @@ jobs:
     - stage: test
       name: 'JS E2E tests'
       language: node_js
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
         - make install-js
       script:
@@ -138,8 +134,6 @@ jobs:
     - stage: test
       name: 'JS type checks'
       language: node_js
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       install:
         - make install-js
       script:
@@ -149,8 +143,6 @@ jobs:
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for POSIX (unsigned dev builds)'
       os: linux
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       script: make -C app-shell dist-posix
       # skip app builds entirely if tag is present but does not match ^v
       if: tag IS blank
@@ -159,8 +151,6 @@ jobs:
       <<: *app_stage_build
       name: 'Build/deploy Opentrons App for Linux'
       os: linux
-      before_install:
-        - sudo apt-get install -y --no-install-recommends libudev-dev
       script: make -C app-shell dist-linux
       if: tag =~ ^v
 

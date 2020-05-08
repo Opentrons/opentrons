@@ -1,4 +1,5 @@
 import enum
+from math import sqrt, isclose
 from typing import Any, NamedTuple, TYPE_CHECKING, Union
 
 if TYPE_CHECKING:
@@ -22,7 +23,9 @@ class Point(NamedTuple):
     def __eq__(self, other: Any) -> bool:
         if not isinstance(other, Point):
             return False
-        return self.x == other.x and self.y == other.y and self.z == other.z
+        pairs = ((self.x, other.x), (self.y, other.y), (self.z, other.z))
+        return all(isclose(s, o,
+                           rel_tol=1e-05, abs_tol=1e-08) for s, o in pairs)
 
     def __add__(self, other: Any) -> 'Point':
         if not isinstance(other, Point):
@@ -34,8 +37,19 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
+    def __abs__(self) -> 'Point':
+        return Point(abs(self.x), abs(self.y), abs(self.z))
+
     def __str__(self):
         return '({}, {}, {})'.format(self.x, self.y, self.z)
+
+    def magnitude_to(self, other: Any) -> float:
+        if not isinstance(other, Point):
+            return NotImplemented
+        x_diff = self.x - other.x
+        y_diff = self.y - other.y
+        z_diff = self.z - other.z
+        return sqrt(x_diff**2 + y_diff**2 + z_diff**2)
 
 
 LocationLabware = Union['Labware', 'Well', str, 'ModuleGeometry', None]

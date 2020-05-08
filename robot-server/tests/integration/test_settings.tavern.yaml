@@ -1,0 +1,144 @@
+---
+test_name: GET Settings
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Settings GET request returns correct info 
+    request:
+      method: GET
+      url: "{host:s}:{port:d}/settings"
+    response:
+      status_code: 200
+      json:
+        settings:
+        - id: shortFixedTrash
+          old_id: short-fixed-trash
+          title: Short (55mm) fixed trash
+          description: !re_search "Trash box is 55mm tall"
+          restart_required: false
+          value: !anything
+        - id: calibrateToBottom
+          old_id: calibrate-to-bottom
+          title: Calibrate to bottom
+          description: !re_search "Calibrate using the bottom-center"
+          restart_required: false
+          value: !anything
+        - id: deckCalibrationDots
+          old_id: dots-deck-type
+          title: Deck calibration to dots
+          description: !re_search "Perform deck calibration to dots"
+          restart_required: false
+          value: !anything
+        - id: useProtocolApi2
+          old_id: Null
+          title: Use Protocol API version 2
+          description: Deprecated feature flag
+          restart_required: false
+          value: !anything
+        - id: disableHomeOnBoot
+          old_id: disable-home-on-boot
+          title: Disable home on boot
+          description: Prevent robot from homing motors on boot
+          restart_required: false
+          value: !anything
+        - id: useOldAspirationFunctions
+          old_id: Null
+          title: Use older aspirate behavior
+          description: !re_search "Aspirate with the less accurate volumetric calibrations"
+          restart_required: false
+          value: !anything
+        - id: useV1HttpApi
+          old_id: Null
+          title: Revert to legacy HTTP API v1
+          description: !re_match "Tells the OT-2 to run the legacy v1.*"
+          restart_required: true
+          value: !anything
+        links: !anydict 
+
+---
+# All Possible Settings with bool values
+test_name: POST Setting and value
+marks:
+  - usefixtures:
+      - run_server
+  - parametrize:
+      key: id
+      vals: 
+      - shortFixedTrash
+      - calibrateToBottom
+      - deckCalibrationDots
+      - useProtocolApi2
+      - disableHomeOnBoot
+      - useOldAspirationFunctions
+      - useV1HttpApi
+  - parametrize:
+      key: value
+      vals:
+      - "True"
+      - "False"
+stages:
+  - name: Set each setting to acceptable values 
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/settings"
+      json: 
+        id: "{id}"
+        value: "{value}"
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_settings_value
+        extra_kwargs:
+          id: "{id}"
+          value: "{value}"
+
+---
+# All Possible Settings with no values
+test_name: POST Settings with no values
+marks:
+  - usefixtures:
+      - run_server
+  - parametrize:
+      key: id
+      vals: 
+      - shortFixedTrash
+      - calibrateToBottom
+      - deckCalibrationDots
+      - useProtocolApi2
+      - disableHomeOnBoot
+      - useOldAspirationFunctions
+      - useV1HttpApi
+stages:
+  - name: Set each setting to acceptable values 
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/settings"
+      json: 
+        id: "{id}"
+    response:
+      status_code: 200
+      verify_response_with:
+        function: tests.integration.utils:verify_settings_value
+        extra_kwargs:
+          id: "{id}"
+          value: Null
+
+---
+# POST Incorrect Values
+test_name: POST With incorrect ID
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Post with incorrect ID
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/settings"
+      json: 
+        id: notARealID
+        value: true
+    response:
+      status_code: 400
+      json:
+        message: "{tavern.request_vars.json.id} is not recognized"

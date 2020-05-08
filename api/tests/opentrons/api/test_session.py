@@ -3,6 +3,7 @@ import copy
 import pytest
 import base64
 
+from opentrons.api import session
 from opentrons.api.session import (
     _accumulate, _dedupe)
 from tests.opentrons.conftest import state
@@ -130,6 +131,21 @@ def test_set_state(run_session):
 
     with pytest.raises(ValueError):
         run_session.set_state('impossible-state')
+
+
+def test_set_state_info(run_session, monkeypatch):
+    assert run_session.stateInfo == {}
+    run_session.set_state('paused',
+                          reason='test1',
+                          user_message='cool message',
+                          duration=10)
+    assert run_session.stateInfo == {'message': 'test1',
+                                     'userMessage': 'cool message',
+                                     'estimatedDuration': 10}
+    run_session.startTime = 300
+    monkeypatch.setattr(session, 'now', lambda: 350)
+    run_session.set_state('running')
+    assert run_session.stateInfo == {'changedAt': 50}
 
 
 def test_error_append(run_session):

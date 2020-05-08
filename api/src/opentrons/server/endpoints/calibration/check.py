@@ -2,7 +2,7 @@ from aiohttp import web
 
 from opentrons import types
 from .session import CheckCalibrationSession, CalibrationCheckTrigger
-from .models import SpecificPipette, MoveLocation, JogPosition
+from .models import JogPosition
 
 
 async def get_session(request: web.Request, session) -> web.Response:
@@ -31,8 +31,7 @@ async def create_session(request):
     current_session = session_storage.sessions.get(session_type)
     if not current_session:
         hardware = request.config_dict['com.opentrons.hardware']
-        await CheckCalibrationSession.build(hardware)
-        new_session = CheckCalibrationSession(hardware)
+        new_session = await CheckCalibrationSession.build(hardware)
         session_storage.sessions[session_type] = new_session
         return web.json_response(status=201)
     else:
@@ -66,40 +65,17 @@ async def load_labware(request: web.Request, session) -> web.Response:
 
 
 async def prepare_pipette(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette,
-                                     pipette_id=pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette)
+    return web.json_response(status=200)
+
+
+async def compare_point(request: web.Request, session) -> web.Response:
+    await session.trigger_transition(CalibrationCheckTrigger.compare_point)
     return web.json_response(status=200)
 
 
 async def confirm_step(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
-                                     pipette_id=pipette.pipetteId)
-    return web.json_response(status=200)
-
-
-# TODO: BC: make this function idea "confirm point" instead of "move"
-async def move(request: web.Request, session) -> web.Response:
-    req = await request.json()
-    moveloc = MoveLocation(**req)
-    if hasattr(moveloc.location, 'offset'):
-        # using getattr to avoid error raised by Union of deck position and
-        # tiprack position having different attributes.
-        offset = getattr(moveloc.location, 'offset')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "offset": types.Point(*offset)}
-    else:
-        position = getattr(moveloc.location, 'position')
-        location = {
-            "locationId": moveloc.location.locationId,
-            "position": types.Point(*position)}
-    await session.trigger_transition(CalibrationCheckTrigger.confirm_step,
-                                     pipette_id=moveloc.pipetteId,
-                                     request_location=location)
+    await session.trigger_transition(CalibrationCheckTrigger.go_to_next_check)
     return web.json_response(status=200)
 
 
@@ -107,34 +83,24 @@ async def jog(request: web.Request, session: 'CheckCalibrationSession'):
     req = await request.json()
     jog_position = JogPosition(**req)
     await session.trigger_transition(CalibrationCheckTrigger.jog,
-                                     jog_position.pipetteId,
                                      types.Point(*jog_position.vector))
     return web.json_response(status=200)
 
 
 async def pick_up_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.pick_up_tip,
-                                     pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.pick_up_tip)
     return web.json_response(status=200)
 
 
 async def invalidate_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
-    pipette = SpecificPipette(**req)
-    await session.trigger_transition(CalibrationCheckTrigger.invalidate_tip,
-                                     pipette.pipetteId)
+    await session.trigger_transition(CalibrationCheckTrigger.invalidate_tip)
     return web.json_response(status=200)
 
 
 async def confirm_tip(
         request: web.Request, session: 'CheckCalibrationSession'):
-    req = await request.json()
-    pipette = SpecificPipette(**req)
     await session.trigger_transition(
-        CalibrationCheckTrigger.confirm_tip_attached,
-        pipette.pipetteId)
+        CalibrationCheckTrigger.confirm_tip_attached)
     return web.json_response(status=200)

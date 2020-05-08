@@ -26,4 +26,4 @@ def use_old_aspiration_functions():
 
 
 def use_fast_api() -> bool:
-    return advs.get_setting_with_env_overload('useFastApi')
+    return not advs.get_setting_with_env_overload('useV1HttpApi')

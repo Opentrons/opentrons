@@ -1,7 +1,7 @@
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 3
+good_file_version = 4
 good_file_settings = {
     'shortFixedTrash': None,
     'calibrateToBottom': None,
@@ -11,7 +11,7 @@ good_file_settings = {
     'disableLogAggregation': None,
     'enableApi1BackCompat': None,
     'useProtocolApi2': None,
-    'useFastApi': None,
+    'useV1HttpApi': None,
 }
 
 
@@ -41,7 +41,7 @@ def test_migrates_versionless_new_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useFastApi': None
+      'useV1HttpApi': None
     }
 
 
@@ -63,7 +63,7 @@ def test_migrates_versionless_old_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useFastApi': None
+      'useV1HttpApi': None
     }
 
 
@@ -97,6 +97,7 @@ def test_migrates_v1_config():
         'disableLogAggregation': None,
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
+        'useV1HttpApi': None,
     }
 
 
@@ -123,6 +124,7 @@ def test_migrates_v2_config():
         'disableLogAggregation': False,
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
+        'useV1HttpApi': None,
     }
 
 
@@ -148,6 +150,7 @@ def test_migrates_v3_config():
         'disableLogAggregation': False,
         'useProtocolApi2': None,
         'enableApi1BackCompat': False,
+        'useV1HttpApi': None
     }
 
 
@@ -165,5 +168,5 @@ def test_ensures_config():
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
              'useProtocolApi2': None,
-             'useFastApi': None
+             'useV1HttpApi': None
          }

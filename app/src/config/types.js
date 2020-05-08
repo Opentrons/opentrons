@@ -17,71 +17,74 @@ export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,
 |}>
 
-export type Config = {
+export type Config = $ReadOnly<{|
   devtools: boolean,
   reinstallDevtools: boolean,
 
   // app update config
-  update: {
+  update: $ReadOnly<{|
     channel: UpdateChannel,
-  },
+  |}>,
 
   // robot update config
-  buildroot: {
+  buildroot: $ReadOnly<{|
     manifestUrl: string,
-  },
+  |}>,
 
   // logging config
-  log: {
-    level: {
+  log: $ReadOnly<{|
+    level: $ReadOnly<{|
       file: LogLevel,
       console: LogLevel,
-    },
-  },
+    |}>,
+  |}>,
 
   // ui and browser config
-  ui: {
+  ui: $ReadOnly<{|
     width: number,
     height: number,
-    url: {
+    url: $ReadOnly<{|
       protocol: UrlProtocol,
       path: string,
-    },
-    webPreferences: {
+    |}>,
+    webPreferences: $ReadOnly<{|
       webSecurity: boolean,
-    },
-  },
+    |}>,
+  |}>,
 
-  analytics: {
+  analytics: $ReadOnly<{|
     appId: string,
     optedIn: boolean,
     seenOptIn: boolean,
-  },
+  |}>,
 
   // deprecated; remove with first migration
-  p10WarningSeen: {
+  p10WarningSeen: $ReadOnly<{|
     [id: string]: ?boolean,
-  },
+  |}>,
 
-  support: {
+  support: $ReadOnly<{|
     userId: string,
     createdAt: number,
     name: string,
     email: ?string,
-  },
+  |}>,
 
-  discovery: {
+  discovery: $ReadOnly<{|
     candidates: DiscoveryCandidates,
-  },
+  |}>,
 
   // custom labware files
-  labware: {
+  labware: $ReadOnly<{|
     directory: string,
-  },
+  |}>,
+
+  // app wide alerts
+  alerts: $ReadOnly<{| ignored: $ReadOnlyArray<string> |}>,
 
   // internal development flags
-  devInternal?: FeatureFlags,
-}
+  devInternal?: $ReadOnly<FeatureFlags>,
+|}>
 
 export type UpdateConfigAction = {|
   type: 'config:UPDATE',

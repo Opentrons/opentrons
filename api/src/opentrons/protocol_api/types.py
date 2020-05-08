@@ -1,7 +1,8 @@
 from typing import Any, Callable, Dict
 from .labware import Labware
 from .contexts import InstrumentContext, ProtocolContext, \
-    MagneticModuleContext, TemperatureModuleContext
+    MagneticModuleContext, TemperatureModuleContext, \
+    ThermocyclerContext
 
 Instruments = Dict[str, InstrumentContext]
 
@@ -16,3 +17,5 @@ PipetteHandler = Callable[[Instruments, LoadedLabware, Any], None]
 MagneticModuleHandler = Callable[[MagneticModuleContext, Any], None]
 
 TemperatureModuleHandler = Callable[[TemperatureModuleContext, Any], None]
+
+ThermocyclerModuleHandler = Callable[[ThermocyclerContext, Any], None]

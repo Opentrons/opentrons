@@ -18,7 +18,7 @@ export function UnreachableRobotItem(props: UnreachableRobot) {
       >
         {hoverTooltipHandlers => (
           <RobotLink
-            url="#"
+            url=""
             className={styles.robot_item}
             disabled
             hoverTooltipHandlers={hoverTooltipHandlers}

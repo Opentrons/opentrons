@@ -1,0 +1,267 @@
+---
+test_name: GET Pipettes
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: GET Pipette Settings request returns correct info
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes"
+      method: GET
+    response:
+      status_code: 200
+      json: 
+        testpipette01: 
+          fields: 
+            blowout: !anydict
+            bottom: !anydict
+            defaultAspirateFlowRate: !anydict
+            defaultBlowOutFlowRate: !anydict
+            defaultDispenseFlowRate: !anydict
+            dropTip: !anydict
+            dropTipCurrent: !anydict
+            dropTipSpeed: !anydict
+            pickUpCurrent: !anydict
+            pickUpDistance: !anydict
+            pickUpIncrement: !anydict
+            pickUpPresses: !anydict
+            pickUpSpeed: !anydict
+            plungerCurrent: !anydict
+            quirks: !anydict
+            tipLength: !anydict
+            top: !anydict
+          info:
+            model: p300_multi_v1
+            name: p300_multi
+      strict: false 
+---
+test_name: GET Pipette {pipette_id}
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: GET Pipette Settings of specific pipette request returns correct info
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: GET
+    response:
+      status_code: 200
+      json: 
+        fields: 
+          blowout: !anydict
+          bottom: !anydict
+          defaultAspirateFlowRate: !anydict
+          defaultBlowOutFlowRate: !anydict
+          defaultDispenseFlowRate: !anydict
+          dropTip: !anydict
+          dropTipCurrent: !anydict
+          dropTipSpeed: !anydict
+          pickUpCurrent: !anydict
+          pickUpDistance: !anydict
+          pickUpIncrement: !anydict
+          pickUpPresses: !anydict
+          pickUpSpeed: !anydict
+          plungerCurrent: !anydict
+          quirks: !anydict
+          tipLength: !anydict
+          top: !anydict
+        info:
+          model: p300_multi_v1
+          name: p300_multi
+      strict: true
+---
+test_name: PATCH Pipette {pipette_id} single value
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: PATCH Pipette Settings of a single value
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: PATCH
+      json:
+        fields:
+          dropTip:
+            value: -3.0
+    response:
+      status_code: 200
+      json: 
+        fields: 
+          blowout: !anydict
+          bottom: !anydict
+          defaultAspirateFlowRate: !anydict
+          defaultBlowOutFlowRate: !anydict
+          defaultDispenseFlowRate: !anydict
+          dropTip: 
+            units: mm
+            type: float
+            min: -6.0
+            max: 2.0
+            default: -2.0
+            value: -3.0
+          dropTipCurrent: !anydict
+          dropTipSpeed: !anydict
+          pickUpCurrent: !anydict
+          pickUpDistance: !anydict
+          pickUpIncrement: !anydict
+          pickUpPresses: !anydict
+          pickUpSpeed: !anydict
+          plungerCurrent: !anydict
+          quirks: !anydict
+          tipLength: !anydict
+          top: !anydict
+        info:
+          model: p300_multi_v1
+          name: p300_multi
+      strict: true
+---
+test_name: PATCH Pipette {pipette_id} multiple values
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: PATCH Pipette Settings of multiple values
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: PATCH
+      json:
+        fields:
+          blowout: 
+            value: 5.0
+          bottom:
+            value: 3.0
+          top:
+            value: 18.0
+    response:
+      status_code: 200
+      json: 
+        fields: 
+          blowout:
+            units: mm
+            type: float
+            min: -4.0
+            max: 10.0
+            default: 3.0
+            value: 5.0
+          bottom:
+            units: mm
+            type: float
+            min: -2.0
+            max: 19.0
+            default: 3.5
+            value: 3.0
+          defaultAspirateFlowRate: !anydict
+          defaultBlowOutFlowRate: !anydict
+          defaultDispenseFlowRate: !anydict
+          dropTip: !anydict 
+          dropTipCurrent: !anydict
+          dropTipSpeed: !anydict
+          pickUpCurrent: !anydict
+          pickUpDistance: !anydict
+          pickUpIncrement: !anydict
+          pickUpPresses: !anydict
+          pickUpSpeed: !anydict
+          plungerCurrent: !anydict
+          quirks: !anydict
+          tipLength: !anydict
+          top:
+            units: mm
+            type: float
+            min: 5.0
+            max: 19.5
+            default: 19.5
+            value: 18.0
+        info:
+          model: p300_multi_v1
+          name: p300_multi
+      strict: true
+---
+test_name: PATCH Pipette {pipette_id} value too low
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: PATCH Pipette Settings with too low of a value
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: PATCH
+      json:
+        fields:
+          dropTip:
+            value: -10.0
+    response:
+      status_code: 412
+      json: 
+        message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+      strict: true
+---
+test_name: PATCH Pipette {pipette_id} value too high
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: PATCH Pipette Settings with too high of a value
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: PATCH
+      json:
+        fields:
+          dropTip:
+            value: 5.0
+    response:
+      status_code: 412
+      json: 
+        message: "dropTip out of range with {tavern.request_vars.json.fields.dropTip.value}"
+      strict: true
+---
+test_name: PATCH Pipette {pipette_id} no value
+marks:
+  - usefixtures:
+      - run_server
+      - attach_pipettes
+stages:
+  - name: PATCH Pipette Settings with no value at all (should reset to default)
+    request:
+      url: "{host:s}:{port:d}/settings/pipettes/testpipette01"
+      method: PATCH
+      json:
+        fields:
+          dropTip:
+            value: Null
+    response:
+      status_code: 200
+      json: 
+        fields: 
+          blowout: !anydict
+          bottom: !anydict
+          defaultAspirateFlowRate: !anydict
+          defaultBlowOutFlowRate: !anydict
+          defaultDispenseFlowRate: !anydict
+          dropTip: 
+            units: mm
+            type: float
+            min: -6.0
+            max: 2.0
+            default: -2.0
+            value: -2.0
+          dropTipCurrent: !anydict
+          dropTipSpeed: !anydict
+          pickUpCurrent: !anydict
+          pickUpDistance: !anydict
+          pickUpIncrement: !anydict
+          pickUpPresses: !anydict
+          pickUpSpeed: !anydict
+          plungerCurrent: !anydict
+          quirks: !anydict
+          tipLength: !anydict
+          top: !anydict
+        info:
+          model: p300_multi_v1
+          name: p300_multi
+      strict: true

@@ -112,8 +112,6 @@ class CalibrationRoutes(object):
             check.create_session,
             name="sessionStart")
         self.app.router.add_post(
-            '/{type}/session/move', check.move, name="move")
-        self.app.router.add_post(
             '/{type}/session/loadLabware',
             check.load_labware,
             name="loadLabware")
@@ -135,6 +133,10 @@ class CalibrationRoutes(object):
             name="invalidateTip")
         self.app.router.add_post(
             '/{type}/session/jog', check.jog, name="jog")
+        self.app.router.add_post(
+            '/{type}/session/comparePoint',
+            check.compare_point,
+            name="comparePoint")
         self.app.router.add_post(
             '/{type}/session/confirmStep',
             check.confirm_step,

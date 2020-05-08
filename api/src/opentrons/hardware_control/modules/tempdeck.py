@@ -48,9 +48,8 @@ class Poller(Thread):
         while not self._stop_event.wait(TEMP_POLL_INTERVAL_SECS):
             self._driver_ref.update_temperature()
 
-    def join(self):
+    def stop(self):
         self._stop_event.set()
-        super().join()
 
 
 class TempDeck(mod_abc.AbstractModule):
@@ -223,6 +222,7 @@ class TempDeck(mod_abc.AbstractModule):
         TempDecks
         """
         if self._poller:
+            self._poller.stop()
             self._poller.join()
         if not self._driver.is_connected():
             self._driver.connect(self._port)
@@ -232,7 +232,7 @@ class TempDeck(mod_abc.AbstractModule):
 
     def __del__(self):
         if hasattr(self, '_poller') and self._poller:
-            self._poller.join()
+            self._poller.stop()
 
     async def prep_for_update(self) -> str:
         model = self._device_info and self._device_info.get('model')
@@ -241,6 +241,7 @@ class TempDeck(mod_abc.AbstractModule):
                                     "Please contact Opentrons Support.")
 
         if self._poller:
+            self._poller.stop()
             self._poller.join()
         del self._poller
         self._poller = None

@@ -30,26 +30,37 @@ if (config.devtools) {
 let mainWindow
 let rendererLogger
 
-app.once('ready', startUp)
-app.once('window-all-closed', () => app.quit())
+// prepended listener is important here to work around Electron issue
+// https://github.com/electron/electron/issues/19468#issuecomment-623529556
+app.prependOnceListener('ready', startUp)
+if (config.devtools) app.once('ready', installDevtools)
+
+app.once('window-all-closed', () => {
+  log.debug('all windows closed, quitting the app')
+  app.quit()
+})
 
 function startUp() {
   log.info('Starting App')
   process.on('uncaughtException', error => log.error('Uncaught: ', { error }))
+  process.on('unhandledRejection', reason =>
+    log.error('Uncaught Promise rejection: ', { reason })
+  )
 
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 
   mainWindow.once('closed', () => (mainWindow = null))
 
-  if (config.devtools) installDevtools()
   contextMenu({ showInspectElement: config.devtools })
   initializeMenu()
 
   // wire modules to UI dispatches
   const dispatch = action => {
-    log.silly('Sending action via IPC to renderer', { action })
-    mainWindow.webContents.send('dispatch', action)
+    if (mainWindow) {
+      log.silly('Sending action via IPC to renderer', { action })
+      mainWindow.webContents.send('dispatch', action)
+    }
   }
 
   const actionHandlers = [
@@ -81,20 +92,18 @@ function createRendererLogger() {
 
 function installDevtools() {
   const devtools = require('electron-devtools-installer')
-  const extensions = ['REACT_DEVELOPER_TOOLS', 'REDUX_DEVTOOLS']
+  const extensions = [devtools.REACT_DEVELOPER_TOOLS, devtools.REDUX_DEVTOOLS]
   const install = devtools.default
   const forceReinstall = config.reinstallDevtools
 
-  return Promise.all(
-    extensions.map(name => {
-      return install(devtools[name], forceReinstall)
-        .then(() => log.debug('Devtools extension installed', { name }))
-        .catch(e =>
-          log.warn('Failed to install devtools extension', {
-            name,
-            forceReinstall,
-          })
-        )
+  log.debug('Installing devtools')
+
+  return install(extensions, forceReinstall)
+    .then(() => log.debug('Devtools extensions installed'))
+    .catch(error => {
+      log.warn('Failed to install devtools extensions', {
+        forceReinstall,
+        error,
+      })
     })
-  )
 }

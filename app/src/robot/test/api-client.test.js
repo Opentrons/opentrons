@@ -8,7 +8,7 @@ import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession } from './__fixtures__/session'
+import { MockSession, MockSessionNoStateInfo } from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
@@ -353,6 +353,12 @@ describe('api client', () => {
         {
           name: session.name,
           state: session.state,
+          statusInfo: {
+            message: null,
+            userMessage: null,
+            changedAt: null,
+            estimatedDuration: null,
+          },
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -378,6 +384,49 @@ describe('api client', () => {
           sendNotification('session', session)
         })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses without status info', () => {
+      session = MockSessionNoStateInfo()
+      sessionManager.session = session
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses with some status info set', () => {
+      session.stateInfo.changedAt = 2
+      session.stateInfo.message = 'test message'
+      const expected = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          statusInfo: {
+            message: 'test message',
+            userMessage: null,
+            changedAt: 2,
+            estimatedDuration: null,
+          },
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+          apiLevel: [1, 0],
+        },
+        false
+      )
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
     it('handles connnect without session', () => {
@@ -686,8 +735,78 @@ describe('api client', () => {
     })
 
     it('sends SESSION_UPDATE if session notification has lastCommand', () => {
-      const update = { state: 'running', startTime: 1, lastCommand: null }
-      const expected = actions.sessionUpdate(update, expect.any(Number))
+      const update = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        stateInfo: {},
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 1,
+        lastCommand: null,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => sendNotification('session', update))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with no stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+      }
+
+      const actionInput = {
+        ...update,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => sendNotification('session', update))
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with values in stateInfo', () => {
+      const update = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        stateInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+        },
+      }
+
+      const actionInput = {
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        statusInfo: {
+          message: 'hi and hello football fans',
+          userMessage: 'whos ready for some FOOTBALL',
+          changedAt: 2,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
         .then(() => sendNotification('session', update))

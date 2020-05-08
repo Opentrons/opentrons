@@ -1,6 +1,6 @@
 // @flow
 
-import { POST, DELETE } from '../../robot-api'
+import { POST, GET, DELETE } from '../../robot-api'
 import {
   makeResponseFixtures,
   mockFailureBody,
@@ -17,14 +17,22 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
-      mount_axis: 2,
-      plunger_axis: 4,
+      mount_axis: 'z',
+      plunger_axis: 'b',
       pipette_id: 'abc123_pipette_uuid',
     },
+    def456_pipette_uuid: {
+      model: 'fake_pipette_model',
+      name: 'fake_pipette_name',
+      tip_length: 42,
+      mount_axis: 'a',
+      plunger_axis: 'c',
+      pipette_id: 'def456_pipette_uuid',
+    },
   },
-  currentStep: 'sessionStart',
+  currentStep: 'sessionStarted',
   nextSteps: {
-    links: { loadLabware: '/fake/route' },
+    links: { labwareLoaded: '/fake/route' },
   },
   labware: [
     {
@@ -33,6 +41,15 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       id: 'abc123_labware_uuid',
       forPipettes: ['abc123_pipette_uuid'],
       loadName: 'opentrons_96_tiprack_300ul',
+      namespace: 'opentrons',
+      version: 1,
+    },
+    {
+      alternatives: ['fake_other_tiprack_load_name'],
+      slot: '6',
+      id: 'def456_labware_uuid',
+      forPipettes: ['def456_pipette_uuid'],
+      loadName: 'opentrons_96_tiprack_20ul',
       namespace: 'opentrons',
       version: 1,
     },
@@ -55,6 +72,35 @@ export const {
   failureStatus: 500,
   failureBody: mockFailureBody,
 })
+
+export const {
+  successMeta: mockFetchCheckSessionSuccessMeta,
+  failureMeta: mockFetchCheckSessionFailureMeta,
+  success: mockFetchCheckSessionSuccess,
+  failure: mockFetchCheckSessionFailure,
+} = makeResponseFixtures<
+  RobotCalibrationCheckSessionData,
+  {| message: string |}
+>({
+  method: GET,
+  path: ROBOT_CALIBRATION_CHECK_PATH,
+  successStatus: 200,
+  successBody: mockRobotCalibrationCheckSessionData,
+  failureStatus: 500,
+  failureBody: mockFailureBody,
+})
+
+export const makeUpdateCheckSessionResponseFixtures = (pathExtension: string) =>
+  makeResponseFixtures<RobotCalibrationCheckSessionData, {| message: string |}>(
+    {
+      method: POST,
+      path: `${ROBOT_CALIBRATION_CHECK_PATH}/${pathExtension}`,
+      successStatus: 200,
+      successBody: mockRobotCalibrationCheckSessionData,
+      failureStatus: 500,
+      failureBody: mockFailureBody,
+    }
+  )
 
 export const {
   successMeta: mockDeleteCheckSessionSuccessMeta,

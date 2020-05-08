@@ -274,9 +274,6 @@ class Simulator:
     def get_lights(self) -> Dict[str, bool]:
         return self._lights
 
-    async def identify(self):
-        pass
-
     def pause(self):
         self._run_flag.clear()
 
