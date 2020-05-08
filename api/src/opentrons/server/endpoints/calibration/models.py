@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Dict, Optional, List, Any
 from functools import partial
 from pydantic import BaseModel, Field
-from opentrons.types import Mount
 
 
 Point = List[float]
@@ -44,7 +43,7 @@ class AttachedPipette(BaseModel):
                                 "generation version")
     tip_length: Optional[float] =\
         Field(None, description="The default tip length for this pipette")
-    mount: Optional[Mount] =\
+    mount: Optional[str] =\
         Field(None, description="The mount this pipette attached to")
     has_tip: Optional[bool] =\
         Field(None, description="Whether a tip is attached.")
