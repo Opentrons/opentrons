@@ -15,7 +15,6 @@ import { i18n } from '../../../localization'
 import { createCustomTiprackDef } from '../../../labware-defs/actions'
 import { getLabwareDefsByURI } from '../../../labware-defs/selectors'
 import { PipetteDiagram } from './PipetteDiagram'
-import { TiprackDiagram } from './TiprackDiagram'
 
 import styles from './FilePipettesModal.css'
 import formStyles from '../../forms/forms.css'
@@ -52,7 +51,6 @@ export type Props = {|
   onSetFieldValue: (field: string, value: string | null) => void,
   onSetFieldTouched: (field: string, touched: boolean) => void,
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
-  customTipracksEnabled: ?boolean,
 |}
 
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
@@ -67,7 +65,6 @@ export function PipetteFields(props: Props) {
     onBlur,
     errors,
     touched,
-    customTipracksEnabled,
   } = props
 
   const dispatch = useDispatch()
@@ -157,13 +154,10 @@ export function PipetteFields(props: Props) {
             />
           </FormGroup>
         </div>
-        {customTipracksEnabled && (
-          <PipetteDiagram
-            leftPipette={values.left.pipetteName}
-            rightPipette={values.right.pipetteName}
-            customTipracksEnabled={customTipracksEnabled}
-          />
-        )}
+        <PipetteDiagram
+          leftPipette={values.left.pipetteName}
+          rightPipette={values.right.pipetteName}
+        />
         <div className={styles.mount_column}>
           <FormGroup
             key="rightPipetteModel"
@@ -206,28 +200,15 @@ export function PipetteFields(props: Props) {
           </FormGroup>
         </div>
       </div>
-      {!customTipracksEnabled ? (
-        <div className={styles.diagrams}>
-          <TiprackDiagram definitionURI={values.left.tiprackDefURI} />
-
-          <PipetteDiagram
-            leftPipette={values.left.pipetteName}
-            rightPipette={values.right.pipetteName}
-            customTipracksEnabled={customTipracksEnabled}
+      <div>
+        <OutlineButton Component="label" className={styles.upload_button}>
+          {i18n.t('button.upload_custom_tip_rack')}
+          <input
+            type="file"
+            onChange={e => dispatch(createCustomTiprackDef(e))}
           />
-          <TiprackDiagram definitionURI={values.right.tiprackDefURI} />
-        </div>
-      ) : (
-        <div>
-          <OutlineButton Component="label" className={styles.upload_button}>
-            {i18n.t('button.upload_custom_tip_rack')}
-            <input
-              type="file"
-              onChange={e => dispatch(createCustomTiprackDef(e))}
-            />
-          </OutlineButton>
-        </div>
-      )}
+        </OutlineButton>
+      </div>
     </React.Fragment>
   )
 }

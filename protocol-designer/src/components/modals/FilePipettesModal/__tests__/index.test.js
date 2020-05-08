@@ -59,7 +59,6 @@ describe('FilePipettesModal', () => {
       onSave: jest.fn(),
       thermocyclerEnabled: true,
       moduleRestrictionsDisabled: false,
-      customTipracksEnabled: false,
     }
   })
 
