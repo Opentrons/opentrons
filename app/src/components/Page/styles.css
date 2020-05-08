@@ -1,20 +1,9 @@
-:root {
-  --relative-fill: {
-    width: 100%;
-    height: 100%;
-    position: relative;
-  }
-}
-
-.relative {
-  @apply --relative-fill;
-}
-
-.task {
-  @apply --relative-fill;
-
-  overflow-y: auto;
+.page {
+  position: relative;
+  width: 100%;
+  height: 100%;
   padding-top: 3rem;
+  overflow-y: auto;
 }
 
 .fixed_title_bar {

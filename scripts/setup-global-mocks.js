@@ -16,3 +16,5 @@ jest.mock('../app-shell/src/log')
 
 jest.mock('../protocol-designer/src/labware-defs/utils.js')
 jest.mock('../protocol-designer/src/components/portals/MainPageModalPortal.js')
+
+jest.mock('typeface-open-sans', () => {})
