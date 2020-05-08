@@ -66,6 +66,9 @@ export function registerDiscovery(dispatch: Dispatch) {
 
       case 'discovery:REMOVE':
         return client.remove(action.payload.robotName)
+
+      case 'discovery:CLEAR_CACHE':
+        return clearCache()
     }
   }
 
@@ -75,6 +78,13 @@ export function registerDiscovery(dispatch: Dispatch) {
       type: 'discovery:UPDATE_LIST',
       payload: { robots: client.services },
     })
+  }
+
+  function clearCache() {
+    client.stop()
+    client.services = []
+    handleServices()
+    client.start()
   }
 }
 
