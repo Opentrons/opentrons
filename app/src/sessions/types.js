@@ -37,13 +37,11 @@ export type RobotSessionData = {|
   meta: {...},
 |}
 
-
 export type RobotSessionUpdateData = {|
   commandId: string,
   status: string,
   meta: RobotSessionData,
 |}
-
 
 
 export type CreateRobotSessionAction = {|
@@ -135,3 +133,22 @@ export type RobotSessionAction =
   | UpdateRobotSessionAction
   | UpdateRobotSessionSuccessAction
   | UpdateRobotSessionFailureAction
+
+
+export type SessionsById = $Shape<
+  {|
+    [id: string]: RobotSessionData 
+  |}
+>
+
+export type PerRobotSessionState = $Shape<
+  $ReadOnly<{|
+    robotSessions: void | SessionsById,
+  |}>
+>
+
+export type SessionState = $Shape<
+  $ReadOnly<{|
+    [robotName: string]: void | PerRobotSessionState,
+  |}>
+>

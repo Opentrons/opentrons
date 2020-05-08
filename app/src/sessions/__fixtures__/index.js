@@ -19,5 +19,12 @@ export const mockRobotSessionUpdate : Types.RobotSessionUpdate = {
 export const mockRobotSessionUpdateData : RobotSessionUpdateData = {
   commandId: '4321',
   status: 'accepted',
-  meta: mockRobotSessionData,
+  meta: {
+    sessionType: 'check',
+    sessionId: '1234',
+    meta: {
+      someData: 15,
+      someOtherData: 'hi',
+    },
+  }
 }
