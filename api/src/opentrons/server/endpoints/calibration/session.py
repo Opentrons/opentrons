@@ -271,7 +271,7 @@ class CalibrationSession:
             p = PipetteStatus(
                 model=str(pip['model']),
                 name=str(pip['name']),
-                mount=data['mount'].name,
+                mount=data['mount'],
                 tip_length=float(pip['tip_length']),
                 has_tip=bool(pip['has_tip']),
                 tiprack_id=data['tiprack_id'],
