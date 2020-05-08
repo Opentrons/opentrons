@@ -2,7 +2,7 @@
 // connect and configure robots page
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { withRouter, Route, Switch, Redirect } from 'react-router-dom'
+import { useRouteMatch, Redirect } from 'react-router-dom'
 
 import { createLogger } from '../../logger'
 
@@ -20,14 +20,11 @@ import { Page } from '../../components/Page'
 import { RobotSettings } from './RobotSettings'
 import { InstrumentSettings } from './InstrumentSettings'
 
-import type { ContextRouter } from 'react-router-dom'
-
-type Props = {| ...ContextRouter |}
-
 const log = createLogger(__filename)
 
-export function RobotsComponent(props: Props) {
-  const { path, url, params } = props.match
+export function Robots() {
+  const { path, url, params } = useRouteMatch()
+  const instrumentsMatch = useRouteMatch(`${path}/instruments`)
   const { name } = params
 
   const appUpdate = useSelector(getShellUpdateState)
@@ -59,27 +56,14 @@ export function RobotsComponent(props: Props) {
     )
   }
 
-  return (
-    <Switch>
-      {robot.status === CONNECTABLE && (
-        <Route
-          path={`${path}/instruments`}
-          render={routeProps => (
-            <InstrumentSettings
-              robotName={robot.name}
-              robotDisplayName={robot.displayName}
-              url={routeProps.match.url}
-              path={routeProps.match.path}
-            />
-          )}
-        />
-      )}
-      <Route
-        path={path}
-        render={() => <RobotSettings robot={robot} appUpdate={appUpdate} />}
-      />
-    </Switch>
+  return robot.status === CONNECTABLE && instrumentsMatch ? (
+    <InstrumentSettings
+      robotName={robot.name}
+      robotDisplayName={robot.displayName}
+      url={instrumentsMatch.url}
+      path={instrumentsMatch.path}
+    />
+  ) : (
+    <RobotSettings robot={robot} appUpdate={appUpdate} />
   )
 }
-
-export const Robots = withRouter<_, _>(RobotsComponent)
