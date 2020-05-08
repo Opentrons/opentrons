@@ -57,11 +57,11 @@ const StepCreationButtonComponent = (props: StepButtonComponentProps) => {
   )
 }
 
-type StepButtonItemProps = {
+type StepButtonItemProps = {|
   onClick: () => mixed,
   disabled: boolean,
   stepType: string,
-}
+|}
 
 function StepButtonItem(props: StepButtonItemProps) {
   const { onClick, disabled, stepType } = props
@@ -135,10 +135,9 @@ export const StepCreationButton = () => {
         <ConfirmDeleteStepModal
           onCancelClick={() => setEnqueuedStepType(null)}
           onContinueClick={() => {
-            const s = enqueuedStepType
-            setEnqueuedStepType(null)
-            if (s != null) {
-              addStep(s)
+            if (enqueuedStepType !== null) {
+              addStep(enqueuedStepType)
+              setEnqueuedStepType(null)
             }
           }}
         />
