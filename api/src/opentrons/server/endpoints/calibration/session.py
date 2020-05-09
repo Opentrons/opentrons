@@ -1,5 +1,6 @@
 import typing
 import logging
+import copy
 from uuid import uuid4, UUID
 from enum import Enum
 from dataclasses import dataclass
@@ -37,6 +38,24 @@ class SessionManager:
         return self._sessions
 
 
+class PipetteRank(str, Enum):
+    """The rank in the order of pipettes to use within flow"""
+    first = 'first'
+    second = 'second'
+
+    def __str__(self):
+        return self.name
+
+
+@dataclass
+class PipetteInfo:
+    hw_pipette: Pipette.DictType
+    rank: PipetteRank
+    mount: Mount
+    tiprack_id: typing.Optional[UUID]
+    critical_point: typing.Optional[CriticalPoint]
+
+
 @dataclass
 class PipetteStatus:
     model: str
@@ -44,6 +63,7 @@ class PipetteStatus:
     tip_length: float
     mount: str
     has_tip: bool
+    rank: PipetteRank
     tiprack_id: typing.Optional[UUID]
 
 
@@ -70,7 +90,6 @@ class LabwareInfo:
 class CheckMove:
     position: Point = Point(0, 0, 0)
     locationId: UUID = uuid4()
-    hw_pipette: Pipette.DictType
 
 
 @dataclass
@@ -84,20 +103,6 @@ class Moves:
     joggingFirstPipetteToPointThree: CheckMove = CheckMove()
     joggingSecondPipetteToHeight: CheckMove = CheckMove()
     joggingSecondPipetteToPointOne: CheckMove = CheckMove()
-
-class PipetteRank(str, Enum):
-    """The rank in the order of pipettes to use within flow"""
-    first = 'first'
-    second = 'second'
-
-@dataclass
-class PipetteInfo:
-    tiprack_id: Optional[UUID]
-    critical_point: Optional[CriticalPoint]
-    hw_pipette: Pipette.DictType
-    rank: PipetteRank
-    mount: Mount
-
 
 
 # vector from front bottom left of slot 12
@@ -122,10 +127,13 @@ class CalibrationSession:
         return cls(hardware=hardware)
 
     @staticmethod
-    def _get_pip_info_by_mount(new_pipettes: typing.Dict) -> typing.Dict:
+    def _get_pip_info_by_mount(
+            new_pipettes: typing.Dict[Mount, Pipette.DictType]) \
+            -> typing.Dict[Mount, PipetteInfo]:
         pip_info_by_mount = {}
-        num_pips = len(new_pipettes)
-        for mount, data in new_pipettes.items():
+        attached_pips = {m: p for m, p in new_pipettes.items() if p}
+        num_pips = len(attached_pips)
+        for mount, data in attached_pips.items():
             if data:
                 rank = PipetteRank.first
                 if num_pips == 2 and mount == Mount.LEFT:
@@ -134,11 +142,10 @@ class CalibrationSession:
                 if data['channels'] == 8:
                     cp = CriticalPoint.FRONT_NOZZLE
                 pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
-                                                       critical_point=cp
+                                                       critical_point=cp,
                                                        hw_pipette=data,
                                                        rank=rank,
                                                        mount=mount)
-
         return pip_info_by_mount
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
@@ -155,7 +162,7 @@ class CalibrationSession:
             prev_lw = lw.get(_prev_lw_uuid, None) if _prev_lw_uuid else None
             if _prev_lw_uuid and prev_lw and prev_lw.loadName == load_name:
                 #  pipette uses same tiprack as previous, use existing
-                lw[_prev_lw_uuid].forMounts.append(mount)
+                lw[_prev_lw_uuid].forMounts.append(str(mount))
                 self._pip_info_by_mount[mount].tiprack_id = _prev_lw_uuid
             else:
                 lw_def = labware.get_labware_definition(load_name)
@@ -175,7 +182,7 @@ class CalibrationSession:
         return lw
 
     def _alt_load_names_for_mount(self, mount: Mount) -> typing.List[str]:
-        pip_vol = self.get_pipette(mount)['max_volume']
+        pip_vol = self._pip_info_by_mount[mount].hw_pipette['max_volume']
         return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
 
     def _load_name_for_mount(self, mount: Mount) -> str:
@@ -221,7 +228,7 @@ class CalibrationSession:
     async def _pick_up_tip(self, mount: Mount):
         pip_info = self._pip_info_by_mount[mount]
         if pip_info.tiprack_id:
-            lw_info = self.get_tiprack(tiprack_id)
+            lw_info = self.get_tiprack(pip_info.tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
             # mod geometry contexts. Ignore type checking error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
@@ -254,9 +261,6 @@ class CalibrationSession:
     def hardware(self) -> ThreadManager:
         return self._hardware
 
-    def get_pipette(self, mount: Mount) -> Pipette.DictType:
-        return self.pipettes[mount]
-
     def get_tiprack(self, uuid: UUID) -> LabwareInfo:
         return self._labware_info[uuid]
 
@@ -270,7 +274,12 @@ class CalibrationSession:
         Public property to help format the current labware status of a given
         session for the client.
         """
-        return self._labware_info
+        formatted_labware = {}
+        for id, l in self._labware_info.items():
+            formatted = copy.copy(l)
+            formatted.forMounts = [str(m) for m in l.forMounts]
+            formatted_labware[id] = formatted
+        return formatted_labware
 
 
 # TODO: BC: move the check specific stuff to the check sub dir
@@ -350,7 +359,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_drop_first_tip",
+        "before": "_return_first_tip",
         "after": "_move_first_pipette"
     },
     {
@@ -461,7 +470,7 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.invalidate_tip,
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_drop_second_tip",
+        "before": "_return_second_tip",
         "after": "_move_second_pipette"
     },
     {
@@ -574,9 +583,13 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self.session_type = 'check'
         self._saved_points: typing.Dict[CalibrationCheckState, Point] = {}
 
-    def _get_pipette_by_rank(self, rank: PipetteRank):
-        return next(p for p in self._pip_info_by_mount.values
-                    if p.rank == rank)
+    def _get_pipette_by_rank(self, rank: PipetteRank
+            ) -> typing.Optional[PipetteInfo]:
+        try:
+            return next(p for p in self._pip_info_by_mount.values() \
+                        if p.rank == rank)
+        except StopIteration:
+            return None
 
     def can_distinguish_instr_offset(self):
         """
@@ -588,7 +601,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         return first_pip.mount != Mount.LEFT
 
     async def _is_checking_both_mounts(self):
-        return len(self._pip_info_by_mounts) == 2
+        return len(self._pip_info_by_mount) == 2
 
     async def _load_tip_rack_objects(self):
         """
@@ -601,12 +614,15 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             lw = labware.Labware(lw_data.definition, parent)
             self._deck[lw_data.slot] = lw
 
-            for index, mount in enumerate(lw_data.forMounts):
+            MODULE_LOG.info(f'\nload tipracks second pip {second_pip}\n')
+            for mount in lw_data.forMounts:
                 is_second_mount = second_pip and second_pip.mount == mount
+                MODULE_LOG.info(f'\nmount: {mount} second mount{second_pip.mount} \n')
                 pips_share_rack = len(lw_data.forMounts) == 2
                 well_name = 'A1'
                 if is_second_mount and pips_share_rack:
                     well_name = 'B1'
+                MODULE_LOG.info(f'\nwell_name: {well_name} share{pips_share_rack} \n')
                 well = lw.wells_by_name()[well_name]
                 position = well.top().point + MOVE_TO_TIP_RACK_SAFETY_BUFFER
                 move = CheckMove(position=position, locationId=uuid4())
@@ -616,7 +632,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 else:
                     self._moves.preparingFirstPipette = move
 
-    def pipette_status(self) -> typing.Dict[UUID, PipetteStatus]:
+    def pipette_status(self) -> typing.Dict[Mount, PipetteStatus]:
         """
         Public property to help format the current labware status of a given
         session for the client.
@@ -631,6 +647,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 tip_length=float(hw_pip['tip_length']),
                 has_tip=bool(hw_pip['has_tip']),
                 tiprack_id=pip_info.tiprack_id,
+                rank=str(pip_info.rank),
             )
             to_dict[mount] = p
         return to_dict
@@ -645,15 +662,16 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self.hardware.set_lights(rails=False)
 
     def _get_preparing_state_mount(self) -> typing.Optional[Mount]:
-        pip = {}
+        pip = None
         if self.current_state_name == \
                 CalibrationCheckState.preparingFirstPipette:
             pip = self._get_pipette_by_rank(PipetteRank.first)
         elif self.current_state_name == \
                 CalibrationCheckState.preparingSecondPipette:
             pip = self._get_pipette_by_rank(PipetteRank.second)
-
-        return pip.get('mount', None)
+        assert pip, f'cannot check prepare pipette from state:' \
+                    f' {self.current_state_name}'
+        return pip.mount
 
     async def _is_tip_pick_up_dangerous(self):
         """
@@ -661,8 +679,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         outside of the safe threshold for conducting the rest of the check.
         """
         mount = self._get_preparing_state_mount()
-        assert mount, f'cannot check if tip pick up dangerous from state:' \
-                      f' {self.current_state_name}'
 
         current_pt = await self.hardware.gantry_position(mount)
 
@@ -670,7 +686,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                             self.current_state_name)]
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
-        if str(self.get_pipette(mount)['model']).startswith('p1000'):
+        pip_model = self._pip_info_by_mount[mount].hw_pipette['model']
+        if str(pip_model).startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
         xyThresholdMag = Point(0, 0, 0).magnitude_to(
                 threshold_vector._replace(z=0))
@@ -693,8 +710,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         #     raise CalibrationException(f"Tip is already attached "
         #                                f"to {pipette_id} pipette.")
         mount = self._get_preparing_state_mount()
-        assert mount, f'cannot pick up tip from state:' \
-                      f' {self.current_state_name}'
 
         await self._pick_up_tip(mount)
 
@@ -784,6 +799,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
                 'cannot move pipette on second mount, pipette not present'
+        MODULE_LOG.info(f'\nsecond pip move pip {second_pip}\n')
+        MODULE_LOG.info(f'\nsecond pip move curstate {self.current_state_name}\n')
+        MODULE_LOG.info(f'\nsecond pip move position {getattr(self._moves, self.current_state_name).position}\n')
         await self._move(second_pip.mount,
                          Location(getattr(self._moves,
                                           self.current_state_name).position,
@@ -815,16 +833,26 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
                 'cannot jog pipette on second mount, pipette not present'
-        await super(self.__class__, self)._jog(second_pip.jmount, vector)
+        await super(self.__class__, self)._jog(second_pip.mount, vector)
 
-    async def _drop_first_tip(self):
+    async def _return_first_tip(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
                 'cannot drop tip on first mount, pipette not present'
+        await self._move(first_pip.mount,
+                Location(getattr(self._moves,
+                                CalibrationCheckState.preparingFirstPipette
+                                ).position,
+                         None))
         await self._drop_tip(first_pip.mount)
 
-    async def _drop_second_tip(self):
+    async def _return_second_tip(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
                 'cannot drop tip on second mount, pipette not present'
+        await self._move(second_pip.mount,
+                Location(getattr(self._moves,
+                                CalibrationCheckState.preparingSecondPipette
+                                ).position,
+                         None))
         await self._drop_tip(second_pip.mount)

@@ -38,6 +38,7 @@ def _create_calibration_check_session_details(
             tip_length=v.tip_length,
             mount=v.mount,
             has_tip=v.has_tip,
+            rank=v.rank,
             tiprack_id=v.tiprack_id)
         for k, v in session.pipette_status().items()
     }
@@ -46,7 +47,7 @@ def _create_calibration_check_session_details(
                 alternatives=data.alternatives,
                 slot=data.slot,
                 id=data.id,
-                forPipettes=data.forPipettes,
+                forMounts=data.forMounts,
                 loadName=data.loadName,
                 namespace=data.namespace,
                 version=data.version) for data in

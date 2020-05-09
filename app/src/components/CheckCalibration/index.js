@@ -45,22 +45,30 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     () => instruments && Object.keys(instruments).length === 2,
     [instruments]
   )
-  const activeLabware = ''
-  // React.useMemo(
-  //   () =>
-  //     labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
-  //   [labware, activeInstrumentId]
-  // )
-  const isActiveInstrumentMultiChannel = false
-  //  React.useMemo(() => {
-  //   const spec =
-  //     instruments &&
-  //     getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
-  //   return spec ? spec.channels > 1 : false
-  // }, [activeInstrumentId, instruments])
+
+  const activeInstrument = React.useMemo(() => {
+    const rank = getPipetteRankForStep(currentStep)
+    return (
+      instruments &&
+      instruments[
+        Object.keys(instruments).find(mount => instruments[mount].rank === rank)
+      ]
+    )
+  }, [currentStep, instruments])
+
+  const activeLabware = React.useMemo(
+    () =>
+      labware &&
+      activeInstrument &&
+      labware.find(l => l.id === activeInstrument.tiprack_id),
+    [labware, activeInstrument]
+  )
+  const isActiveInstrumentMultiChannel = React.useMemo(() => {
+    const spec = instruments && getPipetteModelSpecs(activeInstrument?.model)
+    return spec ? spec.channels > 1 : false
+  }, [activeInstrument, instruments])
   // TODO: BC: once api returns real values for instrument.mount_axis
   // infer active mount from activeInstrument
-  const activeMount = 'left'
 
   function exit() {
     dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
@@ -94,6 +102,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
         Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
       ].includes(currentStep)
+
       stepContents = activeLabware ? (
         <TipPickUp
           tiprack={activeLabware}
@@ -129,7 +138,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           robotName={robotName}
           slotNumber={slotNumber}
           isMulti={isActiveInstrumentMultiChannel}
-          mount={activeMount}
+          mount={activeInstrument.mount.toLowerCase()}
           exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
@@ -154,7 +163,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         <CheckHeight
           robotName={robotName}
           isMulti={isActiveInstrumentMultiChannel}
-          mount={activeMount}
+          mount={activeInstrument.mount.toLowerCase()}
           exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
@@ -220,7 +229,6 @@ const getNextButtonTextForStep = (
       return CHECK_Z_AXIS
     }
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
     case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
@@ -228,6 +236,9 @@ const getNextButtonTextForStep = (
     }
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
       return hasTwoPipettes ? DROP_TIP_AND_DO_SECOND_PIPETTE : CONTINUE
+    }
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return CONTINUE
     }
     default: {
       // should never reach this case, func only called when currentStep listed above
@@ -253,6 +264,36 @@ const getSlotNumberFromStep = (
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
       return '7'
+    }
+    default:
+      // should never reach this case, func only called when currentStep listed above
+      return ''
+  }
+}
+
+const getPipetteRankForStep = (
+  step: Calibration.RobotCalibrationCheckStep
+): string => {
+  switch (step) {
+    case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
+    case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return 'first'
+    }
+    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return 'second'
     }
     default:
       // should never reach this case, func only called when currentStep listed above

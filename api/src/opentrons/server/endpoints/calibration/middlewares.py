@@ -64,6 +64,7 @@ def status_response(
                                 tip_length=v.tip_length,
                                 mount=v.mount,
                                 has_tip=v.has_tip,
+                                rank=v.rank,
                                 tiprack_id=v.tiprack_id)
         for k, v in session.pipette_status().items()
     }
@@ -76,7 +77,7 @@ def status_response(
         labware=[LabwareStatus(alternatives=data.alternatives,
                                slot=data.slot,
                                id=data.id,
-                               forPipettes=data.forPipettes,
+                               forMounts=data.forMounts,
                                loadName=data.loadName,
                                namespace=data.namespace,
                                version=data.version) for data in lw_status])

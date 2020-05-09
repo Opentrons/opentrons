@@ -49,6 +49,8 @@ class AttachedPipette(BaseModel):
         Field(None, description="Whether a tip is attached.")
     tiprack_id: Optional[UUID] =\
         Field(None, description="Id of tiprack associated with this pipette.")
+    rank: Optional[str] =\
+        Field(None, description="Rank in the order of pipettes used for flow")
 
 
 class LabwareStatus(BaseModel):
@@ -56,7 +58,7 @@ class LabwareStatus(BaseModel):
     alternatives: List[str]
     slot: Optional[str]
     id: UUID
-    forPipettes: List[UUID]
+    forMounts: List[str]
     loadName: str
     namespace: str
     version: str

@@ -3,8 +3,7 @@ import asyncio
 import pytest
 from opentrons import types
 
-from opentrons.server.endpoints.calibration import session
-from opentrons.server.endpoints.calibration import util
+from opentrons.server.endpoints.calibration import session, util
 
 
 @pytest.fixture
@@ -267,7 +266,7 @@ async def test_diff_pips_diff_tipracks(check_calibration_session):
             session.CalibrationCheckTrigger.load_labware)
     assert len(sess._labware_info.keys()) == 2
     for tiprack in sess._labware_info.values():
-        assert len(tiprack.forPipettes) == 1
+        assert len(tiprack.forMounts) == 1
     # loads tiprack for right mount in 8
     # and tiprack for left mount in 6
     assert sess._deck['8']
@@ -282,7 +281,7 @@ async def test_same_size_pips_share_tiprack(
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.load_labware)
     assert len(sess._labware_info.keys()) == 1
-    assert len(next(iter(sess._labware_info.values())).forPipettes) == 2
+    assert len(next(iter(sess._labware_info.values())).forMounts) == 2
 
     # loads tiprack for right mount in 8
     # and tiprack for left mount in 6
@@ -303,7 +302,8 @@ async def test_same_size_pips_share_tiprack(
 async def test_jog_pipette(check_calibration_session):
     sess = await in_preparing_first_pipette(check_calibration_session)
 
-    last_pos = await sess.hardware.gantry_position(sess._first_mount)
+    last_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
 
     jog_vector_map = {
         'front': types.Point(0, -0.1, 0),
@@ -316,74 +316,80 @@ async def test_jog_pipette(check_calibration_session):
     for dir, vector in jog_vector_map.items():
         await sess.trigger_transition(
             session.CalibrationCheckTrigger.jog, vector)
-        jog_pos = await sess.hardware.gantry_position(sess._first_mount)
+        jog_pos = await sess.hardware.gantry_position(
+                sess._get_pipette_by_rank(session.PipetteRank.first).mount)
         assert jog_pos == vector + last_pos
         last_pos = jog_pos
 
 
 async def test_first_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_first_tip(check_calibration_session)
-    first_pip = sess.get_pipette(sess._first_mount)
-    second_pip = sess.get_pipette(sess._second_mount)
-    assert first_pip['has_tip'] is True
-    assert first_pip['tip_length'] > 0.0
-    assert second_pip['has_tip'] is False
+    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
+    second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
+    assert first_pip.hw_pipette['has_tip'] is True
+    assert first_pip.hw_pipette['tip_length'] > 0.0
+    assert second_pip.hw_pipette['has_tip'] is False
 
 
 async def test_second_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_second_tip(check_calibration_session)
-    first_pip = sess.get_pipette(sess._first_mount)
-    second_pip = sess.get_pipette(sess._second_mount)
-    assert second_pip['has_tip'] is True
-    assert second_pip['tip_length'] > 0.0
-    assert first_pip['has_tip'] is False
+    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
+    second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
+    assert second_pip.hw_pipette['has_tip'] is True
+    assert second_pip.hw_pipette['tip_length'] > 0.0
+    assert first_pip.hw_pipette['has_tip'] is False
 
 
 async def test_invalidate_first_tip(check_calibration_session):
     sess = await in_inspecting_first_tip(check_calibration_session)
-    first_pip = sess.get_pipette(sess._first_mount)
-    assert first_pip['has_tip'] is True
+    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
+    assert first_pip.hw_pipette['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
         session.CalibrationCheckState.preparingFirstPipette
-    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
+    assert sess._get_pipette_by_rank(
+            session.PipetteRank.first).hw_pipette['has_tip'] is False
 
 
 async def test_invalidate_second_tip(check_calibration_session):
     sess = await in_inspecting_second_tip(check_calibration_session)
-    second_pip = sess.get_pipette(sess._second_mount)
-    assert second_pip['has_tip'] is True
+    second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
+    assert second_pip.hw_pipette['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
-    assert sess.get_pipette(sess._second_mount)['has_tip'] is False
+    assert sess._get_pipette_by_rank(
+            session.PipetteRank.second).hw_pipette['has_tip'] is False
 
 
 async def test_complete_check_one_pip(check_calibration_session_only_right):
     sess = await in_comparing_first_pipette_point_three(
             check_calibration_session_only_right)
-    first_pip = sess.get_pipette(sess._first_mount)
-    assert first_pip['has_tip'] is True
+    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
+    assert first_pip.hw_pipette['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
+    assert sess._get_pipette_by_rank(
+            session.PipetteRank.first).hw_pipette['has_tip'] is False
 
 
 async def test_complete_check_both_pips(check_calibration_session):
     sess = await in_comparing_second_pipette_point_one(
             check_calibration_session)
-    second_pip = sess.get_pipette(sess._second_mount)
-    assert second_pip['has_tip'] is True
+    second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
+    assert second_pip.hw_pipette['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
-    assert sess.get_pipette(sess._second_mount)['has_tip'] is False
+    assert sess._get_pipette_by_rank(
+            session.PipetteRank.first).hw_pipette['has_tip'] is False
+    assert sess._get_pipette_by_rank(
+        session.PipetteRank.second).hw_pipette['has_tip'] is False
 
 
 # START flow testing both mounts
@@ -393,7 +399,8 @@ async def test_load_labware_to_preparing_first_pipette(
         check_calibration_session):
     sess = await in_preparing_first_pipette(check_calibration_session)
     tip_pt = sess._moves.preparingFirstPipette.position
-    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    curr_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
 
     assert check_calibration_session.current_state.name == \
@@ -429,7 +436,8 @@ async def test_inspecting_first_pipette_to_jogging_height(
         check_calibration_session):
     sess = await in_jogging_first_pipette_to_height(check_calibration_session)
     tip_pt = sess._moves.joggingFirstPipetteToHeight.position
-    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    curr_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToHeight
@@ -451,7 +459,8 @@ async def test_comparing_first_pipette_height_to_jogging_point_one(
     sess = await in_jogging_first_pipette_to_point_one(
             check_calibration_session)
     tip_pt = sess._moves.joggingFirstPipetteToPointOne.position
-    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    curr_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointOne
@@ -473,7 +482,8 @@ async def test_comparing_first_pipette_point_one_to_jogging_point_two(
     sess = await in_jogging_first_pipette_to_point_two(
             check_calibration_session)
     tip_pt = sess._moves.joggingFirstPipetteToPointTwo.position
-    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    curr_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointTwo
@@ -495,7 +505,8 @@ async def test_comparing_first_pipette_point_two_to_jogging_point_three(
     sess = await in_jogging_first_pipette_to_point_three(
             check_calibration_session)
     tip_pt = sess._moves.joggingFirstPipetteToPointThree.position
-    curr_pos = await sess.hardware.gantry_position(sess._first_mount)
+    curr_pos = await sess.hardware.gantry_position(
+            sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointThree
@@ -516,7 +527,8 @@ async def test_load_labware_to_preparing_second_pipette(
         check_calibration_session):
     sess = await in_preparing_second_pipette(check_calibration_session)
     tip_pt = sess._moves.preparingSecondPipette.position
-    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    curr_pos = await sess.hardware.gantry_position(
+        sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
@@ -538,7 +550,8 @@ async def test_inspecting_second_pipette_to_jogging_height(
     sess = await in_jogging_second_pipette_to_height(
             check_calibration_session)
     tip_pt = sess._moves.joggingSecondPipetteToHeight.position
-    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    curr_pos = await sess.hardware.gantry_position(
+        sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingSecondPipetteToHeight
@@ -560,7 +573,8 @@ async def test_comparing_second_pipette_height_to_jogging_point_one(
     sess = await in_jogging_second_pipette_to_point_one(
             check_calibration_session)
     tip_pt = sess._moves.joggingSecondPipetteToPointOne.position
-    curr_pos = await sess.hardware.gantry_position(sess._second_mount)
+    curr_pos = await sess.hardware.gantry_position(
+        sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingSecondPipetteToPointOne

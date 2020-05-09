@@ -60,7 +60,7 @@ export type RobotCalibrationCheckLabware = {
   alternatives: Array<string>,
   slot: string,
   id: string,
-  forPipettes: Array<string>,
+  forMounts: Array<string>,
   loadName: string,
   namespace: string,
   version: number,
