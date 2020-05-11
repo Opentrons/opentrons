@@ -4,7 +4,8 @@ import { PrimaryButton } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { useDispatch } from 'react-redux'
 
-import type { Dispatch } from '../../types'
+import type { Dispatch, Action } from '../../types'
+import { useDispatchApiRequest } from '../../robot-api'
 import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import {
   pickUpTipRobotCalibrationCheck,
@@ -49,9 +50,10 @@ type TipPickUpProps = {|
   tiprack: RobotCalibrationCheckLabware,
   robotName: string,
   isInspecting: boolean,
+  dispatchRequest: Action => mixed,
 |}
 export function TipPickUp(props: TipPickUpProps) {
-  const { tiprack, robotName, isMulti, isInspecting } = props
+  const { tiprack, robotName, isMulti, isInspecting, dispatchRequest } = props
   const tiprackDef = React.useMemo(
     () => getLatestLabwareDef(tiprack?.loadName),
     [tiprack]
@@ -68,15 +70,15 @@ export function TipPickUp(props: TipPickUpProps) {
   }
 
   function pickUpTip() {
-    dispatch(pickUpTipRobotCalibrationCheck(robotName))
+    dispatchRequest(pickUpTipRobotCalibrationCheck(robotName))
   }
 
   function confirmTipPickedUp() {
-    dispatch(confirmTipRobotCalibrationCheck(robotName))
+    dispatchRequest(confirmTipRobotCalibrationCheck(robotName))
   }
 
   function rejectPickUpAttempt() {
-    dispatch(invalidateTipRobotCalibrationCheck(robotName))
+    dispatchRequest(invalidateTipRobotCalibrationCheck(robotName))
   }
 
   // TODO: BC: once both pipettes are usable in flow,

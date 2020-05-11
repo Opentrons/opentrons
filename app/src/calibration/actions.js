@@ -8,11 +8,12 @@ import type { RobotCalibrationCheckSessionData } from './api-types'
 import * as Constants from './constants'
 
 export const createRobotCalibrationCheckSession = (
-  robotName: string
+  robotName: string,
+  meta: ?RobotApiRequestMeta
 ): Types.CreateRobotCalibrationCheckSessionAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
-  meta: {},
+  meta: { meta },
 })
 
 export const createRobotCalibrationCheckSessionSuccess = (

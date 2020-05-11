@@ -30,7 +30,7 @@ const mapResponseToAction: ResponseToActionMapper<FetchRobotCalibrationCheckSess
 
   if (response.status === 404) {
     // create new session if not found
-    return Actions.createRobotCalibrationCheckSession(host.name)
+    return Actions.createRobotCalibrationCheckSession(host.name, meta)
   } else {
     return response.ok
       ? Actions.fetchRobotCalibrationCheckSessionSuccess(host.name, body, meta)

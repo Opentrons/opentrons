@@ -1,13 +1,10 @@
 // @flow
 import * as React from 'react'
 import { PrimaryButton, AlertModal } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
 
-import type { Dispatch } from '../../types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 import { tiprackImages } from './tiprackImages'
-import { loadLabwareRobotCalibrationCheck } from '../../calibration'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
@@ -29,17 +26,12 @@ const CLEAR_DECK_BODY =
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
-  robotName: string,
+  proceed: () => mixed,
   exit: () => mixed,
 |}
 export function Introduction(props: IntroductionProps) {
-  const { labwareLoadNames, exit, robotName } = props
+  const { labwareLoadNames, exit, proceed } = props
   const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
-  const dispatch = useDispatch<Dispatch>()
-
-  function proceed() {
-    dispatch(loadLabwareRobotCalibrationCheck(robotName))
-  }
 
   // TODO: BC: investigate whether we should sub out the warning modal
   // below for the existing ClearDeckAlertModal

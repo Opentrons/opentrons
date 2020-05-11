@@ -2,19 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
 
-import type { Dispatch } from '../../types'
-import {
-  jogRobotCalibrationCheck,
-  comparePointRobotCalibrationCheck,
-  confirmStepRobotCalibrationCheck,
-  type RobotCalibrationCheckComparison,
-} from '../../calibration'
+import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import { formatJogVector, formatOffsetValue } from './utils'
+import { formatOffsetValue } from './utils'
 
 import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
 import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
@@ -82,18 +75,19 @@ const GOOD_INSPECTING_BODY =
 const DIFFERENCE = 'Difference'
 
 type CheckXYPointProps = {|
-  robotName: string,
   slotNumber: string | null,
   isMulti: boolean,
   mount: Mount,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
-  exit: () => void,
   nextButtonText: string,
+  exit: () => void,
+  comparePoint: () => void,
+  goToNextCheck: () => void,
+  jog: (JogAxis, JogDirection, JogStep) => void,
 |}
 export function CheckXYPoint(props: CheckXYPointProps) {
   const {
-    robotName,
     slotNumber,
     isMulti,
     mount,
@@ -101,29 +95,16 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     comparison,
     exit,
     nextButtonText,
+    comparePoint,
+    goToNextCheck,
+    jog,
   } = props
 
-  const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
     () =>
       slotNumber && assetMap[slotNumber][mount][isMulti ? 'multi' : 'single'],
     [slotNumber, mount, isMulti]
   )
-  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    dispatch(
-      jogRobotCalibrationCheck(
-        robotName,
-        formatJogVector(axis, direction, step)
-      )
-    )
-  }
-
-  function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName))
-  }
-  function goToNextCheck() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName))
-  }
 
   return (
     <>

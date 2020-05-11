@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ModalPage, Icon } from '@opentrons/components'
+import last from 'lodash/last'
+import { ModalPage, SpinnerModal } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
 import * as Calibration from '../../calibration'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
@@ -13,6 +17,7 @@ import { CompleteConfirmation } from './CompleteConfirmation'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
 import { BadCalibration } from './BadCalibration'
+import { formatJogVector } from './utils'
 import styles from './styles.css'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
@@ -29,14 +34,20 @@ type CheckCalibrationProps = {|
 export function CheckCalibration(props: CheckCalibrationProps) {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, last(requestIds))
+  )?.status
+  const pending = requestStatus === PENDING
 
   const { currentStep, labware, instruments, comparisonsByStep } =
     useSelector((state: State) =>
       Calibration.getRobotCalibrationCheckSession(state, robotName)
     ) || {}
   React.useEffect(() => {
-    dispatch(Calibration.fetchRobotCalibrationCheckSession(robotName))
-  }, [dispatch, robotName])
+    dispatchRequest(Calibration.fetchRobotCalibrationCheckSession(robotName))
+  }, [dispatchRequest, robotName])
 
   // TODO: BC: once robot keeps track of active pipette, grab that
   // from the cal check session status instead of arbitrarily
@@ -71,8 +82,20 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   // infer active mount from activeInstrument
 
   function exit() {
-    dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
+    dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
     closeCalibrationCheck()
+  }
+
+  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
+    dispatch(
+      Calibration.jogRobotCalibrationCheck(
+        robotName,
+        formatJogVector(axis, direction, step)
+      )
+    )
+  }
+  function comparePoint() {
+    dispatch(Calibration.comparePointRobotCalibrationCheck(robotName))
   }
 
   let stepContents
@@ -83,14 +106,27 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <Introduction
           exit={exit}
-          robotName={robotName}
+          proceed={() => {
+            dispatchRequest(
+              Calibration.loadLabwareRobotCalibrationCheck(robotName)
+            )
+          }}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
       break
     }
     case Calibration.CHECK_STEP_LABWARE_LOADED: {
-      stepContents = <DeckSetup robotName={robotName} labware={labware} />
+      stepContents = (
+        <DeckSetup
+          proceed={() =>
+            dispatchRequest(
+              Calibration.preparePipetteRobotCalibrationCheck(robotName)
+            )
+          }
+          labware={labware}
+        />
+      )
       modalContentsClassName = styles.page_content_dark
       break
     }
@@ -109,6 +145,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           robotName={robotName}
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
+          dispatchRequest={dispatchRequest}
         />
       ) : null
       break
@@ -135,7 +172,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       )
       stepContents = (
         <CheckXYPoint
-          robotName={robotName}
           slotNumber={slotNumber}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeInstrument.mount.toLowerCase()}
@@ -143,6 +179,13 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}
+          comparePoint={comparePoint}
+          goToNextCheck={() => {
+            dispatchRequest(
+              Calibration.confirmStepRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
         />
       )
       break
@@ -161,13 +204,19 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       )
       stepContents = (
         <CheckHeight
-          robotName={robotName}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeInstrument.mount.toLowerCase()}
-          exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}
+          exit={exit}
+          comparePoint={comparePoint}
+          goToNextCheck={() => {
+            dispatchRequest(
+              Calibration.confirmStepRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
         />
       )
       break
@@ -190,11 +239,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       // 2. session accession is loading
       // both should probably be handled with some sort of UI
       // affordance in the future.
-      stepContents = (
-        <div className={styles.modal_contents}>
-          <Icon name="ot-spinner" className={styles.loading_spinner} spin />
-        </div>
-      )
+      stepContents = <SpinnerModal />
     }
   }
 
@@ -206,7 +251,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       }}
       contentsClassName={modalContentsClassName}
     >
-      {stepContents}
+      {pending ? <SpinnerModal /> : stepContents}
     </ModalPage>
   )
 }
