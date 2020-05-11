@@ -42,7 +42,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
         />
         <ConditionalOnField
           name={'thermocyclerFormType'}
-          condition={val => val === 'thermocyclerState'}
+          condition={val => val === THERMOCYCLER_STATE}
         >
           <StateFields focusHandlers={focusHandlers} />
         </ConditionalOnField>
