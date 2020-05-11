@@ -3,12 +3,14 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import typing
 from pydantic.main import BaseModel
+from uuid import uuid4
 
 from opentrons.server.endpoints.calibration.session \
     import CheckCalibrationSession, CalibrationCheckState, \
     CalibrationCheckTrigger
 from opentrons.server.endpoints.calibration.models import \
     SessionType, JogPosition
+from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager
 
@@ -30,7 +32,43 @@ TYPE_SESSION_ID_CHECK_ = {
 
 
 @pytest.fixture
-def mock_cal_session(hardware):
+def mock_cal_session(hardware, loop):
+
+    id1 = uuid4()
+    id2 = uuid4()
+    mock_instrs = {
+        id1: {
+            'mount': types.Mount.LEFT,
+            'tiprack_id': None,
+            'critical_point': None},
+        id2: {
+            'mount': types.Mount.RIGHT,
+            'tiprack_id': None,
+            'critical_point': None}
+    }
+    other_instrs = {
+        types.Mount.LEFT: {
+            'model': 'p10_single_v1',
+            'has_tip': False,
+            'max_volume': 10,
+            'name': 'p10_single',
+            'tip_length': 0,
+            'channels': 1},
+        types.Mount.RIGHT: {
+            'model': 'p300_single_v1',
+            'has_tip': False,
+            'max_volume': 300,
+            'name': 'p300_single',
+            'tip_length': 0,
+            'channels': 1}
+    }
+
+    def fake_get_pip(mount):
+        return other_instrs[mount]
+
+    CheckCalibrationSession._key_by_uuid = MagicMock(return_value=mock_instrs)
+    CheckCalibrationSession.get_pipette = MagicMock(side_effect=fake_get_pip)
+
     m = CheckCalibrationSession(hardware)
 
     async def async_mock(*args, **kwargs):
@@ -71,6 +109,36 @@ def session_manager_with_session(mock_cal_session):
 
     if SessionType.check in manager.sessions:
         del manager.sessions[SessionType.check]
+
+
+@pytest.fixture
+def session_info(mock_cal_session):
+    current_state = mock_cal_session.current_state_name
+    lw_status = mock_cal_session.labware_status.values()
+    comparisons_by_step = mock_cal_session.get_comparisons_by_step()
+    instruments = {
+        str(k): {'model': v.model,
+                 'name': v.name,
+                 'tip_length': v.tip_length,
+                 'mount': v.mount.value,
+                 'has_tip': v.has_tip,
+                 'tiprack_id': str(v.tiprack_id)}
+        for k, v in mock_cal_session.pipette_status().items()
+    }
+    info = {
+        'instruments': instruments,
+        'labware': [{
+            'alternatives': data.alternatives,
+            'slot': data.slot,
+            'id': str(data.id),
+            'forPipettes': [str(_id) for _id in data.forPipettes],
+            'loadName': data.loadName,
+            'namespace': data.namespace,
+            'version': str(data.version)} for data in lw_status],
+        'currentStep': current_state,
+        'comparisonsByStep': comparisons_by_step
+    }
+    return info
 
 
 def test_create_session_already_present(api_client,
@@ -120,7 +188,7 @@ def test_create_session_error(api_client,
     assert response.status_code == 400
 
 
-def test_create_session(api_client, patch_build_session):
+def test_create_session(api_client, patch_build_session, session_info):
     response = api_client.post("/sessions", json={
         "data": {
             "type": "Session",
@@ -129,8 +197,10 @@ def test_create_session(api_client, patch_build_session):
             }
         }
     })
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': TYPE_SESSION_ID_CHECK_,
+        'data': base_dict,
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -162,11 +232,14 @@ def test_delete_session_not_found(api_client):
 
 
 def test_delete_session(api_client, session_manager_with_session,
-                        mock_cal_session):
+                        mock_cal_session,
+                        session_info):
     response = api_client.delete("/sessions/check")
     mock_cal_session.delete_session.assert_called_once()
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': TYPE_SESSION_ID_CHECK_,
+        'data': base_dict,
         'links': {
             'POST': {
                 'href': '/sessions',
@@ -189,10 +262,12 @@ def test_get_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_get_session(api_client, session_manager_with_session):
+def test_get_session(api_client, session_manager_with_session, session_info):
     response = api_client.get("/sessions/check")
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': TYPE_SESSION_ID_CHECK_,
+        'data': base_dict,
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -216,8 +291,10 @@ def test_get_sessions_no_sessions(api_client):
     assert response.status_code == 200
 
 
-def test_get_sessions(api_client, session_manager_with_session):
+def test_get_sessions(api_client, session_manager_with_session, session_info):
     response = api_client.get("/sessions")
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
         'data': [TYPE_SESSION_ID_CHECK_],
     }
@@ -255,7 +332,8 @@ def test_session_command_create_no_session(api_client):
 
 def test_session_command_create(api_client,
                                 session_manager_with_session,
-                                mock_cal_session):
+                                mock_cal_session,
+                                session_info):
     response = api_client.post(
         "/sessions/check/commands",
         json=command("jog",
@@ -265,6 +343,8 @@ def test_session_command_create(api_client,
         trigger="jog",
         vector=[1.0, 2.0, 3.0])
 
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
         'data': {
             'attributes': {
@@ -275,7 +355,7 @@ def test_session_command_create(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': TYPE_SESSION_ID_CHECK_['attributes'],
+        'meta': base_dict['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -293,7 +373,8 @@ def test_session_command_create(api_client,
 
 def test_session_command_create_no_body(api_client,
                                         session_manager_with_session,
-                                        mock_cal_session):
+                                        mock_cal_session,
+                                        session_info):
     response = api_client.post(
         "/sessions/check/commands",
         json=command("loadLabware", None)
@@ -302,6 +383,8 @@ def test_session_command_create_no_body(api_client,
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="loadLabware")
 
+    base_dict = TYPE_SESSION_ID_CHECK_
+    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
         'data': {
             'attributes': {
@@ -312,7 +395,7 @@ def test_session_command_create_no_body(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': TYPE_SESSION_ID_CHECK_['attributes'],
+        'meta': base_dict['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',

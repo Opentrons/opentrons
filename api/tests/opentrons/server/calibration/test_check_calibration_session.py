@@ -253,6 +253,11 @@ async def test_session_started_to_bad_state(check_calibration_session):
         )
 
 
+async def test_session_no_pipettes_error(hardware):
+    with pytest.raises(session.noPipetteException):
+        await session.CheckCalibrationSession.build(hardware)
+
+
 async def test_session_started_to_end_state(check_calibration_session):
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.exit
@@ -284,8 +289,7 @@ async def test_same_size_pips_share_tiprack(
     assert len(sess._labware_info.keys()) == 1
     assert len(next(iter(sess._labware_info.values())).forPipettes) == 2
 
-    # loads tiprack for right mount in 8
-    # and tiprack for left mount in 6
+    # loads tiprack in 8 only
     assert sess._deck['8']
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
     assert sess._deck['6'] is None

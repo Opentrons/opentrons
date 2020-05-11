@@ -27,6 +27,10 @@ class CalibrationException(Exception):
     pass
 
 
+class noPipetteException(Exception):
+    pass
+
+
 class SessionManager:
     """Small wrapper to keep track of robot calibration sessions created."""
     def __init__(self):
@@ -312,7 +316,6 @@ class CalibrationCheckState(str, Enum):
     returningTip = "returningTip"
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
-    noPipettesAttached = "noPipettesAttached"
     checkComplete = "checkComplete"
 
 
@@ -327,7 +330,6 @@ class CalibrationCheckTrigger(str, Enum):
     go_to_next_check = "goToNextCheck"
     exit = "exitSession"
     reject_calibration = "rejectCalibration"
-    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [
@@ -530,11 +532,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.reject_calibration,
         "from_state": WILDCARD,
         "to_state": CalibrationCheckState.badCalibrationData
-    },
-    {
-        "trigger": CalibrationCheckTrigger.no_pipettes,
-        "from_state": WILDCARD,
-        "to_state": CalibrationCheckState.noPipettesAttached
     }
 ]
 
@@ -603,8 +600,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
         else:
-            MODULE_LOG.warning("Cannot start calibration check "
-                               "with fewer than one pipette.")
+            raise noPipetteException("Cannot start calibration check "
+                                     "with fewer than one pipette.")
 
     async def _is_checking_both_mounts(self):
         return self._second_mount is not None
@@ -749,10 +746,17 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_mag = Point(0, 0, 0).magnitude_to(
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
+                transform_type: typing.Optional[str] = None
+
+                if exceeds and not self._can_distiguish_instr_offset:
+                    transform_type = 'badInstrumentOffset'
+                elif exceeds:
+                    transform_type = 'badDeckTransformCalibration'
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=abs(ref_pt - jogged_pt),
                                      thresholdVector=comp.threshold_vector,
-                                     exceedsThreshold=exceeds)
+                                     exceedsThreshold=exceeds,
+                                     transformType=transform_type)
         return comparisons
 
     async def _register_point_first_pipette(self):

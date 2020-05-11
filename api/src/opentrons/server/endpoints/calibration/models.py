@@ -70,6 +70,7 @@ class ComparisonStatus(BaseModel):
     differenceVector: Point = PointField()
     thresholdVector:  Point = PointField()
     exceedsThreshold: bool
+    transformType: Optional[str]
 
 
 class CalibrationSessionStatus(BaseModel):
