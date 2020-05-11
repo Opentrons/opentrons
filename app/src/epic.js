@@ -35,5 +35,5 @@ export const rootEpic: Epic = combineEpics(
   shellEpic,
   alertsEpic,
   systemInfoEpic,
-  sessionsEpic,
+  sessionsEpic
 )

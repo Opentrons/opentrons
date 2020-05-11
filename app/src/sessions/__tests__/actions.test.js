@@ -3,7 +3,7 @@
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 
-import type { SessionAction } from '../types'
+import type { RobotSessionAction } from '../types'
 
 import {mockV2ErrorResponse} from '../../robot-api/__fixtures__'
 
@@ -11,7 +11,7 @@ type ActionSpec = {|
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
-  expected: SessionAction,
+  expected: RobotSessionAction,
 |}
 
 describe('robot session check actions', () => {

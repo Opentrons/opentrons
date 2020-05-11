@@ -39,7 +39,7 @@ import type { SystemInfoState, SystemInfoAction } from './system-info/types'
 
 import type { AlertsState, AlertsAction } from './alerts/types'
 
-import type { SesssionState, RobotSessionAction } from './sessions/types'
+import type { SessionState, RobotSessionAction } from './sessions/types'
 
 
 export type State = $ReadOnly<{|
@@ -61,7 +61,7 @@ export type State = $ReadOnly<{|
   shell: ShellState,
   systemInfo: SystemInfoState,
   alerts: AlertsState,
-  sessions: SesssionState,
+  sessions: SessionState,
   router: RouterState,
 |}>
 

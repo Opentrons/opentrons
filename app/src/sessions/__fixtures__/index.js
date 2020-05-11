@@ -6,10 +6,13 @@ import { POST, DELETE, GET } from '../../robot-api'
 import {
   makeResponseFixtures,
   mockV2ErrorResponse,
-  RobotApiV2ResponseBody,
-  RobotApiV2ErrorResponseBody,
   mockRobot,
 } from '../../robot-api/__fixtures__'
+
+import type {
+  RobotApiV2ResponseBody,
+  RobotApiV2ErrorResponseBody,
+} from '../../robot-api/types'
 
 
 export const mockRobotSessionData : Types.RobotSessionData = {
@@ -23,7 +26,7 @@ export const mockRobotSessionUpdate : Types.RobotSessionUpdate = {
   payload: {someData: 32}
 }
 
-export const mockRobotSessionUpdateData : RobotSessionUpdateData = {
+export const mockRobotSessionUpdateData : Types.RobotSessionUpdateData = {
   commandId: '4321',
   status: 'accepted',
   meta: {
@@ -60,10 +63,10 @@ export const mockRobotSessionUpdateResponse: RobotApiV2ResponseBody = {
     meta: {
       sessionType: 'check',
       sessionId: '1234',
-    },
-    meta: {
-      someData: 15,
-      someOtherData: 'hi',
+      details: {
+        someData: 15,
+        someOtherData: 'hi',
+      },
     },
   }
 }

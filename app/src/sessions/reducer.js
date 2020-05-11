@@ -3,7 +3,7 @@ import * as Constants from './constants'
 
 import type { Action } from '../types'
 
-import type { SessionState, PerRobotSession } from './types'
+import type { SessionState, PerRobotSessionState } from './types'
 
 const INITIAL_STATE: SessionState = {}
 
