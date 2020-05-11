@@ -55,9 +55,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatchRequest(Calibration.fetchRobotCalibrationCheckSession(robotName))
   }, [dispatchRequest, robotName])
 
-  // TODO: BC: once robot keeps track of active pipette, grab that
-  // from the cal check session status instead of arbitrarily
-  // defaulting to the first pipette
   const hasTwoPipettes = React.useMemo(
     () => instruments && Object.keys(instruments).length === 2,
     [instruments]
@@ -109,7 +106,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     } else {
       return ''
     }
-  }, [instruments, activeInstrument])
+  }, [instruments, activeInstrument, hasTwoPipettes])
 
   function exit() {
     dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
@@ -273,17 +270,11 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      // TODO: BC: get real complete state name after it is update on server side
       stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents
       break
     }
     default: {
-      // TODO: BC next, this null state is visible when either:
-      // 1. session accession errors
-      // 2. session accession is loading
-      // both should probably be handled with some sort of UI
-      // affordance in the future.
       stepContents = <SpinnerModal />
     }
   }
