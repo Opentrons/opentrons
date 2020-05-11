@@ -276,9 +276,15 @@ describe('createPresavedStepForm', () => {
       id: stepId,
       stepType: 'thermocycler',
       moduleId: 'someThermocyclerModuleId',
-      // TODO add TC Default fields once rebased
+      // TC Default field
       stepName: 'thermocycler',
       stepDetails: '',
+      thermocyclerFormType: 'thermocyclerState',
+      blockIsActive: false,
+      blockTargetTemp: null,
+      lidIsActive: false,
+      lidTargetTemp: null,
+      lidOpen: null,
     })
   })
 })
