@@ -4,6 +4,8 @@ import {
   MAGNETIC_MODULE_V2,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V2,
+  THERMOCYCLER_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { fixtureP10Single } from '@opentrons/shared-data/pipette/fixtures/name'
 import {
@@ -54,6 +56,12 @@ beforeEach(() => {
           id: 'someTemperatureModuleId',
           type: TEMPERATURE_MODULE_TYPE,
           model: TEMPERATURE_MODULE_V2,
+          slot: '3',
+        },
+        someThermocyclerModuleId: {
+          id: 'someTemperatureModuleId',
+          type: THERMOCYCLER_MODULE_TYPE,
+          model: THERMOCYCLER_MODULE_V1,
           slot: '3',
         },
       },
@@ -254,6 +262,22 @@ describe('createPresavedStepForm', () => {
       setTemperature: null,
       targetTemperature: null,
       stepName: 'temperature',
+      stepDetails: '',
+    })
+  })
+
+  it('should set a default thermocycler module when a Thermocycler step is added', () => {
+    const args = {
+      ...defaultArgs,
+      stepType: 'thermocycler',
+    }
+
+    expect(createPresavedStepForm(args)).toEqual({
+      id: stepId,
+      stepType: 'thermocycler',
+      moduleId: 'someThermocyclerModuleId',
+      // TODO add TC Default fields once rebased
+      stepName: 'thermocycler',
       stepDetails: '',
     })
   })

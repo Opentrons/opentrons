@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
-import { getNextDefaultTemperatureModuleId } from '..'
+import { getNextDefaultTemperatureModuleId } from '../getNextDefaultTemperatureModuleId'
 
 const getThermocycler = () => ({
   id: 'tcId',
@@ -55,13 +55,6 @@ describe('getNextDefaultTemperatureModuleId', () => {
         expected: 'tempId',
       },
       {
-        testMsg: 'thermocycler only: use tc',
-        equippedModulesById: {
-          tcId: getThermocycler(),
-        },
-        expected: 'tcId',
-      },
-      {
         testMsg: 'only mag module present: return null',
         equippedModulesById: {
           magId: getMag(),
@@ -85,7 +78,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
       })
     })
   })
-  // TODO (ka 2019-12-20): Add in tests for existing temperature form steps once wired up
+
   describe('previous forms', () => {
     const testCases = [
       {
