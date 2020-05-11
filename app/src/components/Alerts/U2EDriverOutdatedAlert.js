@@ -9,7 +9,6 @@ import {
   Link,
   useToggle,
 } from '@opentrons/components'
-import { useFeatureFlag } from '../../config'
 import { useTrackEvent } from '../../analytics'
 import {
   U2E_DRIVER_UPDATE_URL,
@@ -46,12 +45,6 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props
-
-  // TODO(mc, 2020-05-07): remove this feature flag
-  const enabled = useFeatureFlag('enableSystemInfo')
-  React.useLayoutEffect(() => {
-    if (!enabled) dismissAlert()
-  })
 
   return (
     <AlertModal

@@ -147,8 +147,7 @@ export const getMoreLocation: State => NavLocation = createSelector(
     let notificationReason = null
     if (appUpdate) {
       notificationReason = APP_UPDATE_AVAILABLE
-      // TODO(mc, 2020-05-08): remove enableSystemInfo feature flag
-    } else if (driverStatus === OUTDATED && flags.enableSystemInfo) {
+    } else if (driverStatus === OUTDATED) {
       notificationReason = DRIVER_UPDATE_AVAILABLE
     }
 

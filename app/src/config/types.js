@@ -11,7 +11,6 @@ export type DevInternalFlag =
   | 'allPipetteConfig'
   | 'enableBundleUpload'
   | 'enableRobotCalCheck'
-  | 'enableSystemInfo'
 
 export type FeatureFlags = $Shape<{|
   [DevInternalFlag]: boolean | void,
