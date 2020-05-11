@@ -1,69 +1,59 @@
 {
-    "ordering": [
-        [
-            "A1"
-        ]
-    ],
-    "brand": {
-        "brand": "Onboarding",
-        "brandId": [
-            "Onboarding1"
-        ]
-    },
-    "metadata": {
+  "ordering": [["A1"]],
+  "brand": {
+    "brand": "Onboarding",
+    "brandId": ["Onboarding1"]
+  },
+  "metadata": {
+    "displayName": "Onboarding 1 Well Plate 1000 µL",
+    "displayCategory": "wellPlate",
+    "displayVolumeUnits": "µL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.5,
+    "yDimension": 85,
+    "zDimension": 20
+  },
+  "wells": {
+    "A1": {
+      "depth": 10,
+      "totalLiquidVolume": 1000,
+      "shape": "rectangular",
+      "xDimension": 20,
+      "yDimension": 20,
+      "x": 63.75,
+      "y": 42.5,
+      "z": 10
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
         "displayName": "Onboarding 1 Well Plate 1000 µL",
         "displayCategory": "wellPlate",
-        "displayVolumeUnits": "µL",
-        "tags": []
-    },
-    "dimensions": {
-        "xDimension": 127.5,
-        "yDimension": 85,
-        "zDimension": 20
-    },
-    "wells": {
-        "A1": {
-            "depth": 10,
-            "totalLiquidVolume": 1000,
-            "shape": "rectangular",
-            "xDimension": 20,
-            "yDimension": 20,
-            "x": 63.75,
-            "y": 42.5,
-            "z": 10
-        }
-    },
-    "groups": [
-        {
-            "metadata": {
-                "displayName": "Onboarding 1 Well Plate 1000 µL",
-                "displayCategory": "wellPlate",
-                "wellBottomShape": "v"
-            },
-            "brand": {
-                "brand": "Onboarding",
-                "brandId": [
-                    "Onboarding1"
-                ]
-            },
-            "wells": [
-                "A1"
-            ]
-        }
-    ],
-    "parameters": {
-        "format": "irregular",
-        "quirks": [],
-        "isTiprack": false,
-        "isMagneticModuleCompatible": false,
-        "loadName": "onboarding_1_wellplate_1000ul"
-    },
-    "namespace": "custom_beta",
-    "version": 1,
-    "schemaVersion": 2,
-    "cornerOffsetFromSlot": {
-        "x": 0,
-        "y": 0,
-        "z": 0
+        "wellBottomShape": "v"
+      },
+      "brand": {
+        "brand": "Onboarding",
+        "brandId": ["Onboarding1"]
+      },
+      "wells": ["A1"]
     }
+  ],
+  "parameters": {
+    "format": "irregular",
+    "quirks": [],
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "onboarding_1_wellplate_1000ul"
+  },
+  "namespace": "custom_beta",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
 }
