@@ -34,7 +34,9 @@ const mapResponseToAction: ResponseToActionMapper<CreateRobotCalibrationCheckSes
 
   if (response.status === 409) {
     // delete session and recreate if conflicting
-    return Actions.deleteRobotCalibrationCheckSession(host.name, true)
+    return Actions.deleteRobotCalibrationCheckSession(host.name, true, {
+      requestId: meta.requestId,
+    })
   } else {
     return response.ok
       ? Actions.createRobotCalibrationCheckSessionSuccess(host.name, body, meta)

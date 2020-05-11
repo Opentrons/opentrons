@@ -4,15 +4,12 @@ import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
 
-import * as Calibration from '../../../calibration'
-import { mockRobot } from '../../../calibration/__fixtures__'
 import { Introduction } from '../Introduction'
 
 jest.mock('../../../calibration/selectors')
 
 describe('Introduction', () => {
   let render
-  let mockStore
 
   const mockProceed = jest.fn()
   const mockExit = jest.fn()
@@ -76,9 +73,7 @@ describe('Introduction', () => {
 
     act(() => getClearDeckContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.loadLabwareRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockProceed).toHaveBeenCalled()
 
     act(() => getClearDeckCancelButton(wrapper).invoke('onClick')())
     wrapper.update()

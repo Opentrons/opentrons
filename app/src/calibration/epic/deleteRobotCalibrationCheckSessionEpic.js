@@ -33,7 +33,9 @@ const mapResponseToAction: ResponseToActionMapper<Types.DeleteRobotCalibrationCh
   const meta = { ...originalAction.meta, response: responseMeta }
   if (response.ok) {
     return originalAction.payload.recreate
-      ? Actions.createRobotCalibrationCheckSession(host.name, meta)
+      ? Actions.createRobotCalibrationCheckSession(host.name, {
+          requestId: meta.requestId,
+        })
       : Actions.deleteRobotCalibrationCheckSessionSuccess(host.name, body, meta)
   } else {
     return Actions.deleteRobotCalibrationCheckSessionFailure(

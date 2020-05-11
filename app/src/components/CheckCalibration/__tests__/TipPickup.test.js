@@ -1,19 +1,12 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-} from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
-
+import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
 import { TipPickUp } from '../TipPickUp'
 
 describe('TipPickUp', () => {
   let render
-  let mockStore
 
   const mockPickUpTip = jest.fn()
   const mockConfirmTip = jest.fn()
@@ -35,14 +28,6 @@ describe('TipPickUp', () => {
     wrapper.find('PrimaryButton[children="No, try again"]').find('button')
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (props = {}) => {
       const {
         isMulti = false,
@@ -60,11 +45,7 @@ describe('TipPickUp', () => {
           invalidateTip={mockInvalidateTip}
           pickUpTip={mockPickUpTip}
           jog={mockJog}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+        />
       )
     }
   })
@@ -88,20 +69,13 @@ describe('TipPickUp', () => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
-        Calibration.jogRobotCalibrationCheck(
-          mockRobot.name,
-          jogVectorsByDirection[direction]
-        )
-      )
+      expect(mockJog).toHaveBeenCalledWith(jogVectorsByDirection[direction])
     })
 
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.pickUpTipRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockPickUpTip).toHaveBeenCalled()
   })
 
   it('gives option to continue or invalidate tip if inspecting', () => {
@@ -110,15 +84,11 @@ describe('TipPickUp', () => {
     act(() => getConfirmButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmTipRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockConfirmTip).toHaveBeenCalled()
 
     act(() => getRejectButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.invalidateTipRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockInvalidateTip).toHaveBeenCalled()
   })
 })

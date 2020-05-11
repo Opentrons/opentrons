@@ -151,11 +151,12 @@ export const updateRobotCalibrationCheckSessionFailure = (
 
 export const deleteRobotCalibrationCheckSession = (
   robotName: string,
-  recreate: boolean = false
+  recreate: boolean = false,
+  meta: RobotApiRequestMeta = {}
 ): Types.DeleteRobotCalibrationCheckSessionAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName, recreate },
-  meta: {},
+  meta,
 })
 
 export const deleteRobotCalibrationCheckSessionSuccess = (

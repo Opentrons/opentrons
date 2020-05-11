@@ -1,5 +1,6 @@
 // @flow
 import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
+import { mockRequestMeta } from '../../../robot-api/__fixtures__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { calibrationEpic } from '..'
@@ -105,7 +106,10 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.createRobotCalibrationCheckSession(mocks.robot.name),
+          a: Actions.createRobotCalibrationCheckSession(
+            mocks.robot.name,
+            mockRequestMeta
+          ),
         })
       })
     })
