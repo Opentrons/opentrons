@@ -12,5 +12,6 @@ export const getRobotSessionById: (
   state: State,
   robotName: string,
   sessionId: string
-) => Types.RobotSessionData | null = (state, robotName, sessionId) =>
-  getRobotSessions(state, robotName)[sessionId] ?? null
+) => Types.RobotSessionData | null = (state, robotName, sessionId) => {
+  return (getRobotSessions(state, robotName) || {})[sessionId] ?? null
+}

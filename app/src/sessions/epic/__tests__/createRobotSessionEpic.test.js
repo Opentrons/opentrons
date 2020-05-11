@@ -51,7 +51,7 @@ describe('createRobotSessionEpic', () => {
         data: {
           type: 'Session',
           attributes: {
-            session_type: 'check',
+            sessionType: 'check',
           },
         },
       },

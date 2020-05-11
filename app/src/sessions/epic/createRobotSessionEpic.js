@@ -23,7 +23,7 @@ const mapActionToRequest: ActionToRequestMapper<CreateRobotSessionAction> = acti
     data: {
       type: 'Session',
       attributes: {
-        session_type: action.payload.sessionType,
+        sessionType: action.payload.sessionType,
       },
     },
   },
