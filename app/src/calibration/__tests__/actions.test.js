@@ -117,12 +117,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE',
       creator: Actions.preparePipetteRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
@@ -130,12 +129,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_JOG',
       creator: Actions.jogRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid', [1, 0, 0]],
+      args: ['robot-name', [1, 0, 0]],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_JOG',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
           vector: [1, 0, 0],
         },
         meta: {},
@@ -144,12 +142,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_PICK_UP_TIP',
       creator: Actions.pickUpTipRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_PICK_UP_TIP',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
@@ -158,12 +155,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP',
       creator: Actions.confirmTipRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_TIP',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
@@ -171,12 +167,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT',
       creator: Actions.comparePointRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_COMPARE_POINT',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
@@ -184,12 +179,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP',
       creator: Actions.confirmStepRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_CONFIRM_STEP',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
@@ -197,12 +191,11 @@ describe('robot calibration check actions', () => {
     {
       name: 'calibration:ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP',
       creator: Actions.invalidateTipRobotCalibrationCheck,
-      args: ['robot-name', 'abc123_pipette_uuid'],
+      args: ['robot-name'],
       expected: {
         type: 'calibration:ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP',
         payload: {
           robotName: 'robot-name',
-          pipetteId: 'abc123_pipette_uuid',
         },
         meta: {},
       },
