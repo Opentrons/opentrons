@@ -72,14 +72,6 @@ export type RobotApiState = $Shape<
   |}>
 >
 
-export type RobotApiV2RequestBody = {
-  data: {|
-    id?: string,
-    type: string,
-    attributes: {...}
-  |}
-}
-
 export type RobotApiV2ResponseBody = {
   meta?: {...},
   links?: {...},

@@ -39,6 +39,9 @@ import type { SystemInfoState, SystemInfoAction } from './system-info/types'
 
 import type { AlertsState, AlertsAction } from './alerts/types'
 
+import type { SesssionState, RobotSessionAction } from './sessions/types'
+
+
 export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,
@@ -58,6 +61,7 @@ export type State = $ReadOnly<{|
   shell: ShellState,
   systemInfo: SystemInfoState,
   alerts: AlertsState,
+  sessions: SesssionState,
   router: RouterState,
 |}>
 
@@ -81,6 +85,7 @@ export type Action =
   | NetworkingAction
   | SystemInfoAction
   | AlertsAction
+  | RobotSessionAction
 
 export type GetState = () => State
 
