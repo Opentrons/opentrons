@@ -154,7 +154,7 @@ def test_create_session_already_present(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "check"
             }
         }
     })
@@ -181,7 +181,7 @@ def test_create_session_error(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "check"
             }
         }
     })
@@ -201,7 +201,7 @@ def test_create_session(api_client, patch_build_session,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "check"
             }
         }
     })
