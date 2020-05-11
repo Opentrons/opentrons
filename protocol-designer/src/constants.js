@@ -93,7 +93,7 @@ export const MAX_ENGAGE_HEIGHT_V1 = 40
 export const MIN_ENGAGE_HEIGHT_V2 = -4
 export const MAX_ENGAGE_HEIGHT_V2 = 19
 
-export const MIN_TEMP_MODULE_TEMP = 0
+export const MIN_TEMP_MODULE_TEMP = 4
 export const MAX_TEMP_MODULE_TEMP = 95
 
 // Temperature statuses

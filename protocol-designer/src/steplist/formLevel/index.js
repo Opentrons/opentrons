@@ -72,7 +72,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
-    getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
 
