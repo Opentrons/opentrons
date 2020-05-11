@@ -19,7 +19,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionData,
+        ...Fixtures.mockRobotSessionResponse,
       },
       meta: {},
     },
@@ -31,7 +31,7 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockRobotSessionData,
+          '1234': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
@@ -42,22 +42,22 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionData,
+        ...Fixtures.mockRobotSessionResponse,
       },
       meta: {},
     },
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockRobotSessionData,
+          '4321': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockRobotSessionData,
-          '1234': Fixtures.mockRobotSessionData,
+          '4321': Fixtures.mockRobotSessionResponse.data.attributes,
+          '1234': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
@@ -68,7 +68,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionData,
+        ...Fixtures.mockRobotSessionResponse,
       },
       meta: {},
     },
@@ -78,7 +78,7 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockRobotSessionData,
+          '1234': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
@@ -89,22 +89,22 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionData,
+        ...Fixtures.mockRobotSessionResponse,
       },
       meta: {},
     },
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockRobotSessionData,
+          '4321': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockRobotSessionData,
-          '4321': Fixtures.mockRobotSessionData,
+          '1234': Fixtures.mockRobotSessionResponse.data.attributes,
+          '4321': Fixtures.mockRobotSessionResponse.data.attributes,
         },
       },
     },
@@ -115,7 +115,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionUpdateData,
+        ...Fixtures.mockRobotSessionUpdateResponse,
       },
       meta: {},
     },
@@ -129,9 +129,7 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': {
-            ...Fixtures.mockRobotSessionUpdateData.meta,
-          },
+          '1234': Fixtures.mockRobotSessionUpdateResponse.meta,
         },
       },
     },
@@ -142,7 +140,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionUpdateData,
+        ...Fixtures.mockRobotSessionUpdateResponse,
       },
       meta: {},
     },
@@ -158,9 +156,7 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
-          '1234': {
-            ...Fixtures.mockRobotSessionUpdateData.meta,
-          },
+          '1234': Fixtures.mockRobotSessionUpdateResponse.meta,
         },
       },
     },
@@ -171,7 +167,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:DELETE_ROBOT_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        ...Fixtures.mockRobotSessionData,
+        ...Fixtures.mockRobotSessionResponse,
       },
       meta: {},
     },
@@ -187,7 +183,6 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
-          '1234': null,
         },
       },
     },

@@ -43,10 +43,11 @@ describe('updateRobotSessionEpic', () => {
   })
 
   describe('handles explicit UPDATE SESSION', () => {
-    const action = Actions.updateRobotSession(mockRobot.name, '1234', {
-      commandType: 'command',
-      payload: { someData: 3 },
-    })
+    const action = Actions.updateRobotSession(
+      mockRobot.name,
+      '1234',
+      Fixtures.mockRobotSessionUpdate
+    )
     const expectedRequest = {
       method: 'POST',
       path: '/sessions/1234/commands',
@@ -54,9 +55,9 @@ describe('updateRobotSessionEpic', () => {
         data: {
           type: 'Command',
           attributes: {
-            commandType: 'command',
-            payload: {
-              someData: 3,
+            command: 'dosomething',
+            data: {
+              someData: 32,
             },
           },
         },

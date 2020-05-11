@@ -22,7 +22,10 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotSessionAction> = acti
   body: {
     data: {
       type: 'Command',
-      attributes: action.payload.update,
+      attributes: {
+        command: action.payload.command.command,
+        data: action.payload.command.data,
+      },
     },
   },
 })

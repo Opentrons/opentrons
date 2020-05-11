@@ -72,17 +72,17 @@ export type RobotApiState = $Shape<
   |}>
 >
 
-export type RobotApiV2ResponseBody = {
-  meta?: { ... },
+export type RobotApiV2ResponseBody<AttributesT, MetaT> = {|
+  meta?: MetaT,
   links?: { ... },
   data: {|
     id: string,
     type: string,
-    attributes: { ... },
+    attributes: AttributesT,
   |},
-}
+|}
 
-export type RobotApiV2Error = {
+export type RobotApiV2Error = {|
   id?: string,
   links?: { ... },
   status?: string,
@@ -94,7 +94,7 @@ export type RobotApiV2Error = {
     parameter?: string,
   |},
   meta?: { ... },
-}
+|}
 
 export type RobotApiV2ErrorResponseBody = {
   errors: Array<RobotApiV2Error>,

@@ -1,4 +1,6 @@
 // @flow
+import omit from 'lodash/omit'
+
 import * as Constants from './constants'
 
 import type { Action } from '../types'
@@ -26,7 +28,7 @@ export function robotSessionReducer(
           ...robotState,
           robotSessions: {
             ...robotState.robotSessions,
-            [sessionState.sessionId]: sessionState,
+            [sessionState.data.id]: sessionState.data.attributes,
           },
         },
       }
@@ -36,20 +38,24 @@ export function robotSessionReducer(
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
 
+      // if (sessionState.meta?.sessionId) {
+      //   return robotState
+      // }
+
       return {
         ...state,
         [robotName]: {
           ...robotState,
           robotSessions: {
             ...robotState.robotSessions,
-            [sessionState.meta.sessionId]: sessionState.meta,
+            [sessionState.meta?.sessionId]: sessionState.meta,
           },
         },
       }
     }
 
     case Constants.DELETE_ROBOT_SESSION_SUCCESS: {
-      const { robotName, sessionId } = action.payload
+      const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
 
       return {
@@ -57,8 +63,7 @@ export function robotSessionReducer(
         [robotName]: {
           ...robotState,
           robotSessions: {
-            ...robotState.robotSessions,
-            [sessionId]: null,
+            ...omit(robotState.robotSessions, sessionState.data.id),
           },
         },
       }

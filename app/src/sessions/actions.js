@@ -2,10 +2,14 @@
 
 import * as Types from './types'
 import * as Constants from './constants'
+import type {
+  RobotApiRequestMeta,
+  RobotApiV2ErrorResponseBody,
+} from '../robot-api/types'
 
 export const createRobotSession = (
   robotName: string,
-  sessionType: Types.SessionType
+  sessionType: Types.RobotSessionType
 ): Types.CreateRobotSessionAction => ({
   type: Constants.CREATE_ROBOT_SESSION,
   payload: { robotName, sessionType },
@@ -14,7 +18,7 @@ export const createRobotSession = (
 
 export const createRobotSessionSuccess = (
   robotName: string,
-  body: RobotSessionData,
+  body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
 ): Types.CreateRobotSessionSuccessAction => ({
   type: Constants.CREATE_ROBOT_SESSION_SUCCESS,
@@ -43,7 +47,7 @@ export const deleteRobotSession = (
 
 export const deleteRobotSessionSuccess = (
   robotName: string,
-  body: RobotSessionData,
+  body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
 ): Types.DeleteRobotSessionSuccessAction => ({
   type: Constants.DELETE_ROBOT_SESSION_SUCCESS,
@@ -72,7 +76,7 @@ export const fetchRobotSession = (
 
 export const fetchRobotSessionSuccess = (
   robotName: string,
-  body: RobotSessionData,
+  body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchRobotSessionSuccessAction => ({
   type: Constants.FETCH_ROBOT_SESSION_SUCCESS,
@@ -93,16 +97,16 @@ export const fetchRobotSessionFailure = (
 export const updateRobotSession = (
   robotName: string,
   sessionId: string,
-  update: Types.RobotSessionUpdate
+  command: Types.RobotSessionUpdate
 ): Types.UpdateRobotSessionAction => ({
   type: Constants.UPDATE_ROBOT_SESSION,
-  payload: { robotName, sessionId, update },
+  payload: { robotName, sessionId, command },
   meta: {},
 })
 
 export const updateRobotSessionSuccess = (
   robotName: string,
-  body: Types.RobotSessionUpdateData,
+  body: Types.RobotSessionUpdateResponse,
   meta: RobotApiRequestMeta
 ): Types.UpdateRobotSessionSuccessAction => ({
   type: Constants.UPDATE_ROBOT_SESSION_SUCCESS,
