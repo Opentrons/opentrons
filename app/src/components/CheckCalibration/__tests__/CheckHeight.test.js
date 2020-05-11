@@ -13,18 +13,15 @@ describe('CheckHeight', () => {
   const mockJog = jest.fn()
   const mockExit = jest.fn()
 
-  const getConfirmButton = wrapper =>
-    wrapper.find('PrimaryButton[children="check z-axis"]').find('button')
-
   const getContinueButton = wrapper =>
-    wrapper.find('PrimaryButton[children="continue"]').find('button')
+    wrapper.find('PrimaryButton[children="Go To Next Check"]').find('button')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
-  const getExitButton = (wrapper, direction) =>
+  const getExitButton = wrapper =>
     wrapper
-      .find('JogButton[children="Drop tip and exit calibration check"]')
+      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
       .find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
@@ -89,15 +86,15 @@ describe('CheckHeight', () => {
     const wrapper = render()
 
     const jogDirections = ['up', 'down']
-    const jogVectorsByDirection = {
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
+    const jogParamsByDirection = {
+      up: ['z', 1, 0.1],
+      down: ['z', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockJog).toHaveBeenCalledWith(jogVectorsByDirection[direction])
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -109,7 +106,7 @@ describe('CheckHeight', () => {
   it('compares check step when primary button is clicked', () => {
     const wrapper = render()
 
-    act(() => getConfirmButton(wrapper).invoke('onClick')())
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockComparePoint).toHaveBeenCalled()
@@ -124,9 +121,21 @@ describe('CheckHeight', () => {
     expect(mockGoToNextCheck).toHaveBeenCalled()
   })
 
-  it('exits when isInspecting and exit button is clicked', () => {
+  it('no exit button when isInspecting not exceeded threshold', () => {
     const wrapper = render({ isInspecting: true })
 
+    expect(getExitButton(wrapper).exists()).toBe(false)
+  })
+
+  it('exits when isInspecting and exit button is clicked', () => {
+    const wrapper = render({
+      isInspecting: true,
+      comparison: {
+        differenceVector: [0, 0, 0],
+        thresholdVector: [1, 1, 1],
+        exceedsThreshold: true,
+      },
+    })
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
 

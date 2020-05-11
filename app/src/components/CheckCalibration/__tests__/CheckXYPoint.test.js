@@ -14,9 +14,6 @@ describe('CheckXYPoint', () => {
   const mockJog = jest.fn()
   const mockExit = jest.fn()
 
-  const getConfirmButton = wrapper =>
-    wrapper.find('PrimaryButton[children="check x and y-axis"]').find('button')
-
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="continue"]').find('button')
 
@@ -37,7 +34,7 @@ describe('CheckXYPoint', () => {
           thresholdVector: [1, 1, 1],
           exceedsThreshold: false,
         },
-        nextButtonText = 'Continue',
+        nextButtonText = 'continue',
       } = props
       return mount(
         <CheckXYPoint
@@ -125,17 +122,17 @@ describe('CheckXYPoint', () => {
     const wrapper = render()
 
     const jogDirections = ['left', 'right', 'back', 'forward']
-    const jogVectorsByDirection = {
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
+    const jogParamsByDirection = {
+      left: ['x', -1, 0.1],
+      right: ['x', 1, 0.1],
+      back: ['y', 1, 0.1],
+      forward: ['y', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockJog).toHaveBeenCalledWith(jogVectorsByDirection[direction])
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     const unavailableJogDirections = ['up', 'down']
@@ -147,7 +144,7 @@ describe('CheckXYPoint', () => {
   it('compares check step when primary button is clicked', () => {
     const wrapper = render()
 
-    act(() => getConfirmButton(wrapper).invoke('onClick')())
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockComparePoint).toHaveBeenCalled()

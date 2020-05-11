@@ -57,19 +57,19 @@ describe('TipPickUp', () => {
     const wrapper = render()
 
     const jogDirections = ['left', 'right', 'back', 'forward', 'up', 'down']
-    const jogVectorsByDirection = {
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
+    const jogParamsByDirection = {
+      left: ['x', -1, 0.1],
+      right: ['x', 1, 0.1],
+      back: ['y', 1, 0.1],
+      forward: ['y', -1, 0.1],
+      up: ['z', 1, 0.1],
+      down: ['z', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockJog).toHaveBeenCalledWith(jogVectorsByDirection[direction])
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     act(() => getContinueButton(wrapper).invoke('onClick')())

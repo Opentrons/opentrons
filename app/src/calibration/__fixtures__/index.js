@@ -11,22 +11,28 @@ import type { RobotCalibrationCheckSessionData } from '../api-types'
 
 export { mockRobot }
 
+const mockComparison = {
+  differenceVector: [0, 0, 0],
+  thresholdVector: [1, 1, 1],
+  exceedsThreshold: false,
+}
+
 export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionData = {
   instruments: {
-    abc123_pipette_uuid: {
+    LEFT: {
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
       mount: 'left',
-      tiprack_id: 'fake_96_tiprack',
+      tiprack_id: 'abc123_labware_uuid',
       rank: 'first',
     },
-    def456_pipette_uuid: {
+    RIGHT: {
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
       mount: 'right',
-      tiprack_id: 'fake_96_tiprack',
+      tiprack_id: 'def456_labware_uuid',
       rank: 'second',
     },
   },
@@ -34,7 +40,14 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
   nextSteps: {
     links: { labwareLoaded: '/fake/route' },
   },
-  comparisonsByStep: {},
+  comparisonsByStep: {
+    comparingFirstPipetteHeight: mockComparison,
+    comparingFirstPipettePointOne: mockComparison,
+    comparingFirstPipettePointTwo: mockComparison,
+    comparingFirstPipettePointThree: mockComparison,
+    comparingSecondPipetteHeight: mockComparison,
+    comparingSecondPipettePointOne: mockComparison,
+  },
   labware: [
     {
       alternatives: ['fake_tiprack_load_name'],
