@@ -26,12 +26,16 @@ export type RobotSessionType = 'check'
 
 export type RobotSessionUpdate = {|
   command: string,
+  // TODO(al, 2020-05-11): data should be properly typed with all
+  // known command types
   data: { ... },
 |}
 
 export type RobotSessionData = {|
   sessionType: RobotSessionType,
   sessionId: string,
+  // TODO(al, 2020-05-11): details should be properly typed with all
+  // known session response types
   details: { ... },
 |}
 
