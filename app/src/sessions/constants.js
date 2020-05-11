@@ -4,6 +4,9 @@
 export const SESSIONS_PATH: '/sessions' = 
   '/sessions'
 
+export const SESSIONS_UPDATE_PATH_EXTENSION: 'commands' =
+  'commands'
+
 export const CREATE_ROBOT_SESSION: 'sessions:CREATE_ROBOT_SESSION' = 
   'sessions:CREATE_ROBOT_SESSION'
 
