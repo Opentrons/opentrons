@@ -1,21 +1,12 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-  badZComparison,
-  goodZComparison,
-} from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
 
 import { CheckHeight } from '../CheckHeight'
 
 describe('CheckHeight', () => {
   let render
-  let mockStore
 
   const mockComparePoint = jest.fn()
   const mockGoToNextCheck = jest.fn()
@@ -31,17 +22,14 @@ describe('CheckHeight', () => {
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
+  const getExitButton = (wrapper, direction) =>
+    wrapper
+      .find('JogButton[children="Drop tip and exit calibration check"]')
+      .find('button')
+
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (props = {}) => {
       const {
         isMulti = false,
@@ -64,11 +52,7 @@ describe('CheckHeight', () => {
           goToNextCheck={mockGoToNextCheck}
           jog={mockJog}
           exit={mockExit}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+        />
       )
     }
   })
@@ -113,12 +97,7 @@ describe('CheckHeight', () => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
-        Calibration.jogRobotCalibrationCheck(
-          mockRobot.name,
-          jogVectorsByDirection[direction]
-        )
-      )
+      expect(mockJog).toHaveBeenCalledWith(jogVectorsByDirection[direction])
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -133,9 +112,7 @@ describe('CheckHeight', () => {
     act(() => getConfirmButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.comparePointRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockComparePoint).toHaveBeenCalled()
   })
 
   it('confirms check step when isInspecting and primary button is clicked', () => {
@@ -144,8 +121,15 @@ describe('CheckHeight', () => {
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmStepRobotCalibrationCheck(mockRobot.name)
-    )
+    expect(mockGoToNextCheck).toHaveBeenCalled()
+  })
+
+  it('exits when isInspecting and exit button is clicked', () => {
+    const wrapper = render({ isInspecting: true })
+
+    act(() => getExitButton(wrapper).invoke('onClick')())
+    wrapper.update()
+
+    expect(mockExit).toHaveBeenCalled()
   })
 })

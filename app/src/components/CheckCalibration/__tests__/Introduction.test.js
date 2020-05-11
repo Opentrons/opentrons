@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import { AlertModal } from '@opentrons/components'
@@ -15,6 +14,7 @@ describe('Introduction', () => {
   let render
   let mockStore
 
+  const mockProceed = jest.fn()
   const mockExit = jest.fn()
 
   const getContinueButton = wrapper =>
@@ -38,25 +38,13 @@ describe('Introduction', () => {
   ]
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (labwareLoadNames = tiprackLoadnames) => {
       return mount(
         <Introduction
           labwareLoadNames={labwareLoadNames}
-          robotName={mockRobot.name}
+          proceed={mockProceed}
           exit={mockExit}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+        />
       )
     }
   })

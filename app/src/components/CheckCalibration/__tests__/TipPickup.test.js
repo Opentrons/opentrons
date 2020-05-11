@@ -15,6 +15,11 @@ describe('TipPickUp', () => {
   let render
   let mockStore
 
+  const mockPickUpTip = jest.fn()
+  const mockConfirmTip = jest.fn()
+  const mockInvalidateTip = jest.fn()
+  const mockJog = jest.fn()
+
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="Pick up tip"]').find('button')
 
@@ -42,15 +47,19 @@ describe('TipPickUp', () => {
       const {
         isMulti = false,
         tiprack = mockRobotCalibrationCheckSessionData.labware[0],
-        robotName = mockRobot.name,
         isInspecting = false,
+        tipRackWellName = 'A1',
       } = props
       return mount(
         <TipPickUp
           isMulti={isMulti}
           tiprack={tiprack}
-          robotName={robotName}
           isInspecting={isInspecting}
+          tipRackWellName={tipRackWellName}
+          confirmTip={mockConfirmTip}
+          invalidateTip={mockInvalidateTip}
+          pickUpTip={mockPickUpTip}
+          jog={mockJog}
         />,
         {
           wrappingComponent: Provider,
