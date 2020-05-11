@@ -202,6 +202,14 @@ export type DeactivateTemperatureArgs = {|
   message?: string,
 |}
 
+export type ThermocyclerStateStepArgs = {|
+  module: string,
+  commandCreatorFnName: 'thermocyclerState',
+  blockTargetTemp: number | null,
+  lidTargetTemp: number | null,
+  lidOpen: boolean,
+|}
+
 export type CommandCreatorArgs =
   | ConsolidateArgs
   | DistributeArgs
@@ -213,6 +221,7 @@ export type CommandCreatorArgs =
   | SetTemperatureArgs
   | AwaitTemperatureArgs
   | DeactivateTemperatureArgs
+  | ThermocyclerStateStepArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
  * For an 8-channel, on a 96-flat, Tip 0 is in row A, Tip 7 is in row H.
