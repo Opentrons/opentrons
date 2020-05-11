@@ -3,6 +3,10 @@ import * as React from 'react'
 import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
+import {
+  THERMOCYCLER_STATE,
+  THERMOCYCLER_PROFILE,
+} from '../../../../constants.js'
 
 import { RadioGroupField, ConditionalOnField } from '../../fields'
 import { StateFields } from './StateFields'
@@ -24,34 +28,34 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
       </div>
       <div className={styles.tc_step_group}>
         <RadioGroupField
-          name="thermocyclerAction"
+          name="thermocyclerFormType"
           className={styles.tc_step_option}
           options={[
             {
               name: i18n.t(
                 'form.step_edit_form.field.thermocyclerAction.options.state'
               ),
-              value: 'tcState',
+              value: THERMOCYCLER_STATE,
             },
           ]}
           {...focusHandlers}
         />
         <ConditionalOnField
-          name={'thermocyclerAction'}
-          condition={val => val === 'tcState'}
+          name={'thermocyclerFormType'}
+          condition={val => val === THERMOCYCLER_STATE}
         >
           <StateFields focusHandlers={focusHandlers} />
         </ConditionalOnField>
 
         <RadioGroupField
-          name="thermocyclerAction"
+          name="thermocyclerFormType"
           className={cx(styles.tc_step_option, styles.disabled)}
           options={[
             {
               name: i18n.t(
                 'form.step_edit_form.field.thermocyclerAction.options.profile'
               ),
-              value: 'tcProfile',
+              value: THERMOCYCLER_PROFILE,
             },
           ]}
           {...focusHandlers}

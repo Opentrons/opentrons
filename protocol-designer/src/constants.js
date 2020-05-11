@@ -164,3 +164,7 @@ export const DND_TYPES = {
   LABWARE: 'LABWARE',
   STEP_ITEM: 'STEP_ITEM',
 }
+
+// Values for TC fields
+export const THERMOCYCLER_STATE: 'thermocyclerState' = 'thermocyclerState'
+export const THERMOCYCLER_PROFILE: 'thermocyclerProfile' = 'thermocyclerProfile'
