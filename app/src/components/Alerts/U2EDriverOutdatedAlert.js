@@ -1,9 +1,14 @@
 // @flow
 import * as React from 'react'
-import { useHistory, Link } from 'react-router-dom'
+import { useHistory, Link as InternalLink } from 'react-router-dom'
 import styled from 'styled-components'
 
-import { AlertModal, CheckboxField, useToggle } from '@opentrons/components'
+import {
+  AlertModal,
+  CheckboxField,
+  Link,
+  useToggle,
+} from '@opentrons/components'
 import { useFeatureFlag } from '../../config'
 import { useTrackEvent } from '../../analytics'
 import {
@@ -25,6 +30,12 @@ const DRIVER_UPDATE_CTA =
   "Please update your computer's driver to ensure you can connect to your OT-2."
 
 const ADAPTER_INFO_URL = '/menu/network-and-system'
+
+const LinkButton = styled(Link)`
+  width: auto;
+  padding-left: 1rem;
+  padding-right: 1rem;
+`
 
 const IgnoreCheckbox = styled(CheckboxField)`
   position: absolute;
@@ -50,7 +61,8 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
       heading={DRIVER_OUT_OF_DATE}
       buttons={[
         {
-          Component: Link,
+          Component: LinkButton,
+          as: InternalLink,
           to: ADAPTER_INFO_URL,
           children: VIEW_ADAPTER_INFO,
           onClick: () => {
@@ -62,10 +74,9 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
           },
         },
         {
-          Component: 'a',
+          Component: LinkButton,
           href: U2E_DRIVER_UPDATE_URL,
-          target: '_blank',
-          rel: 'noopener noreferrer',
+          external: true,
           children: GET_UPDATE,
           onClick: () => {
             history.push(ADAPTER_INFO_URL)

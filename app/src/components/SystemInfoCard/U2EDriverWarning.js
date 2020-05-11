@@ -6,6 +6,7 @@ import {
   Flex,
   Icon,
   Text,
+  Link,
   OutlineButton,
   ALIGN_START,
   COLOR_WARNING,
@@ -44,16 +45,15 @@ export function U2EDriverWarning(props: React.ElementProps<typeof Flex>) {
       <AlertIcon name="alert-circle" />
       <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{DRIVER_WARNING}</Text>
       <GetUpdateButton
-        Component="a"
+        Component={Link}
+        external={true}
         href={U2E_DRIVER_UPDATE_URL}
-        target="_blank"
-        rel="noopener noreferrer"
-        onClick={() =>
+        onClick={() => {
           trackEvent({
             name: EVENT_U2E_DRIVER_LINK_CLICKED,
             properties: { source: 'card' },
           })
-        }
+        }}
       >
         {GET_UPDATE}
       </GetUpdateButton>
