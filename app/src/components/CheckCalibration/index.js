@@ -100,7 +100,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       hasTwoPipettes &&
       instruments[instr_ids[0]]?.tiprack_id ===
         instruments[instr_ids[1]]?.tiprack_id &&
-      activeInstrument.mount === LEFT
+      activeInstrument.mount.toLowerCase() === LEFT
     ) {
       return 'B1'
     } else if (instr_ids.length > 0) {
