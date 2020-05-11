@@ -614,15 +614,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             lw = labware.Labware(lw_data.definition, parent)
             self._deck[lw_data.slot] = lw
 
-            MODULE_LOG.info(f'\nload tipracks second pip {second_pip}\n')
             for mount in lw_data.forMounts:
                 is_second_mount = second_pip and second_pip.mount == mount
-                MODULE_LOG.info(f'\nmount: {mount} second mount{second_pip.mount} \n')
                 pips_share_rack = len(lw_data.forMounts) == 2
                 well_name = 'A1'
                 if is_second_mount and pips_share_rack:
                     well_name = 'B1'
-                MODULE_LOG.info(f'\nwell_name: {well_name} share{pips_share_rack} \n')
                 well = lw.wells_by_name()[well_name]
                 position = well.top().point + MOVE_TO_TIP_RACK_SAFETY_BUFFER
                 move = CheckMove(position=position, locationId=uuid4())
@@ -799,9 +796,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
                 'cannot move pipette on second mount, pipette not present'
-        MODULE_LOG.info(f'\nsecond pip move pip {second_pip}\n')
-        MODULE_LOG.info(f'\nsecond pip move curstate {self.current_state_name}\n')
-        MODULE_LOG.info(f'\nsecond pip move position {getattr(self._moves, self.current_state_name).position}\n')
         await self._move(second_pip.mount,
                          Location(getattr(self._moves,
                                           self.current_state_name).position,

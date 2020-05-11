@@ -45,6 +45,7 @@
 
 .error_explanation {
   @apply --font-body-2-dark;
+
   margin: 0.75rem 0;
 }
 
@@ -296,11 +297,11 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   margin-left: 2rem;
 }
 
-.difference_value.difference_good{
+.difference_value.difference_good {
   color: var(--c-success);
 }
 
-.difference_value.difference_bad{
+.difference_value.difference_bad {
   color: var(--c-error);
 }
 
@@ -315,5 +316,5 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .difference_body {
   @apply --font-body-2-dark;
 
-  margin: 1rem 0 ;
+  margin: 1rem 0;
 }

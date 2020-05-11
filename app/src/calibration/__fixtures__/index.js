@@ -11,9 +11,24 @@ import type { RobotCalibrationCheckSessionData } from '../api-types'
 
 export { mockRobot }
 
-const mockComparison = {
-  differenceVector: [0, 0, 0],
-  thresholdVector: [1, 1, 1],
+export const badZComparison = {
+  differenceVector: [0, 0, 4],
+  thresholdVector: [0, 0, 1],
+  exceedsThreshold: true,
+}
+export const goodZComparison = {
+  differenceVector: [0, 0, 0.1],
+  thresholdVector: [0, 0, 1],
+  exceedsThreshold: false,
+}
+export const badXYComparison = {
+  differenceVector: [4, 4, 0],
+  thresholdVector: [1, 1, 0],
+  exceedsThreshold: true,
+}
+export const goodXYComparison = {
+  differenceVector: [0.1, 0.1, 0],
+  thresholdVector: [1, 1, 0],
   exceedsThreshold: false,
 }
 
@@ -41,12 +56,12 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
     links: { labwareLoaded: '/fake/route' },
   },
   comparisonsByStep: {
-    comparingFirstPipetteHeight: mockComparison,
-    comparingFirstPipettePointOne: mockComparison,
-    comparingFirstPipettePointTwo: mockComparison,
-    comparingFirstPipettePointThree: mockComparison,
-    comparingSecondPipetteHeight: mockComparison,
-    comparingSecondPipettePointOne: mockComparison,
+    comparingFirstPipetteHeight: goodZComparison,
+    comparingFirstPipettePointOne: goodXYComparison,
+    comparingFirstPipettePointTwo: goodXYComparison,
+    comparingFirstPipettePointThree: goodXYComparison,
+    comparingSecondPipetteHeight: goodZComparison,
+    comparingSecondPipettePointOne: goodXYComparison,
   },
   labware: [
     {
@@ -68,27 +83,6 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       version: 1,
     },
   ],
-}
-
-export const badZComparison = {
-  differenceVector: [0, 0, 4],
-  thresholdVector: [0, 0, 1],
-  exceedsThreshold: true,
-}
-export const goodZComparison = {
-  differenceVector: [0, 0, 0.1],
-  thresholdVector: [0, 0, 1],
-  exceedsThreshold: false,
-}
-export const badXYComparison = {
-  differenceVector: [4, 4, 0],
-  thresholdVector: [1, 1, 0],
-  exceedsThreshold: true,
-}
-export const goodXYComparison = {
-  differenceVector: [0.1, 0.1, 0],
-  thresholdVector: [1, 1, 0],
-  exceedsThreshold: false,
 }
 
 export const {
