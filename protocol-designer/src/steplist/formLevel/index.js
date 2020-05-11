@@ -18,7 +18,6 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
   pauseTemperatureRangeExceeded,
