@@ -17,6 +17,11 @@ describe('CheckHeight', () => {
   let render
   let mockStore
 
+  const mockComparePoint = jest.fn()
+  const mockGoToNextCheck = jest.fn()
+  const mockJog = jest.fn()
+  const mockExit = jest.fn()
+
   const getConfirmButton = wrapper =>
     wrapper.find('PrimaryButton[children="check z-axis"]').find('button')
 
@@ -39,20 +44,26 @@ describe('CheckHeight', () => {
 
     render = (props = {}) => {
       const {
-        robotName = mockRobot.name,
         isMulti = false,
         isInspecting = false,
         mountProp = 'left',
-        comparison = {},
+        comparison = {
+          differenceVector: [0, 0, 0],
+          thresholdVector: [1, 1, 1],
+          exceedsThreshold: false,
+        },
       } = props
       return mount(
         <CheckHeight
-          robotName={robotName}
           isMulti={isMulti}
           isInspecting={isInspecting}
           comparison={comparison}
           mount={mountProp}
           nextButtonText="Go To Next Check"
+          comparePoint={mockComparePoint}
+          goToNextCheck={mockGoToNextCheck}
+          jog={mockJog}
+          exit={mockExit}
         />,
         {
           wrappingComponent: Provider,

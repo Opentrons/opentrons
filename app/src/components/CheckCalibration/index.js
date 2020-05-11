@@ -2,7 +2,13 @@
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
-import { ModalPage, SpinnerModal } from '@opentrons/components'
+import {
+  ModalPage,
+  SpinnerModal,
+  LEFT,
+  RIGHT,
+  type Mount,
+} from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
@@ -62,10 +68,17 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     return (
       instruments &&
       instruments[
-        Object.keys(instruments).find(mount => instruments[mount].rank === rank)
+        Object.keys(instruments).find(
+          mount => instruments[mount]?.rank === rank
+        )
       ]
     )
   }, [currentStep, instruments])
+
+  const activeMount: ?Mount = React.useMemo(() => {
+    const rawMount = activeInstrument && activeInstrument.mount.toLowerCase()
+    return [(LEFT, RIGHT)].find(m => m === rawMount)
+  }, [activeInstrument])
 
   const activeLabware = React.useMemo(
     () =>
@@ -78,8 +91,24 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     const spec = instruments && getPipetteModelSpecs(activeInstrument?.model)
     return spec ? spec.channels > 1 : false
   }, [activeInstrument, instruments])
-  // TODO: BC: once api returns real values for instrument.mount_axis
-  // infer active mount from activeInstrument
+
+  const tipRackWellName: string = React.useMemo(() => {
+    const instr_ids = instruments ? Object.keys(instruments) : []
+    if (!activeInstrument) {
+      return ''
+    } else if (
+      hasTwoPipettes &&
+      instruments[instr_ids[0]]?.tiprack_id ===
+        instruments[instr_ids[1]]?.tiprack_id &&
+      activeInstrument.mount === LEFT
+    ) {
+      return 'B1'
+    } else if (instr_ids.length > 0) {
+      return 'A1'
+    } else {
+      return ''
+    }
+  }, [instruments, activeInstrument])
 
   function exit() {
     dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
@@ -142,10 +171,25 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = activeLabware ? (
         <TipPickUp
           tiprack={activeLabware}
-          robotName={robotName}
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
-          dispatchRequest={dispatchRequest}
+          tipRackWellName={tipRackWellName}
+          pickUpTip={() => {
+            dispatchRequest(
+              Calibration.pickUpTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          confirmTip={() => {
+            dispatchRequest(
+              Calibration.confirmTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          invalidateTip={() => {
+            dispatchRequest(
+              Calibration.invalidateTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
         />
       ) : null
       break
@@ -174,7 +218,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         <CheckXYPoint
           slotNumber={slotNumber}
           isMulti={isActiveInstrumentMultiChannel}
-          mount={activeInstrument.mount.toLowerCase()}
+          mount={activeMount}
           exit={exit}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
@@ -205,7 +249,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <CheckHeight
           isMulti={isActiveInstrumentMultiChannel}
-          mount={activeInstrument.mount.toLowerCase()}
+          mount={activeMount}
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}

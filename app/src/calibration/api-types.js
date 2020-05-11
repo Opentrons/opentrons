@@ -49,12 +49,14 @@ export type RobotCalibrationCheckStep =
   | CHECK_STEP_BAD_ROBOT_CALIBRATION
   | CHECK_STEP_NO_PIPETTES_ATTACHED
 
+type RobotCalibrationCheckPipetteRank = 'first' | 'second'
 export type RobotCalibrationCheckInstrument = {
   model: string,
   name: string,
   tip_length: number,
   mount: string,
-  pipette_id: string,
+  tiprack_id: string,
+  rank: RobotCalibrationCheckPipetteRank,
 }
 export type RobotCalibrationCheckLabware = {
   alternatives: Array<string>,

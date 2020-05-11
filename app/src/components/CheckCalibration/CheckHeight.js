@@ -2,19 +2,12 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
 
-import type { Dispatch } from '../../types'
-import {
-  jogRobotCalibrationCheck,
-  comparePointRobotCalibrationCheck,
-  confirmStepRobotCalibrationCheck,
-  type RobotCalibrationCheckComparison,
-} from '../../calibration'
+import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import { formatJogVector, formatOffsetValue } from './utils'
+import { formatOffsetValue } from './utils'
 
 import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z_(640X480)_REV1.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z_(640X480)_REV1.webm'
@@ -55,7 +48,7 @@ const DIFFERENCE = 'Difference'
 
 type CheckHeightProps = {|
   isMulti: boolean,
-  mount: Mount,
+  mount: ?Mount,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   exit: () => void,
@@ -78,7 +71,7 @@ export function CheckHeight(props: CheckHeightProps) {
   } = props
 
   const demoAsset = React.useMemo(
-    () => assetMap[mount][isMulti ? 'multi' : 'single'],
+    () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
     [mount, isMulti]
   )
 

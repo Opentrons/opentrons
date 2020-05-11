@@ -77,7 +77,7 @@ const DIFFERENCE = 'Difference'
 type CheckXYPointProps = {|
   slotNumber: string | null,
   isMulti: boolean,
-  mount: Mount,
+  mount: ?Mount,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   nextButtonText: string,
