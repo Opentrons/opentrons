@@ -9,22 +9,17 @@ import { InstrumentDiagram } from '@opentrons/components'
 type Props = {
   leftPipette: ?string,
   rightPipette: ?string,
-  customTipracksEnabled?: ?boolean,
 }
 export function PipetteDiagram(props: Props) {
-  const { leftPipette, rightPipette, customTipracksEnabled } = props
+  const { leftPipette, rightPipette } = props
 
   // TODO (ka 2020-4-16): This is temporaray until FF is removed.
   // Gross but neccessary for removing the wrapper div when FF is off.
   return (
     <>
-      {customTipracksEnabled ? (
-        <div className={cx({ [styles.mount_diagram]: customTipracksEnabled })}>
-          <PipetteGroup leftPipette={leftPipette} rightPipette={rightPipette} />
-        </div>
-      ) : (
+      <div className={cx(styles.mount_diagram)}>
         <PipetteGroup leftPipette={leftPipette} rightPipette={rightPipette} />
-      )}
+      </div>
     </>
   )
 }
