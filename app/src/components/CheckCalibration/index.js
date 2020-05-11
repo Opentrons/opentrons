@@ -65,14 +65,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   const activeInstrument = React.useMemo(() => {
     const rank = getPipetteRankForStep(currentStep)
-    return (
+    const activeInstrId =
       instruments &&
-      instruments[
-        Object.keys(instruments).find(
-          mount => instruments[mount]?.rank === rank
-        )
-      ]
-    )
+      Object.keys(instruments).find(mount =>
+        mount ? instruments[mount]?.rank === rank : null
+      )
+    return activeInstrId && instruments[activeInstrId]
   }, [currentStep, instruments])
 
   const activeMount: ?Mount = React.useMemo(() => {
@@ -88,7 +86,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     [labware, activeInstrument]
   )
   const isActiveInstrumentMultiChannel = React.useMemo(() => {
-    const spec = instruments && getPipetteModelSpecs(activeInstrument?.model)
+    const spec =
+      instruments &&
+      activeInstrument &&
+      getPipetteModelSpecs(activeInstrument?.model)
     return spec ? spec.channels > 1 : false
   }, [activeInstrument, instruments])
 
