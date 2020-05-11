@@ -77,7 +77,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   const activeMount: ?Mount = React.useMemo(() => {
     const rawMount = activeInstrument && activeInstrument.mount.toLowerCase()
-    return [(LEFT, RIGHT)].find(m => m === rawMount)
+    return [LEFT, RIGHT].find(m => m === rawMount)
   }, [activeInstrument])
 
   const activeLabware = React.useMemo(
