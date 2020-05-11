@@ -9,7 +9,7 @@ import * as Constants from './constants'
 
 export const createRobotCalibrationCheckSession = (
   robotName: string,
-  meta: ?RobotApiRequestMeta = {}
+  meta: RobotApiRequestMeta = {}
 ): Types.CreateRobotCalibrationCheckSessionAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
