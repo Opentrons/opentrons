@@ -73,7 +73,6 @@ export type Props = {|
     modules: Array<ModuleCreationArgs>,
   |}) => mixed,
   thermocyclerEnabled: ?boolean,
-  customTipracksEnabled: ?boolean,
   moduleRestrictionsDisabled: ?boolean,
 |}
 
@@ -344,9 +343,6 @@ export class FilePipettesModal extends React.Component<Props, State> {
                           errors={errors.pipettesByMount ?? null}
                           touched={touched.pipettesByMount ?? null}
                           onSetFieldTouched={setFieldTouched}
-                          customTipracksEnabled={
-                            this.props.customTipracksEnabled
-                          }
                         />
 
                         {this.props.showModulesFields && (

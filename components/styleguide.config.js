@@ -68,6 +68,10 @@ module.exports = {
       name: 'Tooltips',
       components: 'src/tooltips/[A-Z]*.js',
     },
+    {
+      name: 'Primitives',
+      components: 'src/primitives/[A-Z]*.js',
+    },
   ],
   getComponentPathLine(componentPath) {
     const name = path.basename(componentPath, '.js')

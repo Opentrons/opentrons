@@ -48,6 +48,14 @@ class Axis(enum.Enum):
         return self.name
 
 
+class DoorState(enum.Enum):
+    OPEN = False
+    CLOSED = True
+
+    def __str__(self):
+        return self.name
+
+
 class HardwareAPILike(abc.ABC):
     """ A dummy class useful in isinstance checks to accept an API or adapter
     """
@@ -57,6 +65,14 @@ class HardwareAPILike(abc.ABC):
 
     @property
     def board_revision(self) -> str:
+        ...
+
+    @property
+    def door_state(self) -> DoorState:
+        ...
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState) -> DoorState:
         ...
 
 

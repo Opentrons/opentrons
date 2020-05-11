@@ -18,7 +18,7 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError)
+                    MustHomeError, NoTipAttachedError, DoorState)
 from . import modules
 
 mod_log = logging.getLogger(__name__)
@@ -72,6 +72,20 @@ class API(HardwareAPILike):
         # current_position(), which will not be updated until the move() or
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
+        self._door_state = DoorState.CLOSED
+
+    @property
+    def door_state(self) -> DoorState:
+        return self._door_state
+
+    @door_state.setter
+    def door_state(self, door_state: DoorState):
+        self._door_state = door_state
+
+    def _update_door_state(self, door_state: DoorState):
+        mod_log.info(
+            f'Updating the window switch status: {door_state}')
+        self.door_state = door_state
 
     @classmethod
     async def build_hardware_controller(
@@ -130,6 +144,10 @@ class API(HardwareAPILike):
             checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
+            checked_loop.create_task(
+                backend.gpio_chardev.monitor_door_switch_state(
+                    loop=checked_loop,
+                    update_door_state=api_instance._update_door_state))
             return api_instance
         finally:
             blink_task.cancel()
@@ -158,6 +176,7 @@ class API(HardwareAPILike):
                             attached_modules,
                             config, checked_loop,
                             strict_attached_instruments)
+        await backend.setup_gpio_chardev()
         api_instance = cls(backend, loop=checked_loop, config=config)
         checked_loop.create_task(backend.watch_modules(
                 register_modules=api_instance.register_modules))

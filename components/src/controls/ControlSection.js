@@ -4,7 +4,7 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { FONT_BODY_1_DARK, FW_SEMIBOLD } from '../styles'
+import { FONT_BODY_1_DARK, FONT_WEIGHT_SEMIBOLD } from '../styles'
 
 import type { StyledComponent } from 'styled-components'
 
@@ -20,7 +20,7 @@ const SectionWrapper: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
 `
 
 const SectionTitle: StyledComponent<{||}, {||}, HTMLElement> = styled.p`
-  ${FW_SEMIBOLD}
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
   margin-bottom: 0.5rem;
 `
 

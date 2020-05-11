@@ -105,15 +105,17 @@ export class SelectionRect extends React.Component<Props, State> {
   }
 
   handleDrag = (e: MouseEvent) => {
-    const nextRect = {
-      ...this.state.positions,
-      xDynamic: e.clientX,
-      yDynamic: e.clientY,
-    }
-    this.setState({ positions: nextRect })
+    if (this.state.positions) {
+      const nextRect = {
+        ...this.state.positions,
+        xDynamic: e.clientX,
+        yDynamic: e.clientY,
+      }
+      this.setState({ positions: nextRect })
 
-    const rect = this.getRect(nextRect)
-    this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
+      const rect = this.getRect(nextRect)
+      this.props.onSelectionMove && this.props.onSelectionMove(e, rect)
+    }
   }
 
   handleMouseUp = (e: MouseEvent) => {

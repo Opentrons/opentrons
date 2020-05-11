@@ -20,7 +20,7 @@ import type { LabwareDefinition2, PipetteNameSpecs } from '../types'
 type WellSetByPrimaryWell = Array<Array<string>>
 
 // Compute all well sets for a labware def (non-memoized)
-export function _getAllWellSetsForLabware(
+function _getAllWellSetsForLabware(
   labwareDef: LabwareDefinition2
 ): WellSetByPrimaryWell {
   const allWells: Array<string> = Object.keys(labwareDef.wells)

@@ -11,6 +11,7 @@ const mockStore = {
   clear: jest.fn(),
   onDidChange: jest.fn(),
   openInEditor: jest.fn(),
+  reset: jest.fn(),
 }
 
 module.exports = Store

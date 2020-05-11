@@ -23,9 +23,9 @@ export function createBlankForm(args: NewFormArgs): FormData {
     stepDetails: '',
   }
 
+  // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
   return {
     ...baseForm,
-    // $FlowFixMe(IL, 2020-02-24): address in #3161, underspecified form fields may be overwritten in type-unsafe manner
     ...getDefaultsForStepType(stepType),
   }
 }

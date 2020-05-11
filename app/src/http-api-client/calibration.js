@@ -118,7 +118,6 @@ export function deckCalibrationCommand(
     const token = startState.response && startState.response.token
 
     if (request.command === 'release') {
-      // $FlowFixMe: (mc, 2019-04-18) http-api-client types need to be redone
       dispatch(clearApiResponse(robot, DECK_START))
     }
 
@@ -137,7 +136,6 @@ export function clearDeckCalibration(robot: RobotService): ThunkPromiseAction {
   const clearDeck = clearApiResponse(robot, DECK)
   const clearDeckStart = clearApiResponse(robot, DECK_START)
 
-  // $FlowFixMe: (mc, 2019-04-23) http-api-client types need to be redone
   return dispatch => dispatch(chainActions(clearDeck, clearDeckStart))
 }
 

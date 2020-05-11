@@ -2,7 +2,7 @@
 // presentational components for the wifi connect form
 import * as React from 'react'
 import styled from 'styled-components'
-import { FW_SEMIBOLD } from '@opentrons/components'
+import { FONT_WEIGHT_SEMIBOLD } from '@opentrons/components'
 
 import type { StyledComponent } from 'styled-components'
 
@@ -20,7 +20,7 @@ const StyledLabel: StyledComponent<{||}, {||}, HTMLLabelElement> = styled.label`
   display: table-cell;
   padding-right: 1rem;
   text-align: right;
-  ${FW_SEMIBOLD}
+  font-weight: ${FONT_WEIGHT_SEMIBOLD};
 `
 
 const StyledInputWrapper: StyledComponent<

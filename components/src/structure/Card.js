@@ -40,7 +40,7 @@ const Section: StyledComponent<
   {||},
   HTMLElement
 > = styled.section`
-  ${styles.FS_BODY_2}
+  font-size: ${styles.FONT_SIZE_BODY_2};
   position: relative;
   overflow: visible;
   box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.33);
@@ -60,7 +60,7 @@ const Section: StyledComponent<
 
 const Title = styled.h3`
   ${styles.FONT_HEADER_DARK}
-  ${styles.FW_REGULAR}
+  font-weight: ${styles.FONT_WEIGHT_REGULAR};
   margin: 0;
   padding: ${styles.S_1} ${styles.S_1} 0;
   text-transform: capitalize;

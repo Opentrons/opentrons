@@ -98,15 +98,6 @@ describe('Desktop Navigation', () => {
       cy.get("select[name*='right.tiprack']").select(
         'Opentrons 96 Filter Tip Rack 20 µL'
       )
-      // Diagrams of the tip racks are displayed
-      cy.get("div[class*='FilePipettesModal__tiprack_labware__']")
-        .first()
-        .get('svg')
-        .should('exist')
-      cy.get("div[class*='FilePipettesModal__tiprack_labware__']")
-        .last()
-        .get('svg')
-        .should('exist')
       // The save button is now available...
       cy.get('button')
         .contains('save')

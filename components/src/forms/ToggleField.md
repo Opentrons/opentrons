@@ -4,8 +4,8 @@ const [state, setState] = React.useState({
 })
 ;<div>
   <ToggleField
-    labelOff="Toggled Off"
-    labelOn="Toggled On"
+    offLabel="Toggled Off"
+    onLabel="Toggled On"
     className="display-block"
     onChange={() => setState({ ...state, isChecked: !state.isChecked })}
     value={state.isChecked}

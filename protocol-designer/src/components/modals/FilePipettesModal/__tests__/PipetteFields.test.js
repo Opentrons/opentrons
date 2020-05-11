@@ -13,7 +13,6 @@ import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/f
 import { actions as labwareDefActions } from '../../../../labware-defs'
 import { getOnlyLatestDefs } from '../../../../labware-defs/utils'
 import { PipetteFields } from '../PipetteFields'
-import { TiprackDiagram } from '../TiprackDiagram'
 import { PipetteDiagram } from '../PipetteDiagram'
 
 import type { LabwareDefByDefURI } from '../../../../labware-defs'
@@ -23,7 +22,6 @@ jest.mock('../../../../feature-flags/selectors')
 jest.mock('../../../../labware-defs/selectors')
 jest.mock('../../../../labware-defs/utils.js')
 jest.mock('../../../../labware-defs/actions')
-jest.mock('../TiprackDiagram')
 
 const getOnlyLatestDefsMock: JestMockFn<
   [],
@@ -74,7 +72,6 @@ describe('PipetteFields', () => {
       },
       errors: null,
       touched: null,
-      customTipracksEnabled: false,
     }
 
     getOnlyLatestDefsMock.mockReturnValue({
@@ -157,22 +154,6 @@ describe('PipetteFields', () => {
 
     expect(props.onFieldChange).toHaveBeenCalledWith(event)
   })
-
-  it('renders tiprack diagrams for selected tipracks', () => {
-    props.values.left = unselectedPipette
-
-    const wrapper = render(props)
-    const tiprackDiagrams = wrapper.find(TiprackDiagram)
-
-    expect(tiprackDiagrams).toHaveLength(2)
-    expect(tiprackDiagrams.at(0).props()).toEqual({
-      definitionURI: '',
-    })
-    expect(tiprackDiagrams.at(1).props()).toEqual({
-      definitionURI: 'tiprack_1000',
-    })
-  })
-
   it('displays pipette diagrams for selected pipettes', () => {
     const wrapper = render(props)
     const pipetteDiagram = wrapper.find(PipetteDiagram)
@@ -181,12 +162,10 @@ describe('PipetteFields', () => {
     expect(pipetteDiagram.props()).toEqual({
       leftPipette: leftPipette.pipetteName,
       rightPipette: rightPipette.pipetteName,
-      customTipracksEnabled: false,
     })
   })
 
-  it('allows the user to upload custom tip racks when custom tipracks FF enabled', () => {
-    props.customTipracksEnabled = true
+  it('allows the user to upload custom tip racks', () => {
     const wrapper = render(props)
     const uploadButton = wrapper.find(OutlineButton).at(0)
     expect(uploadButton.text()).toMatch('Upload custom tip rack')
