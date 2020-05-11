@@ -10,58 +10,62 @@ import {
 import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
 import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 
+const getThermocycler = () => ({
+  id: 'tcId',
+  type: THERMOCYCLER_MODULE_TYPE,
+  model: THERMOCYCLER_MODULE_V1,
+  slot: '_span781011',
+  moduleState: {
+    type: THERMOCYCLER_MODULE_TYPE,
+    blockTargetTemp: null,
+    lidTargetTemp: null,
+    lidOpen: null,
+  },
+})
+
+const getMag = () => ({
+  id: 'magId',
+  type: MAGNETIC_MODULE_TYPE,
+  model: MAGNETIC_MODULE_V1,
+  slot: '_span781011',
+  moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+})
+
+const getTemp = () => ({
+  id: 'tempId',
+  type: TEMPERATURE_MODULE_TYPE,
+  model: TEMPERATURE_MODULE_V1,
+  slot: '3',
+  moduleState: {
+    type: TEMPERATURE_MODULE_TYPE,
+    status: TEMPERATURE_DEACTIVATED,
+    targetTemperature: null,
+  },
+})
+
 describe('getNextDefaultThermocyclerModuleId', () => {
   describe('NO previous forms', () => {
     const testCases = [
       {
         testMsg: 'temp and TC module present: use TC',
         equippedModulesById: {
-          tempId: {
-            id: 'tempId',
-            type: TEMPERATURE_MODULE_TYPE,
-            model: TEMPERATURE_MODULE_V1,
-            slot: '3',
-            moduleState: {
-              type: TEMPERATURE_MODULE_TYPE,
-              status: TEMPERATURE_DEACTIVATED,
-              targetTemperature: null,
-            },
-          },
-          tcId: {
-            id: 'tcId',
-            type: THERMOCYCLER_MODULE_TYPE,
-            model: THERMOCYCLER_MODULE_V1,
-            slot: '_span781011',
-            moduleState: { type: THERMOCYCLER_MODULE_TYPE },
-          },
+          tempId: getTemp(),
+          tcId: getThermocycler(),
         },
         expected: 'tcId',
       },
       {
-        testMsg: 'thermocycler only: use tc',
+        testMsg: 'only TC module present: use TC',
         equippedModulesById: {
-          tcId: {
-            id: 'tcId',
-            type: THERMOCYCLER_MODULE_TYPE,
-            model: THERMOCYCLER_MODULE_V1,
-            slot: '_span781011',
-            moduleState: {
-              type: THERMOCYCLER_MODULE_TYPE,
-            },
-          },
+          tcId: getThermocycler(),
         },
         expected: 'tcId',
       },
+
       {
         testMsg: 'only mag module present: return null',
         equippedModulesById: {
-          magId: {
-            id: 'magId',
-            type: MAGNETIC_MODULE_TYPE,
-            model: MAGNETIC_MODULE_V1,
-            slot: '_span781011',
-            moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
-          },
+          magId: getMag(),
         },
         expected: null,
       },
@@ -88,24 +92,8 @@ describe('getNextDefaultThermocyclerModuleId', () => {
       {
         testMsg: 'temp and tc present, last step was tc: use tc mod',
         equippedModulesById: {
-          tempId: {
-            id: 'tempId',
-            type: TEMPERATURE_MODULE_TYPE,
-            model: TEMPERATURE_MODULE_V1,
-            slot: '3',
-            moduleState: {
-              type: TEMPERATURE_MODULE_TYPE,
-              status: TEMPERATURE_DEACTIVATED,
-              targetTemperature: null,
-            },
-          },
-          tcId: {
-            id: 'tcId',
-            type: THERMOCYCLER_MODULE_TYPE,
-            model: THERMOCYCLER_MODULE_V1,
-            slot: '_span781011',
-            moduleState: { type: THERMOCYCLER_MODULE_TYPE },
-          },
+          tempId: getTemp(),
+          tcId: getThermocycler(),
         },
         savedForms: {
           tempStepId: {
@@ -125,7 +113,7 @@ describe('getNextDefaultThermocyclerModuleId', () => {
         expected: 'tcId',
       },
       {
-        testMsg: 'temp and mag present, last step was mag step: return null',
+        testMsg: 'temp and mag present return null',
         equippedModulesById: {
           magId: {
             id: 'magId',
