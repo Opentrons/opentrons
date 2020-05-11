@@ -12,7 +12,11 @@ import {
   FONT_WEIGHT_SEMIBOLD,
 } from '@opentrons/components'
 
-import { U2E_DRIVER_UPDATE_URL } from '../../system-info'
+import {
+  U2E_DRIVER_UPDATE_URL,
+  EVENT_U2E_DRIVER_LINK_CLICKED,
+} from '../../system-info'
+import { useTrackEvent } from '../../analytics'
 
 // TODO(mc, 2020-05-08): i18n
 const DRIVER_WARNING =
@@ -33,6 +37,8 @@ const GetUpdateButton = styled(OutlineButton)`
 `
 
 export function U2EDriverWarning(props: React.ElementProps<typeof Flex>) {
+  const trackEvent = useTrackEvent()
+
   return (
     <Flex {...props} alignItems={ALIGN_START} color={COLOR_WARNING}>
       <AlertIcon name="alert-circle" />
@@ -42,6 +48,12 @@ export function U2EDriverWarning(props: React.ElementProps<typeof Flex>) {
         href={U2E_DRIVER_UPDATE_URL}
         target="_blank"
         rel="noopener noreferrer"
+        onClick={() =>
+          trackEvent({
+            name: EVENT_U2E_DRIVER_LINK_CLICKED,
+            properties: { source: 'card' },
+          })
+        }
       >
         {GET_UPDATE}
       </GetUpdateButton>

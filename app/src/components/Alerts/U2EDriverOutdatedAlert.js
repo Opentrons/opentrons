@@ -1,11 +1,16 @@
 // @flow
 import * as React from 'react'
-import { Link } from 'react-router-dom'
+import { useHistory, Link } from 'react-router-dom'
 import styled from 'styled-components'
 
 import { AlertModal, CheckboxField, useToggle } from '@opentrons/components'
 import { useFeatureFlag } from '../../config'
-import { U2E_DRIVER_UPDATE_URL } from '../../system-info'
+import { useTrackEvent } from '../../analytics'
+import {
+  U2E_DRIVER_UPDATE_URL,
+  EVENT_U2E_DRIVER_ALERT_DISMISSED,
+  EVENT_U2E_DRIVER_LINK_CLICKED,
+} from '../../system-info'
 import type { AlertProps } from './types'
 
 // TODO(mc, 2020-05-07): i18n
@@ -28,8 +33,10 @@ const IgnoreCheckbox = styled(CheckboxField)`
 `
 
 export function U2EDriverOutdatedAlert(props: AlertProps) {
+  const history = useHistory()
+  const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
-  const dismissAlert = () => props.dismissAlert(rememberDismiss)
+  const { dismissAlert } = props
 
   // TODO(mc, 2020-05-07): remove this feature flag
   const enabled = useFeatureFlag('enableSystemInfo')
@@ -46,7 +53,13 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
           Component: Link,
           to: ADAPTER_INFO_URL,
           children: VIEW_ADAPTER_INFO,
-          onClick: dismissAlert,
+          onClick: () => {
+            dismissAlert(rememberDismiss)
+            trackEvent({
+              name: EVENT_U2E_DRIVER_ALERT_DISMISSED,
+              properties: { rememberDismiss },
+            })
+          },
         },
         {
           Component: 'a',
@@ -54,7 +67,14 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
           target: '_blank',
           rel: 'noopener noreferrer',
           children: GET_UPDATE,
-          onClick: dismissAlert,
+          onClick: () => {
+            history.push(ADAPTER_INFO_URL)
+            dismissAlert(rememberDismiss)
+            trackEvent({
+              name: EVENT_U2E_DRIVER_LINK_CLICKED,
+              properties: { source: 'modal' },
+            })
+          },
         },
       ]}
     >

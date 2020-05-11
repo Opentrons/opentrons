@@ -13,6 +13,7 @@ import type { State } from '../../../types'
 import type { UsbDevice, DriverStatus } from '../../../system-info/types'
 
 jest.mock('../../../system-info/selectors')
+jest.mock('../../../analytics')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 

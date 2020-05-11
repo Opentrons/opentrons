@@ -21,3 +21,8 @@ export const USB_DEVICE_ADDED: 'systemInfo:USB_DEVICE_ADDED' =
 
 export const USB_DEVICE_REMOVED: 'systemInfo:USB_DEVICE_REMOVED' =
   'systemInfo:USB_DEVICE_REMOVED'
+
+// analytics events
+
+export const EVENT_U2E_DRIVER_ALERT_DISMISSED = 'u2eDriverAlertDismissed'
+export const EVENT_U2E_DRIVER_LINK_CLICKED = 'u2eDriverLinkClicked'
