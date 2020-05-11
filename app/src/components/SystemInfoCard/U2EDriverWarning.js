@@ -16,12 +16,11 @@ import {
 import {
   U2E_DRIVER_UPDATE_URL,
   EVENT_U2E_DRIVER_LINK_CLICKED,
+  U2E_DRIVER_OUTDATED_MESSAGE,
+  U2E_DRIVER_OUTDATED_CTA,
 } from '../../system-info'
-import { useTrackEvent } from '../../analytics'
 
-// TODO(mc, 2020-05-08): i18n
-const DRIVER_WARNING =
-  "Your computer's Realtek USB-to-Ethernet adapter driver may be out of date. Please update your computer's driver to ensure you can connect to your OT-2."
+import { useTrackEvent } from '../../analytics'
 
 const GET_UPDATE = 'get update'
 
@@ -43,7 +42,9 @@ export function U2EDriverWarning(props: React.ElementProps<typeof Flex>) {
   return (
     <Flex {...props} alignItems={ALIGN_START} color={COLOR_WARNING}>
       <AlertIcon name="alert-circle" />
-      <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>{DRIVER_WARNING}</Text>
+      <Text fontWeight={FONT_WEIGHT_SEMIBOLD}>
+        {U2E_DRIVER_OUTDATED_MESSAGE} {U2E_DRIVER_OUTDATED_CTA}
+      </Text>
       <GetUpdateButton
         Component={Link}
         external={true}

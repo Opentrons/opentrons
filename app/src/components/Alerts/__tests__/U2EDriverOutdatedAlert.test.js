@@ -48,7 +48,7 @@ describe('U2EDriverOutdatedAlert', () => {
     const alertModal = wrapper.find(AlertModal)
 
     expect(alertModal.prop('heading')).toBe(
-      'Realtek USB-to-Ethernet Driver Out of Date'
+      'Realtek USB-to-Ethernet Driver Update Available'
     )
   })
 
