@@ -18,8 +18,7 @@ type SelectorSpec = {|
 
 const SPECS: Array<SelectorSpec> = [
   {
-    name:
-      'getRobotSessions returns null if no sessions',
+    name: 'getRobotSessions returns null if no sessions',
     selector: Selectors.getRobotSessions,
     state: {
       sessions: {},
@@ -42,7 +41,7 @@ const SPECS: Array<SelectorSpec> = [
     args: ['germanium-cobweb'],
     expected: {
       '1234': Fixtures.mockRobotSessionData,
-      }
+    },
   },
   {
     name: 'getRobotSessionById returns null if not found',

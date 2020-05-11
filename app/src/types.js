@@ -41,7 +41,6 @@ import type { AlertsState, AlertsAction } from './alerts/types'
 
 import type { SessionState, RobotSessionAction } from './sessions/types'
 
-
 export type State = $ReadOnly<{|
   robot: RobotState,
   superDeprecatedRobotApi: SuperDeprecatedRobotApiState,

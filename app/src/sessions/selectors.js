@@ -4,7 +4,7 @@ import * as Types from './types'
 
 export const getRobotSessions: (
   state: State,
-  robotName: string,
+  robotName: string
 ) => Types.SessionsById | null = (state, robotName) =>
   state.sessions[robotName]?.robotSessions ?? null
 
@@ -14,4 +14,3 @@ export const getRobotSessionById: (
   sessionId: string
 ) => Types.RobotSessionData | null = (state, robotName, sessionId) =>
   getRobotSessions(state, robotName)[sessionId] ?? null
-  

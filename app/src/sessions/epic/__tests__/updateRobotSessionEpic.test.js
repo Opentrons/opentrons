@@ -12,9 +12,7 @@ import type {
   RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../../robot-api/types'
-import {
-  mockRobot
-} from '../../../robot-api/__fixtures__'
+import { mockRobot } from '../../../robot-api/__fixtures__'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -45,7 +43,10 @@ describe('updateRobotSessionEpic', () => {
   })
 
   describe('handles explicit UPDATE SESSION', () => {
-    const action = Actions.updateRobotSession(mockRobot.name, '1234', {commandType: 'command', payload: {someData:3}})
+    const action = Actions.updateRobotSession(mockRobot.name, '1234', {
+      commandType: 'command',
+      payload: { someData: 3 },
+    })
     const expectedRequest = {
       method: 'POST',
       path: '/sessions/1234/commands',
@@ -55,7 +56,7 @@ describe('updateRobotSessionEpic', () => {
           attributes: {
             commandType: 'command',
             payload: {
-              someData: 3
+              someData: 3,
             },
           },
         },
@@ -115,7 +116,7 @@ describe('updateRobotSessionEpic', () => {
         expectObservable(output$).toBe('--a', {
           a: Actions.updateRobotSessionFailure(
             mockRobot.name,
-            { errors: [{status: 'went bad'}]},
+            { errors: [{ status: 'went bad' }] },
             { response: Fixtures.mockUpdateSessionFailureMeta }
           ),
         })

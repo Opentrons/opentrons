@@ -27,16 +27,13 @@ const mapResponseToAction: ResponseToActionMapper<DeleteRobotSessionAction> = (
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-  
+
   return response.ok
-      ? Actions.deleteRobotSessionSuccess(host.name, body, meta)
-      : Actions.deleteRobotSessionFailure(host.name, body, meta)
+    ? Actions.deleteRobotSessionSuccess(host.name, body, meta)
+    : Actions.deleteRobotSessionFailure(host.name, body, meta)
 }
 
-export const deleteRobotSessionEpic: Epic = (
-  action$,
-  state$
-) => {
+export const deleteRobotSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.DELETE_ROBOT_SESSION),
     mapToRobotApiRequest(

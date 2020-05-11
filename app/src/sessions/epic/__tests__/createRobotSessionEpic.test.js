@@ -12,9 +12,7 @@ import type {
   RobotApiRequestOptions,
   RobotApiResponse,
 } from '../../../robot-api/types'
-import {
-  mockRobot
-} from '../../../robot-api/__fixtures__'
+import { mockRobot } from '../../../robot-api/__fixtures__'
 
 jest.mock('../../../robot-api/http')
 jest.mock('../../../discovery/selectors')
@@ -112,7 +110,7 @@ describe('createRobotSessionEpic', () => {
         expectObservable(output$).toBe('--a', {
           a: Actions.createRobotSessionFailure(
             mockRobot.name,
-            { errors: [{status: 'went bad'}]},
+            { errors: [{ status: 'went bad' }] },
             { response: Fixtures.mockCreateSessionFailureMeta }
           ),
         })

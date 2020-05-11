@@ -36,14 +36,11 @@ const mapResponseToAction: ResponseToActionMapper<CreateRobotSessionAction> = (
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
-      ? Actions.createRobotSessionSuccess(host.name, body, meta)
-      : Actions.createRobotSessionFailure(host.name, body, meta)
+    ? Actions.createRobotSessionSuccess(host.name, body, meta)
+    : Actions.createRobotSessionFailure(host.name, body, meta)
 }
 
-export const createRobotSessionEpic: Epic = (
-  action$,
-  state$
-) => {
+export const createRobotSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.CREATE_ROBOT_SESSION),
     mapToRobotApiRequest(

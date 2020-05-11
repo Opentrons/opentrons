@@ -25,12 +25,12 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {}
-      }
+        robotSessions: {},
+      },
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '1234': Fixtures.mockRobotSessionData,
         },
       },
@@ -48,14 +48,14 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
-        }
-      }
+        },
+      },
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
           '1234': Fixtures.mockRobotSessionData,
         },
@@ -73,12 +73,11 @@ const SPECS: Array<ReducerSpec> = [
       meta: {},
     },
     state: {
-      'eggplant-parm': {
-      }
+      'eggplant-parm': {},
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '1234': Fixtures.mockRobotSessionData,
         },
       },
@@ -96,14 +95,14 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
         },
       },
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '1234': Fixtures.mockRobotSessionData,
           '4321': Fixtures.mockRobotSessionData,
         },
@@ -122,14 +121,14 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '1234': Fixtures.mockRobotSessionData,
         },
       },
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '1234': {
             ...Fixtures.mockRobotSessionUpdateData.meta,
           },
@@ -149,7 +148,7 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
           '1234': Fixtures.mockRobotSessionData,
         },
@@ -157,7 +156,7 @@ const SPECS: Array<ReducerSpec> = [
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
           '1234': {
             ...Fixtures.mockRobotSessionUpdateData.meta,
@@ -178,7 +177,7 @@ const SPECS: Array<ReducerSpec> = [
     },
     state: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
           '1234': Fixtures.mockRobotSessionData,
         },
@@ -186,7 +185,7 @@ const SPECS: Array<ReducerSpec> = [
     },
     expected: {
       'eggplant-parm': {
-        'robotSessions': {
+        robotSessions: {
           '4321': Fixtures.mockRobotSessionData,
           '1234': null,
         },

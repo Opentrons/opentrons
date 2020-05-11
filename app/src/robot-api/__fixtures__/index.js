@@ -83,7 +83,7 @@ export const makeResponseFixtures = <SuccessBody, FailureBody>(
 
 export const mockV2Error: RobotApiV2Error = {
   status: 'went bad',
-};
+}
 
 export const mockV2ErrorResponse: RobotApiV2ErrorResponseBody = {
   errors: [mockV2Error],

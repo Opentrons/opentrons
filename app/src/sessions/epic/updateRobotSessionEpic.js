@@ -19,7 +19,6 @@ import type { UpdateRobotSessionAction } from '../types'
 const mapActionToRequest: ActionToRequestMapper<UpdateRobotSessionAction> = action => ({
   method: POST,
   path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}/${Constants.SESSIONS_UPDATE_PATH_EXTENSION}`,
-  body: action.payload.update,
   body: {
     data: {
       type: 'Command',
@@ -34,16 +33,13 @@ const mapResponseToAction: ResponseToActionMapper<UpdateRobotSessionAction> = (
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-  
+
   return response.ok
-      ? Actions.updateRobotSessionSuccess(host.name, body, meta)
-      : Actions.updateRobotSessionFailure(host.name, body, meta)
+    ? Actions.updateRobotSessionSuccess(host.name, body, meta)
+    : Actions.updateRobotSessionFailure(host.name, body, meta)
 }
 
-export const updateRobotSessionEpic: Epic = (
-  action$,
-  state$
-) => {
+export const updateRobotSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.UPDATE_ROBOT_SESSION),
     mapToRobotApiRequest(

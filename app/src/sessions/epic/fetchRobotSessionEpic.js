@@ -27,16 +27,13 @@ const mapResponseToAction: ResponseToActionMapper<FetchRobotSessionAction> = (
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-  
+
   return response.ok
-      ? Actions.fetchRobotSessionSuccess(host.name, body, meta)
-      : Actions.fetchRobotSessionFailure(host.name, body, meta)
+    ? Actions.fetchRobotSessionSuccess(host.name, body, meta)
+    : Actions.fetchRobotSessionFailure(host.name, body, meta)
 }
 
-export const fetchRobotSessionEpic: Epic = (
-  action$,
-  state$
-) => {
+export const fetchRobotSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
     ofType(Constants.FETCH_ROBOT_SESSION),
     mapToRobotApiRequest(

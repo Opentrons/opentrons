@@ -13,28 +13,25 @@ import typeof {
   UPDATE_ROBOT_SESSION,
   UPDATE_ROBOT_SESSION_SUCCESS,
   UPDATE_ROBOT_SESSION_FAILURE,
-  } from "./constants";
+} from './constants'
 
-import type { 
+import type {
   RobotApiRequestMeta,
-  RobotApiV2ErrorResponseBody 
-  } from '../robot-api/types'
-
+  RobotApiV2ErrorResponseBody,
+} from '../robot-api/types'
 
 // The available session types
 export type RobotSessionType = 'check'
 
-
 export type RobotSessionUpdate = {|
   commandType: string,
-  payload: {...},
+  payload: { ... },
 |}
-
 
 export type RobotSessionData = {|
   sessionType: RobotSessionType,
   sessionId: string,
-  meta: {...},
+  meta: { ... },
 |}
 
 export type RobotSessionUpdateData = {|
@@ -43,10 +40,9 @@ export type RobotSessionUpdateData = {|
   meta: RobotSessionData,
 |}
 
-
 export type CreateRobotSessionAction = {|
   type: CREATE_ROBOT_SESSION,
-  payload: {| robotName: string, sessionType: SessionType |},
+  payload: {| robotName: string, sessionType: RobotSessionType |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -61,7 +57,6 @@ export type CreateRobotSessionFailureAction = {|
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}
-
 
 export type DeleteRobotSessionAction = {|
   type: DELETE_ROBOT_SESSION,
@@ -81,7 +76,6 @@ export type DeleteRobotSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-
 export type FetchRobotSessionAction = {|
   type: FETCH_ROBOT_SESSION,
   payload: {| robotName: string, sessionId: string |},
@@ -100,10 +94,13 @@ export type FetchRobotSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-
 export type UpdateRobotSessionAction = {|
   type: UPDATE_ROBOT_SESSION,
-  payload: {| robotName: string, sessionId: string, command: RobotSessionUpdate |},
+  payload: {|
+    robotName: string,
+    sessionId: string,
+    command: RobotSessionUpdate,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -119,8 +116,7 @@ export type UpdateRobotSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-
-export type RobotSessionAction = 
+export type RobotSessionAction =
   | CreateRobotSessionAction
   | CreateRobotSessionSuccessAction
   | CreateRobotSessionFailureAction
@@ -134,12 +130,9 @@ export type RobotSessionAction =
   | UpdateRobotSessionSuccessAction
   | UpdateRobotSessionFailureAction
 
-
-export type SessionsById = $Shape<
-  {|
-    [id: string]: RobotSessionData 
-  |}
->
+export type SessionsById = $Shape<{|
+  [id: string]: RobotSessionData,
+|}>
 
 export type PerRobotSessionState = $Shape<
   $ReadOnly<{|

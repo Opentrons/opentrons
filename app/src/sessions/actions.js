@@ -3,9 +3,8 @@
 import * as Types from './types'
 import * as Constants from './constants'
 
-
 export const createRobotSession = (
-  robotName: string, 
+  robotName: string,
   sessionType: Types.SessionType
 ): Types.CreateRobotSessionAction => ({
   type: Constants.CREATE_ROBOT_SESSION,
@@ -33,11 +32,9 @@ export const createRobotSessionFailure = (
   meta: meta,
 })
 
-
-
 export const deleteRobotSession = (
-  robotName: string, 
-  sessionId: string,
+  robotName: string,
+  sessionId: string
 ): Types.DeleteRobotSessionAction => ({
   type: Constants.DELETE_ROBOT_SESSION,
   payload: { robotName, sessionId },
@@ -64,11 +61,9 @@ export const deleteRobotSessionFailure = (
   meta: meta,
 })
 
-
-
 export const fetchRobotSession = (
-  robotName: string, 
-  sessionId: string,
+  robotName: string,
+  sessionId: string
 ): Types.FetchRobotSessionAction => ({
   type: Constants.FETCH_ROBOT_SESSION,
   payload: { robotName, sessionId },
@@ -95,12 +90,10 @@ export const fetchRobotSessionFailure = (
   meta: meta,
 })
 
-
-
 export const updateRobotSession = (
-  robotName: string, 
+  robotName: string,
   sessionId: string,
-  update: Types.RobotSessionUpdate,
+  update: Types.RobotSessionUpdate
 ): Types.UpdateRobotSessionAction => ({
   type: Constants.UPDATE_ROBOT_SESSION,
   payload: { robotName, sessionId, update },
