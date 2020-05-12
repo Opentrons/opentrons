@@ -48,7 +48,6 @@ class PipetteRank(str, Enum):
 
 @dataclass
 class PipetteInfo:
-    hw_pipette: Pipette.DictType
     rank: PipetteRank
     mount: Mount
     tiprack_id: typing.Optional[UUID]
@@ -139,7 +138,6 @@ class CalibrationSession:
                     cp = CriticalPoint.FRONT_NOZZLE
                 pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
                                                        critical_point=cp,
-                                                       hw_pipette=data,
                                                        rank=rank,
                                                        mount=mount)
         return pip_info_by_mount
@@ -178,11 +176,11 @@ class CalibrationSession:
         return lw
 
     def _alt_load_names_for_mount(self, mount: Mount) -> typing.List[str]:
-        pip_vol = self._pip_info_by_mount[mount].hw_pipette['max_volume']
+        pip_vol = self.pipettes[mount]['max_volume']
         return list(LOOKUP_LABWARE[str(pip_vol)].alternatives)
 
     def _load_name_for_mount(self, mount: Mount) -> str:
-        pip_vol = self._pip_info_by_mount[mount].hw_pipette['max_volume']
+        pip_vol = self.pipettes[mount]['max_volume']
         return LOOKUP_LABWARE[str(pip_vol)].load_name
 
     def _build_deck_moves(self) -> Moves:
@@ -229,7 +227,7 @@ class CalibrationSession:
             # mod geometry contexts. Ignore type checking error here.
             tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
         else:
-            tip_length = pip_info.hw_pipette['fallback_tip_length']
+            tip_length = self.pipettes[mount]['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
 
     async def _trash_tip(self, mount: Mount):
@@ -627,7 +625,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         """
         to_dict = {}
         for mount, pip_info in self._pip_info_by_mount.items():
-            hw_pip = pip_info.hw_pipette
+            hw_pip = self.pipettes[mount]
             p = PipetteStatus(
                 model=str(hw_pip['model']),
                 name=str(hw_pip['name']),
@@ -675,7 +673,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                             self.current_state_name)]
 
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
-        pip_model = self._pip_info_by_mount[mount].hw_pipette['model']
+        pip_model = self.pipettes[mount]['model']
         if str(pip_model).startswith('p1000'):
             threshold_vector = P1000_OK_TIP_PICK_UP_VECTOR
         xyThresholdMag = Point(0, 0, 0).magnitude_to(

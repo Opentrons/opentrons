@@ -326,70 +326,66 @@ async def test_first_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_first_tip(check_calibration_session)
     first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
     second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
-    assert first_pip.hw_pipette['has_tip'] is True
-    assert first_pip.hw_pipette['tip_length'] > 0.0
-    assert second_pip.hw_pipette['has_tip'] is False
+    assert sess.pipettes[first_pip.mount]['has_tip'] is True
+    assert sess.pipettes[first_pip.mount]['tip_length'] > 0.0
+    assert sess.pipettes[second_pip.mount]['has_tip'] is False
 
 
 async def test_second_pick_up_tip(check_calibration_session):
     sess = await in_inspecting_second_tip(check_calibration_session)
     first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
     second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
-    assert second_pip.hw_pipette['has_tip'] is True
-    assert second_pip.hw_pipette['tip_length'] > 0.0
-    assert first_pip.hw_pipette['has_tip'] is False
+    assert sess.pipettes[second_pip.mount]['has_tip'] is True
+    assert sess.pipettes[second_pip.mount]['tip_length'] > 0.0
+    assert sess.pipettes[first_pip.mount]['has_tip'] is False
 
 
 async def test_invalidate_first_tip(check_calibration_session):
     sess = await in_inspecting_first_tip(check_calibration_session)
     first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
-    assert first_pip.hw_pipette['has_tip'] is True
+    assert sess.pipettes[first_pip.mount]['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
         session.CalibrationCheckState.preparingFirstPipette
-    assert sess._get_pipette_by_rank(
-            session.PipetteRank.first).hw_pipette['has_tip'] is False
+    assert sess.pipettes[first_pip.mount]['has_tip'] is False
 
 
 async def test_invalidate_second_tip(check_calibration_session):
     sess = await in_inspecting_second_tip(check_calibration_session)
     second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
-    assert second_pip.hw_pipette['has_tip'] is True
+    assert sess.pipettes[second_pip.mount]['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
-    assert sess._get_pipette_by_rank(
-            session.PipetteRank.second).hw_pipette['has_tip'] is False
+    assert sess.pipettes[second_pip.mount]['has_tip'] is False
 
 
 async def test_complete_check_one_pip(check_calibration_session_only_right):
     sess = await in_comparing_first_pipette_point_three(
             check_calibration_session_only_right)
     first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
-    assert first_pip.hw_pipette['has_tip'] is True
+    assert sess.pipettes[first_pip.mount]['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess._get_pipette_by_rank(
-            session.PipetteRank.first).hw_pipette['has_tip'] is False
+    assert sess.pipettes[first_pip.mount]['has_tip'] is False
 
 
 async def test_complete_check_both_pips(check_calibration_session):
     sess = await in_comparing_second_pipette_point_one(
             check_calibration_session)
+    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
     second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
-    assert second_pip.hw_pipette['has_tip'] is True
+    assert sess.pipettes[second_pip.mount]['has_tip'] is True
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess._get_pipette_by_rank(
-            session.PipetteRank.first).hw_pipette['has_tip'] is False
-    assert sess._get_pipette_by_rank(
-        session.PipetteRank.second).hw_pipette['has_tip'] is False
+    assert sess.pipettes[first_pip.mount]['has_tip'] is False
+    assert sess.pipettes[second_pip.mount]['has_tip'] is False
 
 
 # START flow testing both mounts
