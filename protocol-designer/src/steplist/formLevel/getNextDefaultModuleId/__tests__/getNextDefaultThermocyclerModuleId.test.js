@@ -8,7 +8,7 @@ import {
   THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { TEMPERATURE_DEACTIVATED } from '../../../../constants'
-import { getNextDefaultTemperatureModuleId } from '..'
+import { getNextDefaultThermocyclerModuleId } from '../getNextDefaultThermocyclerModuleId'
 
 const getThermocycler = () => ({
   id: 'tcId',
@@ -43,24 +43,25 @@ const getTemp = () => ({
   },
 })
 
-describe('getNextDefaultTemperatureModuleId', () => {
+describe('getNextDefaultThermocyclerModuleId', () => {
   describe('NO previous forms', () => {
     const testCases = [
       {
-        testMsg: 'temp and TC module present: use temp',
+        testMsg: 'temp and TC module present: use TC',
         equippedModulesById: {
           tempId: getTemp(),
           tcId: getThermocycler(),
         },
-        expected: 'tempId',
+        expected: 'tcId',
       },
       {
-        testMsg: 'thermocycler only: use tc',
+        testMsg: 'only TC module present: use TC',
         equippedModulesById: {
           tcId: getThermocycler(),
         },
         expected: 'tcId',
       },
+
       {
         testMsg: 'only mag module present: return null',
         equippedModulesById: {
@@ -75,7 +76,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
         const savedForms = {}
         const orderedStepIds = []
 
-        const result = getNextDefaultTemperatureModuleId(
+        const result = getNextDefaultThermocyclerModuleId(
           savedForms,
           orderedStepIds,
           equippedModulesById
@@ -85,11 +86,11 @@ describe('getNextDefaultTemperatureModuleId', () => {
       })
     })
   })
-  // TODO (ka 2019-12-20): Add in tests for existing temperature form steps once wired up
+
   describe('previous forms', () => {
     const testCases = [
       {
-        testMsg: 'temp and tc present, last step was tc: use temp mod',
+        testMsg: 'temp and tc present, last step was tc: use tc mod',
         equippedModulesById: {
           tempId: getTemp(),
           tcId: getThermocycler(),
@@ -109,13 +110,29 @@ describe('getNextDefaultTemperatureModuleId', () => {
           },
         },
         orderedStepIds: ['tempStepId', 'tcStepId'],
-        expected: 'tempId',
+        expected: 'tcId',
       },
       {
-        testMsg: 'temp and mag present, last step was mag step: use temp mod',
+        testMsg: 'temp and mag present return null',
         equippedModulesById: {
-          magId: getMag(),
-          tempId: getTemp(),
+          magId: {
+            id: 'magId',
+            type: MAGNETIC_MODULE_TYPE,
+            model: MAGNETIC_MODULE_V1,
+            slot: '_span781011',
+            moduleState: { type: MAGNETIC_MODULE_TYPE, engaged: false },
+          },
+          tempId: {
+            id: 'tempId',
+            type: TEMPERATURE_MODULE_TYPE,
+            model: TEMPERATURE_MODULE_V1,
+            slot: '3',
+            moduleState: {
+              type: TEMPERATURE_MODULE_TYPE,
+              status: TEMPERATURE_DEACTIVATED,
+              targetTemperature: null,
+            },
+          },
         },
         savedForms: {
           tempStepId: {
@@ -132,7 +149,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
           },
         },
         orderedStepIds: ['tempStepId', 'magStepId'],
-        expected: 'tempId',
+        expected: null,
       },
     ]
 
@@ -145,7 +162,7 @@ describe('getNextDefaultTemperatureModuleId', () => {
         expected,
       }) => {
         it(testMsg, () => {
-          const result = getNextDefaultTemperatureModuleId(
+          const result = getNextDefaultThermocyclerModuleId(
             savedForms,
             orderedStepIds,
             equippedModulesById

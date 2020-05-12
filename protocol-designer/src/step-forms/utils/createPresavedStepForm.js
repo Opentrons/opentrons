@@ -6,6 +6,7 @@ import {
   getNextDefaultMagnetAction,
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
+  getNextDefaultThermocyclerModuleId,
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
@@ -140,6 +141,27 @@ const _patchTemperatureModuleId = (args: {|
   return null
 }
 
+const _patchThermocyclerModuleId = (args: {|
+  initialDeckSetup: InitialDeckSetup,
+  orderedStepIds: OrderedStepIdsState,
+  savedStepForms: SavedStepFormState,
+  stepType: StepType,
+|}): FormUpdater => () => {
+  const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
+
+  const hasThermocyclerModuleId = stepType === 'thermocycler'
+
+  if (hasThermocyclerModuleId) {
+    const moduleId = getNextDefaultThermocyclerModuleId(
+      savedStepForms,
+      orderedStepIds,
+      initialDeckSetup.modules
+    )
+    return { moduleId }
+  }
+  return null
+}
+
 export const createPresavedStepForm = ({
   initialDeckSetup,
   labwareEntities,
@@ -176,11 +198,19 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
+  const updateThermocyclerModuleId = _patchThermocyclerModuleId({
+    initialDeckSetup,
+    orderedStepIds,
+    savedStepForms,
+    stepType,
+  })
+
   // finally, compose and apply all the updaters in order,
   // passing the applied result from one updater as the input of the next
   return [
     updateDefaultPipette,
     updateTemperatureModuleId,
+    updateThermocyclerModuleId,
     updateMagneticModuleId,
   ].reduce<FormData>(
     (acc, updater: FormUpdater) => {

@@ -30,7 +30,10 @@ export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
 export { getDisabledFields } from './getDisabledFields'
 export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'
-export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
+export {
+  getNextDefaultTemperatureModuleId,
+  getNextDefaultThermocyclerModuleId,
+} from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
