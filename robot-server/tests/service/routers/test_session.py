@@ -26,7 +26,6 @@ def session_details():
                 'labware': [],
             },
             'sessionType': 'calibrationCheck',
-            'sessionId': 'calibrationCheck',
         },
         'type': 'Session',
         'id': 'calibrationCheck'

@@ -56,9 +56,6 @@ class BasicSession(BaseModel):
 
 class Session(BasicSession):
     """Full description of session"""
-    sessionId: str =\
-        Field(...,
-              description="Unique identifier of the session")
     details: SessionDetails =\
         Field(...,
               description="Detailed session specific status")
