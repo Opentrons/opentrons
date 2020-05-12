@@ -6,7 +6,11 @@ import * as PipetteSelectors from '../../pipettes/selectors'
 import * as RobotSelectors from '../../robot/selectors'
 import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
+import * as SystemInfoSelectors from '../../system-info/selectors'
+import * as ConfigSelectors from '../../config/selectors'
 import * as Selectors from '../selectors'
+
+import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
 
 import type { State } from '../../types'
 import type { Robot, ViewableRobot } from '../../discovery/types'
@@ -22,8 +26,10 @@ type SelectorSpec = {|
 jest.mock('../../discovery/selectors')
 jest.mock('../../pipettes/selectors')
 jest.mock('../../buildroot/selectors')
+jest.mock('../../system-info/selectors')
 jest.mock('../../shell')
 jest.mock('../../robot/selectors')
+jest.mock('../../config/selectors')
 
 const mockGetConnectedRobot: JestMockFn<
   [State],
@@ -39,6 +45,11 @@ const mockGetAvailableShellUpdate: JestMockFn<
   [State],
   $Call<typeof ShellSelectors.getAvailableShellUpdate, State>
 > = ShellSelectors.getAvailableShellUpdate
+
+const mockGetU2EWindowsDriverStatus: JestMockFn<
+  [State],
+  $Call<typeof SystemInfoSelectors.getU2EWindowsDriverStatus, State>
+> = SystemInfoSelectors.getU2EWindowsDriverStatus
 
 const mockGetBuildrootUpdateAvailable: JestMockFn<
   [State, ViewableRobot],
@@ -68,6 +79,11 @@ const mockGetCommands: JestMockFn<
   [State],
   any
 > = (RobotSelectors.getCommands: any)
+
+const mockGetFeatureFlags: JestMockFn<
+  [State],
+  $Call<typeof ConfigSelectors.getFeatureFlags, State>
+> = ConfigSelectors.getFeatureFlags
 
 const EXPECTED_ROBOTS = {
   id: 'robots',
@@ -122,6 +138,10 @@ describe('nav selectors', () => {
     mockGetIsDone.mockReturnValue(false)
     mockGetSessionIsLoaded.mockReturnValue(false)
     mockGetCommands.mockReturnValue([])
+    mockGetU2EWindowsDriverStatus.mockReturnValue(NOT_APPLICABLE)
+
+    // TODO(mc, 2020-05-08): remove enableSystemInfo feature flag
+    mockGetFeatureFlags.mockReturnValue({ enableSystemInfo: true })
   })
 
   afterEach(() => {
@@ -292,7 +312,26 @@ describe('nav selectors', () => {
         EXPECTED_RUN,
         {
           ...EXPECTED_MORE,
-          notificationReason: expect.stringMatching(/update is available/),
+          notificationReason: expect.stringMatching(/app update is available/),
+        },
+      ],
+    },
+    {
+      name: 'getNavbarLocations with notification for driver update',
+      selector: Selectors.getNavbarLocations,
+      before: () => {
+        mockGetU2EWindowsDriverStatus.mockReturnValue(OUTDATED)
+      },
+      expected: [
+        EXPECTED_ROBOTS,
+        EXPECTED_UPLOAD,
+        EXPECTED_CALIBRATE,
+        EXPECTED_RUN,
+        {
+          ...EXPECTED_MORE,
+          notificationReason: expect.stringMatching(
+            /driver update is available/
+          ),
         },
       ],
     },

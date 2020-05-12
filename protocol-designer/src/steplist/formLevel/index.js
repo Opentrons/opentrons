@@ -18,10 +18,8 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
-  pauseTemperatureRangeExceeded,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
@@ -30,7 +28,10 @@ export { createBlankForm } from './createBlankForm'
 export { getDefaultsForStepType } from './getDefaultsForStepType'
 export { getDisabledFields } from './getDisabledFields'
 export { getNextDefaultPipetteId } from './getNextDefaultPipetteId'
-export { getNextDefaultTemperatureModuleId } from './getNextDefaultModuleId'
+export {
+  getNextDefaultTemperatureModuleId,
+  getNextDefaultThermocyclerModuleId,
+} from './getNextDefaultModuleId'
 export { getNextDefaultMagnetAction } from './getNextDefaultMagnetAction'
 export { getNextDefaultEngageHeight } from './getNextDefaultEngageHeight'
 export { stepFormToArgs } from './stepFormToArgs'
@@ -48,7 +49,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   pause: {
     getErrors: composeErrors(pauseForTimeOrUntilTold),
-    getWarnings: composeWarnings(pauseTemperatureRangeExceeded),
   },
   moveLiquid: {
     getErrors: composeErrors(
@@ -72,7 +72,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
-    getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
 

@@ -4,6 +4,8 @@ from typing import Dict, Optional, List, Any
 from functools import partial
 from pydantic import BaseModel, Field
 
+from .helper_classes import DeckCalibrationError
+
 
 Point = List[float]
 
@@ -71,6 +73,7 @@ class ComparisonStatus(BaseModel):
     differenceVector: Point = PointField()
     thresholdVector:  Point = PointField()
     exceedsThreshold: bool
+    transformType: DeckCalibrationError
 
 
 class CalibrationSessionStatus(BaseModel):

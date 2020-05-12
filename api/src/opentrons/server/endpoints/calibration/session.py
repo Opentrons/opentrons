@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import CriticalPoint, Axis
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
 from .models import ComparisonStatus
+from .helper_classes import LabwareInfo, CheckMove, Moves, DeckCalibrationError
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -24,6 +25,10 @@ offset or a robot deck transform.
 
 
 class CalibrationException(Exception):
+    pass
+
+
+class NoPipetteException(CalibrationException):
     pass
 
 
@@ -65,41 +70,6 @@ class PipetteStatus:
     tiprack_id: typing.Optional[UUID]
 
 
-@dataclass
-class LabwareInfo:
-    """
-    This class purely maps to :py:class:`.models.LabwareStatus` and is
-    intended to inform a client about the tipracks required for a session.
-    """
-    alternatives: typing.List[str]
-    forMounts: typing.List[Mount]
-    loadName: str
-    slot: str
-    namespace: str
-    version: str
-    id: UUID
-    definition: labware.LabwareDefinition
-
-
-@dataclass
-class CheckMove:
-    position: Point = Point(0, 0, 0)
-    locationId: UUID = uuid4()
-
-
-@dataclass
-class Moves:
-    """A mapping of calibration check state to gantry move parameters"""
-    preparingFirstPipette: CheckMove = CheckMove()
-    preparingSecondPipette: CheckMove = CheckMove()
-    joggingFirstPipetteToHeight: CheckMove = CheckMove()
-    joggingFirstPipetteToPointOne: CheckMove = CheckMove()
-    joggingFirstPipetteToPointTwo: CheckMove = CheckMove()
-    joggingFirstPipetteToPointThree: CheckMove = CheckMove()
-    joggingSecondPipetteToHeight: CheckMove = CheckMove()
-    joggingSecondPipetteToPointOne: CheckMove = CheckMove()
-
-
 # vector from front bottom left of slot 12
 TRASH_TIP_OFFSET = Point(20, 20, -20)
 
@@ -128,19 +98,23 @@ class CalibrationSession:
         pip_info_by_mount = {}
         attached_pips = {m: p for m, p in new_pipettes.items() if p}
         num_pips = len(attached_pips)
-        for mount, data in attached_pips.items():
-            if data:
-                rank = PipetteRank.first
-                if num_pips == 2 and mount == Mount.LEFT:
-                    rank = PipetteRank.second
-                cp = None
-                if data['channels'] == 8:
-                    cp = CriticalPoint.FRONT_NOZZLE
-                pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
-                                                       critical_point=cp,
-                                                       rank=rank,
-                                                       mount=mount)
-        return pip_info_by_mount
+        if num_pips > 0:
+            for mount, data in attached_pips.items():
+                if data:
+                    rank = PipetteRank.first
+                    if num_pips == 2 and mount == Mount.LEFT:
+                        rank = PipetteRank.second
+                    cp = None
+                    if data['channels'] == 8:
+                        cp = CriticalPoint.FRONT_NOZZLE
+                    pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
+                                                        critical_point=cp,
+                                                        rank=rank,
+                                                        mount=mount)
+            return pip_info_by_mount
+        else:
+            raise NoPipetteException("Cannot start calibration check "
+                                     "with fewer than one pipette.")
 
     def _determine_required_labware(self) -> typing.Dict[UUID, LabwareInfo]:
         """
@@ -295,7 +269,6 @@ class CalibrationCheckState(str, Enum):
     returningTip = "returningTip"
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
-    noPipettesAttached = "noPipettesAttached"
     checkComplete = "checkComplete"
 
 
@@ -310,7 +283,6 @@ class CalibrationCheckTrigger(str, Enum):
     go_to_next_check = "goToNextCheck"
     exit = "exitSession"
     reject_calibration = "rejectCalibration"
-    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [
@@ -513,11 +485,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.reject_calibration,
         "from_state": WILDCARD,
         "to_state": CalibrationCheckState.badCalibrationData
-    },
-    {
-        "trigger": CalibrationCheckTrigger.no_pipettes,
-        "from_state": WILDCARD,
-        "to_state": CalibrationCheckState.noPipettesAttached
     }
 ]
 
@@ -754,10 +721,17 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_mag = Point(0, 0, 0).magnitude_to(
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
+                transform_type = DeckCalibrationError.UNKNOWN
+
+                if exceeds and not self.can_distiguish_instr_offset():
+                    transform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
+                elif exceeds:
+                    transform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=comp.threshold_vector,
-                                     exceedsThreshold=exceeds)
+                                     exceedsThreshold=exceeds,
+                                     transformType=transform_type)
         return comparisons
 
     async def _register_point_first_pipette(self):

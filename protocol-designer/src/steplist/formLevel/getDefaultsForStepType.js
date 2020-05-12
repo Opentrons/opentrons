@@ -100,6 +100,7 @@ export function getDefaultsForStepType(
         blockIsActive: false,
         blockTargetTemp: null,
         lidIsActive: false,
+        lidTargetTemp: null,
         lidOpen: null,
       }
     default:

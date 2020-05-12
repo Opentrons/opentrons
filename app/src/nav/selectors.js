@@ -6,6 +6,8 @@ import { getProtocolPipettesMatch } from '../pipettes'
 import { selectors as RobotSelectors } from '../robot'
 import { getBuildrootUpdateAvailable } from '../buildroot'
 import { getAvailableShellUpdate } from '../shell'
+import { getU2EWindowsDriverStatus, OUTDATED } from '../system-info'
+import { getFeatureFlags } from '../config'
 
 import type { State } from '../types'
 import type { NavLocation } from './types'
@@ -31,6 +33,7 @@ const PLEASE_RESET_PROTOCOL =
   'Please reset your protocol run before re-calibrating'
 
 const APP_UPDATE_AVAILABLE = 'An app update is available'
+const DRIVER_UPDATE_AVAILABLE = 'A driver update is available'
 const ROBOT_UPDATE_AVAILABLE = 'A robot software update is available'
 
 const getConnectedRobotPipettesMatch: State => boolean = createSelector(
@@ -138,13 +141,25 @@ export const getRunLocation: State => NavLocation = createSelector(
 
 export const getMoreLocation: State => NavLocation = createSelector(
   getAvailableShellUpdate,
-  update => ({
-    id: 'more',
-    path: '/menu',
-    title: MORE,
-    iconName: 'dots-horizontal',
-    notificationReason: update ? APP_UPDATE_AVAILABLE : null,
-  })
+  getU2EWindowsDriverStatus,
+  getFeatureFlags,
+  (appUpdate, driverStatus, flags) => {
+    let notificationReason = null
+    if (appUpdate) {
+      notificationReason = APP_UPDATE_AVAILABLE
+      // TODO(mc, 2020-05-08): remove enableSystemInfo feature flag
+    } else if (driverStatus === OUTDATED && flags.enableSystemInfo) {
+      notificationReason = DRIVER_UPDATE_AVAILABLE
+    }
+
+    return {
+      id: 'more',
+      path: '/menu',
+      title: MORE,
+      iconName: 'dots-horizontal',
+      notificationReason,
+    }
+  }
 )
 
 export const getNavbarLocations: State => Array<NavLocation> = createSelector(

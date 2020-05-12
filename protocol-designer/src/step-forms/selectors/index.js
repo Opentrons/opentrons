@@ -163,7 +163,11 @@ const TEMPERATURE_MODULE_INITIAL_STATE: TemperatureModuleState = {
 }
 const THERMOCYCLER_MODULE_INITIAL_STATE: ThermocyclerModuleState = {
   type: THERMOCYCLER_MODULE_TYPE,
+  blockTargetTemp: null,
+  lidTargetTemp: null,
+  lidOpen: null,
 }
+
 const _getInitialDeckSetup = (
   initialSetupStep: FormData,
   labwareEntities: LabwareEntities,

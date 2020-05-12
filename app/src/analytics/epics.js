@@ -41,7 +41,7 @@ export const optIntoAnalyticsEpic: Epic = (_, state$) =>
     ignoreElements()
   )
 
-export const analyticsEpic = combineEpics(
+export const analyticsEpic: Epic = combineEpics(
   sendAnalyticsEventEpic,
   optIntoAnalyticsEpic
 )

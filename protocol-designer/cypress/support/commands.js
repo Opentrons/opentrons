@@ -67,8 +67,12 @@ Cypress.Commands.add('choosePipettes', (left, right) => {
 })
 
 Cypress.Commands.add('selectTipRacks', (left, right) => {
-  cy.get("select[name*='left.tiprack']").select(left)
-  cy.get("select[name*='right.tiprack']").select(right)
+  if (left) {
+    cy.get("select[name*='left.tiprack']").select(left)
+  }
+  if (right) {
+    cy.get("select[name*='right.tiprack']").select(right)
+  }
 })
 
 //
