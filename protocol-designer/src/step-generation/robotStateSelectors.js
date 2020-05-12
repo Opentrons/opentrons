@@ -139,10 +139,11 @@ export function getModuleState(
   robotState: RobotState,
   module: string
 ): $PropertyType<ModuleTemporalProperties, 'moduleState'> {
-  console.warn(
-    module in robotState.modules,
-    `getModuleState expected module id "${module}"`
-  )
+  if (!(module in robotState.modules)) {
+    console.warn(
+      `getModuleState expected module id "${module}" to be in robot state`
+    )
+  }
 
   return robotState.modules[module]?.moduleState
 }

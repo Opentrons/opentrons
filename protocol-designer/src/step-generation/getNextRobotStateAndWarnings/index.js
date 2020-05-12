@@ -8,6 +8,17 @@ import { forDropTip } from './forDropTip'
 import { forPickUpTip } from './forPickUpTip'
 import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
 import {
+  forThermocyclerAwaitBlockTemperature,
+  forThermocyclerAwaitLidTemperature,
+  forThermocyclerDeactivateBlock,
+  forThermocyclerDeactivateLid,
+  forThermocyclerSetTargetBlockTemperature,
+  forThermocyclerSetTargetLidTemperature,
+  forThermocyclerCloseLid,
+  forThermocyclerOpenLid,
+} from './thermocyclerUpdates'
+
+import {
   forAwaitTemperature,
   forSetTemperature,
   forDeactivateTemperature,
@@ -78,13 +89,61 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'thermocycler/setTargetBlockTemperature':
+      forThermocyclerSetTargetBlockTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/setTargetLidTemperature':
+      forThermocyclerSetTargetLidTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitBlockTemperature':
+      forThermocyclerAwaitBlockTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitLidTemperature':
+      forThermocyclerAwaitLidTemperature(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/deactivateBlock':
+      forThermocyclerDeactivateBlock(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/deactivateLid':
+      forThermocyclerDeactivateLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/closeLid':
+      forThermocyclerCloseLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/openLid':
+      forThermocyclerOpenLid(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/runProfile':
     case 'thermocycler/awaitProfileComplete':
       console.warn(`NOT IMPLEMENTED: ${command.command}`)
