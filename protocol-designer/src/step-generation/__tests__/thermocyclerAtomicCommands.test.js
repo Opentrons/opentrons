@@ -82,7 +82,7 @@ describe('thermocycler atomic commands', () => {
     params: P,
     expectedType: string,
   |}) => {
-    it('...', () => {
+    it(`creates a single "${expectedType}" command with the given params`, () => {
       const robotInitialState = getRobotInitialState()
 
       const result = commandCreator(params, invariantContext, robotInitialState)
