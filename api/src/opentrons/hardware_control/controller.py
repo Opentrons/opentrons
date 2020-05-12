@@ -268,6 +268,6 @@ class Controller:
             try:
                 loop = asyncio.get_event_loop()
                 if not loop.is_closed():
-                    self.gpio_chardev.quit_monitoring()
+                    self.gpio_chardev.stop_door_switch_watcher(loop)
             except RuntimeError:
                 pass
