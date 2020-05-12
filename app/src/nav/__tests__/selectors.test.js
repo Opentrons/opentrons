@@ -7,7 +7,6 @@ import * as RobotSelectors from '../../robot/selectors'
 import * as BuildrootSelectors from '../../buildroot/selectors'
 import * as ShellSelectors from '../../shell'
 import * as SystemInfoSelectors from '../../system-info/selectors'
-import * as ConfigSelectors from '../../config/selectors'
 import * as Selectors from '../selectors'
 
 import { NOT_APPLICABLE, OUTDATED } from '../../system-info'
@@ -80,11 +79,6 @@ const mockGetCommands: JestMockFn<
   any
 > = (RobotSelectors.getCommands: any)
 
-const mockGetFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof ConfigSelectors.getFeatureFlags, State>
-> = ConfigSelectors.getFeatureFlags
-
 const EXPECTED_ROBOTS = {
   id: 'robots',
   path: '/robots',
@@ -139,9 +133,6 @@ describe('nav selectors', () => {
     mockGetSessionIsLoaded.mockReturnValue(false)
     mockGetCommands.mockReturnValue([])
     mockGetU2EWindowsDriverStatus.mockReturnValue(NOT_APPLICABLE)
-
-    // TODO(mc, 2020-05-08): remove enableSystemInfo feature flag
-    mockGetFeatureFlags.mockReturnValue({ enableSystemInfo: true })
   })
 
   afterEach(() => {

@@ -34,4 +34,4 @@ export const U2E_DRIVER_OUTDATED_MESSAGE =
 export const U2E_DRIVER_DESCRIPTION =
   'The OT-2 uses this adapter for its USB connection to the Opentrons App.'
 export const U2E_DRIVER_OUTDATED_CTA =
-  "If you are experiencing connectivity issues with your OT-2, please update your computer's driver."
+  "Please update your computer's driver to ensure a reliable connection to your OT-2."
