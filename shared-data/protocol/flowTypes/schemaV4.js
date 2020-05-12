@@ -25,6 +25,12 @@ export type TemperatureParams = {| module: string, temperature: number |}
 
 export type ModuleOnlyParams = {| module: string |}
 
+export type ThermocyclerSetTargetBlockTemperatureArgs = {|
+  module: string,
+  temperature: number,
+  volume?: number,
+|}
+
 export type Command =
   | {|
       command: 'aspirate' | 'dispense' | 'airGap',
@@ -66,7 +72,7 @@ export type Command =
     |}
   | {|
       command: 'thermocycler/setTargetBlockTemperature',
-      params: {| module: string, temperature: number, volume: number |},
+      params: ThermocyclerSetTargetBlockTemperatureArgs,
     |}
   | {|
       command: 'thermocycler/setTargetLidTemperature',
