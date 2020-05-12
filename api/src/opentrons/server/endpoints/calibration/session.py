@@ -723,7 +723,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 exceeds = diff_magnitude > threshold_mag
                 transform_type = DeckCalibrationError.UNKNOWN
 
-                if exceeds and not self.can_distiguish_instr_offset():
+                if exceeds and not self.can_distinguish_instr_offset():
                     transform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
                 elif exceeds:
                     transform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
