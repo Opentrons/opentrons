@@ -20,7 +20,6 @@ import {
   minDisposalVolume,
   type FormWarning,
   type FormWarningType,
-  pauseTemperatureRangeExceeded,
 } from './warnings'
 import type { StepType } from '../../form-types'
 
@@ -50,7 +49,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   pause: {
     getErrors: composeErrors(pauseForTimeOrUntilTold),
-    getWarnings: composeWarnings(pauseTemperatureRangeExceeded),
   },
   moveLiquid: {
     getErrors: composeErrors(

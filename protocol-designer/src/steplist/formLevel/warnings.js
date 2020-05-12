@@ -1,11 +1,6 @@
 // @flow
 import * as React from 'react'
 import { getWellTotalVolume } from '@opentrons/shared-data'
-import {
-  MIN_TEMP_MODULE_TEMP,
-  MAX_TEMP_MODULE_TEMP,
-  PAUSE_UNTIL_TEMP,
-} from '../../constants'
 import { KnowledgeBaseLink } from '../../components/KnowledgeBaseLink'
 import type { FormError } from './errors'
 /*******************
@@ -16,10 +11,6 @@ export type FormWarningType =
   | 'BELOW_PIPETTE_MINIMUM_VOLUME'
   | 'OVER_MAX_WELL_VOLUME'
   | 'BELOW_MIN_DISPOSAL_VOLUME'
-  | 'TEMPERATURE_MIN_EXCEEDED'
-  | 'TEMPERATURE_MAX_EXCEEDED'
-  | 'PAUSE_TEMPERATURE_MIN_EXCEEDED'
-  | 'PAUSE_TEMPERATURE_MAX_EXCEEDED'
 
 export type FormWarning = {
   ...$Exact<FormError>,
@@ -48,26 +39,6 @@ const FORM_WARNINGS: { [FormWarningType]: FormWarning } = {
       </React.Fragment>
     ),
     dependentFields: ['disposalVolume_volume', 'pipette'],
-  },
-  TEMPERATURE_MIN_EXCEEDED: {
-    type: 'TEMPERATURE_MIN_EXCEEDED',
-    title: 'Specified temperature is below module minimum',
-    dependentFields: ['setTemperature', 'targetTemperature'],
-  },
-  TEMPERATURE_MAX_EXCEEDED: {
-    type: 'TEMPERATURE_MAX_EXCEEDED',
-    title: 'Specified temperature is above module maximum',
-    dependentFields: ['setTemperature', 'targetTemperature'],
-  },
-  PAUSE_TEMPERATURE_MIN_EXCEEDED: {
-    type: 'TEMPERATURE_MIN_EXCEEDED',
-    title: 'Specified temperature is below module minimum',
-    dependentFields: ['pauseAction', 'pauseTemperature'],
-  },
-  PAUSE_TEMPERATURE_MAX_EXCEEDED: {
-    type: 'TEMPERATURE_MAX_EXCEEDED',
-    title: 'Specified temperature is above module maximum',
-    dependentFields: ['pauseAction', 'pauseTemperature'],
   },
 }
 
@@ -114,19 +85,6 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   if (isUnselected) return FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME
   const isBelowMin = disposalVolume_volume < pipette.spec.minVolume
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
-}
-
-export const pauseTemperatureRangeExceeded = (
-  fields: HydratedFormData
-): ?FormWarning => {
-  const { pauseAction, pauseTemperature } = fields
-  const setTemperature = pauseAction === PAUSE_UNTIL_TEMP
-  if (setTemperature && pauseTemperature < MIN_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.PAUSE_TEMPERATURE_MIN_EXCEEDED
-  } else if (setTemperature && pauseTemperature > MAX_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.PAUSE_TEMPERATURE_MAX_EXCEEDED
-  }
-  return null
 }
 
 /*******************
