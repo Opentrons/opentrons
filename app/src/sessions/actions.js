@@ -9,7 +9,7 @@ import type {
 
 export const createSession = (
   robotName: string,
-  sessionType: Types.RobotSessionType
+  sessionType: Types.SessionType
 ): Types.CreateSessionAction => ({
   type: Constants.CREATE_SESSION,
   payload: { robotName, sessionType },
@@ -18,7 +18,7 @@ export const createSession = (
 
 export const createSessionSuccess = (
   robotName: string,
-  body: Types.RobotSessionResponse,
+  body: Types.SessionResponse,
   meta: RobotApiRequestMeta
 ): Types.CreateSessionSuccessAction => ({
   type: Constants.CREATE_SESSION_SUCCESS,
@@ -47,7 +47,7 @@ export const deleteSession = (
 
 export const deleteSessionSuccess = (
   robotName: string,
-  body: Types.RobotSessionResponse,
+  body: Types.SessionResponse,
   meta: RobotApiRequestMeta
 ): Types.DeleteSessionSuccessAction => ({
   type: Constants.DELETE_SESSION_SUCCESS,
@@ -76,7 +76,7 @@ export const fetchSession = (
 
 export const fetchSessionSuccess = (
   robotName: string,
-  body: Types.RobotSessionResponse,
+  body: Types.SessionResponse,
   meta: RobotApiRequestMeta
 ): Types.FetchSessionSuccessAction => ({
   type: Constants.FETCH_SESSION_SUCCESS,
@@ -97,7 +97,7 @@ export const fetchSessionFailure = (
 export const createSessionCommand = (
   robotName: string,
   sessionId: string,
-  command: Types.RobotSessionUpdate
+  command: Types.SessionCommand
 ): Types.CreateSessionCommandAction => ({
   type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },
@@ -106,7 +106,7 @@ export const createSessionCommand = (
 
 export const createSessionCommandSuccess = (
   robotName: string,
-  body: Types.RobotSessionUpdateResponse,
+  body: Types.SessionCommandResponse,
   meta: RobotApiRequestMeta
 ): Types.CreateSessionCommandSuccessAction => ({
   type: Constants.CREATE_SESSION_COMMAND_SUCCESS,

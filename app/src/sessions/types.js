@@ -22,48 +22,48 @@ import type {
 } from '../robot-api/types'
 
 // The available session types
-export type RobotSessionType = 'calibrationCheck'
+export type SessionType = 'calibrationCheck'
 
-export type RobotSessionUpdate = {|
+export type SessionCommand = {|
   command: string,
   // TODO(al, 2020-05-11): data should be properly typed with all
   // known command types
   data: { ... },
 |}
 
-export type RobotSessionData = {|
-  sessionType: RobotSessionType,
+export type SessionData = {|
+  sessionType: SessionType,
   sessionId: string,
   // TODO(al, 2020-05-11): details should be properly typed with all
   // known session response types
   details: { ... },
 |}
 
-export type RobotSessionUpdateData = {|
+export type SessionCommandData = {|
   command: string,
   data: { ... },
   status?: string,
 |}
 
-export type RobotSessionResponse = RobotApiV2ResponseBody<
-  RobotSessionData,
+export type SessionResponse = RobotApiV2ResponseBody<
+  SessionData,
   {||}
 >
 
-export type RobotSessionUpdateResponse = RobotApiV2ResponseBody<
-  RobotSessionUpdateData,
-  RobotSessionData
+export type SessionCommandResponse = RobotApiV2ResponseBody<
+  SessionCommandData,
+  SessionData
 >
 
 export type CreateSessionAction = {|
   type: CREATE_SESSION,
-  payload: {| robotName: string, sessionType: RobotSessionType |},
+  payload: {| robotName: string, sessionType: SessionType |},
   meta: RobotApiRequestMeta,
 |}
 
 export type CreateSessionSuccessAction = {|
   type: CREATE_SESSION_SUCCESS,
-  payload: {| robotName: string, ...RobotSessionResponse |},
+  payload: {| robotName: string, ...SessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -81,7 +81,7 @@ export type DeleteSessionAction = {|
 
 export type DeleteSessionSuccessAction = {|
   type: DELETE_SESSION_SUCCESS,
-  payload: {| robotName: string, ...RobotSessionResponse |},
+  payload: {| robotName: string, ...SessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -99,7 +99,7 @@ export type FetchSessionAction = {|
 
 export type FetchSessionSuccessAction = {|
   type: FETCH_SESSION_SUCCESS,
-  payload: {| robotName: string, ...RobotSessionResponse |},
+  payload: {| robotName: string, ...SessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -114,14 +114,14 @@ export type CreateSessionCommandAction = {|
   payload: {|
     robotName: string,
     sessionId: string,
-    command: RobotSessionUpdate,
+    command: SessionCommand,
   |},
   meta: RobotApiRequestMeta,
 |}
 
 export type CreateSessionCommandSuccessAction = {|
   type: CREATE_SESSION_COMMAND_SUCCESS,
-  payload: {| robotName: string, ...RobotSessionUpdateResponse |},
+  payload: {| robotName: string, ...SessionCommandResponse |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -146,7 +146,7 @@ export type SessionsAction =
   | CreateSessionCommandFailureAction
 
 export type SessionsById = $Shape<{|
-  [id: string]: RobotSessionData,
+  [id: string]: SessionData,
 |}>
 
 export type PerRobotSessionState = $Shape<

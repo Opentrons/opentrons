@@ -10,36 +10,36 @@ import {
 
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
-export const mockRobotSessionData: Types.RobotSessionData = {
+export const mockSessionData: Types.SessionData = {
   sessionType: 'calibrationCheck',
   sessionId: '1234',
   details: { someData: 5 },
 }
 
-export const mockRobotSessionUpdate: Types.RobotSessionUpdate = {
+export const mockSessionCommand: Types.SessionCommand = {
   command: 'dosomething',
   data: { someData: 32 },
 }
 
-export const mockRobotSessionUpdateData: Types.RobotSessionUpdateData = {
+export const mockSessionCommandData: Types.SessionCommandData = {
   command: '4321',
   status: 'accepted',
   data: {},
 }
 
-export const mockRobotSessionResponse: Types.RobotSessionResponse = {
+export const mockSessionResponse: Types.SessionResponse = {
   data: {
-    id: mockRobotSessionData.sessionId,
+    id: mockSessionData.sessionId,
     type: 'Session',
-    attributes: mockRobotSessionData,
+    attributes: mockSessionData,
   },
 }
 
-export const mockRobotSessionUpdateResponse: Types.RobotSessionUpdateResponse = {
+export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
     id: '4321',
     type: 'Command',
-    attributes: mockRobotSessionUpdateData,
+    attributes: mockSessionCommandData,
   },
   meta: {
     sessionType: 'calibrationCheck',
@@ -56,14 +56,11 @@ export const {
   failureMeta: mockCreateSessionFailureMeta,
   success: mockCreateSessionSuccess,
   failure: mockCreateSessionFailure,
-} = makeResponseFixtures<
-  Types.RobotSessionResponse,
-  RobotApiV2ErrorResponseBody
->({
+} = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: POST,
   path: Constants.SESSIONS_PATH,
   successStatus: 201,
-  successBody: mockRobotSessionResponse,
+  successBody: mockSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
@@ -73,14 +70,11 @@ export const {
   failureMeta: mockDeleteSessionFailureMeta,
   success: mockDeleteSessionSuccess,
   failure: mockDeleteSessionFailure,
-} = makeResponseFixtures<
-  Types.RobotSessionResponse,
-  RobotApiV2ErrorResponseBody
->({
+} = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: DELETE,
   path: `${Constants.SESSIONS_PATH}/1234`,
   successStatus: 200,
-  successBody: mockRobotSessionResponse,
+  successBody: mockSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
@@ -90,14 +84,11 @@ export const {
   failureMeta: mockFetchSessionFailureMeta,
   success: mockFetchSessionSuccess,
   failure: mockFetchSessionFailure,
-} = makeResponseFixtures<
-  Types.RobotSessionResponse,
-  RobotApiV2ErrorResponseBody
->({
+} = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: GET,
   path: `${Constants.SESSIONS_PATH}/1234`,
   successStatus: 200,
-  successBody: mockRobotSessionResponse,
+  successBody: mockSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
@@ -108,13 +99,13 @@ export const {
   success: mockUpdateSessionSuccess,
   failure: mockUpdateSessionFailure,
 } = makeResponseFixtures<
-  Types.RobotSessionUpdateResponse,
+  Types.SessionCommandResponse,
   RobotApiV2ErrorResponseBody
 >({
   method: GET,
   path: `${Constants.SESSIONS_PATH}/1234/${Constants.SESSIONS_UPDATE_PATH_EXTENSION}`,
   successStatus: 200,
-  successBody: mockRobotSessionUpdateResponse,
+  successBody: mockSessionCommandResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })

@@ -29,16 +29,12 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:CREATE_SESSION_SUCCESS',
       creator: Actions.createSessionSuccess,
-      args: [
-        'robot-name',
-        Fixtures.mockRobotSessionResponse,
-        { requestId: 'abc' },
-      ],
+      args: ['robot-name', Fixtures.mockSessionResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:CREATE_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          ...Fixtures.mockRobotSessionResponse,
+          ...Fixtures.mockSessionResponse,
         },
         meta: { requestId: 'abc' },
       },
@@ -66,16 +62,12 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:DELETE_SESSION_SUCCESS',
       creator: Actions.deleteSessionSuccess,
-      args: [
-        'robot-name',
-        Fixtures.mockRobotSessionResponse,
-        { requestId: 'abc' },
-      ],
+      args: ['robot-name', Fixtures.mockSessionResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:DELETE_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          ...Fixtures.mockRobotSessionResponse,
+          ...Fixtures.mockSessionResponse,
         },
         meta: { requestId: 'abc' },
       },
@@ -103,16 +95,12 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:FETCH_SESSION_SUCCESS',
       creator: Actions.fetchSessionSuccess,
-      args: [
-        'robot-name',
-        Fixtures.mockRobotSessionResponse,
-        { requestId: 'abc' },
-      ],
+      args: ['robot-name', Fixtures.mockSessionResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:FETCH_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          ...Fixtures.mockRobotSessionResponse,
+          ...Fixtures.mockSessionResponse,
         },
         meta: { requestId: 'abc' },
       },
@@ -130,13 +118,13 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:CREATE_SESSION_COMMAND',
       creator: Actions.createSessionCommand,
-      args: ['robot-name', '1234', Fixtures.mockRobotSessionUpdate],
+      args: ['robot-name', '1234', Fixtures.mockSessionCommand],
       expected: {
         type: 'sessions:CREATE_SESSION_COMMAND',
         payload: {
           robotName: 'robot-name',
           sessionId: '1234',
-          command: Fixtures.mockRobotSessionUpdate,
+          command: Fixtures.mockSessionCommand,
         },
         meta: {},
       },
@@ -146,14 +134,14 @@ describe('robot session check actions', () => {
       creator: Actions.createSessionCommandSuccess,
       args: [
         'robot-name',
-        Fixtures.mockRobotSessionUpdateResponse,
+        Fixtures.mockSessionCommandResponse,
         { requestId: 'abc' },
       ],
       expected: {
         type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
         payload: {
           robotName: 'robot-name',
-          ...Fixtures.mockRobotSessionUpdateResponse,
+          ...Fixtures.mockSessionCommandResponse,
         },
         meta: { requestId: 'abc' },
       },

@@ -43,10 +43,7 @@ describe('createSessionEpic', () => {
   })
 
   describe('handles explicit CREATE SESSION', () => {
-    const action = Actions.createSession(
-      mockRobot.name,
-      'calibrationCheck'
-    )
+    const action = Actions.createSession(mockRobot.name, 'calibrationCheck')
     const expectedRequest = {
       method: 'POST',
       path: '/sessions',
@@ -63,7 +60,7 @@ describe('createSessionEpic', () => {
     it('calls POST /sessions', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockRobotSessionResponse })
+          cold('r', { r: Fixtures.mockSessionResponse })
         )
 
         const action$ = hot('--a', { a: action })

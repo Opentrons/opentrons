@@ -46,7 +46,7 @@ describe('createSessionCommandEpic', () => {
     const action = Actions.createSessionCommand(
       mockRobot.name,
       '1234',
-      Fixtures.mockRobotSessionUpdate
+      Fixtures.mockSessionCommand
     )
     const expectedRequest = {
       method: 'POST',
