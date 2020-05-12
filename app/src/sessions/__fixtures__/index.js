@@ -92,16 +92,16 @@ export const {
 })
 
 export const {
-  successMeta: mockUpdateSessionSuccessMeta,
-  failureMeta: mockUpdateSessionFailureMeta,
-  success: mockUpdateSessionSuccess,
-  failure: mockUpdateSessionFailure,
+  successMeta: mockSessionCommandsSuccessMeta,
+  failureMeta: mockSessionCommandsFailureMeta,
+  success: mockSessionCommandsSuccess,
+  failure: mockSessionCommandsFailure,
 } = makeResponseFixtures<
   Types.SessionCommandResponse,
   RobotApiV2ErrorResponseBody
 >({
   method: GET,
-  path: `${Constants.SESSIONS_PATH}/1234/${Constants.SESSIONS_UPDATE_PATH_EXTENSION}`,
+  path: `${Constants.SESSIONS_PATH}/1234/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
   successStatus: 200,
   successBody: mockSessionCommandResponse,
   failureStatus: 500,

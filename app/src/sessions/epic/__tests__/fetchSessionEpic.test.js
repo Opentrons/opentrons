@@ -45,7 +45,7 @@ describe('fetchSessionEpic', () => {
       Fixtures.mockFetchSessionSuccess
     )
 
-    runEpicTest(mocks,({ hot, expectObservable, flush }) => {
+    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)

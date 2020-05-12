@@ -32,7 +32,7 @@ describe('createSessionCommandEpic', () => {
   it('calls POST /sessions/1234/commands', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockUpdateSessionSuccess
+      Fixtures.mockSessionCommandsSuccess
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
@@ -53,7 +53,7 @@ describe('createSessionCommandEpic', () => {
   it('maps successful response to CREATE_SESSION_COMMAND_SUCCESS', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockUpdateSessionSuccess
+      Fixtures.mockSessionCommandsSuccess
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
@@ -65,8 +65,8 @@ describe('createSessionCommandEpic', () => {
         a: Actions.createSessionCommandSuccess(
           mocks.robot.name,
           mocks.action.payload.sessionId,
-          Fixtures.mockUpdateSessionSuccess.body,
-          { ...mocks.meta, response: Fixtures.mockUpdateSessionSuccessMeta }
+          Fixtures.mockSessionCommandsSuccess.body,
+          { ...mocks.meta, response: Fixtures.mockSessionCommandsSuccessMeta }
         ),
       })
     })
@@ -75,7 +75,7 @@ describe('createSessionCommandEpic', () => {
   it('maps failed response to CREATE_SESSION_COMMAND_FAILURE', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockUpdateSessionFailure
+      Fixtures.mockSessionCommandsFailure
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
@@ -88,7 +88,7 @@ describe('createSessionCommandEpic', () => {
           mocks.robot.name,
           mocks.action.payload.sessionId,
           { errors: [{ status: 'went bad' }] },
-          { ...mocks.meta, response: Fixtures.mockUpdateSessionFailureMeta }
+          { ...mocks.meta, response: Fixtures.mockSessionCommandsFailureMeta }
         ),
       })
     })

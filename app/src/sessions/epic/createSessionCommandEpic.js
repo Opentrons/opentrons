@@ -18,7 +18,7 @@ import type { CreateSessionCommandAction } from '../types'
 
 const mapActionToRequest: ActionToRequestMapper<CreateSessionCommandAction> = action => ({
   method: POST,
-  path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}/${Constants.SESSIONS_UPDATE_PATH_EXTENSION}`,
+  path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
   body: {
     data: {
       type: 'Command',
