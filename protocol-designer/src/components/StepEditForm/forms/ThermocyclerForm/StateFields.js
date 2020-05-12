@@ -9,9 +9,8 @@ import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
 import type { FocusHandlers } from '../../types'
-import type { FormData } from '../../../../form-types'
 
-type Props = {| focusHandlers: FocusHandlers, formData: FormData |}
+type Props = {| focusHandlers: FocusHandlers |}
 export const StateFields = (props: Props) => {
   const { focusHandlers } = props
   return (

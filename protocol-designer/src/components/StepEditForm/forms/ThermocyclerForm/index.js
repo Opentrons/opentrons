@@ -18,7 +18,7 @@ import type { FocusHandlers } from '../../types'
 type TCFormProps = {| focusHandlers: FocusHandlers, formData: FormData |}
 
 export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
-  const { focusHandlers, formData } = props
+  const { focusHandlers } = props
   return (
     <div className={styles.form_wrapper}>
       <div className={styles.section_header}>
@@ -44,7 +44,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           name={'thermocyclerFormType'}
           condition={val => val === THERMOCYCLER_STATE}
         >
-          <StateFields focusHandlers={focusHandlers} formData={formData} />
+          <StateFields focusHandlers={focusHandlers} />
         </ConditionalOnField>
 
         <RadioGroupField

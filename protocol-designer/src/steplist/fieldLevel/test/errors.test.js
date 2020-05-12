@@ -50,6 +50,12 @@ describe('errors', () => {
     it('returns null when value is null', () => {
       expect(rangeChecker(null)).toBe(null)
     })
+    it('returns null when value is equal to the min', () => {
+      expect(rangeChecker(MIN)).toBe(null)
+    })
+    it('returns null when value passed greater than the min', () => {
+      expect(rangeChecker(MIN + 1)).toBe(null)
+    })
     it('returns null when value is equal to the max', () => {
       expect(rangeChecker(MAX)).toBe(null)
     })
