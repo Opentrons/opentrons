@@ -695,17 +695,22 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_mag = Point(0, 0, 0).magnitude_to(
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
-                transform_type = DeckCalibrationError.UNKNOWN
+                tform_type = DeckCalibrationError.UNKNOWN
 
-                if exceeds and not self.can_distinguish_instr_offset():
-                    transform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
-                elif exceeds:
-                    transform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
+                is_second_pip = jogged_state in [
+                    CalibrationCheckState.joggingSecondPipetteToHeight,
+                    CalibrationCheckState.joggingSecondPipetteToPointOne,
+                ]
+                if exceeds:
+                    if is_second_pip and self.can_distinguish_instr_offset():
+                        tform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
+                    else:
+                        tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=comp.threshold_vector,
                                      exceedsThreshold=exceeds,
-                                     transformType=transform_type)
+                                     transformType=tform_type)
         return comparisons
 
     async def _register_point_first_pipette(self):
