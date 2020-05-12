@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { css } from 'styled-components'
 
+import { Flex, Text, FONT_STYLE_ITALIC } from '@opentrons/components'
 import type { UsbDevice } from '../../system-info/types'
 
 // TODO(mc, 2020-04-28): i18n
@@ -14,17 +15,11 @@ export type U2EDeviceDetailsProps = {|
   device: UsbDevice | null,
 |}
 
-const NO_ADAPTER_FOUND_STYLE = css`
-  font-style: italic;
+const MARGIN_TOP_0_5 = css`
   margin-top: 0.5rem;
 `
 
-const DETAIL_LIST_STYLE = css`
-  margin-top: 0.5rem;
-`
-
-const DETAIL_ITEM_STYLE = css`
-  display: flex;
+const MARGIN_BOTTOM_0_25 = css`
   margin-bottom: 0.25rem;
 `
 
@@ -41,21 +36,23 @@ const STATS: Array<{| label: string, property: $Keys<UsbDevice> |}> = [
 ]
 
 export const U2EDeviceDetails = ({ device }: U2EDeviceDetailsProps) => (
-  <>
-    <p>{U2E_ADAPTER_DESCRIPTION}</p>
+  <div>
+    <Text>{U2E_ADAPTER_DESCRIPTION}</Text>
     {device === null ? (
-      <p css={NO_ADAPTER_FOUND_STYLE}>{NO_ADAPTER_FOUND}</p>
+      <Text fontStyle={FONT_STYLE_ITALIC} css={MARGIN_TOP_0_5}>
+        {NO_ADAPTER_FOUND}
+      </Text>
     ) : (
-      <ul css={DETAIL_LIST_STYLE}>
+      <ul css={MARGIN_TOP_0_5}>
         {STATS.filter(({ property }) => property in device).map(
           ({ label, property }) => (
-            <li key={property} css={DETAIL_ITEM_STYLE}>
+            <Flex as="li" key={property} css={MARGIN_BOTTOM_0_25}>
               <span css={DETAIL_TEXT_STYLE}>{label}:</span>
               <span css={DETAIL_TEXT_STYLE}>{device[property] ?? UNKNOWN}</span>
-            </li>
+            </Flex>
           )
         )}
       </ul>
     )}
-  </>
+  </div>
 )

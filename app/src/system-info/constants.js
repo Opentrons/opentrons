@@ -21,3 +21,17 @@ export const USB_DEVICE_ADDED: 'systemInfo:USB_DEVICE_ADDED' =
 
 export const USB_DEVICE_REMOVED: 'systemInfo:USB_DEVICE_REMOVED' =
   'systemInfo:USB_DEVICE_REMOVED'
+
+// analytics events
+
+export const EVENT_U2E_DRIVER_ALERT_DISMISSED = 'u2eDriverAlertDismissed'
+export const EVENT_U2E_DRIVER_LINK_CLICKED = 'u2eDriverLinkClicked'
+
+// copy
+// TODO(mc, 2020-05-11): i18n
+export const U2E_DRIVER_OUTDATED_MESSAGE =
+  'There is an updated Realtek USB-to-Ethernet adapter driver available for your computer.'
+export const U2E_DRIVER_DESCRIPTION =
+  'The OT-2 uses this adapter for its USB connection to the Opentrons App.'
+export const U2E_DRIVER_OUTDATED_CTA =
+  "If you are experiencing connectivity issues with your OT-2, please update your computer's driver."

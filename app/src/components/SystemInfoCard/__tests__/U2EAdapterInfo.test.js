@@ -6,13 +6,14 @@ import noop from 'lodash/noop'
 
 import * as Fixtures from '../../../system-info/__fixtures__'
 import * as SystemInfo from '../../../system-info'
-import { ControlSection } from '@opentrons/components'
 import { U2EAdapterInfo } from '../U2EAdapterInfo'
+import { U2EDriverWarning } from '../U2EDriverWarning'
 
 import type { State } from '../../../types'
-import type { UsbDevice } from '../../../system-info/types'
+import type { UsbDevice, DriverStatus } from '../../../system-info/types'
 
 jest.mock('../../../system-info/selectors')
+jest.mock('../../../analytics')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
@@ -25,6 +26,16 @@ const MOCK_STORE = {
 const getU2EAdapterDevice: JestMockFn<[State], UsbDevice | null> =
   SystemInfo.getU2EAdapterDevice
 
+const getU2EWindowsDriverStatus: JestMockFn<[State], DriverStatus> =
+  SystemInfo.getU2EWindowsDriverStatus
+
+function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
+  mock.mockImplementation(state => {
+    expect(state).toBe(MOCK_STATE)
+    return rVal
+  })
+}
+
 describe('U2EAdapterInfo', () => {
   const render = () => {
     return mount(<U2EAdapterInfo />, {
@@ -34,18 +45,19 @@ describe('U2EAdapterInfo', () => {
   }
 
   beforeEach(() => {
-    getU2EAdapterDevice.mockReturnValue(null)
+    stubSelector(getU2EAdapterDevice, null)
+    stubSelector(getU2EWindowsDriverStatus, SystemInfo.NOT_APPLICABLE)
   })
 
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('should render a LabeledControl with the proper title', () => {
+  it('should render a title', () => {
     const wrapper = render()
-    expect(wrapper.find(ControlSection).prop('title')).toBe(
-      'USB-to-Ethernet Adapter Information'
-    )
+    const title = wrapper.find('h3')
+
+    expect(title.html()).toMatch(/USB-to-Ethernet Adapter Information/)
   })
 
   it('should render a description of the information', () => {
@@ -67,7 +79,7 @@ describe('U2EAdapterInfo', () => {
   it('should display device information if present', () => {
     const device = Fixtures.mockRealtekDevice
 
-    getU2EAdapterDevice.mockReturnValue(device)
+    stubSelector(getU2EAdapterDevice, device)
 
     const wrapper = render()
     const children = wrapper.children().html()
@@ -81,7 +93,7 @@ describe('U2EAdapterInfo', () => {
   it('should display Windows driver version if available', () => {
     const device = Fixtures.mockWindowsRealtekDevice
 
-    getU2EAdapterDevice.mockReturnValue(device)
+    stubSelector(getU2EAdapterDevice, device)
 
     const wrapper = render()
     const children = wrapper.children().html()
@@ -96,12 +108,19 @@ describe('U2EAdapterInfo', () => {
       windowsDriverVersion: null,
     }
 
-    getU2EAdapterDevice.mockReturnValue(device)
+    stubSelector(getU2EAdapterDevice, device)
 
     const wrapper = render()
     const children = wrapper.children().html()
 
     expect(getU2EAdapterDevice).toHaveBeenCalledWith(MOCK_STATE)
     expect(children).toContain('unknown')
+  })
+
+  it('should show an U2EDriverWarning if driver status is OUTDATED', () => {
+    stubSelector(getU2EWindowsDriverStatus, SystemInfo.OUTDATED)
+
+    const wrapper = render()
+    expect(wrapper.exists(U2EDriverWarning)).toBe(true)
   })
 })
