@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useHistory, Link as InternalLink } from 'react-router-dom'
+import { Link as InternalLink } from 'react-router-dom'
 import styled from 'styled-components'
 
 import {
@@ -41,7 +41,6 @@ const IgnoreCheckbox = styled(CheckboxField)`
 `
 
 export function U2EDriverOutdatedAlert(props: AlertProps) {
-  const history = useHistory()
   const trackEvent = useTrackEvent()
   const [rememberDismiss, toggleRememberDismiss] = useToggle()
   const { dismissAlert } = props
@@ -70,7 +69,6 @@ export function U2EDriverOutdatedAlert(props: AlertProps) {
           external: true,
           children: GET_UPDATE,
           onClick: () => {
-            history.push(ADAPTER_INFO_URL)
             dismissAlert(rememberDismiss)
             trackEvent({
               name: EVENT_U2E_DRIVER_LINK_CLICKED,
