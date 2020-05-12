@@ -14,35 +14,37 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { CreateRobotSessionAction } from '../types'
+import type { CreateSessionCommandAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<CreateRobotSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<CreateSessionCommandAction> = action => ({
   method: POST,
-  path: Constants.SESSIONS_PATH,
+  path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}/${Constants.SESSIONS_UPDATE_PATH_EXTENSION}`,
   body: {
     data: {
-      type: 'Session',
+      type: 'Command',
       attributes: {
-        sessionType: action.payload.sessionType,
+        command: action.payload.command.command,
+        data: action.payload.command.data,
       },
     },
   },
 })
 
-const mapResponseToAction: ResponseToActionMapper<CreateRobotSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<CreateSessionCommandAction> = (
   response,
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
+
   return response.ok
-    ? Actions.createRobotSessionSuccess(host.name, body, meta)
-    : Actions.createRobotSessionFailure(host.name, body, meta)
+    ? Actions.createSessionCommandSuccess(host.name, body, meta)
+    : Actions.createSessionCommandFailure(host.name, body, meta)
 }
 
-export const createRobotSessionEpic: Epic = (action$, state$) => {
+export const createSessionCommandEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.CREATE_ROBOT_SESSION),
+    ofType(Constants.CREATE_SESSION_COMMAND),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

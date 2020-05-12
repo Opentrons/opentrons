@@ -3,7 +3,7 @@
 import * as Actions from '../actions'
 import * as Fixtures from '../__fixtures__'
 
-import type { RobotSessionAction } from '../types'
+import type { SessionsAction } from '../types'
 
 import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 
@@ -11,31 +11,31 @@ type ActionSpec = {|
   name: string,
   creator: (...Array<any>) => mixed,
   args: Array<mixed>,
-  expected: RobotSessionAction,
+  expected: SessionsAction,
 |}
 
 describe('robot session check actions', () => {
   const SPECS: Array<ActionSpec> = [
     {
-      name: 'sessions:CREATE_ROBOT_SESSION',
-      creator: Actions.createRobotSession,
+      name: 'sessions:CREATE_SESSION',
+      creator: Actions.createSession,
       args: ['robot-name', 'calibrationCheck'],
       expected: {
-        type: 'sessions:CREATE_ROBOT_SESSION',
+        type: 'sessions:CREATE_SESSION',
         payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
         meta: {},
       },
     },
     {
-      name: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
-      creator: Actions.createRobotSessionSuccess,
+      name: 'sessions:CREATE_SESSION_SUCCESS',
+      creator: Actions.createSessionSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotSessionResponse,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
+        type: 'sessions:CREATE_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
           ...Fixtures.mockRobotSessionResponse,
@@ -44,35 +44,35 @@ describe('robot session check actions', () => {
       },
     },
     {
-      name: 'sessions:CREATE_ROBOT_SESSION_FAILURE',
-      creator: Actions.createRobotSessionFailure,
+      name: 'sessions:CREATE_SESSION_FAILURE',
+      creator: Actions.createSessionFailure,
       args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
-        type: 'sessions:CREATE_ROBOT_SESSION_FAILURE',
+        type: 'sessions:CREATE_SESSION_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
         meta: { requestId: 'abc' },
       },
     },
     {
-      name: 'sessions:DELETE_ROBOT_SESSION',
-      creator: Actions.deleteRobotSession,
+      name: 'sessions:DELETE_SESSION',
+      creator: Actions.deleteSession,
       args: ['robot-name', '1234'],
       expected: {
-        type: 'sessions:DELETE_ROBOT_SESSION',
+        type: 'sessions:DELETE_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
         meta: {},
       },
     },
     {
-      name: 'sessions:DELETE_ROBOT_SESSION_SUCCESS',
-      creator: Actions.deleteRobotSessionSuccess,
+      name: 'sessions:DELETE_SESSION_SUCCESS',
+      creator: Actions.deleteSessionSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotSessionResponse,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'sessions:DELETE_ROBOT_SESSION_SUCCESS',
+        type: 'sessions:DELETE_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
           ...Fixtures.mockRobotSessionResponse,
@@ -81,35 +81,35 @@ describe('robot session check actions', () => {
       },
     },
     {
-      name: 'sessions:DELETE_ROBOT_SESSION_FAILURE',
-      creator: Actions.deleteRobotSessionFailure,
+      name: 'sessions:DELETE_SESSION_FAILURE',
+      creator: Actions.deleteSessionFailure,
       args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
-        type: 'sessions:DELETE_ROBOT_SESSION_FAILURE',
+        type: 'sessions:DELETE_SESSION_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
         meta: { requestId: 'abc' },
       },
     },
     {
-      name: 'sessions:FETCH_ROBOT_SESSION',
-      creator: Actions.fetchRobotSession,
+      name: 'sessions:FETCH_SESSION',
+      creator: Actions.fetchSession,
       args: ['robot-name', '1234'],
       expected: {
-        type: 'sessions:FETCH_ROBOT_SESSION',
+        type: 'sessions:FETCH_SESSION',
         payload: { robotName: 'robot-name', sessionId: '1234' },
         meta: {},
       },
     },
     {
-      name: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
-      creator: Actions.fetchRobotSessionSuccess,
+      name: 'sessions:FETCH_SESSION_SUCCESS',
+      creator: Actions.fetchSessionSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotSessionResponse,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
+        type: 'sessions:FETCH_SESSION_SUCCESS',
         payload: {
           robotName: 'robot-name',
           ...Fixtures.mockRobotSessionResponse,
@@ -118,21 +118,21 @@ describe('robot session check actions', () => {
       },
     },
     {
-      name: 'sessions:FETCH_ROBOT_SESSION_FAILURE',
-      creator: Actions.fetchRobotSessionFailure,
+      name: 'sessions:FETCH_SESSION_FAILURE',
+      creator: Actions.fetchSessionFailure,
       args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
-        type: 'sessions:FETCH_ROBOT_SESSION_FAILURE',
+        type: 'sessions:FETCH_SESSION_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
         meta: { requestId: 'abc' },
       },
     },
     {
-      name: 'sessions:UPDATE_ROBOT_SESSION',
-      creator: Actions.updateRobotSession,
+      name: 'sessions:CREATE_SESSION_COMMAND',
+      creator: Actions.createSessionCommand,
       args: ['robot-name', '1234', Fixtures.mockRobotSessionUpdate],
       expected: {
-        type: 'sessions:UPDATE_ROBOT_SESSION',
+        type: 'sessions:CREATE_SESSION_COMMAND',
         payload: {
           robotName: 'robot-name',
           sessionId: '1234',
@@ -142,15 +142,15 @@ describe('robot session check actions', () => {
       },
     },
     {
-      name: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
-      creator: Actions.updateRobotSessionSuccess,
+      name: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
+      creator: Actions.createSessionCommandSuccess,
       args: [
         'robot-name',
         Fixtures.mockRobotSessionUpdateResponse,
         { requestId: 'abc' },
       ],
       expected: {
-        type: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
+        type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
         payload: {
           robotName: 'robot-name',
           ...Fixtures.mockRobotSessionUpdateResponse,
@@ -159,11 +159,11 @@ describe('robot session check actions', () => {
       },
     },
     {
-      name: 'sessions:UPDATE_ROBOT_SESSION_FAILURE',
-      creator: Actions.updateRobotSessionFailure,
+      name: 'sessions:CREATE_SESSION_COMMAND_FAILURE',
+      creator: Actions.createSessionCommandFailure,
       args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
-        type: 'sessions:UPDATE_ROBOT_SESSION_FAILURE',
+        type: 'sessions:CREATE_SESSION_COMMAND_FAILURE',
         payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
         meta: { requestId: 'abc' },
       },

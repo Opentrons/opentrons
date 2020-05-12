@@ -1,7 +1,7 @@
 // @flow
 import { ofType } from 'redux-observable'
 
-import { GET } from '../../robot-api/constants'
+import { POST } from '../../robot-api/constants'
 import { mapToRobotApiRequest } from '../../robot-api/operators'
 
 import * as Actions from '../actions'
@@ -14,28 +14,35 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { FetchRobotSessionAction } from '../types'
+import type { CreateSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<FetchRobotSessionAction> = action => ({
-  method: GET,
-  path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}`,
+const mapActionToRequest: ActionToRequestMapper<CreateSessionAction> = action => ({
+  method: POST,
+  path: Constants.SESSIONS_PATH,
+  body: {
+    data: {
+      type: 'Session',
+      attributes: {
+        sessionType: action.payload.sessionType,
+      },
+    },
+  },
 })
 
-const mapResponseToAction: ResponseToActionMapper<FetchRobotSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<CreateSessionAction> = (
   response,
   originalAction
 ) => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
-
   return response.ok
-    ? Actions.fetchRobotSessionSuccess(host.name, body, meta)
-    : Actions.fetchRobotSessionFailure(host.name, body, meta)
+    ? Actions.createSessionSuccess(host.name, body, meta)
+    : Actions.createSessionFailure(host.name, body, meta)
 }
 
-export const fetchRobotSessionEpic: Epic = (action$, state$) => {
+export const createSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.FETCH_ROBOT_SESSION),
+    ofType(Constants.CREATE_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

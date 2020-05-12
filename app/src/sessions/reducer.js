@@ -18,8 +18,8 @@ export function robotSessionReducer(
   action: Action
 ): SessionState {
   switch (action.type) {
-    case Constants.CREATE_ROBOT_SESSION_SUCCESS:
-    case Constants.FETCH_ROBOT_SESSION_SUCCESS: {
+    case Constants.CREATE_SESSION_SUCCESS:
+    case Constants.FETCH_SESSION_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
       return {
@@ -34,7 +34,7 @@ export function robotSessionReducer(
       }
     }
 
-    case Constants.UPDATE_ROBOT_SESSION_SUCCESS: {
+    case Constants.CREATE_SESSION_COMMAND_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
       const sessionId = sessionState.meta?.sessionId
@@ -53,7 +53,7 @@ export function robotSessionReducer(
       }
     }
 
-    case Constants.DELETE_ROBOT_SESSION_SUCCESS: {
+    case Constants.DELETE_SESSION_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
 

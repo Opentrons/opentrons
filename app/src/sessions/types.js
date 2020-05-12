@@ -1,18 +1,18 @@
 // @flow
 
 import typeof {
-  CREATE_ROBOT_SESSION,
-  CREATE_ROBOT_SESSION_SUCCESS,
-  CREATE_ROBOT_SESSION_FAILURE,
-  DELETE_ROBOT_SESSION,
-  DELETE_ROBOT_SESSION_SUCCESS,
-  DELETE_ROBOT_SESSION_FAILURE,
-  FETCH_ROBOT_SESSION,
-  FETCH_ROBOT_SESSION_SUCCESS,
-  FETCH_ROBOT_SESSION_FAILURE,
-  UPDATE_ROBOT_SESSION,
-  UPDATE_ROBOT_SESSION_SUCCESS,
-  UPDATE_ROBOT_SESSION_FAILURE,
+  CREATE_SESSION,
+  CREATE_SESSION_SUCCESS,
+  CREATE_SESSION_FAILURE,
+  DELETE_SESSION,
+  DELETE_SESSION_SUCCESS,
+  DELETE_SESSION_FAILURE,
+  FETCH_SESSION,
+  FETCH_SESSION_SUCCESS,
+  FETCH_SESSION_FAILURE,
+  CREATE_SESSION_COMMAND,
+  CREATE_SESSION_COMMAND_SUCCESS,
+  CREATE_SESSION_COMMAND_FAILURE,
 } from './constants'
 
 import type {
@@ -45,69 +45,72 @@ export type RobotSessionUpdateData = {|
   status?: string,
 |}
 
-export type RobotSessionResponse = RobotApiV2ResponseBody<RobotSessionData, any>
+export type RobotSessionResponse = RobotApiV2ResponseBody<
+  RobotSessionData,
+  {||}
+>
 
 export type RobotSessionUpdateResponse = RobotApiV2ResponseBody<
   RobotSessionUpdateData,
   RobotSessionData
 >
 
-export type CreateRobotSessionAction = {|
-  type: CREATE_ROBOT_SESSION,
+export type CreateSessionAction = {|
+  type: CREATE_SESSION,
   payload: {| robotName: string, sessionType: RobotSessionType |},
   meta: RobotApiRequestMeta,
 |}
 
-export type CreateRobotSessionSuccessAction = {|
-  type: CREATE_ROBOT_SESSION_SUCCESS,
+export type CreateSessionSuccessAction = {|
+  type: CREATE_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotSessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
-export type CreateRobotSessionFailureAction = {|
-  type: CREATE_ROBOT_SESSION_FAILURE,
+export type CreateSessionFailureAction = {|
+  type: CREATE_SESSION_FAILURE,
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}
 
-export type DeleteRobotSessionAction = {|
-  type: DELETE_ROBOT_SESSION,
+export type DeleteSessionAction = {|
+  type: DELETE_SESSION,
   payload: {| robotName: string, sessionId: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type DeleteRobotSessionSuccessAction = {|
-  type: DELETE_ROBOT_SESSION_SUCCESS,
+export type DeleteSessionSuccessAction = {|
+  type: DELETE_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotSessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
-export type DeleteRobotSessionFailureAction = {|
-  type: DELETE_ROBOT_SESSION_FAILURE,
+export type DeleteSessionFailureAction = {|
+  type: DELETE_SESSION_FAILURE,
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchRobotSessionAction = {|
-  type: FETCH_ROBOT_SESSION,
+export type FetchSessionAction = {|
+  type: FETCH_SESSION,
   payload: {| robotName: string, sessionId: string |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchRobotSessionSuccessAction = {|
-  type: FETCH_ROBOT_SESSION_SUCCESS,
+export type FetchSessionSuccessAction = {|
+  type: FETCH_SESSION_SUCCESS,
   payload: {| robotName: string, ...RobotSessionResponse |},
   meta: RobotApiRequestMeta,
 |}
 
-export type FetchRobotSessionFailureAction = {|
-  type: FETCH_ROBOT_SESSION_FAILURE,
+export type FetchSessionFailureAction = {|
+  type: FETCH_SESSION_FAILURE,
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}
 
-export type UpdateRobotSessionAction = {|
-  type: UPDATE_ROBOT_SESSION,
+export type CreateSessionCommandAction = {|
+  type: CREATE_SESSION_COMMAND,
   payload: {|
     robotName: string,
     sessionId: string,
@@ -116,31 +119,31 @@ export type UpdateRobotSessionAction = {|
   meta: RobotApiRequestMeta,
 |}
 
-export type UpdateRobotSessionSuccessAction = {|
-  type: UPDATE_ROBOT_SESSION_SUCCESS,
+export type CreateSessionCommandSuccessAction = {|
+  type: CREATE_SESSION_COMMAND_SUCCESS,
   payload: {| robotName: string, ...RobotSessionUpdateResponse |},
   meta: RobotApiRequestMeta,
 |}
 
-export type UpdateRobotSessionFailureAction = {|
-  type: UPDATE_ROBOT_SESSION_FAILURE,
+export type CreateSessionCommandFailureAction = {|
+  type: CREATE_SESSION_COMMAND_FAILURE,
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}
 
-export type RobotSessionAction =
-  | CreateRobotSessionAction
-  | CreateRobotSessionSuccessAction
-  | CreateRobotSessionFailureAction
-  | DeleteRobotSessionAction
-  | DeleteRobotSessionSuccessAction
-  | DeleteRobotSessionFailureAction
-  | FetchRobotSessionAction
-  | FetchRobotSessionSuccessAction
-  | FetchRobotSessionFailureAction
-  | UpdateRobotSessionAction
-  | UpdateRobotSessionSuccessAction
-  | UpdateRobotSessionFailureAction
+export type SessionsAction =
+  | CreateSessionAction
+  | CreateSessionSuccessAction
+  | CreateSessionFailureAction
+  | DeleteSessionAction
+  | DeleteSessionSuccessAction
+  | DeleteSessionFailureAction
+  | FetchSessionAction
+  | FetchSessionSuccessAction
+  | FetchSessionFailureAction
+  | CreateSessionCommandAction
+  | CreateSessionCommandSuccessAction
+  | CreateSessionCommandFailureAction
 
 export type SessionsById = $Shape<{|
   [id: string]: RobotSessionData,

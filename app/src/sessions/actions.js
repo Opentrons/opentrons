@@ -7,119 +7,119 @@ import type {
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
 
-export const createRobotSession = (
+export const createSession = (
   robotName: string,
   sessionType: Types.RobotSessionType
-): Types.CreateRobotSessionAction => ({
-  type: Constants.CREATE_ROBOT_SESSION,
+): Types.CreateSessionAction => ({
+  type: Constants.CREATE_SESSION,
   payload: { robotName, sessionType },
   meta: {},
 })
 
-export const createRobotSessionSuccess = (
+export const createSessionSuccess = (
   robotName: string,
   body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
-): Types.CreateRobotSessionSuccessAction => ({
-  type: Constants.CREATE_ROBOT_SESSION_SUCCESS,
+): Types.CreateSessionSuccessAction => ({
+  type: Constants.CREATE_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const createRobotSessionFailure = (
+export const createSessionFailure = (
   robotName: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
-): Types.CreateRobotSessionFailureAction => ({
-  type: Constants.CREATE_ROBOT_SESSION_FAILURE,
+): Types.CreateSessionFailureAction => ({
+  type: Constants.CREATE_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })
 
-export const deleteRobotSession = (
+export const deleteSession = (
   robotName: string,
   sessionId: string
-): Types.DeleteRobotSessionAction => ({
-  type: Constants.DELETE_ROBOT_SESSION,
+): Types.DeleteSessionAction => ({
+  type: Constants.DELETE_SESSION,
   payload: { robotName, sessionId },
   meta: {},
 })
 
-export const deleteRobotSessionSuccess = (
+export const deleteSessionSuccess = (
   robotName: string,
   body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
-): Types.DeleteRobotSessionSuccessAction => ({
-  type: Constants.DELETE_ROBOT_SESSION_SUCCESS,
+): Types.DeleteSessionSuccessAction => ({
+  type: Constants.DELETE_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const deleteRobotSessionFailure = (
+export const deleteSessionFailure = (
   robotName: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
-): Types.DeleteRobotSessionFailureAction => ({
-  type: Constants.DELETE_ROBOT_SESSION_FAILURE,
+): Types.DeleteSessionFailureAction => ({
+  type: Constants.DELETE_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })
 
-export const fetchRobotSession = (
+export const fetchSession = (
   robotName: string,
   sessionId: string
-): Types.FetchRobotSessionAction => ({
-  type: Constants.FETCH_ROBOT_SESSION,
+): Types.FetchSessionAction => ({
+  type: Constants.FETCH_SESSION,
   payload: { robotName, sessionId },
   meta: {},
 })
 
-export const fetchRobotSessionSuccess = (
+export const fetchSessionSuccess = (
   robotName: string,
   body: Types.RobotSessionResponse,
   meta: RobotApiRequestMeta
-): Types.FetchRobotSessionSuccessAction => ({
-  type: Constants.FETCH_ROBOT_SESSION_SUCCESS,
+): Types.FetchSessionSuccessAction => ({
+  type: Constants.FETCH_SESSION_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const fetchRobotSessionFailure = (
+export const fetchSessionFailure = (
   robotName: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
-): Types.FetchRobotSessionFailureAction => ({
-  type: Constants.FETCH_ROBOT_SESSION_FAILURE,
+): Types.FetchSessionFailureAction => ({
+  type: Constants.FETCH_SESSION_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })
 
-export const updateRobotSession = (
+export const createSessionCommand = (
   robotName: string,
   sessionId: string,
   command: Types.RobotSessionUpdate
-): Types.UpdateRobotSessionAction => ({
-  type: Constants.UPDATE_ROBOT_SESSION,
+): Types.CreateSessionCommandAction => ({
+  type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },
   meta: {},
 })
 
-export const updateRobotSessionSuccess = (
+export const createSessionCommandSuccess = (
   robotName: string,
   body: Types.RobotSessionUpdateResponse,
   meta: RobotApiRequestMeta
-): Types.UpdateRobotSessionSuccessAction => ({
-  type: Constants.UPDATE_ROBOT_SESSION_SUCCESS,
+): Types.CreateSessionCommandSuccessAction => ({
+  type: Constants.CREATE_SESSION_COMMAND_SUCCESS,
   payload: { robotName, ...body },
   meta: meta,
 })
 
-export const updateRobotSessionFailure = (
+export const createSessionCommandFailure = (
   robotName: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
-): Types.UpdateRobotSessionFailureAction => ({
-  type: Constants.UPDATE_ROBOT_SESSION_FAILURE,
+): Types.CreateSessionCommandFailureAction => ({
+  type: Constants.CREATE_SESSION_COMMAND_FAILURE,
   payload: { robotName, error },
   meta: meta,
 })

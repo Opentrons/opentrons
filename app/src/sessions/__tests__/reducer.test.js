@@ -14,9 +14,9 @@ type ReducerSpec = {|
 
 const SPECS: Array<ReducerSpec> = [
   {
-    name: 'handles sessions:CREATE_ROBOT_SESSION_SUCCESS',
+    name: 'handles sessions:CREATE_SESSION_SUCCESS',
     action: {
-      type: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:CREATE_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionResponse,
@@ -37,9 +37,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:CREATE_ROBOT_SESSION_SUCCESS with existing',
+    name: 'handles sessions:CREATE_SESSION_SUCCESS with existing',
     action: {
-      type: 'sessions:CREATE_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:CREATE_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionResponse,
@@ -63,9 +63,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:FETCH_ROBOT_SESSION_SUCCESS',
+    name: 'handles sessions:FETCH_SESSION_SUCCESS',
     action: {
-      type: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:FETCH_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionResponse,
@@ -84,9 +84,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:FETCH_ROBOT_SESSION_SUCCESS with existing',
+    name: 'handles sessions:FETCH_SESSION_SUCCESS with existing',
     action: {
-      type: 'sessions:FETCH_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:FETCH_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionResponse,
@@ -110,9 +110,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:UPDATE_ROBOT_SESSION_SUCCESS',
+    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS',
     action: {
-      type: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionUpdateResponse,
@@ -135,9 +135,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:UPDATE_ROBOT_SESSION_SUCCESS with existing',
+    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS with existing',
     action: {
-      type: 'sessions:UPDATE_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionUpdateResponse,
@@ -162,9 +162,9 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:DELETE_ROBOT_SESSION_SUCCESS',
+    name: 'handles sessions:DELETE_SESSION_SUCCESS',
     action: {
-      type: 'sessions:DELETE_ROBOT_SESSION_SUCCESS',
+      type: 'sessions:DELETE_SESSION_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
         ...Fixtures.mockRobotSessionResponse,

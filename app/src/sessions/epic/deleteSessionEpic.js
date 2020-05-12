@@ -14,14 +14,14 @@ import type {
   ResponseToActionMapper,
 } from '../../robot-api/operators'
 
-import type { DeleteRobotSessionAction } from '../types'
+import type { DeleteSessionAction } from '../types'
 
-const mapActionToRequest: ActionToRequestMapper<DeleteRobotSessionAction> = action => ({
+const mapActionToRequest: ActionToRequestMapper<DeleteSessionAction> = action => ({
   method: DELETE,
   path: `${Constants.SESSIONS_PATH}/${action.payload.sessionId}`,
 })
 
-const mapResponseToAction: ResponseToActionMapper<DeleteRobotSessionAction> = (
+const mapResponseToAction: ResponseToActionMapper<DeleteSessionAction> = (
   response,
   originalAction
 ) => {
@@ -29,13 +29,13 @@ const mapResponseToAction: ResponseToActionMapper<DeleteRobotSessionAction> = (
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.deleteRobotSessionSuccess(host.name, body, meta)
-    : Actions.deleteRobotSessionFailure(host.name, body, meta)
+    ? Actions.deleteSessionSuccess(host.name, body, meta)
+    : Actions.deleteSessionFailure(host.name, body, meta)
 }
 
-export const deleteRobotSessionEpic: Epic = (action$, state$) => {
+export const deleteSessionEpic: Epic = (action$, state$) => {
   return action$.pipe(
-    ofType(Constants.DELETE_ROBOT_SESSION),
+    ofType(Constants.DELETE_SESSION),
     mapToRobotApiRequest(
       state$,
       a => a.payload.robotName,

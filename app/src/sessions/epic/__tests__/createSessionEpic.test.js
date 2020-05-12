@@ -27,7 +27,7 @@ const mockGetRobotByName: JestMockFn<[any, string], mixed> =
 
 const mockState = { state: true }
 
-describe('fetchRobotSessionEpic', () => {
+describe('createSessionEpic', () => {
   let testScheduler
 
   beforeEach(() => {
@@ -42,17 +42,28 @@ describe('fetchRobotSessionEpic', () => {
     jest.resetAllMocks()
   })
 
-  describe('handles explicit FETCH SESSION', () => {
-    const action = Actions.fetchRobotSession(mockRobot.name, '1234')
+  describe('handles explicit CREATE SESSION', () => {
+    const action = Actions.createSession(
+      mockRobot.name,
+      'calibrationCheck'
+    )
     const expectedRequest = {
-      method: 'GET',
-      path: '/sessions/1234',
+      method: 'POST',
+      path: '/sessions',
+      body: {
+        data: {
+          type: 'Session',
+          attributes: {
+            sessionType: 'calibrationCheck',
+          },
+        },
+      },
     }
 
-    it('calls GET /sessions/1234', () => {
+    it('calls POST /sessions', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchSessionSuccess })
+          cold('r', { r: Fixtures.mockRobotSessionResponse })
         )
 
         const action$ = hot('--a', { a: action })
@@ -69,10 +80,10 @@ describe('fetchRobotSessionEpic', () => {
       })
     })
 
-    it('maps successful response to FETCH_ROBOT_SESSION_SUCCESS', () => {
+    it('maps successful response to CREATE_SESSION_SUCCESS', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchSessionSuccess })
+          cold('r', { r: Fixtures.mockCreateSessionSuccess })
         )
 
         const action$ = hot('--a', { a: action })
@@ -80,19 +91,19 @@ describe('fetchRobotSessionEpic', () => {
         const output$ = sessionsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchRobotSessionSuccess(
+          a: Actions.createSessionSuccess(
             mockRobot.name,
-            Fixtures.mockFetchSessionSuccess.body,
-            { response: Fixtures.mockFetchSessionSuccessMeta }
+            Fixtures.mockCreateSessionSuccess.body,
+            { response: Fixtures.mockCreateSessionSuccessMeta }
           ),
         })
       })
     })
 
-    it('maps failed response to FETCH_ROBOT_SESSION_FAILURE', () => {
+    it('maps failed response to CREATE_ROBOT_CHECK_SESSION_FAILURE', () => {
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
         mockFetchRobotApi.mockReturnValue(
-          cold('r', { r: Fixtures.mockFetchSessionFailure })
+          cold('r', { r: Fixtures.mockCreateSessionFailure })
         )
 
         const action$ = hot('--a', { a: action })
@@ -100,10 +111,10 @@ describe('fetchRobotSessionEpic', () => {
         const output$ = sessionsEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.fetchRobotSessionFailure(
+          a: Actions.createSessionFailure(
             mockRobot.name,
             { errors: [{ status: 'went bad' }] },
-            { response: Fixtures.mockFetchSessionFailureMeta }
+            { response: Fixtures.mockCreateSessionFailureMeta }
           ),
         })
       })
