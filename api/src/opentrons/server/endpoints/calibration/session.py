@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import CriticalPoint, Axis
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
 from .models import ComparisonStatus
+from .helper_classes import LabwareInfo, CheckMove, Moves, DeckCalibrationError
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -24,6 +25,10 @@ offset or a robot deck transform.
 
 
 class CalibrationException(Exception):
+    pass
+
+
+class NoPipetteException(CalibrationException):
     pass
 
 
@@ -45,44 +50,6 @@ class PipetteStatus:
     mount: Mount
     has_tip: bool
     tiprack_id: typing.Optional[UUID]
-
-
-@dataclass
-class LabwareInfo:
-    """
-    This class purely maps to :py:class:`.models.LabwareStatus` and is
-    intended to inform a client about the tipracks required for a session.
-
-    :note: The UUID class is utilized here instead of UUID4 for type checking
-    as UUID4 is only valid in pydantic models.
-    """
-    alternatives: typing.List[str]
-    forPipettes: typing.List[UUID]
-    loadName: str
-    slot: str
-    namespace: str
-    version: str
-    id: UUID
-    definition: labware.LabwareDefinition
-
-
-@dataclass
-class CheckMove:
-    position: Point = Point(0, 0, 0)
-    locationId: UUID = uuid4()
-
-
-@dataclass
-class Moves:
-    """A mapping of calibration check state to gantry move parameters"""
-    preparingFirstPipette: CheckMove = CheckMove()
-    preparingSecondPipette: CheckMove = CheckMove()
-    joggingFirstPipetteToHeight: CheckMove = CheckMove()
-    joggingFirstPipetteToPointOne: CheckMove = CheckMove()
-    joggingFirstPipetteToPointTwo: CheckMove = CheckMove()
-    joggingFirstPipetteToPointThree: CheckMove = CheckMove()
-    joggingSecondPipetteToHeight: CheckMove = CheckMove()
-    joggingSecondPipetteToPointOne: CheckMove = CheckMove()
 
 
 # vector from front bottom left of slot 12
@@ -312,7 +279,6 @@ class CalibrationCheckState(str, Enum):
     returningTip = "returningTip"
     sessionExited = "sessionExited"
     badCalibrationData = "badCalibrationData"
-    noPipettesAttached = "noPipettesAttached"
     checkComplete = "checkComplete"
 
 
@@ -327,7 +293,6 @@ class CalibrationCheckTrigger(str, Enum):
     go_to_next_check = "goToNextCheck"
     exit = "exitSession"
     reject_calibration = "rejectCalibration"
-    no_pipettes = "noPipettes"
 
 
 CHECK_TRANSITIONS = [
@@ -530,11 +495,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.reject_calibration,
         "from_state": WILDCARD,
         "to_state": CalibrationCheckState.badCalibrationData
-    },
-    {
-        "trigger": CalibrationCheckTrigger.no_pipettes,
-        "from_state": WILDCARD,
-        "to_state": CalibrationCheckState.noPipettesAttached
     }
 ]
 
@@ -603,8 +563,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
         else:
-            MODULE_LOG.warning("Cannot start calibration check "
-                               "with fewer than one pipette.")
+            raise NoPipetteException("Cannot start calibration check "
+                                     "with fewer than one pipette.")
 
     async def _is_checking_both_mounts(self):
         return self._second_mount is not None
@@ -749,10 +709,17 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_mag = Point(0, 0, 0).magnitude_to(
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
+                transform_type = DeckCalibrationError.UNKNOWN
+
+                if exceeds and not self._can_distiguish_instr_offset:
+                    transform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
+                elif exceeds:
+                    transform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=abs(ref_pt - jogged_pt),
                                      thresholdVector=comp.threshold_vector,
-                                     exceedsThreshold=exceeds)
+                                     exceedsThreshold=exceeds,
+                                     transformType=transform_type)
         return comparisons
 
     async def _register_point_first_pipette(self):
