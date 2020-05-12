@@ -96,6 +96,12 @@ export const MAX_ENGAGE_HEIGHT_V2 = 19
 export const MIN_TEMP_MODULE_TEMP = 4
 export const MAX_TEMP_MODULE_TEMP = 95
 
+export const MIN_TC_BLOCK_TEMP = 4
+export const MAX_TC_BLOCK_TEMP = 99
+
+export const MIN_TC_LID_TEMP = 37
+export const MAX_TC_LID_TEMP = 110
+
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
   'TEMPERATURE_DEACTIVATED'

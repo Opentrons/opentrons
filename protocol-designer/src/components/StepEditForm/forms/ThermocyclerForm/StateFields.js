@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
@@ -8,8 +9,9 @@ import { ConditionalOnField, ToggleRowField, TextField } from '../../fields'
 import styles from '../../StepEditForm.css'
 
 import type { FocusHandlers } from '../../types'
+import type { FormData } from '../../../../form-types'
 
-type Props = {| focusHandlers: FocusHandlers |}
+type Props = {| focusHandlers: FocusHandlers, formData: FormData |}
 export const StateFields = (props: Props) => {
   const { focusHandlers } = props
   return (
@@ -36,7 +38,10 @@ export const StateFields = (props: Props) => {
           >
             <TextField
               name="blockTargetTemp"
-              className={styles.small_field}
+              className={cx(
+                styles.small_field,
+                styles.toggle_temperature_field
+              )}
               units={i18n.t('application.units.degrees')}
               {...focusHandlers}
             />
@@ -64,7 +69,10 @@ export const StateFields = (props: Props) => {
           >
             <TextField
               name="lidTargetTemp"
-              className={styles.small_field}
+              className={cx(
+                styles.small_field,
+                styles.toggle_temperature_field
+              )}
               units={i18n.t('application.units.degrees')}
               {...focusHandlers}
             />
