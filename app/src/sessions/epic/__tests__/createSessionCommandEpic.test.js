@@ -97,6 +97,7 @@ describe('createSessionCommandEpic', () => {
         expectObservable(output$).toBe('--a', {
           a: Actions.createSessionCommandSuccess(
             mockRobot.name,
+            action.payload.sessionId,
             Fixtures.mockUpdateSessionSuccess.body,
             { response: Fixtures.mockUpdateSessionSuccessMeta }
           ),
@@ -117,6 +118,7 @@ describe('createSessionCommandEpic', () => {
         expectObservable(output$).toBe('--a', {
           a: Actions.createSessionCommandFailure(
             mockRobot.name,
+            action.payload.sessionId,
             { errors: [{ status: 'went bad' }] },
             { response: Fixtures.mockUpdateSessionFailureMeta }
           ),

@@ -12,7 +12,6 @@ import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
 export const mockSessionData: Types.SessionData = {
   sessionType: 'calibrationCheck',
-  sessionId: '1234',
   details: { someData: 5 },
 }
 
@@ -29,7 +28,7 @@ export const mockSessionCommandData: Types.SessionCommandData = {
 
 export const mockSessionResponse: Types.SessionResponse = {
   data: {
-    id: mockSessionData.sessionId,
+    id: '1234',
     type: 'Session',
     attributes: mockSessionData,
   },
@@ -43,7 +42,6 @@ export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   },
   meta: {
     sessionType: 'calibrationCheck',
-    sessionId: '1234',
     details: {
       someData: 15,
       someOtherData: 'hi',

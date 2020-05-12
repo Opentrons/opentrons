@@ -134,6 +134,7 @@ describe('robot session check actions', () => {
       creator: Actions.createSessionCommandSuccess,
       args: [
         'robot-name',
+        '1234',
         Fixtures.mockSessionCommandResponse,
         { requestId: 'abc' },
       ],
@@ -141,6 +142,7 @@ describe('robot session check actions', () => {
         type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
         payload: {
           robotName: 'robot-name',
+          sessionId: '1234',
           ...Fixtures.mockSessionCommandResponse,
         },
         meta: { requestId: 'abc' },
@@ -149,10 +151,14 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:CREATE_SESSION_COMMAND_FAILURE',
       creator: Actions.createSessionCommandFailure,
-      args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
+      args: ['robot-name', '1234', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:CREATE_SESSION_COMMAND_FAILURE',
-        payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
+        payload: {
+          robotName: 'robot-name',
+          sessionId: '1234',
+          error: mockV2ErrorResponse,
+        },
         meta: { requestId: 'abc' },
       },
     },

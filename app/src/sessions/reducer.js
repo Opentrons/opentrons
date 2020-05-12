@@ -35,9 +35,8 @@ export function robotSessionReducer(
     }
 
     case Constants.CREATE_SESSION_COMMAND_SUCCESS: {
-      const { robotName, ...sessionState } = action.payload
+      const { robotName, sessionId, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
-      const sessionId = sessionState.meta?.sessionId
 
       if (!sessionId) return state
 

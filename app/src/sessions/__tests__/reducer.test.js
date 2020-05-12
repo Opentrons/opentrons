@@ -115,6 +115,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
+        sessionId: '1234',
         ...Fixtures.mockSessionCommandResponse,
       },
       meta: {},
@@ -140,6 +141,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
+        sessionId: '1234',
         ...Fixtures.mockSessionCommandResponse,
       },
       meta: {},

@@ -106,20 +106,22 @@ export const createSessionCommand = (
 
 export const createSessionCommandSuccess = (
   robotName: string,
+  sessionId: string,
   body: Types.SessionCommandResponse,
   meta: RobotApiRequestMeta
 ): Types.CreateSessionCommandSuccessAction => ({
   type: Constants.CREATE_SESSION_COMMAND_SUCCESS,
-  payload: { robotName, ...body },
+  payload: { robotName, sessionId, ...body },
   meta: meta,
 })
 
 export const createSessionCommandFailure = (
   robotName: string,
+  sessionId: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
 ): Types.CreateSessionCommandFailureAction => ({
   type: Constants.CREATE_SESSION_COMMAND_FAILURE,
-  payload: { robotName, error },
+  payload: { robotName, sessionId, error },
   meta: meta,
 })

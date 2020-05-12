@@ -38,8 +38,18 @@ const mapResponseToAction: ResponseToActionMapper<CreateSessionCommandAction> = 
   const meta = { ...originalAction.meta, response: responseMeta }
 
   return response.ok
-    ? Actions.createSessionCommandSuccess(host.name, body, meta)
-    : Actions.createSessionCommandFailure(host.name, body, meta)
+    ? Actions.createSessionCommandSuccess(
+        host.name,
+        originalAction.payload.sessionId,
+        body,
+        meta
+      )
+    : Actions.createSessionCommandFailure(
+        host.name,
+        originalAction.payload.sessionId,
+        body,
+        meta
+      )
 }
 
 export const createSessionCommandEpic: Epic = (action$, state$) => {

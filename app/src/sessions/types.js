@@ -33,7 +33,6 @@ export type SessionCommand = {|
 
 export type SessionData = {|
   sessionType: SessionType,
-  sessionId: string,
   // TODO(al, 2020-05-11): details should be properly typed with all
   // known session response types
   details: { ... },
@@ -118,13 +117,21 @@ export type CreateSessionCommandAction = {|
 
 export type CreateSessionCommandSuccessAction = {|
   type: CREATE_SESSION_COMMAND_SUCCESS,
-  payload: {| robotName: string, ...SessionCommandResponse |},
+  payload: {|
+    robotName: string,
+    sessionId: string,
+    ...SessionCommandResponse,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
 export type CreateSessionCommandFailureAction = {|
   type: CREATE_SESSION_COMMAND_FAILURE,
-  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  payload: {|
+    robotName: string,
+    sessionId: string,
+    error: RobotApiV2ErrorResponseBody,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
