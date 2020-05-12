@@ -116,6 +116,27 @@ The simulation script can also be invoked through python:
 
     python -m opentrons.simulate /path/to/protocol
 
+``opentrons_simulate`` has several command line options that might be useful.
+Most options are explained below, but to see all options you can run
+
+.. code-block:: shell
+
+   opentrons_simulate --help
+
+
+Using Custom Labware
+^^^^^^^^^^^^^^^^^^^^
+
+By default, ``opentrons_simulate`` will load custom labware definitions from the
+directory in which you run it. You can change the directory
+``opentrons_simulate`` searches for custom labware with the
+``--custom-labware-path`` option:
+
+.. code-block:: shell
+
+   python.exe -m opentrons.simulate --custom-labware-path="C:\Custom Labware"
+
+
 In the Python Shell
 ^^^^^^^^^^^^^^^^^^^
 
