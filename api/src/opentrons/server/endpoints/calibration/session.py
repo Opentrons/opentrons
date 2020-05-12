@@ -7,6 +7,7 @@ from dataclasses import dataclass
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import CriticalPoint, Axis
+from opentrons.hardware_control.util import plan_arc
 
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
@@ -760,11 +761,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         cp = self._pip_info_by_mount[mount].critical_point
 
         max_height = self.hardware.get_instrument_max_height(mount)
-        moves = geometry.plan_moves(from_loc, to_loc,
-                                    self._deck, max_height)
+        safe = geometry.safe_height(
+            from_loc, to_loc, self._deck, max_height)
+        moves = plan_arc(from_pt, to_loc.point, safe,
+                         origin_cp=None,
+                         dest_cp=cp)
         for move in moves:
             await self.hardware.move_to(
-                mount, move[0], move[1], critical_point=cp)
+                mount, move[0], critical_point=move[1])
 
     async def _jog_first_pipette(self, vector: Point):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
