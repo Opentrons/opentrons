@@ -33,6 +33,11 @@ class JogPosition(BaseModel):
     vector: Point = PointField()
 
 
+# TODO: BC: the mount and rank fields here are typed as strings
+# because of serialization problems, though they are actually
+# backed by enums. This shouldn't be the case, and we should
+# be able to handle the de/serialization of these fields from
+# the middle ware before they are returned to the client
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
     model: Optional[str] =\
