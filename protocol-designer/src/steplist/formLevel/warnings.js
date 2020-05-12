@@ -116,21 +116,6 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
   return isBelowMin ? FORM_WARNINGS.BELOW_MIN_DISPOSAL_VOLUME : null
 }
 
-export const temperatureRangeExceeded = (
-  fields: HydratedFormData
-): ?FormWarning => {
-  const { setTemperature, targetTemperature } = fields
-  if (setTemperature === 'true' && targetTemperature < MIN_TEMP_MODULE_TEMP) {
-    return FORM_WARNINGS.TEMPERATURE_MIN_EXCEEDED
-  } else if (
-    setTemperature === 'true' &&
-    targetTemperature > MAX_TEMP_MODULE_TEMP
-  ) {
-    return FORM_WARNINGS.TEMPERATURE_MAX_EXCEEDED
-  }
-  return null
-}
-
 export const pauseTemperatureRangeExceeded = (
   fields: HydratedFormData
 ): ?FormWarning => {

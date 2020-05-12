@@ -18,7 +18,6 @@ import {
   belowPipetteMinimumVolume,
   maxDispenseWellVolume,
   minDisposalVolume,
-  temperatureRangeExceeded,
   type FormWarning,
   type FormWarningType,
   pauseTemperatureRangeExceeded,
@@ -75,7 +74,6 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
-    getWarnings: composeWarnings(temperatureRangeExceeded),
   },
 }
 
