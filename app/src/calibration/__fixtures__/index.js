@@ -42,7 +42,7 @@ export const goodXYComparison = {
 
 export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionData = {
   instruments: {
-    LEFT: {
+    left: {
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,
@@ -50,7 +50,7 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
       tiprack_id: 'abc123_labware_uuid',
       rank: 'first',
     },
-    RIGHT: {
+    right: {
       model: 'fake_pipette_model',
       name: 'fake_pipette_name',
       tip_length: 42,

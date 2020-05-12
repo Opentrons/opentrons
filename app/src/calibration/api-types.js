@@ -75,10 +75,10 @@ export type RobotCalibrationCheckComparison = {|
 |}
 
 export type RobotCalibrationCheckSessionData = {|
-  instruments: {| [mount: string]: RobotCalibrationCheckInstrument |},
+  instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {|
-    links: {| [RobotCalibrationCheckStep]: string |},
+    links: { [RobotCalibrationCheckStep]: string, ... },
   |},
   comparisonsByStep: {
     [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
