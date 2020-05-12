@@ -374,7 +374,6 @@ async def test_complete_check_one_pip(check_calibration_session_only_right):
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
 
 
 async def test_complete_check_both_pips(check_calibration_session):
@@ -386,8 +385,6 @@ async def test_complete_check_both_pips(check_calibration_session):
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
         session.CalibrationCheckState.checkComplete
-    assert sess.get_pipette(sess._first_mount)['has_tip'] is False
-    assert sess.get_pipette(sess._second_mount)['has_tip'] is False
 
 
 # START flow testing both mounts
