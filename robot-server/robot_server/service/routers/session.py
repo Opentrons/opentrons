@@ -5,7 +5,7 @@ from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
 from opentrons.server.endpoints.calibration.session import \
     (CheckCalibrationSession, SessionManager,
-     CalibrationSession, noPipetteException)
+     CalibrationSession, CalibrationException)
 from opentrons.server.endpoints.calibration.util import StateMachineError
 from opentrons.server.endpoints.calibration import models
 
@@ -62,20 +62,11 @@ async def create_session_handler(
         try:
             # TODO generalize for other kinds of sessions
             new_session = await CheckCalibrationSession.build(hardware)
-        except noPipetteException as e:
-            raise RobotServerError(
-                status_code=http_status_codes.HTTP_403_FORBIDDEN,
-                error=Error(
-                    title="No Pipettes Attached",
-                    detail=f"Failed to create a session of type "
-                           f"'{session_type}': {str(e)}.",
-                )
-            )
-        except AssertionError as e:
+        except (AssertionError, CalibrationException) as e:
             raise RobotServerError(
                 status_code=http_status_codes.HTTP_400_BAD_REQUEST,
                 error=Error(
-                    title="Exception",
+                    title="Creation Failed",
                     detail=f"Failed to create session of type "
                            f"'{session_type}': {str(e)}.",
                 )

@@ -11,6 +11,7 @@ from opentrons.hardware_control.types import CriticalPoint, Axis
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
 from .models import ComparisonStatus
+from .helper_classes import LabwareInfo, CheckMove, Moves, DeckCalibrationError
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -27,7 +28,7 @@ class CalibrationException(Exception):
     pass
 
 
-class noPipetteException(Exception):
+class NoPipetteException(CalibrationException):
     pass
 
 
@@ -49,44 +50,6 @@ class PipetteStatus:
     mount: Mount
     has_tip: bool
     tiprack_id: typing.Optional[UUID]
-
-
-@dataclass
-class LabwareInfo:
-    """
-    This class purely maps to :py:class:`.models.LabwareStatus` and is
-    intended to inform a client about the tipracks required for a session.
-
-    :note: The UUID class is utilized here instead of UUID4 for type checking
-    as UUID4 is only valid in pydantic models.
-    """
-    alternatives: typing.List[str]
-    forPipettes: typing.List[UUID]
-    loadName: str
-    slot: str
-    namespace: str
-    version: str
-    id: UUID
-    definition: labware.LabwareDefinition
-
-
-@dataclass
-class CheckMove:
-    position: Point = Point(0, 0, 0)
-    locationId: UUID = uuid4()
-
-
-@dataclass
-class Moves:
-    """A mapping of calibration check state to gantry move parameters"""
-    preparingFirstPipette: CheckMove = CheckMove()
-    preparingSecondPipette: CheckMove = CheckMove()
-    joggingFirstPipetteToHeight: CheckMove = CheckMove()
-    joggingFirstPipetteToPointOne: CheckMove = CheckMove()
-    joggingFirstPipetteToPointTwo: CheckMove = CheckMove()
-    joggingFirstPipetteToPointThree: CheckMove = CheckMove()
-    joggingSecondPipetteToHeight: CheckMove = CheckMove()
-    joggingSecondPipetteToPointOne: CheckMove = CheckMove()
 
 
 # vector from front bottom left of slot 12
@@ -600,7 +563,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             if self._first_mount == Mount.LEFT:
                 self._can_distiguish_instr_offset = False
         else:
-            raise noPipetteException("Cannot start calibration check "
+            raise NoPipetteException("Cannot start calibration check "
                                      "with fewer than one pipette.")
 
     async def _is_checking_both_mounts(self):
@@ -746,12 +709,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_mag = Point(0, 0, 0).magnitude_to(
                         comp.threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
-                transform_type: typing.Optional[str] = None
+                transform_type = DeckCalibrationError.UNKNOWN
 
                 if exceeds and not self._can_distiguish_instr_offset:
-                    transform_type = 'badInstrumentOffset'
+                    transform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
                 elif exceeds:
-                    transform_type = 'badDeckTransformCalibration'
+                    transform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=abs(ref_pt - jogged_pt),
                                      thresholdVector=comp.threshold_vector,

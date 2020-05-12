@@ -15,25 +15,31 @@ from opentrons import types
 from robot_server.service.dependencies import get_session_manager
 
 
-TYPE_SESSION_ID_CHECK_ = {
-    'attributes': {
-        'details': {
-            'comparisonsByStep': {},
-            'currentStep': 'preparingFirstPipette',
-            'instruments': {},
-            'labware': [],
+@pytest.fixture
+def session_details():
+    sess_dict = {
+        'attributes': {
+            'details': {
+                'comparisonsByStep': {},
+                'currentStep': 'preparingFirstPipette',
+                'instruments': {},
+                'labware': [],
+            },
+            'session_type': 'check',
+            'session_id': 'check',
         },
-        'session_type': 'check',
-        'session_id': 'check',
-    },
-    'type': 'Session',
-    'id': 'check'
-}
+        'type': 'Session',
+        'id': 'check'
+    }
+    return sess_dict
 
 
 @pytest.fixture
 def mock_cal_session(hardware, loop):
-
+    # TODO: The mock instrs dictionary needs
+    # to be modified to fit changes that
+    # remove instances of pip id in
+    # the check calibration session class.
     id1 = uuid4()
     id2 = uuid4()
     mock_instrs = {
@@ -112,7 +118,7 @@ def session_manager_with_session(mock_cal_session):
 
 
 @pytest.fixture
-def session_info(mock_cal_session):
+def session_hardware_info(mock_cal_session, session_details):
     current_state = mock_cal_session.current_state_name
     lw_status = mock_cal_session.labware_status.values()
     comparisons_by_step = mock_cal_session.get_comparisons_by_step()
@@ -138,7 +144,8 @@ def session_info(mock_cal_session):
         'currentStep': current_state,
         'comparisonsByStep': comparisons_by_step
     }
-    return info
+    session_details["attributes"].update({"details": info})
+    return session_details
 
 
 def test_create_session_already_present(api_client,
@@ -183,12 +190,13 @@ def test_create_session_error(api_client,
             'detail': "Failed to create session of type 'check': Please "
                       "attach pipettes before proceeding.",
             'status': '400',
-            'title': 'Exception'}
+            'title': 'Creation Failed'}
         ]}
     assert response.status_code == 400
 
 
-def test_create_session(api_client, patch_build_session, session_info):
+def test_create_session(api_client, patch_build_session,
+                        session_hardware_info):
     response = api_client.post("/sessions", json={
         "data": {
             "type": "Session",
@@ -197,10 +205,9 @@ def test_create_session(api_client, patch_build_session, session_info):
             }
         }
     })
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
+
     assert response.json() == {
-        'data': base_dict,
+        'data': session_hardware_info,
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -233,13 +240,11 @@ def test_delete_session_not_found(api_client):
 
 def test_delete_session(api_client, session_manager_with_session,
                         mock_cal_session,
-                        session_info):
+                        session_hardware_info):
     response = api_client.delete("/sessions/check")
     mock_cal_session.delete_session.assert_called_once()
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': base_dict,
+        'data': session_hardware_info,
         'links': {
             'POST': {
                 'href': '/sessions',
@@ -262,12 +267,11 @@ def test_get_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_get_session(api_client, session_manager_with_session, session_info):
+def test_get_session(api_client, session_manager_with_session,
+                     session_hardware_info):
     response = api_client.get("/sessions/check")
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': base_dict,
+        'data': session_hardware_info,
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -291,12 +295,11 @@ def test_get_sessions_no_sessions(api_client):
     assert response.status_code == 200
 
 
-def test_get_sessions(api_client, session_manager_with_session, session_info):
+def test_get_sessions(api_client, session_manager_with_session,
+                      session_hardware_info):
     response = api_client.get("/sessions")
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
-        'data': [TYPE_SESSION_ID_CHECK_],
+        'data': [session_hardware_info],
     }
     assert response.status_code == 200
 
@@ -333,7 +336,7 @@ def test_session_command_create_no_session(api_client):
 def test_session_command_create(api_client,
                                 session_manager_with_session,
                                 mock_cal_session,
-                                session_info):
+                                session_hardware_info):
     response = api_client.post(
         "/sessions/check/commands",
         json=command("jog",
@@ -343,8 +346,6 @@ def test_session_command_create(api_client,
         trigger="jog",
         vector=[1.0, 2.0, 3.0])
 
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
         'data': {
             'attributes': {
@@ -355,7 +356,7 @@ def test_session_command_create(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': base_dict['attributes'],
+        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',
@@ -374,7 +375,7 @@ def test_session_command_create(api_client,
 def test_session_command_create_no_body(api_client,
                                         session_manager_with_session,
                                         mock_cal_session,
-                                        session_info):
+                                        session_hardware_info):
     response = api_client.post(
         "/sessions/check/commands",
         json=command("loadLabware", None)
@@ -383,8 +384,6 @@ def test_session_command_create_no_body(api_client,
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="loadLabware")
 
-    base_dict = TYPE_SESSION_ID_CHECK_
-    base_dict["attributes"].update({"details": session_info})
     assert response.json() == {
         'data': {
             'attributes': {
@@ -395,7 +394,7 @@ def test_session_command_create_no_body(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': base_dict['attributes'],
+        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/check/commands',

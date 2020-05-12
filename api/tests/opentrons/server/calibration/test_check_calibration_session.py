@@ -254,7 +254,7 @@ async def test_session_started_to_bad_state(check_calibration_session):
 
 
 async def test_session_no_pipettes_error(hardware):
-    with pytest.raises(session.noPipetteException):
+    with pytest.raises(session.NoPipetteException):
         await session.CheckCalibrationSession.build(hardware)
 
 
