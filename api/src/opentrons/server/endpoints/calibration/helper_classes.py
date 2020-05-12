@@ -4,6 +4,7 @@ from opentrons.types import Point, Mount
 from enum import Enum, auto
 from uuid import uuid4, UUID
 from dataclasses import dataclass
+from opentrons.hardware_control.types import CriticalPoint
 
 if typing.TYPE_CHECKING:
     from opentrons.protocol_api.labware import LabwareDefinition
@@ -51,3 +52,51 @@ class DeckCalibrationError(Enum):
     UNKNOWN = auto()
     BAD_INSTRUMENT_OFFSET = auto()
     BAD_DECK_TRANSFORM = auto()
+
+
+class PipetteRank(str, Enum):
+    """The rank in the order of pipettes to use within flow"""
+    first = 1
+    second = 2
+
+    def __str__(self):
+        return self.name
+
+    def __ge__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value >= other.value
+        return NotImplemented
+
+    def __gt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value > other.value
+        return NotImplemented
+
+    def __le__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value <= other.value
+        return NotImplemented
+
+    def __lt__(self, other):
+        if self.__class__ is other.__class__:
+            return self.value < other.value
+        return NotImplemented
+
+
+@dataclass
+class PipetteInfo:
+    rank: PipetteRank
+    mount: Mount
+    tiprack_id: typing.Optional[UUID]
+    critical_point: typing.Optional[CriticalPoint]
+
+
+@dataclass
+class PipetteStatus:
+    model: str
+    name: str
+    tip_length: float
+    mount: str
+    has_tip: bool
+    rank: str
+    tiprack_id: typing.Optional[UUID]

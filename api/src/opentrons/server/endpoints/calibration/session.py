@@ -11,7 +11,9 @@ from opentrons.hardware_control.types import CriticalPoint, Axis
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
 from .models import ComparisonStatus
-from .helper_classes import LabwareInfo, CheckMove, Moves, DeckCalibrationError
+from .helper_classes import (LabwareInfo, CheckMove, Moves,
+                             DeckCalibrationError, PipetteRank,
+                             PipetteInfo, PipetteStatus)
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 
@@ -40,34 +42,6 @@ class SessionManager:
     @property
     def sessions(self):
         return self._sessions
-
-
-class PipetteRank(str, Enum):
-    """The rank in the order of pipettes to use within flow"""
-    first = 'first'
-    second = 'second'
-
-    def __str__(self):
-        return self.name
-
-
-@dataclass
-class PipetteInfo:
-    rank: PipetteRank
-    mount: Mount
-    tiprack_id: typing.Optional[UUID]
-    critical_point: typing.Optional[CriticalPoint]
-
-
-@dataclass
-class PipetteStatus:
-    model: str
-    name: str
-    tip_length: float
-    mount: str
-    has_tip: bool
-    rank: str
-    tiprack_id: typing.Optional[UUID]
 
 
 # vector from front bottom left of slot 12
