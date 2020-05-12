@@ -96,13 +96,13 @@ export type RobotApiV2ResponseBody<
   MetaT = void
 > = {|
   data: DataT,
-  links?: { ... },
+  links?: ResourceLinks,
   meta?: MetaT,
 |}
 
 export type RobotApiV2Error = {|
   id?: string,
-  links?: { ... },
+  links?: ResourceLinks,
   status?: string,
   code?: string,
   title?: string,
