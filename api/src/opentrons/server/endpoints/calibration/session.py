@@ -692,12 +692,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         the current location, and save any offset it might have from the
         original position.
         """
-        # TODO: remove this check? is it still relevant given state machine?
-        # if self._has_tip(pipette_id):
-        #     raise CalibrationException(f"Tip is already attached "
-        #                                f"to {pipette_id} pipette.")
         mount = self._get_preparing_state_mount()
         assert mount, 'cannot attempt tip pick up, no mount specified'
+        assert self.pipettes[mount]['has_tip'] is False, \
+            f"Tip is already attached to {mount} pipette, " \
+            "cannot pick up another"
 
         await self._pick_up_tip(mount)
 

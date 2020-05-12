@@ -6,7 +6,15 @@ import {
   mockFailureBody,
   mockRobot,
 } from '../../robot-api/__fixtures__'
-import { ROBOT_CALIBRATION_CHECK_PATH } from '../constants'
+import {
+  ROBOT_CALIBRATION_CHECK_PATH,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+  CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+  CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+  CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+} from '../constants'
 import type { RobotCalibrationCheckSessionData } from '../api-types'
 
 export { mockRobot }
@@ -56,12 +64,12 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
     links: { labwareLoaded: '/fake/route' },
   },
   comparisonsByStep: {
-    comparingFirstPipetteHeight: goodZComparison,
-    comparingFirstPipettePointOne: goodXYComparison,
-    comparingFirstPipettePointTwo: goodXYComparison,
-    comparingFirstPipettePointThree: goodXYComparison,
-    comparingSecondPipetteHeight: goodZComparison,
-    comparingSecondPipettePointOne: goodXYComparison,
+    [CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: goodZComparison,
+    [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: goodXYComparison,
+    [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: goodXYComparison,
+    [CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: goodXYComparison,
+    [CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: goodZComparison,
+    [CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: goodXYComparison,
   },
   labware: [
     {
