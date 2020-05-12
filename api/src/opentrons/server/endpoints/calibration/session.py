@@ -108,9 +108,9 @@ class CalibrationSession:
                     if data['channels'] == 8:
                         cp = CriticalPoint.FRONT_NOZZLE
                     pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
-                                                        critical_point=cp,
-                                                        rank=rank,
-                                                        mount=mount)
+                                                           critical_point=cp,
+                                                           rank=rank,
+                                                           mount=mount)
             return pip_info_by_mount
         else:
             raise NoPipetteException("Cannot start calibration check "
