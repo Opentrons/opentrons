@@ -697,14 +697,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 exceeds = diff_magnitude > threshold_mag
                 tform_type = DeckCalibrationError.UNKNOWN
 
-                is_second_pip = jogged_state in [
-                    CalibrationCheckState.joggingSecondPipetteToHeight,
-                    CalibrationCheckState.joggingSecondPipetteToPointOne,
-                ]
                 if exceeds:
-                    if is_second_pip and self.can_distinguish_instr_offset():
+                    is_second_pip = jogged_state in [
+                        CalibrationCheckState.joggingSecondPipetteToHeight,
+                        CalibrationCheckState.joggingSecondPipetteToPointOne,
+                    ]
+                    if is_second_pip:
                         tform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
-                    else:
+                    elif self.can_distinguish_instr_offset():
                         tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
