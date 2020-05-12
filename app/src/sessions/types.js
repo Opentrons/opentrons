@@ -45,10 +45,7 @@ export type SessionCommandData = {|
   status?: string,
 |}
 
-export type SessionResponse = RobotApiV2ResponseBody<
-  SessionData,
-  {||}
->
+export type SessionResponse = RobotApiV2ResponseBody<SessionData, {||}>
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<
   SessionCommandData,

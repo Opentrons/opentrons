@@ -22,8 +22,7 @@ export const DELETE_SESSION_SUCCESS: 'sessions:DELETE_SESSION_SUCCESS' =
 export const DELETE_SESSION_FAILURE: 'sessions:DELETE_SESSION_FAILURE' =
   'sessions:DELETE_SESSION_FAILURE'
 
-export const FETCH_SESSION: 'sessions:FETCH_SESSION' =
-  'sessions:FETCH_SESSION'
+export const FETCH_SESSION: 'sessions:FETCH_SESSION' = 'sessions:FETCH_SESSION'
 
 export const FETCH_SESSION_SUCCESS: 'sessions:FETCH_SESSION_SUCCESS' =
   'sessions:FETCH_SESSION_SUCCESS'
