@@ -2,7 +2,7 @@ import pytest
 
 from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import (
-    Deck, plan_moves, first_parent, should_dodge_thermocycler)
+    Deck, plan_moves, safe_height, first_parent, should_dodge_thermocycler)
 from opentrons.protocol_api import labware, module_geometry
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.protocol_api.definitions import MAX_SUPPORTED_VERSION
@@ -333,25 +333,25 @@ def test_instr_max_height():
     # the max instrument achievable height, we use the max instrument
     # height as the safe height
     instr_max_height = trough.wells()[0].top().point.z + 1
-    moves1 = plan_moves(
+    height = safe_height(
         trough.wells()[0].top(), trough2.wells()[0].top(),
         deck, round(instr_max_height, 2), 7.0, 15.0)
-    assert moves1[0][0].z == round(instr_max_height, 2)
+    assert height == round(instr_max_height, 2)
 
     # if the highest deck height is > 10 mm below the max instrument
     # height, we use the lw_z_margin instead
     instr_max_height = trough.wells()[0].top().point.z + 30
-    moves2 = plan_moves(
+    height2 = safe_height(
         trough.wells()[0].top(), trough2.wells()[0].top(),
         deck, round(instr_max_height, 2), 7.0, 15.0)
-    assert moves2[0][0].z ==\
+    assert height2 ==\
         round(trough.wells()[0].top().point.z, 2) + 15.0
 
     # it fails if the highest deck height is less than 1 mm below
     # the max instr achievable height
     instr_max_height = trough.wells()[0].top().point.z
     with pytest.raises(Exception):
-        plan_moves(
+        safe_height(
             trough.wells()[0].top(), trough2.wells()[0].top(),
             deck, round(instr_max_height, 2), 7.0, 15.0)
 
