@@ -118,7 +118,7 @@ async def delete_session_handler(
             attributes=session.Session(
                 sessionId=session_id,
                 # TODO support other session types
-                sessionType=models.SessionType.check,
+                sessionType=models.SessionType.calibration_check,
                 details=create_session_details(session_obj)),
             resource_id=session_id),
         links={
@@ -225,7 +225,7 @@ async def session_command_create_handler(
         meta=session.Session(details=create_session_details(session_obj),
                              sessionId=session_id,
                              # TODO Get type from session
-                             sessionType=models.SessionType.check),
+                             sessionType=models.SessionType.calibration_check),
         links=get_valid_session_links(session_id, router)
     )
 

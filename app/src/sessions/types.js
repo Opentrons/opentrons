@@ -22,7 +22,7 @@ import type {
 } from '../robot-api/types'
 
 // The available session types
-export type RobotSessionType = 'check'
+export type RobotSessionType = 'calibrationCheck'
 
 export type RobotSessionUpdate = {|
   command: string,

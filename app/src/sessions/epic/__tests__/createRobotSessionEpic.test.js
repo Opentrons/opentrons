@@ -43,7 +43,10 @@ describe('createRobotSessionEpic', () => {
   })
 
   describe('handles explicit CREATE SESSION', () => {
-    const action = Actions.createRobotSession(mockRobot.name, 'check')
+    const action = Actions.createRobotSession(
+      mockRobot.name,
+      'calibrationCheck'
+    )
     const expectedRequest = {
       method: 'POST',
       path: '/sessions',
@@ -51,7 +54,7 @@ describe('createRobotSessionEpic', () => {
         data: {
           type: 'Session',
           attributes: {
-            sessionType: 'check',
+            sessionType: 'calibrationCheck',
           },
         },
       },

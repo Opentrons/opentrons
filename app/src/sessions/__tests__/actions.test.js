@@ -19,10 +19,10 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:CREATE_ROBOT_SESSION',
       creator: Actions.createRobotSession,
-      args: ['robot-name', 'check'],
+      args: ['robot-name', 'calibrationCheck'],
       expected: {
         type: 'sessions:CREATE_ROBOT_SESSION',
-        payload: { robotName: 'robot-name', sessionType: 'check' },
+        payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
         meta: {},
       },
     },
