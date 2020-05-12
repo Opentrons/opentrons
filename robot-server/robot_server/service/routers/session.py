@@ -45,7 +45,9 @@ def get_session(manager: SessionManager,
 @router.post("/sessions",
              description="Create a session",
              response_model_exclude_unset=True,
-             response_model=session.SessionResponse)
+             response_model=session.SessionResponse,
+             status_code=http_status_codes.HTTP_201_CREATED,
+             )
 async def create_session_handler(
         create_request: SessionCreateRequest,
         session_manager: SessionManager = Depends(get_session_manager),
