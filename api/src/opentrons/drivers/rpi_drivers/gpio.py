@@ -247,5 +247,9 @@ class GPIOCharDev:
         self.lines.pop(pin.name)
 
     def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
-        door_fd = self.lines['window_door_sw'].event_get_fd()
-        loop.remove_reader(door_fd)
+        try:
+            door_fd = self.lines['window_door_sw'].event_get_fd()
+            loop.remove_reader(door_fd)
+        except Exception:
+            MODULE_LOG.exception(
+                "Failed to remove window door switch fd reader")
