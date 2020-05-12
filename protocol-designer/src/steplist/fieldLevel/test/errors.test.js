@@ -1,4 +1,8 @@
-import { minFieldValue, maxFieldValue, rangeFieldValue } from '../errors'
+import {
+  minFieldValue,
+  maxFieldValue,
+  temperatureRangeFieldValue,
+} from '../errors'
 
 describe('errors', () => {
   describe('minFieldValue', () => {
@@ -40,12 +44,12 @@ describe('errors', () => {
     })
   })
 
-  describe('rangeFieldValue', () => {
+  describe('temperatureRangeFieldValue', () => {
     const MIN = 4
     const MAX = 99
     let rangeChecker
     beforeEach(() => {
-      rangeChecker = rangeFieldValue(MIN, MAX)
+      rangeChecker = temperatureRangeFieldValue(MIN, MAX)
     })
     it('returns null when value is null', () => {
       expect(rangeChecker(null)).toBe(null)

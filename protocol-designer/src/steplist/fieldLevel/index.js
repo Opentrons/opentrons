@@ -6,7 +6,7 @@ import {
   composeErrors,
   minFieldValue,
   maxFieldValue,
-  rangeFieldValue,
+  temperatureRangeFieldValue,
   realNumber,
 } from './errors'
 import {
@@ -178,13 +178,15 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
   blockTargetTemp: {
     getErrors: composeErrors(
-      rangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   lidTargetTemp: {
-    getErrors: composeErrors(rangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)),
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+    ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
