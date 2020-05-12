@@ -72,6 +72,13 @@ export type RobotApiState = $Shape<
   |}>
 >
 
+export type ResourceLink = {|
+  href: string,
+  meta?: $Shape<{| [string]: string | void |}>,
+|}
+
+export type ResourceLinks = $Shape<{| [string]: ResourceLink | string | void |}>
+
 // generic response data supertype
 export type RobotApiV2ResponseData = {|
   id: string,
