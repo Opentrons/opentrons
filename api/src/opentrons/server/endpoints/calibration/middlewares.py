@@ -77,7 +77,7 @@ def status_response(
         labware=[LabwareStatus(alternatives=data.alternatives,
                                slot=data.slot,
                                id=data.id,
-                               forMounts=data.forMounts,
+                               forMounts=[str(m) for m in data.forMounts],
                                loadName=data.loadName,
                                namespace=data.namespace,
                                version=data.version) for data in lw_status])
