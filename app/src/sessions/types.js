@@ -24,31 +24,45 @@ import type {
 // The available session types
 export type SessionType = 'calibrationCheck'
 
-export type SessionCommand = {|
+export type SessionCommandRequest = {|
   command: string,
   // TODO(al, 2020-05-11): data should be properly typed with all
   // known command types
   data: { ... },
 |}
 
-export type SessionData = {|
+export type Session = {|
   sessionType: SessionType,
   // TODO(al, 2020-05-11): details should be properly typed with all
   // known session response types
   details: { ... },
 |}
 
-export type SessionCommandData = {|
+export type SessionCommand = {|
   command: string,
+  // TODO(al, 2020-05-11): data should be properly typed with all
+  // known command types
   data: { ... },
   status?: string,
 |}
 
-export type SessionResponse = RobotApiV2ResponseBody<SessionData, {||}>
+export type SessionResponseModel = {|
+  id: string,
+  type: 'Session',
+  attributes: Session,
+|}
+
+export type SessionCommandResponseModel = {|
+  id: string,
+  type: 'SessionCommand',
+  attributes: SessionCommand,
+|}
+
+export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<
-  SessionCommandData,
-  SessionData
+  SessionCommandResponseModel,
+  Session
 >
 
 export type CreateSessionAction = {|
@@ -150,7 +164,7 @@ export type SessionsAction =
   | CreateSessionCommandFailureAction
 
 export type SessionsById = $Shape<{|
-  [id: string]: SessionData,
+  [id: string]: Session,
 |}>
 
 export type PerRobotSessionState = $Shape<

@@ -72,14 +72,25 @@ export type RobotApiState = $Shape<
   |}>
 >
 
-export type RobotApiV2ResponseBody<AttributesT, MetaT> = {|
-  meta?: MetaT,
+// generic response data supertype
+export type RobotApiV2ResponseData = {|
+  id: string,
+  // the "+" means that these properties are covariant, so
+  // "extending" types may specify more strict subtypes
+  +type: string,
+  +attributes: { ... },
+|}
+
+// parameterized response type
+// DataT parameter must be a subtype of RobotApiV2ResponseData
+// MetaT defaults to void if unspecified
+export type RobotApiV2ResponseBody<
+  DataT: RobotApiV2ResponseData,
+  MetaT = void
+> = {|
+  data: DataT,
   links?: { ... },
-  data: {|
-    id: string,
-    type: string,
-    attributes: AttributesT,
-  |},
+  meta?: MetaT,
 |}
 
 export type RobotApiV2Error = {|
