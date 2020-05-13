@@ -291,3 +291,12 @@ describe('makeInitialRobotState', () => {
     })
   ).toMatchSnapshot()
 })
+
+describe('getThermocyclerStaterDiff', () => {
+  // getTCStateDiff(prevRobotState, args) //
+  //{lidOpen, lidClosed, setBlockTemperature , deactivateBlockTemperature, setLidTemperature, deactivateLidTemperature}
+  it('returns lidOpen when the lid state has changed to open', () => {})
+  it('returns does NOT return lidOpen when the lid state is unchanged', () => {})
+
+  it('returns setBlockTemperature when the block temperature state has changed to non null value', () => {})
+})
