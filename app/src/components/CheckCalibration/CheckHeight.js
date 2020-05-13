@@ -48,7 +48,7 @@ const DIFFERENCE = 'Difference'
 
 type CheckHeightProps = {|
   isMulti: boolean,
-  mount: ?Mount,
+  mount: Mount | null,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   exit: () => void,

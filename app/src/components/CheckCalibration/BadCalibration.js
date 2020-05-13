@@ -44,7 +44,6 @@ export function BadCalibration(props: CompleteConfirmationProps) {
             href={DECK_CAL_ARTICLE_URL}
             target="_blank"
             rel="noopener noreferrer"
-            onClick={e => e.stopPropagation()}
           >
             {THIS_ARTICLE}
           </a>
