@@ -1,6 +1,6 @@
 // @flow
 import * as React from 'react'
-import { Icon, PrimaryButton } from '@opentrons/components'
+import { Icon, PrimaryButton, Link } from '@opentrons/components'
 import styles from './styles.css'
 
 const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Bad calibration data detected'
@@ -40,13 +40,9 @@ export function BadCalibration(props: CompleteConfirmationProps) {
         <p className={styles.error_explanation}>
           {PERFORM_CALIBRATION}
           &nbsp;
-          <a
-            href={DECK_CAL_ARTICLE_URL}
-            target="_blank"
-            rel="noopener noreferrer"
-          >
+          <Link href={DECK_CAL_ARTICLE_URL} external>
             {THIS_ARTICLE}
-          </a>
+          </Link>
           &nbsp;
           {LEARN_MORE}
         </p>
