@@ -65,9 +65,13 @@ class ThermocyclerModuleLiveData(BaseModel):
               description="The total number of steps within the current cycle")
 
 
+# ThermocyclerModuleLiveData must be first. The ordering in a Union has to go
+# in order of specicifity.
 ModuleLiveData = typing.Union[
-    TemperatureModuleLiveData, MagneticModuleLiveData,
-    ThermocyclerModuleLiveData]
+    ThermocyclerModuleLiveData,
+    TemperatureModuleLiveData,
+    MagneticModuleLiveData,
+]
 
 
 class Module(BaseModel):
