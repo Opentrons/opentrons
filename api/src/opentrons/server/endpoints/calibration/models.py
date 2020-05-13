@@ -3,7 +3,6 @@ from enum import Enum
 from typing import Dict, Optional, List, Any
 from functools import partial
 from pydantic import BaseModel, Field
-from opentrons.types import Mount
 
 from .helper_classes import DeckCalibrationError
 
@@ -34,6 +33,11 @@ class JogPosition(BaseModel):
     vector: Point = PointField()
 
 
+# TODO: BC: the mount and rank fields here are typed as strings
+# because of serialization problems, though they are actually
+# backed by enums. This shouldn't be the case, and we should
+# be able to handle the de/serialization of these fields from
+# the middle ware before they are returned to the client
 class AttachedPipette(BaseModel):
     """Pipette (if any) attached to the mount"""
     model: Optional[str] =\
@@ -46,12 +50,14 @@ class AttachedPipette(BaseModel):
                                 "generation version")
     tip_length: Optional[float] =\
         Field(None, description="The default tip length for this pipette")
-    mount: Optional[Mount] =\
+    mount: Optional[str] =\
         Field(None, description="The mount this pipette attached to")
     has_tip: Optional[bool] =\
         Field(None, description="Whether a tip is attached.")
     tiprack_id: Optional[UUID] =\
         Field(None, description="Id of tiprack associated with this pipette.")
+    rank: Optional[str] =\
+        Field(None, description="Rank in the order of pipettes used for flow")
 
 
 class LabwareStatus(BaseModel):
@@ -59,7 +65,7 @@ class LabwareStatus(BaseModel):
     alternatives: List[str]
     slot: Optional[str]
     id: UUID
-    forPipettes: List[UUID]
+    forMounts: List[str]
     loadName: str
     namespace: str
     version: str

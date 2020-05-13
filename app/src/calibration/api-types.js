@@ -49,29 +49,40 @@ export type RobotCalibrationCheckStep =
   | CHECK_STEP_BAD_ROBOT_CALIBRATION
   | CHECK_STEP_NO_PIPETTES_ATTACHED
 
-export type RobotCalibrationCheckInstrument = {
+type RobotCalibrationCheckPipetteRank = 'first' | 'second'
+export type RobotCalibrationCheckInstrument = {|
   model: string,
   name: string,
   tip_length: number,
-  mount_axis: string,
-  plunger_axis: string,
-  pipette_id: string,
-}
-export type RobotCalibrationCheckLabware = {
+  mount: string,
+  tiprack_id: string,
+  rank: RobotCalibrationCheckPipetteRank,
+|}
+export type RobotCalibrationCheckLabware = {|
   alternatives: Array<string>,
   slot: string,
   id: string,
-  forPipettes: Array<string>,
+  forMounts: Array<string>,
   loadName: string,
   namespace: string,
   version: number,
-}
+|}
+
+export type RobotCalibrationCheckComparison = {|
+  differenceVector: [number, number, number],
+  thresholdVector: [number, number, number],
+  exceedsThreshold: boolean,
+|}
 
 export type RobotCalibrationCheckSessionData = {|
-  instruments: { [string]: RobotCalibrationCheckInstrument },
+  instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
   currentStep: RobotCalibrationCheckStep,
-  nextSteps: {
-    links: { [RobotCalibrationCheckStep]: string },
+  nextSteps: {|
+    links: { [RobotCalibrationCheckStep]: string, ... },
+  |},
+  comparisonsByStep: {
+    [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
+    ...,
   },
   labware: Array<RobotCalibrationCheckLabware>,
 |}

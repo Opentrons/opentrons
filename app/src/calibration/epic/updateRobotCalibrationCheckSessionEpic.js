@@ -51,52 +51,43 @@ const mapActionToRequest: ActionToRequestMapper<UpdateRobotCalibrationCheckSessi
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PREPARE_PIPETTE}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     case ROBOT_CALIBRATION_CHECK_JOG: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_JOG}`,
-        body: {
-          pipetteId: action.payload.pipetteId,
-          vector: action.payload.vector,
-        },
+        body: { vector: action.payload.vector },
       }
     }
     case ROBOT_CALIBRATION_CHECK_PICK_UP_TIP: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_PICK_UP_TIP}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     case ROBOT_CALIBRATION_CHECK_COMPARE_POINT: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_COMPARE_POINT}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     case ROBOT_CALIBRATION_CHECK_CONFIRM_TIP: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_TIP}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     case ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_INVALIDATE_TIP}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     case ROBOT_CALIBRATION_CHECK_CONFIRM_STEP: {
       return {
         method: POST,
         path: `${ROBOT_CALIBRATION_CHECK_PATH}/${CHECK_UPDATE_PATH_CONFIRM_STEP}`,
-        body: { pipetteId: action.payload.pipetteId },
       }
     }
     default: {

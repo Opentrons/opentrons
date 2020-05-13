@@ -1,18 +1,13 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, type Mount } from '@opentrons/components'
-import { useDispatch } from 'react-redux'
+import cx from 'classnames'
+import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
 
-import type { Dispatch } from '../../types'
-import {
-  jogRobotCalibrationCheck,
-  comparePointRobotCalibrationCheck,
-  confirmStepRobotCalibrationCheck,
-} from '../../calibration'
+import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import { formatJogVector } from './utils'
+import { formatOffsetValue } from './utils'
 
 import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z_(640X480)_REV1.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z_(640X480)_REV1.webm'
@@ -31,7 +26,6 @@ const assetMap = {
 }
 
 const CHECK_Z_HEADER = 'Check the Z-axis'
-const CHECK_Z_BUTTON_TEXT = 'check z-axis'
 
 const JOG_UNTIL = 'Jog pipette until tip is'
 const JUST_BARELY = 'just barely'
@@ -42,39 +36,44 @@ const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
 
-const CONTINUE = 'continue'
+const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
+
+const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
+const GOOD_INSPECTING_HEADER = 'Good calibration'
+const BAD_INSPECTING_BODY =
+  'The jogged and calibrated z-axis co-ordinates do not match, and are out of acceptable bounds.'
+const GOOD_INSPECTING_BODY =
+  'The jogged and calibrated z-axis co-ordinates fall within acceptable bounds.'
+const DIFFERENCE = 'Difference'
 
 type CheckHeightProps = {|
-  pipetteId: string,
-  robotName: string,
   isMulti: boolean,
-  mount: Mount,
+  mount: Mount | null,
   isInspecting: boolean,
+  comparison: RobotCalibrationCheckComparison,
+  exit: () => void,
+  nextButtonText: string,
+  comparePoint: () => void,
+  goToNextCheck: () => void,
+  jog: (JogAxis, JogDirection, JogStep) => void,
 |}
 export function CheckHeight(props: CheckHeightProps) {
-  const { pipetteId, robotName, isMulti, mount, isInspecting } = props
+  const {
+    isMulti,
+    mount,
+    isInspecting,
+    comparison,
+    exit,
+    nextButtonText,
+    comparePoint,
+    goToNextCheck,
+    jog,
+  } = props
 
-  const dispatch = useDispatch<Dispatch>()
   const demoAsset = React.useMemo(
-    () => assetMap[mount][isMulti ? 'multi' : 'single'],
+    () => mount && assetMap[mount][isMulti ? 'multi' : 'single'],
     [mount, isMulti]
   )
-  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    dispatch(
-      jogRobotCalibrationCheck(
-        robotName,
-        pipetteId,
-        formatJogVector(axis, direction, step)
-      )
-    )
-  }
-
-  function comparePoint() {
-    dispatch(comparePointRobotCalibrationCheck(robotName, pipetteId))
-  }
-  function confirmStep() {
-    dispatch(confirmStepRobotCalibrationCheck(robotName, pipetteId))
-  }
 
   return (
     <>
@@ -82,17 +81,12 @@ export function CheckHeight(props: CheckHeightProps) {
         <h3>{CHECK_Z_HEADER}</h3>
       </div>
       {isInspecting ? (
-        <>
-          <div>IS INSPECTING!!</div>
-          <div className={styles.button_row}>
-            <PrimaryButton
-              onClick={confirmStep}
-              className={styles.pick_up_tip_button}
-            >
-              {CONTINUE}
-            </PrimaryButton>
-          </div>
-        </>
+        <CompareZ
+          comparison={comparison}
+          goToNextCheck={goToNextCheck}
+          exit={exit}
+          nextButtonText={nextButtonText}
+        />
       ) : (
         <>
           <div className={styles.tip_pick_up_demo_wrapper}>
@@ -123,13 +117,63 @@ export function CheckHeight(props: CheckHeightProps) {
           <div className={styles.button_row}>
             <PrimaryButton
               onClick={comparePoint}
-              className={styles.pick_up_tip_button}
+              className={styles.command_button}
             >
-              {CHECK_Z_BUTTON_TEXT}
+              {nextButtonText}
             </PrimaryButton>
           </div>
         </>
       )}
     </>
+  )
+}
+
+type CompareZProps = {|
+  comparison: RobotCalibrationCheckComparison,
+  goToNextCheck: () => void,
+  exit: () => void,
+  nextButtonText: string,
+|}
+function CompareZ(props: CompareZProps) {
+  const { comparison, goToNextCheck, exit, nextButtonText } = props
+  const { differenceVector, exceedsThreshold } = comparison
+
+  let header = GOOD_INSPECTING_HEADER
+  let body = GOOD_INSPECTING_BODY
+  let icon = <Icon name="check-circle" className={styles.success_status_icon} />
+  let differenceClass = styles.difference_good
+
+  if (exceedsThreshold) {
+    header = BAD_INSPECTING_HEADER
+    body = BAD_INSPECTING_BODY
+    icon = <Icon name="close-circle" className={styles.error_status_icon} />
+    differenceClass = styles.difference_bad
+  }
+
+  return (
+    <div className={styles.padded_contents_wrapper}>
+      <div className={styles.modal_icon_wrapper}>
+        {icon}
+        <h3>{header}</h3>
+      </div>
+      <p className={styles.difference_body}>{body}</p>
+      <div className={cx(styles.difference_wrapper, differenceClass)}>
+        <h5>{DIFFERENCE}</h5>
+        <div className={styles.difference_values}>
+          <div className={styles.difference_value_wrapper}>
+            <h5>Z</h5>
+            <span className={cx(styles.difference_value, differenceClass)}>
+              {formatOffsetValue(differenceVector[2])}
+            </span>
+          </div>
+        </div>
+      </div>
+      <div className={styles.button_stack}>
+        {exceedsThreshold && (
+          <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+        )}
+        <PrimaryButton onClick={goToNextCheck}>{nextButtonText}</PrimaryButton>
+      </div>
+    </div>
   )
 }

@@ -1,9 +1,15 @@
 @import '@opentrons/components';
 
-.status_icon {
+.success_status_icon {
   width: 2.5rem;
   margin-right: 0.75rem;
   color: var(--c-success);
+}
+
+.error_status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-error);
 }
 
 .modal_header {
@@ -37,9 +43,31 @@
   margin: 1rem 0 2rem 0;
 }
 
+.error_explanation {
+  @apply --font-body-2-dark;
+
+  margin: 0.75rem 0;
+}
+
+.padded_contents_wrapper {
+  margin: 1rem 3rem;
+}
+
+.bad_cal_body {
+  margin: 0 0 2rem 0;
+}
+
 .button_row {
   width: 100%;
   display: flex;
+}
+
+.button_stack {
+  margin: 1rem 0;
+}
+
+.button_stack > button {
+  margin: 0.5rem 0;
 }
 
 .continue_button {
@@ -202,7 +230,7 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
   margin: 0 1rem;
 }
 
-.pick_up_tip_button {
+.command_button {
   margin: 0 5rem;
 }
 
@@ -237,4 +265,56 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .loading_spinner {
   width: 7.5rem;
   margin-bottom: 3rem;
+}
+
+.difference_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  border-radius: var(--bd-radius-default);
+  border-width: var(--bd-width-default);
+  border-style: solid;
+  padding: 0.5rem;
+  max-width: 18rem;
+  margin: 1rem 0 2rem 0;
+}
+
+.difference_values {
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-end;
+  align-items: center;
+  min-width: 8rem;
+}
+
+.difference_value_wrapper {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  width: 4rem;
+  margin-left: 2rem;
+}
+
+.difference_value.difference_good {
+  color: var(--c-success);
+}
+
+.difference_value.difference_bad {
+  color: var(--c-error);
+}
+
+.difference_wrapper.difference_good {
+  border-color: var(--c-success);
+}
+
+.difference_wrapper.difference_bad {
+  border-color: var(--c-error);
+}
+
+.difference_body {
+  @apply --font-body-2-dark;
+
+  margin: 1rem 0;
 }

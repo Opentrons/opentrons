@@ -1,62 +1,55 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-} from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
 
 import { CheckHeight } from '../CheckHeight'
 
 describe('CheckHeight', () => {
   let render
-  let mockStore
 
-  const getConfirmButton = wrapper =>
-    wrapper.find('PrimaryButton[children="check z-axis"]').find('button')
+  const mockComparePoint = jest.fn()
+  const mockGoToNextCheck = jest.fn()
+  const mockJog = jest.fn()
+  const mockExit = jest.fn()
 
   const getContinueButton = wrapper =>
-    wrapper.find('PrimaryButton[children="continue"]').find('button')
+    wrapper.find('PrimaryButton[children="Go To Next Check"]').find('button')
 
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
+  const getExitButton = wrapper =>
+    wrapper
+      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
+      .find('button')
+
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (props = {}) => {
       const {
-        pipetteId = Object.keys(
-          mockRobotCalibrationCheckSessionData.instruments
-        )[0],
-        robotName = mockRobot.name,
         isMulti = false,
         isInspecting = false,
         mountProp = 'left',
+        comparison = {
+          differenceVector: [0, 0, 0],
+          thresholdVector: [1, 1, 1],
+          exceedsThreshold: false,
+        },
       } = props
       return mount(
         <CheckHeight
-          pipetteId={pipetteId}
-          robotName={robotName}
           isMulti={isMulti}
           isInspecting={isInspecting}
+          comparison={comparison}
           mount={mountProp}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+          nextButtonText="Go To Next Check"
+          comparePoint={mockComparePoint}
+          goToNextCheck={mockGoToNextCheck}
+          jog={mockJog}
+          exit={mockExit}
+        />
       )
     }
   })
@@ -93,21 +86,15 @@ describe('CheckHeight', () => {
     const wrapper = render()
 
     const jogDirections = ['up', 'down']
-    const jogVectorsByDirection = {
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
+    const jogParamsByDirection = {
+      up: ['z', 1, 0.1],
+      down: ['z', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
-        Calibration.jogRobotCalibrationCheck(
-          mockRobot.name,
-          'abc123_pipette_uuid',
-          jogVectorsByDirection[direction]
-        )
-      )
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     const unavailableJogDirections = ['left', 'right', 'back', 'forward']
@@ -119,15 +106,10 @@ describe('CheckHeight', () => {
   it('compares check step when primary button is clicked', () => {
     const wrapper = render()
 
-    act(() => getConfirmButton(wrapper).invoke('onClick')())
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.comparePointRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockComparePoint).toHaveBeenCalled()
   })
 
   it('confirms check step when isInspecting and primary button is clicked', () => {
@@ -136,11 +118,27 @@ describe('CheckHeight', () => {
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmStepRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockGoToNextCheck).toHaveBeenCalled()
+  })
+
+  it('no exit button when isInspecting not exceeded threshold', () => {
+    const wrapper = render({ isInspecting: true })
+
+    expect(getExitButton(wrapper).exists()).toBe(false)
+  })
+
+  it('exits when isInspecting and exit button is clicked', () => {
+    const wrapper = render({
+      isInspecting: true,
+      comparison: {
+        differenceVector: [0, 0, 0],
+        thresholdVector: [1, 1, 1],
+        exceedsThreshold: true,
+      },
+    })
+    act(() => getExitButton(wrapper).invoke('onClick')())
+    wrapper.update()
+
+    expect(mockExit).toHaveBeenCalled()
   })
 })

@@ -8,11 +8,12 @@ import type { RobotCalibrationCheckSessionData } from './api-types'
 import * as Constants from './constants'
 
 export const createRobotCalibrationCheckSession = (
-  robotName: string
+  robotName: string,
+  meta: RobotApiRequestMeta = {}
 ): Types.CreateRobotCalibrationCheckSessionAction => ({
   type: Constants.CREATE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName },
-  meta: {},
+  meta,
 })
 
 export const createRobotCalibrationCheckSessionSuccess = (
@@ -72,66 +73,59 @@ export const loadLabwareRobotCalibrationCheck = (
 })
 
 export const preparePipetteRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckPreparePipetteAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
 export const jogRobotCalibrationCheck = (
   robotName: string,
-  pipetteId: string,
   vector: Types.JogVector
 ): Types.RobotCalibrationCheckJogAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_JOG,
-  payload: { robotName, pipetteId, vector },
+  payload: { robotName, vector },
   meta: {},
 })
 
 export const pickUpTipRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckPickUpTipAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
 export const confirmTipRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckConfirmTipAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
 export const comparePointRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckComparePointAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
 export const confirmStepRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckConfirmStepAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
 export const invalidateTipRobotCalibrationCheck = (
-  robotName: string,
-  pipetteId: string
+  robotName: string
 ): Types.RobotCalibrationCheckInvalidateTipAction => ({
   type: Constants.ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
-  payload: { robotName, pipetteId },
+  payload: { robotName },
   meta: {},
 })
 
@@ -157,11 +151,12 @@ export const updateRobotCalibrationCheckSessionFailure = (
 
 export const deleteRobotCalibrationCheckSession = (
   robotName: string,
-  recreate: boolean = false
+  recreate: boolean = false,
+  meta: RobotApiRequestMeta = {}
 ): Types.DeleteRobotCalibrationCheckSessionAction => ({
   type: Constants.DELETE_ROBOT_CALIBRATION_CHECK_SESSION,
   payload: { robotName, recreate },
-  meta: {},
+  meta,
 })
 
 export const deleteRobotCalibrationCheckSessionSuccess = (

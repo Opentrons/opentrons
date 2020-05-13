@@ -1,13 +1,8 @@
 // @flow
 import * as React from 'react'
-import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import * as Calibration from '../../../calibration'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-} from '../../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
 
 import { DeckSetup } from '../DeckSetup'
 
@@ -18,32 +13,17 @@ jest.mock('@opentrons/components/src/deck/RobotWorkSpace', () => ({
 }))
 
 describe('DeckSetup', () => {
-  let mockStore
   let render
 
-  const activeInstrumentId = Object.keys(
-    mockRobotCalibrationCheckSessionData.instruments
-  )[0]
+  const mockProceed = jest.fn()
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
     render = () => {
       return mount(
         <DeckSetup
           labware={mockRobotCalibrationCheckSessionData.labware}
-          robotName={mockRobot.name}
-          activeInstrumentId={activeInstrumentId}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+          proceed={mockProceed}
+        />
       )
     }
   })
@@ -58,11 +38,6 @@ describe('DeckSetup', () => {
     act(() => wrapper.find('button').invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.preparePipetteRobotCalibrationCheck(
-        mockRobot.name,
-        activeInstrumentId
-      )
-    )
+    expect(mockProceed).toHaveBeenCalled()
   })
 })

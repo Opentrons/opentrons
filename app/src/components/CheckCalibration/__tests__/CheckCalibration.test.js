@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
+import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
@@ -23,7 +24,9 @@ jest.mock('../../../calibration/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
+  childProps?: {},
   currentStep: Calibration.RobotCalibrationCheckStep,
+  ...
 }
 const getRobotCalibrationCheckSession: JestMockFn<
   [State, string],
@@ -38,6 +41,7 @@ const mockGetDeckDefinitions: JestMockFn<
 describe('CheckCalibration', () => {
   let mockStore
   let render
+  let dispatch
 
   const mockCloseCalibrationCheck = jest.fn()
 
@@ -76,12 +80,13 @@ describe('CheckCalibration', () => {
   ]
 
   beforeEach(() => {
+    dispatch = jest.fn()
     mockStore = {
       subscribe: () => {},
       getState: () => ({
-        mockState: true,
+        robotApi: {},
       }),
-      dispatch: jest.fn(),
+      dispatch,
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
@@ -108,9 +113,11 @@ describe('CheckCalibration', () => {
       mockRobotCalibrationCheckSessionData
     )
     render()
-
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.fetchRobotCalibrationCheckSession('robot-name')
+      expect.objectContaining({
+        ...Calibration.fetchRobotCalibrationCheckSession('robot-name'),
+        meta: { requestId: expect.any(String) },
+      })
     )
   })
 
@@ -135,10 +142,16 @@ describe('CheckCalibration', () => {
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {
     const wrapper = render()
 
-    getBackButton(wrapper).invoke('onClick')()
+    act(() => {
+      getBackButton(wrapper).invoke('onClick')()
+    })
+    wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.deleteRobotCalibrationCheckSession('robot-name')
+      expect.objectContaining({
+        ...Calibration.deleteRobotCalibrationCheckSession('robot-name'),
+        meta: { requestId: expect.any(String) },
+      })
     )
     expect(mockCloseCalibrationCheck).toHaveBeenCalled()
   })

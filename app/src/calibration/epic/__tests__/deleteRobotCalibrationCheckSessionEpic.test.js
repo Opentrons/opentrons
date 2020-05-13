@@ -2,6 +2,7 @@
 import { TestScheduler } from 'rxjs/testing'
 
 import * as RobotApiHttp from '../../../robot-api/http'
+import { mockRequestMeta } from '../../../robot-api/__fixtures__'
 import * as DiscoverySelectors from '../../../discovery/selectors'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
@@ -112,7 +113,8 @@ describe('deleteRobotCalibrationCheckSessionEpic', () => {
     it('maps success response with recreate to CREATE_ROBOT_CALIBRATION_CHECK_SESSION', () => {
       const recreateAction = Actions.deleteRobotCalibrationCheckSession(
         mockRobot.name,
-        true
+        true,
+        { requestId: mockRequestMeta.requestId }
       )
 
       testScheduler.run(({ hot, cold, expectObservable, flush }) => {
@@ -125,7 +127,10 @@ describe('deleteRobotCalibrationCheckSessionEpic', () => {
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Actions.createRobotCalibrationCheckSession(mockRobot.name),
+          a: Actions.createRobotCalibrationCheckSession(
+            mockRobot.name,
+            mockRequestMeta
+          ),
         })
       })
     })

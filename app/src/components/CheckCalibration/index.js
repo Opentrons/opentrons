@@ -1,20 +1,332 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { ModalPage, Icon } from '@opentrons/components'
+import last from 'lodash/last'
+import {
+  ModalPage,
+  SpinnerModal,
+  LEFT,
+  RIGHT,
+  type Mount,
+} from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
+import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
+import type { RequestState } from '../../robot-api/types'
 import * as Calibration from '../../calibration'
+import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
 import { CompleteConfirmation } from './CompleteConfirmation'
-import styles from './styles.css'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
+import { BadCalibration } from './BadCalibration'
+import { formatJogVector } from './utils'
+import styles from './styles.css'
 
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
+const MOVE_TO_NEXT = 'move to next check'
+const CONTINUE = 'continue'
+const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip and continue to 2nd pipette'
+const CHECK_X_Y_AXES = 'check x and y-axis'
+const CHECK_Z_AXIS = 'check z-axis'
+
+type CheckCalibrationProps = {|
+  robotName: string,
+  closeCalibrationCheck: () => mixed,
+|}
+export function CheckCalibration(props: CheckCalibrationProps) {
+  const { robotName, closeCalibrationCheck } = props
+  const dispatch = useDispatch<Dispatch>()
+  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+
+  const requestStatus = useSelector<State, RequestState | null>(state =>
+    getRequestById(state, last(requestIds))
+  )?.status
+  const pending = requestStatus === PENDING
+
+  const { currentStep, labware, instruments, comparisonsByStep } =
+    useSelector((state: State) =>
+      Calibration.getRobotCalibrationCheckSession(state, robotName)
+    ) || {}
+  React.useEffect(() => {
+    dispatchRequest(Calibration.fetchRobotCalibrationCheckSession(robotName))
+  }, [dispatchRequest, robotName])
+
+  const hasTwoPipettes = React.useMemo(
+    () => instruments && Object.keys(instruments).length === 2,
+    [instruments]
+  )
+
+  const activeInstrument = React.useMemo(() => {
+    const rank = getPipetteRankForStep(currentStep)
+    const activeInstrId =
+      instruments &&
+      Object.keys(instruments).find(mount =>
+        mount ? instruments[mount]?.rank === rank : null
+      )
+    return activeInstrId && instruments[activeInstrId]
+  }, [currentStep, instruments])
+
+  const activeMount: Mount | null = React.useMemo(() => {
+    const rawMount = activeInstrument && activeInstrument.mount.toLowerCase()
+    return [LEFT, RIGHT].find(m => m === rawMount) || null
+  }, [activeInstrument])
+
+  const activeLabware = React.useMemo(
+    () =>
+      labware &&
+      activeInstrument &&
+      labware.find(l => l.id === activeInstrument.tiprack_id),
+    [labware, activeInstrument]
+  )
+  const isActiveInstrumentMultiChannel = React.useMemo(() => {
+    const spec =
+      instruments &&
+      activeInstrument &&
+      getPipetteModelSpecs(activeInstrument?.model)
+    return spec ? spec.channels > 1 : false
+  }, [activeInstrument, instruments])
+
+  const tipRackWellName: string = React.useMemo(() => {
+    const instr_ids = instruments ? Object.keys(instruments) : []
+    if (!activeInstrument) {
+      return ''
+    } else if (
+      hasTwoPipettes &&
+      instruments[instr_ids[0]]?.tiprack_id ===
+        instruments[instr_ids[1]]?.tiprack_id &&
+      activeInstrument.mount.toLowerCase() === LEFT
+    ) {
+      return 'B1'
+    } else if (instr_ids.length > 0) {
+      return 'A1'
+    } else {
+      return ''
+    }
+  }, [instruments, activeInstrument, hasTwoPipettes])
+
+  function exit() {
+    dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
+    closeCalibrationCheck()
+  }
+
+  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
+    dispatch(
+      Calibration.jogRobotCalibrationCheck(
+        robotName,
+        formatJogVector(axis, direction, step)
+      )
+    )
+  }
+  function comparePoint() {
+    dispatch(Calibration.comparePointRobotCalibrationCheck(robotName))
+  }
+
+  let stepContents
+  let modalContentsClassName = styles.modal_contents
+
+  switch (currentStep) {
+    case Calibration.CHECK_STEP_SESSION_STARTED: {
+      stepContents = (
+        <Introduction
+          exit={exit}
+          proceed={() => {
+            dispatchRequest(
+              Calibration.loadLabwareRobotCalibrationCheck(robotName)
+            )
+          }}
+          labwareLoadNames={labware.map(l => l.loadName)}
+        />
+      )
+      break
+    }
+    case Calibration.CHECK_STEP_LABWARE_LOADED: {
+      stepContents = (
+        <DeckSetup
+          proceed={() =>
+            dispatchRequest(
+              Calibration.preparePipetteRobotCalibrationCheck(robotName)
+            )
+          }
+          labware={labware}
+        />
+      )
+      modalContentsClassName = styles.page_content_dark
+      break
+    }
+    case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
+    case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE: {
+      const isInspecting = [
+        Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
+        Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
+      ].includes(currentStep)
+
+      stepContents = activeLabware ? (
+        <TipPickUp
+          tiprack={activeLabware}
+          isMulti={isActiveInstrumentMultiChannel}
+          isInspecting={isInspecting}
+          tipRackWellName={tipRackWellName}
+          pickUpTip={() => {
+            dispatchRequest(
+              Calibration.pickUpTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          confirmTip={() => {
+            dispatchRequest(
+              Calibration.confirmTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          invalidateTip={() => {
+            dispatchRequest(
+              Calibration.invalidateTipRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
+        />
+      ) : null
+      break
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      const slotNumber = getSlotNumberFromStep(currentStep)
+
+      const isInspecting = [
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+      ].includes(currentStep)
+      const nextButtonText = getNextButtonTextForStep(
+        currentStep,
+        hasTwoPipettes
+      )
+      stepContents = (
+        <CheckXYPoint
+          slotNumber={slotNumber}
+          isMulti={isActiveInstrumentMultiChannel}
+          mount={activeMount}
+          exit={exit}
+          isInspecting={isInspecting}
+          comparison={comparisonsByStep[currentStep]}
+          nextButtonText={nextButtonText}
+          comparePoint={comparePoint}
+          goToNextCheck={() => {
+            dispatchRequest(
+              Calibration.confirmStepRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
+        />
+      )
+      break
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+      const isInspecting = [
+        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+      ].includes(currentStep)
+      const nextButtonText = getNextButtonTextForStep(
+        currentStep,
+        hasTwoPipettes
+      )
+      stepContents = (
+        <CheckHeight
+          isMulti={isActiveInstrumentMultiChannel}
+          mount={activeMount}
+          isInspecting={isInspecting}
+          comparison={comparisonsByStep[currentStep]}
+          nextButtonText={nextButtonText}
+          exit={exit}
+          comparePoint={comparePoint}
+          goToNextCheck={() => {
+            dispatchRequest(
+              Calibration.confirmStepRobotCalibrationCheck(robotName)
+            )
+          }}
+          jog={jog}
+        />
+      )
+      break
+    }
+    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
+      stepContents = <BadCalibration exit={exit} />
+      break
+    }
+    case Calibration.CHECK_STEP_SESSION_EXITED:
+    case Calibration.CHECK_STEP_CHECK_COMPLETE:
+    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
+      stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
+      modalContentsClassName = styles.terminal_modal_contents
+      break
+    }
+    default: {
+      stepContents = <SpinnerModal />
+    }
+  }
+
+  return (
+    <ModalPage
+      titleBar={{
+        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+        back: { onClick: exit },
+      }}
+      contentsClassName={modalContentsClassName}
+    >
+      {pending ? <SpinnerModal /> : stepContents}
+    </ModalPage>
+  )
+}
+
+// helpers
+
+const getNextButtonTextForStep = (
+  step: Calibration.RobotCalibrationCheckStep,
+  hasTwoPipettes: boolean
+): string => {
+  switch (step) {
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE: {
+      return CHECK_X_Y_AXES
+    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT: {
+      return CHECK_Z_AXIS
+    }
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+      return MOVE_TO_NEXT
+    }
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return hasTwoPipettes ? DROP_TIP_AND_DO_SECOND_PIPETTE : CONTINUE
+    }
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return CONTINUE
+    }
+    default: {
+      // should never reach this case, func only called when currentStep listed above
+      return ''
+    }
+  }
+}
 
 const getSlotNumberFromStep = (
   step: Calibration.RobotCalibrationCheckStep
@@ -35,180 +347,37 @@ const getSlotNumberFromStep = (
       return '7'
     }
     default:
-      // should never reach this case, as func only called when currentStep listed above
+      // should never reach this case, func only called when currentStep listed above
       return ''
   }
 }
 
-type CheckCalibrationProps = {|
-  robotName: string,
-  closeCalibrationCheck: () => mixed,
-|}
-export function CheckCalibration(props: CheckCalibrationProps) {
-  const { robotName, closeCalibrationCheck } = props
-  const dispatch = useDispatch<Dispatch>()
-
-  const { currentStep, labware, instruments } =
-    useSelector((state: State) =>
-      Calibration.getRobotCalibrationCheckSession(state, robotName)
-    ) || {}
-  React.useEffect(() => {
-    dispatch(Calibration.fetchRobotCalibrationCheckSession(robotName))
-  }, [dispatch, robotName])
-
-  // TODO: BC: once robot keeps track of active pipette, grab that
-  // from the cal check session status instead of arbitrarily
-  // defaulting to the first pipette
-  const activeInstrumentId = React.useMemo(
-    () => instruments && Object.keys(instruments)[0],
-    [instruments]
-  )
-  const activeLabware = React.useMemo(
-    () =>
-      labware && labware.find(l => l.forPipettes.includes(activeInstrumentId)),
-    [labware, activeInstrumentId]
-  )
-  const isActiveInstrumentMultiChannel = React.useMemo(() => {
-    const spec =
-      instruments &&
-      getPipetteModelSpecs(instruments[activeInstrumentId]?.model)
-    return spec ? spec.channels > 1 : false
-  }, [activeInstrumentId, instruments])
-  // TODO: BC: once api returns real values for instrument.mount_axis
-  // infer active mount from activeInstrument
-  const activeMount = 'left'
-
-  function exit() {
-    dispatch(Calibration.deleteRobotCalibrationCheckSession(robotName))
-    closeCalibrationCheck()
-  }
-
-  let stepContents
-  let modalContentsClassName = styles.modal_contents
-
-  switch (currentStep) {
-    case Calibration.CHECK_STEP_SESSION_STARTED: {
-      stepContents = (
-        <Introduction
-          exit={exit}
-          robotName={robotName}
-          labwareLoadNames={labware.map(l => l.loadName)}
-        />
-      )
-      break
-    }
-    case Calibration.CHECK_STEP_LABWARE_LOADED: {
-      stepContents = (
-        <DeckSetup
-          robotName={robotName}
-          activeInstrumentId={activeInstrumentId}
-          labware={labware}
-        />
-      )
-      modalContentsClassName = styles.page_content_dark
-      break
-    }
+const getPipetteRankForStep = (
+  step: Calibration.RobotCalibrationCheckStep
+): string => {
+  switch (step) {
     case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
     case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
-    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
-    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE: {
-      const isInspecting = [
-        Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
-        Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
-      ].includes(currentStep)
-      stepContents =
-        activeInstrumentId && activeLabware ? (
-          <TipPickUp
-            tiprack={activeLabware}
-            robotName={robotName}
-            pipetteId={activeInstrumentId}
-            isMulti={isActiveInstrumentMultiChannel}
-            isInspecting={isInspecting}
-          />
-        ) : null
-      break
-    }
+    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
+    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return 'first'
+    }
+    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE:
+    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT:
     case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      const slotNumber = getSlotNumberFromStep(currentStep)
-
-      const isInspecting = [
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
-        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
-      ].includes(currentStep)
-      stepContents =
-        activeInstrumentId && slotNumber != null ? (
-          <CheckXYPoint
-            robotName={robotName}
-            pipetteId={activeInstrumentId}
-            slotNumber={slotNumber}
-            isMulti={isActiveInstrumentMultiChannel}
-            mount={activeMount}
-            isInspecting={isInspecting}
-          />
-        ) : null
-      break
+      return 'second'
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
-      const isInspecting = [
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
-        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
-      ].includes(currentStep)
-
-      stepContents = activeInstrumentId ? (
-        <CheckHeight
-          robotName={robotName}
-          pipetteId={activeInstrumentId}
-          isMulti={isActiveInstrumentMultiChannel}
-          mount={activeMount}
-          isInspecting={isInspecting}
-        />
-      ) : null
-      break
-    }
-    case Calibration.CHECK_STEP_SESSION_EXITED:
-    case Calibration.CHECK_STEP_CHECK_COMPLETE:
-    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION:
-    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      // TODO: BC: get real complete state name after it is update on server side
-      stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
-      modalContentsClassName = styles.terminal_modal_contents
-      break
-    }
-    default: {
-      // TODO: BC next, this null state is visible when either:
-      // 1. session accession errors
-      // 2. session accession is loading
-      // both should probably be handled with some sort of UI
-      // affordance in the future.
-      stepContents = (
-        <div className={styles.modal_contents}>
-          <Icon name="ot-spinner" className={styles.loading_spinner} spin />
-        </div>
-      )
-    }
+    default:
+      // should never reach this case, func only called when currentStep listed above
+      return ''
   }
-
-  return (
-    <ModalPage
-      titleBar={{
-        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-        back: { onClick: exit },
-      }}
-      contentsClassName={modalContentsClassName}
-    >
-      {stepContents}
-    </ModalPage>
-  )
 }

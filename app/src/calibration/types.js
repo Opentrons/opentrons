@@ -69,43 +69,43 @@ export type RobotCalibrationCheckLoadLabwareAction = {|
 
 export type RobotCalibrationCheckPreparePipetteAction = {|
   type: ROBOT_CALIBRATION_CHECK_PREPARE_PIPETTE,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckJogAction = {|
   type: ROBOT_CALIBRATION_CHECK_JOG,
-  payload: {| robotName: string, pipetteId: string, vector: JogVector |},
+  payload: {| robotName: string, vector: JogVector |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckPickUpTipAction = {|
   type: ROBOT_CALIBRATION_CHECK_PICK_UP_TIP,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckConfirmTipAction = {|
   type: ROBOT_CALIBRATION_CHECK_CONFIRM_TIP,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckInvalidateTipAction = {|
   type: ROBOT_CALIBRATION_CHECK_INVALIDATE_TIP,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckComparePointAction = {|
   type: ROBOT_CALIBRATION_CHECK_COMPARE_POINT,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 
 export type RobotCalibrationCheckConfirmStepAction = {|
   type: ROBOT_CALIBRATION_CHECK_CONFIRM_STEP,
-  payload: {| robotName: string, pipetteId: string |},
+  payload: {| robotName: string |},
   meta: RobotApiRequestMeta,
 |}
 

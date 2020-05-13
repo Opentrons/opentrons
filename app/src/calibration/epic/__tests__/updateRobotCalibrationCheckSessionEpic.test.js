@@ -26,7 +26,6 @@ const mockGetRobotByName: JestMockFn<[any, string], mixed> =
 
 const mockRobot = Fixtures.mockRobot
 const mockState = { state: true }
-const mockPipetteId = 'abc123_pipette'
 
 describe('updateRobotCalibrationCheckSessionEpic', () => {
   let testScheduler
@@ -49,53 +48,29 @@ describe('updateRobotCalibrationCheckSessionEpic', () => {
       pathExtension: 'loadLabware',
     },
     {
-      action: Actions.preparePipetteRobotCalibrationCheck(
-        mockRobot.name,
-        mockPipetteId
-      ),
+      action: Actions.preparePipetteRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'preparePipette',
-      body: { pipetteId: mockPipetteId },
     },
     {
-      action: Actions.jogRobotCalibrationCheck(mockRobot.name, mockPipetteId, [
-        1,
-        0,
-        0,
-      ]),
+      action: Actions.jogRobotCalibrationCheck(mockRobot.name, [1, 0, 0]),
       pathExtension: 'jog',
-      body: { pipetteId: mockPipetteId, vector: [1, 0, 0] },
+      body: { vector: [1, 0, 0] },
     },
     {
-      action: Actions.pickUpTipRobotCalibrationCheck(
-        mockRobot.name,
-        mockPipetteId
-      ),
+      action: Actions.pickUpTipRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'pickUpTip',
-      body: { pipetteId: mockPipetteId },
     },
     {
-      action: Actions.confirmTipRobotCalibrationCheck(
-        mockRobot.name,
-        mockPipetteId
-      ),
+      action: Actions.confirmTipRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'confirmTip',
-      body: { pipetteId: mockPipetteId },
     },
     {
-      action: Actions.invalidateTipRobotCalibrationCheck(
-        mockRobot.name,
-        mockPipetteId
-      ),
+      action: Actions.invalidateTipRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'invalidateTip',
-      body: { pipetteId: mockPipetteId },
     },
     {
-      action: Actions.confirmStepRobotCalibrationCheck(
-        mockRobot.name,
-        mockPipetteId
-      ),
+      action: Actions.confirmStepRobotCalibrationCheck(mockRobot.name),
       pathExtension: 'confirmStep',
-      body: { pipetteId: mockPipetteId },
     },
   ]
 

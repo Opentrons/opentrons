@@ -29,7 +29,7 @@ def test_create_session_response(hardware):
 
     labware = {
         uuid4(): LabwareInfo(alternatives=["a", "b"],
-                             forPipettes=[uuid4()],
+                             forMounts=[Mount.LEFT, Mount.RIGHT],
                              loadName="loadname1",
                              slot="slot1",
                              namespace="namespace1",
@@ -59,7 +59,7 @@ def test_create_session_response(hardware):
         },
         'labware': [{
             'alternatives': lw.alternatives,
-            'forPipettes': lw.forPipettes,
+            'forMounts': lw.forMounts,
             'loadName': lw.loadName,
             'slot': lw.slot,
             'namespace': lw.namespace,

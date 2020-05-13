@@ -1,23 +1,18 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
 import type { Mount } from '@opentrons/components'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-} from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
 
 import { CheckXYPoint } from '../CheckXYPoint'
 
 describe('CheckXYPoint', () => {
   let render
-  let mockStore
 
-  const getConfirmButton = wrapper =>
-    wrapper.find('PrimaryButton[children="check x and y-axis"]').find('button')
+  const mockComparePoint = jest.fn()
+  const mockGoToNextCheck = jest.fn()
+  const mockJog = jest.fn()
+  const mockExit = jest.fn()
 
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="continue"]').find('button')
@@ -28,38 +23,32 @@ describe('CheckXYPoint', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (props: $Shape<React.ElementProps<typeof CheckXYPoint>> = {}) => {
       const {
-        pipetteId = Object.keys(
-          mockRobotCalibrationCheckSessionData.instruments
-        )[0],
-        robotName = mockRobot.name,
         slotNumber = '1',
         isMulti = false,
         mount: mountProp = 'left',
         isInspecting = false,
+        comparison = {
+          differenceVector: [0, 0, 0],
+          thresholdVector: [1, 1, 1],
+          exceedsThreshold: false,
+        },
+        nextButtonText = 'continue',
       } = props
       return mount(
         <CheckXYPoint
-          pipetteId={pipetteId}
-          robotName={robotName}
           slotNumber={slotNumber}
           isMulti={isMulti}
           mount={mountProp}
           isInspecting={isInspecting}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+          comparison={comparison}
+          nextButtonText={nextButtonText}
+          exit={mockExit}
+          comparePoint={mockComparePoint}
+          goToNextCheck={mockGoToNextCheck}
+          jog={mockJog}
+        />
       )
     }
   })
@@ -133,23 +122,17 @@ describe('CheckXYPoint', () => {
     const wrapper = render()
 
     const jogDirections = ['left', 'right', 'back', 'forward']
-    const jogVectorsByDirection = {
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
+    const jogParamsByDirection = {
+      left: ['x', -1, 0.1],
+      right: ['x', 1, 0.1],
+      back: ['y', 1, 0.1],
+      forward: ['y', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
-        Calibration.jogRobotCalibrationCheck(
-          mockRobot.name,
-          'abc123_pipette_uuid',
-          jogVectorsByDirection[direction]
-        )
-      )
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     const unavailableJogDirections = ['up', 'down']
@@ -161,15 +144,10 @@ describe('CheckXYPoint', () => {
   it('compares check step when primary button is clicked', () => {
     const wrapper = render()
 
-    act(() => getConfirmButton(wrapper).invoke('onClick')())
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.comparePointRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockComparePoint).toHaveBeenCalled()
   })
 
   it('confirms check step when isInspecting and primary button is clicked', () => {
@@ -178,11 +156,6 @@ describe('CheckXYPoint', () => {
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmStepRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockGoToNextCheck).toHaveBeenCalled()
   })
 })

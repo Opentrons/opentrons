@@ -102,8 +102,8 @@ export const CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: 'comparingSecondPipe
   'comparingSecondPipettePointOne'
 export const CHECK_STEP_CHECK_COMPLETE: 'checkComplete' = 'checkComplete'
 export const CHECK_STEP_SESSION_EXITED: 'sessionExited' = 'sessionExited'
-export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badRobotCalibration' =
-  'badRobotCalibration'
+export const CHECK_STEP_BAD_ROBOT_CALIBRATION: 'badCalibrationData' =
+  'badCalibrationData'
 export const CHECK_STEP_NO_PIPETTES_ATTACHED: 'noPipettesAttached' =
   'noPipettesAttached'
 

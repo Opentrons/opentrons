@@ -1,19 +1,17 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { Provider } from 'react-redux'
 import { act } from 'react-dom/test-utils'
-import {
-  mockRobotCalibrationCheckSessionData,
-  mockRobot,
-} from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
-
+import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
 import { TipPickUp } from '../TipPickUp'
 
 describe('TipPickUp', () => {
   let render
-  let mockStore
+
+  const mockPickUpTip = jest.fn()
+  const mockConfirmTip = jest.fn()
+  const mockInvalidateTip = jest.fn()
+  const mockJog = jest.fn()
 
   const getContinueButton = wrapper =>
     wrapper.find('PrimaryButton[children="Pick up tip"]').find('button')
@@ -30,36 +28,24 @@ describe('TipPickUp', () => {
     wrapper.find('PrimaryButton[children="No, try again"]').find('button')
 
   beforeEach(() => {
-    mockStore = {
-      subscribe: () => {},
-      getState: () => ({
-        mockState: true,
-      }),
-      dispatch: jest.fn(),
-    }
-
     render = (props = {}) => {
       const {
-        pipetteId = Object.keys(
-          mockRobotCalibrationCheckSessionData.instruments
-        )[0],
         isMulti = false,
         tiprack = mockRobotCalibrationCheckSessionData.labware[0],
-        robotName = mockRobot.name,
         isInspecting = false,
+        tipRackWellName = 'A1',
       } = props
       return mount(
         <TipPickUp
-          pipetteId={pipetteId}
           isMulti={isMulti}
           tiprack={tiprack}
-          robotName={robotName}
           isInspecting={isInspecting}
-        />,
-        {
-          wrappingComponent: Provider,
-          wrappingComponentProps: { store: mockStore },
-        }
+          tipRackWellName={tipRackWellName}
+          confirmTip={mockConfirmTip}
+          invalidateTip={mockInvalidateTip}
+          pickUpTip={mockPickUpTip}
+          jog={mockJog}
+        />
       )
     }
   })
@@ -71,36 +57,25 @@ describe('TipPickUp', () => {
     const wrapper = render()
 
     const jogDirections = ['left', 'right', 'back', 'forward', 'up', 'down']
-    const jogVectorsByDirection = {
-      left: [-0.1, 0, 0],
-      right: [0.1, 0, 0],
-      back: [0, 0.1, 0],
-      forward: [0, -0.1, 0],
-      up: [0, 0, 0.1],
-      down: [0, 0, -0.1],
+    const jogParamsByDirection = {
+      left: ['x', -1, 0.1],
+      right: ['x', 1, 0.1],
+      back: ['y', 1, 0.1],
+      forward: ['y', -1, 0.1],
+      up: ['z', 1, 0.1],
+      down: ['z', -1, 0.1],
     }
     jogDirections.forEach(direction => {
       act(() => getJogButton(wrapper, direction).invoke('onClick')())
       wrapper.update()
 
-      expect(mockStore.dispatch).toHaveBeenCalledWith(
-        Calibration.jogRobotCalibrationCheck(
-          mockRobot.name,
-          'abc123_pipette_uuid',
-          jogVectorsByDirection[direction]
-        )
-      )
+      expect(mockJog).toHaveBeenCalledWith(...jogParamsByDirection[direction])
     })
 
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.pickUpTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockPickUpTip).toHaveBeenCalled()
   })
 
   it('gives option to continue or invalidate tip if inspecting', () => {
@@ -109,21 +84,11 @@ describe('TipPickUp', () => {
     act(() => getConfirmButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.confirmTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockConfirmTip).toHaveBeenCalled()
 
     act(() => getRejectButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      Calibration.invalidateTipRobotCalibrationCheck(
-        mockRobot.name,
-        'abc123_pipette_uuid'
-      )
-    )
+    expect(mockInvalidateTip).toHaveBeenCalled()
   })
 })
