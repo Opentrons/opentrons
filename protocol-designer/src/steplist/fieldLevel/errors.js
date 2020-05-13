@@ -1,6 +1,6 @@
 // @flow
 import isArray from 'lodash/isArray'
-
+import { i18n } from '../../localization'
 /*******************
  ** Error Messages **
  ********************/
@@ -14,6 +14,7 @@ export type FieldError =
   | 'UNDER_RANGE_MINIMUM'
   | 'OVER_RANGE_MAXIMUM'
   | 'NOT_A_REAL_NUMBER'
+  | 'OUTSIDE_OF_RANGE'
 
 const FIELD_ERRORS: { [FieldError]: string } = {
   REQUIRED: 'This field is required',
@@ -22,6 +23,7 @@ const FIELD_ERRORS: { [FieldError]: string } = {
   UNDER_RANGE_MINIMUM: 'Min is',
   OVER_RANGE_MAXIMUM: 'Max is',
   NOT_A_REAL_NUMBER: 'Must be a number',
+  OUTSIDE_OF_RANGE: 'Must be between',
 }
 
 // TODO: test these
@@ -54,6 +56,16 @@ export const maxFieldValue = (maximum: number): ErrorChecker => (
   value === null || Number(value) <= maximum
     ? null
     : `${FIELD_ERRORS.OVER_RANGE_MAXIMUM} ${maximum}`
+
+export const temperatureRangeFieldValue = (
+  minimum: number,
+  maximum: number
+): ErrorChecker => (value: mixed): ?string =>
+  value === null || (Number(value) <= maximum && Number(value) >= minimum)
+    ? null
+    : `${FIELD_ERRORS.OUTSIDE_OF_RANGE} ${minimum} and ${maximum} ${i18n.t(
+        'application.units.degrees'
+      )}`
 
 export const realNumber: ErrorChecker = (value: mixed) =>
   isNaN(Number(value)) ? FIELD_ERRORS.NOT_A_REAL_NUMBER : null

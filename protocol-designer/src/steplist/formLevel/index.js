@@ -12,6 +12,8 @@ import {
   type FormError,
   moduleIdRequired,
   targetTemperatureRequired,
+  blockTemperatureRequired,
+  lidTemperatureRequired,
 } from './errors'
 import {
   composeWarnings,
@@ -72,6 +74,9 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
   },
   temperature: {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
+  },
+  thermocycler: {
+    getErrors: composeErrors(blockTemperatureRequired, lidTemperatureRequired),
   },
 }
 

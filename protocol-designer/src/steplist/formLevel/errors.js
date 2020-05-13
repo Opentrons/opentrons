@@ -31,6 +31,8 @@ export type FormErrorKey =
   | 'ENGAGE_HEIGHT_REQUIRED'
   | 'MODULE_ID_REQUIRED'
   | 'TARGET_TEMPERATURE_REQUIRED'
+  | 'BLOCK_TEMPERATURE_REQUIRED'
+  | 'LID_TEMPERATURE_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -92,6 +94,14 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
   TARGET_TEMPERATURE_REQUIRED: {
     title: 'Temperature is required',
     dependentFields: ['setTemperature', 'targetTemperature'],
+  },
+  BLOCK_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['blockIsActive', 'blockTargetTemp'],
+  },
+  LID_TEMPERATURE_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['lidIsActive', 'lidTargetTemp'],
   },
 }
 export type FormErrorChecker = mixed => ?FormError
@@ -211,6 +221,24 @@ export const targetTemperatureRequired = (
   const { setTemperature, targetTemperature } = fields
   return setTemperature === 'true' && !targetTemperature
     ? FORM_ERRORS.TARGET_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const blockTemperatureRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { blockIsActive, blockTargetTemp } = fields
+  return blockIsActive === true && !blockTargetTemp
+    ? FORM_ERRORS.BLOCK_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const lidTemperatureRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { lidIsActive, lidTargetTemp } = fields
+  return lidIsActive === true && !lidTargetTemp
+    ? FORM_ERRORS.LID_TEMPERATURE_REQUIRED
     : null
 }
 
