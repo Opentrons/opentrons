@@ -6,8 +6,9 @@ from dataclasses import dataclass
 
 from opentrons.types import Mount, Point, Location
 from opentrons.hardware_control.pipette import Pipette
-from opentrons.hardware_control.types import CriticalPoint, Axis
+from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
+from opentrons.config import feature_flags as ff
 
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
@@ -56,6 +57,16 @@ class CalibrationSession:
         self._deck = geometry.Deck()
         self._pip_info_by_mount = self._get_pip_info_by_mount(
                 hardware.get_attached_instruments())
+        if ff.short_fixed_trash():
+            trash_lw = labware.load(
+                'opentrons_1_trash_850ml_fixed',
+                self._deck.position_for('12'))
+        else:
+            trash_lw = labware.load(
+                'opentrons_1_trash_1100ml_fixed',
+                self._deck.position_for('12'))
+        self._deck['12'] = trash_lw
+        self._trash_lw = trash_lw
         self._labware_info = self._determine_required_labware()
         self._moves = self._build_deck_moves()
 
@@ -185,14 +196,8 @@ class CalibrationSession:
         await self.hardware.pick_up_tip(mount, tip_length)
 
     async def _trash_tip(self, mount: Mount):
-        fixed_trash = self._deck.position_for('12')
-        await self.hardware.retract(mount)
-        high_point = await self.hardware.current_position(mount)
-        drop_point = fixed_trash.point._replace(
-                x=fixed_trash.point.x,
-                y=fixed_trash.point.y,
-                z=high_point[Axis.by_mount(mount)])
-        await self.hardware.move_to(mount, drop_point + TRASH_TIP_OFFSET)
+        to_loc = self._trash_lw.wells()[0].top()
+        await self._move(mount, to_loc, CriticalPoint.XY_CENTER)
         await self._drop_tip(mount)
 
     async def _drop_tip(self, mount: Mount):
@@ -223,6 +228,24 @@ class CalibrationSession:
         session for the client.
         """
         return self._labware_info
+
+    async def _move(self,
+                    mount: Mount,
+                    to_loc: Location,
+                    cp_override: CriticalPoint = None):
+        from_pt = await self.hardware.gantry_position(mount)
+        from_loc = Location(from_pt, None)
+        cp = cp_override or self._pip_info_by_mount[mount].critical_point
+
+        max_height = self.hardware.get_instrument_max_height(mount)
+        safe = geometry.safe_height(
+            from_loc, to_loc, self._deck, max_height)
+        moves = plan_arc(from_pt, to_loc.point, safe,
+                         origin_cp=None,
+                         dest_cp=cp)
+        for move in moves:
+            await self.hardware.move_to(
+                mount, move[0], critical_point=move[1])
 
 
 # TODO: BC: move the check specific stuff to the check sub dir
@@ -751,24 +774,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                           self.current_state_name).position,
                                   None))
         await self._register_point_second_pipette()
-
-    async def _move(self,
-                    mount: Mount,
-                    to_loc: Location):
-        from_pt = await self.hardware.gantry_position(mount)
-        from_loc = Location(from_pt, None)
-
-        cp = self._pip_info_by_mount[mount].critical_point
-
-        max_height = self.hardware.get_instrument_max_height(mount)
-        safe = geometry.safe_height(
-            from_loc, to_loc, self._deck, max_height)
-        moves = plan_arc(from_pt, to_loc.point, safe,
-                         origin_cp=None,
-                         dest_cp=cp)
-        for move in moves:
-            await self.hardware.move_to(
-                mount, move[0], critical_point=move[1])
 
     async def _jog_first_pipette(self, vector: Point):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
