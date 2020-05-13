@@ -1,6 +1,6 @@
 // @flow
 import * as Fixtures from '../__fixtures__'
-import { robotSessionReducer } from '../reducer'
+import { sessionReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
@@ -160,7 +160,7 @@ const SPECS: Array<ReducerSpec> = [
       'rock-lobster': {
         robotSessions: {
           fake_stale_session_id: {
-            ...Fixtures.mockSessionData,
+            ...Fixtures.mockSessionAttributes,
             id: 'fake_stale_session_id',
           },
         },
@@ -195,7 +195,7 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
         },
       },
     },
@@ -221,15 +221,15 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionAttributes,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionAttributes,
           [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
         },
       },
@@ -248,15 +248,15 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionAttributes,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionAttributes,
         },
       },
     },
@@ -266,6 +266,6 @@ const SPECS: Array<ReducerSpec> = [
 describe('robotSessionReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    it(name, () => expect(robotSessionReducer(state, action)).toEqual(expected))
+    it(name, () => expect(sessionReducer(state, action)).toEqual(expected))
   })
 })

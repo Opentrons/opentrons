@@ -13,7 +13,7 @@ import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
-export const mockSessionData: Types.Session = {
+export const mockSessionAttributes: Types.Session = {
   id: mockSessionId,
   sessionType: 'calibrationCheck',
   details: mockRobotCalibrationCheckSessionDetails,
@@ -24,7 +24,7 @@ export const mockSessionCommand: Types.SessionCommand = {
   data: { someData: 32 },
 }
 
-export const mockSessionCommandData: Types.SessionCommand = {
+export const mockSessionCommandAttributes: Types.SessionCommand = {
   command: 'preparePipette',
   status: 'accepted',
   data: {},
@@ -34,7 +34,7 @@ export const mockSessionResponse: Types.SessionResponse = {
   data: {
     id: mockSessionId,
     type: 'Session',
-    attributes: mockSessionData,
+    attributes: mockSessionAttributes,
   },
 }
 
@@ -43,12 +43,12 @@ export const mockMultiSessionResponse: Types.MultiSessionResponse = {
     {
       id: mockSessionId,
       type: 'Session',
-      attributes: mockSessionData,
+      attributes: mockSessionAttributes,
     },
     {
       id: mockOtherSessionId,
       type: 'Session',
-      attributes: mockSessionData,
+      attributes: mockSessionAttributes,
     },
   ],
 }
@@ -57,7 +57,7 @@ export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
     id: mockSessionId,
     type: 'SessionCommand',
-    attributes: mockSessionCommandData,
+    attributes: mockSessionCommandAttributes,
   },
   meta: {
     id: mockSessionId,

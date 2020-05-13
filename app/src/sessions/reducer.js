@@ -13,7 +13,7 @@ const INITIAL_PER_ROBOT_STATE: PerRobotSessionState = {
   robotSessions: null,
 }
 
-export function robotSessionReducer(
+export function sessionReducer(
   state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {
@@ -80,9 +80,7 @@ export function robotSessionReducer(
         ...state,
         [robotName]: {
           ...robotState,
-          robotSessions: {
-            ...omit(robotState.robotSessions, sessionState.data.id),
-          },
+          robotSessions: omit(robotState.robotSessions, sessionState.data.id),
         },
       }
     }
