@@ -5,7 +5,7 @@ describe('getNextDefaultBlockTemperature', () => {
   describe('no previous forms defaults to null', () => {
     const testCases = [
       {
-        testMsg: 'no previous thermocycler state',
+        testMsg: 'returns false when no previous thermocycler state',
         expected: null,
       },
     ]
@@ -34,15 +34,8 @@ describe('getNextDefaultBlockTemperature', () => {
         expected: null,
       },
       {
-        testMsg:
-          'returns default when block activated previous selected and previous block temp entered',
-        orderedStepIds: ['a', 'd', 'a'],
-        expected: 40,
-      },
-      {
-        testMsg:
-          'returns default when block deactivated previous selected and previous block temp entered',
-        orderedStepIds: ['d', 'a', 'd'],
+        testMsg: 'block target temp populates with previously saved value',
+        orderedStepIds: ['d', 'a'],
         expected: 40,
       },
     ]

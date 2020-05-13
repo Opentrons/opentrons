@@ -5,7 +5,7 @@ describe('getNextDefaultLidOpen', () => {
   describe('no previous forms defaults to null', () => {
     const testCases = [
       {
-        testMsg: 'no previous thermocycler state',
+        testMsg: 'returns null when no previous thermocycler state',
         expected: null,
       },
     ]

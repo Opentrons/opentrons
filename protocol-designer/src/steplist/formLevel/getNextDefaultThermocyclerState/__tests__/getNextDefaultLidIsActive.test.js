@@ -5,7 +5,7 @@ describe('getNextDefaultLidIsActive', () => {
   describe('no previous forms defaults to false', () => {
     const testCases = [
       {
-        testMsg: 'no previous thermocycler state',
+        testMsg: 'returns false when no previous thermocycler state',
         expected: false,
       },
     ]
@@ -31,7 +31,7 @@ describe('getNextDefaultLidIsActive', () => {
       },
       {
         testMsg: 'returns false when false previously selected',
-        orderedStepIds: ['f', 'f', 'f'],
+        orderedStepIds: ['f', 't', 'f'],
         expected: false,
       },
     ]

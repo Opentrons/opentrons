@@ -5,7 +5,7 @@ describe('getNextDefaultBlockIsActive', () => {
   describe('no previous forms defaults to false', () => {
     const testCases = [
       {
-        testMsg: 'no previous thermocycler state',
+        testMsg: 'returns false when no previous thermocycler state',
         expected: false,
       },
     ]

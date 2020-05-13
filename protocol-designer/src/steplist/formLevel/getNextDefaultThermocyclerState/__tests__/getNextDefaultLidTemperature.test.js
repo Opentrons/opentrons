@@ -5,7 +5,7 @@ describe('getNextDefaultLidTemperature', () => {
   describe('no previous forms defaults to null', () => {
     const testCases = [
       {
-        testMsg: 'no previous thermocycler state',
+        testMsg: 'returns null when no previous thermocycler state',
         expected: null,
       },
     ]
@@ -31,15 +31,8 @@ describe('getNextDefaultLidTemperature', () => {
         expected: null,
       },
       {
-        testMsg:
-          'returns default when lid activated previous selected and previous lid temp entered',
-        orderedStepIds: ['a', 'd', 'a'],
-        expected: 40,
-      },
-      {
-        testMsg:
-          'returns default when lid deactivated previous selected and previous lid temp entered',
-        orderedStepIds: ['d', 'a', 'd'],
+        testMsg: 'lid target temp populates with previously saved value',
+        orderedStepIds: ['d', 'a'],
         expected: 40,
       },
     ]
