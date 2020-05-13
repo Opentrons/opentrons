@@ -81,7 +81,7 @@ class GPIODriverLike(Protocol):
     def get_door_state(self) -> DoorState:
         ...
 
-    async def monitor_door_switch_state(
+    def start_door_switch_watcher(
             self, loop: asyncio.AbstractEventLoop,
             update_door_state: Callable[[DoorState], None]):
         ...
@@ -89,5 +89,5 @@ class GPIODriverLike(Protocol):
     def release_line(self, pin: GPIOPin):
         ...
 
-    def quit_monitoring(self):
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
         ...

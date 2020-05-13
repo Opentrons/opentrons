@@ -4,11 +4,6 @@ from typing import List, Optional
 from opentrons.hardware_control.types import BoardRevision
 
 
-class GpioQueueEvent(enum.Enum):
-    EVENT_RECEIVED = enum.auto()
-    QUIT = enum.auto()
-
-
 class PinDir(enum.Enum):
     rev_input = enum.auto()
     input = enum.auto()
