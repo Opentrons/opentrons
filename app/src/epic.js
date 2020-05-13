@@ -16,6 +16,7 @@ import { networkingEpic } from './networking/epic'
 import { shellEpic } from './shell/epic'
 import { alertsEpic } from './alerts/epic'
 import { systemInfoEpic } from './system-info/epic'
+import { sessionsEpic } from './sessions/epic'
 
 import type { Epic } from './types'
 
@@ -33,5 +34,6 @@ export const rootEpic: Epic = combineEpics(
   networkingEpic,
   shellEpic,
   alertsEpic,
-  systemInfoEpic
+  systemInfoEpic,
+  sessionsEpic
 )
