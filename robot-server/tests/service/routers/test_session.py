@@ -3,13 +3,14 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import typing
 from pydantic.main import BaseModel
-from uuid import uuid4
 
 from opentrons.server.endpoints.calibration.session \
     import CheckCalibrationSession, CalibrationCheckState, \
     CalibrationCheckTrigger
 from opentrons.server.endpoints.calibration.models import \
     SessionType, JogPosition
+from opentrons.server.endpoints.calibration.helper_classes import \
+    PipetteInfo, PipetteRank
 from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager
@@ -35,23 +36,22 @@ def session_details():
 
 @pytest.fixture
 def mock_cal_session(hardware, loop):
-    # TODO: The mock instrs dictionary needs
-    # to be modified to fit changes that
-    # remove instances of pip id in
-    # the check calibration session class.
-    id1 = uuid4()
-    id2 = uuid4()
-    mock_instrs = {
-        id1: {
-            'mount': types.Mount.LEFT,
-            'tiprack_id': None,
-            'critical_point': None},
-        id2: {
-            'mount': types.Mount.RIGHT,
-            'tiprack_id': None,
-            'critical_point': None}
+
+    mock_pipette_info_by_mount = {
+        types.Mount.LEFT: PipetteInfo(
+            tiprack_id=None,
+            critical_point=None,
+            rank=PipetteRank.second,
+            mount=types.Mount.LEFT
+        ),
+        types.Mount.RIGHT: PipetteInfo(
+            tiprack_id=None,
+            critical_point=None,
+            rank=PipetteRank.first,
+            mount=types.Mount.RIGHT
+        )
     }
-    other_instrs = {
+    mock_hw_pipettes = {
         types.Mount.LEFT: {
             'model': 'p10_single_v1',
             'has_tip': False,
@@ -68,11 +68,9 @@ def mock_cal_session(hardware, loop):
             'channels': 1}
     }
 
-    def fake_get_pip(mount):
-        return other_instrs[mount]
-
-    CheckCalibrationSession._key_by_uuid = MagicMock(return_value=mock_instrs)
-    CheckCalibrationSession.get_pipette = MagicMock(side_effect=fake_get_pip)
+    CheckCalibrationSession._get_pip_info_by_mount =\
+        MagicMock(return_value=mock_pipette_info_by_mount)
+    CheckCalibrationSession.pipettes = mock_hw_pipettes
 
     m = CheckCalibrationSession(hardware)
 
@@ -125,9 +123,10 @@ def session_hardware_info(mock_cal_session, session_details):
         str(k): {'model': v.model,
                  'name': v.name,
                  'tip_length': v.tip_length,
-                 'mount': v.mount.value,
+                 'mount': v.mount,
                  'has_tip': v.has_tip,
-                 'tiprack_id': str(v.tiprack_id)}
+                 'tiprack_id': str(v.tiprack_id),
+                 'rank': v.rank}
         for k, v in mock_cal_session.pipette_status().items()
     }
     info = {
@@ -136,7 +135,7 @@ def session_hardware_info(mock_cal_session, session_details):
             'alternatives': data.alternatives,
             'slot': data.slot,
             'id': str(data.id),
-            'forPipettes': [str(_id) for _id in data.forPipettes],
+            'forMounts': [str(m) for m in data.forMounts],
             'loadName': data.loadName,
             'namespace': data.namespace,
             'version': str(data.version)} for data in lw_status],
