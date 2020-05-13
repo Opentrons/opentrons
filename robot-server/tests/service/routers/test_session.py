@@ -38,7 +38,7 @@ def session_details():
 @pytest.fixture
 def mock_cal_session(hardware, loop):
 
-    mock_instrs = {
+    mock_pipette_info_by_mount = {
         types.Mount.LEFT: PipetteInfo(
             tiprack_id=None,
             critical_point=None,
@@ -52,7 +52,7 @@ def mock_cal_session(hardware, loop):
             mount=types.Mount.RIGHT
         )
     }
-    other_instrs = {
+    mock_hw_pipettes = {
         types.Mount.LEFT: {
             'model': 'p10_single_v1',
             'has_tip': False,
@@ -70,8 +70,8 @@ def mock_cal_session(hardware, loop):
     }
 
     CheckCalibrationSession._get_pip_info_by_mount =\
-        MagicMock(return_value=mock_instrs)
-    CheckCalibrationSession.pipettes = other_instrs
+        MagicMock(return_value=mock_pipette_info_by_mount)
+    CheckCalibrationSession.pipettes = mock_hw_pipettes
 
     m = CheckCalibrationSession(hardware)
 
