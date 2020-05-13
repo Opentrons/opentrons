@@ -76,6 +76,9 @@ class Controller:
         self._board_revision = self.gpio_chardev.board_rev
         await self.gpio_chardev.setup()
 
+    def start_gpio_door_watcher(self, **kargs):
+        self.gpio_chardev.start_door_switch_watcher(**kargs)
+
     def update_position(self) -> Dict[str, float]:
         self._smoothie_driver.update_position()
         return self._smoothie_driver.position
@@ -268,6 +271,6 @@ class Controller:
             try:
                 loop = asyncio.get_event_loop()
                 if not loop.is_closed():
-                    self.gpio_chardev.quit_monitoring()
+                    self.gpio_chardev.stop_door_switch_watcher(loop)
             except RuntimeError:
                 pass

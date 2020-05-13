@@ -10,9 +10,6 @@ import { U2EDriverOutdatedAlert } from '../U2EDriverOutdatedAlert'
 jest.mock('../../../analytics')
 
 jest.mock('react-router-dom', () => ({
-  // TODO(mc, 2020-05-11): code smell; figure out a better way to test usage
-  // of the useHistory hook
-  useHistory: () => ({ push: jest.fn() }),
   // TODO(mc, 2020-05-07): create a tested Link wrapper that's safe to mock
   Link: () => <></>,
 }))

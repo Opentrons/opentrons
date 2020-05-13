@@ -1,12 +1,14 @@
 // @flow
 import * as React from 'react'
 import { useSelector } from 'react-redux'
-import { css } from 'styled-components'
 
 import {
+  Box,
   Text,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
+  SPACING_2,
+  SPACING_3,
 } from '@opentrons/components'
 
 import * as SystemInfo from '../../system-info'
@@ -25,30 +27,17 @@ export const U2EAdapterInfo = () => {
   })
 
   return (
-    <div
-      css={css`
-        font-size: ${FONT_SIZE_BODY_1};
-        padding: 1rem;
-      `}
-    >
+    <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3}>
       <Text
         as="h3"
         fontSize={FONT_SIZE_BODY_1}
         fontWeight={FONT_WEIGHT_SEMIBOLD}
-        css={css`
-          margin-bottom: 0.5rem;
-        `}
+        marginBottom={SPACING_2}
       >
         {U2E_ADAPTER_INFORMATION}
       </Text>
-      {driverOutdated && (
-        <U2EDriverWarning
-          css={css`
-            margin-bottom: 1rem;
-          `}
-        />
-      )}
+      {driverOutdated && <U2EDriverWarning marginBottom={SPACING_3} />}
       <U2EDeviceDetails device={device} />
-    </div>
+    </Box>
   )
 }

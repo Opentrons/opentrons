@@ -5,7 +5,7 @@ import time
 from typing import Callable, Dict, Tuple
 from opentrons.hardware_control.types import BoardRevision, DoorState
 from . import RevisionPinsError
-from .types import gpio_group, PinDir, GPIOPin, GpioQueueEvent
+from .types import gpio_group, PinDir, GPIOPin
 
 import gpiod  # type: ignore
 
@@ -18,12 +18,13 @@ MODULE_LOG = logging.getLogger(__name__)
 DTOVERLAY_PATH = '/proc/device-tree/soc/gpio@7e200000/gpio_rev_bit_pins'
 
 
-def _event_callback(q: asyncio.Queue):
+def _event_callback(
+            update_door_state: Callable[[DoorState], None],
+            get_door_state: Callable[..., DoorState]):
     try:
-        q.put_nowait(GpioQueueEvent.EVENT_RECEIVED)
-    except asyncio.QueueFull:
-        MODULE_LOG.warning(
-            'Event queue is full and can no longer receive new events')
+        update_door_state(get_door_state())
+    except Exception:
+        MODULE_LOG.exception("Errored during event callback")
 
 
 class GPIOCharDev:
@@ -223,7 +224,7 @@ class GPIOCharDev:
         else:
             return DoorState.CLOSED
 
-    async def monitor_door_switch_state(
+    def start_door_switch_watcher(
             self, loop: asyncio.AbstractEventLoop,
             update_door_state: Callable[[DoorState], None]):
         current_door_value = self.read_window_switches()
@@ -232,29 +233,23 @@ class GPIOCharDev:
         else:
             update_door_state(DoorState.CLOSED)
 
-        self.event_queue: asyncio.Queue = asyncio.Queue()
-        door_fd = self.lines['window_door_sw'].event_get_fd()
-        loop.add_reader(door_fd, _event_callback, self.event_queue)
-        while True:
-            try:
-                ev = await self.event_queue.get()
-            except RuntimeError:
-                break
-            if ev == GpioQueueEvent.EVENT_RECEIVED:
-                door_state = self.get_door_state()
-                update_door_state(door_state)
-            elif ev == GpioQueueEvent.QUIT:
-                return
-            else:
-                raise RuntimeError(
-                    "Event queue has received an unknown item")
+        try:
+            door_fd = self.lines['window_door_sw'].event_get_fd()
+            loop.add_reader(door_fd, _event_callback,
+                            update_door_state, self.get_door_state)
+        except Exception:
+            MODULE_LOG.exception(
+                "Failed to add fd reader, cannot not monitor window door "
+                "switch properly")
 
     def release_line(self, pin: GPIOPin):
         self.lines[pin.name].release()
         self.lines.pop(pin.name)
 
-    def quit_monitoring(self):
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
         try:
-            self.event_queue.put_nowait(GpioQueueEvent.QUIT)
-        except RuntimeError:
-            pass
+            door_fd = self.lines['window_door_sw'].event_get_fd()
+            loop.remove_reader(door_fd)
+        except Exception:
+            MODULE_LOG.exception(
+                "Failed to remove window door switch fd reader")

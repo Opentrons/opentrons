@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { shallow } from 'enzyme'
 
-import { C_WHITE } from '../../styles'
+import { C_WHITE, FONT_SIZE_BODY_1 } from '../../styles'
 import {
   Flex,
   ALIGN_NORMAL,
@@ -145,5 +145,16 @@ describe('Flex primitive component', () => {
 
     wrapper.setProps({ wrap: WRAP_REVERSE })
     expect(wrapper).toHaveStyleRule('flex-wrap', 'wrap-reverse')
+  })
+
+  it('should take spacing props', () => {
+    const wrapper = shallow(<Flex marginBottom={0} paddingLeft={0} />)
+    expect(wrapper).toHaveStyleRule('margin-bottom', '0')
+    expect(wrapper).toHaveStyleRule('padding-left', '0')
+  })
+
+  it('should take typography props', () => {
+    const wrapper = shallow(<Flex fontSize={FONT_SIZE_BODY_1} />)
+    expect(wrapper).toHaveStyleRule('font-size', FONT_SIZE_BODY_1)
   })
 })

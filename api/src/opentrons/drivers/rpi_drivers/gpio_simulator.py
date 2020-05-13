@@ -3,7 +3,7 @@ import logging
 from typing import Callable, Dict, Tuple
 
 from opentrons.hardware_control.types import BoardRevision, DoorState
-from .types import gpio_group, GPIOPin, GpioQueueEvent
+from .types import gpio_group, GPIOPin
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -108,29 +108,17 @@ class SimulatingGPIOCharDev:
         else:
             return DoorState.OPEN
 
-    async def monitor_door_switch_state(
+    def start_door_switch_watcher(
             self, loop: asyncio.AbstractEventLoop,
             update_door_state: Callable[[DoorState], None]):
-        self.event_queue: asyncio.Queue = asyncio.Queue()
-        while True:
-            try:
-                ev = await self.event_queue.get()
-            except RuntimeError:
-                break
-            if ev == GpioQueueEvent.EVENT_RECEIVED:
-                door_state = self.get_door_state()
-                update_door_state(door_state)
-            elif ev == GpioQueueEvent.QUIT:
-                return
-            else:
-                raise RuntimeError(
-                    "Event queue has received an unknown item")
+        current_door_value = self.read_window_switches()
+        if current_door_value == 0:
+            update_door_state(DoorState.OPEN)
+        else:
+            update_door_state(DoorState.CLOSED)
 
     def release_line(self, pin: GPIOPin):
         self.lines.pop(pin.name)
 
-    def quit_monitoring(self):
-        try:
-            self.event_queue.put_nowait(GpioQueueEvent.QUIT)
-        except RuntimeError:
-            pass
+    def stop_door_switch_watcher(self, loop: asyncio.AbstractEventLoop):
+        pass

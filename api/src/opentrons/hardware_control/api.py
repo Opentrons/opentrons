@@ -144,10 +144,9 @@ class API(HardwareAPILike):
             checked_loop.create_task(backend.watch_modules(
                 loop=checked_loop,
                 register_modules=api_instance.register_modules))
-            checked_loop.create_task(
-                backend.gpio_chardev.monitor_door_switch_state(
-                    loop=checked_loop,
-                    update_door_state=api_instance._update_door_state))
+            backend.start_gpio_door_watcher(
+                loop=checked_loop,
+                update_door_state=api_instance._update_door_state)
             return api_instance
         finally:
             blink_task.cancel()
