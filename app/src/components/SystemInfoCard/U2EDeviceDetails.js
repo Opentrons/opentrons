@@ -1,8 +1,16 @@
 // @flow
 import * as React from 'react'
-import { css } from 'styled-components'
+import styled from 'styled-components'
 
-import { Flex, Text, FONT_STYLE_ITALIC } from '@opentrons/components'
+import {
+  Box,
+  Flex,
+  Text,
+  FONT_STYLE_ITALIC,
+  SPACING_1,
+  SPACING_2,
+} from '@opentrons/components'
+
 import type { UsbDevice } from '../../system-info/types'
 
 // TODO(mc, 2020-04-28): i18n
@@ -15,17 +23,9 @@ export type U2EDeviceDetailsProps = {|
   device: UsbDevice | null,
 |}
 
-const MARGIN_TOP_0_5 = css`
-  margin-top: 0.5rem;
-`
-
-const MARGIN_BOTTOM_0_25 = css`
-  margin-bottom: 0.25rem;
-`
-
-const DETAIL_TEXT_STYLE = css`
+const DetailText = styled.span`
   min-width: 6rem;
-  margin-right: 0.25rem;
+  margin-right: ${SPACING_1};
 `
 
 const STATS: Array<{| label: string, property: $Keys<UsbDevice> |}> = [
@@ -39,20 +39,20 @@ export const U2EDeviceDetails = ({ device }: U2EDeviceDetailsProps) => (
   <div>
     <Text>{U2E_ADAPTER_DESCRIPTION}</Text>
     {device === null ? (
-      <Text fontStyle={FONT_STYLE_ITALIC} css={MARGIN_TOP_0_5}>
+      <Text fontStyle={FONT_STYLE_ITALIC} marginTop={SPACING_2}>
         {NO_ADAPTER_FOUND}
       </Text>
     ) : (
-      <ul css={MARGIN_TOP_0_5}>
+      <Box as="ul" marginTop={SPACING_2}>
         {STATS.filter(({ property }) => property in device).map(
           ({ label, property }) => (
-            <Flex as="li" key={property} css={MARGIN_BOTTOM_0_25}>
-              <span css={DETAIL_TEXT_STYLE}>{label}:</span>
-              <span css={DETAIL_TEXT_STYLE}>{device[property] ?? UNKNOWN}</span>
+            <Flex as="li" key={property} marginBottom={SPACING_1}>
+              <DetailText>{label}:</DetailText>
+              <DetailText>{device[property] ?? UNKNOWN}</DetailText>
             </Flex>
           )
         )}
-      </ul>
+      </Box>
     )}
   </div>
 )

@@ -29,6 +29,18 @@ export const FONT_WEIGHT_BOLD = 800
 export const FONT_STYLE_NORMAL = 'normal'
 export const FONT_STYLE_ITALIC = 'italic'
 
+// text align
+export const TEXT_ALIGN_LEFT = 'left'
+export const TEXT_ALIGN_CENTER = 'center'
+export const TEXT_ALIGN_RIGHT = 'right'
+export const TEXT_ALIGN_JUSTIFY = 'justify'
+
+// text transform
+export const TEXT_TRANSFORM_NONE = 'none'
+export const TEXT_TRANSFORM_CAPITALIZE = 'capitalize'
+export const TEXT_TRANSFORM_UPPERCASE = 'uppercase'
+export const TEXT_TRANSFORM_LOWERCASE = 'lowercase'
+
 // font property sets
 export const FONT_HEADER_DARK = css`
   font-size: ${FONT_SIZE_HEADER};

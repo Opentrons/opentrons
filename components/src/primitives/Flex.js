@@ -1,5 +1,8 @@
 // @flow
 import styled from 'styled-components'
+
+import * as StyleProps from './style-props'
+
 import type { StyledComponent } from 'styled-components'
 
 export const ALIGN_NORMAL = 'normal'
@@ -34,7 +37,9 @@ export const WRAP_REVERSE = 'wrap-reverse'
 // style props are string type for flexibility, but try to use the constants
 // defined above for safety
 export type FlexProps = {|
-  color?: string,
+  ...StyleProps.ColorProps,
+  ...StyleProps.SpacingProps,
+  ...StyleProps.TypographyProps,
   alignItems?: string,
   justifyContent?: string,
   direction?: string,
@@ -52,7 +57,9 @@ export const Flex: StyledComponent<
   HTMLDivElement
 > = styled.div`
   display: flex;
-  ${({ color }) => (color ? `color: ${color};` : '')}
+  ${StyleProps.colorStyles}
+  ${StyleProps.spacingStyles}
+  ${StyleProps.typographyStyles}
   ${({ alignItems: ai }) => (ai ? `align-items: ${ai};` : '')}
   ${({ justifyContent: jc }) => (jc ? `justify-content: ${jc};` : '')}
   ${({ direction: d }) => (d ? `flex-direction: ${d};` : '')}

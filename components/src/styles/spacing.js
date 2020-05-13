@@ -1,6 +1,11 @@
 // @flow
 
-// TODO(isk: 3/2/20): Make these more generic and use calc() to compose spacing
-export const S_0875 = '0.875rem'
-export const S_1 = '1rem'
-export const S_1125 = '1.125rem'
+export const SPACING_AUTO = 'auto'
+export const SPACING_1 = '0.25rem'
+export const SPACING_2 = '0.5rem'
+export const SPACING_3 = '1rem'
+export const SPACING_4 = '2rem'
+export const SPACING_5 = '4rem'
+export const SPACING_6 = '8rem'
+export const SPACING_7 = '16rem'
+export const SPACING_8 = '32rem'

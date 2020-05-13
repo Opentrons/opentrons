@@ -62,6 +62,6 @@ const Title = styled.h3`
   ${styles.FONT_HEADER_DARK}
   font-weight: ${styles.FONT_WEIGHT_REGULAR};
   margin: 0;
-  padding: ${styles.S_1} ${styles.S_1} 0;
+  padding: ${styles.SPACING_3} ${styles.SPACING_3} 0;
   text-transform: capitalize;
 `

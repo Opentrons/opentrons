@@ -5,18 +5,11 @@ import { shallow } from 'enzyme'
 import {
   C_WHITE,
   FONT_SIZE_DEFAULT,
-  FONT_SIZE_HEADER,
-  FONT_SIZE_BODY_2,
-  FONT_SIZE_BODY_1,
-  FONT_SIZE_CAPTION,
   FONT_WEIGHT_REGULAR,
-  FONT_WEIGHT_SEMIBOLD,
   LINE_HEIGHT_SOLID,
-  LINE_HEIGHT_TITLE,
-  LINE_HEIGHT_COPY,
   FONT_STYLE_NORMAL,
-  FONT_STYLE_ITALIC,
 } from '../../styles'
+
 import { Text } from '..'
 
 describe('Text primitive component', () => {
@@ -63,45 +56,27 @@ describe('Text primitive component', () => {
 
   it('should take a fontSize prop', () => {
     const wrapper = shallow(<Text fontSize={FONT_SIZE_DEFAULT} />)
-    expect(wrapper).toHaveStyleRule('font-size', '1rem')
-
-    wrapper.setProps({ fontSize: FONT_SIZE_HEADER })
-    expect(wrapper).toHaveStyleRule('font-size', '1.125rem')
-
-    wrapper.setProps({ fontSize: FONT_SIZE_BODY_2 })
-    expect(wrapper).toHaveStyleRule('font-size', '0.875rem')
-
-    wrapper.setProps({ fontSize: FONT_SIZE_BODY_1 })
-    expect(wrapper).toHaveStyleRule('font-size', '0.75rem')
-
-    wrapper.setProps({ fontSize: FONT_SIZE_CAPTION })
-    expect(wrapper).toHaveStyleRule('font-size', '0.625rem')
+    expect(wrapper).toHaveStyleRule('font-size', FONT_SIZE_DEFAULT)
   })
 
   it('should take a fontWeight prop', () => {
     const wrapper = shallow(<Text fontWeight={FONT_WEIGHT_REGULAR} />)
-    expect(wrapper).toHaveStyleRule('font-weight', '400')
-
-    wrapper.setProps({ fontWeight: FONT_WEIGHT_SEMIBOLD })
-    expect(wrapper).toHaveStyleRule('font-weight', '600')
+    expect(wrapper).toHaveStyleRule('font-weight', `${FONT_WEIGHT_REGULAR}`)
   })
 
   it('should take a lineHeight prop', () => {
     const wrapper = shallow(<Text lineHeight={LINE_HEIGHT_SOLID} />)
-    expect(wrapper).toHaveStyleRule('line-height', '1')
-
-    wrapper.setProps({ lineHeight: LINE_HEIGHT_TITLE })
-    expect(wrapper).toHaveStyleRule('line-height', '1.25')
-
-    wrapper.setProps({ lineHeight: LINE_HEIGHT_COPY })
-    expect(wrapper).toHaveStyleRule('line-height', '1.5')
+    expect(wrapper).toHaveStyleRule('line-height', `${LINE_HEIGHT_SOLID}`)
   })
 
   it('should take a fontStyle prop', () => {
     const wrapper = shallow(<Text fontStyle={FONT_STYLE_NORMAL} />)
-    expect(wrapper).toHaveStyleRule('font-style', 'normal')
+    expect(wrapper).toHaveStyleRule('font-style', FONT_STYLE_NORMAL)
+  })
 
-    wrapper.setProps({ fontStyle: FONT_STYLE_ITALIC })
-    expect(wrapper).toHaveStyleRule('font-style', 'italic')
+  it('should take spacing props', () => {
+    const wrapper = shallow(<Text marginRight="100%" paddingBottom={0} />)
+    expect(wrapper).toHaveStyleRule('margin-right', '100%')
+    expect(wrapper).toHaveStyleRule('padding-bottom', '0')
   })
 })

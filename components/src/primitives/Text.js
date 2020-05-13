@@ -1,15 +1,13 @@
 // @flow
 import styled from 'styled-components'
+import * as StyleProps from './style-props'
+
 import type { StyledComponent } from 'styled-components'
 
-// props are string type for flexibility, but try to use constants for safety
-// TODO(mc, 2020-05-11): move common style interpolations into common location
 export type TextProps = {|
-  color?: string,
-  fontSize?: string,
-  fontWeight?: number | string,
-  fontStyle?: string,
-  lineHeight?: number | string,
+  ...StyleProps.ColorProps,
+  ...StyleProps.TypographyProps,
+  ...StyleProps.SpacingProps,
 |}
 
 // TODO(mc, 2020-05-08): add variants (--font-body-2-dark, etc) as variant prop
@@ -27,9 +25,7 @@ export const Text: StyledComponent<
 > = styled.p`
   margin-top: 0;
   margin-bottom: 0;
-  ${({ fontSize }) => (fontSize ? `font-size: ${fontSize};` : '')}
-  ${({ fontWeight }) => (fontWeight ? `font-weight: ${fontWeight};` : '')}
-  ${({ fontStyle }) => (fontStyle ? `font-style: ${fontStyle};` : '')}
-  ${({ lineHeight }) => (lineHeight ? `line-height: ${lineHeight};` : '')}
-  ${({ color }) => (color ? `color: ${color};` : '')}
+  ${StyleProps.colorStyles}
+  ${StyleProps.typographyStyles}
+  ${StyleProps.spacingStyles}
 `
