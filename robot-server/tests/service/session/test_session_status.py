@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock
 from uuid import uuid4
 
 from opentrons.types import Mount
