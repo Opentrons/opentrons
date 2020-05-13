@@ -287,4 +287,40 @@ describe('createPresavedStepForm', () => {
       lidOpen: null,
     })
   })
+
+  it('should set a default thermocycler module for thermocycler step, and populate TC state when previously saved TC state', () => {
+    const args = {
+      ...defaultArgs,
+      savedStepForms: {
+        prevStepId: {
+          id: 'prevStepId',
+          stepName: 'thermocycler',
+          stepDetails: '',
+          thermocyclerFormType: 'thermocyclerState',
+          blockIsActive: true,
+          blockTargetTemp: 45,
+          lidIsActive: true,
+          lidTargetTemp: 45,
+          lidOpen: true,
+        },
+      },
+      orderedStepIds: ['prevStepId'],
+      stepType: 'thermocycler',
+    }
+
+    expect(createPresavedStepForm(args)).toEqual({
+      id: stepId,
+      stepType: 'thermocycler',
+      moduleId: 'someThermocyclerModuleId',
+      // TC Default field
+      stepName: 'thermocycler',
+      stepDetails: '',
+      thermocyclerFormType: 'thermocyclerState',
+      blockIsActive: true,
+      blockTargetTemp: 45,
+      lidIsActive: true,
+      lidTargetTemp: 45,
+      lidOpen: true,
+    })
+  })
 })
