@@ -145,8 +145,13 @@ class CalibrationSession:
         return CheckMove(position=Point(*cross_coords), locationId=uuid4())
 
     def _build_height_dict(self, slot: str) -> CheckMove:
-        pos = Point(*self._deck.get_slot_center(slot))
-        updated_pos = pos - Point(20, 0, pos.z)
+        pos = self._deck.get_slot_center(slot)
+        ydim: float\
+            = self._deck.get_slot_definition(slot)['boundingBox']['yDimension']
+        # shift down to 10mm +y of the slot edge to both stay clear of the
+        # slot boundary, avoid the engraved slot number, and avoid the
+        # tiprack colliding if this is a multi
+        updated_pos = pos - Point(0, (ydim/2)-10, pos.z)
         return CheckMove(position=updated_pos, locationId=uuid4())
 
     def _get_tip_rack_slot_for_mount(self, mount) -> str:
