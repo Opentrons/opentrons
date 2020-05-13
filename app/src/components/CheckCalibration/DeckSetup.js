@@ -5,6 +5,7 @@ import {
   OutlineButton,
   RobotWorkSpace,
   LabwareRender,
+  LabwareNameOverlay,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
 import {
@@ -99,14 +100,7 @@ export function TiprackRender(props: TiprackRenderProps) {
         transformWithSVG
         innerDivProps={{ className: styles.labware_ui_wrapper }}
       >
-        <div className={styles.labware_ui_content}>
-          <div className={styles.name_overlay}>
-            <p className={styles.display_name} title={title}>
-              {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
-              {title.replace('µL', 'uL')}
-            </p>
-          </div>
-        </div>
+        <LabwareNameOverlay title={title.replace('µL', 'uL')} />
       </RobotCoordsForeignDiv>
     </g>
   )
