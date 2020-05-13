@@ -7,6 +7,7 @@ from typing import Any, List, Optional, Set, Tuple, Dict
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
+from opentrons.hardware_control.util import plan_arc
 from opentrons.system.shared_data import load_shared_data
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
@@ -107,15 +108,124 @@ def should_dodge_thermocycler(
     return False
 
 
-def plan_moves(  # noqa(C901)
+@dataclass
+class MoveConstraints:
+    instr_max_height: float
+    well_z_margin: float = 5.0
+    lw_z_margin: float = 10.0
+    minimum_lw_z_margin: float = 1.0
+    minimum_z_height: float = 0.0
+
+    @classmethod
+    def build(cls, **kwargs):
+        return cls(**{k: v for k, v in kwargs.items() if v is not None})
+
+
+def safe_height(
         from_loc: types.Location,
         to_loc: types.Location,
         deck: 'Deck',
         instr_max_height: float,
-        well_z_margin: float = 5.0,
-        lw_z_margin: float = 10.0,
+        well_z_margin: float = None,
+        lw_z_margin: float = None,
+        minimum_lw_z_margin: float = None,
+        minimum_z_height: float = None,) -> float:
+    """
+    Derive the height required to clear the current deck setup along
+    with other constraints
+    :param from_loc: The last location.
+    :param to_loc: The location to move to.
+    :param deck: The :py:class:`Deck` instance describing the robot.
+    :param float instr_max_height: The highest z location this pipette can
+                                   achieve
+    :param float well_z_margin: How much extra Z margin to raise the cp by over
+                                the bare minimum to clear wells within the same
+                                labware. Default: 5mm
+    :param float lw_z_margin: How much extra Z margin to raise the cp by over
+                              the bare minimum to clear different pieces of
+                              labware.
+    :param minimum_z_height: When specified, this Z margin is able to raise
+                             (but never lower) the mid-arc height.
+    """
+    constraints = MoveConstraints.build(
+        instr_max_height=instr_max_height,
+        well_z_margin=well_z_margin,
+        lw_z_margin=lw_z_margin,
+        minimum_lw_z_margin=minimum_lw_z_margin,
+        minimum_z_height=minimum_z_height)
+    assert constraints.minimum_z_height >= 0.0
+    return _build_safe_height(from_loc, to_loc, deck, constraints)
+
+
+def _build_safe_height(from_loc: types.Location,
+                       to_loc: types.Location,
+                       deck: 'Deck',
+                       constraints: MoveConstraints) -> float:
+    to_point = to_loc.point
+    to_lw, to_well = split_loc_labware(to_loc)
+    from_point = from_loc.point
+    from_lw, from_well = split_loc_labware(from_loc)
+
+    if to_lw and to_lw == from_lw:
+        # If we know the labwares we’re moving from and to, we can calculate
+        # a safe z based on their heights
+        if to_well:
+            to_safety = to_well.top().point.z + constraints.well_z_margin
+        else:
+            to_safety = to_lw.highest_z + constraints.well_z_margin
+        if from_well:
+            from_safety = from_well.top().point.z + constraints.well_z_margin
+        else:
+            from_safety = from_lw.highest_z + constraints.well_z_margin
+        # if we are already at the labware, we know the instr max height would
+        # be tall enough
+        if max(from_safety, to_safety) > constraints.instr_max_height:
+            to_safety = constraints.instr_max_height
+            from_safety = 0.0  # (ignore since it's in a max())
+    else:
+        # One of our labwares is invalid so we have to just go above
+        # deck.highest_z since we don’t know where we are
+        to_safety = deck.highest_z + constraints.lw_z_margin
+
+        if to_safety > constraints.instr_max_height:
+            if constraints.instr_max_height\
+               >= (deck.highest_z + constraints.minimum_lw_z_margin):
+                to_safety = constraints.instr_max_height
+            else:
+                tallest_lw = list(filter(
+                    lambda lw: lw.highest_z == deck.highest_z,
+                    [lw for lw in deck.data.values() if lw]))[0]
+                if isinstance(tallest_lw, ModuleGeometry) and\
+                        tallest_lw.labware:
+                    tallest_lw = tallest_lw.labware
+                raise LabwareHeightError(
+                    f"The {tallest_lw} has a total height of {deck.highest_z}"
+                    " mm, which is too tall for your current pipette "
+                    "configurations. The longest pipette on your robot can "
+                    f"only be raised to {constraints.instr_max_height} mm "
+                    "above the deck. "
+                    "This may be because the labware is incorrectly defined, "
+                    "incorrectly calibrated, or physically too tall. Please "
+                    "check your labware definitions and calibrations.")
+        from_safety = 0.0  # (ignore since it’s in a max())
+
+    return max_many(
+        to_point.z,
+        from_point.z,
+        to_safety,
+        from_safety,
+        constraints.minimum_z_height)
+
+
+def plan_moves(
+        from_loc: types.Location,
+        to_loc: types.Location,
+        deck: 'Deck',
+        instr_max_height: float,
+        well_z_margin: float = None,
+        lw_z_margin: float = None,
         force_direct: bool = False,
-        minimum_lw_z_margin: float = 1.0,
+        minimum_lw_z_margin: float = None,
         minimum_z_height: float = None,)\
         -> List[Tuple[types.Point,
                       Optional[CriticalPoint]]]:
@@ -125,25 +235,23 @@ def plan_moves(  # noqa(C901)
     kind of geometry attached. This function is intended to return series
     of moves that contain the minimum safe retractions to avoid (known)
     labware on the specified :py:class:`Deck`.
-
     :param from_loc: The last location.
     :param to_loc: The location to move to.
     :param deck: The :py:class:`Deck` instance describing the robot.
-    :param float well_z_margin: How much extra Z margin to raise the cp by over
-                                the bare minimum to clear wells within the same
-                                labware. Default: 5mm
-    :param float lw_z_margin: How much extra Z margin to raise the cp by over
-                              the bare minimum to clear different pieces of
-                              labware. Default: 20mm
     :param force_direct: If True, ignore any Z margins force a direct move
-    :param minimum_z_height: When specified, this Z margin is able to raise
-                             (but never lower) the mid-arc height.
+
+    The other parameters are as :py:meth:`safe_height`.
 
     :returns: A list of tuples of :py:class:`.Point` and critical point
               overrides to move through.
     """
-
-    assert minimum_z_height is None or minimum_z_height >= 0.0
+    constraints = MoveConstraints.build(
+        instr_max_height=instr_max_height,
+        well_z_margin=well_z_margin,
+        lw_z_margin=lw_z_margin,
+        minimum_lw_z_margin=minimum_lw_z_margin,
+        minimum_z_height=minimum_z_height)
+    assert constraints.minimum_z_height >= 0.0
 
     to_point = to_loc.point
     to_lw, to_well = split_loc_labware(to_loc)
@@ -167,65 +275,16 @@ def plan_moves(  # noqa(C901)
     # Generate arc moves
 
     # Find the safe z heights based on the destination and origin labware/well
-    if to_lw and to_lw == from_lw:
-        # If we know the labwares we’re moving from and to, we can calculate
-        # a safe z based on their heights
-        if to_well:
-            to_safety = to_well.top().point.z + well_z_margin
-        else:
-            to_safety = to_lw.highest_z + well_z_margin
-        if from_well:
-            from_safety = from_well.top().point.z + well_z_margin
-        else:
-            from_safety = from_lw.highest_z + well_z_margin
-        # if we are already at the labware, we know the instr max height would
-        # be tall enough
-        if max(from_safety, to_safety) > instr_max_height:
-            to_safety = instr_max_height
-            from_safety = 0.0  # (ignore since it's in a max())
-    else:
-        # One of our labwares is invalid so we have to just go above
-        # deck.highest_z since we don’t know where we are
-        to_safety = deck.highest_z + lw_z_margin
-
-        if to_safety > instr_max_height:
-            if instr_max_height >= (deck.highest_z + minimum_lw_z_margin):
-                to_safety = instr_max_height
-            else:
-                tallest_lw = list(filter(
-                    lambda lw: lw.highest_z == deck.highest_z,
-                    [lw for lw in deck.data.values() if lw]))[0]
-                if isinstance(tallest_lw, ModuleGeometry) and\
-                        tallest_lw.labware:
-                    tallest_lw = tallest_lw.labware
-                raise LabwareHeightError(
-                    f"The {tallest_lw} has a total height of {deck.highest_z}"
-                    " mm, which is too tall for your current pipette "
-                    "configurations. The longest pipette on your robot can "
-                    f"only be raised to {instr_max_height} mm above the deck."
-                    " This may be because the labware is incorrectly defined,"
-                    " incorrectly calibrated, or physically too tall. Please "
-                    "check your labware definitions and calibrations.")
-        from_safety = 0.0  # (ignore since it’s in a max())
-
-    safe = max_many(
-        to_point.z,
-        from_point.z,
-        to_safety,
-        from_safety,
-        minimum_z_height or 0)
+    safe = _build_safe_height(from_loc, to_loc, deck, constraints)
     must_dodge = should_dodge_thermocycler(deck, from_loc, to_loc)
-    # We should use the origin’s cp for the first move since it should
-    # move only in z and the destination’s cp subsequently
-    up = (from_point._replace(z=safe), origin_cp_override)
-    over = (to_point._replace(z=safe), dest_cp_override)
-    down = (to_point, dest_cp_override)
-    if not must_dodge:
-        return [up, over, down]
+    if must_dodge:
+        sc = deck.get_slot_center('5')
+        wp = [(sc.x, sc.y)]
     else:
-        extra = (
-            deck.get_slot_center('5')._replace(z=safe), dest_cp_override)
-        return [up, extra, over, down]
+        wp = []
+    return plan_arc(from_point, to_point, safe,
+                    origin_cp_override, dest_cp_override,
+                    wp)
 
 
 class Deck(UserDict):
