@@ -579,7 +579,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     async def delete_session(self):
         for mount in self._pip_info_by_mount.keys():
-            if self.get_pipettes[mount]['has_tip']:
+            if self.pipettes[mount]['has_tip']:
                 try:
                     await self._trash_tip(mount)
                 except (CalibrationException, AssertionError):

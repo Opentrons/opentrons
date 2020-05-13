@@ -380,7 +380,6 @@ async def test_complete_check_one_pip(check_calibration_session_only_right):
 async def test_complete_check_both_pips(check_calibration_session):
     sess = await in_comparing_second_pipette_point_one(
             check_calibration_session)
-    first_pip = sess._get_pipette_by_rank(session.PipetteRank.first)
     second_pip = sess._get_pipette_by_rank(session.PipetteRank.second)
     assert sess.pipettes[second_pip.mount]['has_tip'] is True
     await sess.trigger_transition(
