@@ -13,6 +13,8 @@ export type ProtocolAnalyticsData = {|
   protocolName: string,
   protocolAuthor: string,
   protocolText: string,
+  pipettes: string,
+  modules: string,
 |}
 
 export type RobotAnalyticsData = {|

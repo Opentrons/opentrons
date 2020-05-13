@@ -1,6 +1,7 @@
 // @flow
 
 import * as Protocol from '../../protocol'
+import * as RobotSelectors from '../../robot/selectors'
 import * as Hash from '../hash'
 
 import { getProtocolAnalyticsData } from '../selectors'
@@ -8,6 +9,7 @@ import { getProtocolAnalyticsData } from '../selectors'
 import type { State } from '../../types'
 
 jest.mock('../../protocol/selectors')
+jest.mock('../../robot/selectors')
 jest.mock('../hash')
 
 describe('analytics selectors', () => {
@@ -59,6 +61,16 @@ describe('analytics selectors', () => {
       $Call<typeof Protocol.getProtocolContents, State>
     > = Protocol.getProtocolContents
 
+    const getModules: JestMockFn<
+      [State],
+      $Call<typeof RobotSelectors.getModules, State>
+    > = RobotSelectors.getModules
+
+    const getPipettes: JestMockFn<
+      [State],
+      $Call<typeof RobotSelectors.getPipettes, State>
+    > = RobotSelectors.getPipettes
+
     beforeEach(() => {
       hash.mockImplementation(source => Promise.resolve(`hash:${source}`))
       getProtocolType.mockReturnValue(null)
@@ -68,6 +80,8 @@ describe('analytics selectors', () => {
       getProtocolSource.mockReturnValue(null)
       getProtocolAuthor.mockReturnValue(null)
       getProtocolContents.mockReturnValue(null)
+      getModules.mockReturnValue([])
+      getPipettes.mockReturnValue([])
     })
 
     it('should have information about the protocol', () => {
@@ -82,6 +96,8 @@ describe('analytics selectors', () => {
         protocolSource: '',
         protocolAuthor: '',
         protocolText: '',
+        pipettes: '',
+        modules: '',
       })
     })
 
@@ -122,6 +138,52 @@ describe('analytics selectors', () => {
           protocolAuthor: 'hash:Private Author',
           protocolText: 'hash:Private Contents',
         })
+      })
+    })
+
+    it('should collect pipette requestedAs (or actual) names', () => {
+      getPipettes.mockReturnValue([
+        {
+          _id: 0,
+          mount: 'left',
+          channels: 8,
+          name: 'p300_single_v2.0',
+          tipRacks: [],
+          requestedAs: 'p300_single',
+          probed: true,
+          tipOn: false,
+          modelSpecs: null,
+        },
+        {
+          _id: 1,
+          mount: 'right',
+          channels: 8,
+          name: 'p20_multi_v2.0',
+          tipRacks: [],
+          requestedAs: null,
+          probed: true,
+          tipOn: false,
+          modelSpecs: null,
+        },
+      ])
+
+      const result = getProtocolAnalyticsData(mockState)
+
+      return expect(result).resolves.toMatchObject({
+        pipettes: 'p300_single,p20_multi_v2.0',
+      })
+    })
+
+    it('should collect module models', () => {
+      getModules.mockReturnValue([
+        { _id: 0, slot: '1', model: 'temperatureModuleV1' },
+        { _id: 1, slot: '2', model: 'magneticModuleV2' },
+      ])
+
+      const result = getProtocolAnalyticsData(mockState)
+
+      return expect(result).resolves.toMatchObject({
+        modules: 'temperatureModuleV1,magneticModuleV2',
       })
     })
   })
