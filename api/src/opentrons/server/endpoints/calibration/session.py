@@ -417,7 +417,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingFirstPipettePointThree,
         "to_state": CalibrationCheckState.checkComplete,
-        "before": "_trash_first_pipette_tip",
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
@@ -484,7 +483,6 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.go_to_next_check,
         "from_state": CalibrationCheckState.comparingSecondPipettePointOne,
         "to_state": CalibrationCheckState.checkComplete,
-        "before": "_trash_second_pipette_tip",
     },
     {
         "trigger": CalibrationCheckTrigger.exit,
@@ -596,11 +594,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     self._moves.preparingFirstPipette = move
 
     async def delete_session(self):
-        for mount in self._pip_info_by_id.values():
-            try:
-                await self._trash_tip(mount['mount'])
-            except (CalibrationException, AssertionError):
-                pass
+        for pid, mount in self._pip_info_by_id.items():
+            if self._has_tip(pid):
+                try:
+                    await self._trash_tip(mount['mount'])
+                except (CalibrationException, AssertionError):
+                    pass
         await self.hardware.home()
         await self.hardware.set_lights(rails=False)
 
