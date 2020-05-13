@@ -58,7 +58,7 @@ def check_calibration_session_only_left(hardware) \
 
 
 BAD_DIFF_VECTOR = types.Point(30, 30, 30)
-OK_DIFF_VECTOR = types.Point(30, 30, 30)
+OK_DIFF_VECTOR = types.Point(1, 1, 0.5)
 
 # helpers
 
@@ -237,6 +237,22 @@ def test_session_started(check_calibration_session):
            session.CalibrationCheckState.sessionStarted
 
 
+async def test_comparing_by_step(check_calibration_session):
+    sess = await in_jogging_first_pipette_to_height(check_calibration_session)
+
+    assert sess._z_offset_for_xy == types.Point(0, 0, 0.5)
+
+    await sess.trigger_transition(
+        session.CalibrationCheckTrigger.jog, types.Point(0, 0, -.8))
+
+    await sess.trigger_transition(
+        session.CalibrationCheckTrigger.compare_point)
+
+    sess.get_comparisons_by_step()
+    assert sess._z_offset_for_xy ==\
+        types.Point(0, 0, 0.5) + types.Point(0, 0, -.8)
+
+
 async def test_session_started_to_labware_loaded(check_calibration_session):
     check_calibration_session = await in_labware_loaded(
         check_calibration_session
@@ -397,7 +413,7 @@ async def test_load_labware_to_preparing_first_pipette(
     tip_pt = sess._moves.preparingFirstPipette.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt
+    assert curr_pos == tip_pt + types.Point(0, 0, 0.5)
 
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.preparingFirstPipette
@@ -457,7 +473,7 @@ async def test_comparing_first_pipette_height_to_jogging_point_one(
     tip_pt = sess._moves.joggingFirstPipetteToPointOne.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt
+    assert curr_pos == tip_pt + types.Point(0, 0, 0.5)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointOne
     await check_calibration_session.trigger_transition(
@@ -480,7 +496,7 @@ async def test_comparing_first_pipette_point_one_to_jogging_point_two(
     tip_pt = sess._moves.joggingFirstPipetteToPointTwo.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt
+    assert curr_pos == tip_pt + types.Point(0, 0, 0.5)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointTwo
     await check_calibration_session.trigger_transition(
@@ -503,7 +519,7 @@ async def test_comparing_first_pipette_point_two_to_jogging_point_three(
     tip_pt = sess._moves.joggingFirstPipetteToPointThree.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt
+    assert curr_pos == tip_pt + types.Point(0, 0, 0.5)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingFirstPipetteToPointThree
     await check_calibration_session.trigger_transition(
@@ -525,7 +541,7 @@ async def test_load_labware_to_preparing_second_pipette(
     tip_pt = sess._moves.preparingSecondPipette.position
     curr_pos = await sess.hardware.gantry_position(
         sess._get_pipette_by_rank(session.PipetteRank.second).mount)
-    assert curr_pos == tip_pt
+    assert curr_pos == tip_pt + types.Point(0, 0, 0.5)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.preparingSecondPipette
     await check_calibration_session.trigger_transition(
@@ -571,7 +587,11 @@ async def test_comparing_second_pipette_height_to_jogging_point_one(
     tip_pt = sess._moves.joggingSecondPipetteToPointOne.position
     curr_pos = await sess.hardware.gantry_position(
         sess._get_pipette_by_rank(session.PipetteRank.second).mount)
-    assert curr_pos == tip_pt
+    rounded_pos = types.Point(
+        round(curr_pos[0], 2),
+        round(curr_pos[1], 2),
+        round(curr_pos[2], 2))
+    assert rounded_pos == tip_pt + types.Point(0, 0, 0.5)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.joggingSecondPipetteToPointOne
     await check_calibration_session.trigger_transition(
