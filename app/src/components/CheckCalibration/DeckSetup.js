@@ -100,6 +100,7 @@ export function TiprackRender(props: TiprackRenderProps) {
         transformWithSVG
         innerDivProps={{ className: styles.labware_ui_wrapper }}
       >
+        {/* title is capitalized by CSS, and "µL" capitalized is "ML" */}
         <LabwareNameOverlay title={title.replace('µL', 'uL')} />
       </RobotCoordsForeignDiv>
     </g>
