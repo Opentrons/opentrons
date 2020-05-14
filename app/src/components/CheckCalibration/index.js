@@ -49,9 +49,14 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   const pending = requestStatus === PENDING
 
   const { currentStep, labware, instruments, comparisonsByStep } =
-    useSelector((state: State) =>
-      Calibration.getRobotCalibrationCheckSession(state, robotName)
-    ) || {}
+    useSelector((state: State) => {
+      const session = Sessions.getRobotSessionById(
+        state,
+        robotName,
+        Calibration.CALIBRATION_CHECK_SESSION_ID
+      )
+      return session ? session.details : null
+    }) || {}
   React.useEffect(() => {
     dispatchRequest(
       Sessions.fetchSession(robotName, Calibration.CALIBRATION_CHECK_SESSION_ID)

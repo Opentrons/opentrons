@@ -1,5 +1,7 @@
 // @flow
-import { of, ofType, filter, switchMap } from 'redux-observable'
+import { of } from 'rxjs'
+import { filter, switchMap } from 'rxjs/operators'
+import { ofType } from 'redux-observable'
 
 import * as Sessions from '../../sessions'
 
@@ -14,9 +16,9 @@ export const fetchRobotCalibrationCheckSessionEpic: Epic = (
   return action$.pipe(
     ofType(Sessions.FETCH_SESSION_FAILURE),
     filter(
-      action =>
-        action.meta.response.status === 404 &&
-        action.payload.error.id === CALIBRATION_CHECK_SESSION_ID
+      action => action.meta.response.status === 404
+      // TODO: BC: un comment this once the sessionId is return from a failed response
+      // && action.payload.error.id === CALIBRATION_CHECK_SESSION_ID
     ),
     switchMap(action =>
       of(
