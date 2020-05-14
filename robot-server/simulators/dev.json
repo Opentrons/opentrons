@@ -1,0 +1,56 @@
+{
+  "attached_instruments": {
+    "RIGHT": {
+      "model": "p300_single_v1",
+      "id": "321",
+      "max_volume": 300,
+      "name": "p300_single",
+      "tip_length": 0,
+      "channels": 1
+    },
+    "LEFT": {
+      "model": "p10_single_v1",
+      "id": "123",
+      "max_volume": 10,
+      "name": "p10_single",
+      "tip_length": 0,
+      "channels": 1
+    }
+  },
+  "attached_modules": {
+    "thermocycler": [
+      {
+        "function_name": "set_temperature",
+        "kwargs": {
+          "temperature": 3,
+          "hold_time_seconds": 1,
+          "hold_time_minutes": 2,
+          "ramp_rate": 4,
+          "volume": 5
+        }
+      },
+      {
+        "function_name": "set_lid_temperature",
+        "kwargs": {
+          "temperature": 4
+        }
+      }
+    ],
+    "tempdeck": [
+      {
+        "function_name": "set_temperature",
+        "kwargs": {
+          "celsius": 3
+        }
+      }
+    ],
+    "magdeck": [
+      {
+        "function_name": "engage",
+        "kwargs": {
+          "height": 4
+        }
+      }
+    ]
+  }
+}

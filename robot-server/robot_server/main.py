@@ -1,7 +1,10 @@
 import typing
 import logging
+from pathlib import Path
 
 from opentrons.hardware_control import ThreadManager
+from opentrons.hardware_control.simulator_setup import load_simulator, \
+    load_simulator_setup
 from opentrons.main import initialize as initialize_api
 from opentrons.config import feature_flags as ff
 
@@ -48,11 +51,17 @@ def main():
     """
     app_settings = get_settings()
 
-    # Create the hardware
-    checked_hardware = initialize_api(
-            hardware_server=app_settings.hardware_server_enable,
-            hardware_server_socket=app_settings.hardware_server_socket_path
-    )
+    if app_settings.simulator_configuration_file_path:
+        # A path to a simulation configuration is defined. Let's use it.
+        checked_hardware = ThreadManager(
+            load_simulator,
+            Path(app_settings.simulator_configuration_file_path))
+    else:
+        # Create the hardware
+        checked_hardware = initialize_api(
+                hardware_server=app_settings.hardware_server_enable,
+                hardware_server_socket=app_settings.hardware_server_socket_path
+        )
 
     run(hardware=checked_hardware,
         hostname=app_settings.ws_host_name,

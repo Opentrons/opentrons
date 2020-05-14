@@ -12,7 +12,7 @@ stages:
         data:
           type: Session
           attributes:
-            sessionType: check
+            sessionType: calibrationCheck
     response:
       status_code: 201
       save:
