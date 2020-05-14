@@ -14,6 +14,7 @@ import type { State, Dispatch } from '../../types'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
 import * as Calibration from '../../calibration'
+import * as Sessions from '../../sessions'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import { Introduction } from './Introduction'
@@ -52,7 +53,9 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       Calibration.getRobotCalibrationCheckSession(state, robotName)
     ) || {}
   React.useEffect(() => {
-    dispatchRequest(Calibration.fetchRobotCalibrationCheckSession(robotName))
+    dispatchRequest(
+      Sessions.fetchSession(robotName, Calibration.CALIBRATION_CHECK_SESSION_ID)
+    )
   }, [dispatchRequest, robotName])
 
   const hasTwoPipettes = React.useMemo(
@@ -109,7 +112,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }, [instruments, activeInstrument, hasTwoPipettes])
 
   function exit() {
-    dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
+    dispatchRequest(
+      Sessions.deleteSession(
+        robotName,
+        Calibration.CALIBRATION_CHECK_SESSION_ID
+      )
+    )
     closeCalibrationCheck()
   }
 

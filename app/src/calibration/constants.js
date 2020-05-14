@@ -123,3 +123,5 @@ export const CHECK_UPDATE_PATH_CHECK_POINT_THREE: 'checkPointThree' =
 export const CHECK_UPDATE_PATH_CHECK_HEIGHT: 'checkHeight' = 'checkHeight'
 export const CHECK_UPDATE_PATH_COMPARE_POINT: 'comparePoint' = 'comparePoint'
 export const CHECK_UPDATE_PATH_CONFIRM_STEP: 'confirmStep' = 'confirmStep'
+
+export const CALIBRATION_CHECK_SESSION_ID = 'calibrationCheck'
