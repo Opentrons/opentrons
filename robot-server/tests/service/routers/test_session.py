@@ -354,7 +354,6 @@ def test_session_command_create(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/calibrationCheck/commands',
@@ -392,7 +391,6 @@ def test_session_command_create_no_body(api_client,
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
                 'href': '/sessions/calibrationCheck/commands',

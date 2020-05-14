@@ -222,9 +222,6 @@ async def session_command_create_handler(
             # TODO have session create id for command for later querying
             resource_id=str(uuid4())
         ),
-        meta=session.Session(details=create_session_details(session_obj),
-                             # TODO Get type from session
-                             sessionType=models.SessionType.calibration_check),
         links=get_valid_session_links(session_id, router)
     )
 
