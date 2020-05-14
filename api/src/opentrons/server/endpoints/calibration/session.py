@@ -46,6 +46,7 @@ class SessionManager:
 
 # vector from front bottom left of slot 12
 TRASH_TIP_OFFSET = Point(20, 20, -20)
+HEIGHT_SAFETY_BUFFER = Point(0, 0, 5.0)
 
 
 class CalibrationSession:
@@ -146,7 +147,7 @@ class CalibrationSession:
 
     def _build_height_dict(self, slot: str) -> CheckMove:
         pos = Point(*self._deck.get_slot_center(slot))
-        updated_pos = pos - Point(20, 0, pos.z)
+        updated_pos = pos - Point(20, 0, pos.z) + HEIGHT_SAFETY_BUFFER
         return CheckMove(position=updated_pos, locationId=uuid4())
 
     def _get_tip_rack_slot_for_mount(self, mount) -> str:
@@ -612,12 +613,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         assert mount, 'cannot attempt tip pick up, no mount specified'
 
         current_pt = await self.hardware.gantry_position(mount)
-
         ref_pt = self._saved_points[getattr(CalibrationCheckState,
                                             self.current_state_name)]
 
         ref_pt_no_safety = ref_pt - MOVE_TO_TIP_RACK_SAFETY_BUFFER
-        curr_pt_no_safety = current_pt - MOVE_TO_TIP_RACK_SAFETY_BUFFER
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
         pip_model = self.pipettes[mount]['model']
         if str(pip_model).startswith('p1000'):
@@ -627,9 +626,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         zThresholdMag = Point(0, 0, 0).magnitude_to(
                 threshold_vector._replace(x=0, y=0))
         xyDiffMag = ref_pt_no_safety._replace(z=0).magnitude_to(
-                curr_pt_no_safety._replace(z=0))
+                current_pt._replace(z=0))
         zDiffMag = ref_pt_no_safety._replace(x=0, y=0).magnitude_to(
-                curr_pt_no_safety._replace(x=0, y=0))
+                current_pt._replace(x=0, y=0))
         return xyDiffMag > xyThresholdMag or zDiffMag > zThresholdMag
 
     async def _pick_up_pipette_tip(self):
@@ -722,16 +721,24 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _register_point_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, 'cannot register point for missing first pipette'
+        buffer = Point(0, 0, 0)
+        if self.current_state_name ==\
+                CalibrationCheckState.comparingFirstPipetteHeight:
+            buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(first_pip.mount)
+            await self.hardware.gantry_position(first_pip.mount) - buffer
 
     async def _register_point_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, 'cannot register point for missing second pipette'
+        buffer = Point(0, 0, 0)
+        if self.current_state_name ==\
+                CalibrationCheckState.comparingSecondPipetteHeight:
+            buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(second_pip.mount)
+            await self.hardware.gantry_position(second_pip.mount) - buffer
 
     async def _move_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
