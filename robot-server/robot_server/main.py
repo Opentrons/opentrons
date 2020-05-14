@@ -3,8 +3,7 @@ import logging
 from pathlib import Path
 
 from opentrons.hardware_control import ThreadManager
-from opentrons.hardware_control.simulator_setup import load_simulator, \
-    load_simulator_setup
+from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.main import initialize as initialize_api
 from opentrons.config import feature_flags as ff
 
