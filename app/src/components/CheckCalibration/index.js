@@ -137,9 +137,15 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
     dispatch(
-      Calibration.jogRobotCalibrationCheck(
+      Sessions.createSessionCommand(
         robotName,
-        formatJogVector(axis, direction, step)
+        Calibration.CALIBRATION_CHECK_SESSION_ID,
+        {
+          command: Calibration.CHECK_COMMAND_JOG,
+          data: {
+            vector: formatJogVector(axis, direction, step),
+          },
+        }
       )
     )
   }
