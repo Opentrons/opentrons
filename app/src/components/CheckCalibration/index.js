@@ -29,6 +29,7 @@ import styles from './styles.css'
 const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
 const MOVE_TO_NEXT = 'move to next check'
 const CONTINUE = 'continue'
+const EXIT = 'exit'
 const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip and continue to 2nd pipette'
 const CHECK_X_Y_AXES = 'check x and y-axis'
 const CHECK_Z_AXIS = 'check z-axis'
@@ -283,7 +284,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     <ModalPage
       titleBar={{
         title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-        back: { onClick: exit },
+        back: { onClick: exit, children: EXIT, title: EXIT },
       }}
       contentsClassName={modalContentsClassName}
     >
