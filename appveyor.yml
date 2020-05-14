@@ -5,8 +5,8 @@
 image: Visual Studio 2015
 
 environment:
-  # ensure Python 3.6 is first in path
-  PATH: 'C:\Python36;C:\Python36\Scripts;%PATH%'
+  # ensure Python 3.7 is first in path
+  PATH: 'C:\Python37;C:\Python37\Scripts;%PATH%'
   # GNU make
   MAKE: C:\MinGW\bin\mingw32-make.exe
 
