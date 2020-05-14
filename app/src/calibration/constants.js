@@ -125,3 +125,13 @@ export const CHECK_UPDATE_PATH_COMPARE_POINT: 'comparePoint' = 'comparePoint'
 export const CHECK_UPDATE_PATH_CONFIRM_STEP: 'confirmStep' = 'confirmStep'
 
 export const CALIBRATION_CHECK_SESSION_ID = 'calibrationCheck'
+
+export const CHECK_COMMAND_LOAD_LABWARE: 'loadLabware' = 'loadLabware'
+export const CHECK_COMMAND_PREPARE_PIPETTE: 'preparePipette' = 'preparePipette'
+export const CHECK_COMMAND_JOG: 'jog' = 'jog'
+export const CHECK_COMMAND_PICK_UP_TIP: 'pickUpTip' = 'pickUpTip'
+export const CHECK_COMMAND_CONFIRM_TIP: 'confirmTip' = 'confirmTip'
+export const CHECK_COMMAND_INVALIDATE_TIP: 'invalidateTip' = 'invalidateTip'
+export const CHECK_COMMAND_COMPARE_POINT: 'comparePoint' = 'comparePoint'
+export const CHECK_COMMAND_GO_TO_NEXT_CHECK: 'goToNextCheck' = 'goToNextCheck'
+export const CHECK_COMMAND_EXIT: 'exitSession' = 'exitSession'

@@ -126,6 +126,15 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     closeCalibrationCheck()
   }
 
+  function sendCommand(command: string, data: { ... }) {
+    dispatchRequest(
+      Sessions.createSessionCommand(
+        robotName,
+        Calibration.CALIBRATION_CHECK_SESSION_ID,
+        { command, data }
+      )
+    )
+  }
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
     dispatch(
       Calibration.jogRobotCalibrationCheck(
@@ -133,9 +142,6 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         formatJogVector(axis, direction, step)
       )
     )
-  }
-  function comparePoint() {
-    dispatch(Calibration.comparePointRobotCalibrationCheck(robotName))
   }
 
   let stepContents
@@ -146,11 +152,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <Introduction
           exit={exit}
-          proceed={() => {
-            dispatchRequest(
-              Calibration.loadLabwareRobotCalibrationCheck(robotName)
-            )
-          }}
+          proceed={() => sendCommand(Calibration.CHECK_COMMAND_LOAD_LABWARE)}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
@@ -159,11 +161,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_LABWARE_LOADED: {
       stepContents = (
         <DeckSetup
-          proceed={() =>
-            dispatchRequest(
-              Calibration.preparePipetteRobotCalibrationCheck(robotName)
-            )
-          }
+          proceed={() => sendCommand(Calibration.CHECK_COMMAND_PREPARE_PIPETTE)}
           labware={labware}
         />
       )
@@ -185,21 +183,11 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
           tipRackWellName={tipRackWellName}
-          pickUpTip={() => {
-            dispatchRequest(
-              Calibration.pickUpTipRobotCalibrationCheck(robotName)
-            )
-          }}
-          confirmTip={() => {
-            dispatchRequest(
-              Calibration.confirmTipRobotCalibrationCheck(robotName)
-            )
-          }}
-          invalidateTip={() => {
-            dispatchRequest(
-              Calibration.invalidateTipRobotCalibrationCheck(robotName)
-            )
-          }}
+          pickUpTip={() => sendCommand(Calibration.CHECK_COMMAND_PICK_UP_TIP)}
+          confirmTip={() => sendCommand(Calibration.CHECK_COMMAND_CONFIRM_TIP)}
+          invalidateTip={() =>
+            sendCommand(Calibration.CHECK_COMMAND_INVALIDATE_TIP)
+          }
           jog={jog}
         />
       ) : null
@@ -234,12 +222,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           isInspecting={isInspecting}
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}
-          comparePoint={comparePoint}
-          goToNextCheck={() => {
-            dispatchRequest(
-              Calibration.confirmStepRobotCalibrationCheck(robotName)
-            )
-          }}
+          comparePoint={() =>
+            sendCommand(Calibration.CHECK_COMMAND_COMPARE_POINT)
+          }
+          goToNextCheck={() =>
+            sendCommand(Calibration.CHECK_COMMAND_GO_TO_NEXT_CHECK)
+          }
           jog={jog}
         />
       )
@@ -265,12 +253,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}
           exit={exit}
-          comparePoint={comparePoint}
-          goToNextCheck={() => {
-            dispatchRequest(
-              Calibration.confirmStepRobotCalibrationCheck(robotName)
-            )
-          }}
+          comparePoint={() =>
+            sendCommand(Calibration.CHECK_COMMAND_COMPARE_POINT)
+          }
+          goToNextCheck={() =>
+            sendCommand(Calibration.CHECK_COMMAND_GO_TO_NEXT_CHECK)
+          }
           jog={jog}
         />
       )
