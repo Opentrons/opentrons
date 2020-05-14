@@ -31,7 +31,7 @@ describe('getNextDefaultBlockIsActive', () => {
       },
       {
         testMsg: 'returns false when false previously selected',
-        orderedStepIds: ['f', 'f', 'f'],
+        orderedStepIds: ['f', 't', 'f'],
         expected: false,
       },
     ]
