@@ -182,17 +182,17 @@ async def get_sessions_handler(
     )
 
 
-@router.post("/sessions/{session_id}/commands",
-             description="Create a command",
+@router.post("/sessions/{session_id}/commands/execute",
+             description="Create and execute a command immediately",
              response_model_exclude_unset=True,
              response_model=session.CommandResponse)
-async def session_command_create_handler(
+async def session_command_execute_handler(
         session_id: str,
         command_request: session.CommandRequest,
         session_manager: SessionManager = Depends(get_session_manager),
 ) -> session.CommandResponse:
     """
-    Process a session command
+    Execute a session command
     """
     session_obj = typing.cast(CheckCalibrationSession,
                               get_session(manager=session_manager,
@@ -218,7 +218,7 @@ async def session_command_create_handler(
         data=ResponseDataModel.create(
             attributes=session.SessionCommand(data=command_data,
                                               command=command,
-                                              status='accepted'),
+                                              status='executed'),
             # TODO have session create id for command for later querying
             resource_id=str(uuid4())
         ),
@@ -234,7 +234,7 @@ def get_valid_session_links(session_id: str, api_router: APIRouter) \
             get_session_handler.__name__,
             session_id=session_id)),
         "POST": ResourceLink(href=api_router.url_path_for(
-            session_command_create_handler.__name__,
+            session_command_execute_handler.__name__,
             session_id=session_id)),
         "DELETE": ResourceLink(href=api_router.url_path_for(
             delete_session_handler.__name__,
