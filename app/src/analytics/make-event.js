@@ -4,7 +4,8 @@ import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getRobotCalibrationCheckSession } from '../calibration'
+import { CALIBRATION_CHECK_SESSION_ID } from '../calibration'
+import * as Sessions from '../sessions'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
@@ -257,19 +258,29 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
+    case Sessions.CREATE_SESSION_SUCCESS: {
+      if (action.payload.data.id === CALIBRATION_CHECK_SESSION_ID) {
+        const { robotName } = action.payload
+        const sessionData = Sessions.getRobotSessionById(
+          state,
+          robotName,
+          CALIBRATION_CHECK_SESSION_ID
+        )
 
-      return Promise.resolve({
-        name: 'calibrationCheckStart',
-        properties: { ...sessionData },
-      })
+        return Promise.resolve({
+          name: 'calibrationCheckStart',
+          properties: { ...sessionData },
+        })
+      }
     }
 
     case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
       const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
+      const sessionData = Sessions.getRobotSessionById(
+        state,
+        robotName,
+        CALIBRATION_CHECK_SESSION_ID
+      )
 
       return Promise.resolve({
         name: 'calibrationCheckPass',

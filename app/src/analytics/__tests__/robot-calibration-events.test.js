@@ -24,7 +24,17 @@ const SPECS: Array<EventSpec> = [
     name: 'calibrationCheckStart',
     action: Sessions.createSessionSuccess(
       'fake-robot-name',
-      CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+      {
+        data: {
+          id: Calibration.CALIBRATION_CHECK_SESSION_ID,
+          type: 'Session',
+          attributes: {
+            sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+            details:
+              CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+          },
+        },
+      },
       mockRequestMeta
     ),
     expected: {
@@ -45,16 +55,17 @@ const SPECS: Array<EventSpec> = [
 const getRobotSessionById: JestMockFn<
   [State, string, string],
   $Call<typeof Sessions.getRobotSessionById, State, string, string>
-> = Sessions.getRobotSessioById
+> = Sessions.getRobotSessionById
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('robot calibration analytics events', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    getRobotSessionById.mockReturnValue(
-      CalibrationFixtures.mockRobotCalibrationCheckSessionDetails
-    )
+    getRobotSessionById.mockReturnValue({
+      sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+      details: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+    })
   })
 
   SPECS.forEach(spec => {

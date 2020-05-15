@@ -7,12 +7,12 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-
+import { mockRobotCalibrationCheckSessionDetails } from '../../calibration/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
 export const mockSessionData: Types.Session = {
   sessionType: 'calibrationCheck',
-  details: { someData: 5 },
+  details: mockRobotCalibrationCheckSessionDetails,
 }
 
 export const mockSessionCommand: Types.SessionCommand = {
@@ -42,10 +42,7 @@ export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   },
   meta: {
     sessionType: 'calibrationCheck',
-    details: {
-      someData: 15,
-      someOtherData: 'hi',
-    },
+    details: mockRobotCalibrationCheckSessionDetails,
   },
 }
 
