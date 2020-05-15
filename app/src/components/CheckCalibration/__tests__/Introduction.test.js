@@ -6,8 +6,6 @@ import { AlertModal } from '@opentrons/components'
 
 import { Introduction } from '../Introduction'
 
-jest.mock('../../../calibration/selectors')
-
 describe('Introduction', () => {
   let render
 

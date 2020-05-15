@@ -16,12 +16,12 @@ export const mockSessionData: Types.Session = {
 }
 
 export const mockSessionCommand: Types.SessionCommand = {
-  command: 'dosomething',
+  command: 'jog',
   data: { someData: 32 },
 }
 
 export const mockSessionCommandData: Types.SessionCommand = {
-  command: '4321',
+  command: 'preparePipette',
   status: 'accepted',
   data: {},
 }

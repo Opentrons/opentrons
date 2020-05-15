@@ -20,7 +20,7 @@ describe('createSessionCommandEpic', () => {
       data: {
         type: 'Command',
         attributes: {
-          command: 'dosomething',
+          command: 'jog',
           data: {
             someData: 32,
           },

@@ -15,6 +15,10 @@ import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
 import * as Calibration from '../../calibration'
 import * as Sessions from '../../sessions'
+import type {
+  SessionCommandString,
+  SessionCommandData,
+} from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import { Introduction } from './Introduction'
@@ -127,7 +131,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     closeCalibrationCheck()
   }
 
-  function sendCommand(command: string, data: { ... }) {
+  function sendCommand(
+    command: SessionCommandString,
+    data: SessionCommandData = {}
+  ) {
     dispatchRequest(
       Sessions.createSessionCommand(
         robotName,

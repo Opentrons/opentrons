@@ -3,12 +3,15 @@
 import { makeEvent } from '../make-event'
 
 import * as Calibration from '../../calibration'
+import * as Sessions from '../../sessions'
+import * as SessionsFixtures from '../../sessions/__fixtures__'
 import * as CalibrationFixtures from '../../calibration/__fixtures__'
+import { mockRequestMeta } from '../../robot-api/__fixtures__'
 
 import type { State, Action } from '../../types'
 import type { AnalyticsEvent } from '../types'
 
-jest.mock('../../calibration/selectors')
+jest.mock('../../sessions/selectors')
 
 type EventSpec = {|
   name: string,
@@ -19,10 +22,10 @@ type EventSpec = {|
 const SPECS: Array<EventSpec> = [
   {
     name: 'calibrationCheckStart',
-    action: Calibration.createSessionSuccess(
+    action: Sessions.createSessionSuccess(
       'fake-robot-name',
       CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
-      {}
+      mockRequestMeta
     ),
     expected: {
       name: 'calibrationCheckStart',
@@ -39,17 +42,17 @@ const SPECS: Array<EventSpec> = [
   },
 ]
 
-const getRobotCalibrationCheckSession: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
-> = Calibration.getRobotCalibrationCheckSession
+const getRobotSessionById: JestMockFn<
+  [State, string, string],
+  $Call<typeof Sessions.getRobotSessionById, State, string, string>
+> = Sessions.getRobotSessioById
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('robot calibration analytics events', () => {
   beforeEach(() => {
     jest.resetAllMocks()
-    getRobotCalibrationCheckSession.mockReturnValue(
+    getRobotSessionById.mockReturnValue(
       CalibrationFixtures.mockRobotCalibrationCheckSessionDetails
     )
   })

@@ -27,13 +27,15 @@ export type SessionType = 'calibrationCheck'
 
 // The details associated with available session types
 type SessionDetails = Calibration.RobotCalibrationCheckSessionDetails
-type SessionCommandString = $Values<typeof Calibration.checkCommands>
+export type SessionCommandString = $Values<typeof Calibration.checkCommands>
+
+// TODO(al, 2020-05-11): data should be properly typed with all
+// known command types
+export type SessionCommandData = { ... }
 
 export type SessionCommandRequest = {|
   command: SessionCommandString,
-  // TODO(al, 2020-05-11): data should be properly typed with all
-  // known command types
-  data: { ... },
+  data: SessionCommandData,
 |}
 
 export type Session = {|
@@ -43,9 +45,7 @@ export type Session = {|
 
 export type SessionCommand = {|
   command: SessionCommandString,
-  // TODO(al, 2020-05-11): data should be properly typed with all
-  // known command types
-  data: { ... },
+  data: SessionCommandData,
   status?: string,
 |}
 
