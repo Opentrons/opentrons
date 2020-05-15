@@ -2,23 +2,22 @@ from uuid import UUID
 from enum import Enum
 from typing import Dict, Optional, List, Any
 from functools import partial
-from pydantic import BaseModel, Field, validator
+from pydantic import BaseModel, Field
 
 from .helper_classes import DeckCalibrationError
-import opentrons.types as top_types
 
 
-Point = List[float]
+OffsetVector = List[float]
 
-# # Commonly used Point type description and constraints
-PointField = partial(Field, ...,
-                     description="A point in deck coordinates (x, y, z)",
-                     min_items=3, max_items=3)
+OffsetVectorField = partial(Field, ...,
+                            description="An offset vector in deck "
+                                        "coordinates (x, y, z)",
+                            min_items=3, max_items=3)
 
 
 class TiprackPosition(BaseModel):
     locationId: UUID
-    offset: Point = PointField()
+    offset: OffsetVector = OffsetVectorField()
 
 
 class SessionType(str, Enum):
@@ -31,11 +30,7 @@ class SpecificPipette(BaseModel):
 
 
 class JogPosition(BaseModel):
-    vector: top_types.Point
-
-    @validator("vector")
-    def validate_point(cls, v):
-        return Point(*v)
+    vector: OffsetVector
 
 
 # TODO: BC: the mount and rank fields here are typed as strings
@@ -80,8 +75,8 @@ class ComparisonStatus(BaseModel):
     """
     A model describing the comparison of a checked point to calibrated value
     """
-    differenceVector: Point = PointField()
-    thresholdVector:  Point = PointField()
+    differenceVector: OffsetVector = OffsetVectorField()
+    thresholdVector:  OffsetVector = OffsetVectorField()
     exceedsThreshold: bool
     transformType: DeckCalibrationError
 
