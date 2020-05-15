@@ -23,7 +23,6 @@ describe('robot calibration check actions', () => {
         payload: {
           robotName: 'robot-name',
         },
-        meta: {},
       },
     },
   ]

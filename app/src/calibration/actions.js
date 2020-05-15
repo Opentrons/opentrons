@@ -4,7 +4,7 @@ import type {
   RobotApiErrorResponse,
 } from '../robot-api/types'
 import * as Types from './types'
-import type { RobotCalibrationCheckSessionData } from './api-types'
+import type { RobotCalibrationCheckSessionDetails } from './api-types'
 import * as Constants from './constants'
 
 export const completeRobotCalibrationCheck = (

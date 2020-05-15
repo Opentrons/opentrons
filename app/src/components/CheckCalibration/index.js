@@ -141,7 +141,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         robotName,
         Calibration.CALIBRATION_CHECK_SESSION_ID,
         {
-          command: Calibration.CHECK_COMMAND_JOG,
+          command: Calibration.checkCommands.JOG,
           data: {
             vector: formatJogVector(axis, direction, step),
           },
@@ -158,7 +158,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <Introduction
           exit={exit}
-          proceed={() => sendCommand(Calibration.CHECK_COMMAND_LOAD_LABWARE)}
+          proceed={() => sendCommand(Calibration.checkCommands.LOAD_LABWARE)}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
@@ -167,7 +167,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_LABWARE_LOADED: {
       stepContents = (
         <DeckSetup
-          proceed={() => sendCommand(Calibration.CHECK_COMMAND_PREPARE_PIPETTE)}
+          proceed={() => sendCommand(Calibration.checkCommands.PREPARE_PIPETTE)}
           labware={labware}
         />
       )
@@ -189,10 +189,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
           tipRackWellName={tipRackWellName}
-          pickUpTip={() => sendCommand(Calibration.CHECK_COMMAND_PICK_UP_TIP)}
-          confirmTip={() => sendCommand(Calibration.CHECK_COMMAND_CONFIRM_TIP)}
+          pickUpTip={() => sendCommand(Calibration.checkCommands.PICK_UP_TIP)}
+          confirmTip={() => sendCommand(Calibration.checkCommands.CONFIRM_TIP)}
           invalidateTip={() =>
-            sendCommand(Calibration.CHECK_COMMAND_INVALIDATE_TIP)
+            sendCommand(Calibration.checkCommands.INVALIDATE_TIP)
           }
           jog={jog}
         />
@@ -229,10 +229,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           comparison={comparisonsByStep[currentStep]}
           nextButtonText={nextButtonText}
           comparePoint={() =>
-            sendCommand(Calibration.CHECK_COMMAND_COMPARE_POINT)
+            sendCommand(Calibration.checkCommands.COMPARE_POINT)
           }
           goToNextCheck={() =>
-            sendCommand(Calibration.CHECK_COMMAND_GO_TO_NEXT_CHECK)
+            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
           }
           jog={jog}
         />
@@ -260,10 +260,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           nextButtonText={nextButtonText}
           exit={exit}
           comparePoint={() =>
-            sendCommand(Calibration.CHECK_COMMAND_COMPARE_POINT)
+            sendCommand(Calibration.checkCommands.COMPARE_POINT)
           }
           goToNextCheck={() =>
-            sendCommand(Calibration.CHECK_COMMAND_GO_TO_NEXT_CHECK)
+            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
           }
           jog={jog}
         />

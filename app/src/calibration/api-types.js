@@ -74,7 +74,7 @@ export type RobotCalibrationCheckComparison = {|
   exceedsThreshold: boolean,
 |}
 
-export type RobotCalibrationCheckSessionData = {|
+export type RobotCalibrationCheckSessionDetails = {|
   instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {|

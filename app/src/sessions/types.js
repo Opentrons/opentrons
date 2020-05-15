@@ -20,12 +20,17 @@ import type {
   RobotApiV2ResponseBody,
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
+import * as Calibration from '../calibration'
 
 // The available session types
 export type SessionType = 'calibrationCheck'
 
+// The details associated with available session types
+type SessionDetails = Calibration.RobotCalibrationCheckSessionDetails
+type SessionCommandString = $Values<typeof Calibration.checkCommands>
+
 export type SessionCommandRequest = {|
-  command: string,
+  command: SessionCommandString,
   // TODO(al, 2020-05-11): data should be properly typed with all
   // known command types
   data: { ... },
@@ -33,13 +38,11 @@ export type SessionCommandRequest = {|
 
 export type Session = {|
   sessionType: SessionType,
-  // TODO(al, 2020-05-11): details should be properly typed with all
-  // known session response types
-  details: { ... },
+  details: SessionDetails,
 |}
 
 export type SessionCommand = {|
-  command: string,
+  command: SessionCommandString,
   // TODO(al, 2020-05-11): data should be properly typed with all
   // known command types
   data: { ... },

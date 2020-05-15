@@ -6,8 +6,9 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
+import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
 
 import { CheckCalibration } from '../index'
 import { Introduction } from '../Introduction'
@@ -20,7 +21,7 @@ import { CompleteConfirmation } from '../CompleteConfirmation'
 import type { State } from '../../../types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../calibration/selectors')
+jest.mock('../../../sessions/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
@@ -28,10 +29,10 @@ type CheckCalibrationSpec = {
   currentStep: Calibration.RobotCalibrationCheckStep,
   ...
 }
-const getRobotCalibrationCheckSession: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
-> = Calibration.getRobotCalibrationCheckSession
+const getRobotSessionById: JestMockFn<
+  [State, string, string],
+  $Call<typeof Sessions.getRobotSessionById, State, string, string>
+> = Sessions.getRobotSessionById
 
 const mockGetDeckDefinitions: JestMockFn<
   [],
@@ -46,7 +47,7 @@ describe('CheckCalibration', () => {
   const mockCloseCalibrationCheck = jest.fn()
 
   const getBackButton = wrapper =>
-    wrapper.find({ title: 'Back' }).find('button')
+    wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
@@ -109,13 +110,17 @@ describe('CheckCalibration', () => {
   })
 
   it('fetches robot cal check session on mount', () => {
-    getRobotCalibrationCheckSession.mockReturnValue(
-      mockRobotCalibrationCheckSessionData
-    )
+    getRobotSessionById.mockReturnValue({
+      sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+      details: mockRobotCalibrationCheckSessionDetails,
+    })
     render()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Calibration.fetchRobotCalibrationCheckSession('robot-name'),
+        ...Sessions.fetchSession(
+          'robot-name',
+          Calibration.CALIBRATION_CHECK_SESSION_ID
+        ),
         meta: { requestId: expect.any(String) },
       })
     )
@@ -123,9 +128,12 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      getRobotCalibrationCheckSession.mockReturnValue({
-        ...mockRobotCalibrationCheckSessionData,
-        currentStep: spec.currentStep,
+      getRobotSessionById.mockReturnValue({
+        sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+        details: {
+          ...mockRobotCalibrationCheckSessionDetails,
+          currentStep: spec.currentStep,
+        },
       })
       const wrapper = render()
 
@@ -149,7 +157,10 @@ describe('CheckCalibration', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Calibration.deleteRobotCalibrationCheckSession('robot-name'),
+        ...Sessions.deleteSession(
+          'robot-name',
+          Calibration.CALIBRATION_CHECK_SESSION_ID
+        ),
         meta: { requestId: expect.any(String) },
       })
     )

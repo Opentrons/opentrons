@@ -19,14 +19,14 @@ type EventSpec = {|
 const SPECS: Array<EventSpec> = [
   {
     name: 'calibrationCheckStart',
-    action: Calibration.createRobotCalibrationCheckSessionSuccess(
+    action: Calibration.createSessionSuccess(
       'fake-robot-name',
-      CalibrationFixtures.mockRobotCalibrationCheckSessionData,
+      CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
       {}
     ),
     expected: {
       name: 'calibrationCheckStart',
-      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionData,
+      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
     },
   },
   {
@@ -34,7 +34,7 @@ const SPECS: Array<EventSpec> = [
     action: Calibration.completeRobotCalibrationCheck('fake-robot-name'),
     expected: {
       name: 'calibrationCheckPass',
-      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionData,
+      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
     },
   },
 ]
@@ -50,7 +50,7 @@ describe('robot calibration analytics events', () => {
   beforeEach(() => {
     jest.resetAllMocks()
     getRobotCalibrationCheckSession.mockReturnValue(
-      CalibrationFixtures.mockRobotCalibrationCheckSessionData
+      CalibrationFixtures.mockRobotCalibrationCheckSessionDetails
     )
   })
 
