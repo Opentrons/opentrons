@@ -3,17 +3,13 @@ import assert from 'assert'
 import { MAGNETIC_MODULE_TYPE } from '@opentrons/shared-data'
 import * as errorCreators from '../../errorCreators'
 
-import type {
-  InvariantContext,
-  RobotState,
-  EngageMagnetArgs,
-} from '../../types'
+import type { CommandCreator, EngageMagnetArgs } from '../../types'
 
 /** Engage magnet of specified magnetic module to given engage height. */
-export const engageMagnet = (
-  args: EngageMagnetArgs,
-  invariantContext: InvariantContext,
-  prevRobotState: RobotState
+export const engageMagnet: CommandCreator<EngageMagnetArgs> = (
+  args,
+  invariantContext,
+  prevRobotState
 ) => {
   const { module, engageHeight } = args
   const command = 'magneticModule/engageMagnet'
