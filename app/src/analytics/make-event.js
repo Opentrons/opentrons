@@ -272,6 +272,7 @@ export function makeEvent(
           properties: { ...sessionData },
         })
       }
+      break
     }
 
     case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {

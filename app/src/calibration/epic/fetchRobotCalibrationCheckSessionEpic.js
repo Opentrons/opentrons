@@ -18,7 +18,7 @@ export const fetchRobotCalibrationCheckSessionEpic: Epic = (
     tap(console.log),
     filter(
       action => action.meta.response.status === 404
-      // TODO: BC: un comment this once the sessionId is return from a failed response
+      // TODO: BC: un comment this once the sessionId is returned from a failed response
       // && action.payload.error.id === CALIBRATION_CHECK_SESSION_ID
     ),
     switchMap(action =>

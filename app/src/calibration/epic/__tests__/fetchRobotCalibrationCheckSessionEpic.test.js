@@ -1,10 +1,7 @@
 // @flow
 import { TestScheduler } from 'rxjs/testing'
-import {
-  mockFetchSessionFailureMeta,
-  mockFetchSessionFailure,
-} from '../../../sessions/__fixtures__'
-import { mockV2ErrorResponse, mockRobot } from '../../../robot-api/__fixtures__'
+import { mockFetchSessionFailureMeta } from '../../../sessions/__fixtures__'
+import { mockRobot } from '../../../robot-api/__fixtures__'
 import { CALIBRATION_CHECK_SESSION_ID } from '../../constants'
 import * as Sessions from '../../../sessions'
 import { calibrationEpic } from '..'

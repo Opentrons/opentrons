@@ -4,7 +4,6 @@ import { makeEvent } from '../make-event'
 
 import * as Calibration from '../../calibration'
 import * as Sessions from '../../sessions'
-import * as SessionsFixtures from '../../sessions/__fixtures__'
 import * as CalibrationFixtures from '../../calibration/__fixtures__'
 import { mockRequestMeta } from '../../robot-api/__fixtures__'
 
@@ -39,7 +38,10 @@ const SPECS: Array<EventSpec> = [
     ),
     expected: {
       name: 'calibrationCheckStart',
-      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+      properties: {
+        sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+        details: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+      },
     },
   },
   {
@@ -47,7 +49,10 @@ const SPECS: Array<EventSpec> = [
     action: Calibration.completeRobotCalibrationCheck('fake-robot-name'),
     expected: {
       name: 'calibrationCheckPass',
-      properties: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+      properties: {
+        sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+        details: CalibrationFixtures.mockRobotCalibrationCheckSessionDetails,
+      },
     },
   },
 ]

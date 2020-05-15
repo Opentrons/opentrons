@@ -1,7 +1,6 @@
 // @flow
 
 import * as Actions from '../actions'
-import * as Fixtures from '../__fixtures__'
 
 import type { CalibrationAction } from '../types'
 
