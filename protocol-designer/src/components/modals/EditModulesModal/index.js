@@ -14,6 +14,7 @@ import {
 import {
   THERMOCYCLER_MODULE_TYPE,
   MAGNETIC_MODULE_TYPE,
+  THERMOCYCLER_MODULE_V1,
 } from '@opentrons/shared-data'
 import { i18n } from '../../../localization'
 import {
@@ -95,10 +96,17 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
     return !isLabwareCompatible
   }
 
-  const initialValues = {
-    selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
-    selectedModel: moduleOnDeck?.model || null,
-  }
+  const moduleIsThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
+
+  let initialValues = moduleIsThermocycler
+    ? {
+        selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
+        selectedModel: THERMOCYCLER_MODULE_V1,
+      }
+    : {
+        selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
+        selectedModel: moduleOnDeck?.model || null,
+      }
 
   const validator = ({
     selectedModel,
