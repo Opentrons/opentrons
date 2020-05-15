@@ -182,60 +182,6 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS',
-    action: {
-      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
-      payload: {
-        robotName: 'eggplant-parm',
-        sessionId: Fixtures.mockSessionId,
-        ...Fixtures.mockSessionCommandResponse,
-      },
-      meta: {},
-    },
-    state: {
-      'eggplant-parm': {
-        robotSessions: {
-          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
-        },
-      },
-    },
-    expected: {
-      'eggplant-parm': {
-        robotSessions: {
-          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
-        },
-      },
-    },
-  },
-  {
-    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS with existing',
-    action: {
-      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
-      payload: {
-        robotName: 'eggplant-parm',
-        sessionId: Fixtures.mockSessionId,
-        ...Fixtures.mockSessionCommandResponse,
-      },
-      meta: {},
-    },
-    state: {
-      'eggplant-parm': {
-        robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionAttributes,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
-        },
-      },
-    },
-    expected: {
-      'eggplant-parm': {
-        robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionAttributes,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
-        },
-      },
-    },
-  },
-  {
     name: 'handles sessions:DELETE_SESSION_SUCCESS',
     action: {
       type: 'sessions:DELETE_SESSION_SUCCESS',

@@ -59,11 +59,6 @@ export const mockSessionCommandResponse: Types.SessionCommandResponse = {
     type: 'SessionCommand',
     attributes: mockSessionCommandAttributes,
   },
-  meta: {
-    id: mockSessionId,
-    sessionType: 'calibrationCheck',
-    details: mockRobotCalibrationCheckSessionDetails,
-  },
 }
 
 export const {

@@ -104,7 +104,6 @@ export type RobotApiV2Error = {|
   id?: string,
   links?: ResourceLinks,
   status?: string,
-  code?: string,
   title?: string,
   detail?: string,
   source?: {|
