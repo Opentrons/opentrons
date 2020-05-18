@@ -1,0 +1,62 @@
+---
+test_name: Get modules
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Get all the modules
+    request:
+      url: "{host:s}:{port:d}/modules"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        modules:
+          - name: thermocycler
+            displayName: thermocycler
+            moduleModel: thermocyclerModuleV1
+            port: !anystr
+            serial: !anystr
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              lid: !anystr
+              lidTarget: !anyfloat
+              lidTemp: !anyfloat
+              currentTemp: !anyfloat
+              holdTime: !anyfloat
+              targetTemp: !anyfloat
+              rampRate: !anyfloat
+              currentCycleIndex: Null
+              totalCycleCount: Null
+              currentStepIndex: Null
+              totalStepCount: Null
+          - name: tempdeck
+            displayName: tempdeck
+            moduleModel: temperatureModuleV1
+            port: !anystr
+            serial: !anystr
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              currentTemp: !anyfloat
+              targetTemp: !anyfloat
+          - name: magdeck
+            displayName: magdeck
+            moduleModel: magneticModuleV1
+            port: !anystr
+            serial: !anystr
+            model: !anystr
+            revision: !anystr
+            fwVersion: !anystr
+            hasAvailableUpdate: !anybool
+            status: !anystr
+            data:
+              height: !anyfloat
+              engaged: !anybool

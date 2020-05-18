@@ -47,6 +47,14 @@
         "ot_robot_server_hardware_server_socket_path"
       ],
       "type": "string"
+    },
+    "simulator_configuration_file_path": {
+      "title": "Simulator Configuration File Path",
+      "description": "Path to a json file that describes the hardware simulator.",
+      "env_names": [
+        "ot_robot_server_simulator_configuration_file_path"
+      ],
+      "type": "string"
     }
   },
   "additionalProperties": false

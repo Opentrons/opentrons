@@ -218,7 +218,7 @@ def test_create_session(api_client, patch_build_session,
             },
         }
     }
-    assert response.status_code == 200
+    assert response.status_code == 201
     # Clean up
     get_session_manager().sessions.clear()
 

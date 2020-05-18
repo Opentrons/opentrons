@@ -1,0 +1,41 @@
+---
+test_name: Session Lifecycle
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create a session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: calibrationCheck
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+
+  - name: Get the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: Fail to get the deleted session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 404

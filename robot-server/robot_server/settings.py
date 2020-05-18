@@ -63,5 +63,11 @@ class RobotServerSettings(BaseSettings):
         description="Unix file system path used by the hardware server."
     )
 
+    simulator_configuration_file_path: str = Field(
+        None,
+        description="Path to a json file that describes the hardware"
+                    " simulator."
+    )
+
     class Config:
         env_prefix = "OT_ROBOT_SERVER_"
