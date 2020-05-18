@@ -3,7 +3,7 @@ import functools
 import logging
 import json
 from dataclasses import dataclass
-from typing import Any, List, Optional, Set, Tuple, Dict
+from typing import Any, List, Optional, Tuple, Dict
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
@@ -13,6 +13,7 @@ from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
+from .util import first_parent
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -49,27 +50,6 @@ def split_loc_labware(
         return loc.labware.parent, loc.labware
     else:
         return None, None
-
-
-def first_parent(loc: types.LocationLabware) -> Optional[str]:
-    """ Return the topmost parent of this location. It should be
-    either a string naming a slot or a None if the location isn't
-    associated with a slot """
-
-    # cycle-detecting recursive climbing
-    seen: Set[types.LocationLabware] = set()
-
-    # internal function to have the cycle detector different per call
-    def _fp_recurse(location: types.LocationLabware):
-        if location in seen:
-            raise RuntimeError('Cycle in labware parent')
-        seen.add(location)
-        if location is None or isinstance(location, str):
-            return location
-        else:
-            return first_parent(location.parent)
-
-    return _fp_recurse(loc)
 
 
 BAD_PAIRS = [('1', '12'),

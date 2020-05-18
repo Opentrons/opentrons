@@ -50,7 +50,9 @@ minimalLabwareDef = {
         "xDimension": 1.0,
         "yDimension": 2.0,
         "zDimension": 3.0
-    }
+    },
+    "namespace": "opentrons",
+    "version": 1
 }
 
 
