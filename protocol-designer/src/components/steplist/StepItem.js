@@ -8,6 +8,7 @@ import {
 import { THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType } from '../../form-types'
 import { i18n } from '../../localization'
+import { makeTemperatureText } from '../../utils'
 import { PDTitledList } from '../lists'
 import { StepDescription } from '../StepDescription'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -23,11 +24,6 @@ import type {
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
-
-const makeTemperatureText = (temperature: number | null): string =>
-  temperature === null
-    ? 'Deactivated'
-    : `${temperature} ${i18n.t('application.units.degrees')}`
 
 export type StepItemProps = {|
   description?: ?string,
