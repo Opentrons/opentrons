@@ -26,6 +26,7 @@ class SimulatorSetup:
 
 
 async def create_simulator(setup: SimulatorSetup, loop=None) -> API:
+    """Create a simulator"""
     simulator = await API.build_hardware_simulator(
         attached_instruments=setup.attached_instruments,
         attached_modules=list(setup.attached_modules.keys()),
@@ -44,8 +45,9 @@ async def create_simulator(setup: SimulatorSetup, loop=None) -> API:
 
 
 async def load_simulator(path: Path, loop=None) -> API:
+    """Create a simulator from a JSON file."""
     return await create_simulator(setup=load_simulator_setup(path),
-                                  loop=None)
+                                  loop=loop)
 
 
 def save_simulator_setup(simulator_setup: SimulatorSetup, path: Path):
@@ -75,7 +77,7 @@ def _prepare_for_dict(key, value):
 
 
 def _prepare_for_simulator_setup(key, value):
-    """Convert """
+    """Convert value to a SimulatorSetup"""
     if key == 'attached_instruments' and value:
         return {Mount[mount.upper()]: data for (mount, data) in value.items()}
     if key == 'config' and value:
