@@ -172,7 +172,6 @@ def get_protocol_api(
        and JUPYTER_NOTEBOOK_LABWARE_DIR.is_dir():  # type: ignore
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
-    print("AMIT")
     return _build_protocol_context(
         checked_version, bundled_labware, bundled_data,
         extra_labware, hardware_simulator)
