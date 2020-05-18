@@ -5,8 +5,10 @@ import pytest
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
 from opentrons.system.shared_data import load_shared_data
+from opentrons import config
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
+from opentrons.protocol_api.geometry import Deck
 
 test_data = {
     'circular_well_json': {
@@ -29,6 +31,14 @@ test_data = {
         'z': 22
     }
 }
+
+
+@pytest.fixture
+def index_file_dir(tmpdir):
+    config.CONFIG['labware_calibration_offsets_dir_v2'] = tmpdir
+    # config.reload()
+    yield tmpdir
+    config.reload()
 
 
 def test_well_init():
@@ -465,3 +475,36 @@ def test_uris():
     assert labware.uri_from_definition(defn) == uri
     lw = labware.Labware(defn, Location(Point(0, 0, 0), 'Test Slot'))
     assert lw.uri == uri
+
+
+@pytest.mark.parametrize(
+    'labware_name', [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml'])
+def test_add_index_file(labware_name, index_file_dir):
+    deck = Deck()
+    parent = deck.position_for(1)
+    definition = labware.get_labware_definition(labware_name)
+    lw = labware.Labware(definition, parent)
+    labware_hash = labware._hash_labware_def(lw._definition)
+    labware._add_to_index_offset_file(lw, labware_hash)
+
+    lw_uri = labware.uri_from_definition(definition)
+
+    str_parent = labware._get_parent_identifier(lw.parent)
+    slot = '1'
+    if str_parent:
+        mod_dict = {str_parent: f'{slot}-{str_parent}'}
+    else:
+        mod_dict = {}
+    blob = {
+            "id": f'{labware_hash}',
+            "slot": f'{labware_hash}{str_parent}',
+            "module": mod_dict
+        }
+
+    lw_path = index_file_dir / 'index.json'
+    info = labware._read_file(lw_path)
+    assert info[lw_uri] == blob
