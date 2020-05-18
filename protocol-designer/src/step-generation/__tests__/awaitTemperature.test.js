@@ -6,7 +6,7 @@ import {
 } from '../../constants'
 import { awaitTemperature } from '../commandCreators/atomic/awaitTemperature'
 import {
-  getStateAndContextTempMagModules,
+  getStateAndContextTempTCModules,
   robotWithStatusAndTemp,
 } from '../__fixtures__'
 
@@ -27,7 +27,7 @@ describe('awaitTemperature', () => {
   let robotState
 
   beforeEach(() => {
-    const stateAndContext = getStateAndContextTempMagModules({
+    const stateAndContext = getStateAndContextTempTCModules({
       temperatureModuleId,
       thermocyclerId,
     })
