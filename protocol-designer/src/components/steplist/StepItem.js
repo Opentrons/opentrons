@@ -3,13 +3,14 @@ import * as React from 'react'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import { PDTitledList } from '../lists'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
 import { PauseStepItems } from './PauseStepItems'
-import { ModuleStepItems } from './ModuleStepItems'
+import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
 import { StepDescription } from '../StepDescription'
 import { stepIconsByType } from '../../form-types'
 import { i18n } from '../../localization'
@@ -21,6 +22,11 @@ import type {
   SubstepItemData,
   WellIngredientNames,
 } from '../../steplist/types'
+
+const makeTemperatureText = (temperature: number | null): string =>
+  temperature === null
+    ? 'Deactivated'
+    : `${temperature} ${i18n.t('application.units.degrees')}`
 
 export type StepItemProps = {|
   description?: ?string,
@@ -141,10 +147,7 @@ export const StepItemContents = (props: StepItemContentsProps) => {
   }
 
   if (substeps && substeps.substepType === 'temperature') {
-    const temperature =
-      substeps.temperature === null
-        ? 'Deactivated'
-        : `${substeps.temperature} ${i18n.t('application.units.degrees')}`
+    const temperature = makeTemperatureText(substeps.temperature)
 
     return (
       <ModuleStepItems
@@ -155,6 +158,29 @@ export const StepItemContents = (props: StepItemContentsProps) => {
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
       />
+    )
+  }
+
+  if (substeps && substeps.substepType === 'thermocyclerState') {
+    const blockTemperature = makeTemperatureText(substeps.blockTargetTemp)
+    const lidTemperature = makeTemperatureText(substeps.lidTargetTemp)
+    const lidLabelText = i18n.t(`modules.lid_label`, {
+      lidStatus: i18n.t(
+        substeps.lidOpen ? 'modules.lid_open' : 'modules.lid_closed'
+      ),
+    })
+
+    return (
+      <ModuleStepItems
+        labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
+        message={substeps.message}
+        action={i18n.t(`modules.actions.hold`)}
+        actionText={blockTemperature}
+        moduleType={THERMOCYCLER_MODULE_TYPE}
+      >
+        <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
+      </ModuleStepItems>
     )
   }
 

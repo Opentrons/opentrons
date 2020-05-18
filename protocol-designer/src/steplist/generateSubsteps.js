@@ -14,6 +14,7 @@ import {
   mix,
   curryCommandCreator,
 } from '../step-generation'
+import { THERMOCYCLER_STATE } from '../constants'
 
 import type { StepIdType } from '../form-types'
 import type {
@@ -44,7 +45,7 @@ type TransferLikeArgs =
   | TransferArgs
   | MixArgs
 
-function getCommandCreatorForSubsteps(
+function getCommandCreatorForTransferlikeSubsteps(
   stepArgs: TransferLikeArgs
 ): CurriedCommandCreator | null {
   // Call appropriate command creator with the validateForm fields.
@@ -273,7 +274,9 @@ function transferLikeSubsteps(args: {|
 
   // Call appropriate command creator with the validateForm fields.
   // Disable any mix args so those aspirate/dispenses don't show up in substeps
-  const substepCommandCreator = getCommandCreatorForSubsteps(stepArgs)
+  const substepCommandCreator = getCommandCreatorForTransferlikeSubsteps(
+    stepArgs
+  )
   if (!substepCommandCreator) {
     assert(false, `transferLikeSubsteps could not make a command creator`)
     return null
@@ -419,6 +422,18 @@ export function generateSubsteps(
       temperature: stepArgs.temperature,
       labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
+      message: stepArgs.message,
+    }
+  }
+
+  if (stepArgs.commandCreatorFnName === THERMOCYCLER_STATE) {
+    return {
+      substepType: 'thermocyclerState',
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
+      blockTargetTemp: stepArgs.blockTargetTemp,
+      lidTargetTemp: stepArgs.lidTargetTemp,
+      lidOpen: stepArgs.lidOpen,
       message: stepArgs.message,
     }
   }

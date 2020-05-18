@@ -128,12 +128,23 @@ export type AwaitTemperatureSubstepItem = {|
   message?: string,
 |}
 
+export type ThermocyclerStateSubstepItem = {|
+  substepType: 'thermocyclerState',
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  blockTargetTemp: number | null,
+  lidTargetTemp: number | null,
+  lidOpen: boolean,
+  message?: string,
+|}
+
 export type SubstepItemData =
   | SourceDestSubstepItem
   | PauseSubstepItem
   | MagnetSubstepItem
   | TemperatureSubstepItem
   | AwaitTemperatureSubstepItem
+  | ThermocyclerStateSubstepItem
 
 export type SubSteps = { [StepIdType]: ?SubstepItemData }
 
