@@ -58,8 +58,8 @@ async def test_with_tempdeck(loop):
     setup = simulator_setup.SimulatorSetup(
         attached_modules={'tempdeck': [
             simulator_setup.ModuleCall('set_temperature',
-                                       kwargs={'celsius': 23})]
-        })
+                                       kwargs={'celsius': 23})
+        ]})
     simulator = await simulator_setup.create_simulator(setup)
 
     assert type(simulator.attached_modules[0]) == TempDeck
