@@ -5,15 +5,16 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { PDTitledList } from '../lists'
-import { SourceDestSubstep } from './SourceDestSubstep'
-import { AspirateDispenseHeader } from './AspirateDispenseHeader'
-import { MixHeader } from './MixHeader'
-import { PauseStepItems } from './PauseStepItems'
-import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
-import { StepDescription } from '../StepDescription'
+import { THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType } from '../../form-types'
 import { i18n } from '../../localization'
+import { PDTitledList } from '../lists'
+import { StepDescription } from '../StepDescription'
+import { AspirateDispenseHeader } from './AspirateDispenseHeader'
+import { MixHeader } from './MixHeader'
+import { ModuleStepItems, ModuleStepItemRow } from './ModuleStepItems'
+import { PauseStepItems } from './PauseStepItems'
+import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
 
 import type { FormData, StepType } from '../../form-types'
@@ -161,7 +162,7 @@ export const StepItemContents = (props: StepItemContentsProps) => {
     )
   }
 
-  if (substeps && substeps.substepType === 'thermocyclerState') {
+  if (substeps && substeps.substepType === THERMOCYCLER_STATE) {
     const blockTemperature = makeTemperatureText(substeps.blockTargetTemp)
     const lidTemperature = makeTemperatureText(substeps.lidTargetTemp)
     const lidLabelText = i18n.t(`modules.lid_label`, {

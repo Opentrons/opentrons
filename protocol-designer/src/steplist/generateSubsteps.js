@@ -428,7 +428,7 @@ export function generateSubsteps(
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_STATE) {
     return {
-      substepType: 'thermocyclerState',
+      substepType: THERMOCYCLER_STATE,
       labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       blockTargetTemp: stepArgs.blockTargetTemp,

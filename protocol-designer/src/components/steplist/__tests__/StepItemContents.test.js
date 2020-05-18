@@ -1,9 +1,10 @@
 // @flow
 import React from 'react'
 import { shallow } from 'enzyme'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
+import { THERMOCYCLER_STATE } from '../../../constants'
 import { StepItemContents } from '../StepItem'
 import { ModuleStepItems } from '../ModuleStepItems'
-
 import type { StepItemContentsProps } from '../StepItem'
 
 describe('StepItemContents', () => {
@@ -148,6 +149,57 @@ describe('StepItemContents', () => {
       expect(component).toHaveLength(1)
       expect(component.prop('action')).toEqual('pause until')
       expect(component.prop('actionText')).toEqual('45 °C')
+    })
+  })
+
+  describe('thermocyclerState substep type', () => {
+    let thermocyclerStateProps: StepItemContentsProps
+    const stepType = THERMOCYCLER_STATE
+
+    beforeEach(() => {
+      thermocyclerStateProps = {
+        ...props,
+        rawForm: {
+          stepType,
+          id: stepType,
+          StepFieldName: stepType,
+        },
+        substeps: null,
+        stepType: stepType,
+        labwareNicknamesById: {
+          temperatureId: 'tc nickname',
+        },
+        labwareDefDisplayNamesById: {
+          temperatureId: 'tc display',
+        },
+      }
+    })
+
+    it('module is rendered with temperature and lid state', () => {
+      thermocyclerStateProps.substeps = {
+        substepType: stepType,
+        blockTargetTemp: 55,
+        lidTargetTemp: 45,
+        lidOpen: false,
+        labwareDisplayName: 'tc display',
+        labwareNickname: 'tc nickname',
+        message: 'message',
+      }
+      const wrapper = shallow(<StepItemContents {...thermocyclerStateProps} />)
+      const component = wrapper.find(ModuleStepItems)
+      expect(component).toHaveLength(1)
+
+      expect(component.prop('labwareDisplayName')).toEqual('tc display')
+      expect(component.prop('labwareNickname')).toEqual('tc nickname')
+      expect(component.prop('message')).toEqual('message')
+      expect(component.prop('action')).toEqual('hold')
+      expect(component.prop('actionText')).toEqual('55 °C')
+      expect(component.prop('moduleType')).toEqual(THERMOCYCLER_MODULE_TYPE)
+
+      const children = component.children()
+      expect(children.length).toEqual(1)
+      expect(component.childAt(0).prop('label')).toEqual('Lid (closed)')
+      expect(component.childAt(0).prop('value')).toEqual('45 °C')
     })
   })
 })

@@ -1,4 +1,5 @@
 // @flow
+import typeof { THERMOCYCLER_STATE } from '../constants'
 import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
 import type { StepIdType, StepFieldName } from '../form-types'
 import type { FormError } from './formLevel/errors'
@@ -129,7 +130,7 @@ export type AwaitTemperatureSubstepItem = {|
 |}
 
 export type ThermocyclerStateSubstepItem = {|
-  substepType: 'thermocyclerState',
+  substepType: THERMOCYCLER_STATE,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
   blockTargetTemp: number | null,
