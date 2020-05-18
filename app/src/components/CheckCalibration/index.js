@@ -26,7 +26,7 @@ import { BadCalibration } from './BadCalibration'
 import { formatJogVector } from './utils'
 import styles from './styles.css'
 
-const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check robot calibration'
 const MOVE_TO_NEXT = 'move to next check'
 const CONTINUE = 'continue'
 const EXIT = 'exit'

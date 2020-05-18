@@ -8,19 +8,19 @@ import { tiprackImages } from './tiprackImages'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Check deck calibration'
+const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Check robot calibration'
 const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
-  'Testing your deck calibration builds confidence that the robot is working correctly and accurately. If at any point the robot does not go to the points as expected, exit this process and re-calibrate your robot deck.'
+  "Checking your robot calibration assesses your OT-2's ability to position pipettes accurately relative to the deck. If at any point the robot does not go to the positions as expected, exit this process and follow the instructions provided to help resolve the issue."
 const TIPRACK_REQS = 'For this process you will require:'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const NOTE_HEADER = 'Please note: '
 const NOTE_BODY =
-  "It's important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips."
+  "It's important you perform this test using the Opentrons tips and tip racks specified above, as the robot determines accuracy based on the measurements of these tips."
 const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'
 const CLEAR_DECK_HEADER = 'Clear the deck'
 const CLEAR_DECK_BODY =
-  'Before continuing to check deck calibration, please remove all labware and modules from the deck.'
+  'Before continuing to check robot calibration, please remove all labware and modules from the deck.'
 
 type IntroductionProps = {|
   labwareLoadNames: Array<string>,
