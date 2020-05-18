@@ -1,6 +1,6 @@
 {
   "attached_instruments": {
-    "RIGHT": {
+    "right": {
       "model": "p300_single_v1",
       "id": "321",
       "max_volume": 300,
@@ -8,7 +8,7 @@
       "tip_length": 0,
       "channels": 1
     },
-    "LEFT": {
+    "left": {
       "model": "p10_single_v1",
       "id": "123",
       "max_volume": 10,

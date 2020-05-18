@@ -70,7 +70,7 @@ def load_simulator_setup(path: Path) -> SimulatorSetup:
 def _prepare_for_dict(key, value):
     """Convert an element in SimulatorSetup to be a serializable dict"""
     if key == 'attached_instruments' and value:
-        return {mount.name: data for (mount, data) in value.items()}
+        return {mount.name.lower(): data for (mount, data) in value.items()}
     if key == 'config' and value:
         return robot_configs.config_to_save(value)[1]
     return value
