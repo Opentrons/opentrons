@@ -830,12 +830,40 @@ def _hash_labware_def(labware_def: LabwareDefinition) -> str:
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
 
 
+def _add_to_index_offset_file(labware: Labware, lw_hash: str):
+    index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    uri = labware.uri
+    uri_exists = None
+    if index_file.exists():
+        blob = _read_file(str(index_file))
+        uri_exists = blob.get(uri)
+    else:
+        blob = {}
+
+    if not uri_exists:
+        str_parent = _get_parent_identifier(labware.parent)
+        if str_parent:
+            slot = labware.parent.parent
+            mod_dict = {str_parent: f'{slot}-{str_parent}'}
+        else:
+            slot = labware.parent
+            mod_dict = {}
+        blob[uri] = {
+                "id": f'{lw_hash}{str_parent}',
+                "slot": slot,
+                "module": mod_dict
+            }
+        with index_file.open('w') as f:
+            json.dump(blob, f)
+
+
 def _get_labware_offset_path(labware: Labware):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     calibration_path.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
+    _add_to_index_offset_file(labware, labware_hash)
     return calibration_path/f'{labware_hash}{parent_id}.json'
 
 
