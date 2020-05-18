@@ -785,7 +785,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot jog pipette on second mount, pipette not present'
-        await super(self.__class__, self)._jog(second_pip.mount, Point(*vector))
+        await super(self.__class__, self)._jog(second_pip.mount,
+                                               Point(*vector))
 
     async def _return_first_tip(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
