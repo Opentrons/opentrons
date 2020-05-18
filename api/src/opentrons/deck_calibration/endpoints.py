@@ -36,15 +36,29 @@ class SessionWrapper:
 session_wrapper = SessionWrapper()
 
 
+class DeckCalibrationPoint(str, Enum):
+    """
+    The name of a point relative to deck calibration. The number points are
+    calibration crosses ("1" in slot 1, "2" in slot 3, "3" in slot 7); "safeZ"
+    is a safe height above the deck, "attachTip" is a good place to go for the
+    user to attach a tip.
+    """
+    one = "1"
+    two = "2"
+    three = "3"
+    safeZ = "safeZ"
+    attachTip = "attachTip"
+
+
 def expected_points():
     slot_1_lower_left,\
         slot_3_lower_right,\
         slot_7_upper_left = dots_set()
 
     return {
-        '1': slot_1_lower_left,
-        '2': slot_3_lower_right,
-        '3': slot_7_upper_left}
+        DeckCalibrationPoint.one: slot_1_lower_left,
+        DeckCalibrationPoint.two: slot_3_lower_right,
+        DeckCalibrationPoint.three: slot_7_upper_left}
 
 
 def safe_points() -> Dict[str, Tuple[float, float, float]]:
@@ -64,11 +78,11 @@ def safe_points() -> Dict[str, Tuple[float, float, float]]:
     attach_tip_point = (200, 90, 130)
 
     return {
-        '1': slot_1_safe_point,
-        '2': slot_3_safe_point,
-        '3': slot_7_safe_point,
-        'safeZ': z_pos,
-        'attachTip': attach_tip_point
+        DeckCalibrationPoint.one: slot_1_safe_point,
+        DeckCalibrationPoint.two: slot_3_safe_point,
+        DeckCalibrationPoint.three: slot_7_safe_point,
+        DeckCalibrationPoint.safeZ: z_pos,
+        DeckCalibrationPoint.attachTip: attach_tip_point
     }
 
 
@@ -349,7 +363,7 @@ async def move(data) -> CommandResult:
         raise NoSessionInProgress()
 
     point_name = data.get('point')
-    point = safe_points().get(str(point_name))
+    point = safe_points().get(point_name)
     if point and len(point) == 3:
         if not feature_flags.use_protocol_api_v2():
             pipette = session_wrapper.session.pipettes[

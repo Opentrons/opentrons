@@ -3,7 +3,8 @@ from enum import Enum
 from uuid import UUID
 
 from pydantic import BaseModel, Field
-from opentrons.deck_calibration.endpoints import CalibrationCommand
+from opentrons.deck_calibration.endpoints import CalibrationCommand, \
+    DeckCalibrationPoint
 from robot_server.service.models.control import Mount
 
 
@@ -40,20 +41,6 @@ class DeckStartResponse(BaseModel):
                     "model": "p10_single_v1.5"
                   }
                 }}
-
-
-class DeckCalibrationPoint(str, Enum):
-    """
-    The name of a point relative to deck calibration. The number points are
-    calibration crosses ("1" in slot 1, "2" in slot 3, "3" in slot 7); "safeZ"
-    is a safe height above the deck, "attachTip" is a good place to go for the
-    user to attach a tip.
-    """
-    one = "1"
-    two = "2"
-    three = "3"
-    safeZ = "safeZ"
-    attachTip = "attachTip"
 
 
 class JogAxis(str, Enum):
