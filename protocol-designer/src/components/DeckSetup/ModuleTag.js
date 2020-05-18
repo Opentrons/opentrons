@@ -6,6 +6,7 @@ import { RobotCoordsForeignDiv } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
+  THERMOCYCLER_MODULE_TYPE,
   type ModuleRealType,
 } from '@opentrons/shared-data'
 import { i18n } from '../../localization'
@@ -36,8 +37,11 @@ type Props = {|
 |}
 
 // eyeballed width/height to match designs
-const TAG_HEIGHT = 45
-const TAG_WIDTH = 70
+const STANDARD_TAG_HEIGHT = 50
+const STANDARD_TAG_WIDTH = 65
+// thermocycler has its slot farther right = more width, and it has more lines of content = more height
+const THERMOCYCLER_TAG_HEIGHT = 70
+const THERMOCYCLER_TAG_WIDTH = 75
 
 function getTempStatus(temperatureModuleState: TemperatureModuleState): string {
   const { targetTemperature, status } = temperatureModuleState
@@ -79,6 +83,43 @@ export const ModuleStatus = ({
       const tempStatus = getTempStatus(moduleState)
       return <div className={styles.module_status_line}>{tempStatus}</div>
 
+    case THERMOCYCLER_MODULE_TYPE:
+      // TODO IMMEDIATELY use i18n added in substeps PR
+      // and temperature test function
+      const makeTemperatureText = (temperature: number | null): string =>
+        temperature === null
+          ? 'Deactivated'
+          : `${temperature} ${i18n.t('application.units.degrees')}`
+
+      return (
+        <>
+          {/* <div className={styles.module_status_line}>Block,</div>
+          <div className={styles.module_status_line}>
+            {'  - ' + makeTemperatureText(moduleState.blockTargetTemp)}
+          </div>
+          <div className={styles.module_status_line}>
+            Lid ({moduleState.lidOpen ? 'open' : 'closed'}),
+          </div>
+          <div className={styles.module_status_line}>
+            {'  - ' + makeTemperatureText(moduleState.lidTargetTemp)}
+          </div> */}
+
+          <div className={styles.module_status_line}>
+            Block, {makeTemperatureText(moduleState.blockTargetTemp)}
+          </div>
+          <div />
+          <div
+            className={cx(
+              styles.module_status_line,
+              styles.new_module_status_line
+            )}
+          >
+            Lid ({moduleState.lidOpen ? 'open' : 'closed'}),{' '}
+            {makeTemperatureText(moduleState.lidTargetTemp)}
+          </div>
+        </>
+      )
+
     default:
       console.warn(
         `ModuleStatus doesn't support module type ${moduleState.type}`
@@ -113,6 +154,14 @@ const ModuleTagComponent = (props: Props) => {
     return null
   }
 
+  let tagHeight = STANDARD_TAG_HEIGHT
+  let tagWidth = STANDARD_TAG_WIDTH
+
+  if (moduleType === THERMOCYCLER_MODULE_TYPE) {
+    tagHeight = THERMOCYCLER_TAG_HEIGHT
+    tagWidth = THERMOCYCLER_TAG_WIDTH
+  }
+
   const { childXOffset, childYOffset } = getModuleVizDims(
     props.orientation,
     moduleType
@@ -122,12 +171,12 @@ const ModuleTagComponent = (props: Props) => {
       x={
         props.x +
         (props.orientation === 'left'
-          ? childXOffset - TAG_WIDTH
+          ? childXOffset - tagWidth
           : STD_SLOT_X_DIM + childXOffset)
       }
-      y={props.y + childYOffset + (STD_SLOT_Y_DIM - TAG_HEIGHT) / 2}
-      height={TAG_HEIGHT}
-      width={TAG_WIDTH}
+      y={props.y + childYOffset + (STD_SLOT_Y_DIM - tagHeight) / 2}
+      height={tagHeight}
+      width={tagWidth}
       innerDivProps={{
         'data-test': `ModuleTag_${moduleType}`,
         className: cx(styles.module_info_tag, {

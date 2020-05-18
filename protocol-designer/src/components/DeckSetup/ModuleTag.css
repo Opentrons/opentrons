@@ -22,6 +22,10 @@
   text-transform: capitalize;
 }
 
+.new_module_status_line {
+  padding-top: 0.5rem;
+}
+
 .highlighted_border_left_none {
   border-right: 3px;
   border-left: 3px transparent;
