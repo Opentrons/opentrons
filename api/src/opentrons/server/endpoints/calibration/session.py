@@ -465,40 +465,60 @@ MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
 DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(1.79, 1.64, 2)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(2.7, 2.7, 2)
-OK_HEIGHT_VECTOR = Point(0.0, 0.0, 0.8)
-OK_XY_VECTOR = Point(2.7, 2.7, 0.0)
+
+
+def _determine_threshold(
+        pipette_type: str, state: CalibrationCheckState):
+    is_p1000 = pipette_type.startswith('p1000')
+    height_states = [
+        CalibrationCheckState.joggingFirstPipetteToHeight,
+        CalibrationCheckState.joggingSecondPipetteToHeight]
+    cross_states = [
+        CalibrationCheckState.joggingFirstPipetteToPointOne,
+        CalibrationCheckState.joggingFirstPipetteToPointTwo,
+        CalibrationCheckState.joggingFirstPipetteToPointThree,
+        CalibrationCheckState.joggingSecondPipetteToPointOne
+    ]
+    if is_p1000 and state in cross_states:
+        return Point(2.7, 2.7, 0.0)
+    elif is_p1000 and state in height_states:
+        return Point(0.0, 0.0, 1)
+    elif state in cross_states:
+        return Point(1.79, 1.64, 0.0)
+    else:
+        return Point(0.0, 0.0, 0.8)
 
 
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
-    threshold_vector: Point
+    threshold_function: typing.Callable[[str, typing.Any], typing.Any]
 
 
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
     CalibrationCheckState.comparingFirstPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToHeight,
-        threshold_vector=OK_HEIGHT_VECTOR,
+        threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointOne,
-        threshold_vector=OK_XY_VECTOR,
+        threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointTwo: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        threshold_vector=OK_XY_VECTOR,
+        threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointThree: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointThree,
-        threshold_vector=OK_XY_VECTOR,
+        threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToHeight,
-        threshold_vector=OK_HEIGHT_VECTOR,
+        threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToPointOne,
-        threshold_vector=OK_XY_VECTOR,
+        threshold_function=_determine_threshold,
     ),
 }
 
@@ -684,13 +704,22 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
+            mount = self._get_preparing_state_mount()
+            pipette_type = ''
+            if mount:
+                pipette_type = str(self.pipettes[mount]['model'])
+            # Mypy will incorrectly assumes the first argument for
+            # this callable is self. See this issue:
+            # https://github.com/python/mypy/issues/5485
+            threshold_vector = \
+                comp.threshold_function(pipette_type, comp.reference_state)  # type: ignore  # noqa(E501)
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
-                if comp.threshold_vector.z == 0.0:
+                if threshold_vector.z == 0.0:
                     diff_magnitude = ref_pt._replace(z=0.0).magnitude_to(
                             jogged_pt._replace(z=0.0))
-                elif comp.threshold_vector.x == 0.0 and \
-                        comp.threshold_vector.y == 0.0:
+                elif threshold_vector.x == 0.0 and \
+                        threshold_vector.y == 0.0:
                     diff_magnitude = ref_pt._replace(
                             x=0.0, y=0.0).magnitude_to(jogged_pt._replace(
                                                        x=0.0, y=0.0))
@@ -698,7 +727,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     'step comparisons must check z or (x and y) magnitude'
 
                 threshold_mag = Point(0, 0, 0).magnitude_to(
-                        comp.threshold_vector)
+                        threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
                 tform_type = DeckCalibrationError.UNKNOWN
 
@@ -713,7 +742,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
-                                     thresholdVector=comp.threshold_vector,
+                                     thresholdVector=threshold_vector,
                                      exceedsThreshold=exceeds,
                                      transformType=tform_type)
         return comparisons
