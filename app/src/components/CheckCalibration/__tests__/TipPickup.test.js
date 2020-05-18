@@ -20,9 +20,7 @@ describe('TipPickUp', () => {
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
   const getConfirmButton = wrapper =>
-    wrapper
-      .find('PrimaryButton[children="Yes, move to first check"]')
-      .find('button')
+    wrapper.find('PrimaryButton[children="Yes, continue"]').find('button')
 
   const getRejectButton = (wrapper, direction) =>
     wrapper.find('PrimaryButton[children="No, try again"]').find('button')

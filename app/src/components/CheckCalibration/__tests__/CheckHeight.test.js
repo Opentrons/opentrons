@@ -21,7 +21,7 @@ describe('CheckHeight', () => {
 
   const getExitButton = wrapper =>
     wrapper
-      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
+      .find('PrimaryButton[children="exit robot calibration check"]')
       .find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
@@ -45,6 +45,7 @@ describe('CheckHeight', () => {
           comparison={comparison}
           mount={mountProp}
           nextButtonText="Go To Next Check"
+          instructions={null}
           comparePoint={mockComparePoint}
           goToNextCheck={mockGoToNextCheck}
           jog={mockJog}
