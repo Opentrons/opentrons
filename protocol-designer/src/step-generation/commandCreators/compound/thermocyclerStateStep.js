@@ -1,4 +1,5 @@
 // @flow
+import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerStateDiff } from '../../utils/thermocyclerStateDiff'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
@@ -6,14 +7,13 @@ import { thermocyclerDeactivateBlock } from '../atomic/thermocyclerDeactivateBlo
 import { thermocyclerSetTargetBlockTemperature } from '../atomic/thermocyclerSetTargetBlockTemperature'
 import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
 import { thermocyclerOpenLid } from '../atomic/thermocyclerOpenLid'
+import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
+import { thermocyclerDeactivateLid } from '../atomic/thermocyclerDeactivateLid'
 import type {
   CommandCreator,
   CurriedCommandCreator,
   ThermocyclerStateStepArgs,
 } from '../../types'
-import { curryCommandCreator, reduceCommandCreators } from '../../utils'
-import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
-import { thermocyclerDeactivateLid } from '../atomic/thermocyclerDeactivateLid'
 
 export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = (
   args,
