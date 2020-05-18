@@ -23,9 +23,14 @@
   },
   "actions": {
     "action": "action",
-    "go_to": "go to",
-    "engage": "engage",
+    "await_temperature": "pause until",
     "disengage": "disengage",
-    "await_temperature": "pause until"
-  }
+    "engage": "engage",
+    "go_to": "go to",
+    "hold": "hold"
+  },
+  "block_label": "Block",
+  "lid_label": "Lid ({{lidStatus}})",
+  "lid_closed": "closed",
+  "lid_open": "open"
 }

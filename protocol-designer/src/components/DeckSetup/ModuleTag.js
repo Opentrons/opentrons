@@ -21,6 +21,7 @@ import {
 } from '../../constants'
 import * as uiSelectors from '../../ui/steps'
 import { getLabwareOnModule } from '../../ui/modules/utils'
+import { makeTemperatureText } from '../../utils'
 import { getModuleVizDims } from './getModuleVizDims'
 import styles from './ModuleTag.css'
 import type { ModuleOrientation } from '../../types'
@@ -84,13 +85,11 @@ export const ModuleStatus = ({
       return <div className={styles.module_status_line}>{tempStatus}</div>
 
     case THERMOCYCLER_MODULE_TYPE:
-      // TODO IMMEDIATELY use i18n added in substeps PR
-      // and temperature test function
-      const makeTemperatureText = (temperature: number | null): string =>
-        temperature === null
-          ? 'Deactivated'
-          : `${temperature} ${i18n.t('application.units.degrees')}`
-
+      const lidText = i18n.t(`modules.lid_label`, {
+        lidStatus: i18n.t(
+          moduleState.lidOpen ? 'modules.lid_open' : 'modules.lid_closed'
+        ),
+      })
       return (
         <>
           {/* <div className={styles.module_status_line}>Block,</div>
@@ -105,7 +104,8 @@ export const ModuleStatus = ({
           </div> */}
 
           <div className={styles.module_status_line}>
-            Block, {makeTemperatureText(moduleState.blockTargetTemp)}
+            <div>{i18n.t('modules.block_label')},</div>
+            <div>{makeTemperatureText(moduleState.blockTargetTemp)}</div>
           </div>
           <div />
           <div
@@ -114,8 +114,8 @@ export const ModuleStatus = ({
               styles.new_module_status_line
             )}
           >
-            Lid ({moduleState.lidOpen ? 'open' : 'closed'}),{' '}
-            {makeTemperatureText(moduleState.lidTargetTemp)}
+            <div>{lidText},</div>
+            <div>{makeTemperatureText(moduleState.lidTargetTemp)}</div>
           </div>
         </>
       )
