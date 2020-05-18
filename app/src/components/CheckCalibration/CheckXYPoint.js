@@ -81,6 +81,7 @@ type CheckXYPointProps = {|
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   nextButtonText: string,
+  instructions: React.Node | null,
   exit: () => void,
   comparePoint: () => void,
   goToNextCheck: () => void,
@@ -95,6 +96,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
     comparison,
     exit,
     nextButtonText,
+    instructions,
     comparePoint,
     goToNextCheck,
     jog,
@@ -121,6 +123,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
           goToNextCheck={goToNextCheck}
           exit={exit}
           nextButtonText={nextButtonText}
+          instructions={instructions}
         />
       ) : (
         <>
@@ -169,9 +172,16 @@ type CompareXYProps = {|
   goToNextCheck: () => void,
   exit: () => void,
   nextButtonText: string,
+  instructions: React.Node | null,
 |}
 function CompareXY(props: CompareXYProps) {
-  const { comparison, goToNextCheck, exit, nextButtonText } = props
+  const {
+    comparison,
+    goToNextCheck,
+    exit,
+    nextButtonText,
+    instructions,
+  } = props
   const { differenceVector, exceedsThreshold } = comparison
 
   let header = GOOD_INSPECTING_HEADER
@@ -210,6 +220,7 @@ function CompareXY(props: CompareXYProps) {
           </div>
         </div>
       </div>
+      {instructions}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{EXIT_CHECK}</PrimaryButton>

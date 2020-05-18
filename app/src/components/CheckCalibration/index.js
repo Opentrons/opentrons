@@ -5,6 +5,7 @@ import last from 'lodash/last'
 import {
   ModalPage,
   SpinnerModal,
+  Link,
   LEFT,
   RIGHT,
   type Mount,
@@ -33,6 +34,15 @@ const EXIT = 'exit'
 const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip and continue to 2nd pipette'
 const CHECK_X_Y_AXES = 'check x and y-axis'
 const CHECK_Z_AXIS = 'check z-axis'
+
+const INSTR_OFFSET_INSTRUCTIONS =
+  'To resolve this, you will need to perform a pipette mount offset calibration. Read'
+const THIS_ARTICLE = 'this article'
+const TO_LEARN_MORE = 'to learn more'
+
+// TODO: BC: Immediately confirm actual link
+const INSTR_OFFSET_ARTICLE_URL =
+  'http://opentrons.com/support/pipette-mount-offset'
 
 type CheckCalibrationProps = {|
   robotName: string,
@@ -213,6 +223,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         currentStep,
         hasTwoPipettes
       )
+      const comparison = comparisonsByStep[currentStep]
       stepContents = (
         <CheckXYPoint
           slotNumber={slotNumber}
@@ -220,8 +231,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           mount={activeMount}
           exit={exit}
           isInspecting={isInspecting}
-          comparison={comparisonsByStep[currentStep]}
+          comparison={comparison}
           nextButtonText={nextButtonText}
+          instructions={getInstructionsFromBadComparison(
+            currentStep,
+            comparison
+          )}
           comparePoint={comparePoint}
           goToNextCheck={() => {
             dispatchRequest(
@@ -245,13 +260,18 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         currentStep,
         hasTwoPipettes
       )
+      const comparison = comparisonsByStep[currentStep]
       stepContents = (
         <CheckHeight
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
           isInspecting={isInspecting}
-          comparison={comparisonsByStep[currentStep]}
+          comparison={comparison}
           nextButtonText={nextButtonText}
+          instructions={getInstructionsFromBadComparison(
+            currentStep,
+            comparison
+          )}
           exit={exit}
           comparePoint={comparePoint}
           goToNextCheck={() => {
@@ -380,5 +400,34 @@ const getPipetteRankForStep = (
     default:
       // should never reach this case, func only called when currentStep listed above
       return ''
+  }
+}
+
+const getInstructionsFromBadComparison = (
+  step: Calibration.RobotCalibrationCheckStep,
+  comparison: Calibration.RobotCalibrationCheckComparison
+): React.Node | null => {
+  // TODO: BC: immediately add an else if case for differentiating
+  //  between "left pip only" and "right pip first" messaging
+  // i.e. "deck transform cal needed" or "deck transform cal and offset cal needed"
+  if (
+    [
+      Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+      Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+    ].includes(step)
+  ) {
+    return (
+      <p className={styles.error_explanation}>
+        {INSTR_OFFSET_INSTRUCTIONS}
+        &nbsp;
+        <Link href={INSTR_OFFSET_ARTICLE_URL} external>
+          {THIS_ARTICLE}
+        </Link>
+        &nbsp;
+        {TO_LEARN_MORE}
+      </p>
+    )
+  } else {
+    return null
   }
 }

@@ -6,7 +6,8 @@ import type { Dispatch } from '../../types'
 import { completeRobotCalibrationCheck } from '../../calibration'
 import styles from './styles.css'
 
-const DELETE_ROBOT_CALIBRATION_CHECK_HEADER = 'Calibration check is complete'
+const DELETE_ROBOT_CALIBRATION_CHECK_HEADER =
+  'Robot calibration check is complete'
 const DELETE_ROBOT_CALIBRATION_CHECK_BODY =
   "You have successfully checked the accuracy of this robot's calibration."
 const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip and exit'
