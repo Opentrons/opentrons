@@ -24,7 +24,7 @@ from typing import (
 
 import jsonschema  # type: ignore
 
-from .util import ModifiedList, requires_version
+from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
@@ -833,28 +833,24 @@ def _hash_labware_def(labware_def: LabwareDefinition) -> str:
 def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
     uri = labware.uri
-    uri_exists = None
     if index_file.exists():
         blob = _read_file(str(index_file))
-        uri_exists = blob.get(uri)
     else:
         blob = {}
 
-    if not uri_exists:
-        str_parent = _get_parent_identifier(labware.parent)
-        if str_parent:
-            slot = labware.parent.parent
-            mod_dict = {str_parent: f'{slot}-{str_parent}'}
-        else:
-            slot = labware.parent
-            mod_dict = {}
-        blob[uri] = {
-                "id": f'{lw_hash}{str_parent}',
-                "slot": slot,
-                "module": mod_dict
-            }
-        with index_file.open('w') as f:
-            json.dump(blob, f)
+    mod_parent = _get_parent_identifier(labware.parent)
+    slot = first_parent(labware)
+    if mod_parent:
+        mod_dict = {mod_parent: f'{slot}-{mod_parent}'}
+    else:
+        mod_dict = {}
+    blob[uri] = {
+            "id": f'{lw_hash}',
+            "slot": f'{lw_hash}{mod_parent}',
+            "module": mod_dict
+        }
+    with index_file.open('w') as f:
+        json.dump(blob, f)
 
 
 def _get_labware_offset_path(labware: Labware):

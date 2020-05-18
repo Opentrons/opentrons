@@ -494,15 +494,14 @@ def test_add_index_file(labware_name, index_file_dir):
     lw_uri = labware.uri_from_definition(definition)
 
     str_parent = labware._get_parent_identifier(lw.parent)
+    slot = '1'
     if str_parent:
-        slot = lw.parent.parent
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
     else:
-        slot = lw.parent
         mod_dict = {}
     blob = {
-            "id": f'{labware_hash}{str_parent}',
-            "slot": slot,
+            "id": f'{labware_hash}',
+            "slot": f'{labware_hash}{str_parent}',
             "module": mod_dict
         }
 
