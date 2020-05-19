@@ -10,6 +10,9 @@ import typeof {
   FETCH_SESSION,
   FETCH_SESSION_SUCCESS,
   FETCH_SESSION_FAILURE,
+  FETCH_ALL_SESSIONS,
+  FETCH_ALL_SESSIONS_SUCCESS,
+  FETCH_ALL_SESSIONS_FAILURE,
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
@@ -63,6 +66,10 @@ export type SessionCommandResponseModel = {|
 |}
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
+export type MultiSessionResponse = RobotApiV2ResponseBody<
+  Array<SessionResponseModel>,
+  {||}
+>
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<
   SessionCommandResponseModel,
@@ -119,6 +126,24 @@ export type FetchSessionSuccessAction = {|
 
 export type FetchSessionFailureAction = {|
   type: FETCH_SESSION_FAILURE,
+  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchAllSessionsAction = {|
+  type: FETCH_ALL_SESSIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchAllSessionsSuccessAction = {|
+  type: FETCH_ALL_SESSIONS_SUCCESS,
+  payload: {| robotName: string, sessions: MultiSessionResponse |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchAllSessionsFailureAction = {|
+  type: FETCH_ALL_SESSIONS_FAILURE,
   payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
   meta: RobotApiRequestMeta,
 |}

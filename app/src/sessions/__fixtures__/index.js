@@ -34,6 +34,21 @@ export const mockSessionResponse: Types.SessionResponse = {
   },
 }
 
+export const mockMultiSessionResponse: Types.MultiSessionResponse = {
+  data: [
+    {
+      id: '1234',
+      type: 'Session',
+      attributes: mockSessionData,
+    },
+    {
+      id: '5678',
+      type: 'Session',
+      attributes: mockSessionData,
+    },
+  ],
+}
+
 export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
     id: '4321',
@@ -84,6 +99,23 @@ export const {
   path: `${Constants.SESSIONS_PATH}/1234`,
   successStatus: 200,
   successBody: mockSessionResponse,
+  failureStatus: 500,
+  failureBody: mockV2ErrorResponse,
+})
+
+export const {
+  successMeta: mockFetchAllSessionsSuccessMeta,
+  failureMeta: mockFetchAllSessionsFailureMeta,
+  success: mockFetchAllSessionsSuccess,
+  failure: mockFetchAllSessionsFailure,
+} = makeResponseFixtures<
+  Types.MultiSessionResponse,
+  RobotApiV2ErrorResponseBody
+>({
+  method: GET,
+  path: Constants.SESSIONS_PATH,
+  successStatus: 200,
+  successBody: mockMultiSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })

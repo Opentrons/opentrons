@@ -1,6 +1,6 @@
 from uuid import UUID
 from enum import Enum
-from typing import Dict, Optional, List, Any
+from typing import Dict, Optional, List, Any, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
 

@@ -72,7 +72,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     robotCalCheckSession.details || {}
 
   React.useEffect(() => {
-    dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSessionId))
+    if (robotCalCheckSessionId) {
+      dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSessionId))
+    } else {
+      dispatchRequest(
+        Sessions.createSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        )
+      )
+    }
   }, [dispatchRequest, robotName, robotCalCheckSessionId])
 
   const hasTwoPipettes = React.useMemo(
@@ -136,7 +145,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   function sendCommand(
     command: SessionCommandString,
-    data: SessionCommandData = {}
+    data: SessionCommandData =
   ) {
     robotCalCheckSessionId &&
       dispatchRequest(

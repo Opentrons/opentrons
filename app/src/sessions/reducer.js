@@ -34,6 +34,22 @@ export function robotSessionReducer(
       }
     }
 
+    case Constants.FETCH_ALL_SESSIONS_SUCCESS: {
+      const { robotName, sessions } = action.payload
+      const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
+      const sessionsById = sessions.reduce(
+        (acc, s) => ({ ...acc, [s.id]: s.attributes }),
+        {}
+      )
+      return {
+        ...state,
+        [robotName]: {
+          ...robotState,
+          robotSessions: sessionsById,
+        },
+      }
+    }
+
     case Constants.CREATE_SESSION_COMMAND_SUCCESS: {
       const { robotName, sessionId, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
