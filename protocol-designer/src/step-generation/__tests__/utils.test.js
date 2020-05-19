@@ -571,82 +571,74 @@ describe('thermocyclerPipetteColission', () => {
 
   const testCases: Array<{|
     testMsg: string,
-    robotState: RobotState,
+    modules: $PropertyType<RobotState, 'modules'>,
+    labware: $PropertyType<RobotState, 'labware'>,
     expected: boolean,
   |}> = [
     {
       testMsg:
         'returns true when aspirating from labware on TC with lidOpen set to null',
-      robotState: {
-        ...getRobotStateWithTipStandard(makeContext()),
-        modules: {
-          [thermocyclerId]: {
-            slot: '7',
-            moduleState: {
-              type: THERMOCYCLER_MODULE_TYPE,
-              blockTargetTemp: null,
-              lidTargetTemp: null,
-              lidOpen: null,
-            },
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: null,
           },
         },
-        labware: {
-          [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
-        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       expected: true,
     },
     {
       testMsg:
         'returns true when aspirating from labware on TC with lidOpen set to false',
-      robotState: {
-        ...getRobotStateWithTipStandard(makeContext()),
-        modules: {
-          [thermocyclerId]: {
-            slot: '7',
-            moduleState: {
-              type: THERMOCYCLER_MODULE_TYPE,
-              blockTargetTemp: null,
-              lidTargetTemp: null,
-              lidOpen: false,
-            },
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: false,
           },
         },
-        labware: {
-          [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
-        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       expected: true,
     },
     {
       testMsg:
         'returns false when aspirating from labware on TC with lidOpen set to true',
-      robotState: {
-        ...getRobotStateWithTipStandard(makeContext()),
-        modules: {
-          [thermocyclerId]: {
-            slot: '7',
-            moduleState: {
-              type: THERMOCYCLER_MODULE_TYPE,
-              blockTargetTemp: null,
-              lidTargetTemp: null,
-              lidOpen: true,
-            },
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: true,
           },
         },
-        labware: {
-          [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
-        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
       expected: false,
     },
   ]
 
-  testCases.forEach(({ testMsg, robotState, expected }) => {
+  testCases.forEach(({ testMsg, modules, labware, expected }) => {
     it(testMsg, () => {
-      expect(thermocyclerPipetteCollission(robotState, labwareOnTCId)).toBe(
-        expected
-      )
+      expect(
+        thermocyclerPipetteCollision(modules, labware, labwareOnTCId)
+      ).toBe(expected)
     })
   })
 })

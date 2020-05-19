@@ -2,11 +2,11 @@
 import { THERMOCYCLER_MODULE_TYPE } from '../../../../shared-data/js/constants'
 import type { RobotState } from '../'
 
-export const thermocyclerPipetteCollission = (
-  robotState: RobotState,
+export const thermocyclerPipetteCollision = (
+  modules: $PropertyType<RobotState, 'modules'>,
+  labware: $PropertyType<RobotState, 'labware'>,
   labwareId: string
 ): boolean => {
-  const { modules, labware } = robotState
   const labwareSlot: string = labware[labwareId]?.slot
 
   const moduleUnderLabware: ?string =

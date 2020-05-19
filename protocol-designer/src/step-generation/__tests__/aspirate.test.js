@@ -19,9 +19,13 @@ import type { RobotState } from '../'
 jest.mock('../utils/thermocyclerPipetteCollision')
 
 const mockThermocyclerPipetteCollission: JestMockFn<
-  [RobotState, string],
+  [
+    $PropertyType<RobotState, 'modules'>,
+    $PropertyType<RobotState, 'labware'>,
+    string
+  ],
   boolean
-> = thermocyclerPipetteCollission
+> = thermocyclerPipetteCollision
 
 describe('aspirate', () => {
   let initialRobotState
@@ -169,10 +173,15 @@ describe('aspirate', () => {
       type: 'LABWARE_DOES_NOT_EXIST',
     })
   })
-  it('aspirate from thermocycler with pipette collision returns an error', () => {
+  it('should return an error when aspirating from thermocycler with pipette collision', () => {
     mockThermocyclerPipetteCollission.mockImplementationOnce(
-      (robotState: RobotState, labwareId: string) => {
-        expect(robotState).toBe(robotStateWithTip)
+      (
+        modules: $PropertyType<RobotState, 'modules'>,
+        labware: $PropertyType<RobotState, 'labware'>,
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
         expect(labwareId).toBe(SOURCE_LABWARE)
         return true
       }

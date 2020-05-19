@@ -50,7 +50,13 @@ export const aspirate: CommandCreator<AspirateParams> = (
     )
   }
 
-  if (thermocyclerPipetteCollission(prevRobotState, labware)) {
+  if (
+    thermocyclerPipetteCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
     errors.push(errorCreators.thermocyclerLidClosed())
   }
 
