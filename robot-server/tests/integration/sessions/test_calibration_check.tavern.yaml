@@ -21,7 +21,7 @@ stages:
         json:
           session_id: data.id
   - name: Check that current state is sessionStarted
-    request:
+    request: &get_session
       url: "{host:s}:{port:d}/sessions/{session_id}"
       method: GET
     response:
@@ -34,7 +34,7 @@ stages:
               currentStep: sessionStarted
 
   - name: Load labware
-    request:
+    request: &post_command
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
       method: POST
       json:
@@ -45,9 +45,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -59,8 +57,7 @@ stages:
 
   - name: Prepare first pipette
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -69,9 +66,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -83,8 +78,7 @@ stages:
 
   - name: Jog first pipette
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -95,9 +89,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -109,8 +101,7 @@ stages:
 
   - name: Pick up tip
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -119,9 +110,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -133,8 +122,7 @@ stages:
 
   - name: Confirm tip attached
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -143,9 +131,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -157,8 +143,7 @@ stages:
 
   - name: Jog first pipette to height
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -169,9 +154,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -183,8 +166,7 @@ stages:
 
   - name: Compare first pipette height
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -193,9 +175,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -207,8 +187,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -217,9 +196,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -231,8 +208,7 @@ stages:
 
   - name: Compare first pipette point one
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -241,9 +217,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -255,8 +229,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -265,9 +238,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -279,8 +250,7 @@ stages:
 
   - name: Compare first pipette point two
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -289,9 +259,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -303,8 +271,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -313,9 +280,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -327,8 +292,7 @@ stages:
 
   - name: Compare first pipette point three
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -337,9 +301,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -351,8 +313,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -361,9 +322,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -375,8 +334,7 @@ stages:
 
   - name: Jog Second Pipette
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -387,9 +345,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -401,8 +357,7 @@ stages:
 
   - name: Pick up tip
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -411,9 +366,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -425,8 +378,7 @@ stages:
 
   - name: Confirm tip
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -435,9 +387,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -449,8 +399,7 @@ stages:
 
   - name: Compare second pipette to height
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -459,9 +408,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -473,8 +420,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -483,9 +429,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -497,8 +441,7 @@ stages:
 
   - name: Compare second pipette to point one
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -507,9 +450,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -521,8 +462,7 @@ stages:
 
   - name: Go to next check
     request:
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
-      method: POST
+      <<: *post_command
       json:
         data:
           type: SessionCommand
@@ -531,9 +471,7 @@ stages:
     response:
       status_code: 200
   - name: Check the effect of command
-    request:
-      url: "{host:s}:{port:d}/sessions/{session_id}"
-      method: GET
+    request: *get_session
     response:
       status_code: 200
       json:
@@ -558,4 +496,3 @@ stages:
       status_code: 200
       json:
         data: []
-
