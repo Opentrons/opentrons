@@ -1,0 +1,272 @@
+---
+test_name: Calibration check session full flow
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: calibrationCheck
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+  - name: Load labware
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: loadLabware
+    response:
+      status_code: 200
+  - name: Prepare first pipette
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: preparePipette
+    response:
+      status_code: 200
+  - name: Jog first pipette
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: jog
+            data:
+              vector: [1, 0, 0]
+    response:
+      status_code: 200
+  - name: Pick up tip
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: pickUpTip
+    response:
+      status_code: 200
+  - name: Confirm tip attached
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: confirmTip
+    response:
+      status_code: 200
+  - name: Jog first pipette to height
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: jog
+            data:
+              vector: [1, 2, 3]
+    response:
+      status_code: 200
+  - name: Compare first pipette height
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Compare first pipette point one
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Compare first pipette point two
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Compare first pipette point three
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Jog Second Pipette
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: jog
+            data:
+              vector: [1, 2, 3]
+    response:
+      status_code: 200
+  - name: Pick up tip
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: pickUpTip
+    response:
+      status_code: 200
+  - name: Confirm tip
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: confirmTip
+    response:
+      status_code: 200
+  - name: Compare second pipette to height
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Compare second pipette to point one
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: comparePoint
+    response:
+      status_code: 200
+  - name: Go to next check
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: goToNextCheck
+    response:
+      status_code: 200
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
+  - name: There are no sessions
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data: []
+
