@@ -6,6 +6,7 @@ import {
   composeErrors,
   minFieldValue,
   maxFieldValue,
+  temperatureRangeFieldValue,
   realNumber,
 } from './errors'
 import {
@@ -18,7 +19,14 @@ import {
   type ValueMasker,
   type ValueCaster,
 } from './processing'
-import { MIN_TEMP_MODULE_TEMP, MAX_TEMP_MODULE_TEMP } from '../../constants'
+import {
+  MIN_TEMP_MODULE_TEMP,
+  MAX_TEMP_MODULE_TEMP,
+  MIN_TC_BLOCK_TEMP,
+  MAX_TC_BLOCK_TEMP,
+  MIN_TC_LID_TEMP,
+  MAX_TC_LID_TEMP,
+} from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
 import type { InvariantContext } from '../../step-generation'
@@ -164,6 +172,20 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     getErrors: composeErrors(
       minFieldValue(MIN_TEMP_MODULE_TEMP),
       maxFieldValue(MAX_TEMP_MODULE_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  blockTargetTemp: {
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  lidTargetTemp: {
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
     ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,

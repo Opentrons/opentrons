@@ -59,6 +59,8 @@ import { systemInfoReducer } from './system-info/reducer'
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
 
+import { robotSessionReducer } from './sessions/reducer'
+
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
 
@@ -83,5 +85,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   shell: shellReducer,
   systemInfo: systemInfoReducer,
   alerts: alertsReducer,
+  sessions: robotSessionReducer,
   router: connectRouter<_, Action>(history),
 })

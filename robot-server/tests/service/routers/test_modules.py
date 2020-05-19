@@ -1,9 +1,10 @@
 from pathlib import Path
-from unittest.mock import patch
+from unittest.mock import patch, PropertyMock
 
 import pytest
 import asyncio
 from opentrons.hardware_control import ExecutionManager
+from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control.modules import utils, UpdateError, \
     BundledFirmware
 
@@ -20,6 +21,8 @@ def magdeck():
             loop=asyncio.get_event_loop()
         )
     )
+    MagDeck.current_height = PropertyMock(return_value=321)
+
     yield m
 
 
@@ -35,6 +38,9 @@ def tempdeck():
             loop=asyncio.get_event_loop()
         )
     )
+    TempDeck.temperature = PropertyMock(return_value=123.0)
+    TempDeck.target = PropertyMock(return_value=321.0)
+
     yield t
 
     # Have to stop the poller
@@ -42,43 +48,173 @@ def tempdeck():
     t._poller.join()
 
 
-def test_get_modules(api_client, hardware, magdeck, tempdeck):
-    hardware.attached_modules = [magdeck]
+@pytest.fixture
+def thermocycler():
+    t = asyncio.get_event_loop().run_until_complete(
+        utils.build(
+            port='/dev/ot_module_thermocycler1',
+            which='thermocycler',
+            simulating=True,
+            interrupt_callback=lambda x: None,
+            execution_manager=ExecutionManager(loop=asyncio.get_event_loop()),
+            loop=asyncio.get_event_loop()
+        )
+    )
+    Thermocycler.lid_status = PropertyMock(return_value="open")
+    Thermocycler.lid_target = PropertyMock(return_value=1.2)
+    Thermocycler.lid_temp = PropertyMock(return_value=22.0)
+    Thermocycler.temperature = PropertyMock(return_value=100.0)
+    Thermocycler.target = PropertyMock(return_value=200.0)
+    Thermocycler.hold_time = PropertyMock(return_value=1)
+    Thermocycler.ramp_rate = PropertyMock(return_value=3)
+    Thermocycler.current_cycle_index = PropertyMock(return_value=1)
+    Thermocycler.total_cycle_count = PropertyMock(return_value=3)
+    Thermocycler.current_step_index = PropertyMock(return_value=5)
+    Thermocycler.total_step_count = PropertyMock(return_value=2)
+    return t
 
-    keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
-                   'status', 'data', 'hasAvailableUpdate', 'revision',
-                   'moduleModel', 'displayName'])
+
+def test_get_modules_magdeck(api_client, hardware, magdeck):
+    hardware.attached_modules = [magdeck]
 
     resp = api_client.get('/modules')
     body = resp.json()
     assert resp.status_code == 200
-    assert 'modules' in body
-    assert len(body['modules']) == 1
-    assert sorted(body['modules'][0].keys()) == keys
-    assert 'engaged' in body['modules'][0]['data']
+    assert body == {
+        'modules': [
+            {
+                'displayName': 'magdeck',
+                'fwVersion': 'dummyVersionMD',
+                'hasAvailableUpdate': False,
+                'model': 'mag_deck_v1.1',
+                'moduleModel': 'magneticModuleV1',
+                'name': 'magdeck',
+                'port': '/dev/ot_module_magdeck1',
+                'revision': 'mag_deck_v1.1',
+                'serial': 'dummySerialMD',
+                'status': 'engaged',
+                'data': {
+                    'engaged': True,
+                    'height': 321,
+                }
+            }
+        ]
+    }
 
-    hardware.attacked_modules = [tempdeck]
+
+def test_get_modules_tempdeck(api_client, hardware, tempdeck):
+    hardware.attached_modules = [tempdeck]
 
     for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
         tempdeck._device_info['model'] = model
         resp = api_client.get('/modules')
         body = resp.json()
         assert resp.status_code == 200
-        assert len(body['modules']) == 1
-        assert not body['modules'][0]['hasAvailableUpdate']
+        assert body == {
+            'modules': [
+                {
+                    'displayName': 'tempdeck',
+                    'fwVersion': 'dummyVersionTD',
+                    'hasAvailableUpdate': False,
+                    'model': model,
+                    'moduleModel': 'temperatureModuleV1',
+                    'name': 'tempdeck',
+                    'port': '/dev/ot_module_tempdeck1',
+                    'revision': model,
+                    'serial': 'dummySerialTD',
+                    'status': 'idle',
+                    'data': {
+                        'currentTemp': 123,
+                        'targetTemp':  321,
+                    }
+                }
+            ]
+        }
 
 
-def test_get_module_serial(api_client, hardware, magdeck, monkeypatch):
+def test_get_modules_thermocycler(api_client, hardware, thermocycler):
+    hardware.attached_modules = [thermocycler]
+
+    resp = api_client.get('/modules')
+    body = resp.json()
+    assert resp.status_code == 200
+    assert body == {
+        'modules': [{
+            'displayName': 'thermocycler',
+            'fwVersion': 'dummyVersionTC',
+            'hasAvailableUpdate': False,
+            'model': 'dummyModelTC',
+            'moduleModel': 'thermocyclerModuleV1',
+            'name': 'thermocycler',
+            'port': '/dev/ot_module_thermocycler1',
+            'revision': 'dummyModelTC',
+            'serial': 'dummySerialTC',
+            'status': 'idle',
+            'data': {
+                'lid': "open",
+                'lidTarget': 1.2,
+                'lidTemp': 22,
+                'currentTemp': 100,
+                'targetTemp': 200,
+                'holdTime': 1,
+                'rampRate': 3,
+                'currentCycleIndex': 1,
+                'totalCycleCount': 3,
+                'currentStepIndex': 5,
+                'totalStepCount': 2,
+            }
+        }]
+    }
+
+
+def test_get_module_serial_magdeck(api_client, hardware, magdeck):
     hardware.attached_modules = [magdeck]
 
     resp = api_client.get('/modules/dummySerialMD/data')
 
     body = resp.json()
     assert resp.status_code == 200
-    assert body == {"status": "disengaged",
+    assert body == {"status": "engaged",
                     "data": {
-                        "engaged": False,
-                        "height": 0
+                        "engaged": True,
+                        "height": 321.0
+                    }}
+
+
+def test_get_module_serial_tempdeck(api_client, hardware, tempdeck):
+    hardware.attached_modules = [tempdeck]
+
+    resp = api_client.get('/modules/dummySerialTD/data')
+
+    body = resp.json()
+    assert resp.status_code == 200
+    assert body == {"status": "idle",
+                    "data": {
+                        "currentTemp": 123.0,
+                        "targetTemp": 321.0
+                    }}
+
+
+def test_get_module_serial_thermocycler(api_client, hardware, thermocycler):
+    hardware.attached_modules = [thermocycler]
+
+    resp = api_client.get('/modules/dummySerialTC/data')
+
+    body = resp.json()
+    assert resp.status_code == 200
+    assert body == {"status": "idle",
+                    "data": {
+                        'lid': "open",
+                        'lidTarget': 1.2,
+                        'lidTemp': 22,
+                        'currentTemp': 100,
+                        'targetTemp': 200,
+                        'holdTime': 1,
+                        'rampRate': 3,
+                        'currentCycleIndex': 1,
+                        'totalCycleCount': 3,
+                        'currentStepIndex': 5,
+                        'totalStepCount': 2,
                     }}
 
 

@@ -344,7 +344,7 @@ export type Timeline = {|
   errors?: ?Array<CommandCreatorError>,
 |}
 
-export type RobotStateAndWarnings = {
+export type RobotStateAndWarnings = {|
   robotState: RobotState,
   warnings: Array<CommandCreatorWarning>,
-}
+|}

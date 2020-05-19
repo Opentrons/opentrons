@@ -36,7 +36,7 @@ def _create_calibration_check_session_details(
             model=v.model,
             name=v.name,
             tip_length=v.tip_length,
-            mount=v.mount,
+            mount=str(v.mount),
             has_tip=v.has_tip,
             rank=v.rank,
             tiprack_id=v.tiprack_id)
@@ -47,7 +47,7 @@ def _create_calibration_check_session_details(
                 alternatives=data.alternatives,
                 slot=data.slot,
                 id=data.id,
-                forMounts=data.forMounts,
+                forMounts=[str(m) for m in data.forMounts],
                 loadName=data.loadName,
                 namespace=data.namespace,
                 version=data.version) for data in

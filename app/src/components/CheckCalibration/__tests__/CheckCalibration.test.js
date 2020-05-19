@@ -46,7 +46,7 @@ describe('CheckCalibration', () => {
   const mockCloseCalibrationCheck = jest.fn()
 
   const getBackButton = wrapper =>
-    wrapper.find({ title: 'Back' }).find('button')
+    wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,

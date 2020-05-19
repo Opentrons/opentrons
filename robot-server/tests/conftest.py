@@ -29,7 +29,7 @@ def api_client(hardware) -> TestClient:
 @pytest.fixture(scope="session")
 def run_server():
     with subprocess.Popen([sys.executable, "-m", "robot_server.main"],
-                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': 'dev.env'},
+                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': 'test.env'},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
         # Wait for a bit to get started

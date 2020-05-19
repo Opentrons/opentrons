@@ -7,6 +7,11 @@ import {
   getNextDefaultPipetteId,
   getNextDefaultTemperatureModuleId,
   getNextDefaultThermocyclerModuleId,
+  getNextDefaultBlockIsActive,
+  getNextDefaultBlockTemperature,
+  getNextDefaultLidIsActive,
+  getNextDefaultLidTemperature,
+  getNextDefaultLidOpen,
   handleFormChange,
 } from '../../steplist/formLevel'
 import {
@@ -141,7 +146,7 @@ const _patchTemperatureModuleId = (args: {|
   return null
 }
 
-const _patchThermocyclerModuleId = (args: {|
+const _patchThermocyclerFields = (args: {|
   initialDeckSetup: InitialDeckSetup,
   orderedStepIds: OrderedStepIdsState,
   savedStepForms: SavedStepFormState,
@@ -149,17 +154,42 @@ const _patchThermocyclerModuleId = (args: {|
 |}): FormUpdater => () => {
   const { initialDeckSetup, orderedStepIds, savedStepForms, stepType } = args
 
-  const hasThermocyclerModuleId = stepType === 'thermocycler'
-
-  if (hasThermocyclerModuleId) {
-    const moduleId = getNextDefaultThermocyclerModuleId(
-      savedStepForms,
-      orderedStepIds,
-      initialDeckSetup.modules
-    )
-    return { moduleId }
+  if (stepType !== 'thermocycler') {
+    return null
   }
-  return null
+
+  const moduleId = getNextDefaultThermocyclerModuleId(
+    savedStepForms,
+    orderedStepIds,
+    initialDeckSetup.modules
+  )
+
+  const blockIsActive = getNextDefaultBlockIsActive(
+    savedStepForms,
+    orderedStepIds
+  )
+
+  const blockTargetTemp = getNextDefaultBlockTemperature(
+    savedStepForms,
+    orderedStepIds
+  )
+
+  const lidIsActive = getNextDefaultLidIsActive(savedStepForms, orderedStepIds)
+
+  const lidTargetTemp = getNextDefaultLidTemperature(
+    savedStepForms,
+    orderedStepIds
+  )
+
+  const lidOpen = getNextDefaultLidOpen(savedStepForms, orderedStepIds)
+  return {
+    moduleId,
+    blockIsActive,
+    blockTargetTemp,
+    lidIsActive,
+    lidTargetTemp,
+    lidOpen,
+  }
 }
 
 export const createPresavedStepForm = ({
@@ -198,7 +228,7 @@ export const createPresavedStepForm = ({
     stepType,
   })
 
-  const updateThermocyclerModuleId = _patchThermocyclerModuleId({
+  const updateThermocyclerModuleId = _patchThermocyclerFields({
     initialDeckSetup,
     orderedStepIds,
     savedStepForms,

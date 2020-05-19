@@ -49,16 +49,16 @@ SessionCommandTypes = typing.Union[
 
 class BasicSession(BaseModel):
     """Minimal session description"""
-    session_type: calibration_models.SessionType =\
-        Field(..., description="The type of the session")
+    sessionType: calibration_models.SessionType =\
+        Field(...,
+              description="The type of the session")
 
 
 class Session(BasicSession):
     """Full description of session"""
-    session_id: str =\
-        Field(..., description="Unique identifier of the session")
     details: SessionDetails =\
-        Field(..., description="Detailed session specific status")
+        Field(...,
+              description="Detailed session specific status")
 
 
 class SessionCommand(BaseModel):

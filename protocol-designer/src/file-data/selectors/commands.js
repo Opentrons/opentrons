@@ -152,6 +152,11 @@ const commandCreatorFromStepArgs = (
         StepGeneration.awaitTemperature,
         args
       )
+    case 'thermocyclerState':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.thermocyclerStateStep,
+        args
+      )
   }
   console.warn(`unhandled commandCreatorFnName: ${args.commandCreatorFnName}`)
   return null
