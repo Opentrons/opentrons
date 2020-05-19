@@ -1,0 +1,36 @@
+---
+test_name: Create a deck calibration session
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Force caching of pipettes
+    request:
+      url: "{host:s}:{port:d}/pipettes"
+      params:
+        refresh: True
+    response:
+      status_code: 200
+  - name: Create a session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck/start"
+      method: POST
+      json:
+        force: False
+    response:
+      status_code: 201
+      save:
+        json:
+          token: token
+      json: !anydict
+  - name: Delete session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: release
+    response:
+      status_code: 200
+      json:
+        message: calibration session released
