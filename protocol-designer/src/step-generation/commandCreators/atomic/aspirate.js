@@ -1,8 +1,10 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
 import { getPipetteWithTipMaxVol } from '../../robotStateSelectors'
-import { modulePipetteCollision } from '../../utils'
-import { thermocyclerPipetteCollission } from '../../utils/thermocyclerPipetteCollision'
+import {
+  modulePipetteCollision,
+  thermocyclerPipetteCollision,
+} from '../../utils'
 import type { AspirateParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 

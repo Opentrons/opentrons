@@ -24,11 +24,7 @@ import {
 } from '../utils/misc'
 import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { FIXED_TRASH_ID } from '../__fixtures__'
-import {
-  makeContext,
-  getRobotStateWithTipStandard,
-} from '../__fixtures__/robotStateFixtures'
-import { thermocyclerPipetteCollission } from '../utils/thermocyclerPipetteCollision'
+import { thermocyclerPipetteCollision } from '../utils'
 import type { RobotState } from '../'
 
 describe('splitLiquid', () => {

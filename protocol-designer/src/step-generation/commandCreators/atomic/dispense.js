@@ -1,6 +1,9 @@
 // @flow
 import * as errorCreators from '../../errorCreators'
-import { modulePipetteCollision } from '../../utils'
+import {
+  modulePipetteCollision,
+  thermocyclerPipetteCollision,
+} from '../../utils'
 import type { DispenseParams } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { CommandCreator, CommandCreatorError } from '../../types'
 
