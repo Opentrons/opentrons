@@ -1,5 +1,7 @@
 ---
 test_name: Calibration check session full flow
+strict:
+  - json:off
 marks:
   - usefixtures:
       - run_server
@@ -18,6 +20,19 @@ stages:
       save:
         json:
           session_id: data.id
+  - name: Check that current state is sessionStarted
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: sessionStarted
+
   - name: Load labware
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -29,6 +44,19 @@ stages:
             command: loadLabware
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: labwareLoaded
+
   - name: Prepare first pipette
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -40,6 +68,19 @@ stages:
             command: preparePipette
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: preparingFirstPipette
+
   - name: Jog first pipette
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -53,6 +94,19 @@ stages:
               vector: [1, 0, 0]
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: preparingFirstPipette
+
   - name: Pick up tip
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -64,6 +118,19 @@ stages:
             command: pickUpTip
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: inspectingFirstTip
+
   - name: Confirm tip attached
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -75,6 +142,19 @@ stages:
             command: confirmTip
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingFirstPipetteToHeight
+
   - name: Jog first pipette to height
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -88,6 +168,19 @@ stages:
               vector: [1, 2, 3]
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingFirstPipetteToHeight
+
   - name: Compare first pipette height
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -99,6 +192,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingFirstPipetteHeight
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -110,6 +216,19 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingFirstPipetteToPointOne
+
   - name: Compare first pipette point one
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -121,6 +240,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingFirstPipettePointOne
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -132,6 +264,19 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingFirstPipetteToPointTwo
+
   - name: Compare first pipette point two
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -143,6 +288,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingFirstPipettePointTwo
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -154,6 +312,19 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingFirstPipetteToPointThree
+
   - name: Compare first pipette point three
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -165,6 +336,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingFirstPipettePointThree
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -176,6 +360,19 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: preparingSecondPipette
+
   - name: Jog Second Pipette
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -189,6 +386,19 @@ stages:
               vector: [1, 2, 3]
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: preparingSecondPipette
+
   - name: Pick up tip
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -200,6 +410,19 @@ stages:
             command: pickUpTip
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: inspectingSecondTip
+
   - name: Confirm tip
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -211,6 +434,19 @@ stages:
             command: confirmTip
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingSecondPipetteToHeight
+
   - name: Compare second pipette to height
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -222,6 +458,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingSecondPipetteHeight
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -233,6 +482,19 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: joggingSecondPipetteToPointOne
+
   - name: Compare second pipette to point one
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -244,6 +506,19 @@ stages:
             command: comparePoint
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: comparingSecondPipettePointOne
+
   - name: Go to next check
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}/commands"
@@ -255,12 +530,26 @@ stages:
             command: goToNextCheck
     response:
       status_code: 200
+  - name: Check the effect of command
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+          type: Session
+          attributes:
+            details:
+              currentStep: checkComplete
+
   - name: Delete the session
     request:
       url: "{host:s}:{port:d}/sessions/{session_id}"
       method: DELETE
     response:
       status_code: 200
+
   - name: There are no sessions
     request:
       url: "{host:s}:{port:d}/sessions"
