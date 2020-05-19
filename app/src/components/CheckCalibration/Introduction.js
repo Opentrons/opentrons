@@ -14,10 +14,8 @@ const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
 const TIPRACK_REQS = 'For this process you will require:'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const NOTE_HEADER = 'Please note: '
-const IMPORTANCE_MODIFIER = 'extremely'
-const NOTE_BODY_1 = "It's "
-const NOTE_BODY_2 =
-  ' important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips.'
+const NOTE_BODY =
+  "It's important you perform this test using the Opentrons tips and tipracks specified above, as the robot determines accuracy based on the measurements of these tips."
 const CANCEL = 'Cancel'
 const CONTINUE = 'Continue'
 const CLEAR_DECK_HEADER = 'Clear the deck'
@@ -72,9 +70,7 @@ export function Introduction(props: IntroductionProps) {
 
       <p className={styles.tipracks_note_body}>
         <b className={styles.tipracks_note_header}>{NOTE_HEADER}</b>
-        {NOTE_BODY_1}
-        <u>{IMPORTANCE_MODIFIER}</u>
-        {NOTE_BODY_2}
+        {NOTE_BODY}
       </p>
       <div className={styles.button_row}>
         <PrimaryButton

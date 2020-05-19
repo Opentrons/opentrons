@@ -187,6 +187,9 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 .labware_ui_wrapper {
   height: 100%;
   width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 .labware_ui_content {

@@ -3,7 +3,7 @@ from collections import UserDict
 import functools
 import logging
 from dataclasses import dataclass, field, astuple
-from typing import Any, Callable, Optional, TYPE_CHECKING, Union, List
+from typing import Any, Callable, Optional, TYPE_CHECKING, Union, List, Set
 
 from opentrons import types as top_types
 from opentrons.protocols.types import APIVersion
@@ -99,6 +99,27 @@ def build_edges(
         return [edge for edge in astuple(edge_list) if edge]
     new_edges = determine_edge_path(where, mount, edge_list, deck)
     return [edge for edge in astuple(new_edges) if edge]
+
+
+def first_parent(loc: top_types.LocationLabware) -> Optional[str]:
+    """ Return the topmost parent of this location. It should be
+    either a string naming a slot or a None if the location isn't
+    associated with a slot """
+
+    # cycle-detecting recursive climbing
+    seen: Set[top_types.LocationLabware] = set()
+
+    # internal function to have the cycle detector different per call
+    def _fp_recurse(location: top_types.LocationLabware):
+        if location in seen:
+            raise RuntimeError('Cycle in labware parent')
+        seen.add(location)
+        if location is None or isinstance(location, str):
+            return location
+        else:
+            return first_parent(location.parent)
+
+    return _fp_recurse(loc)
 
 
 class FlowRates:

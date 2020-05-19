@@ -296,9 +296,13 @@ and when that is implemented.
 .toggle_row {
   display: flex;
   flex-direction: row;
-  align-items: center;
+  align-items: flex-start;
 }
 
 .toggle_field {
   margin-right: 1rem;
+}
+
+.toggle_temperature_field {
+  margin-top: 0.125rem;
 }

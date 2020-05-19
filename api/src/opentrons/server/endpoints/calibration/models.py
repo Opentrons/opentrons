@@ -22,7 +22,7 @@ class TiprackPosition(BaseModel):
 
 class SessionType(str, Enum):
     """The available session types"""
-    check = 'check'
+    calibration_check = 'calibrationCheck'
 
 
 class SpecificPipette(BaseModel):

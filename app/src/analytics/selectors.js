@@ -27,6 +27,7 @@ import {
 
 import { getRobotSettings } from '../robot-settings'
 import { getAttachedPipettes } from '../pipettes'
+import { getPipettes, getModules } from '../robot/selectors'
 
 import { hash } from './hash'
 
@@ -51,7 +52,19 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
   getProtocolSource,
   getProtocolAuthor,
   getProtocolContents,
-  (type, app, apiVersion, name, source, author, contents) => ({
+  getPipettes,
+  getModules,
+  (
+    type,
+    app,
+    apiVersion,
+    name,
+    source,
+    author,
+    contents,
+    pipettes,
+    modules
+  ) => ({
     protocolType: type || '',
     protocolAppName: app.name || '',
     protocolAppVersion: app.version || '',
@@ -60,6 +73,8 @@ const _getUnhashedProtocolAnalyticsData: ProtocolDataSelector = createSelector(
     protocolSource: source || '',
     protocolAuthor: author || '',
     protocolText: contents || '',
+    pipettes: pipettes.map(p => p.requestedAs ?? p.name).join(','),
+    modules: modules.map(m => m.model).join(','),
   })
 )
 

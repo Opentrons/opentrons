@@ -15,6 +15,7 @@ export {
   mix,
   replaceTip,
   setTemperature,
+  thermocyclerStateStep,
   touchTip,
   transfer,
 } from './commandCreators'

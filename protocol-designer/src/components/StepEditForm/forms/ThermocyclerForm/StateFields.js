@@ -1,5 +1,6 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 import { FormGroup } from '@opentrons/components'
@@ -36,7 +37,10 @@ export const StateFields = (props: Props) => {
           >
             <TextField
               name="blockTargetTemp"
-              className={styles.small_field}
+              className={cx(
+                styles.small_field,
+                styles.toggle_temperature_field
+              )}
               units={i18n.t('application.units.degrees')}
               {...focusHandlers}
             />
@@ -64,7 +68,10 @@ export const StateFields = (props: Props) => {
           >
             <TextField
               name="lidTargetTemp"
-              className={styles.small_field}
+              className={cx(
+                styles.small_field,
+                styles.toggle_temperature_field
+              )}
               units={i18n.t('application.units.degrees')}
               {...focusHandlers}
             />

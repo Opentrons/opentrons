@@ -121,6 +121,7 @@ test-py-windows:
 .PHONY: test-py
 test-py: test-py-windows
 	$(MAKE) -C update-server test
+	$(MAKE) -C robot-server test
 
 .PHONY: test-js
 test-js:

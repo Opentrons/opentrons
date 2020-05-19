@@ -3,13 +3,14 @@ from unittest.mock import MagicMock, PropertyMock, patch
 
 import typing
 from pydantic.main import BaseModel
-from uuid import uuid4
 
 from opentrons.server.endpoints.calibration.session \
     import CheckCalibrationSession, CalibrationCheckState, \
     CalibrationCheckTrigger
 from opentrons.server.endpoints.calibration.models import \
     SessionType, JogPosition
+from opentrons.server.endpoints.calibration.helper_classes import \
+    PipetteInfo, PipetteRank
 from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager
@@ -25,34 +26,32 @@ def session_details():
                 'instruments': {},
                 'labware': [],
             },
-            'session_type': 'check',
-            'session_id': 'check',
+            'sessionType': 'calibrationCheck',
         },
         'type': 'Session',
-        'id': 'check'
+        'id': 'calibrationCheck'
     }
     return sess_dict
 
 
 @pytest.fixture
 def mock_cal_session(hardware, loop):
-    # TODO: The mock instrs dictionary needs
-    # to be modified to fit changes that
-    # remove instances of pip id in
-    # the check calibration session class.
-    id1 = uuid4()
-    id2 = uuid4()
-    mock_instrs = {
-        id1: {
-            'mount': types.Mount.LEFT,
-            'tiprack_id': None,
-            'critical_point': None},
-        id2: {
-            'mount': types.Mount.RIGHT,
-            'tiprack_id': None,
-            'critical_point': None}
+
+    mock_pipette_info_by_mount = {
+        types.Mount.LEFT: PipetteInfo(
+            tiprack_id=None,
+            critical_point=None,
+            rank=PipetteRank.second,
+            mount=types.Mount.LEFT
+        ),
+        types.Mount.RIGHT: PipetteInfo(
+            tiprack_id=None,
+            critical_point=None,
+            rank=PipetteRank.first,
+            mount=types.Mount.RIGHT
+        )
     }
-    other_instrs = {
+    mock_hw_pipettes = {
         types.Mount.LEFT: {
             'model': 'p10_single_v1',
             'has_tip': False,
@@ -69,11 +68,9 @@ def mock_cal_session(hardware, loop):
             'channels': 1}
     }
 
-    def fake_get_pip(mount):
-        return other_instrs[mount]
-
-    CheckCalibrationSession._key_by_uuid = MagicMock(return_value=mock_instrs)
-    CheckCalibrationSession.get_pipette = MagicMock(side_effect=fake_get_pip)
+    CheckCalibrationSession._get_pip_info_by_mount =\
+        MagicMock(return_value=mock_pipette_info_by_mount)
+    CheckCalibrationSession.pipettes = mock_hw_pipettes
 
     m = CheckCalibrationSession(hardware)
 
@@ -109,12 +106,12 @@ def patch_build_session(mock_cal_session):
 @pytest.fixture
 def session_manager_with_session(mock_cal_session):
     manager = get_session_manager()
-    manager.sessions[SessionType.check] = mock_cal_session
+    manager.sessions[SessionType.calibration_check] = mock_cal_session
 
     yield mock_cal_session
 
-    if SessionType.check in manager.sessions:
-        del manager.sessions[SessionType.check]
+    if SessionType.calibration_check in manager.sessions:
+        del manager.sessions[SessionType.calibration_check]
 
 
 @pytest.fixture
@@ -126,9 +123,10 @@ def session_hardware_info(mock_cal_session, session_details):
         str(k): {'model': v.model,
                  'name': v.name,
                  'tip_length': v.tip_length,
-                 'mount': v.mount.value,
+                 'mount': v.mount,
                  'has_tip': v.has_tip,
-                 'tiprack_id': str(v.tiprack_id)}
+                 'tiprack_id': str(v.tiprack_id),
+                 'rank': v.rank}
         for k, v in mock_cal_session.pipette_status().items()
     }
     info = {
@@ -137,7 +135,7 @@ def session_hardware_info(mock_cal_session, session_details):
             'alternatives': data.alternatives,
             'slot': data.slot,
             'id': str(data.id),
-            'forPipettes': [str(_id) for _id in data.forPipettes],
+            'forMounts': [str(m) for m in data.forMounts],
             'loadName': data.loadName,
             'namespace': data.namespace,
             'version': str(data.version)} for data in lw_status],
@@ -154,15 +152,15 @@ def test_create_session_already_present(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "calibrationCheck"
             }
         }
     })
     assert response.json() == {
         'errors': [{
-            'detail': "A session with id 'check' already exists. "
+            'detail': "A session with id 'calibrationCheck' already exists. "
                       "Please delete to proceed.",
-            'links': {'DELETE': '/sessions/check'},
+            'links': {'DELETE': '/sessions/calibrationCheck'},
             'status': '409',
             'title': 'Conflict'
         }]
@@ -181,14 +179,14 @@ def test_create_session_error(api_client,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "calibrationCheck"
             }
         }
     })
     assert response.json() == {
         'errors': [{
-            'detail': "Failed to create session of type 'check': Please "
-                      "attach pipettes before proceeding.",
+            'detail': "Failed to create session of type 'calibrationCheck': "
+                      "Please attach pipettes before proceeding.",
             'status': '400',
             'title': 'Creation Failed'}
         ]}
@@ -201,7 +199,7 @@ def test_create_session(api_client, patch_build_session,
         "data": {
             "type": "Session",
             "attributes": {
-                "session_type": "check"
+                "sessionType": "calibrationCheck"
             }
         }
     })
@@ -210,26 +208,26 @@ def test_create_session(api_client, patch_build_session,
         'data': session_hardware_info,
         'links': {
             'POST': {
-                'href': '/sessions/check/commands',
+                'href': '/sessions/calibrationCheck/commands',
             },
             'GET': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
             'DELETE': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
         }
     }
-    assert response.status_code == 200
+    assert response.status_code == 201
     # Clean up
     get_session_manager().sessions.clear()
 
 
 def test_delete_session_not_found(api_client):
-    response = api_client.delete("/sessions/check")
+    response = api_client.delete("/sessions/calibrationCheck")
     assert response.json() == {
         'errors': [{
-            'detail': "Cannot find session with id 'check'.",
+            'detail': "Cannot find session with id 'calibrationCheck'.",
             'links': {'POST': '/sessions'},
             'status': '404',
             'title': 'No session'
@@ -241,7 +239,7 @@ def test_delete_session_not_found(api_client):
 def test_delete_session(api_client, session_manager_with_session,
                         mock_cal_session,
                         session_hardware_info):
-    response = api_client.delete("/sessions/check")
+    response = api_client.delete("/sessions/calibrationCheck")
     mock_cal_session.delete_session.assert_called_once()
     assert response.json() == {
         'data': session_hardware_info,
@@ -269,18 +267,18 @@ def test_get_session_not_found(api_client):
 
 def test_get_session(api_client, session_manager_with_session,
                      session_hardware_info):
-    response = api_client.get("/sessions/check")
+    response = api_client.get("/sessions/calibrationCheck")
     assert response.json() == {
         'data': session_hardware_info,
         'links': {
             'POST': {
-                'href': '/sessions/check/commands',
+                'href': '/sessions/calibrationCheck/commands',
             },
             'GET': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
             'DELETE': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
         }
     }
@@ -338,7 +336,7 @@ def test_session_command_create(api_client,
                                 mock_cal_session,
                                 session_hardware_info):
     response = api_client.post(
-        "/sessions/check/commands",
+        "/sessions/calibrationCheck/commands",
         json=command("jog",
                      JogPosition(vector=[1, 2, 3])))
 
@@ -359,13 +357,13 @@ def test_session_command_create(api_client,
         'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
-                'href': '/sessions/check/commands',
+                'href': '/sessions/calibrationCheck/commands',
             },
             'GET': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
             'DELETE': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
         }
     }
@@ -377,7 +375,7 @@ def test_session_command_create_no_body(api_client,
                                         mock_cal_session,
                                         session_hardware_info):
     response = api_client.post(
-        "/sessions/check/commands",
+        "/sessions/calibrationCheck/commands",
         json=command("loadLabware", None)
     )
 
@@ -397,13 +395,13 @@ def test_session_command_create_no_body(api_client,
         'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
-                'href': '/sessions/check/commands',
+                'href': '/sessions/calibrationCheck/commands',
             },
             'GET': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
             'DELETE': {
-                'href': '/sessions/check',
+                'href': '/sessions/calibrationCheck',
             },
         }
     }
@@ -420,7 +418,7 @@ def test_session_command_create_raise(api_client,
     mock_cal_session.trigger_transition.side_effect = raiser
 
     response = api_client.post(
-        "/sessions/check/commands",
+        "/sessions/calibrationCheck/commands",
         json=command("jog",
                      JogPosition(vector=[1, 2, 3])))
 

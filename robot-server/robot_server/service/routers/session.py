@@ -46,14 +46,16 @@ def get_session(manager: SessionManager,
 @router.post("/sessions",
              description="Create a session",
              response_model_exclude_unset=True,
-             response_model=session.SessionResponse)
+             response_model=session.SessionResponse,
+             status_code=http_status_codes.HTTP_201_CREATED,
+             )
 async def create_session_handler(
         create_request: SessionCreateRequest,
         session_manager: SessionManager = Depends(get_session_manager),
         hardware=Depends(get_hardware)) \
         -> session.SessionResponse:
     """Create a session"""
-    session_type = create_request.data.attributes.session_type
+    session_type = create_request.data.attributes.sessionType
     # TODO We use type as ID while we only support one session type.
     session_id = session_type.value
 
@@ -75,8 +77,7 @@ async def create_session_handler(
         return session.SessionResponse(
             data=ResponseDataModel.create(
                 attributes=session.Session(
-                    session_id=session_id,
-                    session_type=session_type,
+                    sessionType=session_type,
                     details=create_session_details(new_session)),
                 resource_id=session_id),
             links=get_valid_session_links(session_id, router)
@@ -116,9 +117,9 @@ async def delete_session_handler(
     return session.SessionResponse(
         data=ResponseDataModel.create(
             attributes=session.Session(
-                session_id=session_id,
+                sessionId=session_id,
                 # TODO support other session types
-                session_type=models.SessionType.check,
+                sessionType=models.SessionType.calibration_check,
                 details=create_session_details(session_obj)),
             resource_id=session_id),
         links={
@@ -144,8 +145,7 @@ async def get_session_handler(
         data=ResponseDataModel.create(
             # TODO use a proper session id rather than the type
             attributes=session.Session(
-                session_id=session_id,
-                session_type=models.SessionType(session_id),
+                sessionType=models.SessionType(session_id),
                 details=create_session_details(session_obj)),
             resource_id=session_id),
         links=get_valid_session_links(session_id, router)
@@ -165,9 +165,9 @@ async def get_sessions_handler(
 
     sessions = (
         session.Session(
-            session_id=session_id,
+            sessionId=session_id,
             # TODO use a proper session id rather than the type
-            session_type=models.SessionType(session_id),
+            sessionType=models.SessionType(session_id),
             details=create_session_details(session_obj))
         # TODO type_filter
         for (session_id, session_obj) in session_manager.sessions.items()
@@ -177,7 +177,7 @@ async def get_sessions_handler(
         data=[ResponseDataModel.create(
             attributes=session,
             # TODO use a proper session id rather than the type
-            resource_id=session.session_type) for session in sessions
+            resource_id=session.sessionType) for session in sessions
         ]
     )
 
@@ -223,9 +223,8 @@ async def session_command_create_handler(
             resource_id=str(uuid4())
         ),
         meta=session.Session(details=create_session_details(session_obj),
-                             session_id=session_id,
                              # TODO Get type from session
-                             session_type=models.SessionType.check),
+                             sessionType=models.SessionType.calibration_check),
         links=get_valid_session_links(session_id, router)
     )
 
