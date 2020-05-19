@@ -92,17 +92,6 @@ export const ModuleStatus = ({
       })
       return (
         <>
-          {/* <div className={styles.module_status_line}>Block,</div>
-          <div className={styles.module_status_line}>
-            {'  - ' + makeTemperatureText(moduleState.blockTargetTemp)}
-          </div>
-          <div className={styles.module_status_line}>
-            Lid ({moduleState.lidOpen ? 'open' : 'closed'}),
-          </div>
-          <div className={styles.module_status_line}>
-            {'  - ' + makeTemperatureText(moduleState.lidTargetTemp)}
-          </div> */}
-
           <div className={styles.module_status_line}>
             <div>{i18n.t('modules.block_label')},</div>
             <div>{makeTemperatureText(moduleState.blockTargetTemp)}</div>
