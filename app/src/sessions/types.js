@@ -67,7 +67,7 @@ export type SessionCommandResponseModel = {|
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
 export type MultiSessionResponse = RobotApiV2ResponseBody<
-  Array<SessionResponseModel>,
+  $ReadOnlyArray<SessionResponseModel>,
   {||}
 >
 
@@ -188,6 +188,9 @@ export type SessionsAction =
   | FetchSessionAction
   | FetchSessionSuccessAction
   | FetchSessionFailureAction
+  | FetchAllSessionsAction
+  | FetchAllSessionsSuccessAction
+  | FetchAllSessionsFailureAction
   | CreateSessionCommandAction
   | CreateSessionCommandSuccessAction
   | CreateSessionCommandFailureAction

@@ -95,6 +95,7 @@ describe('CheckCalibration', () => {
       dispatch,
     }
     mockGetDeckDefinitions.mockReturnValue({})
+    findRobotSessionIdByType.mockReturnValue('fake_session_id')
 
     render = () => {
       return mount(
@@ -115,7 +116,6 @@ describe('CheckCalibration', () => {
   })
 
   it('fetches robot cal check session on mount', () => {
-    findRobotSessionIdByType.mockReturnValue('fake_session_id')
     getRobotSessionById.mockReturnValue({
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
       details: mockRobotCalibrationCheckSessionDetails,
@@ -123,10 +123,7 @@ describe('CheckCalibration', () => {
     render()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Sessions.fetchSession(
-          'robot-name',
-          Sessions.SESSION_TYPE_CALIBRATION_CHECK
-        ),
+        ...Sessions.fetchSession('robot-name', 'fake_session_id'),
         meta: { requestId: expect.any(String) },
       })
     )
@@ -163,10 +160,7 @@ describe('CheckCalibration', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Sessions.deleteSession(
-          'robot-name',
-          Sessions.SESSION_TYPE_CALIBRATION_CHECK
-        ),
+        ...Sessions.deleteSession('robot-name', 'fake_session_id'),
         meta: { requestId: expect.any(String) },
       })
     )

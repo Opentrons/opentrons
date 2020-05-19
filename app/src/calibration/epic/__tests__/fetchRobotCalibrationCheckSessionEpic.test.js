@@ -14,13 +14,13 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
   })
 
   describe('handles fetch calibration check session', () => {
-    it('maps cal check session not found response to CREATE_SESSION', () => {
-      const triggerAction = Sessions.fetchSessionFailure(
+    it('maps cal check session creation conflict response to FETCH_ALL_SESSIONS', () => {
+      const triggerAction = Sessions.createSessionFailure(
         mockRobot.name,
-        { errors: [{ status: 'no session found' }] },
+        { errors: [{ status: 'theres already someone in here' }] },
         {
           requestId: 'abc',
-          response: { ...mockFetchSessionFailureMeta, status: 404 },
+          response: { ...mockFetchSessionFailureMeta, status: 409 },
         }
       )
 
@@ -33,10 +33,7 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
         const output$ = calibrationEpic(action$, state$)
 
         expectObservable(output$).toBe('--a', {
-          a: Sessions.createSession(
-            mockRobot.name,
-            Sessions.SESSION_TYPE_CALIBRATION_CHECK
-          ),
+          a: Sessions.fetchAllSessions(mockRobot.name),
         })
       })
     })
