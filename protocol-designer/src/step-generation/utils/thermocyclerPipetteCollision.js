@@ -1,5 +1,5 @@
 // @flow
-import { THERMOCYCLER_MODULE_TYPE } from '../../../../shared-data/js/constants'
+import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import type { RobotState } from '../'
 
 export const thermocyclerPipetteCollision = (
