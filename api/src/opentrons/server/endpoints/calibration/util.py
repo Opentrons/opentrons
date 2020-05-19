@@ -132,11 +132,13 @@ class StateMachine:
         log.debug(f"trigger_transition for {trigger} "
                   f"in {self.current_state_name}")
         events = self._events.get(trigger, {})
+        # print(events)
         if events and WILDCARD not in events and \
                 self.current_state_name not in events:
             raise StateMachineError(f'cannot trigger event {trigger}'
                                     f' from state {self.current_state_name}')
         try:
+            # print(WILDCARD)
             from_state = WILDCARD if WILDCARD in events \
                 else self.current_state_name
             for transition in events[from_state]:
