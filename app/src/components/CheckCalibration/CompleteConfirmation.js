@@ -1,9 +1,6 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 import { Icon, PrimaryButton } from '@opentrons/components'
-import type { Dispatch } from '../../types'
-import { completeRobotCalibrationCheck } from '../../calibration'
 import styles from './styles.css'
 
 const DELETE_ROBOT_CALIBRATION_CHECK_HEADER = 'Calibration check is complete'
@@ -12,15 +9,10 @@ const DELETE_ROBOT_CALIBRATION_CHECK_BODY =
 const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip and exit'
 
 type CompleteConfirmationProps = {|
-  robotName: string,
   exit: () => mixed,
 |}
 export function CompleteConfirmation(props: CompleteConfirmationProps) {
-  const { robotName, exit } = props
-  const dispatch = useDispatch<Dispatch>()
-  React.useEffect(() => {
-    dispatch(completeRobotCalibrationCheck(robotName))
-  }, [dispatch, robotName])
+  const { exit } = props
 
   return (
     <>

@@ -1,5 +1,4 @@
 // @flow
-export const SESSION_TYPE_CALIBRATION_CHECK = 'calibrationCheck'
 
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'

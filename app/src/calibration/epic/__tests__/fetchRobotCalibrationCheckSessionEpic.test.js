@@ -2,7 +2,6 @@
 import { TestScheduler } from 'rxjs/testing'
 import { mockFetchSessionFailureMeta } from '../../../sessions/__fixtures__'
 import { mockRobot } from '../../../robot-api/__fixtures__'
-import { SESSION_TYPE_CALIBRATION_CHECK } from '../../constants'
 import * as Sessions from '../../../sessions'
 import { calibrationEpic } from '..'
 
@@ -36,7 +35,7 @@ describe('fetchRobotCalibrationCheckSessionEpic', () => {
         expectObservable(output$).toBe('--a', {
           a: Sessions.createSession(
             mockRobot.name,
-            SESSION_TYPE_CALIBRATION_CHECK
+            Sessions.SESSION_TYPE_CALIBRATION_CHECK
           ),
         })
       })

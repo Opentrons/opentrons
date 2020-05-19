@@ -53,23 +53,27 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   )?.status
   const pending = requestStatus === PENDING
 
-  const { currentStep, labware, instruments, comparisonsByStep } =
-    useSelector((state: State) => {
-      const session = Sessions.getRobotSessionById(
-        state,
-        robotName,
-        Calibration.SESSION_TYPE_CALIBRATION_CHECK
-      )
-      return session ? session.details : null
-    }) || {}
-  React.useEffect(() => {
-    dispatchRequest(
-      Sessions.fetchSession(
-        robotName,
-        Calibration.SESSION_TYPE_CALIBRATION_CHECK
-      )
+  const robotCalCheckSessionId = useSelector((state: State) => {
+    const session = Sessions.findRobotSessionIdByType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_CALIBRATION_CHECK
     )
-  }, [dispatchRequest, robotName])
+    return session ?? null
+  })
+
+  const robotCalCheckSession = useSelector((state: State) => {
+    const session = robotCalCheckSessionId
+      ? Sessions.getRobotSessionById(state, robotName, robotCalCheckSessionId)
+      : null
+    return session ?? {}
+  })
+  const { currentStep, labware, instruments, comparisonsByStep } =
+    robotCalCheckSession.details || {}
+
+  React.useEffect(() => {
+    dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSessionId))
+  }, [dispatchRequest, robotName, robotCalCheckSessionId])
 
   const hasTwoPipettes = React.useMemo(
     () => instruments && Object.keys(instruments).length === 2,
@@ -125,12 +129,8 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }, [instruments, activeInstrument, hasTwoPipettes])
 
   function exit() {
-    dispatchRequest(
-      Sessions.deleteSession(
-        robotName,
-        Calibration.SESSION_TYPE_CALIBRATION_CHECK
-      )
-    )
+    robotCalCheckSessionId &&
+      dispatchRequest(Sessions.deleteSession(robotName, robotCalCheckSessionId))
     closeCalibrationCheck()
   }
 
@@ -138,27 +138,24 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     command: SessionCommandString,
     data: SessionCommandData = {}
   ) {
-    dispatchRequest(
-      Sessions.createSessionCommand(
-        robotName,
-        Calibration.SESSION_TYPE_CALIBRATION_CHECK,
-        { command, data }
+    robotCalCheckSessionId &&
+      dispatchRequest(
+        Sessions.createSessionCommand(robotName, robotCalCheckSessionId, {
+          command,
+          data,
+        })
       )
-    )
   }
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    dispatch(
-      Sessions.createSessionCommand(
-        robotName,
-        Calibration.SESSION_TYPE_CALIBRATION_CHECK,
-        {
+    robotCalCheckSessionId &&
+      dispatch(
+        Sessions.createSessionCommand(robotName, robotCalCheckSessionId, {
           command: Calibration.checkCommands.JOG,
           data: {
             vector: formatJogVector(axis, direction, step),
           },
-        }
+        })
       )
-    )
   }
 
   let stepContents
@@ -288,7 +285,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
+      stepContents = <CompleteConfirmation exit={exit} />
       modalContentsClassName = styles.terminal_modal_contents
       break
     }

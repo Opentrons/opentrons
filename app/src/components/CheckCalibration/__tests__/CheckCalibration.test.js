@@ -29,6 +29,11 @@ type CheckCalibrationSpec = {
   currentStep: Calibration.RobotCalibrationCheckStep,
   ...
 }
+
+const findRobotSessionIdByType: JestMockFn<
+  [State, string, string],
+  $Call<typeof Sessions.findRobotSessionIdByType, State, string, string>
+> = Sessions.findRobotSessionIdByType
 const getRobotSessionById: JestMockFn<
   [State, string, string],
   $Call<typeof Sessions.getRobotSessionById, State, string, string>
@@ -110,8 +115,9 @@ describe('CheckCalibration', () => {
   })
 
   it('fetches robot cal check session on mount', () => {
+    findRobotSessionIdByType.mockReturnValue('fake_session_id')
     getRobotSessionById.mockReturnValue({
-      sessionType: Calibration.SESSION_TYPE_CALIBRATION_CHECK,
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
       details: mockRobotCalibrationCheckSessionDetails,
     })
     render()
@@ -119,7 +125,7 @@ describe('CheckCalibration', () => {
       expect.objectContaining({
         ...Sessions.fetchSession(
           'robot-name',
-          Calibration.SESSION_TYPE_CALIBRATION_CHECK
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
         ),
         meta: { requestId: expect.any(String) },
       })
@@ -129,7 +135,7 @@ describe('CheckCalibration', () => {
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
       getRobotSessionById.mockReturnValue({
-        sessionType: Calibration.SESSION_TYPE_CALIBRATION_CHECK,
+        sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
         details: {
           ...mockRobotCalibrationCheckSessionDetails,
           currentStep: spec.currentStep,
@@ -159,7 +165,7 @@ describe('CheckCalibration', () => {
       expect.objectContaining({
         ...Sessions.deleteSession(
           'robot-name',
-          Calibration.SESSION_TYPE_CALIBRATION_CHECK
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
         ),
         meta: { requestId: expect.any(String) },
       })

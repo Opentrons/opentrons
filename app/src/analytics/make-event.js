@@ -4,12 +4,9 @@ import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { SESSION_TYPE_CALIBRATION_CHECK } from '../calibration'
-import * as Sessions from '../sessions'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
-import * as calibrationActions from '../calibration/constants'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,

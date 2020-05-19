@@ -1,13 +1,11 @@
 // @flow
 import { of } from 'rxjs'
-import { filter, switchMap, tap } from 'rxjs/operators'
+import { filter, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
 import * as Sessions from '../../sessions'
 
 import type { Epic } from '../../types'
-
-import { SESSION_TYPE_CALIBRATION_CHECK } from '../constants'
 
 export const fetchRobotCalibrationCheckSessionEpic: Epic = (
   action$,
@@ -24,7 +22,7 @@ export const fetchRobotCalibrationCheckSessionEpic: Epic = (
       of(
         Sessions.createSession(
           action.payload.robotName,
-          SESSION_TYPE_CALIBRATION_CHECK
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
         )
       )
     )
