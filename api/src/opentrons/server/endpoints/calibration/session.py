@@ -463,8 +463,11 @@ CHECK_TRANSITIONS = [
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(1.79, 1.64, 2)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(2.7, 2.7, 2)
+# Add in a 2mm buffer to tiprack thresholds on top of
+# the max acceptable range for a given pipette based
+# on calibration research data.
+DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
+P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
 
 
 def _determine_threshold(
@@ -777,10 +780,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                        self.current_state_name).position,
                                None)
 
-        whitelist = [CalibrationCheckState.joggingFirstPipetteToPointOne,
-                     CalibrationCheckState.joggingFirstPipetteToPointTwo,
-                     CalibrationCheckState.joggingFirstPipetteToPointThree]
-        if self.current_state_name in whitelist:
+        saved_z_whitelist = \
+            [CalibrationCheckState.joggingFirstPipetteToPointOne,
+             CalibrationCheckState.joggingFirstPipetteToPointTwo,
+             CalibrationCheckState.joggingFirstPipetteToPointThree]
+        if self.current_state_name in saved_z_whitelist:
             saved_height =\
                 self._saved_points[getattr(CalibrationCheckState,
                                            'comparingFirstPipetteHeight')]
