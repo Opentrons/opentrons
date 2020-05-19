@@ -4,6 +4,7 @@ import { aspirate } from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import { thermocyclerPipetteCollission } from '../utils/thermocyclerPipetteCollision'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -13,6 +14,14 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import type { RobotState } from '../'
+
+jest.mock('../utils/thermocyclerPipetteCollision')
+
+const mockThermocyclerPipetteCollission: JestMockFn<
+  [RobotState, string],
+  boolean
+> = thermocyclerPipetteCollission
 
 describe('aspirate', () => {
   let initialRobotState
@@ -28,6 +37,10 @@ describe('aspirate', () => {
       flowRate: 6,
       offsetFromBottomMm: 5,
     }
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('aspirate normally (with tip)', () => {
@@ -154,6 +167,30 @@ describe('aspirate', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
+    })
+  })
+  it('aspirate from thermocycler with pipette collision returns an error', () => {
+    mockThermocyclerPipetteCollission.mockImplementationOnce(
+      (robotState: RobotState, labwareId: string) => {
+        expect(robotState).toBe(robotStateWithTip)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'THERMOCYCLER_LID_CLOSED',
     })
   })
 })

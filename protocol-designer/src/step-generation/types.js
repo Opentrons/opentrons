@@ -296,6 +296,7 @@ export type ErrorType =
   | 'PIPETTE_VOLUME_EXCEEDED'
   | 'TIP_VOLUME_EXCEEDED'
   | 'MISSING_TEMPERATURE_STEP'
+  | 'THERMOCYCLER_LID_CLOSED'
 
 export type CommandCreatorError = {|
   message: string,
