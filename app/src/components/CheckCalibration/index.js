@@ -58,13 +58,16 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       const session = Sessions.getRobotSessionById(
         state,
         robotName,
-        Calibration.CALIBRATION_CHECK_SESSION_ID
+        Calibration.SESSION_TYPE_CALIBRATION_CHECK
       )
       return session ? session.details : null
     }) || {}
   React.useEffect(() => {
     dispatchRequest(
-      Sessions.fetchSession(robotName, Calibration.CALIBRATION_CHECK_SESSION_ID)
+      Sessions.fetchSession(
+        robotName,
+        Calibration.SESSION_TYPE_CALIBRATION_CHECK
+      )
     )
   }, [dispatchRequest, robotName])
 
@@ -125,7 +128,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatchRequest(
       Sessions.deleteSession(
         robotName,
-        Calibration.CALIBRATION_CHECK_SESSION_ID
+        Calibration.SESSION_TYPE_CALIBRATION_CHECK
       )
     )
     closeCalibrationCheck()
@@ -138,7 +141,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatchRequest(
       Sessions.createSessionCommand(
         robotName,
-        Calibration.CALIBRATION_CHECK_SESSION_ID,
+        Calibration.SESSION_TYPE_CALIBRATION_CHECK,
         { command, data }
       )
     )
@@ -147,7 +150,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     dispatch(
       Sessions.createSessionCommand(
         robotName,
-        Calibration.CALIBRATION_CHECK_SESSION_ID,
+        Calibration.SESSION_TYPE_CALIBRATION_CHECK,
         {
           command: Calibration.checkCommands.JOG,
           data: {

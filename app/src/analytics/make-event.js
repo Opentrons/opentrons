@@ -4,7 +4,7 @@ import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { CALIBRATION_CHECK_SESSION_ID } from '../calibration'
+import { SESSION_TYPE_CALIBRATION_CHECK } from '../calibration'
 import * as Sessions from '../sessions'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
@@ -255,37 +255,6 @@ export function makeEvent(
       return Promise.resolve({
         name: 'addCustomLabware',
         properties: { success: false, overwrite: false, error },
-      })
-    }
-
-    case Sessions.CREATE_SESSION_SUCCESS: {
-      if (action.payload.data.id === CALIBRATION_CHECK_SESSION_ID) {
-        const { robotName } = action.payload
-        const sessionData = Sessions.getRobotSessionById(
-          state,
-          robotName,
-          CALIBRATION_CHECK_SESSION_ID
-        )
-
-        return Promise.resolve({
-          name: 'calibrationCheckStart',
-          properties: { ...sessionData },
-        })
-      }
-      break
-    }
-
-    case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
-      const { robotName } = action.payload
-      const sessionData = Sessions.getRobotSessionById(
-        state,
-        robotName,
-        CALIBRATION_CHECK_SESSION_ID
-      )
-
-      return Promise.resolve({
-        name: 'calibrationCheckPass',
-        properties: { ...sessionData },
       })
     }
 

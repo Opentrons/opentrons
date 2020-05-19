@@ -111,7 +111,7 @@ describe('CheckCalibration', () => {
 
   it('fetches robot cal check session on mount', () => {
     getRobotSessionById.mockReturnValue({
-      sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+      sessionType: Calibration.SESSION_TYPE_CALIBRATION_CHECK,
       details: mockRobotCalibrationCheckSessionDetails,
     })
     render()
@@ -119,7 +119,7 @@ describe('CheckCalibration', () => {
       expect.objectContaining({
         ...Sessions.fetchSession(
           'robot-name',
-          Calibration.CALIBRATION_CHECK_SESSION_ID
+          Calibration.SESSION_TYPE_CALIBRATION_CHECK
         ),
         meta: { requestId: expect.any(String) },
       })
@@ -129,7 +129,7 @@ describe('CheckCalibration', () => {
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
       getRobotSessionById.mockReturnValue({
-        sessionType: Calibration.CALIBRATION_CHECK_SESSION_ID,
+        sessionType: Calibration.SESSION_TYPE_CALIBRATION_CHECK,
         details: {
           ...mockRobotCalibrationCheckSessionDetails,
           currentStep: spec.currentStep,
@@ -159,7 +159,7 @@ describe('CheckCalibration', () => {
       expect.objectContaining({
         ...Sessions.deleteSession(
           'robot-name',
-          Calibration.CALIBRATION_CHECK_SESSION_ID
+          Calibration.SESSION_TYPE_CALIBRATION_CHECK
         ),
         meta: { requestId: expect.any(String) },
       })

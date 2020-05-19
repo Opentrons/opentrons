@@ -1,15 +1,5 @@
 // @flow
-// domain layer constants
-
-export const COMPLETE_ROBOT_CALIBRATION_CHECK: 'calibration:COMPLETE_ROBOT_CALIBRATION_CHECK' =
-  'calibration:COMPLETE_ROBOT_CALIBRATION_CHECK'
-
-// api constants
-
-export const CALIBRATION_CHECK_SESSION_ID = 'calibrationCheck'
-
-export const ROBOT_CALIBRATION_CHECK_PATH: '/calibration/check/session' =
-  '/calibration/check/session'
+export const SESSION_TYPE_CALIBRATION_CHECK = 'calibrationCheck'
 
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'

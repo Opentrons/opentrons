@@ -7,12 +7,11 @@ from pydantic import BaseModel, Field
 from .helper_classes import DeckCalibrationError
 
 
-OffsetVector = List[float]
+OffsetVector = Tuple[float, float, float]
 
 OffsetVectorField = partial(Field, ...,
                             description="An offset vector in deck "
-                                        "coordinates (x, y, z)",
-                            min_items=3, max_items=3)
+                                        "coordinates (x, y, z)")
 
 
 class TiprackPosition(BaseModel):
