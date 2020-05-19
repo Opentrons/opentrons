@@ -39,6 +39,16 @@ export const dispense: CommandCreator<DispenseParams> = (
     errors.push(errorCreators.labwareDoesNotExist({ actionName, labware }))
   }
 
+  if (
+    thermocyclerPipetteCollision(
+      prevRobotState.modules,
+      prevRobotState.labware,
+      labware
+    )
+  ) {
+    errors.push(errorCreators.thermocyclerLidClosed())
+  }
+
   if (errors.length > 0) {
     return { errors }
   }
