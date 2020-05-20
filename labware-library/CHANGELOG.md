@@ -3,23 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.18.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.1...v3.18.0-alpha.2) (2020-05-20)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [3.18.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.0...v3.18.0-alpha.1) (2020-05-18)
-
-**Note:** Version bump only for package @opentrons/labware-library
-
-
-
-
-
-# [3.18.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0-alpha.0) (2020-05-14)
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
 
 
 ### Bug Fixes
