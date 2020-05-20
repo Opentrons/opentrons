@@ -155,11 +155,11 @@ class TempDeck(mod_abc.AbstractModule):
 
             if status == 'heating':
                 while self.temperature < awaiting_temperature:
-                    asyncio.sleep(0.2)
+                    await asyncio.sleep(0.2)
 
             elif status == 'cooling':
                 while self.temperature > awaiting_temperature:
-                    asyncio.sleep(0.2)
+                    await asyncio.sleep(0.2)
 
         t = self._loop.create_task(_await_temperature(awaiting_temperature))
         await self.make_cancellable(t)
