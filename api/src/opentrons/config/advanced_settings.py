@@ -154,8 +154,8 @@ settings = [
         _id='enableDoorSafetySwitch',
         title='Enable robot door safety switch',
         description="Automatically pause protocols when robot door opens. "
-                    "Note that opening the robot door during a run will "
-                    "pause your robot only after it has completed it's "
+                    "Opening the robot door during a run will "
+                    "pause your robot only after it has completed its "
                     "current motion."
     )
 ]
