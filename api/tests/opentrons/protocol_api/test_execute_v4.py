@@ -21,6 +21,7 @@ from opentrons.protocol_api import MagneticModuleContext, \
     ProtocolContext, execute
 from opentrons.protocol_api.constants import JsonCommand
 
+
 # autouse set to True to setup/teardown mock after each run
 @pytest.fixture(autouse=True)
 def mockObj():

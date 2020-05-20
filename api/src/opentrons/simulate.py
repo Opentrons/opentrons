@@ -368,7 +368,7 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
             to_ret.extend(
                 ['\t' * command['level']
                  + f'{l.levelname} ({l.module}): {l.msg}' % l.args
-                 for l in command['logs']])
+                 for l in command['logs']])  # noqa(E741)
     return '\n'.join(to_ret)
 
 
