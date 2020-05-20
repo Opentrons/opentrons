@@ -499,58 +499,35 @@ DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
 P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
 
 
-def _determine_threshold(
-        pipette_type: str, state: CalibrationCheckState):
-    is_p1000 = pipette_type.startswith('p1000')
-    height_states = [
-        CalibrationCheckState.joggingFirstPipetteToHeight,
-        CalibrationCheckState.joggingSecondPipetteToHeight]
-    cross_states = [
-        CalibrationCheckState.joggingFirstPipetteToPointOne,
-        CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        CalibrationCheckState.joggingFirstPipetteToPointThree,
-        CalibrationCheckState.joggingSecondPipetteToPointOne
-    ]
-    if is_p1000 and state in cross_states:
-        return Point(2.7, 2.7, 0.0)
-    elif is_p1000 and state in height_states:
-        return Point(0.0, 0.0, 1)
-    elif state in cross_states:
-        return Point(1.79, 1.64, 0.0)
-    else:
-        return Point(0.0, 0.0, 0.8)
-
-
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
-    threshold_function: typing.Callable[[str, typing.Any], typing.Any]
 
 
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
     CalibrationCheckState.comparingFirstPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToHeight,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointOne,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointTwo: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointThree: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointThree,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToHeight,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToPointOne,
-        threshold_function=_determine_threshold,
+        # threshold_function=_determine_threshold,
     ),
 }
 
@@ -726,6 +703,40 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
+    def _determine_threshold(self):
+        first_pipette = [
+            CalibrationCheckState.joggingFirstPipetteToHeight,
+            CalibrationCheckState.joggingFirstPipetteToPointOne,
+            CalibrationCheckState.joggingFirstPipetteToPointTwo,
+            CalibrationCheckState.joggingFirstPipetteToPointThree,
+        ]
+        if self.current_state_name in first_pipette:
+            pip = self._get_pipette_by_rank(PipetteRank.first)
+        else:
+            pip = self._get_pipette_by_rank(PipetteRank.second)
+
+        pipette_type = ''
+        if pip and pip.mount:
+            pipette_type = str(self.pipettes[pip.mount]['model'])
+        is_p1000 = pipette_type.startswith('p1000')
+        height_states = [
+            CalibrationCheckState.joggingFirstPipetteToHeight,
+            CalibrationCheckState.joggingSecondPipetteToHeight]
+        cross_states = [
+            CalibrationCheckState.joggingFirstPipetteToPointOne,
+            CalibrationCheckState.joggingFirstPipetteToPointTwo,
+            CalibrationCheckState.joggingFirstPipetteToPointThree,
+            CalibrationCheckState.joggingSecondPipetteToPointOne
+        ]
+        if is_p1000 and self.current_state_name in cross_states:
+            return Point(2.7, 2.7, 0.0)
+        elif is_p1000 and self.current_state_name in height_states:
+            return Point(0.0, 0.0, 1)
+        elif self.current_state_name in cross_states:
+            return Point(1.79, 1.64, 0.0)
+        else:
+            return Point(0.0, 0.0, 0.8)
+
     def get_comparisons_by_step(
             self) -> typing.Dict[CalibrationCheckState, ComparisonStatus]:
         comparisons = {}
@@ -736,15 +747,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
-            mount = self._get_preparing_state_mount()
-            pipette_type = ''
-            if mount:
-                pipette_type = str(self.pipettes[mount]['model'])
+
             # Mypy will incorrectly assumes the first argument for
             # this callable is self. See this issue:
             # https://github.com/python/mypy/issues/5485
-            threshold_vector = \
-                comp.threshold_function(pipette_type, comp.reference_state)  # type: ignore  # noqa(E501)
+            threshold_vector = self._determine_threshold()
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
                 if threshold_vector.z == 0.0:
