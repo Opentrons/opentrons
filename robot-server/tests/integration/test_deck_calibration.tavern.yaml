@@ -1,22 +1,62 @@
 ---
-test_name: Create a deck calibration session
+test_name: Creating a deck calibration session while one exists raises an error
 marks:
   - usefixtures:
       - run_server
 stages:
-  - name: Force caching of pipettes
-    request:
-      url: "{host:s}:{port:d}/pipettes"
-      params:
-        refresh: True
-    response:
-      status_code: 200
   - name: Create a session
     request:
       url: "{host:s}:{port:d}/calibration/deck/start"
       method: POST
       json:
         force: False
+    response:
+      status_code: 201
+      save:
+        json:
+          token: token
+      json: !anydict
+  - name: Fail to create another session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck/start"
+      method: POST
+      json:
+        force: False
+    response:
+      status_code: 409
+      json:
+        message: !re_match "Error, session in progress.+"
+  - name: Delete session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: release
+    response:
+      status_code: 200
+      json: !anydict
+---
+test_name: Using force will force creation of session
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create a session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck/start"
+      method: POST
+      json:
+        force: False
+    response:
+      status_code: 201
+      json: !anydict
+  - name: Create a session using force
+    request:
+      url: "{host:s}:{port:d}/calibration/deck/start"
+      method: POST
+      json:
+        force: True
     response:
       status_code: 201
       save:
@@ -32,5 +72,129 @@ stages:
         command: release
     response:
       status_code: 200
+      json: !anydict
+---
+test_name: Create a deck calibration session
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create a session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck/start"
+      method: POST
+      json:
+        force: False
+    response:
+      status_code: 201
+      save:
+        json:
+          token: token
+      json: !anydict
+  - name: Send a jog command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: jog
+        axis: x
+        direction: 1
+        step: 1
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Jogged to .+"
+  - name: Send an attach tip command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: attach tip
+        tipLength: 0.1
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Tip length set: .+"
+  - name: Send a move command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: move
+        point: "1"
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Moved to .+"
+  - name: Send point 1 save xy command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: save xy
+        point: "1"
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Saved point 1 value: .+"
+  - name: Send point 2 save xy command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: save xy
+        point: "2"
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Saved point 2 value: .+"
+  - name: Send point 3 save xy command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: save xy
+        point: "3"
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Saved point 3 value: .+"
+  - name: Send a save z command
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: save z
+    response:
+      status_code: 200
+      json:
+        message: !re_match "Saved z: .+"
+  - name: Delete session
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: release
+    response:
+      status_code: 200
       json:
         message: calibration session released
+  - name: Sending a command after release will fail
+    request:
+      url: "{host:s}:{port:d}/calibration/deck"
+      method: POST
+      json:
+        token: "{token}"
+        command: save transform
+    response:
+      status_code: 418
+      json:
+        message: "Session must be started before issuing commands"
