@@ -31,7 +31,8 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]:
+            Fixtures.mockSessionResponse.data.attributes,
         },
       },
     },
@@ -49,15 +50,18 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id:
+            Fixtures.mockSessionResponse.data.attributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionResponse.data.attributes,
-          '1234': Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id:
+            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]:
+            Fixtures.mockSessionResponse.data.attributes,
         },
       },
     },
@@ -78,7 +82,8 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]:
+            Fixtures.mockSessionResponse.data.attributes,
         },
       },
     },
@@ -96,15 +101,82 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id:
+            Fixtures.mockSessionResponse.data.attributes,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockSessionResponse.data.attributes,
-          '4321': Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]:
+            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id:
+            Fixtures.mockSessionResponse.data.attributes,
+        },
+      },
+    },
+  },
+  {
+    name: 'handles sessions:FETCH_ALL_SESSIONS_SUCCESS with none existing',
+    action: {
+      type: 'sessions:FETCH_ALL_SESSIONS_SUCCESS',
+      payload: {
+        robotName: 'rock-lobster',
+        sessions: Fixtures.mockMultiSessionResponse.data,
+      },
+      meta: {},
+    },
+    state: {
+      'rock-lobster': {},
+    },
+    expected: {
+      'rock-lobster': {
+        robotSessions: {
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockMultiSessionResponse.data[0].attributes,
+            id: Fixtures.mockSessionId,
+          },
+          [Fixtures.mockOtherSessionId]: {
+            ...Fixtures.mockMultiSessionResponse.data[1].attributes,
+            id: Fixtures.mockOtherSessionId,
+          },
+        },
+      },
+    },
+  },
+  {
+    name:
+      'handles sessions:FETCH_ALL_SESSIONS_SUCCESS overwriting existing sessions',
+    action: {
+      type: 'sessions:FETCH_ALL_SESSIONS_SUCCESS',
+      payload: {
+        robotName: 'rock-lobster',
+        sessions: Fixtures.mockMultiSessionResponse.data,
+      },
+      meta: {},
+    },
+    state: {
+      'rock-lobster': {
+        robotSessions: {
+          fake_stale_session_id: {
+            ...Fixtures.mockSessionData,
+            id: 'fake_stale_session_id',
+          },
+        },
+      },
+    },
+    expected: {
+      'rock-lobster': {
+        robotSessions: {
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockMultiSessionResponse.data[0].attributes,
+            id: Fixtures.mockSessionId,
+          },
+          [Fixtures.mockOtherSessionId]: {
+            ...Fixtures.mockMultiSessionResponse.data[1].attributes,
+            id: Fixtures.mockOtherSessionId,
+          },
         },
       },
     },
@@ -115,7 +187,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        sessionId: '1234',
+        sessionId: Fixtures.mockSessionId,
         ...Fixtures.mockSessionCommandResponse,
       },
       meta: {},
@@ -123,14 +195,14 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockSessionData,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '1234': Fixtures.mockSessionCommandResponse.meta,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
         },
       },
     },
@@ -141,7 +213,7 @@ const SPECS: Array<ReducerSpec> = [
       type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
       payload: {
         robotName: 'eggplant-parm',
-        sessionId: '1234',
+        sessionId: Fixtures.mockSessionId,
         ...Fixtures.mockSessionCommandResponse,
       },
       meta: {},
@@ -149,16 +221,16 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionData,
-          '1234': Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionData,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionData,
-          '1234': Fixtures.mockSessionCommandResponse.meta,
+          existing_fake_session_id: Fixtures.mockSessionData,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
         },
       },
     },
@@ -176,15 +248,15 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionData,
-          '1234': Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionData,
+          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          '4321': Fixtures.mockSessionData,
+          existing_fake_session_id: Fixtures.mockSessionData,
         },
       },
     },

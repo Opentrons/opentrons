@@ -37,12 +37,8 @@ export type SessionCommandString = $Values<typeof Calibration.checkCommands>
 // known command types
 export type SessionCommandData = { ... }
 
-export type SessionCommandRequest = {|
-  command: SessionCommandString,
-  data: SessionCommandData,
-|}
-
 export type Session = {|
+  id: string,
   sessionType: SessionType,
   details: SessionDetails,
 |}
@@ -138,7 +134,10 @@ export type FetchAllSessionsAction = {|
 
 export type FetchAllSessionsSuccessAction = {|
   type: FETCH_ALL_SESSIONS_SUCCESS,
-  payload: {| robotName: string, sessions: MultiSessionResponse |},
+  payload: {|
+    robotName: string,
+    sessions: $ReadOnlyArray<SessionResponseModel>,
+  |},
   meta: RobotApiRequestMeta,
 |}
 

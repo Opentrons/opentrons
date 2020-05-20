@@ -16,15 +16,15 @@ export const getRobotSessionById: (
   return (getRobotSessions(state, robotName) || {})[sessionId] ?? null
 }
 
-export const findRobotSessionIdByType: (
+export const getRobotSessionOfType: (
   state: State,
   robotName: string,
   sessionType: Types.SessionType
-) => string | null = (state, robotName, sessionType) => {
+) => Types.Session | null = (state, robotName, sessionType) => {
   const sessionsById = getRobotSessions(state, robotName) || {}
-  return (
+  const foundSessionId =
     Object.keys(sessionsById).find(
       id => sessionsById[id].sessionType === sessionType
     ) ?? null
-  )
+  return foundSessionId ? sessionsById[foundSessionId] : null
 }

@@ -10,7 +10,11 @@ import {
 import { mockRobotCalibrationCheckSessionDetails } from '../../calibration/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
+export const mockSessionId: string = 'fake_session_id'
+export const mockOtherSessionId: string = 'other_fake_session_id'
+
 export const mockSessionData: Types.Session = {
+  id: mockSessionId,
   sessionType: 'calibrationCheck',
   details: mockRobotCalibrationCheckSessionDetails,
 }
@@ -28,7 +32,7 @@ export const mockSessionCommandData: Types.SessionCommand = {
 
 export const mockSessionResponse: Types.SessionResponse = {
   data: {
-    id: '1234',
+    id: mockSessionId,
     type: 'Session',
     attributes: mockSessionData,
   },
@@ -37,12 +41,12 @@ export const mockSessionResponse: Types.SessionResponse = {
 export const mockMultiSessionResponse: Types.MultiSessionResponse = {
   data: [
     {
-      id: '1234',
+      id: mockSessionId,
       type: 'Session',
       attributes: mockSessionData,
     },
     {
-      id: '5678',
+      id: mockOtherSessionId,
       type: 'Session',
       attributes: mockSessionData,
     },
@@ -51,11 +55,12 @@ export const mockMultiSessionResponse: Types.MultiSessionResponse = {
 
 export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
-    id: '4321',
+    id: mockSessionId,
     type: 'SessionCommand',
     attributes: mockSessionCommandData,
   },
   meta: {
+    id: mockSessionId,
     sessionType: 'calibrationCheck',
     details: mockRobotCalibrationCheckSessionDetails,
   },
@@ -82,7 +87,7 @@ export const {
   failure: mockDeleteSessionFailure,
 } = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: DELETE,
-  path: `${Constants.SESSIONS_PATH}/1234`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
   successStatus: 200,
   successBody: mockSessionResponse,
   failureStatus: 500,
@@ -96,7 +101,7 @@ export const {
   failure: mockFetchSessionFailure,
 } = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: GET,
-  path: `${Constants.SESSIONS_PATH}/1234`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
   successStatus: 200,
   successBody: mockSessionResponse,
   failureStatus: 500,
@@ -130,7 +135,7 @@ export const {
   RobotApiV2ErrorResponseBody
 >({
   method: GET,
-  path: `${Constants.SESSIONS_PATH}/1234/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
   successStatus: 200,
   successBody: mockSessionCommandResponse,
   failureStatus: 500,

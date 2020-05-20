@@ -53,27 +53,20 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   )?.status
   const pending = requestStatus === PENDING
 
-  const robotCalCheckSessionId = useSelector((state: State) => {
-    const session = Sessions.findRobotSessionIdByType(
+  const robotCalCheckSession = useSelector((state: State) => {
+    const session = Sessions.getRobotSessionOfType(
       state,
       robotName,
       Sessions.SESSION_TYPE_CALIBRATION_CHECK
     )
-    return session ?? null
-  })
-
-  const robotCalCheckSession = useSelector((state: State) => {
-    const session = robotCalCheckSessionId
-      ? Sessions.getRobotSessionById(state, robotName, robotCalCheckSessionId)
-      : null
     return session ?? {}
   })
   const { currentStep, labware, instruments, comparisonsByStep } =
     robotCalCheckSession.details || {}
 
   React.useEffect(() => {
-    if (robotCalCheckSessionId) {
-      dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSessionId))
+    if (robotCalCheckSession.id) {
+      dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSession.id))
     } else {
       dispatchRequest(
         Sessions.createSession(
@@ -82,7 +75,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         )
       )
     }
-  }, [dispatchRequest, robotName, robotCalCheckSessionId])
+  }, [dispatchRequest, robotName, robotCalCheckSession.id])
 
   const hasTwoPipettes = React.useMemo(
     () => instruments && Object.keys(instruments).length === 2,
@@ -138,8 +131,10 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }, [instruments, activeInstrument, hasTwoPipettes])
 
   function exit() {
-    robotCalCheckSessionId &&
-      dispatchRequest(Sessions.deleteSession(robotName, robotCalCheckSessionId))
+    robotCalCheckSession.id &&
+      dispatchRequest(
+        Sessions.deleteSession(robotName, robotCalCheckSession.id)
+      )
     closeCalibrationCheck()
   }
 
@@ -147,18 +142,18 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     command: SessionCommandString,
     data: SessionCommandData = {}
   ) {
-    robotCalCheckSessionId &&
+    robotCalCheckSession.id &&
       dispatchRequest(
-        Sessions.createSessionCommand(robotName, robotCalCheckSessionId, {
+        Sessions.createSessionCommand(robotName, robotCalCheckSession.id, {
           command,
           data,
         })
       )
   }
   function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    robotCalCheckSessionId &&
+    robotCalCheckSession.id &&
       dispatch(
-        Sessions.createSessionCommand(robotName, robotCalCheckSessionId, {
+        Sessions.createSessionCommand(robotName, robotCalCheckSession.id, {
           command: Calibration.checkCommands.JOG,
           data: {
             vector: formatJogVector(axis, direction, step),
