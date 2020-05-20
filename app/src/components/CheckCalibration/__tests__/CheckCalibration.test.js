@@ -30,14 +30,10 @@ type CheckCalibrationSpec = {
   ...
 }
 
-const findRobotSessionIdByType: JestMockFn<
+const getRobotSessionOfType: JestMockFn<
   [State, string, string],
-  $Call<typeof Sessions.findRobotSessionIdByType, State, string, string>
-> = Sessions.findRobotSessionIdByType
-const getRobotSessionById: JestMockFn<
-  [State, string, string],
-  $Call<typeof Sessions.getRobotSessionById, State, string, string>
-> = Sessions.getRobotSessionById
+  $Call<typeof Sessions.getRobotSessionOfType, State, string, string>
+> = Sessions.getRobotSessionOfType
 
 const mockGetDeckDefinitions: JestMockFn<
   [],
@@ -95,7 +91,6 @@ describe('CheckCalibration', () => {
       dispatch,
     }
     mockGetDeckDefinitions.mockReturnValue({})
-    findRobotSessionIdByType.mockReturnValue('fake_session_id')
 
     render = () => {
       return mount(
@@ -115,15 +110,30 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('fetches robot cal check session on mount', () => {
-    getRobotSessionById.mockReturnValue({
+  it('fetches robot cal check session on mount if session in state', () => {
+    getRobotSessionOfType.mockReturnValue({
+      id: 'fake_check_session_id',
       sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
       details: mockRobotCalibrationCheckSessionDetails,
     })
     render()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Sessions.fetchSession('robot-name', 'fake_session_id'),
+        ...Sessions.fetchSession('robot-name', 'fake_check_session_id'),
+        meta: { requestId: expect.any(String) },
+      })
+    )
+  })
+
+  it('creates robot cal check session on mount if no session already in state', () => {
+    getRobotSessionOfType.mockReturnValue(null)
+    render()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...Sessions.createSession(
+          'robot-name',
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        ),
         meta: { requestId: expect.any(String) },
       })
     )
@@ -131,7 +141,8 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      getRobotSessionById.mockReturnValue({
+      getRobotSessionOfType.mockReturnValue({
+        id: 'fake_check_session_id',
         sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
         details: {
           ...mockRobotCalibrationCheckSessionDetails,
@@ -151,6 +162,11 @@ describe('CheckCalibration', () => {
   })
 
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {
+    getRobotSessionOfType.mockReturnValue({
+      id: 'fake_check_session_id',
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
+      details: mockRobotCalibrationCheckSessionDetails,
+    })
     const wrapper = render()
 
     act(() => {
@@ -160,7 +176,7 @@ describe('CheckCalibration', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Sessions.deleteSession('robot-name', 'fake_session_id'),
+        ...Sessions.deleteSession('robot-name', 'fake_check_session_id'),
         meta: { requestId: expect.any(String) },
       })
     )

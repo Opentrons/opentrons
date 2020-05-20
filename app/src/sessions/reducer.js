@@ -40,12 +40,11 @@ export function robotSessionReducer(
     case Constants.FETCH_ALL_SESSIONS_SUCCESS: {
       const { robotName, sessions } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
-      const sessionsById = Array.isArray(sessions)
-        ? sessions.reduce(
-            (acc, s) => ({ ...acc, [s.id]: { ...s.attributes, id: s.id } }),
-            {}
-          )
-        : null
+      const sessionsById = sessions.reduce(
+        (acc, s) => ({ ...acc, [s.id]: { ...s.attributes, id: s.id } }),
+        {}
+      )
+
       return {
         ...state,
         [robotName]: {
