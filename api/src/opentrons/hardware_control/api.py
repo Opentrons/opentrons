@@ -177,8 +177,9 @@ class API(HardwareAPILike):
                             strict_attached_instruments)
         await backend.setup_gpio_chardev()
         api_instance = cls(backend, loop=checked_loop, config=config)
-        checked_loop.create_task(backend.watch_modules(
-                register_modules=api_instance.register_modules))
+        await api_instance.cache_instruments()
+        await backend.watch_modules(
+                register_modules=api_instance.register_modules)
         return api_instance
 
     def __repr__(self):

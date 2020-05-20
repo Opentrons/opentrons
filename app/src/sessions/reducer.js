@@ -28,8 +28,28 @@ export function robotSessionReducer(
           ...robotState,
           robotSessions: {
             ...robotState.robotSessions,
-            [sessionState.data.id]: sessionState.data.attributes,
+            [sessionState.data.id]: {
+              ...sessionState.data.attributes,
+              id: sessionState.data.id,
+            },
           },
+        },
+      }
+    }
+
+    case Constants.FETCH_ALL_SESSIONS_SUCCESS: {
+      const { robotName, sessions } = action.payload
+      const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
+      const sessionsById = sessions.reduce(
+        (acc, s) => ({ ...acc, [s.id]: { ...s.attributes, id: s.id } }),
+        {}
+      )
+
+      return {
+        ...state,
+        [robotName]: {
+          ...robotState,
+          robotSessions: sessionsById,
         },
       }
     }
@@ -46,7 +66,7 @@ export function robotSessionReducer(
           ...robotState,
           robotSessions: {
             ...robotState.robotSessions,
-            [sessionId]: sessionState.meta,
+            [sessionId]: { ...sessionState.meta, id: sessionId },
           },
         },
       }

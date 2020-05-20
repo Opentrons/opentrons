@@ -6,8 +6,9 @@ import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
+import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
 
 import { CheckCalibration } from '../index'
 import { Introduction } from '../Introduction'
@@ -20,7 +21,7 @@ import { CompleteConfirmation } from '../CompleteConfirmation'
 import type { State } from '../../../types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
-jest.mock('../../../calibration/selectors')
+jest.mock('../../../sessions/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
@@ -28,10 +29,11 @@ type CheckCalibrationSpec = {
   currentStep: Calibration.RobotCalibrationCheckStep,
   ...
 }
-const getRobotCalibrationCheckSession: JestMockFn<
-  [State, string],
-  $Call<typeof Calibration.getRobotCalibrationCheckSession, State, string>
-> = Calibration.getRobotCalibrationCheckSession
+
+const getRobotSessionOfType: JestMockFn<
+  [State, string, string],
+  $Call<typeof Sessions.getRobotSessionOfType, State, string, string>
+> = Sessions.getRobotSessionOfType
 
 const mockGetDeckDefinitions: JestMockFn<
   [],
@@ -108,14 +110,30 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('fetches robot cal check session on mount', () => {
-    getRobotCalibrationCheckSession.mockReturnValue(
-      mockRobotCalibrationCheckSessionData
-    )
+  it('fetches robot cal check session on mount if session in state', () => {
+    getRobotSessionOfType.mockReturnValue({
+      id: 'fake_check_session_id',
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
+      details: mockRobotCalibrationCheckSessionDetails,
+    })
     render()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Calibration.fetchRobotCalibrationCheckSession('robot-name'),
+        ...Sessions.fetchSession('robot-name', 'fake_check_session_id'),
+        meta: { requestId: expect.any(String) },
+      })
+    )
+  })
+
+  it('creates robot cal check session on mount if no session already in state', () => {
+    getRobotSessionOfType.mockReturnValue(null)
+    render()
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        ...Sessions.createSession(
+          'robot-name',
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        ),
         meta: { requestId: expect.any(String) },
       })
     )
@@ -123,9 +141,13 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      getRobotCalibrationCheckSession.mockReturnValue({
-        ...mockRobotCalibrationCheckSessionData,
-        currentStep: spec.currentStep,
+      getRobotSessionOfType.mockReturnValue({
+        id: 'fake_check_session_id',
+        sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
+        details: {
+          ...mockRobotCalibrationCheckSessionDetails,
+          currentStep: spec.currentStep,
+        },
       })
       const wrapper = render()
 
@@ -140,6 +162,11 @@ describe('CheckCalibration', () => {
   })
 
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {
+    getRobotSessionOfType.mockReturnValue({
+      id: 'fake_check_session_id',
+      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
+      details: mockRobotCalibrationCheckSessionDetails,
+    })
     const wrapper = render()
 
     act(() => {
@@ -149,7 +176,7 @@ describe('CheckCalibration', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Calibration.deleteRobotCalibrationCheckSession('robot-name'),
+        ...Sessions.deleteSession('robot-name', 'fake_check_session_id'),
         meta: { requestId: expect.any(String) },
       })
     )

@@ -208,6 +208,7 @@ export type ThermocyclerStateStepArgs = {|
   blockTargetTemp: number | null,
   lidTargetTemp: number | null,
   lidOpen: boolean,
+  message?: string,
 |}
 
 export type CommandCreatorArgs =

@@ -218,7 +218,7 @@ def test_create_session(api_client, patch_build_session,
             },
         }
     }
-    assert response.status_code == 200
+    assert response.status_code == 201
     # Clean up
     get_session_manager().sessions.clear()
 
@@ -319,7 +319,7 @@ def test_session_command_create_no_session(api_client):
     response = api_client.post(
         "/sessions/1234/commands",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
     assert response.json() == {
         'errors': [{
             'detail': "Cannot find session with id '1234'.",
@@ -338,11 +338,11 @@ def test_session_command_create(api_client,
     response = api_client.post(
         "/sessions/calibrationCheck/commands",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="jog",
-        vector=[1.0, 2.0, 3.0])
+        vector=(1.0, 2.0, 3.0))
 
     assert response.json() == {
         'data': {
@@ -420,7 +420,7 @@ def test_session_command_create_raise(api_client,
     response = api_client.post(
         "/sessions/calibrationCheck/commands",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
 
     assert response.json() == {
         'errors': [
