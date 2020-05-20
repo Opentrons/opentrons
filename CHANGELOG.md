@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.18.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.1...v3.18.0-alpha.2) (2020-05-20)
+
+
+### Bug Fixes
+
+* **app:** tighten filter logic that identifies Realtek U2E adapters ([#5707](https://github.com/Opentrons/opentrons/issues/5707)) ([ea9a6c4](https://github.com/Opentrons/opentrons/commit/ea9a6c4))
+* **robot-server:** prevent nmcli connection states from causing a 500 response ([e380837](https://github.com/Opentrons/opentrons/commit/e380837)), closes [#5698](https://github.com/Opentrons/opentrons/issues/5698)
+
+
+
+
+
 # [3.18.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.0...v3.18.0-alpha.1) (2020-05-18)
 
 
