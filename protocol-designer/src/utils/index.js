@@ -82,5 +82,5 @@ export const {
 
 export const makeTemperatureText = (temperature: number | null): string =>
   temperature === null
-    ? 'Deactivated'
+    ? i18n.t('modules.status.deactivated')
     : `${temperature} ${i18n.t('application.units.degrees')}`

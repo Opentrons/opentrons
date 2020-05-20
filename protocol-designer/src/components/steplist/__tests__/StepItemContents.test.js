@@ -109,7 +109,7 @@ describe('StepItemContents', () => {
       const wrapper = shallow(<StepItemContents {...temperatureProps} />)
       const component = wrapper.find(ModuleStepItems)
       expect(component).toHaveLength(1)
-      expect(component.prop('actionText')).toEqual('Deactivated')
+      expect(component.prop('actionText')).toEqual('deactivated')
     })
   })
 
