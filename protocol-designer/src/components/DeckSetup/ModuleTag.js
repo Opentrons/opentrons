@@ -85,27 +85,23 @@ export const ModuleStatus = ({
       return <div className={styles.module_status_line}>{tempStatus}</div>
 
     case THERMOCYCLER_MODULE_TYPE:
-      const lidText = i18n.t(`modules.lid_label`, {
-        lidStatus: i18n.t(
-          moduleState.lidOpen ? 'modules.lid_open' : 'modules.lid_closed'
-        ),
-      })
+      const lidText = `Lid: ${i18n.t(
+        moduleState.lidOpen ? 'modules.lid_open' : 'modules.lid_closed'
+      )},`
       return (
         <>
+          <div className={cx(styles.module_status_line)}>
+            <div>
+              {lidText} {makeTemperatureText(moduleState.lidTargetTemp)}
+            </div>
+          </div>
           <div className={styles.module_status_line}>
-            <div>{i18n.t('modules.block_label')},</div>
-            <div>{makeTemperatureText(moduleState.blockTargetTemp)}</div>
+            <div>
+              {i18n.t('modules.block_label')}:{' '}
+              {makeTemperatureText(moduleState.blockTargetTemp)}
+            </div>
           </div>
           <div />
-          <div
-            className={cx(
-              styles.module_status_line,
-              styles.new_module_status_line
-            )}
-          >
-            <div>{lidText},</div>
-            <div>{makeTemperatureText(moduleState.lidTargetTemp)}</div>
-          </div>
         </>
       )
 
@@ -176,7 +172,7 @@ const ModuleTagComponent = (props: Props) => {
         }),
       }}
     >
-      <div className={cx(styles.module_info_type, styles.module_info_line)}>
+      <div className={styles.module_info_type}>
         {i18n.t(`modules.module_display_names.${moduleType}`)}
       </div>
       <div className={styles.module_info_line}>
