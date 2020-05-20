@@ -13,13 +13,6 @@ class ConnectivityStatus(str, Enum):
     unknown = "unknown"
 
 
-class ConnectionState(str, Enum):
-    connected = "connected"
-    connecting = "connecting"
-    disconnected = "disconnected"
-    unavailable = "unavailable"
-
-
 class ConnectionType(str, Enum):
     wifi = "wifi"
     ethernet = "ethernet"
@@ -40,9 +33,10 @@ class InterfaceStatus(BaseModel):
     gatewayAddress: str = \
         Field(None,
               description="The address of the configured gateway")
-    state: ConnectionState = \
+    state: str = \
         Field(...,
-              description="The state of the connection")
+              description="The state of the connection. (i.e. connected, "
+                          "disconnected, connection failed)")
     type: ConnectionType = \
         Field(...,
               description="What kind of interface this is")
