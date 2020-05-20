@@ -150,6 +150,14 @@ settings = [
         description='Tells the OT-2 to run the legacy v1 http api.',
         restart_required=True
     ),
+    SettingDefinition(
+        _id='enableDoorSafetySwitch',
+        title='Enable robot door safety switch',
+        description="Automatically pause protocols when robot door opens. "
+                    "Note that opening the robot door during a run will "
+                    "pause your robot only after it has completed it's "
+                    "current motion."
+    )
 ]
 
 if ARCHITECTURE == SystemArchitecture.BUILDROOT:
@@ -303,7 +311,18 @@ def _migrate3to4(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4]
+def _migrate4to5(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 5 of the feature flags file. Adds the
+    enableDoorSafetyFeature config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableDoorSafetySwitch'] = None
+    return newmap
+
+
+_MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
+               _migrate4to5]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

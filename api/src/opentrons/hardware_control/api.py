@@ -18,7 +18,8 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, DoorState)
+                    MustHomeError, NoTipAttachedError, DoorState,
+                    HardwareEvent)
 from . import modules
 
 mod_log = logging.getLogger(__name__)
@@ -86,6 +87,10 @@ class API(HardwareAPILike):
         mod_log.info(
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
+        for index, cb in enumerate(self._callbacks):
+            mod_log.info(
+                f"Calling registered callback number {index}")
+            cb(HardwareEvent.DOOR_SWITCH_CHANGE, door_state)
 
     @classmethod
     async def build_hardware_controller(

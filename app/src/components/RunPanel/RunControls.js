@@ -15,6 +15,7 @@ export type RunControlsProps = {|
   isReadyToRun: boolean,
   isPaused: boolean,
   isRunning: boolean,
+  isBlocked: boolean,
   onRunClick: () => mixed,
   onPauseClick: () => mixed,
   onResumeClick: () => mixed,
@@ -28,6 +29,7 @@ export function RunControls(props: RunControlsProps) {
     isReadyToRun,
     isPaused,
     isRunning,
+    isBlocked,
     onRunClick,
     onPauseClick,
     onResumeClick,
@@ -45,7 +47,7 @@ export function RunControls(props: RunControlsProps) {
 
   if (isReadyToRun && !isRunning) {
     // TODO(mc, 2019-09-03): add same check for pipettes
-    const runDisabled = disabled || !modulesReady
+    const runDisabled = disabled || !modulesReady || isBlocked
     let tooltip = modulesReady ? null : MISSING_MODULES
 
     runButton = (
@@ -64,11 +66,12 @@ export function RunControls(props: RunControlsProps) {
       </HoverTooltip>
     )
   } else if (isRunning) {
+    const pauseDisabled = disabled || isBlocked
     pauseResumeButton = (
       <OutlineButton
         onClick={onPauseResumeClick}
         className={styles.run_button}
-        disabled={disabled}
+        disabled={pauseDisabled}
       >
         {pauseResumeText}
       </OutlineButton>

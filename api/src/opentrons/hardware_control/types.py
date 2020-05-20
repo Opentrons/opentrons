@@ -76,6 +76,10 @@ class HardwareAPILike(abc.ABC):
         ...
 
 
+class HardwareEvent(enum.Enum):
+    DOOR_SWITCH_CHANGE = enum.auto()
+
+
 class BoardRevision(enum.Enum):
     UNKNOWN = enum.auto()
     OG = enum.auto()

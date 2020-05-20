@@ -109,6 +109,10 @@ export function getIsPaused(state: State): boolean {
   return getSessionStatus(state) === ('paused': SessionStatus)
 }
 
+export function getIsBlocked(state: State): boolean {
+  return session(state).blocked
+}
+
 export function getCancelInProgress(state: State) {
   return cancelRequest(state).inProgress
 }

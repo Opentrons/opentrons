@@ -10,6 +10,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
 from opentrons.broker import Broker
+from opentrons.config import feature_flags as ff
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols.types import PythonProtocol, APIVersion
@@ -20,6 +21,7 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
+from opentrons.hardware_control.types import HardwareEvent, DoorState
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -265,6 +267,9 @@ class Session(object):
 
         self.startTime: Optional[float] = None
         self._motion_lock = motion_lock
+        self._event_watcher = None
+        self.doorState: Optional[str] = None
+        self.blocked: Optional[bool] = None
 
     def _hw_iface(self):
         if self._use_v2:
@@ -482,6 +487,29 @@ class Session(object):
         self.set_state('running')
         return self
 
+    def start_hardware_event_watcher(self):
+        # initialize and update window switch state
+        self.update_window_state(self._hardware.door_state)
+        self._event_watcher = self._hardware.register_callback(
+            self.handle_hardware_event)
+
+    def handle_hardware_event(self, hardware_event: HardwareEvent,
+                              state: DoorState):
+        self.update_window_state(state)
+        if ff.enable_door_safety_switch() and state == DoorState.OPEN and \
+                self.state == 'running':
+            self.pause('Robot door is open')
+        else:
+            self._on_state_changed()
+
+    def update_window_state(self, state: DoorState):
+        self.doorState = str(state)
+        if ff.enable_door_safety_switch() and \
+                state == DoorState.OPEN:
+            self.blocked = True
+        else:
+            self.blocked = False
+
     @_motion_lock  # noqa(C901)
     def _run(self):
         def on_command(message):
@@ -610,6 +638,9 @@ class Session(object):
     def _reset(self):
         self._hw_iface().reset()
         self.clear_logs()
+        if self._event_watcher is not None:
+            self._event_watcher()  # unregister existing event watcher
+        self.start_hardware_event_watcher()
 
     def _snapshot(self):
         if self.state == 'loaded':
@@ -627,6 +658,8 @@ class Session(object):
                 'state': self.state,
                 'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
+                'doorState': self.doorState,
+                'blocked': self.blocked,
                 'errors': self.errors,
                 'lastCommand': last_command
             }

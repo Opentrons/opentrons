@@ -27,6 +27,8 @@ export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
   statusInfo: SessionStatusInfo,
+  doorState: string | null,
+  blocked: boolean | null,
   errors: Array<{|
     timestamp: number,
     line: number,
@@ -80,6 +82,8 @@ const INITIAL_STATE: SessionState = {
     estimatedDuration: null,
     userMessage: null,
   },
+  doorState: null,
+  blocked: null,
   errors: [],
   protocolCommands: [],
   protocolCommandsById: {},

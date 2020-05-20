@@ -359,6 +359,8 @@ describe('api client', () => {
             changedAt: null,
             estimatedDuration: null,
           },
+          doorState: null,
+          blocked: null,
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},

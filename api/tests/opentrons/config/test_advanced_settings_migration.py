@@ -1,7 +1,7 @@
 from opentrons.config.advanced_settings import _migrate, _ensure
 
 
-good_file_version = 4
+good_file_version = 5
 good_file_settings = {
     'shortFixedTrash': None,
     'calibrateToBottom': None,
@@ -12,6 +12,7 @@ good_file_settings = {
     'enableApi1BackCompat': None,
     'useProtocolApi2': None,
     'useV1HttpApi': None,
+    'enableDoorSafetySwitch': None,
 }
 
 
@@ -41,7 +42,8 @@ def test_migrates_versionless_new_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useV1HttpApi': None
+      'useV1HttpApi': None,
+      'enableDoorSafetySwitch': None
     }
 
 
@@ -63,7 +65,8 @@ def test_migrates_versionless_old_config():
       'disableLogAggregation': None,
       'enableApi1BackCompat': None,
       'useProtocolApi2': None,
-      'useV1HttpApi': None
+      'useV1HttpApi': None,
+      'enableDoorSafetySwitch': None
     }
 
 
@@ -98,6 +101,7 @@ def test_migrates_v1_config():
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
         'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None
     }
 
 
@@ -125,6 +129,7 @@ def test_migrates_v2_config():
         'useProtocolApi2': None,
         'enableApi1BackCompat': None,
         'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None
     }
 
 
@@ -150,7 +155,36 @@ def test_migrates_v3_config():
         'disableLogAggregation': False,
         'useProtocolApi2': None,
         'enableApi1BackCompat': False,
-        'useV1HttpApi': None
+        'useV1HttpApi': None,
+        'enableDoorSafetySwitch': None
+    }
+
+
+def test_migrates_v4_config():
+    settings, version = _migrate({
+        '_version': 4,
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useProtocolApi2': None,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False
+    })
+    assert version == good_file_version
+    assert settings == {
+        'shortFixedTrash': True,
+        'calibrateToBottom': True,
+        'deckCalibrationDots': False,
+        'disableHomeOnBoot': True,
+        'useOldAspirationFunctions': True,
+        'disableLogAggregation': False,
+        'useProtocolApi2': None,
+        'enableApi1BackCompat': False,
+        'useV1HttpApi': False,
+        'enableDoorSafetySwitch': None
     }
 
 
@@ -168,5 +202,6 @@ def test_ensures_config():
              'useOldAspirationFunctions': None,
              'disableLogAggregation': True,
              'useProtocolApi2': None,
-             'useV1HttpApi': None
+             'useV1HttpApi': None,
+             'enableDoorSafetySwitch': None
          }

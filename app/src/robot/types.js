@@ -168,6 +168,8 @@ export type SessionUpdate = {|
   state: SessionStatus,
   statusInfo: SessionStatusInfo,
   startTime: ?number,
+  doorState: string,
+  blocked: boolean,
   lastCommand: ?{|
     id: number,
     handledAt: number,
