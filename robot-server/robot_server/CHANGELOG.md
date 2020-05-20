@@ -3,35 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.18.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.1...v3.18.0-alpha.2) (2020-05-20)
-
-
-### Bug Fixes
-
-* **robot-server:** prevent nmcli connection states from causing a 500 response ([e380837](https://github.com/Opentrons/opentrons/commit/e380837)), closes [#5698](https://github.com/Opentrons/opentrons/issues/5698)
-
-
-
-
-
-# [3.18.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.0...v3.18.0-alpha.1) (2020-05-18)
-
-
-### Bug Fixes
-
-* **robot-server,api:** bug in deck calibration ([e0c1754](https://github.com/Opentrons/opentrons/commit/e0c1754)), closes [#5688](https://github.com/Opentrons/opentrons/issues/5688)
-
-
-
-
-
-# [3.18.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0-alpha.0) (2020-05-14)
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
 
 
 ### Bug Fixes
 
 * **robot-server:**  /modules was not returning the right module specific data ([9ba54e4](https://github.com/Opentrons/opentrons/commit/9ba54e4))
 * **robot-server:** Fixup failing tests in robot-server ([#5673](https://github.com/Opentrons/opentrons/issues/5673)) ([d307e12](https://github.com/Opentrons/opentrons/commit/d307e12))
+* **robot-server:** prevent nmcli connection states from causing a 500 response ([e380837](https://github.com/Opentrons/opentrons/commit/e380837)), closes [#5698](https://github.com/Opentrons/opentrons/issues/5698)
+* **robot-server,api:** bug in deck calibration ([e0c1754](https://github.com/Opentrons/opentrons/commit/e0c1754)), closes [#5688](https://github.com/Opentrons/opentrons/issues/5688)
 
 
 ### Features

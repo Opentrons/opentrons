@@ -3,26 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.18.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.1...v3.18.0-alpha.2) (2020-05-20)
-
-**Note:** Version bump only for package @opentrons/api-server
-
-
-
-
-
-# [3.18.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.18.0-alpha.0...v3.18.0-alpha.1) (2020-05-18)
-
-
-### Bug Fixes
-
-* **robot-server,api:** bug in deck calibration ([e0c1754](https://github.com/Opentrons/opentrons/commit/e0c1754)), closes [#5688](https://github.com/Opentrons/opentrons/issues/5688)
-
-
-
-
-
-# [3.18.0-alpha.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0-alpha.0) (2020-05-14)
+# [3.18.0](https://github.com/Opentrons/opentrons/compare/v3.17.1...v3.18.0) (2020-05-20)
 
 
 ### Bug Fixes
@@ -36,6 +17,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **api:** make delay wait for existing pause before pausing itself ([#5558](https://github.com/Opentrons/opentrons/issues/5558)) ([3935adc](https://github.com/Opentrons/opentrons/commit/3935adc)), closes [#4801](https://github.com/Opentrons/opentrons/issues/4801)
 * **api:** make reading door switch state unblocking ([#5658](https://github.com/Opentrons/opentrons/issues/5658)) ([4efa400](https://github.com/Opentrons/opentrons/commit/4efa400)), closes [#5536](https://github.com/Opentrons/opentrons/issues/5536)
 * **api:** Move multi-channel pipettes to the correct location in cal check ([#5544](https://github.com/Opentrons/opentrons/issues/5544)) ([f29861f](https://github.com/Opentrons/opentrons/commit/f29861f))
+* **robot-server,api:** bug in deck calibration ([e0c1754](https://github.com/Opentrons/opentrons/commit/e0c1754)), closes [#5688](https://github.com/Opentrons/opentrons/issues/5688)
 
 
 ### Features
