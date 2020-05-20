@@ -140,7 +140,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
 
   function sendCommand(
     command: SessionCommandString,
-    data: SessionCommandData = {}
+    data: SessionCommandData | null = null
   ) {
     robotCalCheckSession.id &&
       dispatchRequest(

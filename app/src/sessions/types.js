@@ -35,7 +35,7 @@ export type SessionCommandString = $Values<typeof Calibration.checkCommands>
 
 // TODO(al, 2020-05-11): data should be properly typed with all
 // known command types
-export type SessionCommandData = { ... }
+export type SessionCommandData = { ... } | null
 
 export type Session = {|
   id: string,
