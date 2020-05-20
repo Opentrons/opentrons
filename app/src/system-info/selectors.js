@@ -1,6 +1,6 @@
 // @flow
 import { createSelector } from 'reselect'
-import { isRealtekDevice, getDriverStatus } from './utils'
+import { isRealtekU2EAdapter, getDriverStatus } from './utils'
 import { NOT_APPLICABLE } from './constants'
 
 import type { State } from '../types'
@@ -10,7 +10,7 @@ export const getU2EAdapterDevice: (
   state: State
 ) => UsbDevice | null = createSelector(
   state => state.systemInfo.usbDevices,
-  usbDevices => usbDevices.find(isRealtekDevice) ?? null
+  usbDevices => usbDevices.find(isRealtekU2EAdapter) ?? null
 )
 
 export const getU2EWindowsDriverStatus: (

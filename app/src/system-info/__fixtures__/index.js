@@ -15,10 +15,10 @@ export const mockUsbDevice: UsbDevice = {
 
 export const mockRealtekDevice: UsbDevice = {
   locationId: 1,
-  // 0x0010
-  vendorId: 16,
-  // 0x00A0
-  productId: 160,
+  // 0x0BDA
+  vendorId: 3034,
+  // 0x8150
+  productId: 33104,
   deviceName: 'USB 10/100 LAN',
   manufacturer: 'Realtek',
   serialNumber: 'Serial Number',
@@ -27,10 +27,10 @@ export const mockRealtekDevice: UsbDevice = {
 
 export const mockWindowsRealtekDevice: UsbDevice = {
   locationId: 1,
-  // 0x0100
-  vendorId: 256,
-  // 0x0A00
-  productId: 2560,
+  // 0x0BDA
+  vendorId: 3034,
+  // 0x8150
+  productId: 33104,
   deviceName: 'Realtek USB FE Family Controller',
   manufacturer: 'Realtek',
   serialNumber: 'Serial Number',

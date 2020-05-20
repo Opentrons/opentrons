@@ -102,7 +102,7 @@ export function makeProfileUpdate(
 
       const update = head(
         devices
-          .filter(SystemInfo.isRealtekDevice)
+          .filter(SystemInfo.isRealtekU2EAdapter)
           .map(SystemInfo.deviceToU2EAnalyticsProps)
       )
 

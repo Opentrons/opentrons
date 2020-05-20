@@ -285,7 +285,7 @@ export function makeEvent(
 
       const superProperties = head(
         devices
-          .filter(SystemInfo.isRealtekDevice)
+          .filter(SystemInfo.isRealtekU2EAdapter)
           .map(SystemInfo.deviceToU2EAnalyticsProps)
       )
 
