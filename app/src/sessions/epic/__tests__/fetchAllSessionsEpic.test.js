@@ -4,38 +4,27 @@ import { setupEpicTestMocks, runEpicTest } from '../../../robot-api/__utils__'
 import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
+import { mockRobot } from '../../../robot-api/__fixtures__'
 
-const makeTriggerAction = robotName =>
-  Actions.createSessionCommand(robotName, '1234', Fixtures.mockSessionCommand)
+const makeTriggerAction = robotName => Actions.fetchAllSessions(robotName)
 
-describe('createSessionCommandEpic', () => {
+describe('fetchAllSessionsEpic', () => {
   afterEach(() => {
     jest.resetAllMocks()
   })
 
   const expectedRequest = {
-    method: 'POST',
-    path: '/sessions/1234/commands',
-    body: {
-      data: {
-        type: 'Command',
-        attributes: {
-          command: 'jog',
-          data: {
-            someData: 32,
-          },
-        },
-      },
-    },
+    method: 'GET',
+    path: '/sessions',
   }
 
-  it('calls POST /sessions/1234/commands', () => {
+  it('calls GET /sessions', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockSessionCommandsSuccess
+      Fixtures.mockFetchAllSessionsSuccess
     )
 
-    runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
+    runEpicTest(mocks, ({ hot, cold, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
       const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
@@ -50,10 +39,10 @@ describe('createSessionCommandEpic', () => {
     })
   })
 
-  it('maps successful response to CREATE_SESSION_COMMAND_SUCCESS', () => {
+  it('maps successful response to FETCH_ALL_SESSIONS_SUCCESS', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockSessionCommandsSuccess
+      Fixtures.mockFetchAllSessionsSuccess
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
@@ -62,33 +51,31 @@ describe('createSessionCommandEpic', () => {
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.createSessionCommandSuccess(
-          mocks.robot.name,
-          mocks.action.payload.sessionId,
-          Fixtures.mockSessionCommandsSuccess.body,
-          { ...mocks.meta, response: Fixtures.mockSessionCommandsSuccessMeta }
+        a: Actions.fetchAllSessionsSuccess(
+          mockRobot.name,
+          Fixtures.mockFetchAllSessionsSuccess.body,
+          { ...mocks.meta, response: Fixtures.mockFetchAllSessionsSuccessMeta }
         ),
       })
     })
   })
 
-  it('maps failed response to CREATE_SESSION_COMMAND_FAILURE', () => {
+  it('maps failed response to FETCH_ALL_SESSIONS_FAILURE', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
-      Fixtures.mockSessionCommandsFailure
+      Fixtures.mockFetchAllSessionsFailure
     )
 
     runEpicTest(mocks, ({ hot, expectObservable, flush }) => {
       const action$ = hot('--a', { a: mocks.action })
-      const state$ = hot('a-a', { a: mocks.state })
+      const state$ = hot('s-s', { s: mocks.state })
       const output$ = sessionsEpic(action$, state$)
 
       expectObservable(output$).toBe('--a', {
-        a: Actions.createSessionCommandFailure(
+        a: Actions.fetchAllSessionsFailure(
           mocks.robot.name,
-          mocks.action.payload.sessionId,
           { errors: [{ status: 'went bad' }] },
-          { ...mocks.meta, response: Fixtures.mockSessionCommandsFailureMeta }
+          { ...mocks.meta, response: Fixtures.mockFetchAllSessionsFailureMeta }
         ),
       })
     })

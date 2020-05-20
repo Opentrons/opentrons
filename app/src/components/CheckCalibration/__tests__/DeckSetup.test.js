@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
 
 import { DeckSetup } from '../DeckSetup'
 
@@ -21,7 +21,7 @@ describe('DeckSetup', () => {
     render = () => {
       return mount(
         <DeckSetup
-          labware={mockRobotCalibrationCheckSessionData.labware}
+          labware={mockRobotCalibrationCheckSessionDetails.labware}
           proceed={mockProceed}
         />
       )

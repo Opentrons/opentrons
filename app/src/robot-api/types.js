@@ -92,7 +92,7 @@ export type RobotApiV2ResponseData = {|
 // DataT parameter must be a subtype of RobotApiV2ResponseData
 // MetaT defaults to void if unspecified
 export type RobotApiV2ResponseBody<
-  DataT: RobotApiV2ResponseData,
+  DataT: RobotApiV2ResponseData | $ReadOnlyArray<RobotApiV2ResponseData>,
   MetaT = void
 > = {|
   data: DataT,

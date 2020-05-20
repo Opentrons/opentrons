@@ -1,13 +1,5 @@
 // @flow
-
-import { POST, GET, DELETE } from '../../robot-api'
 import {
-  makeResponseFixtures,
-  mockFailureBody,
-  mockRobot,
-} from '../../robot-api/__fixtures__'
-import {
-  ROBOT_CALIBRATION_CHECK_PATH,
   CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
   CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
@@ -15,9 +7,7 @@ import {
   CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
 } from '../constants'
-import type { RobotCalibrationCheckSessionData } from '../api-types'
-
-export { mockRobot }
+import type { RobotCalibrationCheckSessionDetails } from '../api-types'
 
 export const badZComparison = {
   differenceVector: [0, 0, 4],
@@ -40,7 +30,7 @@ export const goodXYComparison = {
   exceedsThreshold: false,
 }
 
-export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionData = {
+export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessionDetails = {
   instruments: {
     left: {
       model: 'fake_pipette_model',
@@ -92,63 +82,3 @@ export const mockRobotCalibrationCheckSessionData: RobotCalibrationCheckSessionD
     },
   ],
 }
-
-export const {
-  successMeta: mockCreateCheckSessionSuccessMeta,
-  failureMeta: mockCreateCheckSessionFailureMeta,
-  success: mockCreateCheckSessionSuccess,
-  failure: mockCreateCheckSessionFailure,
-} = makeResponseFixtures<
-  RobotCalibrationCheckSessionData,
-  {| message: string |}
->({
-  method: POST,
-  path: ROBOT_CALIBRATION_CHECK_PATH,
-  successStatus: 201,
-  successBody: mockRobotCalibrationCheckSessionData,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
-
-export const {
-  successMeta: mockFetchCheckSessionSuccessMeta,
-  failureMeta: mockFetchCheckSessionFailureMeta,
-  success: mockFetchCheckSessionSuccess,
-  failure: mockFetchCheckSessionFailure,
-} = makeResponseFixtures<
-  RobotCalibrationCheckSessionData,
-  {| message: string |}
->({
-  method: GET,
-  path: ROBOT_CALIBRATION_CHECK_PATH,
-  successStatus: 200,
-  successBody: mockRobotCalibrationCheckSessionData,
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
-
-export const makeUpdateCheckSessionResponseFixtures = (pathExtension: string) =>
-  makeResponseFixtures<RobotCalibrationCheckSessionData, {| message: string |}>(
-    {
-      method: POST,
-      path: `${ROBOT_CALIBRATION_CHECK_PATH}/${pathExtension}`,
-      successStatus: 200,
-      successBody: mockRobotCalibrationCheckSessionData,
-      failureStatus: 500,
-      failureBody: mockFailureBody,
-    }
-  )
-
-export const {
-  successMeta: mockDeleteCheckSessionSuccessMeta,
-  failureMeta: mockDeleteCheckSessionFailureMeta,
-  success: mockDeleteCheckSessionSuccess,
-  failure: mockDeleteCheckSessionFailure,
-} = makeResponseFixtures<{| message: string |}, {| message: string |}>({
-  method: DELETE,
-  path: ROBOT_CALIBRATION_CHECK_PATH,
-  successStatus: 200,
-  successBody: { message: 'Successfully deleted session' },
-  failureStatus: 500,
-  failureBody: mockFailureBody,
-})
