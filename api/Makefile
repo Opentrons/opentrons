@@ -173,3 +173,7 @@ deploy: wheel
 .PHONY: term
 term:
 	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host)
+
+.PHONY: plot-session
+plot-session:
+	$(python) util/plot_session.py calibration_check calibration_check.pdf
