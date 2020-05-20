@@ -565,7 +565,7 @@ describe('thermocyclerStateDiff', () => {
   })
 })
 
-describe('thermocyclerPipetteColission', () => {
+describe('thermocyclerPipetteColision', () => {
   const thermocyclerId = 'thermocyclerId'
   const labwareOnTCId = 'labwareOnTCId'
 

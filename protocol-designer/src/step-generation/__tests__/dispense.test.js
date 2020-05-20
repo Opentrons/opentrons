@@ -14,7 +14,7 @@ import type { RobotState } from '../'
 
 jest.mock('../utils/thermocyclerPipetteCollision')
 
-const mockThermocyclerPipetteCollission: JestMockFn<
+const mockThermocyclerPipetteCollision: JestMockFn<
   [
     $PropertyType<RobotState, 'modules'>,
     $PropertyType<RobotState, 'labware'>,
@@ -89,7 +89,7 @@ describe('dispense', () => {
     })
 
     it('should return an error when dispensing into thermocycler with pipette collision', () => {
-      mockThermocyclerPipetteCollission.mockImplementationOnce(
+      mockThermocyclerPipetteCollision.mockImplementationOnce(
         (
           modules: $PropertyType<RobotState, 'modules'>,
           labware: $PropertyType<RobotState, 'labware'>,
