@@ -33,6 +33,8 @@ def build_calibration_check_plot(
                 kws['after'] = edgespec['after']
         label = r'\n'.join([edgespec['trigger'].name]
                            + [rf'{k}: {v}' for k, v in kws.items()])
+        if edgespec.get('condition'):
+            label += rf'\ncondition: {edgespec["condition"]}'
         for f in fs_s:
             d.edge(f, ts, label=label)
     return d
