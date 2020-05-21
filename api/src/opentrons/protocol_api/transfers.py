@@ -578,7 +578,7 @@ class TransferPlan:
         yield from self._new_tip_action()
 
     Target = TypeVar('Target')
-    @staticmethod
+    @staticmethod  # noqa(E301)
     def _expand_for_volume_constraints(
             volumes: Iterator[float],
             targets: Iterator[Target],
