@@ -48,6 +48,7 @@ stages:
           type: SessionCommand
           attributes:
             command: loadLabware
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -73,6 +74,7 @@ stages:
           type: SessionCommand
           attributes:
             command: preparePipette
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -98,7 +100,7 @@ stages:
           attributes:
             command: jog
             data:
-              vector: [1, 0, 0]
+              vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -123,6 +125,7 @@ stages:
           type: SessionCommand
           attributes:
             command: pickUpTip
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -147,6 +150,7 @@ stages:
           type: SessionCommand
           attributes:
             command: confirmTip
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -172,7 +176,7 @@ stages:
           attributes:
             command: jog
             data:
-              vector: [0, 0, 0]
+              vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -197,6 +201,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -223,6 +228,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -249,6 +255,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -276,6 +283,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -303,6 +311,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -331,6 +340,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -359,6 +369,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -388,6 +399,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -418,7 +430,7 @@ stages:
           attributes:
             command: jog
             data:
-              vector: [1, 2, 3]
+              vector: [0, 0, -10]
     response:
       status_code: 200
   - name: Check the effect of command
@@ -448,6 +460,7 @@ stages:
           type: SessionCommand
           attributes:
             command: pickUpTip
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -477,6 +490,7 @@ stages:
           type: SessionCommand
           attributes:
             command: confirmTip
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -506,6 +520,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -536,6 +551,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -566,6 +582,7 @@ stages:
           type: SessionCommand
           attributes:
             command: comparePoint
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
@@ -597,6 +614,7 @@ stages:
           type: SessionCommand
           attributes:
             command: goToNextCheck
+            data: {}
     response:
       status_code: 200
   - name: Check the effect of command
