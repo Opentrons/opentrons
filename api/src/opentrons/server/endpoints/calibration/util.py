@@ -6,7 +6,9 @@ log = logging.getLogger(__name__)
 
 
 # Transition callbacks pass through all params from trigger call
-TransitionCallback = Callable[..., Awaitable[Any]]
+TransitionCallback = Union[
+    Callable[..., Awaitable[Any]],
+    List[Callable[..., Awaitable[Any]]]]
 
 # Condition callbacks pass through all params from trigger call,
 # and must return bool
@@ -40,10 +42,16 @@ class Transition:
     async def execute(self, set_current_state, *args, **kwargs):
         if self.condition and not await self.condition(*args, **kwargs):
             return False
-        if self.before:
+        if isinstance(self.before, list):
+            for b in self.before:
+                await b(*args, **kwargs)
+        elif self.before:
             await self.before(*args, **kwargs)
         set_current_state(self.to_state)
-        if self.after:
+        if isinstance(self.after, list):
+            for a in self.after:
+                await a(*args, **kwargs)
+        elif self.after:
             await self.after(*args, **kwargs)
         return True
 
@@ -132,13 +140,11 @@ class StateMachine:
         log.debug(f"trigger_transition for {trigger} "
                   f"in {self.current_state_name}")
         events = self._events.get(trigger, {})
-        # print(events)
         if events and WILDCARD not in events and \
                 self.current_state_name not in events:
             raise StateMachineError(f'cannot trigger event {trigger}'
                                     f' from state {self.current_state_name}')
         try:
-            # print(WILDCARD)
             from_state = WILDCARD if WILDCARD in events \
                 else self.current_state_name
             for transition in events[from_state]:
@@ -156,8 +162,15 @@ class StateMachine:
         return getattr(self, method_name) if method_name else None
 
     def _bind_cb_kwarg(self, key, value):
+        cb_whitelist = ['before', 'after']
         if key in enum_to_set(CallbackKeys):
-            return self._get_cb(value)
+            if key in cb_whitelist and isinstance(value, list):
+                to_return = []
+                for m in value:
+                    to_return.append(self._get_cb(m))
+            else:
+                to_return = self._get_cb(value)
+            return to_return
         return value
 
     def add_state(self, *args, **kwargs):

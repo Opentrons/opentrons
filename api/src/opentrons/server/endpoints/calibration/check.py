@@ -66,7 +66,6 @@ async def load_labware(request: web.Request, session) -> web.Response:
 
 async def prepare_pipette(request: web.Request, session) -> web.Response:
     await session.trigger_transition(CalibrationCheckTrigger.prepare_pipette)
-    await session.trigger_transition(CalibrationCheckTrigger.move_to_tiprack)
     return web.json_response(status=200)
 
 

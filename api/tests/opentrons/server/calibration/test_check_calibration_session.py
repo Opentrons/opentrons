@@ -452,11 +452,11 @@ async def test_load_labware_to_preparing_first_pipette(
     assert curr_pos == tip_pt - types.Point(0, 0, 10)
 
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToTiprack
+        session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToTiprack
+        session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_preparing_first_pipette_to_bad_calibration(
@@ -466,7 +466,7 @@ async def test_preparing_first_pipette_to_bad_calibration(
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, BAD_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToTiprack
+        session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.pick_up_tip)
     await check_calibration_session.trigger_transition(
@@ -581,11 +581,11 @@ async def test_load_labware_to_preparing_second_pipette(
         sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt - types.Point(0, 0, 10)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToTiprack
+        session.CalibrationCheckState.preparingSecondPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToTiprack
+        session.CalibrationCheckState.preparingSecondPipette
 
 
 async def test_preparing_second_pipette_to_inspecting(
@@ -655,7 +655,7 @@ async def test_right_load_labware_to_preparing_first_pipette(
     await in_preparing_first_pipette(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToTiprack
+        session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_right_preparing_first_pipette_to_inspecting(
@@ -749,7 +749,7 @@ async def test_left_load_labware_to_preparing_first_pipette(
         check_calibration_session_only_left):
     await in_preparing_first_pipette(check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToTiprack
+        session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_left_preparing_first_pipette_to_inspecting(
