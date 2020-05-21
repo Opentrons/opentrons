@@ -191,7 +191,15 @@ class CalibrationSession:
             lw_info = self.get_tiprack(pip_info.tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
             # mod geometry contexts. Ignore type checking error here.
-            tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
+            tiprack = self._deck[lw_info.slot]
+            full_length = tiprack.tip_length  # type: ignore
+            overlap_dict: typing.Dict =\
+                self.pipettes[mount]['tip_overlap']  # type: ignore
+            default = overlap_dict['default']
+            overlap = overlap_dict.get(
+                                    tiprack.uri,  # type: ignore
+                                    default)
+            tip_length = full_length - overlap
         else:
             tip_length = self.pipettes[mount]['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
@@ -507,27 +515,21 @@ class ComparisonParams:
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
     CalibrationCheckState.comparingFirstPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToHeight,
-        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointOne,
-        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointTwo: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingFirstPipettePointThree: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointThree,
-        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToHeight,
-        # threshold_function=_determine_threshold,
     ),
     CalibrationCheckState.comparingSecondPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToPointOne,
-        # threshold_function=_determine_threshold,
     ),
 }
 
@@ -748,9 +750,6 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
 
-            # Mypy will incorrectly assumes the first argument for
-            # this callable is self. See this issue:
-            # https://github.com/python/mypy/issues/5485
             threshold_vector = self._determine_threshold()
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
@@ -795,7 +794,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(first_pip.mount) - buffer
+            await self.hardware.gantry_position(first_pip.mount) + buffer
 
     async def _register_point_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
@@ -806,7 +805,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(second_pip.mount) - buffer
+            await self.hardware.gantry_position(second_pip.mount) + buffer
 
     async def _move_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
@@ -824,7 +823,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             saved_height =\
                 self._saved_points[getattr(CalibrationCheckState,
                                            'comparingFirstPipetteHeight')]
-            z_point = saved_height + self._initial_z_offset
+            z_point =\
+                saved_height + self._initial_z_offset - HEIGHT_SAFETY_BUFFER
             updated_point = loc_to_move.point + z_point._replace(x=0.0, y=0.0)
             loc_to_move = Location(updated_point, None)
         await self._move(first_pip.mount, loc_to_move)
@@ -842,7 +842,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             saved_height =\
                 self._saved_points[getattr(CalibrationCheckState,
                                            'comparingSecondPipetteHeight')]
-            z_point = saved_height + self._initial_z_offset
+            z_point =\
+                saved_height + self._initial_z_offset - HEIGHT_SAFETY_BUFFER
             updated_point = loc_to_move.point + z_point._replace(x=0.0, y=0.0)
             loc_to_move = Location(updated_point, None)
         await self._move(second_pip.mount, loc_to_move)
