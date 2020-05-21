@@ -6,6 +6,8 @@ from opentrons.server.endpoints.calibration import \
     models as calibration_models
 from opentrons.server.endpoints.calibration.session import \
     CalibrationCheckTrigger
+
+from robot_server.service.models import EmptyModel
 from robot_server.service.models.json_api.response import ResponseDataModel,\
     ResponseModel
 from robot_server.service.models.json_api.request import RequestDataModel,\
@@ -29,7 +31,7 @@ class SessionCommands(str, Enum):
     exit = CalibrationCheckTrigger.exit.value
     reject_calibration = CalibrationCheckTrigger.reject_calibration.value
 
-    def __new__(cls, value, model=type(None)):
+    def __new__(cls, value, model=EmptyModel):
         """Create a string enum with the expected model"""
         obj = str.__new__(cls, value)
         obj._value_ = value
@@ -42,8 +44,8 @@ class SessionCommands(str, Enum):
 
 
 SessionCommandTypes = typing.Union[
-    None,
     calibration_models.JogPosition,
+    EmptyModel
 ]
 
 

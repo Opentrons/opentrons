@@ -309,7 +309,7 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
             "type": "SessionCommand",
             "attributes": {
                 "command": command_type,
-                "data": body.dict(exclude_unset=True) if body else None
+                "data": body.dict(exclude_unset=True) if body else {}
             }
         }
     }
@@ -386,7 +386,7 @@ def test_session_command_create_no_body(api_client,
         'data': {
             'attributes': {
                 'command': 'loadLabware',
-                'data': None,
+                'data': {},
                 'status': 'accepted'
             },
             'type': 'SessionCommand',
