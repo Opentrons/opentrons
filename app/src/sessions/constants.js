@@ -2,7 +2,10 @@
 
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 
-export const SESSIONS_COMMANDS_PATH_EXTENSION: 'commands' = 'commands'
+export const SESSIONS_COMMANDS_PATH_EXTENSION: '/commands' = '/commands'
+
+export const SESSIONS_COMMANDS_EXECUTE_PATH_EXTENSION: '/commands/execute' =
+  '/commands/execute'
 
 export const CREATE_SESSION: 'sessions:CREATE_SESSION' =
   'sessions:CREATE_SESSION'

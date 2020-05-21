@@ -33,14 +33,14 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
           },
         },
       },
     },
     args: ['germanium-cobweb'],
     expected: {
-      [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+      [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
     },
   },
   {
@@ -50,7 +50,7 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
           },
         },
       },
@@ -65,13 +65,13 @@ const SPECS: Array<SelectorSpec> = [
       sessions: {
         'germanium-cobweb': {
           robotSessions: {
-            [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
           },
         },
       },
     },
     args: ['germanium-cobweb', Fixtures.mockSessionId],
-    expected: Fixtures.mockSessionData,
+    expected: Fixtures.mockSessionAttributes,
   },
 ]
 

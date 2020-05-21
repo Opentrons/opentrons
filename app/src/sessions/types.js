@@ -37,13 +37,17 @@ export type SessionCommandString = $Values<typeof Calibration.checkCommands>
 // known command types
 export type SessionCommandData = { ... }
 
-export type Session = {|
-  id: string,
+export type SessionResponseAttributes = {|
   sessionType: SessionType,
   details: SessionDetails,
 |}
 
-export type SessionCommand = {|
+export type Session = {|
+  ...SessionResponseAttributes,
+  id: string,
+|}
+
+export type SessionCommandAttributes = {|
   command: SessionCommandString,
   data: SessionCommandData,
   status?: string,
@@ -52,13 +56,13 @@ export type SessionCommand = {|
 export type SessionResponseModel = {|
   id: string,
   type: 'Session',
-  attributes: Session,
+  attributes: SessionResponseAttributes,
 |}
 
 export type SessionCommandResponseModel = {|
   id: string,
   type: 'SessionCommand',
-  attributes: SessionCommand,
+  attributes: SessionCommandAttributes,
 |}
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
@@ -152,7 +156,7 @@ export type CreateSessionCommandAction = {|
   payload: {|
     robotName: string,
     sessionId: string,
-    command: SessionCommand,
+    command: SessionCommandAttributes,
   |},
   meta: RobotApiRequestMeta,
 |}

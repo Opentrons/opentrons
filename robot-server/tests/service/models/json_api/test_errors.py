@@ -12,7 +12,6 @@ def errors_wrapper(d):
 valid_error_objects = [
     {'id': 'abc123'},
     {'status': '404'},
-    {'code': '1005'},
     {'title': 'Something went wrong'},
     {'detail': "oh wow, there's a few things we messed up there"},
     {'meta': {'num_errors_today': 10000}},

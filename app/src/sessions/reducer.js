@@ -13,7 +13,7 @@ const INITIAL_PER_ROBOT_STATE: PerRobotSessionState = {
   robotSessions: null,
 }
 
-export function robotSessionReducer(
+export function sessionReducer(
   state: SessionState = INITIAL_STATE,
   action: Action
 ): SessionState {
@@ -54,24 +54,6 @@ export function robotSessionReducer(
       }
     }
 
-    case Constants.CREATE_SESSION_COMMAND_SUCCESS: {
-      const { robotName, sessionId, ...sessionState } = action.payload
-      const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
-
-      if (!sessionId) return state
-
-      return {
-        ...state,
-        [robotName]: {
-          ...robotState,
-          robotSessions: {
-            ...robotState.robotSessions,
-            [sessionId]: { ...sessionState.meta, id: sessionId },
-          },
-        },
-      }
-    }
-
     case Constants.DELETE_SESSION_SUCCESS: {
       const { robotName, ...sessionState } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
@@ -80,9 +62,7 @@ export function robotSessionReducer(
         ...state,
         [robotName]: {
           ...robotState,
-          robotSessions: {
-            ...omit(robotState.robotSessions, sessionState.data.id),
-          },
+          robotSessions: omit(robotState.robotSessions, sessionState.data.id),
         },
       }
     }

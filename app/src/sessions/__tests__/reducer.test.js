@@ -1,6 +1,6 @@
 // @flow
 import * as Fixtures from '../__fixtures__'
-import { robotSessionReducer } from '../reducer'
+import { sessionReducer } from '../reducer'
 
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
@@ -31,8 +31,10 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -50,18 +52,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -82,8 +90,10 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -101,18 +111,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
@@ -160,7 +176,7 @@ const SPECS: Array<ReducerSpec> = [
       'rock-lobster': {
         robotSessions: {
           fake_stale_session_id: {
-            ...Fixtures.mockSessionData,
+            ...Fixtures.mockSessionAttributes,
             id: 'fake_stale_session_id',
           },
         },
@@ -182,60 +198,6 @@ const SPECS: Array<ReducerSpec> = [
     },
   },
   {
-    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS',
-    action: {
-      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
-      payload: {
-        robotName: 'eggplant-parm',
-        sessionId: Fixtures.mockSessionId,
-        ...Fixtures.mockSessionCommandResponse,
-      },
-      meta: {},
-    },
-    state: {
-      'eggplant-parm': {
-        robotSessions: {
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
-        },
-      },
-    },
-    expected: {
-      'eggplant-parm': {
-        robotSessions: {
-          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
-        },
-      },
-    },
-  },
-  {
-    name: 'handles sessions:CREATE_SESSION_COMMAND_SUCCESS with existing',
-    action: {
-      type: 'sessions:CREATE_SESSION_COMMAND_SUCCESS',
-      payload: {
-        robotName: 'eggplant-parm',
-        sessionId: Fixtures.mockSessionId,
-        ...Fixtures.mockSessionCommandResponse,
-      },
-      meta: {},
-    },
-    state: {
-      'eggplant-parm': {
-        robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
-        },
-      },
-    },
-    expected: {
-      'eggplant-parm': {
-        robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionCommandResponse.meta,
-        },
-      },
-    },
-  },
-  {
     name: 'handles sessions:DELETE_SESSION_SUCCESS',
     action: {
       type: 'sessions:DELETE_SESSION_SUCCESS',
@@ -248,15 +210,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionData,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionAttributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionData,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
@@ -266,6 +237,6 @@ const SPECS: Array<ReducerSpec> = [
 describe('robotSessionReducer', () => {
   SPECS.forEach(spec => {
     const { name, state, action, expected } = spec
-    it(name, () => expect(robotSessionReducer(state, action)).toEqual(expected))
+    it(name, () => expect(sessionReducer(state, action)).toEqual(expected))
   })
 })

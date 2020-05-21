@@ -29,10 +29,6 @@ class Error(BaseModel):
         Field(None,
               description="the HTTP status code applicable to this problem,"
                           " expressed as a string value.")
-    code: Optional[str] = \
-        Field(None,
-              description="an application-specific error code, expressed"
-                          " as a string value.")
     title: Optional[str] = \
         Field(None,
               description="a short, human-readable summary of the problem"
