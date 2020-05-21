@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.17.0 to 3.17.1
+# Robot OS Changes from 3.17.1 to 3.18.0
 
 For more details about this release, please see the full [technical change
 log][changelog]
@@ -7,30 +7,20 @@ log][changelog]
 
 ## Bugfixes
 
-- In API Level 2.4, motion in the `touch_tip` command is slightly different; the OT-2 will
-  now move to the center of the well in between touching each side, and will
-  move to the appropriate height before moving to the well sides to avoid
-  diagonal movement
-- Fix an issue that could lead to corrupt deck calibration if the deck
-  calibration process was ended early (issue [#5446][5446])
-- Fix `opentrons_simulate` when there is a Temperature Module in the protocol
-  (issue [#5561][5561])
+- Fixed a well access bug that was causing touch-tip to fail with labware that was on top of a module ([#5531][])
+- Fixed protocol pause commands skipping if they preceded a delay command ([#4801][])
 
-[5446]: https://github.com/Opentrons/opentrons/issues/5446
-[5561]: https://github.com/Opentrons/opentrons/issues/5561
+[#5531]: https://github.com/Opentrons/opentrons/issues/5531
+[#4801]: https://github.com/Opentrons/opentrons/issues/5531
 
 ## New Features
 
-- Add [NEST's deep well plate][deep-well] as `nest_96_wellplate_2ml_deep`
-- New api level: 2.4. Set `'apiLevel': '2.4'` in your protocol's metadata to
-  take advantage of the `touch_tip`-related changes. See [the
-  documentation][version-2-4] for more detailed information.
-- In API Level 2.4, you can now reduce the speed of a `touch_tip` command to 1 mm/s
-- In API Level 2.4, `touch_tip` will now touch only 3 sides of a well if
-  touching the fourth side would cause a collision with an adjacent module or
-  the side of the OT-2. For instance, using the left pipette to `touch_tip` in
-  column 12 of a 96-well plate in slot 2 with a Magnetic Module in slot 3 will
-  touch only the top, left, and bottom sides of the well.
+- Added support for Thermocylers in Protocol Designer protocols ([#5557][])
+- Switched the Robot Server's HTTP framework to [FastAPI][] ([#5590][])
+  - This does not change the behavior of any endpoints, but it does add a few new ones!
+  - You can now access the OpenAPI Spec of the robot's HTTP server at `http://${robot_ip_address}:31950/openapi.json`
+  - You can now access documentation of the robot's HTTP server at `http://${robot_ip_address}:31950/redoc`
 
-[deep-well]: https://labware.opentrons.com/nest_96_wellplate_2ml_deep/
-[version-2-4]: https://docs.opentrons.com/v2/versioning.html#version-2-4
+[#5557]: https://github.com/Opentrons/opentrons/pull/5557
+[#5590]: https://github.com/Opentrons/opentrons/pull/5590
+[fastapi]: https://fastapi.tiangolo.com/
