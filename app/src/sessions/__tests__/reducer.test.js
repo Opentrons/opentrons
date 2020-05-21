@@ -31,8 +31,10 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -50,18 +52,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -82,8 +90,10 @@ const SPECS: Array<ReducerSpec> = [
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
@@ -101,18 +111,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          [Fixtures.mockSessionId]:
-            Fixtures.mockSessionResponse.data.attributes,
-          existing_fake_session_id:
-            Fixtures.mockSessionResponse.data.attributes,
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: Fixtures.mockSessionId,
+          },
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionResponse.data.attributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },
@@ -194,15 +210,24 @@ const SPECS: Array<ReducerSpec> = [
     state: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionAttributes,
-          [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionAttributes,
+            id: Fixtures.mockSessionId,
+          },
         },
       },
     },
     expected: {
       'eggplant-parm': {
         robotSessions: {
-          existing_fake_session_id: Fixtures.mockSessionAttributes,
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
         },
       },
     },

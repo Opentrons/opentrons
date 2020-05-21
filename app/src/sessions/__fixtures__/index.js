@@ -13,18 +13,17 @@ import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
-export const mockSessionAttributes: Types.Session = {
-  id: mockSessionId,
+export const mockSessionAttributes: Types.SessionResponseAttributes = {
   sessionType: 'calibrationCheck',
   details: mockRobotCalibrationCheckSessionDetails,
 }
 
-export const mockSessionCommand: Types.SessionCommand = {
+export const mockSessionCommand: Types.SessionCommandAttributes = {
   command: 'jog',
   data: { someData: 32 },
 }
 
-export const mockSessionCommandAttributes: Types.SessionCommand = {
+export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
   command: 'preparePipette',
   status: 'accepted',
   data: {},

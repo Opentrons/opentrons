@@ -125,7 +125,7 @@ export const fetchAllSessionsFailure = (
 export const createSessionCommand = (
   robotName: string,
   sessionId: string,
-  command: Types.SessionCommand
+  command: Types.SessionCommandAttributes
 ): Types.CreateSessionCommandAction => ({
   type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },
