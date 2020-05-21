@@ -48,6 +48,7 @@ class SessionManager:
 
 # vector from front bottom left of slot 12
 TRASH_TIP_OFFSET = Point(20, 20, -20)
+HEIGHT_SAFETY_BUFFER = Point(0, 0, 5.0)
 
 
 class CalibrationSession:
@@ -163,7 +164,7 @@ class CalibrationSession:
         # shift down to 10mm +y of the slot edge to both stay clear of the
         # slot boundary, avoid the engraved slot number, and avoid the
         # tiprack colliding if this is a multi
-        updated_pos = pos - Point(0, (ydim/2)-10, pos.z)
+        updated_pos = pos - Point(0, (ydim/2)-10, pos.z) + HEIGHT_SAFETY_BUFFER
         return CheckMove(position=updated_pos, locationId=uuid4())
 
     def _get_tip_rack_slot_for_mount(self, mount) -> str:
@@ -190,7 +191,15 @@ class CalibrationSession:
             lw_info = self.get_tiprack(pip_info.tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
             # mod geometry contexts. Ignore type checking error here.
-            tip_length = self._deck[lw_info.slot].tip_length  # type: ignore
+            tiprack = self._deck[lw_info.slot]
+            full_length = tiprack.tip_length  # type: ignore
+            overlap_dict: typing.Dict =\
+                self.pipettes[mount]['tip_overlap']  # type: ignore
+            default = overlap_dict['default']
+            overlap = overlap_dict.get(
+                                    tiprack.uri,  # type: ignore
+                                    default)
+            tip_length = full_length - overlap
         else:
             tip_length = self.pipettes[mount]['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
@@ -491,42 +500,36 @@ CHECK_TRANSITIONS = [
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(15, 15, 15)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(10, 10, 10)
-OK_HEIGHT_VECTOR = Point(0.0, 0.0, 5.0)
-OK_XY_VECTOR = Point(5.0, 5.0, 0.0)
+# Add in a 2mm buffer to tiprack thresholds on top of
+# the max acceptable range for a given pipette based
+# on calibration research data.
+DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
+P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
 
 
 @dataclass
 class ComparisonParams:
     reference_state: CalibrationCheckState
-    threshold_vector: Point
 
 
 COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
     CalibrationCheckState.comparingFirstPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToHeight,
-        threshold_vector=OK_HEIGHT_VECTOR,
     ),
     CalibrationCheckState.comparingFirstPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointOne,
-        threshold_vector=OK_XY_VECTOR,
     ),
     CalibrationCheckState.comparingFirstPipettePointTwo: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointTwo,
-        threshold_vector=OK_XY_VECTOR,
     ),
     CalibrationCheckState.comparingFirstPipettePointThree: ComparisonParams(
         reference_state=CalibrationCheckState.joggingFirstPipetteToPointThree,
-        threshold_vector=OK_XY_VECTOR,
     ),
     CalibrationCheckState.comparingSecondPipetteHeight: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToHeight,
-        threshold_vector=OK_HEIGHT_VECTOR,
     ),
     CalibrationCheckState.comparingSecondPipettePointOne: ComparisonParams(
         reference_state=CalibrationCheckState.joggingSecondPipetteToPointOne,
-        threshold_vector=OK_XY_VECTOR,
     ),
 }
 
@@ -556,6 +559,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         """
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         return first_pip and first_pip.mount != Mount.LEFT
+
+    @property
+    def _initial_z_offset(self):
+        return Point(0, 0, 0.5)
 
     async def _is_checking_both_mounts(self):
         return len(self._pip_info_by_mount) == 2
@@ -637,10 +644,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         assert mount, 'cannot attempt tip pick up, no mount specified'
 
         current_pt = await self.hardware.gantry_position(mount)
-
         ref_pt = self._saved_points[getattr(CalibrationCheckState,
                                             self.current_state_name)]
 
+        ref_pt_no_safety = ref_pt - MOVE_TO_TIP_RACK_SAFETY_BUFFER
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
         pip_model = self.pipettes[mount]['model']
         if str(pip_model).startswith('p1000'):
@@ -649,9 +656,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 threshold_vector._replace(z=0))
         zThresholdMag = Point(0, 0, 0).magnitude_to(
                 threshold_vector._replace(x=0, y=0))
-        xyDiffMag = ref_pt._replace(z=0).magnitude_to(
+        xyDiffMag = ref_pt_no_safety._replace(z=0).magnitude_to(
                 current_pt._replace(z=0))
-        zDiffMag = ref_pt._replace(x=0, y=0).magnitude_to(
+        zDiffMag = ref_pt_no_safety._replace(x=0, y=0).magnitude_to(
                 current_pt._replace(x=0, y=0))
         return xyDiffMag > xyThresholdMag or zDiffMag > zThresholdMag
 
@@ -698,6 +705,40 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
+    def _determine_threshold(self):
+        first_pipette = [
+            CalibrationCheckState.joggingFirstPipetteToHeight,
+            CalibrationCheckState.joggingFirstPipetteToPointOne,
+            CalibrationCheckState.joggingFirstPipetteToPointTwo,
+            CalibrationCheckState.joggingFirstPipetteToPointThree,
+        ]
+        if self.current_state_name in first_pipette:
+            pip = self._get_pipette_by_rank(PipetteRank.first)
+        else:
+            pip = self._get_pipette_by_rank(PipetteRank.second)
+
+        pipette_type = ''
+        if pip and pip.mount:
+            pipette_type = str(self.pipettes[pip.mount]['model'])
+        is_p1000 = pipette_type.startswith('p1000')
+        height_states = [
+            CalibrationCheckState.joggingFirstPipetteToHeight,
+            CalibrationCheckState.joggingSecondPipetteToHeight]
+        cross_states = [
+            CalibrationCheckState.joggingFirstPipetteToPointOne,
+            CalibrationCheckState.joggingFirstPipetteToPointTwo,
+            CalibrationCheckState.joggingFirstPipetteToPointThree,
+            CalibrationCheckState.joggingSecondPipetteToPointOne
+        ]
+        if is_p1000 and self.current_state_name in cross_states:
+            return Point(2.7, 2.7, 0.0)
+        elif is_p1000 and self.current_state_name in height_states:
+            return Point(0.0, 0.0, 1)
+        elif self.current_state_name in cross_states:
+            return Point(1.79, 1.64, 0.0)
+        else:
+            return Point(0.0, 0.0, 0.8)
+
     def get_comparisons_by_step(
             self) -> typing.Dict[CalibrationCheckState, ComparisonStatus]:
         comparisons = {}
@@ -705,15 +746,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             ref_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                     comp.reference_state),
                                             None)
+
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
+
+            threshold_vector = self._determine_threshold()
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
-                if comp.threshold_vector.z == 0.0:
+                if threshold_vector.z == 0.0:
                     diff_magnitude = ref_pt._replace(z=0.0).magnitude_to(
                             jogged_pt._replace(z=0.0))
-                elif comp.threshold_vector.x == 0.0 and \
-                        comp.threshold_vector.y == 0.0:
+                elif threshold_vector.x == 0.0 and \
+                        threshold_vector.y == 0.0:
                     diff_magnitude = ref_pt._replace(
                             x=0.0, y=0.0).magnitude_to(jogged_pt._replace(
                                                        x=0.0, y=0.0))
@@ -721,7 +765,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     'step comparisons must check z or (x and y) magnitude'
 
                 threshold_mag = Point(0, 0, 0).magnitude_to(
-                        comp.threshold_vector)
+                        threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
                 tform_type = DeckCalibrationError.UNKNOWN
 
@@ -736,7 +780,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
-                                     thresholdVector=comp.threshold_vector,
+                                     thresholdVector=threshold_vector,
                                      exceedsThreshold=exceeds,
                                      transformType=tform_type)
         return comparisons
@@ -744,35 +788,65 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     async def _register_point_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, 'cannot register point for missing first pipette'
+        buffer = Point(0, 0, 0)
+        if self.current_state_name ==\
+                CalibrationCheckState.comparingFirstPipetteHeight:
+            buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(first_pip.mount)
+            await self.hardware.gantry_position(first_pip.mount) + buffer
 
     async def _register_point_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, 'cannot register point for missing second pipette'
+        buffer = Point(0, 0, 0)
+        if self.current_state_name ==\
+                CalibrationCheckState.comparingSecondPipetteHeight:
+            buffer = HEIGHT_SAFETY_BUFFER
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(second_pip.mount)
+            await self.hardware.gantry_position(second_pip.mount) + buffer
 
     async def _move_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
             'cannot move pipette on first mount, pipette not present'
-        await self._move(first_pip.mount,
-                         Location(getattr(self._moves,
-                                          self.current_state_name).position,
-                                  None))
+        loc_to_move = Location(getattr(self._moves,
+                                       self.current_state_name).position,
+                               None)
+
+        saved_z_whitelist = \
+            [CalibrationCheckState.joggingFirstPipetteToPointOne,
+             CalibrationCheckState.joggingFirstPipetteToPointTwo,
+             CalibrationCheckState.joggingFirstPipetteToPointThree]
+        if self.current_state_name in saved_z_whitelist:
+            saved_height =\
+                self._saved_points[getattr(CalibrationCheckState,
+                                           'comparingFirstPipetteHeight')]
+            z_point =\
+                saved_height + self._initial_z_offset - HEIGHT_SAFETY_BUFFER
+            updated_point = loc_to_move.point + z_point._replace(x=0.0, y=0.0)
+            loc_to_move = Location(updated_point, None)
+        await self._move(first_pip.mount, loc_to_move)
         await self._register_point_first_pipette()
 
     async def _move_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot move pipette on second mount, pipette not present'
-        await self._move(second_pip.mount,
-                         Location(getattr(self._moves,
-                                          self.current_state_name).position,
-                                  None))
+        loc_to_move = Location(getattr(self._moves,
+                                       self.current_state_name).position,
+                               None)
+        if self.current_state_name ==\
+                CalibrationCheckState.joggingSecondPipetteToPointOne:
+            saved_height =\
+                self._saved_points[getattr(CalibrationCheckState,
+                                           'comparingSecondPipetteHeight')]
+            z_point =\
+                saved_height + self._initial_z_offset - HEIGHT_SAFETY_BUFFER
+            updated_point = loc_to_move.point + z_point._replace(x=0.0, y=0.0)
+            loc_to_move = Location(updated_point, None)
+        await self._move(second_pip.mount, loc_to_move)
         await self._register_point_second_pipette()
 
     async def _jog_first_pipette(self, vector: OffsetVector):
