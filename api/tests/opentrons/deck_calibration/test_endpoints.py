@@ -17,6 +17,8 @@ from opentrons import types
 # operation, and then these tests should be revised to match expected reality.
 
 # ------------ Function tests (unit) ----------------------
+
+
 async def test_add_and_remove_tip(dc_session, instruments):
     hardware = dc_session.adapter
     hardware.reset()
@@ -402,7 +404,6 @@ async def test_set_and_jog_integration(hardware, monkeypatch):
                              {},
                              {"point": "Z"},
                              {"point": "att"},
-                             {"point": []},
                              {"point": None}
                          ])
 async def test_move_no_point(command_data, dc_session):
@@ -423,6 +424,19 @@ async def test_move_basic(dc_session):
         command='move',
         command_data={
             "point": "attachTip"
+        })
+
+    assert resp.success is True
+    assert resp.message == "Moved to (200, 90, 130)"
+
+
+async def test_move_basic_typed(dc_session):
+    dc_session.current_mount = endpoints.Mount.RIGHT
+    resp = await endpoints.dispatch(
+        token=dc_session.id,
+        command='move',
+        command_data={
+            "point": endpoints.DeckCalibrationPoint.attachTip
         })
 
     assert resp.success is True

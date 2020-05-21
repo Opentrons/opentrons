@@ -1,6 +1,7 @@
 // @flow
 import uuidv1 from 'uuid/v1'
 import { makeWellSetHelpers } from '@opentrons/shared-data'
+import { i18n } from '../localization'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
 
@@ -78,3 +79,8 @@ export const {
   getAllWellSetsForLabware,
   getWellSetForMultichannel,
 } = makeWellSetHelpers()
+
+export const makeTemperatureText = (temperature: number | null): string =>
+  temperature === null
+    ? i18n.t('modules.status.deactivated')
+    : `${temperature} ${i18n.t('application.units.degrees')}`

@@ -12,7 +12,7 @@ from opentrons.config import feature_flags as ff
 
 from .constants import LOOKUP_LABWARE
 from .util import StateMachine, WILDCARD
-from .models import ComparisonStatus
+from .models import ComparisonStatus, OffsetVector
 from .helper_classes import (LabwareInfo, CheckMove, Moves,
                              DeckCalibrationError, PipetteRank,
                              PipetteInfo, PipetteStatus)
@@ -849,17 +849,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         await self._move(second_pip.mount, loc_to_move)
         await self._register_point_second_pipette()
 
-    async def _jog_first_pipette(self, vector: Point):
+    async def _jog_first_pipette(self, vector: OffsetVector):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
             'cannot jog pipette on first mount, pipette not present'
-        await super(self.__class__, self)._jog(first_pip.mount, vector)
+        await super(self.__class__, self)._jog(first_pip.mount, Point(*vector))
 
-    async def _jog_second_pipette(self, vector: Point):
+    async def _jog_second_pipette(self, vector: OffsetVector):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot jog pipette on second mount, pipette not present'
-        await super(self.__class__, self)._jog(second_pip.mount, vector)
+        await super(self.__class__, self)._jog(second_pip.mount,
+                                               Point(*vector))
 
     async def _return_first_tip(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)

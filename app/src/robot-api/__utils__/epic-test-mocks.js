@@ -50,9 +50,11 @@ export const setupEpicTestMocks = <
   mockResponse?: R
 ): EpicTestMocks<A, R> => {
   const mockState: State = ({ state: true, mock: true }: any)
+  const triggerAction = makeTriggerAction(mockRobot.name)
+
   const mockAction = {
-    ...makeTriggerAction(mockRobot.name),
-    meta: mockRequestMeta,
+    ...triggerAction,
+    meta: { ...(triggerAction.meta || {}), ...mockRequestMeta },
   }
 
   mockGetRobotByName.mockImplementation((state, robotName) => {

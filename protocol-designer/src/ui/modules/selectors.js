@@ -64,21 +64,6 @@ export const getTemperatureLabwareOptions: Selector<Options> = createSelector(
   }
 )
 
-/** Returns dropdown option for labware placed on thermocycler module */
-export const getThermocyclerLabwareOptions: Selector<Options> = createSelector(
-  getInitialDeckSetup,
-  getLabwareNicknamesById,
-  (initialDeckSetup, nicknamesById) => {
-    return getModuleLabwareOptions(
-      initialDeckSetup,
-      nicknamesById,
-      THERMOCYCLER_MODULE_TYPE
-    )
-  }
-)
-
-// TODO(IL, 2020-04-27) check if these selectors are used see #5488
-
 /** Get single magnetic module (assumes no multiples) */
 export const getSingleMagneticModuleId: Selector<
   string | null
@@ -131,7 +116,6 @@ export const getThermocyclerModuleHasLabware: Selector<boolean> = createSelector
   }
 )
 
-// TODO(IL, 2020-04-27) check if these selectors are used see #5488
 export const getMagnetLabwareEngageHeight: Selector<
   number | null
 > = createSelector(

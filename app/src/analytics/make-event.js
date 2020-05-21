@@ -4,11 +4,9 @@ import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getRobotCalibrationCheckSession } from '../calibration'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
-import * as calibrationActions from '../calibration/constants'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -257,26 +255,6 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
-
-      return Promise.resolve({
-        name: 'calibrationCheckStart',
-        properties: { ...sessionData },
-      })
-    }
-
-    case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
-
-      return Promise.resolve({
-        name: 'calibrationCheckPass',
-        properties: { ...sessionData },
-      })
-    }
-
     case SystemInfo.INITIALIZED:
     case SystemInfo.USB_DEVICE_ADDED: {
       const devices = action.payload.usbDevice
@@ -285,7 +263,7 @@ export function makeEvent(
 
       const superProperties = head(
         devices
-          .filter(SystemInfo.isRealtekDevice)
+          .filter(SystemInfo.isRealtekU2EAdapter)
           .map(SystemInfo.deviceToU2EAnalyticsProps)
       )
 

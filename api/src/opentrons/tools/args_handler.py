@@ -16,6 +16,6 @@ def root_argparser(description: str = None):
 def build_driver(
         port: str = None)\
         -> Tuple[adapters.SynchronousAdapter, SmoothieDriver_3_0_0]:
-    hardware = ThreadManager(API.build_hardware_controller).sync
+    hardware = ThreadManager(API.build_hardware_controller, None, port).sync
     driver = hardware._backend._smoothie_driver
     return hardware, driver

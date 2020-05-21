@@ -1,56 +1,23 @@
 // @flow
+import { of } from 'rxjs'
+import { filter, switchMap } from 'rxjs/operators'
 import { ofType } from 'redux-observable'
 
-import { GET } from '../../robot-api/constants'
-import { mapToRobotApiRequest } from '../../robot-api/operators'
-
-import * as Actions from '../actions'
-import * as Constants from '../constants'
+import * as Sessions from '../../sessions'
 
 import type { Epic } from '../../types'
-
-import type {
-  ActionToRequestMapper,
-  ResponseToActionMapper,
-} from '../../robot-api/operators'
-
-import type { FetchRobotCalibrationCheckSessionAction } from '../types'
-
-const mapActionToRequest: ActionToRequestMapper<FetchRobotCalibrationCheckSessionAction> = action => ({
-  method: GET,
-  path: Constants.ROBOT_CALIBRATION_CHECK_PATH,
-})
-
-const mapResponseToAction: ResponseToActionMapper<FetchRobotCalibrationCheckSessionAction> = (
-  response,
-  originalAction
-) => {
-  const { host, body, ...responseMeta } = response
-  const meta = { ...originalAction.meta, response: responseMeta }
-
-  if (response.status === 404) {
-    // create new session if not found
-    return Actions.createRobotCalibrationCheckSession(host.name, {
-      requestId: meta.requestId,
-    })
-  } else {
-    return response.ok
-      ? Actions.fetchRobotCalibrationCheckSessionSuccess(host.name, body, meta)
-      : Actions.fetchRobotCalibrationCheckSessionFailure(host.name, body, meta)
-  }
-}
 
 export const fetchRobotCalibrationCheckSessionEpic: Epic = (
   action$,
   state$
 ) => {
   return action$.pipe(
-    ofType(Constants.FETCH_ROBOT_CALIBRATION_CHECK_SESSION),
-    mapToRobotApiRequest(
-      state$,
-      a => a.payload.robotName,
-      mapActionToRequest,
-      mapResponseToAction
-    )
+    ofType(Sessions.CREATE_SESSION_FAILURE),
+    filter(
+      action => action.meta.response.status === 409
+      // TODO: BC: un comment this once the sessionType is returned from a failed response
+      // && action.payload.error.sessionType === SESSION_TYPE_CALIBRATION_CHECK
+    ),
+    switchMap(action => of(Sessions.fetchAllSessions(action.payload.robotName)))
   )
 }

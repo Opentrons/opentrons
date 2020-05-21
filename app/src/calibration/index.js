@@ -3,9 +3,12 @@
 import type {
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
+  RobotCalibrationCheckSessionDetails,
 } from './api-types'
-export * from './actions'
-export * from './selectors'
 export * from './constants'
 
-export type { RobotCalibrationCheckStep, RobotCalibrationCheckComparison }
+export type {
+  RobotCalibrationCheckStep,
+  RobotCalibrationCheckComparison,
+  RobotCalibrationCheckSessionDetails,
+}

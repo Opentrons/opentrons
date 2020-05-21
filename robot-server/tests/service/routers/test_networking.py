@@ -27,7 +27,7 @@ def test_networking_status(api_client, monkeypatch):
             'macAddress': 'B8:27:EB:39:C0:9A',
             # test missing output gets mapped to None
             'gatewayAddress': None,
-            'state': 'connected',
+            'state': 'connecting (configuring)',
             'type': 'ethernet'
         }
     }
