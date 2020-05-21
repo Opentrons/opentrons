@@ -29,7 +29,9 @@
     "go_to": "go to",
     "hold": "hold"
   },
+  "block_label": "Block",
   "lid_label": "Lid ({{lidStatus}})",
   "lid_closed": "closed",
-  "lid_open": "open"
+  "lid_open": "open",
+  "lid_undefined": "undefined"
 }
