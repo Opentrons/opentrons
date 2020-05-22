@@ -43,13 +43,15 @@ export const useConditionalConfirm = (
   /** the action we may want to require confirmation for */
   handleContinue: () => mixed,
   /** if no confirmation is needed, we will avoid the modal and immediately call handleContinue */
-  needConfirmation: boolean
+  shouldBlock: boolean
 ): ConditionalConfirmOutput => {
-  const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
+  const [requiresConfirmation, setRequiresConfirmation] = useState<boolean>(
+    false
+  )
 
   const conditionalContinue = () => {
-    if (needConfirmation) {
-      setShowConfirmModal(true)
+    if (shouldBlock) {
+      setRequiresConfirmation(true)
     } else {
       handleContinue()
     }
@@ -57,13 +59,13 @@ export const useConditionalConfirm = (
 
   return {
     conditionalContinue,
-    requiresConfirmation: showConfirmModal,
+    requiresConfirmation,
     confirmAndContinue: () => {
       handleContinue()
-      setShowConfirmModal(false)
+      setRequiresConfirmation(false)
     },
     cancelConfirm: () => {
-      setShowConfirmModal(false)
+      setRequiresConfirmation(false)
     },
   }
 }
