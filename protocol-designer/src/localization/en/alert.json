@@ -69,6 +69,10 @@
       "MISSING_TEMPERATURE_STEP": {
         "title": "Missing Temperature step",
         "body": "Add a Temperature step prior to this Pause step. The module is not currently changing temperature because it has either been deactivated or is holding a temperature"
+      },
+      "THERMOCYCLER_LID_CLOSED": {
+        "title": "Thermocycler lid is closed",
+        "body": "Before a pipette can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
       }
     },
     "warning": {
