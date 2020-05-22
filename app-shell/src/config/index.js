@@ -8,13 +8,13 @@ import mergeOptions from 'merge-options'
 import { getIn, exists } from '@thi.ng/paths'
 import uuid from 'uuid/v4'
 import yargsParser from 'yargs-parser'
-
-import pkg from '../package.json'
-import { createLogger } from './log'
+import isEmpty from 'lodash/isEmpty'
+import pkg from '../../package.json'
+import { createLogger } from '../log'
 import * as Cfg from '@opentrons/app/src/config'
-
+import { migrate } from './migration'
 import type { Config } from '@opentrons/app/src/config/types'
-import type { Action, Dispatch } from './types'
+import type { Action, Dispatch } from '../types'
 
 export type { Config }
 
@@ -29,8 +29,12 @@ const PARSE_ARGS_OPTS = {
   },
 }
 
+// Needs to be updated with every change to the configs
+const CONFIGS_VERSION: number = 1
+
 // TODO(mc, 2018-05-25): future config changes may require migration strategy
 const DEFAULTS: Config = {
+  version: 0,
   devtools: false,
   reinstallDevtools: false,
 
@@ -72,9 +76,6 @@ const DEFAULTS: Config = {
     seenOptIn: false,
   },
 
-  // deprecated; remove with first migration
-  p10WarningSeen: {},
-
   // user support (intercom)
   support: {
     userId: uuid(),
@@ -86,6 +87,7 @@ const DEFAULTS: Config = {
   // robot discovery
   discovery: {
     candidates: [],
+    disableDiscoveryCache: false,
   },
 
   // custom labware files
@@ -106,6 +108,9 @@ const store = () => _store || (_store = new Store({ defaults: DEFAULTS }))
 const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
 const log = () => _log || (_log = createLogger('config'))
 
+export const initializeConfig = () => {
+  store().store = migrate(store().store)
+}
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch) {
   return function handleIncomingAction(action: Action) {

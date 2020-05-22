@@ -4,7 +4,7 @@ import { setIn } from '@thi.ng/paths'
 import { remote } from '../shell/remote'
 
 import type { Action } from '../types'
-import type { Config } from './types'
+import type { Config } from './ConfigTypes'
 
 // config reducer
 export function configReducer(state: ?Config, action: Action): Config {
