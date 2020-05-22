@@ -22,8 +22,8 @@
     "@hot-loader/react-dom": "16.8.6",
     "@opentrons/components": "3.18.0",
     "@opentrons/shared-data": "3.18.0",
-    "classnames": "^2.2.5",
-    "lodash": "^4.17.4",
+    "classnames": "2.2.5",
+    "lodash": "4.17.4",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-hot-loader": "^4.12.19"
