@@ -1,8 +1,6 @@
 // @flow
 import type { LogLevel } from '../logger'
 
-import type { LogLevel } from '../logger'
-
 export type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
