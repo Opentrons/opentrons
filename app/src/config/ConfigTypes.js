@@ -1,4 +1,5 @@
 // @flow
+import type { LogLevel } from '../logger'
 
 export type ConfigV0 = $ReadOnly<{|
   configFileVersion: 0,
