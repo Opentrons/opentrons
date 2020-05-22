@@ -22,6 +22,10 @@ class Health(BaseModel):
               description="The robot's name. In most cases the same as its "
                           "mDNS advertisement domain name but this can get out"
                           " of sync. Mostly useful for user-facing titles.")
+    valid_calibration: bool = \
+        Field(...,
+              description="A boolean determining whether a user has a "
+                          "valid robot deck calibration.")
     api_version: str = \
         Field(...,
               description="The SemVer dotted-int version of the API server "
