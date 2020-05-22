@@ -297,7 +297,7 @@ class CalibrationCheckTrigger(str, Enum):
     reject_calibration = "rejectCalibration"
 
 
-CHECK_TRANSITIONS = [
+CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
     {
         "trigger": CalibrationCheckTrigger.load_labware,
         "from_state": CalibrationCheckState.sessionStarted,
@@ -545,7 +545,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     def __init__(self, hardware: 'ThreadManager'):
         CalibrationSession.__init__(self, hardware)
         StateMachine.__init__(self, states=[s for s in CalibrationCheckState],
-                              transitions=CHECK_TRANSITIONS,  # type: ignore
+                              transitions=CHECK_TRANSITIONS,
                               initial_state="sessionStarted")
         self.session_type = 'check'
         self._saved_points: typing.Dict[CalibrationCheckState, Point] = {}
