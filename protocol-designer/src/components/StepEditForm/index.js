@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
 import cx from 'classnames'
 
-import { useConditionalConfirm } from '../useConditionalConfirm'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'

@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
+import { useConditionalConfirm } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -24,7 +25,6 @@ import { selectors as fileDataSelectors } from '../file-data'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
-import { useConditionalConfirm } from '../components/useConditionalConfirm'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'

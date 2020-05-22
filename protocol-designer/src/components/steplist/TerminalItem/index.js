@@ -1,14 +1,14 @@
 // @flow
 import React, { type Node } from 'react'
-import { useConditionalConfirm } from '../../useConditionalConfirm'
 import { useSelector, useDispatch } from 'react-redux'
-import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
+import { useConditionalConfirm } from '@opentrons/components'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../../ui/steps'
 import { getCurrentFormIsPresaved } from '../../../step-forms/selectors'
+import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
 import { PDTitledList } from '../../lists'
 import type { TerminalItemId } from '../../../steplist'
 
