@@ -1,17 +1,16 @@
 // @flow
 // app configuration and settings
 // TODO(mc, 2020-01-31): this module is high-importance and needs unit tests
-import path from 'path'
-import { app } from 'electron'
 import Store from 'electron-store'
 import mergeOptions from 'merge-options'
 import { getIn, exists } from '@thi.ng/paths'
-import uuid from 'uuid/v4'
 import yargsParser from 'yargs-parser'
-import pkg from '../../package.json'
-import { createLogger } from '../log'
+
 import * as Cfg from '@opentrons/app/src/config'
-import { migrate } from './migration'
+
+import { createLogger } from '../log'
+import { DEFAULTS, migrate } from './migrate'
+
 import type { Config } from '@opentrons/app/src/config/types'
 import type { Action, Dispatch } from '../types'
 
@@ -28,88 +27,21 @@ const PARSE_ARGS_OPTS = {
   },
 }
 
-// TODO(mc, 2018-05-25): future config changes may require migration strategy
-const DEFAULTS: Config = {
-  version: 0,
-  devtools: false,
-  reinstallDevtools: false,
-
-  // app update config
-  update: {
-    channel: pkg.version.includes('beta') ? 'beta' : 'latest',
-  },
-
-  buildroot: {
-    manifestUrl:
-      'https://opentrons-buildroot-ci.s3.us-east-2.amazonaws.com/releases.json',
-  },
-
-  // logging config
-  log: {
-    level: {
-      file: 'debug',
-      console: 'info',
-    },
-  },
-
-  // ui and browser config
-  ui: {
-    width: 1024,
-    height: 768,
-    url: {
-      protocol: 'file:',
-      path: 'ui/index.html',
-    },
-    webPreferences: {
-      webSecurity: true,
-    },
-  },
-
-  // analytics (mixpanel)
-  analytics: {
-    appId: uuid(),
-    optedIn: false,
-    seenOptIn: false,
-  },
-
-  // deprecated; remove with first migration
-  p10WarningSeen: {},
-
-  // user support (intercom)
-  support: {
-    userId: uuid(),
-    createdAt: Math.floor(Date.now() / 1000),
-    name: 'Unknown User',
-    email: null,
-  },
-
-  // robot discovery
-  discovery: {
-    candidates: [],
-    disableDiscoveryCache: false,
-  },
-
-  // custom labware files
-  labware: {
-    directory: path.join(app.getPath('userData'), 'labware'),
-  },
-
-  alerts: {
-    ignored: [],
-  },
-}
-
 // lazy load store, overrides, and log because of config/log interdependency
 let _store
 let _over
 let _log
-const store = () => _store || (_store = new Store({ defaults: DEFAULTS }))
+const store = () => {
+  if (_store == null) {
+    // perform store migration if loading for the first time
+    _store = new Store({ defaults: DEFAULTS })
+    _store.store = migrate(_store.store)
+  }
+  return _store
+}
 const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
 const log = () => _log || (_log = createLogger('config'))
 
-export const initializeConfig = () => {
-  store().store = migrate(store().store)
-}
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch) {
   return function handleIncomingAction(action: Action) {

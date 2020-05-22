@@ -11,13 +11,8 @@ import { registerRobotLogs } from './robot-logs'
 import { registerUpdate } from './update'
 import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
-import {
-  initializeConfig,
-  getConfig,
-  getStore,
-  getOverrides,
-  registerConfig,
-} from './config'
+import { getConfig, getStore, getOverrides, registerConfig } from './config'
+
 const config = getConfig()
 const log = createLogger('main')
 
@@ -51,7 +46,7 @@ function startUp() {
   process.on('unhandledRejection', reason =>
     log.error('Uncaught Promise rejection: ', { reason })
   )
-  initializeConfig()
+
   mainWindow = createUi()
   rendererLogger = createRendererLogger()
 

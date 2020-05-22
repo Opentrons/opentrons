@@ -1,11 +1,8 @@
 // @flow
 
-import type {
-  ConfigV1,
-  ConfigIntermediateV0ToV1,
-} from '@opentrons/app/src/config/ConfigTypes'
+import type { ConfigV0, ConfigV1 } from '@opentrons/app/src/config/types'
 
-export const MOCK_CONFIG_V0: ConfigIntermediateV0ToV1 = {
+export const MOCK_CONFIG_V0: ConfigV0 = {
   version: 0, // Default key added on boot if missing in configs
   devtools: false,
   reinstallDevtools: false,
@@ -34,13 +31,19 @@ export const MOCK_CONFIG_V0: ConfigIntermediateV0ToV1 = {
     },
   },
   analytics: {
-    appId: 'abcdfc1-9012-42cf-809a-1d76034a35d',
+    appId: 'mock-mixpanel-id',
     optedIn: false,
     seenOptIn: false,
   },
-  p10WarningSeen: {},
+
+  // deprecated warning flag
+  p10WarningSeen: {
+    'some-id': true,
+  },
+
+  // user support (intercom)
   support: {
-    userId: '0220df78-5db3-4e0d-b8c7-c4f6c456d',
+    userId: 'mock-intercom-id',
     createdAt: 1589744281,
     name: 'Unknown User',
     email: null,
@@ -60,7 +63,7 @@ export const MOCK_CONFIG_V1: ConfigV1 = {
   ...MOCK_CONFIG_V0,
   version: 1,
   discovery: {
-    candidates: [],
-    disableDiscoveryCache: false,
+    ...MOCK_CONFIG_V0.discovery,
+    disableCache: false,
   },
 }
