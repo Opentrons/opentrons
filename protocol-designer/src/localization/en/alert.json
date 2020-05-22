@@ -64,7 +64,7 @@
       },
       "THERMOCYCLER_LID_CLOSED": {
         "title": "Thermocycler lid is closed",
-        "body": "Use a thermocycler step to open the lid before trying to pipette into it."
+        "body": "Before a pipette can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
       }
     },
     "warning": {
