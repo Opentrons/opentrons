@@ -41,7 +41,7 @@ stages:
 
   - name: Load labware
     request: &post_command
-      url: "{host:s}:{port:d}/sessions/{session_id}/commands"
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
       method: POST
       json:
         data:
