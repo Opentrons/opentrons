@@ -573,6 +573,7 @@ describe('thermocyclerPipetteColision', () => {
     testMsg: string,
     modules: $PropertyType<RobotState, 'modules'>,
     labware: $PropertyType<RobotState, 'labware'>,
+    labwareId: string,
     expected: boolean,
   |}> = [
     {
@@ -592,6 +593,7 @@ describe('thermocyclerPipetteColision', () => {
       labware: {
         [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
+      labwareId: labwareOnTCId,
       expected: true,
     },
     {
@@ -611,6 +613,7 @@ describe('thermocyclerPipetteColision', () => {
       labware: {
         [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
+      labwareId: labwareOnTCId,
       expected: true,
     },
     {
@@ -630,15 +633,36 @@ describe('thermocyclerPipetteColision', () => {
       labware: {
         [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
       },
+      labwareId: labwareOnTCId,
+      expected: false,
+    },
+    {
+      testMsg:
+        'returns false when labware is not on TC, even when TC lid is closed',
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: false,
+          },
+        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId },
+      },
+      labwareId: 'someOtherLabwareNotOnTC',
       expected: false,
     },
   ]
 
-  testCases.forEach(({ testMsg, modules, labware, expected }) => {
+  testCases.forEach(({ testMsg, modules, labware, labwareId, expected }) => {
     it(testMsg, () => {
-      expect(
-        thermocyclerPipetteCollision(modules, labware, labwareOnTCId)
-      ).toBe(expected)
+      expect(thermocyclerPipetteCollision(modules, labware, labwareId)).toBe(
+        expected
+      )
     })
   })
 })
