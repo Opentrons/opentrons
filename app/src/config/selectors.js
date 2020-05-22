@@ -1,8 +1,7 @@
 // @flow
 import type { DropdownOption } from '@opentrons/components'
-import type { State } from '../types'
+import type { State, Config } from '../types'
 import type { FeatureFlags, UpdateChannel } from './types'
-import type { Config } from './ConfigTypes'
 export const getConfig = (state: State): Config => state.config
 
 export const getFeatureFlags = (state: State): FeatureFlags =>

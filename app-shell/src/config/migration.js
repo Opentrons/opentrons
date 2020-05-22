@@ -1,15 +1,13 @@
 // @flow
 
 import type {
-  Config,
-  ConfigV0,
   ConfigV1,
+  ConfigIntermediateV0ToV1,
 } from '@opentrons/app/src/config/ConfigTypes'
+import type { Config } from '@opentrons/app/src/config/types'
 
-// Update outdated entries
-// Don't use getFullConfig() since that takes in overrides
 // config version 1 migration
-const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
+const toVersion1 = (prevConfig: ConfigIntermediateV0ToV1): ConfigV1 => {
   const nextConfig = {
     ...prevConfig,
     discovery: {
@@ -23,7 +21,7 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
 const MIGRATIONS = [toVersion1]
 
 export function migrate(prevConfig: Config): Config {
-  const prevVersion = prevConfig.version
+  const prevVersion = prevConfig.version | 0
   let result = prevConfig
   for (let i = prevVersion; i < MIGRATIONS.length; i++) {
     const migrateVersion = MIGRATIONS[i]

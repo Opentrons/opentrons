@@ -1,5 +1,10 @@
 // @flow
-import type { LogLevel } from '../logger'
+import type {
+  ConfigV0,
+  ConfigV1,
+  ConfigIntermediateV0ToV1,
+} from './ConfigTypes'
+
 export type UrlProtocol = 'file:' | 'http:'
 
 export type UpdateChannel = 'latest' | 'beta' | 'alpha'
@@ -34,6 +39,8 @@ export type SetConfigAction = {|
     value: any,
   |},
 |}
+
+export type Config = ConfigV0 | ConfigV1 | ConfigIntermediateV0ToV1
 
 export type ConfigAction =
   | UpdateConfigAction

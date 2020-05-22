@@ -1,8 +1,11 @@
 // @flow
 
-import type { Config, ConfigV1 } from '@opentrons/app/src/config/ConfigTypes'
+import type {
+  ConfigV1,
+  ConfigIntermediateV0ToV1,
+} from '@opentrons/app/src/config/ConfigTypes'
 
-export const MOCK_CONFIG_V0: Config = {
+export const MOCK_CONFIG_V0: ConfigIntermediateV0ToV1 = {
   version: 0, // Default key added on boot if missing in configs
   devtools: false,
   reinstallDevtools: false,

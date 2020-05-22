@@ -70,6 +70,14 @@ export type ConfigV0 = $ReadOnly<{|
   devInternal?: $ReadOnly<FeatureFlags>,
 |}>
 
+// When a V0 config is compared to V1's defaults the first time,
+// the version number field will be added by default (even without migration)
+// because of the way electron-store handles missing fields.
+export type ConfigIntermediateV0ToV1 = $ReadOnly<{|
+  ...ConfigV0,
+  version: 0,
+|}>
+
 export type ConfigV1 = $ReadOnly<{|
   ...ConfigV0,
   version: 1,
@@ -78,7 +86,3 @@ export type ConfigV1 = $ReadOnly<{|
     disableDiscoveryCache: boolean,
   |}>,
 |}>
-
-export type Config =
-  | ConfigV0
-  | ConfigV1
