@@ -29,6 +29,8 @@ import typeof {
   PICKED_UP,
   CONFIRMING,
   CONFIRMED,
+  DOOR_OPEN,
+  DOOR_CLOSED,
 } from './constants'
 
 import * as ApiTypes from './api-types'
@@ -164,11 +166,13 @@ export type SessionStatusInfo = {|
   userMessage: string | null,
 |}
 
+export type DoorState = '' | DOOR_OPEN | DOOR_CLOSED
+
 export type SessionUpdate = {|
   state: SessionStatus,
   statusInfo: SessionStatusInfo,
   startTime: ?number,
-  doorState: string,
+  doorState: DoorState,
   blocked: boolean,
   lastCommand: ?{|
     id: number,

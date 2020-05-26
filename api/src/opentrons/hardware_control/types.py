@@ -53,7 +53,11 @@ class DoorState(enum.Enum):
     CLOSED = True
 
     def __str__(self):
-        return self.name
+        return self.name.lower()
+
+
+class HardwareEventType(enum.Enum):
+    DOOR_SWITCH_CHANGE = enum.auto()
 
 
 class HardwareAPILike(abc.ABC):
@@ -74,10 +78,6 @@ class HardwareAPILike(abc.ABC):
     @door_state.setter
     def door_state(self, door_state: DoorState) -> DoorState:
         ...
-
-
-class HardwareEvent(enum.Enum):
-    DOOR_SWITCH_CHANGE = enum.auto()
 
 
 class BoardRevision(enum.Enum):

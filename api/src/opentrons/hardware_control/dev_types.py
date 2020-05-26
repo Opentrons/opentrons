@@ -1,11 +1,16 @@
 import asyncio
-from typing import List
+import enum
+from typing import List, Union
 from .modules import ModuleAtPort
+from .types import DoorState, HardwareEventType
 try:
     from typing_extensions import Protocol
 except ModuleNotFoundError:
     Protocol = None  # type: ignore
-
+try:
+    from typing_extensions import TypedDict, Literal
+except ModuleNotFoundError:
+    TypedDict = None  # type: ignore
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking.
 #
@@ -27,3 +32,14 @@ if Protocol is not None:
         @property
         def loop(self) -> asyncio.AbstractEventLoop:
             ...
+
+
+if TypedDict is not None:
+    class DoorStateNotification(TypedDict):
+        event: Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
+        new_state: DoorState
+
+    # new event types get new TypedDict classes (or dataclasses if we want)
+
+    # when we add more event types we add them here
+    HardwareEvent = Union[DoorStateNotification]

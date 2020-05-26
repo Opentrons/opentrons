@@ -359,8 +359,8 @@ describe('api client', () => {
             changedAt: null,
             estimatedDuration: null,
           },
-          doorState: null,
-          blocked: null,
+          doorState: 'closed',
+          blocked: false,
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -413,6 +413,8 @@ describe('api client', () => {
             changedAt: 2,
             estimatedDuration: null,
           },
+          doorState: 'closed',
+          blocked: false,
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -742,12 +744,16 @@ describe('api client', () => {
         startTime: 1,
         lastCommand: null,
         stateInfo: {},
+        doorState: 'closed',
+        blocked: false,
       }
 
       const actionInput = {
         state: 'running',
         startTime: 1,
         lastCommand: null,
+        blocked: false,
+        doorState: 'closed',
         statusInfo: {
           message: null,
           userMessage: null,
@@ -766,11 +772,15 @@ describe('api client', () => {
       const update = {
         state: 'running',
         startTime: 2,
+        doorState: 'closed',
+        blocked: 'false',
         lastCommand: null,
       }
 
       const actionInput = {
         ...update,
+        doorState: 'closed',
+        blocked: 'fasle',
         statusInfo: {
           message: null,
           userMessage: null,
@@ -790,6 +800,8 @@ describe('api client', () => {
         state: 'running',
         startTime: 2,
         lastCommand: null,
+        blocked: false,
+        doorState: 'open',
         stateInfo: {
           message: 'hi and hello football fans',
           userMessage: 'whos ready for some FOOTBALL',
@@ -801,6 +813,8 @@ describe('api client', () => {
         state: 'running',
         startTime: 2,
         lastCommand: null,
+        blocked: 'false',
+        doorState: 'open',
         statusInfo: {
           message: 'hi and hello football fans',
           userMessage: 'whos ready for some FOOTBALL',

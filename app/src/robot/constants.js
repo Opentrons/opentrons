@@ -30,6 +30,10 @@ export const PICKED_UP: 'picked-up' = 'picked-up'
 export const CONFIRMING: 'confirming' = 'confirming'
 export const CONFIRMED: 'confirmed' = 'confirmed'
 
+// door states
+export const DOOR_OPEN: 'open' = 'open'
+export const DOOR_CLOSED: 'closed' = 'closed'
+
 // deck layout
 export const PIPETTE_MOUNTS: Array<Mount> = ['left', 'right']
 export const DECK_SLOTS: Array<Slot> = [

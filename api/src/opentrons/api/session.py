@@ -21,7 +21,7 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
-from opentrons.hardware_control.types import HardwareEvent, DoorState
+from opentrons.hardware_control.types import DoorState, HardwareEventType
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -31,6 +31,8 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 
 if TYPE_CHECKING:
     from .dev_types import State, StateInfo
+    from opentrons.hardware_control.dev_types import (
+        HardwareEvent)  # noqa (F501)
 
 log = logging.getLogger(__name__)
 
@@ -103,6 +105,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents) if is_binary else contents
@@ -138,6 +141,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents)
@@ -181,6 +185,7 @@ class SessionManager(object):
             raise Exception(
                 "Cannot create session while simulation in progress")
 
+        self.clear()
         self._session_lock = True
         try:
             session_short_id = hex(uuid4().fields[0])
@@ -204,6 +209,7 @@ class SessionManager(object):
                 'Cannot clear session while simulation in progress')
 
         if self.session:
+            self.session.remove_hardware_event_watcher()
             self._hardware.reset()
         self.session = None
         self._broker.set_logger(self._command_logger)
@@ -268,7 +274,7 @@ class Session(object):
         self.startTime: Optional[float] = None
         self._motion_lock = motion_lock
         self._event_watcher = None
-        self.doorState: Optional[str] = None
+        self.door_state: Optional[str] = None
         self.blocked: Optional[bool] = None
 
     def _hw_iface(self):
@@ -448,6 +454,7 @@ class Session(object):
         self.modules = self.get_modules()
         self.startTime = None
         self.set_state('loaded')
+
         return self
 
     def stop(self):
@@ -488,22 +495,33 @@ class Session(object):
         return self
 
     def start_hardware_event_watcher(self):
-        # initialize and update window switch state
-        self.update_window_state(self._hardware.door_state)
-        self._event_watcher = self._hardware.register_callback(
-            self.handle_hardware_event)
-
-    def handle_hardware_event(self, hardware_event: HardwareEvent,
-                              state: DoorState):
-        self.update_window_state(state)
-        if ff.enable_door_safety_switch() and state == DoorState.OPEN and \
-                self.state == 'running':
-            self.pause('Robot door is open')
+        if not callable(self._event_watcher):
+            # initialize and update window switch state
+            self.update_window_state(self._hardware.door_state)
+            log.info('Starting hardware event watcher')
+            self._event_watcher = self._hardware.register_callback(
+                self.handle_hardware_event)
         else:
-            self._on_state_changed()
+            log.warning("Cannot start new hardware event watcher "
+                        "when one already exists")
+
+    def remove_hardware_event_watcher(self):
+        if callable(self._event_watcher):
+            self._event_watcher()
+            self._event_watcher = None
+
+    def handle_hardware_event(self, hw_event: 'HardwareEvent'):
+        if hw_event['event'] == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self.update_window_state(hw_event['new_state'])
+            if ff.enable_door_safety_switch() and \
+                    hw_event['new_state'] == DoorState.OPEN and \
+                    self.state == 'running':
+                self.pause('Robot door is open')
+            else:
+                self._on_state_changed()
 
     def update_window_state(self, state: DoorState):
-        self.doorState = str(state)
+        self.door_state = str(state)
         if ff.enable_door_safety_switch() and \
                 state == DoorState.OPEN:
             self.blocked = True
@@ -638,8 +656,8 @@ class Session(object):
     def _reset(self):
         self._hw_iface().reset()
         self.clear_logs()
-        if self._event_watcher is not None:
-            self._event_watcher()  # unregister existing event watcher
+        # unregister existing event watcher
+        self.remove_hardware_event_watcher()
         self.start_hardware_event_watcher()
 
     def _snapshot(self):
@@ -658,7 +676,7 @@ class Session(object):
                 'state': self.state,
                 'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
-                'doorState': self.doorState,
+                'doorState': self.door_state,
                 'blocked': self.blocked,
                 'errors': self.errors,
                 'lastCommand': last_command

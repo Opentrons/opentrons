@@ -8,6 +8,8 @@ export function MockSession() {
     command_log: {},
     state: 'loaded',
     stateInfo: {},
+    door_state: 'closed',
+    blocked: false,
     instruments: [],
     containers: [],
 
@@ -28,6 +30,8 @@ export function MockSessionNoStateInfo() {
     protocol_text: '# mock protocol text',
     commands: [],
     command_log: {},
+    door_state: 'closed',
+    blocked: false,
     state: 'loaded',
     instruments: [],
     containers: [],
