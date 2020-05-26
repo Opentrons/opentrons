@@ -4,7 +4,7 @@ from typing import Dict, Optional, List, Any, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
 
-from .helper_classes import DeckCalibrationError
+from opentrons.calibration.check.helper_classes import DeckCalibrationError
 
 
 OffsetVector = Tuple[float, float, float]

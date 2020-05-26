@@ -17,7 +17,7 @@ from opentrons.hardware_control import ThreadManager
 from .rpc import RPCServer
 from .http import HTTPServer, CalibrationRoutes
 
-from .endpoints.calibration.session import SessionManager as CalSessionManager
+from opentrons.calibration.check.session import SessionManager as CalSessionManager
 from .endpoints.calibration.middlewares import \
         session_middleware as cal_session_middleware
 

@@ -2,7 +2,7 @@ from unittest.mock import MagicMock
 from uuid import uuid4
 
 from opentrons.types import Mount
-from opentrons.server.endpoints.calibration.session import \
+from opentrons.calibration.check.session import \
     CheckCalibrationSession, PipetteStatus, LabwareInfo
 
 from robot_server.service.session.session_status import\

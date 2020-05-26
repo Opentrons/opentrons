@@ -4,13 +4,10 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import typing
 from pydantic.main import BaseModel
 
-from opentrons.server.endpoints.calibration.session \
-    import CheckCalibrationSession, CalibrationCheckState, \
-    CalibrationCheckTrigger
-from opentrons.server.endpoints.calibration.models import \
-    SessionType, JogPosition
-from opentrons.server.endpoints.calibration.helper_classes import \
-    PipetteInfo, PipetteRank
+from opentrons.calibration.check.session import CheckCalibrationSession, \
+    CalibrationCheckState, CalibrationCheckTrigger
+from opentrons.calibration.check.models import SessionType, JogPosition
+from opentrons.calibration.check.helper_classes import PipetteInfo, PipetteRank
 from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager
@@ -80,8 +77,8 @@ def mock_cal_session(hardware, loop):
     m.trigger_transition = MagicMock(side_effect=async_mock)
     m.delete_session = MagicMock(side_effect=async_mock)
 
-    path = 'opentrons.server.endpoints.calibration.' \
-           'session.CheckCalibrationSession.current_state_name'
+    path = 'opentrons.calibration.check.session.' \
+           'CheckCalibrationSession.current_state_name'
     with patch(path, new_callable=PropertyMock) as p:
         p.return_value = CalibrationCheckState.preparingFirstPipette.value
 

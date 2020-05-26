@@ -10,12 +10,12 @@ from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
 from opentrons.config import feature_flags as ff
 
-from .constants import LOOKUP_LABWARE
-from .util import StateMachine, WILDCARD
-from .models import ComparisonStatus, OffsetVector
-from .helper_classes import (LabwareInfo, CheckMove, Moves,
-                             DeckCalibrationError, PipetteRank,
-                             PipetteInfo, PipetteStatus)
+from opentrons.calibration.check.constants import LOOKUP_LABWARE
+from opentrons.calibration.util import StateMachine, WILDCARD
+from opentrons.calibration.check.models import ComparisonStatus, OffsetVector
+from opentrons.calibration.check.helper_classes import (LabwareInfo, CheckMove, Moves,
+                                                        DeckCalibrationError, PipetteRank,
+                                                        PipetteInfo, PipetteStatus)
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware, geometry
 

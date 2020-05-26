@@ -3,7 +3,8 @@ import asyncio
 import pytest
 from opentrons import types
 
-from opentrons.server.endpoints.calibration import session, util
+from opentrons.calibration import util
+from opentrons.calibration.check import session
 
 
 @pytest.fixture
@@ -294,7 +295,7 @@ async def test_session_started_to_labware_loaded(check_calibration_session):
         check_calibration_session
     )
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.labwareLoaded
+           session.CalibrationCheckState.labwareLoaded
 
 
 async def test_session_started_to_bad_state(check_calibration_session):
@@ -314,7 +315,7 @@ async def test_session_started_to_end_state(check_calibration_session):
             session.CalibrationCheckTrigger.exit
         )
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.sessionExited
+           session.CalibrationCheckState.sessionExited
 
 
 async def test_diff_pips_diff_tipracks(check_calibration_session):
@@ -403,7 +404,7 @@ async def test_invalidate_first_tip(check_calibration_session):
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
     assert sess.pipettes[first_pip.mount]['has_tip'] is False
 
 
@@ -414,7 +415,7 @@ async def test_invalidate_second_tip(check_calibration_session):
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.invalidate_tip)
     assert sess.current_state.name == \
-        session.CalibrationCheckState.preparingSecondPipette
+           session.CalibrationCheckState.preparingSecondPipette
     assert sess.pipettes[second_pip.mount]['has_tip'] is False
 
 
@@ -426,7 +427,7 @@ async def test_complete_check_one_pip(check_calibration_session_only_right):
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
-        session.CalibrationCheckState.checkComplete
+           session.CalibrationCheckState.checkComplete
 
 
 async def test_complete_check_both_pips(check_calibration_session):
@@ -437,7 +438,7 @@ async def test_complete_check_both_pips(check_calibration_session):
     await sess.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert sess.current_state.name == \
-        session.CalibrationCheckState.checkComplete
+           session.CalibrationCheckState.checkComplete
 
 
 # START flow testing both mounts
@@ -452,11 +453,11 @@ async def test_load_labware_to_preparing_first_pipette(
     assert curr_pos == tip_pt - types.Point(0, 0, 10)
 
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_preparing_first_pipette_to_bad_calibration(
@@ -466,20 +467,20 @@ async def test_preparing_first_pipette_to_bad_calibration(
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, BAD_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.pick_up_tip)
     await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.confirm_tip_attached)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.badCalibrationData
+           session.CalibrationCheckState.badCalibrationData
 
 
 async def test_preparing_first_pipette_to_inspecting(
         check_calibration_session):
     await in_inspecting_first_tip(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.inspectingFirstTip
+           session.CalibrationCheckState.inspectingFirstTip
 
 
 async def test_inspecting_first_pipette_to_jogging_height(
@@ -490,18 +491,18 @@ async def test_inspecting_first_pipette_to_jogging_height(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToHeight
+           session.CalibrationCheckState.joggingFirstPipetteToHeight
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToHeight
+           session.CalibrationCheckState.joggingFirstPipetteToHeight
 
 
 async def test_jogging_first_pipette_height_to_comparing(
         check_calibration_session):
     await in_comparing_first_pipette_height(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipetteHeight
+           session.CalibrationCheckState.comparingFirstPipetteHeight
 
 
 async def test_comparing_first_pipette_height_to_jogging_point_one(
@@ -513,18 +514,18 @@ async def test_comparing_first_pipette_height_to_jogging_point_one(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointOne
+           session.CalibrationCheckState.joggingFirstPipetteToPointOne
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointOne
+           session.CalibrationCheckState.joggingFirstPipetteToPointOne
 
 
 async def test_jogging_first_pipette_point_one_to_comparing(
         check_calibration_session):
     await in_comparing_first_pipette_point_one(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointOne
+           session.CalibrationCheckState.comparingFirstPipettePointOne
 
 
 async def test_comparing_first_pipette_point_one_to_jogging_point_two(
@@ -536,18 +537,18 @@ async def test_comparing_first_pipette_point_one_to_jogging_point_two(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointTwo
+           session.CalibrationCheckState.joggingFirstPipetteToPointTwo
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointTwo
+           session.CalibrationCheckState.joggingFirstPipetteToPointTwo
 
 
 async def test_jogging_first_pipette_point_two_to_comparing(
         check_calibration_session):
     await in_comparing_first_pipette_point_two(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointTwo
+           session.CalibrationCheckState.comparingFirstPipettePointTwo
 
 
 async def test_comparing_first_pipette_point_two_to_jogging_point_three(
@@ -559,18 +560,18 @@ async def test_comparing_first_pipette_point_two_to_jogging_point_three(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
     assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointThree
+           session.CalibrationCheckState.joggingFirstPipetteToPointThree
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointThree
+           session.CalibrationCheckState.joggingFirstPipetteToPointThree
 
 
 async def test_jogging_first_pipette_point_three_to_comparing(
         check_calibration_session):
     await in_comparing_first_pipette_point_three(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointThree
+           session.CalibrationCheckState.comparingFirstPipettePointThree
 
 
 async def test_load_labware_to_preparing_second_pipette(
@@ -581,18 +582,18 @@ async def test_load_labware_to_preparing_second_pipette(
         sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt - types.Point(0, 0, 10)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.preparingSecondPipette
+           session.CalibrationCheckState.preparingSecondPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.preparingSecondPipette
+           session.CalibrationCheckState.preparingSecondPipette
 
 
 async def test_preparing_second_pipette_to_inspecting(
         check_calibration_session):
     await in_inspecting_second_tip(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.inspectingSecondTip
+           session.CalibrationCheckState.inspectingSecondTip
 
 
 async def test_inspecting_second_pipette_to_jogging_height(
@@ -604,18 +605,18 @@ async def test_inspecting_second_pipette_to_jogging_height(
         sess._get_pipette_by_rank(session.PipetteRank.second).mount)
     assert curr_pos == tip_pt
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToHeight
+           session.CalibrationCheckState.joggingSecondPipetteToHeight
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToHeight
+           session.CalibrationCheckState.joggingSecondPipetteToHeight
 
 
 async def test_jogging_second_pipette_height_to_comparing(
         check_calibration_session):
     await in_comparing_second_pipette_height(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingSecondPipetteHeight
+           session.CalibrationCheckState.comparingSecondPipetteHeight
 
 
 async def test_comparing_second_pipette_height_to_jogging_point_one(
@@ -631,18 +632,18 @@ async def test_comparing_second_pipette_height_to_jogging_point_one(
         round(curr_pos[2], 2))
     assert rounded_pos == tip_pt + types.Point(0, 0, 5.5)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToPointOne
+           session.CalibrationCheckState.joggingSecondPipetteToPointOne
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.jog, OK_DIFF_VECTOR)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.joggingSecondPipetteToPointOne
+           session.CalibrationCheckState.joggingSecondPipetteToPointOne
 
 
 async def test_jogging_second_pipette_point_one_to_comparing(
         check_calibration_session):
     await in_comparing_second_pipette_point_one(check_calibration_session)
     assert check_calibration_session.current_state.name == \
-        session.CalibrationCheckState.comparingSecondPipettePointOne
+           session.CalibrationCheckState.comparingSecondPipettePointOne
 
 
 # END flow testing both mounts
@@ -655,7 +656,7 @@ async def test_right_load_labware_to_preparing_first_pipette(
     await in_preparing_first_pipette(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_right_preparing_first_pipette_to_inspecting(
@@ -663,7 +664,7 @@ async def test_right_preparing_first_pipette_to_inspecting(
     await in_inspecting_first_tip(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.inspectingFirstTip
+           session.CalibrationCheckState.inspectingFirstTip
 
 
 async def test_right_inspecting_first_pipette_to_jogging_height(
@@ -671,7 +672,7 @@ async def test_right_inspecting_first_pipette_to_jogging_height(
     await in_jogging_first_pipette_to_height(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToHeight
+           session.CalibrationCheckState.joggingFirstPipetteToHeight
 
 
 async def test_right_jogging_first_pipette_height_to_comparing(
@@ -679,7 +680,7 @@ async def test_right_jogging_first_pipette_height_to_comparing(
     await in_comparing_first_pipette_height(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipetteHeight
+           session.CalibrationCheckState.comparingFirstPipetteHeight
 
 
 async def test_right_comparing_first_pipette_height_to_jogging_point_one(
@@ -687,7 +688,7 @@ async def test_right_comparing_first_pipette_height_to_jogging_point_one(
     await in_jogging_first_pipette_to_point_one(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointOne
+           session.CalibrationCheckState.joggingFirstPipetteToPointOne
 
 
 async def test_right_jogging_first_pipette_point_one_to_comparing(
@@ -695,7 +696,7 @@ async def test_right_jogging_first_pipette_point_one_to_comparing(
     await in_comparing_first_pipette_point_one(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointOne
+           session.CalibrationCheckState.comparingFirstPipettePointOne
 
 
 async def test_right_comparing_first_pipette_point_one_to_jogging_point_two(
@@ -703,7 +704,7 @@ async def test_right_comparing_first_pipette_point_one_to_jogging_point_two(
     await in_jogging_first_pipette_to_point_two(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointTwo
+           session.CalibrationCheckState.joggingFirstPipetteToPointTwo
 
 
 async def test_right_jogging_first_pipette_point_two_to_comparing(
@@ -711,7 +712,7 @@ async def test_right_jogging_first_pipette_point_two_to_comparing(
     await in_comparing_first_pipette_point_two(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointTwo
+           session.CalibrationCheckState.comparingFirstPipettePointTwo
 
 
 async def test_right_comparing_first_pipette_point_two_to_jogging_point_three(
@@ -719,7 +720,7 @@ async def test_right_comparing_first_pipette_point_two_to_jogging_point_three(
     await in_jogging_first_pipette_to_point_three(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointThree
+           session.CalibrationCheckState.joggingFirstPipetteToPointThree
 
 
 async def test_right_jogging_first_pipette_point_three_to_comparing(
@@ -727,7 +728,7 @@ async def test_right_jogging_first_pipette_point_three_to_comparing(
     await in_comparing_first_pipette_point_three(
             check_calibration_session_only_right)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointThree
+           session.CalibrationCheckState.comparingFirstPipettePointThree
 
 
 async def test_right_jogging_first_pipette_point_three_to_complete(
@@ -737,7 +738,7 @@ async def test_right_jogging_first_pipette_point_three_to_complete(
     await check_calibration_session_only_right.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert check_calibration_session_only_right.current_state.name == \
-        session.CalibrationCheckState.checkComplete
+           session.CalibrationCheckState.checkComplete
 
 
 # END flow testing right only
@@ -749,14 +750,14 @@ async def test_left_load_labware_to_preparing_first_pipette(
         check_calibration_session_only_left):
     await in_preparing_first_pipette(check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.preparingFirstPipette
+           session.CalibrationCheckState.preparingFirstPipette
 
 
 async def test_left_preparing_first_pipette_to_inspecting(
         check_calibration_session_only_left):
     await in_inspecting_first_tip(check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.inspectingFirstTip
+           session.CalibrationCheckState.inspectingFirstTip
 
 
 async def test_left_inspecting_first_pipette_to_jogging_height(
@@ -764,7 +765,7 @@ async def test_left_inspecting_first_pipette_to_jogging_height(
     await in_jogging_first_pipette_to_height(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToHeight
+           session.CalibrationCheckState.joggingFirstPipetteToHeight
 
 
 async def test_left_jogging_first_pipette_height_to_comparing(
@@ -772,7 +773,7 @@ async def test_left_jogging_first_pipette_height_to_comparing(
     await in_comparing_first_pipette_height(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipetteHeight
+           session.CalibrationCheckState.comparingFirstPipetteHeight
 
 
 async def test_left_comparing_first_pipette_height_to_jogging_point_one(
@@ -780,7 +781,7 @@ async def test_left_comparing_first_pipette_height_to_jogging_point_one(
     await in_jogging_first_pipette_to_point_one(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointOne
+           session.CalibrationCheckState.joggingFirstPipetteToPointOne
 
 
 async def test_left_jogging_first_pipette_point_one_to_comparing(
@@ -788,7 +789,7 @@ async def test_left_jogging_first_pipette_point_one_to_comparing(
     await in_comparing_first_pipette_point_one(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointOne
+           session.CalibrationCheckState.comparingFirstPipettePointOne
 
 
 async def test_left_comparing_first_pipette_point_one_to_jogging_point_two(
@@ -796,7 +797,7 @@ async def test_left_comparing_first_pipette_point_one_to_jogging_point_two(
     await in_jogging_first_pipette_to_point_two(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointTwo
+           session.CalibrationCheckState.joggingFirstPipetteToPointTwo
 
 
 async def test_left_jogging_first_pipette_point_two_to_comparing(
@@ -804,7 +805,7 @@ async def test_left_jogging_first_pipette_point_two_to_comparing(
     await in_comparing_first_pipette_point_two(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointTwo
+           session.CalibrationCheckState.comparingFirstPipettePointTwo
 
 
 async def test_left_comparing_first_pipette_point_two_to_jogging_point_three(
@@ -812,7 +813,7 @@ async def test_left_comparing_first_pipette_point_two_to_jogging_point_three(
     await in_jogging_first_pipette_to_point_three(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.joggingFirstPipetteToPointThree
+           session.CalibrationCheckState.joggingFirstPipetteToPointThree
 
 
 async def test_left_jogging_first_pipette_point_three_to_comparing(
@@ -820,7 +821,7 @@ async def test_left_jogging_first_pipette_point_three_to_comparing(
     await in_comparing_first_pipette_point_three(
             check_calibration_session_only_left)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.comparingFirstPipettePointThree
+           session.CalibrationCheckState.comparingFirstPipettePointThree
 
 
 async def test_left_jogging_first_pipette_point_three_to_complete(
@@ -830,7 +831,7 @@ async def test_left_jogging_first_pipette_point_three_to_complete(
     await check_calibration_session_only_left.trigger_transition(
             session.CalibrationCheckTrigger.go_to_next_check)
     assert check_calibration_session_only_left.current_state.name == \
-        session.CalibrationCheckState.checkComplete
+           session.CalibrationCheckState.checkComplete
 
 
 # END flow testing left only
