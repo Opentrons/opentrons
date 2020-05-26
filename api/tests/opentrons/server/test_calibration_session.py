@@ -183,7 +183,7 @@ def machine(loop):
        {"trigger": "become_exhausted", "from_state": "ThinkingAboutCats",
         "to_state": "Sleeping"},
        {"trigger": "become_exhausted", "from_state": "BrowsingCatPictures",
-        "to_state": "Sleeping", "before": "close_reddit_tab",
+        "to_state": "Sleeping", "before": ["close_reddit_tab", "lay_in_bed"],
         "after": "reach_rem"},
        {"trigger": "start_dreaming", "from_state": "*",
         "to_state": "Dreaming"},
@@ -198,11 +198,15 @@ def machine(loop):
                              transitions=transitions,
                              initial_state="Working")
             self.reached_rem = False
+            self.in_bed = False
             self.code_written = ''
             self.tabs_open = {'github'}
 
         async def reach_rem(self):
             self.reached_rem = True
+
+        async def lay_in_bed(self):
+            self.in_bed = True
 
         async def update_written_code(self, code: str):
             self.code_written = code
@@ -239,10 +243,14 @@ async def test_state_machine(machine):
     assert machine.current_state.name == 'BrowsingCatPictures'
     assert 'reddit' in machine.tabs_open
     assert not machine.reached_rem
+    assert not machine.in_bed
+    # check that you can have mulitple actions in the before/after
+    # callbacks.
     await machine.trigger_transition("become_exhausted")
     assert machine.current_state.name == 'Sleeping'
     assert 'reddit' not in machine.tabs_open
     assert machine.reached_rem
+    assert machine.in_bed
 
     # wild card from_state transitions
     await machine.trigger_transition("start_dreaming")
