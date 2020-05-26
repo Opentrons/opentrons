@@ -1,4 +1,4 @@
-# Opentrons App Changes from 3.17.1 to 3.18.0
+# Opentrons App Changes from 3.17.1 to 3.18.1
 
 For more details about this release, please see the full [technical change
 log][changelog]
@@ -7,7 +7,8 @@ log][changelog]
 
 ## Bugfixes
 
-- Regular maintenance
+- (3.18.1) Replaced a localization-free link to Realtek's website with the English-language link to work around redirect issues with Realtek's website
+- (3.18.1) Made Realtek driver version checking more lenient to resolve false alerts after Realtek released a new driver version with a lower version number than the previous release
 
 ## New Features
 
