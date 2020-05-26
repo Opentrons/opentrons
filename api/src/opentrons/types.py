@@ -37,6 +37,16 @@ class Point(NamedTuple):
             return NotImplemented
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
+    def __mul__(self, other: Any) -> 'Point':
+        if not (isinstance(other, float) or isinstance(other, int)):
+            return NotImplemented
+        return Point(self.x*other, self.y*other, self.z*other)
+
+    def __rmul__(self, other: Any) -> 'Point':
+        if not (isinstance(other, float) or isinstance(other, int)):
+            return NotImplemented
+        return Point(self.x*other, self.y*other, self.z*other)
+
     def __abs__(self) -> 'Point':
         return Point(abs(self.x), abs(self.y), abs(self.z))
 
