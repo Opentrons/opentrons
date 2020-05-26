@@ -1,7 +1,8 @@
 from aiohttp import web
 
 from opentrons import types
-from opentrons.calibration.check.session import CheckCalibrationSession, CalibrationCheckTrigger
+from opentrons.calibration.check.session import CheckCalibrationSession,\
+    CalibrationCheckTrigger
 from opentrons.calibration.check.models import JogPosition
 
 

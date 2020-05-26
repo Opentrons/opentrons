@@ -7,7 +7,7 @@ from pydantic.main import BaseModel
 from opentrons.calibration.check.session import CheckCalibrationSession, \
     CalibrationCheckState, CalibrationCheckTrigger
 from opentrons.calibration.check.models import SessionType, JogPosition
-from opentrons.calibration.check.helper_classes import PipetteInfo, PipetteRank
+from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank
 from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager

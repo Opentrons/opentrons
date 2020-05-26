@@ -2,10 +2,12 @@ import typing
 import logging
 from aiohttp import web
 from aiohttp.web_urldispatcher import UrlDispatcher
-from opentrons.calibration.check.session import CheckCalibrationSession, CalibrationCheckTrigger, \
-    CalibrationException
-from opentrons.calibration.check.models import CalibrationSessionStatus, LabwareStatus, AttachedPipette
-from opentrons.calibration.check.constants import ALLOWED_SESSIONS
+from opentrons.calibration.check.session import CheckCalibrationSession, \
+    CalibrationCheckTrigger
+from opentrons.calibration.session import CalibrationException
+from opentrons.calibration.check.models import CalibrationSessionStatus,\
+    LabwareStatus, AttachedPipette
+from opentrons.calibration.constants import ALLOWED_SESSIONS
 from opentrons.calibration.util import StateMachineError
 
 MODULE_LOG = logging.getLogger(__name__)

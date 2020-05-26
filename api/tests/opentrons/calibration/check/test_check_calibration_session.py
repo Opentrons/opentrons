@@ -1,5 +1,6 @@
 import asyncio
 
+import opentrons.calibration.session
 import pytest
 from opentrons import types
 
@@ -306,7 +307,7 @@ async def test_session_started_to_bad_state(check_calibration_session):
 
 
 async def test_session_no_pipettes_error(hardware):
-    with pytest.raises(session.NoPipetteException):
+    with pytest.raises(opentrons.calibration.session.NoPipetteException):
         await session.CheckCalibrationSession.build(hardware)
 
 
