@@ -433,6 +433,40 @@ describe('api client', () => {
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
+    it('handles sessionResponses without door state and blocked info', () => {
+      session.blocked = null
+      session.door_state = null
+      const expected = actions.sessionResponse(
+        null,
+        {
+          name: session.name,
+          state: session.state,
+          statusInfo: {
+            message: null,
+            userMessage: null,
+            changedAt: null,
+            estimatedDuration: null,
+          },
+          doorState: '',
+          blocked: false,
+          protocolText: session.protocol_text,
+          protocolCommands: [],
+          protocolCommandsById: {},
+          pipettesByMount: {},
+          labwareBySlot: {},
+          modulesBySlot: {},
+          apiLevel: [1, 0],
+        },
+        false
+      )
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
     it('handles connnect without session', () => {
       const notExpected = actions.sessionResponse(
         null,
@@ -744,7 +778,7 @@ describe('api client', () => {
         startTime: 1,
         lastCommand: null,
         stateInfo: {},
-        doorState: 'closed',
+        door_state: 'open',
         blocked: false,
       }
 
@@ -752,19 +786,22 @@ describe('api client', () => {
         state: 'running',
         startTime: 1,
         lastCommand: null,
-        blocked: false,
-        doorState: 'closed',
         statusInfo: {
           message: null,
           userMessage: null,
           changedAt: null,
           estimatedDuration: null,
         },
+        doorState: 'open',
+        blocked: false,
       }
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
-        .then(() => sendNotification('session', update))
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -772,15 +809,13 @@ describe('api client', () => {
       const update = {
         state: 'running',
         startTime: 2,
-        doorState: 'closed',
-        blocked: 'false',
         lastCommand: null,
       }
 
       const actionInput = {
         ...update,
-        doorState: 'closed',
-        blocked: 'fasle',
+        doorState: '',
+        blocked: false,
         statusInfo: {
           message: null,
           userMessage: null,
@@ -791,7 +826,10 @@ describe('api client', () => {
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
-        .then(() => sendNotification('session', update))
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
 
@@ -801,7 +839,7 @@ describe('api client', () => {
         startTime: 2,
         lastCommand: null,
         blocked: false,
-        doorState: 'open',
+        door_state: 'closed',
         stateInfo: {
           message: 'hi and hello football fans',
           userMessage: 'whos ready for some FOOTBALL',
@@ -813,8 +851,8 @@ describe('api client', () => {
         state: 'running',
         startTime: 2,
         lastCommand: null,
-        blocked: 'false',
-        doorState: 'open',
+        blocked: false,
+        doorState: 'closed',
         statusInfo: {
           message: 'hi and hello football fans',
           userMessage: 'whos ready for some FOOTBALL',
@@ -825,7 +863,10 @@ describe('api client', () => {
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
 
       return sendConnect()
-        .then(() => sendNotification('session', update))
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
         .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
     })
   })
