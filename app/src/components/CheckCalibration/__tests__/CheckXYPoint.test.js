@@ -4,6 +4,11 @@ import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import type { Mount } from '@opentrons/components'
 
+import {
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../../calibration'
 import { CheckXYPoint } from '../CheckXYPoint'
 
 describe('CheckXYPoint', () => {
@@ -33,6 +38,7 @@ describe('CheckXYPoint', () => {
           differenceVector: [0, 0, 0],
           thresholdVector: [1, 1, 1],
           exceedsThreshold: false,
+          transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
         nextButtonText = 'continue',
       } = props
@@ -150,12 +156,39 @@ describe('CheckXYPoint', () => {
     expect(mockComparePoint).toHaveBeenCalled()
   })
 
-  it('confirms check step when isInspecting and primary button is clicked', () => {
-    const wrapper = render({ isInspecting: true })
+  it('confirms check step when isInspecting and primary button is clicked, and not instr offset', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_DECK,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
 
     act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockGoToNextCheck).toHaveBeenCalled()
+    expect(
+      wrapper.exists(
+        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
+      )
+    ).toBe(false)
+  })
+
+  it('renders instr offset blurb when exceeds threshold and transform type is instr offset', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(
+      wrapper.exists(
+        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
+      )
+    ).toBe(true)
   })
 })

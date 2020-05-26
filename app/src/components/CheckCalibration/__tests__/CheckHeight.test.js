@@ -3,6 +3,11 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
+import {
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../../calibration'
 import { CheckHeight } from '../CheckHeight'
 
 describe('CheckHeight', () => {
@@ -36,6 +41,7 @@ describe('CheckHeight', () => {
           differenceVector: [0, 0, 0],
           thresholdVector: [1, 1, 1],
           exceedsThreshold: false,
+          transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
       } = props
       return mount(
@@ -127,18 +133,40 @@ describe('CheckHeight', () => {
     expect(getExitButton(wrapper).exists()).toBe(false)
   })
 
-  it('exits when isInspecting and exit button is clicked', () => {
+  it('exits when isInspecting and exit button is clicked, and not instr offset', () => {
     const wrapper = render({
       isInspecting: true,
       comparison: {
         differenceVector: [0, 0, 0],
         thresholdVector: [1, 1, 1],
         exceedsThreshold: true,
+        transformType: CHECK_TRANSFORM_TYPE_DECK,
       },
     })
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
 
     expect(mockExit).toHaveBeenCalled()
+    expect(
+      wrapper.exists(
+        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
+      )
+    ).toBe(false)
+  })
+
+  it('renders instr offset blurb when exceeds threshold and transform type is instr offset', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(
+      wrapper.exists(
+        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
+      )
+    ).toBe(true)
   })
 })
