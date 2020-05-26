@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
+import { Icon, PrimaryButton, Link, type Mount } from '@opentrons/components'
 
-import { type RobotCalibrationCheckComparison } from '../../calibration'
+import {
+  type RobotCalibrationCheckComparison,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+} from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
@@ -73,6 +76,14 @@ const BAD_INSPECTING_BODY =
 const GOOD_INSPECTING_BODY =
   'The jogged and calibrated x and y-axis co-ordinates fall within acceptable bounds.'
 const DIFFERENCE = 'Difference'
+const INSTR_OFFSET_BLURB =
+  'To resolve this, you will need to perform a pipette mount offset calibration. Read'
+const THIS_ARTICLE = 'this article'
+const TO_LEARN = 'to learn more'
+
+// TODO: BC: Immediately confirm actual link
+const INSTR_OFFSET_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2'
 
 type CheckXYPointProps = {|
   slotNumber: string | null,
@@ -209,6 +220,18 @@ function CompareXY(props: CompareXYProps) {
           </div>
         </div>
       </div>
+      {exceedsThreshold &&
+        comparison.transformType === CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET && (
+          <p className={styles.difference_body}>
+            {INSTR_OFFSET_BLURB}
+            &nbsp;
+            <Link href={INSTR_OFFSET_ARTICLE_URL} external>
+              {THIS_ARTICLE}
+            </Link>
+            &nbsp;
+            {TO_LEARN}
+          </p>
+        )}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
