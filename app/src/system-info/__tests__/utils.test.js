@@ -76,42 +76,26 @@ describe('system info utilities', () => {
       expect(getDriverStatus(device)).toBe('OUTDATED')
     })
 
-    it('should show OUTDATED for patch version difference', () => {
+    it('should not show OUTDATED for patch version difference', () => {
       const device = {
         ...mockRealtekDevice,
         windowsDriverVersion: '10.38.116.2020',
       }
-      expect(getDriverStatus(device)).toBe('OUTDATED')
+      expect(getDriverStatus(device)).toBe('UP_TO_DATE')
     })
 
-    it('should show OUTDATED for build version difference', () => {
+    it('should not show OUTDATED for build version difference', () => {
       const device = {
         ...mockRealtekDevice,
         windowsDriverVersion: '10.38.117.2019',
       }
-      expect(getDriverStatus(device)).toBe('OUTDATED')
+      expect(getDriverStatus(device)).toBe('UP_TO_DATE')
     })
 
     it('should show UP_TO_DATE for good version', () => {
       const device = {
         ...mockRealtekDevice,
         windowsDriverVersion: '10.38.117.2020',
-      }
-      expect(getDriverStatus(device)).toBe('UP_TO_DATE')
-    })
-
-    it('should show UP_TO_DATE for greater build version', () => {
-      const device = {
-        ...mockRealtekDevice,
-        windowsDriverVersion: '10.38.117.2021',
-      }
-      expect(getDriverStatus(device)).toBe('UP_TO_DATE')
-    })
-
-    it('should show UP_TO_DATE for greater patch version', () => {
-      const device = {
-        ...mockRealtekDevice,
-        windowsDriverVersion: '10.38.118.0',
       }
       expect(getDriverStatus(device)).toBe('UP_TO_DATE')
     })
