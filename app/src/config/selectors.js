@@ -2,7 +2,6 @@
 import type { DropdownOption } from '@opentrons/components'
 import type { State } from '../types'
 import type { Config, FeatureFlags, UpdateChannel } from './types'
-
 export const getConfig = (state: State): Config => state.config
 
 export const getFeatureFlags = (state: State): FeatureFlags =>
