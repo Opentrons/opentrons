@@ -18,7 +18,7 @@ describe('useConditionalConfirm', () => {
       cancelConfirm,
     } = useConditionalConfirm(options.handleContinue, options.needConfirmation))
 
-    return <span>mock useConditionalConfirm </span>
+    return <span> test wrapper using useConditionalConfirm </span>
   }
 
   afterEach(() => {
