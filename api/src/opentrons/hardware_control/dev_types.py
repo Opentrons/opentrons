@@ -1,5 +1,4 @@
 import asyncio
-import enum
 from typing import List, Union
 from .modules import ModuleAtPort
 from .types import DoorState, HardwareEventType
