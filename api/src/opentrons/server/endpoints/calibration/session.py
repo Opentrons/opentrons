@@ -756,14 +756,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
-    def _determine_threshold(self):
+    def _determine_threshold(self, state: CalibrationCheckState) -> Point:
+        """
+        Helper function used to determine the threshold for comparison
+        based on the state currently being compared and the pipette.
+        """
         first_pipette = [
-            CalibrationCheckState.joggingFirstPipetteToHeight,
-            CalibrationCheckState.joggingFirstPipetteToPointOne,
-            CalibrationCheckState.joggingFirstPipetteToPointTwo,
-            CalibrationCheckState.joggingFirstPipetteToPointThree,
+            CalibrationCheckState.comparingFirstPipetteHeight,
+            CalibrationCheckState.comparingFirstPipettePointOne,
+            CalibrationCheckState.comparingFirstPipettePointTwo,
+            CalibrationCheckState.comparingFirstPipettePointThree,
         ]
-        if self.current_state_name in first_pipette:
+        if state in first_pipette:
             pip = self._get_pipette_by_rank(PipetteRank.first)
         else:
             pip = self._get_pipette_by_rank(PipetteRank.second)
@@ -773,19 +777,19 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             pipette_type = str(self.pipettes[pip.mount]['model'])
         is_p1000 = pipette_type.startswith('p1000')
         height_states = [
-            CalibrationCheckState.joggingFirstPipetteToHeight,
-            CalibrationCheckState.joggingSecondPipetteToHeight]
+            CalibrationCheckState.comparingFirstPipetteHeight,
+            CalibrationCheckState.comparingSecondPipetteHeight]
         cross_states = [
-            CalibrationCheckState.joggingFirstPipetteToPointOne,
-            CalibrationCheckState.joggingFirstPipetteToPointTwo,
-            CalibrationCheckState.joggingFirstPipetteToPointThree,
-            CalibrationCheckState.joggingSecondPipetteToPointOne
+            CalibrationCheckState.comparingFirstPipettePointOne,
+            CalibrationCheckState.comparingFirstPipettePointTwo,
+            CalibrationCheckState.comparingFirstPipettePointThree,
+            CalibrationCheckState.comparingSecondPipettePointOne
         ]
-        if is_p1000 and self.current_state_name in cross_states:
+        if is_p1000 and state in cross_states:
             return Point(2.7, 2.7, 0.0)
-        elif is_p1000 and self.current_state_name in height_states:
+        elif is_p1000 and state in height_states:
             return Point(0.0, 0.0, 1)
-        elif self.current_state_name in cross_states:
+        elif state in cross_states:
             return Point(1.79, 1.64, 0.0)
         else:
             return Point(0.0, 0.0, 0.8)
@@ -801,7 +805,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
 
-            threshold_vector = self._determine_threshold()
+            threshold_vector = self._determine_threshold(jogged_state)
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
                 if threshold_vector.z == 0.0:
