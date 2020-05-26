@@ -705,7 +705,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
-    def _determine_threshold(self, state: CalibrationCheckState):
+    def _determine_threshold(self, state: CalibrationCheckState) -> Point:
+        """
+        Helper function used to determine the threshold for comparison
+        based on the state currently being compared and the pipette.
+        """
         first_pipette = [
             CalibrationCheckState.comparingFirstPipetteHeight,
             CalibrationCheckState.comparingFirstPipettePointOne,
