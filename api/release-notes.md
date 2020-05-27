@@ -1,4 +1,4 @@
-# Robot OS Changes from 3.17.1 to 3.18.0
+# Robot OS Changes from 3.17.1 to 3.18.1
 
 For more details about this release, please see the full [technical change
 log][changelog]
