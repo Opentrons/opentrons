@@ -86,12 +86,10 @@ export const ConnectedStepItem = (props: Props) => {
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
   // step selection is gated when showConfirmation is true
-  const {
-    conditionalContinue,
-    showConfirmation,
-    confirmAndContinue,
-    cancelConfirm,
-  } = useConditionalConfirm(selectStep, currentFormIsPresaved)
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    selectStep,
+    currentFormIsPresaved
+  )
 
   const stepItemProps = {
     description: step.stepDetails,
@@ -109,7 +107,7 @@ export const ConnectedStepItem = (props: Props) => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    selectStep: conditionalContinue,
+    selectStep: confirm,
     toggleStepCollapsed,
     unhighlightStep,
   }
@@ -131,8 +129,8 @@ export const ConnectedStepItem = (props: Props) => {
     <>
       {showConfirmation && (
         <ConfirmDeleteStepModal
-          onContinueClick={confirmAndContinue}
-          onCancelClick={cancelConfirm}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>

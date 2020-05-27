@@ -8,35 +8,32 @@ import { useState } from 'react'
 //
 // const ExampleDangerForm = props => {
 //   const {
-//     conditionalContinue,
+//     confirm,
 //     showConfirmation,
-//     confirmAndContinue,
-//     cancelConfirm,
+//     cancel,
 //   } = useConditionalConfirm(props.goAhead, props.dangerIsPresent)
 
 //   return (
 //     <>
 //       {showConfirmation && (
 //         <AreYouSureModal
-//           handleCancel={cancelConfirm}
-//           handleContinue={confirmAndContinue}
+//           handleCancel={cancel}
+//           handleContinue={confirm}
 //         />
 //       )}
 //       <DangerFormFields />
-//       <DangerousSubmit onClick={conditionalContinue} />
+//       <DangerousSubmit onClick={confirm} />
 //     </>
 //   )
 // }
 
 export type ConditionalConfirmOutput = {|
-  /** should be called when the user attempts the action (eg clicks "DELETE" button) */
-  conditionalContinue: () => mixed,
+  /** should be called when the user attempts the action (eg clicks "DELETE" button) as well as passed into the confirm UI's continue button (eg "CONFIRM" button of modal) */
+  confirm: () => mixed,
   /** should control the rendering of the confirm UI (eg a modal) */
   showConfirmation: boolean,
-  /** should be passed into the confirm UI's continue button (eg "CONFIRM" button of modal) */
-  confirmAndContinue: () => mixed,
   /** should be passed into the confirm UI's cancel button */
-  cancelConfirm: () => mixed,
+  cancel: () => mixed,
 |}
 
 export const useConditionalConfirm = (
@@ -47,22 +44,19 @@ export const useConditionalConfirm = (
 ): ConditionalConfirmOutput => {
   const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
 
-  const conditionalContinue = () => {
-    if (shouldBlock) {
+  const confirm = () => {
+    if (shouldBlock && !showConfirmation) {
       setShowConfirmation(true)
     } else {
+      setShowConfirmation(false)
       handleContinue()
     }
   }
 
   return {
-    conditionalContinue,
+    confirm,
     showConfirmation,
-    confirmAndContinue: () => {
-      handleContinue()
-      setShowConfirmation(false)
-    },
-    cancelConfirm: () => {
+    cancel: () => {
       setShowConfirmation(false)
     },
   }

@@ -35,19 +35,17 @@ export const TerminalItem = (props: Props) => {
   const onMouseEnter = () => dispatch(stepsActions.hoverOnTerminalItem(id))
   const onMouseLeave = () => dispatch(stepsActions.hoverOnTerminalItem(null))
 
-  const {
-    conditionalContinue,
-    showConfirmation,
-    confirmAndContinue,
-    cancelConfirm,
-  } = useConditionalConfirm(selectItem, currentFormIsPresaved)
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    selectItem,
+    currentFormIsPresaved
+  )
 
   return (
     <>
       {showConfirmation && (
         <ConfirmDeleteStepModal
-          onContinueClick={confirmAndContinue}
-          onCancelClick={cancelConfirm}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
         />
       )}
       <PDTitledList
@@ -56,7 +54,7 @@ export const TerminalItem = (props: Props) => {
           selected,
           title,
           children,
-          onClick: conditionalContinue,
+          onClick: confirm,
           onMouseEnter,
           onMouseLeave,
         }}

@@ -5,18 +5,15 @@ import { mount } from 'enzyme'
 import { useConditionalConfirm } from '../useConditionalConfirm'
 
 describe('useConditionalConfirm', () => {
-  let conditionalContinue: () => mixed
+  let confirm: () => mixed
   let showConfirmation: boolean
-  let confirmAndContinue: () => mixed
-  let cancelConfirm: () => mixed
+  let cancel: () => mixed
 
   const TestUseConditionalConfirm = options => {
-    ;({
-      conditionalContinue,
-      showConfirmation,
-      confirmAndContinue,
-      cancelConfirm,
-    } = useConditionalConfirm(options.handleContinue, options.needConfirmation))
+    ;({ confirm, showConfirmation, cancel } = useConditionalConfirm(
+      options.handleContinue,
+      options.shouldBlock
+    ))
 
     return <span> test wrapper using useConditionalConfirm </span>
   }
@@ -28,132 +25,146 @@ describe('useConditionalConfirm', () => {
   it('should initially set showConfirmation to false', () => {
     const props = {
       handleContinue: jest.fn(),
-      needConfirmation: true,
+      shouldBlock: true,
     }
     mount(<TestUseConditionalConfirm {...props} />)
 
     expect(showConfirmation).toBe(false)
   })
 
-  it('should call handleContinue when calling confirmAndContinue', () => {
+  it('should NOT call handleContinue when calling cancel', () => {
     const props = {
       handleContinue: jest.fn(),
-      needConfirmation: true,
+      shouldBlock: true,
     }
 
     mount(<TestUseConditionalConfirm {...props} />)
 
     act(() => {
-      confirmAndContinue()
-    })
-
-    expect(props.handleContinue).toHaveBeenCalled()
-  })
-
-  it('should set showConfirmation to false when calling confirmAndContinue', () => {
-    const props = {
-      handleContinue: jest.fn(),
-      needConfirmation: true,
-    }
-
-    mount(<TestUseConditionalConfirm {...props} />)
-
-    act(() => {
-      confirmAndContinue()
-    })
-
-    expect(showConfirmation).toBe(false)
-  })
-
-  it('should NOT call handleContinue when calling cancelConfirm', () => {
-    const props = {
-      handleContinue: jest.fn(),
-      needConfirmation: true,
-    }
-
-    mount(<TestUseConditionalConfirm {...props} />)
-
-    act(() => {
-      cancelConfirm()
+      cancel()
     })
 
     expect(props.handleContinue).not.toHaveBeenCalled()
   })
 
-  it('should set showConfirmation to false when calling cancelConfirm', () => {
+  it('should set showConfirmation to false when calling cancel', () => {
     const props = {
       handleContinue: jest.fn(),
-      needConfirmation: true,
+      shouldBlock: true,
     }
 
     mount(<TestUseConditionalConfirm {...props} />)
 
     act(() => {
-      cancelConfirm()
+      cancel()
     })
 
     expect(showConfirmation).toBe(false)
   })
 
-  describe('when it needs confirmation', () => {
-    it('should set showConfirmation to true after calling conditionalContinue', () => {
-      const props = {
-        handleContinue: jest.fn(),
-        needConfirmation: true,
-      }
+  describe('when it should block the user', () => {
+    describe('and the user has NOT yet confirmed', () => {
+      it('should set showConfirmation to true after calling confirm', () => {
+        const props = {
+          handleContinue: jest.fn(),
+          shouldBlock: true,
+        }
 
-      mount(<TestUseConditionalConfirm {...props} />)
+        mount(<TestUseConditionalConfirm {...props} />)
 
-      expect(showConfirmation).toBe(false)
+        expect(showConfirmation).toBe(false)
 
-      act(() => {
-        conditionalContinue()
+        act(() => {
+          confirm()
+        })
+
+        expect(showConfirmation).toBe(true)
       })
 
-      expect(showConfirmation).toBe(true)
+      it('should NOT call handleContinue after calling confirm ', () => {
+        const props = {
+          handleContinue: jest.fn(),
+          shouldBlock: true,
+        }
+
+        mount(<TestUseConditionalConfirm {...props} />)
+
+        act(() => {
+          confirm()
+        })
+
+        expect(props.handleContinue).not.toHaveBeenCalled()
+      })
     })
 
-    it('should NOT call handleContinue after calling conditionalContinue ', () => {
-      const props = {
-        handleContinue: jest.fn(),
-        needConfirmation: true,
-      }
+    describe('and the user has confirmed', () => {
+      it('should call handleContinue after calling confirm', () => {
+        const props = {
+          handleContinue: jest.fn(),
+          shouldBlock: true,
+        }
 
-      mount(<TestUseConditionalConfirm {...props} />)
+        mount(<TestUseConditionalConfirm {...props} />)
 
-      act(() => {
-        conditionalContinue()
+        expect(showConfirmation).toBe(false)
+
+        act(() => {
+          confirm() // initial confirmation
+        })
+
+        act(() => {
+          confirm() // we've already confirmed, go ahead!
+        })
+
+        expect(props.handleContinue).toHaveBeenCalled()
       })
 
-      expect(props.handleContinue).not.toHaveBeenCalled()
+      it('should set showConfirmation to false after calling confirm', () => {
+        const props = {
+          handleContinue: jest.fn(),
+          shouldBlock: true,
+        }
+
+        mount(<TestUseConditionalConfirm {...props} />)
+
+        act(() => {
+          confirm() // initial confirmation
+        })
+
+        act(() => {
+          confirm() // we've already confirmed, go ahead!
+        })
+
+        expect(showConfirmation).toBe(false)
+      })
     })
   })
-  describe('when it does NOT need confirmation', () => {
-    it('should call handleContinue after calling conditionalContinue', () => {
+  describe('when it should NOT block the user', () => {
+    it('should call handleContinue after calling confirm', () => {
       const props = {
         handleContinue: jest.fn(),
-        needConfirmation: false,
+        shouldBlock: false,
       }
 
       mount(<TestUseConditionalConfirm {...props} />)
 
       act(() => {
-        conditionalContinue()
+        confirm()
       })
 
       expect(props.handleContinue).toHaveBeenCalled()
     })
 
-    it('should NOT set showConfirmation to true after calling conditionalContinue ', () => {
+    it('should NOT set showConfirmation to true after calling confirm ', () => {
       const props = {
         handleContinue: jest.fn(),
-        needConfirmation: false,
+        shouldBlock: false,
       }
 
       mount(<TestUseConditionalConfirm {...props} />)
 
       act(() => {
-        conditionalContinue()
+        confirm()
       })
 
       expect(showConfirmation).toBe(false)

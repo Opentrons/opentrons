@@ -192,23 +192,20 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const saveStepForm = () => dispatch(stepsActions.saveStepForm())
 
   const {
-    conditionalContinue: conditionalDelete,
+    confirm: confirmDelete,
     showConfirmation: showConfirmDeleteModal,
-    confirmAndContinue: confirmDelete,
-    cancelConfirm: cancelConfirmDelete,
+    cancel: cancelDelete,
   } = useConditionalConfirm(handleDelete, true)
 
   const {
-    conditionalContinue: conditionalClose,
+    confirm: confirmClose,
     showConfirmation: showConfirmCancelModal,
-    confirmAndContinue: confirmClose,
-    cancelConfirm: cancelConfirmClose,
+    cancel: cancelClose,
   } = useConditionalConfirm(handleClose, isNewStep)
 
   const {
-    conditionalContinue: conditionalAddPauseUntilTempStep,
+    confirm: confirmAddPauseUntilTempStep,
     showConfirmation: showAddPauseUntilTempStepModal,
-    confirmAndContinue: confirmAddPauseUntilTempStep,
   } = useConditionalConfirm(
     saveSetTempFormWithAddedPauseUntilTemp,
     isPristineSetTempForm
@@ -223,14 +220,14 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     <>
       {showConfirmDeleteModal && (
         <ConfirmDeleteStepModal
-          onCancelClick={cancelConfirmDelete}
+          onCancelClick={cancelDelete}
           onContinueClick={confirmDelete}
         />
       )}
       {showConfirmCancelModal && (
         <ConfirmDeleteStepModal
           close
-          onCancelClick={cancelConfirmClose}
+          onCancelClick={cancelClose}
           onContinueClick={confirmClose}
         />
       )}
@@ -246,10 +243,10 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
           canSave,
           formData,
           dirtyFields,
-          handleClose: conditionalClose,
-          handleDelete: conditionalDelete,
+          handleClose: confirmClose,
+          handleDelete: confirmDelete,
           handleSave: isPristineSetTempForm
-            ? conditionalAddPauseUntilTempStep
+            ? confirmAddPauseUntilTempStep
             : saveStepForm,
           focusedField,
           onFieldBlur,
