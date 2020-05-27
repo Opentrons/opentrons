@@ -13,13 +13,14 @@ Example of calling this script:
 
 import time
 import logging
-from typing import Dict, List
+from typing import Dict, List, TYPE_CHECKING
 
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
-    SmoothieError, DEFAULT_AXES_SPEED, SmoothieDriver_3_0_0
-from opentrons.drivers.rpi_drivers import gpio
-
+    SmoothieError, DEFAULT_AXES_SPEED
 from . import args_handler
+if TYPE_CHECKING:
+    from opentrons.drivers.smoothie_drivers.driver_3_0 import \
+        SmoothieDriver_3_0_0
 
 
 test_time_minutes = 24 * 60
@@ -62,7 +63,7 @@ def attempt_movement(driver, logger, coords_list):
         try:
             driver.move(c)
         except SmoothieError:
-            button_red()
+            driver.turn_on_red_button_light()
             logger.exception('Failed movement: {}'.format(c))
             driver._reset_from_error()
             try:
@@ -73,7 +74,8 @@ def attempt_movement(driver, logger, coords_list):
             attempt_homing(driver, logger)
 
 
-def attempt_homing(driver: SmoothieDriver_3_0_0, logger: logging.Logger):
+def attempt_homing(
+        driver: 'SmoothieDriver_3_0_0', logger: logging.Logger):
     global attempts_to_home
     logger.info('Resetting Smoothieware...')
     driver._smoothie_reset()
@@ -81,7 +83,7 @@ def attempt_homing(driver: SmoothieDriver_3_0_0, logger: logging.Logger):
     try:
         driver.home('XYZA')
     except SmoothieError:
-        button_red()
+        driver.turn_on_red_button_light()
         attempts_to_home += 1
         logger.exception('Failed homing')
         if attempts_to_home < too_many_attempts_to_home:
@@ -97,7 +99,7 @@ def attempt_homing(driver: SmoothieDriver_3_0_0, logger: logging.Logger):
 
 
 def run_time_trial(
-        driver: SmoothieDriver_3_0_0, logger: logging.Logger,
+        driver: 'SmoothieDriver_3_0_0', logger: logging.Logger,
         COORDS_HOURGLASS: List[Dict[str, float]],
         COORDS_BOWTIE: List[Dict[str, float]],
         COORDS_Z_STAGE: List[Dict[str, float]]):
@@ -112,27 +114,16 @@ def run_time_trial(
         logger.info('Test is still running :)')
 
 
-def button_green():
-    gpio.set_low(gpio.OUTPUT_PINS['RED_BUTTON'])
-    gpio.set_high(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-    gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
-
-
-def button_red():
-    gpio.set_high(gpio.OUTPUT_PINS['RED_BUTTON'])
-    gpio.set_low(gpio.OUTPUT_PINS['GREEN_BUTTON'])
-    gpio.set_low(gpio.OUTPUT_PINS['BLUE_BUTTON'])
-
-
 def test_all_axes(
-        driver: SmoothieDriver_3_0_0, logger: logging.Logger,
+        driver: 'SmoothieDriver_3_0_0', logger: logging.Logger,
         COORDS_MAX: Dict[str, float]):
     driver.move(COORDS_MAX)
     for ax in ['Z', 'A', 'X', 'Y']:
         test_axis(driver, logger, ax)
 
 
-def test_axis(driver: SmoothieDriver_3_0_0, logger: logging.Logger, axis: str):
+def test_axis(
+        driver: 'SmoothieDriver_3_0_0', logger: logging.Logger, axis: str):
     retract_amounts = {
         'X': 3,
         'Y': 3,
@@ -155,22 +146,22 @@ def test_axis(driver: SmoothieDriver_3_0_0, logger: logging.Logger, axis: str):
     try:
         driver.move({axis: points[0]})
     except SmoothieError:
-        button_red()
+        driver.turn_on_red_button_light()
         logger.error('Test Failed: Pressing {} too soon'.format(axis))
     if axis == 'Y':
         if driver.switch_state[axis] is not False:
-            button_red()
+            driver.turn_on_red_button_light()
             logger.error('Test Failed: Pressing {} too soon'.format(axis))
         else:
             driver.move({axis: points[1]})
             if driver.switch_state[axis] is not True:
-                button_red()
+                driver.turn_on_red_button_light()
                 logger.error(
                     'Test Failed: Not hitting {} switch'.format(axis))
     else:
         try:
             driver.move({axis: points[1]})
-            button_red()
+            driver.turn_on_red_button_light()
             logger.error('Test Failed: Not hitting {} switch'.format(axis))
         except SmoothieError:
             pass  # hit the switch on purpose, so it's ok
@@ -227,7 +218,7 @@ if __name__ == '__main__':
         {'Z': COORDS_MAX['Z'], 'A': COORDS_MAX['A']}
     ]
     try:
-        button_green()
+        driver.turn_on_green_button_light()
         attempt_homing(driver, logger)
         test_all_axes(driver, logger, COORDS_MAX)
         run_time_trial(driver, logger,
@@ -235,7 +226,7 @@ if __name__ == '__main__':
                        COORDS_BOWTIE,
                        COORDS_Z_STAGE)
     except Exception:
-        button_red()
+        driver.turn_on_red_button_light()
         logger.exception('Unexpected Error')
         exit()
     finally:

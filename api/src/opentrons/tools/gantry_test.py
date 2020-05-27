@@ -8,18 +8,21 @@ with Max speed. This will result to a good assembly vs a bad assembly process.
 Author: Carlos Fernandez
 """
 import logging
+from typing import TYPE_CHECKING
 
 from opentrons.hardware_control.adapters import SynchronousAdapter
 from opentrons.drivers.smoothie_drivers.driver_3_0 import \
     SmoothieError, DEFAULT_AXES_SPEED
-from opentrons.drivers.smoothie_drivers.driver_3_0\
-    import SmoothieDriver_3_0_0
+
+if TYPE_CHECKING:
+    from opentrons.drivers.smoothie_drivers.driver_3_0\
+        import SmoothieDriver_3_0_0
 
 from . import args_handler
 
 
 def setup_motor_current(hardware: SynchronousAdapter,
-                        driver: SmoothieDriver_3_0_0):
+                        driver: 'SmoothieDriver_3_0_0'):
     # only set the current, keeping all other settings at the driver's default
     driver.set_speed(DEFAULT_AXES_SPEED)
     x_current = hardware.config.high_current['X'] * 0.85
@@ -29,7 +32,7 @@ def setup_motor_current(hardware: SynchronousAdapter,
 
 
 def bowtie_pattern(X_max: float, Y_max: float,
-                   driver: SmoothieDriver_3_0_0):
+                   driver: 'SmoothieDriver_3_0_0'):
     zero = 10
     offset = 5
     driver.move({'X': zero, 'Y': zero + offset})
@@ -39,7 +42,7 @@ def bowtie_pattern(X_max: float, Y_max: float,
 
 
 def hourglass_pattern(X_max: float, Y_max: float,
-                      driver: SmoothieDriver_3_0_0):
+                      driver: 'SmoothieDriver_3_0_0'):
     zero = 10
     offset = 5
     driver.move({'X': zero, 'Y': zero + offset})
@@ -49,7 +52,7 @@ def hourglass_pattern(X_max: float, Y_max: float,
 
 
 def test_axis(axis: str, tolerance: float,
-              driver: SmoothieDriver_3_0_0):
+              driver: 'SmoothieDriver_3_0_0'):
     retract_amounts = {
         'X': 3,
         'Y': 3,
@@ -87,7 +90,7 @@ def test_axis(axis: str, tolerance: float,
 
 def run_x_axis(
         cycles: int, x_max: float, y_max: float, tolerance: float,
-        hardware: SynchronousAdapter, driver: SmoothieDriver_3_0_0):
+        hardware: SynchronousAdapter, driver: 'SmoothieDriver_3_0_0'):
     # Test X Axis
     for cycle in range(cycles):
         print("Testing X")
@@ -100,7 +103,7 @@ def run_x_axis(
 
 
 def run_y_axis(cycles: int, x_max: float, y_max: float, tolerance: float,
-               hardware: SynchronousAdapter, driver: SmoothieDriver_3_0_0):
+               hardware: SynchronousAdapter, driver: 'SmoothieDriver_3_0_0'):
     # Test Y Axis
     for cycle in range(cycles):
         print("Testing Y")
@@ -114,7 +117,7 @@ def run_y_axis(cycles: int, x_max: float, y_max: float, tolerance: float,
             driver.home('Y')  # we tell it to home Y manually
 
 
-def _exit_test(driver: SmoothieDriver_3_0_0):
+def _exit_test(driver: 'SmoothieDriver_3_0_0'):
     driver._smoothie_reset()
     driver._setup()
     driver.disengage_axis('XYZABC')
