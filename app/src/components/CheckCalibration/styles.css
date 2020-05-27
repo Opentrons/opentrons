@@ -82,7 +82,7 @@
 
 .raw_data_table {
   font-size: 0.75rem;
-  width: 100%
+  width: 100%;
 }
 
 .copy_icon {
@@ -91,11 +91,11 @@
   margin-bottom: 2rem;
 }
 
-.passed_row{
+.passed_row {
   color: var(--c-success);
 }
 
-.failed_row{
+.failed_row {
   color: var(--c-error);
 }
 
