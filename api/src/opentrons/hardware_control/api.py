@@ -94,7 +94,10 @@ class API(HardwareAPILike):
             hw_event: 'DoorStateNotification' = {
                 'event': HardwareEventType.DOOR_SWITCH_CHANGE,
                 'new_state': door_state}
-            cb(hw_event)
+            try:
+                cb(hw_event)
+            except Exception:
+                mod_log.exception('Errored during door state event callback')
 
     @classmethod
     async def build_hardware_controller(
