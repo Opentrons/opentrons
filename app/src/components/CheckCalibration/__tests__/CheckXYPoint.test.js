@@ -25,6 +25,16 @@ describe('CheckXYPoint', () => {
   const getJogButton = (wrapper, direction) =>
     wrapper.find(`JogButton[name="${direction}"]`).find('button')
 
+  const getDeckCalArticleLink = wrapper =>
+    wrapper.find(
+      'a[href="https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck"]'
+    )
+
+  const getContactSupport = wrapper =>
+    wrapper.find(
+      'p[children="Please contact Opentrons support for next steps."]'
+    )
+
   const getVideo = wrapper => wrapper.find(`source`)
 
   beforeEach(() => {
@@ -156,7 +166,7 @@ describe('CheckXYPoint', () => {
     expect(mockComparePoint).toHaveBeenCalled()
   })
 
-  it('confirms check step when isInspecting and primary button is clicked, and not instr offset', () => {
+  it('confirms check step when isInspecting and primary button is clicked, and deck transform issue', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -169,14 +179,11 @@ describe('CheckXYPoint', () => {
     wrapper.update()
 
     expect(mockGoToNextCheck).toHaveBeenCalled()
-    expect(
-      wrapper.exists(
-        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
-      )
-    ).toBe(false)
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(true)
+    expect(getContactSupport(wrapper).exists()).toBe(false)
   })
 
-  it('renders instr offset blurb when exceeds threshold and transform type is instr offset', () => {
+  it('does not render deck cal blurb when exceeds threshold and transform type is instr offset', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -185,10 +192,20 @@ describe('CheckXYPoint', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
 
-    expect(
-      wrapper.exists(
-        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
-      )
-    ).toBe(true)
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
+  })
+
+  it('does not render deck cal blurb when exceeds threshold and transform type is unknown', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
   })
 })

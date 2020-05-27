@@ -31,6 +31,16 @@ describe('CheckHeight', () => {
 
   const getVideo = wrapper => wrapper.find(`source`)
 
+  const getDeckCalArticleLink = wrapper =>
+    wrapper.find(
+      'a[href="https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck"]'
+    )
+
+  const getContactSupport = wrapper =>
+    wrapper.find(
+      'p[children="Please contact Opentrons support for next steps."]'
+    )
+
   beforeEach(() => {
     render = (props = {}) => {
       const {
@@ -133,28 +143,24 @@ describe('CheckHeight', () => {
     expect(getExitButton(wrapper).exists()).toBe(false)
   })
 
-  it('exits when isInspecting and exit button is clicked, and not instr offset', () => {
-    const wrapper = render({
-      isInspecting: true,
-      comparison: {
-        differenceVector: [0, 0, 0],
-        thresholdVector: [1, 1, 1],
-        exceedsThreshold: true,
-        transformType: CHECK_TRANSFORM_TYPE_DECK,
-      },
-    })
-    act(() => getExitButton(wrapper).invoke('onClick')())
+  it('confirms check step when isInspecting and primary button is clicked, and deck transform issue', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_DECK,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockExit).toHaveBeenCalled()
-    expect(
-      wrapper.exists(
-        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
-      )
-    ).toBe(false)
+    expect(mockGoToNextCheck).toHaveBeenCalled()
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(true)
+    expect(getContactSupport(wrapper).exists()).toBe(false)
   })
 
-  it('renders instr offset blurb when exceeds threshold and transform type is instr offset', () => {
+  it('does not render deck cal blurb when exceeds threshold and transform type is instr offset', () => {
     const comparison = {
       differenceVector: [0, 0, 0],
       thresholdVector: [1, 1, 1],
@@ -163,10 +169,20 @@ describe('CheckHeight', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
 
-    expect(
-      wrapper.exists(
-        'a[href="https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2"]'
-      )
-    ).toBe(true)
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
+  })
+
+  it('does not render deck cal blurb when exceeds threshold and transform type is unknown', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
   })
 })
