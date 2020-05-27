@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
+import { PrimaryButton, Icon, Link, type Mount } from '@opentrons/components'
 
-import { type RobotCalibrationCheckComparison } from '../../calibration'
+import {
+  type RobotCalibrationCheckComparison,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
@@ -35,9 +38,7 @@ const THEN = 'Then'
 const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
-
 const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
-
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
 const BAD_INSPECTING_BODY =
@@ -45,6 +46,13 @@ const BAD_INSPECTING_BODY =
 const GOOD_INSPECTING_BODY =
   'The jogged and calibrated z-axis co-ordinates fall within acceptable bounds.'
 const DIFFERENCE = 'Difference'
+const DECK_CAL_BLURB =
+  'To resolve this, you will need to perform deck calibration. Read'
+const THIS_ARTICLE = 'this article'
+const TO_LEARN = 'to learn more'
+const DECK_CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
+const CONTACT_SUPPORT = 'Please contact Opentrons support for next steps.'
 
 type CheckHeightProps = {|
   isMulti: boolean,
@@ -168,6 +176,20 @@ function CompareZ(props: CompareZProps) {
           </div>
         </div>
       </div>
+      {exceedsThreshold &&
+        (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
+          <p className={styles.difference_body}>
+            {DECK_CAL_BLURB}
+            &nbsp;
+            <Link href={DECK_CAL_ARTICLE_URL} external>
+              {THIS_ARTICLE}
+            </Link>
+            &nbsp;
+            {TO_LEARN}
+          </p>
+        ) : (
+          <p className={styles.difference_body}>{CONTACT_SUPPORT}</p>
+        ))}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>

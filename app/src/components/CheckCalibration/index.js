@@ -289,7 +289,18 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      stepContents = <CompleteConfirmation exit={exit} />
+      const stepsPassed = Object.keys(comparisonsByStep).reduce((acc, step) => {
+        return acc + (comparisonsByStep[step].exceedsThreshold ? 0 : 1)
+      }, 0)
+      const stepsFailed = Object.keys(comparisonsByStep).length - stepsPassed
+      stepContents = (
+        <CompleteConfirmation
+          exit={exit}
+          stepsFailed={stepsFailed}
+          stepsPassed={stepsPassed}
+          comparisonsByStep={comparisonsByStep}
+        />
+      )
       modalContentsClassName = styles.terminal_modal_contents
       break
     }

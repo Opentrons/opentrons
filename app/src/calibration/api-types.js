@@ -23,6 +23,9 @@ import typeof {
   CHECK_STEP_CHECK_COMPLETE,
   CHECK_STEP_BAD_ROBOT_CALIBRATION,
   CHECK_STEP_NO_PIPETTES_ATTACHED,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+  CHECK_TRANSFORM_TYPE_DECK,
 } from './constants'
 
 export type RobotCalibrationCheckStep =
@@ -67,11 +70,16 @@ export type RobotCalibrationCheckLabware = {|
   namespace: string,
   version: number,
 |}
+type CHECK_TRANSFORM_TYPE =
+  | CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET
+  | CHECK_TRANSFORM_TYPE_UNKNOWN
+  | CHECK_TRANSFORM_TYPE_DECK
 
 export type RobotCalibrationCheckComparison = {|
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
+  transformType: CHECK_TRANSFORM_TYPE,
 |}
 
 export type RobotCalibrationCheckSessionDetails = {|
