@@ -1662,3 +1662,7 @@ class API(HardwareAPILike):
             self._config.gantry_calibration,
             (0, 0, max_height))
         return transformed_z
+
+    def clean_up(self):
+        """ Get the API ready to stop cleanly. """
+        self._backend.clean_up()
