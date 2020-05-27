@@ -829,7 +829,21 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         CalibrationCheckState.joggingSecondPipetteToHeight,
                         CalibrationCheckState.joggingSecondPipetteToPointOne,
                     ]
-                    if is_second_pip:
+                    first_pip_steps_passed = not (
+                        comparisons[
+                            CalibrationCheckState.joggingFirstPipetteToHeight
+                        ].exceedsThreshold or
+                        comparisons[
+                            CalibrationCheckState.joggingFirstPipetteToPointOne
+                        ].exceedsThreshold or
+                        comparisons[
+                            CalibrationCheckState.joggingFirstPipetteToPointTwo
+                        ].exceedsThreshold or
+                        comparisons[
+                            CalibrationCheckState.joggingFirstPipetteToPointThree
+                        ].exceedsThreshold
+                    )
+                    if is_second_pip and first_pip_steps_passed:
                         tform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
                     elif self.can_distinguish_instr_offset():
                         tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
