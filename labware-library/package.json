@@ -17,20 +17,20 @@
   "dependencies": {
     "@hot-loader/react-dom": "16.8.6",
     "@opentrons/components": "3.18.1",
-    "ajv": "^6.2.1",
-    "classnames": "^2.2.5",
-    "cookie": "^0.4.0",
-    "core-js": "^3.2.1",
-    "file-saver": "^2.0.1",
-    "formik": "^2.1.4",
-    "jszip": "^3.2.2",
-    "lodash": "^4.17.4",
-    "mixpanel-browser": "^2.29.1",
-    "query-string": "^6.2.0",
+    "ajv": "6.10.2",
+    "classnames": "2.2.5",
+    "cookie": "0.4.0",
+    "core-js": "3.2.1",
+    "file-saver": "2.0.1",
+    "formik": "2.1.4",
+    "jszip": "3.2.2",
+    "lodash": "4.17.4",
+    "mixpanel-browser": "2.29.1",
+    "query-string": "6.2.0",
     "react": "16.8.6",
     "react-dom": "16.8.6",
-    "react-hot-loader": "^4.12.19",
+    "react-hot-loader": "4.12.19",
     "react-router-dom": "5.1.1",
-    "yup": "^0.27.0"
+    "yup": "0.27.0"
   }
 }

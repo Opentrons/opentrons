@@ -10,7 +10,7 @@
   "license": "Apache-2.0",
   "main": "js/index.js",
   "dependencies": {
-    "ajv": "^6.10.2",
-    "lodash": "^4.17.4"
+    "ajv": "6.10.2",
+    "lodash": "4.17.4"
   }
 }
