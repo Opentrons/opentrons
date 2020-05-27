@@ -10,9 +10,18 @@ import styles from '../../StepEditForm.css'
 
 import type { FocusHandlers } from '../../types'
 
-type Props = {| focusHandlers: FocusHandlers |}
+type Props = {| focusHandlers: FocusHandlers, isEndingHold?: boolean |}
+
 export const StateFields = (props: Props) => {
-  const { focusHandlers } = props
+  const { focusHandlers, isEndingHold } = props
+
+  // Append 'Hold' to field names if component is used for an ending hold in a TC profile
+  const blockActiveName = isEndingHold ? 'blockIsActiveHold' : 'blockIsActive'
+  const blockTempName = isEndingHold ? 'blockTargetTempHold' : 'blockTargetTemp'
+  const lidActiveName = isEndingHold ? 'lidIsActiveHold' : 'lidIsActive'
+  const lidTempName = isEndingHold ? 'lidTargetTempHold' : 'lidTargetTemp'
+  const lidOpenName = isEndingHold ? 'lidOpenHold' : 'lidOpen'
+
   return (
     <div className={styles.form_row}>
       <FormGroup
@@ -23,7 +32,7 @@ export const StateFields = (props: Props) => {
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            name="blockIsActive"
+            name={blockActiveName}
             offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.block.toggleOff'
             )}
@@ -32,11 +41,11 @@ export const StateFields = (props: Props) => {
             )}
           />
           <ConditionalOnField
-            name={'blockIsActive'}
+            name={blockActiveName}
             condition={val => val === true}
           >
             <TextField
-              name="blockTargetTemp"
+              name={blockTempName}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
@@ -54,7 +63,7 @@ export const StateFields = (props: Props) => {
       >
         <div className={styles.toggle_row}>
           <ToggleRowField
-            name="lidIsActive"
+            name={lidActiveName}
             offLabel={i18n.t(
               'form.step_edit_form.field.thermocyclerState.lid.toggleOff'
             )}
@@ -63,11 +72,11 @@ export const StateFields = (props: Props) => {
             )}
           />
           <ConditionalOnField
-            name={'lidIsActive'}
+            name={lidActiveName}
             condition={val => val === true}
           >
             <TextField
-              name="lidTargetTemp"
+              name={lidTempName}
               className={cx(
                 styles.small_field,
                 styles.toggle_temperature_field
@@ -86,7 +95,7 @@ export const StateFields = (props: Props) => {
         className={styles.toggle_form_group}
       >
         <ToggleRowField
-          name="lidOpen"
+          name={lidOpenName}
           offLabel={i18n.t(
             'form.step_edit_form.field.thermocyclerState.lidPosition.toggleOff'
           )}
