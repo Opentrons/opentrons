@@ -9,11 +9,9 @@ import styles from './styles.css'
 const MISSING_MODULES =
   'Please attach all required modules before running this protocol'
 
-const DOOR_OPEN_RUN =
-  'Please close the robot door before running this protocol'
+const DOOR_OPEN_RUN = 'Please close the robot door before running this protocol'
 
-const DOOR_OPEN_RESUME =
-  'Please close the robot door before resuming'
+const DOOR_OPEN_RESUME = 'Please close the robot door before resuming'
 
 export type RunControlsProps = {|
   disabled: boolean,
