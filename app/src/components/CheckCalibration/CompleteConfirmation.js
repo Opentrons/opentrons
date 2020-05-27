@@ -1,7 +1,11 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, PrimaryButton } from '@opentrons/components'
+import { Icon, PrimaryButton, IconButton } from '@opentrons/components'
+import type {
+  RobotCalibrationCheckStep,
+  RobotCalibrationCheckComparison,
+} from '../../calibration'
 import styles from './styles.css'
 
 const DELETE_ROBOT_CALIBRATION_CHECK_HEADER = 'Calibration check is complete'
@@ -15,9 +19,21 @@ type CompleteConfirmationProps = {|
   exit: () => mixed,
   stepsPassed: number,
   stepsFailed: number,
+  // TODO: remove raw data from props after UAT
+  comparisonsByStep: {
+    [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
+  },
 |}
 export function CompleteConfirmation(props: CompleteConfirmationProps) {
-  const { exit, stepsPassed, stepsFailed } = props
+  const { exit, stepsPassed, stepsFailed, comparisonsByStep } = props
+  const rawDataRef = React.useRef<HTMLInputElement | null>(null)
+  const handleCopyButtonClick = () => {
+    console.log(rawDataRef.current)
+    if (rawDataRef.current) {
+      rawDataRef.current.select()
+      document.execCommand('copy')
+    }
+  }
   return (
     <>
       <div className={styles.modal_icon_wrapper}>
@@ -47,7 +63,50 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
           </div>
         )}
       </div>
-
+      <div>
+        {/* TODO: the contents of this div are for testing purposes only remove post UAT */}
+        <input
+          ref={rawDataRef}
+          type="text"
+          value={JSON.stringify(comparisonsByStep)}
+          onFocus={e => e.currentTarget.select()}
+          readOnly
+        />
+        <IconButton
+          className={styles.copy_icon}
+          onClick={handleCopyButtonClick}
+          name="ot-copy-text"
+        />
+        <table>
+          <thead>
+            <tr>
+              <th>Step</th>
+              <th>Failed</th>
+              <th>Threshold</th>
+              <th>Difference</th>
+            </tr>
+          </thead>
+          <tbody>
+            {Object.keys(comparisonsByStep).map(step => {
+              const comparison = comparisonsByStep[step]
+              const formatFloat = float => parseFloat(float).toFixed(2)
+              const formatVector = vector => {
+                return `(${formatFloat(vector[0])}, ${formatFloat(
+                  vector[1]
+                )}, ${formatFloat(vector[2])})`
+              }
+              return (
+                <tr key={step}>
+                  <td>{step.replace('comparing', '')}</td>
+                  <td>{comparison.exceedsThreshold ? 'true' : 'false'}</td>
+                  <td>{formatVector(comparison.thresholdVector)}</td>
+                  <td>{formatVector(comparison.differenceVector)}</td>
+                </tr>
+              )
+            })}
+          </tbody>
+        </table>
+      </div>
       <PrimaryButton onClick={exit}>
         {DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
       </PrimaryButton>

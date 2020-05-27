@@ -76,6 +76,11 @@
   width: 1.25rem;
 }
 
+.copy_icon {
+  height: 2rem;
+  width: 2rem;
+}
+
 .summary_section.passed {
   border-color: var(--c-success);
 }

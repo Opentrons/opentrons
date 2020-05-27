@@ -298,6 +298,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           exit={exit}
           stepsFailed={stepsFailed}
           stepsPassed={stepsPassed}
+          comparisonsByStep={comparisonsByStep}
         />
       )
       modalContentsClassName = styles.terminal_modal_contents
