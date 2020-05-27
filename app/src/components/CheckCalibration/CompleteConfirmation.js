@@ -63,21 +63,9 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
           </div>
         )}
       </div>
-      <div>
+      <div className={styles.raw_data_wrapper}>
         {/* TODO: the contents of this div are for testing purposes only remove post UAT */}
-        <input
-          ref={rawDataRef}
-          type="text"
-          value={JSON.stringify(comparisonsByStep)}
-          onFocus={e => e.currentTarget.select()}
-          readOnly
-        />
-        <IconButton
-          className={styles.copy_icon}
-          onClick={handleCopyButtonClick}
-          name="ot-copy-text"
-        />
-        <table>
+        <table className={styles.raw_data_table}>
           <thead>
             <tr>
               <th>Step</th>
@@ -96,7 +84,14 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
                 )}, ${formatFloat(vector[2])})`
               }
               return (
-                <tr key={step}>
+                <tr
+                  key={step}
+                  className={
+                    comparison.exceedsThreshold
+                      ? styles.failed_row
+                      : styles.passed_row
+                  }
+                >
                   <td>{step.replace('comparing', '')}</td>
                   <td>{comparison.exceedsThreshold ? 'true' : 'false'}</td>
                   <td>{formatVector(comparison.thresholdVector)}</td>
@@ -106,6 +101,18 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
             })}
           </tbody>
         </table>
+        <input
+          ref={rawDataRef}
+          type="text"
+          value={JSON.stringify(comparisonsByStep)}
+          onFocus={e => e.currentTarget.select()}
+          readOnly
+        />
+        <IconButton
+          className={styles.copy_icon}
+          onClick={handleCopyButtonClick}
+          name="ot-copy-text"
+        />
       </div>
       <PrimaryButton onClick={exit}>
         {DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}

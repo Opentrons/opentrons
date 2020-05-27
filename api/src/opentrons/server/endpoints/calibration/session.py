@@ -796,7 +796,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     def get_comparisons_by_step(
             self) -> typing.Dict[CalibrationCheckState, ComparisonStatus]:
-        comparisons = {}
+        comparisons: typing.Dict[CalibrationCheckState, ComparisonStatus] = {}
         for jogged_state, comp in COMPARISON_STATE_MAP.items():
             ref_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                     comp.reference_state),
@@ -840,7 +840,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                             CalibrationCheckState.joggingFirstPipetteToPointTwo
                         ].exceedsThreshold or
                         comparisons[
-                            CalibrationCheckState.joggingFirstPipetteToPointThree
+                            CalibrationCheckState
+                            .joggingFirstPipetteToPointThree
                         ].exceedsThreshold
                     )
                     if is_second_pip and first_pip_steps_passed:

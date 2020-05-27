@@ -76,9 +76,27 @@
   width: 1.25rem;
 }
 
+.raw_data_wrapper {
+  align-self: stretch;
+}
+
+.raw_data_table {
+  font-size: 0.75rem;
+  width: 100%
+}
+
 .copy_icon {
   height: 2rem;
   width: 2rem;
+  margin-bottom: 2rem;
+}
+
+.passed_row{
+  color: var(--c-success);
+}
+
+.failed_row{
+  color: var(--c-error);
 }
 
 .summary_section.passed {
