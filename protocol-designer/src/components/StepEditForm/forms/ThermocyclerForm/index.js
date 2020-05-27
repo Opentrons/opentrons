@@ -63,8 +63,8 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           ]}
           {...focusHandlers}
         />
-        -----
-        <ProfileStepRows {...focusHandlers} />
+        <div>-----TODO BELOW-----</div>
+        <ProfileStepRows focusHandlers={focusHandlers} />
       </div>
     </div>
   )

@@ -1,59 +1,34 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { InputField } from '@opentrons/components'
+import { InputField, OutlineButton } from '@opentrons/components'
 import { getUnsavedForm } from '../../../step-forms/selectors'
-import { editProfileStep } from '../../../steplist/actions'
+import * as steplistActions from '../../../steplist/actions'
+import {
+  getProfileFieldErrors,
+  maskProfileField,
+} from '../../../steplist/fieldLevel'
+import type { ProfileStepItem } from '../../../form-types'
+import type { FocusHandlers } from '../types'
 
-type Props = {|
-  name: string,
-  value: string,
-  onBlur: () => mixed,
-  onFocus: () => mixed,
-  onChange: (e: SyntheticInputEvent<*>) => mixed,
-|}
-
-export const maskProfileField = (name: string, rawValue: string) => {
-  // TODO: implement maskers for all fields, use existing masker utils
-  return rawValue
-}
-
-// TODO should look more like ./TextField.js -- this is very barebones now
-export const ProfileStepItemFieldComponent = (props: Props) => {
-  const { onChange, onBlur, onFocus, value } = props
-  return <InputField {...{ onChange, onBlur, onFocus, value }} />
-}
-
-// NOTE this is a copy of  showProfileErrors but w/ different type. Instead, make generic type?
 export const showProfileFieldErrors = ({
-  name,
-  focusedProfileField,
-  dirtyProfileFields,
+  fieldId,
+  focusedField,
+  dirtyFields,
 }: {|
-  name: string,
-  focusedProfileField: ?string,
-  dirtyProfileFields: Array<string>,
+  fieldId: string,
+  focusedField: ?string,
+  dirtyFields: Array<string>,
 |}): boolean =>
-  !(name === focusedProfileField) &&
-  dirtyProfileFields &&
-  dirtyProfileFields.includes(name)
-
-// TODO factor out
-export const getProfileFieldErrors = (
-  name: string,
-  value: string
-): Array<string> => {
-  // TODO implement. Use existing error checker utils
-  return []
-}
+  !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
 export type ProfileStepRowsProps = {|
-  focusedField: ?string,
-  dirtyPFields: Array<string>,
+  focusHandlers: FocusHandlers,
 |}
 export const ProfileStepRows = (props: ProfileStepRowsProps) => {
-  const { focusedProfileField, dirtyProfileFields } = props
   const dispatch = useDispatch()
+  const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
+
   const unsavedForm = useSelector(getUnsavedForm)
   if (!unsavedForm) {
     console.error('ProfileStepRows expected an unsavedForm')
@@ -61,26 +36,71 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
   }
   const { orderedProfileItems, profileItemsById } = unsavedForm
 
-  return orderedProfileItems.map((itemId, index) => {
-    const itemFields = profileItemsById[itemId]
-    // TODO just doing temperature field for now
-    const name = 'temperature'
-    const value = itemFields.temperature
-    const onChange = (e: SyntheticEvent<*>) => {
-      const rawValue = e.currentTarget.value
-      const maskedValue = maskProfileField(name, rawValue)
+  const rows = orderedProfileItems.map((itemId, index) => {
+    const updateStepFieldValue = (name: string, value: string) => {
+      const maskedValue = maskProfileField(name, value)
       dispatch(
-        editProfileStep({
+        steplistActions.editProfileStep({
           id: itemId,
           fields: { [name]: maskedValue },
         })
       )
     }
 
+    const deleteProfileStep = () => {
+      dispatch(steplistActions.deleteProfileStep({ id: itemId }))
+    }
+
+    const itemFields = profileItemsById[itemId]
+
+    return (
+      <div key={index}>
+        <ProfileStepRow
+          deleteProfileStep={deleteProfileStep}
+          profileStepItem={itemFields}
+          updateStepFieldValue={updateStepFieldValue}
+          focusHandlers={props.focusHandlers}
+        />
+      </div>
+    )
+  })
+
+  return (
+    <>
+      {rows}
+      <OutlineButton onClick={addProfileStep}>+ Add Step</OutlineButton>
+    </>
+  )
+}
+
+type ProfileStepRowProps = {|
+  deleteProfileStep: () => mixed,
+  profileStepItem: ProfileStepItem,
+  updateStepFieldValue: (name: string, value: string) => mixed,
+  focusHandlers: FocusHandlers,
+|}
+const ProfileStepRow = (props: ProfileStepRowProps) => {
+  const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
+  const {
+    deleteProfileStep,
+    profileStepItem,
+    updateStepFieldValue,
+    focusHandlers,
+  } = props
+  const fields = names.map(name => {
+    const value = profileStepItem[name]
+    const profileStepId = profileStepItem.id
+    // for the purpose of focus handlers, create a unique ID for each dynamic field
+    const fieldId = `${profileStepId}:${name}`
+
+    const onChange = (e: SyntheticEvent<*>) => {
+      updateStepFieldValue(name, e.currentTarget.value)
+    }
+
     const showErrors = showProfileFieldErrors({
-      name,
-      focusedProfileField,
-      dirtyProfileFields,
+      fieldId,
+      focusedField: focusHandlers.focusedField,
+      dirtyFields: focusHandlers.dirtyFields,
     })
     const errors = getProfileFieldErrors(name, value)
     const errorToShow =
@@ -90,15 +110,28 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
     // const tooltipComponent =
     //   props.tooltipComponent || getTooltipForField(stepType, name, disabled)
 
-    console.log('debug:', { errorToShow }) // TODO DEBUG
-
-    const onBlur = () => {} // TODO
-    const onFocus = () => {} // TODO
+    const onBlur = () => {
+      focusHandlers.onFieldBlur(fieldId)
+    }
+    const onFocus = () => {
+      focusHandlers.onFieldFocus(fieldId)
+    }
     return (
-      <ProfileStepItemFieldComponent
-        key={itemId}
-        {...{ name, onChange, onBlur, onFocus, value }}
-      />
+      <div
+        key={name}
+        style={{ width: '4rem', display: 'inline-block', margin: '0.5rem' }}
+      >
+        <InputField
+          error={errorToShow}
+          {...{ name, onChange, onBlur, onFocus, value }}
+        />
+      </div>
     )
   })
+  return (
+    <div>
+      {fields}
+      <div onClick={deleteProfileStep}>X</div>
+    </div>
+  )
 }

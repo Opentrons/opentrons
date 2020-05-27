@@ -53,6 +53,7 @@ type StepFieldHelpers = {|
   castValue?: ValueCaster,
   hydrate?: (state: InvariantContext, id: string) => mixed,
 |}
+
 const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   aspirate_airGap_volume: {
     maskValue: composeMaskers(
@@ -192,12 +193,33 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
   },
 }
 
+const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
+  temperature: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_TC_BLOCK_TEMP),
+      maxFieldValue(MAX_TC_BLOCK_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+}
+
 export const getFieldErrors = (
   name: StepFieldName,
   value: mixed
 ): Array<string> => {
   const fieldErrorGetter =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].getErrors
+  const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
+  return errors
+}
+
+export const getProfileFieldErrors = (
+  name: string,
+  value: string // TODO: mixed?
+): Array<string> => {
+  const fieldErrorGetter =
+    profileFieldHelperMap[name] && profileFieldHelperMap[name].getErrors
   const errors = fieldErrorGetter ? fieldErrorGetter(value) : []
   return errors
 }
@@ -211,6 +233,12 @@ export const castField = (name: StepFieldName, value: mixed): mixed => {
 export const maskField = (name: StepFieldName, value: mixed): mixed => {
   const fieldMasker =
     stepFieldHelperMap[name] && stepFieldHelperMap[name].maskValue
+  return fieldMasker ? fieldMasker(value) : value
+}
+
+export const maskProfileField = (name: string, value: string) => {
+  const fieldMasker =
+    profileFieldHelperMap[name] && profileFieldHelperMap[name].maskValue
   return fieldMasker ? fieldMasker(value) : value
 }
 

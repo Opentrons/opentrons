@@ -78,7 +78,7 @@ export type EditProfileStepAction = {|
   payload: {|
     id: string,
     fields: {|
-      name?: string,
+      title?: string,
       temperature?: string,
       durationMinutes?: string,
       durationSeconds?: string,
