@@ -41,6 +41,12 @@ export function toggleDevInternalFlag(flag: DevInternalFlag): ThunkAction {
   }
 }
 
+export function toggleDiscoveryCache(): ThunkAction {
+  return (dispatch, getState) => {
+    const cacheDisabled = getConfig(getState()).discovery.disableCache
+    return dispatch(updateConfig('discovery.disableCache', !cacheDisabled))
+  }
+}
 // TODO(mc, 2020-02-05): move to `discovery` module
 export function addManualIp(ip: string): ThunkAction {
   return (dispatch, getState) => {
