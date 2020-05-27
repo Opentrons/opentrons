@@ -6,6 +6,7 @@ import {
   CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../constants'
 import type { RobotCalibrationCheckSessionDetails } from '../api-types'
 
@@ -13,21 +14,25 @@ export const badZComparison = {
   differenceVector: [0, 0, 4],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: true,
+  transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
 export const goodZComparison = {
   differenceVector: [0, 0, 0.1],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: false,
+  transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
 export const badXYComparison = {
   differenceVector: [4, 4, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: true,
+  transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
 export const goodXYComparison = {
   differenceVector: [0.1, 0.1, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: false,
+  transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
 
 export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessionDetails = {

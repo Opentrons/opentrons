@@ -26,6 +26,7 @@ describe('CompleteConfirmation', () => {
           stepsPassed={stepsPassed}
           stepsFailed={stepsFailed}
           exit={mockExit}
+          comparisonsByStep={{}}
         />
       )
     }
