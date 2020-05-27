@@ -35,7 +35,6 @@ describe('CompleteConfirmation', () => {
     jest.resetAllMocks()
   })
 
-  // NOTE: '\u00a0' is the unix character that enzyme translates $nbsp; to
   it('correctly pluralizes passed', () => {
     const wrapper = render({ stepsPassed: 2, stepsFailed: 1 })
 
@@ -44,13 +43,13 @@ describe('CompleteConfirmation', () => {
         .find('p')
         .at(0)
         .text()
-    ).toEqual('2\u00a0checks\u00a0passed')
+    ).toEqual('2 checks passed')
     expect(
       wrapper
         .find('p')
         .at(1)
         .text()
-    ).toEqual('1\u00a0check\u00a0failed')
+    ).toEqual('1 check failed')
   })
 
   it('correctly pluralizes failed', () => {
@@ -60,13 +59,13 @@ describe('CompleteConfirmation', () => {
         .find('p')
         .at(0)
         .text()
-    ).toEqual('1\u00a0check\u00a0passed')
+    ).toEqual('1 check passed')
     expect(
       wrapper
         .find('p')
         .at(1)
         .text()
-    ).toEqual('2\u00a0checks\u00a0failed')
+    ).toEqual('2 checks failed')
   })
 
   it('does not render failed if none failed', () => {
@@ -76,7 +75,7 @@ describe('CompleteConfirmation', () => {
         .find('p')
         .at(0)
         .text()
-    ).toEqual('1\u00a0check\u00a0passed')
+    ).toEqual('1 check passed')
     expect(wrapper.find('p').length).toEqual(1)
   })
 
@@ -88,7 +87,7 @@ describe('CompleteConfirmation', () => {
         .find('p')
         .at(0)
         .text()
-    ).toEqual('1\u00a0check\u00a0failed')
+    ).toEqual('1 check failed')
     expect(wrapper.find('p').length).toEqual(1)
   })
 

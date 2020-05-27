@@ -31,11 +31,7 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
               className={cx(styles.success_status_icon, styles.summary_icon)}
             />
             <p className={styles.complete_body_passed}>
-              {stepsPassed}
-              &nbsp;
-              {stepsPassed > 1 ? CHECKS : CHECK}
-              &nbsp;
-              {PASSED}
+              {`${stepsPassed} ${stepsPassed > 1 ? CHECKS : CHECK} ${PASSED}`}
             </p>
           </div>
         )}
@@ -46,11 +42,7 @@ export function CompleteConfirmation(props: CompleteConfirmationProps) {
               className={cx(styles.error_status_icon, styles.summary_icon)}
             />
             <p className={styles.complete_body_failed}>
-              {stepsFailed}
-              &nbsp;
-              {stepsFailed > 1 ? CHECKS : CHECK}
-              &nbsp;
-              {FAILED}
+              {`${stepsFailed} ${stepsFailed > 1 ? CHECKS : CHECK} ${FAILED}`}
             </p>
           </div>
         )}
