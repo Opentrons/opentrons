@@ -38,12 +38,12 @@ class Point(NamedTuple):
         return Point(self.x - other.x, self.y - other.y, self.z - other.z)
 
     def __mul__(self, other: Union[int, float]) -> 'Point':
-        if not (isinstance(other, float) or isinstance(other, int)):
+        if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x*other, self.y*other, self.z*other)
 
     def __rmul__(self, other: Union[int, float]) -> 'Point':
-        if not (isinstance(other, float) or isinstance(other, int)):
+        if not isinstance(other, (float, int)):
             return NotImplemented
         return Point(self.x*other, self.y*other, self.z*other)
 
