@@ -513,6 +513,10 @@ def thermocycler_close():
 
 
 def delay(seconds, minutes, msg=None):
+    m, s = divmod(seconds, 60)
+    minutes = minutes + m
+    seconds = s
+
     text = f"Delaying for {minutes} minutes and {seconds} seconds"
     if msg:
         text = f"{text}. {msg}"
