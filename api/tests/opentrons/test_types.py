@@ -1,6 +1,7 @@
 import pytest
 from opentrons.types import Point
 
+
 def test_point_mul():
     a = Point(1, 2, 3)
     b = 2
