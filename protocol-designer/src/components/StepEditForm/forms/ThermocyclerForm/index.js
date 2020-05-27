@@ -8,7 +8,11 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../../../constants.js'
 
-import { RadioGroupField, ConditionalOnField } from '../../fields'
+import {
+  ConditionalOnField,
+  ProfileStepRows,
+  RadioGroupField,
+} from '../../fields'
 import { StateFields } from './StateFields'
 import styles from '../../StepEditForm.css'
 
@@ -46,7 +50,6 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
         >
           <StateFields focusHandlers={focusHandlers} />
         </ConditionalOnField>
-
         <RadioGroupField
           name="thermocyclerFormType"
           className={cx(styles.tc_step_option, styles.disabled)}
@@ -60,6 +63,8 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           ]}
           {...focusHandlers}
         />
+        -----
+        <ProfileStepRows />
       </div>
     </div>
   )

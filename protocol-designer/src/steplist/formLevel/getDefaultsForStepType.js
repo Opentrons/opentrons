@@ -102,6 +102,9 @@ export function getDefaultsForStepType(
         lidIsActive: false,
         lidTargetTemp: null,
         lidOpen: null,
+        // NOTE: adding new initial values will require a migration, or something, to support old files (but TC State never released, so not an issue?)
+        orderedProfileItems: [],
+        profileItemsById: {},
       }
     default:
       return {}

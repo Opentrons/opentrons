@@ -140,6 +140,27 @@ export type FormData = {
   [StepFieldName]: any, // TODO: form value processing to ensure type
 }
 
+export const PROFILE_CYCLE: 'profileCycle' = 'profileCycle'
+export const PROFILE_STEP: 'profileStep' = 'profileStep'
+
+export type ProfileStepItem = {|
+  type: typeof PROFILE_STEP,
+  id: string,
+  title: string,
+  temperature: string,
+  durationMinutes: string,
+  durationSeconds: string,
+|}
+
+export type ProfileCycleItem = {|
+  type: typeof PROFILE_CYCLE,
+  id: string,
+  steps: Array<ProfileStepItem>,
+  repetitions: string,
+|}
+
+export type ProfileItem = ProfileStepItem | ProfileCycleItem
+
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
 
 export type WellOrderOption = 'l2r' | 'r2l' | 't2b' | 'b2t'

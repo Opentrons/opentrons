@@ -50,3 +50,44 @@ export const reorderSteps = (
   type: 'REORDER_STEPS',
   payload: { stepIds },
 })
+
+export type AddProfileStepAction = {|
+  type: 'ADD_PROFILE_STEP',
+  payload: null | {| cycleId: string |},
+|}
+export const addProfileStep = (
+  payload: $PropertyType<AddProfileStepAction, 'payload'>
+) => ({
+  type: 'ADD_PROFILE_STEP',
+  payload,
+})
+
+export type DeleteProfileStepAction = {|
+  type: 'DELETE_PROFILE_STEP',
+  payload: {| id: string |},
+|}
+export const deleteProfileStep = (
+  payload: $PropertyType<DeleteProfileStepAction, 'payload'>
+) => ({
+  type: 'DELETE_PROFILE_STEP',
+  payload,
+})
+
+export type EditProfileStepAction = {|
+  type: 'EDIT_PROFILE_STEP',
+  payload: {|
+    id: string,
+    fields: {|
+      name?: string,
+      temperature?: string,
+      durationMinutes?: string,
+      durationSeconds?: string,
+    |},
+  |},
+|}
+export const editProfileStep = (
+  payload: $PropertyType<EditProfileStepAction, 'payload'>
+) => ({
+  type: 'EDIT_PROFILE_STEP',
+  payload,
+})
