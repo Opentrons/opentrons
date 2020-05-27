@@ -9,14 +9,14 @@ import { useState } from 'react'
 // const ExampleDangerForm = props => {
 //   const {
 //     conditionalContinue,
-//     requiresConfirmation,
+//     showConfirmation,
 //     confirmAndContinue,
 //     cancelConfirm,
 //   } = useConditionalConfirm(props.goAhead, props.dangerIsPresent)
 
 //   return (
 //     <>
-//       {requiresConfirmation && (
+//       {showConfirmation && (
 //         <AreYouSureModal
 //           handleCancel={cancelConfirm}
 //           handleContinue={confirmAndContinue}
@@ -32,7 +32,7 @@ export type ConditionalConfirmOutput = {|
   /** should be called when the user attempts the action (eg clicks "DELETE" button) */
   conditionalContinue: () => mixed,
   /** should control the rendering of the confirm UI (eg a modal) */
-  requiresConfirmation: boolean,
+  showConfirmation: boolean,
   /** should be passed into the confirm UI's continue button (eg "CONFIRM" button of modal) */
   confirmAndContinue: () => mixed,
   /** should be passed into the confirm UI's cancel button */
@@ -45,13 +45,11 @@ export const useConditionalConfirm = (
   /** if no confirmation is needed, we will avoid the modal and immediately call handleContinue */
   shouldBlock: boolean
 ): ConditionalConfirmOutput => {
-  const [requiresConfirmation, setRequiresConfirmation] = useState<boolean>(
-    false
-  )
+  const [showConfirmation, setShowConfirmation] = useState<boolean>(false)
 
   const conditionalContinue = () => {
     if (shouldBlock) {
-      setRequiresConfirmation(true)
+      setShowConfirmation(true)
     } else {
       handleContinue()
     }
@@ -59,13 +57,13 @@ export const useConditionalConfirm = (
 
   return {
     conditionalContinue,
-    requiresConfirmation,
+    showConfirmation,
     confirmAndContinue: () => {
       handleContinue()
-      setRequiresConfirmation(false)
+      setShowConfirmation(false)
     },
     cancelConfirm: () => {
-      setRequiresConfirmation(false)
+      setShowConfirmation(false)
     },
   }
 }

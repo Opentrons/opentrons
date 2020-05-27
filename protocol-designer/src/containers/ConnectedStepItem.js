@@ -85,10 +85,10 @@ export const ConnectedStepItem = (props: Props) => {
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  // step selection is gated when requiresConfirmation is true
+  // step selection is gated when showConfirmation is true
   const {
     conditionalContinue,
-    requiresConfirmation,
+    showConfirmation,
     confirmAndContinue,
     cancelConfirm,
   } = useConditionalConfirm(selectStep, currentFormIsPresaved)
@@ -129,7 +129,7 @@ export const ConnectedStepItem = (props: Props) => {
 
   return (
     <>
-      {requiresConfirmation && (
+      {showConfirmation && (
         <ConfirmDeleteStepModal
           onContinueClick={confirmAndContinue}
           onCancelClick={cancelConfirm}

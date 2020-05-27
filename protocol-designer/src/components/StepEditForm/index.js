@@ -193,21 +193,21 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
 
   const {
     conditionalContinue: conditionalDelete,
-    requiresConfirmation: showConfirmDeleteModal,
+    showConfirmation: showConfirmDeleteModal,
     confirmAndContinue: confirmDelete,
     cancelConfirm: cancelConfirmDelete,
   } = useConditionalConfirm(handleDelete, true)
 
   const {
     conditionalContinue: conditionalClose,
-    requiresConfirmation: showConfirmCancelModal,
+    showConfirmation: showConfirmCancelModal,
     confirmAndContinue: confirmClose,
     cancelConfirm: cancelConfirmClose,
   } = useConditionalConfirm(handleClose, isNewStep)
 
   const {
     conditionalContinue: conditionalAddPauseUntilTempStep,
-    requiresConfirmation: showAddPauseUntilTempStepModal,
+    showConfirmation: showAddPauseUntilTempStepModal,
     confirmAndContinue: confirmAddPauseUntilTempStep,
   } = useConditionalConfirm(
     saveSetTempFormWithAddedPauseUntilTemp,

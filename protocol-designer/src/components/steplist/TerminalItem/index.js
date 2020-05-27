@@ -37,14 +37,14 @@ export const TerminalItem = (props: Props) => {
 
   const {
     conditionalContinue,
-    requiresConfirmation,
+    showConfirmation,
     confirmAndContinue,
     cancelConfirm,
   } = useConditionalConfirm(selectItem, currentFormIsPresaved)
 
   return (
     <>
-      {requiresConfirmation && (
+      {showConfirmation && (
         <ConfirmDeleteStepModal
           onContinueClick={confirmAndContinue}
           onCancelClick={cancelConfirm}
