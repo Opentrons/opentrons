@@ -21,6 +21,7 @@ const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 
 export const U2EAdapterInfo = () => {
   const device = useSelector(SystemInfo.getU2EAdapterDevice)
+  const ifacesMap = useSelector(SystemInfo.getU2EInterfacesMap)
   const driverOutdated = useSelector((state: State) => {
     const status = SystemInfo.getU2EWindowsDriverStatus(state)
     return status === SystemInfo.OUTDATED
@@ -37,7 +38,10 @@ export const U2EAdapterInfo = () => {
         {U2E_ADAPTER_INFORMATION}
       </Text>
       {driverOutdated && <U2EDriverWarning marginBottom={SPACING_3} />}
-      <U2EDeviceDetails device={device} />
+      <U2EDeviceDetails
+        device={device}
+        ifaces={device ? ifacesMap[device.serialNumber] ?? [] : []}
+      />
     </Box>
   )
 }

@@ -5,84 +5,92 @@ import { makeEvent } from '../make-event'
 import * as SystemInfo from '../../system-info'
 import * as Fixtures from '../../system-info/__fixtures__'
 
-import type { State, Action } from '../../types'
-import type { AnalyticsEvent } from '../types'
+import type { State } from '../../types'
+import type { U2EAnalyticsProps } from '../../system-info/types'
 
-type EventSpec = {|
-  should: string,
-  action: Action,
-  expected: AnalyticsEvent | null,
-|}
+jest.mock('../../system-info/selectors')
+
+const getU2EDeviceAnalyticsProps: JestMockFn<
+  [State],
+  U2EAnalyticsProps | null
+> = SystemInfo.getU2EDeviceAnalyticsProps
 
 const MOCK_STATE: State = ({ mockState: true }: any)
-
-const { mockWindowsRealtekDevice, mockRealtekDevice, mockUsbDevice } = Fixtures
-
-const SPECS: Array<EventSpec> = [
-  {
-    should: 'ignore systemInfo:INITIALIZED without Realtek devices',
-    action: SystemInfo.initialized([mockUsbDevice]),
-    expected: null,
-  },
-  {
-    should: 'ignores systemInfo:USB_DEVICE_ADDED without Realtek devices',
-    action: SystemInfo.usbDeviceAdded(mockUsbDevice),
-    expected: null,
-  },
-  {
-    should: 'add Realtek info to super props on systemInfo:INITIALIZED',
-    action: SystemInfo.initialized([mockRealtekDevice]),
-    expected: {
-      superProperties: {
-        'U2E Vendor ID': mockRealtekDevice.vendorId,
-        'U2E Product ID': mockRealtekDevice.productId,
-        'U2E Serial Number': mockRealtekDevice.serialNumber,
-        'U2E Device Name': mockRealtekDevice.deviceName,
-        'U2E Manufacturer': mockRealtekDevice.manufacturer,
-      },
-    },
-  },
-  {
-    should: 'add Realtek info to super props on systemInfo:USB_DEVICE_ADDED',
-    action: SystemInfo.usbDeviceAdded(mockRealtekDevice),
-    expected: {
-      superProperties: {
-        'U2E Vendor ID': mockRealtekDevice.vendorId,
-        'U2E Product ID': mockRealtekDevice.productId,
-        'U2E Serial Number': mockRealtekDevice.serialNumber,
-        'U2E Device Name': mockRealtekDevice.deviceName,
-        'U2E Manufacturer': mockRealtekDevice.manufacturer,
-      },
-    },
-  },
-  {
-    should: 'include Realtek windows driver version on systemInfo:INITIALIZED',
-    action: SystemInfo.initialized([mockWindowsRealtekDevice]),
-    expected: {
-      superProperties: expect.objectContaining({
-        'U2E Windows Driver Version':
-          mockWindowsRealtekDevice.windowsDriverVersion,
-      }),
-    },
-  },
-  {
-    should:
-      'include Realtek windows driver version on systemInfo:USB_DEVICE_ADDED',
-    action: SystemInfo.usbDeviceAdded(mockWindowsRealtekDevice),
-    expected: {
-      superProperties: expect.objectContaining({
-        'U2E Windows Driver Version':
-          mockWindowsRealtekDevice.windowsDriverVersion,
-      }),
-    },
-  },
-]
+const MOCK_ANALYTICS_PROPS = {
+  'U2E Vendor ID': Fixtures.mockRealtekDevice.vendorId,
+  'U2E Product ID': Fixtures.mockRealtekDevice.productId,
+  'U2E Serial Number': Fixtures.mockRealtekDevice.serialNumber,
+  'U2E Manufacturer': Fixtures.mockRealtekDevice.manufacturer,
+  'U2E Device Name': Fixtures.mockRealtekDevice.deviceName,
+  'U2E IPv4 Address': '10.0.0.1',
+}
 
 describe('custom labware analytics events', () => {
-  SPECS.forEach(spec => {
-    const { should, action, expected } = spec
-    it(`should ${should}`, () => {
-      return expect(makeEvent(action, MOCK_STATE)).resolves.toEqual(expected)
+  beforeEach(() => {
+    getU2EDeviceAnalyticsProps.mockImplementation(state => {
+      expect(state).toBe(MOCK_STATE)
+      return MOCK_ANALYTICS_PROPS
     })
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
+  })
+
+  it('should trigger an event on systemInfo:INITIALIZED', () => {
+    const action = SystemInfo.initialized([Fixtures.mockRealtekDevice], [])
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual({
+      superProperties: MOCK_ANALYTICS_PROPS,
+    })
+  })
+
+  it('should trigger an event on systemInfo:USB_DEVICE_ADDED', () => {
+    const action = SystemInfo.usbDeviceAdded(Fixtures.mockRealtekDevice)
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual({
+      superProperties: MOCK_ANALYTICS_PROPS,
+    })
+  })
+
+  it('should trigger an event on systemInfo:NETWORK_INTERFACES_CHANGED', () => {
+    const action = SystemInfo.networkInterfacesChanged([
+      Fixtures.mockNetworkInterface,
+    ])
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual({
+      superProperties: MOCK_ANALYTICS_PROPS,
+    })
+  })
+
+  it('should not trigger on systemInfo:INITIALIZED if selector returns null', () => {
+    getU2EDeviceAnalyticsProps.mockReturnValue(null)
+
+    const action = SystemInfo.initialized([Fixtures.mockRealtekDevice], [])
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual(null)
+  })
+
+  it('should not trigger on systemInfo:USB_DEVICE_ADDED if selector returns null', () => {
+    getU2EDeviceAnalyticsProps.mockReturnValue(null)
+
+    const action = SystemInfo.usbDeviceAdded(Fixtures.mockRealtekDevice)
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual(null)
+  })
+
+  it('should not trigger on systemInfo:NETWORK_INTERFACES_CHANGED if selector returns null', () => {
+    getU2EDeviceAnalyticsProps.mockReturnValue(null)
+
+    const action = SystemInfo.networkInterfacesChanged([
+      Fixtures.mockNetworkInterface,
+    ])
+    const result = makeEvent(action, MOCK_STATE)
+    return expect(result).resolves.toEqual(null)
   })
 })

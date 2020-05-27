@@ -1,6 +1,5 @@
 // @flow
 // redux action types to analytics events map
-import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
@@ -256,17 +255,9 @@ export function makeEvent(
     }
 
     case SystemInfo.INITIALIZED:
-    case SystemInfo.USB_DEVICE_ADDED: {
-      const devices = action.payload.usbDevice
-        ? [action.payload.usbDevice]
-        : action.payload.usbDevices
-
-      const superProperties = head(
-        devices
-          .filter(SystemInfo.isRealtekU2EAdapter)
-          .map(SystemInfo.deviceToU2EAnalyticsProps)
-      )
-
+    case SystemInfo.USB_DEVICE_ADDED:
+    case SystemInfo.NETWORK_INTERFACES_CHANGED: {
+      const superProperties = SystemInfo.getU2EDeviceAnalyticsProps(state)
       return Promise.resolve(superProperties ? { superProperties } : null)
     }
   }

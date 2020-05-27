@@ -18,21 +18,42 @@ type ReducerSpec = {|
 const SPECS: Array<ReducerSpec> = [
   {
     should: 'handle systemInfo:INITIALIZED action',
-    action: Actions.initialized([Fixtures.mockUsbDevice]),
-    initialState: { usbDevices: [] },
-    expectedState: { usbDevices: [Fixtures.mockUsbDevice] },
+    action: Actions.initialized(
+      [Fixtures.mockUsbDevice],
+      [Fixtures.mockNetworkInterface]
+    ),
+    initialState: { usbDevices: [], networkInterfaces: [] },
+    expectedState: {
+      usbDevices: [Fixtures.mockUsbDevice],
+      networkInterfaces: [Fixtures.mockNetworkInterface],
+    },
   },
   {
     should: 'add single device with systemInfo:USB_DEVICE_ADDED',
     action: Actions.usbDeviceAdded(Fixtures.mockUsbDevice),
-    initialState: { usbDevices: [] },
-    expectedState: { usbDevices: [Fixtures.mockUsbDevice] },
+    initialState: { usbDevices: [], networkInterfaces: [] },
+    expectedState: {
+      usbDevices: [Fixtures.mockUsbDevice],
+      networkInterfaces: [],
+    },
   },
   {
     should: 'remove device with systemInfo:USB_DEVICE_REMOVED',
     action: Actions.usbDeviceRemoved(Fixtures.mockUsbDevice),
-    initialState: { usbDevices: [Fixtures.mockUsbDevice] },
-    expectedState: { usbDevices: [] },
+    initialState: {
+      usbDevices: [Fixtures.mockUsbDevice],
+      networkInterfaces: [],
+    },
+    expectedState: { usbDevices: [], networkInterfaces: [] },
+  },
+  {
+    should: 'handle systemInfo:NETWORK_INTERFACES_CHANGED action',
+    action: Actions.networkInterfacesChanged([Fixtures.mockNetworkInterface]),
+    initialState: { usbDevices: [], networkInterfaces: [] },
+    expectedState: {
+      usbDevices: [],
+      networkInterfaces: [Fixtures.mockNetworkInterface],
+    },
   },
 ]
 
