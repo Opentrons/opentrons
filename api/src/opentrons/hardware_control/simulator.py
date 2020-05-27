@@ -290,3 +290,6 @@ class Simulator:
     def probe(self, axis: str, distance: float) -> Dict[str, float]:
         self._position[axis.upper()] = self._position[axis.upper()] + distance
         return self._position
+
+    def clean_up(self):
+        pass

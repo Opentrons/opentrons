@@ -5,12 +5,15 @@ import { NOT_APPLICABLE, UNKNOWN, UP_TO_DATE, OUTDATED } from './constants'
 
 import type { UsbDevice, U2EAnalyticsProps, DriverStatus } from './types'
 
-// Driver version 10.38.117.2020, latest for Windows 10 as of 2020-04-12
 // NOTE(mc, 2020-05-05): this will cause false alerts on Windows 7; Realtek's
-// versioning scheme seems to be WindowsVersion.Something.Something.Year
+// versioning scheme seems to be WindowsVersion.Something.Something.Something
 // TODO(mc, 2020-05-06): move to config once migrations are addressed
 // https://github.com/Opentrons/opentrons/issues/5587
-const REALTEK_UP_TO_DATE_VERSION = [10, 38, 117, 2020]
+// NOTE(mc, 2020-05-26): Realtek has an inconsistent versioning scheme
+// so we only check the first two version segments to avoid false alerts
+//  - Driver version as of 2020-04-12: 10.38.117.2020
+//  - Driver version as of 2020-05-20: 10.38.20.117
+const REALTEK_UP_TO_DATE_VERSION = [10, 38]
 
 // Our U2E adapter should have the following properties:
 // Vendor ID: 0x0BDA, Product ID: 0x8150

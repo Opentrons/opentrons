@@ -53,6 +53,9 @@ class DeckCalibrationError(Enum):
     BAD_INSTRUMENT_OFFSET = auto()
     BAD_DECK_TRANSFORM = auto()
 
+    def __str__(self):
+        return self.name
+
 
 class PipetteRank(str, Enum):
     """The rank in the order of pipettes to use within flow"""

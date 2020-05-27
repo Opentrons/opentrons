@@ -20,7 +20,7 @@ jest.mock('../../../config/hooks', () => ({
 }))
 
 const EXPECTED_DOWNLOAD_URL =
-  'https://www.realtek.com/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
+  'https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
 
 const useTrackEvent: JestMockFn<[], $Call<typeof Analytics.useTrackEvent>> =
   Analytics.useTrackEvent

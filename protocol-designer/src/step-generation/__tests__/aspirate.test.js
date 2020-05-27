@@ -4,6 +4,7 @@ import { aspirate } from '../commandCreators/atomic/aspirate'
 import { getLabwareDefURI } from '@opentrons/shared-data'
 import fixture_tiprack_10_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_10_ul.json'
 import fixture_tiprack_1000_ul from '@opentrons/shared-data/labware/fixtures/2/fixture_tiprack_1000_ul.json'
+import { thermocyclerPipetteCollision } from '../utils'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -13,6 +14,18 @@ import {
   DEFAULT_PIPETTE,
   SOURCE_LABWARE,
 } from '../__fixtures__'
+import type { RobotState } from '../'
+
+jest.mock('../utils/thermocyclerPipetteCollision')
+
+const mockThermocyclerPipetteCollision: JestMockFn<
+  [
+    $PropertyType<RobotState, 'modules'>,
+    $PropertyType<RobotState, 'labware'>,
+    string
+  ],
+  boolean
+> = thermocyclerPipetteCollision
 
 describe('aspirate', () => {
   let initialRobotState
@@ -28,6 +41,10 @@ describe('aspirate', () => {
       flowRate: 6,
       offsetFromBottomMm: 5,
     }
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   it('aspirate normally (with tip)', () => {
@@ -154,6 +171,35 @@ describe('aspirate', () => {
     expect(getErrorResult(result).errors).toHaveLength(1)
     expect(getErrorResult(result).errors[0]).toMatchObject({
       type: 'LABWARE_DOES_NOT_EXIST',
+    })
+  })
+  it('should return an error when aspirating from thermocycler with pipette collision', () => {
+    mockThermocyclerPipetteCollision.mockImplementationOnce(
+      (
+        modules: $PropertyType<RobotState, 'modules'>,
+        labware: $PropertyType<RobotState, 'labware'>,
+        labwareId: string
+      ) => {
+        expect(modules).toBe(robotStateWithTip.modules)
+        expect(labware).toBe(robotStateWithTip.labware)
+        expect(labwareId).toBe(SOURCE_LABWARE)
+        return true
+      }
+    )
+    const result = aspirate(
+      {
+        ...flowRateAndOffsets,
+        pipette: DEFAULT_PIPETTE,
+        volume: 50,
+        labware: SOURCE_LABWARE,
+        well: 'A1',
+      },
+      invariantContext,
+      robotStateWithTip
+    )
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'THERMOCYCLER_LID_CLOSED',
     })
   })
 })

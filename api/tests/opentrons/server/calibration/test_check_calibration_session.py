@@ -89,6 +89,10 @@ async def in_inspecting_first_tip(check_calibration_session):
         check_calibration_session
     )
     await check_calibration_session.trigger_transition(
+        session.CalibrationCheckTrigger.jog,
+        types.Point(0, 0, -0.2)
+    )
+    await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.pick_up_tip,
     )
     return check_calibration_session
@@ -191,6 +195,10 @@ async def in_preparing_second_pipette(check_calibration_session):
 async def in_inspecting_second_tip(check_calibration_session):
     check_calibration_session = await in_preparing_second_pipette(
         check_calibration_session
+    )
+    await check_calibration_session.trigger_transition(
+        session.CalibrationCheckTrigger.jog,
+        types.Point(0, 0, -0.5)
     )
     await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.pick_up_tip,
@@ -461,6 +469,8 @@ async def test_preparing_first_pipette_to_bad_calibration(
         session.CalibrationCheckState.preparingFirstPipette
     await check_calibration_session.trigger_transition(
             session.CalibrationCheckTrigger.pick_up_tip)
+    await check_calibration_session.trigger_transition(
+        session.CalibrationCheckTrigger.confirm_tip_attached)
     assert check_calibration_session.current_state.name == \
         session.CalibrationCheckState.badCalibrationData
 

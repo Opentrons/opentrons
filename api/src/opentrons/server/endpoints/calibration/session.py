@@ -297,7 +297,7 @@ class CalibrationCheckTrigger(str, Enum):
     reject_calibration = "rejectCalibration"
 
 
-CHECK_TRANSITIONS = [
+CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
     {
         "trigger": CalibrationCheckTrigger.load_labware,
         "from_state": CalibrationCheckState.sessionStarted,
@@ -308,25 +308,21 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.prepare_pipette,
         "from_state": CalibrationCheckState.labwareLoaded,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "after": "_move_first_pipette",
+        "after": "_move_first_pipette"
     },
     {
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.preparingFirstPipette,
         "to_state": CalibrationCheckState.preparingFirstPipette,
-        "before": "_jog_first_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingFirstPipette,
-        "to_state": CalibrationCheckState.badCalibrationData,
-        "condition": "_is_tip_pick_up_dangerous"
+        "before": "_jog_first_pipette",
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
         "from_state": CalibrationCheckState.preparingFirstPipette,
         "to_state": CalibrationCheckState.inspectingFirstTip,
-        "before": "_pick_up_pipette_tip"
+        "after": [
+            "_register_point_first_pipette",
+            "_pick_up_tip_first_pipette"]
     },
     {
         "trigger": CalibrationCheckTrigger.invalidate_tip,
@@ -334,6 +330,13 @@ CHECK_TRANSITIONS = [
         "to_state": CalibrationCheckState.preparingFirstPipette,
         "before": "_return_first_tip",
         "after": "_move_first_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
+        "from_state": CalibrationCheckState.inspectingFirstTip,
+        "to_state": CalibrationCheckState.badCalibrationData,
+        "condition": "_is_tip_pick_up_dangerous",
+        "after": "_return_first_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -424,19 +427,15 @@ CHECK_TRANSITIONS = [
         "trigger": CalibrationCheckTrigger.jog,
         "from_state": CalibrationCheckState.preparingSecondPipette,
         "to_state": CalibrationCheckState.preparingSecondPipette,
-        "before": "_jog_second_pipette"
-    },
-    {
-        "trigger": CalibrationCheckTrigger.pick_up_tip,
-        "from_state": CalibrationCheckState.preparingSecondPipette,
-        "to_state": CalibrationCheckState.badCalibrationData,
-        "condition": "_is_tip_pick_up_dangerous"
+        "before": "_jog_second_pipette",
     },
     {
         "trigger": CalibrationCheckTrigger.pick_up_tip,
         "from_state": CalibrationCheckState.preparingSecondPipette,
         "to_state": CalibrationCheckState.inspectingSecondTip,
-        "before": "_pick_up_pipette_tip"
+        "after": [
+            "_register_point_second_pipette",
+            "_pick_up_tip_second_pipette"]
     },
     {
         "trigger": CalibrationCheckTrigger.invalidate_tip,
@@ -444,6 +443,13 @@ CHECK_TRANSITIONS = [
         "to_state": CalibrationCheckState.preparingSecondPipette,
         "before": "_return_second_tip",
         "after": "_move_second_pipette"
+    },
+    {
+        "trigger": CalibrationCheckTrigger.confirm_tip_attached,
+        "from_state": CalibrationCheckState.inspectingSecondTip,
+        "to_state": CalibrationCheckState.badCalibrationData,
+        "condition": "_is_tip_pick_up_dangerous",
+        "after": "_return_second_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -497,6 +503,7 @@ CHECK_TRANSITIONS = [
         "to_state": CalibrationCheckState.badCalibrationData
     }
 ]
+
 
 MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
 
@@ -626,14 +633,33 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
     def _get_preparing_state_mount(self) -> typing.Optional[Mount]:
         pip = None
         if self.current_state_name == \
-                CalibrationCheckState.preparingFirstPipette:
+                CalibrationCheckState.inspectingFirstTip:
             pip = self._get_pipette_by_rank(PipetteRank.first)
         elif self.current_state_name == \
-                CalibrationCheckState.preparingSecondPipette:
+                CalibrationCheckState.inspectingSecondTip:
             pip = self._get_pipette_by_rank(PipetteRank.second)
         assert pip, f'cannot check prepare pipette from state:' \
                     f' {self.current_state_name}'
         return pip.mount
+
+    def _look_up_state(self) -> CalibrationCheckState:
+        """
+        We want to check whether a tip pick up was dangerous during the
+        tip inspection state, but the reference points are actually saved
+        during the preparing pipette state, so we should reference those
+        states when looking up the reference point.
+
+        :return: The calibration check state that the reference point
+        was saved under for tip pick up.
+        """
+        if self.current_state_name == CalibrationCheckState.inspectingFirstTip:
+            return CalibrationCheckState.preparingFirstPipette
+        elif self.current_state_name == \
+                CalibrationCheckState.inspectingSecondTip:
+            return CalibrationCheckState.preparingSecondPipette
+        else:
+            raise CalibrationException(
+                f"No transition available for state {self.current_state_name}")
 
     async def _is_tip_pick_up_dangerous(self):
         """
@@ -643,9 +669,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         mount = self._get_preparing_state_mount()
         assert mount, 'cannot attempt tip pick up, no mount specified'
 
-        current_pt = await self.hardware.gantry_position(mount)
+        ref_state = self._look_up_state()
+        jogged_pt = self._saved_points[getattr(CalibrationCheckState,
+                                               self.current_state_name)]
+
         ref_pt = self._saved_points[getattr(CalibrationCheckState,
-                                            self.current_state_name)]
+                                            ref_state)]
 
         ref_pt_no_safety = ref_pt - MOVE_TO_TIP_RACK_SAFETY_BUFFER
         threshold_vector = DEFAULT_OK_TIP_PICK_UP_VECTOR
@@ -657,18 +686,40 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         zThresholdMag = Point(0, 0, 0).magnitude_to(
                 threshold_vector._replace(x=0, y=0))
         xyDiffMag = ref_pt_no_safety._replace(z=0).magnitude_to(
-                current_pt._replace(z=0))
+                jogged_pt._replace(z=0))
         zDiffMag = ref_pt_no_safety._replace(x=0, y=0).magnitude_to(
-                current_pt._replace(x=0, y=0))
+                jogged_pt._replace(x=0, y=0))
         return xyDiffMag > xyThresholdMag or zDiffMag > zThresholdMag
 
-    async def _pick_up_pipette_tip(self):
+    async def _pick_up_tip_first_pipette(self):
         """
         Function to pick up tip. It will attempt to pick up a tip in
         the current location, and save any offset it might have from the
         original position.
         """
-        mount = self._get_preparing_state_mount()
+        pip = self._get_pipette_by_rank(PipetteRank.first)
+        assert pip, 'No pipette attached on first mount'
+
+        mount = pip.mount
+
+        assert mount, 'cannot attempt tip pick up, no mount specified'
+        assert self.pipettes[mount]['has_tip'] is False, \
+            f"Tip is already attached to {mount} pipette, " \
+            "cannot pick up another"
+
+        await self._pick_up_tip(mount)
+
+    async def _pick_up_tip_second_pipette(self):
+        """
+        Function to pick up tip. It will attempt to pick up a tip in
+        the current location, and save any offset it might have from the
+        original position.
+        """
+        pip = self._get_pipette_by_rank(PipetteRank.second)
+        assert pip, 'No pipette attached on second mount'
+
+        mount = pip.mount
+
         assert mount, 'cannot attempt tip pick up, no mount specified'
         assert self.pipettes[mount]['has_tip'] is False, \
             f"Tip is already attached to {mount} pipette, " \
@@ -705,14 +756,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             template_dict['vector'] = [0, 0, 0]
         return template_dict
 
-    def _determine_threshold(self):
+    def _determine_threshold(self, state: CalibrationCheckState) -> Point:
+        """
+        Helper function used to determine the threshold for comparison
+        based on the state currently being compared and the pipette.
+        """
         first_pipette = [
-            CalibrationCheckState.joggingFirstPipetteToHeight,
-            CalibrationCheckState.joggingFirstPipetteToPointOne,
-            CalibrationCheckState.joggingFirstPipetteToPointTwo,
-            CalibrationCheckState.joggingFirstPipetteToPointThree,
+            CalibrationCheckState.comparingFirstPipetteHeight,
+            CalibrationCheckState.comparingFirstPipettePointOne,
+            CalibrationCheckState.comparingFirstPipettePointTwo,
+            CalibrationCheckState.comparingFirstPipettePointThree,
         ]
-        if self.current_state_name in first_pipette:
+        if state in first_pipette:
             pip = self._get_pipette_by_rank(PipetteRank.first)
         else:
             pip = self._get_pipette_by_rank(PipetteRank.second)
@@ -722,19 +777,19 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             pipette_type = str(self.pipettes[pip.mount]['model'])
         is_p1000 = pipette_type.startswith('p1000')
         height_states = [
-            CalibrationCheckState.joggingFirstPipetteToHeight,
-            CalibrationCheckState.joggingSecondPipetteToHeight]
+            CalibrationCheckState.comparingFirstPipetteHeight,
+            CalibrationCheckState.comparingSecondPipetteHeight]
         cross_states = [
-            CalibrationCheckState.joggingFirstPipetteToPointOne,
-            CalibrationCheckState.joggingFirstPipetteToPointTwo,
-            CalibrationCheckState.joggingFirstPipetteToPointThree,
-            CalibrationCheckState.joggingSecondPipetteToPointOne
+            CalibrationCheckState.comparingFirstPipettePointOne,
+            CalibrationCheckState.comparingFirstPipettePointTwo,
+            CalibrationCheckState.comparingFirstPipettePointThree,
+            CalibrationCheckState.comparingSecondPipettePointOne
         ]
-        if is_p1000 and self.current_state_name in cross_states:
+        if is_p1000 and state in cross_states:
             return Point(2.7, 2.7, 0.0)
-        elif is_p1000 and self.current_state_name in height_states:
+        elif is_p1000 and state in height_states:
             return Point(0.0, 0.0, 1)
-        elif self.current_state_name in cross_states:
+        elif state in cross_states:
             return Point(1.79, 1.64, 0.0)
         else:
             return Point(0.0, 0.0, 0.8)
@@ -750,7 +805,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             jogged_pt = self._saved_points.get(getattr(CalibrationCheckState,
                                                        jogged_state), None)
 
-            threshold_vector = self._determine_threshold()
+            threshold_vector = self._determine_threshold(jogged_state)
             if (ref_pt is not None and jogged_pt is not None):
                 diff_magnitude = None
                 if threshold_vector.z == 0.0:
