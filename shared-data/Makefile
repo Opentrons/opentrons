@@ -35,8 +35,8 @@ install-js:
 
 .PHONY: install-py
 install-py:
-	$(pipenv_envvars) pipenv sync $(pipenv_opts)
-	$(pipenv_envvars) pipenv run pip freeze
+	cd python && $(pipenv_envvars) pipenv sync $(pipenv_opts)
+	cd python && $(pipenv_envvars) pipenv run pip freeze
 
 .PHONY: install
 install: install-py install-js
