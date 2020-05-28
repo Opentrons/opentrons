@@ -155,6 +155,6 @@ export type StepFormAndFieldErrors = {
 }
 
 export type StepArgsAndErrors = {
-  errors: StepFormAndFieldErrors,
+  errors: boolean,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
 }
