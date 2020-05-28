@@ -1,0 +1,30 @@
+---
+test_name: POST Identify
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Identify a robot by flashing the lights
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/identify"
+      params:
+        seconds: 5
+    response:
+      status_code: 200
+      json:
+        message: identifying
+---
+test_name: POST Identify without params
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Attempt to send identify request without parameters
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/identify"
+    response:
+      status_code: 422
+      json:
+        message: "query.seconds: field required"
