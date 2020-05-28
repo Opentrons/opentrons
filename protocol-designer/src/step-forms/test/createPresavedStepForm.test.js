@@ -285,6 +285,8 @@ describe('createPresavedStepForm', () => {
       lidIsActive: false,
       lidTargetTemp: null,
       lidOpen: null,
+      orderedProfileItems: [],
+      profileItemsById: {},
     })
   })
 
@@ -302,6 +304,8 @@ describe('createPresavedStepForm', () => {
           lidIsActive: true,
           lidTargetTemp: 45,
           lidOpen: true,
+          orderedProfileItems: [],
+          profileItemsById: {},
         },
       },
       orderedStepIds: ['prevStepId'],
@@ -321,6 +325,8 @@ describe('createPresavedStepForm', () => {
       lidIsActive: true,
       lidTargetTemp: 45,
       lidOpen: true,
+      orderedProfileItems: [],
+      profileItemsById: {},
     })
   })
 })

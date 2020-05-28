@@ -102,6 +102,8 @@ export function getDefaultsForStepType(
         lidIsActive: false,
         lidTargetTemp: null,
         lidOpen: null,
+        orderedProfileItems: [],
+        profileItemsById: {},
       }
     default:
       return {}
