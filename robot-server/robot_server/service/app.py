@@ -42,7 +42,12 @@ app.include_router(router=legacy_routes,
                    })
 
 # New v2 routes
-app.include_router(router=routes)
+app.include_router(router=routes,
+                   responses={
+                       HTTP_422_UNPROCESSABLE_ENTITY: {
+                           "model": ErrorResponse
+                       }
+                   })
 
 
 @app.on_event("startup")
