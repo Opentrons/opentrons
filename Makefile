@@ -53,8 +53,8 @@ install-py:
 install-js:
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install-js
+	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) install-js
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
