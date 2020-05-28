@@ -42,10 +42,7 @@ import type {
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, ProfileItem, StepIdType } from '../../form-types'
-import type {
-  StepArgsAndErrors,
-  StepFormAndFieldErrors,
-} from '../../steplist/types'
+import type { StepArgsAndErrors, StepFormErrors } from '../../steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -427,11 +424,7 @@ const _getProfileItemsHaveErrors = (profileItems: {
   forEach(profileItems, (item, itemId) => {
     forEach(item, (value, fieldName) => {
       const fieldErrors = getProfileFieldErrors(fieldName, value)
-      console.log('_getProfileItemsHaveErrors', {
-        value,
-        fieldName,
-        fieldErrors,
-      })
+
       if (fieldErrors.length > 0) {
         errors = true
         // TODO IMMEDIATELY: break out of it early
@@ -442,11 +435,12 @@ const _getProfileItemsHaveErrors = (profileItems: {
 }
 
 // TODO type with hydrated form type
-const _getFormAndFieldErrorsFromHydratedForm_TODO_NEW = (
-  hydratedForm: FormData
-): boolean => {
-  let errors: boolean = false
+const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
+  return getFormErrors(hydratedForm.stepType, hydratedForm)
+}
 
+const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
+  let errors = false
   forEach(hydratedForm, (value, fieldName) => {
     if (fieldName === 'profileItemsById') {
       errors = errors || _getProfileItemsHaveErrors(value)
@@ -458,39 +452,13 @@ const _getFormAndFieldErrorsFromHydratedForm_TODO_NEW = (
       }
     }
   })
-  console.log({ hydratedForm })
-  const formErrors = getFormErrors(hydratedForm.stepType, hydratedForm)
-  if (formErrors && formErrors.length > 0) {
-    errors = true
-  }
-
   return errors
 }
 
 // TODO type with hydrated form type
-const _getFormAndFieldErrorsFromHydratedForm = (
-  hydratedForm: FormData
-): StepFormAndFieldErrors => {
-  let errors: StepFormAndFieldErrors = {}
-
-  forEach(hydratedForm, (value, fieldName) => {
-    const fieldErrors = getFieldErrors(fieldName, value)
-    if (fieldErrors && fieldErrors.length > 0) {
-      errors = {
-        ...errors,
-        field: {
-          ...errors.field,
-          [fieldName]: fieldErrors,
-        },
-      }
-    }
-  })
-  const formErrors = getFormErrors(hydratedForm.stepType, hydratedForm)
-  if (formErrors && formErrors.length > 0) {
-    errors = { ...errors, form: formErrors }
-  }
-
-  return errors
+const _formHasErrors = (hydratedForm: FormData): boolean => {
+  const hasFormLevelErrors = _formLevelErrors(hydratedForm).length > 0
+  return _hasFieldLevelErrors(hydratedForm) || hasFormLevelErrors
 }
 
 export const getInvariantContext: Selector<InvariantContext> = createSelector(
@@ -516,11 +484,11 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
 )
 
 // NOTE this is only used in FormAlerts
-export const getUnsavedFormErrors: Selector<StepFormAndFieldErrors | null> = createSelector(
+export const getUnsavedFormErrors: Selector<StepFormErrors> = createSelector(
   getHydratedUnsavedForm,
   hydratedForm => {
-    if (!hydratedForm) return null
-    const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
+    if (!hydratedForm) return []
+    const errors = _formLevelErrors(hydratedForm)
     return errors
   }
 )
@@ -529,7 +497,7 @@ export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
   getHydratedUnsavedForm,
   hydratedForm => {
     if (!hydratedForm) return false
-    return !_getFormAndFieldErrorsFromHydratedForm_TODO_NEW(hydratedForm)
+    return !_formHasErrors(hydratedForm)
   }
 )
 
@@ -543,10 +511,8 @@ export const getArgsAndErrorsByStepId: Selector<{
       stepForms,
       (acc, stepForm) => {
         const hydratedForm = _getHydratedForm(stepForm, contextualState)
-        const errors = _getFormAndFieldErrorsFromHydratedForm_TODO_NEW(
-          hydratedForm
-        )
-        const nextStepData = errors
+        const errors = _formHasErrors(hydratedForm)
+        const nextStepData = !errors
           ? { stepArgs: stepFormToArgs(hydratedForm) }
           : { errors, stepArgs: null }
 
