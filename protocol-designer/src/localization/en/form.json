@@ -143,6 +143,12 @@
           "toggleOff": "Closed",
           "toggleOn": "Open"
         }
+      },
+      "thermocyclerProfile": {
+        "volume": "volume",
+        "lid_temp": "lid temp",
+        "lid_position": "lid position",
+        "lid_closed": "Closed"
       }
     }
   }
