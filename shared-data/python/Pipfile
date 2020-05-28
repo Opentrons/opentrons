@@ -1,0 +1,18 @@
+[[source]]
+url = "https://pypi.python.org/simple"
+verify_ssl = true
+name = "pypi"
+
+[requires]
+python_version = "3.7"
+
+[dev-packages]
+typing-extensions = "*"
+mypy = "==0.770"
+pylama = "*"
+twine = "==2.0.0"
+wheel = "==0.30.0"
+"e1839a8" = {editable = true, path = "."}
+
+[packages]
+jsonschema = "==3.0.2"
