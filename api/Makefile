@@ -1,5 +1,8 @@
 # opentrons api makefile
 
+include ../scripts/push.mk
+include ../scripts/python.mk
+
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
 
@@ -13,21 +16,13 @@ SHX := npx shx
 firmware = $(wildcard smoothie/*.hex)
 
 # python and pipenv config
-pipenv_envvars := $(and $(CI),PIPENV_IGNORE_VIRTUALENVS=1)
-python := $(pipenv_envvars) pipenv run python
-pip := $(pipenv_envvars) pipenv run pip
-pytest := $(pipenv_envvars) pipenv run py.test
 sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
-pipenv_opts := --dev
-pipenv_opts += $(and $(CI),--keep-outdated --clear)
-wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 
 
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/opentrons-$(shell $(python) ../scripts/python_build_utils.py api normalize_version)-py2.py3-none-any.whl
-wheel_pattern := dist/opentrons-%-py2.py3-none-any.whl
+wheel_file = dist/$(call python_get_wheelname,api,opentrons)
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -46,11 +41,11 @@ pypi_username ?=
 pypi_password ?=
 
 # Host key location for buildroot robot
-br_ssh_key ?= ~/.ssh/robot_key
+br_ssh_key ?= $(default_ssh_key)
 # Pubkey location for buildroot robot to install with install-key
 br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
-ssh_opts ?= -o stricthostkeychecking=no -o userknownhostsfile=/dev/null
+ssh_opts ?= $(default_ssh_opts)
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 
@@ -85,7 +80,7 @@ clean: docs-clean
 uninstall:
 	$(pipenv_envvars)	pipenv --rm
 
-$(wheel_pattern): setup.py $(ot_sources)
+dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
 	$(clean_cmd)
 	$(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) rm -rf build
@@ -142,17 +137,11 @@ local-shell:
 
 .PHONY: push-no-restart
 push-no-restart: wheel
-	scp -i $(br_ssh_key) $(ssh_opts) $(wheel_file) root@$(host):/data/
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"function cleanup () { rm -f /data/opentrons*.whl && mount -o remount,ro / ; } ;\
-mount -o remount,rw / &&\
-cd /usr/lib/python3.7/site-packages &&\
-unzip -o /data/opentrons-*.whl && cleanup || cleanup"
+	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
 
 .PHONY: push
 push: push-no-restart
-	ssh -i $(br_ssh_key) $(ssh_opts) root@$(host) \
-"systemctl restart jupyter-notebook && systemctl restart opentrons-robot-server"
+	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),"jupyter-notebook opentrons-robot-server")
 
 .PHONY: simulate
 simulate:
