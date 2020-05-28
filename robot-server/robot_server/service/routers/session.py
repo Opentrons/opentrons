@@ -3,11 +3,11 @@ from uuid import uuid4
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
-from opentrons.server.endpoints.calibration.session import \
-    (CheckCalibrationSession, SessionManager,
-     CalibrationSession, CalibrationException)
-from opentrons.server.endpoints.calibration.util import StateMachineError
-from opentrons.server.endpoints.calibration import models
+from opentrons.calibration.check.session import CheckCalibrationSession
+from opentrons.calibration.session import CalibrationSession, \
+    CalibrationException, SessionManager
+from opentrons.calibration.util import StateMachineError
+from opentrons.calibration.check import models
 
 
 from robot_server.service.dependencies import get_session_manager, get_hardware

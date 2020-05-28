@@ -2,10 +2,9 @@ from enum import Enum
 import typing
 
 from pydantic import BaseModel, Field, validator
-from opentrons.server.endpoints.calibration import \
-    models as calibration_models
-from opentrons.server.endpoints.calibration.session import \
-    CalibrationCheckTrigger
+from opentrons.calibration.check import models as calibration_models
+from opentrons.calibration.check.session import CalibrationCheckTrigger
+
 
 from robot_server.service.models import EmptyModel
 from robot_server.service.models.json_api.response import ResponseDataModel,\
