@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 import {
@@ -49,7 +48,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
 
         <RadioGroupField
           name="thermocyclerFormType"
-          className={cx(styles.tc_step_option, styles.disabled)}
+          className={styles.tc_step_option}
           options={[
             {
               name: i18n.t(
@@ -61,6 +60,18 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           {...focusHandlers}
         />
       </div>
+
+      <ConditionalOnField
+        name={'thermocyclerFormType'}
+        condition={val => val === THERMOCYCLER_PROFILE}
+      >
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.ending_hold')}
+          </span>
+        </div>
+        <StateFields focusHandlers={focusHandlers} isEndingHold />
+      </ConditionalOnField>
     </div>
   )
 }
