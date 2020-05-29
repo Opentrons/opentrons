@@ -5,6 +5,7 @@ import { mixFormToArgs } from './mixFormToArgs'
 import { pauseFormToArgs } from './pauseFormToArgs'
 import { magnetFormToArgs } from './magnetFormToArgs'
 import { temperatureFormToArgs } from './temperatureFormToArgs'
+import { thermocyclerFormToArgs } from './thermocyclerFormToArgs'
 import { moveLiquidFormToArgs } from './moveLiquidFormToArgs'
 import type { FormData } from '../../../form-types'
 import type { CommandCreatorArgs } from '../../../step-generation'
@@ -33,6 +34,8 @@ export const stepFormToArgs = (hydratedForm: FormData): StepArgs => {
       return magnetFormToArgs(castForm)
     case 'temperature':
       return temperatureFormToArgs(castForm)
+    case 'thermocycler':
+      return thermocyclerFormToArgs(castForm)
     default:
       console.warn(`stepFormToArgs not implemented for ${castForm.stepType}`)
       return null

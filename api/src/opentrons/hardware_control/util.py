@@ -11,8 +11,7 @@ mod_log = logging.getLogger(__name__)
 
 def _handle_loop_exception(loop: asyncio.AbstractEventLoop,
                            context: Dict[str, Any]):
-    mod_log.error(f"Caught exception: {context['exception']}:"
-                  f" {context['message']}")
+    mod_log.error(f"Caught exception: {context}")
 
 
 def use_or_initialize_loop(loop: Optional[asyncio.AbstractEventLoop]

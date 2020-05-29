@@ -15,12 +15,12 @@ describe('createSessionCommandEpic', () => {
 
   const expectedRequest = {
     method: 'POST',
-    path: '/sessions/1234/commands',
+    path: '/sessions/1234/commands/execute',
     body: {
       data: {
         type: 'Command',
         attributes: {
-          command: 'dosomething',
+          command: 'jog',
           data: {
             someData: 32,
           },
@@ -29,7 +29,7 @@ describe('createSessionCommandEpic', () => {
     },
   }
 
-  it('calls POST /sessions/1234/commands', () => {
+  it('calls POST /sessions/1234/commands/execute', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
       Fixtures.mockSessionCommandsSuccess

@@ -4,9 +4,15 @@ import assert from 'assert'
 import { orderWells } from '../steplist/utils/orderWells.js'
 import min from 'lodash/min'
 import sortBy from 'lodash/sortBy'
-import { getTiprackVolume } from '@opentrons/shared-data'
+import {
+  getTiprackVolume,
+  THERMOCYCLER_MODULE_TYPE,
+} from '@opentrons/shared-data'
 import type { InvariantContext, RobotState } from './'
-import type { ModuleTemporalProperties } from '../step-forms'
+import type {
+  ModuleTemporalProperties,
+  ThermocyclerModuleState,
+} from '../step-forms'
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
@@ -146,4 +152,14 @@ export function getModuleState(
   }
 
   return robotState.modules[module]?.moduleState
+}
+
+export const thermocyclerStateGetter = (
+  robotState: RobotState,
+  moduleId: string
+): ThermocyclerModuleState | null => {
+  const hardwareModule = robotState.modules[moduleId]?.moduleState
+  return hardwareModule && hardwareModule.type === THERMOCYCLER_MODULE_TYPE
+    ? hardwareModule
+    : null
 }

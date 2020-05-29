@@ -2,7 +2,7 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
-import { mockRobotCalibrationCheckSessionData } from '../../../calibration/__fixtures__'
+import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
 import { TipPickUp } from '../TipPickUp'
 
 describe('TipPickUp', () => {
@@ -29,7 +29,7 @@ describe('TipPickUp', () => {
     render = (props = {}) => {
       const {
         isMulti = false,
-        tiprack = mockRobotCalibrationCheckSessionData.labware[0],
+        tiprack = mockRobotCalibrationCheckSessionDetails.labware[0],
         isInspecting = false,
         tipRackWellName = 'A1',
       } = props

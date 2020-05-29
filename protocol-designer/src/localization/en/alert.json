@@ -38,6 +38,14 @@
     },
     "change_magnet_module_model": {
       "title": "All existing engage heights will be cleared"
+    },
+    "thermocycler_lid_passive_cooling": {
+      "title": "Lid temperature",
+      "body1a": "Please note that the lid ",
+      "strong_body1": "does not actively cool",
+      "body1b": ". When entering a temperature lower than the previous temperature, keep in mind the following:",
+      "li1": "If the Thermocycler lid is closed it may take a very long time to reach a cooler temperature.",
+      "li2": "If the room temperature in your lab is higher than the temperature you have defined, the lid will never reach it. This will stall your protocol indefinitely."
     }
   },
   "timeline": {
@@ -61,6 +69,10 @@
       "MISSING_TEMPERATURE_STEP": {
         "title": "Missing Temperature step",
         "body": "Add a Temperature step prior to this Pause step. The module is not currently changing temperature because it has either been deactivated or is holding a temperature"
+      },
+      "THERMOCYCLER_LID_CLOSED": {
+        "title": "Thermocycler lid is closed",
+        "body": "Before a pipette can interact with labware in the Thermocycler, the lid must be open. To resolve this error, please add a thermocycler step ahead of the current step, and set the lid status to \"open\"."
       }
     },
     "warning": {

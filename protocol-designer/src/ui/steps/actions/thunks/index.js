@@ -11,7 +11,10 @@ import { uuid } from '../../../../utils'
 import { selectors as labwareIngredsSelectors } from '../../../../labware-ingred/selectors'
 import { getSelectedStepId } from '../../selectors'
 import { addStep } from '../actions'
-import { actions as tutorialActions } from '../../../../tutorial'
+import {
+  actions as tutorialActions,
+  selectors as tutorialSelectors,
+} from '../../../../tutorial'
 
 import * as uiModuleSelectors from '../../../../ui/modules/selectors'
 import type { DuplicateStepAction } from '../types'
@@ -125,6 +128,10 @@ export const saveStepForm = () => (
       'Tried to saveStepForm with falsey unsavedForm. This should never be able to happen.'
     )
     return
+  }
+
+  if (tutorialSelectors.shouldShowCoolingHint(initialState)) {
+    dispatch(tutorialActions.addHint('thermocycler_lid_passive_cooling'))
   }
 
   // save the form

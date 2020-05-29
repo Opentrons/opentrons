@@ -3,6 +3,7 @@ import {
   getLabwareDefURI,
   TEMPERATURE_MODULE_TYPE,
   TEMPERATURE_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   fixtureP10Single,
@@ -21,7 +22,10 @@ import {
   repeatArray,
   makeInitialRobotState,
 } from '../utils/misc'
+import { thermocyclerStateDiff } from '../utils/thermocyclerStateDiff'
 import { FIXED_TRASH_ID } from '../__fixtures__'
+import { thermocyclerPipetteCollision } from '../utils'
+import type { RobotState } from '../'
 
 describe('splitLiquid', () => {
   const singleIngred = {
@@ -290,4 +294,375 @@ describe('makeInitialRobotState', () => {
       },
     })
   ).toMatchSnapshot()
+})
+
+describe('thermocyclerStateDiff', () => {
+  const getInitialDiff = () => ({
+    lidOpen: false,
+    lidClosed: false,
+    setBlockTemperature: false,
+    deactivateBlockTemperature: false,
+    setLidTemperature: false,
+    deactivateLidTemperature: false,
+  })
+  const thermocyclerId = 'thermocyclerId'
+  const testCases = [
+    {
+      testMsg: 'returns lidOpen when the lid state has changed to open',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: true,
+      },
+      expected: {
+        ...getInitialDiff(),
+        lidOpen: true,
+      },
+    },
+    {
+      testMsg:
+        'does NOT return lidOpen when the lid state did not change to open',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        lidOpen: false,
+        lidClosed: true,
+      },
+    },
+    {
+      testMsg: 'returns lidClosed when the lid state has changed to closed',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        lidClosed: true,
+      },
+    },
+    {
+      testMsg:
+        'does NOT return lidClosed when the lid state did not change to closed',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: true,
+      },
+      expected: {
+        ...getInitialDiff(),
+        lidClosed: false,
+        lidOpen: true,
+      },
+    },
+    {
+      testMsg:
+        'returns setLidTemperature when the lid temperature state changes from null to non null value',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: 20,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: true,
+      },
+    },
+    {
+      testMsg:
+        'returns setLidTemperature when the lid temperature state changes from a non null value to a different non null value',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: 20,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: 30,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: true,
+      },
+    },
+    {
+      testMsg:
+        'does NOT return setLidTemperature when the lid temperature state stays the same ',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: 20,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: 20,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        setLidTemperature: false,
+      },
+    },
+    {
+      testMsg:
+        'returns deactivateLidTemperature when the lid temperature state changes from a non null value to null',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: 20,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        deactivateLidTemperature: true,
+      },
+    },
+    {
+      testMsg:
+        'returns setBlockTemperature when the block temperature state has changed to non null value',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: 20,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        setBlockTemperature: true,
+      },
+    },
+    {
+      testMsg:
+        'returns no diff when the block temperature state is the same number as previous',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: 20,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: 20,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+      },
+    },
+    {
+      testMsg:
+        'returns activate block when temp goes from number to a different number',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: 20,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: 40,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        setBlockTemperature: true,
+      },
+    },
+    {
+      testMsg: 'returns deactivate block when temp goes from number to null',
+      moduleState: {
+        type: THERMOCYCLER_MODULE_TYPE,
+        blockTargetTemp: 20,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      args: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      expected: {
+        ...getInitialDiff(),
+        deactivateBlockTemperature: true,
+      },
+    },
+  ]
+  testCases.forEach(({ testMsg, moduleState, args, expected }) => {
+    it(testMsg, () => {
+      expect(thermocyclerStateDiff(moduleState, args)).toEqual(expected)
+    })
+  })
+})
+
+describe('thermocyclerPipetteColision', () => {
+  const thermocyclerId = 'thermocyclerId'
+  const labwareOnTCId = 'labwareOnTCId'
+
+  const testCases: Array<{|
+    testMsg: string,
+    modules: $PropertyType<RobotState, 'modules'>,
+    labware: $PropertyType<RobotState, 'labware'>,
+    labwareId: string,
+    expected: boolean,
+  |}> = [
+    {
+      testMsg:
+        'returns true when aspirating from labware on TC with lidOpen set to null',
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: null,
+          },
+        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+      },
+      labwareId: labwareOnTCId,
+      expected: true,
+    },
+    {
+      testMsg:
+        'returns true when aspirating from labware on TC with lidOpen set to false',
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: false,
+          },
+        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+      },
+      labwareId: labwareOnTCId,
+      expected: true,
+    },
+    {
+      testMsg:
+        'returns false when aspirating from labware on TC with lidOpen set to true',
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: true,
+          },
+        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId }, // when labware is on a module, the slot is the module's id
+      },
+      labwareId: labwareOnTCId,
+      expected: false,
+    },
+    {
+      testMsg:
+        'returns false when labware is not on TC, even when TC lid is closed',
+      modules: {
+        [thermocyclerId]: {
+          slot: '7',
+          moduleState: {
+            type: THERMOCYCLER_MODULE_TYPE,
+            blockTargetTemp: null,
+            lidTargetTemp: null,
+            lidOpen: false,
+          },
+        },
+      },
+      labware: {
+        [labwareOnTCId]: { slot: thermocyclerId },
+      },
+      labwareId: 'someOtherLabwareNotOnTC',
+      expected: false,
+    },
+  ]
+
+  testCases.forEach(({ testMsg, modules, labware, labwareId, expected }) => {
+    it(testMsg, () => {
+      expect(thermocyclerPipetteCollision(modules, labware, labwareId)).toBe(
+        expected
+      )
+    })
+  })
 })

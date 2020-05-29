@@ -5,6 +5,7 @@ a protocol from the command line.
 """
 
 import argparse
+import asyncio
 
 import sys
 import logging
@@ -16,11 +17,13 @@ from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
 
 
 import opentrons
+from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.protocol_api import execute, MAX_SUPPORTED_VERSION
 import opentrons.commands
 import opentrons.broker
 from opentrons.config import IS_ROBOT, JUPYTER_NOTEBOOK_LABWARE_DIR
 from opentrons import protocol_api
+from opentrons.protocol_api.util import HardwareToManage
 from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents, APIVersion)
@@ -113,7 +116,8 @@ def get_protocol_api(
         version: Union[str, APIVersion],
         bundled_labware: Dict[str, Dict[str, Any]] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Dict[str, Any]] = None)\
+        extra_labware: Dict[str, Dict[str, Any]] = None,
+        hardware_simulator: HardwareToManage = None)\
         -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext`connected to
@@ -154,6 +158,7 @@ def get_protocol_api(
                           on a robot, it will look in the 'labware'
                           subdirectory of the Jupyter data directory for
                           custom labware.
+    :param hardware_simulator: If specified, a hardware simulator instance.
     :returns opentrons.protocol_api.ProtocolContext: The protocol context.
     """
     if isinstance(version, str):
@@ -168,14 +173,16 @@ def get_protocol_api(
         extra_labware = labware_from_paths(
             [str(JUPYTER_NOTEBOOK_LABWARE_DIR)])
     return _build_protocol_context(
-        checked_version, bundled_labware, bundled_data, extra_labware)
+        checked_version, bundled_labware, bundled_data,
+        extra_labware, hardware_simulator)
 
 
 def _build_protocol_context(
         version: APIVersion = None,
         bundled_labware: Dict[str, Dict[str, Any]] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Dict[str, Any]] = None,)\
+        extra_labware: Dict[str, Dict[str, Any]] = None,
+        hardware_simulator: HardwareToManage = None,)\
         -> protocol_api.ProtocolContext:
     """ Internal version of :py:meth:`get_protocol_api` that allows deferring
     version specification for use with
@@ -185,7 +192,9 @@ def _build_protocol_context(
         bundled_labware=bundled_labware,
         bundled_data=bundled_data,
         api_version=version,
-        extra_labware=extra_labware)
+        extra_labware=extra_labware,
+        hardware=hardware_simulator,
+    )
     context.home()
     return context
 
@@ -215,6 +224,7 @@ def simulate(protocol_file: TextIO,
              custom_labware_paths: List[str] = None,
              custom_data_paths: List[str] = None,
              propagate_logs: bool = False,
+             hardware_simulator_file_path: str = None,
              log_level: str = 'warning') -> Tuple[List[Mapping[str, Any]],
                                                   Optional[BundleContents]]:
     """
@@ -262,6 +272,8 @@ def simulate(protocol_file: TextIO,
                               non-recursive contents of specified directories
                               are presented by the protocol context in
                               :py:attr:`.ProtocolContext.bundled_data`.
+    :param hardware_simulator_file_path: A path to a JSON file defining a
+                                         hardware simulator.
     :param propagate_logs: Whether this function should allow logs from the
                            Opentrons stack to propagate up to the root handler.
                            This can be useful if you're integrating this
@@ -293,6 +305,12 @@ def simulate(protocol_file: TextIO,
     else:
         extra_data = {}
 
+    hardware_simulator = None
+    if hardware_simulator_file_path:
+        hardware_simulator = asyncio.get_event_loop().run_until_complete(
+            load_simulator(pathlib.Path(hardware_simulator_file_path))
+        )
+
     protocol = parse.parse(contents, file_name,
                            extra_labware=extra_labware,
                            extra_data=extra_data)
@@ -316,6 +334,7 @@ def simulate(protocol_file: TextIO,
             getattr(protocol, 'api_level', MAX_SUPPORTED_VERSION),
             bundled_labware=getattr(protocol, 'bundled_labware', None),
             bundled_data=getattr(protocol, 'bundled_data', None),
+            hardware_simulator=hardware_simulator,
             extra_labware=gpa_extras)
         scraper = CommandScraper(stack_logger, log_level, context.broker)
         try:
@@ -349,7 +368,7 @@ def format_runlog(runlog: List[Mapping[str, Any]]) -> str:
             to_ret.extend(
                 ['\t' * command['level']
                  + f'{l.levelname} ({l.module}): {l.msg}' % l.args
-                 for l in command['logs']])
+                 for l in command['logs']])  # noqa(E741)
     return '\n'.join(to_ret)
 
 
@@ -427,6 +446,12 @@ def get_arguments(
              'Also note that data files are made available as their name, not '
              'their full path, so name them uniquely.')
     parser.add_argument(
+        '-s', '--custom-hardware-simulator-file',
+        type=str, default=None,
+        help='Specify a file that describes the features present in the '
+             'hardware simulator. Features can be instruments, modules, and '
+             'configuration.')
+    parser.add_argument(
         '-d', '--custom-data-file',
         action='append', default=[],
         help='Specify data files to be made available in '
@@ -494,6 +519,8 @@ def main() -> int:
         getattr(args, 'custom_labware_path', []),
         getattr(args, 'custom_data_path', [])
         + getattr(args, 'custom_data_file', []),
+        hardware_simulator_file_path=getattr(args,
+                                             'custom_hardware_simulator_file'),
         log_level=args.log_level)
 
     if maybe_bundle:

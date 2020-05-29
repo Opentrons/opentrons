@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
+import { Icon, PrimaryButton, Link, type Mount } from '@opentrons/components'
 
-import { type RobotCalibrationCheckComparison } from '../../calibration'
+import {
+  type RobotCalibrationCheckComparison,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
@@ -73,6 +76,13 @@ const BAD_INSPECTING_BODY =
 const GOOD_INSPECTING_BODY =
   "Your current pipette tip position matches your robot's saved calibration data."
 const DIFFERENCE = 'Difference'
+const DECK_CAL_BLURB =
+  'To resolve this, you will need to perform deck calibration. Read'
+const THIS_ARTICLE = 'this article'
+const TO_LEARN = 'to learn more'
+const DECK_CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
+const CONTACT_SUPPORT = 'Please contact Opentrons support for next steps.'
 
 type CheckXYPointProps = {|
   slotNumber: string | null,
@@ -221,6 +231,20 @@ function CompareXY(props: CompareXYProps) {
         </div>
       </div>
       {instructions}
+      {exceedsThreshold &&
+        (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
+          <p className={styles.difference_body}>
+            {DECK_CAL_BLURB}
+            &nbsp;
+            <Link href={DECK_CAL_ARTICLE_URL} external>
+              {THIS_ARTICLE}
+            </Link>
+            &nbsp;
+            {TO_LEARN}
+          </p>
+        ) : (
+          <p className={styles.difference_body}>{CONTACT_SUPPORT}</p>
+        ))}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{EXIT_CHECK}</PrimaryButton>

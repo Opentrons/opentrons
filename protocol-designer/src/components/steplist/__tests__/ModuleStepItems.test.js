@@ -19,7 +19,7 @@ beforeEach(() => {
 test('message is displayed when message exists', () => {
   const wrapper = shallow(<ModuleStepItems {...props} />)
 
-  expect(wrapper.find('PDListItem')).toHaveLength(2)
+  expect(wrapper.find('PDListItem')).toHaveLength(1)
   // TODO 2020-2-4 JF maybe use data attributes when implemented
   expect(
     wrapper
@@ -34,7 +34,6 @@ test('message is not displayed when no message', () => {
 
   const wrapper = shallow(<ModuleStepItems {...props} />)
 
-  expect(wrapper.find('PDListItem')).toHaveLength(1)
   expect(wrapper.find('.step-item-message').exists()).toEqual(false)
 })
 
@@ -51,4 +50,10 @@ test('labware nickname and display name is displayed in the tooltip', () => {
   const wrapper = mount(<ModuleStepItems {...props} />)
 
   expect(wrapper.text()).toContain(props.labwareNickname)
+})
+
+test('accepts arbitrary children', () => {
+  const wrapper = mount(<ModuleStepItems {...props}>Child</ModuleStepItems>)
+
+  expect(wrapper.text()).toContain('Child')
 })

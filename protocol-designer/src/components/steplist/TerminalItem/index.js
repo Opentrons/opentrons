@@ -1,14 +1,14 @@
 // @flow
 import React, { type Node } from 'react'
-import { useConditionalConfirm } from '../../useConditionalConfirm'
 import { useSelector, useDispatch } from 'react-redux'
-import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
+import { useConditionalConfirm } from '@opentrons/components'
 import {
   getHoveredTerminalItemId,
   getSelectedTerminalItemId,
   actions as stepsActions,
 } from '../../../ui/steps'
 import { getCurrentFormIsPresaved } from '../../../step-forms/selectors'
+import { ConfirmDeleteStepModal } from '../../modals/ConfirmDeleteStepModal'
 import { PDTitledList } from '../../lists'
 import type { TerminalItemId } from '../../../steplist'
 
@@ -35,19 +35,17 @@ export const TerminalItem = (props: Props) => {
   const onMouseEnter = () => dispatch(stepsActions.hoverOnTerminalItem(id))
   const onMouseLeave = () => dispatch(stepsActions.hoverOnTerminalItem(null))
 
-  const {
-    conditionalContinue,
-    requiresConfirmation,
-    confirmAndContinue,
-    cancelConfirm,
-  } = useConditionalConfirm(selectItem, currentFormIsPresaved)
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    selectItem,
+    currentFormIsPresaved
+  )
 
   return (
     <>
-      {requiresConfirmation && (
+      {showConfirmation && (
         <ConfirmDeleteStepModal
-          onContinueClick={confirmAndContinue}
-          onCancelClick={cancelConfirm}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
         />
       )}
       <PDTitledList
@@ -56,7 +54,7 @@ export const TerminalItem = (props: Props) => {
           selected,
           title,
           children,
-          onClick: conditionalContinue,
+          onClick: confirm,
           onMouseEnter,
           onMouseLeave,
         }}

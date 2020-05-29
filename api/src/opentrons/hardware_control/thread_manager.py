@@ -174,9 +174,6 @@ class ThreadManager:
         object.__getattribute__(self, 'wrap_module').cache_clear()
         object.__getattribute__(self, '_thread').join()
 
-    def __del__(self):
-        self.clean_up()
-
     @functools.lru_cache(8)
     def wrap_module(
             self, module: AbstractModule) -> CallBridger[AbstractModule]:
@@ -193,6 +190,39 @@ class ThreadManager:
             managed = object.__getattribute__(self, 'managed_obj')
             attr = getattr(managed, attr_name)
             return [wrap(mod) for mod in attr]
+        elif attr_name == 'clean_up':
+            # the wrapped object probably has this attr as well as us, and we
+            # want to call both, with the wrapped one first
+
+            # we only want to call cleanup once, and then only if the loop
+            # is running
+            wrapped_loop = object.__getattribute__(self, '_loop')
+            if not wrapped_loop.is_running():
+                return lambda: None
+
+            wrapped_cleanup = getattr(
+                    object.__getattribute__(self, 'bridged_obj'), 'clean_up')
+            our_cleanup = object.__getattribute__(self, 'clean_up')
+
+            def call_both():
+                # the wrapped cleanup wants to happen in the managed thread,
+                # started from the managed loop. our cleanup wants to happen
+                # in the current thread, _after_ the wrapped cleanup is done
+                # so cancelled tasks can have a chance to complete.
+                async def clean_and_notify():
+                    wrapped_cleanup()
+                    # this sleep allows the wrapped loop to spin a couple
+                    # times to clean up the tasks we just cancelled. My kingdom
+                    # for an asyncio.spin_once()
+                    await asyncio.sleep(0.1)
+
+                fut = asyncio.run_coroutine_threadsafe(
+                    clean_and_notify(), wrapped_loop)
+                fut.result()
+                our_cleanup()
+
+            return call_both
+
         else:
             try:
                 return getattr(

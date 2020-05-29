@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 
 import { i18n } from '../../../../localization'
 import {
@@ -8,8 +7,13 @@ import {
   THERMOCYCLER_PROFILE,
 } from '../../../../constants.js'
 
-import { RadioGroupField, ConditionalOnField } from '../../fields'
+import {
+  ConditionalOnField,
+  ProfileStepRows,
+  RadioGroupField,
+} from '../../fields'
 import { StateFields } from './StateFields'
+import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
@@ -46,10 +50,9 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
         >
           <StateFields focusHandlers={focusHandlers} />
         </ConditionalOnField>
-
         <RadioGroupField
           name="thermocyclerFormType"
-          className={cx(styles.tc_step_option, styles.disabled)}
+          className={styles.tc_step_option}
           options={[
             {
               name: i18n.t(
@@ -61,6 +64,32 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           {...focusHandlers}
         />
       </div>
+
+      <ConditionalOnField
+        name={'thermocyclerFormType'}
+        condition={val => val === THERMOCYCLER_PROFILE}
+      >
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.profile_settings')}
+          </span>
+        </div>
+        <ProfileSettings focusHandlers={focusHandlers} />
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.profile_steps')}
+          </span>
+        </div>
+        <p>
+          <ProfileStepRows focusHandlers={focusHandlers} />
+        </p>
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.ending_hold')}
+          </span>
+        </div>
+        <StateFields focusHandlers={focusHandlers} isEndingHold />
+      </ConditionalOnField>
     </div>
   )
 }

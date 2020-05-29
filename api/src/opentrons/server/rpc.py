@@ -285,7 +285,7 @@ class RPCServer(object):
             try:
                 line_msg = ' [line ' + [
                     l.split(',')[0].strip()
-                    for l in trace.split('line')
+                    for l in trace.split('line')  # noqa(E741)
                     if '<module>' in l][0] + ']'
             except Exception:
                 line_msg = ''

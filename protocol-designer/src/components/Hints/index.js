@@ -89,6 +89,24 @@ class HintsComponent extends React.Component<Props, State> {
             <p>{i18n.t(`alert.hint.${hintKey}.body`)}</p>
           </>
         )
+      case 'thermocycler_lid_passive_cooling':
+        return (
+          <>
+            <p>
+              {i18n.t(`alert.hint.${hintKey}.body1a`)}
+              <strong>{i18n.t(`alert.hint.${hintKey}.strong_body1`)}</strong>
+              {i18n.t(`alert.hint.${hintKey}.body1b`)}
+            </p>
+            <ol className={styles.numbered_list}>
+              <li>
+                <span>{i18n.t(`alert.hint.${hintKey}.li1`)}</span>
+              </li>
+              <li>
+                <span>{i18n.t(`alert.hint.${hintKey}.li2`)}</span>
+              </li>
+            </ol>
+          </>
+        )
       default:
         return null
     }

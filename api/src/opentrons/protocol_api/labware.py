@@ -24,7 +24,7 @@ from typing import (
 
 import jsonschema  # type: ignore
 
-from .util import ModifiedList, requires_version
+from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
@@ -830,12 +830,36 @@ def _hash_labware_def(labware_def: LabwareDefinition) -> str:
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
 
 
+def _add_to_index_offset_file(labware: Labware, lw_hash: str):
+    index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    uri = labware.uri
+    if index_file.exists():
+        blob = _read_file(str(index_file))
+    else:
+        blob = {}
+
+    mod_parent = _get_parent_identifier(labware.parent)
+    slot = first_parent(labware)
+    if mod_parent:
+        mod_dict = {mod_parent: f'{slot}-{mod_parent}'}
+    else:
+        mod_dict = {}
+    blob[uri] = {
+            "id": f'{lw_hash}',
+            "slot": f'{lw_hash}{mod_parent}',
+            "module": mod_dict
+        }
+    with index_file.open('w') as f:
+        json.dump(blob, f)
+
+
 def _get_labware_offset_path(labware: Labware):
     calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
     calibration_path.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
+    _add_to_index_offset_file(labware, labware_hash)
     return calibration_path/f'{labware_hash}{parent_id}.json'
 
 

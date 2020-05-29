@@ -7,7 +7,7 @@
     "pause": "Enable pause within protocol.",
     "moveLiquid": "Move liquid to and from wells/tubes.",
     "magnet": "Engage or disengage the Magnetic module.",
-    "temperature": "Set temperature command for Temperature and Thermocycler modules.",
+    "temperature": "Set temperature command for Temperature module.",
     "thermocycler": "Program a profile for the Thermocycler module."
   },
 

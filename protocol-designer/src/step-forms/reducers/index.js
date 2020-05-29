@@ -17,6 +17,7 @@ import {
   rootReducer as labwareDefsRootReducer,
   type RootState as LabwareDefsRootState,
 } from '../../labware-defs'
+import { uuid } from '../../utils'
 import {
   INITIAL_DECK_SETUP_STEP_ID,
   FIXED_TRASH_ID,
@@ -40,7 +41,7 @@ import {
   getIdsInRange,
 } from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
-
+import { PROFILE_STEP } from '../../form-types'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -49,7 +50,12 @@ import type {
   SwapSlotContentsAction,
 } from '../../labware-ingred/actions'
 import type { ReplaceCustomLabwareDef } from '../../labware-defs/actions'
-import type { FormData, StepIdType, StepType } from '../../form-types'
+import type {
+  FormData,
+  StepIdType,
+  StepType,
+  ProfileStepItem,
+} from '../../form-types'
 import type {
   FileLabware,
   FilePipette,
@@ -62,6 +68,9 @@ import type {
   DeleteStepAction,
   PopulateFormAction,
   ReorderStepsAction,
+  AddProfileStepAction,
+  DeleteProfileStepAction,
+  EditProfileStepAction,
 } from '../../steplist/actions'
 import type {
   AddStepAction,
@@ -100,6 +109,9 @@ type UnsavedFormActions =
   | SelectTerminalItemAction
   | EditModuleAction
   | SubstituteStepFormPipettesAction
+  | AddProfileStepAction
+  | DeleteProfileStepAction
+  | EditProfileStepAction
 export const unsavedForm = (
   rootState: RootState,
   action: UnsavedFormActions
@@ -168,6 +180,68 @@ export const unsavedForm = (
         }
       }
       return unsavedFormState
+    }
+    case 'ADD_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'ADD_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+      const id = uuid()
+      // TODO factor this createInitialProfileStep out somewhere
+      const createInitialProfileStep = (): ProfileStepItem => ({
+        type: PROFILE_STEP,
+        id,
+        title: '',
+        temperature: '',
+        durationMinutes: '',
+        durationSeconds: '',
+      })
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: createInitialProfileStep(),
+        },
+      }
+    }
+    case 'DELETE_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'DELETE_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id } = action.payload
+
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
+          itemId => itemId !== id
+        ),
+        profileItemsById: omit(unsavedFormState.profileItemsById, id),
+      }
+    }
+    case 'EDIT_PROFILE_STEP': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'EDIT_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id, fields } = action.payload
+
+      return {
+        ...unsavedFormState,
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: { ...unsavedFormState.profileItemsById[id], ...fields },
+        },
+      }
     }
     default:
       return unsavedFormState

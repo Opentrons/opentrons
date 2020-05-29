@@ -1,4 +1,5 @@
 // @flow
+import { thermocyclerPipetteCollision } from '../utils'
 import {
   getInitialRobotStateStandard,
   getRobotStateWithTipStandard,
@@ -9,6 +10,18 @@ import {
   SOURCE_LABWARE,
 } from '../__fixtures__'
 import { dispense } from '../commandCreators/atomic/dispense'
+import type { RobotState } from '../'
+
+jest.mock('../utils/thermocyclerPipetteCollision')
+
+const mockThermocyclerPipetteCollision: JestMockFn<
+  [
+    $PropertyType<RobotState, 'modules'>,
+    $PropertyType<RobotState, 'labware'>,
+    string
+  ],
+  boolean
+> = thermocyclerPipetteCollision
 
 describe('dispense', () => {
   let initialRobotState
@@ -19,6 +32,10 @@ describe('dispense', () => {
     invariantContext = makeContext()
     initialRobotState = getInitialRobotStateStandard(invariantContext)
     robotStateWithTip = getRobotStateWithTipStandard(invariantContext)
+  })
+
+  afterEach(() => {
+    jest.resetAllMocks()
   })
 
   describe('tip tracking & commands:', () => {
@@ -68,6 +85,28 @@ describe('dispense', () => {
       expect(res.errors).toHaveLength(1)
       expect(res.errors[0]).toMatchObject({
         type: 'LABWARE_DOES_NOT_EXIST',
+      })
+    })
+
+    it('should return an error when dispensing into thermocycler with pipette collision', () => {
+      mockThermocyclerPipetteCollision.mockImplementationOnce(
+        (
+          modules: $PropertyType<RobotState, 'modules'>,
+          labware: $PropertyType<RobotState, 'labware'>,
+          labwareId: string
+        ) => {
+          expect(modules).toBe(robotStateWithTip.modules)
+          expect(labware).toBe(robotStateWithTip.labware)
+          expect(labwareId).toBe(SOURCE_LABWARE)
+          return true
+        }
+      )
+      const result = dispense(params, invariantContext, robotStateWithTip)
+
+      const res = getErrorResult(result)
+      expect(res.errors).toHaveLength(1)
+      expect(res.errors[0]).toMatchObject({
+        type: 'THERMOCYCLER_LID_CLOSED',
       })
     })
   })

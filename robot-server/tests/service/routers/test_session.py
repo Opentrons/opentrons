@@ -4,13 +4,10 @@ from unittest.mock import MagicMock, PropertyMock, patch
 import typing
 from pydantic.main import BaseModel
 
-from opentrons.server.endpoints.calibration.session \
-    import CheckCalibrationSession, CalibrationCheckState, \
-    CalibrationCheckTrigger
-from opentrons.server.endpoints.calibration.models import \
-    SessionType, JogPosition
-from opentrons.server.endpoints.calibration.helper_classes import \
-    PipetteInfo, PipetteRank
+from opentrons.calibration.check.session import CheckCalibrationSession, \
+    CalibrationCheckState, CalibrationCheckTrigger
+from opentrons.calibration.check.models import SessionType, JogPosition
+from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank
 from opentrons import types
 
 from robot_server.service.dependencies import get_session_manager
@@ -80,8 +77,8 @@ def mock_cal_session(hardware, loop):
     m.trigger_transition = MagicMock(side_effect=async_mock)
     m.delete_session = MagicMock(side_effect=async_mock)
 
-    path = 'opentrons.server.endpoints.calibration.' \
-           'session.CheckCalibrationSession.current_state_name'
+    path = 'opentrons.calibration.check.session.' \
+           'CheckCalibrationSession.current_state_name'
     with patch(path, new_callable=PropertyMock) as p:
         p.return_value = CalibrationCheckState.preparingFirstPipette.value
 
@@ -208,7 +205,7 @@ def test_create_session(api_client, patch_build_session,
         'data': session_hardware_info,
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands',
+                'href': '/sessions/calibrationCheck/commands/execute',
             },
             'GET': {
                 'href': '/sessions/calibrationCheck',
@@ -218,7 +215,7 @@ def test_create_session(api_client, patch_build_session,
             },
         }
     }
-    assert response.status_code == 200
+    assert response.status_code == 201
     # Clean up
     get_session_manager().sessions.clear()
 
@@ -272,7 +269,7 @@ def test_get_session(api_client, session_manager_with_session,
         'data': session_hardware_info,
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands',
+                'href': '/sessions/calibrationCheck/commands/execute',
             },
             'GET': {
                 'href': '/sessions/calibrationCheck',
@@ -309,7 +306,7 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
             "type": "SessionCommand",
             "attributes": {
                 "command": command_type,
-                "data": body.dict(exclude_unset=True) if body else None
+                "data": body.dict(exclude_unset=True) if body else {}
             }
         }
     }
@@ -317,9 +314,9 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
 
 def test_session_command_create_no_session(api_client):
     response = api_client.post(
-        "/sessions/1234/commands",
+        "/sessions/1234/commands/execute",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
     assert response.json() == {
         'errors': [{
             'detail': "Cannot find session with id '1234'.",
@@ -331,33 +328,32 @@ def test_session_command_create_no_session(api_client):
     assert response.status_code == 404
 
 
-def test_session_command_create(api_client,
-                                session_manager_with_session,
-                                mock_cal_session,
-                                session_hardware_info):
+def test_session_command_execute(api_client,
+                                 session_manager_with_session,
+                                 mock_cal_session,
+                                 session_hardware_info):
     response = api_client.post(
-        "/sessions/calibrationCheck/commands",
+        "/sessions/calibrationCheck/commands/execute",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="jog",
-        vector=[1.0, 2.0, 3.0])
+        vector=(1.0, 2.0, 3.0))
 
     assert response.json() == {
         'data': {
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'accepted'
+                'status': 'executed'
             },
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands',
+                'href': '/sessions/calibrationCheck/commands/execute',
             },
             'GET': {
                 'href': '/sessions/calibrationCheck',
@@ -370,12 +366,12 @@ def test_session_command_create(api_client,
     assert response.status_code == 200
 
 
-def test_session_command_create_no_body(api_client,
-                                        session_manager_with_session,
-                                        mock_cal_session,
-                                        session_hardware_info):
+def test_session_command_execute_no_body(api_client,
+                                         session_manager_with_session,
+                                         mock_cal_session,
+                                         session_hardware_info):
     response = api_client.post(
-        "/sessions/calibrationCheck/commands",
+        "/sessions/calibrationCheck/commands/execute",
         json=command("loadLabware", None)
     )
 
@@ -386,16 +382,15 @@ def test_session_command_create_no_body(api_client,
         'data': {
             'attributes': {
                 'command': 'loadLabware',
-                'data': None,
-                'status': 'accepted'
+                'data': {},
+                'status': 'executed'
             },
             'type': 'SessionCommand',
             'id': response.json()['data']['id']
         },
-        'meta': session_hardware_info['attributes'],
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands',
+                'href': '/sessions/calibrationCheck/commands/execute',
             },
             'GET': {
                 'href': '/sessions/calibrationCheck',
@@ -408,9 +403,9 @@ def test_session_command_create_no_body(api_client,
     assert response.status_code == 200
 
 
-def test_session_command_create_raise(api_client,
-                                      session_manager_with_session,
-                                      mock_cal_session):
+def test_session_command_execute_raise(api_client,
+                                       session_manager_with_session,
+                                       mock_cal_session):
 
     async def raiser(*args, **kwargs):
         raise AssertionError("Cannot do it")
@@ -418,9 +413,9 @@ def test_session_command_create_raise(api_client,
     mock_cal_session.trigger_transition.side_effect = raiser
 
     response = api_client.post(
-        "/sessions/calibrationCheck/commands",
+        "/sessions/calibrationCheck/commands/execute",
         json=command("jog",
-                     JogPosition(vector=[1, 2, 3])))
+                     JogPosition(vector=(1, 2, 3))))
 
     assert response.json() == {
         'errors': [

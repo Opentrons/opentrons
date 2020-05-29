@@ -10,9 +10,13 @@ import typeof {
   FETCH_SESSION,
   FETCH_SESSION_SUCCESS,
   FETCH_SESSION_FAILURE,
+  FETCH_ALL_SESSIONS,
+  FETCH_ALL_SESSIONS_SUCCESS,
+  FETCH_ALL_SESSIONS_FAILURE,
   CREATE_SESSION_COMMAND,
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
+  SESSION_TYPE_CALIBRATION_CHECK,
 } from './constants'
 
 import type {
@@ -20,45 +24,52 @@ import type {
   RobotApiV2ResponseBody,
   RobotApiV2ErrorResponseBody,
 } from '../robot-api/types'
+import * as Calibration from '../calibration'
 
 // The available session types
-export type SessionType = 'calibrationCheck'
+export type SessionType = SESSION_TYPE_CALIBRATION_CHECK
 
-export type SessionCommandRequest = {|
-  command: string,
-  // TODO(al, 2020-05-11): data should be properly typed with all
-  // known command types
-  data: { ... },
+// The details associated with available session types
+type SessionDetails = Calibration.RobotCalibrationCheckSessionDetails
+export type SessionCommandString = $Values<typeof Calibration.checkCommands>
+
+// TODO(al, 2020-05-11): data should be properly typed with all
+// known command types
+export type SessionCommandData = { ... }
+
+export type SessionResponseAttributes = {|
+  sessionType: SessionType,
+  details: SessionDetails,
 |}
 
 export type Session = {|
-  sessionType: SessionType,
-  // TODO(al, 2020-05-11): details should be properly typed with all
-  // known session response types
-  details: { ... },
+  ...SessionResponseAttributes,
+  id: string,
 |}
 
-export type SessionCommand = {|
-  command: string,
-  // TODO(al, 2020-05-11): data should be properly typed with all
-  // known command types
-  data: { ... },
+export type SessionCommandAttributes = {|
+  command: SessionCommandString,
+  data: SessionCommandData,
   status?: string,
 |}
 
 export type SessionResponseModel = {|
   id: string,
   type: 'Session',
-  attributes: Session,
+  attributes: SessionResponseAttributes,
 |}
 
 export type SessionCommandResponseModel = {|
   id: string,
   type: 'SessionCommand',
-  attributes: SessionCommand,
+  attributes: SessionCommandAttributes,
 |}
 
 export type SessionResponse = RobotApiV2ResponseBody<SessionResponseModel, {||}>
+export type MultiSessionResponse = RobotApiV2ResponseBody<
+  $ReadOnlyArray<SessionResponseModel>,
+  {||}
+>
 
 export type SessionCommandResponse = RobotApiV2ResponseBody<
   SessionCommandResponseModel,
@@ -119,12 +130,33 @@ export type FetchSessionFailureAction = {|
   meta: RobotApiRequestMeta,
 |}
 
+export type FetchAllSessionsAction = {|
+  type: FETCH_ALL_SESSIONS,
+  payload: {| robotName: string |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchAllSessionsSuccessAction = {|
+  type: FETCH_ALL_SESSIONS_SUCCESS,
+  payload: {|
+    robotName: string,
+    sessions: $ReadOnlyArray<SessionResponseModel>,
+  |},
+  meta: RobotApiRequestMeta,
+|}
+
+export type FetchAllSessionsFailureAction = {|
+  type: FETCH_ALL_SESSIONS_FAILURE,
+  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  meta: RobotApiRequestMeta,
+|}
+
 export type CreateSessionCommandAction = {|
   type: CREATE_SESSION_COMMAND,
   payload: {|
     robotName: string,
     sessionId: string,
-    command: SessionCommand,
+    command: SessionCommandAttributes,
   |},
   meta: RobotApiRequestMeta,
 |}
@@ -159,6 +191,9 @@ export type SessionsAction =
   | FetchSessionAction
   | FetchSessionSuccessAction
   | FetchSessionFailureAction
+  | FetchAllSessionsAction
+  | FetchAllSessionsSuccessAction
+  | FetchAllSessionsFailureAction
   | CreateSessionCommandAction
   | CreateSessionCommandSuccessAction
   | CreateSessionCommandFailureAction

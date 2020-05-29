@@ -2,7 +2,7 @@
 import { createSelector } from 'reselect'
 import mapValues from 'lodash/mapValues'
 import { selectors as stepFormSelectors } from '../step-forms'
-import { getSelectedStepId } from '../ui/steps'
+import { getSelectedStepId } from '../ui/steps/selectors'
 import type { FormWarning } from '../steplist'
 import type { BaseState, Selector } from '../types'
 import type {

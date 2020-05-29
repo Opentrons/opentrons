@@ -2,6 +2,7 @@
 import { generateSubsteps } from '../generateSubsteps'
 import { makeInitialRobotState } from '../../step-generation/utils'
 import { makeContext } from '../../step-generation/__fixtures__'
+import { THERMOCYCLER_STATE } from '../../constants'
 
 describe('generateSubsteps', () => {
   const stepId = 'step123'
@@ -22,6 +23,10 @@ describe('generateSubsteps', () => {
       tempId: {
         displayName: 'temperature module',
         nickname: null,
+      },
+      thermocyclerModuleId: {
+        displayName: 'tc labware',
+        nickname: 'tc labware nickname',
       },
     }
     robotState = makeInitialRobotState({
@@ -618,6 +623,36 @@ describe('generateSubsteps', () => {
       labwareDisplayName: 'temperature module',
       labwareNickname: null,
       message: null,
+    })
+  })
+
+  it('thermocyclerState returns substep data', () => {
+    const stepArgsAndErrors = {
+      errors: {},
+      stepArgs: {
+        module: 'thermocyclerModuleId',
+        commandCreatorFnName: THERMOCYCLER_STATE,
+        message: 'a message',
+        blockTargetTemp: 44,
+        lidTargetTemp: 66,
+        lidOpen: false,
+      },
+    }
+    const result = generateSubsteps(
+      stepArgsAndErrors,
+      invariantContext,
+      robotState,
+      stepId,
+      labwareNamesByModuleId
+    )
+    expect(result).toEqual({
+      substepType: THERMOCYCLER_STATE,
+      labwareDisplayName: 'tc labware',
+      labwareNickname: 'tc labware nickname',
+      blockTargetTemp: 44,
+      lidTargetTemp: 66,
+      lidOpen: false,
+      message: 'a message',
     })
   })
 

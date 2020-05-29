@@ -240,7 +240,7 @@ export const getRobotInitialStateNoTipsRemain = (
   return robotInitialStateNoTipsRemain
 }
 
-export const getStateAndContextTempMagModules = ({
+export const getStateAndContextTempTCModules = ({
   temperatureModuleId,
   thermocyclerId,
 }: {
@@ -280,7 +280,9 @@ export const getStateAndContextTempMagModules = ({
       slot: SPAN7_8_10_11_SLOT,
       moduleState: {
         type: THERMOCYCLER_MODULE_TYPE,
-        // TODO IL 2020-01-14 create this state when thermocycler state is implemented
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: null,
       },
     },
   }

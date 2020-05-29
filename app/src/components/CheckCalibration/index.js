@@ -15,6 +15,11 @@ import type { State, Dispatch } from '../../types'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
 import type { RequestState } from '../../robot-api/types'
 import * as Calibration from '../../calibration'
+import * as Sessions from '../../sessions'
+import type {
+  SessionCommandString,
+  SessionCommandData,
+} from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 
 import { Introduction } from './Introduction'
@@ -58,13 +63,29 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   )?.status
   const pending = requestStatus === PENDING
 
+  const robotCalCheckSession = useSelector((state: State) => {
+    const session = Sessions.getRobotSessionOfType(
+      state,
+      robotName,
+      Sessions.SESSION_TYPE_CALIBRATION_CHECK
+    )
+    return session ?? {}
+  })
   const { currentStep, labware, instruments, comparisonsByStep } =
-    useSelector((state: State) =>
-      Calibration.getRobotCalibrationCheckSession(state, robotName)
-    ) || {}
+    robotCalCheckSession.details || {}
+
   React.useEffect(() => {
-    dispatchRequest(Calibration.fetchRobotCalibrationCheckSession(robotName))
-  }, [dispatchRequest, robotName])
+    if (robotCalCheckSession.id) {
+      dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSession.id))
+    } else {
+      dispatchRequest(
+        Sessions.createSession(
+          robotName,
+          Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        )
+      )
+    }
+  }, [dispatchRequest, robotName, robotCalCheckSession.id])
 
   const hasTwoPipettes = React.useMemo(
     () => instruments && Object.keys(instruments).length === 2,
@@ -120,20 +141,35 @@ export function CheckCalibration(props: CheckCalibrationProps) {
   }, [instruments, activeInstrument, hasTwoPipettes])
 
   function exit() {
-    dispatchRequest(Calibration.deleteRobotCalibrationCheckSession(robotName))
+    robotCalCheckSession.id &&
+      dispatchRequest(
+        Sessions.deleteSession(robotName, robotCalCheckSession.id)
+      )
     closeCalibrationCheck()
   }
 
-  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
-    dispatch(
-      Calibration.jogRobotCalibrationCheck(
-        robotName,
-        formatJogVector(axis, direction, step)
+  function sendCommand(
+    command: SessionCommandString,
+    data: SessionCommandData = {}
+  ) {
+    robotCalCheckSession.id &&
+      dispatchRequest(
+        Sessions.createSessionCommand(robotName, robotCalCheckSession.id, {
+          command,
+          data,
+        })
       )
-    )
   }
-  function comparePoint() {
-    dispatch(Calibration.comparePointRobotCalibrationCheck(robotName))
+  function jog(axis: JogAxis, direction: JogDirection, step: JogStep) {
+    robotCalCheckSession.id &&
+      dispatch(
+        Sessions.createSessionCommand(robotName, robotCalCheckSession.id, {
+          command: Calibration.checkCommands.JOG,
+          data: {
+            vector: formatJogVector(axis, direction, step),
+          },
+        })
+      )
   }
 
   let stepContents
@@ -144,11 +180,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
       stepContents = (
         <Introduction
           exit={exit}
-          proceed={() => {
-            dispatchRequest(
-              Calibration.loadLabwareRobotCalibrationCheck(robotName)
-            )
-          }}
+          proceed={() => sendCommand(Calibration.checkCommands.LOAD_LABWARE)}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
@@ -157,11 +189,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_LABWARE_LOADED: {
       stepContents = (
         <DeckSetup
-          proceed={() =>
-            dispatchRequest(
-              Calibration.preparePipetteRobotCalibrationCheck(robotName)
-            )
-          }
+          proceed={() => sendCommand(Calibration.checkCommands.PREPARE_PIPETTE)}
           labware={labware}
         />
       )
@@ -183,21 +211,11 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
           tipRackWellName={tipRackWellName}
-          pickUpTip={() => {
-            dispatchRequest(
-              Calibration.pickUpTipRobotCalibrationCheck(robotName)
-            )
-          }}
-          confirmTip={() => {
-            dispatchRequest(
-              Calibration.confirmTipRobotCalibrationCheck(robotName)
-            )
-          }}
-          invalidateTip={() => {
-            dispatchRequest(
-              Calibration.invalidateTipRobotCalibrationCheck(robotName)
-            )
-          }}
+          pickUpTip={() => sendCommand(Calibration.checkCommands.PICK_UP_TIP)}
+          confirmTip={() => sendCommand(Calibration.checkCommands.CONFIRM_TIP)}
+          invalidateTip={() =>
+            sendCommand(Calibration.checkCommands.INVALIDATE_TIP)
+          }
           jog={jog}
         />
       ) : null
@@ -237,12 +255,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
             currentStep,
             comparison
           )}
-          comparePoint={comparePoint}
-          goToNextCheck={() => {
-            dispatchRequest(
-              Calibration.confirmStepRobotCalibrationCheck(robotName)
-            )
-          }}
+          comparePoint={() =>
+            sendCommand(Calibration.checkCommands.COMPARE_POINT)
+          }
+          goToNextCheck={() =>
+            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
+          }
           jog={jog}
         />
       )
@@ -273,12 +291,12 @@ export function CheckCalibration(props: CheckCalibrationProps) {
             comparison
           )}
           exit={exit}
-          comparePoint={comparePoint}
-          goToNextCheck={() => {
-            dispatchRequest(
-              Calibration.confirmStepRobotCalibrationCheck(robotName)
-            )
-          }}
+          comparePoint={() =>
+            sendCommand(Calibration.checkCommands.COMPARE_POINT)
+          }
+          goToNextCheck={() =>
+            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
+          }
           jog={jog}
         />
       )
@@ -291,7 +309,18 @@ export function CheckCalibration(props: CheckCalibrationProps) {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      stepContents = <CompleteConfirmation robotName={robotName} exit={exit} />
+      const stepsPassed = Object.keys(comparisonsByStep).reduce((acc, step) => {
+        return acc + (comparisonsByStep[step].exceedsThreshold ? 0 : 1)
+      }, 0)
+      const stepsFailed = Object.keys(comparisonsByStep).length - stepsPassed
+      stepContents = (
+        <CompleteConfirmation
+          exit={exit}
+          stepsFailed={stepsFailed}
+          stepsPassed={stepsPassed}
+          comparisonsByStep={comparisonsByStep}
+        />
+      )
       modalContentsClassName = styles.terminal_modal_contents
       break
     }

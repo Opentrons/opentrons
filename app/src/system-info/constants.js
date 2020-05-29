@@ -3,7 +3,7 @@
 // TODO(mc, 2020-05-07): move to config when we have config migration
 // https://github.com/Opentrons/opentrons/issues/5587
 export const U2E_DRIVER_UPDATE_URL =
-  'https://www.realtek.com/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
+  'https://www.realtek.com/en/component/zoo/category/network-interface-controllers-10-100-1000m-gigabit-ethernet-usb-3-0-software'
 
 // driver statuses
 
