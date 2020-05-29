@@ -42,8 +42,6 @@ pypi_password ?=
 
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
-# Pubkey location for buildroot robot to install with install-key
-br_ssh_pubkey ?= $(br_ssh_key).pub
 # Other SSH args for buildroot robots
 ssh_opts ?= $(default_ssh_opts)
 

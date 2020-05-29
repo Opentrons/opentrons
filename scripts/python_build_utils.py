@@ -30,7 +30,10 @@ package_entries = {
         'update_server'),
     'robot-server': PackageEntry(
         os.path.join(HERE, '..', 'robot-server', 'robot_server', 'package.json'),
-        'robot_server')
+        'robot_server'),
+    'shared-data': PackageEntry(
+        os.path.join(HERE, '..', 'shared-data', 'package.json'),
+        'shared_data'),
 }
 
 
