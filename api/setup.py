@@ -5,6 +5,7 @@ import codecs
 import os
 import os.path
 from setuptools import setup, find_packages
+from setuptools.command import build_py, sdist
 
 import json
 
@@ -15,6 +16,68 @@ if os.name == 'posix':
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+
+# Where we get our files from
+SHARED_DATA_PATH = os.path.join('..', 'shared-data')
+# The subdirectories of SHARED_DATA_PATH to scan for files
+SHARED_DATA_SUBDIRS = ['deck',
+                       'labware',
+                       'module',
+                       'pipette',
+                       'protocol']
+# Where, relative to the package root, we put the files we copy
+DEST_BASE_PATH = 'shared_data'
+
+
+def get_shared_data_files():
+    to_include = []
+    for subdir in SHARED_DATA_SUBDIRS:
+        top = os.path.join(SHARED_DATA_PATH, subdir)
+        for dirpath, dirnames, filenames in os.walk(top):
+            from_source = os.path.relpath(dirpath, SHARED_DATA_PATH)
+            to_include.extend([os.path.join(from_source, fname)
+                               for fname in filenames])
+    return to_include
+
+
+class SDistWithSharedData(sdist.sdist):
+    description = sdist.sdist.description\
+        + " Also, include opentrons data files."
+
+    def make_release_tree(self, base_dir, files):
+        self.announce("adding opentrons data files to base dir {}"
+                      .format(base_dir))
+        for data_file in get_shared_data_files():
+            sdist_dest = os.path.join(base_dir, DEST_BASE_PATH)
+            self.mkpath(os.path.join(sdist_dest, 'opentrons',
+                                     os.path.dirname(data_file)))
+            self.copy_file(os.path.join(SHARED_DATA_PATH, data_file),
+                           os.path.join(sdist_dest, data_file))
+        super().make_release_tree(base_dir, files)
+
+
+class BuildWithSharedData(build_py.build_py):
+    description = build_py.build_py.description\
+        + " Also, include opentrons data files"
+
+    def _get_data_files(self):
+        """
+        Override of build_py.get_data_files that includes out of tree configs.
+        These are currently hardcoded to include selected folders in
+         ../shared-data/, which will move to opentrons/config/shared-data
+        """
+        files = super()._get_data_files()
+        # We don’t really want to duplicate logic used in the original
+        # implementation, but we can back out what it did with commonpath -
+        # should be something ending in opentrons
+        build_base = os.path.commonpath([f[2] for f in files])
+        # We want a list of paths to only files relative to ../shared-data
+        to_include = get_shared_data_files()
+        destination = os.path.join(build_base, DEST_BASE_PATH)
+        # And finally, tell the system about our files
+        files.append(('opentrons', SHARED_DATA_PATH,
+                      destination, to_include))
+        return files
 
 
 def get_version():
@@ -84,6 +147,10 @@ if __name__ == "__main__":
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
         package_dir={'': 'src'},
+        cmdclass={
+            'build_py': BuildWithSharedData,
+            'sdist': SDistWithSharedData
+        },
         entry_points={
             'console_scripts': [
                 'opentrons_simulate = opentrons.simulate:main',
