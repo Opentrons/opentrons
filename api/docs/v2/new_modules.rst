@@ -65,8 +65,13 @@ Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to s
    +----------------------------+-------------------------------------------------+------------------------------------------------+
 
 
-GEN2 Module Differences
-=======================
+GEN2 Modules Differences
+========================
+
+Identifying a GEN2 Module
+-------------------------
+
+You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`.
 
 Temperature Module GEN2
 -----------------------
