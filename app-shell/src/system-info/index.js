@@ -54,7 +54,7 @@ export function registerSystemInfo(dispatch: Dispatch) {
       usbMonitor.stop()
     }
 
-    if (usbMonitor) {
+    if (ifaceMonitor) {
       log.debug('stopping network iface monitoring')
       ifaceMonitor.stop()
     }
