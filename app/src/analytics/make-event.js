@@ -6,6 +6,7 @@ import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
+import * as Sessions from '../sessions'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -273,6 +274,28 @@ export function makeEvent(
             }
           : null
       )
+    }
+
+    case Sessions.DELETE_SESSION: {
+      const { robotName } = action.payload
+      const session = Sessions.getRobotSessionOfType(
+        state,
+        robotName,
+        Sessions.SESSION_TYPE_CALIBRATION_CHECK
+      )
+      const analyticsProps = Sessions.getAnalyticsPropsForSession(session)
+      if (
+        session &&
+        analyticsProps &&
+        session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_CHECK
+      ) {
+        return Promise.resolve({
+          name: 'calibrationCheckExit',
+          properties: analyticsProps,
+        })
+      } else {
+        return Promise.resolve(null)
+      }
     }
   }
 

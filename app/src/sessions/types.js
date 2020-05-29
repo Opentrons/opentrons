@@ -213,3 +213,35 @@ export type SessionState = $Shape<
     [robotName: string]: void | PerRobotSessionState,
   |}>
 >
+
+export type CalibrationCheckSessionAnalyticsProps = {
+  leftPipetteModel?: string,
+  rightPipetteModel?: string,
+  comparingFirstPipetteHeightDifferenceVector?: string,
+  comparingFirstPipetteHeightThresholdVector?: string,
+  comparingFirstPipetteHeightExceedsThreshold?: string,
+  comparingFirstPipetteHeightErrorSource?: string,
+  comparingFirstPipettePointOneDifferenceVector?: string,
+  comparingFirstPipettePointOneThresholdVector?: string,
+  comparingFirstPipettePointOneExceedsThreshold?: string,
+  comparingFirstPipettePointOneErrorSource?: string,
+  comparingFirstPipettePointTwoDifferenceVector?: string,
+  comparingFirstPipettePointTwoThresholdVector?: string,
+  comparingFirstPipettePointTwoExceedsThreshold?: string,
+  comparingFirstPipettePointTwoErrorSource?: string,
+  comparingFirstPipettePointThreeDifferenceVector?: string,
+  comparingFirstPipettePointThreeThresholdVector?: string,
+  comparingFirstPipettePointThreeExceedsThreshold?: string,
+  comparingFirstPipettePointThreeErrorSource?: string,
+  comparingSecondPipetteHeightDifferenceVector?: string,
+  comparingSecondPipetteHeightThresholdVector?: string,
+  comparingSecondPipetteHeightExceedsThreshold?: string,
+  comparingSecondPipetteHeightErrorSource?: string,
+  comparingSecondPipettePointOneDifferenceVector?: string,
+  comparingSecondPipettePointOneThresholdVector?: string,
+  comparingSecondPipettePointOneExceedsThreshold?: string,
+  comparingSecondPipettePointOneErrorSource?: string,
+  ...
+}
+
+export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
