@@ -717,7 +717,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             'cannot drop tip on second mount, pipette not present'
         state_name = CalibrationCheckState.inspectingSecondTip
         return_pt = self._saved_points[getattr(CalibrationCheckState,
-                                        state_name)]
+                                       state_name)]
         loc = Location(return_pt, None)
         await self._move(second_pip.mount, loc)
         await self._drop_tip(second_pip.mount)
