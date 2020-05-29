@@ -41,5 +41,5 @@ endef
 # argument 4 is the unit file path
 define push-systemd-unit
 	scp -i $(2) $(3) "$(4)" root@$(1):/data/
-	ssh -i $(2) $(3) root@$(1) "mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload"
+	ssh -i $(2) $(3) root@$(1) "mount -o remount,rw / && mv /data/$(notdir $(4)) /etc/systemd/system/ && systemctl daemon-reload && mount -o remount,ro / || mount -o remount,ro /"
 endef
