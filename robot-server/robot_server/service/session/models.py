@@ -16,12 +16,11 @@ class EmptyModel(BaseModel):
     pass
 
 
-class SessionCommands(str, Enum):
+class CommandName(str, Enum):
     """The available session commands"""
     load_labware = CalibrationCheckTrigger.load_labware.value
     prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
-    jog =\
-        (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
+    jog = (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
     pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
     confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
     invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
@@ -42,7 +41,7 @@ class SessionCommands(str, Enum):
         return self._model
 
 
-SessionCommandTypes = typing.Union[
+CommandDataType = typing.Union[
     calibration_models.JogPosition,
     EmptyModel
 ]
@@ -64,10 +63,10 @@ class Session(BasicSession):
 
 class SessionCommand(BaseModel):
     """A session command"""
-    data: SessionCommandTypes
+    data: CommandDataType
     # For validation, command MUST appear after data
-    command: SessionCommands = Field(...,
-                                     description="The command description")
+    command: CommandName = Field(...,
+                                 description="The command description")
     status: typing.Optional[str]
 
     @validator('command', always=True)
