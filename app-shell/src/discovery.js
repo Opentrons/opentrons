@@ -53,6 +53,9 @@ export function registerDiscovery(dispatch: Dispatch) {
   )
 
   handleConfigChange('discovery.disableCache', value => {
+    if (value === true) {
+      clearCache()
+    }
     disableCache = value
   })
 

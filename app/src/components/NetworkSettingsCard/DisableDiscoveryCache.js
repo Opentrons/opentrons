@@ -13,7 +13,7 @@ export const DisableDiscoveryCache = () => {
   const dispatch = useDispatch<Dispatch>()
   return (
     <LabeledToggle
-      label="Disable robot caching"
+      label="Disable robot caching (will clear cached robots when switched ON)"
       toggledOn={cacheDisabled}
       onClick={() => {
         dispatch(updateConfig('discovery.disableCache', !cacheDisabled))
