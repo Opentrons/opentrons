@@ -1,31 +1,31 @@
+import pytest
 from opentrons import commands
 
 
-def test_delay():
-    command = commands.delay(10, 0)
-    assert command['name'] == 'command.DELAY'
-    assert command['payload']['seconds'] == 10
-    assert command['payload']['minutes'] == 0
-    assert command['payload']['text'] == "Delaying for 0 minutes"\
-        " and 10 seconds"
+@pytest.mark.parametrize(
+    argnames="seconds,"
+             "minutes,"
+             "expected_seconds,"
+             "expected_minutes,"
+             "expected_text",
+    argvalues=[
+        [10, 0, 10, 0, "Delaying for 0 minutes and 10 seconds"],
+        [10, 9, 10, 9, "Delaying for 9 minutes and 10 seconds"],
+        [100, 0, 40, 1, "Delaying for 1 minutes and 40 seconds"],
+        [105, 5.25, 0, 7, "Delaying for 7 minutes and 0 seconds"],
+    ]
+)
+def test_delay(seconds,
+               minutes,
+               expected_seconds,
+               expected_minutes,
+               expected_text
+               ):
+    command = commands.delay(seconds, minutes)
+    name = command['name']
+    payload = command['payload']
 
-    command = commands.delay(10, 9)
-    assert command['name'] == 'command.DELAY'
-    assert command['payload']['seconds'] == 10
-    assert command['payload']['minutes'] == 9
-    assert command['payload']['text'] == "Delaying for 9 minutes"\
-        " and 10 seconds"
-
-    command = commands.delay(100, 0)
-    assert command['name'] == 'command.DELAY'
-    assert command['payload']['seconds'] == 40
-    assert command['payload']['minutes'] == 1
-    assert command['payload']['text'] == "Delaying for 1 minutes"\
-        " and 40 seconds"
-
-    command = commands.delay(105, 5.25)
-    assert command['name'] == 'command.DELAY'
-    assert command['payload']['seconds'] == 0
-    assert command['payload']['minutes'] == 7
-    assert command['payload']['text'] == "Delaying for 7 minutes"\
-        " and 0 seconds"
+    assert name == 'command.DELAY'
+    assert payload['seconds'] == expected_seconds
+    assert payload['minutes'] == expected_minutes
+    assert payload['text'] == expected_text
