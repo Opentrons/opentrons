@@ -1,4 +1,4 @@
-Simple Box primitive. Renders a `div` by default with various styling props for color, spacing, and typography
+Simple Box primitive. Renders a `div` by default and accepts all primitive styling props.
 
 ```js
 import {

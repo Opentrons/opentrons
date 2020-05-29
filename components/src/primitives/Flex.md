@@ -1,12 +1,13 @@
-Flexbox primitive. Renders a `div` by default with `display: flex;`
+Flexbox primitive. Renders a `div` by default with `display: flex;` and accepts all primitive styling props.
 
 ```js
-import { Icon, ALIGN_CENTER, JUSTIFY_CENTER } from '@opentrons/components'
-;<Flex
-  alignItems={ALIGN_CENTER}
-  justifyContent={JUSTIFY_CENTER}
-  style={{ width: '6rem', height: '6rem' }}
->
+import {
+  Icon,
+  ALIGN_CENTER,
+  JUSTIFY_CENTER,
+  SIZE_4,
+} from '@opentrons/components'
+;<Flex alignItems={ALIGN_CENTER} justifyContent={JUSTIFY_CENTER} size={SIZE_4}>
   <Icon name="ot-logo" width="32" height="32" />
 </Flex>
 ```
