@@ -119,12 +119,13 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
-	$(MAKE) -C api test
+	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-py
 test-py: test-py-windows
-	$(MAKE) -C update-server test
-	$(MAKE) -C robot-server test
+	$(MAKE) -C $(UPDATE_SERVER_DIR) test
+	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:
