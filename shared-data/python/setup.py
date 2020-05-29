@@ -121,6 +121,7 @@ if __name__ == "__main__":
         classifiers=CLASSIFIERS,
         install_requires=INSTALL_REQUIRES,
         include_package_data=True,
+        package_data={'opentrons_shared_data': ['py.typed']},
         cmdclass={
             'build_py': BuildWithData,
             'sdist': SDistWithData

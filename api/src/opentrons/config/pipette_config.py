@@ -6,7 +6,7 @@ from collections import namedtuple
 from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
 
 from opentrons.config import feature_flags as ff, CONFIG
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 
 
 log = logging.getLogger(__name__)

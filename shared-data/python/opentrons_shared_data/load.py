@@ -1,5 +1,4 @@
 import typing
-import sys
 import logging
 import os
 from pathlib import Path
@@ -32,14 +31,14 @@ def get_shared_data_root() -> Path:
         return Path(override)
 
     # Check contents of package
-    module_path = Path(sys.modules['opentrons'].__file__).parent
-    p = module_path / "shared_data"
-    if p.exists():
-        log.info('Using packaged shared data path: %s', p)
-        return p
+    module_path = Path(__file__).parent
+    module_data = module_path / 'data'
+    if module_data.exists():
+        log.info(f'Using packaged shared data path: {str(module_data)}')
+        return module_data
 
     # We are likely to be running locally and will find shared-data in repo
-    for parent in p.parents:
+    for parent in module_path.parents:
         p = parent / "shared-data"
         if p.exists():
             log.info('Using shared data in path: %s', p)
@@ -54,5 +53,5 @@ def load_shared_data(path: typing.Union[str, Path]) -> bytes:
 
     path is relative to the root of all shared data (ie. no "shared-data")
     """
-    with open(str(get_shared_data_root() / path), 'rb') as f:
+    with open(get_shared_data_root() / path, 'rb') as f:
         return f.read()

@@ -2,7 +2,7 @@ import json
 from unittest import mock
 from opentrons.hardware_control.modules.magdeck import OFFSET_TO_LABWARE_BOTTOM
 import opentrons.protocol_api as papi
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from opentrons.types import Point
 
 import pytest

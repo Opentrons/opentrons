@@ -14,7 +14,7 @@ from typing import Any, Dict, Union
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from .types import (Protocol, PythonProtocol, JsonProtocol,
                     Metadata, APIVersion, MalformedProtocolError)
 from .bundle import extract_bundle

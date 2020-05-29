@@ -17,7 +17,7 @@ from typing import Any, Dict, Mapping, Optional, Type, TypeVar, Union
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
 
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem, V2_MODULE_DEF_VERSION

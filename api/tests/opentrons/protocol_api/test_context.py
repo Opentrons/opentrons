@@ -4,7 +4,7 @@ import json
 from unittest import mock
 
 import opentrons.protocol_api as papi
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette

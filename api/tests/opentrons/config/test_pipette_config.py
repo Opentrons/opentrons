@@ -6,7 +6,7 @@ import pytest
 from opentrons import types
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 
 
 defs = json.loads(

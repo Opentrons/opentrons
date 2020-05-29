@@ -28,7 +28,7 @@ from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
-from opentrons.system.shared_data import load_shared_data, get_shared_data_root
+from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)

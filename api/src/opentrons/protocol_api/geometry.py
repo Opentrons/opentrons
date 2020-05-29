@@ -8,7 +8,7 @@ from typing import Any, List, Optional, Tuple, Dict
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
