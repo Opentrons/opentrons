@@ -1122,7 +1122,7 @@
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
-        "loadName": "eppendorf_twintec_skirted_96"
+        "loadName": "eppendorf_twintec_96_wellplate_150ul_pcr_skirted"
     },
     "namespace": "custom_beta",
     "version": 1,
