@@ -200,6 +200,15 @@ You can read the current target temperature of the Temperature Module using the 
 
 .. versionadded:: 2.0
 
+Check the Status
+================
+
+The :py:attr:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+
+.. code-block:: python
+
+    temp_mod.status
+
 Deactivate
 ==========
 
@@ -303,6 +312,16 @@ Disengage
 The Magnetic Module will disengage when the device is turned on. It will not auto-disengage otherwise unless you call :py:meth:`.MagneticModuleContext.disengage` in your protocol.
 
 .. versionadded:: 2.0
+
+Check the Status
+================
+
+The :py:attr:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
+
+.. code-block:: python
+
+    mag_mod.status
+
 
 .. _thermocycler-section:
 
@@ -484,6 +503,16 @@ Thermocycler Status
 
 Throughout your protocol, you may want particular information on the current status of your Thermocycler. Below are
 a few methods that allow you to do that.
+
+Basic Status
+------------
+The :py:attr:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
+
+.. code-block:: python
+
+    tc_mod.status
+
+.. versionadded:: 2.0
 
 Lid Position
 ------------
