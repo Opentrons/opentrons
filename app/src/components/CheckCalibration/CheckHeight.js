@@ -63,7 +63,6 @@ type CheckHeightProps = {|
   comparison: RobotCalibrationCheckComparison,
   exit: () => void,
   nextButtonText: string,
-  instructions: React.Node | null,
   comparePoint: () => void,
   goToNextCheck: () => void,
   jog: (JogAxis, JogDirection, JogStep) => void,
@@ -76,7 +75,6 @@ export function CheckHeight(props: CheckHeightProps) {
     comparison,
     exit,
     nextButtonText,
-    instructions,
     comparePoint,
     goToNextCheck,
     jog,
@@ -98,7 +96,6 @@ export function CheckHeight(props: CheckHeightProps) {
           goToNextCheck={goToNextCheck}
           exit={exit}
           nextButtonText={nextButtonText}
-          instructions={instructions}
         />
       ) : (
         <>
@@ -147,16 +144,9 @@ type CompareZProps = {|
   goToNextCheck: () => void,
   exit: () => void,
   nextButtonText: string,
-  instructions: React.Node | null,
 |}
 function CompareZ(props: CompareZProps) {
-  const {
-    comparison,
-    goToNextCheck,
-    exit,
-    nextButtonText,
-    instructions,
-  } = props
+  const { comparison, goToNextCheck, exit, nextButtonText } = props
   const { differenceVector, exceedsThreshold } = comparison
 
   let header = GOOD_INSPECTING_HEADER
@@ -189,7 +179,6 @@ function CompareZ(props: CompareZProps) {
           </div>
         </div>
       </div>
-      {instructions}
       {exceedsThreshold &&
         (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
           <p className={styles.difference_body}>

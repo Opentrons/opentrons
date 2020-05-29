@@ -60,7 +60,6 @@ describe('CheckXYPoint', () => {
           isInspecting={isInspecting}
           comparison={comparison}
           nextButtonText={nextButtonText}
-          instructions={null}
           exit={mockExit}
           comparePoint={mockComparePoint}
           goToNextCheck={mockGoToNextCheck}

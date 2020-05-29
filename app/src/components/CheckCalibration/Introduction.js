@@ -8,7 +8,7 @@ import { tiprackImages } from './tiprackImages'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Check robot calibration'
+const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Robot calibration check'
 const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
   "Checking your robot calibration assesses your OT-2's ability to position pipettes accurately relative to the deck. If at any point the robot does not go to the positions as expected, exit this process and follow the instructions provided to help resolve the issue."
 const TIPRACK_REQS = 'For this process you will require:'

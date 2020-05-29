@@ -61,7 +61,6 @@ describe('CheckHeight', () => {
           comparison={comparison}
           mount={mountProp}
           nextButtonText="Go To Next Check"
-          instructions={null}
           comparePoint={mockComparePoint}
           goToNextCheck={mockGoToNextCheck}
           jog={mockJog}

@@ -16,9 +16,8 @@ const LEARN_MORE = 'to learn more'
 const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT =
   'Drop tip and exit robot calibration check'
 
-// TODO: BC: Immediately confirm actual link
-const DECK_CAL_ARTICLE_URL = 'http://opentrons.com/support/pipette-mount-offset'
-
+const DECK_CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
 type CompleteConfirmationProps = {|
   exit: () => mixed,
 |}
