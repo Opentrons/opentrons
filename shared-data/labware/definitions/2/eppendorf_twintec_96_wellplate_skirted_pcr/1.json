@@ -1118,7 +1118,7 @@
         }
     ],
     "parameters": {
-        "format": "irregular",
+        "format": "96Standard",
         "quirks": [],
         "isTiprack": false,
         "isMagneticModuleCompatible": false,
