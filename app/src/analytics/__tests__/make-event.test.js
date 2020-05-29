@@ -9,6 +9,7 @@ import * as selectors from '../selectors'
 
 jest.mock('../selectors')
 jest.mock('../../robot/selectors')
+jest.mock('../../sessions')
 jest.mock('../../discovery/selectors')
 
 describe('analytics events map', () => {

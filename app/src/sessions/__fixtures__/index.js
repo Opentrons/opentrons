@@ -18,6 +18,11 @@ export const mockSessionAttributes: Types.SessionResponseAttributes = {
   details: mockRobotCalibrationCheckSessionDetails,
 }
 
+export const mockSession: Types.Session = {
+  ...mockSessionAttributes,
+  id: mockSessionId,
+}
+
 export const mockSessionCommand: Types.SessionCommandAttributes = {
   command: 'jog',
   data: { someData: 32 },
