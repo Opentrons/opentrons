@@ -83,7 +83,7 @@ const INITIAL_STATE: SessionState = {
     estimatedDuration: null,
     userMessage: null,
   },
-  doorState: '',
+  doorState: null,
   blocked: false,
   errors: [],
   protocolCommands: [],

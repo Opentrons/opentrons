@@ -21,7 +21,8 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
-from opentrons.hardware_control.types import DoorState, HardwareEventType
+from opentrons.hardware_control.types import (DoorState, HardwareEventType,
+                                              HardwareEvent)
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -31,8 +32,6 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 
 if TYPE_CHECKING:
     from .dev_types import State, StateInfo
-    from opentrons.hardware_control.dev_types import (
-        HardwareEvent)  # noqa (F501)
 
 log = logging.getLogger(__name__)
 
@@ -209,7 +208,7 @@ class SessionManager(object):
                 'Cannot clear session while simulation in progress')
 
         if self.session:
-            self.session.remove_hardware_event_watcher()
+            self.session._remove_hardware_event_watcher()
             self._hardware.reset()
         self.session = None
         self._broker.set_logger(self._command_logger)
@@ -484,43 +483,48 @@ class Session(object):
         return self
 
     def resume(self):
-        if self._use_v2:
-            self._hardware.resume()
-        # robot.resume in the legacy API will publish commands to the broker
-        # use the broker-less execute_resume instead
+        if not self.blocked:
+            if self._use_v2:
+                self._hardware.resume()
+            # robot.resume in the legacy API will publish commands to the
+            # broker use the broker-less execute_resume instead
+            else:
+                robot.execute_resume()
+
+            self.set_state('running')
+            return self
         else:
-            robot.execute_resume()
+            raise RuntimeError(
+                "Protocol is blocked is cannot be resumed. Make sure the "
+                "robot door is cloed before resuming.")
 
-        self.set_state('running')
-        return self
-
-    def start_hardware_event_watcher(self):
+    def _start_hardware_event_watcher(self):
         if not callable(self._event_watcher):
             # initialize and update window switch state
-            self.update_window_state(self._hardware.door_state)
+            self._update_window_state(self._hardware.door_state)
             log.info('Starting hardware event watcher')
             self._event_watcher = self._hardware.register_callback(
-                self.handle_hardware_event)
+                self._handle_hardware_event)
         else:
             log.warning("Cannot start new hardware event watcher "
                         "when one already exists")
 
-    def remove_hardware_event_watcher(self):
+    def _remove_hardware_event_watcher(self):
         if callable(self._event_watcher):
             self._event_watcher()
             self._event_watcher = None
 
-    def handle_hardware_event(self, hw_event: 'HardwareEvent'):
-        if hw_event['event'] == HardwareEventType.DOOR_SWITCH_CHANGE:
-            self.update_window_state(hw_event['new_state'])
+    def _handle_hardware_event(self, hw_event: HardwareEvent):
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self._update_window_state(hw_event.new_state)
             if ff.enable_door_safety_switch() and \
-                    hw_event['new_state'] == DoorState.OPEN and \
+                    hw_event.new_state == DoorState.OPEN and \
                     self.state == 'running':
                 self.pause('Robot door is open')
             else:
                 self._on_state_changed()
 
-    def update_window_state(self, state: DoorState):
+    def _update_window_state(self, state: DoorState):
         self.door_state = str(state)
         if ff.enable_door_safety_switch() and \
                 state == DoorState.OPEN:
@@ -604,14 +608,19 @@ class Session(object):
             _unsubscribe()
 
     def run(self):
-        try:
-            self._broker.set_logger(self._run_logger)
-            self._run()
-        except Exception:
-            raise
-        finally:
-            self._broker.set_logger(self._default_logger)
-        return self
+        if not self.blocked:
+            try:
+                self._broker.set_logger(self._run_logger)
+                self._run()
+            except Exception:
+                raise
+            finally:
+                self._broker.set_logger(self._default_logger)
+            return self
+        else:
+            raise RuntimeError(
+                'Protocol is blocked and cannot run. Make sure robot door '
+                'is closed before running.')
 
     def set_state(self, state: 'State',
                   reason: str = None,
@@ -657,8 +666,8 @@ class Session(object):
         self._hw_iface().reset()
         self.clear_logs()
         # unregister existing event watcher
-        self.remove_hardware_event_watcher()
-        self.start_hardware_event_watcher()
+        self._remove_hardware_event_watcher()
+        self._start_hardware_event_watcher()
 
     def _snapshot(self):
         if self.state == 'loaded':

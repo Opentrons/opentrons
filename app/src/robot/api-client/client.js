@@ -461,7 +461,7 @@ export function client(dispatch) {
     }
 
     update.blocked = apiSession.blocked ?? false
-    update.doorState = apiSession.door_state ?? ''
+    update.doorState = apiSession.door_state ?? null
 
     // both light and full updates may have the errors list
     if (apiSession.errors) {

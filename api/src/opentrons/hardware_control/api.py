@@ -3,7 +3,7 @@ import contextlib
 import logging
 import pathlib
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -19,11 +19,8 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
-                    HardwareEventType)
+                    DoorStateNotification)
 from . import modules
-
-if TYPE_CHECKING:
-    from .dev_types import DoorStateNotification  # noqa (F501)
 
 mod_log = logging.getLogger(__name__)
 
@@ -91,9 +88,7 @@ class API(HardwareAPILike):
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
         for cb in self._callbacks:
-            hw_event: 'DoorStateNotification' = {
-                'event': HardwareEventType.DOOR_SWITCH_CHANGE,
-                'new_state': door_state}
+            hw_event = DoorStateNotification(new_state=door_state)
             try:
                 cb(hw_event)
             except Exception:

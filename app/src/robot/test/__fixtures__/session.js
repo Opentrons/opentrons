@@ -8,8 +8,8 @@ export function MockSession() {
     command_log: {},
     state: 'loaded',
     stateInfo: {},
-    door_state: 'closed',
-    blocked: false,
+    door_state: null,
+    blocked: null,
     instruments: [],
     containers: [],
 
@@ -30,9 +30,30 @@ export function MockSessionNoStateInfo() {
     protocol_text: '# mock protocol text',
     commands: [],
     command_log: {},
-    door_state: 'closed',
-    blocked: false,
+    door_state: null,
+    blocked: null,
     state: 'loaded',
+    instruments: [],
+    containers: [],
+
+    modules: [],
+
+    run: jest.fn(),
+    pause: jest.fn(),
+    resume: jest.fn(),
+    stop: jest.fn(),
+    refresh: jest.fn(),
+  }
+}
+
+export function MockSessionNoDoorInfo() {
+  return {
+    name: 'MOCK SESSION',
+    protocol_text: '# mock protocol text',
+    commands: [],
+    command_log: {},
+    state: 'loaded',
+    stateInfo: {},
     instruments: [],
     containers: [],
 

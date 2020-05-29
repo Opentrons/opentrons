@@ -8,7 +8,11 @@ import { Client as RpcClient } from '../../rpc/client'
 import { NAME, actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
-import { MockSession, MockSessionNoStateInfo } from './__fixtures__/session'
+import {
+  MockSession,
+  MockSessionNoStateInfo,
+  MockSessionNoDoorInfo,
+} from './__fixtures__/session'
 import { MockCalibrationManager } from './__fixtures__/calibration-manager'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
@@ -359,7 +363,7 @@ describe('api client', () => {
             changedAt: null,
             estimatedDuration: null,
           },
-          doorState: 'closed',
+          doorState: null,
           blocked: false,
           protocolText: session.protocol_text,
           protocolCommands: [],
@@ -413,7 +417,7 @@ describe('api client', () => {
             changedAt: 2,
             estimatedDuration: null,
           },
-          doorState: 'closed',
+          doorState: null,
           blocked: false,
           protocolText: session.protocol_text,
           protocolCommands: [],
@@ -434,8 +438,19 @@ describe('api client', () => {
     })
 
     it('handles sessionResponses without door state and blocked info', () => {
-      session.blocked = null
-      session.door_state = null
+      session = MockSessionNoDoorInfo()
+      sessionManager.session = session
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', session)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expectedInitial))
+    })
+
+    it('handles sessionResponses with door and blocked info', () => {
+      session.blocked = true
+      session.door_state = 'open'
       const expected = actions.sessionResponse(
         null,
         {
@@ -447,8 +462,8 @@ describe('api client', () => {
             changedAt: null,
             estimatedDuration: null,
           },
-          doorState: '',
-          blocked: false,
+          doorState: 'open',
+          blocked: true,
           protocolText: session.protocol_text,
           protocolCommands: [],
           protocolCommandsById: {},
@@ -778,7 +793,7 @@ describe('api client', () => {
         startTime: 1,
         lastCommand: null,
         stateInfo: {},
-        door_state: 'open',
+        door_state: null,
         blocked: false,
       }
 
@@ -792,7 +807,7 @@ describe('api client', () => {
           changedAt: null,
           estimatedDuration: null,
         },
-        doorState: 'open',
+        doorState: null,
         blocked: false,
       }
       const expected = actions.sessionUpdate(actionInput, expect.any(Number))
@@ -810,11 +825,15 @@ describe('api client', () => {
         state: 'running',
         startTime: 2,
         lastCommand: null,
+        door_state: 'closed',
+        blocked: false,
       }
 
       const actionInput = {
-        ...update,
-        doorState: '',
+        state: 'running',
+        startTime: 2,
+        lastCommand: null,
+        doorState: 'closed',
         blocked: false,
         statusInfo: {
           message: null,
@@ -857,6 +876,37 @@ describe('api client', () => {
           message: 'hi and hello football fans',
           userMessage: 'whos ready for some FOOTBALL',
           changedAt: 2,
+          estimatedDuration: null,
+        },
+      }
+      const expected = actions.sessionUpdate(actionInput, expect.any(Number))
+
+      return sendConnect()
+        .then(() => {
+          dispatch.mockClear()
+          sendNotification('session', update)
+        })
+        .then(() => expect(dispatch).toHaveBeenCalledWith(expected))
+    })
+
+    it('handles SESSION_UPDATEs with no door or blocked info', () => {
+      const update = {
+        state: 'paused',
+        startTime: 2,
+        lastCommand: null,
+        stateInfo: {},
+      }
+
+      const actionInput = {
+        state: 'paused',
+        startTime: 2,
+        lastCommand: null,
+        blocked: false,
+        doorState: null,
+        statusInfo: {
+          message: null,
+          userMessage: null,
+          changedAt: null,
           estimatedDuration: null,
         },
       }

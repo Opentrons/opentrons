@@ -166,7 +166,7 @@ export type SessionStatusInfo = {|
   userMessage: string | null,
 |}
 
-export type DoorState = '' | DOOR_OPEN | DOOR_CLOSED
+export type DoorState = null | DOOR_OPEN | DOOR_CLOSED
 
 export type SessionUpdate = {|
   state: SessionStatus,

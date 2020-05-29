@@ -22,7 +22,7 @@ describe('robot reducer - session', () => {
         changedAt: null,
         estimatedDuration: null,
       },
-      doorState: '',
+      doorState: null,
       blocked: false,
       errors: [],
       protocolCommands: [],

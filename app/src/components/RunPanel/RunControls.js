@@ -76,7 +76,7 @@ export function RunControls(props: RunControlsProps) {
     )
   } else if (isRunning) {
     const pauseDisabled = disabled || isBlocked
-    let pauseTooltip = isBlocked ? DOOR_OPEN_RESUME : null
+    const pauseTooltip = isBlocked ? DOOR_OPEN_RESUME : null
 
     pauseResumeButton = (
       <HoverTooltip tooltipComponent={pauseTooltip}>
