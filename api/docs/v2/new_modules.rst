@@ -181,7 +181,7 @@ This function will pause your protocol until your target temperature is reached.
 Read the Current Temperature
 ============================
 
-You can read the current real-time temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.temperature` property:
+You can read the current real-time temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.temperature` property:
 
 .. code-block:: python
 
@@ -192,7 +192,7 @@ You can read the current real-time temperature of the Temperature Module using t
 Read the Target Temperature
 ===========================
 
-You can read the current target temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.target` property:
+You can read the current target temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.target` property:
 
 .. code-block:: python
 
@@ -203,7 +203,7 @@ You can read the current target temperature of the Temperature Module using the 
 Check the Status
 ================
 
-The :py:attr:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+The :py:obj:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
 
 .. code-block:: python
 
@@ -316,7 +316,7 @@ The Magnetic Module will disengage when the device is turned on. It will not aut
 Check the Status
 ================
 
-The :py:attr:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
+The :py:obj:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
 
 .. code-block:: python
 
@@ -506,7 +506,8 @@ a few methods that allow you to do that.
 
 Basic Status
 ------------
-The :py:attr:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
+
+The :py:obj:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
 
 .. code-block:: python
 
