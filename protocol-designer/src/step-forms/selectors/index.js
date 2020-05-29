@@ -1,7 +1,6 @@
 // @flow
 import type { ElementProps } from 'react'
 import assert from 'assert'
-import forEach from 'lodash/forEach'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -22,11 +21,8 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
-import {
-  hydrateField,
-  getFieldErrors,
-  getProfileFieldErrors,
-} from '../../steplist/fieldLevel'
+import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
@@ -41,7 +37,7 @@ import type {
 } from '@opentrons/components'
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
-import type { FormData, ProfileItem, StepIdType } from '../../form-types'
+import type { FormData, StepIdType } from '../../form-types'
 import type { StepArgsAndErrors, StepFormErrors } from '../../steplist/types'
 import type {
   InitialDeckSetup,
@@ -416,47 +412,32 @@ function _getHydratedForm(
   return hydratedForm
 }
 
-const _getProfileItemsHaveErrors = (profileItems: {
-  [id: string]: ProfileItem,
-}): boolean => {
-  let errors = false
-  // TODO: fieldName includes id, stepType, etc... this is weird #3161
-  forEach(profileItems, (item, itemId) => {
-    forEach(item, (value, fieldName) => {
-      const fieldErrors = getProfileFieldErrors(fieldName, value)
-
-      if (fieldErrors.length > 0) {
-        errors = true
-        // TODO IMMEDIATELY: break out of it early
-      }
-    })
-  })
-  return errors
-}
-
 // TODO type with hydrated form type
 const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
   return getFormErrors(hydratedForm.stepType, hydratedForm)
 }
 
-const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
-  let errors = false
-  forEach(hydratedForm, (value, fieldName) => {
+// TODO type with hydrated form type
+export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
+  for (const fieldName in hydratedForm) {
+    const value = hydratedForm[fieldName]
     if (fieldName === 'profileItemsById') {
-      errors = errors || _getProfileItemsHaveErrors(value)
+      if (getProfileItemsHaveErrors(value)) {
+        return true
+      }
     } else {
       // TODO: fieldName includes id, stepType, etc... this is weird #3161
       const fieldErrors = getFieldErrors(fieldName, value)
       if (fieldErrors && fieldErrors.length > 0) {
-        errors = true
+        return true
       }
     }
-  })
-  return errors
+  }
+  return false
 }
 
 // TODO type with hydrated form type
-const _formHasErrors = (hydratedForm: FormData): boolean => {
+export const _formHasErrors = (hydratedForm: FormData): boolean => {
   const hasFormLevelErrors = _formLevelErrors(hydratedForm).length > 0
   return _hasFieldLevelErrors(hydratedForm) || hasFormLevelErrors
 }
@@ -484,7 +465,7 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
 )
 
 // NOTE this is only used in FormAlerts
-export const getUnsavedFormErrors: Selector<StepFormErrors> = createSelector(
+export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
   getHydratedUnsavedForm,
   hydratedForm => {
     if (!hydratedForm) return []
