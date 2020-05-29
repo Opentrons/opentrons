@@ -14,7 +14,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 port ?= 34000
 tests ?= tests
 test_opts ?=
-wheel_file = $(python_get_wheelname,update-server,otupdate)
+wheel_file = $(call python_get_wheelname,update-server,otupdate)
 # Host key location for buildroot robot
 br_ssh_key ?= $(default_ssh_key)
 # Other SSH args for buildroot robots
@@ -69,6 +69,6 @@ restart:
 
 .PHONY: push
 push: wheel
-	$(call push-python-package,$(host),$(br_ssh_key),$(br_ssh_opts),$(wheel_file))
-	$(call push-systemd-unit,$(host),$(br_ssh_key),$(br_ssh_opts),$(./opentrons-update-server.service))
+	$(call push-python-package,$(host),$(br_ssh_key),$(br_ssh_opts),dist/$(wheel_file))
+	$(call push-systemd-unit,$(host),$(br_ssh_key),$(br_ssh_opts),./opentrons-update-server.service)
 	$(call restart-service,$(host),$(br_ssh_key),$(br_ssh_opts),opentrons-update-server)
