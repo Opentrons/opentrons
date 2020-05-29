@@ -29,7 +29,7 @@ twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 all: clean dist
 
 .PHONY: setup-js
-setup:
+setup-js:
 	$(MAKE) dist
 
 .PHONY: setup-py
