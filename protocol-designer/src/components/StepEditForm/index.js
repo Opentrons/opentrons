@@ -6,7 +6,7 @@ import isEqual from 'lodash/isEqual'
 import without from 'lodash/without'
 import cx from 'classnames'
 
-import { useConditionalConfirm } from '../useConditionalConfirm'
+import { useConditionalConfirm } from '@opentrons/components'
 import { actions } from '../../steplist'
 import { actions as stepsActions } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
@@ -192,23 +192,20 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const saveStepForm = () => dispatch(stepsActions.saveStepForm())
 
   const {
-    conditionalContinue: conditionalDelete,
-    requiresConfirmation: showConfirmDeleteModal,
-    confirmAndContinue: confirmDelete,
-    cancelConfirm: cancelConfirmDelete,
+    confirm: confirmDelete,
+    showConfirmation: showConfirmDeleteModal,
+    cancel: cancelDelete,
   } = useConditionalConfirm(handleDelete, true)
 
   const {
-    conditionalContinue: conditionalClose,
-    requiresConfirmation: showConfirmCancelModal,
-    confirmAndContinue: confirmClose,
-    cancelConfirm: cancelConfirmClose,
+    confirm: confirmClose,
+    showConfirmation: showConfirmCancelModal,
+    cancel: cancelClose,
   } = useConditionalConfirm(handleClose, isNewStep)
 
   const {
-    conditionalContinue: conditionalAddPauseUntilTempStep,
-    requiresConfirmation: showAddPauseUntilTempStepModal,
-    confirmAndContinue: confirmAddPauseUntilTempStep,
+    confirm: confirmAddPauseUntilTempStep,
+    showConfirmation: showAddPauseUntilTempStepModal,
   } = useConditionalConfirm(
     saveSetTempFormWithAddedPauseUntilTemp,
     isPristineSetTempForm
@@ -223,14 +220,14 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
     <>
       {showConfirmDeleteModal && (
         <ConfirmDeleteStepModal
-          onCancelClick={cancelConfirmDelete}
+          onCancelClick={cancelDelete}
           onContinueClick={confirmDelete}
         />
       )}
       {showConfirmCancelModal && (
         <ConfirmDeleteStepModal
           close
-          onCancelClick={cancelConfirmClose}
+          onCancelClick={cancelClose}
           onContinueClick={confirmClose}
         />
       )}
@@ -246,10 +243,10 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
           canSave,
           formData,
           dirtyFields,
-          handleClose: conditionalClose,
-          handleDelete: conditionalDelete,
+          handleClose: confirmClose,
+          handleDelete: confirmDelete,
           handleSave: isPristineSetTempForm
-            ? conditionalAddPauseUntilTempStep
+            ? confirmAddPauseUntilTempStep
             : saveStepForm,
           focusedField,
           onFieldBlur,

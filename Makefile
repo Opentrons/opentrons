@@ -46,14 +46,15 @@ install-py:
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 	$(MAKE) -C $(ROBOT_SERVER_DIR) install
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
 .PHONY: install-js
 install-js:
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR)
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR)
+	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
@@ -89,6 +90,8 @@ push: export host=$(usb_host)
 push:
 	$(if $(host),@echo "Pushing to $(host)",$(error host variable required))
 	$(MAKE) -C $(API_DIR) push-no-restart
+	sleep 1
+	$(MAKE) -C $(SHARED_DATA_DIR) push-no-restart
 	sleep 1
 	$(MAKE) -C $(UPDATE_SERVER_DIR) push
 	sleep 1
@@ -148,6 +151,7 @@ lint-py:
 	$(MAKE) -C $(API_DIR) lint
 	$(MAKE) -C $(UPDATE_SERVER_DIR) lint
 	$(MAKE) -C $(ROBOT_SERVER_DIR) lint
+	$(MAKE) -C $(SHARED_DATA_DIR) lint-py
 
 .PHONY: lint-js
 lint-js:

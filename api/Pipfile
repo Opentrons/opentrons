@@ -26,6 +26,7 @@ typing-extensions = "*"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
 graphviz = "*"
+"c445fee" = {editable = true, path = "./../shared-data/python"}
 
 [packages]
 aiohttp = "==3.4.4"

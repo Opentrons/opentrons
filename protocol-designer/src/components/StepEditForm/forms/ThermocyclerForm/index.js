@@ -13,6 +13,7 @@ import {
   RadioGroupField,
 } from '../../fields'
 import { StateFields } from './StateFields'
+import { ProfileSettings } from './ProfileSettings'
 import styles from '../../StepEditForm.css'
 
 import type { FormData } from '../../../../form-types'
@@ -62,14 +63,26 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
           ]}
           {...focusHandlers}
         />
-        <div>-----TODO BELOW-----</div>
-        <ProfileStepRows focusHandlers={focusHandlers} />
       </div>
 
       <ConditionalOnField
         name={'thermocyclerFormType'}
         condition={val => val === THERMOCYCLER_PROFILE}
       >
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.profile_settings')}
+          </span>
+        </div>
+        <ProfileSettings focusHandlers={focusHandlers} />
+        <div className={styles.section_header}>
+          <span className={styles.section_header_text}>
+            {i18n.t('application.stepType.profile_steps')}
+          </span>
+        </div>
+        <p>
+          <ProfileStepRows focusHandlers={focusHandlers} />
+        </p>
         <div className={styles.section_header}>
           <span className={styles.section_header_text}>
             {i18n.t('application.stepType.ending_hold')}

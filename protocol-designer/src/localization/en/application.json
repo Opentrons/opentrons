@@ -6,6 +6,8 @@
     "magnet": "magnet",
     "temperature": "temperature",
     "thermocycler": "thermocycler",
+    "profile_settings": "profile settings",
+    "profile_steps": "profile steps",
     "ending_hold": "ending hold"
   },
   "units": {

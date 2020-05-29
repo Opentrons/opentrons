@@ -280,9 +280,9 @@ class RPCServer(object):
             trace = traceback.format_exc()
             try:
                 line_msg = ' [line ' + [
-                    l.split(',')[0].strip()
-                    for l in trace.split('line')
-                    if '<module>' in l][0] + ']'
+                    line.split(',')[0].strip()
+                    for line in trace.split('line')
+                    if '<module>' in line][0] + ']'
             except Exception:
                 line_msg = ''
             finally:
