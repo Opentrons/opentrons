@@ -15,7 +15,7 @@ import { Icon, ALIGN_CENTER, JUSTIFY_CENTER } from '@opentrons/components'
 
 ```js
 import { DIRECTION_COLUMN } from '@opentrons/components'
-;<Flex as="ul" direction={DIRECTION_COLUMN}>
+;<Flex as="ul" flexDirection={DIRECTION_COLUMN}>
   <li>hello</li>
   <li>world</li>
 </Flex>

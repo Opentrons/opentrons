@@ -70,6 +70,7 @@ module.exports = {
     },
     {
       name: 'Primitives',
+      content: 'src/primitives/README.md',
       components: 'src/primitives/[A-Z]*.js',
     },
   ],

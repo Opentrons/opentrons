@@ -45,7 +45,7 @@
     "reselect": "4.0.0",
     "rxjs": "^6.5.1",
     "semver": "5.5.0",
-    "styled-components": "5.0.1",
+    "styled-components": "5.1.1",
     "typeface-open-sans": "0.0.75"
   }
 }

@@ -1,23 +1,18 @@
 // @flow
 import styled from 'styled-components'
 
-import * as StyleProps from './style-props'
+import { styleProps, isntStyleProp } from './style-props'
 
-import type { StyledComponent } from 'styled-components'
-
-export type BoxProps = {|
-  ...StyleProps.ColorProps,
-  ...StyleProps.SpacingProps,
-  ...StyleProps.TypographyProps,
-|}
+import type { PrimitiveComponent } from './types'
 
 /**
  * Box primitive
  *
  * @component
  */
-export const Box: StyledComponent<BoxProps, {||}, HTMLDivElement> = styled.div`
-  ${StyleProps.colorStyles}
-  ${StyleProps.spacingStyles}
-  ${StyleProps.typographyStyles}
+export const Box: PrimitiveComponent<HTMLDivElement> = styled.div.withConfig({
+  shouldForwardProp: isntStyleProp,
+})`
+  min-width: 0;
+  ${styleProps}
 `
