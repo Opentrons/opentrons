@@ -21,6 +21,10 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
+import {
+  getProfileFormErrors,
+  type ProfileFormError,
+} from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
 import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import { denormalizePipetteEntities } from '../utils'
@@ -418,6 +422,13 @@ const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
 }
 
 // TODO type with hydrated form type
+const _dynamicFieldFormErrors = (
+  hydratedForm: FormData
+): Array<ProfileFormError> => {
+  return getProfileFormErrors(hydratedForm)
+}
+
+// TODO type with hydrated form type
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   for (const fieldName in hydratedForm) {
     const value = hydratedForm[fieldName]
@@ -464,7 +475,18 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
   }
 )
 
-// NOTE this is only used in FormAlerts
+export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
+  Array<ProfileFormError>
+> = createSelector(
+  getHydratedUnsavedForm,
+  hydratedForm => {
+    if (!hydratedForm) return []
+
+    const errors = _dynamicFieldFormErrors(hydratedForm)
+    return errors
+  }
+)
+
 export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
   getHydratedUnsavedForm,
   hydratedForm => {
