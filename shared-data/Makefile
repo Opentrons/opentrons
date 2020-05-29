@@ -83,3 +83,7 @@ deploy-staging: wheel
 deploy: wheel
 	$(python) -m twine upload $(twine_auth_args)\
                             $(wheel_file)
+
+.PHONY: test
+test-py:
+	$(SHX) cd python && $(python) -m pytest tests
