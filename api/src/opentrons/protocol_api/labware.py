@@ -852,6 +852,14 @@ def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
 
 
 def _add_to_index_offset_file(labware: Labware, lw_hash: str):
+    """
+    A helper method to create or add to an index file so that calibration
+    files can be looked up by their hash to reveal the labware uri and
+    parent information of a given file.
+
+    :param labware: A labware object
+    :param lw_hash: The labware hash of the calibration
+    """
     index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
     uri = labware.uri
     if index_file.exists():
@@ -865,9 +873,10 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
         mod_dict = {mod_parent: f'{slot}-{mod_parent}'}
     else:
         mod_dict = {}
-    blob[uri] = {
-            "id": f'{lw_hash}',
-            "slot": f'{lw_hash}{mod_parent}',
+    full_id = f'{lw_hash}{mod_parent}'
+    blob[full_id] = {
+            "uri": f'{uri}',
+            "slot": full_id,
             "module": mod_dict
         }
     with index_file.open('w') as f:
@@ -1302,6 +1311,35 @@ def get_all_labware_definitions() -> List[str]:
     return labware_list
 
 
+def get_all_calibrations() -> List[Dict[str, Any]]:
+    """
+    A helper function that will list all of the given calibrations
+    in a succinct way.
+
+    :return: A list of dictionary objects representing all of the
+    labware calibration files found on the robot.
+    """
+    all_calibrations: List[Dict[str, Any]] = []
+    offset_dir = CONFIG['labware_calibration_offsets_dir_v2']
+    index_path = offset_dir / 'index.json'
+    if not index_path.exists():
+        return all_calibrations
+    index_file = _read_file(str(index_path))
+    for key, data in index_file.items():
+        cal_path = offset_dir / f'{key}.json'
+        calibration = _read_file(str(cal_path))
+        ns, ln, v = details_from_uri(data['uri'])
+        definition = get_labware_definition(ln, ns, v)
+        all_calibrations.append(
+            {'calibration': calibration,
+             'definition': definition,
+             'slot': data['slot'],
+             'module': data['module'],
+             'id': key,
+             'uri': data['uri']})
+    return all_calibrations
+
+
 def clear_calibrations():
     """
     Delete all calibration files for labware. This includes deleting tip-length
@@ -1313,6 +1351,42 @@ def clear_calibrations():
             f for f in calibration_path.iterdir() if f.suffix == '.json']
         for target in targets:
             target.unlink()
+    except FileNotFoundError:
+        pass
+
+
+def _remove_offset_from_index(calibration_id: str):
+    """
+    Helper function to remove an individual offset file.
+
+    :param calibration_id: labware hash
+    :raises FileNotFoundError: If index file does not exist or
+    the specified id is not in the index file.
+    """
+    index_path = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    if index_path.exists():
+        blob = _read_file(str(index_path))
+    else:
+        raise FileNotFoundError()
+    try:
+        del blob[calibration_id]
+        with index_path.open('w') as f:
+            json.dump(blob, f)
+    except KeyError:
+        raise FileNotFoundError()
+
+
+def delete_offset_file(calibration_id: str):
+    """
+    Given a labware's hash, delete the file and remove it from the index file.
+
+    :param calibration_id: labware hash
+    """
+    offset =\
+        CONFIG['labware_calibration_offsets_dir_v2'] / f'{calibration_id}.json'
+    try:
+        _remove_offset_from_index(calibration_id)
+        offset.unlink()
     except FileNotFoundError:
         pass
 
@@ -1378,7 +1452,18 @@ def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
     return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
 
 
-def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
+def details_from_uri(uri: str, delimiter='/'):
+    """
+    Unpack a labware URI to get the namespace, loadname and version
+    """
+    info = uri.split(delimiter)
+    namespace = info[0]
+    load_name = info[1]
+    version = info[2]
+    return namespace, load_name, version
+
+
+def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
     """ Build a labware URI from its definition.
 
     A labware URI is a string that uniquely specifies a labware definition.
