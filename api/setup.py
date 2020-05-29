@@ -53,6 +53,7 @@ INSTALL_REQUIRES = [
     'urwid==1.3.1',
     'jsonschema>=3.0.2,<4',
     'aionotify==0.2.0',
+    f'opentrons_shared_data=={VERSION}'
 ]
 
 
