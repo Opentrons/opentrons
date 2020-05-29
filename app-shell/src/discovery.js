@@ -39,7 +39,7 @@ export function registerDiscovery(dispatch: Dispatch) {
     pollInterval: SLOW_POLL_INTERVAL_MS,
     logger: log,
     candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
-    services: store.get('services'),
+    services: disableCache ? [] : store.get('services'),
   })
 
   client
@@ -55,7 +55,7 @@ export function registerDiscovery(dispatch: Dispatch) {
   handleConfigChange('discovery.disableCache', value => {
     disableCache = value
   })
-  
+
   app.once('will-quit', () => client.stop())
 
   return function handleIncomingAction(action: Action) {
