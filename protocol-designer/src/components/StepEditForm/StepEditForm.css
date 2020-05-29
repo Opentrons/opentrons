@@ -306,3 +306,12 @@ and when that is implemented.
 .toggle_temperature_field {
   margin-top: 0.125rem;
 }
+
+.profile_settings_group {
+  margin-right: 1rem;
+}
+
+.profile_settings_lid {
+  font-size: var(--fs-body-1);
+  line-height: 2;
+}
