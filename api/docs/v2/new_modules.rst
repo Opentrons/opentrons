@@ -79,17 +79,16 @@ You can determine if your module is a GEN2 model by inspecting the sides of the 
 Changes with the GEN2 Temperature Module
 ----------------------------------------
 
-The Temperature Module GEN2 has a plastic insulating rim around the plate and plastic
-insulating shrouds designed to fit over our aluminum blocks, mitigating an issue where the
-Temperature Module GEN1 would not be able to sufficiently cool itself when a Thermocycler
-profile was ongoing in the same robot.
+The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
+This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
 
 Changes with the GEN2 Magnetic Module
 -------------------------------------
 
-Compared to the older version, the Magnetic Module GEN2 uses smaller magnets. This mitigates an
-issue where beads would be attracted even when the magnets were retracted. This also means the
-attraction times for the magnets have increased:
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
+This mitigates an issue where beads would be attracted even when the magnets were retracted.
+
+This means it will take longer for the GEN2 module to attract beads.
 
 Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
