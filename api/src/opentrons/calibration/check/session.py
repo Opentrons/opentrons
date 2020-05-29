@@ -102,7 +102,6 @@ CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.badCalibrationData,
         "condition": "_is_tip_pick_up_dangerous",
-        "after": "_return_first_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -215,7 +214,6 @@ CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.badCalibrationData,
         "condition": "_is_tip_pick_up_dangerous",
-        "after": "_return_second_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -706,8 +704,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
             'cannot drop tip on first mount, pipette not present'
-        state_name = CalibrationCheckState.preparingFirstPipette
-        loc = Location(getattr(self._moves, state_name).position, None)
+        state_name = CalibrationCheckState.inspectingFirstTip
+        return_pt = self._saved_points[getattr(CalibrationCheckState,
+                                       state_name)]
+        loc = Location(return_pt, None)
         await self._move(first_pip.mount, loc)
         await self._drop_tip(first_pip.mount)
 
@@ -715,7 +715,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot drop tip on second mount, pipette not present'
-        state_name = CalibrationCheckState.preparingSecondPipette
-        loc = Location(getattr(self._moves, state_name).position, None)
+        state_name = CalibrationCheckState.inspectingSecondTip
+        return_pt = self._saved_points[getattr(CalibrationCheckState,
+                                        state_name)]
+        loc = Location(return_pt, None)
         await self._move(second_pip.mount, loc)
         await self._drop_tip(second_pip.mount)
