@@ -6,8 +6,8 @@ for modules
 from typing import Any, Dict, List, Union
 from typing_extensions import Literal, TypedDict
 
-SchemaV1 = Literal[1]
-SchemaV2 = Literal[2]
+SchemaV1 = Literal['1']
+SchemaV2 = Literal['2']
 SchemaVersions = Union[SchemaV1, SchemaV2]
 
 ModuleSchema = Dict[str, Any]

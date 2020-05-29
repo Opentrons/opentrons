@@ -407,11 +407,11 @@ def test_magdeck_gen2_labware_props(loop):
 
 def test_module_compatibility(get_module_fixture, monkeypatch):
 
-    def load_fixtures(version, model):
+    def load_fixtures(model):
         return get_module_fixture(model.value)
 
     monkeypatch.setattr(
-        papi.module_geometry, '_load_module_definition', load_fixtures)
+        papi.module_geometry, '_load_v2_module_def', load_fixtures)
 
     class DummyEnum:
         def __init__(self, value: str):
