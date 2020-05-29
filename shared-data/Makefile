@@ -28,18 +28,17 @@ twine_auth_args := --username $(pypi_username) --password $(pypi_password)
 .PHONY: all
 all: clean dist
 
-.PHONY: install-js
-install-js:
-	yarn
+.PHONY: setup-js
+setup:
 	$(MAKE) dist
 
-.PHONY: install-py
-install-py:
+.PHONY: setup-py
+setup-py:
 	cd python && $(pipenv_envvars) pipenv sync $(pipenv_opts)
 	cd python && $(pipenv_envvars) pipenv run pip freeze
 
-.PHONY: install
-install: install-py install-js
+.PHONY: setup
+setup: setup-py setup-js
 
 
 .PHONY: dist

@@ -46,14 +46,14 @@ install-py:
 	$(MAKE) -C $(API_DIR) install
 	$(MAKE) -C $(UPDATE_SERVER_DIR) install
 	$(MAKE) -C $(ROBOT_SERVER_DIR) install
-	$(MAKE) -C $(SHARED_DATA_DIR) install-py
+	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
 .PHONY: install-js
 install-js:
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
-	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) install-js
+	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
 	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install
 
 # uninstall all project dependencies
