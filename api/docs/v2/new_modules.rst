@@ -68,6 +68,9 @@ Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to s
 GEN1 vs. GEN2 Modules
 =====================
 
+GEN2 modules are newer.
+They have improvements that make them more reliable and easier to use.
+
 Identifying a GEN2 Module
 -------------------------
 
