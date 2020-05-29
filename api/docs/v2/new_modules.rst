@@ -65,24 +65,24 @@ Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to s
    +----------------------------+-------------------------------------------------+------------------------------------------------+
 
 
-GEN2 Modules Differences
-========================
+GEN1 vs. GEN2 Modules
+=====================
 
 Identifying a GEN2 Module
 -------------------------
 
 You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`.
 
-Temperature Module GEN2
------------------------
+Changes with the GEN2 Temperature Module
+----------------------------------------
 
 The Temperature Module GEN2 has a plastic insulating rim around the plate and plastic
 insulating shrouds designed to fit over our aluminum blocks, mitigating an issue where the
 Temperature Module GEN1 would not be able to sufficiently cool itself when a Thermocycler
 profile was ongoing in the same robot.
 
-Magnetic Module GEN2
---------------------
+Changes with the GEN2 Magnetic Module
+-------------------------------------
 
 Compared to the older version, the Magnetic Module GEN2 uses smaller magnets. This mitigates an
 issue where beads would be attracted even when the magnets were retracted. This also means the
