@@ -42,7 +42,7 @@ describe('custom labware analytics events', () => {
     const result = makeEvent(action, MOCK_STATE)
 
     return expect(result).resolves.toEqual({
-      superProperties: MOCK_ANALYTICS_PROPS,
+      superProperties: { ...MOCK_ANALYTICS_PROPS, 'U2E IPv4 Address': true },
     })
   })
 
@@ -51,7 +51,7 @@ describe('custom labware analytics events', () => {
     const result = makeEvent(action, MOCK_STATE)
 
     return expect(result).resolves.toEqual({
-      superProperties: MOCK_ANALYTICS_PROPS,
+      superProperties: { ...MOCK_ANALYTICS_PROPS, 'U2E IPv4 Address': true },
     })
   })
 
@@ -62,7 +62,21 @@ describe('custom labware analytics events', () => {
     const result = makeEvent(action, MOCK_STATE)
 
     return expect(result).resolves.toEqual({
-      superProperties: MOCK_ANALYTICS_PROPS,
+      superProperties: { ...MOCK_ANALYTICS_PROPS, 'U2E IPv4 Address': true },
+    })
+  })
+
+  it('maps no assigned IPv4 address to false', () => {
+    getU2EDeviceAnalyticsProps.mockReturnValue({
+      ...MOCK_ANALYTICS_PROPS,
+      'U2E IPv4 Address': null,
+    })
+
+    const action = SystemInfo.initialized([Fixtures.mockRealtekDevice], [])
+    const result = makeEvent(action, MOCK_STATE)
+
+    return expect(result).resolves.toEqual({
+      superProperties: { ...MOCK_ANALYTICS_PROPS, 'U2E IPv4 Address': false },
     })
   })
 

@@ -257,8 +257,22 @@ export function makeEvent(
     case SystemInfo.INITIALIZED:
     case SystemInfo.USB_DEVICE_ADDED:
     case SystemInfo.NETWORK_INTERFACES_CHANGED: {
-      const superProperties = SystemInfo.getU2EDeviceAnalyticsProps(state)
-      return Promise.resolve(superProperties ? { superProperties } : null)
+      const systemInfoProps = SystemInfo.getU2EDeviceAnalyticsProps(state)
+
+      return Promise.resolve(
+        systemInfoProps
+          ? {
+              superProperties: {
+                ...systemInfoProps,
+                // anonymize IP address so analytics profile can't be mapped to more
+                // specific Intercom support profile
+                'U2E IPv4 Address': Boolean(
+                  systemInfoProps['U2E IPv4 Address']
+                ),
+              },
+            }
+          : null
+      )
     }
   }
 
