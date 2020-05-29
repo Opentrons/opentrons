@@ -13,6 +13,8 @@ pylama = "*"
 twine = "==2.0.0"
 wheel = "==0.30.0"
 "e1839a8" = {editable = true, path = "."}
+pytest = "*"
+typeguard = "*"
 
 [packages]
 jsonschema = "==3.0.2"
