@@ -4,7 +4,6 @@
 Hardware Modules
 ################
 
-
 Modules are peripherals that attach to the OT-2 to extend its capabilities.
 
 We currently support the Temperature, Magnetic and Thermocycler Modules.
@@ -13,12 +12,12 @@ We currently support the Temperature, Magnetic and Thermocycler Modules.
 Module Setup
 ************
 
-Loading your Module onto a deck
-===============================
+Loading Your Module Onto the Deck
+=================================
 
-Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol. The Protocol API then creates software objects called :py:class:`.ModuleContext` that represent the attached modules.
+Like labware and pipettes, you must inform the Protocol API of the modules you will use in your protocol.
 
-Modules are loaded using the function :py:meth:`.ProtocolContext.load_module`:
+Use :py:meth:`.ProtocolContext.load_module` to load a module.  It will return an object representing the module.
 
 .. code-block:: python
 
@@ -27,62 +26,77 @@ Modules are loaded using the function :py:meth:`.ProtocolContext.load_module`:
     metadata = {'apiLevel': '2.2'}
 
     def run(protocol: protocol_api.ProtocolContext):
-         module = protocol.load_module('Module Name', slot)
-
-
-
-Module names can be specified in a few different ways. The valid names can be found below. They are not case-sensitive.
-
-+-----------------------------+-----------------------------------------------+
-|        Module Type          |               Valid Names                     |
-+=============================+===============================================+
-| ``Temperature Module``      | ``'Temperature Module'``, ``'tempdeck'``      |
-+-----------------------------+-----------------------------------------------+
-| ``Temperature Module GEN2`` | ``'Temperature Module Gen2'``                 |
-+-----------------------------+-----------------------------------------------+
-| ``Magnetic Module``         | ``'Magnetic Module'``, ``'magdeck'``          |
-+-----------------------------+-----------------------------------------------+
-| ``Magnetic Module GEN2``    | ``'Magnetic Module Gen2'``                    |
-+-----------------------------+-----------------------------------------------+
-| ``Thermocycler Module``     | ``'Thermocycler Module'``, ``'thermocycler'`` |
-+-----------------------------+-----------------------------------------------+
-
-.. note::
-
-    The Temperature Module GEN2 and Magnetic Module GEN2 are introduced in Robot Software version 3.17.0. You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`. If you are using these modules, make sure the API level of your protocol (see :ref:`v2-versioning`) is at least 2.3 or higher.
-
-.. versionadded:: 2.0
+         # Load a Magnetic Module GEN2 in deck slot 1.
+         magnetic_module = protocol.load_module('magnetic module gen2', 1)
+         
+         # Load a Temperature Module GEN1 in deck slot 3.
+         temperature_module = protocol.load_module('temperature module', 3)
 
 .. note::
 
     When you load a module in a protocol, you inform the OT-2 that you want the specified module to be present. Even if you do not use the module anywhere else in your protocol, the Opentrons App and the OT-2 will not let your protocol proceed until all modules loaded with ``load_module`` are attached to the OT-2.
 
-GEN2 Modules
-============
+.. versionadded:: 2.0
 
-Temperature Module GEN2
------------------------
+Available Modules
+-----------------
 
-The Temperature Module GEN2 has a plastic insulating rim around the plate and plastic
-insulating shrouds designed to fit over our aluminum blocks, mitigating an issue where the
-Temperature Module GEN1 would not be able to sufficiently cool itself when a Thermocycler
-profile was ongoing in the same robot.
+The first parameter to :py:meth:`.ProtocolContext.load_module`, the module's *load name,* specifies the kind of module to load.
+Check the table below for the proper load name to use for each kind of module.
 
-Magnetic Module GEN2
---------------------
+Some modules were added to the Protocol API later than others.
+Make sure you use a :ref:`Protocol API version <v2-versioning>` high enough to support all the modules you want to use.
 
-Compared to the older version, the Magnetic Module GEN2 uses smaller magnets. This mitigates an
-issue where beads would be attracted even when the magnets were retracted. This also means the
-attraction times for the magnets have increased:
+.. table::
+   :widths: 2 1 3 3
+   
+   +--------------------+-------------------------------+------------------------------------+
+   | Module             | Load name                     | Minimum                            |
+   |                    |                               | :ref:`API version <v2-versioning>` |
+   +=============+======+===============================+====================================+
+   | Temperature | GEN1 | ``'temperature module'``      | 2.0                                |
+   | Module      |      | or ``'tempdeck'``             |                                    |
+   |             +------+-------------------------------+------------------------------------+
+   |             | GEN2 | ``'temperature module gen2'`` | 2.3                                |
+   +-------------+------+-------------------------------+------------------------------------+
+   | Magnetic    | GEN1 | ``'magnetic module'``         | 2.0                                |
+   | Module      |      | or ``'magdeck'``              |                                    |
+   |             +------+-------------------------------+------------------------------------+
+   |             | GEN2 | ``'magnetic module gen2'``    | 2.3                                |
+   +-------------+------+-------------------------------+------------------------------------+
+   | Thermocycler       | ``'thermocycler module'``     | 2.0                                |
+   | Module             | or ``'thermocycler'``         |                                    |
+   +--------------------+-------------------------------+------------------------------------+
+
+
+GEN1 vs. GEN2 Modules
+=====================
+
+GEN2 modules are newer.
+They have improvements that make them more reliable and easier to use.
+
+Identifying a GEN2 Module
+-------------------------
+
+You can determine if your module is a GEN2 model by inspecting the sides of the device for a label that specifies `GEN2`.
+
+Changes with the GEN2 Temperature Module
+----------------------------------------
+
+The GEN2 Temperature Module has a plastic insulating rim around the plate, and plastic insulating shrouds designed to fit over our aluminum blocks.
+This mitigates an issue where the GEN1 Temperature Module would have trouble cooling to very low temperatures, especially if it shared the deck with a running Thermocycler.
+
+Changes with the GEN2 Magnetic Module
+-------------------------------------
+
+The GEN2 Magnetic Module uses smaller magnets than the GEN1 version.
+This mitigates an issue where beads would be attracted even when the magnets were retracted.
+
+This means it will take longer for the GEN2 module to attract beads.
 
 Recommended Magnetic Module GEN2 bead attraction time:
     - Total liquid volume <= 50 uL: 5 minutes
     - Total liquid volume > 50 uL: 7 minutes
-
-Module and Labware Compatibility
-================================
-
-Before adding labware to your module, you should check if the desired labware is compatible with your module. For more information about each module’s compatible labware, check out this `support article <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`_.
 
 
 Loading Labware Onto Your Module
@@ -101,10 +115,18 @@ Like specifying labware that will be present on the deck of the OT-2, you must s
          my_labware = module.load_labware('opentrons_24_aluminumblock_generic_2ml_screwcap',
                                           label='Temperature-Controlled Tubes')
 
-You do not need to specify a slot, because the labware is loaded into the module.
+Notice that when you load labware on a module, you don't specify the labware's deck slot.  The labware is loaded on the module, on whichever deck slot the module occupies.
+
 
 .. versionadded:: 2.0
 
+Module and Labware Compatibility
+--------------------------------
+
+It's up to you to make sure that the labware and module you chose make sense together.
+The Protocol API won't stop you from making nonsensical combinations, like a tube rack on a Thermocycler.
+
+See: `What labware can I use with my modules? <https://support.opentrons.com/en/articles/3540964-what-labware-can-i-use-with-my-modules>`__
 
 Loading Custom Labware Into Your Module
 ---------------------------------------
@@ -118,32 +140,9 @@ Any custom labware added to your Opentrons App (see :ref:`v2-custom-labware`) is
     In API version 2.0, :py:meth:`.ModuleContext.load_labware` only took a ``load_name`` argument. In API version 2.1 (introduced in Robot Software version 3.15.2) or higher you can now specify a label, version, and namespace (though most of the time you won't have to).
 
 
-Checking The Status Of Your Module
-==================================
-
-All modules have the ability to check what state they are currently in:
-
-.. code-block:: python
-
-    from opentrons import protocol_api
-
-    metadata = {'apiLevel': '2.2'}
-
-    def run(protocol: protocol_api.ProtocolContext):
-         module = protocol.load_module('Module Name', slot)
-         status = module.status
-
-The Temperature Module's ``status`` is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
-
-The Magnetic Module's ``status`` is a string that is one of  ``'engaged'`` or ``'disengaged'``.
-
-The Thermocycler Module ``status`` is a string that is one of ``'holding at target'`` or ``'idle'``. There are more detailed status checks which can be found in :ref:`thermocycler-section`
-
-.. versionadded:: 2.0
-
-******************
-Temperature Module
-******************
+**************************
+Using a Temperature Module
+**************************
 
 The Temperature Module acts as both a cooling and heating device. It can control the temperature
 of its deck between 4 °C and 95 °C with a resolution of 1 °C.
@@ -186,7 +185,7 @@ This function will pause your protocol until your target temperature is reached.
 Read the Current Temperature
 ============================
 
-You can read the current real-time temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.temperature` property:
+You can read the current real-time temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.temperature` property:
 
 .. code-block:: python
 
@@ -197,13 +196,22 @@ You can read the current real-time temperature of the Temperature Module using t
 Read the Target Temperature
 ===========================
 
-You can read the current target temperature of the Temperature Module using the :py:attr:`.TemperatureModuleContext.target` property:
+You can read the current target temperature of the Temperature Module using the :py:obj:`.TemperatureModuleContext.target` property:
 
 .. code-block:: python
 
     temp_mod.target
 
 .. versionadded:: 2.0
+
+Check the Status
+================
+
+The :py:obj:`.TemperatureModuleContext.status` property is a string that is one of  ``'heating'``, ``'cooling'``, ``'holding at target'`` or ``'idle'``.
+
+.. code-block:: python
+
+    temp_mod.status
 
 Deactivate
 ==========
@@ -225,9 +233,9 @@ After deactivating your Temperature module, you can later call :py:meth:`.Temper
 
 .. versionadded:: 2.0
 
-***************
-Magnetic Module
-***************
+***********************
+Using a Magnetic Module
+***********************
 
 The Magnetic Module controls a set of permanent magnets which can move vertically. When the magnets are raised or engaged, they induce a magnetic field in the labware on the module. When they are lowered or disengaged, they do not.
 
@@ -309,11 +317,21 @@ The Magnetic Module will disengage when the device is turned on. It will not aut
 
 .. versionadded:: 2.0
 
+Check the Status
+================
+
+The :py:obj:`.MagneticModuleContext.status` property is a string that is one of ``'engaged'`` or ``'disengaged'``.
+
+.. code-block:: python
+
+    mag_mod.status
+
+
 .. _thermocycler-section:
 
-*******************
-Thermocycler Module
-*******************
+***************************
+Using a Thermocycler Module
+***************************
 
 
 The Thermocycler Module allows users to perform complete experiments that require temperature sensitive reactions such as PCR.
@@ -489,6 +507,17 @@ Thermocycler Status
 
 Throughout your protocol, you may want particular information on the current status of your Thermocycler. Below are
 a few methods that allow you to do that.
+
+Basic Status
+------------
+
+The :py:obj:`.ThermocyclerContext.status` property is one of the strings ``‘holding at target’``, ``‘cooling’``, ``‘heating’``, or ``‘idle’``.
+
+.. code-block:: python
+
+    tc_mod.status
+
+.. versionadded:: 2.0
 
 Lid Position
 ------------
