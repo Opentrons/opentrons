@@ -53,10 +53,17 @@ def _create_calibration_check_session_details(
                 version=data.version) for data in
             session.labware_status.values()
         ]
-
+    comparisons = {
+        k: calibration_models.ComparisonStatus(
+            differenceVector=v.differenceVector,
+            thresholdVector=v.thresholdVector,
+            exceedsThreshold=v.exceedsThreshold,
+            transformType=str(v.transformType)
+        )
+        for k, v in session.get_comparisons_by_step().items()}
     return calibration_models.CalibrationSessionStatus(
         instruments=instruments,
         currentStep=session.current_state_name,
-        comparisonsByStep=session.get_comparisons_by_step(),
+        comparisonsByStep=comparisons,
         labware=labware,
     )

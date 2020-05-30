@@ -704,10 +704,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
             'cannot drop tip on first mount, pipette not present'
+        mount = first_pip.mount
+        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
         state_name = CalibrationCheckState.inspectingFirstTip
+
         return_pt = self._saved_points[getattr(CalibrationCheckState,
                                        state_name)]
-        loc = Location(return_pt, None)
+        account_for_tip = return_pt - Point(0, 0, z_value)
+        loc = Location(account_for_tip, None)
         await self._move(first_pip.mount, loc)
         await self._drop_tip(first_pip.mount)
 
@@ -715,9 +719,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot drop tip on second mount, pipette not present'
+        mount = second_pip.mount
+        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
         state_name = CalibrationCheckState.inspectingSecondTip
         return_pt = self._saved_points[getattr(CalibrationCheckState,
                                        state_name)]
-        loc = Location(return_pt, None)
+        account_for_tip = return_pt - Point(0, 0, z_value)
+        loc = Location(account_for_tip, None)
         await self._move(second_pip.mount, loc)
         await self._drop_tip(second_pip.mount)
