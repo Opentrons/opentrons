@@ -23,6 +23,6 @@ def build_gpio_chardev(chip_name: str) -> 'GPIODriverLike':
             'stop the robot server with systemctl stop '
             'opentrons-robot-server. Until you restart the server '
             'with systemctl start opentrons-robot-server, you will '
-            'be unable to control the robot using the Opentrons app')
+            'be unable to control the robot using the Opentrons app.')
         from .gpio_simulator import SimulatingGPIOCharDev
         return SimulatingGPIOCharDev(chip_name)
