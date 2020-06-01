@@ -7,6 +7,7 @@ name = "pypi"
 python_version = "3.7"
 
 [dev-packages]
+atomicwrites = {version="*", sys_platform="== 'win32'"}
 typing-extensions = "*"
 mypy = "==0.770"
 pylama = "*"
