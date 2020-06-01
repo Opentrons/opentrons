@@ -214,40 +214,51 @@ export type SessionState = $Shape<
   |}>
 >
 
-export type AnalyticsModelsByMount = {|
-  leftPipetteModel?: string,
-  rightPipetteModel?: string,
-|}
+export type AnalyticsModelsByMount =
+  | {|
+      leftPipetteModel?: string,
+      rightPipetteModel?: string,
+    |}
+  | {||}
+export type CalibrationCheckAnalyticsData =
+  | {|
+      comparingFirstPipetteHeightDifferenceVector?: string,
+      comparingFirstPipetteHeightThresholdVector?: string,
+      comparingFirstPipetteHeightExceedsThreshold?: string,
+      comparingFirstPipetteHeightErrorSource?: string,
+      comparingFirstPipettePointOneDifferenceVector?: string,
+      comparingFirstPipettePointOneThresholdVector?: string,
+      comparingFirstPipettePointOneExceedsThreshold?: string,
+      comparingFirstPipettePointOneErrorSource?: string,
+      comparingFirstPipettePointTwoDifferenceVector?: string,
+      comparingFirstPipettePointTwoThresholdVector?: string,
+      comparingFirstPipettePointTwoExceedsThreshold?: string,
+      comparingFirstPipettePointTwoErrorSource?: string,
+      comparingFirstPipettePointThreeDifferenceVector?: string,
+      comparingFirstPipettePointThreeThresholdVector?: string,
+      comparingFirstPipettePointThreeExceedsThreshold?: string,
+      comparingFirstPipettePointThreeErrorSource?: string,
+      comparingSecondPipetteHeightDifferenceVector?: string,
+      comparingSecondPipetteHeightThresholdVector?: string,
+      comparingSecondPipetteHeightExceedsThreshold?: string,
+      comparingSecondPipetteHeightErrorSource?: string,
+      comparingSecondPipettePointOneDifferenceVector?: string,
+      comparingSecondPipettePointOneThresholdVector?: string,
+      comparingSecondPipettePointOneExceedsThreshold?: string,
+      comparingSecondPipettePointOneErrorSource?: string,
+    |}
+  | {||}
 
-export type CalibrationCheckSessionAnalyticsProps = {|
-  ...AnalyticsModelsByMount,
-  comparingFirstPipetteHeightDifferenceVector?: string,
-  comparingFirstPipetteHeightThresholdVector?: string,
-  comparingFirstPipetteHeightExceedsThreshold?: string,
-  comparingFirstPipetteHeightErrorSource?: string,
-  comparingFirstPipettePointOneDifferenceVector?: string,
-  comparingFirstPipettePointOneThresholdVector?: string,
-  comparingFirstPipettePointOneExceedsThreshold?: string,
-  comparingFirstPipettePointOneErrorSource?: string,
-  comparingFirstPipettePointTwoDifferenceVector?: string,
-  comparingFirstPipettePointTwoThresholdVector?: string,
-  comparingFirstPipettePointTwoExceedsThreshold?: string,
-  comparingFirstPipettePointTwoErrorSource?: string,
-  comparingFirstPipettePointThreeDifferenceVector?: string,
-  comparingFirstPipettePointThreeThresholdVector?: string,
-  comparingFirstPipettePointThreeExceedsThreshold?: string,
-  comparingFirstPipettePointThreeErrorSource?: string,
-  comparingSecondPipetteHeightDifferenceVector?: string,
-  comparingSecondPipetteHeightThresholdVector?: string,
-  comparingSecondPipetteHeightExceedsThreshold?: string,
-  comparingSecondPipetteHeightErrorSource?: string,
-  comparingSecondPipettePointOneDifferenceVector?: string,
-  comparingSecondPipettePointOneThresholdVector?: string,
-  comparingSecondPipettePointOneExceedsThreshold?: string,
-  comparingSecondPipettePointOneErrorSource?: string,
-|}
-
-export type SessionAnalyticsProps = {|
+export type SharedAnalyticsProps = {|
   sessionType: SessionType,
-  ...CalibrationCheckSessionAnalyticsProps,
 |}
+
+export type CalibrationCheckSessionAnalyticsProps =
+  | {|
+      ...SharedAnalyticsProps,
+      ...AnalyticsModelsByMount,
+      ...CalibrationCheckAnalyticsData,
+    |}
+  | {||}
+
+export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps

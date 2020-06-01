@@ -8,6 +8,7 @@ export const getAnalyticsPropsForSession = (
   if (!session) return null
   if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
     const { instruments, comparisonsByStep } = session.details
+    const initialModelsByMount: Types.AnalyticsModelsByMount = {}
     const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
       instruments
     ).reduce(
@@ -15,8 +16,9 @@ export const getAnalyticsPropsForSession = (
         ...acc,
         [`${mount.toLowerCase()}PipetteModel`]: instruments[mount].model,
       }),
-      {}
+      initialModelsByMount
     )
+    const initialStepData: Types.CalibrationCheckAnalyticsData = {}
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
       (acc, stepName) => {
         const {
@@ -33,7 +35,7 @@ export const getAnalyticsPropsForSession = (
           [`${stepName}ErrorSource`]: transformType,
         }
       },
-      {}
+      initialStepData
     )
     return {
       sessionType: session.sessionType,
