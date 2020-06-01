@@ -214,9 +214,13 @@ export type SessionState = $Shape<
   |}>
 >
 
-export type CalibrationCheckSessionAnalyticsProps = {
+export type AnalyticsModelsByMount = {|
   leftPipetteModel?: string,
   rightPipetteModel?: string,
+|}
+
+export type CalibrationCheckSessionAnalyticsProps = {|
+  ...AnalyticsModelsByMount,
   comparingFirstPipetteHeightDifferenceVector?: string,
   comparingFirstPipetteHeightThresholdVector?: string,
   comparingFirstPipetteHeightExceedsThreshold?: string,
@@ -241,7 +245,9 @@ export type CalibrationCheckSessionAnalyticsProps = {
   comparingSecondPipettePointOneThresholdVector?: string,
   comparingSecondPipettePointOneExceedsThreshold?: string,
   comparingSecondPipettePointOneErrorSource?: string,
-  ...
-}
+|}
 
-export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
+export type SessionAnalyticsProps = {|
+  sessionType: SessionType,
+  ...CalibrationCheckSessionAnalyticsProps,
+|}
