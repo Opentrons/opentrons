@@ -3,30 +3,25 @@
 import { makeEvent } from '../make-event'
 
 import * as Sessions from '../../sessions'
-import * as calibrationFixtures from '../../calibration/__fixtures__'
+import * as sessionsFixtures from '../../sessions/__fixtures__'
 
 import type { State } from '../../types'
-import type { Session } from '../../sessions/types'
+import type { SessionAnalyticsProps } from '../../sessions/types'
 
 jest.mock('../../sessions/selectors')
 
-const getRobotSessionOfType: JestMockFn<
+const getAnalyticsPropsForRobotSessionById: JestMockFn<
   [State, string, string],
-  Session | null
-> = Sessions.getRobotSessionOfType
+  SessionAnalyticsProps | null
+> = Sessions.getAnalyticsPropsForRobotSessionById
 
 const MOCK_STATE: State = ({ mockState: true }: any)
-const MOCK_CAL_CHECK_SESSION = {
-  id: 'fake_session_id',
-  sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-  details: calibrationFixtures.mockRobotCalibrationCheckSessionDetails,
-}
 
 describe('events with calibration check session data', () => {
   beforeEach(() => {
-    getRobotSessionOfType.mockImplementation(state => {
+    getAnalyticsPropsForRobotSessionById.mockImplementation(state => {
       expect(state).toBe(MOCK_STATE)
-      return MOCK_CAL_CHECK_SESSION
+      return sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps
     })
   })
 
@@ -41,8 +36,8 @@ describe('events with calibration check session data', () => {
     )
 
     return expect(makeEvent(deleteSession, MOCK_STATE)).resolves.toEqual({
-      name: 'calibrationCheckExit',
-      properties: Sessions.getAnalyticsPropsForSession(MOCK_CAL_CHECK_SESSION),
+      name: 'sessionExit',
+      properties: sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps,
     })
   })
 })

@@ -1,7 +1,5 @@
 // @flow
 
-import * as Types from '../types'
-import * as Constants from '../constants'
 import { POST, DELETE, GET } from '../../robot-api'
 import {
   makeResponseFixtures,
@@ -10,11 +8,14 @@ import {
 import { mockRobotCalibrationCheckSessionDetails } from '../../calibration/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
+import * as Types from '../types'
+import * as Constants from '../constants'
+
 export const mockSessionId: string = 'fake_session_id'
 export const mockOtherSessionId: string = 'other_fake_session_id'
 
 export const mockSessionAttributes: Types.SessionResponseAttributes = {
-  sessionType: 'calibrationCheck',
+  sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
   details: mockRobotCalibrationCheckSessionDetails,
 }
 
@@ -140,3 +141,83 @@ export const {
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
+
+export const mockCalibrationCheckSessionAnalyticsProps = {
+  sessionType: Constants.SESSION_TYPE_CALIBRATION_CHECK,
+  leftPipetteModel:
+    mockRobotCalibrationCheckSessionDetails.instruments.left.model,
+  rightPipetteModel:
+    mockRobotCalibrationCheckSessionDetails.instruments.right.model,
+  comparingFirstPipetteHeightDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipetteHeight.differenceVector,
+  comparingFirstPipetteHeightThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipetteHeight.thresholdVector,
+  comparingFirstPipetteHeightExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipetteHeight.exceedsThreshold,
+  comparingFirstPipetteHeightErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipetteHeight.transformType,
+  comparingFirstPipettePointOneDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointOne.differenceVector,
+  comparingFirstPipettePointOneThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointOne.thresholdVector,
+  comparingFirstPipettePointOneExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointOne.exceedsThreshold,
+  comparingFirstPipettePointOneErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointOne.transformType,
+  comparingFirstPipettePointTwoDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointTwo.differenceVector,
+  comparingFirstPipettePointTwoThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointTwo.thresholdVector,
+  comparingFirstPipettePointTwoExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointTwo.exceedsThreshold,
+  comparingFirstPipettePointTwoErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointTwo.transformType,
+  comparingFirstPipettePointThreeDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointThree.differenceVector,
+  comparingFirstPipettePointThreeThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointThree.thresholdVector,
+  comparingFirstPipettePointThreeExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointThree.exceedsThreshold,
+  comparingFirstPipettePointThreeErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingFirstPipettePointThree.transformType,
+  comparingSecondPipetteHeightDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipetteHeight.differenceVector,
+  comparingSecondPipetteHeightThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipetteHeight.thresholdVector,
+  comparingSecondPipetteHeightExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipetteHeight.exceedsThreshold,
+  comparingSecondPipetteHeightErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipetteHeight.transformType,
+  comparingSecondPipettePointOneDifferenceVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipettePointOne.differenceVector,
+  comparingSecondPipettePointOneThresholdVector:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipettePointOne.thresholdVector,
+  comparingSecondPipettePointOneExceedsThreshold:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipettePointOne.exceedsThreshold,
+  comparingSecondPipettePointOneErrorSource:
+    mockRobotCalibrationCheckSessionDetails.comparisonsByStep
+      .comparingSecondPipettePointOne.transformType,
+}

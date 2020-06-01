@@ -73,6 +73,22 @@ const SPECS: Array<SelectorSpec> = [
     args: ['germanium-cobweb', Fixtures.mockSessionId],
     expected: Fixtures.mockSessionAttributes,
   },
+  {
+    name:
+      'getAnalyticsPropsForRobotSessionById returns props for check cal session',
+    selector: Selectors.getAnalyticsPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]: Fixtures.mockSessionAttributes,
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', Fixtures.mockSessionId],
+    expected: Fixtures.mockCalibrationCheckSessionAnalyticsProps,
+  },
 ]
 
 describe('sessions selectors', () => {

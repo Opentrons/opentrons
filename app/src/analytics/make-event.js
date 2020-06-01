@@ -277,20 +277,15 @@ export function makeEvent(
     }
 
     case Sessions.DELETE_SESSION: {
-      const { robotName } = action.payload
-      const session = Sessions.getRobotSessionOfType(
+      const { robotName, sessionId } = action.payload
+      const analyticsProps = Sessions.getAnalyticsPropsForRobotSessionById(
         state,
         robotName,
-        Sessions.SESSION_TYPE_CALIBRATION_CHECK
+        sessionId
       )
-      const analyticsProps = Sessions.getAnalyticsPropsForSession(session)
-      if (
-        session &&
-        analyticsProps &&
-        session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_CHECK
-      ) {
+      if (analyticsProps) {
         return Promise.resolve({
-          name: 'calibrationCheckExit',
+          name: 'sessionExit',
           properties: analyticsProps,
         })
       } else {
