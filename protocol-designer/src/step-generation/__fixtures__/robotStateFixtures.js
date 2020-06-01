@@ -154,7 +154,7 @@ export const makeState = (args: {|
     pipetteLocations,
     tiprackSetting,
   } = args
-  let robotState = makeInitialRobotState({
+  const robotState = makeInitialRobotState({
     invariantContext,
     labwareLocations,
     moduleLocations: moduleLocations || {},

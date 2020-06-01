@@ -16,7 +16,7 @@ export const dispense: CommandCreator<DispenseParams> = (
   const { pipette, volume, labware, well, offsetFromBottomMm, flowRate } = args
 
   const actionName = 'dispense'
-  let errors: Array<CommandCreatorError> = []
+  const errors: Array<CommandCreatorError> = []
 
   if (
     modulePipetteCollision({

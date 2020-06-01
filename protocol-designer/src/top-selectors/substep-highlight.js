@@ -60,7 +60,7 @@ function _getSelectedWellsForStep(
   const getWells = (wells: Array<string>) =>
     _wellsForPipette(pipetteEntity, labwareEntity, wells)
 
-  let wells = []
+  const wells = []
 
   // If we're moving liquids within a single labware,
   // both the source and dest wells together need to be selected.
@@ -153,7 +153,7 @@ function _getSelectedWellsForSubstep(
     return []
   }
 
-  let wells: Array<string> = []
+  const wells: Array<string> = []
 
   // single-labware steps
   if (

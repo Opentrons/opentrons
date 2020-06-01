@@ -14,7 +14,7 @@ if (!buildDir) {
   )
 }
 
-let output = {}
+const output = {}
 
 const files = glob.sync(
   path.join(__dirname, '../../labware/definitions/1/*.json')

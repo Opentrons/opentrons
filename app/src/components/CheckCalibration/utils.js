@@ -5,7 +5,7 @@ const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']
 
 // e.g. reformat from ['x', -1, 0.1] to [-0.1, 0, 0]
 export function formatJogVector(axis: string, direction: number, step: number) {
-  let vector = [0, 0, 0]
+  const vector = [0, 0, 0]
   const index = ORDERED_AXES.findIndex(a => a === axis)
   if (index >= 0) {
     vector[index] = step * direction

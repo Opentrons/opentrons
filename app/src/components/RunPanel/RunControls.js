@@ -46,7 +46,7 @@ export function RunControls(props: RunControlsProps) {
   if (isReadyToRun && !isRunning) {
     // TODO(mc, 2019-09-03): add same check for pipettes
     const runDisabled = disabled || !modulesReady
-    let tooltip = modulesReady ? null : MISSING_MODULES
+    const tooltip = modulesReady ? null : MISSING_MODULES
 
     runButton = (
       <HoverTooltip tooltipComponent={tooltip}>

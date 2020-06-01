@@ -121,7 +121,7 @@ const getLabwareSelectionMode: MemoizedSelector<boolean> = createSelector(
 const getLiquidGroupsOnDeck: MemoizedSelector<Array<string>> = createSelector(
   getLiquidsByLabwareId,
   ingredLocationsByLabware => {
-    let liquidGroups: Set<string> = new Set()
+    const liquidGroups: Set<string> = new Set()
     forEach(
       ingredLocationsByLabware,
       (byWell: $Values<typeof ingredLocationsByLabware>) =>

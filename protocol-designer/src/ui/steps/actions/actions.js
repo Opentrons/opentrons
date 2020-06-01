@@ -96,7 +96,7 @@ export const selectStep = (stepId: StepIdType): ThunkAction<*> => (
   dispatch(selectStepAction)
 
   const state = getState()
-  let formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
+  const formData = { ...stepFormSelectors.getSavedStepForms(state)[stepId] }
 
   dispatch({
     type: 'POPULATE_FORM',

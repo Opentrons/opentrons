@@ -42,7 +42,7 @@ export function fieldsToLabware(
     // NOTE Ian 2019-07-29: Cannot use fields.labwareType, must be "96Standard", "384Standard", "trough", "irregular", or "trash".
     // Also note that 'irregular' in `format` just means "not 96/384 standard, not trough, and not trash",
     // it doesn't imply anything about having multiple grids or not.
-    let format = 'irregular'
+    const format = 'irregular'
     let quirks = []
 
     const heightOrDiameter =

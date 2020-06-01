@@ -71,7 +71,7 @@ describe('Protocols with Modules', () => {
       // Verify modules were added
       cy.contains('File Details').should('exist')
       cy.contains('Modules').should('exist')
-      var modulesSection = 'div[class*="modules_card_content"]'
+      const modulesSection = 'div[class*="modules_card_content"]'
       cy.get(modulesSection).within(() => {
         cy.contains('Magnetic').should('exist')
         cy.contains('GEN1').should('exist')
@@ -208,7 +208,7 @@ describe('Protocols with Modules', () => {
 
       // Add labware to Temp Deck
       cy.get(slotThree).click()
-      var aluminumWellBlock =
+      const aluminumWellBlock =
         'Opentrons 96 Well Aluminum Block with Generic PCR Strip 200'
       cy.get(designPageModal).within(() => {
         cy.contains('Slot 3, Temperature module Labware').should('exist')

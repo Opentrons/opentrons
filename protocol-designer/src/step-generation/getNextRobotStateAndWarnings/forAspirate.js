@@ -61,7 +61,7 @@ export function forAspirate(
     range(pipetteSpec.channels).forEach((tipIndex): void => {
       const pipette = liquidState.pipettes[pipetteId]
       const indexToString = tipIndex.toString()
-      let tipLiquidState = pipette[indexToString]
+      const tipLiquidState = pipette[indexToString]
 
       // since volumePerTip is being calculated to avoid splitting unevenly across tips,
       // AIR needs to be added in here if it's an over-aspiration

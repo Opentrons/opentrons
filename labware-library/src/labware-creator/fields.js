@@ -294,7 +294,7 @@ export const aluminumBlockChildTypeOptions: Options = [
 export const getImplicitAutofillValues = (
   preAutofilledValues: LabwareFields
 ): $Shape<LabwareFields> => {
-  let result: $Shape<LabwareFields> = {}
+  const result: $Shape<LabwareFields> = {}
   if ('gridRows' in preAutofilledValues) {
     result.regularRowSpacing = 'true'
   }
