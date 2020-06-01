@@ -16,7 +16,10 @@ def build_gpio_chardev(chip_name: str) -> 'GPIODriverLike':
         from .gpio import GPIOCharDev
         return GPIOCharDev(chip_name)
     except (ImportError, OSError):
-        MODULE_LOG.info(
-            'Failed to initialize character device, cannot control gpios')
+        MODULE_LOG.warning(
+            'Failed to initialize character device, will not '
+            'be able to control gpios (lights, button, smoothie kill'
+            ', smoothie reset')
         from .gpio_simulator import SimulatingGPIOCharDev
         return SimulatingGPIOCharDev(chip_name)
+    
