@@ -49,16 +49,20 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     errors: formLevelErrors,
   })
 
+  // deal with special-case dynamic field form-level errors
   const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
-  const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
-    state
-  )
-  const filteredDynamicFieldFormErrors = getVisibleProfileErrors({
-    focusedField,
-    dirtyFields,
-    errors: dynamicFieldFormErrors,
-    profileItemsById,
-  })
+  let filteredDynamicFieldFormErrors = []
+  if (profileItemsById != null) {
+    const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
+      state
+    )
+    filteredDynamicFieldFormErrors = getVisibleProfileErrors({
+      focusedField,
+      dirtyFields,
+      errors: dynamicFieldFormErrors,
+      profileItemsById,
+    })
+  }
 
   return {
     errors: [
