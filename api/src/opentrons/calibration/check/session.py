@@ -620,7 +620,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=threshold_vector,
                                      exceedsThreshold=exceeds,
-                                     transformType=tform_type)
+                                     transformType=str(tform_type))
         return comparisons
 
     async def _register_point_first_pipette(self):
