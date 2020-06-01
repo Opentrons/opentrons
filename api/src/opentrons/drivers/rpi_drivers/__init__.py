@@ -22,4 +22,3 @@ def build_gpio_chardev(chip_name: str) -> 'GPIODriverLike':
             ', smoothie reset')
         from .gpio_simulator import SimulatingGPIOCharDev
         return SimulatingGPIOCharDev(chip_name)
-    
