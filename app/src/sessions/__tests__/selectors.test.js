@@ -89,6 +89,44 @@ const SPECS: Array<SelectorSpec> = [
     args: ['germanium-cobweb', Fixtures.mockSessionId],
     expected: Fixtures.mockCalibrationCheckSessionAnalyticsProps,
   },
+  {
+    name:
+      'getAnalyticsPropsForRobotSessionById returns null for untracked session type',
+    selector: Selectors.getAnalyticsPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]: {
+              ...Fixtures.mockSessionAttributes,
+              sessionType: 'FakeUntrackedSessionType',
+            },
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', Fixtures.mockSessionId],
+    expected: null,
+  },
+  {
+    name:
+      'getAnalyticsPropsForRobotSessionById returns null if session not found',
+    selector: Selectors.getAnalyticsPropsForRobotSessionById,
+    state: {
+      sessions: {
+        'germanium-cobweb': {
+          robotSessions: {
+            [Fixtures.mockSessionId]: {
+              ...Fixtures.mockSessionAttributes,
+              sessionType: 'FakeUntrackedSessionType',
+            },
+          },
+        },
+      },
+    },
+    args: ['germanium-cobweb', 'fake_nonexistent_session_id'],
+    expected: null,
+  },
 ]
 
 describe('sessions selectors', () => {
