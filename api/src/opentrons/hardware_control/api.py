@@ -3,7 +3,7 @@ import contextlib
 import logging
 import pathlib
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional, Tuple, TYPE_CHECKING
+from typing import Dict, Union, List, Optional, Tuple
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -18,11 +18,10 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, DoorState)
+                    MustHomeError, NoTipAttachedError, DoorState,
+                    DoorStateNotification)
 from . import modules
 
-if TYPE_CHECKING:
-    from .dev_types import DoorStateNotification
 
 mod_log = logging.getLogger(__name__)
 

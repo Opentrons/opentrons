@@ -1,8 +1,7 @@
 import asyncio
-from dataclasses import dataclass
-from typing import List, Union
+from typing import List
 from .modules import ModuleAtPort
-from .types import HardwareEventType, DoorState
+from .types import HardwareEventType
 try:
     from typing_extensions import Protocol
 except ModuleNotFoundError:
@@ -34,12 +33,5 @@ if Protocol is not None:
             ...
 
 if Literal is not None:
-    @dataclass
-    class DoorStateNotification:
-        event: Literal[HardwareEventType.DOOR_SWITCH_CHANGE] = \
-            HardwareEventType.DOOR_SWITCH_CHANGE
-        new_state: DoorState = DoorState.CLOSED
+    DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
 
-    # new event types get new dataclasses
-    # when we add more event types we add them here
-    HardwareEvent = Union[DoorStateNotification]

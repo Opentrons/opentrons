@@ -21,7 +21,8 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
-from opentrons.hardware_control.types import DoorState, HardwareEventType
+from opentrons.hardware_control.types import (DoorState, HardwareEventType,
+                                              HardwareEvent)
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -31,7 +32,6 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 
 if TYPE_CHECKING:
     from .dev_types import State, StateInfo
-    from opentrons.hardware_control.dev_types import HardwareEvent
 
 log = logging.getLogger(__name__)
 
@@ -493,10 +493,6 @@ class Session(object):
 
             self.set_state('running')
             return self
-        else:
-            raise RuntimeError(
-                "Protocol is blocked and cannot be resumed. Make sure the "
-                "robot door is closed before resuming.")
 
     def _start_hardware_event_watcher(self):
         if not callable(self._event_watcher):

@@ -2,8 +2,12 @@ import abc
 import asyncio
 import enum
 import logging
-from typing import Tuple
+from dataclasses import dataclass
+from typing import Tuple, Union, TYPE_CHECKING
 from opentrons import types as top_types
+
+if TYPE_CHECKING:
+    from .dev_types import DoorStateNotificationType
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -58,6 +62,18 @@ class DoorState(enum.Enum):
 
 class HardwareEventType(enum.Enum):
     DOOR_SWITCH_CHANGE = enum.auto()
+
+
+@dataclass
+class DoorStateNotification:
+    event: 'DoorStateNotificationType' = \
+        HardwareEventType.DOOR_SWITCH_CHANGE
+    new_state: DoorState = DoorState.CLOSED
+
+
+# new event types get new dataclasses
+# when we add more event types we add them here
+HardwareEvent = Union[DoorStateNotification]
 
 
 class HardwareAPILike(abc.ABC):

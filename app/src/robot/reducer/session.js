@@ -28,6 +28,7 @@ export type SessionState = {
   sessionRequest: Request,
   state: SessionStatus,
   statusInfo: SessionStatusInfo,
+  // TODO(aa, 2020-06-01): DoorState is not currently used anywhere yet
   doorState: DoorState,
   blocked: boolean,
   errors: Array<{|
