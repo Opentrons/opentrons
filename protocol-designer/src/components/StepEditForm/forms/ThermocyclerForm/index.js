@@ -80,9 +80,7 @@ export const ThermocyclerForm = (props: TCFormProps): React.Element<'div'> => {
             {i18n.t('application.stepType.profile_steps')}
           </span>
         </div>
-
         <ProfileStepRows focusHandlers={focusHandlers} />
-
         <div className={styles.section_header}>
           <span className={styles.section_header_text}>
             {i18n.t('application.stepType.ending_hold')}
