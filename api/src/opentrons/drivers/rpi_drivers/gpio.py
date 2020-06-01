@@ -123,6 +123,7 @@ class GPIOCharDev:
 
     async def setup(self):
         MODULE_LOG.info("Setting up GPIOs")
+        self.set_audio_enable(True)
         # smoothieware programming pins, must be in a known state (HIGH)
         self.set_halt_pin(True)
         self.set_isp_pin(True)
@@ -174,6 +175,12 @@ class GPIOCharDev:
             self.set_high(gpio_group.halt)
         else:
             self.set_low(gpio_group.halt)
+
+    def set_audio_enable(self, on: bool = True):
+        if on:
+            self.set_high(gpio_group.audio_enable)
+        else:
+            self.set_low(gpio_group.audio_enable)
 
     def _read(self, input_pin: GPIOPin):
         try:
