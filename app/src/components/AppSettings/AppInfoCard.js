@@ -20,7 +20,7 @@ const VERSION_LABEL = 'Software Version'
 const UPDATE_AVAILABLE = 'view available update'
 const UPDATE_NOT_AVAILABLE = 'up to date'
 
-export function AppInfoCard(props: AppInfoCardProps) {
+export function AppInfoCard(props: AppInfoCardProps): React.Node {
   const { checkUpdate, availableVersion } = props
 
   return (

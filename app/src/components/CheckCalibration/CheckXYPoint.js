@@ -96,7 +96,7 @@ type CheckXYPointProps = {|
   goToNextCheck: () => void,
   jog: (JogAxis, JogDirection, JogStep) => void,
 |}
-export function CheckXYPoint(props: CheckXYPointProps) {
+export function CheckXYPoint(props: CheckXYPointProps): React.Node {
   const {
     slotNumber,
     isMulti,

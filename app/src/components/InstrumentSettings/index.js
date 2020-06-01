@@ -14,7 +14,7 @@ type Props = {|
   makeConfigurePipetteUrl: (mount: Mount) => string,
 |}
 
-export function InstrumentSettings(props: Props) {
+export function InstrumentSettings(props: Props): React.Node {
   const { robotName, makeChangePipetteUrl, makeConfigurePipetteUrl } = props
 
   return (

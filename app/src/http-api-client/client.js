@@ -72,6 +72,6 @@ function jsonFromResponse<T>(response: Response): Promise<T> {
     )
 }
 
-function fetchErrorFromError(error: Error): Promise<*> {
+function fetchErrorFromError(error: Error): Promise<empty> {
   return Promise.reject(FetchError(error))
 }

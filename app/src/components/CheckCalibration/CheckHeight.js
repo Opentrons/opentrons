@@ -67,7 +67,7 @@ type CheckHeightProps = {|
   goToNextCheck: () => void,
   jog: (JogAxis, JogDirection, JogStep) => void,
 |}
-export function CheckHeight(props: CheckHeightProps) {
+export function CheckHeight(props: CheckHeightProps): React.Node {
   const {
     isMulti,
     mount,

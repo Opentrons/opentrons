@@ -19,7 +19,7 @@ type Props = {| robotName: string |}
 const TITLE = 'Modules'
 const POLL_MODULE_INTERVAL_MS = 5000
 
-export function AttachedModulesCard(props: Props) {
+export function AttachedModulesCard(props: Props): React.Node {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const connectedRobotName = useSelector(getConnectedRobotName)

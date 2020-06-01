@@ -4,6 +4,7 @@ import { connect } from 'react-redux'
 import { push, goBack } from 'connected-react-router'
 import { Switch, Route, withRouter } from 'react-router-dom'
 
+import type { ContextRouter } from 'react-router-dom'
 import type { State, Dispatch } from '../../types'
 import type { OP, SP, DP, CalibrateDeckProps, CalibrationStep } from './types'
 
@@ -34,7 +35,9 @@ const BAD_PIPETTE_ERROR = 'Unexpected pipette response from robot'
 const ERROR_DESCRIPTION =
   'An unexpected error has cleared your deck calibration progress, please try again.'
 
-export const CalibrateDeck = withRouter<_, _>(
+export const CalibrateDeck: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<CalibrateDeckProps, OP, SP, _, _, _>(
     makeMapStateToProps,
     mapDispatchToProps

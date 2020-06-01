@@ -6,12 +6,12 @@ import styles from './upload-panel.css'
 
 export type UploadInputProps = {|
   onUpload: (
-    SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<*>
+    SyntheticInputEvent<HTMLInputElement> | SyntheticDragEvent<>
   ) => void,
   isButton?: boolean,
 |}
 
-export function UploadInput(props: UploadInputProps) {
+export function UploadInput(props: UploadInputProps): React.Node {
   const { isButton, onUpload } = props
 
   const Label = isButton ? PrimaryButton : 'label'

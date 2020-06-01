@@ -25,7 +25,7 @@ export type ViewUpdateModalProps = {|
   proceed: () => mixed,
 |}
 
-export function ViewUpdateModal(props: ViewUpdateModalProps) {
+export function ViewUpdateModal(props: ViewUpdateModalProps): React.Node {
   const { robotName, robotUpdateType, robotSystemType, close, proceed } = props
   const updateInfo = useSelector(getBuildrootUpdateInfo)
   const downloadProgress = useSelector(getBuildrootDownloadProgress)

@@ -23,7 +23,7 @@ const DIAGRAMS: { [step: CalibrationStep]: { [Channels]: string } } = {
   },
 }
 
-export function AttachTip(props: AttachTipProps) {
+export function AttachTip(props: AttachTipProps): React.Node {
   const multi = props.pipette.channels === 8
   const tipLocation = multi ? 'very first channel at front of' : ''
 

@@ -10,7 +10,7 @@ export type ScanButtonProps = {|
   found: boolean,
 |}
 
-export function ScanButton(props: ScanButtonProps) {
+export function ScanButton(props: ScanButtonProps): React.Node {
   const { isScanning, onScanClick, found } = props
   const buttonText = found ? 'Refresh List' : 'Try Again'
 

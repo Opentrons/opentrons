@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react'
+import * as React from 'react'
 import {
   OutlineButton,
   AlertModal,
@@ -32,11 +32,11 @@ export const TemperatureControl = ({
   module,
   sendModuleCommand,
   disabledReason,
-}: Props) => {
-  const [primaryTempValue, setPrimaryTempValue] = useState(null)
-  const [secondaryTempValue, setSecondaryTempValue] = useState(null)
-  const [isModalOpen, setIsModalOpen] = useState(false)
-  const [isSecondaryTempEnabled, enableSecondaryTemp] = useState(false)
+}: Props): React.Node => {
+  const [primaryTempValue, setPrimaryTempValue] = React.useState(null)
+  const [secondaryTempValue, setSecondaryTempValue] = React.useState(null)
+  const [isModalOpen, setIsModalOpen] = React.useState(false)
+  const [isSecondaryTempEnabled, enableSecondaryTemp] = React.useState(false)
 
   const hasTarget =
     module.status !== 'idle' ||

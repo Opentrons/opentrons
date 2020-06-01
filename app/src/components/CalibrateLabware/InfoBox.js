@@ -14,7 +14,7 @@ import type { Labware, LabwareType } from '../../robot/types'
 
 export type InfoBoxProps = {| labware: ?Labware |}
 
-export function InfoBox(props: InfoBoxProps) {
+export function InfoBox(props: InfoBoxProps): React.Node {
   const { labware } = props
 
   let title = 'No labware selected'

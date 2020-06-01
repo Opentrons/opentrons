@@ -11,7 +11,7 @@ import { U2EDriverOutdatedAlert } from './U2EDriverOutdatedAlert'
 import type { State, Dispatch } from '../../types'
 import type { AlertId } from '../../alerts/types'
 
-export function Alerts() {
+export function Alerts(): React.Node {
   const dispatch = useDispatch<Dispatch>()
 
   // TODO(mc, 2020-05-07): move head logic to selector with alert priorities

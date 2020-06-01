@@ -6,7 +6,7 @@ export type LabwareTableProps = {|
   children: React.Node,
 |}
 
-export function LabwareTable(props: LabwareTableProps) {
+export function LabwareTable(props: LabwareTableProps): React.Node {
   return (
     <table className={styles.labware_table}>
       <tbody>

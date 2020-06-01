@@ -28,7 +28,7 @@ export type FileInfoProps = {|
   showCustomLabwareWarning: boolean,
 |}
 
-export function FileInfo(props: FileInfoProps) {
+export function FileInfo(props: FileInfoProps): React.Node {
   const {
     robot,
     filename,

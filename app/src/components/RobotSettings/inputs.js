@@ -10,7 +10,7 @@ import {
 } from '@opentrons/components'
 
 export type FormProps = {
-  onSubmit: () => *,
+  onSubmit: () => mixed,
   disabled?: boolean,
   children: React.Node,
   className?: string,
@@ -20,7 +20,7 @@ export type InputProps<T> = {
   name: T,
   value: ?string,
   disabled?: boolean,
-  onChange: ({ [name: T]: string }) => *,
+  onChange: ({ [name: T]: string }) => mixed,
   className?: string,
 }
 
@@ -33,12 +33,12 @@ type TextInputProps<T> = InputProps<T> & {
 }
 
 export class Form extends React.Component<FormProps> {
-  onSubmit = (event: SyntheticEvent<>) => {
+  onSubmit: (event: SyntheticEvent<>) => void = event => {
     this.props.onSubmit()
     event.preventDefault()
   }
 
-  render() {
+  render(): React.Node {
     const onSubmit = !this.props.disabled ? this.onSubmit : undefined
 
     return (
@@ -50,7 +50,7 @@ export class Form extends React.Component<FormProps> {
 }
 
 export class Select<T: string> extends React.Component<SelectProps<T>> {
-  onChange = (event: SyntheticInputEvent<>) => {
+  onChange: (event: SyntheticInputEvent<>) => void = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,
@@ -58,7 +58,7 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
     }
   }
 
-  render() {
+  render(): React.Node {
     const { value, options, disabled, className } = this.props
 
     return (
@@ -74,7 +74,7 @@ export class Select<T: string> extends React.Component<SelectProps<T>> {
 }
 
 export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
-  onChange = (event: SyntheticInputEvent<>) => {
+  onChange: (event: SyntheticInputEvent<>) => void = event => {
     if (!this.props.disabled) {
       this.props.onChange({
         [this.props.name]: event.target.value,
@@ -82,7 +82,7 @@ export class TextInput<T: string> extends React.Component<TextInputProps<T>> {
     }
   }
 
-  render() {
+  render(): React.Node {
     const { type, value, disabled, className } = this.props
 
     return (

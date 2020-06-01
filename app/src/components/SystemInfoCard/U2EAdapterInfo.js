@@ -19,7 +19,7 @@ import type { State } from '../../types'
 
 const U2E_ADAPTER_INFORMATION = 'USB-to-Ethernet Adapter Information'
 
-export const U2EAdapterInfo = () => {
+export const U2EAdapterInfo = (): React.Node => {
   const device = useSelector(SystemInfo.getU2EAdapterDevice)
   const ifacesMap = useSelector(SystemInfo.getU2EInterfacesMap)
   const driverOutdated = useSelector((state: State) => {

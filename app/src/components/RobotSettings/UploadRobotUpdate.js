@@ -12,7 +12,7 @@ export type UploadRobotUpdateProps = {|
   robotName: string,
 |}
 
-export function UploadRobotUpdate(props: UploadRobotUpdateProps) {
+export function UploadRobotUpdate(props: UploadRobotUpdateProps): React.Node {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const handleChange = (event: SyntheticInputEvent<HTMLInputElement>) => {

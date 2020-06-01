@@ -86,7 +86,7 @@ const getGroupedRobotsMap: GetGroupedRobotsMap = createSelector(
     })
 )
 
-export function getScanning(state: State) {
+export function getScanning(state: State): boolean {
   return state.discovery.scanning
 }
 

@@ -13,7 +13,7 @@ export type MissingItemWarningProps = {|
   isBlocking?: boolean,
 |}
 
-export function MissingItemWarning(props: MissingItemWarningProps) {
+export function MissingItemWarning(props: MissingItemWarningProps): React.Node {
   const { instrumentType, url, isBlocking = false } = props
   return (
     <SectionContentHalf className={styles.align_center}>

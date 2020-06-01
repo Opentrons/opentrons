@@ -21,7 +21,7 @@ import type { Mount } from '../../pipettes/types'
 
 type Props = ContextRouter
 
-export function Pipettes(props: Props) {
+export function Pipettes(props: Props): React.Node {
   const { mount } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)

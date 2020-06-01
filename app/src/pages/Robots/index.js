@@ -22,7 +22,7 @@ import { InstrumentSettings } from './InstrumentSettings'
 
 const log = createLogger(__filename)
 
-export function Robots() {
+export function Robots(): React.Node {
   const { path, url, params } = useRouteMatch()
   const instrumentsMatch = useRouteMatch(`${path}/instruments`)
   const { name } = params

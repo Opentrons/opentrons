@@ -7,7 +7,7 @@ export type InfoSectionProps = {|
   children: React.Node,
 |}
 
-export function InfoSection(props: InfoSectionProps) {
+export function InfoSection(props: InfoSectionProps): React.Node {
   return (
     <section className={styles.info_section}>
       <h3 className={styles.title}>{props.title}</h3>

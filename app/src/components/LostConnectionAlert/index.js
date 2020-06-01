@@ -14,7 +14,7 @@ import { ModalCopy } from './ModalCopy'
 
 import type { State, Dispatch } from '../../types'
 
-export function LostConnectionAlert() {
+export function LostConnectionAlert(): React.Node {
   const history = useHistory()
   const dispatch = useDispatch<Dispatch>()
 

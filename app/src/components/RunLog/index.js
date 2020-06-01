@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 
 import {
@@ -25,7 +26,14 @@ type DP = {|
   onResetClick: () => mixed,
 |}
 
-export const RunLog = connect<CommandListProps, {||}, _, _, _, _>(
+export const RunLog: React.AbstractComponent<{||}> = connect<
+  CommandListProps,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(CommandList)

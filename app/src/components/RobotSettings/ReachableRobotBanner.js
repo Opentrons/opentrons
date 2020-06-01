@@ -57,7 +57,7 @@ export class ReachableRobotBanner extends React.Component<
     this.state = { dismissed: false }
   }
 
-  render() {
+  render(): React.Node {
     const { serverOk } = this.props
     const isVisible = !this.state.dismissed
     const message = serverOk ? SERVER_MESSAGE : NO_SERVER_MESSAGE

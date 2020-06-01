@@ -36,7 +36,7 @@ const CALIBRATE_DECK_DESCRIPTION =
 
 const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
 
-export function ControlsCard(props: Props) {
+export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
   const { name: robotName, status } = robot

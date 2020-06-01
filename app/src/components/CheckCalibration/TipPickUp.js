@@ -48,7 +48,7 @@ type TipPickUpProps = {|
   invalidateTip: () => void,
   jog: (JogAxis, JogDirection, JogStep) => void,
 |}
-export function TipPickUp(props: TipPickUpProps) {
+export function TipPickUp(props: TipPickUpProps): React.Node {
   const {
     tiprack,
     isMulti,

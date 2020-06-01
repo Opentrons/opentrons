@@ -8,7 +8,7 @@ export type RunTimerProps = {|
   runTime: string,
 |}
 
-export function RunTimer(props: RunTimerProps) {
+export function RunTimer(props: RunTimerProps): React.Node {
   const { startTime, runTime } = props
   const startTimeStamp = startTime ?? ''
 

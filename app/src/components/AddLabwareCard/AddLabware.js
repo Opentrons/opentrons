@@ -22,7 +22,7 @@ export type AddLabwareProps = {|
   onAddLabware: () => mixed,
 |}
 
-export function AddLabware(props: AddLabwareProps) {
+export function AddLabware(props: AddLabwareProps): React.Node {
   const { onAddLabware } = props
 
   return (

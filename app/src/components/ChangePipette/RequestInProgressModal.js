@@ -22,7 +22,7 @@ type Props = {|
   movementStatus: MovementStatus,
 |}
 
-export function RequestInProgressModal(props: Props) {
+export function RequestInProgressModal(props: Props): React.Node {
   const { title, subtitle, mount, movementStatus } = props
   let message = `${mount === RIGHT ? RIGHT_PIP : LEFT_PIP} ${CARRIAGE_MOVING}`
 

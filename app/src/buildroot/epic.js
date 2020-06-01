@@ -393,7 +393,7 @@ export const disconnectRpcOnStartEpic: Epic = action$ => {
   )
 }
 
-export const buildrootEpic = combineEpics(
+export const buildrootEpic: Epic = combineEpics(
   startUpdateEpic,
   retryAfterPremigrationEpic,
   retryAfterUserFileInfoEpic,

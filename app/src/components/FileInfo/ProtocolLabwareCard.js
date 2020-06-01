@@ -17,9 +17,14 @@ type Props = {| ...SP, dispatch: Dispatch |}
 
 const TITLE = 'Required Labware'
 
-export const ProtocolLabwareCard = connect<Props, {||}, _, _, _, _>(
-  mapStateToProps
-)(ProtocolLabwareCardComponent)
+export const ProtocolLabwareCard: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(ProtocolLabwareCardComponent)
 
 function ProtocolLabwareCardComponent(props: Props) {
   const { labware } = props

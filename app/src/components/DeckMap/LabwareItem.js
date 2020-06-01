@@ -31,7 +31,7 @@ export type LabwareItemProps = {|
   y: number,
 |}
 
-export function LabwareItem(props: LabwareItemProps) {
+export function LabwareItem(props: LabwareItemProps): React.Node {
   const { labware, highlighted, areTipracksConfirmed, handleClick } = props
   const { isTiprack, confirmed, name, type, slot, definition } = labware
 

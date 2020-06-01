@@ -5,6 +5,6 @@ import * as React from 'react'
 import { OutlineButton, type ButtonProps } from '@opentrons/components'
 import styles from './styles.css'
 
-export function ModalButton(props: ButtonProps) {
+export function ModalButton(props: ButtonProps): React.Node {
   return <OutlineButton {...props} className={styles.modal_button} />
 }

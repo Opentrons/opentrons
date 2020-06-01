@@ -70,7 +70,7 @@ export class JogControls extends React.Component<
   JogControlsProps,
   JogControlsState
 > {
-  static defaultProps = {
+  static defaultProps: {| axes: Array<JogAxis>, stepSizes: Array<JogStep> |} = {
     stepSizes: DEFAULT_STEPS,
     axes: ['x', 'y', 'z'],
   }
@@ -80,23 +80,32 @@ export class JogControls extends React.Component<
     this.state = { step: props.stepSizes[0] }
   }
 
-  increaseStepSize = () => {
+  increaseStepSize: () => void = () => {
     const i = this.props.stepSizes.indexOf(this.state.step)
     if (i < this.props.stepSizes.length - 1)
       this.setState({ step: this.props.stepSizes[i + 1] })
   }
 
-  decreaseStepSize = () => {
+  decreaseStepSize: () => void = () => {
     const i = this.props.stepSizes.indexOf(this.state.step)
     if (i > 0) this.setState({ step: this.props.stepSizes[i - 1] })
   }
 
-  handleStepSelect = (event: SyntheticInputEvent<*>) => {
+  handleStepSelect: (
+    event: SyntheticInputEvent<HTMLInputElement>
+  ) => void = event => {
     this.setState({ step: Number(event.target.value) })
     event.target.blur()
   }
 
-  getJogHandlers() {
+  getJogHandlers(): {|
+    back: () => mixed,
+    down: () => mixed,
+    forward: () => mixed,
+    left: () => mixed,
+    right: () => mixed,
+    up: () => mixed,
+  |} {
     const { jog } = this.props
     const { step } = this.state
 
@@ -110,7 +119,7 @@ export class JogControls extends React.Component<
     }
   }
 
-  renderJogControls() {
+  renderJogControls(): React.Node {
     const { step } = this.state
     const { axes } = this.props
     const jogHandlers = this.getJogHandlers()
@@ -169,7 +178,7 @@ export class JogControls extends React.Component<
     )
   }
 
-  render() {
+  render(): React.Node {
     const hasAcrossControls =
       this.props.axes.includes('x') || this.props.axes.includes('y')
     return (

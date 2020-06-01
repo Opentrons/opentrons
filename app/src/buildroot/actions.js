@@ -68,7 +68,7 @@ export function buildrootStatus(
   return { type: Constants.BR_STATUS, payload: { stage, message, progress } }
 }
 
-export function readUserBuildrootFile(systemFile: string) {
+export function readUserBuildrootFile(systemFile: string): BuildrootAction {
   return {
     type: Constants.BR_READ_USER_FILE,
     payload: { systemFile },

@@ -43,7 +43,7 @@ type CheckCalibrationProps = {|
   robotName: string,
   closeCalibrationCheck: () => mixed,
 |}
-export function CheckCalibration(props: CheckCalibrationProps) {
+export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   const { robotName, closeCalibrationCheck } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()

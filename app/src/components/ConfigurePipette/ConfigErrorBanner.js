@@ -9,7 +9,7 @@ type Props = {|
 
 const TITLE = 'Error updating pipette settings'
 
-export function ConfigErrorBanner(props: Props) {
+export function ConfigErrorBanner(props: Props): React.Node {
   const { message } = props
   const [dismissed, setDismissed] = React.useState(false)
   if (message == null || dismissed) return null

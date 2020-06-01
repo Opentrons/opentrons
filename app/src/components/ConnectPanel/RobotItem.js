@@ -16,15 +16,15 @@ import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
 export type RobotItemProps = {|
+  ...ContextRouter,
   robot: ViewableRobot,
 |}
 
-export const RobotItem = withRouter<_, _>(RobotItemComponent)
+export const RobotItem: React.AbstractComponent<
+  $Diff<RobotItemProps, ContextRouter>
+> = withRouter(RobotItemComponent)
 
-export function RobotItemComponent(props: {|
-  ...ContextRouter,
-  ...RobotItemProps,
-|}) {
+export function RobotItemComponent(props: RobotItemProps): React.Node {
   const { robot, match } = props
   const { name, displayName, status, local: isLocal } = robot
   const isUpgradable = useSelector((state: State) => {

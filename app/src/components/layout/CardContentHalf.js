@@ -8,7 +8,7 @@ export type CardContentHalfProps = {|
   className?: string,
 |}
 
-export function CardContentHalf(props: CardContentHalfProps) {
+export function CardContentHalf(props: CardContentHalfProps): React.Node {
   return (
     <div className={cx(styles.card_content_50, props.className)}>
       {props.children}

@@ -30,11 +30,11 @@ export class UpdateAppModal extends React.Component<
     this.state = { showReleaseNotes: false }
   }
 
-  setShowReleaseNotes = () => {
+  setShowReleaseNotes: () => void = () => {
     this.setState({ showReleaseNotes: true })
   }
 
-  render() {
+  render(): React.Node {
     const {
       downloadUpdate,
       closeModal,

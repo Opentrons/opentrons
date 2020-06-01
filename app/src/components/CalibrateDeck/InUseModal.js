@@ -27,7 +27,7 @@ export class InUseModal extends React.Component<InUseModalProps, State> {
     }
   }
 
-  render() {
+  render(): React.Node {
     const { close, forceStart } = this.props
     const canContinue = Object.keys(this.state).every(k => this.state[k])
 

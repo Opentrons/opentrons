@@ -11,7 +11,7 @@ export type FormColumnProps = {|
   children: React.Node,
 |}
 
-export function FormColumn(props: FormColumnProps) {
+export function FormColumn(props: FormColumnProps): React.Node {
   return <div className={styles.form_column}>{props.children}</div>
 }
 
@@ -23,7 +23,7 @@ export type ConfigFormGroupProps = {|
   formFields: Array<DisplayFieldProps>,
 |}
 
-export function ConfigFormGroup(props: ConfigFormGroupProps) {
+export function ConfigFormGroup(props: ConfigFormGroupProps): React.Node {
   const { groupLabel, groupError, formFields } = props
   const formattedError =
     groupError &&
@@ -52,9 +52,9 @@ export type ConfigFormRowProps = {|
 |}
 
 const FIELD_ID_PREFIX = '__PipetteConfig__'
-const makeId = (name: *): string => `${FIELD_ID_PREFIX}.${name}`
+const makeId = name => `${FIELD_ID_PREFIX}.${name}`
 
-export function ConfigFormRow(props: ConfigFormRowProps) {
+export function ConfigFormRow(props: ConfigFormRowProps): React.Node {
   const { labelFor, label } = props
   return (
     <div className={styles.form_row}>
@@ -71,7 +71,7 @@ export type ConfigInputProps = {|
   className?: string,
 |}
 
-export function ConfigInput(props: ConfigInputProps) {
+export function ConfigInput(props: ConfigInputProps): React.Node {
   const { field, className } = props
   const { name, units, displayName } = field
   const id = makeId(field.name)
@@ -103,7 +103,7 @@ export type ConfigCheckboxProps = {|
   className?: string,
 |}
 
-export function ConfigCheckbox(props: ConfigCheckboxProps) {
+export function ConfigCheckbox(props: ConfigCheckboxProps): React.Node {
   const { field, className } = props
   const { name, displayName } = field
   const id = makeId(name)
@@ -128,7 +128,7 @@ export type ConfigQuirkGroupProps = {|
   quirks: Array<DisplayQuirkFieldProps>,
 |}
 
-export function ConfigQuirkGroup(props: ConfigQuirkGroupProps) {
+export function ConfigQuirkGroup(props: ConfigQuirkGroupProps): React.Node {
   const { groupLabel, quirks } = props
   return (
     <FormGroup label={groupLabel} className={styles.form_group}>

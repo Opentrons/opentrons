@@ -50,7 +50,9 @@ const ROBOT_LOGS_OPTOUT_MESSAGE = (
   </>
 )
 
-export function AdvancedSettingsCard(props: AdvancedSettingsCardProps) {
+export function AdvancedSettingsCard(
+  props: AdvancedSettingsCardProps
+): React.Node {
   const { robot, resetUrl } = props
   const { name, health, status } = robot
   const settings = useSelector<State, RobotSettings>(state =>

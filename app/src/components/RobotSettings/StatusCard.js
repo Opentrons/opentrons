@@ -26,7 +26,7 @@ const STATUS_VALUE_DEFAULT = 'Idle'
 const CONNECT = 'connect'
 const DISCONNECT = 'disconnect'
 
-export function StatusCard(props: Props) {
+export function StatusCard(props: Props): React.Node {
   const { robot } = props
   const dispatch = useDispatch<Dispatch>()
   const connected = robot.connected != null && robot.connected === true

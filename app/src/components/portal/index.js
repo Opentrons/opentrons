@@ -9,7 +9,7 @@ type State = {| hasRoot: boolean |}
 const PORTAL_ROOT_ID = '__otAppModalPortalRoot'
 const getPortalRoot = () => global.document.getElementById(PORTAL_ROOT_ID)
 
-export function PortalRoot() {
+export function PortalRoot(): React.Node {
   return <div id={PORTAL_ROOT_ID} />
 }
 
@@ -32,7 +32,7 @@ export class Portal extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.Portal | null {
     if (!this.$root) return null
     return ReactDom.createPortal(this.props.children, this.$root)
   }

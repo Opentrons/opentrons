@@ -5,7 +5,7 @@ import * as React from 'react'
 import { ResourceCard } from './ResourceCard'
 import { CardContainer, CardRow } from '../layout'
 
-export function Resources() {
+export function Resources(): React.Node {
   return (
     <CardContainer>
       <CardRow>

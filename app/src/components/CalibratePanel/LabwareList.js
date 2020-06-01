@@ -31,7 +31,7 @@ type Props = {|
   setLabware: (labware: Labware) => mixed,
 |}
 
-export const LabwareList = withRouter<{||}, _>(
+export const LabwareList: React.AbstractComponent<{||}> = withRouter(
   connect<Props, _, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,

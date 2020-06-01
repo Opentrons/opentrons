@@ -5,6 +5,7 @@ import { updateConfig } from '../config'
 import { initializeMixpanel } from './mixpanel'
 
 import type { State, ThunkAction } from '../types'
+import type { UpdateConfigAction } from '../config/types'
 
 export * from './hooks'
 export * from './selectors'
@@ -28,14 +29,14 @@ export function toggleAnalyticsOptedIn(): ThunkAction {
   }
 }
 
-export function setAnalyticsSeen() {
+export function setAnalyticsSeen(): UpdateConfigAction {
   return updateConfig('analytics.seenOptIn', true)
 }
 
-export function getAnalyticsOptedIn(state: State) {
+export function getAnalyticsOptedIn(state: State): boolean {
   return state.config.analytics.optedIn
 }
 
-export function getAnalyticsSeen(state: State) {
+export function getAnalyticsSeen(state: State): boolean {
   return state.config.analytics.seenOptIn
 }

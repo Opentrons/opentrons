@@ -59,9 +59,10 @@ import { alertsReducer } from './alerts/reducer'
 import { sessionReducer } from './sessions/reducer'
 
 import type { Reducer } from 'redux'
+import type { HashHistory } from 'history/createHashHistory'
 import type { State, Action } from './types'
 
-export const history = createHistory()
+export const history: HashHistory = createHistory()
 
 export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   robot: robotReducer,

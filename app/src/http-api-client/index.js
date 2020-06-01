@@ -3,10 +3,20 @@
 // TODO(mc, 2019-12-17): remove when able
 // robot HTTP API client module
 import { combineReducers } from 'redux'
-import { calibrationReducer, type CalibrationAction } from './calibration'
-import type { Action } from '../types'
+import { calibrationReducer } from './calibration'
 
-export const superDeprecatedRobotApiReducer = combineReducers<_, Action>({
+import type { Reducer } from 'redux'
+import type { Action } from '../types'
+import type { CalibrationAction, CalState } from './calibration'
+
+export type State = {|
+  calibration: CalState,
+|}
+
+export const superDeprecatedRobotApiReducer: Reducer<
+  State,
+  Action
+> = combineReducers<_, Action>({
   calibration: calibrationReducer,
 })
 
@@ -20,8 +30,6 @@ export type {
   JogStep,
   DeckCalPoint,
 } from './calibration'
-
-export type State = $Call<typeof superDeprecatedRobotApiReducer, void, Action>
 
 export type HttpApiAction = CalibrationAction
 

@@ -30,7 +30,7 @@ const PIPETTES = 'Pipettes'
 
 const FETCH_PIPETTES_INTERVAL_MS = 5000
 
-export function AttachedPipettesCard(props: Props) {
+export function AttachedPipettesCard(props: Props): React.Node {
   const { robotName, makeChangeUrl, makeConfigureUrl } = props
   const dispatch = useDispatch<Dispatch>()
 

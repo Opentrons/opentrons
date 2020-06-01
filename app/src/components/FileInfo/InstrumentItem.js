@@ -12,7 +12,7 @@ export type InstrumentItemProps = {|
   hidden?: boolean,
 |}
 
-export function InstrumentItem(props: InstrumentItemProps) {
+export function InstrumentItem(props: InstrumentItemProps): React.Node {
   if (props.hidden) return null
   return (
     <div className={styles.instrument_item}>

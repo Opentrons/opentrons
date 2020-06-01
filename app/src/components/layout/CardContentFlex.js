@@ -8,7 +8,7 @@ export type CardContentFlexProps = {|
   className?: string,
 |}
 
-export function CardContentFlex(props: CardContentFlexProps) {
+export function CardContentFlex(props: CardContentFlexProps): React.Node {
   return (
     <div className={cx(styles.card_content_flex, props.className)}>
       {props.children}

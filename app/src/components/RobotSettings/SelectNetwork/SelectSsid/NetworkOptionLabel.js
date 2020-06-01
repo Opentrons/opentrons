@@ -53,7 +53,9 @@ export type NetworkOptionLabelProps = {|
   showConnectedIcon: boolean,
 |}
 
-export const NetworkOptionLabel = (props: NetworkOptionLabelProps) => {
+export const NetworkOptionLabel = (
+  props: NetworkOptionLabelProps
+): React.Node => {
   const { ssid, active, securityType, showConnectedIcon } = props
   const hasConnectedIcon = active && showConnectedIcon
   const hasSecureIcon = securityType !== SECURITY_NONE
@@ -68,9 +70,11 @@ export const NetworkOptionLabel = (props: NetworkOptionLabelProps) => {
   )
 }
 
-export const NetworkActionLabel = ({ label }: {| label: string |}) => (
-  <StyledName padLeft={true}>{label}</StyledName>
-)
+export const NetworkActionLabel = ({
+  label,
+}: {|
+  label: string,
+|}): React.Node => <StyledName padLeft={true}>{label}</StyledName>
 
 const renderSignalIcon = signal => {
   let iconName: IconName

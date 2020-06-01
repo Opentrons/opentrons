@@ -8,7 +8,7 @@ export type SectionContentHalfProps = {|
   className?: string,
 |}
 
-export function SectionContentHalf(props: SectionContentHalfProps) {
+export function SectionContentHalf(props: SectionContentHalfProps): React.Node {
   return (
     <div className={cx(styles.section_content_50, props.className)}>
       {props.children}

@@ -15,7 +15,14 @@ type DP = {| toggleOptedIn: () => mixed |}
 
 type Props = {| ...SP, ...DP |}
 
-export const AnalyticsToggle = connect<Props, OP, _, _, _, _>(
+export const AnalyticsToggle: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(AnalyticsToggleComponent)

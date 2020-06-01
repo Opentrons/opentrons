@@ -17,7 +17,14 @@ type DP = {|
 
 type Props = {| ...OP, ...DP |}
 
-export const ClearDeckAlert = connect<Props, OP, _, DP, _, _>(
+export const ClearDeckAlert: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(ClearDeckAlertComponent)

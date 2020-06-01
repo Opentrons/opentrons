@@ -28,7 +28,7 @@ export type ConnectModalProps = {|
   onCancel: () => mixed,
 |}
 
-export const ConnectModal = (props: ConnectModalProps) => {
+export const ConnectModal = (props: ConnectModalProps): React.Node => {
   const { network, eapOptions, onConnect } = props
 
   const handleSubmit = (values: ConnectFormValues) => {
@@ -52,7 +52,7 @@ export const ConnectModal = (props: ConnectModalProps) => {
   )
 }
 
-export const ConnectModalComponent = (props: ConnectModalProps) => {
+export const ConnectModalComponent = (props: ConnectModalProps): React.Node => {
   const { robotName, network, wifiKeys, eapOptions, onCancel } = props
   const { values, isValid } = useFormikContext<ConnectFormValues>()
 

@@ -11,7 +11,7 @@ export type CalibrationInfoBoxProps = {|
   children: React.Node,
 |}
 
-export function CalibrationInfoBox(props: CalibrationInfoBoxProps) {
+export function CalibrationInfoBox(props: CalibrationInfoBoxProps): React.Node {
   const { className, confirmed, title, children } = props
 
   const iconName = confirmed ? 'check-circle' : 'checkbox-blank-circle-outline'

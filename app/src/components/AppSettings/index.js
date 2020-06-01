@@ -12,7 +12,7 @@ export type AppSettingsProps = {|
   checkUpdate: () => mixed,
 |}
 
-export function AppSettings(props: AppSettingsProps) {
+export function AppSettings(props: AppSettingsProps): React.Node {
   return (
     <CardContainer>
       <CardRow>

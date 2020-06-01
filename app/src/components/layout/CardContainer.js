@@ -6,6 +6,6 @@ export type CardContainerProps = {|
   children: React.Node,
 |}
 
-export function CardContainer(props: CardContainerProps) {
+export function CardContainer(props: CardContainerProps): React.Node {
   return <div className={styles.card_container}>{props.children}</div>
 }

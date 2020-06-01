@@ -29,7 +29,7 @@ export type ResetRobotModalProps = {|
 
 const TITLE = 'Robot Configuration Reset'
 
-export function ResetRobotModal(props: ResetRobotModalProps) {
+export function ResetRobotModal(props: ResetRobotModalProps): React.Node {
   const { robotName, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchRequest, requestIds] = useDispatchApiRequest()

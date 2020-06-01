@@ -54,7 +54,10 @@ const DetailItem = ({
   </Flex>
 )
 
-export const U2EDeviceDetails = ({ device, ifaces }: U2EDeviceDetailsProps) => {
+export const U2EDeviceDetails = ({
+  device,
+  ifaces,
+}: U2EDeviceDetailsProps): React.Node => {
   const nwIfaceName = ifaces.length > 0 ? ifaces[0].name : NOT_ASSIGNED
 
   return (

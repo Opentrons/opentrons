@@ -8,7 +8,7 @@ export type CardContentThirdProps = {|
   className?: string,
 |}
 
-export function CardContentThird(props: CardContentThirdProps) {
+export function CardContentThird(props: CardContentThirdProps): React.Node {
   return (
     <div className={cx(styles.card_content_third, props.className)}>
       {props.children}

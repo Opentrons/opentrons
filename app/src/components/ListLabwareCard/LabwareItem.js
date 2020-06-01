@@ -34,7 +34,7 @@ export type LabwareItemProps = {|
   file: CheckedLabwareFile,
 |}
 
-export function LabwareItem(props: LabwareItemProps) {
+export function LabwareItem(props: LabwareItemProps): React.Node {
   const { file } = props
   const { type, filename, created, definition = null } = file
   const apiName = definition?.parameters.loadName || NA

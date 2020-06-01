@@ -8,7 +8,7 @@ export type WarningProps = {|
   children: React.Node,
 |}
 
-export function Warning(props: WarningProps) {
+export function Warning(props: WarningProps): React.Node {
   const { children } = props
 
   return (

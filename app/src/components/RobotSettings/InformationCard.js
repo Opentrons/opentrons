@@ -49,7 +49,7 @@ const DEFAULT_MAX_API_VERSION = '1.0'
 
 const UPDATE_RECHECK_DELAY_MS = 60000
 
-export function InformationCard(props: InformationCardProps) {
+export function InformationCard(props: InformationCardProps): React.Node {
   const { robot, updateUrl } = props
   const updateType = useSelector((state: State) =>
     getBuildrootUpdateAvailable(state, robot)

@@ -3,6 +3,8 @@
 import { resetConfig } from '../config'
 import * as Types from './types'
 
+import type { ResetConfigAction } from '../config/types'
+
 // action type literals
 
 export const FETCH_CUSTOM_LABWARE: 'labware:FETCH_CUSTOM_LABWARE' =
@@ -96,5 +98,5 @@ export const openCustomLabwareDirectory = (): Types.OpenCustomLabwareDirectoryAc
   meta: { shell: true },
 })
 
-export const resetCustomLabwareDirectory = () =>
+export const resetCustomLabwareDirectory = (): ResetConfigAction =>
   resetConfig(LABWARE_DIRECTORY_CONFIG_PATH)

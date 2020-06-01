@@ -27,7 +27,7 @@ const REINSTALL_HEADING = 'Robot is up to date'
 const REINSTALL_MESSAGE =
   "It looks like your robot is already up to date, but if you're experiencing issues you can re-apply the latest update."
 
-export function VersionInfoModal(props: VersionInfoModalProps) {
+export function VersionInfoModal(props: VersionInfoModalProps): React.Node {
   const { robot, robotUpdateType, close, proceed } = props
   const appUpdate = useSelector(getShellUpdateState)
   const robotVersion = getRobotApiVersion(robot)
