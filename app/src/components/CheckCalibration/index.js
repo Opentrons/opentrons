@@ -31,7 +31,7 @@ import { BadCalibration } from './BadCalibration'
 import { formatJogVector } from './utils'
 import styles from './styles.css'
 
-const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Check deck calibration'
+const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration check'
 const MOVE_TO_NEXT = 'move to next check'
 const CONTINUE = 'continue'
 const EXIT = 'exit'
@@ -231,6 +231,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         currentStep,
         hasTwoPipettes
       )
+      const comparison = comparisonsByStep[currentStep]
       stepContents = (
         <CheckXYPoint
           slotNumber={slotNumber}
@@ -238,7 +239,7 @@ export function CheckCalibration(props: CheckCalibrationProps) {
           mount={activeMount}
           exit={exit}
           isInspecting={isInspecting}
-          comparison={comparisonsByStep[currentStep]}
+          comparison={comparison}
           nextButtonText={nextButtonText}
           comparePoint={() =>
             sendCommand(Calibration.checkCommands.COMPARE_POINT)
@@ -263,12 +264,13 @@ export function CheckCalibration(props: CheckCalibrationProps) {
         currentStep,
         hasTwoPipettes
       )
+      const comparison = comparisonsByStep[currentStep]
       stepContents = (
         <CheckHeight
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
           isInspecting={isInspecting}
-          comparison={comparisonsByStep[currentStep]}
+          comparison={comparison}
           nextButtonText={nextButtonText}
           exit={exit}
           comparePoint={() =>

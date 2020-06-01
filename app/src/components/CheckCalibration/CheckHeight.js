@@ -38,13 +38,15 @@ const THEN = 'Then'
 const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
-const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
+
+const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
+
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
 const BAD_INSPECTING_BODY =
-  'The jogged and calibrated z-axis co-ordinates do not match, and are out of acceptable bounds.'
+  "Your current pipette tip position does not match your robot's saved calibration data"
 const GOOD_INSPECTING_BODY =
-  'The jogged and calibrated z-axis co-ordinates fall within acceptable bounds.'
+  "Your current pipette tip position matches your robot's saved calibration data"
 const DIFFERENCE = 'Difference'
 const DECK_CAL_BLURB =
   'To resolve this, you will need to perform deck calibration. Read'
@@ -103,6 +105,7 @@ export function CheckHeight(props: CheckHeightProps) {
               <b>&nbsp;{JUST_BARELY}&nbsp;</b>
               {TOUCHING}
               <b>&nbsp;{SLOT_5}.&nbsp;</b>
+              <br />
               {THEN}
               <b>&nbsp;{CHECK_AXES}&nbsp;</b>
               {TO_DETERMINE_MATCH}
@@ -192,7 +195,7 @@ function CompareZ(props: CompareZProps) {
         ))}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
-          <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+          <PrimaryButton onClick={exit}>{EXIT_CALIBRATION_CHECK}</PrimaryButton>
         )}
         <PrimaryButton onClick={goToNextCheck}>{nextButtonText}</PrimaryButton>
       </div>
