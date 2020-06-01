@@ -12,7 +12,9 @@ export type RobotCoordsForeignDivProps = {|
   transformWithSVG?: boolean,
 |}
 
-export const RobotCoordsForeignDiv = (props: RobotCoordsForeignDivProps) => {
+export const RobotCoordsForeignDiv = (
+  props: RobotCoordsForeignDivProps
+): React.Node => {
   const {
     children,
     x = 0,

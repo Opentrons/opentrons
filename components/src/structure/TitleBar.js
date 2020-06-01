@@ -21,7 +21,7 @@ export type TitleBarProps = {|
   backButtonLabel?: string,
 |}
 
-export function TitleBar(props: TitleBarProps) {
+export function TitleBar(props: TitleBarProps): React.Node {
   const {
     title,
     subtitle,

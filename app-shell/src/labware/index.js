@@ -86,7 +86,10 @@ const copyLabware = (
   })
 }
 
-export function registerLabware(dispatch: Dispatch, mainWindow: {}) {
+export function registerLabware(
+  dispatch: Dispatch,
+  mainWindow: { ... }
+): Action => void {
   handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })

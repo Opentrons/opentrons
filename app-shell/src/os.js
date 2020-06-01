@@ -1,4 +1,4 @@
 // @flow
 // os helpers
 
-export const isWindows = () => process.platform === 'win32'
+export const isWindows = (): boolean => process.platform === 'win32'

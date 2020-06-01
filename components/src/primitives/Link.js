@@ -31,13 +31,14 @@ type StyledLinkProps = React.ElementProps<typeof StyledLink>
 /**
  * Link primitive
  */
-export const Link = React.forwardRef<StyledLinkProps, HTMLAnchorElement>(
-  (props: StyledLinkProps, ref) => {
-    const { external, ...styleProps } = props
-    const linkProps = external
-      ? { ...styleProps, target: '_blank', rel: 'noopener noreferrer' }
-      : styleProps
+export const Link: React.AbstractComponent<
+  StyledLinkProps,
+  HTMLAnchorElement
+> = React.forwardRef((props: StyledLinkProps, ref) => {
+  const { external, ...styleProps } = props
+  const linkProps = external
+    ? { ...styleProps, target: '_blank', rel: 'noopener noreferrer' }
+    : styleProps
 
-    return <StyledLink ref={ref} {...linkProps} />
-  }
-)
+  return <StyledLink ref={ref} {...linkProps} />
+})

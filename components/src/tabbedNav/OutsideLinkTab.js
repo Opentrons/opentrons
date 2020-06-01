@@ -30,7 +30,7 @@ export type OutsideLinkTabProps = {|
 |}
 
 /** Very much like NavTab, but used for opening external links in a new tab/window */
-export function OutsideLinkTab(props: OutsideLinkTabProps) {
+export function OutsideLinkTab(props: OutsideLinkTabProps): React.Node {
   const className = cx(props.className, styles.tab, styles.no_link, {
     [styles.disabled]: props.disabled,
     [styles.bottom]: props.isBottom,

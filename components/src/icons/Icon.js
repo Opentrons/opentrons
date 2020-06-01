@@ -36,7 +36,7 @@ export type IconProps = {|
  * import type { IconName } from '@opentrons/components'
  * ```
  */
-export function Icon(props: IconProps) {
+export function Icon(props: IconProps): React.Node {
   const { name, x, y, height, width, style } = props
 
   if (!(name in ICON_DATA_BY_NAME)) {

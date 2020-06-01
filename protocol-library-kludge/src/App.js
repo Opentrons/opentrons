@@ -4,8 +4,8 @@ import { hot } from 'react-hot-loader/root'
 import { URLDeck } from './URLDeck'
 import './globals.css'
 
-export function AppComponent() {
+export function AppComponent(): React.Node {
   return <URLDeck />
 }
 
-export const App = hot(AppComponent)
+export const App: React.AbstractComponent<{||}> = hot(AppComponent)

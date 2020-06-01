@@ -34,7 +34,19 @@ function _getAllWellSetsForLabware(
 }
 
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
-export const makeWellSetHelpers = () => {
+export const makeWellSetHelpers = (): {|
+  getAllWellSetsForLabware: (
+    labwareDef: LabwareDefinition2
+  ) => WellSetByPrimaryWell,
+  getWellSetForMultichannel: (
+    labwareDef: LabwareDefinition2,
+    well: string
+  ) => ?Array<string>,
+  canPipetteUseLabware: (
+    pipetteSpec: PipetteNameSpecs,
+    labwareDef: LabwareDefinition2
+  ) => boolean,
+|} => {
   let cache: {
     [labwareDefURI: string]: ?{|
       labwareDef: LabwareDefinition2,
@@ -73,7 +85,7 @@ export const makeWellSetHelpers = () => {
   const canPipetteUseLabware = (
     pipetteSpec: PipetteNameSpecs,
     labwareDef: LabwareDefinition2
-  ): ?boolean => {
+  ): boolean => {
     if (pipetteSpec.channels === 1) {
       // assume all labware can be used by single-channel
       return true

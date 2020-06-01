@@ -39,7 +39,10 @@ type TypographyPropsBase = { ...TypographyProps, ... }
 
 type SpacingPropsBase = { ...SpacingProps, ... }
 
-export const colorStyles = ({ color, backgroundColor }: ColorPropsBase) => `
+export const colorStyles = ({
+  color,
+  backgroundColor,
+}: ColorPropsBase): string => `
   ${color != null ? `color: ${color};` : ''}
   ${backgroundColor != null ? `background-color: ${backgroundColor};` : ''}
 `
@@ -51,7 +54,7 @@ export const typographyStyles = ({
   lineHeight,
   textAlign,
   textTransform,
-}: TypographyPropsBase) => `
+}: TypographyPropsBase): string => `
   ${fontSize != null ? `font-size: ${fontSize};` : ''}
   ${fontWeight != null ? `font-weight: ${fontWeight};` : ''}
   ${fontStyle != null ? `font-style: ${fontStyle};` : ''}
@@ -75,7 +78,7 @@ export const spacingStyles = ({
   paddingRight,
   paddingBottom,
   paddingLeft,
-}: SpacingPropsBase) => `
+}: SpacingPropsBase): string => `
   ${margin != null ? `margin: ${margin};` : ''}
   ${mx != null ? `margin-right: ${mx}; margin-left: ${mx};` : ''}
   ${my != null ? `margin-top: ${my}; margin-bottom: ${my};` : ''}

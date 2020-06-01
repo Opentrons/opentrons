@@ -25,7 +25,7 @@ const DIRECTORY = path.join(app.getPath('userData'), '__ot_buildroot__')
 let checkingForUpdates = false
 let updateSet: ReleaseSetFilepaths | null = null
 
-export function registerBuildrootUpdate(dispatch: Dispatch) {
+export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
   return function handleAction(action: Action) {
     switch (action.type) {
       case 'shell:CHECK_UPDATE':

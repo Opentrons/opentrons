@@ -22,7 +22,7 @@ const EMPTY_INSTRUMENT_PROPS = {
  * Renders a left and right pipette diagram & info.
  * Takes child `InstrumentInfo` props in `right` and `left` props.
  */
-export function InstrumentGroup(props: InstrumentGroupProps) {
+export function InstrumentGroup(props: InstrumentGroupProps): React.Node {
   const { left, right, showMountLabel } = props
 
   const leftProps = left || { ...EMPTY_INSTRUMENT_PROPS, mount: 'left' }
