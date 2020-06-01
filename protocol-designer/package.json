@@ -31,7 +31,7 @@
     "formik": "2.1.4",
     "i18next": "11.5.0",
     "immer": "5.1.0",
-    "lodash": "4.17.4",
+    "lodash": "4.17.15",
     "query-string": "6.2.0",
     "react": "16.8.6",
     "react-dnd": "6.0.0",

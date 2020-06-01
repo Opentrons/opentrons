@@ -11,6 +11,6 @@
   "main": "js/index.js",
   "dependencies": {
     "ajv": "6.10.2",
-    "lodash": "4.17.4"
+    "lodash": "4.17.15"
   }
 }
