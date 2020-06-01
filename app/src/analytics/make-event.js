@@ -1,6 +1,5 @@
 // @flow
 // redux action types to analytics events map
-import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
@@ -256,18 +255,24 @@ export function makeEvent(
     }
 
     case SystemInfo.INITIALIZED:
-    case SystemInfo.USB_DEVICE_ADDED: {
-      const devices = action.payload.usbDevice
-        ? [action.payload.usbDevice]
-        : action.payload.usbDevices
+    case SystemInfo.USB_DEVICE_ADDED:
+    case SystemInfo.NETWORK_INTERFACES_CHANGED: {
+      const systemInfoProps = SystemInfo.getU2EDeviceAnalyticsProps(state)
 
-      const superProperties = head(
-        devices
-          .filter(SystemInfo.isRealtekU2EAdapter)
-          .map(SystemInfo.deviceToU2EAnalyticsProps)
+      return Promise.resolve(
+        systemInfoProps
+          ? {
+              superProperties: {
+                ...systemInfoProps,
+                // anonymize IP address so analytics profile can't be mapped to more
+                // specific Intercom support profile
+                'U2E IPv4 Address': Boolean(
+                  systemInfoProps['U2E IPv4 Address']
+                ),
+              },
+            }
+          : null
       )
-
-      return Promise.resolve(superProperties ? { superProperties } : null)
     }
   }
 

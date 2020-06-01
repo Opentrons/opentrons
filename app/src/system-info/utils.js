@@ -3,7 +3,7 @@
 
 import { NOT_APPLICABLE, UNKNOWN, UP_TO_DATE, OUTDATED } from './constants'
 
-import type { UsbDevice, U2EAnalyticsProps, DriverStatus } from './types'
+import type { UsbDevice, DriverStatus } from './types'
 
 // NOTE(mc, 2020-05-05): this will cause false alerts on Windows 7; Realtek's
 // versioning scheme seems to be WindowsVersion.Something.Something.Something
@@ -20,24 +20,6 @@ const REALTEK_UP_TO_DATE_VERSION = [10, 38]
 // NOTE(mc, 2020-05-20): our device erroneously reports a PID of 0x8050
 const REALTEK_VID = parseInt('0BDA', 16)
 const RE_REALTEK_PID = /^8[0|1]5[0-9]$/
-
-export const deviceToU2EAnalyticsProps = (
-  device: UsbDevice
-): U2EAnalyticsProps => {
-  const result: U2EAnalyticsProps = {
-    'U2E Vendor ID': device.vendorId,
-    'U2E Product ID': device.productId,
-    'U2E Serial Number': device.serialNumber,
-    'U2E Manufacturer': device.manufacturer,
-    'U2E Device Name': device.deviceName,
-  }
-
-  if (device.windowsDriverVersion) {
-    result['U2E Windows Driver Version'] = device.windowsDriverVersion
-  }
-
-  return result
-}
 
 export const isRealtekU2EAdapter = (device: UsbDevice): boolean => {
   return (
