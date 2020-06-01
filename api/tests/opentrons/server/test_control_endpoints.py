@@ -3,6 +3,8 @@ import json
 import pytest
 from unittest import mock
 
+from opentrons_shared_data.pipette import name_for_model
+
 from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 from opentrons.hardware_control import (
@@ -206,7 +208,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     expected2 = {
         'left': {
             'model': model1,
-            'name': pipette_config.name_for_model(model1),
+            'name': name_for_model(model1),
             'tip_length': config1.tip_length,
             'mount_axis': 'z',
             'plunger_axis': 'b',
@@ -214,7 +216,7 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
         },
         'right': {
             'model': model1,
-            'name': pipette_config.name_for_model(model1),
+            'name': name_for_model(model1),
             'tip_length': config1.tip_length,
             'mount_axis': 'a',
             'plunger_axis': 'c',

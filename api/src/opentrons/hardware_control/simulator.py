@@ -2,7 +2,7 @@ import asyncio
 import copy
 import logging
 from threading import Event
-from typing import Dict, Optional, List, Tuple, TYPE_CHECKING
+from typing import Dict, Optional, List, Tuple, TYPE_CHECKING, Union
 from contextlib import contextmanager
 from opentrons import types
 from opentrons.config.pipette_config import (config_models,
@@ -17,7 +17,10 @@ from .types import BoardRevision
 
 
 if TYPE_CHECKING:
-    from .dev_types import RegisterModules  # noqa (F501)
+    from opentrons_shared_data.pipette.dev_types import (
+        PipetteName, PipetteModel
+    )
+    from .dev_types import RegisterModules, AttachedInstrument  # noqa (F501)
     from opentrons.drivers.rpi_drivers.dev_types\
         import GPIODriverLike  # noqa(F501)
 
@@ -25,10 +28,10 @@ if TYPE_CHECKING:
 MODULE_LOG = logging.getLogger(__name__)
 
 
-def find_config(prefix: str) -> str:
+def find_config(prefix: str) -> 'PipetteModel':
     """ Find the most recent config matching `prefix` """
     if prefix in config_models:
-        return prefix
+        return prefix  # type: ignore
 
     # We need to check for the nickname of pipettes if the prefix given
     # is not the exact model. This is because gen2 nicknames are not
@@ -94,7 +97,25 @@ class Simulator:
         """
         self._config = config
         self._loop = loop
-        self._attached_instruments = attached_instruments
+
+        def _sanitize_attached_instrument(
+                passed_ai: Dict[str, Optional[str]] = None)\
+                -> 'AttachedInstrument':
+            if not passed_ai or not passed_ai.get('model'):
+                return {'model': None, 'id': None}
+            if passed_ai['model'] in config_models:
+                return passed_ai  # type: ignore
+            if passed_ai['model'] in config_names:
+                return {'model': passed_ai['model'] + '_v1',   # type: ignore
+                        'id': passed_ai.get('id')}
+            raise KeyError(
+                'If you specify attached_instruments, the model '
+                'should be pipette names or pipette models, but '
+                f'{passed_ai["model"]} is not')
+
+        self._attached_instruments = {
+            m: _sanitize_attached_instrument(attached_instruments.get(m))
+            for m in types.Mount}
         self._stubbed_attached_modules = attached_modules
         self._position = copy.copy(_HOME_POSITION)
         # Engaged axes start all true in smoothie for some reason so we
@@ -142,8 +163,9 @@ class Simulator:
         return self._position
 
     def get_attached_instruments(
-            self, expected: Dict[types.Mount, str])\
-            -> Dict[types.Mount, Dict[str, Optional[str]]]:
+            self, expected: Dict[types.Mount,
+                                 Union['PipetteModel', 'PipetteName']])\
+            -> Dict[types.Mount, 'AttachedInstrument']:
         """ Update the internal cache of attached instruments.
 
         This method allows after-init-time specification of attached simulated
@@ -162,18 +184,21 @@ class Simulator:
         :raises RuntimeError: If an instrument is expected but not found.
         :returns: A dict of mount to either instrument model names or `None`.
         """
-        to_return: Dict[types.Mount, Dict[str, Optional[str]]] = {}
+        to_return: Dict[types.Mount, 'AttachedInstrument'] = {}
+        allowed: List[Union['PipetteName', 'PipetteModel']]\
+            = config_models + config_names  # type: ignore
         for mount in types.Mount:
 
             expected_instr = expected.get(mount, None)
-            if expected_instr and expected_instr not in\
-               config_models + config_names:
+            if expected_instr and expected_instr not in allowed:
                 raise RuntimeError(
                     f'mount {mount.name}: invalid pipette type'
                     f' {expected_instr}')
-            init_instr = self._attached_instruments.get(mount, {})
-            found_model = init_instr.get('model', '')
-            back_compat: List[str] = []
+            init_instr = self._attached_instruments.get(
+                mount,
+                {'model': None, 'id': None})
+            found_model = init_instr['model']
+            back_compat: List['PipetteName'] = []
             if found_model:
                 back_compat = configs[found_model].get('backCompatNames', [])
             if expected_instr and found_model\

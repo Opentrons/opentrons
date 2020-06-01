@@ -27,6 +27,10 @@ ConfigUnit = Union[Literal['mm'], Literal['amps'], Literal['mm/sec']]
 
 Quirk = NewType('Quirk', str)
 
+ChannelCount = Union[Literal[1], Literal[8]]
+
+UlPerMmAction = Union[Literal['aspirate'], Literal['dispense']]
+
 
 class PipetteConfigElement(TypedDict):
     value: float
@@ -66,7 +70,7 @@ class PipetteNameSpec(TypedDict):
     displayCategory: DisplayCategory
     minVolume: Union[float, int]
     maxVolume: Union[float, int]
-    channels: int
+    channels: ChannelCount
     defaultAspirateFlowRate: PipetteConfigElement
     defaultDispenseFlowRate: PipetteConfigElement
     defaultBlowOutFlowRate: PipetteConfigElement
@@ -75,10 +79,7 @@ class PipetteNameSpec(TypedDict):
 
 PipetteNameSpecs = Dict[PipetteName, PipetteNameSpec]
 
-
-class UlPerMm(TypedDict):
-    aspirate: List[List[float]]
-    dispense: List[List[float]]
+UlPerMm = Dict[UlPerMmAction, List[List[float]]]
 
 
 class PipetteModelSpec(TypedDict, total=False):
@@ -104,6 +105,10 @@ class PipetteModelSpec(TypedDict, total=False):
     backCompatNames: List[PipetteName]
     idleCurrent: float
     returnTipHeight: float
+
+
+class PipetteFusedSpec(PipetteNameSpec, PipetteModelSpec, total=False):
+    pass
 
 
 class PipetteModelSpecs(TypedDict):

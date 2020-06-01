@@ -1,52 +1,56 @@
-import copy
 import logging
 import json
 import numbers
-from collections import namedtuple
-from typing import Any, Dict, List, Union, Tuple, Sequence, Optional
+from typing import (Any, Dict, List, Union, NamedTuple, Tuple,
+                    Sequence, TYPE_CHECKING)
 
 from opentrons.config import feature_flags as ff, CONFIG
-from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.pipette import (
+    model_config, name_config, fuse)
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.pipette.dev_types import (
+        PipetteName, PipetteModel, UlPerMm, Quirk, PipetteFusedSpec
+    )
 
 
 log = logging.getLogger(__name__)
 
-pipette_config = namedtuple(
-    'pipette_config',
-    [
-        'top',
-        'bottom',
-        'blow_out',
-        'drop_tip',
-        'pick_up_current',
-        'pick_up_distance',
-        'pick_up_increment',
-        'pick_up_presses',
-        'pick_up_speed',
-        'aspirate_flow_rate',
-        'dispense_flow_rate',
-        'channels',
-        'model_offset',
-        'plunger_current',
-        'drop_tip_current',
-        'drop_tip_speed',
-        'min_volume',
-        'max_volume',
-        'ul_per_mm',
-        'quirks',
-        'tip_length',  # TODO (andy): remove from pipette, move to tip-rack
-        'tip_overlap',  # TODO: Replace entirely with tip length calibration
-        'display_name',
-        'name',
-        'back_compat_names',
-        'return_tip_height',
-        'blow_out_flow_rate',
-        'max_travel',
-        'home_position',
-        'steps_per_mm',
-        'idle_current'
-    ]
-)
+
+class pipette_config(NamedTuple):
+    top: float
+    bottom: float
+    blow_out: float
+    drop_tip: float
+    pick_up_current: float
+    pick_up_distance: float
+    pick_up_increment: float
+    pick_up_presses: int
+    pick_up_speed: float
+    aspirate_flow_rate: float
+    dispense_flow_rate: float
+    channels: float
+    model_offset: Tuple[float, float, float]
+    plunger_current: float
+    drop_tip_current: float
+    drop_tip_speed: float
+    min_volume: float
+    max_volume: float
+    ul_per_mm: 'UlPerMm'
+    quirks: List['Quirk']
+    tip_length: float  # TODO(seth): remove
+    # TODO: Replace entirely with tip length calibration
+    tip_overlap: Dict[str, float]
+    display_name: str
+    name: 'PipetteName'
+    back_compat_names: List['PipetteName']
+    return_tip_height: float
+    blow_out_flow_rate: float
+    max_travel: float
+    home_position: float
+    steps_per_mm: float
+    idle_current: float
+
 
 # Notes:
 # - multi-channel pipettes share the same dimensional offsets
@@ -71,21 +75,6 @@ Z_OFFSET_P1000 = 20  # shortest single-channel pipette
 
 LOW_CURRENT_DEFAULT = 0.05
 
-
-def model_config() -> Dict[str, Any]:
-    """ Load the per-pipette-model config file from within the wheel """
-    return json.loads(
-        load_shared_data('pipette/definitions/pipetteModelSpecs.json')
-        or '{}')
-
-
-def name_config() -> Dict[str, Any]:
-    """ Load the per-pipette-name config file from within the wheel """
-    return json.loads(
-        load_shared_data('pipette/definitions/pipetteNameSpecs.json')
-        or '{}')
-
-
 config_models = list(model_config()['config'].keys())
 config_names = list(name_config().keys())
 configs = model_config()['config']
@@ -96,11 +85,9 @@ VALID_QUIRKS = model_config()['validQuirks']
 #: A list of valid quirks for pipettes
 
 
-def name_for_model(pipette_model: str) -> str:
-    return configs[pipette_model]['name']
-
-
-def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
+def load(
+        pipette_model: 'PipetteModel',
+        pipette_id: str = None) -> pipette_config:
     """
     Load pipette config data
 
@@ -132,8 +119,8 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
     """
 
     # Load the model config and update with the name config
-    cfg = copy.deepcopy(configs[pipette_model])
-    cfg.update(copy.deepcopy(name_config()[cfg['name']]))
+    cfg = fuse(pipette_model)
+
     # Load overrides if we have a pipette id
     if pipette_id:
         try:
@@ -148,7 +135,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
                 "Save defaults for pipette model {} and id {}".format(
                     pipette_model, pipette_id))
         else:
-            cfg.update(override)
+            cfg.update(override)  # type: ignore
 
     # the ulPerMm functions are structured in pipetteModelSpecs.json as
     # a list sorted from oldest to newest. That means the latest functions
@@ -195,7 +182,7 @@ def load(pipette_model: str, pipette_id: str = None) -> pipette_config:
         tip_overlap=cfg['tipOverlap'],
         tip_length=ensure_value(cfg, 'tipLength', MUTABLE_CONFIGS),
         display_name=ensure_value(cfg, 'displayName', MUTABLE_CONFIGS),
-        name=cfg.get('name'),
+        name=cfg['name'],
         back_compat_names=cfg.get('backCompatNames', []),
         return_tip_height=cfg.get('returnTipHeight', 0.5),
         blow_out_flow_rate=ensure_value(
@@ -271,12 +258,12 @@ def override(pipette_id: str, fields: TypeOverrides):
     config_match = list_mutable_configs(pipette_id)
     whole_config = load_config_dict(pipette_id)
     validate_overrides(data=fields, config_model=config_match)
-    save_overrides(pipette_id, fields, whole_config.get('model'))
+    save_overrides(pipette_id, fields, whole_config['model'])
 
 
 def save_overrides(pipette_id: str,
                    overrides: TypeOverrides,
-                   model: Optional[str]):
+                   model: 'PipetteModel'):
     """
     Save overrides for the pipette.
 
@@ -294,7 +281,7 @@ def save_overrides(pipette_id: str,
         if 'quirks' not in existing.keys():
             existing['quirks'] = model_configs_quirks
     except FileNotFoundError:
-        existing = model_configs_quirks
+        existing = model_configs_quirks  # type: ignore
 
     for key, value in overrides.items():
         # If an existing override is saved as null from endpoint, remove from
@@ -306,10 +293,14 @@ def save_overrides(pipette_id: str,
             existing, model_configs = change_quirks(
                 {key: value}, existing, model_configs)
         else:
-            if not model_configs[key].get('default'):
-                model_configs[key]['default'] = model_configs[key]['value']
-            model_configs[key]['value'] = value
-            existing[key] = model_configs[key]
+            # type ignores are here because mypy needs typed dict accesses to
+            # be string literals sadly enough
+            model_config_value = model_configs[key]  # type: ignore
+            if not model_config_value.get('default'):
+                model_config_value['default']\
+                    = model_config_value['value']
+            model_config_value['value'] = value
+            existing[key] = model_config_value
     assert model in config_models
     existing['model'] = model
     json.dump(existing, (override_dir/f'{pipette_id}.json').open('w'))
@@ -353,7 +344,7 @@ def validate_quirks(quirks: List[str]):
 
 
 def ensure_value(
-        config: dict,
+        config: 'PipetteFusedSpec',
         name: Union[str, Tuple[str, ...]],
         mutable_config_list: List[str]):
     """
@@ -366,9 +357,9 @@ def ensure_value(
     else:
         path = name
     for element in path[:-1]:
-        config = config[element]
+        config = config[element]  # type: ignore
 
-    value = config[path[-1]]
+    value = config[path[-1]]  # type: ignore
     if path[-1] != 'quirks' and path[-1] in mutable_config_list:
         value = value['value']
     return value
@@ -390,24 +381,23 @@ def add_default(cfg):
                 add_default(cfg[top_level_key])
 
 
-def load_config_dict(pipette_id: str) -> Dict:
+def load_config_dict(pipette_id: str) -> 'PipetteFusedSpec':
     """ Give updated config with overrides for a pipette. This will add
     the default value for a mutable config before returning the modified
     config value.
     """
     override = load_overrides(pipette_id)
     model = override['model']
-    config = copy.deepcopy(model_config()['config'][model])
-    config.update(copy.deepcopy(name_config()[config['name']]))
+    config = fuse(model)
 
     if 'quirks' not in override.keys():
         override['quirks'] = {key: True for key in config['quirks']}
 
     for top_level_key in config.keys():
         if top_level_key != 'quirks':
-            add_default(config[top_level_key])
+            add_default(config[top_level_key])  # type: ignore
 
-    config.update(override)
+    config.update(override)  # type: ignore
 
     return config
 
@@ -426,5 +416,5 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
 
     for key in config:
         if key in MUTABLE_CONFIGS:
-            cfg[key] = config[key]
+            cfg[key] = config[key]  # type: ignore
     return cfg

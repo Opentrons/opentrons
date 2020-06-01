@@ -3,7 +3,10 @@ import contextlib
 import logging
 import pathlib
 from collections import OrderedDict
-from typing import Dict, Union, List, Optional, Tuple
+from typing import Dict, Union, List, Optional, Tuple, TYPE_CHECKING
+
+from opentrons_shared_data.pipette import name_for_model
+
 from opentrons import types as top_types
 from opentrons.util import linal
 from opentrons.config import robot_configs, pipette_config
@@ -21,6 +24,11 @@ from .types import (Axis, HardwareAPILike, CriticalPoint,
                     MustHomeError, NoTipAttachedError, DoorState,
                     DoorStateNotification)
 from . import modules
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.pipette.dev_types import (
+        UlPerMmAction, PipetteModel, PipetteName
+    )
 
 
 mod_log = logging.getLogger(__name__)
@@ -179,7 +187,9 @@ class API(HardwareAPILike):
 
         if None is attached_modules:
             attached_modules = []
+
         checked_loop = use_or_initialize_loop(loop)
+
         backend = Simulator(attached_instruments,
                             attached_modules,
                             config, checked_loop,
@@ -289,9 +299,10 @@ class API(HardwareAPILike):
             await self._execution_manager.register_cancellable_task(delay_task)
         self.resume()
 
-    async def cache_instruments(self,
-                                require:
-                                Dict[top_types.Mount, str] = {}):
+    async def cache_instruments(
+            self,
+            require: Dict[
+                top_types.Mount, Union['PipetteModel', 'PipetteName']] = {}):
         """
          - Get the attached instrument on each mount and
          - Cache their pipette configs from pipette-config.json
@@ -314,7 +325,7 @@ class API(HardwareAPILike):
         for mount, instrument_data in found.items():
             model = instrument_data.get('model')
             req_instr = require.get(mount, None)
-            back_compat: List[str] = []
+            back_compat: List['PipetteName'] = []
             mount_axis = Axis.by_mount(mount)
             plunger_axis = Axis.of_plunger(mount)
             splits: Dict[str, MoveSplit] = {}
@@ -325,7 +336,8 @@ class API(HardwareAPILike):
                     instrument_data['id'])
                 back_compat = p.config.back_compat_names
                 if req_instr and req_instr in back_compat:
-                    bc_conf = pipette_config.name_config()[req_instr]
+                    name_conf = pipette_config.name_config()
+                    bc_conf = name_conf[req_instr]  # type: ignore
                     p.working_volume = bc_conf['maxVolume']
                     p.update_config_item('min_volume', bc_conf['minVolume'])
                     p.update_config_item('max_volume', bc_conf['maxVolume'])
@@ -348,7 +360,7 @@ class API(HardwareAPILike):
                     raise RuntimeError(
                         f'mount {mount}: instrument {req_instr} was'
                         f' requested, but no instrument is present')
-                name = pipette_config.name_for_model(model)
+                name = name_for_model(model)
                 if req_instr not in (name, model)\
                         and req_instr not in back_compat:
                     raise RuntimeError(f'mount {mount}: instrument'
@@ -1149,18 +1161,20 @@ class API(HardwareAPILike):
             this_pipette.remove_current_volume(disp_vol)
 
     def _plunger_position(self, instr: Pipette, ul: float,
-                          action: str) -> float:
+                          action: 'UlPerMmAction') -> float:
         mm = ul / instr.ul_per_mm(ul, action)
         position = mm + instr.config.bottom
         return round(position, 6)
 
     def _plunger_speed(
-            self, instr: Pipette, ul_per_s: float, action: str) -> float:
+            self, instr: Pipette, ul_per_s: float,
+            action: 'UlPerMmAction') -> float:
         mm_per_s = ul_per_s / instr.ul_per_mm(instr.config.max_volume, action)
         return round(mm_per_s, 6)
 
     def _plunger_flowrate(
-            self, instr: Pipette, mm_per_s: float, action: str) -> float:
+            self, instr: Pipette, mm_per_s: float,
+            action: 'UlPerMmAction') -> float:
         ul_per_s = mm_per_s * instr.ul_per_mm(instr.config.max_volume, action)
         return round(ul_per_s, 6)
 

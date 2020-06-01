@@ -1,36 +1,32 @@
+# this file defines types that require dev dependencies
+# and are only relevant for static typechecking. this file should only
+# be imported if typing.TYPE_CHECKING is True
 import asyncio
-from typing import List
+from typing import List, Optional
+
+from opentrons_shared_data.pipette.dev_types import (
+    PipetteModel
+)
+
 from .modules import ModuleAtPort
 from .types import HardwareEventType
-try:
-    from typing_extensions import Protocol
-except ModuleNotFoundError:
-    Protocol = None  # type: ignore
-try:
-    from typing_extensions import Literal
-except ModuleNotFoundError:
-    Literal = None  # type: ignore
-# this file defines types that require dev dependencies
-# and are only relevant for static typechecking.
-#
-#  - code should be written so that this file can fail to import
-#  - or the things defined in here can be None at execution time
-#  - only types that match the above criteria should be put here
-#  - please include this file as close to a leaf as possible
+from typing_extensions import Protocol, TypedDict, Literal
 
 
-if Protocol is not None:
-    class RegisterModules(Protocol):
-        async def __call__(
-            self,
-            new_mods_at_ports: List[ModuleAtPort] = None,
-            removed_mods_at_ports: List[ModuleAtPort] = None
-        ) -> None: ...
+class RegisterModules(Protocol):
+    async def __call__(
+        self,
+        new_mods_at_ports: List[ModuleAtPort] = None,
+        removed_mods_at_ports: List[ModuleAtPort] = None
+    ) -> None: ...
 
-    class HasLoop(Protocol):
-        @property
-        def loop(self) -> asyncio.AbstractEventLoop:
-            ...
+class HasLoop(Protocol):
+    @property
+    def loop(self) -> asyncio.AbstractEventLoop:
+        ...
 
-if Literal is not None:
-    DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
+DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
+
+class AttachedInstrument(TypedDict):
+    model: Optional[PipetteModel]
+    id: Optional[str]
