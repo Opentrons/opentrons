@@ -20,7 +20,7 @@ export type FormGroupProps = {|
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 |}
 
-export function FormGroup(props: FormGroupProps) {
+export function FormGroup(props: FormGroupProps): React.Node {
   const error = props.error != null
   const className = cx(props.className, {
     [styles.error]: error,

@@ -32,7 +32,7 @@ const addDriverVersion = (device: Device): Promise<UsbDevice> => {
   return Promise.resolve({ ...device })
 }
 
-export function registerSystemInfo(dispatch: Dispatch) {
+export function registerSystemInfo(dispatch: Dispatch): Action => void {
   let usbMonitor: UsbDeviceMonitor
   let ifaceMonitor: NetworkInterfaceMonitor
 

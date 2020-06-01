@@ -43,7 +43,7 @@ const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
 const log = () => _log || (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
-export function registerConfig(dispatch: Dispatch) {
+export function registerConfig(dispatch: Dispatch): Action => void {
   return function handleIncomingAction(action: Action) {
     if (action.type === Cfg.UPDATE || action.type === Cfg.RESET) {
       const { path } = action.payload
@@ -65,17 +65,17 @@ export function registerConfig(dispatch: Dispatch) {
   }
 }
 
-export function getStore() {
+export function getStore(): Config {
   return store().store
 }
 
-export function getOverrides(path?: string) {
+export function getOverrides(path?: string): mixed {
   return getIn(overrides(), path)
 }
 
 // TODO(mc, 2010-07-01): getConfig with path parameter can't be typed
 // Remove the path parameter
-export function getConfig(path?: string) {
+export function getConfig(path?: string): any {
   const result = store().get(path)
   const over = getIn(overrides(), path)
 

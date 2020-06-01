@@ -30,7 +30,7 @@ export type NavTabProps = {|
   selected?: boolean,
 |}
 
-export function NavTab(props: NavTabProps) {
+export function NavTab(props: NavTabProps): React.Node {
   const { url } = props
   const className = classnames(props.className, styles.tab, {
     [styles.disabled]: props.disabled,

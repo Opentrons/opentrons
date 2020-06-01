@@ -1,13 +1,5 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`ListAlert list alert renders correctly 1`] = `
-<li
-  className="list_alert"
->
-  alert alert
-</li>
-`;
-
 exports[`ListItem Disabled Side Panel Group renders correctly 1`] = `
 <div
   className="panel_group disabled"

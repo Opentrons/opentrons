@@ -132,5 +132,5 @@ export function toCandidate(service: Service): ?Candidate {
   return makeCandidate(service.ip, service.port)
 }
 
-export const matchService = (source: Service) => (target: Service) =>
+export const matchService: Service => Service => boolean = source => target =>
   source.name === target.name && source.ip === target.ip

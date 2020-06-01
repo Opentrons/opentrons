@@ -33,7 +33,9 @@ type ListItemProps = {|
  * A styled `<li>` with an optional icon, and an optional url for a React Router `NavLink`
  *
  */
-export const ListItem = React.forwardRef<ListItemProps, _>(ListItemComponent)
+export const ListItem: React.AbstractComponent<ListItemProps> = React.forwardRef(
+  ListItemComponent
+)
 
 function ListItemComponent(props: ListItemProps, ref) {
   const { url, isDisabled, iconName, activeClassName, exact } = props

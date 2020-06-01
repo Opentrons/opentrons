@@ -28,7 +28,7 @@ let config
 let store
 let client
 
-export function registerDiscovery(dispatch: Dispatch) {
+export function registerDiscovery(dispatch: Dispatch): Action => mixed {
   const onServiceUpdate = throttle(handleServices, UPDATE_THROTTLE_MS)
 
   config = getConfig('discovery')
@@ -88,7 +88,7 @@ export function registerDiscovery(dispatch: Dispatch) {
   }
 }
 
-export function getRobots() {
+export function getRobots(): Array<Service> {
   if (!client) return []
 
   return client.services

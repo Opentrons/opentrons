@@ -57,10 +57,6 @@ const santizeRe = (patterns: ?Array<string | RegExp>) => {
   return patterns.map(p => (typeof p === 'string' ? escape(p) : p))
 }
 
-export function createDiscoveryClient(options?: Options) {
-  return new DiscoveryClient(options || {})
-}
-
 export const SERVICE_EVENT: 'service' = 'service'
 export const SERVICE_REMOVED_EVENT: 'serviceRemoved' = 'serviceRemoved'
 export const DEFAULT_POLL_INTERVAL = 5000
@@ -287,4 +283,8 @@ export class DiscoveryClient extends EventEmitter {
       this.emit(SERVICE_EVENT, updated)
     }
   }
+}
+
+export function createDiscoveryClient(options?: Options): DiscoveryClient {
+  return new DiscoveryClient(options || {})
 }

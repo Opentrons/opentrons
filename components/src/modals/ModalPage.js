@@ -17,7 +17,7 @@ export type ModalPageProps = {|
   children?: React.Node,
 |}
 
-export function ModalPage(props: ModalPageProps) {
+export function ModalPage(props: ModalPageProps): React.Node {
   const { titleBar, heading } = props
 
   return (

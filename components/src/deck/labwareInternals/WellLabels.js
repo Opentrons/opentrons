@@ -55,4 +55,6 @@ function WellLabelsComponent(props: WellLabelsProps) {
   )
 }
 
-export const WellLabels = React.memo<WellLabelsProps>(WellLabelsComponent)
+export const WellLabels: React.AbstractComponent<WellLabelsProps> = React.memo(
+  WellLabelsComponent
+)

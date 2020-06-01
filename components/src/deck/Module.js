@@ -1,5 +1,5 @@
 // @flow
-import React, { useMemo } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import {
@@ -24,15 +24,16 @@ export type ModuleProps = {|
   mode: 'default' | 'present' | 'missing' | 'info',
 |}
 
-export function Module(props: ModuleProps) {
+export function Module(props: ModuleProps): React.Node {
   // TODO: BC 2019-7-23 get these from shared data, once absolute
   // dimensions are added to data
-  const deckDef = useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+  const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   let x = 0
   let y = 0
   let {
     xDimension: width,
     yDimension: height,
+    // TODO(mc, 2020-06-01): is optional chaining necessary here? If so, type defs need updateding
   } = deckDef?.locations?.orderedSlots[0]?.boundingBox
 
   switch (props.model) {

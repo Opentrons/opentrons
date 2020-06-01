@@ -106,7 +106,9 @@ const _getSvgYValueForWell = (
 }
 
 /** For display. Flips Y axis to match SVG, applies offset to wells */
-export function getWellPropsForSVGLabwareV1(def: LabwareDefinition1) {
+export function getWellPropsForSVGLabwareV1(
+  def: LabwareDefinition1
+): { [well: string]: WellDefinition, ... } {
   const wellDefs = def && def.wells
 
   // Most labware defs have a weird offset,

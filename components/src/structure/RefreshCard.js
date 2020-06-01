@@ -29,7 +29,7 @@ export type RefreshCardProps = {|
  * @deprecated Use {@link Card} with {@link useInterval} hook instead
  */
 export class RefreshCard extends React.Component<RefreshCardProps> {
-  render() {
+  render(): React.Node {
     const { watch, refresh, refreshing, children, ...cardProps } = this.props
 
     return (

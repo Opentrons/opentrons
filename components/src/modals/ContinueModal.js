@@ -17,7 +17,7 @@ const CONTINUE = 'Continue'
 /**
  * AlertModal variant to prompt user to "Cancel" or "Continue" a given action
  */
-export function ContinueModal(props: ContinueModalProps) {
+export function ContinueModal(props: ContinueModalProps): React.Node {
   const { onCancelClick, onContinueClick, ...passThruProps } = props
   const buttons = [
     { title: CANCEL, children: CANCEL, onClick: onCancelClick },

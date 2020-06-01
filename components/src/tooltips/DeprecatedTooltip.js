@@ -49,7 +49,7 @@ export type DeprecatedTooltipProps<ChildProps: {}> = {|
  */
 export function DeprecatedTooltip<ChildProps: {}>(
   props: DeprecatedTooltipProps<ChildProps>
-) {
+): React.Node {
   if (!props.tooltipComponent) return props.children()
 
   return (

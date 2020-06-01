@@ -31,7 +31,7 @@ export type NavButtonProps = {|
   tooltipComponent?: React.Node,
 |}
 
-export function NavButton(props: NavButtonProps) {
+export function NavButton(props: NavButtonProps): React.Node {
   const { url, tooltipComponent } = props
   const className = classnames(props.className, styles.button, {
     [styles.disabled]: props.disabled,
