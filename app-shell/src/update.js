@@ -20,7 +20,7 @@ export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
   'utf8'
 )
 
-export function registerUpdate(dispatch: Dispatch) {
+export function registerUpdate(dispatch: Dispatch): Action => mixed {
   return function handleAction(action: Action) {
     switch (action.type) {
       case 'shell:CHECK_UPDATE':
@@ -47,7 +47,7 @@ function checkUpdate(dispatch: Dispatch) {
   updater.channel = getConfig('update.channel')
   updater.checkForUpdates()
 
-  function done(payload: *) {
+  function done(payload) {
     updater.removeListener('update-available', onAvailable)
     updater.removeListener('update-not-available', onNotAvailable)
     updater.removeListener('error', onError)
@@ -63,7 +63,7 @@ function downloadUpdate(dispatch: Dispatch) {
   updater.once('error', onError)
   updater.downloadUpdate()
 
-  function done(payload: *) {
+  function done(payload) {
     updater.removeListener('update-downloaded', onDownloaded)
     updater.removeListener('error', onError)
     dispatch({ type: 'shell:DOWNLOAD_UPDATE_RESULT', payload })

@@ -5,9 +5,13 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
-import { getVisibleAlerts } from './utils'
 import { getSelectedStepId } from '../../ui/steps'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import {
+  getVisibleFormErrors,
+  getVisibleFormWarnings,
+  getVisibleProfileErrors,
+} from './utils'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../form-types'
 import type { StepFieldName } from '../../steplist/fieldLevel'
@@ -30,26 +34,47 @@ type OP = {|
 
 const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const { focusedField, dirtyFields } = ownProps
-  const visibleWarnings = getVisibleAlerts({
+  const visibleWarnings = getVisibleFormWarnings({
     focusedField,
     dirtyFields,
-    alerts: dismissSelectors.getFormWarningsForSelectedStep(state),
+    errors: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
 
   const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
     state
   )
-  const filteredErrors = getVisibleAlerts({
+  const filteredErrors = getVisibleFormErrors({
     focusedField,
     dirtyFields,
-    alerts: formLevelErrors,
+    errors: formLevelErrors,
   })
 
+  // deal with special-case dynamic field form-level errors
+  const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
+  let filteredDynamicFieldFormErrors = []
+  if (profileItemsById != null) {
+    const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
+      state
+    )
+    filteredDynamicFieldFormErrors = getVisibleProfileErrors({
+      focusedField,
+      dirtyFields,
+      errors: dynamicFieldFormErrors,
+      profileItemsById,
+    })
+  }
+
   return {
-    errors: filteredErrors.map(error => ({
-      title: error.title,
-      description: error.body || null,
-    })),
+    errors: [
+      ...filteredErrors.map(error => ({
+        title: error.title,
+        description: error.body || null,
+      })),
+      ...filteredDynamicFieldFormErrors.map(error => ({
+        title: error.title,
+        description: error.body || null,
+      })),
+    ],
     warnings: visibleWarnings.map(warning => ({
       title: warning.title,
       description: warning.body || null,

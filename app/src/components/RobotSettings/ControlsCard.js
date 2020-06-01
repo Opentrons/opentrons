@@ -34,7 +34,7 @@ const TITLE = 'Robot Controls'
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
-const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's deck calibration"
+const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
 
 export function ControlsCard(props: Props) {
   const dispatch = useDispatch<Dispatch>()
@@ -68,7 +68,7 @@ export function ControlsCard(props: Props) {
     <Card title={TITLE} disabled={notConnectable}>
       {ff.enableRobotCalCheck && (
         <LabeledButton
-          label="Check deck calibration"
+          label="Check robot calibration"
           buttonProps={{
             onClick: () => setIsCheckingRobotCal(true),
             disabled: buttonDisabled,

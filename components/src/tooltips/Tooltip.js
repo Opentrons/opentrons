@@ -42,26 +42,27 @@ export type TooltipProps = {|
  * Tooltip component that renders based on its `visible` prop. For use with the
  * `useTooltip` and `useHoverTooltip` hooks. See examples in `Tooltip.md`.
  */
-export const Tooltip = React.forwardRef<TooltipProps, _>(
-  function TooltipComponent(props: TooltipProps, ref) {
-    const {
-      visible,
-      placement,
-      id,
-      style,
-      arrowRef,
-      arrowStyle,
-      children,
-    } = props
+export const Tooltip: React.AbstractComponent<
+  TooltipProps,
+  HTMLDivElement
+> = React.forwardRef(function TooltipComponent(props: TooltipProps, ref) {
+  const {
+    visible,
+    placement,
+    id,
+    style,
+    arrowRef,
+    arrowStyle,
+    children,
+  } = props
 
-    return visible ? (
-      <div role="tooltip" id={id} style={style} ref={ref} css={TOOLTIP_CSS}>
-        {children}
-        <Arrow {...{ arrowRef, arrowStyle, placement }} />
-      </div>
-    ) : null
-  }
-)
+  return visible ? (
+    <div role="tooltip" id={id} style={style} ref={ref} css={TOOLTIP_CSS}>
+      {children}
+      <Arrow {...{ arrowRef, arrowStyle, placement }} />
+    </div>
+  ) : null
+})
 
 // shift arrows off the element
 const ARROW_ANCHOR_OFFSET = `-${ARROW_SIZE_PX}px;`
@@ -119,7 +120,7 @@ export type ArrowProps = {|
   arrowStyle: $Shape<CSSStyleDeclaration>,
 |}
 
-export function Arrow(props: ArrowProps) {
+export function Arrow(props: ArrowProps): React.Node {
   const placement = props.placement ?? ''
   const placementBase = placement.split('-')[0]
   const arrowCss = ARROW_CSS_BY_PLACEMENT_BASE[placementBase]

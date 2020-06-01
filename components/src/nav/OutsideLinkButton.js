@@ -29,7 +29,7 @@ type OutsideLinkButtonProps = {|
 |}
 
 /** Very much like NavButton, but used for opening external links in a new tab/window */
-export function OutsideLinkButton(props: OutsideLinkButtonProps) {
+export function OutsideLinkButton(props: OutsideLinkButtonProps): React.Node {
   const className = cx(props.className, styles.button, styles.no_link, {
     [styles.disabled]: props.disabled,
     [styles.bottom]: props.isBottom,

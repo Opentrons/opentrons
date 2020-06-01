@@ -10,7 +10,7 @@ export type LabeledControlProps = {|
   children?: React.Node,
 |}
 
-export function LabeledControl(props: LabeledControlProps) {
+export function LabeledControl(props: LabeledControlProps): React.Node {
   const { label, control, children } = props
 
   return (

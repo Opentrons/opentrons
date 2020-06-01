@@ -22,7 +22,7 @@ const TRASH_OUTLINE_PROPS = {
 /**
  * @deprecated Use {@link RobotWorkSpace}
  */
-export function DeckOutline() {
+export function DeckOutline(): React.Node {
   return (
     // TODO(mc, 2018-07-16): consolidate transform into path
     <g className={styles.deck_outline} transform="scale(0.666)">

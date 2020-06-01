@@ -26,7 +26,7 @@ describe('CheckHeight', () => {
 
   const getExitButton = wrapper =>
     wrapper
-      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
+      .find('PrimaryButton[children="exit robot calibration check"]')
       .find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)

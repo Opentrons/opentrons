@@ -12,7 +12,7 @@ export type LabeledToggleProps = {|
   onClick: () => mixed,
 |}
 
-export function LabeledToggle(props: LabeledToggleProps) {
+export function LabeledToggle(props: LabeledToggleProps): React.Node {
   const { label, toggledOn, onClick } = props
 
   return (

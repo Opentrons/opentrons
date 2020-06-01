@@ -1,14 +1,16 @@
 // @flow
-import { type ElementRef, useEffect, useRef } from 'react'
+import { useEffect, useRef } from 'react'
 import assert from 'assert'
 
 export type UseOnClickOutsideOptions = $Shape<{|
   onClickOutside?: MouseEvent => mixed,
 |}>
 
-export const useOnClickOutside = (options: UseOnClickOutsideOptions) => {
+export const useOnClickOutside = <E: Element>(
+  options: UseOnClickOutsideOptions
+): {| current: E | null |} => {
   const { onClickOutside } = options
-  const node: ElementRef<*> = useRef()
+  const node: {| current: E | null |} = useRef(null)
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -24,7 +26,7 @@ export const useOnClickOutside = (options: UseOnClickOutsideOptions) => {
         node &&
         node.current &&
         node.current.contains &&
-        !node.current.contains(clickedElem)
+        !node.current.contains(((clickedElem: any): Node))
       ) {
         onClickOutside(event)
       }

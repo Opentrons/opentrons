@@ -83,6 +83,6 @@ function StaticLabwareComponent(props: StaticLabwareProps) {
   )
 }
 
-export const StaticLabware = React.memo<StaticLabwareProps>(
+export const StaticLabware: React.AbstractComponent<StaticLabwareProps> = React.memo(
   StaticLabwareComponent
 )

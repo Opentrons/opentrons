@@ -19,7 +19,7 @@ export function getDisplayVolume(
   return `${typeof digits === 'number' ? round(volume, digits) : volume}`
 }
 
-export function getAsciiVolumeUnits(displayUnits: LabwareVolumeUnits) {
+export function getAsciiVolumeUnits(displayUnits: LabwareVolumeUnits): string {
   if (displayUnits === 'µL') return 'uL'
   return displayUnits
 }

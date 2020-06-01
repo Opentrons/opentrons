@@ -12,7 +12,7 @@ export type TitledListProps = {|
   /** optional icon left of the title */
   iconName?: ?IconName,
   /** props passed down to icon (`className` and `name` are ignored) */
-  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: * }>,
+  iconProps?: $Diff<React.ElementProps<typeof Icon>, { name: mixed }>,
   // TODO(mc, 2018-01-25): enforce <li> children requirement with flow
   /** children must all be `<li>` */
   children?: React.Node,
@@ -45,7 +45,7 @@ export type TitledListProps = {|
 /**
  * An ordered list with optional title, icon, and description.
  */
-export function TitledList(props: TitledListProps) {
+export function TitledList(props: TitledListProps): React.Node {
   const {
     iconName,
     disabled,

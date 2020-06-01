@@ -9,7 +9,10 @@ import {
 } from '../../step-generation/utils'
 import styles from './StepEditForm.css'
 import type { Options } from '@opentrons/components'
-import type { FormData } from '../../form-types'
+import type { ProfileFormError } from '../../steplist/formLevel/profileErrors'
+import type { FormWarning } from '../../steplist/formLevel/warnings'
+import type { StepFormErrors } from '../../steplist/types'
+import type { FormData, ProfileItem } from '../../form-types'
 
 export function getBlowoutLocationOptionsForForm(
   disposalLabwareOptions: Options,
@@ -64,20 +67,72 @@ export function getBlowoutLocationOptionsForForm(
   return disposalLabwareOptions
 }
 
-export function getVisibleAlerts<
-  Field,
-  Alert: { dependentFields: Array<Field> }
->(args: {
-  focusedField: ?Field,
-  dirtyFields: Array<Field>,
-  alerts: Array<Alert>,
-}): Array<Alert> {
-  const { focusedField, dirtyFields, alerts } = args
-  return alerts.filter(
-    alert =>
-      !alert.dependentFields.includes(focusedField) &&
-      difference(alert.dependentFields, dirtyFields).length === 0
-  )
+export const getVisibleFormErrors = (args: {
+  focusedField: ?string,
+  dirtyFields: Array<string>,
+  errors: StepFormErrors,
+}): StepFormErrors => {
+  const { focusedField, dirtyFields, errors } = args
+  return errors.filter(error => {
+    const dependentFieldsAreNotFocused = !error.dependentFields.includes(
+      focusedField
+    )
+    const dependentFieldsAreDirty =
+      difference(error.dependentFields, dirtyFields).length === 0
+
+    return dependentFieldsAreNotFocused && dependentFieldsAreDirty
+  })
+}
+
+export const getVisibleFormWarnings = (args: {
+  focusedField: ?string,
+  dirtyFields: Array<string>,
+  errors: Array<FormWarning>,
+}): Array<FormWarning> => {
+  const { focusedField, dirtyFields, errors } = args
+  return errors.filter(error => {
+    const dependentFieldsAreNotFocused = !error.dependentFields.includes(
+      focusedField
+    )
+    const dependentFieldsAreDirty =
+      difference(error.dependentFields, dirtyFields).length === 0
+
+    return dependentFieldsAreNotFocused && dependentFieldsAreDirty
+  })
+}
+
+// for the purpose of focus handlers, derive a unique ID for each dynamic field
+export const getDynamicFieldFocusHandlerId = ({
+  id,
+  name,
+}: {|
+  id: string,
+  name: string,
+|}) => `${id}:${name}`
+
+export const getVisibleProfileErrors = (args: {|
+  focusedField: ?string,
+  dirtyFields: Array<string>,
+  errors: Array<ProfileFormError>,
+  profileItemsById: { [itemId: string]: ProfileItem },
+|}): Array<ProfileFormError> => {
+  const { dirtyFields, focusedField, errors, profileItemsById } = args
+  const profileIds = Object.keys(profileItemsById)
+
+  return errors.filter(error => {
+    return profileIds.every(itemId => {
+      const fieldsForItem = error.dependentProfileFields.map(
+        fieldName => `${itemId}:${fieldName}` // TODO IMMEDIATELY import util for "hashing" the name + id
+      )
+
+      const dependentFieldsAreNotFocused = !fieldsForItem.includes(focusedField)
+
+      const dependentProfileFieldsAreDirty =
+        difference(fieldsForItem, dirtyFields).length === 0
+
+      return dependentFieldsAreNotFocused && dependentProfileFieldsAreDirty
+    })
+  })
 }
 
 // NOTE: some field components get their tooltips directly from i18n, and do not use `getTooltipForField`.

@@ -52,7 +52,7 @@ export type InputFieldProps = {|
   autoFocus?: boolean,
 |}
 
-export function InputField(props: InputFieldProps) {
+export function InputField(props: InputFieldProps): React.Node {
   const error = props.error != null
   const labelClass = cx(styles.form_field, props.className, {
     [styles.error]: error,

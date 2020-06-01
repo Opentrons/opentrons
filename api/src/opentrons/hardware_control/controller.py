@@ -41,7 +41,9 @@ class Controller:
                 'This is intended to run on a robot, and while it can connect '
                 'to a smoothie via a usb/serial adapter unexpected things '
                 'using gpios (such as smoothie reset or light management) '
-                'will fail')
+                'will fail. If you are seeing this message and you are '
+                'running on a robot, you need to set the RUNNING_ON_PI '
+                'environmental variable to 1.')
 
         self.config = config or opentrons.config.robot_configs.load()
 

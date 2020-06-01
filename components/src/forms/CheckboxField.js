@@ -29,7 +29,7 @@ export type CheckboxFieldProps = {|
   hoverTooltipHandlers?: ?HoverTooltipHandlers,
 |}
 
-export function CheckboxField(props: CheckboxFieldProps) {
+export function CheckboxField(props: CheckboxFieldProps): React.Node {
   const error = props.error != null
   const outerClassName = cx(styles.form_field, props.className, {
     [styles.checkbox_disabled]: props.disabled,

@@ -12,7 +12,7 @@ export type ToggleButtonProps = {|
   toggledOn: boolean,
 |}
 
-export function ToggleButton(props: ToggleButtonProps) {
+export function ToggleButton(props: ToggleButtonProps): React.Node {
   // TODO(mc, 2020-02-04): destructuring `name` to avoid flow error
   // ButtonProps::name conflicts with IconProps::name, and IconButton
   // has `name` prop to pass to Icon. IconButton will need to be redone

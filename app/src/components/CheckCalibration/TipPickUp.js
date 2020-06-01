@@ -17,10 +17,14 @@ const TIP_PICK_UP_HEADER = 'Position pipette over '
 const TIP_PICK_UP_BUTTON_TEXT = 'Pick up tip'
 
 const CONFIRM_TIP_BODY = 'Did pipette pick up tips successfully?'
-const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, move to first check'
+const CONFIRM_TIP_YES_BUTTON_TEXT = 'Yes, continue'
 const CONFIRM_TIP_NO_BUTTON_TEXT = 'No, try again'
-const JOG_UNTIL_AT = 'Jog pipette until nozzle is centered above'
-const POSITION_AND = 'position and'
+const SINGLE_JOG_UNTIL_AT = 'Jog pipette until nozzle is centered above the'
+const MULTI_JOG_UNTIL_AT = 'Jog pipette until the channel nozzle'
+const CLOSEST = 'closest'
+const TO_YOU_IS_CENTERED = 'to you is centered above the'
+const POSITION = 'position'
+const AND = 'and'
 const FLUSH = 'flush'
 const WITH_TOP_OF_TIP = 'with the top of the tip.'
 
@@ -63,6 +67,16 @@ export function TipPickUp(props: TipPickUpProps) {
   const demoAsset =
     tipRackWellName && ASSET_MAP[tipRackWellName][isMulti ? 'multi' : 'single']
 
+  const jogUntilAbove = isMulti ? (
+    <>
+      {MULTI_JOG_UNTIL_AT}
+      <b>&nbsp;{CLOSEST}&nbsp;</b>
+      {TO_YOU_IS_CENTERED}
+    </>
+  ) : (
+    SINGLE_JOG_UNTIL_AT
+  )
+
   return (
     <>
       <div className={styles.modal_header}>
@@ -96,9 +110,11 @@ export function TipPickUp(props: TipPickUpProps) {
         <>
           <div className={styles.tip_pick_up_demo_wrapper}>
             <p className={styles.tip_pick_up_demo_body}>
-              {JOG_UNTIL_AT}
+              {jogUntilAbove}
               <b>&nbsp;{tipRackWellName}&nbsp;</b>
-              {POSITION_AND}
+              {POSITION}
+              <br />
+              {AND}
               <b>&nbsp;{FLUSH}&nbsp;</b>
               {WITH_TOP_OF_TIP}
             </p>
