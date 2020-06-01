@@ -2,7 +2,7 @@ import json
 
 import pytest
 
-from opentrons_shared_data.modules import (
+from opentrons_shared_data.module import (
     load_definition, load_schema, ModuleNotFoundError)
 from opentrons_shared_data import load_shared_data
 

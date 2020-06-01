@@ -17,14 +17,14 @@ from typing import (Mapping, Optional,
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
 
-from opentrons_shared_data import modules
+from opentrons_shared_data import module
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem, V2_MODULE_DEF_VERSION
 from .labware import Labware
 
 if TYPE_CHECKING:
-    from opentrons_shared_data.modules.dev_types import (
+    from opentrons_shared_data.module.dev_types import (
         ModuleDefinitionV1, ModuleDefinitionV2,
         ThermocyclerModuleType, MagneticModuleType, TemperatureModuleType,
         )
@@ -492,7 +492,7 @@ def load_module_from_definition(
         v1def: 'ModuleDefinitionV1' = definition  # type: ignore
         return _load_from_v1(v1def, parent, api_level)
     if schema == 'module/schemas/2':
-        schema_doc = modules.load_schema('2')
+        schema_doc = module.load_schema('2')
         try:
             jsonschema.validate(definition, schema_doc)
         except jsonschema.ValidationError:
@@ -523,13 +523,13 @@ def _load_v1_module_def(module_model: ModuleModel) -> 'ModuleDefinitionV1':
         raise NoSuchModuleError(
             f'Could not find module {module_model.value}',
             module_model)
-    return modules.load_definition('1', name)
+    return module.load_definition('1', name)
 
 
 def _load_v2_module_def(module_model: ModuleModel) -> 'ModuleDefinitionV2':
     try:
-        return modules.load_definition('2', module_model.value)
-    except modules.ModuleNotFoundError:
+        return module.load_definition('2', module_model.value)
+    except module.ModuleNotFoundError:
         raise NoSuchModuleError(
             f'Could not find the module {module_model.value}.',
             module_model)
