@@ -79,6 +79,7 @@ type ProfileStepRowProps = {|
   updateStepFieldValue: (name: string, value: string) => mixed,
   focusHandlers: FocusHandlers,
 |}
+
 const ProfileStepRow = (props: ProfileStepRowProps) => {
   const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
   const {

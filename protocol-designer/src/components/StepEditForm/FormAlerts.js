@@ -36,8 +36,9 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
     alerts: dismissSelectors.getFormWarningsForSelectedStep(state),
   })
 
-  const unsavedFormErrors = stepFormSelectors.getUnsavedFormErrors(state)
-  const formLevelErrors = (unsavedFormErrors && unsavedFormErrors.form) || []
+  const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
+    state
+  )
   const filteredErrors = getVisibleAlerts({
     focusedField,
     dirtyFields,

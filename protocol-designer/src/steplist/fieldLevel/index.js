@@ -196,6 +196,7 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
 const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
   temperature: {
     getErrors: composeErrors(
+      requiredField,
       minFieldValue(MIN_TC_BLOCK_TEMP),
       maxFieldValue(MAX_TC_BLOCK_TEMP)
     ),
