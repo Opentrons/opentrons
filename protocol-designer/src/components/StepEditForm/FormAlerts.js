@@ -5,13 +5,13 @@ import {
   actions as dismissActions,
   selectors as dismissSelectors,
 } from '../../dismiss'
+import { getSelectedStepId } from '../../ui/steps'
+import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
   getVisibleProfileErrors,
 } from './utils'
-import { getSelectedStepId } from '../../ui/steps'
-import { selectors as stepFormSelectors } from '../../step-forms'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../form-types'
 import type { StepFieldName } from '../../steplist/fieldLevel'
