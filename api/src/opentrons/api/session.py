@@ -21,8 +21,7 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
-from opentrons.hardware_control.types import (DoorState, HardwareEventType,
-                                              HardwareEvent)
+from opentrons.hardware_control.types import DoorState, HardwareEventType
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -32,6 +31,7 @@ from opentrons.legacy_api.containers import get_container, location_to_list
 
 if TYPE_CHECKING:
     from .dev_types import State, StateInfo
+    from opentrons.hardware_control.dev_types import HardwareEvent
 
 log = logging.getLogger(__name__)
 
@@ -495,8 +495,8 @@ class Session(object):
             return self
         else:
             raise RuntimeError(
-                "Protocol is blocked is cannot be resumed. Make sure the "
-                "robot door is cloed before resuming.")
+                "Protocol is blocked and cannot be resumed. Make sure the "
+                "robot door is closed before resuming.")
 
     def _start_hardware_event_watcher(self):
         if not callable(self._event_watcher):
@@ -514,7 +514,7 @@ class Session(object):
             self._event_watcher()
             self._event_watcher = None
 
-    def _handle_hardware_event(self, hw_event: HardwareEvent):
+    def _handle_hardware_event(self, hw_event: 'HardwareEvent'):
         if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
             self._update_window_state(hw_event.new_state)
             if ff.enable_door_safety_switch() and \
