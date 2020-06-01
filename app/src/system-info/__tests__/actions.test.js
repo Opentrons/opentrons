@@ -32,11 +32,11 @@ const SPECS: Array<ActionSpec> = [
     },
   },
   {
-    // TODO(mc, 2020-04-17): add other system info
     should: 'create a systemInfo:INITIALIZED action',
     creator: Actions.initialized,
     args: [
       [Fixtures.mockUsbDevice, Fixtures.mockUsbDevice, Fixtures.mockUsbDevice],
+      [Fixtures.mockNetworkInterface],
     ],
     expected: {
       type: 'systemInfo:INITIALIZED',
@@ -46,6 +46,18 @@ const SPECS: Array<ActionSpec> = [
           Fixtures.mockUsbDevice,
           Fixtures.mockUsbDevice,
         ],
+        networkInterfaces: [Fixtures.mockNetworkInterface],
+      },
+    },
+  },
+  {
+    should: 'create a systemInfo:NETWORK_INTERFACES_CHANGED action',
+    creator: Actions.networkInterfacesChanged,
+    args: [[Fixtures.mockNetworkInterface]],
+    expected: {
+      type: 'systemInfo:NETWORK_INTERFACES_CHANGED',
+      payload: {
+        networkInterfaces: [Fixtures.mockNetworkInterface],
       },
     },
   },

@@ -22,7 +22,7 @@ export type PillProps = {|
 /**
  * Colored Pill containing text or other contents
  */
-export function Pill(props: PillProps) {
+export function Pill(props: PillProps): React.Node {
   const className = cx(styles.pill, props.className, {
     [styles.invert_text]: props.invertTextColor,
   })

@@ -6,6 +6,8 @@ import pick from 'lodash/pick'
 
 import * as Types from './types'
 
+import type { Styles } from 'styled-components'
+
 const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 
 const TYPOGRAPHY_PROPS = [
@@ -127,7 +129,7 @@ const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
   return styles
 }
 
-export const styleProps = (props: { ...Types.StyleProps, ... }) => ({
+export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...colorStyles(props),
   ...typographyStyles(props),
   ...spacingStyles(props),
@@ -136,4 +138,5 @@ export const styleProps = (props: { ...Types.StyleProps, ... }) => ({
   ...layoutStyles(props),
 })
 
-export const isntStyleProp = (prop: string) => !STYLE_PROPS.includes(prop)
+export const isntStyleProp = (prop: string): boolean =>
+  !STYLE_PROPS.includes(prop)

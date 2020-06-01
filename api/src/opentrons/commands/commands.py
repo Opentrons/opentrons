@@ -1,3 +1,4 @@
+from datetime import timedelta
 from . import types as command_types
 from opentrons.broker import Broker
 
@@ -513,6 +514,9 @@ def thermocycler_close():
 
 
 def delay(seconds, minutes, msg=None):
+    td = timedelta(minutes=minutes, seconds=seconds)
+    minutes, seconds = divmod(td.seconds, 60)
+
     text = f"Delaying for {minutes} minutes and {seconds} seconds"
     if msg:
         text = f"{text}. {msg}"

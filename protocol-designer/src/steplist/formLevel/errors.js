@@ -104,6 +104,7 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     dependentFields: ['lidIsActive', 'lidTargetTemp'],
   },
 }
+
 export type FormErrorChecker = mixed => ?FormError
 
 // TODO: test these

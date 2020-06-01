@@ -28,11 +28,11 @@ const matchHandler = e => h =>
  * and `props.preventDefault` is true.
  */
 export class HandleKeypress extends React.Component<HandleKeypressProps> {
-  handlePressIfKey = (event: KeypressEvent) => {
+  handlePressIfKey: (event: KeypressEvent) => void = event => {
     this.props.handlers.filter(matchHandler(event)).forEach(h => h.onPress())
   }
 
-  preventDefaultIfKey = (event: KeypressEvent) => {
+  preventDefaultIfKey: (event: KeypressEvent) => void = event => {
     if (!this.props.preventDefault) return
 
     const pressHandled = this.props.handlers.some(matchHandler(event))
@@ -40,19 +40,19 @@ export class HandleKeypress extends React.Component<HandleKeypressProps> {
     if (pressHandled) event.preventDefault()
   }
 
-  componentDidMount() {
+  componentDidMount(): void {
     window.addEventListener('keyup', this.handlePressIfKey)
     window.addEventListener('keyup', this.preventDefaultIfKey)
     window.addEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  componentWillUnmount() {
+  componentWillUnmount(): void {
     window.removeEventListener('keyup', this.handlePressIfKey)
     window.removeEventListener('keyup', this.preventDefaultIfKey)
     window.removeEventListener('keydown', this.preventDefaultIfKey)
   }
 
-  render() {
+  render(): React.Node {
     return <>{this.props.children}</>
   }
 }

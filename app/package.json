@@ -28,7 +28,7 @@
     "events": "3.0.0",
     "formik": "2.1.4",
     "history": "4.7.2",
-    "lodash": "4.17.4",
+    "lodash": "4.17.15",
     "mixpanel-browser": "2.22.1",
     "netmask": "1.0.6",
     "path-to-regexp": "3.0.0",

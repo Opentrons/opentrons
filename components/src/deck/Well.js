@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 
 import { wellIsRect, type WellDefinition } from '@opentrons/shared-data'
@@ -19,20 +19,20 @@ export type WellProps = {|
   ...SingleWell,
   selectable?: boolean,
   wellDef: WellDefinition,
-  onMouseOver?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseLeave?: (e: SyntheticMouseEvent<*>) => mixed,
-  onMouseMove?: (e: SyntheticMouseEvent<*>) => mixed,
+  onMouseOver?: (e: SyntheticMouseEvent<Element>) => mixed,
+  onMouseLeave?: (e: SyntheticMouseEvent<Element>) => mixed,
+  onMouseMove?: (e: SyntheticMouseEvent<Element>) => mixed,
 |}
 
 export class Well extends React.Component<WellProps> {
-  shouldComponentUpdate(nextProps: WellProps) {
+  shouldComponentUpdate(nextProps: WellProps): boolean {
     return (
       this.props.highlighted !== nextProps.highlighted ||
       this.props.selected !== nextProps.selected ||
       this.props.fillColor !== nextProps.fillColor
     )
   }
-  render() {
+  render(): React.Node {
     const {
       wellName,
       selectable,

@@ -8,6 +8,7 @@ import {
   getProfileFieldErrors,
   maskProfileField,
 } from '../../../steplist/fieldLevel'
+import { getDynamicFieldFocusHandlerId } from '../utils'
 import type { ProfileStepItem } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
@@ -79,6 +80,7 @@ type ProfileStepRowProps = {|
   updateStepFieldValue: (name: string, value: string) => mixed,
   focusHandlers: FocusHandlers,
 |}
+
 const ProfileStepRow = (props: ProfileStepRowProps) => {
   const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
   const {
@@ -89,9 +91,10 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
   } = props
   const fields = names.map(name => {
     const value = profileStepItem[name]
-    const profileStepId = profileStepItem.id
-    // for the purpose of focus handlers, create a unique ID for each dynamic field
-    const fieldId = `${profileStepId}:${name}`
+    const fieldId = getDynamicFieldFocusHandlerId({
+      id: profileStepItem.id,
+      name,
+    })
 
     const onChange = (e: SyntheticEvent<*>) => {
       updateStepFieldValue(name, e.currentTarget.value)

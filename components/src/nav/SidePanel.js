@@ -14,7 +14,7 @@ export type SidePanelProps = {|
   onMouseLeave?: (event: SyntheticMouseEvent<>) => mixed,
 |}
 
-export function SidePanel(props: SidePanelProps) {
+export function SidePanel(props: SidePanelProps): React.Node {
   const open = !props.isClosed || props.onCloseClick == null
   const closeButton = props.onCloseClick && (
     <IconButton

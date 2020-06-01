@@ -4,12 +4,12 @@
 import * as Constants from './constants'
 import * as Types from './types'
 
-// TODO(mc, 2020-04-17): add other system info
 export const initialized = (
-  usbDevices: Array<Types.UsbDevice>
+  usbDevices: Array<Types.UsbDevice>,
+  networkInterfaces: Array<Types.NetworkInterface>
 ): Types.InitializedAction => ({
   type: Constants.INITIALIZED,
-  payload: { usbDevices },
+  payload: { usbDevices, networkInterfaces },
 })
 
 export const usbDeviceAdded = (
@@ -24,4 +24,11 @@ export const usbDeviceRemoved = (
 ): Types.UsbDeviceRemovedAction => ({
   type: Constants.USB_DEVICE_REMOVED,
   payload: { usbDevice },
+})
+
+export const networkInterfacesChanged = (
+  networkInterfaces: Array<Types.NetworkInterface>
+): Types.NetworkInterfacesChangedAction => ({
+  type: Constants.NETWORK_INTERFACES_CHANGED,
+  payload: { networkInterfaces },
 })

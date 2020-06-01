@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import type {
   PipetteNameSpecs,
@@ -19,7 +19,7 @@ export type InstrumentDiagramProps = {|
   mount: Mount,
 |}
 
-export function InstrumentDiagram(props: InstrumentDiagramProps) {
+export function InstrumentDiagram(props: InstrumentDiagramProps): React.Node {
   const { pipetteSpecs, mount } = props
   const { displayCategory, channels } = pipetteSpecs || {}
 

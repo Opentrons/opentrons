@@ -114,7 +114,7 @@ const CLEAR_STYLES = {
   // valueContainer: _ => _,
 }
 
-export function Select(props: SelectProps) {
+export function Select(props: SelectProps): React.Node {
   return (
     <ReactSelect
       {...props}

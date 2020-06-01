@@ -48,9 +48,9 @@ type GridStart = {|
   colStride: number,
 |}
 
-type InputParams = $Rest<Params, {| loadName: * |}>
+type InputParams = $Rest<Params, {| loadName: mixed |}>
 
-type InputWellGroup = $Rest<WellGroup, {| wells: * |}>
+type InputWellGroup = $Rest<WellGroup, {| wells: mixed |}>
 
 export type BaseLabwareProps = {|
   metadata: Metadata,

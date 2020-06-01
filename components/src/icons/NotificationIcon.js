@@ -26,7 +26,7 @@ const SCALE_FACTOR = 3
  * ```
  */
 
-export function NotificationIcon(props: NotificationIconProps) {
+export function NotificationIcon(props: NotificationIconProps): React.Node {
   const { childName, childClassName, ...iconProps } = props
   const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)

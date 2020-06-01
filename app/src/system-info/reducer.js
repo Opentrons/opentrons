@@ -8,6 +8,7 @@ import type { SystemInfoState } from './types'
 
 const INITIAL_STATE: SystemInfoState = {
   usbDevices: [],
+  networkInterfaces: [],
 }
 
 export function systemInfoReducer(
@@ -16,7 +17,8 @@ export function systemInfoReducer(
 ): SystemInfoState {
   switch (action.type) {
     case Constants.INITIALIZED: {
-      return { ...state, usbDevices: action.payload.usbDevices }
+      const { usbDevices, networkInterfaces } = action.payload
+      return { ...state, usbDevices, networkInterfaces }
     }
 
     case Constants.USB_DEVICE_ADDED: {
@@ -38,6 +40,10 @@ export function systemInfoReducer(
           )
         }),
       }
+    }
+
+    case Constants.NETWORK_INTERFACES_CHANGED: {
+      return { ...state, networkInterfaces: action.payload.networkInterfaces }
     }
   }
 

@@ -1,5 +1,5 @@
 // @flow
-import type { UsbDevice } from '../types'
+import type { UsbDevice, NetworkInterface } from '../types'
 
 export const mockUsbDevice: UsbDevice = {
   locationId: 1,
@@ -36,4 +36,25 @@ export const mockWindowsRealtekDevice: UsbDevice = {
   serialNumber: 'Serial Number',
   deviceAddress: 5,
   windowsDriverVersion: '1.2.3',
+}
+
+export const mockNetworkInterface: NetworkInterface = {
+  name: 'en1',
+  address: '192.168.1.2',
+  netmask: '255.255.255.0',
+  family: 'IPv4',
+  mac: '88:e9:fe:74:69:60',
+  internal: false,
+  cidr: '192.168.1.2/24',
+}
+
+export const mockNetworkInterfaceV6: NetworkInterface = {
+  name: 'en1',
+  address: 'fe80::87f:5b2:cbc4:1638',
+  netmask: 'ffff:ffff:ffff:ffff::',
+  family: 'IPv6',
+  mac: '88:e9:fe:74:69:60',
+  internal: false,
+  cidr: 'fe80::87f:5b2:cbc4:1638/64',
+  scopeid: 7,
 }

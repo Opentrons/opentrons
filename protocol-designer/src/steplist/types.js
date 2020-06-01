@@ -1,7 +1,7 @@
 // @flow
 import typeof { THERMOCYCLER_STATE } from '../constants'
 import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
-import type { StepIdType, StepFieldName } from '../form-types'
+import type { StepIdType } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
 // timeline start and end
@@ -149,12 +149,9 @@ export type SubstepItemData =
 
 export type SubSteps = { [StepIdType]: ?SubstepItemData }
 
-export type StepFormAndFieldErrors = {
-  field?: { [StepFieldName]: Array<string> },
-  form?: Array<FormError>,
-}
+export type StepFormErrors = Array<FormError>
 
 export type StepArgsAndErrors = {
-  errors: StepFormAndFieldErrors,
+  errors: boolean,
   stepArgs: CommandCreatorArgs | null, // TODO: incompleteData field when this is null?
 }

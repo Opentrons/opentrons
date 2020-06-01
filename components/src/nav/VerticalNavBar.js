@@ -8,7 +8,7 @@ export type VerticalNavBarProps = {|
   children: React.Node,
 |}
 
-export function VerticalNavBar(props: VerticalNavBarProps) {
+export function VerticalNavBar(props: VerticalNavBarProps): React.Node {
   const className = classnames(styles.navbar, props.className)
   return <nav className={className}>{props.children}</nav>
 }

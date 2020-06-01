@@ -49,7 +49,10 @@ export class Deck extends React.Component<DeckProps> {
   // this `parentRef` should be HTMLElement | SVGElement
   parentRef: ?any
 
-  getXY = (rawX: number, rawY: number) => {
+  getXY: (
+    rawX: number,
+    rawY: number
+  ) => $Shape<{| scaledX?: number, scaledY?: number |}> = (rawX, rawY) => {
     if (!this.parentRef) return {}
     const clientRect: {
       width: number,
@@ -70,7 +73,7 @@ export class Deck extends React.Component<DeckProps> {
     const scaledY = (rawY - clientRect.top) * heightCoefficient + scaledYOffset
     return { scaledX, scaledY }
   }
-  render() {
+  render(): React.Node {
     const { className, LabwareComponent, DragPreviewLayer } = this.props
 
     return (
@@ -126,13 +129,13 @@ function renderLabware(
 // TODO: BC 2019-05-03 we should migrate to only using the DeckFromData
 // component; once Deck is removed, we should rename it Deck
 
-export type DeckFromDataProps = {
+export type DeckFromDataProps = {|
   def: DeckDefinition,
   layerBlacklist: Array<string>,
-}
+|}
 
 export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
-  render() {
+  render(): React.Node {
     const { def, layerBlacklist } = this.props
     return (
       <g>
