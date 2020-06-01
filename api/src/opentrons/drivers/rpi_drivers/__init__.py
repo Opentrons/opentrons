@@ -20,7 +20,7 @@ def build_gpio_chardev(chip_name: str) -> 'GPIODriverLike':
             'Failed to initialize character device, will not '
             'be able to control gpios (lights, button, smoothie'
             'kill, smoothie reset). If you need to control gpios, '
-            'stop the robot server with systemctl stop '
+            'first stop the robot server with systemctl stop '
             'opentrons-robot-server. Until you restart the server '
             'with systemctl start opentrons-robot-server, you will '
             'be unable to control the robot using the Opentrons app.')
