@@ -22,6 +22,8 @@ export function UploadRobotUpdate(props: UploadRobotUpdateProps) {
       // https://electronjs.org/docs/api/file-object
       dispatch(startBuildrootUpdate(robotName, (files[0]: any).path))
     }
+    // clear input value to allow same file to be selected again if necessary
+    event.target.value = ''
   }
 
   return (
