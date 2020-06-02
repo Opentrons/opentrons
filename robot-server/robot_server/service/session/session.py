@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from opentrons.calibration.check.models import SessionType
 
 from robot_server.service.session.command import Command
@@ -16,22 +18,23 @@ class Session:
         :param common: Data and utilities common to all session types
         """
         self._id = create_identifier()
+        self._created_on = datetime.utcnow()
         self._common = common
 
     @classmethod
-    def create(cls, common: SessionCommon) -> 'Session':
+    async def create(cls, common: SessionCommon) -> 'Session':
         """Create instance"""
         return cls(common)
 
-    def clean_up(self):
+    async def clean_up(self):
         """Called before session is deleted"""
         pass
 
-    def enqueue_command(self, command: Command):
+    async def enqueue_command(self, command: Command):
         """Enqueue a command for later execution"""
         raise NotImplementedError()
 
-    def execute_command(self, command: Command):
+    async def execute_command(self, command: Command):
         """Execute the command"""
         raise NotImplementedError()
 
@@ -42,3 +45,14 @@ class Session:
     @property
     def session_type(self) -> SessionType:
         return SessionType.null
+
+    @property
+    def created_on(self) -> datetime:
+        return self._created_on
+
+    def __str__(self) -> str:
+        return f"Session(" \
+               f"session_type={self.session_type}," \
+               f"identifier={self.identifier}," \
+               f"created_on={self.created_on}," \
+               f")"

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from robot_server.service.models.session import CommandName, CommandDataType
 from robot_server.service.session.models import IdentifierType, \
     create_identifier
@@ -11,6 +13,7 @@ class Command:
         self._data = data
         # Create a unique identifier for the command
         self._id = create_identifier()
+        self._created_on = datetime.utcnow()
 
     @property
     def name(self) -> CommandName:
@@ -24,5 +27,14 @@ class Command:
     def identifier(self) -> IdentifierType:
         return self._id
 
+    @property
+    def created_on(self) -> datetime:
+        return self._created_on
+
     def __str__(self) -> str:
-        return f"{self.name}:{self.identifier}[{self.data}]"
+        return f"Command(" \
+               f"name={self.name}, " \
+               f"identifier={self.identifier}" \
+               f"data={self.data}" \
+               f"created_on={self.created_on}," \
+               f")"

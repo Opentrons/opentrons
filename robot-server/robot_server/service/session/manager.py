@@ -29,22 +29,22 @@ class SessionManager:
             is_active=self.is_active
         )
 
-    def add(self, session_type: SessionType) -> Optional[Session]:
+    async def add(self, session_type: SessionType) -> Optional[Session]:
         """Add a new session"""
         session = None
         cls = SessionTypeToClass.get(session_type)
         if cls:
-            session = cls.create(self._session_common)
+            session = await cls.create(self._session_common)
             if session:
                 self._sessions[session.identifier] = session
         return session
 
-    def remove(self, identifier: IdentifierType) -> Optional[Session]:
+    async def remove(self, identifier: IdentifierType) -> Optional[Session]:
         """Remove a session"""
         session = self.deactivate(identifier)
         if session:
             del self._sessions[session.identifier]
-            session.clean_up()
+            await session.clean_up()
         return session
 
     def get_by_id(self, identifier: IdentifierType) \
