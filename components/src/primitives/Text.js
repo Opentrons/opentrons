@@ -1,14 +1,9 @@
 // @flow
 import styled from 'styled-components'
-import * as StyleProps from './style-props'
 
-import type { StyledComponent } from 'styled-components'
+import { styleProps, isntStyleProp } from './style-props'
 
-export type TextProps = {|
-  ...StyleProps.ColorProps,
-  ...StyleProps.TypographyProps,
-  ...StyleProps.SpacingProps,
-|}
+import type { PrimitiveComponent } from './types'
 
 // TODO(mc, 2020-05-08): add variants (--font-body-2-dark, etc) as variant prop
 // or as components that compose the base Text component
@@ -18,14 +13,10 @@ export type TextProps = {|
  *
  * @component
  */
-export const Text: StyledComponent<
-  TextProps,
-  {||},
-  HTMLParagraphElement
-> = styled.p`
+export const Text: PrimitiveComponent<HTMLParagraphElement> = styled.p.withConfig(
+  { shouldForwardProp: isntStyleProp }
+)`
   margin-top: 0;
   margin-bottom: 0;
-  ${StyleProps.colorStyles}
-  ${StyleProps.typographyStyles}
-  ${StyleProps.spacingStyles}
+  ${styleProps}
 `
