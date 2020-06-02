@@ -81,7 +81,7 @@ The speeds at which the pipette will aspirate and dispense can be set through ``
 
 
 Minimum and Maximum Volume
-==================
+==========================
 
 The minimum and maximum volume of the pipette may be set using
 ``min_volume`` and ``max_volume``. The values are in microliters and have
