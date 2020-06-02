@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 
-from robot_server.service.models.json_api.request import json_api_request
+from robot_server.service.json_api.request import json_api_request
 
 
 class ItemModel(BaseModel):

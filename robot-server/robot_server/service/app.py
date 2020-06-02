@@ -9,14 +9,14 @@ from starlette.exceptions import HTTPException as StarletteHTTPException
 from starlette.status import HTTP_422_UNPROCESSABLE_ENTITY
 
 from .logging import initialize_logging
-from .models import V1BasicResponse
+from robot_server.service.legacy.models import V1BasicResponse
 from .errors import V1HandlerError, \
     transform_http_exception_to_json_api_errors, \
     transform_validation_error_to_json_api_errors, \
     consolidate_fastapi_response, RobotServerError, ErrorResponse
 from .dependencies import get_rpc_server
 from robot_server import constants
-from .routers import legacy_routes, routes
+from robot_server.service.legacy.routers import legacy_routes, routes
 
 
 log = logging.getLogger(__name__)

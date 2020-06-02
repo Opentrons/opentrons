@@ -3,7 +3,7 @@ from typing import List, Dict, Any
 from pydantic import ValidationError
 from starlette.exceptions import HTTPException
 
-from robot_server.service.models.json_api.errors import ErrorResponse, Error, \
+from robot_server.service.json_api.errors import ErrorResponse, Error, \
     ErrorSource
 
 
