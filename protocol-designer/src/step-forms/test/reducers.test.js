@@ -1217,6 +1217,123 @@ describe('unsavedForm reducer', () => {
       },
     })
   })
+
+  it('should remove a profile step item on DELETE_PROFILE_STEP', () => {
+    const id = 'stepItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_STEP,
+            id,
+            title: '',
+            temperature: '',
+            durationMinutes: '',
+            durationSeconds: '',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
+
+  it('should remove a step item inside a cycle on DELETE_PROFILE_STEP', () => {
+    const stepId = 'stepItemId'
+    const cycleId = 'cycleId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id: stepId } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [
+              {
+                type: PROFILE_STEP,
+                id: stepId,
+                title: '',
+                temperature: '',
+                durationMinutes: '',
+                durationSeconds: '',
+              },
+            ],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [],
+          repetitions: '1',
+        },
+      },
+    })
+  })
+
+  it('should do nothing on DELETE_PROFILE_STEP when the id is a cycle', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual(state.unsavedForm)
+  })
+
+  it('should delete cycle on DELETE_PROFILE_CYCLE', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_CYCLE', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
 })
 
 describe('presavedStepForm reducer', () => {

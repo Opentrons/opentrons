@@ -62,6 +62,17 @@ export const addProfileStep = (
   payload,
 })
 
+export type DeleteProfileCycleAction = {|
+  type: 'DELETE_PROFILE_CYCLE',
+  payload: {| id: string |},
+|}
+export const deleteProfileCycle = (
+  payload: $PropertyType<DeleteProfileCycleAction, 'payload'>
+) => ({
+  type: 'DELETE_PROFILE_CYCLE',
+  payload,
+})
+
 export type DeleteProfileStepAction = {|
   type: 'DELETE_PROFILE_STEP',
   payload: {| id: string |},

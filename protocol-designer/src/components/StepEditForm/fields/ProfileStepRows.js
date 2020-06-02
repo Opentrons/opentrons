@@ -74,6 +74,14 @@ type ProfileCycleRowProps = {|
 |}
 export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
   const { cycleItem, focusHandlers } = props
+  const dispatch = useDispatch()
+
+  const addStepToCycle = () =>
+    dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
+
+  const deleteProfileCycle = () =>
+    dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
+
   return (
     <div>
       <div>TODO: cycle</div>
@@ -81,9 +89,13 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
         <ProfileStepItemRow
           stepItem={stepItem}
           focusHandlers={focusHandlers}
-          key={index}
+          key={stepItem.id}
         />
       ))}
+      <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
+      <div onClick={deleteProfileCycle}>
+        <Icon name="close" className={styles.delete_step_icon} />
+      </div>
       <div>---</div>
     </div>
   )
@@ -109,7 +121,7 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
         <ProfileCycleRow
           cycleItem={itemFields}
           focusHandlers={props.focusHandlers}
-          key={index}
+          key={itemId}
         />
       )
     }
@@ -118,7 +130,7 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
       <ProfileStepItemRow
         stepItem={itemFields}
         focusHandlers={props.focusHandlers}
-        key={index}
+        key={itemId}
       />
     )
   })

@@ -5,6 +5,7 @@ import mapValues from 'lodash/mapValues'
 import cloneDeep from 'lodash/cloneDeep'
 import merge from 'lodash/merge'
 import omit from 'lodash/omit'
+import omitBy from 'lodash/omitBy'
 import reduce from 'lodash/reduce'
 import {
   getLabwareDefaultEngageHeight,
@@ -54,6 +55,7 @@ import type {
   FormData,
   StepIdType,
   StepType,
+  ProfileItem,
   ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
@@ -71,6 +73,7 @@ import type {
   ReorderStepsAction,
   AddProfileCycleAction,
   AddProfileStepAction,
+  DeleteProfileCycleAction,
   DeleteProfileStepAction,
   EditProfileStepAction,
 } from '../../steplist/actions'
@@ -132,6 +135,7 @@ type UnsavedFormActions =
   | SubstituteStepFormPipettesAction
   | AddProfileStepAction
   | DeleteProfileStepAction
+  | DeleteProfileCycleAction
   | EditProfileStepAction
 export const unsavedForm = (
   rootState: RootState,
@@ -257,6 +261,28 @@ export const unsavedForm = (
         },
       }
     }
+    case 'DELETE_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'DELETE_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+
+      const { id } = action.payload
+      const isCycle =
+        unsavedFormState.profileItemsById[id].type === PROFILE_CYCLE
+      if (!isCycle) {
+        return unsavedFormState
+      }
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
+          itemId => itemId !== id
+        ),
+        profileItemsById: omit(unsavedFormState.profileItemsById, id),
+      }
+    }
     case 'DELETE_PROFILE_STEP': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
@@ -267,15 +293,55 @@ export const unsavedForm = (
 
       const { id } = action.payload
 
+      const omitTopLevelSteps = (profileItemsById: {
+        [string]: ProfileItem,
+        ...,
+      }) =>
+        omitBy(
+          profileItemsById,
+          (item: ProfileItem, itemId: string): boolean => {
+            return item.type === PROFILE_STEP && itemId === id
+          }
+        )
+
+      // not top-level, must be nested inside a cycle
+      const omitCycleSteps = (profileItemsById: {
+        [string]: ProfileItem,
+        ...,
+      }) =>
+        mapValues(profileItemsById, (item: ProfileItem): ProfileItem => {
+          if (item.type === PROFILE_CYCLE) {
+            return {
+              ...item,
+              steps: item.steps.filter(
+                (stepItem: ProfileStepItem) => stepItem.id !== id
+              ),
+            }
+          }
+          return item
+        })
+
+      const isTopLevelProfileStep =
+        unsavedFormState.orderedProfileItems.includes(id) &&
+        unsavedFormState.profileItemsById[id].type === PROFILE_STEP
+
+      const filteredItemsById = isTopLevelProfileStep
+        ? omitTopLevelSteps(unsavedFormState.profileItemsById)
+        : omitCycleSteps(unsavedFormState.profileItemsById)
+
+      const filteredOrderedProfileItems = isTopLevelProfileStep
+        ? unsavedFormState.orderedProfileItems.filter(itemId => itemId !== id)
+        : unsavedFormState.orderedProfileItems
+
       return {
         ...unsavedFormState,
-        orderedProfileItems: unsavedFormState.orderedProfileItems.filter(
-          itemId => itemId !== id
-        ),
-        profileItemsById: omit(unsavedFormState.profileItemsById, id),
+        orderedProfileItems: filteredOrderedProfileItems,
+        profileItemsById: filteredItemsById,
       }
     }
     case 'EDIT_PROFILE_STEP': {
+      // TODO IMMEDIATELY clean this up and add tests
+
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
           'EDIT_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
@@ -285,12 +351,39 @@ export const unsavedForm = (
 
       const { id, fields } = action.payload
 
-      return {
-        ...unsavedFormState,
-        profileItemsById: {
-          ...unsavedFormState.profileItemsById,
-          [id]: { ...unsavedFormState.profileItemsById[id], ...fields },
-        },
+      const isTopLevelStep =
+        unsavedFormState.orderedProfileItems.includes(id) &&
+        unsavedFormState.profileItemsById[id].type === PROFILE_STEP
+
+      if (isTopLevelStep) {
+        return {
+          ...unsavedFormState,
+          profileItemsById: {
+            ...unsavedFormState.profileItemsById,
+            [id]: { ...unsavedFormState.profileItemsById[id], ...fields },
+          },
+        }
+      } else {
+        return {
+          ...unsavedFormState,
+          profileItemsById: mapValues(
+            unsavedFormState.profileItemsById,
+            item => {
+              if (
+                item.type === PROFILE_CYCLE &&
+                item.steps.some(step => step.id)
+              ) {
+                return {
+                  ...item,
+                  steps: item.steps.map(step =>
+                    step.id === id ? { ...step, ...fields } : step
+                  ),
+                }
+              }
+              return item
+            }
+          ),
+        }
       }
     }
     default:
