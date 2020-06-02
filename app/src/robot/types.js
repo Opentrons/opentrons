@@ -80,7 +80,19 @@ export type Command = {
   handledAt: ?number,
   // subcommands
   children: number[],
+  ...
 }
+
+// protocol command graph node
+// contructed from Command
+export type CommandNode = {|
+  id: number,
+  description: string,
+  handledAt: ?number,
+  isCurrent: boolean,
+  isLast: boolean,
+  children: Array<CommandNode>,
+|}
 
 // instrument as stored in redux state
 export type StatePipette = {|

@@ -20,7 +20,6 @@ export function UnprobedPanel(props: TipProbeProps) {
   const deckPopulated = useSelector(getDeckPopulated)
 
   const moveToFront = () => {
-    // $FlowFixMe: robotActions.moveToFront is not typed
     dispatch(robotActions.moveToFront(mount))
     setShowClearDeck(false)
   }

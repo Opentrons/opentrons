@@ -1,7 +1,7 @@
 // robot selectors test
 import { format } from 'date-fns'
 import { setIn } from '@thi.ng/paths'
-import { NAME, selectors, constants } from '../'
+import { selectors, constants } from '../'
 
 import { getLabwareDefBySlot } from '../../protocol/selectors'
 import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
@@ -9,7 +9,7 @@ import { getCustomLabwareDefinitions } from '../../custom-labware/selectors'
 jest.mock('../../protocol/selectors')
 jest.mock('../../custom-labware/selectors')
 
-const makeState = state => ({ [NAME]: state })
+const makeState = robotState => ({ robot: robotState })
 
 const {
   getConnectedRobotName,
@@ -216,7 +216,7 @@ describe('robot selectors', () => {
 
   it('getRunTime with no startTime', () => {
     const state = {
-      [NAME]: {
+      robot: {
         session: {
           startTime: null,
           runTime: 42,
@@ -229,7 +229,7 @@ describe('robot selectors', () => {
 
   it('getRunTime with no remoteTimeCompensation', () => {
     const state = {
-      [NAME]: {
+      robot: {
         session: {
           remoteTimeCompensation: null,
           startTime: 40,
@@ -244,7 +244,7 @@ describe('robot selectors', () => {
   it('getRunTime', () => {
     const testGetRunTime = (seconds, expected) => {
       const stateWithRunTime = {
-        [NAME]: {
+        robot: {
           session: {
             remoteTimeCompensation: 0,
             startTime: 42,
@@ -718,12 +718,12 @@ describe('robot selectors', () => {
       })
 
       const nextState = {
-        [NAME]: {
-          ...state[NAME],
+        robot: {
+          ...state.robot,
           calibration: {
-            ...state[NAME].calibration,
+            ...state.robot.calibration,
             confirmedBySlot: {
-              ...state[NAME].calibration.confirmedBySlot,
+              ...state.robot.calibration.confirmedBySlot,
               1: true,
               2: true,
             },

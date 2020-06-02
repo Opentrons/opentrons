@@ -111,4 +111,4 @@ export type Epic = (
   state$: Observable<State>
 ) => Observable<Action>
 
-export type Error = { name: string, message: string }
+export type Error = { name?: string, message?: string, ... }

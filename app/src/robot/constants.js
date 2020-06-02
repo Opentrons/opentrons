@@ -2,8 +2,6 @@
 // robot redux module constants
 import type { Mount, Slot } from './types'
 
-export const _NAME = 'robot'
-
 // connection states
 export const DISCONNECTED: 'disconnected' = 'disconnected'
 export const CONNECTING: 'connecting' = 'connecting'

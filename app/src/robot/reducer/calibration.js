@@ -16,6 +16,12 @@ import type {
   SetModulesReviewedAction,
   ReturnTipResponseAction,
   ReturnTipAction,
+  SetDeckPopulatedAction,
+  MoveToFrontAction,
+  MoveToFrontResponseAction,
+  ProbeTipAction,
+  ProbeTipResponseAction,
+  ConfirmLabwareAction,
 } from '../actions'
 
 // calibration request types
@@ -34,7 +40,7 @@ type CalibrationRequestType =
   | 'SET_MODULES_REVIEWED'
   | 'RETURN_TIP'
 
-type CalibrationRequest = $ReadOnly<{|
+export type CalibrationRequest = $ReadOnly<{|
   type: CalibrationRequestType,
   mount?: Mount,
   slot?: Slot,
@@ -181,7 +187,7 @@ export function calibrationReducer(
 
 function handleSetDeckPopulated(
   state: CalibrationState,
-  action: any
+  action: SetDeckPopulatedAction
 ): CalibrationState {
   return { ...state, deckPopulated: action.payload }
 }
@@ -195,7 +201,7 @@ function handleSetModulesReviewed(
 
 function handleMoveToFront(
   state: CalibrationState,
-  action: any
+  action: MoveToFrontAction
 ): CalibrationState {
   if (!action.payload || !action.payload.mount) return state
 
@@ -218,29 +224,29 @@ function handleMoveToFront(
 
 function handleMoveToFrontResponse(
   state: CalibrationState,
-  action: any
+  action: MoveToFrontResponseAction
 ): CalibrationState {
-  const { payload, error } = action
+  const error = action.error && action.payload ? action.payload : null
 
   return {
     ...state,
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: error ? payload : null,
+      error,
     },
   }
 }
 
 function handleProbeTip(
   state: CalibrationState,
-  action: any
+  action: ProbeTipAction
 ): CalibrationState {
   if (!action.payload || !action.payload.mount) return state
 
-  const {
-    payload: { mount },
-  } = action
+  const { mount } = action.payload
+  const probedByMount = { ...state.probedByMount }
+  probedByMount[mount] = false
 
   return {
     ...state,
@@ -250,16 +256,13 @@ function handleProbeTip(
       inProgress: true,
       error: null,
     },
-    probedByMount: {
-      ...state.probedByMount,
-      [mount]: false,
-    },
+    probedByMount,
   }
 }
 
 function handleProbeTipResponse(
   state: CalibrationState,
-  action: any
+  action: ProbeTipResponseAction
 ): CalibrationState {
   const { payload, error } = action
 
@@ -268,7 +271,7 @@ function handleProbeTipResponse(
     calibrationRequest: {
       ...state.calibrationRequest,
       inProgress: false,
-      error: error ? payload : null,
+      error: error && payload ? payload : null,
     },
     confirmedBySlot: {},
   }
@@ -659,18 +662,15 @@ function handleUpdateOffsetFailure(
 
 function handleConfirmLabware(
   state: CalibrationState,
-  action: any
+  action: ConfirmLabwareAction
 ): CalibrationState {
   if (!action.payload || !action.payload.labware) return state
 
-  const {
-    payload: { labware: slot },
-  } = action
+  const { labware: slot } = action.payload
+  const confirmedBySlot = { ...state.confirmedBySlot }
+  confirmedBySlot[slot] = true
 
-  return {
-    ...state,
-    confirmedBySlot: { ...state.confirmedBySlot, [slot]: true },
-  }
+  return { ...state, confirmedBySlot }
 }
 
 function handleReturnTip(
@@ -699,6 +699,7 @@ function handleReturnTipResponse(
   const { mount } = calibrationRequest
   if (!mount) return state
 
+  const error = action.error && action.payload ? action.payload : null
   const nextTipOnByMount = { ...tipOnByMount }
   nextTipOnByMount[mount] = false
 
@@ -707,7 +708,7 @@ function handleReturnTipResponse(
     calibrationRequest: {
       ...calibrationRequest,
       inProgress: false,
-      error: null,
+      error,
     },
     tipOnByMount: nextTipOnByMount,
   }

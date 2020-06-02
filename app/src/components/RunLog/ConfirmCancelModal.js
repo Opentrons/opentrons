@@ -14,12 +14,10 @@ const BACK_TEXT = 'go back'
 export function ConfirmCancelModal() {
   const dispatch = useDispatch<Dispatch>()
   const back = () => {
-    // $FlowFixMe(mc, 2019-07-01): RPC robotActions.resume is untyped
     dispatch(robotActions.resume())
     dispatch(push('/run'))
   }
   const cancel = () => {
-    // $FlowFixMe(mc, 2019-07-01): RPC robotActions.cancel is untyped
     dispatch(robotActions.cancel())
     dispatch(push('/run'))
   }

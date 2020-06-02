@@ -48,11 +48,8 @@ const mapStateToProps = (state: State): SP => ({
 })
 
 const mapDispatchToProps = (dispatch: Dispatch): DP => ({
-  // $FlowFixMe: robotActions.run is not typed
   onRunClick: () => dispatch(robotActions.run()),
-  // $FlowFixMe: robotActions.pause is not typed
   onPauseClick: () => dispatch(robotActions.pause()),
-  // $FlowFixMe: robotActions.resume is not typed
   onResumeClick: () => dispatch(robotActions.resume()),
   onResetClick: () => dispatch(robotActions.refreshSession()),
 })

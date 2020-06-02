@@ -16,7 +16,7 @@ type OP = {||}
 type SP = {|
   nextPipette: Pipette | null,
   labware: Array<Labware>,
-  nextLabware: Labware,
+  nextLabware: Labware | void,
   isTipsProbed: boolean,
 |}
 
