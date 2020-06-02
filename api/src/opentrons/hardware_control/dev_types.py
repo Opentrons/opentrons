@@ -34,4 +34,3 @@ if Protocol is not None:
 
 if Literal is not None:
     DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
-
