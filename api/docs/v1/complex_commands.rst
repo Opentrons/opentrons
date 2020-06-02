@@ -736,7 +736,7 @@ will have the steps
 
 .. note::
 
-    The following scenarios may _not_ work as you expect them to.
+    The following scenarios may **not** work as you expect them to.
 
     .. code-block:: python
 
