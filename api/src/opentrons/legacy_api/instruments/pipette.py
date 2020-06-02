@@ -1377,12 +1377,12 @@ class Pipette(CommandPublisher):
             a linear gradient between the two volumes in the tuple.
 
         source : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, from where
-            liquid will be :any:`aspirate`ed from.
+            Single :any:`Placeable` or list of :any:`Placeable`\\ s, from where
+            liquid will be :any:`aspirate`\\ d from.
 
         dest : Placeable or list
-            Single :any:`Placeable` or list of :any:`Placeable`s, where
-            liquid will be :any:`dispense`ed to.
+            Single :any:`Placeable` or list of :any:`Placeable`\\ s, where
+            liquid will be :any:`dispense`\\ ed to.
 
         new_tip : str
             The number of clean tips this transfer command will use. If
