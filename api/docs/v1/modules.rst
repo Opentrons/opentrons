@@ -139,6 +139,7 @@ We can read the target temperature of the module by the following:
     plate = labware.load('96-flat', slot, share=True)
 
     temperature = module.target
+
 This will return a float of the temperature that the module is trying to reach.
 
 Deactivate
