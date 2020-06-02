@@ -210,7 +210,7 @@ const DeckSetupContents = (props: ContentsProps) => {
   const allModules: Array<ModuleOnDeck> = values(initialDeckSetup.modules)
 
   // NOTE: naively hard-coded to show warning north of slots 1 or 3 when occupied by any module
-  let multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
+  const multichannelWarningSlots: Array<DeckDefSlot> = showGen1MultichannelCollisionWarnings
     ? compact([
         (allModules.some(
           moduleOnDeck =>

@@ -19,7 +19,7 @@ export const mixFormToArgs = (
 ): MixStepArgs => {
   const { labware, pipette } = hydratedFormData
 
-  let unorderedWells = hydratedFormData.wells || []
+  const unorderedWells = hydratedFormData.wells || []
   const orderFirst = hydratedFormData.mix_wellOrder_first
   const orderSecond = hydratedFormData.mix_wellOrder_second
 

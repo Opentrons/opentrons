@@ -15,8 +15,8 @@ export function mergeWhen<T>(
   let canMerge = true
 
   for (let i = 0; i + 1 < array.length; i++) {
-    let current = array[i]
-    let next = array[i + 1]
+    const current = array[i]
+    const next = array[i + 1]
 
     if (canMerge) {
       if (predicate(current, next)) {

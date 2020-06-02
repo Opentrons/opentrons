@@ -47,11 +47,12 @@ export const makeWellSetHelpers = (): {|
     labwareDef: LabwareDefinition2
   ) => boolean,
 |} => {
-  let cache: {
+  const cache: {
     [labwareDefURI: string]: ?{|
       labwareDef: LabwareDefinition2,
       wellSetByPrimaryWell: WellSetByPrimaryWell,
     |},
+    ...,
   } = {}
 
   const getAllWellSetsForLabware = (

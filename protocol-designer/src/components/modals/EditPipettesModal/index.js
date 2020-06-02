@@ -69,8 +69,8 @@ const makeUpdatePipettes = (
   closeModal
 ) => ({ pipettes: newPipetteArray }) => {
   const prevPipetteIds = Object.keys(prevPipettes)
-  let usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
-  let nextPipettes: {
+  const usedPrevPipettes: Array<string> = [] // IDs of pipettes in prevPipettes that were already put into nextPipettes
+  const nextPipettes: {
     [pipetteId: string]: {
       mount: string,
       name: string,
@@ -88,7 +88,7 @@ const makeUpdatePipettes = (
         const alreadyUsed = usedPrevPipettes.some(usedId => usedId === id)
         return !alreadyUsed && prevPipette.name === newPipette.name
       })
-      let pipetteId: ?string = candidatePipetteIds[0]
+      const pipetteId: ?string = candidatePipetteIds[0]
       if (pipetteId) {
         // update used pipette list
         usedPrevPipettes.push(pipetteId)

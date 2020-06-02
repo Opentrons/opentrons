@@ -69,7 +69,7 @@ export function getSpacingIfUniform(
     ROUNDING_PRECISION
   )
 
-  for (var i = 2; i < wellPositions.length; i++) {
+  for (let i = 2; i < wellPositions.length; i++) {
     const pos = wellPositions[i]
     const prevWellPos = wellPositions[i - 1]
     const spacing = round(pos - prevWellPos, ROUNDING_PRECISION)

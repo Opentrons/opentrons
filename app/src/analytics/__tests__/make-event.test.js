@@ -74,7 +74,7 @@ describe('analytics events map', () => {
   })
 
   describe('events with protocol data', () => {
-    var protocolData = { foo: 'bar' }
+    const protocolData = { foo: 'bar' }
 
     beforeEach(() => {
       selectors.getProtocolAnalyticsData.mockResolvedValue(protocolData)

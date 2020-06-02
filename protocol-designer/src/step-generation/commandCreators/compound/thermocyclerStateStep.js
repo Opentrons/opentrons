@@ -35,7 +35,7 @@ export const thermocyclerStateStep: CommandCreator<ThermocyclerStateStepArgs> = 
     deactivateLidTemperature,
   } = thermocyclerStateDiff(thermocyclerState, args)
 
-  let commandCreators: Array<CurriedCommandCreator> = []
+  const commandCreators: Array<CurriedCommandCreator> = []
 
   if (lidOpen) {
     commandCreators.push(

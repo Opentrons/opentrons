@@ -8,7 +8,7 @@ export const getNewProtocolModal = (state: BaseState) =>
   navigationRootSelector(state).newProtocolModal
 
 export const getCurrentPage: Selector<Page> = (state: BaseState) => {
-  let page = navigationRootSelector(state).page
+  const page = navigationRootSelector(state).page
 
   return page
 }

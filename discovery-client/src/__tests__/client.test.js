@@ -540,7 +540,7 @@ describe('discovery client', () => {
     const client = createDiscoveryClient({ candidates: ['localhost'] })
     const expectedCandidates = [{ ip: 'localhost', port: 31950 }]
 
-    let result = client.setPollInterval(1000)
+    const result = client.setPollInterval(1000)
     expect(result).toBe(client)
     expect(poller.poll).toHaveBeenLastCalledWith(
       expectedCandidates,
