@@ -480,8 +480,8 @@ Thermocycler profiles are defined for the Protocol API as lists of dicts. Each d
 .. code-block:: python
 
         profile = [
-          {temperature: 10, hold_time_seconds: 30},
-          {temperature: 60, hold_time_seconds: 45}]
+          {'temperature': 10, 'hold_time_seconds': 30},
+          {'temperature': 60, 'hold_time_seconds': 45}]
 
 Once you have written your profile, you command the Thermocycler to execute it using :py:meth:`.ThermocyclerContext.execute_profile`. This function executes your profile steps multiple times depending on the ``repetitions`` parameter. It also takes a ``block_max_volume`` parameter, which is the same as that of the :py:meth:`.ThermocyclerContext.set_block_temperature` function.
 
@@ -490,8 +490,8 @@ For instance, you can execute the profile defined above 100 times for a 30 µL-p
 .. code-block:: python
 
         profile = [
-          {temperature: 10, hold_time_seconds: 30},
-          {temperature: 60, hold_time_seconds: 30}]
+          {'temperature': 10, 'hold_time_seconds': 30},
+          {'temperature': 60, 'hold_time_seconds': 30}]
 
         tc_mod.execute_profile(steps=profile, repetitions=100, block_max_volume=30)
 
