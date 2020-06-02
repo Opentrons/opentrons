@@ -15,6 +15,11 @@ const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
       ...patch,
       ...getDefaultFields('blockTargetTemp'),
     }
+  } else if (fieldHasChanged(rawForm, patch, 'blockIsActiveHold')) {
+    return {
+      ...patch,
+      ...getDefaultFields('blockTargetTempHold'),
+    }
   }
   return patch
 }
@@ -24,6 +29,11 @@ const updatePatchOnLidChange = (patch: FormPatch, rawForm: FormData) => {
     return {
       ...patch,
       ...getDefaultFields('lidTargetTemp'),
+    }
+  } else if (fieldHasChanged(rawForm, patch, 'lidIsActiveHold')) {
+    return {
+      ...patch,
+      ...getDefaultFields('lidTargetTempHold'),
     }
   }
   return patch
