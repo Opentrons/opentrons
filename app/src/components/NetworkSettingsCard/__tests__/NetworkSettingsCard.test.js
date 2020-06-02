@@ -6,6 +6,7 @@ import { Card } from '@opentrons/components'
 import { AddManualIp } from '../AddManualIp'
 import { NetworkSettingsCard } from '..'
 import { ClearDiscoveryCache } from '../ClearDiscoveryCache'
+import { DisableDiscoveryCache } from '../DisableDiscoveryCache'
 
 describe('NetworkSettingsCard', () => {
   it('should render a card with the proper title', () => {
@@ -22,4 +23,9 @@ describe('NetworkSettingsCard', () => {
     const wrapper = shallow(<NetworkSettingsCard />)
     expect(wrapper.exists(ClearDiscoveryCache)).toBe(true)
   })
+
+  it('should render a DisableDiscoveryCache component', () => {
+    const wrapper = shallow(<DisableDiscoveryCache />)
+    expect(wrapper.exists(DisableDiscoveryCache)).toBe(true)
+    })
 })
