@@ -630,9 +630,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if self.current_state_name ==\
                 CalibrationCheckState.comparingFirstPipetteHeight:
             buffer = HEIGHT_SAFETY_BUFFER
+        current_point = self.hardware.gantry_position(
+            first_pip.mount, critical_point=first_pip.critical_point)
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(first_pip.mount) + buffer
+            await current_point + buffer
 
     async def _register_point_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
@@ -641,9 +643,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if self.current_state_name ==\
                 CalibrationCheckState.comparingSecondPipetteHeight:
             buffer = HEIGHT_SAFETY_BUFFER
+        current_point = self.hardware.gantry_position(
+            second_pip.mount, critical_point=second_pip.critical_point
+        )
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(second_pip.mount) + buffer
+            await current_point + buffer
 
     async def _move_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
