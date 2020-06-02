@@ -2,7 +2,7 @@ import asyncio
 import contextlib
 import logging
 from typing import (Dict, Iterator, List,
-                    Optional, Set, Tuple, Union)
+                    Optional, Set, Tuple, Union, TYPE_CHECKING)
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import (SynchronousAdapter, modules,
@@ -11,7 +11,7 @@ from opentrons.config import feature_flags as fflags
 from opentrons.commands import CommandPublisher
 from opentrons.protocols.types import APIVersion, Protocol
 from .labware import (
-    LabwareDefinition, Labware, get_labware_definition, load_from_definition)
+    Labware, get_labware_definition, load_from_definition)
 from .module_geometry import (
     ModuleGeometry, load_module, resolve_module_model,
     resolve_module_type, models_compatible, ModuleType,
@@ -24,7 +24,8 @@ from .module_contexts import (
     ThermocyclerContext)
 from .util import (AxisMaxSpeeds, HardwareManager,
                    requires_version, HardwareToManage, APIVersionError)
-
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -56,9 +57,9 @@ class ProtocolContext(CommandPublisher):
                  loop: asyncio.AbstractEventLoop = None,
                  hardware: HardwareToManage = None,
                  broker=None,
-                 bundled_labware: Dict[str, LabwareDefinition] = None,
+                 bundled_labware: Dict[str, 'LabwareDefinition'] = None,
                  bundled_data: Dict[str, bytes] = None,
-                 extra_labware: Dict[str, LabwareDefinition] = None,
+                 extra_labware: Dict[str, 'LabwareDefinition'] = None,
                  api_version: APIVersion = None,
                  ) -> None:
         """ Build a :py:class:`.ProtocolContext`.
@@ -288,7 +289,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
-            labware_def: LabwareDefinition,
+            labware_def: 'LabwareDefinition',
             location: types.DeckLocation,
             label: str = None,
     ) -> Labware:

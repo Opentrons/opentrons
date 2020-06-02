@@ -9,7 +9,7 @@ import logging
 import re
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
@@ -18,6 +18,9 @@ from opentrons_shared_data import load_shared_data
 from .types import (Protocol, PythonProtocol, JsonProtocol,
                     Metadata, APIVersion, MalformedProtocolError)
 from .bundle import extract_bundle
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -70,10 +73,10 @@ def _parse_json(
 def _parse_python(
     protocol_contents: str,
     filename: str = None,
-    bundled_labware: Dict[str, Dict[str, Any]] = None,
+    bundled_labware: Dict[str, 'LabwareDefinition'] = None,
     bundled_data: Dict[str, bytes] = None,
     bundled_python: Dict[str, str] = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -132,7 +135,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 def parse(
     protocol_file: Union[str, bytes],
     filename: str = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
     extra_data: Dict[str, bytes] = None
 ) -> Protocol:
     """ Parse a protocol from text.

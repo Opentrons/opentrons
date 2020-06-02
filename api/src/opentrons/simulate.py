@@ -13,7 +13,7 @@ import os
 import pathlib
 import queue
 from typing import (Any, Dict, List, Mapping, TextIO, Tuple, BinaryIO,
-                    Optional, Union)
+                    Optional, Union, TYPE_CHECKING)
 
 
 import opentrons
@@ -28,6 +28,9 @@ from opentrons.protocols import parse, bundle
 from opentrons.protocols.types import (
     PythonProtocol, BundleContents, APIVersion)
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 
 class AccumulatingHandler(logging.Handler):
@@ -114,9 +117,9 @@ class CommandScraper:
 
 def get_protocol_api(
         version: Union[str, APIVersion],
-        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_labware: Dict[str, 'LabwareDefinition'] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Dict[str, Any]] = None,
+        extra_labware: Dict[str, 'LabwareDefinition'] = None,
         hardware_simulator: HardwareToManage = None)\
         -> protocol_api.ProtocolContext:
     """
@@ -179,9 +182,9 @@ def get_protocol_api(
 
 def _build_protocol_context(
         version: APIVersion = None,
-        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_labware: Dict[str, 'LabwareDefinition'] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Dict[str, Any]] = None,
+        extra_labware: Dict[str, 'LabwareDefinition'] = None,
         hardware_simulator: HardwareToManage = None,)\
         -> protocol_api.ProtocolContext:
     """ Internal version of :py:meth:`get_protocol_api` that allows deferring
@@ -207,7 +210,7 @@ def bundle_from_sim(
     From a protocol, and the context that has finished simulating that
     protocol, determine what needs to go in a bundle for the protocol.
     """
-    bundled_labware: Dict[str, Dict[str, Any]] = {}
+    bundled_labware: Dict[str, 'LabwareDefinition'] = {}
     for lw in context.loaded_labwares.values():
         if isinstance(lw, opentrons.protocol_api.labware.Labware)\
            and lw.uri not in bundled_labware:
