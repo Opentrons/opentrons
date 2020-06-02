@@ -1,11 +1,15 @@
 import asyncio
 from typing import List
 from .modules import ModuleAtPort
+from .types import HardwareEventType
 try:
     from typing_extensions import Protocol
 except ModuleNotFoundError:
     Protocol = None  # type: ignore
-
+try:
+    from typing_extensions import Literal
+except ModuleNotFoundError:
+    Literal = None  # type: ignore
 # this file defines types that require dev dependencies
 # and are only relevant for static typechecking.
 #
@@ -27,3 +31,6 @@ if Protocol is not None:
         @property
         def loop(self) -> asyncio.AbstractEventLoop:
             ...
+
+if Literal is not None:
+    DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
