@@ -1442,7 +1442,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ...
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '5') # doctest: +SKIP
