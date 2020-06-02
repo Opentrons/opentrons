@@ -424,7 +424,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '2') # doctest: +SKIP
@@ -526,7 +526,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
@@ -688,7 +688,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '4') # doctest: +SKIP
@@ -748,7 +748,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
@@ -812,7 +812,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '8') # doctest: +SKIP
@@ -895,7 +895,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='left') # doctest: +SKIP
@@ -941,7 +941,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
@@ -996,7 +996,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('GEB-tiprack-300', '2') # doctest: +SKIP
@@ -1106,7 +1106,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> tiprack = labware.load('opentrons_96_tiprack_300ul', 'C2') # doctest: +SKIP  # noqa E501
@@ -1282,7 +1282,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> p300 = instruments.P300_Single(mount='right') # doctest: +SKIP
@@ -1310,7 +1310,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', '3') # doctest: +SKIP
@@ -1342,7 +1342,7 @@ class Pipette(CommandPublisher):
 
         Examples
         --------
-        ..
+
         >>> from opentrons import instruments, labware, robot # doctest: +SKIP
         >>> robot.reset() # doctest: +SKIP
         >>> plate = labware.load('96-flat', 'A3') # doctest: +SKIP
