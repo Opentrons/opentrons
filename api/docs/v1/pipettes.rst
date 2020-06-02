@@ -20,8 +20,6 @@ Pipette Model(s)
 ===================
 Currently in our API there are 10 pipette models to correspond with the offered pipette models on our website.
 
-.. note::
-
 They are as follows:
 
 - ``P10_Single`` (1 - 10 ul)
