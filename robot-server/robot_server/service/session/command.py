@@ -1,8 +1,7 @@
 from datetime import datetime
 
-from robot_server.service.models.session import CommandName, CommandDataType
 from robot_server.service.session.models import IdentifierType, \
-    create_identifier
+    create_identifier, CommandName, CommandDataType
 
 
 class Command:
