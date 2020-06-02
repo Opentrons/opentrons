@@ -41,10 +41,7 @@ describe('DisableDiscoveryCache', () => {
 
   beforeEach(() => {
     stubSelector(getConfig, {
-      discovery: {
-        candidates: [],
-        disableCache: false,
-      },
+      discovery: { candidates: [], disableCache: false },
     })
   })
 
@@ -68,24 +65,27 @@ describe('DisableDiscoveryCache', () => {
 
   it('updates the toggle status according to disableCache config', () => {
     stubSelector(getConfig, {
-      discovery: {
-        candidates: [],
-        disableCache: true,
-      },
+      discovery: { candidates: [], disableCache: true },
     })
     const wrapper = render()
-    const theToggle = wrapper.find(LabeledToggle)
-    expect(theToggle.prop('toggledOn')).toBe(true)
+    expect(wrapper.find(LabeledToggle).prop('toggledOn')).toBe(true)
+
+    // toggle switches value
+    stubSelector(getConfig, {
+      discovery: { candidates: [], disableCache: false },
+    })
+
+    // trigger a re-render
+    wrapper.setProps({})
+    expect(wrapper.find(LabeledToggle).prop('toggledOn')).toBe(false)
   })
 
   it('dispatches config update on toggle', () => {
     const wrapper = render()
     const theToggle = wrapper.find(LabeledToggle)
     theToggle.prop('onClick')()
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'config:UPDATE',
-      payload: { path: 'discovery.disableCache', value: true },
-      meta: { shell: true },
-    })
+    expect(dispatch).toHaveBeenCalledWith(
+      AllConfig.updateConfig('discovery.disableCache', true)
+    )
   })
 })

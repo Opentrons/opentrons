@@ -20,7 +20,9 @@ export const DisableDiscoveryCache = () => {
       }}
     >
       <p>
-        NOTE: This will clear cached robots when switched ON
+        NOTE: This will clear cached robots when switched ON.
+      </p>
+      <p>
         Disable caching of previously seen robots. Enabling this setting may
         improve overall networking performance in environments with many OT-2s,
         but may cause initial OT-2 discovery on app launch to be slower and more
