@@ -102,7 +102,6 @@ CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
         "from_state": CalibrationCheckState.inspectingFirstTip,
         "to_state": CalibrationCheckState.badCalibrationData,
         "condition": "_is_tip_pick_up_dangerous",
-        "after": "_return_first_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -215,7 +214,6 @@ CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
         "from_state": CalibrationCheckState.inspectingSecondTip,
         "to_state": CalibrationCheckState.badCalibrationData,
         "condition": "_is_tip_pick_up_dangerous",
-        "after": "_return_second_tip"
     },
     {
         "trigger": CalibrationCheckTrigger.confirm_tip_attached,
@@ -622,7 +620,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=threshold_vector,
                                      exceedsThreshold=exceeds,
-                                     transformType=tform_type)
+                                     transformType=str(tform_type))
         return comparisons
 
     async def _register_point_first_pipette(self):
@@ -632,9 +630,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if self.current_state_name ==\
                 CalibrationCheckState.comparingFirstPipetteHeight:
             buffer = HEIGHT_SAFETY_BUFFER
+        current_point = self.hardware.gantry_position(
+            first_pip.mount, critical_point=first_pip.critical_point)
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(first_pip.mount) + buffer
+            await current_point + buffer
 
     async def _register_point_second_pipette(self):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
@@ -643,9 +643,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if self.current_state_name ==\
                 CalibrationCheckState.comparingSecondPipetteHeight:
             buffer = HEIGHT_SAFETY_BUFFER
+        current_point = self.hardware.gantry_position(
+            second_pip.mount, critical_point=second_pip.critical_point
+        )
         self._saved_points[getattr(CalibrationCheckState,
                                    self.current_state_name)] = \
-            await self.hardware.gantry_position(second_pip.mount) + buffer
+            await current_point + buffer
 
     async def _move_first_pipette(self):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
@@ -706,8 +709,14 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         first_pip = self._get_pipette_by_rank(PipetteRank.first)
         assert first_pip, \
             'cannot drop tip on first mount, pipette not present'
-        state_name = CalibrationCheckState.preparingFirstPipette
-        loc = Location(getattr(self._moves, state_name).position, None)
+        mount = first_pip.mount
+        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
+        state_name = CalibrationCheckState.inspectingFirstTip
+
+        return_pt = self._saved_points[getattr(CalibrationCheckState,
+                                       state_name)]
+        account_for_tip = return_pt - Point(0, 0, z_value)
+        loc = Location(account_for_tip, None)
         await self._move(first_pip.mount, loc)
         await self._drop_tip(first_pip.mount)
 
@@ -715,7 +724,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         second_pip = self._get_pipette_by_rank(PipetteRank.second)
         assert second_pip, \
             'cannot drop tip on second mount, pipette not present'
-        state_name = CalibrationCheckState.preparingSecondPipette
-        loc = Location(getattr(self._moves, state_name).position, None)
+        mount = second_pip.mount
+        z_value = float(self.pipettes[mount]['tip_length']) * 0.5
+        state_name = CalibrationCheckState.inspectingSecondTip
+        return_pt = self._saved_points[getattr(CalibrationCheckState,
+                                       state_name)]
+        account_for_tip = return_pt - Point(0, 0, z_value)
+        loc = Location(account_for_tip, None)
         await self._move(second_pip.mount, loc)
         await self._drop_tip(second_pip.mount)

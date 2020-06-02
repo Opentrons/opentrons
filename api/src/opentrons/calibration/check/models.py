@@ -4,8 +4,6 @@ from typing import Dict, Optional, List, Any, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
 
-from opentrons.calibration.helper_classes import DeckCalibrationError
-
 
 OffsetVector = Tuple[float, float, float]
 
@@ -77,7 +75,7 @@ class ComparisonStatus(BaseModel):
     differenceVector: OffsetVector = OffsetVectorField()
     thresholdVector:  OffsetVector = OffsetVectorField()
     exceedsThreshold: bool
-    transformType: DeckCalibrationError
+    transformType: str
 
 
 class CalibrationSessionStatus(BaseModel):
