@@ -40,7 +40,7 @@ export const getAnalyticsPropsForRobotSessionById: (
 
   if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
     const { instruments, comparisonsByStep } = session.details
-    const initialModelsByMount: Types.AnalyticsModelsByMount = {}
+    const initialModelsByMount: $Shape<Types.AnalyticsModelsByMount> = {}
     const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
       instruments
     ).reduce(
@@ -50,7 +50,7 @@ export const getAnalyticsPropsForRobotSessionById: (
       }),
       initialModelsByMount
     )
-    const initialStepData: Types.CalibrationCheckAnalyticsData = {}
+    const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
       (acc, stepName) => {
         const {

@@ -251,12 +251,10 @@ export type SharedAnalyticsProps = {|
   sessionType: SessionType,
 |}
 
-export type CalibrationCheckSessionAnalyticsProps =
-  | {|
-      ...SharedAnalyticsProps,
-      ...AnalyticsModelsByMount,
-      ...CalibrationCheckAnalyticsData,
-    |}
-  | {||}
+export type CalibrationCheckSessionAnalyticsProps = {|
+  ...SharedAnalyticsProps,
+  ...AnalyticsModelsByMount,
+  ...CalibrationCheckAnalyticsData,
+|}
 
 export type SessionAnalyticsProps = CalibrationCheckSessionAnalyticsProps
