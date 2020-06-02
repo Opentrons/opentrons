@@ -59,7 +59,7 @@ describe('DisableDiscoveryCache', () => {
     expect(theToggle.prop('toggledOn')).toBe(false)
   })
 
-  it('updates the toggle on change to disableCache', () => {
+  it('updates the toggle status according to disableCache config', () => {
     stubSelector(getConfig, {
       discovery: {
         candidates: [],
