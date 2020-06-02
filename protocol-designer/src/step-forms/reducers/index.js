@@ -41,7 +41,7 @@ import {
   getIdsInRange,
 } from '../utils'
 import { getLabwareOnModule } from '../../ui/modules/utils'
-import { PROFILE_STEP } from '../../form-types'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -54,6 +54,7 @@ import type {
   FormData,
   StepIdType,
   StepType,
+  ProfileCycleItem,
   ProfileStepItem,
 } from '../../form-types'
 import type {
@@ -68,6 +69,7 @@ import type {
   DeleteStepAction,
   PopulateFormAction,
   ReorderStepsAction,
+  AddProfileCycleAction,
   AddProfileStepAction,
   DeleteProfileStepAction,
   EditProfileStepAction,
@@ -97,9 +99,28 @@ import type {
 
 type FormState = FormData | null
 
+// TODO IMMEDIATELY factor out
+export const createInitialProfileCycle = (id: string): ProfileCycleItem => ({
+  id,
+  type: PROFILE_CYCLE,
+  repetitions: '',
+  steps: [],
+})
+
+// TODO IMMEDIATELY factor out
+const createInitialProfileStep = (id: string): ProfileStepItem => ({
+  type: PROFILE_STEP,
+  id,
+  title: '',
+  temperature: '',
+  durationMinutes: '',
+  durationSeconds: '',
+})
+
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
 type UnsavedFormActions =
+  | AddProfileCycleAction
   | AddStepAction
   | ChangeFormInputAction
   | PopulateFormAction
@@ -120,6 +141,24 @@ export const unsavedForm = (
     ? rootState.unsavedForm
     : unsavedFormInitialState
   switch (action.type) {
+    case 'ADD_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'ADD_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
+      const id = uuid()
+
+      return {
+        ...unsavedFormState,
+        orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: createInitialProfileCycle(id),
+        },
+      }
+    }
     case 'ADD_STEP': {
       return createPresavedStepForm({
         stepType: action.payload.stepType,
@@ -163,7 +202,7 @@ export const unsavedForm = (
 
       if (
         unsavedFormState &&
-        unsavedFormState.pipette &&
+        unsavedFormState?.pipette && // TODO(IL, 2020-06-02): Flow should know unsavedFormState is not null here (so keys are safe to access), but it's being dumb
         unsavedFormState.pipette in substitutionMap &&
         unsavedFormState.id &&
         stepIdsToUpdate.includes(unsavedFormState.id)
@@ -189,21 +228,32 @@ export const unsavedForm = (
         return unsavedFormState
       }
       const id = uuid()
+
+      const newStep = createInitialProfileStep(id)
+
+      if (action.payload !== null) {
+        const { cycleId } = action.payload
+        const targetCycle = unsavedFormState.profileItemsById[cycleId]
+        // add to cycle
+        return {
+          ...unsavedFormState,
+          profileItemsById: {
+            ...unsavedFormState.profileItemsById,
+            [cycleId]: {
+              ...targetCycle,
+              steps: [...targetCycle.steps, newStep],
+            },
+          },
+        }
+      }
       // TODO factor this createInitialProfileStep out somewhere
-      const createInitialProfileStep = (): ProfileStepItem => ({
-        type: PROFILE_STEP,
-        id,
-        title: '',
-        temperature: '',
-        durationMinutes: '',
-        durationSeconds: '',
-      })
+
       return {
         ...unsavedFormState,
         orderedProfileItems: [...unsavedFormState.orderedProfileItems, id],
         profileItemsById: {
           ...unsavedFormState.profileItemsById,
-          [id]: createInitialProfileStep(),
+          [id]: newStep,
         },
       }
     }

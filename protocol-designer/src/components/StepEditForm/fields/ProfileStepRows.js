@@ -5,13 +5,18 @@ import { InputField, OutlineButton, Icon } from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
+import { PROFILE_CYCLE } from '../../../form-types'
 import {
   getProfileFieldErrors,
   maskProfileField,
 } from '../../../steplist/fieldLevel'
 import { getDynamicFieldFocusHandlerId } from '../utils'
 import styles from '../StepEditForm.css'
-import type { ProfileStepItem } from '../../../form-types'
+import type {
+  ProfileStepItem,
+  ProfileItem,
+  ProfileCycleItem,
+} from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
 export const showProfileFieldErrors = ({
@@ -28,8 +33,65 @@ export const showProfileFieldErrors = ({
 export type ProfileStepRowsProps = {|
   focusHandlers: FocusHandlers,
 |}
+
+type ProfileStepItemRowProps = {|
+  stepItem: ProfileStepItem,
+  focusHandlers: FocusHandlers,
+|}
+const ProfileStepItemRow = (props: ProfileStepItemRowProps) => {
+  const { focusHandlers, stepItem } = props // TODO IMMEDIATELY rename var
+  const dispatch = useDispatch() // TODO consider passing action creator into dumb component
+
+  const updateStepFieldValue = (name: string, value: string) => {
+    const maskedValue = maskProfileField(name, value)
+    dispatch(
+      steplistActions.editProfileStep({
+        id: stepItem.id,
+        fields: { [name]: maskedValue },
+      })
+    )
+  }
+
+  const deleteProfileStep = () => {
+    dispatch(steplistActions.deleteProfileStep({ id: stepItem.id }))
+  }
+
+  return (
+    <div>
+      <ProfileStepRow
+        deleteProfileStep={deleteProfileStep}
+        profileStepItem={stepItem}
+        updateStepFieldValue={updateStepFieldValue}
+        focusHandlers={focusHandlers}
+      />
+    </div>
+  )
+}
+
+type ProfileCycleRowProps = {|
+  cycleItem: ProfileCycleItem,
+  focusHandlers: FocusHandlers,
+|}
+export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
+  const { cycleItem, focusHandlers } = props
+  return (
+    <div>
+      <div>TODO: cycle</div>
+      {cycleItem.steps.map((stepItem, index) => (
+        <ProfileStepItemRow
+          stepItem={stepItem}
+          focusHandlers={focusHandlers}
+          key={index}
+        />
+      ))}
+      <div>---</div>
+    </div>
+  )
+}
+
 export const ProfileStepRows = (props: ProfileStepRowsProps) => {
   const dispatch = useDispatch()
+  const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
 
   const unsavedForm = useSelector(getUnsavedForm)
@@ -40,31 +102,24 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
   const { orderedProfileItems, profileItemsById } = unsavedForm
 
   const rows = orderedProfileItems.map((itemId, index) => {
-    const updateStepFieldValue = (name: string, value: string) => {
-      const maskedValue = maskProfileField(name, value)
-      dispatch(
-        steplistActions.editProfileStep({
-          id: itemId,
-          fields: { [name]: maskedValue },
-        })
+    const itemFields: ProfileItem = profileItemsById[itemId]
+
+    if (itemFields.type === PROFILE_CYCLE) {
+      return (
+        <ProfileCycleRow
+          cycleItem={itemFields}
+          focusHandlers={props.focusHandlers}
+          key={index}
+        />
       )
     }
 
-    const deleteProfileStep = () => {
-      dispatch(steplistActions.deleteProfileStep({ id: itemId }))
-    }
-
-    const itemFields = profileItemsById[itemId]
-
     return (
-      <div key={index}>
-        <ProfileStepRow
-          deleteProfileStep={deleteProfileStep}
-          profileStepItem={itemFields}
-          updateStepFieldValue={updateStepFieldValue}
-          focusHandlers={props.focusHandlers}
-        />
-      </div>
+      <ProfileStepItemRow
+        stepItem={itemFields}
+        focusHandlers={props.focusHandlers}
+        key={index}
+      />
     )
   })
 
@@ -79,7 +134,8 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
       )}
       {rows}
       <div className={styles.profile_button_group}>
-        <OutlineButton onClick={addProfileStep}>+ Add Step</OutlineButton>
+        <OutlineButton onClick={addProfileStep}>+ Step</OutlineButton>
+        <OutlineButton onClick={addProfileCycle}>+ Cycle</OutlineButton>
       </div>
     </>
   )

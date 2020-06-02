@@ -13,6 +13,7 @@ import {
   presavedStepForm,
   savedStepForms,
   unsavedForm,
+  createInitialProfileCycle,
 } from '../reducers'
 import {
   _getPipetteEntitiesRootState,
@@ -26,18 +27,23 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { uuid } from '../../utils'
 import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
 jest.mock('../utils/createPresavedStepForm')
 jest.mock('../../utils/labwareModuleCompatibility')
+jest.mock('../../utils')
+
+const mockUuid: JestMockFn<[], string> = uuid
 
 const mockCreatePresavedStepForm: JestMockFn<
   [CreatePresavedStepFormArgs],
@@ -66,7 +72,7 @@ const mock_getInitialDeckSetupRootState: JestMockFn<
   any
 > = _getInitialDeckSetupRootState
 
-beforeEach(() => {
+afterEach(() => {
   jest.clearAllMocks()
 })
 
@@ -1142,6 +1148,74 @@ describe('unsavedForm reducer', () => {
         },
       ],
     ])
+  })
+
+  it('should add a profile cycle item upon ADD_PROFILE_CYCLE action', () => {
+    const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
+
+    const id = 'newCycleId'
+    mockUuid.mockReturnValue(id)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [],
+        profileItemsById: {},
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [id],
+      profileItemsById: {
+        [id]: createInitialProfileCycle(id),
+      },
+    })
+  })
+
+  it('should add a profile step item to the specified cycle upon ADD_PROFILE_STEP action with cycleId payload', () => {
+    const cycleId = 'someCycleId'
+    const stepId = 'newStepId'
+    const action = { type: 'ADD_PROFILE_STEP', payload: { cycleId } }
+
+    mockUuid.mockReturnValue(stepId)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            repetitions: '1',
+            steps: [],
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          ...state.unsavedForm.profileItemsById[cycleId],
+          steps: [
+            {
+              id: stepId,
+              type: PROFILE_STEP,
+              title: '',
+              temperature: '',
+              durationMinutes: '',
+              durationSeconds: '',
+            },
+          ],
+        },
+      },
+    })
   })
 })
 

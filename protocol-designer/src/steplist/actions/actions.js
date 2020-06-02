@@ -91,3 +91,14 @@ export const editProfileStep = (
   type: 'EDIT_PROFILE_STEP',
   payload,
 })
+
+export type AddProfileCycleAction = {|
+  type: 'ADD_PROFILE_CYCLE',
+  payload: null,
+|}
+export const addProfileCycle = (
+  payload: $PropertyType<AddProfileStepAction, 'payload'>
+) => ({
+  type: 'ADD_PROFILE_CYCLE',
+  payload,
+})
