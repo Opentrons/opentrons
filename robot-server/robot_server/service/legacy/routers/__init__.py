@@ -2,7 +2,6 @@ from fastapi import APIRouter
 
 from . import health, networking, control, settings, deck_calibration, \
     modules, pipettes, motors, camera, logs, rpc
-from ...session import router
 
 legacy_routes = APIRouter()
 
@@ -19,7 +18,3 @@ legacy_routes.include_router(router=motors.router, tags=["Motors"])
 legacy_routes.include_router(router=camera.router, tags=["Camera"])
 legacy_routes.include_router(router=logs.router, tags=["Logs"])
 legacy_routes.include_router(router=rpc.router, tags=["RPC"])
-
-routes = APIRouter()
-routes.include_router(router=router.router,
-                      tags=["Session Management"])

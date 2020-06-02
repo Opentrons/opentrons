@@ -5,15 +5,15 @@ from pydantic import BaseModel, Field, validator
 from opentrons.calibration.check import models as calibration_models
 from opentrons.calibration.check.session import CalibrationCheckTrigger
 
-
-from robot_server.service.legacy.models import EmptyModel
-from robot_server.service.json_api.response import ResponseDataModel,\
-    ResponseModel
-from robot_server.service.json_api.request import RequestDataModel,\
-    RequestModel
+from robot_server.service.json_api import \
+    ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
 
 
 SessionDetails = typing.Union[calibration_models.CalibrationSessionStatus]
+
+
+class EmptyModel(BaseModel):
+    pass
 
 
 class SessionCommands(str, Enum):
