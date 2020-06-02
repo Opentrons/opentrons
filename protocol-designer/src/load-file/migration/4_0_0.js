@@ -21,7 +21,7 @@ export const migrateSavedStepForms = (savedStepForms: { [string]: any }) => {
   return mapValues(savedStepForms, stepForm => {
     if (stepForm.stepType === 'pause') {
       const prevPauseActionValue = stepForm.pauseForAmountOfTime
-      let res = omit(stepForm, 'pauseForAmountOfTime')
+      const res = omit(stepForm, 'pauseForAmountOfTime')
       res.pauseAction = PAUSE_ACTION_MAP[prevPauseActionValue]
       return res
     }

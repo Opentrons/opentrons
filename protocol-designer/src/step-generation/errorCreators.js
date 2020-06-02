@@ -102,3 +102,10 @@ export const modulePipetteCollisionDanger = (): CommandCreatorError => {
       'Gen 1 8-Channel pipettes cannot access labware or tip racks in slot 4 or 6 because they are adjacent to modules.',
   }
 }
+
+export const thermocyclerLidClosed = (): CommandCreatorError => {
+  return {
+    type: 'THERMOCYCLER_LID_CLOSED',
+    message: 'Attempted to pipette into a thermocycler with the lid closed.',
+  }
+}

@@ -1,14 +1,11 @@
 // @flow
 // redux action types to analytics events map
-import head from 'lodash/head'
 import { createLogger } from '../logger'
 import { selectors as robotSelectors } from '../robot'
 import { getConnectedRobot } from '../discovery'
-import { getRobotCalibrationCheckSession } from '../calibration'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
-import * as calibrationActions from '../calibration/constants'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -257,39 +254,25 @@ export function makeEvent(
       })
     }
 
-    case calibrationActions.CREATE_ROBOT_CALIBRATION_CHECK_SESSION_SUCCESS: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
-
-      return Promise.resolve({
-        name: 'calibrationCheckStart',
-        properties: { ...sessionData },
-      })
-    }
-
-    case calibrationActions.COMPLETE_ROBOT_CALIBRATION_CHECK: {
-      const { robotName } = action.payload
-      const sessionData = getRobotCalibrationCheckSession(state, robotName)
-
-      return Promise.resolve({
-        name: 'calibrationCheckPass',
-        properties: { ...sessionData },
-      })
-    }
-
     case SystemInfo.INITIALIZED:
-    case SystemInfo.USB_DEVICE_ADDED: {
-      const devices = action.payload.usbDevice
-        ? [action.payload.usbDevice]
-        : action.payload.usbDevices
+    case SystemInfo.USB_DEVICE_ADDED:
+    case SystemInfo.NETWORK_INTERFACES_CHANGED: {
+      const systemInfoProps = SystemInfo.getU2EDeviceAnalyticsProps(state)
 
-      const superProperties = head(
-        devices
-          .filter(SystemInfo.isRealtekDevice)
-          .map(SystemInfo.deviceToU2EAnalyticsProps)
+      return Promise.resolve(
+        systemInfoProps
+          ? {
+              superProperties: {
+                ...systemInfoProps,
+                // anonymize IP address so analytics profile can't be mapped to more
+                // specific Intercom support profile
+                'U2E IPv4 Address': Boolean(
+                  systemInfoProps['U2E IPv4 Address']
+                ),
+              },
+            }
+          : null
       )
-
-      return Promise.resolve(superProperties ? { superProperties } : null)
     }
   }
 

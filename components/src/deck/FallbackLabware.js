@@ -10,7 +10,7 @@ import styles from './Labware.css'
 /**
  * @deprecated No longer necessary, do not use
  */
-export function FallbackLabware() {
+export function FallbackLabware(): React.Node {
   return (
     <g>
       <LabwareOutline width={SLOT_RENDER_WIDTH} height={SLOT_RENDER_HEIGHT} />

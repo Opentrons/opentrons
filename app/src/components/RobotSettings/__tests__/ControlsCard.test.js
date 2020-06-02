@@ -57,7 +57,7 @@ describe('ControlsCard', () => {
 
   const getRobotCalibrationCheckButton = wrapper =>
     wrapper
-      .find({ label: 'Check deck calibration' })
+      .find({ label: 'Check robot calibration' })
       .find(LabeledButton)
       .find('button')
 

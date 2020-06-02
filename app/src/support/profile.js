@@ -1,7 +1,5 @@
 // @flow
 // functions for managing the user's Intercom profile
-import head from 'lodash/head'
-
 import { version as appVersion } from '../../package.json'
 import { FF_PREFIX, getRobotAnalyticsData } from '../analytics'
 import { getConnectedRobot } from '../discovery'
@@ -95,18 +93,9 @@ export function makeProfileUpdate(
     }
 
     case SystemInfo.INITIALIZED:
-    case SystemInfo.USB_DEVICE_ADDED: {
-      const devices = action.payload.usbDevice
-        ? [action.payload.usbDevice]
-        : action.payload.usbDevices
-
-      const update = head(
-        devices
-          .filter(SystemInfo.isRealtekDevice)
-          .map(SystemInfo.deviceToU2EAnalyticsProps)
-      )
-
-      return update ?? null
+    case SystemInfo.USB_DEVICE_ADDED:
+    case SystemInfo.NETWORK_INTERFACES_CHANGED: {
+      return SystemInfo.getU2EDeviceAnalyticsProps(state)
     }
   }
   return null

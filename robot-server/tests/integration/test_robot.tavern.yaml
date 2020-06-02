@@ -1,0 +1,126 @@
+---
+test_name: GET list of useful robot positions
+marks:
+  - usefixtures:
+    - run_server
+stages:
+  - name: Get robot positions
+    request:
+      method: GET
+      url: "{host:s}:{port:d}/robot/positions"
+    response:
+      status_code: 200
+      json:
+        positions:
+          change_pipette:
+            target: mount
+            left:
+              - !anyfloat
+              - !anyfloat
+              - !anyfloat
+            right:
+              - !anyfloat
+              - !anyfloat
+              - !anyfloat
+          attach_tip:
+            target: pipette
+            point:
+              - !anyfloat
+              - !anyfloat
+              - !anyfloat
+---
+test_name: POST Move Robot
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: GET the left pipette attached to the robot
+    request:
+      method: GET
+      url: "{host:s}:{port:d}/pipettes"
+    response:
+      status_code: 200
+      save:
+        json:
+          left_pipette: left.model
+  - name: POST Move the left pipette to a specific location
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/robot/move"
+      json:
+        target: pipette
+        point:
+          - 200.0
+          - 90.0
+          - 150.0
+        mount: left
+        model: "{left_pipette}"
+    response:
+      status_code: 200
+      json:
+        message: !re_search "Move complete"
+---
+test_name: POST Robot Home
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Home the Robot
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/robot/home"
+      json:
+        target: pipette
+        mount: right
+    response:
+      status_code: 200
+      json:
+        message: Pipette on {tavern.request_vars.json.mount} homed successfully
+---
+test_name: Turn on the robot lights
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: POST Robot Lights
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/robot/lights"
+      json:
+        "on": true # needed to escape "on" because it is a keyword
+    response:
+      status_code: 200
+      json:
+        "on": true
+  - name: GET Robot lights status
+    request:
+      method: GET
+      url: "{host:s}:{port:d}/robot/lights"
+    response:
+      status_code: 200
+      json:
+        "on": true
+---
+test_name: Turn off the robot lights
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: POST Robot Lights
+    request:
+      method: POST
+      url: "{host:s}:{port:d}/robot/lights"
+      json:
+        "on": false
+    response:
+      status_code: 200
+      json:
+        "on": false
+  - name: GET Robot lights status
+    request:
+      method: GET
+      url: "{host:s}:{port:d}/robot/lights"
+    response:
+      status_code: 200
+      json:
+        "on": false

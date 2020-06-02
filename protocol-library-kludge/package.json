@@ -9,7 +9,7 @@
   },
   "name": "protocol-library-kludge",
   "private": true,
-  "version": "3.17.1",
+  "version": "3.19.0-alpha.0",
   "productName": "Opentrons Protocol Library",
   "description": "Protocol library stuff (WIP)",
   "main": "src/index.js",
@@ -20,10 +20,10 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hot-loader/react-dom": "16.8.6",
-    "@opentrons/components": "3.17.1",
-    "@opentrons/shared-data": "3.17.1",
-    "classnames": "^2.2.5",
-    "lodash": "^4.17.4",
+    "@opentrons/components": "3.19.0-alpha.0",
+    "@opentrons/shared-data": "3.19.0-alpha.0",
+    "classnames": "2.2.5",
+    "lodash": "4.17.15",
     "react": "16.8.6",
     "react-dom": "16.8.6",
     "react-hot-loader": "^4.12.19"

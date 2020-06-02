@@ -1,4 +1,4 @@
-Anchor link primitive. Renders an `<a>` by default with `text-decoration: none;`
+Anchor link primitive. Renders an `<a>` by default with `text-decoration: none;` and accepts all primitive styling props.
 
 ```js
 <Link href={'#'}>hello anchor</Link>
@@ -12,7 +12,7 @@ A `<Link>` can be marked as `external` to open links in a new tab (`target="_bla
 </Link>
 ```
 
-`<Link>` is a [StyledComponent](https://styled-components.com/docs/basics#getting-started), and accepts an `as` prop to render as any other DOM element or React component (e.g. `<Link>` from `react-router-dom`). It also takes all the same styling props as the `<Text>` primitive.
+`<Link>` is a [StyledComponent](https://styled-components.com/docs/basics#getting-started), and accepts an `as` prop to render as any other DOM element or React component (e.g. `<Link>` from `react-router-dom`).
 
 ```js
 import {

@@ -3,24 +3,21 @@ import * as React from 'react'
 import { Icon, PrimaryButton, Link } from '@opentrons/components'
 import styles from './styles.css'
 
-const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Bad calibration data detected'
+const BAD_ROBOT_CALIBRATION_CHECK_HEADER = 'Unable to check robot calibration'
 const SUMMARY =
-  'Robot is unable to continue checking calibration, as a result of bad calibration data which is likely to cause a crash.'
-const REASON =
-  'Based on the current co-ordinates of the pipette relative to the tip rack, the specified position is significantly off from the expected location of the target tip position for a standard Opentrons tip in this slot.'
-const ENSURE_TIPS_CORRECT =
-  'Please ensure you are using the correct Opentrons-brand tips, as an incorrect tip can also cause this error'
+  "Your pipette tip pick-up location does not match its calibrated location. This may occur if the tip rack is out of place, or if your robot's deck is out of calibration"
+const TO_TROUBLESHOOT = 'To troubleshoot this issue:'
+const TIP_RACK_CENTERED = 'Confirm your tip rack is centered in its slot'
+const USE_OPENTRONS_TIPS = 'Confirm you are using Opentrons brand tips'
 const PERFORM_CALIBRATION =
-  'Please perform a deck transform calibration on this robot. View'
+  'If you continue to see this error, exit calibration check and complete a deck calibration. View'
 const THIS_ARTICLE = 'this article'
 const LEARN_MORE = 'to learn more'
 const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT =
-  'Drop tip and exit calibration check'
+  'Drop tip and exit robot calibration check'
 
-// TODO: BC: Immediately confirm actual link
 const DECK_CAL_ARTICLE_URL =
-  'https://support.opentrons.com/en/articles/3499692-calibrating-your-ot-2'
-
+  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
 type CompleteConfirmationProps = {|
   exit: () => mixed,
 |}
@@ -35,8 +32,11 @@ export function BadCalibration(props: CompleteConfirmationProps) {
       </div>
       <div className={styles.bad_cal_body}>
         <p className={styles.error_explanation}>{SUMMARY}</p>
-        <p className={styles.error_explanation}>{REASON}</p>
-        <p className={styles.error_explanation}>{ENSURE_TIPS_CORRECT}</p>
+        <p className={styles.error_explanation}>{TO_TROUBLESHOOT}</p>
+        <ul>
+          <li className={styles.error_explanation}>{TIP_RACK_CENTERED}</li>
+          <li className={styles.error_explanation}>{USE_OPENTRONS_TIPS}</li>
+        </ul>
         <p className={styles.error_explanation}>
           {PERFORM_CALIBRATION}
           &nbsp;

@@ -5,14 +5,14 @@ import { act } from 'react-dom/test-utils'
 
 import { BadCalibration } from '../BadCalibration'
 
-jest.mock('../../../calibration/selectors')
-
 describe('Introduction', () => {
   const mockExit = jest.fn()
 
   const getExitButton = wrapper =>
     wrapper
-      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
+      .find(
+        'PrimaryButton[children="Drop tip and exit robot calibration check"]'
+      )
       .find('button')
 
   afterEach(() => {

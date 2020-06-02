@@ -1,4 +1,4 @@
-Text primitive. Renders a `p` by default with `margin-top: 0; margin-bottom: 0;`
+Text primitive. Renders a `p` by default with `margin-top: 0; margin-bottom: 0;` and accepts all primitive styling props.
 
 ```js
 import { FONT_SIZE_BODY_2 } from '@opentrons/components'

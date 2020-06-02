@@ -1,9 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
+import { Icon, PrimaryButton, Link, type Mount } from '@opentrons/components'
 
-import { type RobotCalibrationCheckComparison } from '../../calibration'
+import {
+  type RobotCalibrationCheckComparison,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
@@ -57,22 +60,29 @@ const assetMap = {
 
 const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
 const SLOT = 'slot'
-const JOG_UNTIL = 'Jog pipette until tip is'
+const JOG_UNTIL = 'Jog the robot until the tip is'
 const JUST_BARELY = 'just barely'
 const TOUCHING_THE_CROSS = 'touching the cross in'
 const THEN = 'Then'
 const CHECK_AXES = 'check x and y-axis'
 const TO_DETERMINE_MATCH =
   'to see if the position matches the calibration co-ordinate.'
-const DROP_TIP_AND_EXIT = 'Drop tip and exit calibration check'
+const EXIT_CHECK = 'Exit robot calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
 const BAD_INSPECTING_BODY =
-  'The jogged and calibrated x and y-axis co-ordinates do not match, and are out of acceptable bounds.'
+  "Your current pipette tip position does not match your robot's saved calibration data."
 const GOOD_INSPECTING_BODY =
-  'The jogged and calibrated x and y-axis co-ordinates fall within acceptable bounds.'
+  "Your current pipette tip position matches your robot's saved calibration data."
 const DIFFERENCE = 'Difference'
+const DECK_CAL_BLURB =
+  'To resolve this, you will need to perform deck calibration. Read'
+const THIS_ARTICLE = 'this article'
+const TO_LEARN = 'to learn more'
+const DECK_CAL_ARTICLE_URL =
+  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
+const CONTACT_SUPPORT = 'Please contact Opentrons support for next steps.'
 
 type CheckXYPointProps = {|
   slotNumber: string | null,
@@ -130,6 +140,7 @@ export function CheckXYPoint(props: CheckXYPointProps) {
               <b>&nbsp;{JUST_BARELY}&nbsp;</b>
               {TOUCHING_THE_CROSS}
               <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
+              <br />
               {THEN}
               <b>&nbsp;{CHECK_AXES}&nbsp;</b>
               {TO_DETERMINE_MATCH}
@@ -209,9 +220,23 @@ function CompareXY(props: CompareXYProps) {
           </div>
         </div>
       </div>
+      {exceedsThreshold &&
+        (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
+          <p className={styles.difference_body}>
+            {DECK_CAL_BLURB}
+            &nbsp;
+            <Link href={DECK_CAL_ARTICLE_URL} external>
+              {THIS_ARTICLE}
+            </Link>
+            &nbsp;
+            {TO_LEARN}
+          </p>
+        ) : (
+          <p className={styles.difference_body}>{CONTACT_SUPPORT}</p>
+        ))}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
-          <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+          <PrimaryButton onClick={exit}>{EXIT_CHECK}</PrimaryButton>
         )}
         <PrimaryButton onClick={goToNextCheck}>{nextButtonText}</PrimaryButton>
       </div>

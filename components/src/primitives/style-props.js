@@ -1,93 +1,142 @@
 // @flow
-// common styling props you can apply to any styled-component
+// common styling props you can apply to any primitive component
 // props are string type for flexibility, but try to use constants for safety
 
-export type ColorProps = {|
-  color?: string,
-  backgroundColor?: string,
-|}
+import pick from 'lodash/pick'
 
-export type TypographyProps = {|
-  fontSize?: string | number,
-  fontWeight?: string | number,
-  fontStyle?: string,
-  lineHeight?: string | number,
-  textAlign?: string,
-  textTransform?: string,
-|}
+import * as Types from './types'
 
-export type SpacingProps = {|
-  margin?: string | number,
-  marginX?: string | number,
-  marginY?: string | number,
-  marginTop?: string | number,
-  marginRight?: string | number,
-  marginBottom?: string | number,
-  marginLeft?: string | number,
-  padding?: string | number,
-  paddingX?: string | number,
-  paddingY?: string | number,
-  paddingTop?: string | number,
-  paddingRight?: string | number,
-  paddingBottom?: string | number,
-  paddingLeft?: string | number,
-|}
+import type { Styles } from 'styled-components'
 
-type ColorPropsBase = { ...ColorProps, ... }
+const COLOR_PROPS = ['color', 'backgroundColor', 'opacity']
 
-type TypographyPropsBase = { ...TypographyProps, ... }
+const TYPOGRAPHY_PROPS = [
+  'fontSize',
+  'fontWeight',
+  'fontStyle',
+  'lineHeight',
+  'textAlign',
+  'textTransform',
+]
 
-type SpacingPropsBase = { ...SpacingProps, ... }
+const SPACING_PROPS = [
+  'margin',
+  'marginX',
+  'marginY',
+  'marginTop',
+  'marginRight',
+  'marginBottom',
+  'marginLeft',
+  'padding',
+  'paddingX',
+  'paddingY',
+  'paddingTop',
+  'paddingRight',
+  'paddingBottom',
+  'paddingLeft',
+]
 
-export const colorStyles = ({ color, backgroundColor }: ColorPropsBase) => `
-  ${color != null ? `color: ${color};` : ''}
-  ${backgroundColor != null ? `background-color: ${backgroundColor};` : ''}
-`
+const BORDER_PROPS = [
+  'border',
+  'borderTop',
+  'borderRight',
+  'borderBottom',
+  'borderLeft',
+  'borderRadius',
+]
 
-export const typographyStyles = ({
-  fontSize,
-  fontWeight,
-  fontStyle,
-  lineHeight,
-  textAlign,
-  textTransform,
-}: TypographyPropsBase) => `
-  ${fontSize != null ? `font-size: ${fontSize};` : ''}
-  ${fontWeight != null ? `font-weight: ${fontWeight};` : ''}
-  ${fontStyle != null ? `font-style: ${fontStyle};` : ''}
-  ${lineHeight != null ? `line-height: ${lineHeight};` : ''}
-  ${textAlign != null ? `text-align: ${textAlign};` : ''}
-  ${textTransform != null ? `text-transform: ${textTransform};` : ''}
-`
+const FLEXBOX_PROPS = [
+  'flex',
+  'alignItems',
+  'justifyContent',
+  'flexDirection',
+  'flexWrap',
+]
 
-export const spacingStyles = ({
-  margin,
-  marginX: mx,
-  marginY: my,
-  marginTop,
-  marginRight,
-  marginBottom,
-  marginLeft,
-  padding,
-  paddingX: px,
-  paddingY: py,
-  paddingTop,
-  paddingRight,
-  paddingBottom,
-  paddingLeft,
-}: SpacingPropsBase) => `
-  ${margin != null ? `margin: ${margin};` : ''}
-  ${mx != null ? `margin-right: ${mx}; margin-left: ${mx};` : ''}
-  ${my != null ? `margin-top: ${my}; margin-bottom: ${my};` : ''}
-  ${marginTop != null ? `margin-top: ${marginTop};` : ''}
-  ${marginRight != null ? `margin-right: ${marginRight};` : ''}
-  ${marginBottom != null ? `margin-bottom: ${marginBottom};` : ''}
-  ${marginLeft != null ? `margin-left: ${marginLeft};` : ''}
-  ${padding != null ? `padding: ${padding};` : ''}
-  ${px != null ? `padding-right: ${px}; padding-left: ${px};` : ''}
-  ${py != null ? `padding-top: ${py}; padding-bottom: ${py};` : ''}
-  ${paddingTop != null ? `padding-top: ${paddingTop};` : ''}
-  ${paddingRight != null ? `padding-right: ${paddingRight};` : ''}
-  ${paddingBottom != null ? `padding-bottom: ${paddingBottom};` : ''}
-  ${paddingLeft != null ? `padding-left: ${paddingLeft};` : ''}
-`
+const LAYOUT_PROPS = [
+  'display',
+  'size',
+  'width',
+  'minWidth',
+  'maxWidth',
+  'height',
+  'minHeight',
+  'maxHeight',
+  'overflow',
+  'overflowX',
+  'overflowY',
+]
+
+const STYLE_PROPS = [
+  ...COLOR_PROPS,
+  ...TYPOGRAPHY_PROPS,
+  ...SPACING_PROPS,
+  ...BORDER_PROPS,
+  ...FLEXBOX_PROPS,
+  ...LAYOUT_PROPS,
+]
+
+const colorStyles = (props: { ...Types.ColorProps, ... }) => {
+  return (pick(props, COLOR_PROPS): Types.ColorProps)
+}
+
+const typographyStyles = (props: { ...Types.TypographyProps, ... }) => {
+  return (pick(props, TYPOGRAPHY_PROPS): Types.TypographyProps)
+}
+
+const spacingStyles = (props: { ...Types.SpacingProps, ... }) => {
+  const { marginX, marginY, paddingX, paddingY, ...styles } = (pick(
+    props,
+    SPACING_PROPS
+  ): Types.SpacingProps)
+
+  if (marginX != null) {
+    styles.marginRight = styles.marginRight ?? marginX
+    styles.marginLeft = styles.marginLeft ?? marginX
+  }
+  if (marginY != null) {
+    styles.marginTop = styles.marginTop ?? marginY
+    styles.marginBottom = styles.marginBottom ?? marginY
+  }
+  if (paddingX != null) {
+    styles.paddingRight = styles.paddingRight ?? paddingX
+    styles.paddingLeft = styles.paddingLeft ?? paddingX
+  }
+  if (paddingY != null) {
+    styles.paddingTop = styles.paddingTop ?? paddingY
+    styles.paddingBottom = styles.paddingBottom ?? paddingY
+  }
+
+  return styles
+}
+
+const borderStyles = (props: { ...Types.BorderProps, ... }) => {
+  return (pick(props, BORDER_PROPS): Types.BorderProps)
+}
+
+const flexboxStyles = (props: { ...Types.FlexboxProps, ... }) => {
+  return (pick(props, FLEXBOX_PROPS): Types.FlexboxProps)
+}
+
+const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
+  const { size, ...styles } = (pick(props, LAYOUT_PROPS): Types.LayoutProps)
+
+  if (size != null) {
+    styles.width = styles.width ?? size
+    styles.height = styles.height ?? size
+  }
+
+  return styles
+}
+
+export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
+  ...colorStyles(props),
+  ...typographyStyles(props),
+  ...spacingStyles(props),
+  ...borderStyles(props),
+  ...flexboxStyles(props),
+  ...layoutStyles(props),
+})
+
+export const isntStyleProp = (prop: string): boolean =>
+  !STYLE_PROPS.includes(prop)

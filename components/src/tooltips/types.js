@@ -64,7 +64,12 @@ export type UseHoverTooltipOptions = $Shape<{|
   ...UseHoverOptions,
 |}>
 
+export type UseHoverTooltipTargetProps = {|
+  ...UseTooltipResultTargetProps,
+  ...HoverHandlers,
+|}
+
 export type UseHoverTooltipResult = [
-  {| ...UseTooltipResultTargetProps, ...HoverHandlers |},
+  UseHoverTooltipTargetProps,
   {| ...UseTooltipResultTooltipProps, visible: boolean |}
 ]

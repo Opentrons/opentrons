@@ -15,12 +15,16 @@ def mock_settings_version():
 
 
 @pytest.fixture
-def mock_read_settings_file(mock_settings_values, mock_settings_version):
-    with patch("opentrons.config.advanced_settings._read_settings_file") as p:
-        p.return_value = \
-            advanced_settings.SettingsData(
+def mock_settings(mock_settings_values, mock_settings_version):
+    return advanced_settings.SettingsData(
                 settings_map=mock_settings_values,
                 version=mock_settings_version)
+
+
+@pytest.fixture
+def mock_read_settings_file(mock_settings):
+    with patch("opentrons.config.advanced_settings._read_settings_file") as p:
+        p.return_value = mock_settings
         yield p
 
 
@@ -36,11 +40,17 @@ def restore_restart_required():
     advanced_settings._SETTINGS_RESTART_REQUIRED = False
 
 
-def test_get_advanced_setting_not_found(mock_read_settings_file):
+@pytest.fixture
+def clear_cache():
+    advanced_settings.get_all_adv_settings.cache_clear()
+
+
+def test_get_advanced_setting_not_found(clear_cache, mock_read_settings_file):
     assert advanced_settings.get_adv_setting("unknown") is None
 
 
-def test_get_advanced_setting_found(mock_read_settings_file,
+def test_get_advanced_setting_found(clear_cache,
+                                    mock_read_settings_file,
                                     mock_settings_values):
     for k, v in mock_settings_values.items():
         s = advanced_settings.get_adv_setting(k)
@@ -49,7 +59,8 @@ def test_get_advanced_setting_found(mock_read_settings_file,
             advanced_settings.settings_by_id[k]
 
 
-def test_get_all_adv_settings(mock_read_settings_file,
+def test_get_all_adv_settings(clear_cache,
+                              mock_read_settings_file,
                               mock_settings_values):
     s = advanced_settings.get_all_adv_settings()
     assert s.keys() == mock_settings_values.keys()
@@ -59,7 +70,8 @@ def test_get_all_adv_settings(mock_read_settings_file,
             advanced_settings.settings_by_id[k]
 
 
-def test_get_all_adv_settings_empty(mock_read_settings_file):
+def test_get_all_adv_settings_empty(clear_cache,
+                                    mock_read_settings_file):
     mock_read_settings_file.return_value = \
         advanced_settings.SettingsData({}, 1)
     s = advanced_settings.get_all_adv_settings()
@@ -91,6 +103,30 @@ async def test_set_adv_setting_unknown(loop,
         advanced_settings.SettingsData({}, 1)
     with pytest.raises(ValueError, match="is not recognized"):
         await advanced_settings.set_adv_setting("no", False)
+
+
+async def test_get_all_adv_settings_lru_cache(loop,
+                                              clear_cache,
+                                              mock_read_settings_file,
+                                              mock_write_settings_file):
+    # Cache should not be used.
+    advanced_settings.get_all_adv_settings()
+    mock_read_settings_file.assert_called_once()
+    mock_read_settings_file.reset_mock()
+    # Should use cache
+    advanced_settings.get_all_adv_settings()
+    mock_read_settings_file.assert_not_called()
+    mock_read_settings_file.reset_mock()
+    # Updating will invalidate cache
+    await advanced_settings.set_adv_setting('useProtocolApi2', True)
+    mock_read_settings_file.reset_mock()
+    # Cache should not be used
+    advanced_settings.get_all_adv_settings()
+    mock_read_settings_file.assert_called_once()
+    mock_read_settings_file.reset_mock()
+    # Should use cache
+    advanced_settings.get_all_adv_settings()
+    mock_read_settings_file.assert_not_called()
 
 
 async def test_on_change_called(loop,

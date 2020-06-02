@@ -3,6 +3,11 @@ import * as React from 'react'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
+import {
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_DECK,
+} from '../../../calibration'
 import { CheckHeight } from '../CheckHeight'
 
 describe('CheckHeight', () => {
@@ -21,10 +26,20 @@ describe('CheckHeight', () => {
 
   const getExitButton = wrapper =>
     wrapper
-      .find('PrimaryButton[children="Drop tip and exit calibration check"]')
+      .find('PrimaryButton[children="exit robot calibration check"]')
       .find('button')
 
   const getVideo = wrapper => wrapper.find(`source`)
+
+  const getDeckCalArticleLink = wrapper =>
+    wrapper.find(
+      'a[href="https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck"]'
+    )
+
+  const getContactSupport = wrapper =>
+    wrapper.find(
+      'p[children="Please contact Opentrons support for next steps."]'
+    )
 
   beforeEach(() => {
     render = (props = {}) => {
@@ -36,6 +51,7 @@ describe('CheckHeight', () => {
           differenceVector: [0, 0, 0],
           thresholdVector: [1, 1, 1],
           exceedsThreshold: false,
+          transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
       } = props
       return mount(
@@ -60,12 +76,12 @@ describe('CheckHeight', () => {
   it('displays proper demo asset', () => {
     const assetMap = {
       left: {
-        multi: 'SLOT_5_LEFT_MULTI_Z_(640X480)_REV1.webm',
-        single: 'SLOT_5_LEFT_SINGLE_Z_(640X480)_REV1.webm',
+        multi: 'SLOT_5_LEFT_MULTI_Z_(640X480)_REV3.webm',
+        single: 'SLOT_5_LEFT_SINGLE_Z_(640X480)_REV3.webm',
       },
       right: {
-        multi: 'SLOT_5_RIGHT_MULTI_Z_(640X480)_REV1.webm',
-        single: 'SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV1.webm',
+        multi: 'SLOT_5_RIGHT_MULTI_Z_(640X480)_REV3.webm',
+        single: 'SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV3.webm',
       },
     }
 
@@ -127,18 +143,46 @@ describe('CheckHeight', () => {
     expect(getExitButton(wrapper).exists()).toBe(false)
   })
 
-  it('exits when isInspecting and exit button is clicked', () => {
-    const wrapper = render({
-      isInspecting: true,
-      comparison: {
-        differenceVector: [0, 0, 0],
-        thresholdVector: [1, 1, 1],
-        exceedsThreshold: true,
-      },
-    })
-    act(() => getExitButton(wrapper).invoke('onClick')())
+  it('confirms check step when isInspecting and primary button is clicked, and deck transform issue', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_DECK,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    act(() => getContinueButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockExit).toHaveBeenCalled()
+    expect(mockGoToNextCheck).toHaveBeenCalled()
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(true)
+    expect(getContactSupport(wrapper).exists()).toBe(false)
+  })
+
+  it('does not render deck cal blurb when exceeds threshold and transform type is instr offset', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
+  })
+
+  it('does not render deck cal blurb when exceeds threshold and transform type is unknown', () => {
+    const comparison = {
+      differenceVector: [0, 0, 0],
+      thresholdVector: [1, 1, 1],
+      exceedsThreshold: true,
+      transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
+    }
+    const wrapper = render({ isInspecting: true, comparison })
+
+    expect(getDeckCalArticleLink(wrapper).exists()).toBe(false)
+    expect(getContactSupport(wrapper).exists()).toBe(true)
   })
 })

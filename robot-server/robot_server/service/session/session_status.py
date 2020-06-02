@@ -1,8 +1,8 @@
 import typing
-from opentrons.server.endpoints.calibration import models as calibration_models
-from opentrons.server.endpoints.calibration.session import \
-    CheckCalibrationSession, CalibrationSession
-from robot_server.service.models.session import SessionDetails
+from opentrons.calibration.check import models as calibration_models
+from opentrons.calibration.check.session import CheckCalibrationSession,\
+    CalibrationSession
+from robot_server.service.session.models import SessionDetails
 
 
 SessionObjectTypes = typing.Union[CalibrationSession, CheckCalibrationSession]

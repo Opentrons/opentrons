@@ -13,7 +13,7 @@ export type LabeledSelectProps = {|
   children: React.Node,
 |}
 
-export function LabeledSelect(props: LabeledSelectProps) {
+export function LabeledSelect(props: LabeledSelectProps): React.Node {
   const { label, value, options, onChange } = props
 
   return (

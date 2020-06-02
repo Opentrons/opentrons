@@ -248,6 +248,11 @@ declare module 'styled-components' {
         Instance
       >
     >,
+    // TODO(mc, 2020-05-13): placeholder until flow-typed catches up
+    +withConfig: ({ ... }) => TaggedTemplateLiteral<
+      PropsWithTheme<StyleProps, Theme>,
+      StyledComponent<StyleProps, Theme, Instance>
+    >,
   |};
 
   declare export type StyledShorthandFactory<V> = {|
@@ -267,6 +272,11 @@ declare module 'styled-components' {
         Theme,
         V
       >
+    >,
+    // TODO(mc, 2020-05-13): placeholder until flow-typed catches up
+    +withConfig: ({ ... }) => TaggedTemplateLiteral<
+      PropsWithTheme<StyleProps, Theme>,
+      StyledComponent<StyleProps, Theme, Instance>
     >,
   |};
 

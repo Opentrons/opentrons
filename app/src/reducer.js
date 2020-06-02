@@ -32,9 +32,6 @@ import { pipettesReducer } from './pipettes/reducer'
 // modules state
 import { modulesReducer } from './modules/reducer'
 
-// calibration state
-import { calibrationReducer } from './calibration/reducer'
-
 // networking state
 import { networkingReducer } from './networking/reducer'
 
@@ -59,7 +56,7 @@ import { systemInfoReducer } from './system-info/reducer'
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
 
-import { robotSessionReducer } from './sessions/reducer'
+import { sessionReducer } from './sessions/reducer'
 
 import type { Reducer } from 'redux'
 import type { State, Action } from './types'
@@ -76,7 +73,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   buildroot: buildrootReducer,
   pipettes: pipettesReducer,
   modules: modulesReducer,
-  calibration: calibrationReducer,
   networking: networkingReducer,
   config: configReducer,
   discovery: discoveryReducer,
@@ -85,6 +81,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   shell: shellReducer,
   systemInfo: systemInfoReducer,
   alerts: alertsReducer,
-  sessions: robotSessionReducer,
+  sessions: sessionReducer,
   router: connectRouter<_, Action>(history),
 })

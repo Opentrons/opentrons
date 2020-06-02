@@ -2,6 +2,7 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import mapValues from 'lodash/mapValues'
+import { useConditionalConfirm } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
 import { selectors as uiLabwareSelectors } from '../ui/labware'
@@ -24,7 +25,6 @@ import { selectors as fileDataSelectors } from '../file-data'
 
 import { StepItem, StepItemContents } from '../components/steplist/StepItem'
 import { ConfirmDeleteStepModal } from '../components/modals/ConfirmDeleteStepModal'
-import { useConditionalConfirm } from '../components/useConditionalConfirm'
 
 import type { SubstepIdentifier } from '../steplist/types'
 import type { StepIdType } from '../form-types'
@@ -85,13 +85,11 @@ export const ConnectedStepItem = (props: Props) => {
   const highlightStep = () => dispatch(stepsActions.hoverOnStep(stepId))
   const unhighlightStep = () => dispatch(stepsActions.hoverOnStep(null))
 
-  // step selection is gated when requiresConfirmation is true
-  const {
-    conditionalContinue,
-    requiresConfirmation,
-    confirmAndContinue,
-    cancelConfirm,
-  } = useConditionalConfirm(selectStep, currentFormIsPresaved)
+  // step selection is gated when showConfirmation is true
+  const { confirm, showConfirmation, cancel } = useConditionalConfirm(
+    selectStep,
+    currentFormIsPresaved
+  )
 
   const stepItemProps = {
     description: step.stepDetails,
@@ -109,7 +107,7 @@ export const ConnectedStepItem = (props: Props) => {
     hovered: hoveredStep === stepId && !hoveredSubstep,
 
     highlightStep,
-    selectStep: conditionalContinue,
+    selectStep: confirm,
     toggleStepCollapsed,
     unhighlightStep,
   }
@@ -129,10 +127,10 @@ export const ConnectedStepItem = (props: Props) => {
 
   return (
     <>
-      {requiresConfirmation && (
+      {showConfirmation && (
         <ConfirmDeleteStepModal
-          onContinueClick={confirmAndContinue}
-          onCancelClick={cancelConfirm}
+          onContinueClick={confirm}
+          onCancelClick={cancel}
         />
       )}
       <StepItem {...stepItemProps} onStepContextMenu={props.onStepContextMenu}>

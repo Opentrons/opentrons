@@ -24,10 +24,13 @@ const LABEL_BY_MOUNT = {
   right: 'Right pipette',
 }
 
+const SERIAL_NUMBER = 'Serial number'
+
 export function PipetteInfo(props: PipetteInfoProps) {
   const { mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null
+  const serialNumber = pipette ? pipette.id : null
   const channels = pipette ? pipette.modelSpecs.channels : null
   const direction = pipette ? 'change' : 'attach'
 
@@ -37,11 +40,18 @@ export function PipetteInfo(props: PipetteInfoProps) {
 
   return (
     <div className={className}>
-      <LabeledValue
-        label={label}
-        value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
-        valueClassName={styles.pipette_display_name}
-      />
+      <div className={styles.pipette_info_block}>
+        <LabeledValue
+          label={label}
+          value={(displayName || 'None').replace(/-/, '‑')} // non breaking hyphen
+          valueClassName={styles.pipette_info_element}
+        />
+        <LabeledValue
+          label={SERIAL_NUMBER}
+          value={serialNumber || 'None'}
+          valueClassName={styles.pipette_info_element}
+        />
+      </div>
 
       <div className={styles.button_group}>
         <OutlineButton Component={Link} to={changeUrl}>

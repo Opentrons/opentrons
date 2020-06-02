@@ -94,10 +94,38 @@ export const fetchSessionFailure = (
   meta: meta,
 })
 
+export const fetchAllSessions = (
+  robotName: string
+): Types.FetchAllSessionsAction => ({
+  type: Constants.FETCH_ALL_SESSIONS,
+  payload: { robotName },
+  meta: {},
+})
+
+export const fetchAllSessionsSuccess = (
+  robotName: string,
+  body: Types.MultiSessionResponse,
+  meta: RobotApiRequestMeta
+): Types.FetchAllSessionsSuccessAction => ({
+  type: Constants.FETCH_ALL_SESSIONS_SUCCESS,
+  payload: { robotName, sessions: body.data },
+  meta: meta,
+})
+
+export const fetchAllSessionsFailure = (
+  robotName: string,
+  error: RobotApiV2ErrorResponseBody,
+  meta: RobotApiRequestMeta
+): Types.FetchAllSessionsFailureAction => ({
+  type: Constants.FETCH_ALL_SESSIONS_FAILURE,
+  payload: { robotName, error },
+  meta: meta,
+})
+
 export const createSessionCommand = (
   robotName: string,
   sessionId: string,
-  command: Types.SessionCommand
+  command: Types.SessionCommandAttributes
 ): Types.CreateSessionCommandAction => ({
   type: Constants.CREATE_SESSION_COMMAND,
   payload: { robotName, sessionId, command },

@@ -4,6 +4,8 @@ import { css } from 'styled-components'
 
 import { C_DARK_GRAY, C_WHITE } from './colors'
 
+import type { CSSRules } from 'styled-components'
+
 // font size values
 export const FONT_SIZE_HUGE = '3rem'
 export const FONT_SIZE_HEADER = '1.125rem'
@@ -42,19 +44,19 @@ export const TEXT_TRANSFORM_UPPERCASE = 'uppercase'
 export const TEXT_TRANSFORM_LOWERCASE = 'lowercase'
 
 // font property sets
-export const FONT_HEADER_DARK = css`
+export const FONT_HEADER_DARK: CSSRules = css`
   font-size: ${FONT_SIZE_HEADER};
   font-weight: ${FONT_WEIGHT_SEMIBOLD};
   color: ${C_DARK_GRAY};
 `
 
-export const FONT_BODY_1_DARK = css`
+export const FONT_BODY_1_DARK: CSSRules = css`
   font-size: ${FONT_SIZE_BODY_1};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_DARK_GRAY};
 `
 
-export const FONT_BODY_1_LIGHT = css`
+export const FONT_BODY_1_LIGHT: CSSRules = css`
   font-size: ${FONT_SIZE_BODY_1};
   font-weight: ${FONT_WEIGHT_REGULAR};
   color: ${C_WHITE};

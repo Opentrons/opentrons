@@ -47,7 +47,7 @@ const specToOption = ({ name, displayName }: PipetteNameSpecs) => ({
   label: displayName,
 })
 
-export const PipetteSelect = (props: PipetteSelectProps) => {
+export const PipetteSelect = (props: PipetteSelectProps): React.Node => {
   const { tabIndex, className, enableNoneOption, nameBlacklist = [] } = props
   const whitelist = ({ value }: SelectOption) => {
     return !nameBlacklist.some(n => n === value)

@@ -2,10 +2,10 @@ from functools import lru_cache
 
 from opentrons.api import MainRouter
 from opentrons.hardware_control import HardwareAPILike, ThreadedAsyncLock
-from opentrons.server.endpoints.calibration.session import SessionManager \
+from opentrons.calibration.session import SessionManager \
     as CalibrationSessionManager
 
-from .rpc.rpc import RPCServer
+from robot_server.service.legacy.rpc import RPCServer
 from . import HARDWARE_APP_KEY
 
 

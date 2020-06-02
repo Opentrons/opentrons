@@ -2,7 +2,10 @@
 
 export const SESSIONS_PATH: '/sessions' = '/sessions'
 
-export const SESSIONS_COMMANDS_PATH_EXTENSION: 'commands' = 'commands'
+export const SESSIONS_COMMANDS_PATH_EXTENSION: '/commands' = '/commands'
+
+export const SESSIONS_COMMANDS_EXECUTE_PATH_EXTENSION: '/commands/execute' =
+  '/commands/execute'
 
 export const CREATE_SESSION: 'sessions:CREATE_SESSION' =
   'sessions:CREATE_SESSION'
@@ -30,6 +33,15 @@ export const FETCH_SESSION_SUCCESS: 'sessions:FETCH_SESSION_SUCCESS' =
 export const FETCH_SESSION_FAILURE: 'sessions:FETCH_SESSION_FAILURE' =
   'sessions:FETCH_SESSION_FAILURE'
 
+export const FETCH_ALL_SESSIONS: 'sessions:FETCH_ALL_SESSIONS' =
+  'sessions:FETCH_ALL_SESSIONS'
+
+export const FETCH_ALL_SESSIONS_SUCCESS: 'sessions:FETCH_ALL_SESSIONS_SUCCESS' =
+  'sessions:FETCH_ALL_SESSIONS_SUCCESS'
+
+export const FETCH_ALL_SESSIONS_FAILURE: 'sessions:FETCH_ALL_SESSIONS_FAILURE' =
+  'sessions:FETCH_ALL_SESSIONS_FAILURE'
+
 export const CREATE_SESSION_COMMAND: 'sessions:CREATE_SESSION_COMMAND' =
   'sessions:CREATE_SESSION_COMMAND'
 
@@ -38,3 +50,5 @@ export const CREATE_SESSION_COMMAND_SUCCESS: 'sessions:CREATE_SESSION_COMMAND_SU
 
 export const CREATE_SESSION_COMMAND_FAILURE: 'sessions:CREATE_SESSION_COMMAND_FAILURE' =
   'sessions:CREATE_SESSION_COMMAND_FAILURE'
+
+export const SESSION_TYPE_CALIBRATION_CHECK = 'calibrationCheck'

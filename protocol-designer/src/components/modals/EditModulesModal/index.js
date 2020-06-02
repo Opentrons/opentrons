@@ -98,7 +98,7 @@ export const EditModulesModal = (props: EditModulesModalProps) => {
 
   const moduleIsThermocycler = moduleType === THERMOCYCLER_MODULE_TYPE
 
-  let initialValues = moduleIsThermocycler
+  const initialValues = moduleIsThermocycler
     ? {
         selectedSlot: moduleOnDeck?.slot || supportedModuleSlot,
         selectedModel: THERMOCYCLER_MODULE_V1,

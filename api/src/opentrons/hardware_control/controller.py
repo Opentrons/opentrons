@@ -41,7 +41,9 @@ class Controller:
                 'This is intended to run on a robot, and while it can connect '
                 'to a smoothie via a usb/serial adapter unexpected things '
                 'using gpios (such as smoothie reset or light management) '
-                'will fail')
+                'will fail. If you are seeing this message and you are '
+                'running on a robot, you need to set the RUNNING_ON_PI '
+                'environmental variable to 1.')
 
         self.config = config or opentrons.config.robot_configs.load()
 
@@ -146,7 +148,11 @@ class Controller:
             self._smoothie_driver.pop_active_current()
 
     async def _handle_watch_event(self, register_modules: 'RegisterModules'):
-        event = await self._module_watcher.get_event()
+        try:
+            event = await self._module_watcher.get_event()
+        except asyncio.IncompleteReadError:
+            MODULE_LOG.debug("incomplete read error when quitting watcher")
+            return
         flags = aionotify.Flags.parse(event.flags)
         if event is not None and 'ot_module' in event.name:
             maybe_module_at_port = modules.get_module_at_port(event.name)
@@ -262,15 +268,20 @@ class Controller:
         """
         return self._smoothie_driver.probe_axis(axis, distance)
 
-    def __del__(self):
-        if hasattr(self, '_module_watcher'):
+    def clean_up(self):
+        try:
             loop = asyncio.get_event_loop()
+        except RuntimeError:
+            return
+        if hasattr(self, '_module_watcher'):
             if loop.is_running() and self._module_watcher:
                 self._module_watcher.close()
         if hasattr(self, 'gpio_chardev'):
             try:
-                loop = asyncio.get_event_loop()
                 if not loop.is_closed():
                     self.gpio_chardev.stop_door_switch_watcher(loop)
             except RuntimeError:
                 pass
+
+    def __del__(self):
+        self.clean_up()

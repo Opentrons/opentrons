@@ -1,8 +1,6 @@
 // @flow
 import type { ElementProps } from 'react'
 import assert from 'assert'
-import forEach from 'lodash/forEach'
-import isEmpty from 'lodash/isEmpty'
 import mapValues from 'lodash/mapValues'
 import reduce from 'lodash/reduce'
 import { createSelector } from 'reselect'
@@ -23,7 +21,12 @@ import {
   getFormErrors,
   stepFormToArgs,
 } from '../../steplist/formLevel'
+import {
+  getProfileFormErrors,
+  type ProfileFormError,
+} from '../../steplist/formLevel/profileErrors'
 import { hydrateField, getFieldErrors } from '../../steplist/fieldLevel'
+import { getProfileItemsHaveErrors } from '../utils/getProfileItemsHaveErrors'
 import { denormalizePipetteEntities } from '../utils'
 import {
   selectors as labwareDefSelectors,
@@ -39,10 +42,7 @@ import type {
 import type { FormWarning } from '../../steplist/formLevel'
 import type { BaseState, Selector, DeckSlot } from '../../types'
 import type { FormData, StepIdType } from '../../form-types'
-import type {
-  StepArgsAndErrors,
-  StepFormAndFieldErrors,
-} from '../../steplist/types'
+import type { StepArgsAndErrors, StepFormErrors } from '../../steplist/types'
 import type {
   InitialDeckSetup,
   NormalizedLabwareById,
@@ -417,29 +417,40 @@ function _getHydratedForm(
 }
 
 // TODO type with hydrated form type
-const _getFormAndFieldErrorsFromHydratedForm = (
-  hydratedForm: FormData
-): StepFormAndFieldErrors => {
-  let errors: StepFormAndFieldErrors = {}
+const _formLevelErrors = (hydratedForm: FormData): StepFormErrors => {
+  return getFormErrors(hydratedForm.stepType, hydratedForm)
+}
 
-  forEach(hydratedForm, (value, fieldName) => {
-    const fieldErrors = getFieldErrors(fieldName, value)
-    if (fieldErrors && fieldErrors.length > 0) {
-      errors = {
-        ...errors,
-        field: {
-          ...errors.field,
-          [fieldName]: fieldErrors,
-        },
+// TODO type with hydrated form type
+const _dynamicFieldFormErrors = (
+  hydratedForm: FormData
+): Array<ProfileFormError> => {
+  return getProfileFormErrors(hydratedForm)
+}
+
+// TODO type with hydrated form type
+export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
+  for (const fieldName in hydratedForm) {
+    const value = hydratedForm[fieldName]
+    if (fieldName === 'profileItemsById') {
+      if (getProfileItemsHaveErrors(value)) {
+        return true
+      }
+    } else {
+      // TODO: fieldName includes id, stepType, etc... this is weird #3161
+      const fieldErrors = getFieldErrors(fieldName, value)
+      if (fieldErrors && fieldErrors.length > 0) {
+        return true
       }
     }
-  })
-  const formErrors = getFormErrors(hydratedForm.stepType, hydratedForm)
-  if (formErrors && formErrors.length > 0) {
-    errors = { ...errors, form: formErrors }
   }
+  return false
+}
 
-  return errors
+// TODO type with hydrated form type
+export const _formHasErrors = (hydratedForm: FormData): boolean => {
+  const hasFormLevelErrors = _formLevelErrors(hydratedForm).length > 0
+  return _hasFieldLevelErrors(hydratedForm) || hasFormLevelErrors
 }
 
 export const getInvariantContext: Selector<InvariantContext> = createSelector(
@@ -464,19 +475,32 @@ export const getHydratedUnsavedForm: Selector<any> = createSelector(
   }
 )
 
-export const getUnsavedFormErrors: Selector<?StepFormAndFieldErrors> = createSelector(
+export const getDynamicFieldFormErrorsForUnsavedForm: Selector<
+  Array<ProfileFormError>
+> = createSelector(
   getHydratedUnsavedForm,
   hydratedForm => {
-    if (!hydratedForm) return null
-    const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
+    if (!hydratedForm) return []
+
+    const errors = _dynamicFieldFormErrors(hydratedForm)
+    return errors
+  }
+)
+
+export const getFormLevelErrorsForUnsavedForm: Selector<StepFormErrors> = createSelector(
+  getHydratedUnsavedForm,
+  hydratedForm => {
+    if (!hydratedForm) return []
+    const errors = _formLevelErrors(hydratedForm)
     return errors
   }
 )
 
 export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
-  getUnsavedFormErrors,
-  formErrors => {
-    return Boolean(formErrors && isEmpty(formErrors))
+  getHydratedUnsavedForm,
+  hydratedForm => {
+    if (!hydratedForm) return false
+    return !_formHasErrors(hydratedForm)
   }
 )
 
@@ -490,8 +514,8 @@ export const getArgsAndErrorsByStepId: Selector<{
       stepForms,
       (acc, stepForm) => {
         const hydratedForm = _getHydratedForm(stepForm, contextualState)
-        const errors = _getFormAndFieldErrorsFromHydratedForm(hydratedForm)
-        const nextStepData = isEmpty(errors)
+        const errors = _formHasErrors(hydratedForm)
+        const nextStepData = !errors
           ? { stepArgs: stepFormToArgs(hydratedForm) }
           : { errors, stepArgs: null }
 

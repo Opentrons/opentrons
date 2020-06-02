@@ -3,7 +3,7 @@ import { createDiscoveryClient } from '.'
 import { version } from '../package.json'
 
 const LOG_LVLS = ['error', 'warn', 'info', 'http', 'verbose', 'debug', 'silly']
-const noop = (...args: Array<*>) => {}
+const noop = () => {}
 
 const NORMALIZE_IP_RE = /\[?([a-f0-9.:]+)]?/i
 

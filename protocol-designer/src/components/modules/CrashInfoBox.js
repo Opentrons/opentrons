@@ -50,7 +50,7 @@ function getCrashableModulesCopy(props: Props): string | null {
 }
 function getCrashDiagramSrc(props: Props): string | null {
   const { magnetOnDeck, temperatureOnDeck } = props
-  let CRASH_DIAGRAM_SRC: string | null = null
+  const CRASH_DIAGRAM_SRC: string | null = null
   if (magnetOnDeck && temperatureOnDeck) {
     return require('../../images/modules/crash_warning_mag_temp.png')
   } else if (magnetOnDeck) {

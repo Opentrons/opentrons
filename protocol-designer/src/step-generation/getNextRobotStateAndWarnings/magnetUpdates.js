@@ -19,7 +19,7 @@ export function forEngageMagnet(
   robotStateAndWarnings: RobotStateAndWarnings
 ): void {
   const { module } = params
-  let { robotState } = robotStateAndWarnings
+  const { robotState } = robotStateAndWarnings
   const moduleState = getModuleState(robotState, module)
 
   _setMagnet(moduleState, true)

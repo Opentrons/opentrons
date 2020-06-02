@@ -7,45 +7,56 @@ import {
   makeResponseFixtures,
   mockV2ErrorResponse,
 } from '../../robot-api/__fixtures__'
-
+import { mockRobotCalibrationCheckSessionDetails } from '../../calibration/__fixtures__'
 import type { RobotApiV2ErrorResponseBody } from '../../robot-api/types'
 
-export const mockSessionData: Types.Session = {
+export const mockSessionId: string = 'fake_session_id'
+export const mockOtherSessionId: string = 'other_fake_session_id'
+
+export const mockSessionAttributes: Types.SessionResponseAttributes = {
   sessionType: 'calibrationCheck',
-  details: { someData: 5 },
+  details: mockRobotCalibrationCheckSessionDetails,
 }
 
-export const mockSessionCommand: Types.SessionCommand = {
-  command: 'dosomething',
+export const mockSessionCommand: Types.SessionCommandAttributes = {
+  command: 'jog',
   data: { someData: 32 },
 }
 
-export const mockSessionCommandData: Types.SessionCommand = {
-  command: '4321',
+export const mockSessionCommandAttributes: Types.SessionCommandAttributes = {
+  command: 'preparePipette',
   status: 'accepted',
   data: {},
 }
 
 export const mockSessionResponse: Types.SessionResponse = {
   data: {
-    id: '1234',
+    id: mockSessionId,
     type: 'Session',
-    attributes: mockSessionData,
+    attributes: mockSessionAttributes,
   },
+}
+
+export const mockMultiSessionResponse: Types.MultiSessionResponse = {
+  data: [
+    {
+      id: mockSessionId,
+      type: 'Session',
+      attributes: mockSessionAttributes,
+    },
+    {
+      id: mockOtherSessionId,
+      type: 'Session',
+      attributes: mockSessionAttributes,
+    },
+  ],
 }
 
 export const mockSessionCommandResponse: Types.SessionCommandResponse = {
   data: {
-    id: '4321',
+    id: mockSessionId,
     type: 'SessionCommand',
-    attributes: mockSessionCommandData,
-  },
-  meta: {
-    sessionType: 'calibrationCheck',
-    details: {
-      someData: 15,
-      someOtherData: 'hi',
-    },
+    attributes: mockSessionCommandAttributes,
   },
 }
 
@@ -70,7 +81,7 @@ export const {
   failure: mockDeleteSessionFailure,
 } = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: DELETE,
-  path: `${Constants.SESSIONS_PATH}/1234`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
   successStatus: 200,
   successBody: mockSessionResponse,
   failureStatus: 500,
@@ -84,9 +95,26 @@ export const {
   failure: mockFetchSessionFailure,
 } = makeResponseFixtures<Types.SessionResponse, RobotApiV2ErrorResponseBody>({
   method: GET,
-  path: `${Constants.SESSIONS_PATH}/1234`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}`,
   successStatus: 200,
   successBody: mockSessionResponse,
+  failureStatus: 500,
+  failureBody: mockV2ErrorResponse,
+})
+
+export const {
+  successMeta: mockFetchAllSessionsSuccessMeta,
+  failureMeta: mockFetchAllSessionsFailureMeta,
+  success: mockFetchAllSessionsSuccess,
+  failure: mockFetchAllSessionsFailure,
+} = makeResponseFixtures<
+  Types.MultiSessionResponse,
+  RobotApiV2ErrorResponseBody
+>({
+  method: GET,
+  path: Constants.SESSIONS_PATH,
+  successStatus: 200,
+  successBody: mockMultiSessionResponse,
   failureStatus: 500,
   failureBody: mockV2ErrorResponse,
 })
@@ -101,7 +129,7 @@ export const {
   RobotApiV2ErrorResponseBody
 >({
   method: GET,
-  path: `${Constants.SESSIONS_PATH}/1234/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
+  path: `${Constants.SESSIONS_PATH}/${mockSessionId}/${Constants.SESSIONS_COMMANDS_PATH_EXTENSION}`,
   successStatus: 200,
   successBody: mockSessionCommandResponse,
   failureStatus: 500,

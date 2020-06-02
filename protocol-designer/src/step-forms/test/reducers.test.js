@@ -765,7 +765,7 @@ describe('savedStepForms reducer: initial deck setup step', () => {
           },
         }
       })
-      let testCases = [
+      const testCases = [
         {
           testName: 'create mag mod -> override mag step module id',
           action: {

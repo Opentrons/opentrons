@@ -10,7 +10,11 @@ import { U2EAdapterInfo } from '../U2EAdapterInfo'
 import { U2EDriverWarning } from '../U2EDriverWarning'
 
 import type { State } from '../../../types'
-import type { UsbDevice, DriverStatus } from '../../../system-info/types'
+import type {
+  UsbDevice,
+  DriverStatus,
+  U2EInterfaceMap,
+} from '../../../system-info/types'
 
 jest.mock('../../../system-info/selectors')
 jest.mock('../../../analytics')
@@ -25,6 +29,9 @@ const MOCK_STORE = {
 
 const getU2EAdapterDevice: JestMockFn<[State], UsbDevice | null> =
   SystemInfo.getU2EAdapterDevice
+
+const getU2EInterfacesMap: JestMockFn<[State], U2EInterfaceMap> =
+  SystemInfo.getU2EInterfacesMap
 
 const getU2EWindowsDriverStatus: JestMockFn<[State], DriverStatus> =
   SystemInfo.getU2EWindowsDriverStatus
@@ -47,6 +54,7 @@ describe('U2EAdapterInfo', () => {
   beforeEach(() => {
     stubSelector(getU2EAdapterDevice, null)
     stubSelector(getU2EWindowsDriverStatus, SystemInfo.NOT_APPLICABLE)
+    stubSelector(getU2EInterfacesMap, {})
   })
 
   afterEach(() => {
@@ -122,5 +130,24 @@ describe('U2EAdapterInfo', () => {
 
     const wrapper = render()
     expect(wrapper.exists(U2EDriverWarning)).toBe(true)
+  })
+
+  it('should display device network adapter information if present', () => {
+    const device = Fixtures.mockRealtekDevice
+    const iface4 = Fixtures.mockNetworkInterface
+    const iface6 = Fixtures.mockNetworkInterfaceV6
+
+    stubSelector(getU2EAdapterDevice, device)
+    stubSelector(getU2EInterfacesMap, {
+      [device.serialNumber]: [iface4, iface6],
+    })
+
+    const wrapper = render()
+    const children = wrapper.children().html()
+
+    expect(getU2EAdapterDevice).toHaveBeenCalledWith(MOCK_STATE)
+    expect(children).toContain(iface4.name)
+    expect(children).toContain(iface4.address)
+    expect(children).toContain(iface6.address)
   })
 })

@@ -5,6 +5,7 @@ import typeof {
   INITIALIZED,
   USB_DEVICE_ADDED,
   USB_DEVICE_REMOVED,
+  NETWORK_INTERFACES_CHANGED,
   NOT_APPLICABLE,
   UNKNOWN,
   UP_TO_DATE,
@@ -22,6 +23,23 @@ export type UsbDevice = {|
   windowsDriverVersion?: string | null,
 |}
 
+// based on built-in type os$NetIFAddr
+export type NetworkInterface = {|
+  name: string,
+  address: string,
+  netmask: string,
+  family: string,
+  mac: string,
+  internal: boolean,
+  cidr: string,
+  scopeid?: number,
+|}
+
+export type U2EInterfaceMap = {
+  [deviceSerialNumber: string]: Array<NetworkInterface>,
+  ...,
+}
+
 export type DriverStatus = NOT_APPLICABLE | UNKNOWN | UP_TO_DATE | OUTDATED
 
 export type U2EAnalyticsProps = {|
@@ -30,18 +48,23 @@ export type U2EAnalyticsProps = {|
   'U2E Serial Number': string,
   'U2E Device Name': string,
   'U2E Manufacturer': string,
+  'U2E IPv4 Address': string | null,
   'U2E Windows Driver Version'?: string | null,
 |}
 
 // TODO(mc, 2020-04-17): add other system info
 export type SystemInfoState = {|
   usbDevices: Array<UsbDevice>,
+  networkInterfaces: Array<NetworkInterface>,
 |}
 
 // TODO(mc, 2020-04-17): add other system info
 export type InitializedAction = {|
   type: INITIALIZED,
-  payload: {| usbDevices: Array<UsbDevice> |},
+  payload: {|
+    usbDevices: Array<UsbDevice>,
+    networkInterfaces: Array<NetworkInterface>,
+  |},
 |}
 
 export type UsbDeviceAddedAction = {|
@@ -54,7 +77,13 @@ export type UsbDeviceRemovedAction = {|
   payload: {| usbDevice: UsbDevice |},
 |}
 
+export type NetworkInterfacesChangedAction = {|
+  type: NETWORK_INTERFACES_CHANGED,
+  payload: {| networkInterfaces: Array<NetworkInterface> |},
+|}
+
 export type SystemInfoAction =
   | InitializedAction
   | UsbDeviceAddedAction
   | UsbDeviceRemovedAction
+  | NetworkInterfacesChangedAction

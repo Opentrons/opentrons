@@ -223,6 +223,11 @@ export function FileSidebar(props: Props) {
     },
   })
 
+  const scrollToTop = () => {
+    const editPage = document.getElementById('main-page')
+    if (editPage) editPage.scrollTop = 0
+  }
+
   return (
     <>
       {blockingV4ExportHint}
@@ -271,8 +276,10 @@ export function FileSidebar(props: Props) {
             <PrimaryButton
               onClick={() => {
                 if (hasWarning) {
+                  scrollToTop()
                   setShowExportWarningModal(true)
                 } else if (isV4Protocol) {
+                  scrollToTop()
                   setShowV4ExportWarning(true)
                 } else {
                   saveFile(downloadData)
