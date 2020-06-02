@@ -7,7 +7,7 @@ import { Link } from '../ui'
 
 import styles from './styles.css'
 
-export function Breadcrumbs() {
+export function Breadcrumbs(): React.Node {
   return (
     <div className={styles.breadcrumbs}>
       <div className={styles.breadcrumbs_contents}>

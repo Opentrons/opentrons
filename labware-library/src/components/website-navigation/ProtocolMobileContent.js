@@ -8,7 +8,7 @@ import { protocolLinkProps } from './nav-data'
 
 type Props = {||}
 
-export function ProtocolMobileContent(props: Props) {
+export function ProtocolMobileContent(props: Props): React.Node {
   const links = map(protocolLinkProps)
   return (
     <ul className={styles.mobile_content}>

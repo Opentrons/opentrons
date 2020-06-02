@@ -8,7 +8,7 @@ type Props = {|
   active: boolean,
 |}
 
-export function ProtocolMenu(props: Props) {
+export function ProtocolMenu(props: Props): React.Node {
   const { active } = props
   const {
     options,

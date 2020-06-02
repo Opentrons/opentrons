@@ -18,10 +18,16 @@ const WELL_BOTTOM_IMAGES = {
   v: require('../../../images/wellShapeV.svg'),
 }
 
+type OptionsWithImages = Array<{|
+  name: string,
+  value: string,
+  children?: React.Node,
+|}>
+
 const makeOptionsWithImages = (
   options: Options,
   imageMap: { [value: string]: string }
-): Array<{| name: string, value: string, children?: React.Node |}> =>
+): OptionsWithImages =>
   options.map(opt => ({
     name: opt.name,
     value: opt.value,
@@ -33,12 +39,12 @@ const makeOptionsWithImages = (
     ),
   }))
 
-export const wellShapeOptionsWithIcons = makeOptionsWithImages(
+export const wellShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
   wellShapeOptions,
   WELL_SHAPE_IMAGES
 )
 
-export const wellBottomShapeOptionsWithIcons = makeOptionsWithImages(
+export const wellBottomShapeOptionsWithIcons: OptionsWithImages = makeOptionsWithImages(
   wellBottomShapeOptions,
   WELL_BOTTOM_IMAGES
 )

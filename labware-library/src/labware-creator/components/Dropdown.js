@@ -19,14 +19,16 @@ export type DropdownProps = {|
   >,
 |}
 
-export const OptionLabel = (props: $ElementType<Options, number>) => (
+export const OptionLabel = (
+  props: $ElementType<Options, number>
+): React.Node => (
   <div className={styles.option_row}>
     {props.imgSrc && <img className={styles.option_image} src={props.imgSrc} />}
     <div className={styles.option_label}>{props.name}</div>
   </div>
 )
 
-export const Dropdown = (props: DropdownProps) => {
+export const Dropdown = (props: DropdownProps): React.Node => {
   const options = React.useMemo(
     () =>
       props.options.map(o => ({

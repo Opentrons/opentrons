@@ -13,7 +13,7 @@ type Props = {|
   active: boolean,
 |}
 
-export function ProductMenu(props: Props) {
+export function ProductMenu(props: Props): React.Node {
   const { active } = props
   return (
     <>

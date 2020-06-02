@@ -8,7 +8,7 @@ type Props = {|
   children: React.Node,
 |}
 
-export function LabwareCreator(props: Props) {
+export function LabwareCreator(props: Props): React.Node {
   return (
     <>
       <AnalyticsOptInModal className={styles.analytics_modal}>

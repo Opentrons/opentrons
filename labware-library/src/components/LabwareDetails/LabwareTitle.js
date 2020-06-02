@@ -15,7 +15,7 @@ export type LabwareTitleProps = {|
   className?: string,
 |}
 
-export function LabwareTitle(props: LabwareTitleProps) {
+export function LabwareTitle(props: LabwareTitleProps): React.Node {
   const { definition, className } = props
   const { metadata } = definition
   const { displayCategory } = definition.metadata

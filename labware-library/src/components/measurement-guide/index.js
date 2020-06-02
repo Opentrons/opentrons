@@ -11,7 +11,7 @@ export type DiagramProps = {|
   isMultiRow?: boolean,
 |}
 
-const FOOTPRINT_DIAGRAMS: { [category: string]: Array<string> } = {
+const FOOTPRINT_DIAGRAMS: { [category: string]: Array<string>, ... } = {
   wellPlate: [
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-plate-and-reservoir@3x.png'),
@@ -34,7 +34,7 @@ const FOOTPRINT_DIAGRAMS: { [category: string]: Array<string> } = {
   ],
 }
 
-const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<string> } = {
+const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<string>, ... } = {
   tubeRack: [
     require('./images/dimensions/footprint@3x.png'),
     require('./images/dimensions/height-alum-block-tubes@3x.png'),
@@ -47,6 +47,7 @@ const ALUM_BLOCK_FOOTPRINTS: { [category: string]: Array<string> } = {
 
 const RESERVOIR_SPACING_DIAGRAMS: {
   [rows: string]: Array<string>,
+  ...,
 } = {
   singleRow: [
     require('./images/offset/offset-reservoir@3x.png'),
@@ -60,6 +61,7 @@ const RESERVOIR_SPACING_DIAGRAMS: {
 
 const SPACING_DIAGRAMS: {
   [shape: string]: Array<string>,
+  ...,
 } = {
   circular: [
     require('./images/offset/offset-well-circular@3x.png'),
@@ -77,7 +79,8 @@ const TIPRACK_MEASUREMENT_DIAGRAMS: Array<string> = [
 ]
 
 const PLATE_MEASUREMENT_DIAGRAMS: {
-  [wellBottomShape: string]: { [shape: string]: Array<string> },
+  [wellBottomShape: string]: { [shape: string]: Array<string>, ... },
+  ...,
 } = {
   flat: {
     circular: [
@@ -111,7 +114,8 @@ const PLATE_MEASUREMENT_DIAGRAMS: {
   },
 }
 const MEASUREMENT_DIAGRAMS: {
-  [wellBottomShape: string]: { [shape: string]: Array<string> },
+  [wellBottomShape: string]: { [shape: string]: Array<string>, ... },
+  ...,
 } = {
   flat: {
     circular: [
@@ -145,7 +149,7 @@ const MEASUREMENT_DIAGRAMS: {
   },
 }
 
-export function getFootprintDiagram(props: DiagramProps) {
+export function getFootprintDiagram(props: DiagramProps): Array<string> {
   const { category, insertCategory, irregular } = props
   if (category === 'aluminumBlock') {
     return insertCategory ? ALUM_BLOCK_FOOTPRINTS[insertCategory] : []
@@ -155,7 +159,7 @@ export function getFootprintDiagram(props: DiagramProps) {
   return category ? FOOTPRINT_DIAGRAMS[category] : []
 }
 
-export function getSpacingDiagram(props: DiagramProps) {
+export function getSpacingDiagram(props: DiagramProps): Array<string> {
   const { category, isMultiRow, shape } = props
   if (category === 'reservoir') {
     return isMultiRow
@@ -166,7 +170,7 @@ export function getSpacingDiagram(props: DiagramProps) {
   return shape ? SPACING_DIAGRAMS[shape] : []
 }
 
-export function getMeasurementDiagram(props: DiagramProps) {
+export function getMeasurementDiagram(props: DiagramProps): Array<string> {
   const { category, wellBottomShape, shape } = props
   if (category === 'tipRack') return TIPRACK_MEASUREMENT_DIAGRAMS
   else if (category === 'wellPlate') {
