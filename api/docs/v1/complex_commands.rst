@@ -736,20 +736,20 @@ will have the steps
 
 .. note::
 
-The following scenarios may _not_ work as you expect them to.
+    The following scenarios may _not_ work as you expect them to.
 
-.. code-block:: python
+    .. code-block:: python
 
-    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.wells())
+        multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.wells())
 
-The multi-channel would visit **every** well in the plate and dispense liquid
-outside of the plate boundaries so be careful!
+    The multi-channel would visit **every** well in the plate and dispense liquid
+    outside of the plate boundaries so be careful!
 
-.. code-block:: python
+    .. code-block:: python
 
-    multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.rows('A'))
+        multi_pipette.transfer(50, plate_96.wells('A1'), plate_96.rows('A'))
 
-In this scenario, the multi-channel would only visit the first column of the plate.
+    In this scenario, the multi-channel would only visit the first column of the plate.
 
 
 Transfer in a 384 Well Plate
