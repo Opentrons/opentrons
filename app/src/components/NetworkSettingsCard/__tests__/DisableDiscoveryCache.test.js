@@ -59,6 +59,13 @@ describe('DisableDiscoveryCache', () => {
     expect(theToggle.prop('toggledOn')).toBe(false)
   })
 
+  it('renders description of the toggle component', () => {
+    const wrapper = render()
+    expect(wrapper.children().html()).toMatch(
+      /Disable caching of previously seen robots./
+    )
+  })
+
   it('updates the toggle status according to disableCache config', () => {
     stubSelector(getConfig, {
       discovery: {
