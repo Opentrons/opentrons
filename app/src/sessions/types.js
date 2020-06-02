@@ -214,42 +214,38 @@ export type SessionState = $Shape<
   |}>
 >
 
-export type AnalyticsModelsByMount =
-  | {|
-      leftPipetteModel?: string,
-      rightPipetteModel?: string,
-    |}
-  | {||}
+export type AnalyticsModelsByMount = {|
+  leftPipetteModel?: string,
+  rightPipetteModel?: string,
+|}
 
 type VectorTuple = [number, number, number]
-export type CalibrationCheckAnalyticsData =
-  | {|
-      comparingFirstPipetteHeightDifferenceVector?: VectorTuple,
-      comparingFirstPipetteHeightThresholdVector?: VectorTuple,
-      comparingFirstPipetteHeightExceedsThreshold?: boolean,
-      comparingFirstPipetteHeightErrorSource?: string,
-      comparingFirstPipettePointOneDifferenceVector?: VectorTuple,
-      comparingFirstPipettePointOneThresholdVector?: VectorTuple,
-      comparingFirstPipettePointOneExceedsThreshold?: boolean,
-      comparingFirstPipettePointOneErrorSource?: string,
-      comparingFirstPipettePointTwoDifferenceVector?: VectorTuple,
-      comparingFirstPipettePointTwoThresholdVector?: VectorTuple,
-      comparingFirstPipettePointTwoExceedsThreshold?: boolean,
-      comparingFirstPipettePointTwoErrorSource?: string,
-      comparingFirstPipettePointThreeDifferenceVector?: VectorTuple,
-      comparingFirstPipettePointThreeThresholdVector?: VectorTuple,
-      comparingFirstPipettePointThreeExceedsThreshold?: boolean,
-      comparingFirstPipettePointThreeErrorSource?: string,
-      comparingSecondPipetteHeightDifferenceVector?: VectorTuple,
-      comparingSecondPipetteHeightThresholdVector?: VectorTuple,
-      comparingSecondPipetteHeightExceedsThreshold?: boolean,
-      comparingSecondPipetteHeightErrorSource?: string,
-      comparingSecondPipettePointOneDifferenceVector?: VectorTuple,
-      comparingSecondPipettePointOneThresholdVector?: VectorTuple,
-      comparingSecondPipettePointOneExceedsThreshold?: boolean,
-      comparingSecondPipettePointOneErrorSource?: string,
-    |}
-  | {||}
+export type CalibrationCheckAnalyticsData = {|
+  comparingFirstPipetteHeightDifferenceVector?: VectorTuple,
+  comparingFirstPipetteHeightThresholdVector?: VectorTuple,
+  comparingFirstPipetteHeightExceedsThreshold?: boolean,
+  comparingFirstPipetteHeightErrorSource?: string,
+  comparingFirstPipettePointOneDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointOneThresholdVector?: VectorTuple,
+  comparingFirstPipettePointOneExceedsThreshold?: boolean,
+  comparingFirstPipettePointOneErrorSource?: string,
+  comparingFirstPipettePointTwoDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointTwoThresholdVector?: VectorTuple,
+  comparingFirstPipettePointTwoExceedsThreshold?: boolean,
+  comparingFirstPipettePointTwoErrorSource?: string,
+  comparingFirstPipettePointThreeDifferenceVector?: VectorTuple,
+  comparingFirstPipettePointThreeThresholdVector?: VectorTuple,
+  comparingFirstPipettePointThreeExceedsThreshold?: boolean,
+  comparingFirstPipettePointThreeErrorSource?: string,
+  comparingSecondPipetteHeightDifferenceVector?: VectorTuple,
+  comparingSecondPipetteHeightThresholdVector?: VectorTuple,
+  comparingSecondPipetteHeightExceedsThreshold?: boolean,
+  comparingSecondPipetteHeightErrorSource?: string,
+  comparingSecondPipettePointOneDifferenceVector?: VectorTuple,
+  comparingSecondPipettePointOneThresholdVector?: VectorTuple,
+  comparingSecondPipettePointOneExceedsThreshold?: boolean,
+  comparingSecondPipettePointOneErrorSource?: string,
+|}
 
 export type SharedAnalyticsProps = {|
   sessionType: SessionType,

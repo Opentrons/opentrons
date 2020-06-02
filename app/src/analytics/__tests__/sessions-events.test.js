@@ -18,18 +18,15 @@ const getAnalyticsPropsForRobotSessionById: JestMockFn<
 const MOCK_STATE: State = ({ mockState: true }: any)
 
 describe('events with calibration check session data', () => {
-  beforeEach(() => {
-    getAnalyticsPropsForRobotSessionById.mockImplementation(state => {
-      expect(state).toBe(MOCK_STATE)
-      return sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps
-    })
-  })
-
   afterEach(() => {
     jest.resetAllMocks()
   })
 
-  it('sessions:DELETE_SESSION of type Calibration Check > calibrationCheckExit', () => {
+  it('sessions:DELETE_SESSION of type Calibration Check > sessionExit', () => {
+    getAnalyticsPropsForRobotSessionById.mockImplementation(state => {
+      expect(state).toBe(MOCK_STATE)
+      return sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps
+    })
     const deleteSession = Sessions.deleteSession(
       'sacrosanct_coelacanth',
       'fake_session_id'
@@ -39,5 +36,17 @@ describe('events with calibration check session data', () => {
       name: 'sessionExit',
       properties: sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps,
     })
+  })
+  it('sessions:DELETE_SESSION of type Calibration Check > null', () => {
+    getAnalyticsPropsForRobotSessionById.mockImplementation(state => {
+      expect(state).toBe(MOCK_STATE)
+      return null
+    })
+    const deleteSession = Sessions.deleteSession(
+      'sacrosanct_coelacanth',
+      'fake_session_id'
+    )
+
+    return expect(makeEvent(deleteSession, MOCK_STATE)).resolves.toEqual(null)
   })
 })
