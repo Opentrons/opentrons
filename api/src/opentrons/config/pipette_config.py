@@ -256,9 +256,9 @@ def override(pipette_id: str, fields: TypeOverrides):
     :param fields: Dict of field name to override value
     """
     config_match = list_mutable_configs(pipette_id)
-    whole_config = load_config_dict(pipette_id)
+    whole_config, model = load_config_dict(pipette_id)
     validate_overrides(data=fields, config_model=config_match)
-    save_overrides(pipette_id, fields, whole_config['model'])
+    save_overrides(pipette_id, fields, model)
 
 
 def save_overrides(pipette_id: str,
@@ -381,7 +381,8 @@ def add_default(cfg):
                 add_default(cfg[top_level_key])
 
 
-def load_config_dict(pipette_id: str) -> 'PipetteFusedSpec':
+def load_config_dict(pipette_id: str) -> Tuple[
+        'PipetteFusedSpec', 'PipetteModel']:
     """ Give updated config with overrides for a pipette. This will add
     the default value for a mutable config before returning the modified
     config value.
@@ -399,7 +400,7 @@ def load_config_dict(pipette_id: str) -> 'PipetteFusedSpec':
 
     config.update(override)  # type: ignore
 
-    return config
+    return config, model
 
 
 def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
@@ -409,7 +410,7 @@ def list_mutable_configs(pipette_id: str) -> Dict[str, Any]:
     cfg: Dict[str, Any] = {}
 
     if pipette_id in known_pipettes():
-        config = load_config_dict(pipette_id)
+        config, model = load_config_dict(pipette_id)
     else:
         log.info(f'Pipette id {pipette_id} not found')
         return cfg
