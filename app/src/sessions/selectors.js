@@ -1,5 +1,6 @@
 // @flow
 import type { State } from '../types'
+import * as Calibration from '../calibration'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -44,7 +45,7 @@ export const getAnalyticsPropsForRobotSessionById: (
     const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
       instruments
     ).reduce(
-      (acc, mount) => ({
+      (acc: Types.AnalyticsModelsByMount, mount: string) => ({
         ...acc,
         [`${mount.toLowerCase()}PipetteModel`]: instruments[mount].model,
       }),
@@ -52,7 +53,10 @@ export const getAnalyticsPropsForRobotSessionById: (
     )
     const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
-      (acc, stepName) => {
+      (
+        acc: Types.CalibrationCheckAnalyticsData,
+        stepName: Calibration.RobotCalibrationCheckStep
+      ) => {
         const {
           differenceVector,
           thresholdVector,
