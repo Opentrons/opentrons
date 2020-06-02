@@ -66,17 +66,19 @@ class Pipette(CommandPublisher):
 
     All model-specific instrument constructors are inheritors of this class.
     With any of those instances you can can:
-        * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
-          :meth:`mix`, and :meth:`blow_out`
-        * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
-          and :meth:`return_tip`
-        * Calibrate this pipette's plunger positions
-        * Calibrate the position of each :any:`Container` on deck
+    
+    * Handle liquids with :meth:`aspirate`, :meth:`dispense`,
+      :meth:`mix`, and :meth:`blow_out`
+    * Handle tips with :meth:`pick_up_tip`, :meth:`drop_tip`,
+      and :meth:`return_tip`
+    * Calibrate this pipette's plunger positions
+    * Calibrate the position of each :any:`Container` on deck
 
     Here are the typical steps of using the Pipette:
-        * Instantiate a pipette with a maximum volume (uL)
-        and a mount (`left` or `right`)
-        * Design your protocol through the pipette's liquid-handling commands
+    
+    * Instantiate a pipette with a maximum volume (uL)
+      and a mount (`left` or `right`)
+    * Design your protocol through the pipette's liquid-handling commands
 
     Methods in this class include assertions where needed to ensure that any
     action that requires a tip must be preceeded by `pick_up_tip`. For example:
@@ -1838,6 +1840,7 @@ class Pipette(CommandPublisher):
         Set the speed (uL/second) the :any:`Pipette` plunger will move
         during :meth:`aspirate` and :meth:`dispense`. The speed is set using
         nominal max volumes for any given pipette model.
+        
         Parameters
         ----------
         aspirate: int
