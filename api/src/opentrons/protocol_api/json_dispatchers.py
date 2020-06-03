@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, TYPE_CHECKING
 from opentrons.protocol_api.execute_v3 import _blowout, _pick_up_tip, \
     _drop_tip, _aspirate, _dispense, _touch_tip
 from opentrons.protocol_api.execute_v4 import _engage_magnet, \
@@ -12,28 +12,39 @@ from opentrons.protocol_api.execute_v4 import _engage_magnet, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
     _thermocycler_run_profile
-from .types import PipetteHandler, MagneticModuleHandler, \
-    TemperatureModuleHandler, \
-    ThermocyclerModuleHandler, \
-    ThermocyclerContext
-from .constants import JsonCommand
+
+from .types import ThermocyclerContext
 
 
-pipette_command_map: Dict[str, PipetteHandler] = {
+from opentrons_shared_data.protocol.constants import JsonCommand
+
+if TYPE_CHECKING:
+    from .dev_types import (
+        JsonV4PipetteDispatch, JsonV4MagneticModuleDispatch,
+        JsonV4TemperatureModuleDispatch,
+        JsonV4ThermocyclerDispatch
+    )
+
+
+def not_implemented(*args, **kwargs) -> None:
+    raise NotImplementedError('Not implemented')
+
+pipette_command_map: 'JsonV4PipetteDispatch' = {
     JsonCommand.blowout.value: _blowout,
     JsonCommand.pickUpTip.value: _pick_up_tip,
     JsonCommand.dropTip.value: _drop_tip,
     JsonCommand.aspirate.value: _aspirate,
     JsonCommand.dispense.value: _dispense,
     JsonCommand.touchTip.value: _touch_tip,
+    JsonCommand.airGap.value: not_implemented,
 }
 
-magnetic_module_command_map: Dict[str, MagneticModuleHandler] = {
+magnetic_module_command_map: 'JsonV4MagneticModuleDispatch' = {
     JsonCommand.magneticModuleEngageMagnet.value: _engage_magnet,
     JsonCommand.magneticModuleDisengageMagnet.value: _disengage_magnet,
 }
 
-temperature_module_command_map: Dict[str, TemperatureModuleHandler] = {
+temperature_module_command_map: 'JsonV4TemperatureModuleDispatch' = {
     JsonCommand.temperatureModuleSetTargetTemperature.value:
         _temperature_module_set_temp,
     JsonCommand.temperatureModuleDeactivate.value:
@@ -47,8 +58,7 @@ def tc_do_nothing(module: ThermocyclerContext, params) -> None:
     pass
 
 
-thermocycler_module_command_map: \
-    Dict[str, ThermocyclerModuleHandler] = \
+thermocycler_module_command_map: 'JsonV4ThermocyclerDispatch' =
     {
         JsonCommand.thermocyclerCloseLid.value:
             _thermocycler_close_lid,
@@ -72,5 +82,5 @@ thermocycler_module_command_map: \
         JsonCommand.thermocyclerAwaitLidTemperature.value: \
         tc_do_nothing,
         JsonCommand.thermocyclerAwaitProfileComplete.value: \
-        tc_do_nothing
+        tc_do_nothing,
     }

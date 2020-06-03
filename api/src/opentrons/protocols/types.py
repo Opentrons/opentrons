@@ -2,6 +2,9 @@ from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
 
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.protocol.dev_types import (
+        JsonProtocol as JsonProtocolDef
+    )
 
 Metadata = Dict[str, Union[str, int]]
 
@@ -17,7 +20,7 @@ class APIVersion(NamedTuple):
 class JsonProtocol(NamedTuple):
     text: str
     filename: Optional[str]
-    contents: Dict[str, Any]
+    contents: 'JsonProtocolDef'
     schema_version: int
 
 
