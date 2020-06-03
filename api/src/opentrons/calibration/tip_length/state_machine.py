@@ -1,6 +1,7 @@
 import typing
+from enum import Enum
 
-from opentrons.calibration.util import StateMachine
+from opentrons.calibration.util import StateMachine, WILDCARD
 
 
 """
@@ -10,7 +11,7 @@ unique (by serial number) physical pipette.
 """
 
 
-class TipLengthCalibrationState(str, Enum):
+class TipCalibrationState(str, Enum):
     sessionStarted = "sessionStarted"
     labwareLoaded = "labwareLoaded"
     measuringNozzleOffset = "measuringNozzleOffset"
@@ -21,10 +22,10 @@ class TipLengthCalibrationState(str, Enum):
     sessionExited = "sessionExited"
 
 
-class TipLengthCalibrationTrigger(str, Enum):
+class TipCalibrationTrigger(str, Enum):
     load_labware = "loadLabware"
     move_to_measure_nozzle_offset = "moveToMeasureNozzleOffset"
-    save_nozzle_position = "saveNozzlePositon"
+    save_nozzle_position = "saveNozzlePosition"
     jog = "jog"
     pick_up_tip = "pickUpTip"
     confirm_tip_attached = "confirmTip"
@@ -35,79 +36,82 @@ class TipLengthCalibrationTrigger(str, Enum):
 
 TIP_LENGTH_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
     {
-        "trigger": TipLengthCalibrationTrigger.load_labware,
-        "from_state": TipLengthCalibrationState.sessionStarted,
-        "to_state": TipLengthCalibrationState.labwareLoaded,
+        "trigger": TipCalibrationTrigger.load_labware,
+        "from_state": TipCalibrationState.sessionStarted,
+        "to_state": TipCalibrationState.labwareLoaded,
         # TODO: load tiprack and (has_calibration_block && cal block)
     },
     {
-        "trigger": TipLengthCalibrationTrigger.move_to_measure_nozzle_offset,
-        "from_state": TipLengthCalibrationState.labwareLoaded,
-        "to_state": TipLengthCalibrationState.measuringNozzleOffset,
+        "trigger": TipCalibrationTrigger.move_to_measure_nozzle_offset,
+        "from_state": TipCalibrationState.labwareLoaded,
+        "to_state": TipCalibrationState.measuringNozzleOffset,
         # TODO: move nozzle to has_calibration_block ? block : trash edge
     },
     {
-        "trigger": TipLengthCalibrationTrigger.jog,
-        "from_state": TipLengthCalibrationState.measuringNozzleOffset,
-        "to_state": TipLengthCalibrationState.measuringNozzleOffset,
+        "trigger": TipCalibrationTrigger.jog,
+        "from_state": TipCalibrationState.measuringNozzleOffset,
+        "to_state": TipCalibrationState.measuringNozzleOffset,
         # TODO: jog pipette by supplied offset vector
     },
     {
-        "trigger": TipLengthCalibrationTrigger.save_nozzle_position,
-        "from_state": TipLengthCalibrationState.measuringNozzleOffset,
-        "to_state": TipLengthCalibrationState.preparingPipette,
+        "trigger": TipCalibrationTrigger.save_nozzle_position,
+        "from_state": TipCalibrationState.measuringNozzleOffset,
+        "to_state": TipCalibrationState.preparingPipette,
         # TODO: save jogged-to position
         # TODO: after saving position move nozzle to tiprack A1
     },
     {
-        "trigger": TipLengthCalibrationTrigger.jog,
-        "from_state": TipLengthCalibrationState.preparingPipette,
-        "to_state": TipLengthCalibrationState.preparingPipette,
+        "trigger": TipCalibrationTrigger.jog,
+        "from_state": TipCalibrationState.preparingPipette,
+        "to_state": TipCalibrationState.preparingPipette,
         # TODO: jog pipette by supplied offset vector
     },
     {
-        "trigger": TipLengthCalibrationTrigger.pick_up_tip,
-        "from_state": TipLengthCalibrationState.preparingPipette,
-        "to_state": TipLengthCalibrationState.inspectingTip,
+        "trigger": TipCalibrationTrigger.pick_up_tip,
+        "from_state": TipCalibrationState.preparingPipette,
+        "to_state": TipCalibrationState.inspectingTip,
         # TODO: pick up tip
     },
     {
-        "trigger": TipLengthCalibrationTrigger.invalidate_tip,
-        "from_state": TipLengthCalibrationState.inspectingTip,
-        "to_state": TipLengthCalibrationState.preparingPipette,
+        "trigger": TipCalibrationTrigger.invalidate_tip,
+        "from_state": TipCalibrationState.inspectingTip,
+        "to_state": TipCalibrationState.preparingPipette,
         # TODO: return (tip)
         # TODO: move nozzle back to safety buffer above tip to pick up
     },
     {
-        "trigger": TipLengthCalibrationTrigger.confirm_tip_attached,
-        "from_state": TipLengthCalibrationState.inspectingTip,
-        "to_state": TipLengthCalibrationState.measuringTipOffset,
+        "trigger": TipCalibrationTrigger.confirm_tip_attached,
+        "from_state": TipCalibrationState.inspectingTip,
+        "to_state": TipCalibrationState.measuringTipOffset,
         # TODO: move pip with tip has_calibration_block ? block : trash edge
     },
     {
-        "trigger": TipLengthCalibrationTrigger.jog,
-        "from_state": TipLengthCalibrationState.measuringTipOffset,
-        "to_state": TipLengthCalibrationState.measuringTipOffset,
+        "trigger": TipCalibrationTrigger.jog,
+        "from_state": TipCalibrationState.measuringTipOffset,
+        "to_state": TipCalibrationState.measuringTipOffset,
         # TODO: jog pipette by supplied offset vector
     },
     {
-        "trigger": TipLengthCalibrationTrigger.save_tip_position,
-        "from_state": TipLengthCalibrationState.measuringTipOffset,
-        "to_state": TipLengthCalibrationState.calibrationComplete,
+        "trigger": TipCalibrationTrigger.save_tip_position,
+        "from_state": TipCalibrationState.measuringTipOffset,
+        "to_state": TipCalibrationState.calibrationComplete,
     },
     {
-        "trigger": TipLengthCalibrationTrigger.exit_session,
-        "from_state": TipLengthCalibrationState.calibrationComplete,
-        "to_state": TipLengthCalibrationState.sessionExited,
-        # TODO: return tip to it's well in tiprack
+        "trigger": TipCalibrationTrigger.exit_session,
+        "from_state": WILDCARD,
+        "to_state": TipCalibrationState.sessionExited,
+        # TODO: if tip on pipette return tip to it's well in tiprack
     },
 ]
 
 
-class TipLengthCalibrationStateMachine(StateMachine):
-    def __init__(self, has_calibration_block=True):
-        StateMachine.__init__(self, states=[s for s in TipLengthCalibrationState],
+class TipCalibrationStateMachine(StateMachine):
+    def __init__(self,
+                 has_calibration_block=True,
+                 initial_state=TipCalibrationState.sessionStarted):
+        StateMachine.__init__(self,
+                              states=[s for s in TipCalibrationState],
                               transitions=TIP_LENGTH_TRANSITIONS,
-                              initial_state="sessionStarted")
+                              initial_state=initial_state)
         self._has_calibration_block = has_calibration_block
 
