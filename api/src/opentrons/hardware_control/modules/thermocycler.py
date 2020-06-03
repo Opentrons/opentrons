@@ -7,7 +7,7 @@ from ..execution_manager import ExecutionManager
 from . import types, update, mod_abc
 
 MODULE_LOG = logging.getLogger(__name__)
-
+TEMP_OVERSHOOT_DURATION = 10
 
 class Thermocycler(mod_abc.AbstractModule):
     """
@@ -198,6 +198,18 @@ class Thermocycler(mod_abc.AbstractModule):
 
         Subject to change without a version bump.
         """
+        # Wait until temp is close to target
+        while self.status != 'holding at target':
+            await asyncio.sleep(0.1)
+
+        # holding_at_target merely checks if block temp is close to target
+        # at that particular moment. The peltiers overshoot for a fixed
+        # duration before stabilizing to target temp.
+
+        # Wait until overshoot has passed
+        await asyncio.sleep(TEMP_OVERSHOOT_DURATION)
+
+        # Check if temp has stabilized at target
         while self.status != 'holding at target':
             await asyncio.sleep(0.1)
 
