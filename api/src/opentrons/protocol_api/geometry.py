@@ -1,19 +1,23 @@
 from collections import UserDict
 import functools
 import logging
-import json
 from dataclasses import dataclass
-from typing import Any, List, Optional, Tuple, Dict
+from typing import List, Optional, Tuple, Dict, TYPE_CHECKING
 
 from opentrons import types
 from opentrons.hardware_control.types import CriticalPoint
 from opentrons.hardware_control.util import plan_arc
-from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.deck import load
 from .labware import (Labware, Well,
                       quirks_from_any_parent)
 from .definitions import DeckItem
 from .module_geometry import ThermocyclerGeometry, ModuleGeometry, ModuleType
 from .util import first_parent
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.deck.dev_types import (
+        SlotDefV2
+    )
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -280,8 +284,7 @@ class Deck(UserDict):
                            for idx in range(12)}
         self._highest_z = 0.0
         # TODO: support deck loadName as a param
-        def_path = 'deck/definitions/2/ot2_standard.json'
-        self._definition = json.loads(load_shared_data(def_path))
+        self._definition = load('ot2_standard', 2)
 
     @staticmethod
     def _assure_int(key: object) -> int:
@@ -392,8 +395,8 @@ class Deck(UserDict):
         for item in [lw for lw in self.data.values() if lw]:
             self._highest_z = max(item.highest_z, self._highest_z)
 
-    def get_slot_definition(self, slot_name) -> Dict[str, Any]:
-        slots: List[Dict] = self._definition['locations']['orderedSlots']
+    def get_slot_definition(self, slot_name) -> 'SlotDefV2':
+        slots = self._definition['locations']['orderedSlots']
         slot_def = next(
             (slot for slot in slots if slot['id'] == slot_name), None)
         if not slot_def:
@@ -416,9 +419,9 @@ class Deck(UserDict):
                         ModuleType.THERMOCYCLER: 'Thermocycler',
                         ModuleType.TEMPERATURE: 'Temperature Module'}
         if isinstance(location, str) or isinstance(location, int):
-            slot_def: Dict[str, Any] = self.get_slot_definition(
+            slot_def = self.get_slot_definition(
                 str(location))
-            compatible_modules: List[str] = slot_def['compatibleModuleTypes']
+            compatible_modules = slot_def['compatibleModuleTypes']
             if module_type.value in compatible_modules:
                 return location
             else:
@@ -446,7 +449,7 @@ class Deck(UserDict):
         return self._highest_z
 
     @property
-    def slots(self) -> List[Dict]:
+    def slots(self) -> List['SlotDefV2']:
         """ Return the definition of the loaded robot deck. """
         return self._definition['locations']['orderedSlots']
 
