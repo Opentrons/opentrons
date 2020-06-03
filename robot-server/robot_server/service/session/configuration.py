@@ -5,7 +5,7 @@ from opentrons.hardware_control import HardwareAPILike
 from robot_server.service.session.models import IdentifierType
 
 
-class SessionCommon:
+class SessionConfiguration:
     """Data and utilities common to all session types
      provided by session manager"""
 

@@ -5,14 +5,14 @@ from opentrons.calibration.check.models import SessionType
 from opentrons.hardware_control import HardwareAPILike
 
 from robot_server.service.session.session import Session
-from robot_server.service.session.common import SessionCommon
+from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType
-
+from robot_server.service.session.session_types.null_session import NullSession
 
 log = logging.getLogger(__name__)
 
 SessionTypeToClass: Dict[SessionType, Type[Session]] = {
-    SessionType.null: Session,
+    SessionType.null: NullSession,
     # SessionType.default:
 }
 
@@ -24,7 +24,7 @@ class SessionManager:
         self._sessions: Dict[IdentifierType, Session] = {}
         self._active_session_id: Optional[IdentifierType] = None
         # Create object supplied to all sessions
-        self._session_common = SessionCommon(
+        self._session_common = SessionConfiguration(
             hardware=hardware,
             is_active=self.is_active
         )
@@ -36,14 +36,14 @@ class SessionManager:
         if cls:
             session = await cls.create(self._session_common)
             if session:
-                self._sessions[session.identifier] = session
+                self._sessions[session.meta.identifier] = session
         return session
 
     async def remove(self, identifier: IdentifierType) -> Optional[Session]:
         """Remove a session"""
         session = self.deactivate(identifier)
         if session:
-            del self._sessions[session.identifier]
+            del self._sessions[session.meta.identifier]
             await session.clean_up()
         return session
 

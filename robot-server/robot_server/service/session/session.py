@@ -1,58 +1,96 @@
+from abc import ABC, abstractmethod
+from dataclasses import dataclass, field
 from datetime import datetime
+from typing import Optional
 
 from opentrons.calibration.check.models import SessionType
 
-from robot_server.service.session.command import Command
-from robot_server.service.session.common import SessionCommon
-from robot_server.service.session.models import create_identifier,\
-    IdentifierType
+from .command_execution.base_command_queue import CommandQueue
+from .command_execution.base_executor import CommandExecutor
+from .configuration import SessionConfiguration
+from robot_server.service.session import models
 
 
-class Session:
+@dataclass(frozen=True)
+class SessionMetaData:
+    name: Optional[str]
+    description: Optional[str]
+    identifier: models.IdentifierType = field(
+        default_factory=models.create_identifier
+    )
+    created_on: datetime = field(default_factory=datetime.utcnow)
+
+
+class Session(ABC):
     """Base class of all sessions"""
 
-    def __init__(self, common: SessionCommon):
+    def __init__(self,
+                 configuration: SessionConfiguration,
+                 instance_meta: SessionMetaData):
         """
         Constructor
 
-        :param common: Data and utilities common to all session types
+        :param configuration: Data and utilities common to all session types
+        :param instance_meta: Session metadata
         """
-        self._id = create_identifier()
-        self._created_on = datetime.utcnow()
-        self._common = common
+        self._configuration = configuration
+        self._instance_meta = instance_meta
 
     @classmethod
-    async def create(cls, common: SessionCommon) -> 'Session':
-        """Create instance"""
-        return cls(common)
+    async def create(cls,
+                     configuration: SessionConfiguration,
+                     name: Optional[str] = None,
+                     description: Optional[str] = None):
+        """
+        Create a session object
+
+        :param configuration: Data and utilities common to all session types
+        :param name: Optional name for the session
+        :param description: Optional description of the session
+        :return: A new session
+        """
+        return cls(configuration=configuration,
+                   instance_meta=SessionMetaData(
+                       name=name,
+                       description=description
+                   ))
+
+    def get_response_model(self) -> models.Session:
+        """Get the response model"""
+        return models.Session(sessionType=self.session_type,
+                              details=self._get_response_details())
+
+    @abstractmethod
+    def _get_response_details(self) -> models.SessionDetails:
+        """Get session type specific details"""
+        pass
 
     async def clean_up(self):
         """Called before session is deleted"""
         pass
 
-    async def enqueue_command(self, command: Command):
-        """Enqueue a command for later execution"""
-        raise NotImplementedError()
-
-    async def execute_command(self, command: Command):
-        """Execute the command"""
-        raise NotImplementedError()
+    @property
+    @abstractmethod
+    def command_executor(self) -> CommandExecutor:
+        """Accessor for the command executor"""
+        pass
 
     @property
-    def identifier(self) -> IdentifierType:
-        return self._id
+    @abstractmethod
+    def command_queue(self) -> CommandQueue:
+        pass
 
     @property
+    def meta(self) -> SessionMetaData:
+        return self._instance_meta
+
+    @property
+    @abstractmethod
     def session_type(self) -> SessionType:
-        return SessionType.null
-
-    @property
-    def created_on(self) -> datetime:
-        return self._created_on
+        pass
 
     def __str__(self) -> str:
         return f"Session(" \
                f"session_type={self.session_type}," \
-               f"identifier={self.identifier}," \
-               f"created_on={self.created_on}," \
+               f"meta={self.meta}," \
                f")"

@@ -40,35 +40,35 @@ async def test_add_no_class_doesnt_call_create(manager, mock_session_create):
 
 async def test_add_stores_session(manager):
     session = await manager.add(SessionType.null)
-    assert manager._sessions[session.identifier] == session
+    assert manager._sessions[session.meta.identifier] == session
 
 
 async def test_remove_removes(manager):
     session = await manager.add(SessionType.null)
-    assert await manager.remove(session.identifier) is session
-    assert session.identifier not in manager._sessions
+    assert await manager.remove(session.meta.identifier) is session
+    assert session.meta.identifier not in manager._sessions
 
 
 async def test_remove_calls_cleanup(manager):
     session = await manager.add(SessionType.null)
     session.clean_up = MagicMock(side_effect=side_effect)
-    await manager.remove(session.identifier)
+    await manager.remove(session.meta.identifier)
     session.clean_up.assert_called_once()
 
 
 async def test_remove_active_session(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.identifier
-    await manager.remove(session.identifier)
+    manager._active_session_id = session.meta.identifier
+    await manager.remove(session.meta.identifier)
     assert manager._active_session_id is None
 
 
 async def test_remove_inactive_session(manager):
     active_session = await manager.add(SessionType.null)
-    manager._active_session_id = active_session.identifier
+    manager._active_session_id = active_session.meta.identifier
     session = await manager.add(SessionType.null)
-    await manager.remove(session.identifier)
-    assert manager._active_session_id is active_session.identifier
+    await manager.remove(session.meta.identifier)
+    assert manager._active_session_id is active_session.meta.identifier
 
 
 async def test_remove_unknown_session(manager):
@@ -89,7 +89,7 @@ async def test_get_by_type(manager):
 
 async def test_get_active(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.identifier
+    manager._active_session_id = session.meta.identifier
     assert manager.get_active() is session
 
 
@@ -100,8 +100,8 @@ def test_get_active_no_active(manager):
 
 async def test_is_active(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.identifier
-    assert manager.is_active(session.identifier) is True
+    manager._active_session_id = session.meta.identifier
+    assert manager.is_active(session.meta.identifier) is True
 
 
 def test_is_active_not_active(manager):
@@ -110,8 +110,8 @@ def test_is_active_not_active(manager):
 
 async def test_activate(manager):
     session = await manager.add(SessionType.null)
-    assert manager.activate(session.identifier) is session
-    assert manager._active_session_id == session.identifier
+    assert manager.activate(session.meta.identifier) is session
+    assert manager._active_session_id == session.meta.identifier
 
 
 def test_activate_unknown_session(manager):
@@ -121,16 +121,16 @@ def test_activate_unknown_session(manager):
 
 async def test_deactivate(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.identifier
-    assert manager.deactivate(session.identifier) is session
+    manager._active_session_id = session.meta.identifier
+    assert manager.deactivate(session.meta.identifier) is session
     assert manager._active_session_id is None
 
 
 async def test_deactivate_unknown_session(manager):
     session = await manager.add(SessionType.null)
-    manager._active_session_id = session.identifier
+    manager._active_session_id = session.meta.identifier
     assert manager.deactivate(create_identifier()) is None
-    assert manager._active_session_id is session.identifier
+    assert manager._active_session_id is session.meta.identifier
 
 
 def test_deactivate_non_active(manager):
