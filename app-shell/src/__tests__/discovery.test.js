@@ -1,3 +1,4 @@
+// @flow
 // tests for the app-shell's discovery module
 import EventEmitter from 'events'
 import { app } from 'electron'
@@ -12,8 +13,10 @@ jest.mock('@opentrons/discovery-client')
 jest.mock('../log')
 jest.mock('../config')
 
-const _handleConfigChange: JestMockFn<[string, (any, any) => mixed], mixed> =
-  handleConfigChange
+const _handleConfigChange: JestMockFn<
+  [string, (any, any) => mixed],
+  mixed
+> = handleConfigChange
 
 describe('app-shell/discovery', () => {
   let dispatch

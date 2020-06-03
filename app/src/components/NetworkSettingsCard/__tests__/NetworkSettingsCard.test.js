@@ -27,5 +27,5 @@ describe('NetworkSettingsCard', () => {
   it('should render a DisableDiscoveryCache component', () => {
     const wrapper = shallow(<NetworkSettingsCard />)
     expect(wrapper.exists(DisableDiscoveryCache)).toBe(true)
-    })
+  })
 })

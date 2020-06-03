@@ -15,7 +15,7 @@ jest.mock('../../../config/selectors')
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 
-const getConfig: JestMockFn<[State], Config> = AllConfig.getConfig
+const getConfig: JestMockFn<[State], $Shape<Config>> = AllConfig.getConfig
 
 function stubSelector<R>(mock: JestMockFn<[State], R>, rVal: R) {
   mock.mockImplementation(state => {

@@ -19,9 +19,7 @@ export const DisableDiscoveryCache = () => {
         dispatch(updateConfig('discovery.disableCache', !cacheDisabled))
       }}
     >
-      <p>
-        NOTE: This will clear cached robots when switched ON.
-      </p>
+      <p>NOTE: This will clear cached robots when switched ON.</p>
       <p>
         Disable caching of previously seen robots. Enabling this setting may
         improve overall networking performance in environments with many OT-2s,
