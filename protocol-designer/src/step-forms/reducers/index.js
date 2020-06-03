@@ -75,6 +75,7 @@ import type {
   AddProfileStepAction,
   DeleteProfileCycleAction,
   DeleteProfileStepAction,
+  EditProfileCycleAction,
   EditProfileStepAction,
 } from '../../steplist/actions'
 import type {
@@ -136,6 +137,7 @@ type UnsavedFormActions =
   | AddProfileStepAction
   | DeleteProfileStepAction
   | DeleteProfileCycleAction
+  | EditProfileCycleAction
   | EditProfileStepAction
 export const unsavedForm = (
   rootState: RootState,
@@ -339,9 +341,37 @@ export const unsavedForm = (
         profileItemsById: filteredItemsById,
       }
     }
-    case 'EDIT_PROFILE_STEP': {
-      // TODO IMMEDIATELY clean this up and add tests
+    case 'EDIT_PROFILE_CYCLE': {
+      if (unsavedFormState?.stepType !== 'thermocycler') {
+        console.error(
+          'EDIT_PROFILE_CYCLE should only be dispatched when unsaved form is "thermocycler" form'
+        )
+        return unsavedFormState
+      }
 
+      const { id, fields } = action.payload
+
+      const cycle = unsavedFormState.profileItemsById[id]
+
+      if (cycle.type !== PROFILE_CYCLE) {
+        console.warn(
+          `EDIT_PROFILE_CYCLE got non-cycle profile item ${cycle.id}`
+        )
+        return unsavedFormState
+      }
+
+      return {
+        ...unsavedFormState,
+        profileItemsById: {
+          ...unsavedFormState.profileItemsById,
+          [id]: {
+            ...cycle,
+            ...fields,
+          },
+        },
+      }
+    }
+    case 'EDIT_PROFILE_STEP': {
       if (unsavedFormState?.stepType !== 'thermocycler') {
         console.error(
           'EDIT_PROFILE_STEP should only be dispatched when unsaved form is "thermocycler" form'
@@ -364,25 +394,50 @@ export const unsavedForm = (
           },
         }
       } else {
+        // it's a step in a cycle. Get the cycle id, and the index of our edited step in that cycle's `steps` array
+        let editedStepIndex = -1
+        const cycleId: string | void = Object.keys(
+          unsavedFormState.profileItemsById
+        ).find((itemId: string): boolean => {
+          const item: ProfileItem = unsavedFormState.profileItemsById[itemId]
+          if (item.type === PROFILE_CYCLE) {
+            const stepIndex = item.steps.findIndex(step => step.id === id)
+            if (stepIndex !== -1) {
+              editedStepIndex = stepIndex
+              return true
+            }
+          }
+          return false
+        })
+
+        if (cycleId == null || editedStepIndex === -1) {
+          console.warn(`EDIT_PROFILE_STEP: step does not exist ${id}`)
+          return unsavedFormState
+        }
+
+        let newCycle: ProfileCycleItem = {
+          ...unsavedFormState.profileItemsById[cycleId],
+        }
+
+        const newSteps = [...newCycle.steps]
+
+        newSteps[editedStepIndex] = {
+          ...newCycle.steps[editedStepIndex],
+          ...fields,
+        }
+
+        newCycle = {
+          ...newCycle,
+          steps: newSteps,
+        }
+
+        const newProfileItems = {
+          ...unsavedFormState.profileItemsById,
+          [cycleId]: newCycle,
+        }
         return {
           ...unsavedFormState,
-          profileItemsById: mapValues(
-            unsavedFormState.profileItemsById,
-            item => {
-              if (
-                item.type === PROFILE_CYCLE &&
-                item.steps.some(step => step.id)
-              ) {
-                return {
-                  ...item,
-                  steps: item.steps.map(step =>
-                    step.id === id ? { ...step, ...fields } : step
-                  ),
-                }
-              }
-              return item
-            }
-          ),
+          profileItemsById: newProfileItems,
         }
       }
     }

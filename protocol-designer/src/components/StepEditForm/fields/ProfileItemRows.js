@@ -30,44 +30,6 @@ export const showProfileFieldErrors = ({
 |}): boolean =>
   !(fieldId === focusedField) && dirtyFields && dirtyFields.includes(fieldId)
 
-export type ProfileStepRowsProps = {|
-  focusHandlers: FocusHandlers,
-|}
-
-type ProfileStepItemRowProps = {|
-  stepItem: ProfileStepItem,
-  focusHandlers: FocusHandlers,
-|}
-const ProfileStepItemRow = (props: ProfileStepItemRowProps) => {
-  const { focusHandlers, stepItem } = props // TODO IMMEDIATELY rename var
-  const dispatch = useDispatch() // TODO consider passing action creator into dumb component
-
-  const updateStepFieldValue = (name: string, value: string) => {
-    const maskedValue = maskProfileField(name, value)
-    dispatch(
-      steplistActions.editProfileStep({
-        id: stepItem.id,
-        fields: { [name]: maskedValue },
-      })
-    )
-  }
-
-  const deleteProfileStep = () => {
-    dispatch(steplistActions.deleteProfileStep({ id: stepItem.id }))
-  }
-
-  return (
-    <div>
-      <ProfileStepRow
-        deleteProfileStep={deleteProfileStep}
-        profileStepItem={stepItem}
-        updateStepFieldValue={updateStepFieldValue}
-        focusHandlers={focusHandlers}
-      />
-    </div>
-  )
-}
-
 type ProfileCycleRowProps = {|
   cycleItem: ProfileCycleItem,
   focusHandlers: FocusHandlers,
@@ -85,13 +47,30 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
   return (
     <div>
       <div>TODO: cycle</div>
-      {cycleItem.steps.map((stepItem, index) => (
-        <ProfileStepItemRow
-          stepItem={stepItem}
+      <div>
+        {cycleItem.steps.map((stepItem, index) => (
+          <ProfileStepRow
+            profileStepItem={stepItem}
+            focusHandlers={focusHandlers}
+            key={stepItem.id}
+          />
+        ))}
+      </div>
+      <div>
+        <ProfileField
+          name="repetitions"
           focusHandlers={focusHandlers}
-          key={stepItem.id}
+          profileItem={cycleItem}
+          updateValue={(name, value) =>
+            dispatch(
+              steplistActions.editProfileCycle({
+                id: cycleItem.id,
+                fields: { [name]: value },
+              })
+            )
+          }
         />
-      ))}
+      </div>
       <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
       <div onClick={deleteProfileCycle}>
         <Icon name="close" className={styles.delete_step_icon} />
@@ -101,7 +80,11 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
   )
 }
 
-export const ProfileStepRows = (props: ProfileStepRowsProps) => {
+export type ProfileItemRowsProps = {|
+  focusHandlers: FocusHandlers,
+|}
+
+export const ProfileItemRows = (props: ProfileItemRowsProps) => {
   const dispatch = useDispatch()
   const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))
@@ -127,8 +110,8 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
     }
 
     return (
-      <ProfileStepItemRow
-        stepItem={itemFields}
+      <ProfileStepRow
+        profileStepItem={itemFields}
         focusHandlers={props.focusHandlers}
         key={itemId}
       />
@@ -153,14 +136,78 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
   )
 }
 
-type ProfileStepRowProps = {|
-  deleteProfileStep: () => mixed,
-  profileStepItem: ProfileStepItem,
-  updateStepFieldValue: (name: string, value: string) => mixed,
+type ProfileFieldProps = {|
+  name: string,
   focusHandlers: FocusHandlers,
+  profileItem: ProfileItem,
+  units?: React.Node,
+  updateValue: (name: string, value: mixed) => mixed,
+|}
+const ProfileField = (props: ProfileFieldProps) => {
+  const { focusHandlers, name, profileItem, units, updateValue } = props
+  const value = profileItem[name]
+  const fieldId = getDynamicFieldFocusHandlerId({
+    id: profileItem.id,
+    name,
+  })
+
+  const onChange = (e: SyntheticEvent<*>) => {
+    const value = e.currentTarget.value
+    const maskedValue = maskProfileField(name, value)
+    updateValue(name, maskedValue)
+  }
+
+  const showErrors = showProfileFieldErrors({
+    fieldId,
+    focusedField: focusHandlers.focusedField,
+    dirtyFields: focusHandlers.dirtyFields,
+  })
+  const errors = getProfileFieldErrors(name, value)
+  const errorToShow = showErrors && errors.length > 0 ? errors.join(', ') : null
+
+  // TODO: tooltips for profile fields
+  // const tooltipComponent =
+  //   props.tooltipComponent || getTooltipForField(stepType, name, disabled)
+
+  const onBlur = () => {
+    focusHandlers.onFieldBlur(fieldId)
+  }
+  const onFocus = () => {
+    focusHandlers.onFieldFocus(fieldId)
+  }
+  return (
+    <div className={styles.step_input_wrapper}>
+      <InputField
+        className={styles.step_input}
+        error={errorToShow}
+        units={units}
+        {...{ name, onChange, onBlur, onFocus, value }}
+      />
+    </div>
+  )
+}
+
+type ProfileStepRowProps = {|
+  focusHandlers: FocusHandlers,
+  profileStepItem: ProfileStepItem,
 |}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
+  const { focusHandlers, profileStepItem } = props
+  const dispatch = useDispatch()
+
+  const updateStepFieldValue = (name: string, value: mixed) => {
+    dispatch(
+      steplistActions.editProfileStep({
+        id: profileStepItem.id,
+        fields: { [name]: value },
+      })
+    )
+  }
+
+  const deleteProfileStep = () => {
+    dispatch(steplistActions.deleteProfileStep({ id: profileStepItem.id }))
+  }
   const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
   const units = {
     title: null,
@@ -168,53 +215,18 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     durationMinutes: i18n.t('application.units.minutes'),
     durationSeconds: i18n.t('application.units.seconds'),
   }
-  const {
-    deleteProfileStep,
-    profileStepItem,
-    updateStepFieldValue,
-    focusHandlers,
-  } = props
-  const fields = names.map(name => {
-    const value = profileStepItem[name]
-    const fieldId = getDynamicFieldFocusHandlerId({
-      id: profileStepItem.id,
-      name,
-    })
-
-    const onChange = (e: SyntheticEvent<*>) => {
-      updateStepFieldValue(name, e.currentTarget.value)
-    }
-
-    const showErrors = showProfileFieldErrors({
-      fieldId,
-      focusedField: focusHandlers.focusedField,
-      dirtyFields: focusHandlers.dirtyFields,
-    })
-    const errors = getProfileFieldErrors(name, value)
-    const errorToShow =
-      showErrors && errors.length > 0 ? errors.join(', ') : null
-
-    // TODO: tooltips for profile fields
-    // const tooltipComponent =
-    //   props.tooltipComponent || getTooltipForField(stepType, name, disabled)
-
-    const onBlur = () => {
-      focusHandlers.onFieldBlur(fieldId)
-    }
-    const onFocus = () => {
-      focusHandlers.onFieldFocus(fieldId)
-    }
-    return (
-      <div key={name} className={styles.step_input_wrapper}>
-        <InputField
-          className={styles.step_input}
-          error={errorToShow}
-          units={units[name]}
-          {...{ name, onChange, onBlur, onFocus, value }}
-        />
-      </div>
-    )
-  })
+  const fields = names.map(name => (
+    <ProfileField
+      key={name}
+      units={units[name]}
+      {...{
+        name,
+        focusHandlers,
+        profileItem: profileStepItem,
+        updateValue: updateStepFieldValue,
+      }}
+    />
+  ))
   return (
     <div className={styles.profile_step_row}>
       <div className={styles.profile_step_fields}>{fields}</div>

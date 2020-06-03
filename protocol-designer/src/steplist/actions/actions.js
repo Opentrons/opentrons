@@ -84,6 +84,22 @@ export const deleteProfileStep = (
   payload,
 })
 
+export type EditProfileCycleAction = {|
+  type: 'EDIT_PROFILE_CYCLE',
+  payload: {|
+    id: string,
+    fields: {|
+      repetitions?: string,
+    |},
+  |},
+|}
+export const editProfileCycle = (
+  payload: $PropertyType<EditProfileCycleAction, 'payload'>
+) => ({
+  type: 'EDIT_PROFILE_CYCLE',
+  payload,
+})
+
 export type EditProfileStepAction = {|
   type: 'EDIT_PROFILE_STEP',
   payload: {|

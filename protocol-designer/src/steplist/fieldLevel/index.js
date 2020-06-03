@@ -194,12 +194,19 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
 }
 
 const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
+  // profile step fields
   temperature: {
     getErrors: composeErrors(
       requiredField,
       minFieldValue(MIN_TC_BLOCK_TEMP),
       maxFieldValue(MAX_TC_BLOCK_TEMP)
     ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  // profile cycle fields
+  repetitions: {
+    getErrors: composeErrors(requiredField),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
@@ -217,7 +224,7 @@ export const getFieldErrors = (
 
 export const getProfileFieldErrors = (
   name: string,
-  value: string // TODO: mixed?
+  value: mixed
 ): Array<string> => {
   const fieldErrorGetter =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].getErrors
@@ -237,7 +244,7 @@ export const maskField = (name: StepFieldName, value: mixed): mixed => {
   return fieldMasker ? fieldMasker(value) : value
 }
 
-export const maskProfileField = (name: string, value: string) => {
+export const maskProfileField = (name: string, value: mixed): mixed => {
   const fieldMasker =
     profileFieldHelperMap[name] && profileFieldHelperMap[name].maskValue
   return fieldMasker ? fieldMasker(value) : value
