@@ -20,7 +20,7 @@ def manager(hardware):
 @pytest.fixture
 def mock_session_create():
     """Patch of Session.create"""
-    with patch("robot_server.service.session.manager.Session.create") as m:
+    with patch("robot_server.service.session.manager.BaseSession.create") as m:
         m.side_effect = side_effect
         yield m
 

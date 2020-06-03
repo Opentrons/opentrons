@@ -6,10 +6,10 @@ from robot_server.service.session.command_execution.base_command_queue import \
     CommandQueue
 from robot_server.service.session.command_execution import StateMachineExecutor
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.session import Session
+from robot_server.service.session.session_types.base_session import BaseSession
 
 
-class CheckSession(Session):
+class CheckBaseSession(BaseSession):
 
     def __init__(self, configuration: SessionConfiguration, **kwargs):
         super().__init__(configuration, **kwargs)

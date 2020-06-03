@@ -5,9 +5,9 @@ from typing import Optional
 
 from opentrons.calibration.check.models import SessionType
 
-from .command_execution.base_command_queue import CommandQueue
-from .command_execution.base_executor import CommandExecutor
-from .configuration import SessionConfiguration
+from robot_server.service.session.command_execution import CommandQueue,\
+    CommandExecutor
+from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session import models
 
 
@@ -21,7 +21,7 @@ class SessionMetaData:
     created_on: datetime = field(default_factory=datetime.utcnow)
 
 
-class Session(ABC):
+class BaseSession(ABC):
     """Base class of all sessions"""
 
     def __init__(self,
