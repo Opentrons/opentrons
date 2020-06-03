@@ -285,7 +285,7 @@ export function makeEvent(
       )
       if (analyticsProps) {
         return Promise.resolve({
-          name: 'sessionExit',
+          name: `${analyticsProps.sessionType}SessionExit`,
           properties: analyticsProps,
         })
       } else {
