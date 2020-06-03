@@ -1,11 +1,10 @@
 import pytest
 from typing import List, Tuple
-from opentrons import types
 
 from opentrons.calibration.tip_length import state_machine
 
 
-valid_transitions: List[Tuple[str,str,str]] = [
+valid_transitions: List[Tuple[str, str, str]] = [
   ('loadLabware', 'sessionStarted', 'labwareLoaded'),
   ('moveToMeasureNozzleOffset', 'labwareLoaded', 'measuringNozzleOffset'),
   ('jog', 'measuringNozzleOffset', 'measuringNozzleOffset'),
@@ -24,6 +23,7 @@ valid_transitions: List[Tuple[str,str,str]] = [
   ('exitSession', 'inspectingTip', 'sessionExited'),
   ('exitSession', 'measuringTipOffset', 'sessionExited'),
 ]
+
 
 @pytest.mark.parametrize('trigger,from_state,to_state', valid_transitions)
 async def test_valid_transitions(trigger, from_state, to_state):

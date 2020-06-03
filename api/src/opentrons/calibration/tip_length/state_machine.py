@@ -114,4 +114,3 @@ class TipCalibrationStateMachine(StateMachine):
                               transitions=TIP_LENGTH_TRANSITIONS,
                               initial_state=initial_state)
         self._has_calibration_block = has_calibration_block
-
