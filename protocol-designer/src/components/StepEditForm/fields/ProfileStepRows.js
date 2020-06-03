@@ -1,7 +1,13 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { InputField, OutlineButton, Icon } from '@opentrons/components'
+import {
+  InputField,
+  OutlineButton,
+  Icon,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
@@ -63,6 +69,7 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
           profileStepItem={itemFields}
           updateStepFieldValue={updateStepFieldValue}
           focusHandlers={props.focusHandlers}
+          stepNumber={index}
         />
       </div>
     )
@@ -90,6 +97,7 @@ type ProfileStepRowProps = {|
   profileStepItem: ProfileStepItem,
   updateStepFieldValue: (name: string, value: string) => mixed,
   focusHandlers: FocusHandlers,
+  stepNumber: number,
 |}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
@@ -105,7 +113,13 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     profileStepItem,
     updateStepFieldValue,
     focusHandlers,
+    stepNumber,
   } = props
+
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top',
+  })
+
   const fields = names.map(name => {
     const value = profileStepItem[name]
     const fieldId = getDynamicFieldFocusHandlerId({
@@ -149,8 +163,14 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
   })
   return (
     <div className={styles.profile_step_row}>
-      <div className={styles.profile_step_fields}>{fields}</div>
-      <div onClick={deleteProfileStep}>
+      <div className={styles.profile_step_fields}>
+        <span className={styles.profile_step_number}>{stepNumber + 1}. </span>
+        {fields}
+      </div>
+      <div onClick={deleteProfileStep} {...targetProps}>
+        <Tooltip {...tooltipProps}>
+          {i18n.t('tooltip.step_fields.profileStepRow.deleteStep')}
+        </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
     </div>
