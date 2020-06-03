@@ -10,7 +10,7 @@ except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
 from collections import deque
-from typing import Callable, Optional, Mapping, Tuple, TYPE_CHECKING
+from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
@@ -353,7 +353,7 @@ class Thermocycler:
         self._lid_target = None
         self._lid_temp = None
         # to store previous _current_temp values:
-        self._block_temp_buffer = deque(maxlen=TEMP_BUFFER_MAX_LEN)
+        self._block_temp_buffer: Deque = deque(maxlen=TEMP_BUFFER_MAX_LEN)
 
     async def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
