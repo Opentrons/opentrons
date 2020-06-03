@@ -47,7 +47,7 @@ class LabwareBrandData(TypedDict, total=False):
     links: List[str]
 
 
-class LabwareMetadata(TypedDict):
+class LabwareMetadata(TypedDict, total=False):
     displayName: str
     displayCategory: LabwareDisplayCategory
     displayVolumeUnits: Union[Literal['µL'], Literal['mL'], Literal['L']]
