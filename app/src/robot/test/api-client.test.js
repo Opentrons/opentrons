@@ -5,7 +5,7 @@ import { push } from 'connected-react-router'
 
 import { client } from '../api-client/client'
 import { Client as RpcClient } from '../../rpc/client'
-import { NAME, actions, constants } from '../'
+import { actions, constants } from '../'
 import * as AdminActions from '../../robot-admin/actions'
 
 import {
@@ -92,7 +92,7 @@ describe('api client', () => {
   const ROBOT_NAME = 'ot'
   const ROBOT_IP = '127.0.0.1'
   const STATE = {
-    [NAME]: {
+    robot: {
       connection: {
         connectedTo: '',
         connectRequest: { inProgress: false },
@@ -925,7 +925,7 @@ describe('api client', () => {
     let state
     beforeEach(() => {
       state = {
-        [NAME]: {
+        robot: {
           calibration: {
             calibrationRequest: {},
             confirmedBySlot: {},
@@ -1162,7 +1162,7 @@ describe('api client', () => {
     })
 
     it('CONFIRM_TIPRACK noops and keeps tip if last tiprack', () => {
-      state[NAME].calibration.confirmedBySlot[5] = true
+      state.robot.calibration.confirmedBySlot[5] = true
 
       const action = actions.confirmTiprack('left', '9')
       const expectedResponse = actions.confirmTiprackResponse(null, true)

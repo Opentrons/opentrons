@@ -27,7 +27,6 @@ export function AttachTipPanel(props: Props) {
   const tiprackName =
     tiprack?.definition?.metadata.displayName || tiprack?.name || null
 
-  // $FlowFixMe: robotActions.probeTip is not typed
   const handleTipProbe = () => dispatch(robotActions.probeTip(mount))
   const isMulti = channels > 1
 

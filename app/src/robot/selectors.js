@@ -11,13 +11,14 @@ import { getLabwareDefBySlot } from '../protocol/selectors'
 import { getLatestLabwareDef } from '../getLabware'
 import * as Constants from './constants'
 
-import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 import type {
   Mount,
   Slot,
   Pipette,
+  StatePipette,
   Labware,
+  StateLabware,
   ConnectionStatus,
   LabwareCalibrationStatus,
   LabwareType,
@@ -25,7 +26,11 @@ import type {
   SessionStatusInfo,
   SessionModule,
   TiprackByMountMap,
+  CommandNode,
 } from './types'
+
+import type { ConnectionState } from './reducer/connection'
+import type { CalibrationRequest } from './reducer/calibration'
 
 const calibration = (state: State) => state.robot.calibration
 const connection = (state: State) => state.robot.connection
@@ -45,7 +50,9 @@ export function labwareType(labware: Labware): LabwareType {
   return labware.isTiprack ? 'tiprack' : 'labware'
 }
 
-export function getConnectRequest(state: State) {
+export function getConnectRequest(
+  state: State
+): $PropertyType<ConnectionState, 'connectRequest'> {
   return connection(state).connectRequest
 }
 
@@ -76,7 +83,7 @@ export function getSessionLoadInProgress(state: State): boolean {
   return sessionRequest(state).inProgress
 }
 
-export function getUploadError(state: State): ?{ message: string } {
+export function getUploadError(state: State): ?{ message: string, ... } {
   return sessionRequest(state).error
 }
 
@@ -113,7 +120,7 @@ export function getIsBlocked(state: State): boolean {
   return session(state).blocked
 }
 
-export function getCancelInProgress(state: State) {
+export function getCancelInProgress(state: State): boolean {
   return cancelRequest(state).inProgress
 }
 
@@ -128,7 +135,10 @@ export function getIsDone(state: State): boolean {
 }
 
 // helper function for getCommands selector
-function traverseCommands(commandsById, parentIsCurrent) {
+function traverseCommands(
+  commandsById,
+  parentIsCurrent
+): (id: number, index: number, commands: Array<number>) => CommandNode {
   return function mapIdToCommand(id, index, commands) {
     const { description, handledAt, children } = commandsById[id]
     const next = commandsById[commands[index + 1]]
@@ -149,15 +159,13 @@ function traverseCommands(commandsById, parentIsCurrent) {
   }
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getCommands = createSelector(
+export const getCommands: State => Array<CommandNode> = createSelector(
   (state: State) => session(state).protocolCommands,
   (state: State) => session(state).protocolCommandsById,
   (commands, commandsById) => commands.map(traverseCommands(commandsById, true))
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getRunProgress = createSelector(
+export const getRunProgress: State => number = createSelector(
   getCommands,
   (commands): number => {
     const leaves = commands.reduce(countLeaves, { handled: 0, total: 0 })
@@ -206,8 +214,7 @@ export const getStartTime: (state: State) => string | null = createSelector(
   }
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getRunSeconds = createSelector(
+export const getRunSeconds: State => number = createSelector(
   getStartTimeMs,
   (state: State) => session(state).runTime,
   (startTime: ?number, runTime: ?number): number => {
@@ -225,17 +232,18 @@ export function formatSeconds(runSeconds: number): string {
   return `${hours}:${minutes}:${seconds}`
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getRunTime = createSelector(
+export const getRunTime: State => string = createSelector(
   getRunSeconds,
   formatSeconds
 )
 
-export function getCalibrationRequest(state: State) {
+export function getCalibrationRequest(state: State): CalibrationRequest {
   return calibration(state).calibrationRequest
 }
 
-export function getPipettesByMount(state: State) {
+export function getPipettesByMount(
+  state: State
+): { [Mount]: StatePipette, ... } {
   return session(state).pipettesByMount
 }
 
@@ -278,10 +286,9 @@ export const getNextPipette: State => Pipette | null = createSelector(
 
 // returns the mount of the pipette to use for labware calibration
 // TODO(mc, 2018-02-07): be smarter about the backup case
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getCalibrator = createSelector(
+export const getCalibrator: State => Pipette | void = createSelector(
   getPipettes,
-  (pipettes): ?Pipette => pipettes.find(i => i.tipOn) || pipettes[0]
+  pipettes => pipettes.find(i => i.tipOn) ?? pipettes[0]
 )
 
 // TODO(mc, 2018-02-07): remove this selector in favor of the one above
@@ -293,10 +300,9 @@ export function getCalibratorMount(state: State): ?Mount {
   return calibrator.mount
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getPipettesCalibrated = createSelector(
+export const getPipettesCalibrated: State => boolean = createSelector(
   getPipettes,
-  (pipettes): boolean => pipettes.length !== 0 && pipettes.every(i => i.probed)
+  pipettes => pipettes.length !== 0 && pipettes.every(i => i.probed)
 )
 
 export function getModulesBySlot(state: State): { [Slot]: SessionModule } {
@@ -311,15 +317,11 @@ export const getModules: State => Array<SessionModule> = createSelector(
     Object.keys(modulesBySlot).map((slot: Slot) => modulesBySlot[slot])
 )
 
-export function getLabwareBySlot(state: State) {
+export function getLabwareBySlot(state: State): { [Slot]: StateLabware, ... } {
   return session(state).labwareBySlot
 }
 
-export const getLabware: OutputSelector<
-  State,
-  void,
-  Array<Labware>
-> = createSelector(
+export const getLabware: State => Array<Labware> = createSelector(
   getPipettesByMount,
   getLabwareBySlot,
   (state: State) => calibration(state).confirmedBySlot,
@@ -421,8 +423,7 @@ export function getDeckPopulated(state: State): boolean | null {
   return deckPopulated != null ? deckPopulated : null
 }
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getUnconfirmedLabware = createSelector(
+export const getUnconfirmedLabware: State => Array<Labware> = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.confirmed)
 )
@@ -432,35 +433,30 @@ export const getTipracks: State => Array<Labware> = createSelector(
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getNotTipracks = createSelector(
+export const getNotTipracks: State => Array<Labware> = createSelector(
   getLabware,
   labware => labware.filter(lw => lw.type && !lw.isTiprack)
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getUnconfirmedTipracks = createSelector(
+export const getUnconfirmedTipracks: State => Array<Labware> = createSelector(
   getUnconfirmedLabware,
   labware => labware.filter(lw => lw.type && lw.isTiprack)
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getNextLabware = createSelector(
+export const getNextLabware: State => Labware | void = createSelector(
   getUnconfirmedTipracks,
   getUnconfirmedLabware,
-  (tipracks, labware) => tipracks[0] || labware[0]
+  (tipracks, labware) => tipracks[0] ?? labware[0]
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getTipracksConfirmed = createSelector(
+export const getTipracksConfirmed: State => boolean = createSelector(
   getUnconfirmedTipracks,
-  (remaining): boolean => remaining.length === 0
+  remaining => remaining.length === 0
 )
 
-// $FlowFixMe: (mc, 2019-04-17): untyped RPC state selector
-export const getLabwareConfirmed = createSelector(
+export const getLabwareConfirmed: State => boolean = createSelector(
   getUnconfirmedLabware,
-  (remaining): boolean => remaining.length === 0
+  remaining => remaining.length === 0
 )
 
 export function getJogInProgress(state: State): boolean {

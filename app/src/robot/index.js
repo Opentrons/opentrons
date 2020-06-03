@@ -10,6 +10,5 @@ export type { Action } from './actions'
 
 export * from './types'
 export * from './reducer'
-export { _NAME as NAME } from './constants'
 export { actions, actionTypes } from './actions'
 export { constants, selectors }

@@ -54,7 +54,6 @@ export function InfoBoxButton(props: InfoBoxButtonProps) {
     return (
       <ProceedToRun
         returnTip={() => {
-          // $FlowFixMe(BC, 2019-08-20): tagForRobotApi typing
           dispatch(robotActions.returnTip(mountToUse))
         }}
       />

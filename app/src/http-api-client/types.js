@@ -1,12 +1,12 @@
 // @flow
 // http api client types
 
-import type { Error } from '../types'
-
-export type ApiRequestError = Error & {
+export type ApiRequestError = {
+  message?: string,
   url?: string,
   status?: number,
   statusText?: string,
+  ...
 }
 
 export type ApiCall<T, U> = {
@@ -18,4 +18,5 @@ export type ApiCall<T, U> = {
   request?: ?T,
   /** possible success response body */
   response?: ?U,
+  ...
 }
