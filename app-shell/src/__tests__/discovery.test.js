@@ -1,4 +1,3 @@
-// @flow
 // tests for the app-shell's discovery module
 import EventEmitter from 'events'
 import { app } from 'electron'
@@ -12,11 +11,6 @@ jest.mock('electron-store')
 jest.mock('@opentrons/discovery-client')
 jest.mock('../log')
 jest.mock('../config')
-
-const _handleConfigChange: JestMockFn<
-  [string, (any, any) => mixed],
-  mixed
-> = handleConfigChange
 
 describe('app-shell/discovery', () => {
   let dispatch
@@ -269,7 +263,6 @@ describe('app-shell/discovery', () => {
   it('does not update services from store when caching disabled', () => {
     // cache has been disabled
     getConfig.mockReturnValue({
-      enabled: true,
       candidates: [],
       disableCache: true,
     })
@@ -287,13 +280,11 @@ describe('app-shell/discovery', () => {
         services: [],
       })
     )
-    console.log(Store)
   })
 
   it('clears cache & suspends caching when caching changes to disabled', () => {
     // Cache enabled initially
     getConfig.mockReturnValue({
-      enabled: true,
       candidates: [],
       disableCache: false,
     })
@@ -306,7 +297,7 @@ describe('app-shell/discovery', () => {
     registerDiscovery(dispatch)
 
     // the 'discovery.disableCache' change handler
-    const changeHandler = _handleConfigChange.mock.calls[1][1]
+    const changeHandler = handleConfigChange.mock.calls[1][1]
     const disableCache = true
     changeHandler(disableCache)
 
