@@ -56,69 +56,72 @@ class PipetteRequirement(TypedDict):
     name: PipetteName
 
 
-class StandardLiquidHandlingParams(TypedDict):
-    flowRate: float
+class PipetteAccessParams(TypedDict):
     pipette: str
     labware: str
     well: str
+
+
+class FlowRateParams(TypedDict):
+    flowRate: float
+
+
+class PipetteAccessWithOffsetParams(PipetteAccessParams):
+    offsetFromBottomMm: float
+
+class StandardLiquidHandlingParams(
+        PipetteAccessWithOffsetParams, FlowRateParams):
     volume: float
-    offsetFromBottomMm: float
 
 
+AspirateCommandId = Literal['aspirate']
 class AspirateCommand(TypedDict):
-    command: Literal['aspirate']
+    command: AspirateCommandId
     params: StandardLiquidHandlingParams
 
 
+DispenseCommandId = Literal['dispense']
 class DispenseCommand(TypedDict):
-    command: Literal['dispense']
+    command: DispenseCommandId
     params: StandardLiquidHandlingParams
 
 
+AirGapCommandId = Literal['airGap']
 class AirGapCommand(TypedDict):
-    command: Literal['airGap']
+    command: AirGapCommandId
     params: StandardLiquidHandlingParams
 
 
-class BlowoutParams(TypedDict):
-    flowRate: float
-    pipette: str
-    labware: str
-    well: str
-    offsetFromBottomMm: float
+class BlowoutParams(PipetteAccessWithOffsetParams, FlowRateParams):
+    pass
 
 
+BlowoutCommandId = Literal['blowout']
 class BlowoutCommand(TypedDict):
-    command: Literal['blowout']
+    command: BlowoutCommandId
     params: BlowoutParams
 
 
-class TouchTipParams(TypedDict):
-    pipette: str
-    labware: str
-    well: str
+class TouchTipParams(PipetteAccessParams):
     offsetFromBottomMm: float
 
 
+TouchTipCommandId = Literal['touchTip']
 class TouchTipCommand(TypedDict):
-    command: Literal['touchTip']
+    command: TouchTipCommandId
     params: TouchTipParams
 
 
-class TipHandlingParams(TypedDict):
-    pipette: str
-    labware: str
-    well: str
-
-
+PickUpTipCommandId = Literal['pickUpTip']
 class PickUpTipCommand(TypedDict):
-    command: Literal['pickUpTip']
-    params: TipHandlingParams
+    command: PickUpTipCommandId
+    params: PipetteAccessParams
 
 
+DropTipCommandId = Literal['dropTip']
 class DropTipCommand(TypedDict):
-    command: Literal['dropTip']
-    params: TipHandlingParams
+    command: DropTipCommandId
+    params: PipetteAccessParams
 
 
 class MoveToSlotParams(TypedDict, total=False):
@@ -129,8 +132,9 @@ class MoveToSlotParams(TypedDict, total=False):
     forceDirect: bool
 
 
+MoveToSlotCommandId = Literal['moveToSlot']
 class MoveToSlotCommand(TypedDict):
-    command: Literal['moveToSlot']
+    command: MoveToSlotCommandId
     params: MoveToSlotParams
 
 
@@ -139,93 +143,108 @@ class DelayParams(TypedDict, total=False):
     message: str
 
 
+DelayCommandId = Literal['delay']
 class DelayCommand(TypedDict):
-    command: Literal['delay']
+    command: DelayCommandId
     params: DelayParams
-
-
-class MagneticModuleEngageParams(TypedDict):
-    engageHeight: float
-    module: str
-
-
-class MagneticModuleEngageCommand(TypedDict):
-    command: Literal['magneticModule/engageMagnet']
-    params: MagneticModuleEngageParams
 
 
 class ModuleIDParams(TypedDict):
     module: str
 
 
+class MagneticModuleEngageParams(ModuleIDParams):
+    engageHeight: float
+
+
+MagneticModuleEngageCommandId = Literal['magneticModule/engageMagnet']
+class MagneticModuleEngageCommand(TypedDict):
+    command: MagneticModuleEngageCommandId
+    params: MagneticModuleEngageParams
+
+
+MagneticModuleDisengageCommandId = Literal['magneticModule/disengageMagnet']
 class MagneticModuleDisengageCommand(TypedDict):
-    command: Literal['magneticModule/disengageMagnet']
+    command: MagneticModuleDisengageCommandId
     params: ModuleIDParams
 
 
-class TemperatureParams(TypedDict):
-    module: str
+class TemperatureParams(ModuleIDParams):
     temperature: float
 
 
+TemperatureModuleSetTargetCommandId\
+    = Literal['temperatureModule/setTargetTemperature']
 class TemperatureModuleSetTargetCommand(TypedDict):
-    command: Literal['temperatureModule/setTargetTemperature']
+    command: TemperatureModuleSetTargetCommandId
     params: TemperatureParams
 
 
+TemperatureModuleAwaitCommandId = Literal['temperatureModule/awaitTemperature']
 class TemperatureModuleAwaitCommand(TypedDict):
-    command: Literal['temperatureModule/awaitTemperature']
+    command: TemperatureModuleAwaitCommandId
     params: TemperatureParams
 
 
+TemperatureModuleDeactivateCommandId = Literal['temperatureModule/deactivate']
 class TemperatureModuleDeactivateCommand(TypedDict):
-    command: Literal['temperatureModule/deactivate']
+    command: TemperatureModuleDeactivateCommandId
     params: ModuleIDParams
 
 
-class ThermocyclerSetTargetBlockParams(TypedDict):
-    module: str
-    temperature: float
+class ThermocyclerSetTargetBlockParams(TemperatureParams):
     volume: float
 
 
+ThermocyclerSetTargetBlockCommandId\
+    = Literal['thermocycler/setTargetBlockTemperature']
 class ThermocyclerSetTargetBlockCommand(TypedDict):
-    command: Literal['thermocycler/setTargetBlockTemperature']
+    command: ThermocyclerSetTargetBlockCommandId
     params: ThermocyclerSetTargetBlockParams
 
 
+ThermocyclerSetTargetLidCommandId\
+    = Literal['thermocycler/setTargetLidTemperature']
 class ThermocyclerSetTargetLidCommand(TypedDict):
-    command: Literal['thermocycler/setTargetLidTemperature']
+    command: ThermocyclerSetTargetLidCommandId
     params: TemperatureParams
 
 
+ThermocyclerAwaitLidTemperatureCommandId \
+    = Literal['thermocycler/awaitLidTemperature']
 class ThermocyclerAwaitLidTemperatureCommand(TypedDict):
-    command: Literal['thermocycler/awaitLidTemperature']
+    command: ThermocyclerAwaitLidTemperatureCommandId
     params: TemperatureParams
 
 
+ThermocyclerAwaitBlockTemperatureCommandId \
+    = Literal['thermocycler/awaitBlockTemperature']
 class ThermocyclerAwaitBlockTemperatureCommand(TypedDict):
-    command: Literal['thermocycler/awaitBlockTemperature']
+    command: ThermocyclerAwaitBlockTemperatureCommandId
     params: TemperatureParams
 
 
+ThermocyclerDeactivateBlockCommandId = Literal['thermocycler/deactivateBlock']
 class ThermocyclerDeactivateBlockCommand(TypedDict):
-    command: Literal['thermocycler/deactivateBlock']
+    command: ThermocyclerDeactivateBlockCommandId
     params: ModuleIDParams
 
 
+ThermocyclerDeactivateLidCommandId = Literal['thermocycler/deactivateLid']
 class ThermocyclerDeactivateLidCommand(TypedDict):
-    command: Literal['thermocycler/deactivateLid']
+    command: ThermocyclerDeactivateLidCommandId
     params: ModuleIDParams
 
 
+ThermocyclerOpenLidCommandId = Literal['thermocycler/openLid']
 class ThermocyclerOpenLidCommand(TypedDict):
-    command: Literal['thermocycler/openLid']
+    command: ThermocyclerOpenLidCommandId
     params: ModuleIDParams
 
 
+ThermocyclerCloseLidCommandId = Literal['thermocycler/closeLid']
 class ThermocyclerCloseLidCommand(TypedDict):
-    command: Literal['thermocycler/closeLid']
+    command: ThermocyclerCloseLidCommandId
     params: ModuleIDParams
 
 
@@ -240,13 +259,16 @@ class ThermocyclerRunProfileParams(TypedDict):
     profile: List[ThermocyclerCycle]
 
 
+ThermocyclerRunProfileCommandId = Literal['thermocycler/runProfile']
 class ThermocyclerRunProfileCommand(TypedDict):
-    command: Literal['thermocycler/runProfile']
+    command: ThermocyclerRunProfileCommandId
     params: ThermocyclerRunProfileParams
 
 
+ThermocyclerAwaitProfileCommandId\
+    = Literal['thermocycler/awaitProfileComplete']
 class ThermocyclerAwaitProfileCommand(TypedDict):
-    command: Literal['thermocycler/awaitProfileComplete']
+    command: ThermocyclerAwaitProfileCommandId
     params: ModuleIDParams
 
 
@@ -258,29 +280,56 @@ ThermocyclerCommand = Union[
     ThermocyclerAwaitLidTemperatureCommand,
     ThermocyclerSetTargetLidCommand, ThermocyclerSetTargetBlockCommand
 ]
+ThermocyclerCommandId = Union[
+    ThermocyclerAwaitProfileCommandId, ThermocyclerRunProfileCommandId,
+    ThermocyclerCloseLidCommandId, ThermocyclerOpenLidCommandId,
+    ThermocyclerDeactivateLidCommandId, ThermocyclerDeactivateBlockCommandId,
+    ThermocyclerAwaitBlockTemperatureCommandId,
+    ThermocyclerAwaitLidTemperatureCommandId,
+    ThermocyclerSetTargetLidCommandId,
+    ThermocyclerSetTargetBlockCommandId
+]
 
 TemperatureModuleCommand = Union[
     TemperatureModuleAwaitCommand, TemperatureModuleSetTargetCommand,
     TemperatureModuleDeactivateCommand
 ]
+TemperatureModuleCommandId = Union[
+    TemperatureModuleAwaitCommandId, TemperatureModuleSetTargetCommandId,
+    TemperatureModuleDeactivateCommandId
+]
 
 MagneticModuleCommand = Union[
     MagneticModuleEngageCommand, MagneticModuleDisengageCommand
+]
+MagneticModuleCommandId = Union[
+    MagneticModuleEngageCommandId, MagneticModuleDisengageCommandId
 ]
 
 
 ModuleCommand = Union[ThermocyclerCommand,
                       TemperatureModuleCommand,
                       MagneticModuleCommand]
-
+ModuleCommandId = Union[ThermocyclerCommandId,
+                        TemperatureModuleCommandId,
+                        MagneticModuleCommandId]
 
 PipetteCommand = Union[AspirateCommand, DispenseCommand, AirGapCommand,
                        BlowoutCommand,  TouchTipCommand, PickUpTipCommand,
                        DropTipCommand, MoveToSlotCommand]
+PipetteCommandId = Union[AspirateCommandId, DispenseCommandId, AirGapCommandId,
+                         BlowoutCommandId, TouchTipCommandId,
+                         PickUpTipCommandId, DropTipCommandId,
+                         MoveToSlotCommandId]
 
 RobotCommand = Union[DelayCommand]
+RobotCommandId = Union[DelayCommandId]
 
 Command = Union[ModuleCommand, PipetteCommand, RobotCommand]
+CommandId = Union[ModuleCommandId, PipetteCommandId, RobotCommandId]
+
+V3Command = Union[PipetteCommand, RobotCommand]
+V3CommandId = Union[PipetteCommandId, RobotCommandId]
 
 
 class DesignerApplication(TypedDict):
@@ -304,3 +353,18 @@ JsonProtocolV4 = TypedDict(
         "commandAnnotations": Dict[str, Any],
         "designerApplication": DesignerApplication
     }, total=False)
+
+
+class JsonProtocolV3(TypedDict, total=False):
+    schemaVersion: Literal[3]
+    metadata: Metadata
+    robot: RobotRequirement
+    pipettes: Dict[str, PipetteRequirement]
+    labware: Dict[str, LabwareRequirement]
+    labwareDefinitions: Dict[str, LabwareDefinition]
+    commands: List[V3Command]
+    commandAnnotations: Dict[str, Any]
+    designerApplication: DesignerApplication
+
+
+JsonProtocol = Union[JsonProtocolV4, JsonProtocolV3]
