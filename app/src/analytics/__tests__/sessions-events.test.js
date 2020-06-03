@@ -33,7 +33,7 @@ describe('events with calibration check session data', () => {
     )
 
     return expect(makeEvent(deleteSession, MOCK_STATE)).resolves.toEqual({
-      name: 'sessionExit',
+      name: 'calibrationCheckSessionExit',
       properties: sessionsFixtures.mockCalibrationCheckSessionAnalyticsProps,
     })
   })
