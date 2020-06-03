@@ -48,10 +48,12 @@ class CheckBaseSession(BaseSession):
             labware=labware,
         )
 
-    def get_command_executor(self) -> StateMachineExecutor:
+    @property
+    def command_executor(self) -> StateMachineExecutor:
         return self._command_executor
 
-    def get_command_queue(self) -> CommandQueue:
+    @property
+    def command_queue(self) -> CommandQueue:
         return self._command_queue
 
     @property

@@ -3,9 +3,6 @@ from uuid import uuid4
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
-from opentrons.calibration.check.session import CheckCalibrationSession
-from opentrons.calibration.session import CalibrationSession, \
-    CalibrationException, SessionManager
 from opentrons.calibration.util import StateMachineError
 from opentrons.calibration.check import models
 
@@ -13,7 +10,8 @@ from robot_server.service.dependencies import get_session_manager, get_hardware
 from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
-from robot_server.service.session.session_status import create_session_details
+from robot_server.service.session.command_execution import Command
+from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 
 router = APIRouter()
@@ -21,9 +19,9 @@ router = APIRouter()
 
 def get_session(manager: SessionManager,
                 session_id: str,
-                api_router: APIRouter) -> CalibrationSession:
+                api_router: APIRouter) -> BaseSession:
     """Get the session or raise a RobotServerError"""
-    found_session = manager.sessions.get(session_id)
+    found_session = manager.get_by_id(session_id)
     if not found_session:
         # There is no session raise error
         raise RobotServerError(
@@ -48,51 +46,27 @@ def get_session(manager: SessionManager,
              )
 async def create_session_handler(
         create_request: route_models.SessionCreateRequest,
-        session_manager: SessionManager = Depends(get_session_manager),
-        hardware=Depends(get_hardware)) \
+        session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.SessionResponse:
     """Create a session"""
     session_type = create_request.data.attributes.sessionType
-    # TODO We use type as ID while we only support one session type.
-    session_id = session_type.value
-
-    current_session = session_manager.sessions.get(session_id)
-    if not current_session:
-        try:
-            # TODO generalize for other kinds of sessions
-            new_session = await CheckCalibrationSession.build(hardware)
-        except (AssertionError, CalibrationException) as e:
-            raise RobotServerError(
-                status_code=http_status_codes.HTTP_400_BAD_REQUEST,
-                error=Error(
-                    title="Creation Failed",
-                    detail=f"Failed to create session of type "
-                           f"'{session_type}': {str(e)}.",
-                )
-            )
-        session_manager.sessions[session_id] = new_session
-        return route_models.SessionResponse(
-            data=ResponseDataModel.create(
-                attributes=route_models.Session(
-                    sessionType=session_type,
-                    details=create_session_details(new_session)),
-                resource_id=session_id),
-            links=get_valid_session_links(session_id, router)
-        )
-    else:
+    try:
+        new_session = await session_manager.add(session_type)
+    except AssertionError as e:
         raise RobotServerError(
-            status_code=http_status_codes.HTTP_409_CONFLICT,
+            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(
-                title="Conflict",
-                detail=f"A session with id '{session_id}' already exists. "
-                       f"Please delete to proceed.",
-                links={
-                    "DELETE": router.url_path_for(
-                        delete_session_handler.__name__,
-                        session_id=session_id)
-                }
+                title="Creation Failed",
+                detail=f"Failed to create session of type "
+                       f"'{session_type}': {str(e)}.",
             )
         )
+    return route_models.SessionResponse(
+        data=ResponseDataModel.create(
+            attributes=new_session.get_response_model(),
+            resource_id=new_session.meta.identifier),
+        links=get_valid_session_links(new_session.meta.identifier, router)
+    )
 
 
 @router.delete("/sessions/{session_id}",
@@ -107,16 +81,12 @@ async def delete_session_handler(
     session_obj = get_session(manager=session_manager,
                               session_id=session_id,
                               api_router=router)
-    # TODO generalize for other session types
-    await session_obj.delete_session()  # type: ignore
-    del session_manager.sessions[session_id]
+
+    await session_manager.remove(session_obj.meta.identifier)
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
-            attributes=route_models.Session(
-                # TODO support other session types
-                sessionType=models.SessionType.calibration_check,
-                details=create_session_details(session_obj)),
+            attributes=session_obj.get_response_model(),
             resource_id=session_id),
         links={
             "POST": ResourceLink(href=router.url_path_for(
@@ -139,10 +109,7 @@ async def get_session_handler(
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
-            # TODO use a proper session id rather than the type
-            attributes=route_models.Session(
-                sessionType=models.SessionType(session_id),
-                details=create_session_details(session_obj)),
+            attributes=session_obj.get_response_model(),
             resource_id=session_id),
         links=get_valid_session_links(session_id, router)
     )
@@ -158,21 +125,12 @@ async def get_sessions_handler(
             description="Will limit the results to only this session type"),
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.MultiSessionResponse:
-
-    sessions = (
-        route_models.Session(
-            # TODO use a proper session id rather than the type
-            sessionType=models.SessionType(session_id),
-            details=create_session_details(session_obj))
-        # TODO type_filter
-        for (session_id, session_obj) in session_manager.sessions.items()
-    )
-
+    """Get multiple sessions"""
+    sessions = session_manager.get_by_type(session_type=type_filter)
     return route_models.MultiSessionResponse(
         data=[ResponseDataModel.create(
-            attributes=session,
-            # TODO use a proper session id rather than the type
-            resource_id=session.sessionType) for session in sessions
+            attributes=session.get_response_model(),
+            resource_id=session.meta.identifier) for session in sessions
         ]
     )
 
@@ -189,17 +147,14 @@ async def session_command_execute_handler(
     """
     Execute a session command
     """
-    session_obj = typing.cast(CheckCalibrationSession,
-                              get_session(manager=session_manager,
-                                          session_id=session_id,
-                                          api_router=router))
-    command = command_request.data.attributes.command
-    command_data = command_request.data.attributes.data
+    session_obj = get_session(manager=session_manager,
+                              session_id=session_id,
+                              api_router=router)
+
+    command = Command(name=command_request.data.attributes.command,
+                      data=command_request.data.attributes.data)
     try:
-        await session_obj.trigger_transition(
-            trigger=command.value,
-            **(command_data.dict() if command_data else {})
-        )
+        await session_obj.command_executor.execute(command=command)
     except (AssertionError, StateMachineError) as e:
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
@@ -212,11 +167,10 @@ async def session_command_execute_handler(
     return route_models.CommandResponse(
         data=ResponseDataModel.create(
             attributes=route_models.SessionCommand(
-                data=command_data,
-                command=command,
+                data=command.data,
+                command=command.name,
                 status='executed'),
-            # TODO have session create id for command for later querying
-            resource_id=str(uuid4())
+            resource_id=command.identifier
         ),
         links=get_valid_session_links(session_id, router)
     )

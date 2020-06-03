@@ -1,6 +1,6 @@
 from enum import Enum
 import typing
-from uuid import UUID, uuid4
+from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
 from opentrons.calibration.check import models as calibration_models
@@ -10,12 +10,12 @@ from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
 
 
-IdentifierType = UUID
+IdentifierType = str
 
 
 def create_identifier() -> IdentifierType:
     """Create an identifier"""
-    return uuid4()
+    return str(uuid4())
 
 
 SessionDetails = typing.Union[calibration_models.CalibrationSessionStatus]
