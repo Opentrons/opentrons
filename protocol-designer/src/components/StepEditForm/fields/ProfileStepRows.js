@@ -1,7 +1,8 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { InputField, OutlineButton } from '@opentrons/components'
+import { InputField, OutlineButton, Icon } from '@opentrons/components'
+import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
 import {
@@ -9,6 +10,7 @@ import {
   maskProfileField,
 } from '../../../steplist/fieldLevel'
 import { getDynamicFieldFocusHandlerId } from '../utils'
+import styles from '../StepEditForm.css'
 import type { ProfileStepItem } from '../../../form-types'
 import type { FocusHandlers } from '../types'
 
@@ -68,8 +70,17 @@ export const ProfileStepRows = (props: ProfileStepRowsProps) => {
 
   return (
     <>
+      {rows.length > 0 && (
+        <div className={styles.profile_step_labels}>
+          <div>Name:</div>
+          <div>Temperature:</div>
+          <div>Time:</div>
+        </div>
+      )}
       {rows}
-      <OutlineButton onClick={addProfileStep}>+ Add Step</OutlineButton>
+      <div className={styles.profile_button_group}>
+        <OutlineButton onClick={addProfileStep}>+ Add Step</OutlineButton>
+      </div>
     </>
   )
 }
@@ -83,6 +94,12 @@ type ProfileStepRowProps = {|
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
   const names = ['title', 'temperature', 'durationMinutes', 'durationSeconds']
+  const units = {
+    title: null,
+    temperature: i18n.t('application.units.degrees'),
+    durationMinutes: i18n.t('application.units.minutes'),
+    durationSeconds: i18n.t('application.units.seconds'),
+  }
   const {
     deleteProfileStep,
     profileStepItem,
@@ -120,21 +137,22 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
       focusHandlers.onFieldFocus(fieldId)
     }
     return (
-      <div
-        key={name}
-        style={{ width: '4rem', display: 'inline-block', margin: '0.5rem' }}
-      >
+      <div key={name} className={styles.step_input_wrapper}>
         <InputField
+          className={styles.step_input}
           error={errorToShow}
+          units={units[name]}
           {...{ name, onChange, onBlur, onFocus, value }}
         />
       </div>
     )
   })
   return (
-    <div>
-      {fields}
-      <div onClick={deleteProfileStep}>X</div>
+    <div className={styles.profile_step_row}>
+      <div className={styles.profile_step_fields}>{fields}</div>
+      <div onClick={deleteProfileStep}>
+        <Icon name="close" className={styles.delete_step_icon} />
+      </div>
     </div>
   )
 }

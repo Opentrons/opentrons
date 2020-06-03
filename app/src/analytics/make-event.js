@@ -6,6 +6,7 @@ import { getConnectedRobot } from '../discovery'
 import * as CustomLabware from '../custom-labware'
 import * as SystemInfo from '../system-info'
 import * as brActions from '../buildroot/constants'
+import * as Sessions from '../sessions'
 import {
   getProtocolAnalyticsData,
   getRobotAnalyticsData,
@@ -268,6 +269,23 @@ export function makeEvent(
             }
           : null
       )
+    }
+
+    case Sessions.DELETE_SESSION: {
+      const { robotName, sessionId } = action.payload
+      const analyticsProps = Sessions.getAnalyticsPropsForRobotSessionById(
+        state,
+        robotName,
+        sessionId
+      )
+      if (analyticsProps) {
+        return Promise.resolve({
+          name: 'sessionExit',
+          properties: analyticsProps,
+        })
+      } else {
+        return Promise.resolve(null)
+      }
     }
   }
 

@@ -18,8 +18,10 @@ from .constants import (SHAKE_OFF_TIPS_SPEED, SHAKE_OFF_TIPS_DROP_DISTANCE,
                         DROP_TIP_RELEASE_DISTANCE)
 from .execution_manager import ExecutionManager
 from .types import (Axis, HardwareAPILike, CriticalPoint,
-                    MustHomeError, NoTipAttachedError, DoorState)
+                    MustHomeError, NoTipAttachedError, DoorState,
+                    DoorStateNotification)
 from . import modules
+
 
 mod_log = logging.getLogger(__name__)
 
@@ -86,6 +88,13 @@ class API(HardwareAPILike):
         mod_log.info(
             f'Updating the window switch status: {door_state}')
         self.door_state = door_state
+        for cb in self._callbacks:
+            hw_event = DoorStateNotification(
+                new_state=door_state)
+            try:
+                cb(hw_event)
+            except Exception:
+                mod_log.exception('Errored during door state event callback')
 
     @classmethod
     async def build_hardware_controller(

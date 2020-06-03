@@ -10,6 +10,7 @@ from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
 from opentrons.broker import Broker
+from opentrons.config import feature_flags as ff
 from opentrons.commands import tree, types as command_types
 from opentrons.commands.commands import is_new_loc, listify
 from opentrons.protocols.types import PythonProtocol, APIVersion
@@ -20,6 +21,8 @@ from opentrons.protocol_api import (ProtocolContext,
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
                                         ExecutionCancelledError)
+from opentrons.hardware_control.types import (DoorState, HardwareEventType,
+                                              HardwareEvent)
 from .models import Container, Instrument, Module
 
 from opentrons.legacy_api.containers.placeable import (
@@ -101,6 +104,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents) if is_binary else contents
@@ -136,6 +140,7 @@ class SessionManager(object):
             raise Exception(
                 'Cannot create session while simulation in progress')
 
+        self.clear()
         self._session_lock = True
         try:
             _contents = base64.b64decode(contents)
@@ -179,6 +184,7 @@ class SessionManager(object):
             raise Exception(
                 "Cannot create session while simulation in progress")
 
+        self.clear()
         self._session_lock = True
         try:
             session_short_id = hex(uuid4().fields[0])
@@ -202,6 +208,7 @@ class SessionManager(object):
                 'Cannot clear session while simulation in progress')
 
         if self.session:
+            self.session._remove_hardware_event_watcher()
             self._hardware.reset()
         self.session = None
         self._broker.set_logger(self._command_logger)
@@ -265,6 +272,9 @@ class Session(object):
 
         self.startTime: Optional[float] = None
         self._motion_lock = motion_lock
+        self._event_watcher = None
+        self.door_state: Optional[str] = None
+        self.blocked: Optional[bool] = None
 
     def _hw_iface(self):
         if self._use_v2:
@@ -443,6 +453,7 @@ class Session(object):
         self.modules = self.get_modules()
         self.startTime = None
         self.set_state('loaded')
+
         return self
 
     def stop(self):
@@ -472,15 +483,50 @@ class Session(object):
         return self
 
     def resume(self):
-        if self._use_v2:
-            self._hardware.resume()
-        # robot.resume in the legacy API will publish commands to the broker
-        # use the broker-less execute_resume instead
-        else:
-            robot.execute_resume()
+        if not self.blocked:
+            if self._use_v2:
+                self._hardware.resume()
+            # robot.resume in the legacy API will publish commands to the
+            # broker use the broker-less execute_resume instead
+            else:
+                robot.execute_resume()
 
-        self.set_state('running')
-        return self
+            self.set_state('running')
+            return self
+
+    def _start_hardware_event_watcher(self):
+        if not callable(self._event_watcher):
+            # initialize and update window switch state
+            self._update_window_state(self._hardware.door_state)
+            log.info('Starting hardware event watcher')
+            self._event_watcher = self._hardware.register_callback(
+                self._handle_hardware_event)
+        else:
+            log.warning("Cannot start new hardware event watcher "
+                        "when one already exists")
+
+    def _remove_hardware_event_watcher(self):
+        if callable(self._event_watcher):
+            self._event_watcher()
+            self._event_watcher = None
+
+    def _handle_hardware_event(self, hw_event: 'HardwareEvent'):
+        if hw_event.event == HardwareEventType.DOOR_SWITCH_CHANGE:
+            self._update_window_state(hw_event.new_state)
+            if ff.enable_door_safety_switch() and \
+                    hw_event.new_state == DoorState.OPEN and \
+                    self.state == 'running':
+                self.pause('Robot door is open')
+            else:
+                self._on_state_changed()
+
+    def _update_window_state(self, state: DoorState):
+        self.door_state = str(state)
+        if ff.enable_door_safety_switch() and \
+                state == DoorState.OPEN:
+            self.blocked = True
+        else:
+            self.blocked = False
 
     @_motion_lock  # noqa(C901)
     def _run(self):
@@ -558,14 +604,19 @@ class Session(object):
             _unsubscribe()
 
     def run(self):
-        try:
-            self._broker.set_logger(self._run_logger)
-            self._run()
-        except Exception:
-            raise
-        finally:
-            self._broker.set_logger(self._default_logger)
-        return self
+        if not self.blocked:
+            try:
+                self._broker.set_logger(self._run_logger)
+                self._run()
+            except Exception:
+                raise
+            finally:
+                self._broker.set_logger(self._default_logger)
+            return self
+        else:
+            raise RuntimeError(
+                'Protocol is blocked and cannot run. Make sure robot door '
+                'is closed before running.')
 
     def set_state(self, state: 'State',
                   reason: str = None,
@@ -610,6 +661,9 @@ class Session(object):
     def _reset(self):
         self._hw_iface().reset()
         self.clear_logs()
+        # unregister existing event watcher
+        self._remove_hardware_event_watcher()
+        self._start_hardware_event_watcher()
 
     def _snapshot(self):
         if self.state == 'loaded':
@@ -627,6 +681,8 @@ class Session(object):
                 'state': self.state,
                 'stateInfo': self.stateInfo,
                 'startTime': self.startTime,
+                'doorState': self.door_state,
+                'blocked': self.blocked,
                 'errors': self.errors,
                 'lastCommand': last_command
             }

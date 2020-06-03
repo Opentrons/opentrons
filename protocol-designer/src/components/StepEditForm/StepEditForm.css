@@ -315,3 +315,46 @@ and when that is implemented.
   font-size: var(--fs-body-1);
   line-height: 2;
 }
+
+.profile_step_labels {
+  @apply --font-form-default;
+
+  display: grid;
+  grid-template-columns: 13.5rem 7.25rem 7.25rem;
+  font-weight: var(--fw-semibold);
+  padding: 1rem 0 0.25rem 0.625rem;
+}
+
+.profile_step_row {
+  display: flex;
+  align-items: center;
+  padding: 0.25rem 0;
+}
+
+.profile_step_fields {
+  display: flex;
+  align-items: center;
+  border: var(--bd-light);
+  width: 100%;
+  padding: 0.5rem;
+}
+
+.step_input_wrapper {
+  margin-right: 1.5rem;
+  width: 5.75rem;
+
+  &:first-child {
+    width: 12rem;
+  }
+}
+
+.delete_step_icon {
+  color: var(--c-med-gray);
+  width: 1.5rem;
+  margin-top: 0.25rem;
+}
+
+.profile_button_group {
+  padding: 1rem 1.5rem 0;
+  text-align: right;
+}

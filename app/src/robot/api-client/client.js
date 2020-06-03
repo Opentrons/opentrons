@@ -460,6 +460,9 @@ export function client(dispatch) {
       estimatedDuration: apiSession.stateInfo?.estimatedDuration ?? null,
     }
 
+    update.blocked = apiSession.blocked ?? false
+    update.doorState = apiSession.door_state ?? null
+
     // both light and full updates may have the errors list
     if (apiSession.errors) {
       update.errors = apiSession.errors.map(e => ({

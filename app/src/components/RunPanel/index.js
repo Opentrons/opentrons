@@ -20,6 +20,7 @@ type SP = {|
   isPaused: boolean,
   startTime: string | null,
   isReadyToRun: boolean,
+  isBlocked: boolean,
   modulesReady: boolean,
   runTime: string,
   disabled: boolean,
@@ -39,6 +40,7 @@ const mapStateToProps = (state: State): SP => ({
   isPaused: robotSelectors.getIsPaused(state),
   startTime: robotSelectors.getStartTime(state),
   isReadyToRun: robotSelectors.getIsReadyToRun(state),
+  isBlocked: robotSelectors.getIsBlocked(state),
   modulesReady: getMissingModules(state).length === 0,
   runTime: robotSelectors.getRunTime(state),
   disabled:
@@ -65,6 +67,7 @@ function RunPanelComponent(props: Props) {
           isReadyToRun={props.isReadyToRun}
           isPaused={props.isPaused}
           isRunning={props.isRunning}
+          isBlocked={props.isBlocked}
           onRunClick={props.onRunClick}
           onPauseClick={props.onPauseClick}
           onResumeClick={props.onResumeClick}
