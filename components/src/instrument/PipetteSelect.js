@@ -118,10 +118,32 @@ const PipetteNameItem = (props: PipetteNameSpecs) => {
   }
 
   return (
-    <>
+    <div
+      data-id={dataIdFormat(
+        'PipetteNameItem',
+        volumeClass,
+        channels,
+        displayCategory
+      )}
+      className={styles.pipette_container}
+    >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
       <div className={styles.pipette_category}>{displayCategory}</div>
-    </>
+    </div>
   )
+}
+
+const dataIdFormat = (
+  componentName: string,
+  volumeClass: string,
+  channels: number,
+  displayCategory: string
+): string => {
+  const dataIdFormatChannels = channels === 1 ? 'SingleChannel' : 'MultiChannel'
+  const dataIdVolumeClass = volumeClass.toLowerCase()
+  const dataIdDisplayCategory =
+    displayCategory.charAt(0) + displayCategory.slice(1).toLowerCase()
+
+  return `${componentName}_${dataIdVolumeClass}${dataIdFormatChannels}${dataIdDisplayCategory}`
 }

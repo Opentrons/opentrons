@@ -12,3 +12,7 @@
   cursor: default;
   min-width: 2.5rem;
 }
+
+.pipette_container {
+  display: flex;
+}
