@@ -6,9 +6,11 @@ import { useSelector, useDispatch } from 'react-redux'
 import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
+import { getFeatureFlags } from '../../config'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
+import { CalibrateTipLength } from '../../components/CalibrateTipLength'
 import {
   PipetteTabs,
   Pipettes as PipettesContents,
@@ -25,6 +27,7 @@ export function Pipettes(props: Props): React.Node {
   const { mount } = props.match.params
   const dispatch = useDispatch<Dispatch>()
   const robot = useSelector(getConnectedRobot)
+  const ff = useSelector(getFeatureFlags)
   const robotName = robot?.name || null
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)
   const pipettes = useSelector(robotSelectors.getPipettes)
@@ -52,7 +55,12 @@ export function Pipettes(props: Props): React.Node {
           changePipetteUrl,
         }}
       />
-      {!!currentPipette && <TipProbe {...currentPipette} />}
+      {!!currentPipette &&
+        (ff.enableTipLengthCal ? (
+          <CalibrateTipLength {...currentPipette} />
+        ) : (
+          <TipProbe {...currentPipette} />
+        ))}
     </Page>
   )
 }
