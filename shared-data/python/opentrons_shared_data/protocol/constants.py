@@ -24,62 +24,58 @@ if TYPE_CHECKING:
 
 
 class JsonPipetteCommand(Enum):
-    airGap: AirGapCommandId = 'airGap'
-    blowout: BlowoutCommandId = "blowout"
-    pickUpTip: PickUpTipCommandId = "pickUpTip"
-    dropTip: DropTipCommandId = "dropTip"
-    aspirate: AspirateCommandId = "aspirate"
-    dispense: DispenseCommandId = "dispense"
-    touchTip: TouchTipCommandId = "touchTip"
-    moveToSlot: MoveToSlotCommandId = "moveToSlot"
+    airGap: 'AirGapCommandId' = 'airGap'
+    blowout: 'BlowoutCommandId' = "blowout"
+    pickUpTip: 'PickUpTipCommandId' = "pickUpTip"
+    dropTip: 'DropTipCommandId' = "dropTip"
+    aspirate: 'AspirateCommandId' = "aspirate"
+    dispense: 'DispenseCommandId' = "dispense"
+    touchTip: 'TouchTipCommandId' = "touchTip"
+    moveToSlot: 'MoveToSlotCommandId' = "moveToSlot"
 
 
 class JsonRobotCommand(Enum):
-    delay: DelayCommandId = "delay"
+    delay: 'DelayCommandId' = "delay"
 
 
 class JsonMagneticModuleCommand(Enum):
-    magneticModuleEngageMagnet: MagneticModuleEngageCommandId\
+    magneticModuleEngageMagnet: 'MagneticModuleEngageCommandId'\
         = "magneticModule/engageMagnet"
-    magneticModuleDisengageMagnet: MagneticModuleDisengageCommandId\
+    magneticModuleDisengageMagnet: 'MagneticModuleDisengageCommandId'\
         = "magneticModule/disengageMagnet"
 
+
 class JsonTemperatureModuleCommand(Enum):
-    temperatureModuleSetTargetTemperature: TemperatureModuleSetTargetCommandId\
+    temperatureModuleSetTargetTemperature:\
+        'TemperatureModuleSetTargetCommandId'\
         = "temperatureModule/setTargetTemperature"
-    temperatureModuleDeactivate: TemperatureModuleDeactivateCommandId\
+    temperatureModuleDeactivate: 'TemperatureModuleDeactivateCommandId'\
         = "temperatureModule/deactivate"
-    temperatureModuleAwaitTemperature: TemperatureModuleAwaitCommandId\
+    temperatureModuleAwaitTemperature: 'TemperatureModuleAwaitCommandId'\
         = "temperatureModule/awaitTemperature"
 
+
 class JsonThermocyclerCommand(Enum):
-    thermocyclerSetTargetBlockTemperature: ThermocyclerSetTargetBlockCommandId\
+    thermocyclerSetTargetBlockTemperature:\
+        'ThermocyclerSetTargetBlockCommandId'\
         = "thermocycler/setTargetBlockTemperature"
-    thermocyclerSetTargetLidTemperature: ThermocyclerSetTargetLidCommandId \
+    thermocyclerSetTargetLidTemperature: 'ThermocyclerSetTargetLidCommandId' \
         = "thermocycler/setTargetLidTemperature"
-    thermocyclerAwaitBlockTemperature: ThermocyclerAwaitBlockTemperatureCommandId\
+    thermocyclerAwaitBlockTemperature:\
+        'ThermocyclerAwaitBlockTemperatureCommandId'\
         = "thermocycler/awaitBlockTemperature"
-    thermocyclerAwaitLidTemperature: ThermocyclerAwaitLidTemperatureCommandId\
+    thermocyclerAwaitLidTemperature:\
+        'ThermocyclerAwaitLidTemperatureCommandId'\
         = "thermocycler/awaitLidTemperature"
-    thermocyclerOpenLid: ThermocyclerOpenLidCommandId\
+    thermocyclerOpenLid: 'ThermocyclerOpenLidCommandId'\
         = "thermocycler/openLid"
-    thermocyclerCloseLid: ThermocyclerCloseLidCommandId\
+    thermocyclerCloseLid: 'ThermocyclerCloseLidCommandId'\
         = "thermocycler/closeLid"
-    thermocyclerDeactivateBlock: ThermocyclerDeactivateBlockCommandId\
+    thermocyclerDeactivateBlock: 'ThermocyclerDeactivateBlockCommandId'\
         = "thermocycler/deactivateBlock"
-    thermocyclerDeactivateLid: ThermocyclerDeactivateLidCommandId\
+    thermocyclerDeactivateLid: 'ThermocyclerDeactivateLidCommandId'\
         = "thermocycler/deactivateLid"
-    thermocyclerRunProfile: ThermocyclerRunProfileCommandId\
+    thermocyclerRunProfile: 'ThermocyclerRunProfileCommandId'\
         = "thermocycler/runProfile"
-    thermocyclerAwaitProfileComplete: ThermocyclerAwaitProfileCommandId\
-        = 'thermocycler/awaitProfile'
-
-
-class JsonModuleCommand(JsonThermocyclerCommand, JsonTemperatureModuleCommand,
-                        JsonMagneticModuleCommand):
-    pass
-
-
-class JsonCommand(
-        JsonPipetteCommand, JsonRobotCommand, JsonModuleCommand):
-    pass
+    thermocyclerAwaitProfileComplete: 'ThermocyclerAwaitProfileCommandId'\
+        = 'thermocycler/awaitProfileComplete'
