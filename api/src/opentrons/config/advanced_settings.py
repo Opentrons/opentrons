@@ -158,6 +158,12 @@ settings = [
                     "Opening the robot door during a run will "
                     "pause your robot only after it has completed its "
                     "current motion."
+    ),
+    SettingDefinition(
+        _id='enableTipLengthCalibration',
+        title='Enable Tip Length Calibration',
+        description='Extrapolate the length of the tip by comparing '
+                    'the heights '
     )
 ]
 
@@ -324,8 +330,18 @@ def _migrate4to5(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
+def _migrate5to6(previous: SettingsMap) -> SettingsMap:
+    """
+    Migration to version 6 of the feature flags file. Adds the
+    enableTipLengthCalibration config element.
+    """
+    newmap = {k: v for k, v in previous.items()}
+    newmap['enableTipLengthCalibration'] = None
+    return newmap
+
+
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5]
+               _migrate4to5, _migrate5to6]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

@@ -4,6 +4,7 @@ import os
 import time
 
 import pytest
+from unittest.mock import patch
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 from opentrons import config
@@ -58,6 +59,11 @@ minimalLabwareDef = {
 
 def path(calibration_name):
     return config.CONFIG['labware_calibration_offsets_dir_v2']\
+        / '{}.json'.format(calibration_name)
+
+
+def tlc_path(calibration_name):
+    return config.CONFIG['tip_length_calibration_dir']\
         / '{}.json'.format(calibration_name)
 
 
@@ -120,6 +126,60 @@ def test_save_tip_length(monkeypatch, clear_calibration):
     with open(path(MOCK_HASH)) as calibration_file:
         data = json.load(calibration_file)
         assert data['tipLength']['length'] == calibrated_length
+
+
+def test_tip_length_calibration(monkeypatch, clear_calibration):
+    with patch("os.environ",
+               new={
+                   "OT_API_FF_enableTipLengthCalibration": "TRUE"
+               }):
+
+        assert not os.path.exists(tlc_path(MOCK_HASH))
+
+        monkeypatch.setattr(
+            labware,
+            '_hash_labware_def', mock_hash_labware
+        )
+
+        test_labware = labware.Labware(minimalLabwareDef,
+                                       Location(Point(0, 0, 0), 'deck'))
+
+        # add new tip length data for test_labware
+        tip_length_1 = 22.0
+        pipette_id = 'PIPETTE_ID_1'
+        labware.save_tip_length_calibration(test_labware, tip_length_1,
+                                            pipette_id)
+        assert os.path.exists(tlc_path(MOCK_HASH))
+        with open(tlc_path(MOCK_HASH)) as tip_length_calibration_file:
+            data = json.load(tip_length_calibration_file)
+            assert len(data) == 1
+            assert data[pipette_id]['tipLength'] == tip_length_1
+            time_1 = data[pipette_id]['lastModified']
+
+        # update tip length data for same labware: same pipette
+        tip_length_2 = 25.0
+        labware.save_tip_length_calibration(test_labware, tip_length_2,
+                                            pipette_id)
+        with open(tlc_path(MOCK_HASH)) as tip_length_calibration_file:
+            data = json.load(tip_length_calibration_file)
+            assert len(data) == 1
+            assert data[pipette_id]['tipLength'] == tip_length_2
+            assert data[pipette_id]['lastModified'] > time_1
+
+        # update tip length data for same labware: different pipette
+        tip_length_3 = 24.0
+        pipette_id_2 = 'PIPETTE_ID_2'
+        labware.save_tip_length_calibration(test_labware, tip_length_3,
+                                            pipette_id_2)
+        with open(tlc_path(MOCK_HASH)) as tip_length_calibration_file:
+            data = json.load(tip_length_calibration_file)
+            assert len(data) == 2
+            assert data[pipette_id_2]['tipLength'] == tip_length_3
+            # make sure it did not overwrite previous data
+
+        # clear tip_length calibration
+        labware.clear_tip_length_calibration()
+        assert not os.path.exists(tlc_path(MOCK_HASH))
 
 
 def test_schema_shape(monkeypatch, clear_calibration):

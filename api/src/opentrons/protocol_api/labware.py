@@ -25,7 +25,7 @@ import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
-from opentrons.config import CONFIG
+from opentrons.config import CONFIG, feature_flags as ff
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
@@ -878,6 +878,66 @@ def save_tip_length(labware: Labware, length: float):
     with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
     labware.tip_length = length
+
+
+def _get_labware_tip_length_path(labware: Labware):
+    tip_length_path = CONFIG['tip_length_calibration_dir']
+    tip_length_path.mkdir(parents=True, exist_ok=True)
+
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+    return tip_length_path/f'{labware_hash}{parent_id}.json'
+
+
+def save_tip_length_calibration(labware: Labware, length: float, pip_id: str):
+    if ff.enable_tip_length_calibration():
+        assert labware._is_tiprack, \
+            'cannot save tip length for non-tiprack labware'
+        pip_tip_length_path = _get_labware_tip_length_path(labware)
+        try:
+            tip_length_data = _read_file(pip_tip_length_path)
+        except FileNotFoundError:
+            tip_length_data = {}
+
+        data = {
+            pip_id: {
+                'tipLength': length,
+                'lastModified': time.time()
+                }
+            }
+        tip_length_data.update(data)
+
+        with pip_tip_length_path.open('w') as f:
+            json.dump(tip_length_data, f)
+
+
+def load_tip_length_calibration(labware: Labware, pip_id: str):
+    if ff.enable_tip_length_calibration():
+        assert labware._is_tiprack, \
+            'cannot load tip length for non-tiprack labware'
+        pip_tip_length_path = _get_labware_tip_length_path(labware)
+        try:
+            tip_length_data = _read_file(pip_tip_length_path)
+            return tip_length_data[pip_id]['tipLength']
+        except (FileNotFoundError, AttributeError):
+            raise FileNotFoundError(
+                f'Tip length of {labware.load_name} has not been '
+                f'calibrated for this pipette: {pip_id} and cannot'
+                'be loaded')
+
+
+def clear_tip_length_calibration():
+    """
+    Delete all tip length calibration files.
+    """
+    tip_length_path = CONFIG['tip_length_calibration_dir']
+    try:
+        targets = [
+            f for f in tip_length_path.iterdir() if f.suffix == '.json']
+        for target in targets:
+            target.unlink()
+    except FileNotFoundError:
+        pass
 
 
 def load_calibration(labware: Labware):
