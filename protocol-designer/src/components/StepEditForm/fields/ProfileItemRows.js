@@ -1,7 +1,13 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
-import { InputField, OutlineButton, Icon } from '@opentrons/components'
+import {
+  InputField,
+  OutlineButton,
+  Icon,
+  Tooltip,
+  useHoverTooltip,
+} from '@opentrons/components'
 import { i18n } from '../../../localization'
 import { getUnsavedForm } from '../../../step-forms/selectors'
 import * as steplistActions from '../../../steplist/actions'
@@ -33,13 +39,15 @@ export const showProfileFieldErrors = ({
 type ProfileCycleRowProps = {|
   cycleItem: ProfileCycleItem,
   focusHandlers: FocusHandlers,
+  stepOffset: number,
 |}
 export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
-  const { cycleItem, focusHandlers } = props
+  const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
 
-  const addStepToCycle = () =>
+  const addStepToCycle = () => {
     dispatch(steplistActions.addProfileStep({ cycleId: cycleItem.id }))
+  }
 
   const deleteProfileCycle = () =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
@@ -48,13 +56,16 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
     <div>
       <div>TODO: cycle</div>
       <div>
-        {cycleItem.steps.map((stepItem, index) => (
-          <ProfileStepRow
-            profileStepItem={stepItem}
-            focusHandlers={focusHandlers}
-            key={stepItem.id}
-          />
-        ))}
+        {cycleItem.steps.map((stepItem, index) => {
+          return (
+            <ProfileStepRow
+              profileStepItem={stepItem}
+              focusHandlers={focusHandlers}
+              key={stepItem.id}
+              stepNumber={stepOffset + index}
+            />
+          )
+        })}
       </div>
       <div>
         <ProfileField
@@ -96,24 +107,32 @@ export const ProfileItemRows = (props: ProfileItemRowsProps) => {
   }
   const { orderedProfileItems, profileItemsById } = unsavedForm
 
+  let counter = 0
+
   const rows = orderedProfileItems.map((itemId, index) => {
     const itemFields: ProfileItem = profileItemsById[itemId]
 
     if (itemFields.type === PROFILE_CYCLE) {
-      return (
+      const cycleRow = (
         <ProfileCycleRow
           cycleItem={itemFields}
           focusHandlers={props.focusHandlers}
           key={itemId}
+          stepOffset={counter + 1}
         />
       )
-    }
 
+      counter += itemFields.steps.length
+
+      return cycleRow
+    }
+    counter++
     return (
       <ProfileStepRow
         profileStepItem={itemFields}
         focusHandlers={props.focusHandlers}
         key={itemId}
+        stepNumber={counter}
       />
     )
   })
@@ -190,6 +209,7 @@ const ProfileField = (props: ProfileFieldProps) => {
 type ProfileStepRowProps = {|
   focusHandlers: FocusHandlers,
   profileStepItem: ProfileStepItem,
+  stepNumber: number,
 |}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
@@ -215,6 +235,9 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     durationMinutes: i18n.t('application.units.minutes'),
     durationSeconds: i18n.t('application.units.seconds'),
   }
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top',
+  })
   const fields = names.map(name => (
     <ProfileField
       key={name}
@@ -229,8 +252,14 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
   ))
   return (
     <div className={styles.profile_step_row}>
-      <div className={styles.profile_step_fields}>{fields}</div>
-      <div onClick={deleteProfileStep}>
+      <div className={styles.profile_step_fields}>
+        <span className={styles.profile_step_number}>{props.stepNumber}. </span>
+        {fields}
+      </div>
+      <div onClick={deleteProfileStep} {...targetProps}>
+        <Tooltip {...tooltipProps}>
+          {i18n.t('tooltip.step_fields.profileStepRow.deleteStep')}
+        </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
     </div>
