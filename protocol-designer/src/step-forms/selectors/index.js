@@ -432,7 +432,10 @@ const _dynamicFieldFormErrors = (
 export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
   for (const fieldName in hydratedForm) {
     const value = hydratedForm[fieldName]
-    if (fieldName === 'profileItemsById') {
+    if (
+      hydratedForm.stepType === 'thermocycler' &&
+      fieldName === 'profileItemsById'
+    ) {
       if (getProfileItemsHaveErrors(value)) {
         return true
       }
@@ -448,9 +451,21 @@ export const _hasFieldLevelErrors = (hydratedForm: FormData): boolean => {
 }
 
 // TODO type with hydrated form type
+export const _hasFormLevelErrors = (hydratedForm: FormData): boolean => {
+  if (_formLevelErrors(hydratedForm).length > 0) return true
+
+  if (
+    hydratedForm.stepType === 'thermocycler' &&
+    _dynamicFieldFormErrors(hydratedForm).length > 0
+  ) {
+    return true
+  }
+  return false
+}
+
+// TODO type with hydrated form type
 export const _formHasErrors = (hydratedForm: FormData): boolean => {
-  const hasFormLevelErrors = _formLevelErrors(hydratedForm).length > 0
-  return _hasFieldLevelErrors(hydratedForm) || hasFormLevelErrors
+  return _hasFieldLevelErrors(hydratedForm) || _hasFormLevelErrors(hydratedForm)
 }
 
 export const getInvariantContext: Selector<InvariantContext> = createSelector(

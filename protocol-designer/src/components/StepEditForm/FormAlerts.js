@@ -10,7 +10,7 @@ import { selectors as stepFormSelectors } from '../../step-forms'
 import {
   getVisibleFormErrors,
   getVisibleFormWarnings,
-  getVisibleProfileErrors,
+  getVisibleProfileFormLevelErrors,
 } from './utils'
 import type { Dispatch } from 'redux'
 import type { StepIdType } from '../../form-types'
@@ -43,7 +43,7 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   const formLevelErrors = stepFormSelectors.getFormLevelErrorsForUnsavedForm(
     state
   )
-  const filteredErrors = getVisibleFormErrors({
+  const visibleErrors = getVisibleFormErrors({
     focusedField,
     dirtyFields,
     errors: formLevelErrors,
@@ -51,26 +51,27 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
 
   // deal with special-case dynamic field form-level errors
   const { profileItemsById } = stepFormSelectors.getHydratedUnsavedForm(state)
-  let filteredDynamicFieldFormErrors = []
+  let visibleDynamicFieldFormErrors = []
   if (profileItemsById != null) {
     const dynamicFieldFormErrors = stepFormSelectors.getDynamicFieldFormErrorsForUnsavedForm(
       state
     )
-    filteredDynamicFieldFormErrors = getVisibleProfileErrors({
+    visibleDynamicFieldFormErrors = getVisibleProfileFormLevelErrors({
       focusedField,
       dirtyFields,
       errors: dynamicFieldFormErrors,
       profileItemsById,
     })
+    console.log({ dynamicFieldFormErrors, visibleDynamicFieldFormErrors })
   }
 
   return {
     errors: [
-      ...filteredErrors.map(error => ({
+      ...visibleErrors.map(error => ({
         title: error.title,
         description: error.body || null,
       })),
-      ...filteredDynamicFieldFormErrors.map(error => ({
+      ...visibleDynamicFieldFormErrors.map(error => ({
         title: error.title,
         description: error.body || null,
       })),

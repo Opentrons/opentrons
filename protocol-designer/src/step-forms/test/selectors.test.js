@@ -20,8 +20,11 @@ beforeEach(() => {
 })
 
 describe('_hasFieldLevelErrors', () => {
-  it('should return true if form has "profileItemsById" field and _getProfileItemsHaveErrors returns true', () => {
-    const formData = { profileItemsById: { foo: 'abc' } }
+  it('should return true if form is "thermocycler", has "profileItemsById" field, and _getProfileItemsHaveErrors returns true', () => {
+    const formData = {
+      stepType: 'thermocycler',
+      profileItemsById: { foo: 'abc' },
+    }
     mockGetProfileItemsHaveErrors.mockImplementation(profileItems => {
       expect(profileItems).toEqual(formData.profileItemsById)
       return true
