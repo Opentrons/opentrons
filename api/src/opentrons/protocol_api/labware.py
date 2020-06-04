@@ -1374,7 +1374,6 @@ def _remove_offset_from_index(calibration_id: str):
         json.dump(blob, f)
 
 
-
 def delete_offset_file(calibration_id: str):
     """
     Given a labware's hash, delete the file and remove it from the index file.
