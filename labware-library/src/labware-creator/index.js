@@ -271,7 +271,7 @@ const getXYDimensionAlerts = (
   ) : null
 }
 
-export const LabwareCreator = () => {
+export const LabwareCreator = (): React.Node => {
   const [
     showExportErrorModal,
     _setShowExportErrorModal,

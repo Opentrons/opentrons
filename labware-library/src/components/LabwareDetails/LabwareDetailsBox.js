@@ -24,7 +24,7 @@ export type LabwareDetailsBoxProps = {|
   className?: string,
 |}
 
-export function LabwareDetailsBox(props: LabwareDetailsBoxProps) {
+export function LabwareDetailsBox(props: LabwareDetailsBoxProps): React.Node {
   const { definition, className } = props
   const { metadata, parameters, brand, wells, ordering } = definition
   const { displayVolumeUnits } = metadata

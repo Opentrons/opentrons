@@ -13,8 +13,8 @@ import {
   GEN_ONE_MULTI_PIPETTES,
 } from '../../constants'
 import type { DeckSlotId, ModuleRealType } from '@opentrons/shared-data'
-import type { DeckSlot } from '../../types'
 import type { LabwareDefByDefURI } from '../../labware-defs'
+import type { DeckSlot } from '../../types'
 import type {
   NormalizedPipette,
   NormalizedPipetteById,

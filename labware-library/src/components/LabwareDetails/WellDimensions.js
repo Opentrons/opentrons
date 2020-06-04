@@ -29,7 +29,7 @@ export type WellDimensionsProps = {|
   className?: string,
 |}
 
-export function WellDimensions(props: WellDimensionsProps) {
+export function WellDimensions(props: WellDimensionsProps): React.Node {
   const {
     labwareParams,
     wellProperties,

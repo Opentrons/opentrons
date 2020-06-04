@@ -14,6 +14,10 @@ import {
   targetTemperatureRequired,
   blockTemperatureRequired,
   lidTemperatureRequired,
+  profileVolumeRequired,
+  profileTargetLidTempRequired,
+  blockTemperatureHoldRequired,
+  lidTemperatureHoldRequired,
 } from './errors'
 import {
   composeWarnings,
@@ -83,7 +87,14 @@ const stepFormHelperMap: { [StepType]: FormHelpers } = {
     getErrors: composeErrors(targetTemperatureRequired, moduleIdRequired),
   },
   thermocycler: {
-    getErrors: composeErrors(blockTemperatureRequired, lidTemperatureRequired),
+    getErrors: composeErrors(
+      blockTemperatureRequired,
+      lidTemperatureRequired,
+      profileVolumeRequired,
+      profileTargetLidTempRequired,
+      blockTemperatureHoldRequired,
+      lidTemperatureHoldRequired
+    ),
   },
 }
 

@@ -11,7 +11,7 @@ export type WellCountProps = {|
   className?: string,
 |}
 
-export function WellCount(props: WellCountProps) {
+export function WellCount(props: WellCountProps): React.Node {
   const { count, wellLabel, className } = props
 
   return (

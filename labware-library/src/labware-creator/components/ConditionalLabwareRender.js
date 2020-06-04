@@ -20,7 +20,7 @@ type Props = {|
   values: LabwareFields,
 |}
 
-export const ConditionalLabwareRender = (props: Props) => {
+export const ConditionalLabwareRender = (props: Props): React.Node => {
   const definition = React.useMemo(() => {
     const values = cloneDeep(props.values)
 

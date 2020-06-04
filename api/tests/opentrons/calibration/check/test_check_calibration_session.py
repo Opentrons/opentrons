@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import patch, call
 
 import opentrons.calibration.session
 import pytest
@@ -253,6 +254,17 @@ async def in_comparing_second_pipette_point_one(check_calibration_session):
 def test_session_started(check_calibration_session):
     assert check_calibration_session.current_state.name == \
            session.CalibrationCheckState.sessionStarted
+
+
+async def test_pick_up_tip_sets_current(check_calibration_session_shared_tips):
+    sess = check_calibration_session_shared_tips
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.load_labware)
+    path = "opentrons.hardware_control.pipette.Pipette.update_config_item"
+    with patch(path) as m:
+        await sess._pick_up_tip(types.Mount.LEFT)
+        calls = [call('pick_up_current', 0.1), call('pick_up_current', 0.6)]
+        assert m.call_args_list == calls
 
 
 async def test_ensure_safety_removed_for_comparison(

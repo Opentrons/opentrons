@@ -9,7 +9,7 @@ export type ExternalLinkProps = {
   children: React.Node,
 }
 
-export function ExternalLink(props: ExternalLinkProps) {
+export function ExternalLink(props: ExternalLinkProps): React.Node {
   const { href, children } = props
 
   return (

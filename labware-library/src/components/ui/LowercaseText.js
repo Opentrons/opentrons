@@ -11,6 +11,6 @@ export type LowercaseTextProps = {|
 /**
  * LowercaseText - <span> that transforms all text to lowercase
  */
-export function LowercaseText(props: LowercaseTextProps) {
+export function LowercaseText(props: LowercaseTextProps): React.Node {
   return <span className={styles.lowercase_text}>{props.children}</span>
 }

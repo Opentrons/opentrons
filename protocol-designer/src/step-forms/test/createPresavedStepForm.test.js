@@ -285,12 +285,19 @@ describe('createPresavedStepForm', () => {
       lidIsActive: false,
       lidTargetTemp: null,
       lidOpen: null,
+      profileVolume: null,
+      profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
+      blockIsActiveHold: false,
+      blockTargetTempHold: null,
+      lidIsActiveHold: false,
+      lidTargetTempHold: null,
+      lidOpenHold: null,
     })
   })
 
-  it('should set a default thermocycler module for thermocycler step, and populate TC state when previously saved TC state', () => {
+  it('should populate TC state when previously saved TC state', () => {
     const args = {
       ...defaultArgs,
       savedStepForms: {
@@ -304,8 +311,15 @@ describe('createPresavedStepForm', () => {
           lidIsActive: true,
           lidTargetTemp: 45,
           lidOpen: true,
+          profileVolume: null,
+          profileTargetLidTemp: null,
           orderedProfileItems: [],
           profileItemsById: {},
+          blockIsActiveHold: false,
+          blockTargetTempHold: null,
+          lidIsActiveHold: false,
+          lidTargetTempHold: null,
+          lidOpenHold: null,
         },
       },
       orderedStepIds: ['prevStepId'],
@@ -325,8 +339,15 @@ describe('createPresavedStepForm', () => {
       lidIsActive: true,
       lidTargetTemp: 45,
       lidOpen: true,
+      profileVolume: null,
+      profileTargetLidTemp: null,
       orderedProfileItems: [],
       profileItemsById: {},
+      blockIsActiveHold: false,
+      blockTargetTempHold: null,
+      lidIsActiveHold: false,
+      lidTargetTempHold: null,
+      lidOpenHold: null,
     })
   })
 })

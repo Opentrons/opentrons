@@ -7,7 +7,7 @@ import styles from './styles.css'
 type Props = {|
   active: boolean,
 |}
-export function SupportMenu(props: Props) {
+export function SupportMenu(props: Props): React.Node {
   const { active } = props
   const {
     start,

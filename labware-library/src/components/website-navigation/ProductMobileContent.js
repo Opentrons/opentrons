@@ -12,7 +12,7 @@ import {
 
 type Props = {||}
 
-export function ProductMobileContent(props: Props) {
+export function ProductMobileContent(props: Props): React.Node {
   return (
     <div className={styles.product_mobile_content}>
       <div className={styles.hardware_group}>

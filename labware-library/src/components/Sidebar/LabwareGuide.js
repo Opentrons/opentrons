@@ -34,7 +34,7 @@ const LINKS = [
   },
 ]
 
-export function LabwareGuide() {
+export function LabwareGuide(): React.Node {
   return (
     <section className={styles.labware_guide}>
       <div className={styles.labware_guide_container}>
