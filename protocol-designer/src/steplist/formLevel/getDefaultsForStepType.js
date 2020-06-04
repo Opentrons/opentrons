@@ -102,8 +102,15 @@ export function getDefaultsForStepType(
         lidIsActive: false,
         lidTargetTemp: null,
         lidOpen: null,
+        profileVolume: null,
+        profileTargetLidTemp: null,
         orderedProfileItems: [],
         profileItemsById: {},
+        blockIsActiveHold: false,
+        blockTargetTempHold: null,
+        lidIsActiveHold: false,
+        lidTargetTempHold: null,
+        lidOpenHold: null,
       }
     default:
       return {}

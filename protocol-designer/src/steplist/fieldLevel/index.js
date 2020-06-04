@@ -191,6 +191,25 @@ const stepFieldHelperMap: { [StepFieldName]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
+  profileTargetLidTemp: {
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+    ),
+  },
+  blockTargetTempHold: {
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_BLOCK_TEMP, MAX_TC_BLOCK_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
+  lidTargetTempHold: {
+    getErrors: composeErrors(
+      temperatureRangeFieldValue(MIN_TC_LID_TEMP, MAX_TC_LID_TEMP)
+    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
 }
 
 const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
