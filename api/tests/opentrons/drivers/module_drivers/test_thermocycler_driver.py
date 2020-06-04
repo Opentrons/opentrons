@@ -88,12 +88,12 @@ def test_holding_at_target():
 
     # not yet stabilized
     tc._block_temp_buffer = [26, 28, 29, 30, 30.5, 29.8, 30.25, 29.9, 30, 30.1]
-    assert tc.status == 'cooling'
+    assert not tc._is_holding_at_target()
 
     # stabilized at target
     tc._block_temp_buffer = [30.25, 29.9, 30.0, 30.1, 30, 30, 30, 30, 30, 30.1]
-    assert tc.status == 'holding at target'
+    assert tc._is_holding_at_target()
 
     # not enough history
     tc._block_temp_buffer = [29.8, 30, 30, 30.1]
-    assert tc.status == 'cooling'
+    assert not tc._is_holding_at_target()
