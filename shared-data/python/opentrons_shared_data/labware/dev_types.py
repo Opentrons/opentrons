@@ -1,6 +1,6 @@
 """ opentrons_shared_data.labware.dev_types: types for labware defs
 
-types int this file by and large require the use of typing_extensions.
+types in this file by and large require the use of typing_extensions.
 this module shouldn't be imported unless typing.TYPE_CHECKING is true.
 """
 from typing import Dict, List, Union
