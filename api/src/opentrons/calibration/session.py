@@ -60,8 +60,8 @@ class CalibrationSession:
         await hardware.home()
         return cls(hardware=hardware)
 
+    @staticmethod
     def _get_pip_info_by_mount(
-            self,
             new_pipettes: typing.Dict[Mount, Pipette.DictType]) \
             -> typing.Dict[Mount, PipetteInfo]:
         pip_info_by_mount = {}
@@ -76,8 +76,6 @@ class CalibrationSession:
                     cp = None
                     if data['channels'] == 8:
                         cp = CriticalPoint.FRONT_NOZZLE
-                        pip = self._hardware._attached_instruments[mount]
-                        pip.update_config_item('pick_up_current', 0.1)
                     pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
                                                            critical_point=cp,
                                                            rank=rank,
@@ -171,6 +169,13 @@ class CalibrationSession:
 
     async def _pick_up_tip(self, mount: Mount):
         pip_info = self._pip_info_by_mount[mount]
+        instr = self._hardware._attached_instruments[mount]
+        saved_default = None
+        if pip_info.critical_point:
+            # If the pipette we're picking up tip for
+            # has a critical point, we know it is a multichannel
+            saved_default = instr.config.pick_up_current
+            instr.update_config_item('pick_up_current', 0.1)
         if pip_info.tiprack_id:
             lw_info = self.get_tiprack(pip_info.tiprack_id)
             # Note: ABC DeckItem cannot have tiplength b/c of
@@ -187,6 +192,8 @@ class CalibrationSession:
         else:
             tip_length = self.pipettes[mount]['fallback_tip_length']
         await self.hardware.pick_up_tip(mount, tip_length)
+        if saved_default:
+            instr.update_config_item('pick_up_current', saved_default)
 
     async def _trash_tip(self, mount: Mount):
         to_loc = self._trash_lw.wells()[0].top()

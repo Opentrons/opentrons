@@ -1,4 +1,5 @@
 import asyncio
+from unittest.mock import patch, call
 
 import opentrons.calibration.session
 import pytest
@@ -255,6 +256,17 @@ def test_session_started(check_calibration_session):
            session.CalibrationCheckState.sessionStarted
 
 
+async def test_pick_up_tip_sets_current(check_calibration_session_shared_tips):
+    sess = check_calibration_session_shared_tips
+    await sess.trigger_transition(
+            session.CalibrationCheckTrigger.load_labware)
+    path = "opentrons.hardware_control.pipette.Pipette.update_config_item"
+    with patch(path) as m:
+        await sess._pick_up_tip(types.Mount.LEFT)
+        calls = [call('pick_up_current', 0.1), call('pick_up_current', 0.6)]
+        assert m.call_args_list == calls
+
+
 async def test_ensure_safety_removed_for_comparison(
         check_calibration_session, monkeypatch):
     fake_moves_list = []
@@ -346,10 +358,6 @@ async def test_same_size_pips_share_tiprack(
     assert sess._deck['8']
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
     assert sess._deck['6'] is None
-
-    # Check that the multichannel plunger current gets set to .1
-    pip = sess.hardware._attached_instruments[types.Mount.LEFT]
-    pip.config.pick_up_current == .1
 
     # z and x values should be the same, but y should be different
     # if accessing different tips (A1, B1) on same tiprack
