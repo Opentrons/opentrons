@@ -376,4 +376,4 @@ def validate_json(
             'This may be a corrupted file or a JSON file that is not an '
             'Opentrons JSON protocol.')
     else:
-        return version_num, protocol_json
+        return version_num, protocol_json  # type: ignore
