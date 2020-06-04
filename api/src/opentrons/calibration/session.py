@@ -60,8 +60,8 @@ class CalibrationSession:
         await hardware.home()
         return cls(hardware=hardware)
 
-    @staticmethod
     def _get_pip_info_by_mount(
+            self,
             new_pipettes: typing.Dict[Mount, Pipette.DictType]) \
             -> typing.Dict[Mount, PipetteInfo]:
         pip_info_by_mount = {}
@@ -76,6 +76,8 @@ class CalibrationSession:
                     cp = None
                     if data['channels'] == 8:
                         cp = CriticalPoint.FRONT_NOZZLE
+                        pip = self._hardware._attached_instruments[mount]
+                        pip.update_config_item('pick_up_current', 0.1)
                     pip_info_by_mount[mount] = PipetteInfo(tiprack_id=None,
                                                            critical_point=cp,
                                                            rank=rank,

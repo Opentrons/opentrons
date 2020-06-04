@@ -347,6 +347,10 @@ async def test_same_size_pips_share_tiprack(
     assert sess._deck['8'].name == 'opentrons_96_tiprack_300ul'
     assert sess._deck['6'] is None
 
+    # Check that the multichannel plunger current gets set to .1
+    pip = sess.hardware._attached_instruments[types.Mount.LEFT]
+    pip.config.pick_up_current == .1
+
     # z and x values should be the same, but y should be different
     # if accessing different tips (A1, B1) on same tiprack
     assert sess._moves.preparingFirstPipette.position.x == \
