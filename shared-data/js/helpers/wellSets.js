@@ -34,7 +34,7 @@ function _getAllWellSetsForLabware(
 }
 
 // creates memoized getAllWellSetsForLabware + getWellSetForMultichannel fns.
-export const makeWellSetHelpers = (): {|
+export type WellSetHelpers = {|
   getAllWellSetsForLabware: (
     labwareDef: LabwareDefinition2
   ) => WellSetByPrimaryWell,
@@ -46,7 +46,8 @@ export const makeWellSetHelpers = (): {|
     pipetteSpec: PipetteNameSpecs,
     labwareDef: LabwareDefinition2
   ) => boolean,
-|} => {
+|}
+export const makeWellSetHelpers = (): WellSetHelpers => {
   const cache: {
     [labwareDefURI: string]: ?{|
       labwareDef: LabwareDefinition2,
