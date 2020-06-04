@@ -13,8 +13,8 @@ from robot_server.service.session import models
 
 @dataclass(frozen=True)
 class SessionMetaData:
-    name: Optional[str]
-    description: Optional[str]
+    name: Optional[str] = None
+    description: Optional[str] = None
     identifier: models.IdentifierType = field(
         default_factory=models.create_identifier
     )
@@ -39,21 +39,16 @@ class BaseSession(ABC):
     @classmethod
     async def create(cls,
                      configuration: SessionConfiguration,
-                     name: Optional[str] = None,
-                     description: Optional[str] = None):
+                     instance_meta: SessionMetaData) -> 'BaseSession':
         """
         Create a session object
 
         :param configuration: Data and utilities common to all session types
-        :param name: Optional name for the session
-        :param description: Optional description of the session
+        :param instance_meta: Session metadata
         :return: A new session
         """
         return cls(configuration=configuration,
-                   instance_meta=SessionMetaData(
-                       name=name,
-                       description=description
-                   ))
+                   instance_meta=instance_meta)
 
     def get_response_model(self) -> models.Session:
         """Get the response model"""

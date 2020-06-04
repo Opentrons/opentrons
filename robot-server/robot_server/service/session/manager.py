@@ -8,7 +8,7 @@ from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType
 from robot_server.service.session.session_types import NullBaseSession, \
-    CheckBaseSession
+    CheckBaseSession, SessionMetaData
 
 log = logging.getLogger(__name__)
 
@@ -35,7 +35,8 @@ class SessionManager:
         session = None
         cls = SessionTypeToClass.get(session_type)
         if cls:
-            session = await cls.create(self._session_common)
+            session = await cls.create(configuration=self._session_common,
+                                       instance_meta=SessionMetaData())
             if session:
                 self._sessions[session.meta.identifier] = session
         return session

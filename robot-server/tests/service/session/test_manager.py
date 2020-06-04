@@ -4,7 +4,7 @@ import pytest
 
 from opentrons.calibration.check.models import SessionType
 
-from robot_server.service.session.manager import SessionManager
+from robot_server.service.session.manager import SessionManager, SessionMetaData
 from robot_server.service.session.models import create_identifier
 
 
@@ -27,7 +27,11 @@ def mock_session_create():
 
 async def test_add_calls_session_create(manager, mock_session_create):
     await manager.add(SessionType.null)
-    mock_session_create.assert_called_once_with(manager._session_common)
+    mock_session_create.assert_called_once()
+    assert mock_session_create.call_args[1]['configuration'] ==\
+           manager._session_common
+    assert isinstance(mock_session_create.call_args[1]['instance_meta'],
+                      SessionMetaData)
 
 
 async def test_add_no_class_doesnt_call_create(manager, mock_session_create):

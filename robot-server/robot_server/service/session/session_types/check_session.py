@@ -2,20 +2,40 @@ from opentrons.calibration.check.session import CheckCalibrationSession
 from opentrons.calibration.check import models as calibration_models
 
 from robot_server.service.session import models
-from robot_server.service.session.command_execution.base_command_queue import \
-    CommandQueue
-from robot_server.service.session.command_execution import StateMachineExecutor
+from robot_server.service.session.command_execution import \
+    CommandQueue, StateMachineExecutor
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.session_types.base_session import BaseSession
+from robot_server.service.session.session_types.base_session \
+    import BaseSession, SessionMetaData
 
 
 class CheckBaseSession(BaseSession):
 
-    def __init__(self, configuration: SessionConfiguration, **kwargs):
-        super().__init__(configuration, **kwargs)
-        self._calibration_check = CheckCalibrationSession(configuration.hardware)
+    def __init__(self,
+                 configuration: SessionConfiguration,
+                 instance_meta: SessionMetaData,
+                 calibration_check: CheckCalibrationSession):
+        super().__init__(configuration, instance_meta)
+        self._calibration_check = calibration_check
         self._command_executor = StateMachineExecutor(self._calibration_check)
         self._command_queue = CommandQueue()
+
+    @classmethod
+    async def create(cls,
+                     configuration: SessionConfiguration,
+                     instance_meta: SessionMetaData) -> BaseSession:
+        """Create an instance"""
+        calibration_check = await CheckCalibrationSession.build(
+            configuration.hardware
+        )
+        return cls(
+            configuration=configuration,
+            instance_meta=instance_meta,
+            calibration_check=calibration_check)
+
+    async def clean_up(self):
+        await super().clean_up()
+        await self._calibration_check.delete_session()
 
     def _get_response_details(self) -> models.SessionDetails:
         instruments = {
