@@ -7,8 +7,9 @@ from functools import partial
 
 from opentrons.protocol_api import labware as lw_funcs
 
-from robot_server.service.models import V1BasicResponse, labware as lw_models
-from robot_server.service.errors import V1HandlerError
+from robot_server.service.labware import models as lw_models
+from robot_server.service.errors import RobotServerError
+from robot_server.service.json_api import ErrorResponse, Error
 
 router = APIRouter()
 
@@ -120,7 +121,7 @@ async def get_all_labware_calibrations(
 @router.get("/labware/calibrations/{calibrationId}",
             description="Fetch one specific labware offset by ID",
             response_model=lw_models.LabwareCalibration,
-            responses={status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}})
+            responses={status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}})
 async def get_specific_labware_calibration(
         calibrationId: str) -> lw_models.LabwareCalibration:
     calibration: Dict[Any, Any] = {}
@@ -128,8 +129,9 @@ async def get_specific_labware_calibration(
         if calibrationId == cal['id']:
             calibration = cal
     if not calibration:
-        raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
-                             message=f'{calibrationId} does not exist.')
+        error = Error(title='{calibrationId} does not exist.')
+        raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,
+                               error=error)
 
     formatted_calibrations = _format_calibrations([calibration])
     return formatted_calibrations[0]
@@ -137,12 +139,12 @@ async def get_specific_labware_calibration(
 
 @router.delete("/labware/calibrations/{calibrationId}",
                description="Delete one specific labware offset by ID",
-               response_model=V1BasicResponse,
                responses={
-                   status.HTTP_404_NOT_FOUND: {"model": V1BasicResponse}})
+                   status.HTTP_404_NOT_FOUND: {"model": ErrorResponse}})
 async def delete_specific_labware_calibration(calibrationId: str):
     try:
         lw_funcs.delete_offset_file(calibrationId)
-    except FileNotFoundError:
-        raise V1HandlerError(status_code=status.HTTP_404_NOT_FOUND,
-                             message=f'{calibrationId} does not exist.')
+    except (FileNotFoundError, KeyError):
+        error = Error(title='{calibrationId} does not exist.')
+        raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,
+                               error=error)

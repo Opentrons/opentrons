@@ -1368,12 +1368,11 @@ def _remove_offset_from_index(calibration_id: str):
         blob = _read_file(str(index_path))
     else:
         raise FileNotFoundError()
-    try:
-        del blob[calibration_id]
-        with index_path.open('w') as f:
-            json.dump(blob, f)
-    except KeyError:
-        raise FileNotFoundError()
+
+    del blob[calibration_id]
+    with index_path.open('w') as f:
+        json.dump(blob, f)
+
 
 
 def delete_offset_file(calibration_id: str):

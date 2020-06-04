@@ -126,7 +126,10 @@ def test_access_individual_labware(api_client, grab_id):
     resp = api_client.get('/labware/calibrations/funnyId')
     assert resp.status_code == 404
     body = resp.json()
-    assert body == {'message': 'funnyId does not exist.'}
+    assert body == {
+        'errors': [{
+            'status': '404',
+            'title': '{calibrationId} does not exist.'}]}
 
 
 def test_delete_individual_labware(api_client, grab_id):
@@ -134,7 +137,10 @@ def test_delete_individual_labware(api_client, grab_id):
     resp = api_client.delete('/labware/calibrations/funnyId')
     assert resp.status_code == 404
     body = resp.json()
-    assert body == {'message': 'funnyId does not exist.'}
+    assert body == {
+        'errors': [{
+            'status': '404',
+            'title': '{calibrationId} does not exist.'}]}
 
     resp = api_client.delete(f'/labware/calibrations/{calibration_id}')
     assert resp.status_code == 200
