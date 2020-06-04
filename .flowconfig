@@ -70,7 +70,7 @@ well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/labware-ingre
 ; well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/tutorial
 ; well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/ui
 ; well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/utils
-; well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/well-selection
+well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/well-selection
 well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-library-kludge
 well_formed_exports.whitelist=<PROJECT_ROOT>/shared-data
 
