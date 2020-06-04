@@ -62,6 +62,8 @@ ot_sources := $(ot_py_sources) $(ot_shared_data_sources) $(ot_resources) $(ot_op
 # depend on a PHONY target
 clean_cmd = $(SHX) rm -rf build dist .coverage coverage.xml '*.egg-info' '**/__pycache__' '**/*.pyc'
 
+plot_type ?=
+
 .PHONY: all
 all: clean wheel
 
@@ -163,4 +165,4 @@ term:
 
 .PHONY: plot-session
 plot-session:
-	$(python) util/plot_session.py calibration_check calibration_check.pdf
+	$(python) util/plot_session.py $(plot_type) $(plot_type).pdf
