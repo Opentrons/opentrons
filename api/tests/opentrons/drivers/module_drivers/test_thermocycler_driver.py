@@ -78,3 +78,22 @@ async def test_deactivates():
     assert command_log.pop(0) == 'M108'
     await tc.deactivate_block()
     assert command_log.pop(0) == 'M14'
+
+
+def test_holding_at_target():
+    tc = Thermocycler(lambda x: None)
+
+    tc._target_temp = 30
+    tc._current_temp = 30.1
+
+    # not yet stabilized
+    tc._block_temp_buffer = [26, 28, 29, 30, 30.5, 29.8, 30.25, 29.9, 30, 30.1]
+    assert tc.status == 'cooling'
+
+    # stabilized at target
+    tc._block_temp_buffer = [30.25, 29.9, 30.0, 30.1, 30, 30, 30, 30, 30, 30.1]
+    assert tc.status == 'holding at target'
+
+    # not enough history
+    tc._block_temp_buffer = [29.8, 30, 30, 30.1]
+    assert tc.status == 'cooling'
