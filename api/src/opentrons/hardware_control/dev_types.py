@@ -20,12 +20,15 @@ class RegisterModules(Protocol):
         removed_mods_at_ports: List[ModuleAtPort] = None
     ) -> None: ...
 
+
 class HasLoop(Protocol):
     @property
     def loop(self) -> asyncio.AbstractEventLoop:
         ...
 
+
 DoorStateNotificationType = Literal[HardwareEventType.DOOR_SWITCH_CHANGE]
+
 
 class AttachedInstrument(TypedDict):
     model: Optional[PipetteModel]
