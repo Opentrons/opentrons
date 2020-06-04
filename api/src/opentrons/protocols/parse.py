@@ -324,8 +324,8 @@ def _get_schema_for_protocol(version_num: int) -> protocol.Schema:
     return json.loads(schema.decode('utf-8'))
 
 
-def validate_json(protocol_json: Dict[Any, Any])\
-    -> Tuple[int, 'JsonProtocolDef']:
+def validate_json(
+        protocol_json: Dict[Any, Any]) -> Tuple[int, 'JsonProtocolDef']:
     """ Validates a json protocol and returns its schema version """
     # Check if this is actually a labware
     labware_schema_v2 = json.loads(load_shared_data(
@@ -376,4 +376,4 @@ def validate_json(protocol_json: Dict[Any, Any])\
             'This may be a corrupted file or a JSON file that is not an '
             'Opentrons JSON protocol.')
     else:
-        return protocol_json, version_num  # type: ignore
+        return version_num, protocol_json

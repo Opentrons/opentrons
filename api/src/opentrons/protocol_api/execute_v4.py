@@ -4,10 +4,9 @@ from .contexts import ProtocolContext, \
     MagneticModuleContext, TemperatureModuleContext, ModuleContext, \
     ThermocyclerContext
 from .execute_v3 import _delay, _move_to_slot
-from .types import LoadedLabware, Instruments, PipetteHandler, \
-    MagneticModuleHandler, TemperatureModuleHandler, \
-    ThermocyclerModuleHandler
-from opentrons_shared_data.protocol.constants import JsonCommand
+from .types import LoadedLabware, Instruments
+from opentrons_shared_data.protocol.constants import (
+    JsonRobotCommand, JsonPipetteCommand)
 
 
 if TYPE_CHECKING:
@@ -18,8 +17,12 @@ if TYPE_CHECKING:
         ThermocyclerSetTargetBlockParams,
         ThermocyclerRunProfileParams, Command,
         TemperatureModuleCommandId, MagneticModuleCommandId,
-        ThermocyclerCommandId, PipetteCommandId
+        ThermocyclerCommandId
     )
+    from .dev_types import (
+        JsonV4PipetteDispatch, JsonV4MagneticModuleDispatch,
+        JsonV4TemperatureModuleDispatch,
+        JsonV4ThermocyclerDispatch)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -216,13 +219,10 @@ def dispatch_json(
         instruments: Instruments,
         loaded_labware: LoadedLabware,
         modules: Dict[str, ModuleContext],
-        pipette_command_map: Dict['PipetteCommandId', PipetteHandler],
-        magnetic_module_command_map: Dict['MagneticModuleCommandId',
-                                          MagneticModuleHandler],
-        temperature_module_command_map: Dict['TemperatureModuleCommandId',
-                                             TemperatureModuleHandler],
-        thermocycler_module_command_map: Dict['ThermocyclerCommandId',
-                                              ThermocyclerModuleHandler]
+        pipette_command_map: 'JsonV4PipetteDispatch',
+        magnetic_module_command_map: 'JsonV4MagneticModuleDispatch',
+        temperature_module_command_map: 'JsonV4TemperatureModuleDispatch',
+        thermocycler_module_command_map: 'JsonV4ThermocyclerDispatch'
 ) -> None:
     commands = protocol_data['commands']
 
@@ -232,31 +232,32 @@ def dispatch_json(
     for command_item in commands:
         command_type = command_item['command']
         params = command_item['params']
-
+        # because of https://github.com/python/mypy/issues/8940
+        # we can't narrow down types using in sadly
         if command_type in pipette_command_map:
-            pipette_command_map[command_type](
+            pipette_command_map[command_type](  # type: ignore
                 instruments, loaded_labware, params)
         elif command_type in magnetic_module_command_map:
             handleMagnetCommand(
-                params,
+                params,  # type: ignore
                 modules,
-                command_type,
+                command_type,  # type: ignore
                 magnetic_module_command_map
             )
         elif command_type in temperature_module_command_map:
-            handleTemperatureCommand(params,
+            handleTemperatureCommand(params,  # type: ignore
                                      modules,
-                                     command_type,
+                                     command_type,  # type: ignore
                                      temperature_module_command_map)
         elif command_type in thermocycler_module_command_map:
-            handleThermocyclerCommand(params,
-                                      modules,
-                                      command_type,
+            handleThermocyclerCommand(params,  # type: ignore
+                                      modules,  # type: ignore
+                                      command_type,  # type: ignore
                                       thermocycler_module_command_map)
-        elif command_type == JsonCommand.delay.value:
-            _delay(context, params)
-        elif command_type == JsonCommand.moveToSlot.value:
-            _move_to_slot(context, instruments, params)
+        elif command_item['command'] == JsonRobotCommand.delay.value:
+            _delay(context, params)  # type: ignore
+        elif command_type == JsonPipetteCommand.moveToSlot.value:
+            _move_to_slot(context, instruments, params)  # type: ignore
         else:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))
@@ -282,7 +283,7 @@ def handleTemperatureCommand(
 
 
 def handleThermocyclerCommand(
-        params: Union['ModuleIdParams', 'TemperatureParams',
+        params: Union['ModuleIDParams', 'TemperatureParams',
                       'ThermocyclerRunProfileParams',
                       'ThermocyclerSetTargetBlockParams'],
         modules: Dict[str, ThermocyclerContext],
@@ -302,7 +303,7 @@ def handleThermocyclerCommand(
 
 
 def handleMagnetCommand(
-        params: Union['ModuleIdParams', 'MagneticModuleEngageParams'],
+        params: Union['ModuleIDParams', 'MagneticModuleEngageParams'],
         modules: Dict[str, ModuleContext],
         command_type: 'MagneticModuleCommandId',
         magnetic_module_command_map
