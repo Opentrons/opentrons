@@ -5,7 +5,7 @@ import { LabeledToggle } from '@opentrons/components'
 import type { State, Dispatch } from '../../types'
 import { getConfig, updateConfig } from '../../config'
 
-export const DisableDiscoveryCache = () => {
+export const DisableDiscoveryCache = (): React.Node => {
   const cacheDisabled = useSelector((state: State) => {
     const config = getConfig(state)
     return config.discovery.disableCache
