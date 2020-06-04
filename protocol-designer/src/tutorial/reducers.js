@@ -1,5 +1,5 @@
 // @flow
-import { combineReducers } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
 import pickBy from 'lodash/pickBy'
 import uniq from 'lodash/uniq'
@@ -32,7 +32,7 @@ const hints = handleActions(
 
 type DismissedHintReducerState = { [HintKey]: { rememberDismissal: boolean } }
 const dismissedHintsInitialState = {}
-const dismissedHints = handleActions(
+const dismissedHints: Reducer<DismissedHintReducerState, any> = handleActions(
   {
     // NOTE: only "rememberDismissal" hints should have been persisted
     REHYDRATE_PERSISTED: (
@@ -60,7 +60,9 @@ const dismissedHints = handleActions(
   dismissedHintsInitialState
 )
 
-export function dismissedHintsPersist(state: DismissedHintReducerState) {
+export const dismissedHintsPersist = (
+  state: DismissedHintReducerState
+): DismissedHintReducerState => {
   // persist only 'rememberDismissal' hints
   return pickBy(
     state,
@@ -78,4 +80,6 @@ export type RootState = {
   dismissedHints: DismissedHintReducerState,
 }
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)
