@@ -13,7 +13,6 @@ import {
   presavedStepForm,
   savedStepForms,
   unsavedForm,
-  createInitialProfileCycle,
 } from '../reducers'
 import {
   _getPipetteEntitiesRootState,
@@ -33,6 +32,7 @@ import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
+import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
 import { uuid } from '../../utils'
 import type { DeckSlot } from '../../types'
