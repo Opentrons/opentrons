@@ -7,6 +7,8 @@ import {
   getLabwareDefURI,
   getLabwareDefIsStandard,
 } from '@opentrons/shared-data'
+
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { LabwareUploadMessage, LabwareDefByDefURI } from './types'
 import type {
@@ -28,11 +30,14 @@ const customDefs = handleActions(
         [uri]: action.payload.def,
       }
     },
-    REPLACE_CUSTOM_LABWARE_DEF: (state, action: ReplaceCustomLabwareDef) => ({
+    REPLACE_CUSTOM_LABWARE_DEF: (
+      state: LabwareDefByDefURI,
+      action: ReplaceCustomLabwareDef
+    ) => ({
       ...omit(state, action.payload.defURIToOverwrite),
       [getLabwareDefURI(action.payload.newDef)]: action.payload.newDef,
     }),
-    LOAD_FILE: (state, action: LoadFileAction) => {
+    LOAD_FILE: (state: LabwareDefByDefURI, action: LoadFileAction) => {
       const customDefsFromFile = pickBy(
         action.payload.file.labwareDefinitions,
         def => !getLabwareDefIsStandard(def) // assume if it's not standard, it's custom
@@ -59,14 +64,16 @@ const labwareUploadMessage = handleActions<?LabwareUploadMessage, *>(
   null
 )
 
-export type RootState = {
+export type RootState = {|
   customDefs: LabwareDefByDefURI,
   labwareUploadMessage: ?LabwareUploadMessage,
-}
+|}
 
 const _allReducers = {
   customDefs,
   labwareUploadMessage,
 }
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)

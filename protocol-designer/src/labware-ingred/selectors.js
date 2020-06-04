@@ -6,6 +6,7 @@ import max from 'lodash/max'
 import reduce from 'lodash/reduce'
 
 import type { Options } from '@opentrons/components'
+import type { LabwareLiquidState } from '../step-generation'
 import type {
   RootState,
   ContainersState,
@@ -20,7 +21,12 @@ import type {
   LiquidGroup,
   OrderedLiquids,
 } from './types'
-import type { BaseState, MemoizedSelector, Selector } from './../types'
+import type {
+  BaseState,
+  MemoizedSelector,
+  Selector,
+  DeckSlot,
+} from './../types'
 
 // TODO: Ian 2019-02-15 no RootSlice, use BaseState
 type RootSlice = { labwareIngred: RootState }
@@ -35,7 +41,7 @@ const getLabwareNameInfo: MemoizedSelector<ContainersState> = createSelector(
 
 const getLiquidGroupsById = (state: RootSlice): IngredientsState =>
   rootSelector(state).ingredients
-const getLiquidsByLabwareId = (state: RootSlice) =>
+const getLiquidsByLabwareId = (state: RootSlice): LabwareLiquidState =>
   rootSelector(state).ingredLocations
 
 const getNextLiquidGroupId: MemoizedSelector<string> = createSelector(
@@ -65,10 +71,13 @@ const getLiquidSelectionOptions: MemoizedSelector<Options> = createSelector(
 )
 
 // false or selected slot to add labware to, eg 'A2'
-const selectedAddLabwareSlot = (state: BaseState) =>
+const selectedAddLabwareSlot = (state: BaseState): DeckSlot | false =>
   rootSelector(state).modeLabwareSelection
 
-const getSavedLabware = (state: BaseState) => rootSelector(state).savedLabware
+// TODO(mc, 2020-06-04): move SavedLabwareState to common location and import here
+const getSavedLabware = (
+  state: BaseState
+): { [labwareId: string]: boolean, ... } => rootSelector(state).savedLabware
 
 const getSelectedLabwareId: MemoizedSelector<SelectedContainerId> = createSelector(
   rootSelector,

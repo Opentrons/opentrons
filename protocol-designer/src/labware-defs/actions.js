@@ -14,7 +14,7 @@ import { getIsTiprack } from '../../../shared-data/js/getLabware'
 import * as labwareDefSelectors from './selectors'
 import { getAllWellSetsForLabware } from '../utils'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
-import type { GetState, ThunkAction, ThunkDispatch } from '../types'
+import type { ThunkAction } from '../types'
 import type { LabwareUploadMessage } from './types'
 
 export type LabwareUploadMessageAction = {|
@@ -91,9 +91,11 @@ const getIsOverwriteMismatched = (
   return !(matchedWellOrdering && matchedMultiUse)
 }
 
-const _createCustomLabwareDef = (onlyTiprack: boolean) => (
+const _createCustomLabwareDef: (
+  onlyTiprack: boolean
+) => (
   event: SyntheticInputEvent<HTMLInputElement>
-): ThunkAction<*> => (dispatch: ThunkDispatch<*>, getState: GetState) => {
+) => ThunkAction<any> = onlyTiprack => event => (dispatch, getState) => {
   const allLabwareDefs: Array<LabwareDefinition2> = values(
     labwareDefSelectors.getLabwareDefsByURI(getState())
   )
@@ -233,8 +235,13 @@ const _createCustomLabwareDef = (onlyTiprack: boolean) => (
   reader.readAsText(file)
 }
 
-export const createCustomLabwareDef = _createCustomLabwareDef(false)
-export const createCustomTiprackDef = _createCustomLabwareDef(true)
+export const createCustomLabwareDef: (
+  event: SyntheticInputEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(false)
+
+export const createCustomTiprackDef: (
+  event: SyntheticInputEvent<HTMLInputElement>
+) => ThunkAction<any> = _createCustomLabwareDef(true)
 
 type DismissLabwareUploadMessage = {|
   type: 'DISMISS_LABWARE_UPLOAD_MESSAGE',

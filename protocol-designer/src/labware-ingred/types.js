@@ -8,13 +8,14 @@ export type DisplayLabware = {|
   nickname: ?string,
 |}
 
-export type LabwareTypeById = { [labwareId: string]: ?string }
+export type LabwareTypeById = { [labwareId: string]: ?string, ... }
 
 // ==== WELLS ==========
 
 // TODO: Ian 2019-06-08 remove this in favor of WellGroup
 export type Wells = {
   [wellName: string]: string, // eg A1: 'A1'.
+  ...,
 }
 
 export type WellContents = {|
@@ -26,10 +27,12 @@ export type WellContents = {|
 
 export type ContentsByWell = {
   [wellName: string]: WellContents,
+  ...,
 }
 
 export type WellContentsByLabware = {
   [labwareId: string]: ContentsByWell,
+  ...,
 }
 
 // ==== INGREDIENTS ====
@@ -55,8 +58,10 @@ export type IngredGroupAccessor = $Keys<IngredInputs>
 
 export type LiquidGroupsById = {
   [groupId: string]: LiquidGroup,
+  ...,
 }
 
 export type AllIngredGroupFields = {
   [ingredGroupId: string]: IngredInputs,
+  ...,
 }
