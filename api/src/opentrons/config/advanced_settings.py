@@ -162,8 +162,10 @@ settings = [
     SettingDefinition(
         _id='enableTipLengthCalibration',
         title='Enable Tip Length Calibration',
-        description='Extrapolate the length of the tip by comparing '
-                    'the heights '
+        description='Measure the tip length based on each unique pipette, '
+                    'by comparing the heights of the tip and the pipette '
+                    'nozzle. This should not be activated except by '
+                    'developers.'
     )
 ]
 
