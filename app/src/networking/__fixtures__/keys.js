@@ -9,6 +9,7 @@ import {
 
 import { WIFI_KEYS_PATH } from '../constants'
 
+import type { ResponseFixtures } from '../../robot-api/__fixtures__'
 import type { FetchWifiKeysResponse, PostWifiKeysResponse } from '../types'
 
 export const mockWifiKey = {
@@ -22,7 +23,10 @@ export const {
   failureMeta: mockFetchWifiKeysFailureMeta,
   success: mockFetchWifiKeysSuccess,
   failure: mockFetchWifiKeysFailure,
-} = makeResponseFixtures<FetchWifiKeysResponse, {| message: string |}>({
+}: ResponseFixtures<
+  FetchWifiKeysResponse,
+  {| message: string |}
+> = makeResponseFixtures({
   method: GET,
   path: WIFI_KEYS_PATH,
   successStatus: 200,
@@ -36,7 +40,10 @@ export const {
   failureMeta: mockPostWifiKeysFailureMeta,
   success: mockPostWifiKeysSuccess,
   failure: mockPostWifiKeysFailure,
-} = makeResponseFixtures<PostWifiKeysResponse, {| message: string |}>({
+}: ResponseFixtures<
+  PostWifiKeysResponse,
+  {| message: string |}
+> = makeResponseFixtures({
   method: POST,
   path: WIFI_KEYS_PATH,
   successStatus: 201,

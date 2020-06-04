@@ -8,7 +8,7 @@ import { ClearDiscoveryCache } from './ClearDiscoveryCache'
 // TODO(mc, 2020-04-27): i18n
 const NETWORK_SETTINGS = 'Network Settings'
 
-export const NetworkSettingsCard = () => (
+export const NetworkSettingsCard = (): React.Node => (
   <Card title={NETWORK_SETTINGS}>
     <AddManualIp />
     <ClearDiscoveryCache />

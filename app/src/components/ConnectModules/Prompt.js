@@ -23,7 +23,7 @@ const connectedAlertProps = {
   className: styles.alert,
 }
 
-export function Prompt(props: PromptProps) {
+export function Prompt(props: PromptProps): React.Node {
   const { modulesMissing, onClick } = props
 
   const alert = modulesMissing ? (

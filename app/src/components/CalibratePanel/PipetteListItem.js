@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import capitalize from 'lodash/capitalize'
 
 import { ListItem, HoverTooltip } from '@opentrons/components'
@@ -16,7 +16,7 @@ export type PipetteListItemProps = {|
   disabledReason: string | null,
 |}
 
-export function PipetteListItem(props: PipetteListItemProps) {
+export function PipetteListItem(props: PipetteListItemProps): React.Node {
   const { mount, pipette, calibrateUrl, disabledReason } = props
   const confirmed = pipette?.probed
   const displayName = pipette?.modelSpecs?.displayName || 'N/A'

@@ -8,7 +8,7 @@ import { TipRackList } from './TipRackList'
 import { LabwareList } from './LabwareList'
 import styles from './styles.css'
 
-export function CalibratePanel() {
+export function CalibratePanel(): React.Node {
   return (
     <SidePanel title="Prepare for Run">
       <div className={styles.setup_panel}>

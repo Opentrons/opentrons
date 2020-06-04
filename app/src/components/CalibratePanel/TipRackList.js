@@ -32,7 +32,9 @@ type Props = {|
   setLabware: (labware: Labware) => mixed,
 |}
 
-export const TipRackList = withRouter<_, _>(
+export const TipRackList: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, {||}, State, Dispatch>(
     mapStateToProps,
     null,

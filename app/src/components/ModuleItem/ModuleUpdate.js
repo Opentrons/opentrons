@@ -39,7 +39,7 @@ type Props = {|
   moduleId: string,
 |}
 
-export function ModuleUpdate(props: Props) {
+export function ModuleUpdate(props: Props): React.Node {
   const { hasAvailableUpdate, moduleId, controlDisabledReason } = props
   const dispatch = useDispatch<Dispatch>()
   const robotName = useSelector(getConnectedRobotName)

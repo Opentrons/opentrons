@@ -33,9 +33,15 @@ const INFO_TITLE = 'Information'
 const DESCRIPTION_TITLE = 'Description'
 const DATE_FORMAT = 'PPpp'
 
-export const InformationCard = connect<Props, OP, SP, _, _, _, _>(
-  mapStateToProps
-)(InformationCardComponent)
+export const InformationCard: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(InformationCardComponent)
 
 function InformationCardComponent(props: Props) {
   const { name, author, method, description } = props

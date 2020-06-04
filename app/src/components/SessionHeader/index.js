@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { Link } from 'react-router-dom'
 
@@ -11,9 +11,14 @@ type SP = {| sessionName: ?string |}
 
 type Props = {| ...SP, dispatch: Dispatch |}
 
-export const SessionHeader = connect<Props, {||}, _, _, _, _>(mapStateToProps)(
-  SessionHeaderComponent
-)
+export const SessionHeader: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(SessionHeaderComponent)
 
 function SessionHeaderComponent(props: Props) {
   return <Link to="/upload">{props.sessionName}</Link>

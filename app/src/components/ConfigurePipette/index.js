@@ -37,7 +37,7 @@ type Props = {|
   closeModal: () => mixed,
 |}
 
-export function ConfigurePipette(props: Props) {
+export function ConfigurePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
   const [dispatchRequest, requestIds] = useDispatchApiRequest()
 

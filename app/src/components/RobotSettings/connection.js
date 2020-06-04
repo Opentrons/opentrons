@@ -27,7 +27,9 @@ function shortStatusToDescription(status: ?InternetStatus) {
   return 'Unknown'
 }
 
-export function ConnectionStatusMessage(props: ConnectionStatusProps) {
+export function ConnectionStatusMessage(
+  props: ConnectionStatusProps
+): React.Node {
   const { type, status } = props
 
   return (
@@ -49,7 +51,7 @@ type ConnectionInfoProps = {
   disabled: ?boolean,
 }
 
-export function ConnectionInfo(props: ConnectionInfoProps) {
+export function ConnectionInfo(props: ConnectionInfoProps): React.Node {
   const { connection, title, wired, children, disabled } = props
   const labelStyles = cx(styles.connection_label, {
     [styles.disabled]: disabled,

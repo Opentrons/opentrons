@@ -36,7 +36,7 @@ export function getDiagramsSrc(props: DiagramProps): string {
     : require(`./images/${direction}-${mount}-${channelsKey}-${diagram}@3x.png`)
 }
 
-export function InstructionStep(props: Props) {
+export function InstructionStep(props: Props): React.Node {
   const { step, children, ...diagramProps } = props
 
   return (

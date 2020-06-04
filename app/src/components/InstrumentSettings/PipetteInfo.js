@@ -26,7 +26,7 @@ const LABEL_BY_MOUNT = {
 
 const SERIAL_NUMBER = 'Serial number'
 
-export function PipetteInfo(props: PipetteInfoProps) {
+export function PipetteInfo(props: PipetteInfoProps): React.Node {
   const { mount, pipette, changeUrl, settingsUrl } = props
   const label = LABEL_BY_MOUNT[mount]
   const displayName = pipette ? pipette.modelSpecs.displayName : null

@@ -4,7 +4,7 @@ import { Switch, Route } from 'react-router-dom'
 
 import styles from './styles.css'
 
-export function ModalCopy() {
+export function ModalCopy(): React.Node {
   return (
     <div className={styles.copy}>
       <p>

@@ -26,7 +26,9 @@ const inexactPipetteSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 const TITLE = 'Required Pipettes'
 
-export function ProtocolPipettesCard(props: ProtocolPipettesCardProps) {
+export function ProtocolPipettesCard(
+  props: ProtocolPipettesCardProps
+): React.Node {
   const { robotName } = props
   const dispatch = useDispatch<Dispatch>()
   const infoByMount = useSelector((state: State) =>

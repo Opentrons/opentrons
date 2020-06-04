@@ -57,7 +57,14 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export const IpList = connect<Props, OP, SP, DP, State, Dispatch>(
+export const IpList: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  State,
+  Dispatch
+>(
   mapStateToProps,
   mapDispatchToProps
 )(IpListComponent)

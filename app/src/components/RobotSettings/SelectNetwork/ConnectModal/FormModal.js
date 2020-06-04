@@ -68,7 +68,7 @@ export type FormModalProps = {|
   onCancel: () => mixed,
 |}
 
-export const FormModal = (props: FormModalProps) => {
+export const FormModal = (props: FormModalProps): React.Node => {
   const { id, network, fields, isValid, onCancel } = props
 
   const heading =

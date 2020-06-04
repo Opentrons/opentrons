@@ -21,7 +21,7 @@ type Props = {| robot: ViewableRobot |}
 const CONNECTIVITY = 'Connectivity'
 const STATUS_REFRESH_MS = 5000
 
-export function ConnectionCard(props: Props) {
+export function ConnectionCard(props: Props): React.Node {
   const { robot } = props
   const { name: robotName, status, local } = robot
   const dispatch = useDispatch<Dispatch>()

@@ -26,7 +26,7 @@ export type RunControlsProps = {|
   onResetClick: () => mixed,
 |}
 
-export function RunControls(props: RunControlsProps) {
+export function RunControls(props: RunControlsProps): React.Node {
   const {
     disabled,
     modulesReady,

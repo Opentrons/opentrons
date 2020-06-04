@@ -12,7 +12,9 @@ import type { Labware } from '../../robot/types'
 
 type Props = {| ...ContextRouter, labware: ?Labware |}
 
-export const CalibrateLabware = withRouter<Props, _>(CalibrateLabwareComponent)
+export const CalibrateLabware: React.AbstractComponent<
+  $Diff<Props, ContextRouter>
+> = withRouter(CalibrateLabwareComponent)
 
 function CalibrateLabwareComponent(props: Props) {
   return (

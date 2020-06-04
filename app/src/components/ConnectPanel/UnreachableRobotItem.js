@@ -8,7 +8,7 @@ import styles from './styles.css'
 
 import type { UnreachableRobot } from '../../discovery/types'
 
-export function UnreachableRobotItem(props: UnreachableRobot) {
+export function UnreachableRobotItem(props: UnreachableRobot): React.Node {
   const { displayName } = props
   return (
     <li className={styles.robot_group}>

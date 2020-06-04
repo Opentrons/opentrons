@@ -9,7 +9,7 @@ export const mockHealthResponse = {
   api_version: '0.0.0-mock',
   fw_version: '0.0.0-mock',
   system_version: '0.0.0-mock',
-  logs: [],
+  logs: ([]: Array<string>),
   protocol_api_version: [2, 0],
 }
 
@@ -19,7 +19,7 @@ export const mockUpdateServerHealthResponse = {
   updateServerVersion: '0.0.0-mock',
   smoothieVersion: '0.0.0-mock',
   systemVersion: '0.0.0-mock',
-  capabilities: {},
+  capabilities: ({}: { ... }),
 }
 
 export const mockService: $Exact<Service> = {

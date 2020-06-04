@@ -13,7 +13,7 @@ type Props = {|
   controlDisabledReason: string | null,
 |}
 
-export function ModuleControls(props: Props) {
+export function ModuleControls(props: Props): React.Node {
   const { module: mod, controlDisabledReason } = props
   const sendModuleCommand = useSendModuleCommand()
 

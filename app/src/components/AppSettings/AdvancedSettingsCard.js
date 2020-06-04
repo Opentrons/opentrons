@@ -43,7 +43,9 @@ type Props = {| ...OP, ...SP, ...DP |}
 
 const TITLE = 'Advanced Settings'
 
-export const AdvancedSettingsCard = withRouter(
+export const AdvancedSettingsCard: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect(
     mapStateToProps,
     mapDispatchToProps

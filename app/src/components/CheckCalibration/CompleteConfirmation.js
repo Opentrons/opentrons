@@ -25,7 +25,9 @@ type CompleteConfirmationProps = {|
     [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
   },
 |}
-export function CompleteConfirmation(props: CompleteConfirmationProps) {
+export function CompleteConfirmation(
+  props: CompleteConfirmationProps
+): React.Node {
   const { exit, stepsPassed, stepsFailed, comparisonsByStep } = props
   const rawDataRef = React.useRef<HTMLInputElement | null>(null)
   const handleCopyButtonClick = () => {

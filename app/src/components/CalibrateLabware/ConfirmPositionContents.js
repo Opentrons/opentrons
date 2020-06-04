@@ -27,7 +27,14 @@ type DP = {|
 
 type Props = {| ...OP, ...DP |}
 
-export const ConfirmPositionContents = connect<Props, OP, _, _, _, _>(
+export const ConfirmPositionContents: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  _,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(ConfirmPositionContentsComponent)

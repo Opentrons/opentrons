@@ -41,7 +41,7 @@ const MOVE_PIPETTE_TO_FRONT = 'Move pipette to front'
 const CANCEL = 'Cancel'
 const MOUNT = 'mount'
 
-export function ChangePipette(props: Props) {
+export function ChangePipette(props: Props): React.Node {
   const { robotName, mount, closeModal } = props
   const dispatch = useDispatch<Dispatch>()
   const [dispatchApiRequest, requestIds] = useDispatchApiRequest()

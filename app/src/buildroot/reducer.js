@@ -16,7 +16,7 @@ export const INITIAL_STATE: BuildrootState = {
 export const initialSession = (
   robotName: string,
   session: BuildrootUpdateSession | null
-) => ({
+): BuildrootUpdateSession => ({
   robotName,
   userFileInfo: session?.userFileInfo || null,
   step: null,

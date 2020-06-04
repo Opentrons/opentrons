@@ -21,7 +21,7 @@ export type LabwareListItemProps = {|
   onClick: () => mixed,
 |}
 
-export function LabwareListItem(props: LabwareListItemProps) {
+export function LabwareListItem(props: LabwareListItemProps): React.Node {
   const {
     name,
     type,

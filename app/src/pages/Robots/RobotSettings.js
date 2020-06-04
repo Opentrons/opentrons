@@ -67,7 +67,9 @@ type DP = {|
 
 type Props = {| ...OP, ...DP, ...SP |}
 
-export const RobotSettings = withRouter<_, _>(
+export const RobotSettings: React.AbstractComponent<
+  $Diff<OP, ContextRouter>
+> = withRouter(
   connect<Props, OP, SP, DP, State, Dispatch>(
     mapStateToProps,
     mapDispatchToProps

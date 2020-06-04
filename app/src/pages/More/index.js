@@ -8,7 +8,7 @@ import { CustomLabware } from './CustomLabware'
 import { NetworkAndSystem } from './NetworkAndSystem'
 import { Resources } from './Resources'
 
-export function More() {
+export function More(): React.Node {
   const { path } = useRouteMatch()
   const appPath = `${path}/app`
 

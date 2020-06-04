@@ -18,7 +18,14 @@ type DP = {| onConfirmClick: () => void |}
 
 type Props = {| ...OP, ...DP |}
 
-export const RemoveTipPanel = connect<Props, OP, {||}, DP, _, _>(
+export const RemoveTipPanel: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(RemoveTipPanelComponent)

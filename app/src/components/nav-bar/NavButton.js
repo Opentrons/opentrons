@@ -15,7 +15,7 @@ export type NavButtonProps = {|
   isBottom: boolean,
 |}
 
-export function NavButtonWithoutRouter(props: NavButtonProps) {
+export function NavButtonWithoutRouter(props: NavButtonProps): React.Node {
   const {
     path,
     title,
@@ -47,4 +47,6 @@ export function NavButtonWithoutRouter(props: NavButtonProps) {
   )
 }
 
-export const NavButton = withRouter(NavButtonWithoutRouter)
+export const NavButton: React.AbstractComponent<
+  $Diff<NavButtonProps, ContextRouter>
+> = withRouter(NavButtonWithoutRouter)

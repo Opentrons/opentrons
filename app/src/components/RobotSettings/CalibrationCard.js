@@ -29,7 +29,14 @@ const TITLE = 'Deck Calibration'
 const CALIBRATION_MESSAGE =
   'Calibrate your robot to initial factory settings to ensure accuracy.'
 
-export const CalibrationCard = connect<Props, OP, _, _, _, _>(
+export const CalibrationCard: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  _,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(CalibrationCardComponent)

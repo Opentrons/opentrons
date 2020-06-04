@@ -19,7 +19,7 @@ import type { TipProbeProps } from './types'
 
 type Props = TipProbeProps
 
-export function AttachTipPanel(props: Props) {
+export function AttachTipPanel(props: Props): React.Node {
   const { mount, channels } = props
   const dispatch = useDispatch<Dispatch>()
   const tipracksByMount = useSelector(robotSelectors.getTipracksByMount)

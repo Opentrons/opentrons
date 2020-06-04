@@ -78,7 +78,7 @@ export const mockResetConfigSuccess = {
   path: '/settings/reset',
   ok: true,
   status: 200,
-  body: {},
+  body: ({}: { ... }),
 }
 
 export const mockResetConfigSuccessMeta = {

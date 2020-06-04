@@ -12,7 +12,7 @@ const HEADING = 'Are you sure you want to exit initial robot calibration?'
 const CANCEL_TEXT = 'cancel'
 const EXIT_TEXT = 'exit calibration'
 
-export function ExitAlertModal(props: ExitAlertModalProps) {
+export function ExitAlertModal(props: ExitAlertModalProps): React.Node {
   const { back, exit } = props
   return (
     <AlertModal

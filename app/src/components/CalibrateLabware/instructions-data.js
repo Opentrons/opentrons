@@ -13,7 +13,10 @@ type TypeKey =
   | 'reservoir'
   | 'reservoirCentered'
 
-const DIAGRAMS: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
+const DIAGRAMS: {
+  [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
+  ...,
+} = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -86,7 +89,10 @@ const DIAGRAMS: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
   },
 }
 
-const DIAGRAMS_BOTTOM: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
+const DIAGRAMS_BOTTOM: {
+  [TypeKey]: { [Channels]: { [Step]: string, ... }, ... },
+  ...,
+} = {
   tiprack: {
     single: {
       one: require('./images/step-1-tiprack-single@3x.png'),
@@ -160,7 +166,8 @@ const DIAGRAMS_BOTTOM: { [TypeKey]: { [Channels]: { [Step]: string } } } = {
 }
 
 const INSTRUCTIONS: {
-  [TypeKey]: { [Channels]: { [Step]: string | React.Node } },
+  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
+  ...,
 } = {
   tiprack: {
     single: {
@@ -296,7 +303,8 @@ const INSTRUCTIONS: {
 }
 
 const INSTRUCTIONS_BOTTOM: {
-  [TypeKey]: { [Channels]: { [Step]: string | React.Node } },
+  [TypeKey]: { [Channels]: { [Step]: React.Node, ... }, ... },
+  ...,
 } = {
   tiprack: {
     single: {
@@ -431,7 +439,9 @@ const INSTRUCTIONS_BOTTOM: {
   },
 }
 
-export function getDiagramSrc(props: LabwareCalibrationProps) {
+export function getDiagramSrc(
+  props: LabwareCalibrationProps
+): { [Step]: string, ... } {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
   if (props.calibrateToBottom) {
@@ -440,7 +450,9 @@ export function getDiagramSrc(props: LabwareCalibrationProps) {
   return DIAGRAMS[typeKey][channelsKey]
 }
 
-export function getInstructionsByType(props: LabwareCalibrationProps) {
+export function getInstructionsByType(
+  props: LabwareCalibrationProps
+): { [Step]: React.Node, ... } {
   const typeKey = getTypeKey(props)
   const channelsKey = getChannelsKey(props)
 

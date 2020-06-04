@@ -11,7 +11,7 @@ const HEADING = 'Are you sure you want to cancel this run?'
 const CANCEL_TEXT = 'cancel run'
 const BACK_TEXT = 'go back'
 
-export function ConfirmCancelModal() {
+export function ConfirmCancelModal(): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const back = () => {
     dispatch(robotActions.resume())

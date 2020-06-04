@@ -64,7 +64,7 @@ const GlobalStyle = createGlobalStyle`
 
 const stopEvent = (event: SyntheticEvent<>) => event.preventDefault()
 
-export function App() {
+export function App(): React.Node {
   return (
     <>
       <GlobalStyle />

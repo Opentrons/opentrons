@@ -70,7 +70,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getKnownQuirks = (): Array<DisplayQuirkFieldProps> => {
+  getKnownQuirks: () => Array<DisplayQuirkFieldProps> = () => {
     const quirks = this.props.settings[QUIRK_KEY]
     if (!quirks) return []
     const quirkKeys = Object.keys(quirks)
@@ -85,7 +85,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     })
   }
 
-  getVisibleFields = (): PipetteSettingsFieldsMap => {
+  getVisibleFields: () => PipetteSettingsFieldsMap = () => {
     if (this.props.__showHiddenFields) return this.props.settings
     return pick(this.props.settings, [
       ...PLUNGER_KEYS,
@@ -94,7 +94,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     ])
   }
 
-  getUnknownKeys = (): Array<string> => {
+  getUnknownKeys: () => Array<string> = () => {
     return keys<string>(
       omit(this.props.settings, [
         ...PLUNGER_KEYS,
@@ -105,7 +105,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     )
   }
 
-  handleSubmit = (values: FormValues) => {
+  handleSubmit: (values: FormValues) => void = values => {
     const params = mapValues(values, (v: ?(string | boolean)) => {
       if (v === true || v === false) return v
       if (v === '' || v == null) return null
@@ -126,7 +126,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return Number(value)
   }
 
-  validate = (values: FormValues) => {
+  validate: (values: FormValues) => { ... } = values => {
     const errors = {}
     const fields = this.getVisibleFields()
     const plungerFields = this.getFieldsByKey(PLUNGER_KEYS, fields)
@@ -162,7 +162,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return errors
   }
 
-  getInitialValues = () => {
+  getInitialValues: () => FormValues = () => {
     const fields = this.getVisibleFields()
     const initialFieldValues = mapValues(fields, f => {
       if (f.value === true || f.value === false) return f.value
@@ -178,7 +178,7 @@ export class ConfigForm extends React.Component<ConfigFormProps> {
     return initialValues
   }
 
-  render() {
+  render(): React.Node {
     const { updateInProgress, closeModal } = this.props
     const fields = this.getVisibleFields()
     const UNKNOWN_KEYS = this.getUnknownKeys()

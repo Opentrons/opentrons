@@ -63,38 +63,43 @@ export const UNABLE_TO_CONNECT = 'Unable to connect to Wi-Fi'
 export const CHECK_YOUR_CREDENTIALS =
   'Please double-check your network credentials'
 
-export const CONNECT_TO_SSID = (ssid: string) => `Connect to ${ssid}`
+export const CONNECT_TO_SSID = (ssid: string): string => `Connect to ${ssid}`
 
-export const DISCONNECT_FROM_SSID = (ssid: string) => `Disconnect from ${ssid}`
+export const DISCONNECT_FROM_SSID = (ssid: string): string =>
+  `Disconnect from ${ssid}`
 
-export const ARE_YOU_SURE_YOU_WANT_TO_DISCONNECT = (ssid: string) =>
+export const ARE_YOU_SURE_YOU_WANT_TO_DISCONNECT = (ssid: string): string =>
   `Are you sure you want to disconnect from ${ssid}?`
 
-export const NETWORK_REQUIRES_SECURITY = (network: WifiNetwork) =>
+export const NETWORK_REQUIRES_SECURITY = (network: WifiNetwork): string =>
   `${WIFI_NETWORK} ${network.ssid} ${SECURITY_DESC[network.securityType]}`
 
-export const FIELD_IS_REQUIRED = (name: string) => `${name} is required`
+export const FIELD_IS_REQUIRED = (name: string): string => `${name} is required`
 
-export const FIELD_NOT_LONG_ENOUGH = (name: string, minLength: number) =>
-  `${name} must be at least ${minLength} characters`
+export const FIELD_NOT_LONG_ENOUGH = (
+  name: string,
+  minLength: number
+): string => `${name} must be at least ${minLength} characters`
 
 const renderMaybeSsid = (ssid: string | null) =>
   ssid !== null ? ` network ${ssid}` : ''
 
-export const CONNECTING_TO_NETWORK = (ssid: string | null) =>
+export const CONNECTING_TO_NETWORK = (ssid: string | null): string =>
   `Connecting to Wi-Fi${renderMaybeSsid(ssid)}`
 
-export const DISCONNECTING_FROM_NETWORK = (ssid: string | null) =>
+export const DISCONNECTING_FROM_NETWORK = (ssid: string | null): string =>
   `Disconnecting from Wi-Fi${renderMaybeSsid(ssid)}`
 
-export const YOUR_ROBOT_WAS_UNABLE_TO_CONNECT = (ssid: string | null) =>
+export const YOUR_ROBOT_WAS_UNABLE_TO_CONNECT = (ssid: string | null): string =>
   `Your robot was unable to connect to Wi-Fi${renderMaybeSsid(ssid)}`
 
-export const YOUR_ROBOT_WAS_UNABLE_TO_DISCONNECT = (ssid: string | null) =>
+export const YOUR_ROBOT_WAS_UNABLE_TO_DISCONNECT = (
+  ssid: string | null
+): string =>
   `Your robot was unable to disconnect from Wi-Fi${renderMaybeSsid(ssid)}`
 
-export const YOUR_ROBOT_HAS_DISCONNECTED = (ssid: string | null) =>
+export const YOUR_ROBOT_HAS_DISCONNECTED = (ssid: string | null): string =>
   `Your robot has successfully disconnected from Wi-Fi${renderMaybeSsid(ssid)}`
 
-export const YOUR_ROBOT_HAS_CONNECTED = (ssid: string | null) =>
+export const YOUR_ROBOT_HAS_CONNECTED = (ssid: string | null): string =>
   `Your robot has successfully connected to Wi-Fi${renderMaybeSsid(ssid)}`

@@ -7,6 +7,6 @@ export type RobotListProps = {|
   children: React.Node,
 |}
 
-export function RobotList(props: RobotListProps) {
+export function RobotList(props: RobotListProps): React.Node {
   return <ol className={styles.robot_list}>{props.children}</ol>
 }

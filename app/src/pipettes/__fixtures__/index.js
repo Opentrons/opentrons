@@ -1,6 +1,8 @@
 // @flow
 // mock HTTP responses for pipettes endpoints
 
+import type { PipetteSettings } from '../types'
+
 export const mockRobot = { name: 'robot', ip: '127.0.0.1', port: 31950 }
 
 // fetch pipette fixtures
@@ -53,7 +55,7 @@ export const mockFetchPipettesFailure = {
 
 // fetch pipette settings fixtures
 
-export const mockPipetteSettings = {
+export const mockPipetteSettings: PipetteSettings = {
   info: { name: 'p300_single_gen2', model: 'p300_single_v2.0' },
   fields: { [('fieldId': string)]: { value: 42, default: 42 } },
 }
@@ -68,7 +70,10 @@ export const mockFetchPipetteSettingsSuccessMeta = {
 export const mockFetchPipetteSettingsSuccess = {
   ...mockFetchPipetteSettingsSuccessMeta,
   host: mockRobot,
-  body: { [('abc': string)]: mockPipetteSettings },
+  body: ({ abc: mockPipetteSettings }: {
+    [string]: PipetteSettings,
+    ...,
+  }),
 }
 
 export const mockFetchPipetteSettingsFailureMeta = {

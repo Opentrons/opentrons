@@ -41,7 +41,7 @@ const INSTRUCTIONS: { [step: CalibrationStep]: ?React.Node } = {
   ),
 }
 
-export function Instructions(props: InstructionsProps) {
+export function Instructions(props: InstructionsProps): React.Node {
   const { calibrationStep } = props
   const diagram = getDiagramSrc(calibrationStep)
   const instructions = getInstructionsByStep(calibrationStep)

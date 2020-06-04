@@ -27,7 +27,7 @@ type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
   proceed: () => mixed,
 |}
-export function DeckSetup(props: DeckSetupProps) {
+export function DeckSetup(props: DeckSetupProps): React.Node {
   const { labware, proceed } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
   return (
@@ -86,7 +86,7 @@ type TiprackRenderProps = {|
   labwareDef: LabwareDefinition2,
   slotDef: DeckSlot,
 |}
-export function TiprackRender(props: TiprackRenderProps) {
+export function TiprackRender(props: TiprackRenderProps): React.Node {
   const { labwareDef, slotDef } = props
   const title = getLabwareDisplayName(labwareDef)
   return (

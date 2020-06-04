@@ -26,7 +26,7 @@ class ManualIpFormComponent extends React.Component<Props> {
     this.inputRef = React.createRef()
   }
 
-  render() {
+  render(): React.Node {
     return (
       <Formik
         initialValues={{ ip: '' }}
@@ -67,7 +67,14 @@ function mapDispatchToProps(dispatch: Dispatch): DP {
   }
 }
 
-export const ManualIpForm = connect<Props, OP, _, _, _, _>(
+export const ManualIpForm: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(ManualIpFormComponent)

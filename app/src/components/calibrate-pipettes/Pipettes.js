@@ -17,7 +17,7 @@ export type PipettesProps = {|
   changePipetteUrl: string,
 |}
 
-export function Pipettes(props: PipettesProps) {
+export function Pipettes(props: PipettesProps): React.Node {
   const { currentMount, pipettes, tipracksByMount } = props
 
   const infoByMount = PIPETTE_MOUNTS.reduce<

@@ -12,7 +12,7 @@ export type ConfirmPositionProps = {|
   proceed: () => mixed,
 |}
 
-export function ConfirmPosition(props: ConfirmPositionProps) {
+export function ConfirmPosition(props: ConfirmPositionProps): React.Node {
   return (
     <div>
       <Instructions calibrationStep={props.calibrationStep} />

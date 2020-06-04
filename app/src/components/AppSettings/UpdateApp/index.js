@@ -15,7 +15,7 @@ export type UpdateAppProps = {|
   closeModal: () => mixed,
 |}
 
-export function UpdateApp(props: UpdateAppProps) {
+export function UpdateApp(props: UpdateAppProps): React.Node {
   const {
     update,
     availableVersion,

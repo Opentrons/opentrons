@@ -27,7 +27,7 @@ type IntroductionProps = {|
   proceed: () => mixed,
   exit: () => mixed,
 |}
-export function Introduction(props: IntroductionProps) {
+export function Introduction(props: IntroductionProps): React.Node {
   const { labwareLoadNames, exit, proceed } = props
   const [clearDeckWarningOpen, setClearDeckWarningOpen] = React.useState(false)
 

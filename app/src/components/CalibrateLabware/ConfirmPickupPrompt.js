@@ -5,15 +5,18 @@ import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 
-import type { Pipette } from '../../robot/types'
+import type { Labware, Pipette } from '../../robot/types'
 
-export type ConfirmPickupPromptProps = {
+export type ConfirmPickupPromptProps = {|
+  labware: Labware,
   calibrator: Pipette,
   onNoClick: () => void,
   onYesClick: () => void,
-}
+|}
 
-export function ConfirmPickupPrompt(props: ConfirmPickupPromptProps) {
+export function ConfirmPickupPrompt(
+  props: ConfirmPickupPromptProps
+): React.Node {
   const {
     onNoClick,
     onYesClick,

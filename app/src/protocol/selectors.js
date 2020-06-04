@@ -10,7 +10,7 @@ import { createLogger } from '../logger'
 import type { LabwareDefinition2 } from '@opentrons/shared-data'
 import type { ProtocolFile as SchemaV3ProtocolFile } from '@opentrons/shared-data/protocol/flowTypes/schemaV3'
 import type { State } from '../types'
-import type { ProtocolData, ProtocolType } from './types'
+import type { ProtocolData, ProtocolType, ProtocolFile } from './types'
 
 type StringGetter = (?ProtocolData) => ?string
 type NumberGetter = (?ProtocolData) => ?number
@@ -57,9 +57,12 @@ const getSource: StringGetter = getter('metadata.source')
 
 const stripDirAndExtension = f => path.basename(f, path.extname(f))
 
-export const getProtocolFile = (state: State) => state.protocol.file
-export const getProtocolContents = (state: State) => state.protocol.contents
-export const getProtocolData = (state: State) => state.protocol.data
+export const getProtocolFile = (state: State): ProtocolFile | null =>
+  state.protocol.file
+export const getProtocolContents = (state: State): string | null =>
+  state.protocol.contents
+export const getProtocolData = (state: State): ProtocolData | null =>
+  state.protocol.data
 
 export const getProtocolFilename: StringSelector = createSelector(
   getProtocolFile,

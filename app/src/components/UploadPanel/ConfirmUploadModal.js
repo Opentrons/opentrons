@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 
 import { AlertModal } from '@opentrons/components'
 import { Portal } from '../portal'
@@ -9,7 +9,7 @@ export type ConfirmUploadModalProps = {|
   cancel: () => mixed,
 |}
 
-export function ConfirmUploadModal(props: ConfirmUploadModalProps) {
+export function ConfirmUploadModal(props: ConfirmUploadModalProps): React.Node {
   return (
     <Portal>
       <AlertModal

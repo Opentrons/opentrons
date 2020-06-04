@@ -16,7 +16,7 @@ const EXITING_WILL_END_PIPETTE_SETUP =
 const CANCEL = 'cancel'
 const EXIT = 'exit'
 
-export function ExitAlertModal(props: Props) {
+export function ExitAlertModal(props: Props): React.Node {
   const { back, exit } = props
 
   return (

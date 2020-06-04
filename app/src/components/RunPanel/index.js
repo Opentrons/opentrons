@@ -79,7 +79,14 @@ function RunPanelComponent(props: Props) {
   )
 }
 
-export const RunPanel = connect<Props, {||}, _, _, _, _>(
+export const RunPanel: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(RunPanelComponent)

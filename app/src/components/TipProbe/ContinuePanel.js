@@ -19,9 +19,15 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, dispatch: Dispatch |}
 
-export const ContinuePanel = connect<Props, OP, SP, _, _, _, _>(
-  mapStateToProps
-)(ContinuePanelComponent)
+export const ContinuePanel: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(ContinuePanelComponent)
 
 function ContinuePanelComponent(props: Props) {
   const { done, buttonText } = props

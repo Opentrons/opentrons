@@ -42,7 +42,7 @@ sharedmemory.hash_table_pow=20
 ; 2. Replacing `well_formed_exports` options with `types_first=true`
 ; https://flow.org/en/docs/lang/types-first/
 well_formed_exports=true
-; well_formed_exports.whitelist=<PROJECT_ROOT>/app
+well_formed_exports.whitelist=<PROJECT_ROOT>/app
 well_formed_exports.whitelist=<PROJECT_ROOT>/app-shell
 well_formed_exports.whitelist=<PROJECT_ROOT>/components
 well_formed_exports.whitelist=<PROJECT_ROOT>/discovery-client

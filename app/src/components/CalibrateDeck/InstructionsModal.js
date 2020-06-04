@@ -24,7 +24,14 @@ type Props = {| ...OP, ...DP |}
 
 const TITLE = 'Deck Calibration'
 
-export const InstructionsModal = connect<Props, OP, _, _, _, _>(
+export const InstructionsModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  _,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(InstructionsModalComponent)

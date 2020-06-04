@@ -8,7 +8,7 @@ export type NoPipetteModalProps = {|
 
 const HEADING = 'No pipette attached'
 
-export function NoPipetteModal(props: NoPipetteModalProps) {
+export function NoPipetteModal(props: NoPipetteModalProps): React.Node {
   return (
     <AlertModal
       heading={HEADING}

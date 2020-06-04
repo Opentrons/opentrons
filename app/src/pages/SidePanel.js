@@ -1,6 +1,6 @@
 // @flow
-// side nav panel container
-import React from 'react'
+// side nav panel container'
+import * as React from 'react'
 import { Switch, Route } from 'react-router-dom'
 
 import { ConnectPanel } from '../components/ConnectPanel'
@@ -9,7 +9,7 @@ import { CalibratePanel } from '../components/CalibratePanel'
 import { MenuPanel } from '../components/MenuPanel'
 import { RunPanel } from '../components/RunPanel'
 
-export function SidePanel() {
+export function SidePanel(): React.Node {
   return (
     <Switch>
       <Route path="/robots/:name?" component={ConnectPanel} />

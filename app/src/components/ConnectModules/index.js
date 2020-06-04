@@ -22,7 +22,14 @@ type DP = {| setReviewed: () => mixed, fetchModules: () => mixed |}
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-export const ConnectModules = connect<Props, OP, SP, DP, State, Dispatch>(
+export const ConnectModules: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  State,
+  Dispatch
+>(
   mapStateToProps,
   mapDispatchToProps
 )(ConnectModulesComponent)

@@ -16,7 +16,9 @@ export type LabwareCalibrationProps = {|
   useCenteredTroughs: boolean,
 |}
 
-export function ConfirmPositionDiagram(props: LabwareCalibrationProps) {
+export function ConfirmPositionDiagram(
+  props: LabwareCalibrationProps
+): React.Node {
   const instructions = getInstructionsByType(props)
   const diagrams = getDiagramSrc(props)
 

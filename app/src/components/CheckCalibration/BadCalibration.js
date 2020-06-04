@@ -21,7 +21,7 @@ const DECK_CAL_ARTICLE_URL =
 type CompleteConfirmationProps = {|
   exit: () => mixed,
 |}
-export function BadCalibration(props: CompleteConfirmationProps) {
+export function BadCalibration(props: CompleteConfirmationProps): React.Node {
   const { exit } = props
 
   return (

@@ -39,9 +39,14 @@ const TITLE = 'Required Modules'
 const inexactModuleSupportArticle =
   'https://support.opentrons.com/en/articles/3450143-gen2-pipette-compatibility'
 
-export const ProtocolModulesCard = connect<Props, OP, SP, DP, _, _>(
-  mapStateToProps
-)(ProtocolModulesCardComponent)
+export const ProtocolModulesCard: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(mapStateToProps)(ProtocolModulesCardComponent)
 
 function ProtocolModulesCardComponent(props: Props) {
   const { modules, actualModules, attachModulesUrl } = props

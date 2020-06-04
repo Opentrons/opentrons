@@ -11,7 +11,7 @@ type Props = {|
   module: AttachedModule,
 |}
 
-export function ModuleInfo(props: Props) {
+export function ModuleInfo(props: Props): React.Node {
   const { model, serial, status, fwVersion } = props.module
   const displayName = getModuleDisplayName(model)
 

@@ -21,7 +21,7 @@ const RESTART_MESSAGE = (
   </p>
 )
 
-export function UpdateAppMessage(props: UpdateAppMessageProps) {
+export function UpdateAppMessage(props: UpdateAppMessageProps): React.Node {
   const message = props.downloaded ? RESTART_MESSAGE : UPDATE_MESSAGE
   return (
     <React.Fragment>

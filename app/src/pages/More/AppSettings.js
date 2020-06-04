@@ -38,7 +38,14 @@ type DP = {|
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-export const AppSettings = connect<Props, OP, SP, DP, State, Dispatch>(
+export const AppSettings: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  State,
+  Dispatch
+>(
   mapStateToProps,
   mapDispatchToProps
 )(AppSettingsComponent)
