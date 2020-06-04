@@ -4,7 +4,7 @@ import { app } from 'electron'
 import Store from 'electron-store'
 import { createDiscoveryClient } from '@opentrons/discovery-client'
 import { registerDiscovery } from '../discovery'
-import { getConfig, getOverrides } from '../config'
+import { getConfig, getOverrides, handleConfigChange } from '../config'
 
 jest.mock('electron')
 jest.mock('electron-store')
@@ -258,5 +258,56 @@ describe('app-shell/discovery', () => {
       type: 'discovery:UPDATE_LIST',
       payload: { robots: [] },
     })
+  })
+
+  it('does not update services from store when caching disabled', () => {
+    // cache has been disabled
+    getConfig.mockReturnValue({
+      candidates: [],
+      disableCache: true,
+    })
+    // discovery.json contains 1 entry
+    Store.__store.get.mockImplementation(key => {
+      if (key === 'services') return [{ name: 'foo' }]
+      return null
+    })
+
+    registerDiscovery(dispatch)
+
+    // should not contain above entry
+    expect(createDiscoveryClient).toHaveBeenCalledWith(
+      expect.objectContaining({
+        services: [],
+      })
+    )
+  })
+
+  it('clears cache & suspends caching when caching changes to disabled', () => {
+    // Cache enabled initially
+    getConfig.mockReturnValue({
+      candidates: [],
+      disableCache: false,
+    })
+    // discovery.json contains 1 entry
+    Store.__store.get.mockImplementation(key => {
+      if (key === 'services') return [{ name: 'foo' }]
+      return null
+    })
+
+    registerDiscovery(dispatch)
+
+    // the 'discovery.disableCache' change handler
+    const changeHandler = handleConfigChange.mock.calls[1][1]
+    const disableCache = true
+    changeHandler(disableCache)
+
+    expect(Store.__store.set).toHaveBeenCalledWith('services', [])
+
+    // new services discovered
+    mockClient.services = [{ name: 'foo' }, { name: 'bar' }]
+    mockClient.emit('service')
+
+    // but discovery.json should not update
+    expect(Store.__store.set).toHaveBeenLastCalledWith('services', [])
   })
 })
