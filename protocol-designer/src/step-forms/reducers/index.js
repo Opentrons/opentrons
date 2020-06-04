@@ -41,6 +41,10 @@ import {
   getDeckItemIdInSlot,
   getIdsInRange,
 } from '../utils'
+import {
+  createInitialProfileCycle,
+  createInitialProfileStep,
+} from '../utils/createInitialProfileItems'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import type { LoadFileAction } from '../../load-file'
@@ -102,24 +106,6 @@ import type {
 } from '../actions'
 
 type FormState = FormData | null
-
-// TODO IMMEDIATELY factor out
-export const createInitialProfileCycle = (id: string): ProfileCycleItem => ({
-  id,
-  type: PROFILE_CYCLE,
-  repetitions: '',
-  steps: [],
-})
-
-// TODO IMMEDIATELY factor out
-const createInitialProfileStep = (id: string): ProfileStepItem => ({
-  type: PROFILE_STEP,
-  id,
-  title: '',
-  temperature: '',
-  durationMinutes: '',
-  durationSeconds: '',
-})
 
 const unsavedFormInitialState = null
 // the `unsavedForm` state holds temporary form info that is saved or thrown away with "cancel".
