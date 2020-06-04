@@ -529,15 +529,15 @@ class Thermocycler:
     def _is_holding_at_target(self) -> bool:
         """
         Checks block temp history to determine if block temp has stabilized at
-        the target temperature.
+        the target temperature. Returns true only if all values in history are
+        within threshold range of target temperature.
         """
         if len(self._block_temp_buffer) < TEMP_BUFFER_MAX_LEN:
             # Not enough temp history
             return False
         else:
-            is_at_target = [abs(self.target - t) < TEMP_THRESHOLD
-                            for t in self._block_temp_buffer]
-            return all(is_at_target)
+            return all(abs(self.target - t) < TEMP_THRESHOLD
+                       for t in self._block_temp_buffer)
 
     @property
     def port(self) -> Optional[str]:
