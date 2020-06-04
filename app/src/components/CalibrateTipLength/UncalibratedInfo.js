@@ -1,63 +1,34 @@
 // @flow
 import * as React from 'react'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch } from 'react-redux'
 
 import { PrimaryButton } from '@opentrons/components'
-import { ClearDeckAlertModal } from '../ClearDeckAlertModal'
 import { CalibrationInfoContent } from '../CalibrationInfoContent'
-
-import { actions as robotActions } from '../../robot'
-
-import { getDeckPopulated } from '../../robot/selectors'
-
-import type { Dispatch } from '../../types'
 import type { CalibrateTipLengthProps } from './types'
 
 const IS_CALIBRATED = 'Pipette tip height is calibrated'
 const IS_NOT_CALIBRATED = 'Pipette tip height is not calibrated'
+const CALIBRATE_TIP_LENGTH = 'Calibrate tip length'
+const RECALIBRATE_TIP_LENGTH = 'Re-Calibrate tip length'
+const CONTINUE = 'Continue to labware setup'
 
 export function UncalibratedInfo(props: CalibrateTipLengthProps): React.Node {
   const { mount, probed } = props
   const [showClearDeck, setShowClearDeck] = React.useState(false)
   const dispatch = useDispatch<Dispatch>()
-  const deckPopulated = useSelector(getDeckPopulated)
-
-  const moveToFront = () => {
-    dispatch(robotActions.moveToFront(mount))
-    setShowClearDeck(false)
-  }
 
   const handleStart = () => {
-    if (deckPopulated === true || deckPopulated === null) {
-      setShowClearDeck(true)
-    } else {
-      moveToFront()
-    }
+    console.log('TODO: start tip length cal session')
   }
-
-  const message = !probed ? IS_NOT_CALIBRATED : IS_CALIBRATED
-
-  const buttonText = !probed ? 'Calibrate Tip' : 'Recalibrate Tip'
 
   const leftChildren = (
     <div>
-      <p>{message}</p>
-      <PrimaryButton onClick={handleStart}>{buttonText}</PrimaryButton>
+      <p>{!probed ? IS_NOT_CALIBRATED : IS_CALIBRATED}</p>
+      <PrimaryButton onClick={handleStart}>
+        {!probed ? CALIBRATE_TIP_LENGTH : RECALIBRATE_TIP_LENGTH}
+      </PrimaryButton>
     </div>
   )
 
-  return (
-    <>
-      <CalibrationInfoContent leftChildren={leftChildren} />
-      {showClearDeck && (
-        <ClearDeckAlertModal
-          continueText={'Move pipette to front'}
-          cancelText={'Cancel'}
-          onContinueClick={moveToFront}
-          onCancelClick={() => setShowClearDeck(false)}
-          removeTrash
-        />
-      )}
-    </>
-  )
+  return <CalibrationInfoContent leftChildren={leftChildren} />
 }

@@ -19,9 +19,11 @@ import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
 
-const DECK_SETUP_PROMPT =
-  'Place full tip rack(s) on the deck, in their designated slots, as illustrated below.'
-const DECK_SETUP_BUTTON_TEXT = 'Confirm tip rack placement and continue'
+const DECK_SETUP_WITH_BLOCK_PROMPT =
+  'Place full tip rack and Calibration Block on the deck within their designated slots as illustrated below.'
+const DECK_SETUP_NO_BLOCK_PROMPT =
+  'Place full tip rack on the deck within the designated slot as illustrated below.'
+const DECK_SETUP_BUTTON_TEXT = 'Confirm placement and continue'
 
 type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
@@ -30,10 +32,18 @@ type DeckSetupProps = {|
 export function DeckSetup(props: DeckSetupProps): React.Node {
   const { labware, proceed } = props
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
+
+  // TODO: get real has_block value from tip length calibration session
+  const has_block = true
+
   return (
     <>
       <div className={styles.prompt}>
-        <p className={styles.prompt_text}>{DECK_SETUP_PROMPT}</p>
+        {has_block ? (
+          <p className={styles.prompt_text}>{DECK_SETUP_WITH_BLOCK_PROMPT}</p>
+        ) : (
+          <p className={styles.prompt_text}>{DECK_SETUP_NO_BLOCK_PROMPT}</p>
+        )}
         <OutlineButton
           className={styles.prompt_button}
           onClick={proceed}
@@ -44,13 +54,14 @@ export function DeckSetup(props: DeckSetupProps): React.Node {
       </div>
       <div className={styles.deck_map_wrapper}>
         <RobotWorkSpace
-          deckLayerBlocklist={[
+          deckLayerBlacklist={[
             'fixedBase',
             'doorStops',
             'metalFrame',
             'removalHandle',
             'removableDeckOutline',
             'screwHoles',
+            'calibrationMarkings',
           ]}
           deckDef={deckDef}
           viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
@@ -63,6 +74,9 @@ export function DeckSetup(props: DeckSetupProps): React.Node {
                 if (!slot.matingSurfaceUnitVector) return null // if slot has no mating surface, don't render anything in it
                 const labwareForSlot = labware.find(l => l.slot === slotId)
                 const labwareDef = getLatestLabwareDef(labwareForSlot?.loadName)
+
+                // TODO: also render calibration block if present
+
                 return labwareDef ? (
                   <TiprackRender
                     key={slotId}
