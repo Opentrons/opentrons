@@ -88,7 +88,7 @@ export type DefinitionRouteProps = {
   render: (props: DefinitionRouteRenderProps) => React.Node,
 }
 
-export function DefinitionRoute(props: DefinitionRouteProps) {
+export function DefinitionRoute(props: DefinitionRouteProps): React.Node {
   return (
     <Route
       path={`${getPublicPath()}:loadName?`}

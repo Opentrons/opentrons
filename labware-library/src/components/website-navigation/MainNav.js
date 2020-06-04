@@ -5,7 +5,7 @@ import { NavList } from './NavList'
 import { MobileNav } from './MobileNav'
 import styles from './styles.css'
 
-export function MainNav() {
+export function MainNav(): React.Node {
   return (
     <div className={styles.main_nav_contents}>
       <Logo />

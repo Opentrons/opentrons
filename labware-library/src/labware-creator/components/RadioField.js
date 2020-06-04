@@ -13,7 +13,7 @@ type Props = {|
   labelTextClassName?: ?string,
 |}
 
-export const RadioField = (props: Props) => (
+export const RadioField = (props: Props): React.Node => (
   <Field name={props.name}>
     {({ form, field }) =>
       getIsHidden(props.name, form.values) ? null : (

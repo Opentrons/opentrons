@@ -34,7 +34,7 @@ export type WellPropertiesProps = {|
   hideTitle?: boolean,
 |}
 
-export function AllWellProperties(props: AllWellPropertiesProps) {
+export function AllWellProperties(props: AllWellPropertiesProps): React.Node {
   const { definition, className } = props
   const { displayVolumeUnits } = definition.metadata
   const uniqueWellProps = getUniqueWellProperties(definition)
@@ -59,7 +59,7 @@ const BOTTOM_SHAPE_TO_ICON = {
   flat: 'ot-flat-bottom',
 }
 
-export function WellProperties(props: WellPropertiesProps) {
+export function WellProperties(props: WellPropertiesProps): React.Node {
   const {
     hideTitle,
     wellProperties,

@@ -22,7 +22,10 @@ type Props = {|
   children?: React.Node,
   headingClassName?: string,
 |}
-export const Section = connect((props: Props) => {
+
+export const Section: React.AbstractComponent<
+  $Diff<Props, {| formik: mixed |}>
+> = connect((props: Props) => {
   const fieldList = props.fieldList || []
   if (props.fieldList != null && fieldList.length > 0) {
     const numFieldsHidden = props.fieldList

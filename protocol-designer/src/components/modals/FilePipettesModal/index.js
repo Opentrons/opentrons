@@ -105,8 +105,9 @@ const pipetteValidationShape = Yup.object().shape({
   pipetteName: Yup.string().nullable(),
   tiprackDefURI: Yup.string()
     .nullable()
+    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('pipetteName', {
-      is: val => Boolean(val),
+      is: (val: string | null): boolean => Boolean(val),
       then: Yup.string().required('Required'),
       otherwise: null,
     }),
@@ -115,6 +116,7 @@ const moduleValidationShape = Yup.object().shape({
   onDeck: Yup.boolean().default(false),
   model: Yup.string()
     .nullable()
+    // $FlowFixMe(mc, 2020-06-02): is `otherwise: null` valid?
     .when('onDeck', {
       is: true,
       then: Yup.string().required('Required'),
@@ -133,7 +135,8 @@ const validationSchema = Yup.object().shape({
       right: pipetteValidationShape,
     })
     .test('pipette-is-required', 'a pipette is required', value =>
-      Object.keys(value).some(val => value[val].pipetteName)
+      // $FlowFixMe(mc, 2020-06-02): Flow isn't extracting `value` type properly
+      Object.keys(value).some((val: string) => value[val].pipetteName)
     ),
   modulesByType: Yup.object().shape({
     [MAGNETIC_MODULE_TYPE]: moduleValidationShape,

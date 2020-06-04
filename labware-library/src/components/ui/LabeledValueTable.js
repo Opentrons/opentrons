@@ -8,21 +8,21 @@ import { TableTitle } from './TableTitle'
 
 import type { TableDirection } from './Table'
 
-export type ValueEntry = {
+export type ValueEntry = {|
   label: React.Node,
   value: React.Node,
-}
+|}
 
-export type LabledValueTableProps = {
+export type LabledValueTableProps = {|
   label: React.Node,
   values: Array<ValueEntry>,
   direction?: TableDirection,
   className?: string,
   children?: React.Node,
   diagram?: React.Node,
-}
+|}
 
-export function LabeledValueTable(props: LabledValueTableProps) {
+export function LabeledValueTable(props: LabledValueTableProps): React.Node {
   const { label, values, direction, className, children, diagram } = props
   return (
     <div className={className}>

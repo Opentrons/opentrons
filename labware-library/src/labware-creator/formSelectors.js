@@ -63,7 +63,7 @@ export const _getIsDefaulted = (
 export const getIsHidden = (
   name: $Keys<LabwareFields>,
   values: LabwareFields
-) => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
+): boolean => _getIsAutofilled(name, values) || _getIsDefaulted(name, values)
 
 const _valuesToCreateNameArgs = (values: LabwareFields) => {
   const gridRows = Number(values.gridRows) || 1

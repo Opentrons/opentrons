@@ -10,7 +10,7 @@ type Props = {|
   active: boolean,
 |}
 
-export function NavMenu(props: Props) {
+export function NavMenu(props: Props): React.Node {
   const { name, links, bottomLink, active } = props
   return (
     <>
