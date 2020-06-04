@@ -6,7 +6,7 @@ from typing import (Any, Dict, List, Union, NamedTuple, Tuple,
 
 from opentrons.config import feature_flags as ff, CONFIG
 from opentrons_shared_data.pipette import (
-    model_config, name_config, fuse)
+    model_config, name_config, fuse_specs)
 
 if TYPE_CHECKING:
     from opentrons_shared_data.pipette.dev_types import (
@@ -119,7 +119,7 @@ def load(
     """
 
     # Load the model config and update with the name config
-    cfg = fuse(pipette_model)
+    cfg = fuse_specs(pipette_model)
 
     # Load overrides if we have a pipette id
     if pipette_id:
@@ -389,7 +389,7 @@ def load_config_dict(pipette_id: str) -> Tuple[
     """
     override = load_overrides(pipette_id)
     model = override['model']
-    config = fuse(model)
+    config = fuse_specs(model)
 
     if 'quirks' not in override.keys():
         override['quirks'] = {key: True for key in config['quirks']}

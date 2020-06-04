@@ -31,7 +31,7 @@ def name_for_model(pipette_model: 'PipetteModel') -> 'PipetteName':
     return model_config()['config'][pipette_model]['name']
 
 
-def fuse(
+def fuse_specs(
         pipette_model: 'PipetteModel',
         pipette_name: 'PipetteName' = None) -> 'PipetteFusedSpec':
     """ Combine the model and name spec for a given model.
