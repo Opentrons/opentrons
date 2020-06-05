@@ -152,6 +152,14 @@ async def session_command_execute_handler(
     session_obj = get_session(manager=session_manager,
                               session_id=session_id,
                               api_router=router)
+    if not session_manager.is_active(session_obj.meta.identifier):
+        raise RobotServerError(
+            status_code=http_status_codes.HTTP_403_FORBIDDEN,
+            error=Error(
+                title=f"Session '{session_id}' is not active",
+                detail="Only the active session can execute commands",
+            )
+        )
 
     try:
         command = await session_obj.command_executor.execute(
@@ -161,7 +169,7 @@ async def session_command_execute_handler(
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(
-                title="Exception",
+                title="Command execution error",
                 detail=str(e),
             )
         )

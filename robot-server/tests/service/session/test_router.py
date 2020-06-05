@@ -88,7 +88,7 @@ async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
     session = await manager.add(SessionType.null)
 
-    yield session
+    yield manager
 
     await manager.remove(session.meta.identifier)
 
@@ -248,8 +248,8 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
     }
 
 
-def test_session_command_create_no_session(api_client,
-                                           mock_session_meta):
+def test_execute_command_no_session(api_client,mock_session_meta):
+    """Test that command is rejected if there's no session"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
@@ -265,11 +265,11 @@ def test_session_command_create_no_session(api_client,
     assert response.status_code == 404
 
 
-def test_session_command_create(api_client,
-                                session_manager_with_session,
-                                mock_session_meta,
-                                mock_command_executor,
-                                command_id):
+def test_execute_command(api_client,
+                         session_manager_with_session,
+                         mock_session_meta,
+                         mock_command_executor,
+                         command_id):
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
@@ -291,7 +291,7 @@ def test_session_command_create(api_client,
         },
         'links': {
             'POST': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
             },
             'GET': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
@@ -304,11 +304,12 @@ def test_session_command_create(api_client,
     assert response.status_code == 200
 
 
-def test_session_command_create_no_body(api_client,
-                                        session_manager_with_session,
-                                        mock_session_meta,
-                                        command_id,
-                                        mock_command_executor):
+def test_execute_command_no_body(api_client,
+                                 session_manager_with_session,
+                                 mock_session_meta,
+                                 command_id,
+                                 mock_command_executor):
+    """Test that a command with empty body can be accepted"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("loadLabware", None)
@@ -331,7 +332,7 @@ def test_session_command_create_no_body(api_client,
         },
         'links': {
             'POST': {
-                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e501
             },
             'GET': {
                 'href': f'/sessions/{mock_session_meta.identifier}',
@@ -349,13 +350,13 @@ def test_session_command_create_no_body(api_client,
                              [UnsupportedCommandException, 400],
                              [CommandExecutionException, 400],
                          ])
-def test_session_command_create_raise(api_client,
-                                      session_manager_with_session,
-                                      mock_session_meta,
-                                      mock_command_executor,
-                                      exception,
-                                      expected_status):
-
+def test_execute_command_error(api_client,
+                               session_manager_with_session,
+                               mock_session_meta,
+                               mock_command_executor,
+                               exception,
+                               expected_status):
+    """Test that we handle executor errors correctly"""
     async def raiser(*args, **kwargs):
         raise exception("Cannot do it")
 
@@ -372,8 +373,35 @@ def test_session_command_create_raise(api_client,
             {
                 'detail': 'Cannot do it',
                 'status': f'{expected_status}',
-                'title': 'Exception'
+                'title': 'Command execution error'
             }
         ]
     }
     assert response.status_code == expected_status
+
+
+def test_execute_command_session_inactive(
+        api_client,
+        session_manager_with_session,
+        mock_session_meta,
+        mock_command_executor):
+    """Test that only the active session can execute commands"""
+    session_manager_with_session._active_session_id = None
+
+    response = api_client.post(
+        f"/sessions/{mock_session_meta.identifier}/commands/execute",
+        json=command("jog",
+                     JogPosition(vector=(1, 2, 3,)))
+    )
+
+    assert response.json() == {
+        'errors': [
+            {
+                'detail': 'Only the active session can execute commands',
+                'status': f'403',
+                'title': f"Session '{mock_session_meta.identifier}'"
+                         f" is not active"
+            }
+        ]
+    }
+    assert response.status_code == 403

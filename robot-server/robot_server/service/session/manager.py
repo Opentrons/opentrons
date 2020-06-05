@@ -40,6 +40,7 @@ class SessionManager:
             )
         session = await cls.create(configuration=self._session_common,
                                    instance_meta=SessionMetaData())
+        self._active_session_id = session.meta.identifier
         self._sessions[session.meta.identifier] = session
         return session
 
@@ -63,7 +64,8 @@ class SessionManager:
         :param session_type: Optional session type filter
         """
         return tuple(session for session in self._sessions.values()
-                     if not session_type or session.session_type == session_type)
+                     if not session_type
+                     or session.session_type == session_type)
 
     def get_active(self) -> Optional[BaseSession]:
         """Get the active session"""
