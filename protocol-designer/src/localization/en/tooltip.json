@@ -46,6 +46,9 @@
       "disabled": {
         "wait_until_temp": "There is no temperature module on the deck"
       }
+    },
+    "profileStepRow": {
+      "deleteStep": "Delete profile step"
     }
   },
   "edit_module_card": {
