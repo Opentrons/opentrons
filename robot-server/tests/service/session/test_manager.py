@@ -4,12 +4,13 @@ import pytest
 
 from opentrons.calibration.check.models import SessionType
 
+from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.manager import SessionManager, SessionMetaData
 from robot_server.service.session.models import create_identifier
 
 
 async def side_effect(*args, **kwargs):
-    pass
+    return MagicMock()
 
 
 @pytest.fixture
@@ -38,7 +39,8 @@ async def test_add_no_class_doesnt_call_create(manager, mock_session_create):
     # Patch the type to class dict
     with patch("robot_server.service.session.manager.SessionTypeToClass",
                new={}):
-        await manager.add(SessionType.null)
+        with pytest.raises(SessionCreationException):
+            await manager.add(SessionType.null)
         mock_session_create.assert_not_called()
 
 
@@ -87,8 +89,8 @@ async def test_get_by_type(manager):
     sessions = await asyncio.gather(
         *[manager.add(SessionType.null) for _ in range(5)]
     )
-    assert manager.get_by_type(SessionType.null) == tuple(sessions)
-    assert manager.get_by_type(SessionType.calibration_check) == tuple()
+    assert manager.get(SessionType.null) == tuple(sessions)
+    assert manager.get(SessionType.calibration_check) == tuple()
 
 
 async def test_get_active(manager):

@@ -11,6 +11,8 @@ from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
 from robot_server.service.session.command_execution import Command
+from robot_server.service.session.errors import SessionCreationException, \
+    SessionCommandException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 
@@ -52,7 +54,7 @@ async def create_session_handler(
     session_type = create_request.data.attributes.sessionType
     try:
         new_session = await session_manager.add(session_type)
-    except AssertionError as e:
+    except SessionCreationException as e:
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(
@@ -126,7 +128,7 @@ async def get_sessions_handler(
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.MultiSessionResponse:
     """Get multiple sessions"""
-    sessions = session_manager.get_by_type(session_type=type_filter)
+    sessions = session_manager.get(session_type=type_filter)
     return route_models.MultiSessionResponse(
         data=[ResponseDataModel.create(
             attributes=session.get_response_model(),
@@ -151,11 +153,11 @@ async def session_command_execute_handler(
                               session_id=session_id,
                               api_router=router)
 
-    command = Command(name=command_request.data.attributes.command,
-                      data=command_request.data.attributes.data)
     try:
-        await session_obj.command_executor.execute(command=command)
-    except (AssertionError, StateMachineError) as e:
+        command = await session_obj.command_executor.execute(
+            command=command_request.data.attributes.command,
+            data=command_request.data.attributes.data)
+    except SessionCommandException as e:
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(

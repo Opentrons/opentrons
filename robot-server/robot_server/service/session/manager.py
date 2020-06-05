@@ -4,6 +4,7 @@ from typing import Optional, Tuple, Dict, Type
 from opentrons.calibration.check.models import SessionType
 from opentrons.hardware_control import HardwareAPILike
 
+from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType
@@ -30,15 +31,16 @@ class SessionManager:
             is_active=self.is_active
         )
 
-    async def add(self, session_type: SessionType) -> Optional[BaseSession]:
+    async def add(self, session_type: SessionType) -> BaseSession:
         """Add a new session"""
-        session = None
         cls = SessionTypeToClass.get(session_type)
-        if cls:
-            session = await cls.create(configuration=self._session_common,
-                                       instance_meta=SessionMetaData())
-            if session:
-                self._sessions[session.meta.identifier] = session
+        if not cls:
+            raise SessionCreationException(
+                f"'{session_type}' is not supported"
+            )
+        session = await cls.create(configuration=self._session_common,
+                                   instance_meta=SessionMetaData())
+        self._sessions[session.meta.identifier] = session
         return session
 
     async def remove(self, identifier: IdentifierType) -> Optional[BaseSession]:
@@ -54,10 +56,14 @@ class SessionManager:
         """Get a session by identifier"""
         return self._sessions.get(identifier, None)
 
-    def get_by_type(self, session_type: SessionType) -> Tuple[BaseSession, ...]:
-        """Get sessions by type"""
+    def get(self, session_type: SessionType = None) -> Tuple[BaseSession, ...]:
+        """
+        Get all the sessions with optional filter
+
+        :param session_type: Optional session type filter
+        """
         return tuple(session for session in self._sessions.values()
-                     if session.session_type == session_type)
+                     if not session_type or session.session_type == session_type)
 
     def get_active(self) -> Optional[BaseSession]:
         """Get the active session"""

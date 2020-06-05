@@ -1,230 +1,161 @@
 import pytest
 from unittest.mock import MagicMock, PropertyMock, patch
+from datetime import datetime
 
 import typing
+
+from opentrons.calibration.check.models import SessionType, JogPosition
 from pydantic.main import BaseModel
 
-from opentrons.calibration.check.session import CheckCalibrationSession, \
-    CalibrationCheckState, CalibrationCheckTrigger
-from opentrons.calibration.check.models import SessionType, JogPosition
-from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank
-from opentrons import types
-
 from robot_server.service.dependencies import get_session_manager
+from robot_server.service.session.command_execution import CommandExecutor, \
+    Command
+from robot_server.service.session.errors import SessionCreationException, \
+    UnsupportedCommandException, CommandExecutionException
+from robot_server.service.session.models import CommandName, EmptyModel
+from robot_server.service.session.session_types import NullBaseSession, \
+    SessionMetaData
 
 
 @pytest.fixture
-def session_details():
-    sess_dict = {
+def mock_session_meta():
+    return SessionMetaData(identifier="some_id",
+                           name="session name",
+                           description="session description",
+                           created_on=datetime(2000, 1, 1, 0, 0, 0))
+
+
+@pytest.fixture
+def session_response(mock_session_meta):
+    return {
         'attributes': {
             'details': {
-                'comparisonsByStep': {},
-                'currentStep': 'preparingFirstPipette',
-                'instruments': {},
-                'labware': [],
             },
-            'sessionType': 'calibrationCheck',
+            'sessionType': 'null',
         },
         'type': 'Session',
-        'id': 'calibrationCheck'
+        'id': mock_session_meta.identifier
     }
-    return sess_dict
 
 
 @pytest.fixture
-def mock_cal_session(hardware, loop):
+def command_id():
+    return "123"
 
-    mock_pipette_info_by_mount = {
-        types.Mount.LEFT: PipetteInfo(
-            tiprack_id=None,
-            critical_point=None,
-            rank=PipetteRank.second,
-            mount=types.Mount.LEFT
-        ),
-        types.Mount.RIGHT: PipetteInfo(
-            tiprack_id=None,
-            critical_point=None,
-            rank=PipetteRank.first,
-            mount=types.Mount.RIGHT
-        )
-    }
-    mock_hw_pipettes = {
-        types.Mount.LEFT: {
-            'model': 'p10_single_v1',
-            'has_tip': False,
-            'max_volume': 10,
-            'name': 'p10_single',
-            'tip_length': 0,
-            'channels': 1},
-        types.Mount.RIGHT: {
-            'model': 'p300_single_v1',
-            'has_tip': False,
-            'max_volume': 300,
-            'name': 'p300_single',
-            'tip_length': 0,
-            'channels': 1}
-    }
 
-    CheckCalibrationSession._get_pip_info_by_mount =\
-        MagicMock(return_value=mock_pipette_info_by_mount)
-    CheckCalibrationSession.pipettes = mock_hw_pipettes
+@pytest.fixture
+def mock_command_executor(command_id):
+    mock = MagicMock(spec=CommandExecutor)
 
-    m = CheckCalibrationSession(hardware)
+    async def func(command, data):
+        ret_val = Command(name=command,
+                          data=data)
+        ret_val._created_on = datetime(2020, 1, 1)
+        ret_val._id = command_id
+        return ret_val
 
-    async def async_mock(*args, **kwargs):
+    mock.execute.side_effect = func
+    return mock
+
+
+@pytest.fixture
+def mock_session(mock_session_meta, mock_command_executor):
+    session = NullBaseSession(configuration=MagicMock(),
+                              instance_meta=mock_session_meta)
+
+    session._command_executor = mock_command_executor
+
+    async def func(*args, **kwargs):
         pass
 
-    m.trigger_transition = MagicMock(side_effect=async_mock)
-    m.delete_session = MagicMock(side_effect=async_mock)
-
-    path = 'opentrons.calibration.check.session.' \
-           'CheckCalibrationSession.current_state_name'
-    with patch(path, new_callable=PropertyMock) as p:
-        p.return_value = CalibrationCheckState.preparingFirstPipette.value
-
-        m.get_potential_triggers = MagicMock(return_value={
-            CalibrationCheckTrigger.jog,
-            CalibrationCheckTrigger.pick_up_tip,
-            CalibrationCheckTrigger.exit
-        })
-        yield m
+    session.clean_up = MagicMock(side_effect=func)
+    return session
 
 
 @pytest.fixture
-def patch_build_session(mock_cal_session):
-    r = "robot_server.service.session.router.CheckCalibrationSession.build"
+def patch_create_session(mock_session):
+    r = "robot_server.service.session.session_types.BaseSession.create"
     with patch(r) as p:
-        async def mock_build(hardware):
-            return mock_cal_session
+        async def mock_build(*args, **kwargs):
+            return mock_session
         p.side_effect = mock_build
         yield p
 
 
 @pytest.fixture
-def session_manager_with_session(mock_cal_session):
+@pytest.mark.asyncio
+async def session_manager_with_session(loop, patch_create_session):
     manager = get_session_manager()
-    manager.sessions[SessionType.calibration_check] = mock_cal_session
+    session = await manager.add(SessionType.null)
 
-    yield mock_cal_session
+    yield session
 
-    if SessionType.calibration_check in manager.sessions:
-        del manager.sessions[SessionType.calibration_check]
-
-
-@pytest.fixture
-def session_hardware_info(mock_cal_session, session_details):
-    current_state = mock_cal_session.current_state_name
-    lw_status = mock_cal_session.labware_status.values()
-    comparisons_by_step = mock_cal_session.get_comparisons_by_step()
-    instruments = {
-        str(k): {'model': v.model,
-                 'name': v.name,
-                 'tip_length': v.tip_length,
-                 'mount': v.mount,
-                 'has_tip': v.has_tip,
-                 'tiprack_id': str(v.tiprack_id),
-                 'rank': v.rank}
-        for k, v in mock_cal_session.pipette_status().items()
-    }
-    info = {
-        'instruments': instruments,
-        'labware': [{
-            'alternatives': data.alternatives,
-            'slot': data.slot,
-            'id': str(data.id),
-            'forMounts': [str(m) for m in data.forMounts],
-            'loadName': data.loadName,
-            'namespace': data.namespace,
-            'version': str(data.version)} for data in lw_status],
-        'currentStep': current_state,
-        'comparisonsByStep': comparisons_by_step
-    }
-    session_details["attributes"].update({"details": info})
-    return session_details
-
-
-def test_create_session_already_present(api_client,
-                                        session_manager_with_session):
-    response = api_client.post("/sessions", json={
-        "data": {
-            "type": "Session",
-            "attributes": {
-                "sessionType": "calibrationCheck"
-            }
-        }
-    })
-    assert response.json() == {
-        'errors': [{
-            'detail': "A session with id 'calibrationCheck' already exists. "
-                      "Please delete to proceed.",
-            'links': {'DELETE': '/sessions/calibrationCheck'},
-            'status': '409',
-            'title': 'Conflict'
-        }]
-    }
-    assert response.status_code == 409
+    await manager.remove(session.meta.identifier)
 
 
 def test_create_session_error(api_client,
-                              patch_build_session):
-    async def raiser(hardware):
-        raise AssertionError("Please attach pipettes before proceeding")
+                              patch_create_session):
+    async def raiser(*args, **kwargs):
+        raise SessionCreationException(
+            "Please attach pipettes before proceeding"
+        )
 
-    patch_build_session.side_effect = raiser
+    patch_create_session.side_effect = raiser
 
     response = api_client.post("/sessions", json={
         "data": {
             "type": "Session",
             "attributes": {
-                "sessionType": "calibrationCheck"
+                "sessionType": "null"
             }
         }
     })
     assert response.json() == {
         'errors': [{
-            'detail': "Failed to create session of type 'calibrationCheck': "
-                      "Please attach pipettes before proceeding.",
+            'detail': "Failed to create session of type 'null': Please "
+                      "attach pipettes before proceeding.",
             'status': '400',
             'title': 'Creation Failed'}
         ]}
     assert response.status_code == 400
 
 
-def test_create_session(api_client, patch_build_session,
-                        session_hardware_info):
+def test_create_session(api_client,
+                        patch_create_session,
+                        mock_session_meta,
+                        session_response):
     response = api_client.post("/sessions", json={
         "data": {
             "type": "Session",
             "attributes": {
-                "sessionType": "calibrationCheck"
+                "sessionType": "null"
             }
         }
     })
-
     assert response.json() == {
-        'data': session_hardware_info,
+        'data': session_response,
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: E501
             },
             'GET': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
             'DELETE': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
         }
     }
     assert response.status_code == 201
     # Clean up
-    get_session_manager().sessions.clear()
+    get_session_manager()._sessions = {}
 
 
 def test_delete_session_not_found(api_client):
-    response = api_client.delete("/sessions/calibrationCheck")
+    response = api_client.delete("/sessions/check")
     assert response.json() == {
         'errors': [{
-            'detail': "Cannot find session with id 'calibrationCheck'.",
+            'detail': "Cannot find session with id 'check'.",
             'links': {'POST': '/sessions'},
             'status': '404',
             'title': 'No session'
@@ -233,13 +164,15 @@ def test_delete_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_delete_session(api_client, session_manager_with_session,
-                        mock_cal_session,
-                        session_hardware_info):
-    response = api_client.delete("/sessions/calibrationCheck")
-    mock_cal_session.delete_session.assert_called_once()
+def test_delete_session(api_client,
+                        session_manager_with_session,
+                        mock_session,
+                        mock_session_meta,
+                        session_response):
+    response = api_client.delete(f"/sessions/{mock_session_meta.identifier}")
+    # mock_session.clean_up.assert_called_once()
     assert response.json() == {
-        'data': session_hardware_info,
+        'data': session_response,
         'links': {
             'POST': {
                 'href': '/sessions',
@@ -262,20 +195,22 @@ def test_get_session_not_found(api_client):
     assert response.status_code == 404
 
 
-def test_get_session(api_client, session_manager_with_session,
-                     session_hardware_info):
-    response = api_client.get("/sessions/calibrationCheck")
+def test_get_session(api_client,
+                     mock_session_meta,
+                     session_manager_with_session,
+                     session_response):
+    response = api_client.get(f"/sessions/{mock_session_meta.identifier}")
     assert response.json() == {
-        'data': session_hardware_info,
+        'data': session_response,
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',  # noqa: e5011
             },
             'GET': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
             'DELETE': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
         }
     }
@@ -290,11 +225,12 @@ def test_get_sessions_no_sessions(api_client):
     assert response.status_code == 200
 
 
-def test_get_sessions(api_client, session_manager_with_session,
-                      session_hardware_info):
+def test_get_sessions(api_client,
+                      session_manager_with_session,
+                      session_response):
     response = api_client.get("/sessions")
     assert response.json() == {
-        'data': [session_hardware_info],
+        'data': [session_response],
     }
     assert response.status_code == 200
 
@@ -312,14 +248,15 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
     }
 
 
-def test_session_command_create_no_session(api_client):
+def test_session_command_create_no_session(api_client,
+                                           mock_session_meta):
     response = api_client.post(
-        "/sessions/1234/commands/execute",
+        f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
-                     JogPosition(vector=(1, 2, 3))))
+                     JogPosition(vector=(1, 2, 3,))))
     assert response.json() == {
         'errors': [{
-            'detail': "Cannot find session with id '1234'.",
+            'detail': f"Cannot find session with id '{mock_session_meta.identifier}'.",  # noqa: e501
             'links': {'POST': '/sessions'},
             'status': '404',
             'title': 'No session'
@@ -328,18 +265,19 @@ def test_session_command_create_no_session(api_client):
     assert response.status_code == 404
 
 
-def test_session_command_execute(api_client,
-                                 session_manager_with_session,
-                                 mock_cal_session,
-                                 session_hardware_info):
+def test_session_command_create(api_client,
+                                session_manager_with_session,
+                                mock_session_meta,
+                                mock_command_executor,
+                                command_id):
     response = api_client.post(
-        "/sessions/calibrationCheck/commands/execute",
+        f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
-                     JogPosition(vector=(1, 2, 3))))
+                     JogPosition(vector=(1, 2, 3,))))
 
-    mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="jog",
-        vector=(1.0, 2.0, 3.0))
+    mock_command_executor.execute.assert_called_once_with(
+        command=CommandName.jog,
+        data=JogPosition(vector=(1, 2, 3,)))
 
     assert response.json() == {
         'data': {
@@ -349,34 +287,37 @@ def test_session_command_execute(api_client,
                 'status': 'executed'
             },
             'type': 'SessionCommand',
-            'id': response.json()['data']['id']
+            'id': command_id,
         },
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',
             },
             'GET': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
             'DELETE': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
         }
     }
     assert response.status_code == 200
 
 
-def test_session_command_execute_no_body(api_client,
-                                         session_manager_with_session,
-                                         mock_cal_session,
-                                         session_hardware_info):
+def test_session_command_create_no_body(api_client,
+                                        session_manager_with_session,
+                                        mock_session_meta,
+                                        command_id,
+                                        mock_command_executor):
     response = api_client.post(
-        "/sessions/calibrationCheck/commands/execute",
+        f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("loadLabware", None)
     )
 
-    mock_cal_session.trigger_transition.assert_called_once_with(
-        trigger="loadLabware")
+    mock_command_executor.execute.assert_called_once_with(
+        command=CommandName.load_labware,
+        data=EmptyModel()
+    )
 
     assert response.json() == {
         'data': {
@@ -386,44 +327,53 @@ def test_session_command_execute_no_body(api_client,
                 'status': 'executed'
             },
             'type': 'SessionCommand',
-            'id': response.json()['data']['id']
+            'id': command_id
         },
         'links': {
             'POST': {
-                'href': '/sessions/calibrationCheck/commands/execute',
+                'href': f'/sessions/{mock_session_meta.identifier}/commands/execute',
             },
             'GET': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
             'DELETE': {
-                'href': '/sessions/calibrationCheck',
+                'href': f'/sessions/{mock_session_meta.identifier}',
             },
         }
     }
     assert response.status_code == 200
 
 
-def test_session_command_execute_raise(api_client,
-                                       session_manager_with_session,
-                                       mock_cal_session):
+@pytest.mark.parametrize(argnames="exception,expected_status",
+                         argvalues=[
+                             [UnsupportedCommandException, 400],
+                             [CommandExecutionException, 400],
+                         ])
+def test_session_command_create_raise(api_client,
+                                      session_manager_with_session,
+                                      mock_session_meta,
+                                      mock_command_executor,
+                                      exception,
+                                      expected_status):
 
     async def raiser(*args, **kwargs):
-        raise AssertionError("Cannot do it")
+        raise exception("Cannot do it")
 
-    mock_cal_session.trigger_transition.side_effect = raiser
+    mock_command_executor.execute.side_effect = raiser
 
     response = api_client.post(
-        "/sessions/calibrationCheck/commands/execute",
+        f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
-                     JogPosition(vector=(1, 2, 3))))
+                     JogPosition(vector=(1, 2, 3,)))
+    )
 
     assert response.json() == {
         'errors': [
             {
                 'detail': 'Cannot do it',
-                'status': '400',
+                'status': f'{expected_status}',
                 'title': 'Exception'
             }
         ]
     }
-    assert response.status_code == 400
+    assert response.status_code == expected_status

@@ -18,11 +18,14 @@ def create_identifier() -> IdentifierType:
     return str(uuid4())
 
 
-SessionDetails = typing.Union[calibration_models.CalibrationSessionStatus]
-
-
 class EmptyModel(BaseModel):
     pass
+
+
+SessionDetails = typing.Union[
+    calibration_models.CalibrationSessionStatus,
+    EmptyModel
+]
 
 
 class CommandName(str, Enum):
