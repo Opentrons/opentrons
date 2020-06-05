@@ -12,7 +12,7 @@ Protocol Designer Beta is optimized for [Chrome][chrome] browser. Other browsers
 # from the repo root
 
 # install all dependencies
-make install
+make setup
 
 cd protocol-designer/
 

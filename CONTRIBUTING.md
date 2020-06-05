@@ -165,14 +165,14 @@ Your computer will need the following tools installed to be able to develop with
 - GNU Make - we use [Makefiles][] to manage our builds
 
 - cURL - used to push development updates to robots
-- On Linux, you will need libsystemd and headers. On Ubuntu, install `systemd-dev` and `python3-dev` before running `make install`.
+- On Linux, you will need libsystemd and headers. On Ubuntu, install `systemd-dev` and `python3-dev` before running `make setup`.
 
 Once you're set up, clone the repository and install all project dependencies:
 
 ```shell
 git clone https://github.com/Opentrons/opentrons.git
 cd opentrons
-make install
+make setup
 ```
 
 In addition, if (and only if) you want to build a PDF version of the Opentrons API documentation, you must install a latex distribution that includes a callable pdflatex. If that is installed, you can do `make -C api docs-pdf`.

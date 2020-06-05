@@ -27,7 +27,7 @@ root of the [Opentrons/opentrons repository](https://github.com/Opentrons/opentr
 To test the update server, open a terminal to this directory and enter:
 
 ```bash
-make install
+make setup
 make test
 make lint
 ```

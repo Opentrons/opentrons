@@ -21,7 +21,7 @@ This document is about the structure and purpose of the source code of the HTTP 
 Setting Up For Development
 --------------------------
 
-First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make install`` in this subdirectory.
+First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make setup`` in this subdirectory.
 
 
 Configuration
