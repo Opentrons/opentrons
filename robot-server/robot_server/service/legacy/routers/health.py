@@ -2,7 +2,7 @@ import inspect
 
 from fastapi import APIRouter, Depends
 from opentrons import config, protocol_api
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 from opentrons.protocols.types import APIVersion
 from opentrons import __version__
 from opentrons.config import feature_flags
@@ -23,7 +23,7 @@ router = APIRouter()
                     "version and name.",
             response_description="OT-2 /health response")
 async def get_health(
-        hardware: HardwareAPILike = Depends(get_hardware)) -> Health:
+        hardware: ThreadManager = Depends(get_hardware)) -> Health:
     static_paths = ['/logs/serial.log', '/logs/api.log']
     # This conditional handles the case where we have just changed the
     # use protocol api v2 feature flag, so it does not match the type

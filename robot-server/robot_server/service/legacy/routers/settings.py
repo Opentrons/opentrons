@@ -4,7 +4,7 @@ from typing import Dict
 from starlette import status
 from fastapi import APIRouter, Depends
 
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 from opentrons.system import log_control
 from opentrons.config import pipette_config, reset as reset_util, \
     robot_configs, advanced_settings
@@ -80,7 +80,7 @@ def _create_settings_response() -> AdvancedSettingsResponse:
              response_model=V1BasicResponse)
 async def post_log_level_local(
         log_level: LogLevel,
-        hardware: HardwareAPILike = Depends(get_hardware)) -> V1BasicResponse:
+        hardware: ThreadManager = Depends(get_hardware)) -> V1BasicResponse:
     """Update local log level"""
     level = log_level.log_level
     if not level:
@@ -173,7 +173,7 @@ async def post_settings_reset_options(
             description="Get the current robot config",
             response_model=RobotConfigs)
 async def get_robot_settings(
-        hardware: HardwareAPILike = Depends(get_hardware)) -> RobotConfigs:
+        hardware: ThreadManager = Depends(get_hardware)) -> RobotConfigs:
     return hardware.config._asdict()  # type: ignore
 
 

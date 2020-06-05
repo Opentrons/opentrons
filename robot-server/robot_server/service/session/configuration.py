@@ -1,6 +1,6 @@
 from typing import Callable
 
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 
 from robot_server.service.session.models import IdentifierType
 
@@ -10,13 +10,13 @@ class SessionConfiguration:
      provided by session manager"""
 
     def __init__(self,
-                 hardware: HardwareAPILike,
+                 hardware: ThreadManager,
                  is_active: Callable[[IdentifierType], bool]):
         self._hardware = hardware
         self._is_active = is_active
 
     @property
-    def hardware(self) -> HardwareAPILike:
+    def hardware(self) -> ThreadManager:
         """Access to robot hardware"""
         return self._hardware
 

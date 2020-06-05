@@ -2,7 +2,7 @@ import logging
 from typing import Optional, Tuple, Dict, Type
 
 from opentrons.calibration.check.models import SessionType
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 
 from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.session_types.base_session import BaseSession
@@ -22,7 +22,7 @@ SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
 class SessionManager:
     """Manager of session instances"""
 
-    def __init__(self, hardware: HardwareAPILike):
+    def __init__(self, hardware: ThreadManager):
         self._sessions: Dict[IdentifierType, BaseSession] = {}
         self._active_session_id: Optional[IdentifierType] = None
         # Create object supplied to all sessions
