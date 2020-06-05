@@ -42,6 +42,7 @@ class SessionManager:
                                    instance_meta=SessionMetaData())
         self._active_session_id = session.meta.identifier
         self._sessions[session.meta.identifier] = session
+        log.debug(f"Added new session: {session}")
         return session
 
     async def remove(self, identifier: IdentifierType) \
@@ -51,6 +52,7 @@ class SessionManager:
         if session:
             del self._sessions[session.meta.identifier]
             await session.clean_up()
+            log.debug(f"Removed session: {session}")
         return session
 
     def get_by_id(self, identifier: IdentifierType) \

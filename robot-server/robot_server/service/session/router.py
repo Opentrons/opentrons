@@ -1,3 +1,4 @@
+import logging
 import typing
 
 from starlette import status as http_status_codes
@@ -14,6 +15,9 @@ from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 
 router = APIRouter()
+
+
+log = logging.getLogger(__name__)
 
 
 def get_session(manager: SessionManager,
@@ -52,6 +56,7 @@ async def create_session_handler(
     try:
         new_session = await session_manager.add(session_type)
     except SessionCreationException as e:
+        log.exception("Failed to create session")
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(
@@ -162,7 +167,9 @@ async def session_command_execute_handler(
         command = await session_obj.command_executor.execute(
             command=command_request.data.attributes.command,
             data=command_request.data.attributes.data)
+        log.debug(f"Command completed {command}")
     except SessionCommandException as e:
+        log.exception("Failed to execute command")
         raise RobotServerError(
             status_code=http_status_codes.HTTP_400_BAD_REQUEST,
             error=Error(
