@@ -13,7 +13,7 @@ from robot_server.service.session.command_execution import CommandExecutor, \
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models import CommandName, EmptyModel
-from robot_server.service.session.session_types import NullBaseSession, \
+from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 
 
@@ -60,8 +60,8 @@ def mock_command_executor(command_id):
 
 @pytest.fixture
 def mock_session(mock_session_meta, mock_command_executor):
-    session = NullBaseSession(configuration=MagicMock(),
-                              instance_meta=mock_session_meta)
+    session = NullSession(configuration=MagicMock(),
+                          instance_meta=mock_session_meta)
 
     session._command_executor = mock_command_executor
 

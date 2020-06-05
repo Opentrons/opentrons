@@ -8,13 +8,13 @@ from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType
-from robot_server.service.session.session_types import NullBaseSession, \
+from robot_server.service.session.session_types import NullSession, \
     CheckSession, SessionMetaData
 
 log = logging.getLogger(__name__)
 
 SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
-    SessionType.null: NullBaseSession,
+    SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
 }
 

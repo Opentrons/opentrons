@@ -9,7 +9,7 @@ from robot_server.service.session.session_types.base_session import \
     BaseSession, SessionMetaData
 
 
-class NullBaseSession(BaseSession):
+class NullSession(BaseSession):
     """A session that does nothing."""
 
     def __init__(self,
