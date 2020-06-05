@@ -26,7 +26,6 @@ export type WellDefinition = {
   z: number,
   'total-liquid-volume': number,
 }
-export type { WellSetHelpers } from './helpers/wellSets'
 
 // typedef for labware definitions under v1 labware schema
 export type LabwareDefinition1 = {

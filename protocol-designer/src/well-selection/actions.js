@@ -1,5 +1,4 @@
 // @flow
-import { createAction } from 'redux-actions'
 import type { WellGroup } from '@opentrons/components'
 
 // ===== Preselect / select wells in plate
