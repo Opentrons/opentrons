@@ -37,30 +37,30 @@ usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fef
 
 
 # install all project dependencies
-.PHONY: install
-install: install-js install-py
+.PHONY: setup
+setup: setup-js setup-py
 
-.PHONY: install-py
-install-py:
+.PHONY: setup-py
+setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
-	$(MAKE) -C $(API_DIR) install
-	$(MAKE) -C $(UPDATE_SERVER_DIR) install
-	$(MAKE) -C $(ROBOT_SERVER_DIR) install
+	$(MAKE) -C $(API_DIR) setup
+	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
+	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
-.PHONY: install-js
-install-js:
+.PHONY: setup-js
+setup-js:
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) setup
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
-.PHONY: uninstall
-uninstall:
-	$(MAKE) -C $(API_DIR) clean uninstall
+.PHONY: teardown
+teardown:
+	$(MAKE) -C $(API_DIR) clean teardown
 	shx rm -rf '**/node_modules'
 
 .PHONY: push-api-balena

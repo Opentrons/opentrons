@@ -15,8 +15,8 @@ port ?= 8081
 .PHONY: all
 all: clean dist
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	yarn
 
 .PHONY: clean

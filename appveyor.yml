@@ -36,7 +36,7 @@ install:
   - ps: $env:nodejs_version = Get-Content -Path .nvmrc
   - ps: Install-Product node $env:nodejs_version x64
   # install dev dependencies
-  - cmd: '%MAKE% -j 2 install'
+  - cmd: '%MAKE% -j 2 setup'
   # TODO(mc, 2019-09-09): remove this workaround when this issue is fixed:
   # https://github.com/electron-userland/electron-builder/issues/4092
   - cmd: 'yarn add -DW electron-builder@21.1.2'
