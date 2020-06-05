@@ -1,6 +1,8 @@
-from opentrons.calibration.util import StateMachine
+from opentrons.calibration.util import StateMachine, StateMachineError
 
 from .base_executor import CommandExecutor, Command
+from robot_server.service.session.models import CommandName, CommandDataType
+from robot_server.service.session import errors
 
 
 class StateMachineExecutor(CommandExecutor):
@@ -14,9 +16,17 @@ class StateMachineExecutor(CommandExecutor):
         """
         self. _state_machine = state_machine
 
-    async def execute(self, command: Command):
+    async def execute(self, command: CommandName, data: CommandDataType) \
+            -> Command:
         """Execute command"""
-        await self._state_machine.trigger_transition(
-            trigger=command.name.value,
-            **(command.data.dict() if command.data else {})
-        )
+        try:
+            await self._state_machine.trigger_transition(
+                trigger=command.value,
+                **(data.dict() if data else {})
+            )
+        except AssertionError as e:
+            raise errors.CommandExecutionException(str(e))
+        except StateMachineError as e:
+            raise errors.UnsupportedCommandException(str(e))
+
+        return Command(name=command, data=data)
