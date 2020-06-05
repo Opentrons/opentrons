@@ -106,6 +106,7 @@ export function PipetteFields(props: Props) {
           onSetFieldValue(targetToClear, null)
           onSetFieldTouched(targetToClear, false)
         }}
+        id={`PipetteSelect_${mount}`}
       />
     )
   }

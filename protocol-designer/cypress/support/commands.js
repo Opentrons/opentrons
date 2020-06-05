@@ -46,25 +46,19 @@ Cypress.Commands.add('openFilePage', () => {
 //
 // Pipette Page Actions
 //
-// TODO(SA 2020/04/14): Update this command to use better pipette selectors
-Cypress.Commands.add('choosePipettes', (left, right) => {
-  cy.contains('Left Pipette')
-    .next()
-    .contains('None')
-    .click()
-  cy.contains('Left Pipette')
-    .next()
-    .contains(left)
-    .click()
-  cy.contains('Right Pipette')
-    .next()
-    .contains('None')
-    .click()
-  cy.contains('Right Pipette')
-    .next()
-    .contains(right)
-    .click()
-})
+Cypress.Commands.add(
+  'choosePipettes',
+  (left_pipette_name, right_pipette_name) => {
+    cy.get('[id="PipetteSelect_left"]')
+      .click()
+      .contains(left_pipette_name)
+      .click()
+    cy.get('[id="PipetteSelect_right"]')
+      .click()
+      .contains(right_pipette_name)
+      .click()
+  }
+)
 
 Cypress.Commands.add('selectTipRacks', (left, right) => {
   if (left) {
