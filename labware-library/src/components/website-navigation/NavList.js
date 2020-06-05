@@ -22,12 +22,12 @@ export class NavList extends React.Component<Props, State> {
     this.state = { menu: null }
   }
 
-  clear = () => this.setState({ menu: null })
+  clear: () => void = () => this.setState({ menu: null })
 
-  toggle = (name: MenuName) =>
+  toggle: (name: MenuName) => void = name =>
     this.setState({ menu: this.state.menu !== name ? name : null })
 
-  render() {
+  render(): React.Node {
     const { menu } = this.state
 
     return (

@@ -7,7 +7,7 @@ export type DetailsBoxProps = {|
   aside: React.Node,
 |}
 
-export function DetailsBox(props: DetailsBoxProps) {
+export function DetailsBox(props: DetailsBoxProps): React.Node {
   const { children, aside } = props
 
   return (

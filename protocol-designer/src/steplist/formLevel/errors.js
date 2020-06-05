@@ -11,6 +11,7 @@ import {
   PAUSE_UNTIL_RESUME,
   PAUSE_UNTIL_TIME,
   PAUSE_UNTIL_TEMP,
+  THERMOCYCLER_PROFILE,
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 
@@ -33,6 +34,10 @@ export type FormErrorKey =
   | 'TARGET_TEMPERATURE_REQUIRED'
   | 'BLOCK_TEMPERATURE_REQUIRED'
   | 'LID_TEMPERATURE_REQUIRED'
+  | 'PROFILE_VOLUME_REQUIRED'
+  | 'PROFILE_LID_TEMPERATURE_REQUIRED'
+  | 'BLOCK_TEMPERATURE_HOLD_REQUIRED'
+  | 'LID_TEMPERATURE_HOLD_REQUIRED'
 
 export type FormError = {
   title: string,
@@ -95,13 +100,21 @@ const FORM_ERRORS: { [FormErrorKey]: FormError } = {
     title: 'Temperature is required',
     dependentFields: ['setTemperature', 'targetTemperature'],
   },
-  BLOCK_TEMPERATURE_REQUIRED: {
-    title: 'Temperature is required',
-    dependentFields: ['blockIsActive', 'blockTargetTemp'],
+  PROFILE_VOLUME_REQUIRED: {
+    title: 'Volume is required',
+    dependentFields: ['thermocyclerFormType', 'profileVolume'],
   },
-  LID_TEMPERATURE_REQUIRED: {
+  PROFILE_LID_TEMPERATURE_REQUIRED: {
     title: 'Temperature is required',
-    dependentFields: ['lidIsActive', 'lidTargetTemp'],
+    dependentFields: ['thermocyclerFormType', 'profileTargetLidTemp'],
+  },
+  BLOCK_TEMPERATURE_HOLD_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['blockIsActiveHold', 'blockTargetTempHold'],
+  },
+  LID_TEMPERATURE_HOLD_REQUIRED: {
+    title: 'Temperature is required',
+    dependentFields: ['lidIsActiveHold', 'lidTargetTempHold'],
   },
 }
 
@@ -225,6 +238,24 @@ export const targetTemperatureRequired = (
     : null
 }
 
+export const profileVolumeRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { thermocyclerFormType, profileVolume } = fields
+  return thermocyclerFormType === THERMOCYCLER_PROFILE && !profileVolume
+    ? FORM_ERRORS.PROFILE_VOLUME_REQUIRED
+    : null
+}
+
+export const profileTargetLidTempRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { thermocyclerFormType, profileTargetLidTemp } = fields
+  return thermocyclerFormType === THERMOCYCLER_PROFILE && !profileTargetLidTemp
+    ? FORM_ERRORS.PROFILE_LID_TEMPERATURE_REQUIRED
+    : null
+}
+
 export const blockTemperatureRequired = (
   fields: HydratedFormData
 ): FormError | null => {
@@ -240,6 +271,24 @@ export const lidTemperatureRequired = (
   const { lidIsActive, lidTargetTemp } = fields
   return lidIsActive === true && !lidTargetTemp
     ? FORM_ERRORS.LID_TEMPERATURE_REQUIRED
+    : null
+}
+
+export const blockTemperatureHoldRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { blockIsActiveHold, blockTargetTempHold } = fields
+  return blockIsActiveHold === true && !blockTargetTempHold
+    ? FORM_ERRORS.BLOCK_TEMPERATURE_HOLD_REQUIRED
+    : null
+}
+
+export const lidTemperatureHoldRequired = (
+  fields: HydratedFormData
+): FormError | null => {
+  const { lidIsActiveHold, lidTargetTempHold } = fields
+  return lidIsActiveHold === true && !lidTargetTempHold
+    ? FORM_ERRORS.LID_TEMPERATURE_HOLD_REQUIRED
     : null
 }
 

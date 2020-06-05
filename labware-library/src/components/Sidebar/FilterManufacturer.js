@@ -16,7 +16,9 @@ export type FilterManufacturerProps = {|
   filters: FilterParams,
 |}
 
-export function FilterManufacturerComponent(props: FilterManufacturerProps) {
+export function FilterManufacturerComponent(
+  props: FilterManufacturerProps
+): React.Node {
   const { history, filters } = props
   const manufacturers = getAllManufacturers()
   const options = manufacturers.map(value => ({
@@ -42,4 +44,6 @@ export function FilterManufacturerComponent(props: FilterManufacturerProps) {
   )
 }
 
-export const FilterManufacturer = withRouter(FilterManufacturerComponent)
+export const FilterManufacturer: React.AbstractComponent<
+  $Diff<FilterManufacturerProps, ContextRouter>
+> = withRouter(FilterManufacturerComponent)

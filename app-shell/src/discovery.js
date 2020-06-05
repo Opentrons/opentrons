@@ -33,12 +33,13 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
 
   config = getConfig('discovery')
   store = new Store({ name: 'discovery', defaults: { services: [] } })
+  let disableCache = config.disableCache
 
   client = createDiscoveryClient({
     pollInterval: SLOW_POLL_INTERVAL_MS,
     logger: log,
     candidates: ['[fd00:0:cafe:fefe::1]'].concat(config.candidates),
-    services: store.get('services'),
+    services: disableCache ? [] : store.get('services'),
   })
 
   client
@@ -50,6 +51,13 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
   handleConfigChange('discovery.candidates', value =>
     client.setCandidates(['[fd00:0:cafe:fefe::1]'].concat(value))
   )
+
+  handleConfigChange('discovery.disableCache', value => {
+    if (value === true) {
+      clearCache()
+    }
+    disableCache = value
+  })
 
   app.once('will-quit', () => client.stop())
 
@@ -73,7 +81,9 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
   }
 
   function handleServices() {
-    store.set('services', filterServicesToPersist(client.services))
+    if (!disableCache) {
+      store.set('services', filterServicesToPersist(client.services))
+    }
     dispatch({
       type: 'discovery:UPDATE_LIST',
       payload: { robots: client.services },

@@ -15,7 +15,7 @@ export type LoadNameProps = {|
   loadName: string,
 |}
 
-export function LoadName(props: LoadNameProps) {
+export function LoadName(props: LoadNameProps): React.Node {
   const { loadName } = props
   const [success, setSuccess] = React.useState(false)
   const inputRef = React.useRef<HTMLInputElement | null>(null)

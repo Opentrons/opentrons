@@ -13,7 +13,7 @@ export type SidebarProps = {|
   filters: FilterParams,
 |}
 
-export function Sidebar(props: SidebarProps) {
+export function Sidebar(props: SidebarProps): React.Node {
   const { filters } = props
 
   return (

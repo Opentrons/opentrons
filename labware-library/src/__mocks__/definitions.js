@@ -24,7 +24,7 @@ assert(
   `no labware loadNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllLoadNames = jest.fn<Array<void>, Array<string>>(
+export const getAllLoadNames: JestMockFn<[], Array<string>> = jest.fn(
   () => allLoadNames
 )
 
@@ -40,7 +40,7 @@ assert(
   `no labware displayNames found, something broke. ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDisplayNames = jest.fn<Array<void>, Array<string>>(
+export const getAllDisplayNames: JestMockFn<[], Array<string>> = jest.fn(
   () => allDisplayNames
 )
 
@@ -54,6 +54,6 @@ assert(
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDefinitions = jest.fn<Array<void>, LabwareList>(
+export const getAllDefinitions: JestMockFn<[], LabwareList> = jest.fn(
   () => allLabware
 )

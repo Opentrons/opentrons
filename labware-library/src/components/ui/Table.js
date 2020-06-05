@@ -20,7 +20,7 @@ export type TableProps = {|
 /**
  * Table - rows or columns of data, usually <TableEntry>
  */
-export function Table(props: TableProps) {
+export function Table(props: TableProps): React.Node {
   const { children } = props
   const direction = props.direction || TABLE_COLUMN
   const classes = cx(
@@ -40,7 +40,7 @@ export type TableEntryProps = {|
  * TableEntry - A row or column in a <Table>, with children that are usually
  * <LabelText> and <Value> components
  */
-export function TableEntry(props: TableEntryProps) {
+export function TableEntry(props: TableEntryProps): React.Node {
   const { children } = props
 
   return <div className={styles.table_entry}>{children}</div>

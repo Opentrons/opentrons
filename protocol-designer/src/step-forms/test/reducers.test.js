@@ -26,18 +26,24 @@ import {
   SPAN7_8_10_11_SLOT,
   PAUSE_UNTIL_TEMP,
 } from '../../constants'
+import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
 import {
   createPresavedStepForm,
   type CreatePresavedStepFormArgs,
 } from '../utils/createPresavedStepForm'
+import { createInitialProfileCycle } from '../utils/createInitialProfileItems'
 import { getLabwareIsCompatible } from '../../utils/labwareModuleCompatibility'
+import { uuid } from '../../utils'
 import type { DeckSlot } from '../../types'
 jest.mock('../../labware-defs/utils')
 jest.mock('../selectors')
 jest.mock('../../steplist/formLevel/handleFormChange')
 jest.mock('../utils/createPresavedStepForm')
 jest.mock('../../utils/labwareModuleCompatibility')
+jest.mock('../../utils')
+
+const mockUuid: JestMockFn<[], string> = uuid
 
 const mockCreatePresavedStepForm: JestMockFn<
   [CreatePresavedStepFormArgs],
@@ -66,7 +72,7 @@ const mock_getInitialDeckSetupRootState: JestMockFn<
   any
 > = _getInitialDeckSetupRootState
 
-beforeEach(() => {
+afterEach(() => {
   jest.clearAllMocks()
 })
 
@@ -1142,6 +1148,319 @@ describe('unsavedForm reducer', () => {
         },
       ],
     ])
+  })
+
+  it('should add a profile cycle item upon ADD_PROFILE_CYCLE action', () => {
+    const action = { type: 'ADD_PROFILE_CYCLE', payload: null }
+
+    const id = 'newCycleId'
+    mockUuid.mockReturnValue(id)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [],
+        profileItemsById: {},
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [id],
+      profileItemsById: {
+        [id]: createInitialProfileCycle(id),
+      },
+    })
+  })
+
+  it('should add a profile step item to the specified cycle upon ADD_PROFILE_STEP action with cycleId payload', () => {
+    const cycleId = 'someCycleId'
+    const stepId = 'newStepId'
+    const action = { type: 'ADD_PROFILE_STEP', payload: { cycleId } }
+
+    mockUuid.mockReturnValue(stepId)
+
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            repetitions: '1',
+            steps: [],
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          ...state.unsavedForm.profileItemsById[cycleId],
+          steps: [
+            {
+              id: stepId,
+              type: PROFILE_STEP,
+              title: '',
+              temperature: '',
+              durationMinutes: '',
+              durationSeconds: '',
+            },
+          ],
+        },
+      },
+    })
+  })
+
+  it('should remove a profile step item on DELETE_PROFILE_STEP', () => {
+    const id = 'stepItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_STEP,
+            id,
+            title: '',
+            temperature: '',
+            durationMinutes: '',
+            durationSeconds: '',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
+
+  it('should remove a step item inside a cycle on DELETE_PROFILE_STEP', () => {
+    const stepId = 'stepItemId'
+    const cycleId = 'cycleId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id: stepId } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [
+              {
+                type: PROFILE_STEP,
+                id: stepId,
+                title: '',
+                temperature: '',
+                durationMinutes: '',
+                durationSeconds: '',
+              },
+            ],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [],
+          repetitions: '1',
+        },
+      },
+    })
+  })
+
+  it('should do nothing on DELETE_PROFILE_STEP when the id is a cycle', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_STEP', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual(state.unsavedForm)
+  })
+
+  it('should delete cycle on DELETE_PROFILE_CYCLE', () => {
+    const id = 'cycleItemId'
+    const action = { type: 'DELETE_PROFILE_CYCLE', payload: { id } }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [id],
+        profileItemsById: {
+          [id]: {
+            type: PROFILE_CYCLE,
+            id,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [],
+      profileItemsById: {},
+    })
+  })
+
+  it('should edit a profile step on the top level with EDIT_PROFILE_STEP', () => {
+    const stepId = 'profileStepId'
+    const action = {
+      type: 'EDIT_PROFILE_STEP',
+      payload: { id: stepId, fields: { title: 'x' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [stepId],
+        profileItemsById: {
+          [stepId]: {
+            type: PROFILE_STEP,
+            id: stepId,
+            title: '',
+            temperature: '',
+            durationMinutes: '',
+            durationSeconds: '',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [stepId],
+      profileItemsById: {
+        [stepId]: {
+          type: PROFILE_STEP,
+          id: stepId,
+          title: 'x',
+          temperature: '',
+          durationMinutes: '',
+          durationSeconds: '',
+        },
+      },
+    })
+  })
+
+  it('should edit a profile step that is inside a cycle with EDIT_PROFILE_STEP', () => {
+    const cycleId = 'cycleId'
+    const stepId = 'profileStepId'
+    const action = {
+      type: 'EDIT_PROFILE_STEP',
+      payload: { id: stepId, fields: { title: 'x' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [
+              {
+                type: PROFILE_STEP,
+                id: stepId,
+                title: '',
+                temperature: '',
+                durationMinutes: '',
+                durationSeconds: '',
+              },
+            ],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [
+            {
+              type: PROFILE_STEP,
+              id: stepId,
+              title: 'x',
+              temperature: '',
+              durationMinutes: '',
+              durationSeconds: '',
+            },
+          ],
+          repetitions: '1',
+        },
+      },
+    })
+  })
+
+  it('should edit a profile cycle on EDIT_PROFILE_CYCLE', () => {
+    const cycleId = 'cycleId'
+    const action = {
+      type: 'EDIT_PROFILE_CYCLE',
+      payload: { id: cycleId, fields: { repetitions: '5' } },
+    }
+    const state = {
+      unsavedForm: {
+        stepType: 'thermocycler',
+        orderedProfileItems: [cycleId],
+        profileItemsById: {
+          [cycleId]: {
+            type: PROFILE_CYCLE,
+            id: cycleId,
+            steps: [],
+            repetitions: '1',
+          },
+        },
+      },
+    }
+    const result = unsavedForm(state, action)
+    expect(result).toEqual({
+      stepType: 'thermocycler',
+      orderedProfileItems: [cycleId],
+      profileItemsById: {
+        [cycleId]: {
+          type: PROFILE_CYCLE,
+          id: cycleId,
+          steps: [],
+          repetitions: '5',
+        },
+      },
+    })
   })
 })
 

@@ -159,6 +159,7 @@ export type ProfileCycleItem = {|
   repetitions: string,
 |}
 
+// TODO IMMEDIATELY: ProfileStepItem -> ProfileStep, ProfileCycleItem -> ProfileCycle
 export type ProfileItem = ProfileStepItem | ProfileCycleItem
 
 export type PathOption = 'single' | 'multiAspirate' | 'multiDispense'
