@@ -16,7 +16,7 @@ import type {
 
 export function sortLabwareBySlot(
   labwareState: $PropertyType<RobotState, 'labware'>
-) {
+): Array<string> {
   return sortBy<string>(Object.keys(labwareState), (id: string) =>
     parseInt(labwareState[id].slot)
   )
