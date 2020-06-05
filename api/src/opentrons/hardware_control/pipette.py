@@ -1,5 +1,6 @@
 """ Classes and functions for pipette state tracking
 """
+from dataclasses import asdict, replace
 import logging
 from typing import Any, Dict, Optional, Tuple, Union, TYPE_CHECKING
 
@@ -56,7 +57,7 @@ class Pipette:
         self._instrument_offset = new_offset
 
     @property
-    def config(self) -> pipette_config.pipette_config:
+    def config(self) -> pipette_config.PipetteConfig:
         return self._config
 
     @property
@@ -65,7 +66,8 @@ class Pipette:
 
     def update_config_item(self, elem_name: str, elem_val: Any):
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
-        self._config = self._config._replace(**{elem_name: elem_val})
+        self._config = replace(self._config,
+                               **{elem_name: elem_val})
 
     @property
     def name(self) -> str:
@@ -221,7 +223,7 @@ class Pipette:
                                     id(self))
 
     def as_dict(self) -> 'Pipette.DictType':
-        config_dict = self.config._asdict()
+        config_dict = asdict(self.config)
         config_dict.update({'current_volume': self.current_volume,
                             'available_volume': self.available_volume,
                             'name': self.name,

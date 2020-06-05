@@ -1,7 +1,8 @@
+from dataclasses import dataclass
 import logging
 import json
 import numbers
-from typing import (Any, Dict, List, Union, NamedTuple, Tuple,
+from typing import (Any, Dict, List, Union, Tuple,
                     Sequence, TYPE_CHECKING)
 
 from opentrons.config import feature_flags as ff, CONFIG
@@ -17,7 +18,8 @@ if TYPE_CHECKING:
 log = logging.getLogger(__name__)
 
 
-class pipette_config(NamedTuple):
+@dataclass
+class PipetteConfig:
     top: float
     bottom: float
     blow_out: float
@@ -87,7 +89,7 @@ VALID_QUIRKS = model_config()['validQuirks']
 
 def load(
         pipette_model: 'PipetteModel',
-        pipette_id: str = None) -> pipette_config:
+        pipette_id: str = None) -> PipetteConfig:
     """
     Load pipette config data
 
@@ -115,7 +117,7 @@ def load(
                       the pipetteModelSpecs.json file (and therefore not in
                       :py:attr:`configs`)
 
-    :returns pipette_config: The configuration, loaded and checked
+    :returns PipetteConfig: The configuration, loaded and checked
     """
 
     # Load the model config and update with the name config
@@ -151,7 +153,7 @@ def load(
         ul_per_mm = cfg['ulPerMm'][-1]
 
     smoothie_configs = cfg['smoothieConfigs']
-    res = pipette_config(
+    res = PipetteConfig(
         top=ensure_value(
             cfg, 'top', MUTABLE_CONFIGS),
         bottom=ensure_value(

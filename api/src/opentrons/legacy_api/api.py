@@ -1,3 +1,4 @@
+from dataclasses import replace
 import logging
 from . import (robot as _robot_module,
                instruments as inst,
@@ -270,7 +271,8 @@ class InstrumentsWrapper(object):
             log.warning(
                 f"Using a deprecated constructor for {pipette_model_version}")
             constructor_config = pipette_config.name_config()[name_or_model]
-            config = config._replace(
+            config = replace(
+                config,
                 min_volume=constructor_config['minVolume'],
                 max_volume=constructor_config['maxVolume'])
             name_or_model = config.name
@@ -304,16 +306,16 @@ class InstrumentsWrapper(object):
             requested_as=None):
 
         if aspirate_flow_rate is not None:
-            config = config._replace(aspirate_flow_rate=aspirate_flow_rate)
+            config = replace(config, aspirate_flow_rate=aspirate_flow_rate)
         if dispense_flow_rate is not None:
-            config = config._replace(dispense_flow_rate=dispense_flow_rate)
+            config = replace(config, dispense_flow_rate=dispense_flow_rate)
         if blow_out_flow_rate is not None:
-            config = config._replace(blow_out_flow_rate=blow_out_flow_rate)
+            config = replace(config, blow_out_flow_rate=blow_out_flow_rate)
 
         if min_volume is not None:
-            config = config._replace(min_volume=min_volume)
+            config = replace(config, min_volume=min_volume)
         if max_volume is not None:
-            config = config._replace(max_volume=max_volume)
+            config = replace(config, max_volume=max_volume)
         plunger_positions = {
             'top': config.top,
             'bottom': config.bottom,
