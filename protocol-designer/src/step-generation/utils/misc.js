@@ -238,7 +238,9 @@ export const blowoutUtil = (args: {
   ]
 }
 
-export function createEmptyLiquidState(invariantContext: InvariantContext) {
+export function createEmptyLiquidState(
+  invariantContext: InvariantContext
+): $PropertyType<RobotState, 'liquidState'> {
   const { labwareEntities, pipetteEntities } = invariantContext
 
   return {

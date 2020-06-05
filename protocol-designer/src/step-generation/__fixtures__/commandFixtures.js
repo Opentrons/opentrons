@@ -51,7 +51,18 @@ export const DISPENSE_OFFSET_FROM_BOTTOM_MM = 3.2
 export const BLOWOUT_OFFSET_FROM_TOP_MM = 3.3
 const TOUCH_TIP_OFFSET_FROM_BOTTOM_MM = 3.4
 
-export const getFlowRateAndOffsetParams = () => ({
+type FlowRateAndOffsetParams = {|
+  aspirateFlowRateUlSec: number,
+  dispenseFlowRateUlSec: number,
+  blowoutFlowRateUlSec: number,
+  aspirateOffsetFromBottomMm: number,
+  dispenseOffsetFromBottomMm: number,
+  blowoutOffsetFromTopMm: number,
+  touchTipAfterAspirateOffsetMmFromBottom: number,
+  touchTipAfterDispenseOffsetMmFromBottom: number,
+  touchTipMmFromBottom: number,
+|}
+export const getFlowRateAndOffsetParams = (): FlowRateAndOffsetParams => ({
   aspirateFlowRateUlSec: ASPIRATE_FLOW_RATE,
   dispenseFlowRateUlSec: DISPENSE_FLOW_RATE,
   blowoutFlowRateUlSec: BLOWOUT_FLOW_RATE,
@@ -79,15 +90,19 @@ export const DEFAULT_BLOWOUT_WELL = 'A1'
 
 // =================
 
+type MakeAspDispHelper<P> = (
+  bakedParams?: $Shape<P>
+) => (well: string, volume: number, params?: $Shape<P>) => Command
+
 const _defaultAspirateParams = {
   pipette: DEFAULT_PIPETTE,
   labware: SOURCE_LABWARE,
 }
-export const makeAspirateHelper = (bakedParams?: $Shape<AspirateParams>) => (
-  well: string,
-  volume: number,
-  params?: $Shape<AspirateParams>
-): Command => ({
+export const makeAspirateHelper: MakeAspDispHelper<AspirateParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
   command: 'aspirate',
   params: {
     ..._defaultAspirateParams,
@@ -121,11 +136,11 @@ const _defaultDispenseParams = {
   offsetFromBottomMm: DISPENSE_OFFSET_FROM_BOTTOM_MM,
   flowRate: DISPENSE_FLOW_RATE,
 }
-export const makeDispenseHelper = (bakedParams?: $Shape<DispenseParams>) => (
-  well: string,
-  volume: number,
-  params?: $Shape<DispenseParams>
-): Command => ({
+export const makeDispenseHelper: MakeAspDispHelper<DispenseParams> = bakedParams => (
+  well,
+  volume,
+  params
+) => ({
   command: 'dispense',
   params: {
     ..._defaultDispenseParams,
@@ -141,10 +156,13 @@ const _defaultTouchTipParams = {
   labware: SOURCE_LABWARE,
   offsetFromBottomMm: TOUCH_TIP_OFFSET_FROM_BOTTOM_MM,
 }
-export const makeTouchTipHelper = (bakedParams?: $Shape<TouchTipParams>) => (
-  well: string,
-  params?: $Shape<TouchTipParams>
-): Command => ({
+type MakeTouchTipHelper = (
+  bakedParams?: $Shape<TouchTipParams>
+) => (well: string, params?: $Shape<TouchTipParams>) => Command
+export const makeTouchTipHelper: MakeTouchTipHelper = bakedParams => (
+  well,
+  params
+) => ({
   command: 'touchTip',
   params: {
     ..._defaultTouchTipParams,

@@ -3,6 +3,7 @@ import assert from 'assert'
 import * as React from 'react'
 import difference from 'lodash/difference'
 import { i18n } from '../../localization'
+import { PROFILE_CYCLE } from '../../form-types'
 import {
   SOURCE_WELL_BLOWOUT_DESTINATION,
   DEST_WELL_BLOWOUT_DESTINATION,
@@ -110,27 +111,35 @@ export const getDynamicFieldFocusHandlerId = ({
   name: string,
 |}): string => `${id}:${name}`
 
-export const getVisibleProfileErrors = (args: {|
+// NOTE: if any fields of a given name are pristine, treat all fields of that name as pristine.
+// (Errors don't currently specify the id, so if we later want to only mask form-level errors
+// for specific profile fields, the field's parent ProfileItem id needs to be included in the error)
+export const getVisibleProfileFormLevelErrors = (args: {|
   focusedField: ?string,
   dirtyFields: Array<string>,
   errors: Array<ProfileFormError>,
   profileItemsById: { [itemId: string]: ProfileItem },
 |}): Array<ProfileFormError> => {
   const { dirtyFields, focusedField, errors, profileItemsById } = args
-  const profileIds = Object.keys(profileItemsById)
+  const profileItemIds = Object.keys(profileItemsById)
 
   return errors.filter(error => {
-    return profileIds.every(itemId => {
-      const fieldsForItem = error.dependentProfileFields.map(
-        fieldName => `${itemId}:${fieldName}` // TODO IMMEDIATELY import util for "hashing" the name + id
-      )
+    return profileItemIds.every(itemId => {
+      const item = profileItemsById[itemId]
+      const steps = item.type === PROFILE_CYCLE ? item.steps : [item]
+      return steps.every(step => {
+        const fieldsForStep = error.dependentProfileFields.map(fieldName =>
+          getDynamicFieldFocusHandlerId({ id: step.id, name: fieldName })
+        )
 
-      const dependentFieldsAreNotFocused = !fieldsForItem.includes(focusedField)
+        const dependentFieldsAreNotFocused = !fieldsForStep.includes(
+          focusedField
+        )
 
-      const dependentProfileFieldsAreDirty =
-        difference(fieldsForItem, dirtyFields).length === 0
-
-      return dependentFieldsAreNotFocused && dependentProfileFieldsAreDirty
+        const dependentProfileFieldsAreDirty =
+          difference(fieldsForStep, dirtyFields).length === 0
+        return dependentFieldsAreNotFocused && dependentProfileFieldsAreDirty
+      })
     })
   })
 }

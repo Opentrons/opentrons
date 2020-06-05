@@ -1,27 +1,28 @@
 // @flow
-import { combineReducers } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 import { handleActions } from 'redux-actions'
-import type { ActionType } from 'redux-actions'
 
-import { navigateToPage, toggleNewProtocolModal } from '../actions'
 import type { BaseState, Action } from '../../types'
+import type {
+  NavigateToPageAction,
+  ToggleNewProtocolModalAction,
+} from '../actions'
 import type { Page } from '../types'
 
-const page = handleActions<Page, *>(
+const page: Reducer<Page, any> = handleActions(
   {
     LOAD_FILE: (): Page => 'file-detail',
     CREATE_NEW_PROTOCOL: (): Page => 'file-detail',
-    NAVIGATE_TO_PAGE: (state, action: ActionType<typeof navigateToPage>) =>
-      action.payload,
+    NAVIGATE_TO_PAGE: (state, action: NavigateToPageAction) => action.payload,
   },
   'file-splash'
 )
 
-const newProtocolModal = handleActions<boolean, *>(
+const newProtocolModal: Reducer<boolean, any> = handleActions(
   {
     TOGGLE_NEW_PROTOCOL_MODAL: (
       state,
-      action: ActionType<typeof toggleNewProtocolModal>
+      action: ToggleNewProtocolModalAction
     ): boolean => action.payload,
     CREATE_NEW_PROTOCOL: () => false,
   },
@@ -33,11 +34,13 @@ export const _allReducers = {
   newProtocolModal,
 }
 
-export type RootState = {
+export type RootState = {|
   page: Page,
   newProtocolModal: boolean,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)
 
-export const rootSelector = (state: BaseState) => state.navigation
+export const rootSelector = (state: BaseState): RootState => state.navigation
