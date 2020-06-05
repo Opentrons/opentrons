@@ -1,5 +1,5 @@
 import pytest
-from unittest.mock import MagicMock, PropertyMock, patch
+from unittest.mock import MagicMock, patch
 from datetime import datetime
 
 import typing
@@ -248,7 +248,7 @@ def command(command_type: str, body: typing.Optional[BaseModel]):
     }
 
 
-def test_execute_command_no_session(api_client,mock_session_meta):
+def test_execute_command_no_session(api_client, mock_session_meta):
     """Test that command is rejected if there's no session"""
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
@@ -398,7 +398,7 @@ def test_execute_command_session_inactive(
         'errors': [
             {
                 'detail': 'Only the active session can execute commands',
-                'status': f'403',
+                'status': '403',
                 'title': f"Session '{mock_session_meta.identifier}'"
                          f" is not active"
             }

@@ -1,16 +1,13 @@
 import typing
-from uuid import uuid4
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
-from opentrons.calibration.util import StateMachineError
 from opentrons.calibration.check import models
 
-from robot_server.service.dependencies import get_session_manager, get_hardware
+from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
-from robot_server.service.session.command_execution import Command
 from robot_server.service.session.errors import SessionCreationException, \
     SessionCommandException
 from robot_server.service.session.manager import SessionManager, BaseSession

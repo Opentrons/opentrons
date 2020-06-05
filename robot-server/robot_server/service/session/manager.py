@@ -44,7 +44,8 @@ class SessionManager:
         self._sessions[session.meta.identifier] = session
         return session
 
-    async def remove(self, identifier: IdentifierType) -> Optional[BaseSession]:
+    async def remove(self, identifier: IdentifierType) \
+            -> Optional[BaseSession]:
         """Remove a session"""
         session = self.deactivate(identifier)
         if session:

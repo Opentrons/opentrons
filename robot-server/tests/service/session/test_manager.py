@@ -5,7 +5,8 @@ import pytest
 from opentrons.calibration.check.models import SessionType
 
 from robot_server.service.session.errors import SessionCreationException
-from robot_server.service.session.manager import SessionManager, SessionMetaData
+from robot_server.service.session.manager import SessionManager, \
+    SessionMetaData
 from robot_server.service.session.models import create_identifier
 
 

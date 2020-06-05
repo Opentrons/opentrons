@@ -84,7 +84,7 @@ class CheckSession(BaseSession):
         return calibration_models.CalibrationSessionStatus(
             instruments=instruments,
             currentStep=self._calibration_check.current_state_name,
-            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),
+            comparisonsByStep=self._calibration_check.get_comparisons_by_step(),  # noqa: e501
             labware=labware,
         )
 
