@@ -1,11 +1,11 @@
 // @flow
 import uuidv1 from 'uuid/v1'
-import { makeWellSetHelpers } from '@opentrons/shared-data'
+import { makeWellSetHelpers, type WellSetHelpers } from '@opentrons/shared-data'
 import { i18n } from '../localization'
 import type { WellGroup } from '@opentrons/components'
 import type { BoundingRect, GenericRect } from '../collision-types'
 
-export const registerSelectors =
+export const registerSelectors: any => void =
   process.env.NODE_ENV === 'development'
     ? require('reselect-tools').registerSelectors
     : (a: any) => {}
@@ -14,7 +14,10 @@ export const uuid: () => string = uuidv1
 
 // Collision detection for SelectionRect / SelectableLabware
 
-export const rectCollision = (rect1: BoundingRect, rect2: BoundingRect) =>
+export const rectCollision = (
+  rect1: BoundingRect,
+  rect2: BoundingRect
+): boolean =>
   rect1.x < rect2.x + rect2.width &&
   rect1.x + rect1.width > rect2.x &&
   rect1.y < rect2.y + rect2.height &&
@@ -74,11 +77,17 @@ export const arrayToWellGroup = (w: Array<string>): WellGroup =>
   w.reduce((acc, wellName) => ({ ...acc, [wellName]: null }), {})
 
 // cross-PD memoization of well set utils
-export const {
+const wellSetHelpers: WellSetHelpers = makeWellSetHelpers()
+const {
   canPipetteUseLabware,
   getAllWellSetsForLabware,
   getWellSetForMultichannel,
-} = makeWellSetHelpers()
+} = wellSetHelpers
+export {
+  canPipetteUseLabware,
+  getAllWellSetsForLabware,
+  getWellSetForMultichannel,
+}
 
 export const makeTemperatureText = (temperature: number | null): string =>
   temperature === null

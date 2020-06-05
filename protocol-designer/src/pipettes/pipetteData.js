@@ -1,6 +1,7 @@
 // @flow
 import assert from 'assert'
 import { getPipetteNameSpecs, getTiprackVolume } from '@opentrons/shared-data'
+import type { Options } from '@opentrons/components'
 import type { PipetteEntity } from '../step-forms/types'
 
 const supportedPipetteNames = [
@@ -15,7 +16,7 @@ const supportedPipetteNames = [
 
 // TODO: should a version of pipetteOptions be moved to shared-data,
 // and used for both PD and Run App?
-export const pipetteOptions = supportedPipetteNames
+export const pipetteOptions: Options = supportedPipetteNames
   .map((name: string) => {
     const pipette = getPipetteNameSpecs(name)
     return pipette ? { name: pipette.displayName, value: pipette.name } : null
