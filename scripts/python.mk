@@ -7,6 +7,9 @@ pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
 wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
 
+pypi_upload_url := https://upload.pypi.org/legacy/
+pypi_test_upload_url := https://test.pypi.org/legacy/
+
 # get the python package version
 # (evaluates to that string)
 # paramter 1: name of the project (aka api, robot-server, etc)
@@ -20,4 +23,12 @@ endef
 # parameter 2: the name of the python package (aka opentrons, robot_server, etc)
 define python_get_wheelname
 $(2)-$(call python_package_version,$(1))-py2.py3-none-any.whl
+endef
+
+# upload a package to a repository
+# parameter 1: auth arguments for twine
+# parameter 2: repository url
+# parameter 3: the wheel file to upload
+define python_upload_package
+$(python) -m twine upload --repository-url $(2) $(1) $(3)
 endef
