@@ -1,5 +1,5 @@
 // @flow
-import { combineReducers } from 'redux'
+import { combineReducers, type Reducer } from 'redux'
 
 import { rootReducer as stepsReducer, type StepsState } from './steps/reducers'
 import type { Action } from '../types'
@@ -12,4 +12,6 @@ export const _uiSubReducers = {
   steps: stepsReducer,
 }
 
-export const rootReducer = combineReducers<_, Action>(_uiSubReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _uiSubReducers
+)

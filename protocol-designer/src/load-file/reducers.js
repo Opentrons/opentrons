@@ -70,9 +70,9 @@ export const _allReducers = {
   unsavedChanges,
 }
 
-export type RootState = {
+export type RootState = {|
   fileUploadMessage: FileUploadMessageState,
   unsavedChanges: boolean,
-}
+|}
 
 export const rootReducer = combineReducers<_, Action>(_allReducers)

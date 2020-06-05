@@ -1,5 +1,7 @@
 // @flow
+import uniqBy from 'lodash/uniqBy'
 import { THERMOCYCLER_PROFILE } from '../../constants'
+import { PROFILE_STEP, type ProfileStepItem } from '../../form-types'
 import type { Node } from 'react'
 
 // TODO: real HydratedFormData type
@@ -22,37 +24,51 @@ const PROFILE_FORM_ERRORS: { [ProfileFormErrorKey]: ProfileFormError } = {
 
 // TC Profile multi-field error fns
 
-export const profileItemsValidDuration = (
-  fields: HydratedFormData
+export const profileStepValidDuration = (
+  step: ProfileStepItem
 ): ProfileFormError | null => {
-  const { thermocyclerFormType, orderedProfileItems, profileItemsById } = fields
-  if (thermocyclerFormType === THERMOCYCLER_PROFILE) {
-    const someErrors = orderedProfileItems.some(itemId => {
-      const item = profileItemsById[itemId]
-      const minutes = parseFloat(item.durationMinutes) || 0
-      const seconds = parseFloat(item.durationSeconds) || 0
-      const isValid = minutes > 0 || seconds > 0
-      return !isValid
-    })
-    if (someErrors) {
-      return PROFILE_FORM_ERRORS.INVALID_PROFILE_DURATION
-    }
-  }
-  return null
+  const minutes = parseFloat(step.durationMinutes) || 0
+  const seconds = parseFloat(step.durationSeconds) || 0
+  const isValid = minutes > 0 || seconds > 0
+  return isValid ? null : PROFILE_FORM_ERRORS.INVALID_PROFILE_DURATION
 }
 
 // =====
 
-const ALL_PROFILE_ERROR_GETTERS = [profileItemsValidDuration]
+const PROFILE_STEP_ERROR_GETTERS = [profileStepValidDuration]
 
 export const getProfileFormErrors = (
   hydratedForm: HydratedFormData
 ): Array<ProfileFormError> => {
-  return ALL_PROFILE_ERROR_GETTERS.reduce<Array<ProfileFormError>>(
-    (acc, errorGetter) => {
-      const nextErrors = errorGetter(hydratedForm)
-      return nextErrors === null ? acc : [...acc, nextErrors]
-    },
-    []
-  )
+  if (
+    hydratedForm.stepType !== 'thermocycler' ||
+    hydratedForm.thermocyclerFormType !== THERMOCYCLER_PROFILE
+  ) {
+    return []
+  }
+  const { orderedProfileItems, profileItemsById } = hydratedForm
+  const errors: Array<ProfileFormError> = []
+
+  const addStepErrors = (step: ProfileStepItem): void => {
+    PROFILE_STEP_ERROR_GETTERS.forEach(errorGetter => {
+      const nextErrors = errorGetter(step)
+      if (nextErrors !== null) {
+        errors.push(nextErrors)
+      }
+    })
+  }
+
+  orderedProfileItems.forEach((itemId: string) => {
+    const item = profileItemsById[itemId]
+    if (item.type === PROFILE_STEP) {
+      addStepErrors(item)
+    } else {
+      // Cycles themselves don't currently have any form-level errors,
+      // so we just validate each cycle's steps
+      item.steps.forEach(addStepErrors)
+    }
+  })
+
+  // NOTE: since errors stacking doesn't seem to serve a purpose, remove repeats
+  return uniqBy(errors, error => error.title)
 }
