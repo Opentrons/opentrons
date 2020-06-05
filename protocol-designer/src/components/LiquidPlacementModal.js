@@ -127,7 +127,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   selectWells: wells => dispatch(selectWells(wells)),
 })
 
-export const LiquidPlacementModal = connect<Props, {||}, _, _, _, _>(
+export const LiquidPlacementModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidPlacementModalComponent)

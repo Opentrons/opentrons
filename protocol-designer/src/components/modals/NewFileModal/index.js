@@ -1,5 +1,5 @@
 // @flow
-import type { ElementProps } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import mapValues from 'lodash/mapValues'
 import omit from 'lodash/omit'
@@ -29,7 +29,7 @@ import type { NewProtocolFields } from '../../../load-file'
 import type { PipetteOnDeck, NormalizedPipette } from '../../../step-forms'
 import type { LabwareDefByDefURI } from '../../../labware-defs/types'
 
-type Props = ElementProps<typeof FilePipettesModalComponent>
+type Props = React.ElementProps<typeof FilePipettesModalComponent>
 
 type OP = {|
   showProtocolFields: $PropertyType<Props, 'showProtocolFields'>,
@@ -54,7 +54,14 @@ type DP = {|
   _createNewProtocol: CreateNewProtocolArgs => void,
 |}
 
-export const NewFileModal = connect<Props, OP, SP, DP, _, _>(
+export const NewFileModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

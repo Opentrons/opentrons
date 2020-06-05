@@ -38,8 +38,8 @@ type OP = {| fieldName: TipOffsetFields, className?: string |}
 
 type SP = {|
   disabled: boolean,
-  mmFromBottom: ?string,
-  wellDepthMm: ?number,
+  mmFromBottom: number,
+  wellDepthMm: number,
 |}
 
 type Props = { ...OP, ...SP }
@@ -142,11 +142,18 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
 
   return {
     disabled: rawForm ? getDisabledFields(rawForm).has(fieldName) : false,
+    // $FlowFixMe(mc, 2020-06-05): fix types here and in TipPositionModal
     wellDepthMm,
+    // $FlowFixMe(mc, 2020-06-05): fix types here and in TipPositionModal
     mmFromBottom: rawForm && rawForm[fieldName],
   }
 }
 
-export const TipPositionField = connect<Props, OP, SP, _, _, _>(mapSTP)(
-  TipPositionInput
-)
+export const TipPositionField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(TipPositionInput)

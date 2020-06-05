@@ -30,7 +30,14 @@ function mapDispatchToProps(dispatch: Dispatch<*>): DP {
   }
 }
 
-export const FileUploadMessageModal = connect<Props, {||}, SP, DP, _, _>(
+export const FileUploadMessageModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(FileUploadMessageModalComponent)

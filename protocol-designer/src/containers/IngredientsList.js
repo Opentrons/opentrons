@@ -50,7 +50,14 @@ function mergeProps(
   }
 }
 
-export const IngredientsList = connect<Props, {||}, SP, {||}, _, _>(
+export const IngredientsList: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

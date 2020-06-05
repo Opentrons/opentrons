@@ -26,7 +26,14 @@ type SP = {|
   isV4Protocol: boolean,
 |}
 
-export const FileSidebar = connect<Props, {||}, SP, {||}, _, _>(
+export const FileSidebar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

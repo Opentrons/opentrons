@@ -277,7 +277,14 @@ const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm = connect<StepEditFormManagerProps, {||}, _, _, _, _>(
+export const StepEditForm: React.AbstractComponent<{||}> = connect<
+  StepEditFormManagerProps,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   () => ({}) // no `dispatch` prop
 )((props: StepEditFormManagerProps) => (

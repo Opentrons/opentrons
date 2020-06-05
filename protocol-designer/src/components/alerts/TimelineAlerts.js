@@ -73,7 +73,14 @@ function mergeProps(
   }
 }
 
-export const TimelineAlerts = connect<Props, {||}, SP, {||}, _, _>(
+export const TimelineAlerts: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

@@ -167,7 +167,14 @@ const collectSlotTarget = (connect, monitor) => ({
   itemType: monitor.getItemType(),
 })
 
-export const SlotControls = connect<{| ...OP, ...DP, ...SP |}, OP, _, DP, _, _>(
+export const SlotControls: React.AbstractComponent<OP> = connect<
+  {| ...OP, ...DP, ...SP |},
+  OP,
+  _,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(

@@ -53,7 +53,14 @@ function mergeProps(
   }
 }
 
-export const LabwareUploadMessageModal = connect<Props, {||}, SP, _, _, _>(
+export const LabwareUploadMessageModal: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

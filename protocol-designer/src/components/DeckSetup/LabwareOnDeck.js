@@ -56,6 +56,11 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const LabwareOnDeck = connect<Props, OP, SP, {||}, _, _>(
-  mapStateToProps
-)(LabwareOnDeckComponent)
+export const LabwareOnDeck: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(mapStateToProps)(LabwareOnDeckComponent)

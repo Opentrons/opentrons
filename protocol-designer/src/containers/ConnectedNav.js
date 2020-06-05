@@ -85,7 +85,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const ConnectedNav = connect<Props, {||}, SP, DP, _, _>(
+export const ConnectedNav: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(Nav)

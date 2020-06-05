@@ -49,6 +49,11 @@ function mapStateToProps(state: BaseState): $Exact<Props> {
   }
 }
 
-export const ConnectedSidebar = connect<Props, {||}, _, _, _, _>(
-  mapStateToProps
-)(Sidebar)
+export const ConnectedSidebar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(mapStateToProps)(Sidebar)

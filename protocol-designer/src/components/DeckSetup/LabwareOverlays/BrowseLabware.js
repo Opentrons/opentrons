@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { Icon } from '@opentrons/components'
@@ -48,7 +48,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => ({
   },
 })
 
-export const BrowseLabware = connect<Props, OP, _, DP, _, _>(
+export const BrowseLabware: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  _,
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(BrowseLabwareOverlay)

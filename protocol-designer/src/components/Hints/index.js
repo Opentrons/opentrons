@@ -157,7 +157,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(stepsActions.selectTerminalItem(terminalId)),
 })
 
-export const Hints = connect<Props, {||}, SP, DP, _, _>(
+export const Hints: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(HintsComponent)

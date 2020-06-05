@@ -86,7 +86,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>, ownProps: OP): DP {
   }
 }
 
-export const FlowRateField = connect<Props, OP, SP, DP, _, _>(
+export const FlowRateField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(FlowRateInputWithKey)
