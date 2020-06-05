@@ -4,10 +4,10 @@ import type { WellGroup } from '@opentrons/components'
 // ===== Preselect / select wells in plate
 
 // these actions all use PRIMARY WELLS (see reducers for definition)
-export type HighlightWellsAction = {
+export type HighlightWellsAction = {|
   type: 'HIGHLIGHT_WELLS',
   payload: WellGroup,
-}
+|}
 export const highlightWells = (
   payload: $PropertyType<HighlightWellsAction, 'payload'>
 ): HighlightWellsAction => ({
@@ -15,10 +15,10 @@ export const highlightWells = (
   payload,
 })
 
-export type SelectWellsAction = {
+export type SelectWellsAction = {|
   type: 'SELECT_WELLS',
   payload: WellGroup,
-}
+|}
 export const selectWells = (
   payload: $PropertyType<SelectWellsAction, 'payload'>
 ): SelectWellsAction => ({
@@ -26,10 +26,10 @@ export const selectWells = (
   payload,
 })
 
-export type DeselectWellsAction = {
+export type DeselectWellsAction = {|
   type: 'DESELECT_WELLS',
   payload: WellGroup,
-}
+|}
 export const deselectWells = (
   payload: $PropertyType<DeselectWellsAction, 'payload'>
 ): DeselectWellsAction => ({
@@ -37,9 +37,9 @@ export const deselectWells = (
   payload,
 })
 
-export type DeselectAllWellsAction = {
+export type DeselectAllWellsAction = {|
   type: 'DESELECT_ALL_WELLS',
-}
+|}
 export const deselectAllWells = (): DeselectAllWellsAction => ({
   type: 'DESELECT_ALL_WELLS',
 })

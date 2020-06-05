@@ -75,10 +75,10 @@ const _allReducers = {
   dismissedHints,
 }
 
-export type RootState = {
+export type RootState = {|
   hints: HintReducerState,
   dismissedHints: DismissedHintReducerState,
-}
+|}
 
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers

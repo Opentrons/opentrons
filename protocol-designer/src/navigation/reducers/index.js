@@ -34,10 +34,10 @@ export const _allReducers = {
   newProtocolModal,
 }
 
-export type RootState = {
+export type RootState = {|
   page: Page,
   newProtocolModal: boolean,
-}
+|}
 
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
   _allReducers
