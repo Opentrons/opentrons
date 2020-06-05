@@ -93,7 +93,7 @@ const getSubtitle = (
   const reasonForDisabled = disabledPathMap && disabledPathMap[path]
   return reasonForDisabled || ''
 }
-export const Path = (props: PathFieldProps) => {
+export const Path = (props: PathFieldProps): React.Node => {
   return (
     <FormGroup label="Path">
       <FieldConnector

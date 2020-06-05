@@ -20,7 +20,7 @@ type Props = {
   disabledOptions: ?Set<ChangeTipOptions>,
 }
 
-export const ChangeTip = (props: Props) => {
+export const ChangeTip = (props: Props): React.Node => {
   const { name, disabledOptions } = props
   const options = props.options.map(value => ({
     value,

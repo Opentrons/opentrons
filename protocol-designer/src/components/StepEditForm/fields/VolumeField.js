@@ -14,7 +14,7 @@ type Props = {|
   label: string,
   className: string,
 |}
-export const VolumeField = (props: Props) => (
+export const VolumeField = (props: Props): React.Node => (
   <HoverTooltip
     tooltipComponent={getTooltipForField(props.stepType, 'volume', false)}
     placement="top-start"

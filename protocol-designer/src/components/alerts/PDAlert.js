@@ -14,7 +14,7 @@ type PDAlertProps = {|
   onDismiss?: ?() => mixed,
 |}
 
-export const PDAlert = (props: PDAlertProps) => {
+export const PDAlert = (props: PDAlertProps): React.Node => {
   const { alertType, title, description, onDismiss } = props
   return (
     <AlertItem

@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, type Node } from 'react'
+import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import cx from 'classnames'
 import {
@@ -25,7 +25,7 @@ import { stepIconsByType, type StepType } from '../form-types'
 import styles from './listButtons.css'
 
 type StepButtonComponentProps = {|
-  children: Node,
+  children: React.Node,
   expanded: boolean,
   setExpanded: boolean => mixed,
 |}
@@ -89,7 +89,7 @@ function StepButtonItem(props: StepButtonItemProps) {
   )
 }
 
-export const StepCreationButton = () => {
+export const StepCreationButton = (): React.Node => {
   const currentFormIsPresaved = useSelector(
     stepFormSelectors.getCurrentFormIsPresaved
   )
@@ -103,10 +103,11 @@ export const StepCreationButton = () => {
     thermocycler: getIsModuleOnDeck(modules, THERMOCYCLER_MODULE_TYPE),
   }
 
-  const [expanded, setExpanded] = useState<boolean>(false)
-  const [enqueuedStepType, setEnqueuedStepType] = useState<StepType | null>(
-    null
-  )
+  const [expanded, setExpanded] = React.useState<boolean>(false)
+  const [
+    enqueuedStepType,
+    setEnqueuedStepType,
+  ] = React.useState<StepType | null>(null)
   const dispatch = useDispatch()
 
   const addStep = (stepType: StepType) =>

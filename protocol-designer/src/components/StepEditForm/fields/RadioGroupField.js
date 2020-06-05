@@ -12,7 +12,7 @@ type RadioGroupFieldProps = {|
   className?: string,
 |}
 
-export const RadioGroupField = (props: RadioGroupFieldProps) => {
+export const RadioGroupField = (props: RadioGroupFieldProps): React.Node => {
   const {
     name,
     onFieldFocus,

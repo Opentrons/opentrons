@@ -7,7 +7,7 @@ type Props = {
   pauseArgs: PauseArgs,
 }
 
-export function PauseStepItems(props: Props) {
+export function PauseStepItems(props: Props): React.Node {
   const { pauseArgs } = props
   if (!pauseArgs.meta) {
     // No message or time, show nothing

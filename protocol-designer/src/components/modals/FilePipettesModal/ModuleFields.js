@@ -54,7 +54,7 @@ type Props = {|
   onBlur: (event: SyntheticFocusEvent<HTMLSelectElement>) => mixed,
 |}
 
-export function ModuleFields(props: Props) {
+export function ModuleFields(props: Props): React.Node {
   const {
     onFieldChange,
     onSetFieldValue,

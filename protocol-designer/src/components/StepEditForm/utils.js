@@ -108,7 +108,7 @@ export const getDynamicFieldFocusHandlerId = ({
 }: {|
   id: string,
   name: string,
-|}) => `${id}:${name}`
+|}): string => `${id}:${name}`
 
 export const getVisibleProfileErrors = (args: {|
   focusedField: ?string,

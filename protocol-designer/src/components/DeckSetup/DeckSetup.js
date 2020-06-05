@@ -1,5 +1,5 @@
 // @flow
-import React, { useCallback, useState } from 'react'
+import * as React from 'react'
 import { useSelector } from 'react-redux'
 import compact from 'lodash/compact'
 import values from 'lodash/values'
@@ -172,8 +172,14 @@ const DeckSetupContents = (props: ContentsProps) => {
   // hovered over**. The intrinsic state of `react-dnd` is not designed to handle that.
   // So we need to use our own state here to determine
   // whether swapping will be blocked due to labware<>module compat:
-  const [hoveredLabware, setHoveredLabware] = useState<?LabwareOnDeckType>(null)
-  const [draggedLabware, setDraggedLabware] = useState<?LabwareOnDeckType>(null)
+  const [
+    hoveredLabware,
+    setHoveredLabware,
+  ] = React.useState<?LabwareOnDeckType>(null)
+  const [
+    draggedLabware,
+    setDraggedLabware,
+  ] = React.useState<?LabwareOnDeckType>(null)
 
   const customLabwareDefs = useSelector(
     labwareDefSelectors.getCustomLabwareDefsByURI
@@ -185,7 +191,10 @@ const DeckSetupContents = (props: ContentsProps) => {
     customLabwareDefs,
   })
 
-  const handleHoverEmptySlot = useCallback(() => setHoveredLabware(null), [])
+  const handleHoverEmptySlot = React.useCallback(
+    () => setHoveredLabware(null),
+    []
+  )
 
   const slotsBlockedBySpanning = getSlotsBlockedBySpanning(
     props.initialDeckSetup
@@ -344,7 +353,7 @@ const getHasGen1MultiChannelPipette = (
   )
 }
 
-export const DeckSetup = (props: Props) => {
+export const DeckSetup = (props: Props): React.Node => {
   const _disableCollisionWarnings = useSelector(
     featureFlagSelectors.getDisableModuleRestrictions
   )

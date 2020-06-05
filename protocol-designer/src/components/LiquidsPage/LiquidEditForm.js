@@ -45,7 +45,7 @@ export const liquidEditFormSchema: Yup.Schema<
   serialize: Yup.boolean(),
 })
 
-export function LiquidEditForm(props: Props) {
+export function LiquidEditForm(props: Props): React.Node {
   const { deleteLiquidGroup, cancelForm, canDelete, saveForm } = props
 
   const initialValues: LiquidEditFormValues = {

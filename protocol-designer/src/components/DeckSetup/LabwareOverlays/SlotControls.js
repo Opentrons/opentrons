@@ -1,6 +1,6 @@
 // @flow
 import assert from 'assert'
-import React, { type Node } from 'react'
+import * as React from 'react'
 import { Icon, RobotCoordsForeignDiv } from '@opentrons/components'
 import cx from 'classnames'
 import { connect } from 'react-redux'
@@ -31,7 +31,7 @@ import styles from './LabwareOverlays.css'
 
 type DNDP = {|
   isOver: boolean,
-  connectDropTarget: Node => Node,
+  connectDropTarget: React.Node => React.Node,
   draggedItem: ?{ labwareOnDeck: LabwareOnDeck },
   itemType: string,
 |}
@@ -50,7 +50,7 @@ type SP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
-export const SlotControlsComponent = (props: Props) => {
+export const SlotControlsComponent = (props: Props): React.Node => {
   const {
     slot,
     addLabware,

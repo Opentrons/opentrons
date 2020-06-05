@@ -15,7 +15,7 @@ type ToggleRowProps = {|
   className?: string,
   disabled?: boolean,
 |}
-export const ToggleRowField = (props: ToggleRowProps) => (
+export const ToggleRowField = (props: ToggleRowProps): React.Node => (
   <FieldConnector
     name={props.name}
     render={({ value, updateValue, disabled }) => (

@@ -150,7 +150,7 @@ function getWarningContent({
 }
 
 // TODO (ka 2020-2-26): Update this knowledgebase link when available
-export const v4WarningContent = (
+export const v4WarningContent: React.Node = (
   <div>
     <p>
       {i18n.t(`alert.hint.export_v4_protocol.body1`)}{' '}
@@ -166,7 +166,7 @@ export const v4WarningContent = (
   </div>
 )
 
-export function FileSidebar(props: Props) {
+export function FileSidebar(props: Props): React.Node {
   const {
     canDownload,
     downloadData,

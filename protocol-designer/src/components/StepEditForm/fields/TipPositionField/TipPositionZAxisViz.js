@@ -14,7 +14,7 @@ type Props = {
   wellDepthMm: number,
 }
 
-export const TipPositionZAxisViz = (props: Props) => {
+export const TipPositionZAxisViz = (props: Props): React.Node => {
   const fractionOfWellHeight = props.mmFromBottom / props.wellDepthMm
   const pixelsFromBottom =
     Number(fractionOfWellHeight) * WELL_HEIGHT_PIXELS - WELL_HEIGHT_PIXELS

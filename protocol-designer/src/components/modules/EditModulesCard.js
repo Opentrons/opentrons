@@ -26,7 +26,7 @@ type Props = {
   openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
 }
 
-export function EditModulesCard(props: Props) {
+export function EditModulesCard(props: Props): React.Node {
   const { modules, thermocyclerEnabled, openEditModuleModal } = props
 
   const visibleModules = thermocyclerEnabled

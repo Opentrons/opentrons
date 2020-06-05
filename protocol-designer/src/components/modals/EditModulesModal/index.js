@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { Form, Formik, useFormikContext } from 'formik'
 import cx from 'classnames'
@@ -65,7 +65,7 @@ export type EditModulesFormValues = {|
   selectedSlot: string,
 |}
 
-export const EditModulesModal = (props: EditModulesModalProps) => {
+export const EditModulesModal = (props: EditModulesModalProps): React.Node => {
   const {
     moduleType,
     displayModuleWarning,

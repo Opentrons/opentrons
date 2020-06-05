@@ -14,7 +14,7 @@ type TextFieldProps = {|
 export const TextField = (props: {|
   ...TextFieldProps,
   ...React.ElementProps<typeof InputField>,
-|}) => {
+|}): React.Node => {
   const {
     name,
     focusedField,

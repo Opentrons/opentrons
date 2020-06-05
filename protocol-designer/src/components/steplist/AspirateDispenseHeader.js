@@ -18,7 +18,9 @@ type AspirateDispenseHeaderProps = {
   destLabwareDefDisplayName: ?string,
 }
 
-export function AspirateDispenseHeader(props: AspirateDispenseHeaderProps) {
+export function AspirateDispenseHeader(
+  props: AspirateDispenseHeaderProps
+): React.Node {
   const {
     sourceLabwareNickname,
     sourceLabwareDefDisplayName,

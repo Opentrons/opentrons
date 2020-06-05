@@ -10,7 +10,7 @@ type Props = {|
   close?: boolean,
 |}
 
-export function ConfirmDeleteStepModal(props: Props) {
+export function ConfirmDeleteStepModal(props: Props): React.Node {
   const { close, ...continueModalProps } = props
   return (
     <Portal>

@@ -18,7 +18,7 @@ type Props = {
   targetProps?: ?$ElementType<UseHoverTooltipResult, 0>,
 }
 
-export function IngredPill(props: Props) {
+export function IngredPill(props: Props): React.Node {
   const { ingreds, ingredNames, targetProps } = props
   if (!ingreds || Object.keys(ingreds).length === 0) {
     // Invisible Pill, but has correct height/margin/etc for spacing

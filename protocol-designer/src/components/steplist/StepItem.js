@@ -46,7 +46,7 @@ export type StepItemProps = {|
   children?: React.Node,
 |}
 
-export const StepItem = (props: StepItemProps) => {
+export const StepItem = (props: StepItemProps): React.Node => {
   const {
     stepType,
     stepNumber,
@@ -107,7 +107,7 @@ export type StepItemContentsProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
-export const StepItemContents = (props: StepItemContentsProps) => {
+export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   const {
     rawForm,
     stepType,

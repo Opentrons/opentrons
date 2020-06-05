@@ -1,6 +1,6 @@
 // @flow
 import sortBy from 'lodash/sortBy'
-import React, { type Node, useState } from 'react'
+import * as React from 'react'
 import { i18n } from '../../../localization'
 import { ContinueModal, Card, ToggleButton } from '@opentrons/components'
 import { Portal } from '../../portals/MainPageModalPortal'
@@ -25,8 +25,10 @@ const scrollToTop = () => {
   if (editPage) editPage.scrollTop = 0
 }
 
-export const FeatureFlagCard = (props: Props) => {
-  const [modalFlagName, setModalFlagName] = useState<FlagTypes | null>(null)
+export const FeatureFlagCard = (props: Props): React.Node => {
+  const [modalFlagName, setModalFlagName] = React.useState<FlagTypes | null>(
+    null
+  )
 
   const prereleaseModeEnabled = props.flags.PRERELEASE_MODE === true
 
@@ -40,8 +42,8 @@ export const FeatureFlagCard = (props: Props) => {
     flagName => !userFacingFlags.includes(flagName)
   )
 
-  const getDescription = (flag: FlagTypes): Node => {
-    const RICH_DESCRIPTIONS: { [FlagTypes]: Node } = {
+  const getDescription = (flag: FlagTypes): React.Node => {
+    const RICH_DESCRIPTIONS: { [FlagTypes]: React.Node } = {
       OT_PD_DISABLE_MODULE_RESTRICTIONS: (
         <>
           <p>{i18n.t(`feature_flags.${flag}.description_1`)} </p>

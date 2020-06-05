@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { StepItem } from './StepItem'
 import { PRESAVED_STEP_ID } from '../../steplist/types'
@@ -10,7 +10,7 @@ import {
   actions as stepsActions,
 } from '../../ui/steps'
 
-export const PresavedStepItem = () => {
+export const PresavedStepItem = (): React.Node => {
   const presavedStepForm = useSelector(stepFormSelectors.getPresavedStepForm)
   const stepNumber = useSelector(stepFormSelectors.getOrderedStepIds).length + 1
   const hovered = useSelector(getHoveredTerminalItemId) === PRESAVED_STEP_ID

@@ -1,6 +1,6 @@
 // @flow
 // TODO: Ian 2018-10-09 figure out what belongs in LiquidsSidebar vs IngredientsList after #2427
-import React from 'react'
+import * as React from 'react'
 
 import { IconButton, SidePanel, swatchColors } from '@opentrons/components'
 import { sortWells } from '@opentrons/shared-data'
@@ -160,7 +160,7 @@ type Props = {
   selectedIngredientGroupId: ?string,
 }
 
-export function IngredientsList(props: Props) {
+export function IngredientsList(props: Props): React.Node {
   const {
     labwareWellContents,
     liquidGroupsById,
