@@ -39,3 +39,94 @@ stages:
       method: GET
     response:
       status_code: 404
+
+---
+test_name: Multiple Session Lifecycle
+marks:
+  - usefixtures:
+      - run_server
+strict:
+  - json:off
+stages:
+  - name: Create a null session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: "null"
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id_1: data.id
+
+  - name: Create a calcheck session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: calibrationCheck
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id_2: data.id
+
+  - name: Get all the sessions
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+        - id: "{session_id_1}"
+          type: Session
+          attributes:
+            sessionType: "null"
+        - id: "{session_id_2}"
+          type: Session
+          attributes:
+            sessionType: "calibrationCheck"
+
+  - name: Get just the calcheck sessions
+    request:
+      url: "{host:s}:{port:d}/sessions?session_type=calibrationCheck"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data:
+        - id: "{session_id_2}"
+          type: Session
+          attributes:
+            sessionType: "calibrationCheck"
+
+  - name: Delete session 1
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id_1}"
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: Delete session 2
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id_2}"
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: Get all the sessions and there are none
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data: []

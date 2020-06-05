@@ -1,5 +1,6 @@
 from robot_server.service.session.models import CommandName, CommandDataType
 from .command import Command
+from ..errors import UnsupportedFeature
 
 
 class CommandQueue:
@@ -8,16 +9,16 @@ class CommandQueue:
     async def enqueue(self, command: CommandName, data: CommandDataType) \
             -> Command:
         """Enqueue a command for later execution"""
-        raise NotImplementedError()
+        raise UnsupportedFeature()
 
     async def start(self):
-        raise NotImplementedError()
+        raise UnsupportedFeature()
 
     async def stop(self):
-        raise NotImplementedError()
+        raise UnsupportedFeature()
 
     async def pause(self):
-        raise NotImplementedError()
+        raise UnsupportedFeature()
 
     async def resume(self):
-        raise NotImplementedError()
+        raise UnsupportedFeature()
