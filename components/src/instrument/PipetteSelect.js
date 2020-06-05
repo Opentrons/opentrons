@@ -140,10 +140,10 @@ const dataIdFormat = (
   channels: number,
   displayCategory: string
 ): string => {
+  const dataIdFormatVolumeClass = volumeClass.toLowerCase()
   const dataIdFormatChannels = channels === 1 ? 'SingleChannel' : 'MultiChannel'
-  const dataIdVolumeClass = volumeClass.toLowerCase()
-  const dataIdDisplayCategory =
+  const dataIdFormatDisplayCategory =
     displayCategory.charAt(0) + displayCategory.slice(1).toLowerCase()
 
-  return `${componentName}_${dataIdVolumeClass}${dataIdFormatChannels}${dataIdDisplayCategory}`
+  return `${componentName}_${dataIdFormatVolumeClass}${dataIdFormatChannels}${dataIdFormatDisplayCategory}`
 }
