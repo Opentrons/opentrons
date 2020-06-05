@@ -4,6 +4,8 @@ import mapValues from 'lodash/mapValues'
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import { userFacingFlags, DEPRECATED_FLAGS, type Flags } from './types'
+
+import type { Reducer } from 'redux'
 import type { RehydratePersistedAction } from '../persist'
 import type { SetFeatureFlagAction } from './actions'
 import type { Action } from '../types'
@@ -25,7 +27,8 @@ const initialFlags: Flags = {
     process.env.OT_PD_ENABLE_THERMOCYCLER === '1' || false,
 }
 
-const flags = handleActions<Flags, any>(
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const flags: Reducer<Flags, any> = handleActions(
   {
     SET_FEATURE_FLAGS: (state: Flags, action: SetFeatureFlagAction): Flags => {
       const nextState = { ...state, ...action.payload }
@@ -54,8 +57,10 @@ export const _allReducers = {
   flags,
 }
 
-export type RootState = {
+export type RootState = {|
   flags: Flags,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)

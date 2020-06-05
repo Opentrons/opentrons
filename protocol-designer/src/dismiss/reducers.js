@@ -2,8 +2,11 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 import omit from 'lodash/omit'
-import type { DismissFormWarning, DismissTimelineWarning } from './actions'
+
 import { getPDMetadata } from '../file-types'
+
+import type { Reducer } from 'redux'
+import type { DismissFormWarning, DismissTimelineWarning } from './actions'
 import type { BaseState, Action } from '../types'
 import type { LoadFileAction } from '../load-file'
 import type { DeleteStepAction } from '../steplist/actions'
@@ -13,12 +16,15 @@ export type WarningType = string
 
 export type DismissedWarningsAllSteps = {
   [stepId: StepIdType]: ?Array<WarningType>,
+  ...,
 }
-export type DismissedWarningState = {
+export type DismissedWarningState = {|
   form: DismissedWarningsAllSteps,
   timeline: DismissedWarningsAllSteps,
-}
-const dismissedWarnings = handleActions<DismissedWarningState, *>(
+|}
+
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const dismissedWarnings: Reducer<DismissedWarningState, any> = handleActions(
   {
     DISMISS_FORM_WARNING: (
       state: DismissedWarningState,
@@ -79,10 +85,12 @@ export const _allReducers = {
   dismissedWarnings,
 }
 
-export type RootState = {
+export type RootState = {|
   dismissedWarnings: DismissedWarningState,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)
 
-export const rootSelector = (state: BaseState) => state.dismiss
+export const rootSelector = (state: BaseState): RootState => state.dismiss

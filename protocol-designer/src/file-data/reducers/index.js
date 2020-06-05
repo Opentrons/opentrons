@@ -1,10 +1,10 @@
 // @flow
 import { combineReducers } from 'redux'
-import { handleActions, type ActionType } from 'redux-actions'
+import { handleActions } from 'redux-actions'
 
-import { saveFileMetadata } from '../actions'
+import type { Reducer } from 'redux'
 import type { Action } from '../../types'
-import type { FileMetadataFields } from '../types'
+import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 
 const defaultFields = {
@@ -47,7 +47,7 @@ const fileMetadata = handleActions(
     CREATE_NEW_PROTOCOL: newProtocolMetadata,
     SAVE_FILE_METADATA: (
       state: FileMetadataFields,
-      action: ActionType<typeof saveFileMetadata>
+      action: SaveFileMetadataAction
     ): FileMetadataFields => ({
       ...state,
       ...action.payload,
@@ -60,14 +60,16 @@ const fileMetadata = handleActions(
   defaultFields
 )
 
-export type RootState = {
+export type RootState = {|
   currentProtocolExists: boolean,
   fileMetadata: FileMetadataFields,
-}
+|}
 
 const _allReducers = {
   currentProtocolExists,
   fileMetadata,
 }
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)

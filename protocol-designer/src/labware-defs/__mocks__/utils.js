@@ -25,14 +25,15 @@ assert(
   `no labware fixtures found, is the path correct? ${LABWARE_FIXTURE_PATTERN}`
 )
 
-export const getAllDefinitions = jest.fn<Array<void>, LabwareDefByDefURI>(
+export const getAllDefinitions: JestMockFn<[], LabwareDefByDefURI> = jest.fn(
   () => allLabware
 )
 
-export const _getSharedLabware = jest.fn<Array<string>, ?LabwareDefinition2>(
-  () => null
-)
+export const _getSharedLabware: JestMockFn<
+  [string],
+  ?LabwareDefinition2
+> = jest.fn(() => null)
 
-export const getOnlyLatestDefs = jest.fn<Array<void>, any>(() => {
+export const getOnlyLatestDefs: JestMockFn<[], empty> = jest.fn(() => {
   throw Error('getOnlyLatestDefs should not be used directly')
 })

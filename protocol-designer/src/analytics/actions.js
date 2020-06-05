@@ -20,5 +20,5 @@ const _setOptIn = (payload: $PropertyType<SetOptIn, 'payload'>): SetOptIn => {
   }
 }
 
-export const optIn = () => _setOptIn(true)
-export const optOut = () => _setOptIn(false)
+export const optIn = (): SetOptIn => _setOptIn(true)
+export const optOut = (): SetOptIn => _setOptIn(false)

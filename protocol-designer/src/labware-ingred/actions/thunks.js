@@ -3,18 +3,18 @@ import assert from 'assert'
 import { uuid } from '../../utils'
 import { selectors as stepFormSelectors } from '../../step-forms'
 import { selectors as uiLabwareSelectors } from '../../ui/labware'
+import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
+
 import type {
   CreateContainerArgs,
   CreateContainerAction,
   DuplicateLabwareAction,
 } from './actions'
-import type { GetState, ThunkDispatch } from '../../types'
-import { getNextAvailableDeckSlot, getNextNickname } from '../utils'
+import type { ThunkAction } from '../../types'
 
-export const createContainer = (args: CreateContainerArgs) => (
-  dispatch: ThunkDispatch<CreateContainerAction>,
-  getState: GetState
-) => {
+export const createContainer: (
+  args: CreateContainerArgs
+) => ThunkAction<CreateContainerAction> = args => (dispatch, getState) => {
   const state = getState()
   const initialDeckSetup = stepFormSelectors.getInitialDeckSetup(state)
   const slot = args.slot || getNextAvailableDeckSlot(initialDeckSetup)
@@ -32,9 +32,11 @@ export const createContainer = (args: CreateContainerArgs) => (
   }
 }
 
-export const duplicateLabware = (templateLabwareId: string) => (
-  dispatch: ThunkDispatch<DuplicateLabwareAction>,
-  getState: GetState
+export const duplicateLabware: (
+  templateLabwareId: string
+) => ThunkAction<DuplicateLabwareAction> = templateLabwareId => (
+  dispatch,
+  getState
 ) => {
   const state = getState()
   const templateLabwareDefURI = stepFormSelectors.getLabwareEntities(state)[
@@ -79,9 +81,9 @@ export type RenameLabwareAction = {
   },
 }
 
-export const renameLabware = (
+export const renameLabware: (
   args: $PropertyType<RenameLabwareAction, 'payload'>
-) => (dispatch: ThunkDispatch<RenameLabwareAction>, getState: GetState) => {
+) => ThunkAction<RenameLabwareAction> = args => (dispatch, getState) => {
   const { labwareId } = args
   const state = getState()
 

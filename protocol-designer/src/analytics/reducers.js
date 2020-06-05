@@ -2,13 +2,16 @@
 import { combineReducers } from 'redux'
 import { handleActions } from 'redux-actions'
 
+import type { Reducer } from 'redux'
 import type { Action } from '../types'
 import type { SetOptIn } from './actions'
 import type { RehydratePersistedAction } from '../persist'
 
 type OptInState = boolean | null
 const optInInitialState = null
-const hasOptedIn = handleActions(
+
+// NOTE(mc, 2020-06-04): `handleActions` cannot be strictly typed
+const hasOptedIn: Reducer<OptInState, any> = handleActions(
   {
     SET_OPT_IN: (state: OptInState, action: SetOptIn): OptInState =>
       action.payload,
@@ -27,8 +30,10 @@ const _allReducers = {
   hasOptedIn,
 }
 
-export type RootState = {
+export type RootState = {|
   hasOptedIn: OptInState,
-}
+|}
 
-export const rootReducer = combineReducers<_, Action>(_allReducers)
+export const rootReducer: Reducer<RootState, Action> = combineReducers(
+  _allReducers
+)
