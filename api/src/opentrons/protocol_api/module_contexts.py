@@ -84,17 +84,17 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
 
         :param name: The name of the labware object.
         :param str label: An optional special name to give the labware. If
-                          specified, this is the name the labware will appear
-                          as in the run log and the calibration view in the
-                          Opentrons app.
-        .. versionadded:: 2.1
+            specified, this is the name the labware will appear as in the run
+            log and the calibration view in the Opentrons app.
         :param str namespace: The namespace the labware definition belongs to.
             If unspecified, will search 'opentrons' then 'custom_beta'
-        .. versionadded:: 2.1
         :param int version: The version of the labware definition. If
             unspecified, will use version 1.
-        .. versionadded:: 2.1
+
         :returns: The initialized and loaded labware object.
+
+        .. versionadded:: 2.1
+            The *label,* *namespace,* and *version* parameters.
         """
         if self.api_version < APIVersion(2, 1) and\
                 (label or namespace or version):
@@ -333,10 +333,12 @@ class MagneticModuleContext(ModuleContext[ModuleGeometry]):
 
         :param height_from_base: The height to raise the magnets to, in mm from
                                  the base of the labware
-        .. versionadded:: 2.1
         :param height: The height to raise the magnets to, in mm from home.
         :param offset: An offset relative to the default height for the labware
                        in mm
+
+        .. versionadded:: 2.1
+            The *height_from_base* parameter.
         """
         if height is not None:
             dist = height
