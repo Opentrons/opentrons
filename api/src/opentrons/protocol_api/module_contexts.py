@@ -489,6 +489,7 @@ class ThermocyclerContext(ModuleContext[ThermocyclerGeometry]):
         :param block_max_volume: The maximum volume of any individual well
                                  of the loaded labware. If not supplied,
                                  the thermocycler will default to 25µL/well.
+
         .. note:
 
             If ``hold_time_minutes`` and ``hold_time_seconds`` are not
