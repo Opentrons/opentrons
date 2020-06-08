@@ -15,7 +15,8 @@
   ],
   "brand": {
     "brand": "Eppendorf",
-    "brandId": ["0030129512"]
+    "brandId": ["0030129512"],
+    "links": ["https://online-shop.eppendorf.us/US-en/eshopproduct/view/0030129512.html"]
   },
   "metadata": {
     "displayName": "Eppendorf twin.tec PCR plate 96 LoBind skirted",
