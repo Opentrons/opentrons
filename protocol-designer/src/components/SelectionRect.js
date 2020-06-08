@@ -79,9 +79,7 @@ export class SelectionRect extends React.Component<Props, State> {
     )
   }
 
-  getRect(
-    args: DragRect
-  ): {| x0: number, x1: number, y0: number, y1: number |} {
+  getRect(args: DragRect): GenericRect {
     const { xStart, yStart, xDynamic, yDynamic } = args
     // convert internal rect position to more generic form
     // TODO should this be used in renderRect?
