@@ -1,6 +1,6 @@
 import asyncio
 import logging
-from typing import Any, Dict, Generic, List, Optional, TYPE_CHECKING, TypeVar
+from typing import Generic, List, Optional, TYPE_CHECKING, TypeVar
 
 from opentrons import types, commands as cmds
 from opentrons.hardware_control import modules
@@ -16,6 +16,7 @@ from .util import requires_version
 
 if TYPE_CHECKING:
     from .protocol_context import ProtocolContext
+    from opentrons_shared_data.labware.dev_types import (LabwareDefinition)
 
 ENGAGE_HEIGHT_UNIT_CNV = 2
 STANDARD_MAGDECK_LABWARE = [
@@ -109,7 +110,7 @@ class ModuleContext(CommandPublisher, Generic[GeometryType]):  # noqa(E302)
     @requires_version(2, 0)
     def load_labware_from_definition(
             self,
-            definition: Dict[str, Any],
+            definition: 'LabwareDefinition',
             label: str = None) -> Labware:
         """
         Specify the presence of a labware on the module, using an

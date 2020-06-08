@@ -19,7 +19,12 @@ import opentrons.protocol_api.execute_v4 as v4
 from opentrons.protocol_api import MagneticModuleContext, \
     TemperatureModuleContext, ThermocyclerContext, \
     ProtocolContext, execute
-from opentrons.protocol_api.constants import JsonCommand
+from opentrons_shared_data.protocol.constants import (
+    JsonPipetteCommand as JPC,
+    JsonMagneticModuleCommand as JMMC,
+    JsonTemperatureModuleCommand as JTMC,
+    JsonThermocyclerCommand as JTHC
+)
 
 
 # autouse set to True to setup/teardown mock after each run
@@ -33,12 +38,12 @@ def mockObj():
 @pytest.fixture
 def pipette_command_map(mockObj):
     mock_pipette_command_map = {
-        JsonCommand.blowout.value: mockObj._blowout,
-        JsonCommand.pickUpTip.value: mockObj._pick_up_tip,
-        JsonCommand.dropTip.value: mockObj._drop_tip,
-        JsonCommand.aspirate.value: mockObj._aspirate,
-        JsonCommand.dispense.value: mockObj._dispense,
-        JsonCommand.touchTip.value: mockObj._touch_tip,
+        JPC.blowout.value: mockObj._blowout,
+        JPC.pickUpTip.value: mockObj._pick_up_tip,
+        JPC.dropTip.value: mockObj._drop_tip,
+        JPC.aspirate.value: mockObj._aspirate,
+        JPC.dispense.value: mockObj._dispense,
+        JPC.touchTip.value: mockObj._touch_tip,
     }
     return mock_pipette_command_map
 
@@ -46,9 +51,9 @@ def pipette_command_map(mockObj):
 @pytest.fixture
 def magnetic_module_command_map(mockObj):
     mock_magnetic_module_command_map = {
-        JsonCommand.magneticModuleEngageMagnet.value:
+        JMMC.magneticModuleEngageMagnet.value:
         mockObj._engage_magnet,
-        JsonCommand.magneticModuleDisengageMagnet.value:
+        JMMC.magneticModuleDisengageMagnet.value:
         mockObj._disengage_magnet,
     }
 
@@ -58,11 +63,11 @@ def magnetic_module_command_map(mockObj):
 @pytest.fixture
 def temperature_module_command_map(mockObj):
     mock_temperature_module_command_map = {
-        JsonCommand.temperatureModuleSetTargetTemperature.value:
+        JTMC.temperatureModuleSetTargetTemperature.value:
         mockObj._temperature_module_set_temp,
-        JsonCommand.temperatureModuleDeactivate.value:
+        JTMC.temperatureModuleDeactivate.value:
         mockObj._temperature_module_deactivate,
-        JsonCommand.temperatureModuleAwaitTemperature.value:
+        JTMC.temperatureModuleAwaitTemperature.value:
         mockObj._temperature_module_await_temp
     }
     return mock_temperature_module_command_map
@@ -71,28 +76,28 @@ def temperature_module_command_map(mockObj):
 @pytest.fixture
 def thermocycler_module_command_map(mockObj):
     mock_thermocycler_module_command_map = {
-        JsonCommand.thermocyclerCloseLid.value:
+        JTHC.thermocyclerCloseLid.value:
             mockObj._thermocycler_close_lid,
-        JsonCommand.thermocyclerOpenLid.value:
+        JTHC.thermocyclerOpenLid.value:
             mockObj._thermocycler_open_lid,
-        JsonCommand.thermocyclerDeactivateBlock.value:
+        JTHC.thermocyclerDeactivateBlock.value:
             mockObj._thermocycler_deactivate_block,
-        JsonCommand.thermocyclerDeactivateLid.value:
+        JTHC.thermocyclerDeactivateLid.value:
             mockObj._thermocycler_deactivate_lid,
-        JsonCommand.thermocyclerSetTargetBlockTemperature.value:
+        JTHC.thermocyclerSetTargetBlockTemperature.value:
             mockObj._thermocycler_set_block_temperature,
-        JsonCommand.thermocyclerSetTargetLidTemperature.value:
+        JTHC.thermocyclerSetTargetLidTemperature.value:
             mockObj._thermocycler_set_lid_temperature,
-        JsonCommand.thermocyclerRunProfile.value:
+        JTHC.thermocyclerRunProfile.value:
             mockObj._thermocycler_run_profile,
         # NOTE: the thermocyclerAwaitX commands are expected to always
         # follow a corresponding SetX command, which is implemented as
         # blocking. Then nothing needs to be done for awaitX commands.
-        JsonCommand.thermocyclerAwaitBlockTemperature.value: \
+        JTHC.thermocyclerAwaitBlockTemperature.value: \
             mockObj.tc_do_nothing,
-        JsonCommand.thermocyclerAwaitLidTemperature.value: \
+        JTHC.thermocyclerAwaitLidTemperature.value: \
             mockObj.tc_do_nothing,
-        JsonCommand.thermocyclerAwaitProfileComplete.value: \
+        JTHC.thermocyclerAwaitProfileComplete.value: \
             mockObj.tc_do_nothing
     }
     return mock_thermocycler_module_command_map

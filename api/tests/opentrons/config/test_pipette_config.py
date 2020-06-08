@@ -6,7 +6,7 @@ import pytest
 from opentrons import types
 
 from opentrons.config import pipette_config, feature_flags as ff, CONFIG
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 
 
 defs = json.loads(
@@ -283,7 +283,7 @@ async def test_override(attached_pipettes):
 
     test_id = attached_pipettes['left']['id']
     # Check data has not been changed yet
-    c = pipette_config.load_config_dict(test_id)
+    c, _ = pipette_config.load_config_dict(test_id)
     assert c['pickUpCurrent'] == \
         pipette_config.list_mutable_configs(
             pipette_id=test_id)['pickUpCurrent']
@@ -291,7 +291,7 @@ async def test_override(attached_pipettes):
     # Check that data is changed and matches the changes specified
     pipette_config.override(pipette_id=test_id, fields=changes)
 
-    c = pipette_config.load_config_dict(test_id)
+    c, _ = pipette_config.load_config_dict(test_id)
     assert c['pickUpCurrent']['value'] == changes['pickUpCurrent']
 
     # Check that None reverts a setting to default
@@ -301,7 +301,7 @@ async def test_override(attached_pipettes):
     # Check that data is changed and matches the changes specified
     pipette_config.override(pipette_id=test_id, fields=changes2)
 
-    c = pipette_config.load_config_dict(test_id)
+    c, _ = pipette_config.load_config_dict(test_id)
     assert c['pickUpCurrent']['value'] == \
         pipette_config.list_mutable_configs(
             pipette_id=test_id)['pickUpCurrent']['default']

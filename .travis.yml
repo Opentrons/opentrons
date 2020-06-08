@@ -68,7 +68,7 @@ jobs:
         # push to real pypi on tag
         - provider: script
           skip_cleanup: true
-          script: make -C api deploy pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD}
+          script: make deploy-py pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD} twine_repository_url="https://upload.pypi.org/legacy/"
           on:
             all_branches: true
             condition: $TRAVIS_TAG =~ ^v
@@ -77,7 +77,7 @@ jobs:
         # push to test pypi on pr
         - provider: script
           skip_cleanup: true
-          script: make -C api deploy-staging pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD}
+          script: make deploy-py pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD} twine_repository_url="https://test.pypi.org/legacy/"
           on:
             repo: Opentrons/opentrons
             branch: edge

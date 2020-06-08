@@ -46,6 +46,7 @@ br_ssh_key ?= $(default_ssh_key)
 ssh_opts ?= $(default_ssh_opts)
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
+twine_repository_url ?= $(pypi_test_upload_url)
 
 # Source discovery
 # For the python sources
@@ -147,16 +148,9 @@ push: push-no-restart
 simulate:
 	-$(python) -m opentrons.simulate -l $(sim_log_level) $(simfile)
 
-.PHONY: deploy-staging
-deploy-staging: wheel
-	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
-                             $(twine_auth_args)\
-                             $(wheel_file)
-
 .PHONY: deploy
 deploy: wheel
-	$(python) -m twine upload $(twine_auth_args)\
-                            $(wheel_file)
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term

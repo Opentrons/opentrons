@@ -1,11 +1,18 @@
 """ Classes and functions for pipette state tracking
 """
+from dataclasses import asdict, replace
 import logging
-from typing import Any, Dict, Optional, Tuple, Union
+from typing import Any, Dict, Optional, Tuple, Union, TYPE_CHECKING
 
 from opentrons.types import Point
 from opentrons.config import pipette_config
 from .types import CriticalPoint
+from opentrons_shared_data.pipette import name_for_model
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.pipette.dev_types import (
+        PipetteModel, UlPerMmAction
+    )
 
 mod_log = logging.getLogger(__name__)
 
@@ -21,11 +28,11 @@ class Pipette:
     #: The type of this data class as a dict
 
     def __init__(self,
-                 model: str,
+                 model: 'PipetteModel',
                  inst_offset_config: Dict[str, Tuple[float, float, float]],
                  pipette_id: str = None) -> None:
         self._config = pipette_config.load(model, pipette_id)
-        self._name = pipette_config.name_for_model(model)
+        self._name = name_for_model(model)
         self._model = model
         self._model_offset = self._config.model_offset
         self._current_volume = 0.0
@@ -36,7 +43,7 @@ class Pipette:
         self._tip_overlap_map = self._config.tip_overlap
         self._has_tip = False
         self._pipette_id = pipette_id
-        pip_type = 'multi' if self._config.channels > 1 else 'single'
+        pip_type = 'multi' if self._config.channels == 8 else 'single'
         self._instrument_offset = Point(*inst_offset_config[pip_type])
         self._log = mod_log.getChild(self._pipette_id
                                      if self._pipette_id else '<unknown>')
@@ -50,7 +57,7 @@ class Pipette:
         self._instrument_offset = new_offset
 
     @property
-    def config(self) -> pipette_config.pipette_config:
+    def config(self) -> pipette_config.PipetteConfig:
         return self._config
 
     @property
@@ -59,7 +66,8 @@ class Pipette:
 
     def update_config_item(self, elem_name: str, elem_val: Any):
         self._log.info("updated config: {}={}".format(elem_name, elem_val))
-        self._config = self._config._replace(**{elem_name: elem_val})
+        self._config = replace(self._config,
+                               **{elem_name: elem_val})
 
     @property
     def name(self) -> str:
@@ -198,7 +206,7 @@ class Pipette:
     def has_tip(self) -> bool:
         return self._has_tip
 
-    def ul_per_mm(self, ul: float, action: str) -> float:
+    def ul_per_mm(self, ul: float, action: 'UlPerMmAction') -> float:
         sequence = self._config.ul_per_mm[action]
         return pipette_config.piecewise_volume_conversion(ul, sequence)
 
@@ -215,7 +223,7 @@ class Pipette:
                                     id(self))
 
     def as_dict(self) -> 'Pipette.DictType':
-        config_dict = self.config._asdict()
+        config_dict = asdict(self.config)
         config_dict.update({'current_volume': self.current_volume,
                             'available_volume': self.available_volume,
                             'name': self.name,

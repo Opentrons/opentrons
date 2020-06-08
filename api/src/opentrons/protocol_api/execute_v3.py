@@ -1,17 +1,27 @@
 import logging
-from typing import Any, Dict
+from typing import Dict, TYPE_CHECKING
 
 from .contexts import ProtocolContext, InstrumentContext
-from .constants import JsonCommand
 from . import labware
 from opentrons.types import Point, Location
+from opentrons_shared_data.protocol.constants import (
+    JsonPipetteCommand, JsonRobotCommand)
+
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.protocol.dev_types import (
+        JsonProtocolV3, JsonProtocol,
+        PipetteAccessParams, StandardLiquidHandlingParams,
+        DelayParams, FlowRateParams, TouchTipParams,
+        PipetteAccessWithOffsetParams, BlowoutParams, MoveToSlotParams)
+    from .dev_types import JsonV3Dispatch
 
 MODULE_LOG = logging.getLogger(__name__)
 
 
 def load_pipettes_from_json(
         ctx: ProtocolContext,
-        protocol: Dict[Any, Any]) -> Dict[str, InstrumentContext]:
+        protocol: 'JsonProtocol') -> Dict[str, InstrumentContext]:
     pipette_data = protocol['pipettes']
     pipettes_by_id = {}
     for pipette_id, props in pipette_data.items():
@@ -24,7 +34,7 @@ def load_pipettes_from_json(
 
 
 def _get_well(loaded_labware: Dict[str, labware.Labware],
-              params: Dict[str, Any]) -> labware.Well:
+              params: 'PipetteAccessParams') -> labware.Well:
     labwareId = params['labware']
     well = params['well']
     plate = loaded_labware[labwareId]
@@ -34,7 +44,9 @@ def _get_well(loaded_labware: Dict[str, labware.Labware],
 # TODO (Ian 2019-04-05) once Pipette commands allow flow rate as an
 # absolute value (not % value) as an argument in
 # aspirate/dispense/blowout/air_gap fns, remove this
-def _set_flow_rate(pipette: InstrumentContext, params: Dict[str, Any]) -> None:
+def _set_flow_rate(
+        pipette: InstrumentContext,
+        params: 'FlowRateParams') -> None:
     """
     Set flow rate in uL/mm, to value obtained from command's params.
     """
@@ -50,7 +62,7 @@ def _set_flow_rate(pipette: InstrumentContext, params: Dict[str, Any]) -> None:
 
 def load_labware_from_json_defs(
         ctx: ProtocolContext,
-        protocol: Dict[Any, Any]) -> Dict[str, labware.Labware]:
+        protocol: 'JsonProtocolV3') -> Dict[str, labware.Labware]:
     protocol_labware = protocol['labware']
     definitions = protocol['labwareDefinitions']
     loaded_labware = {}
@@ -65,8 +77,9 @@ def load_labware_from_json_defs(
     return loaded_labware
 
 
-def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
-                              params: Dict[str, Any]) -> Location:
+def _get_location_with_offset(
+        loaded_labware: Dict[str, labware.Labware],
+        params: 'PipetteAccessWithOffsetParams') -> Location:
     well = _get_well(loaded_labware, params)
 
     # Never move to the bottom of the fixed trash
@@ -78,7 +91,7 @@ def _get_location_with_offset(loaded_labware: Dict[str, labware.Labware],
     return bottom.move(Point(z=offset_from_bottom))
 
 
-def _delay(context: ProtocolContext, params: Dict[str, Any]) -> None:
+def _delay(context: ProtocolContext, params: 'DelayParams') -> None:
     wait = params['wait']
     message = params.get('message')
     if wait is None or wait is False:
@@ -92,8 +105,7 @@ def _delay(context: ProtocolContext, params: Dict[str, Any]) -> None:
 
 def _blowout(instruments: Dict[str, InstrumentContext],
              loaded_labware: Dict[str, labware.Labware],
-             params: Dict[str, Any]
-             ) -> None:
+             params: 'BlowoutParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -103,8 +115,7 @@ def _blowout(instruments: Dict[str, InstrumentContext],
 
 def _pick_up_tip(instruments: Dict[str, InstrumentContext],
                  loaded_labware: Dict[str, labware.Labware],
-                 params: Dict[str, Any]
-                 ) -> None:
+                 params: 'PipetteAccessParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -113,8 +124,7 @@ def _pick_up_tip(instruments: Dict[str, InstrumentContext],
 
 def _drop_tip(instruments: Dict[str, InstrumentContext],
               loaded_labware: Dict[str, labware.Labware],
-              params: Dict[str, Any]
-              ) -> None:
+              params: 'PipetteAccessParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     well = _get_well(loaded_labware, params)
@@ -123,8 +133,7 @@ def _drop_tip(instruments: Dict[str, InstrumentContext],
 
 def _aspirate(instruments: Dict[str, InstrumentContext],
               loaded_labware: Dict[str, labware.Labware],
-              params: Dict[str, Any]
-              ) -> None:
+              params: 'StandardLiquidHandlingParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -135,8 +144,7 @@ def _aspirate(instruments: Dict[str, InstrumentContext],
 
 def _dispense(instruments: Dict[str, InstrumentContext],
               loaded_labware: Dict[str, labware.Labware],
-              params: Dict[str, Any]
-              ) -> None:
+              params: 'StandardLiquidHandlingParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -147,8 +155,7 @@ def _dispense(instruments: Dict[str, InstrumentContext],
 
 def _touch_tip(instruments: Dict[str, InstrumentContext],
                loaded_labware: Dict[str, labware.Labware],
-               params: Dict[str, Any]
-               ) -> None:
+               params: 'TouchTipParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     location = _get_location_with_offset(loaded_labware, params)
@@ -160,8 +167,7 @@ def _touch_tip(instruments: Dict[str, InstrumentContext],
 
 def _move_to_slot(context: ProtocolContext,
                   instruments: Dict[str, InstrumentContext],
-                  params: Dict[str, Any]
-                  ) -> None:
+                  params: 'MoveToSlotParams') -> None:
     pipette_id = params['pipette']
     pipette = instruments[pipette_id]
     slot = params['slot']
@@ -182,31 +188,31 @@ def _move_to_slot(context: ProtocolContext,
         minimum_z_height=params.get('minimumZHeight'))
 
 
-dispatcher_map: Dict[str, Any] = {
-    JsonCommand.delay.value: _delay,
-    JsonCommand.blowout.value: _blowout,
-    JsonCommand.pickUpTip.value: _pick_up_tip,
-    JsonCommand.dropTip.value: _drop_tip,
-    JsonCommand.aspirate.value: _aspirate,
-    JsonCommand.dispense.value: _dispense,
-    JsonCommand.touchTip.value: _touch_tip,
-    JsonCommand.moveToSlot.value: _move_to_slot
+dispatcher_map: 'JsonV3Dispatch' = {
+    JsonRobotCommand.delay.value: _delay,
+    JsonPipetteCommand.blowout.value: _blowout,
+    JsonPipetteCommand.pickUpTip.value: _pick_up_tip,
+    JsonPipetteCommand.dropTip.value: _drop_tip,
+    JsonPipetteCommand.aspirate.value: _aspirate,
+    JsonPipetteCommand.dispense.value: _dispense,
+    JsonPipetteCommand.touchTip.value: _touch_tip,
+    JsonPipetteCommand.moveToSlot.value: _move_to_slot
 }
 
 
 def dispatch_json(context: ProtocolContext,
-                  protocol_data: Dict[Any, Any],
+                  protocol_data: 'JsonProtocolV3',
                   instruments: Dict[str, InstrumentContext],
                   loaded_labware: Dict[str, labware.Labware]) -> None:
     commands = protocol_data['commands']
 
     pipette_commands = {
-        JsonCommand.blowout.value,
-        JsonCommand.pickUpTip.value,
-        JsonCommand.dropTip.value,
-        JsonCommand.aspirate.value,
-        JsonCommand.dispense.value,
-        JsonCommand.touchTip.value,
+        JsonPipetteCommand.blowout.value,
+        JsonPipetteCommand.pickUpTip.value,
+        JsonPipetteCommand.dropTip.value,
+        JsonPipetteCommand.aspirate.value,
+        JsonPipetteCommand.dispense.value,
+        JsonPipetteCommand.touchTip.value,
     }
 
     for command_item in commands:
@@ -215,13 +221,13 @@ def dispatch_json(context: ProtocolContext,
 
         # different `_command` helpers take different args
         if command_type in pipette_commands:
+            dispatcher_map[command_type](  # type: ignore
+                instruments, loaded_labware, params)  # type: ignore
+        elif command_type == JsonRobotCommand.delay.value:
+            dispatcher_map[command_type](context, params)  # type: ignore
+        elif command_type == JsonPipetteCommand.moveToSlot.value:
             dispatcher_map[command_type](
-                instruments, loaded_labware, params)
-        elif command_type == 'delay':
-            dispatcher_map[command_type](context, params)
-        elif command_type == 'moveToSlot':
-            dispatcher_map[command_type](
-                context, instruments, params)
+                context, instruments, params)  # type: ignore
         else:
             raise RuntimeError(
                 "Unsupported command type {}".format(command_type))

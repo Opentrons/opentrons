@@ -1,7 +1,7 @@
 import asyncio
 from contextlib import contextmanager, ExitStack
 import logging
-from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING
+from typing import Any, Dict, List, Optional, Tuple, TYPE_CHECKING, Union
 try:
     import aionotify  # type: ignore
 except OSError:
@@ -10,6 +10,7 @@ except OSError:
 from opentrons.drivers.smoothie_drivers import driver_3_0
 from opentrons.drivers.rpi_drivers import build_gpio_chardev
 import opentrons.config
+from opentrons.config.pipette_config import config_models
 from opentrons.types import Mount
 
 from . import modules
@@ -17,9 +18,12 @@ from .execution_manager import ExecutionManager
 from .types import BoardRevision
 
 if TYPE_CHECKING:
-    from .dev_types import RegisterModules  # noqa (F501)
+    from opentrons_shared_data.pipette.dev_types import (
+        PipetteModel, PipetteName
+    )
+    from .dev_types import RegisterModules, AttachedInstrument  # noqa (F501)
     from opentrons.drivers.rpi_drivers.dev_types\
-        import GPIODriverLike  # noqa(F501)
+        import GPIODriverLike # noqa(F501)
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -108,8 +112,8 @@ class Controller:
         return self._smoothie_driver.fast_home(axis, margin)
 
     def get_attached_instruments(
-            self, expected: Dict[Mount, str])\
-            -> Dict[Mount, Dict[str, Optional[str]]]:
+            self, expected: Dict[Mount, Union['PipetteModel', 'PipetteName']])\
+            -> Dict[Mount, 'AttachedInstrument']:
         """ Find the instruments attached to our mounts.
         :param expected: is ignored, it is just meant to enforce
                           the same interface as the simulator, where
@@ -120,10 +124,16 @@ class Controller:
             `None`) and 'id' (containing the serial number of the pipette
             attached to that mount, or `None`).
         """
-        to_return: Dict[Mount, Dict[str, Optional[str]]] = {}
+        to_return: Dict[Mount, 'AttachedInstrument'] = {}
         for mount in Mount:
-            found_model = self._smoothie_driver.read_pipette_model(
-                mount.name.lower())
+            found_model: 'PipetteModel'\
+                = self._smoothie_driver.read_pipette_model(  # type: ignore
+                    mount.name.lower())
+            if found_model and found_model not in config_models:
+                # TODO: Consider how to handle this error - it bubbles up now
+                # and will cause problems at higher levels
+                MODULE_LOG.error(
+                    f'Bad model on {mount.name}: {found_model}')
             found_id = self._smoothie_driver.read_pipette_id(
                 mount.name.lower())
             to_return[mount] = {

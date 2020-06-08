@@ -16,7 +16,6 @@ import shutil
 
 from pathlib import Path
 from collections import defaultdict
-from enum import Enum, auto
 from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import (
@@ -28,10 +27,12 @@ from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
 from opentrons.config import CONFIG
 from opentrons.protocols.types import APIVersion
-from opentrons.system.shared_data import load_shared_data, get_shared_data_root
+from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
+    from opentrons_shared_data.labware.dev_types import (
+        LabwareDefinition, LabwareParameters, WellDefinition)
 
 
 MODULE_LOG = logging.getLogger(__name__)
@@ -42,22 +43,8 @@ CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 
-LabwareDefinition = Dict[str, Any]
-
-
 class OutOfTipsError(Exception):
     pass
-
-
-class WellShape(Enum):
-    RECTANGULAR = auto()
-    CIRCULAR = auto()
-
-
-well_shapes = {
-    'rectangular': WellShape.RECTANGULAR,
-    'circular': WellShape.CIRCULAR
-}
 
 
 class Well:
@@ -67,7 +54,7 @@ class Well:
     It provides functions to return positions used in operations on the well
     such as :py:meth:`top`, :py:meth:`bottom`
     """
-    def __init__(self, well_props: dict,
+    def __init__(self, well_props: 'WellDefinition',
                  parent: Location,
                  display_name: str,
                  has_tip: bool,
@@ -98,12 +85,12 @@ class Well:
             raise ValueError("Wells must have a parent")
         self._parent = parent.labware
         self._has_tip = has_tip
-        self._shape = well_shapes.get(well_props['shape'])
-        if self._shape is WellShape.RECTANGULAR:
-            self._length = well_props['xDimension']
-            self._width = well_props['yDimension']
-            self._diameter = None
-        elif self._shape is WellShape.CIRCULAR:
+        self._shape = well_props['shape']
+        if well_props['shape'] == 'rectangular':
+            self._length: Optional[float] = well_props['xDimension']
+            self._width: Optional[float] = well_props['yDimension']
+            self._diameter: Optional[float] = None
+        elif well_props['shape'] == 'circular':
             self._length = None
             self._width = None
             self._diameter = well_props['diameter']
@@ -211,12 +198,12 @@ class Well:
         coordinates
         """
         center = self._center()
-        if self._shape is WellShape.RECTANGULAR:
-            x_size = self._length
-            y_size = self._width
+        if self._shape == 'rectangular':
+            x_size: float = self._length  # type: ignore
+            y_size: float = self._width  # type: ignore
         else:
-            x_size = self._diameter
-            y_size = self._diameter
+            x_size = self._diameter  # type: ignore
+            y_size = self._diameter  # type: ignore
         z_size = self._depth
 
         return Point(
@@ -268,7 +255,7 @@ class Labware(DeckItem):
 
     """
     def __init__(
-            self, definition: dict,
+            self, definition: 'LabwareDefinition',
             parent: Location, label: str = None,
             api_level: APIVersion = None) -> None:
         """
@@ -375,7 +362,7 @@ class Labware(DeckItem):
 
     @property  # type: ignore
     @requires_version(2, 0)
-    def parameters(self) -> Dict[str, Any]:
+    def parameters(self) -> 'LabwareParameters':
         """Internal properties of a labware including type and quirks"""
         return self._parameters
 
@@ -820,7 +807,7 @@ def _get_parent_identifier(
         return ''  # treat all slots as same
 
 
-def _hash_labware_def(labware_def: LabwareDefinition) -> str:
+def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     # remove keys that do not affect run
     blacklist = ['metadata', 'brand', 'groups']
     def_no_metadata = {
@@ -958,7 +945,7 @@ def _get_path_to_labware(
 
 
 def save_definition(
-    labware_def: LabwareDefinition,
+    labware_def: 'LabwareDefinition',
     force: bool = False,
     location: Path = None
 ) -> None:
@@ -1004,11 +991,11 @@ def delete_all_custom_labware() -> None:
 
 
 def _get_labware_definition_from_bundle(
-    bundled_labware: Dict[str, LabwareDefinition],
+    bundled_labware: Dict[str, 'LabwareDefinition'],
     load_name: str,
     namespace: str = None,
     version: int = None,
-) -> LabwareDefinition:
+) -> 'LabwareDefinition':
     """
     Look up and return a bundled definition by ``load_name`` + ``namespace``
     + ``version`` and return it or raise an exception. The``namespace`` and
@@ -1049,7 +1036,7 @@ def _get_labware_definition_from_bundle(
 
 def _get_standard_labware_definition(
         load_name: str, namespace: str = None, version: int = None)\
-        -> LabwareDefinition:
+        -> 'LabwareDefinition':
 
     if version is None:
         checked_version = 1
@@ -1094,8 +1081,9 @@ def _get_standard_labware_definition(
     return labware_def
 
 
-def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
-        -> LabwareDefinition:
+def verify_definition(contents: Union[
+        AnyStr, 'LabwareDefinition', Dict[str, Any]])\
+        -> 'LabwareDefinition':
     """ Verify that an input string is a labware definition and return it.
 
     If the definition is invalid, an exception is raised; otherwise parse the
@@ -1110,21 +1098,21 @@ def verify_definition(contents: Union[AnyStr, LabwareDefinition])\
 
     if isinstance(contents, dict):
         to_return = contents
-        jsonschema.validate(to_return, labware_schema_v2)
-
     else:
         to_return = json.loads(contents)
-        jsonschema.validate(to_return, labware_schema_v2)
-    return to_return
+    jsonschema.validate(to_return, labware_schema_v2)
+    # we can type ignore this because if it passes the jsonschema it has
+    # the correct structure
+    return to_return  # type: ignore
 
 
 def get_labware_definition(
     load_name: str,
     namespace: str = None,
     version: int = None,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None
-) -> Dict[str, Any]:
+    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
+    extra_defs: Dict[str, 'LabwareDefinition'] = None
+) -> 'LabwareDefinition':
     """
     Look up and return a definition by load_name + namespace + version and
         return it or raise an exception
@@ -1245,7 +1233,7 @@ def filter_tipracks_to_start(
         lambda tr: starting_point.parent is not tr, tipracks))
 
 
-def uri_from_details(namespace: str, load_name: str, version: str,
+def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
                      delimiter='/') -> str:
     """ Build a labware URI from its details.
 
@@ -1256,7 +1244,7 @@ def uri_from_details(namespace: str, load_name: str, version: str,
     return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
 
 
-def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
+def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
     """ Build a labware URI from its definition.
 
     A labware URI is a string that uniquely specifies a labware definition.
@@ -1269,7 +1257,7 @@ def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
 
 
 def load_from_definition(
-        definition: Dict[str, Any],
+        definition: 'LabwareDefinition',
         parent: Location,
         label: str = None,
         api_level: APIVersion = None) -> Labware:
@@ -1303,8 +1291,8 @@ def load(
     label: str = None,
     namespace: str = None,
     version: int = 1,
-    bundled_defs: Dict[str, LabwareDefinition] = None,
-    extra_defs: Dict[str, LabwareDefinition] = None,
+    bundled_defs: Dict[str, 'LabwareDefinition'] = None,
+    extra_defs: Dict[str, 'LabwareDefinition'] = None,
     api_level: APIVersion = None
 ) -> Labware:
     """

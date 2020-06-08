@@ -4,12 +4,13 @@ import json
 from unittest import mock
 
 import opentrons.protocol_api as papi
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
+from opentrons_shared_data.pipette import name_for_model
 from opentrons.types import Mount, Point, Location, TransferTipPolicy
 from opentrons.hardware_control import API, NoTipAttachedError
 from opentrons.hardware_control.pipette import Pipette
 from opentrons.hardware_control.types import Axis
-from opentrons.config.pipette_config import config_models, name_for_model
+from opentrons.config.pipette_config import config_models
 from opentrons.protocol_api import transfers as tf
 from opentrons.protocols.types import APIVersion
 

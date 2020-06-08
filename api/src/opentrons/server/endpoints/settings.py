@@ -152,11 +152,11 @@ async def pipette_settings_id(request: web.Request) -> web.Response:
 
 
 def _make_pipette_response_body(pipette_id):
-    whole_config = pc.load_config_dict(pipette_id)
+    whole_config, model = pc.load_config_dict(pipette_id)
     res = {
         'info': {
             'name': whole_config.get('name'),
-            'model': whole_config.get('model')
+            'model': model,
         },
         'fields': pc.list_mutable_configs(pipette_id)
     }

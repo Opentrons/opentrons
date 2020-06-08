@@ -63,6 +63,14 @@ uninstall:
 	$(MAKE) -C $(API_DIR) clean uninstall
 	shx rm -rf '**/node_modules'
 
+.PHONY: deploy-py
+deploy-py: export twine_repository_url = $(twine_repository_url)
+deploy-py: export pypi_username = $(pypi_username)
+deploy-py: export pypi_password = $(pypi_password)
+deploy-py:
+	$(MAKE) -C $(API_DIR) deploy
+	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
+
 .PHONY: push-api-balena
 push-api-balena: export host = $(usb_host)
 push-api-balena:
@@ -119,12 +127,13 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
-	$(MAKE) -C api test
+	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-py
 test-py: test-py-windows
-	$(MAKE) -C update-server test
-	$(MAKE) -C robot-server test
+	$(MAKE) -C $(UPDATE_SERVER_DIR) test
+	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:

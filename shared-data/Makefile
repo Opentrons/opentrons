@@ -22,6 +22,7 @@ wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shar
 py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data))
 
 twine_auth_args := --username $(pypi_username) --password $(pypi_password)
+twine_repository_url ?= $(pypi_test_upload_url)
 
 #######################################
 
@@ -73,13 +74,10 @@ push-no-restart: $(wheel_file)
 push: push-no-restart
 	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
 
-.PHONY: deploy-staging
-deploy-staging: wheel
-	-$(python) -m twine upload --repository-url "https://test.pypi.org/legacy/"\
-                             $(twine_auth_args)\
-                             $(wheel_file)
-
 .PHONY: deploy
-deploy: wheel
-	$(python) -m twine upload $(twine_auth_args)\
-                            $(wheel_file)
+deploy-py: wheel
+	$(SHX) cd python && $(call python_upload_package,$(twine_auth_args),$(twine_repository_url),../$(wheel_file))
+
+.PHONY: test
+test-py:
+	$(SHX) cd python && $(python) -m pytest tests
