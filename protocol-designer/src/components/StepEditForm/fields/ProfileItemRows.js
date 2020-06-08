@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
+import cx from 'classnames'
 import {
   InputField,
   OutlineButton,
@@ -52,41 +53,55 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
   const deleteProfileCycle = () =>
     dispatch(steplistActions.deleteProfileCycle({ id: cycleItem.id }))
 
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: 'top',
+  })
+
   return (
-    <div>
-      <div>TODO: cycle</div>
-      <div>
-        {cycleItem.steps.map((stepItem, index) => {
-          return (
-            <ProfileStepRow
-              profileStepItem={stepItem}
+    <div className={styles.profile_cycle_wrapper}>
+      <div className={styles.profile_cycle_group}>
+        <div className={styles.cycle_steps}>
+          <div className={styles.cycle_row}>
+            {cycleItem.steps.map((stepItem, index) => {
+              return (
+                <ProfileStepRow
+                  profileStepItem={stepItem}
+                  focusHandlers={focusHandlers}
+                  key={stepItem.id}
+                  stepNumber={stepOffset + index}
+                  isCycle
+                />
+              )
+            })}
+          </div>
+          {cycleItem.steps.length > 0 && (
+            <ProfileField
+              name="repetitions"
               focusHandlers={focusHandlers}
-              key={stepItem.id}
-              stepNumber={stepOffset + index}
+              profileItem={cycleItem}
+              units={i18n.t('application.units.cycles')}
+              className={cx(styles.small_field, styles.cycles_field)}
+              updateValue={(name, value) =>
+                dispatch(
+                  steplistActions.editProfileCycle({
+                    id: cycleItem.id,
+                    fields: { [name]: value },
+                  })
+                )
+              }
             />
-          )
-        })}
+          )}
+        </div>
+        <div className={styles.add_cycle_step}>
+          <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
+        </div>
       </div>
-      <div>
-        <ProfileField
-          name="repetitions"
-          focusHandlers={focusHandlers}
-          profileItem={cycleItem}
-          updateValue={(name, value) =>
-            dispatch(
-              steplistActions.editProfileCycle({
-                id: cycleItem.id,
-                fields: { [name]: value },
-              })
-            )
-          }
-        />
-      </div>
-      <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
-      <div onClick={deleteProfileCycle}>
+      <div onClick={deleteProfileCycle} {...targetProps}>
+        <Tooltip {...tooltipProps}>
+          {i18n.t('tooltip.step_fields.profileCycle.deleteCycle')}
+        </Tooltip>
         <Icon name="close" className={styles.delete_step_icon} />
       </div>
-      <div>---</div>
     </div>
   )
 }
@@ -160,10 +175,18 @@ type ProfileFieldProps = {|
   focusHandlers: FocusHandlers,
   profileItem: ProfileItem,
   units?: React.Node,
+  className?: string,
   updateValue: (name: string, value: mixed) => mixed,
 |}
 const ProfileField = (props: ProfileFieldProps) => {
-  const { focusHandlers, name, profileItem, units, updateValue } = props
+  const {
+    focusHandlers,
+    name,
+    profileItem,
+    units,
+    className,
+    updateValue,
+  } = props
   const value = profileItem[name]
   const fieldId = getDynamicFieldFocusHandlerId({
     id: profileItem.id,
@@ -197,7 +220,7 @@ const ProfileField = (props: ProfileFieldProps) => {
   return (
     <div className={styles.step_input_wrapper}>
       <InputField
-        className={styles.step_input}
+        className={cx(styles.step_input, className)}
         error={errorToShow}
         units={units}
         {...{ name, onChange, onBlur, onFocus, value }}
@@ -210,10 +233,11 @@ type ProfileStepRowProps = {|
   focusHandlers: FocusHandlers,
   profileStepItem: ProfileStepItem,
   stepNumber: number,
+  isCycle?: ?boolean,
 |}
 
 const ProfileStepRow = (props: ProfileStepRowProps) => {
-  const { focusHandlers, profileStepItem } = props
+  const { focusHandlers, profileStepItem, isCycle } = props
   const dispatch = useDispatch()
 
   const updateStepFieldValue = (name: string, value: mixed) => {
@@ -251,12 +275,20 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
     />
   ))
   return (
-    <div className={styles.profile_step_row}>
-      <div className={styles.profile_step_fields}>
+    <div className={cx(styles.profile_step_row, { [styles.cycle]: isCycle })}>
+      <div
+        className={cx(styles.profile_step_fields, {
+          [styles.profile_cycle_fields]: isCycle,
+        })}
+      >
         <span className={styles.profile_step_number}>{props.stepNumber}. </span>
         {fields}
       </div>
-      <div onClick={deleteProfileStep} {...targetProps}>
+      <div
+        onClick={deleteProfileStep}
+        className={cx({ [styles.cycle_step_delete]: isCycle })}
+        {...targetProps}
+      >
         <Tooltip {...tooltipProps}>
           {i18n.t('tooltip.step_fields.profileStepRow.deleteStep')}
         </Tooltip>
