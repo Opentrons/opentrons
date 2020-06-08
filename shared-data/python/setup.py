@@ -2,7 +2,7 @@ import os
 import json
 
 from setuptools.command import build_py, sdist
-from setuptools import setup
+from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
 
@@ -98,7 +98,7 @@ DESCRIPTION = (
     "A bundle of data and python binding that supports the Opentrons API. "
     "Does not need to be installed manually; only a dependency of the "
     "opentrons package")
-PACKAGES = ['opentrons_shared_data']
+PACKAGES = find_packages(where='.', exclude=['tests'])
 INSTALL_REQUIRES = [
     'jsonschema>=3.0.2,<4',
 ]
