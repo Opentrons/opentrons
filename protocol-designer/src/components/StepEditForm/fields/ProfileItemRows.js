@@ -60,21 +60,22 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
   return (
     <div className={styles.profile_cycle_wrapper}>
       <div className={styles.profile_cycle_group}>
-        <div className={styles.cycle_steps}>
-          <div className={styles.cycle_row}>
-            {cycleItem.steps.map((stepItem, index) => {
-              return (
-                <ProfileStepRow
-                  profileStepItem={stepItem}
-                  focusHandlers={focusHandlers}
-                  key={stepItem.id}
-                  stepNumber={stepOffset + index}
-                  isCycle
-                />
-              )
-            })}
-          </div>
-          {cycleItem.steps.length > 0 && (
+        {cycleItem.steps.length > 0 && (
+          <div className={styles.cycle_steps}>
+            <div className={styles.cycle_row}>
+              {cycleItem.steps.map((stepItem, index) => {
+                return (
+                  <ProfileStepRow
+                    profileStepItem={stepItem}
+                    focusHandlers={focusHandlers}
+                    key={stepItem.id}
+                    stepNumber={stepOffset + index}
+                    isCycle
+                  />
+                )
+              })}
+            </div>
+
             <ProfileField
               name="repetitions"
               focusHandlers={focusHandlers}
@@ -90,8 +91,8 @@ export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
                 )
               }
             />
-          )}
-        </div>
+          </div>
+        )}
         <div className={styles.add_cycle_step}>
           <OutlineButton onClick={addStepToCycle}>+ Step</OutlineButton>
         </div>

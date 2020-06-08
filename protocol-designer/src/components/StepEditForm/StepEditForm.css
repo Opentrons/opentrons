@@ -320,9 +320,9 @@ and when that is implemented.
   @apply --font-form-default;
 
   display: grid;
-  grid-template-columns: 13.5rem 7.25rem 7.25rem;
+  grid-template-columns: 14.5rem 7.25rem 7.25rem;
   font-weight: var(--fw-semibold);
-  padding: 1rem 0 0.25rem 0.625rem;
+  padding: 1rem 0 0.25rem 2.125rem;
 }
 
 .profile_step_number {
