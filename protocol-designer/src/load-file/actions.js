@@ -20,7 +20,10 @@ export const fileUploadMessage = (
   payload,
 })
 
-export const dismissFileUploadMessage = () => ({
+export type DismissFileUploadMessageAction = {|
+  type: 'DISMISS_FILE_UPLOAD_MESSAGE',
+|}
+export const dismissFileUploadMessage = (): DismissFileUploadMessageAction => ({
   type: 'DISMISS_FILE_UPLOAD_MESSAGE',
 })
 
@@ -86,6 +89,7 @@ export const createNewProtocol = (
   payload,
 })
 
-export const saveProtocolFile = () => ({
+export type SaveProtocolFileAction = {| type: 'SAVE_PROTOCOL_FILE' |}
+export const saveProtocolFile = (): SaveProtocolFileAction => ({
   type: 'SAVE_PROTOCOL_FILE',
 })

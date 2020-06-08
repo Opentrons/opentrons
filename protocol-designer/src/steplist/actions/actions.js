@@ -6,7 +6,9 @@ export type ChangeSavedStepFormAction = {|
   type: 'CHANGE_SAVED_STEP_FORM',
   payload: ChangeFormPayload,
 |}
-export const changeSavedStepForm = (payload: ChangeFormPayload) => ({
+export const changeSavedStepForm = (
+  payload: ChangeFormPayload
+): ChangeSavedStepFormAction => ({
   type: 'CHANGE_SAVED_STEP_FORM',
   payload,
 })
@@ -29,13 +31,13 @@ export type PopulateFormAction = {| type: 'POPULATE_FORM', payload: FormData |}
 // Create new step
 
 export type DeleteStepAction = {| type: 'DELETE_STEP', payload: StepIdType |}
-export const deleteStep = (stepId: StepIdType) => ({
+export const deleteStep = (stepId: StepIdType): DeleteStepAction => ({
   type: 'DELETE_STEP',
   payload: stepId,
 })
 
 export type CancelStepFormAction = {| type: 'CANCEL_STEP_FORM', payload: null |}
-export const cancelStepForm = () => ({
+export const cancelStepForm = (): CancelStepFormAction => ({
   type: 'CANCEL_STEP_FORM',
   payload: null,
 })
@@ -57,7 +59,7 @@ export type AddProfileStepAction = {|
 |}
 export const addProfileStep = (
   payload: $PropertyType<AddProfileStepAction, 'payload'>
-) => ({
+): AddProfileStepAction => ({
   type: 'ADD_PROFILE_STEP',
   payload,
 })
@@ -68,7 +70,7 @@ export type DeleteProfileCycleAction = {|
 |}
 export const deleteProfileCycle = (
   payload: $PropertyType<DeleteProfileCycleAction, 'payload'>
-) => ({
+): DeleteProfileCycleAction => ({
   type: 'DELETE_PROFILE_CYCLE',
   payload,
 })
@@ -79,7 +81,7 @@ export type DeleteProfileStepAction = {|
 |}
 export const deleteProfileStep = (
   payload: $PropertyType<DeleteProfileStepAction, 'payload'>
-) => ({
+): DeleteProfileStepAction => ({
   type: 'DELETE_PROFILE_STEP',
   payload,
 })
@@ -95,7 +97,7 @@ export type EditProfileCycleAction = {|
 |}
 export const editProfileCycle = (
   payload: $PropertyType<EditProfileCycleAction, 'payload'>
-) => ({
+): EditProfileCycleAction => ({
   type: 'EDIT_PROFILE_CYCLE',
   payload,
 })
@@ -114,7 +116,7 @@ export type EditProfileStepAction = {|
 |}
 export const editProfileStep = (
   payload: $PropertyType<EditProfileStepAction, 'payload'>
-) => ({
+): EditProfileStepAction => ({
   type: 'EDIT_PROFILE_STEP',
   payload,
 })
@@ -124,8 +126,8 @@ export type AddProfileCycleAction = {|
   payload: null,
 |}
 export const addProfileCycle = (
-  payload: $PropertyType<AddProfileStepAction, 'payload'>
-) => ({
+  payload: $PropertyType<AddProfileCycleAction, 'payload'>
+): AddProfileCycleAction => ({
   type: 'ADD_PROFILE_CYCLE',
   payload,
 })
