@@ -24,7 +24,7 @@ _app_stage_build: &app_stage_build
   language: node_js
   install:
     - pip install --user awscli
-    - make install-js
+    - make setup-js
   before_script:
     # pull API wheel from S3
     - mkdir -p ./api/dist
@@ -50,7 +50,7 @@ jobs:
         - pip install awscli
         - nvm install
         - yarn global add shx@0.2.2 codecov@3.1.0
-        - make install-py
+        - make setup-py
       script:
         - make test-py
         - make lint-py
@@ -68,7 +68,7 @@ jobs:
         # push to real pypi on tag
         - provider: script
           skip_cleanup: true
-          script: make -C api deploy pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD}
+          script: make deploy-py pypi_username=${PYPI_USER} pypi_password=${PYPI_PASSWORD} twine_repository_url="https://upload.pypi.org/legacy/"
           on:
             all_branches: true
             condition: $TRAVIS_TAG =~ ^v
@@ -77,7 +77,7 @@ jobs:
         # push to test pypi on pr
         - provider: script
           skip_cleanup: true
-          script: make -C api deploy-staging pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD}
+          script: make deploy-py pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD} twine_repository_url="https://test.pypi.org/legacy/"
           on:
             repo: Opentrons/opentrons
             branch: edge
@@ -88,7 +88,7 @@ jobs:
       # node version pulled from .nvmrc
       language: node_js
       install:
-        - make install-js
+        - make setup-js
       script:
         - make test-js
         - make lint-js
@@ -126,7 +126,7 @@ jobs:
       name: 'JS E2E tests'
       language: node_js
       install:
-        - make install-js
+        - make setup-js
       script:
         - make test-e2e
 
@@ -135,7 +135,7 @@ jobs:
       name: 'JS type checks'
       language: node_js
       install:
-        - make install-js
+        - make setup-js
       script:
         - make check-js
 

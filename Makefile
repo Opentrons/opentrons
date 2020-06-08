@@ -37,31 +37,39 @@ usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fef
 
 
 # install all project dependencies
-.PHONY: install
-install: install-js install-py
+.PHONY: setup
+setup: setup-js setup-py
 
-.PHONY: install-py
-install-py:
+.PHONY: setup-py
+setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
-	$(MAKE) -C $(API_DIR) install
-	$(MAKE) -C $(UPDATE_SERVER_DIR) install
-	$(MAKE) -C $(ROBOT_SERVER_DIR) install
+	$(MAKE) -C $(API_DIR) setup
+	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
+	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
 
 # front-end dependecies handled by yarn
-.PHONY: install-js
-install-js:
+.PHONY: setup-js
+setup-js:
 	yarn
 	$(MAKE) -j 1 -C $(APP_SHELL_DIR) setup
 	$(MAKE) -j 1 -C $(SHARED_DATA_DIR) setup-js
-	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) install
+	$(MAKE) -j 1 -C $(DISCOVERY_CLIENT_DIR) setup
 
 # uninstall all project dependencies
 # TODO(mc, 2018-03-22): API uninstall via pipenv --rm in api/Makefile
-.PHONY: uninstall
-uninstall:
-	$(MAKE) -C $(API_DIR) clean uninstall
+.PHONY: teardown
+teardown:
+	$(MAKE) -C $(API_DIR) clean teardown
 	shx rm -rf '**/node_modules'
+
+.PHONY: deploy-py
+deploy-py: export twine_repository_url = $(twine_repository_url)
+deploy-py: export pypi_username = $(pypi_username)
+deploy-py: export pypi_password = $(pypi_password)
+deploy-py:
+	$(MAKE) -C $(API_DIR) deploy
+	$(MAKE) -C $(SHARED_DATA_DIR) deploy-py
 
 .PHONY: push-api-balena
 push-api-balena: export host = $(usb_host)
@@ -119,12 +127,13 @@ test-e2e:
 
 .PHONY: test-py-windows
 test-py-windows:
-	$(MAKE) -C api test
+	$(MAKE) -C $(API_DIR) test
+	$(MAKE) -C $(SHARED_DATA_DIR) test-py
 
 .PHONY: test-py
 test-py: test-py-windows
-	$(MAKE) -C update-server test
-	$(MAKE) -C robot-server test
+	$(MAKE) -C $(UPDATE_SERVER_DIR) test
+	$(MAKE) -C $(ROBOT_SERVER_DIR) test
 
 .PHONY: test-js
 test-js:

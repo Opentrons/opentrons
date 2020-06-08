@@ -196,10 +196,10 @@ def test_validate_json(get_json_protocol_fixture, get_labware_fixture):
         validate_json({'schemaVersion': '3'})
 
     v3 = get_json_protocol_fixture('3', 'testAllAtomicSingleV3')
-    assert validate_json(v3) == 3
+    assert validate_json(v3)[0] == 3
 
     v4 = get_json_protocol_fixture('4', 'testModulesProtocol')
-    assert validate_json(v4) == 4
+    assert validate_json(v4)[0] == 4
 
 
 @pytest.mark.parametrize('protocol_file',

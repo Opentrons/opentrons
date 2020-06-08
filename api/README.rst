@@ -34,7 +34,7 @@ The Opentrons library has two purposes:
 Setting Up For Development
 --------------------------
 
-First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make install`` in this subdirectory.
+First, read the `top-level contributing guide section on setup <https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#environment-and-repository>`_. As that document states, once you have installed the prerequisites you can simply run ``make setup`` in this subdirectory.
 
 The only additional prerequisite concerns building documentation. If you want to build the PDF version of the documentation, you will need an installation of `LaTeX <https://www.latex-project.org/get/>`_ that includes the ``pdflatex`` tool. Note that if you don’t install this, everything will still work - you just won’t get the PDF documentation.
 

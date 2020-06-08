@@ -4,12 +4,15 @@ functions and utilities for handling zipped protocol bundles
 from datetime import date
 import json
 from pathlib import PurePosixPath, PurePath
-from typing import Any, Dict, BinaryIO
+from typing import Dict, BinaryIO, TYPE_CHECKING
 from zipfile import ZipFile
 
 from opentrons.protocol_api.labware import uri_from_definition
 
 from .types import BundleContents
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
 MAIN_PROTOCOL_FILENAME = 'protocol.ot2.py'
 LABWARE_DIR = 'labware'
@@ -38,7 +41,7 @@ def extract_bundle(bundle: ZipFile) -> BundleContents:  # noqa(C901)
         raise RuntimeError(
             f'Bundled protocol should have a {MAIN_PROTOCOL_FILENAME} ' +
             'file in the root directory')
-    bundled_labware: Dict[str, Dict[str, Any]] = {}
+    bundled_labware: Dict[str, 'LabwareDefinition'] = {}
     bundled_data = {}
     bundled_python = {}
     for zipInfo in bundle.infolist():

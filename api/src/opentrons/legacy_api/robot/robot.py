@@ -7,6 +7,8 @@ from typing import Dict, Any
 
 from numpy import add, subtract, array  # type: ignore
 
+from opentrons_shared_data.pipette import name_for_model
+
 from opentrons import commands, drivers
 from opentrons.commands import CommandPublisher
 
@@ -294,7 +296,7 @@ class Robot(CommandPublisher):
             model_value = self._driver.read_pipette_model(mount)
             splits = {plunger_axis: None}
             if model_value:
-                name_value = pipette_config.name_for_model(model_value)
+                name_value = name_for_model(model_value)
                 pc = pipette_config.load(model_value)
                 home_current = pc.plunger_current
                 if 'needsUnstick' in pc.quirks:

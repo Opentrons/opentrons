@@ -24,7 +24,7 @@ class LabwareInfo:
     loadName: str
     slot: str
     namespace: str
-    version: str
+    version: int
     id: UUID
     definition: 'LabwareDefinition'
 

@@ -9,15 +9,21 @@ import logging
 import re
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Union
+from typing import Any, Dict, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
 from opentrons.config import feature_flags as ff
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data, protocol
 from .types import (Protocol, PythonProtocol, JsonProtocol,
                     Metadata, APIVersion, MalformedProtocolError)
 from .bundle import extract_bundle
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.protocol.dev_types import (
+        JsonProtocol as JsonProtocolDef
+    )
 
 MODULE_LOG = logging.getLogger(__name__)
 
@@ -61,19 +67,19 @@ def _parse_json(
         protocol_contents: str, filename: str = None) -> JsonProtocol:
     """ Parse a protocol known or at least suspected to be json """
     protocol_json = json.loads(protocol_contents)
-    version = validate_json(protocol_json)
+    version, validated = validate_json(protocol_json)
     return JsonProtocol(
-        text=protocol_contents, filename=filename, contents=protocol_json,
+        text=protocol_contents, filename=filename, contents=validated,
         schema_version=version)
 
 
 def _parse_python(
     protocol_contents: str,
     filename: str = None,
-    bundled_labware: Dict[str, Dict[str, Any]] = None,
+    bundled_labware: Dict[str, 'LabwareDefinition'] = None,
     bundled_data: Dict[str, bytes] = None,
     bundled_python: Dict[str, str] = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
 ) -> PythonProtocol:
     """ Parse a protocol known or at least suspected to be python """
     filename_checked = filename or '<protocol>'
@@ -132,7 +138,7 @@ def _parse_bundle(bundle: ZipFile, filename: str = None) -> PythonProtocol:  # n
 def parse(
     protocol_file: Union[str, bytes],
     filename: str = None,
-    extra_labware: Dict[str, Dict[str, Any]] = None,
+    extra_labware: Dict[str, 'LabwareDefinition'] = None,
     extra_data: Dict[str, bytes] = None
 ) -> Protocol:
     """ Parse a protocol from text.
@@ -298,7 +304,7 @@ def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:
         'Make sure there is a version number under "schemaVersion"')
 
 
-def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
+def _get_schema_for_protocol(version_num: int) -> protocol.Schema:
     """ Retrieve the json schema for a protocol schema version
     """
     # TODO(IL, 2020/03/05): use $otSharedSchema, but maybe wait until
@@ -318,7 +324,8 @@ def _get_schema_for_protocol(version_num: int) -> Dict[Any, Any]:
     return json.loads(schema.decode('utf-8'))
 
 
-def validate_json(protocol_json: Dict[Any, Any]) -> int:
+def validate_json(
+        protocol_json: Dict[Any, Any]) -> Tuple[int, 'JsonProtocolDef']:
     """ Validates a json protocol and returns its schema version """
     # Check if this is actually a labware
     labware_schema_v2 = json.loads(load_shared_data(
@@ -369,4 +376,4 @@ def validate_json(protocol_json: Dict[Any, Any]) -> int:
             'This may be a corrupted file or a JSON file that is not an '
             'Opentrons JSON protocol.')
     else:
-        return version_num
+        return version_num, protocol_json  # type: ignore

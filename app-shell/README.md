@@ -300,11 +300,11 @@ To get started: clone the Opentrons/opentrons repository, set up your computer f
 
 ```shell
 # prerequisite: install dependencies as specified in project setup
-make install
+make setup
 # change into the app-shell directory
 cd app-shell
 # install dependencies
-make install
+make setup
 # launch the electron app in dev mode
 make dev
 ```

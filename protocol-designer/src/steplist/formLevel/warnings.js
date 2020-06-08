@@ -91,9 +91,12 @@ export const minDisposalVolume = (fields: HydratedFormData): ?FormWarning => {
  **     Helpers    **
  ********************/
 
-export const composeWarnings = (...warningCheckers: Array<WarningChecker>) => (
-  formData: mixed
-): Array<FormWarning> =>
+type ComposeWarnings = (
+  ...warningCheckers: Array<WarningChecker>
+) => (formData: mixed) => Array<FormWarning>
+export const composeWarnings: ComposeWarnings = (
+  ...warningCheckers: Array<WarningChecker>
+) => formData =>
   warningCheckers.reduce((acc, checker) => {
     const possibleWarning = checker(formData)
     return possibleWarning ? [...acc, possibleWarning] : acc

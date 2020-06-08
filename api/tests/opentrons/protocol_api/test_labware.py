@@ -4,7 +4,7 @@ import pytest
 
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import load_shared_data
 from opentrons import config
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion

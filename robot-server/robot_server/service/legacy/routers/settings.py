@@ -253,7 +253,7 @@ def _pipette_settings_from_config(pc, pipette_id: str) -> PipetteSettings:
     fields = PipetteSettingsFields(
         **{k: v for k, v in mutuble_configs.items()}
     )
-    c = pc.load_config_dict(pipette_id)
+    c, m = pc.load_config_dict(pipette_id)
     return PipetteSettings(info=PipetteSettingsInfo(name=c.get('name'),
-                                                    model=c.get('model')),
+                                                    model=m),
                            fields=fields)

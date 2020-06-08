@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import TYPE_CHECKING
 from opentrons.protocol_api.execute_v3 import _blowout, _pick_up_tip, \
     _drop_tip, _aspirate, _dispense, _touch_tip
 from opentrons.protocol_api.execute_v4 import _engage_magnet, \
@@ -12,33 +12,49 @@ from opentrons.protocol_api.execute_v4 import _engage_magnet, \
     _thermocycler_set_block_temperature, \
     _thermocycler_set_lid_temperature, \
     _thermocycler_run_profile
-from .types import PipetteHandler, MagneticModuleHandler, \
-    TemperatureModuleHandler, \
-    ThermocyclerModuleHandler, \
-    ThermocyclerContext
-from .constants import JsonCommand
+
+from .module_contexts import ThermocyclerContext
 
 
-pipette_command_map: Dict[str, PipetteHandler] = {
-    JsonCommand.blowout.value: _blowout,
-    JsonCommand.pickUpTip.value: _pick_up_tip,
-    JsonCommand.dropTip.value: _drop_tip,
-    JsonCommand.aspirate.value: _aspirate,
-    JsonCommand.dispense.value: _dispense,
-    JsonCommand.touchTip.value: _touch_tip,
+from opentrons_shared_data.protocol.constants import (
+    JsonPipetteCommand, JsonMagneticModuleCommand,
+    JsonTemperatureModuleCommand, JsonThermocyclerCommand
+)
+
+if TYPE_CHECKING:
+    from .dev_types import (
+        JsonV4PipetteDispatch, JsonV4MagneticModuleDispatch,
+        JsonV4TemperatureModuleDispatch,
+        JsonV4ThermocyclerDispatch
+    )
+
+
+def not_implemented(*args, **kwargs) -> None:
+    raise NotImplementedError('Not implemented')
+
+
+pipette_command_map: 'JsonV4PipetteDispatch' = {
+    JsonPipetteCommand.blowout.value: _blowout,
+    JsonPipetteCommand.pickUpTip.value: _pick_up_tip,
+    JsonPipetteCommand.dropTip.value: _drop_tip,
+    JsonPipetteCommand.aspirate.value: _aspirate,
+    JsonPipetteCommand.dispense.value: _dispense,
+    JsonPipetteCommand.touchTip.value: _touch_tip,
+    JsonPipetteCommand.airGap.value: not_implemented,
 }
 
-magnetic_module_command_map: Dict[str, MagneticModuleHandler] = {
-    JsonCommand.magneticModuleEngageMagnet.value: _engage_magnet,
-    JsonCommand.magneticModuleDisengageMagnet.value: _disengage_magnet,
+magnetic_module_command_map: 'JsonV4MagneticModuleDispatch' = {
+    JsonMagneticModuleCommand.magneticModuleEngageMagnet.value: _engage_magnet,
+    JsonMagneticModuleCommand.magneticModuleDisengageMagnet.value:
+    _disengage_magnet,
 }
 
-temperature_module_command_map: Dict[str, TemperatureModuleHandler] = {
-    JsonCommand.temperatureModuleSetTargetTemperature.value:
+temperature_module_command_map: 'JsonV4TemperatureModuleDispatch' = {
+    JsonTemperatureModuleCommand.temperatureModuleSetTargetTemperature.value:
         _temperature_module_set_temp,
-    JsonCommand.temperatureModuleDeactivate.value:
+    JsonTemperatureModuleCommand.temperatureModuleDeactivate.value:
         _temperature_module_deactivate,
-    JsonCommand.temperatureModuleAwaitTemperature.value:
+    JsonTemperatureModuleCommand.temperatureModuleAwaitTemperature.value:
         _temperature_module_await_temp
 }
 
@@ -47,30 +63,27 @@ def tc_do_nothing(module: ThermocyclerContext, params) -> None:
     pass
 
 
-thermocycler_module_command_map: \
-    Dict[str, ThermocyclerModuleHandler] = \
-    {
-        JsonCommand.thermocyclerCloseLid.value:
-            _thermocycler_close_lid,
-        JsonCommand.thermocyclerOpenLid.value:
-            _thermocycler_open_lid,
-        JsonCommand.thermocyclerDeactivateBlock.value:
-            _thermocycler_deactivate_block,
-        JsonCommand.thermocyclerDeactivateLid.value:
-            _thermocycler_deactivate_lid,
-        JsonCommand.thermocyclerSetTargetBlockTemperature.value:
-            _thermocycler_set_block_temperature,
-        JsonCommand.thermocyclerSetTargetLidTemperature.value:
-            _thermocycler_set_lid_temperature,
-        JsonCommand.thermocyclerRunProfile.value:
-            _thermocycler_run_profile,
-        # NOTE: the thermocyclerAwaitX commands are expected to always
-        # follow a corresponding SetX command, which is implemented as
-        # blocking. Then nothing needs to be done for awaitX commands.
-        JsonCommand.thermocyclerAwaitBlockTemperature.value: \
-        tc_do_nothing,
-        JsonCommand.thermocyclerAwaitLidTemperature.value: \
-        tc_do_nothing,
-        JsonCommand.thermocyclerAwaitProfileComplete.value: \
-        tc_do_nothing
-    }
+thermocycler_module_command_map: 'JsonV4ThermocyclerDispatch' = {
+    JsonThermocyclerCommand.thermocyclerCloseLid.value:
+    _thermocycler_close_lid,
+    JsonThermocyclerCommand.thermocyclerOpenLid.value: _thermocycler_open_lid,
+    JsonThermocyclerCommand.thermocyclerDeactivateBlock.value:
+    _thermocycler_deactivate_block,
+    JsonThermocyclerCommand.thermocyclerDeactivateLid.value:
+    _thermocycler_deactivate_lid,
+    JsonThermocyclerCommand.thermocyclerSetTargetBlockTemperature.value:
+    _thermocycler_set_block_temperature,
+    JsonThermocyclerCommand.thermocyclerSetTargetLidTemperature.value:
+    _thermocycler_set_lid_temperature,
+    JsonThermocyclerCommand.thermocyclerRunProfile.value:
+    _thermocycler_run_profile,
+    # NOTE: the thermocyclerAwaitX commands are expected to always
+    # follow a corresponding SetX command, which is implemented as
+    # blocking. Then nothing needs to be done for awaitX commands.
+    JsonThermocyclerCommand.thermocyclerAwaitBlockTemperature.value:
+    tc_do_nothing,
+    JsonThermocyclerCommand.thermocyclerAwaitLidTemperature.value:
+    tc_do_nothing,
+    JsonThermocyclerCommand.thermocyclerAwaitProfileComplete.value:
+    tc_do_nothing,
+}

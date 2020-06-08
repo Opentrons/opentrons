@@ -9,19 +9,25 @@ by :py:mod:`.module_contexts`)
 
 from enum import Enum, auto
 import functools
-import json
 import logging
 import re
-from typing import Any, Dict, Mapping, Optional, Type, TypeVar, Union
+from typing import (Mapping, Optional,
+                    Type, TypeVar, Union, TYPE_CHECKING)
 
 import numpy as np  # type: ignore
 import jsonschema  # type: ignore
 
-from opentrons.system.shared_data import load_shared_data
+from opentrons_shared_data import module
 from opentrons.types import Location, Point, LocationLabware
 from opentrons.protocols.types import APIVersion
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem, V2_MODULE_DEF_VERSION
 from .labware import Labware
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.module.dev_types import (
+        ModuleDefinitionV1, ModuleDefinitionV2,
+        ThermocyclerModuleType, MagneticModuleType, TemperatureModuleType,
+        )
 
 
 E = TypeVar('E', bound='_ProvideLookup')
@@ -56,9 +62,9 @@ class ThermocyclerConfiguration(GenericConfiguration):
 
 
 class ModuleType(_ProvideLookup):
-    THERMOCYCLER: str = 'thermocyclerModuleType'
-    TEMPERATURE: str = 'temperatureModuleType'
-    MAGNETIC: str = 'magneticModuleType'
+    THERMOCYCLER: 'ThermocyclerModuleType' = 'thermocyclerModuleType'
+    TEMPERATURE: 'TemperatureModuleType' = 'temperatureModuleType'
+    MAGNETIC: 'MagneticModuleType' = 'magneticModuleType'
 
 
 class MagneticModuleModel(_ProvideLookup):
@@ -343,7 +349,7 @@ class ThermocyclerGeometry(ModuleGeometry):
         return self._labware
 
 
-def _load_from_v1(definition: Dict[str, Any],
+def _load_from_v1(definition: 'ModuleDefinitionV1',
                   parent: Location,
                   api_level: APIVersion) -> ModuleGeometry:
     """ Load a module geometry from a v1 definition.
@@ -392,7 +398,7 @@ def _load_from_v1(definition: Dict[str, Any],
     return mod
 
 
-def _load_from_v2(definition: Dict[str, Any],
+def _load_from_v2(definition: 'ModuleDefinitionV2',
                   parent: Location,
                   api_level: APIVersion,
                   configuration: GenericConfiguration) -> ModuleGeometry:
@@ -404,7 +410,13 @@ def _load_from_v2(definition: Dict[str, Any],
     pre_transform = np.array((definition['labwareOffset']['x'],
                               definition['labwareOffset']['y'],
                               1))
-    par = parent.labware
+    if not isinstance(parent.labware, str):
+        par = ''
+        log.warning(
+            f'module location parent labware was {parent.labware} which is'
+            'not a slot name; slot transforms will not be loaded')
+    else:
+        par = parent.labware
 
     # this needs to change to look up the current deck type if/when we add
     # that notion
@@ -416,33 +428,40 @@ def _load_from_v2(definition: Dict[str, Any],
     # apply the slot transform if any
     xform = np.array(xform_ser)
     xformed = np.dot(xform, pre_transform)
-    opts = {
-        'parent': parent,
-        'api_level': api_level,
-        'offset': Point(xformed[0],
-                        xformed[1],
-                        definition['labwareOffset']['z']),
-        'overall_height': definition['dimensions']['bareOverallHeight'],
-        'height_over_labware': definition['dimensions']['overLabwareHeight'],
-        'model': module_model_from_string(definition['model']),
-        'module_type': ModuleType.from_str(definition['moduleType']),
-        'display_name': definition['displayName']
-    }
     if definition['moduleType'] in {
             ModuleType.MAGNETIC.value,
             ModuleType.TEMPERATURE.value}:
-        return ModuleGeometry(**opts)
+        return ModuleGeometry(
+            parent=parent,
+            api_level=api_level,
+            offset=Point(xformed[0],
+                         xformed[1],
+                         definition['labwareOffset']['z']),
+            overall_height=definition['dimensions']['bareOverallHeight'],
+            height_over_labware=definition['dimensions']['overLabwareHeight'],
+            model=module_model_from_string(definition['model']),
+            module_type=ModuleType.from_str(definition['moduleType']),
+            display_name=definition['displayName'])
     elif definition['moduleType'] == ModuleType.THERMOCYCLER.value:
         return ThermocyclerGeometry(
+            parent=parent,
+            api_level=api_level,
+            offset=Point(xformed[0],
+                         xformed[1],
+                         definition['labwareOffset']['z']),
+            overall_height=definition['dimensions']['bareOverallHeight'],
+            height_over_labware=definition['dimensions']['overLabwareHeight'],
+            model=module_model_from_string(definition['model']),
+            module_type=ModuleType.from_str(definition['moduleType']),
+            display_name=definition['displayName'],
             lid_height=definition['dimensions']['lidHeight'],
-            configuration=configuration,
-            **opts)
+            configuration=configuration)
     else:
         raise RuntimeError(f'Unknown module type {definition["moduleType"]}')
 
 
 def load_module_from_definition(
-        definition: Dict[str, Any],
+        definition: Union['ModuleDefinitionV1', 'ModuleDefinitionV2'],
         parent: Location,
         api_level: APIVersion = None,
         configuration: GenericConfiguration =
@@ -463,18 +482,26 @@ def load_module_from_definition(
                                  defaults to :py:attr:`.MAX_SUPPORTED_VERSION`.
     """
     api_level = api_level or MAX_SUPPORTED_VERSION
-    schema = definition.get("$otSharedSchema")
+    # def not yet discriminated, mypy complains sadly
+    schema = definition.get("$otSharedSchema")  # type: ignore
     if not schema:
         # v1 definitions don't have schema versions
-        return _load_from_v1(definition, parent, api_level)
+        # but unfortunately we can't tell mypy that because it can only
+        # discriminate unions based on literal tags or similar, not the
+        # presence or absence of keys
+        v1def: 'ModuleDefinitionV1' = definition  # type: ignore
+        return _load_from_v1(v1def, parent, api_level)
     if schema == 'module/schemas/2':
-        schema_doc = json.loads(load_shared_data("module/schemas/2.json"))
+        schema_doc = module.load_schema('2')
         try:
             jsonschema.validate(definition, schema_doc)
         except jsonschema.ValidationError:
             log.exception("Failed to validate module def schema")
             raise RuntimeError('The specified module definition is not valid.')
-        return _load_from_v2(definition, parent, api_level, configuration)
+        # mypy can't tell these apart, but we've schema validated it - this is
+        # the right type
+        v2def: 'ModuleDefinitionV2' = definition  # type: ignore
+        return _load_from_v2(v2def, parent, api_level, configuration)
     elif isinstance(schema, str):
         maybe_schema = re.match('^module/schemas/([0-9]+)$', schema)
         if maybe_schema:
@@ -486,7 +513,7 @@ def load_module_from_definition(
         'The specified module definition is not valid.')
 
 
-def _load_v1_module_def(module_model: ModuleModel) -> Dict[str, Any]:
+def _load_v1_module_def(module_model: ModuleModel) -> 'ModuleDefinitionV1':
     v1names = {MagneticModuleModel.MAGNETIC_V1: 'magdeck',
                TemperatureModuleModel.TEMPERATURE_V1: 'tempdeck',
                ThermocyclerModuleModel.THERMOCYCLER_V1: 'thermocycler'}
@@ -496,23 +523,23 @@ def _load_v1_module_def(module_model: ModuleModel) -> Dict[str, Any]:
         raise NoSuchModuleError(
             f'Could not find module {module_model.value}',
             module_model)
-    return json.loads(load_shared_data('module/definitions/1.json'))[name]
+    return module.load_definition('1', name)
 
 
-def _load_v2_module_def(module_model: ModuleModel) -> Dict[str, Any]:
+def _load_v2_module_def(module_model: ModuleModel) -> 'ModuleDefinitionV2':
     try:
-        return json.loads(
-            load_shared_data(
-                f'module/definitions/2/{module_model.value}.json'))
-    except OSError:
+        return module.load_definition('2', module_model.value)
+    except module.ModuleNotFoundError:
         raise NoSuchModuleError(
             f'Could not find the module {module_model.value}.',
             module_model)
 
 
 @functools.lru_cache(maxsize=128)
-def _load_module_definition(api_level: APIVersion,
-                            module_model: ModuleModel) -> Dict[str, Any]:
+def _load_module_definition(
+        api_level: APIVersion,
+        module_model: ModuleModel) -> Union['ModuleDefinitionV2',
+                                            'ModuleDefinitionV1']:
     """
     Load the appropriate module definition for this api version
     """
@@ -610,13 +637,11 @@ def resolve_module_model(module_name: str) -> ModuleModel:
 
 
 def resolve_module_type(module_model: ModuleModel) -> ModuleType:
-    return ModuleType.from_str(_load_module_definition(
-        V2_MODULE_DEF_VERSION, module_model)['moduleType'])
+    return ModuleType.from_str(_load_v2_module_def(module_model)['moduleType'])
 
 
 def models_compatible(model_a: ModuleModel, model_b: ModuleModel) -> bool:
     """ Check if two module models may be considered the same """
     if model_a == model_b:
         return True
-    return model_b.value in _load_module_definition(
-        V2_MODULE_DEF_VERSION, model_a)['compatibleWith']
+    return model_b.value in _load_v2_module_def(model_a)['compatibleWith']

@@ -193,7 +193,7 @@ export const substepTimeline = (
   invariantContext: InvariantContext,
   initialRobotState: RobotState,
   channels: Channels
-) => {
+): Array<SubstepTimelineFrame> => {
   if (channels === 1) {
     return substepTimelineSingleChannel(
       commandCreator,

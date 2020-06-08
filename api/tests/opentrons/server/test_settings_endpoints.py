@@ -143,7 +143,8 @@ def mock_pipette_config(mock_pipette_data):
     with patch("opentrons.server.endpoints.settings.pc") as p:
         p.known_pipettes.return_value = list(mock_pipette_data.keys())
         p.load_config_dict.side_effect = \
-            lambda id: mock_pipette_data[id]['info']
+            lambda id: (mock_pipette_data[id]['info'],
+                        mock_pipette_data[id]['info']['model'])
         p.list_mutable_configs.side_effect = \
             lambda pipette_id: mock_pipette_data[pipette_id]['fields']
         yield p

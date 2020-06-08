@@ -1,4 +1,10 @@
-from typing import Any, Dict, NamedTuple, Optional, Union
+from typing import Any, Dict, NamedTuple, Optional, Union, TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+    from opentrons_shared_data.protocol.dev_types import (
+        JsonProtocol as JsonProtocolDef
+    )
 
 Metadata = Dict[str, Union[str, int]]
 
@@ -14,7 +20,7 @@ class APIVersion(NamedTuple):
 class JsonProtocol(NamedTuple):
     text: str
     filename: Optional[str]
-    contents: Dict[str, Any]
+    contents: 'JsonProtocolDef'
     schema_version: int
 
 
@@ -25,11 +31,11 @@ class PythonProtocol(NamedTuple):
     metadata: Metadata
     api_level: APIVersion
     # these 'bundled_' attrs should only be included when the protocol is a zip
-    bundled_labware: Optional[Dict[str, Dict[str, Any]]]
+    bundled_labware: Optional[Dict[str, 'LabwareDefinition']]
     bundled_data: Optional[Dict[str, bytes]]
     bundled_python: Optional[Dict[str, str]]
     # this should only be included when the protocol is not a zip
-    extra_labware: Optional[Dict[str, Dict[str, Any]]]
+    extra_labware: Optional[Dict[str, 'LabwareDefinition']]
 
 
 Protocol = Union[JsonProtocol, PythonProtocol]
@@ -37,7 +43,7 @@ Protocol = Union[JsonProtocol, PythonProtocol]
 
 class BundleContents(NamedTuple):
     protocol: str
-    bundled_labware: Dict[str, Dict[str, Any]]
+    bundled_labware: Dict[str, 'LabwareDefinition']
     bundled_data: Dict[str, bytes]
     bundled_python: Dict[str, str]
 

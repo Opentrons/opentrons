@@ -47,6 +47,7 @@ import {
 } from '../utils/createInitialProfileItems'
 import { getLabwareOnModule } from '../../ui/modules/utils'
 import { PROFILE_CYCLE, PROFILE_STEP } from '../../form-types'
+import type { Reducer } from 'redux'
 import type { LoadFileAction } from '../../load-file'
 import type {
   CreateContainerAction,
@@ -996,10 +997,10 @@ const initialLabwareState: NormalizedLabwareById = {
 }
 
 // MIGRATION NOTE: copied from `containers` reducer. Slot + UI stuff stripped out.
-export const labwareInvariantProperties = handleActions<
+export const labwareInvariantProperties: Reducer<
   NormalizedLabwareById,
-  *
->(
+  any
+> = handleActions(
   {
     CREATE_CONTAINER: (
       state: NormalizedLabwareById,
@@ -1055,7 +1056,10 @@ export const labwareInvariantProperties = handleActions<
   initialLabwareState
 )
 
-export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
+export const moduleInvariantProperties: Reducer<
+  ModuleEntities,
+  any
+> = handleActions(
   {
     CREATE_MODULE: (
       state: ModuleEntities,
@@ -1102,10 +1106,10 @@ export const moduleInvariantProperties = handleActions<ModuleEntities, *>(
 
 const initialPipetteState = {}
 
-export const pipetteInvariantProperties = handleActions<
+export const pipetteInvariantProperties: Reducer<
   NormalizedPipetteById,
-  *
->(
+  any
+> = handleActions(
   {
     LOAD_FILE: (
       state: NormalizedPipetteById,
@@ -1153,7 +1157,7 @@ export const pipetteInvariantProperties = handleActions<
 
 export type OrderedStepIdsState = Array<StepIdType>
 const initialOrderedStepIdsState = []
-export const orderedStepIds = handleActions<OrderedStepIdsState, *>(
+export const orderedStepIds: Reducer<OrderedStepIdsState, any> = handleActions(
   {
     SAVE_STEP_FORM: (
       state: OrderedStepIdsState,
@@ -1253,7 +1257,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-export const rootReducer = (state: RootState, action: any) => {
+export const rootReducer: Reducer<RootState, any> = (state, action) => {
   const prevStateFallback = state || {}
   const nextState = {
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
@@ -1271,7 +1275,9 @@ export const rootReducer = (state: RootState, action: any) => {
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     // 'forms' reducers get full rootReducer state
+    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | void)
     savedStepForms: savedStepForms(state, action),
+    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | void)
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,

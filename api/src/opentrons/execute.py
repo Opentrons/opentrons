@@ -10,7 +10,8 @@ import argparse
 import logging
 import os
 import sys
-from typing import Any, Callable, Dict, List, Optional, TextIO, Union
+from typing import (Any, Callable, Dict, List, Optional, TextIO, Union,
+                    TYPE_CHECKING)
 
 import opentrons
 from opentrons import protocol_api, __version__
@@ -23,6 +24,9 @@ from opentrons.protocols.types import APIVersion, PythonProtocol
 from opentrons.hardware_control import API, ThreadManager
 from .util.entrypoint_util import labware_from_paths, datafiles_from_paths
 
+if TYPE_CHECKING:
+    from opentrons_shared_data.labware.dev_types import LabwareDefinition
+
 _THREAD_MANAGED_HW: Optional[ThreadManager] = None
 #: The background global cache that all protocol contexts created by
 #: :py:meth:`get_protocol_api` will share
@@ -30,9 +34,9 @@ _THREAD_MANAGED_HW: Optional[ThreadManager] = None
 
 def get_protocol_api(
         version: Union[str, APIVersion],
-        bundled_labware: Dict[str, Dict[str, Any]] = None,
+        bundled_labware: Dict[str, 'LabwareDefinition'] = None,
         bundled_data: Dict[str, bytes] = None,
-        extra_labware: Dict[str, Any] = None,
+        extra_labware: Dict[str, 'LabwareDefinition'] = None,
 ) -> protocol_api.ProtocolContext:
     """
     Build and return a :py:class:`ProtocolContext` connected to the robot.
