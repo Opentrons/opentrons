@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-import { Flex } from '@opentrons/components'
+import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
