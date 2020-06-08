@@ -899,10 +899,6 @@
       "metadata": {
         "wellBottomShape": "u"
       },
-      "brand": {
-        "brand": "Eppendorf",
-        "brandId": ["0030129512"]
-      },
       "wells": [
         "A1",
         "B1",
