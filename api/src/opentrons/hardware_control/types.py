@@ -95,6 +95,13 @@ class HardwareAPILike(abc.ABC):
     def door_state(self, door_state: DoorState) -> DoorState:
         ...
 
+    @property
+    def valid_transform(self) -> bool:
+        ...
+
+    def validate_calibration(self):
+        ...
+
 
 class BoardRevision(enum.Enum):
     UNKNOWN = enum.auto()

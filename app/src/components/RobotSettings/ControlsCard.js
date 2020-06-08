@@ -4,7 +4,6 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 import { Card, LabeledToggle, LabeledButton, Icon } from '@opentrons/components'
-import { CardContentFull } from '../layout'
 
 import { startDeckCalibration } from '../../http-api-client'
 import { getFeatureFlags } from '../../config'
