@@ -75,7 +75,6 @@ function TipPositionInput(props: Props) {
       <Tooltip {...tooltipProps}>
         {i18n.t('tooltip.step_fields.defaults.tipPosition')}
       </Tooltip>
-      {/* $FlowFixMe: mmFromBottom is typed as a number in TipPositionModal */}
       <TipPositionModal
         fieldName={fieldName}
         closeModal={handleClose}
