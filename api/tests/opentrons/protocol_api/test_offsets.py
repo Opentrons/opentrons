@@ -92,7 +92,7 @@ def clear_tlc_calibration(monkeypatch):
         pass
     yield
     try:
-        os.remove(tlc_path(PIPETTE_ID))
+        os.remove(tlc_path('index'))
     except FileNotFoundError:
         pass
 
@@ -174,6 +174,25 @@ def test_save_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     }
     labware.save_tip_length_calibration(PIPETTE_ID, test_data)
     assert os.path.exists(tlc_path(PIPETTE_ID))
+    # test an index file is also created
+    assert os.path.exists(tlc_path('index'))
+
+
+def test_add_index_file(monkeypatch, clear_tlc_calibration):
+
+    def get_result():
+        with open(tlc_path('index')) as f:
+            result = json.load(f)
+        return result
+
+    labware._append_to_index_tip_length_file('pip_1', 'lw_1')
+    assert get_result() == {'lw_1': ['pip_1']}
+
+    labware._append_to_index_tip_length_file('pip_2', 'lw_1')
+    assert get_result() == {'lw_1': ['pip_1', 'pip_2']}
+
+    labware._append_to_index_tip_length_file('pip_2', 'lw_2')
+    assert get_result() == {'lw_1': ['pip_1', 'pip_2'], 'lw_2': ['pip_2']}
 
 
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):

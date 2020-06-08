@@ -884,17 +884,40 @@ def save_tip_length(labware: Labware, length: float):
     labware.tip_length = length
 
 
-def _get_pip_tip_length_path(pip_id: str):
+# TODO: AA - move out of protocol_api
+def _get_pip_tip_length_path(pip_id: str) -> Path:
     tip_length_path = get_tip_length_cal_path()
     tip_length_path.mkdir(parents=True, exist_ok=True)
     return tip_length_path/f'{pip_id}.json'
 
 
+# TODO: AA - move out of protocol_api
+def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
+    index_file = get_tip_length_cal_path()/'index.json'
+    try:
+        index_data = _read_file(str(index_file))
+    except FileNotFoundError:
+        index_data = {}
+
+    if lw_hash not in index_data:
+        index_data[lw_hash] = [pip_id]
+    elif pip_id not in index_data[lw_hash]:
+        index_data[lw_hash].append(pip_id)
+
+    with index_file.open('w') as f:
+        json.dump(index_data, f)
+
+
+# TODO: AA - move out of protocol_api
 def save_tip_length_calibration(
         pip_id: str, tip_length_cal: PipTipLengthCalibration):
     pip_tip_length_path = _get_pip_tip_length_path(pip_id)
+
+    for lw_hash in tip_length_cal.keys():
+        _append_to_index_tip_length_file(pip_id, lw_hash)
+
     try:
-        tip_length_data = _read_file(pip_tip_length_path)
+        tip_length_data = _read_file(str(pip_tip_length_path))
     except FileNotFoundError:
         tip_length_data = {}
 
@@ -904,6 +927,7 @@ def save_tip_length_calibration(
         json.dump(tip_length_data, f)
 
 
+# TODO: AA - move out of protocol_api
 def create_tip_length_data(
         labware: Labware, length: float) -> PipTipLengthCalibration:
     assert labware._is_tiprack, \
@@ -919,6 +943,7 @@ def create_tip_length_data(
     return data
 
 
+# TODO: AA - move out of protocol_api
 def load_tip_length_calibration(
         pip_id: str, labware: Labware) -> TipLengthCalibration:
     assert labware._is_tiprack, \
@@ -927,7 +952,7 @@ def load_tip_length_calibration(
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
     try:
-        tip_length_data = _read_file(pip_tip_length_path)
+        tip_length_data = _read_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash + parent_id]
     except (FileNotFoundError, AttributeError):
         raise TipLengthCalNotFound(
@@ -936,6 +961,7 @@ def load_tip_length_calibration(
             'be loaded')
 
 
+# TODO: AA - move out of protocol_api
 def clear_tip_length_calibration():
     """
     Delete all tip length calibration files.
