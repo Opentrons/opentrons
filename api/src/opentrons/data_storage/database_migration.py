@@ -10,7 +10,6 @@ from opentrons.data_storage.schema_changes import \
     create_table_ContainerWells, create_table_Containers
 from opentrons.util.vector import Vector
 
-# TODO (SF 7/11/2019): Once we're off balena remove all these prints
 log = logging.getLogger(__name__)
 
 
@@ -64,15 +63,13 @@ def _ensure_containers_and_wells():
     """ Load all persisted containers in to the labware database
     """
 
-    print("Loading json containers...")
+    log.info("Loading json containers...")
     load_all_containers_from_disk()
     json_containers = list_container_names()
-    log.debug("_ensure_containers_and_wells: file load complete")
-    print("Json container file load complete, listing database")
+    log.info("Json container file load complete, listing database")
     current_containers = database.list_all_containers()
     to_update = set(json_containers) - set(current_containers)
     msg = f"Found {len(to_update)} containers to add. Starting migration..."
-    print(msg)
     log.info(msg)
     for container_name in to_update:
         _migrate_container(container_name)
@@ -81,10 +78,8 @@ def _ensure_containers_and_wells():
     if missing:
         msg = f"MIGRATION FAILED: MISSING {missing}"
         log.error(msg)
-        print(msg)
     else:
         log.info("Database migration complete")
-        print("Database migration complete!")
 
 
 def _ensure_trash():
