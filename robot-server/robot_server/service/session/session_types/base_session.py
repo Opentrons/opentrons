@@ -18,7 +18,7 @@ class SessionMetaData:
     identifier: models.IdentifierType = field(
         default_factory=models.create_identifier
     )
-    created_on: datetime = field(default_factory=datetime.utcnow)
+    created_at: datetime = field(default_factory=datetime.utcnow)
 
 
 class BaseSession(ABC):

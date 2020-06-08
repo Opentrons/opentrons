@@ -12,7 +12,7 @@ class Command:
         self._data = data
         # Create a unique identifier for the command
         self._id = create_identifier()
-        self._created_on = datetime.utcnow()
+        self._created_at = datetime.utcnow()
 
     @property
     def name(self) -> CommandName:
@@ -27,13 +27,13 @@ class Command:
         return self._id
 
     @property
-    def created_on(self) -> datetime:
-        return self._created_on
+    def created_at(self) -> datetime:
+        return self._created_at
 
     def __str__(self) -> str:
         return f"Command(" \
                f"name={self.name}, " \
                f"identifier={self.identifier}," \
                f"data={self.data}," \
-               f"created_on={self.created_on}," \
+               f"created_at={self.created_at}," \
                f")"

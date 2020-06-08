@@ -22,7 +22,7 @@ def mock_session_meta():
     return SessionMetaData(identifier="some_id",
                            name="session name",
                            description="session description",
-                           created_on=datetime(2000, 1, 1, 0, 0, 0))
+                           created_at=datetime(2000, 1, 1, 0, 0, 0))
 
 
 @pytest.fixture
@@ -50,7 +50,7 @@ def mock_command_executor(command_id):
     async def func(command, data):
         ret_val = Command(name=command,
                           data=data)
-        ret_val._created_on = datetime(2020, 1, 1)
+        ret_val._created_at = datetime(2020, 1, 1)
         ret_val._id = command_id
         return ret_val
 
