@@ -560,12 +560,6 @@ describe('Protocols with Modules', () => {
       cy.openFilePage()
       cy.get('button[name="removeMagneticModuleType"]').click()
       cy.get('button[name="addMagneticModuleType"]').should('exist')
-      cy.get('h4')
-        .contains('Magnetic')
-        .parent()
-        .within(() => {
-          cy.contains('Slot 1').should('not.exist')
-        })
       cy.openDesignPage()
       cy.get('h3')
         .contains('4. magnet', { matchCase: false })
@@ -605,12 +599,6 @@ describe('Protocols with Modules', () => {
       })
       cy.get('button[name="removeMagneticModuleType"]').should('exist')
       cy.get('button[name="editMagneticModuleType"]').should('exist')
-      cy.get('h4')
-        .contains('Magnetic')
-        .parent()
-        .within(() => {
-          cy.contains('Slot 1').should('exist')
-        })
 
       // Verify timeline errors resolved
       cy.openDesignPage()
@@ -633,12 +621,6 @@ describe('Protocols with Modules', () => {
       cy.openFilePage()
       cy.get('button[name="removeTemperatureModuleType"]').click()
       cy.get('button[name="addTemperatureModuleType"]').should('exist')
-      cy.get('h4')
-        .contains('Temperature')
-        .parent()
-        .within(() => {
-          cy.contains('Slot 3').should('not.exist')
-        })
       cy.openDesignPage()
       cy.get('h3')
         .contains('1. temperature', { matchCase: false })
@@ -704,12 +686,6 @@ describe('Protocols with Modules', () => {
       })
       cy.get('button[name="removeTemperatureModuleType"]').should('exist')
       cy.get('button[name="editTemperatureModuleType"]').should('exist')
-      cy.get('h4')
-        .contains('Temperature')
-        .parent()
-        .within(() => {
-          cy.contains('Slot 3').should('exist')
-        })
 
       // Resolve Timeline Errors
       cy.openDesignPage()
