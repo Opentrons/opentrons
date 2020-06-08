@@ -897,8 +897,6 @@
   "groups": [
     {
       "metadata": {
-        "displayName": "Eppendorf twin.tec PCR plate 96 LoBind skirted plate",
-        "displayCategory": "wellPlate",
         "wellBottomShape": "u"
       },
       "brand": {
