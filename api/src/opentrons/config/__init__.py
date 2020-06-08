@@ -484,3 +484,7 @@ CONFIG = load_and_migrate()
 #: The currently loaded config. This should not change for the lifetime
 #: of the program. This is a dict much like os.environ() where the keys
 #: are config element names
+
+
+def get_tip_length_cal_path() -> Path:
+    return CONFIG['tip_length_calibration_dir']
