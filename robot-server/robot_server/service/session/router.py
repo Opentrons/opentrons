@@ -21,7 +21,7 @@ log = logging.getLogger(__name__)
 
 
 def get_session(manager: SessionManager,
-                session_id: str,
+                session_id: route_models.IdentifierType,
                 api_router: APIRouter) -> BaseSession:
     """Get the session or raise a RobotServerError"""
     found_session = manager.get_by_id(session_id)
@@ -78,7 +78,7 @@ async def create_session_handler(
                response_model_exclude_unset=True,
                response_model=route_models.SessionResponse)
 async def delete_session_handler(
-        session_id: str,
+        session_id: route_models.IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.SessionResponse:
     """Delete a session"""
@@ -104,7 +104,7 @@ async def delete_session_handler(
             response_model_exclude_unset=True,
             response_model=route_models.SessionResponse)
 async def get_session_handler(
-        session_id: str,
+        session_id: route_models.IdentifierType,
         session_manager: SessionManager = Depends(get_session_manager))\
         -> route_models.SessionResponse:
     session_obj = get_session(manager=session_manager,
@@ -144,7 +144,7 @@ async def get_sessions_handler(
              response_model_exclude_unset=True,
              response_model=route_models.CommandResponse)
 async def session_command_execute_handler(
-        session_id: str,
+        session_id: route_models.IdentifierType,
         command_request: route_models.CommandRequest,
         session_manager: SessionManager = Depends(get_session_manager),
 ) -> route_models.CommandResponse:
@@ -190,7 +190,8 @@ async def session_command_execute_handler(
     )
 
 
-def get_valid_session_links(session_id: str, api_router: APIRouter) \
+def get_valid_session_links(session_id: route_models.IdentifierType,
+                            api_router: APIRouter) \
         -> typing.Dict[str, ResourceLink]:
     """Get the valid links for a session"""
     return {

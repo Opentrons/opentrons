@@ -10,12 +10,12 @@ from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
 
 
-IdentifierType = str
+IdentifierType = typing.NewType('IdentifierType', str)
 
 
 def create_identifier() -> IdentifierType:
     """Create an identifier"""
-    return str(uuid4())
+    return IdentifierType(str(uuid4()))
 
 
 class EmptyModel(BaseModel):

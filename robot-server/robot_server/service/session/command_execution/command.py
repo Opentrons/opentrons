@@ -33,7 +33,7 @@ class Command:
     def __str__(self) -> str:
         return f"Command(" \
                f"name={self.name}, " \
-               f"identifier={self.identifier}" \
-               f"data={self.data}" \
+               f"identifier={self.identifier}," \
+               f"data={self.data}," \
                f"created_on={self.created_on}," \
                f")"
