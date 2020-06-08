@@ -1,4 +1,5 @@
 // @flow
+import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
 import type {
   Command,
   EngageMagnetParams,
@@ -202,9 +203,21 @@ export type DeactivateTemperatureArgs = {|
   message?: string,
 |}
 
+export type ThermocyclerProfileStepArgs = {|
+  module: string,
+  commandCreatorFnName: THERMOCYCLER_PROFILE,
+  blockTargetTempHold: number | null,
+  lidOpenHold: boolean,
+  lidTargetTempHold: number | null,
+  message?: string,
+  profileSteps: Array<{| temperature: number, holdTime: number |}>,
+  profileTargetLidTemp: number | null,
+  profileVolume: number,
+|}
+
 export type ThermocyclerStateStepArgs = {|
   module: string,
-  commandCreatorFnName: 'thermocyclerState',
+  commandCreatorFnName: THERMOCYCLER_STATE,
   blockTargetTemp: number | null,
   lidTargetTemp: number | null,
   lidOpen: boolean,
@@ -222,6 +235,7 @@ export type CommandCreatorArgs =
   | SetTemperatureArgs
   | AwaitTemperatureArgs
   | DeactivateTemperatureArgs
+  | ThermocyclerProfileStepArgs
   | ThermocyclerStateStepArgs
 
 /** tips are numbered 0-7. 0 is the furthest to the back of the robot.
