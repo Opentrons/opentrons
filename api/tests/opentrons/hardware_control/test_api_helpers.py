@@ -35,4 +35,4 @@ async def test_validating_calibration(hardware):
     await hardware.update_config(gantry_calibration=inrange_matrix)
     hardware.validate_calibration()
 
-    assert not hardware.valid_transform
+    assert hardware.valid_transform
