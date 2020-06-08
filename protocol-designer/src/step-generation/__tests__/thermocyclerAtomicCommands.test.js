@@ -11,6 +11,7 @@ import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenL
 import { getSuccessResult } from '../__fixtures__'
 
 import type {
+  AtomicProfileStep,
   ModuleOnlyParams,
   TemperatureParams,
   TCProfileParams,
@@ -24,14 +25,9 @@ const getRobotInitialState = (): any => {
 // neither should InvariantContext
 const invariantContext: any = {}
 
-type ProfileItem = $ElementType<
-  $PropertyType<TCProfileParams, 'profile'>,
-  number // Using arrays, we don't statically know the size of the array, so `number` is the key
->
-
 const module: $PropertyType<ModuleOnlyParams, 'module'> = 'someTCModuleId'
 const temperature: $PropertyType<TemperatureParams, 'temperature'> = 42
-const holdTime: $PropertyType<ProfileItem, 'holdTime'> = 10
+const holdTime: $PropertyType<AtomicProfileStep, 'holdTime'> = 10
 const volume: $PropertyType<TCProfileParams, 'volume'> = 10
 const profile = [{ temperature, holdTime }]
 

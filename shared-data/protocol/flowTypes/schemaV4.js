@@ -23,9 +23,10 @@ export type EngageMagnetParams = {|
 
 export type TemperatureParams = {| module: string, temperature: number |}
 
+export type AtomicProfileStep = {| holdTime: number, temperature: number |}
 export type TCProfileParams = {|
   module: string,
-  profile: Array<{| temperature: number, holdTime: number |}>,
+  profile: Array<AtomicProfileStep>,
   volume: number,
 |}
 
@@ -98,11 +99,7 @@ export type Command =
   | {| command: 'thermocycler/deactivateLid', params: ModuleOnlyParams |}
   | {|
       command: 'thermocycler/runProfile',
-      params: {|
-        module: string,
-        profile: Array<{| temperature: number, holdTime: number |}>,
-        volume: number,
-      |},
+      params: TCProfileParams,
     |}
   | {| command: 'thermocycler/awaitProfileComplete', params: ModuleOnlyParams |}
 
