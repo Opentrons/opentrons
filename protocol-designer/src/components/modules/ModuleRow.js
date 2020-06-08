@@ -145,6 +145,7 @@ export function ModuleRow(props: Props) {
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}
+              name={dataIdFormat('edit', type)}
             >
               Edit
             </OutlineButton>
@@ -152,6 +153,7 @@ export function ModuleRow(props: Props) {
           <OutlineButton
             className={styles.module_button}
             onClick={handleAddOrRemove}
+            name={dataIdFormat(addRemoveText, type)}
           >
             {addRemoveText}
           </OutlineButton>
@@ -160,3 +162,6 @@ export function ModuleRow(props: Props) {
     </div>
   )
 }
+
+const dataIdFormat = (action: string, moduleType: ModuleRealType): string =>
+  `${action}${moduleType.charAt(0).toUpperCase()}${moduleType.slice(1)}`
