@@ -21,8 +21,8 @@ br_ssh_key ?= $(default_ssh_key)
 br_ssh_opts ?= $(default_ssh_opts)
 
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	$(pipenv_envvars) pipenv sync $(pipenv_opts)
 
 .PHONY: dev

@@ -22,8 +22,8 @@ Any labware that does not meet the criteria of 'regular'. A labware is irregular
 
 ## Launching the Tool
 
-First you should make sure that you run `make install` within the `opentrons` top level folder.
-If you are up-to-date on all other directories you can simply run `make install-js` instead.
+First you should make sure that you run `make setup` within the `opentrons` top level folder.
+If you are up-to-date on all other directories you can simply run `make setup-js` instead.
 Next you have two options:
 
 1. From the top level folder type: `make -C labware-designer dev`

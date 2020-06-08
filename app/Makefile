@@ -19,8 +19,8 @@ discovery_client_dir = ../discovery-client
 .PHONY: all
 all: clean dist
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	yarn
 
 .PHONY: clean

@@ -68,8 +68,8 @@ plot_type ?=
 .PHONY: all
 all: clean wheel
 
-.PHONY: install
-install:
+.PHONY: setup
+setup:
 	$(pipenv_envvars) pipenv sync $(pipenv_opts)
 	$(pipenv_envvars) pipenv run pip freeze
 
@@ -77,8 +77,8 @@ install:
 clean: docs-clean
 	$(clean_cmd)
 
-.PHONY: uninstall
-uninstall:
+.PHONY: teardown
+teardown:
 	$(pipenv_envvars)	pipenv --rm
 
 dist/opentrons-%-py2.py3-none-any.whl: setup.py $(ot_sources)
