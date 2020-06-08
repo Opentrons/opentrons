@@ -2,7 +2,7 @@
 // BlockingHint is an "are you sure" modal that can be dismissed.
 // Instances of BlockingHint need to be individually placed by whatever component
 // is controlling the flow that this modal will block, via useBlockingHint.
-import React, { useState, useCallback, type Node } from 'react'
+import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { actions, selectors } from '../../tutorial'
 import { ContinueModal, CheckboxField } from '@opentrons/components'
@@ -15,17 +15,19 @@ export type HintProps = {|
   hintKey: HintKey,
   handleCancel: () => mixed,
   handleContinue: () => mixed,
-  content: Node,
+  content: React.Node,
 |}
 
 // This component handles the checkbox and dispatching `removeHint` action on continue/cancel
-export const BlockingHint = (props: HintProps) => {
+export const BlockingHint = (props: HintProps): React.Node => {
   const { hintKey, handleCancel, handleContinue } = props
   const dispatch = useDispatch()
 
-  const [rememberDismissal, setRememberDismissal] = useState<boolean>(false)
+  const [rememberDismissal, setRememberDismissal] = React.useState<boolean>(
+    false
+  )
 
-  const toggleRememberDismissal = useCallback(() => {
+  const toggleRememberDismissal = React.useCallback(() => {
     setRememberDismissal(prevDismissal => !prevDismissal)
   }, [])
 
@@ -67,12 +69,12 @@ export type HintArgs = {|
    * useBlockingHint expects the parent to disable the hint on cancel/continue */
   enabled: boolean,
   hintKey: HintKey,
-  content: Node,
+  content: React.Node,
   handleCancel: () => mixed,
   handleContinue: () => mixed,
 |}
 
-export const useBlockingHint = (args: HintArgs): ?Node => {
+export const useBlockingHint = (args: HintArgs): React.Node => {
   const { enabled, hintKey, handleCancel, handleContinue, content } = args
   const isDismissed = useSelector(selectors.getDismissedHints).includes(hintKey)
 

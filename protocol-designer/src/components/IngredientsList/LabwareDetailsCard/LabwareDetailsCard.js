@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { i18n } from '../../../localization'
 import { PDTitledList, PDListItem } from '../../lists'
@@ -12,7 +12,7 @@ type Props = {
   renameLabware: (name: string) => mixed,
 }
 
-export function LabwareDetailsCard(props: Props) {
+export function LabwareDetailsCard(props: Props): React.Node {
   return (
     <PDTitledList title="labware details" iconName="flask-outline">
       <PDListItem>

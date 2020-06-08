@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { useDispatch, useSelector } from 'react-redux'
 import omit from 'lodash/omit'
@@ -109,7 +109,9 @@ const WellSelectionModalComponent = (
   )
 }
 
-export const WellSelectionModal = (props: WellSelectionModalProps) => {
+export const WellSelectionModal = (
+  props: WellSelectionModalProps
+): React.Node => {
   const { isOpen, labwareId, name, onCloseClick, pipetteId } = props
 
   const dispatch = useDispatch()
@@ -132,10 +134,11 @@ export const WellSelectionModal = (props: WellSelectionModalProps) => {
     wellFieldData != null ? arrayToWellGroup(wellFieldData) : {}
 
   // component state
-  const [selectedPrimaryWells, setSelectedPrimaryWells] = useState<WellGroup>(
-    initialSelectedPrimaryWells
-  )
-  const [highlightedWells, setHighlightedWells] = useState<WellGroup>({})
+  const [
+    selectedPrimaryWells,
+    setSelectedPrimaryWells,
+  ] = React.useState<WellGroup>(initialSelectedPrimaryWells)
+  const [highlightedWells, setHighlightedWells] = React.useState<WellGroup>({})
 
   // actions
   const saveWellSelection = (wells: WellGroup) =>

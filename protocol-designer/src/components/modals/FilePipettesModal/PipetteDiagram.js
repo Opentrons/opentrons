@@ -10,7 +10,7 @@ type Props = {
   leftPipette: ?string,
   rightPipette: ?string,
 }
-export function PipetteDiagram(props: Props) {
+export function PipetteDiagram(props: Props): React.Node {
   const { leftPipette, rightPipette } = props
 
   // TODO (ka 2020-4-16): This is temporaray until FF is removed.

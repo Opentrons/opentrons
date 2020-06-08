@@ -109,7 +109,7 @@ export const getDynamicFieldFocusHandlerId = ({
 }: {|
   id: string,
   name: string,
-|}) => `${id}:${name}`
+|}): string => `${id}:${name}`
 
 // NOTE: if any fields of a given name are pristine, treat all fields of that name as pristine.
 // (Errors don't currently specify the id, so if we later want to only mask form-level errors

@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { useField } from 'formik'
 import { DropdownField } from '@opentrons/components/src/forms/DropdownField'
 
@@ -12,7 +12,7 @@ type ModelDropdownProps = {|
     disabled?: boolean,
   |}>,
 |}
-export const ModelDropdown = (props: ModelDropdownProps) => {
+export const ModelDropdown = (props: ModelDropdownProps): React.Node => {
   const { fieldName, options, tabIndex } = props
   const [field, meta] = useField(fieldName)
   return (

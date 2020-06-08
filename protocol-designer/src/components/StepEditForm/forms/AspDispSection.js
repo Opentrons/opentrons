@@ -12,7 +12,7 @@ type Props = {
   children?: React.Node,
 }
 
-export const AspDispSection = (props: Props) => {
+export const AspDispSection = (props: Props): React.Node => {
   const { children, className, collapsed, toggleCollapsed, prefix } = props
 
   return (

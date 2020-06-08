@@ -6,7 +6,9 @@ type LabwareTooltipContentsProps = {
   labwareNickname: ?string,
   labwareDefDisplayName: ?string,
 }
-export const LabwareTooltipContents = (props: LabwareTooltipContentsProps) => {
+export const LabwareTooltipContents = (
+  props: LabwareTooltipContentsProps
+): React.Node => {
   const { labwareNickname, labwareDefDisplayName } = props
   return (
     <div className={styles.labware_tooltip_contents}>

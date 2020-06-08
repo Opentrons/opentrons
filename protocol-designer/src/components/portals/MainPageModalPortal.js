@@ -4,11 +4,11 @@ import ReactDom from 'react-dom'
 
 const PORTAL_ROOT_ID = 'main-page-modal-portal-root'
 
-export function PortalRoot() {
+export function PortalRoot(): React.Node {
   return <div id={PORTAL_ROOT_ID} />
 }
 
-export function getPortalElem() {
+export function getPortalElem(): HTMLElement | null {
   return document.getElementById(PORTAL_ROOT_ID)
 }
 

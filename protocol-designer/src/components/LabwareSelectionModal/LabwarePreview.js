@@ -24,7 +24,7 @@ type Props = {
     | null,
 }
 
-export const LabwarePreview = (props: Props) => {
+export const LabwarePreview = (props: Props): React.Node => {
   const { labwareDef, moduleCompatibility } = props
   if (!labwareDef) return null
   const maxVolumes = reduce(

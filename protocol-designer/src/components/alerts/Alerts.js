@@ -50,4 +50,6 @@ const AlertsComponent = (props: Props) => {
   )
 }
 
-export const Alerts = React.memo<Props>(AlertsComponent)
+export const Alerts: React.AbstractComponent<Props> = React.memo(
+  AlertsComponent
+)

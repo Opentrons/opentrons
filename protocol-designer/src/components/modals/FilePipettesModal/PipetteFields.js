@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   DropdownField,
@@ -56,7 +56,7 @@ export type Props = {|
 // TODO(mc, 2019-10-14): delete this typedef when gen2 ff is removed
 type PipetteSelectProps = {| mount: Mount, tabIndex: number |}
 
-export function PipetteFields(props: Props) {
+export function PipetteFields(props: Props): React.Node {
   const {
     values,
     onFieldChange,

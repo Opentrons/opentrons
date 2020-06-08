@@ -41,7 +41,7 @@ type ProfileCycleRowProps = {|
   focusHandlers: FocusHandlers,
   stepOffset: number,
 |}
-export const ProfileCycleRow = (props: ProfileCycleRowProps) => {
+export const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { cycleItem, focusHandlers, stepOffset } = props
   const dispatch = useDispatch()
 
@@ -95,7 +95,7 @@ export type ProfileItemRowsProps = {|
   focusHandlers: FocusHandlers,
 |}
 
-export const ProfileItemRows = (props: ProfileItemRowsProps) => {
+export const ProfileItemRows = (props: ProfileItemRowsProps): React.Node => {
   const dispatch = useDispatch()
   const addProfileCycle = () => dispatch(steplistActions.addProfileCycle(null))
   const addProfileStep = () => dispatch(steplistActions.addProfileStep(null))

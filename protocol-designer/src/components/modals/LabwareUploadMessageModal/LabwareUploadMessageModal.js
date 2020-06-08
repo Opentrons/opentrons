@@ -124,7 +124,7 @@ type Props = {|
   overwriteLabwareDef?: () => mixed,
 |}
 
-export const LabwareUploadMessageModal = (props: Props) => {
+export const LabwareUploadMessageModal = (props: Props): React.Node => {
   const { message, dismissModal, overwriteLabwareDef } = props
   if (!message) return null
 

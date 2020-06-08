@@ -29,7 +29,7 @@ type Props = {|
   openEditModuleModal: (moduleType: ModuleRealType, moduleId?: string) => mixed,
 |}
 
-export function ModuleRow(props: Props) {
+export function ModuleRow(props: Props): React.Node {
   const { moduleOnDeck, openEditModuleModal, showCollisionWarnings } = props
   const type: ModuleRealType = moduleOnDeck?.type || props.type
 

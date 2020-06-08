@@ -1,5 +1,5 @@
 // @flow
-import React, { type Node } from 'react'
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import { useConditionalConfirm } from '@opentrons/components'
 import {
@@ -15,12 +15,12 @@ import type { TerminalItemId } from '../../../steplist'
 export { TerminalItemLink } from './TerminalItemLink'
 
 type Props = {|
-  children?: Node,
+  children?: React.Node,
   id: TerminalItemId,
   title: string,
 |}
 
-export const TerminalItem = (props: Props) => {
+export const TerminalItem = (props: Props): React.Node => {
   const { id, title, children } = props
   // const [showConfirmModal, setShowConfirmModal] = useState<boolean>(false)
 

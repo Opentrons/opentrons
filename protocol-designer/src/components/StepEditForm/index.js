@@ -54,7 +54,7 @@ type Props = {|
   dirtyFields: Array<string>,
 |}
 
-export const StepEditFormComponent = (props: Props) => {
+export const StepEditFormComponent = (props: Props): React.Node => {
   const {
     formData,
     canSave,

@@ -1,5 +1,5 @@
 // @flow
-import React, { useState } from 'react'
+import * as React from 'react'
 import { useSelector, useDispatch } from 'react-redux'
 import {
   selectors as stepFormSelectors,
@@ -24,7 +24,7 @@ export type ModelModuleInfo = {|
   slot: string,
 |}
 
-export const EditModules = (props: EditModulesProps) => {
+export const EditModules = (props: EditModulesProps): React.Node => {
   const { onCloseClick, moduleToEdit } = props
   const { moduleId, moduleType } = moduleToEdit
   const _initialDeckSetup = useSelector(stepFormSelectors.getInitialDeckSetup)
@@ -33,7 +33,7 @@ export const EditModules = (props: EditModulesProps) => {
   const [
     changeModuleWarningInfo,
     displayModuleWarning,
-  ] = useState<null | ModelModuleInfo>(null)
+  ] = React.useState<null | ModelModuleInfo>(null)
   const dispatch = useDispatch()
 
   const editModuleModel = (selectedModel: ModuleModel) => {

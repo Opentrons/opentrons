@@ -26,7 +26,7 @@ type Props = {|
 |}
 
 /** Link which opens a page on the knowledge base to a new tab/window */
-export function KnowledgeBaseLink(props: Props) {
+export function KnowledgeBaseLink(props: Props): React.Node {
   return (
     <a
       target="_blank"

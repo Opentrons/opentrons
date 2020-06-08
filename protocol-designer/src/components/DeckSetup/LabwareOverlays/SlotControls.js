@@ -50,7 +50,7 @@ type SP = {|
 |}
 type Props = {| ...OP, ...DP, ...DNDP, ...SP |}
 
-export const SlotControlsComponent = (props: Props) => {
+export const SlotControlsComponent = (props: Props): React.Node => {
   const {
     slot,
     addLabware,

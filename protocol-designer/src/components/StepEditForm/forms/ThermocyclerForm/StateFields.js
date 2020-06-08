@@ -12,7 +12,7 @@ import type { FocusHandlers } from '../../types'
 
 type Props = {| focusHandlers: FocusHandlers, isEndingHold?: boolean |}
 
-export const StateFields = (props: Props) => {
+export const StateFields = (props: Props): React.Node => {
   const { focusHandlers, isEndingHold } = props
 
   // Append 'Hold' to field names if component is used for an ending hold in a TC profile

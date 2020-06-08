@@ -16,7 +16,7 @@ type Props = {|
   message: BlockedSlotMessage,
 |}
 
-export const BlockedSlot = (props: Props) => {
+export const BlockedSlot = (props: Props): React.Node => {
   const { x, y, width, height, message } = props
   return (
     <g>

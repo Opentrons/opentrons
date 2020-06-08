@@ -7,7 +7,7 @@ import styles from './styles.css'
 type Props = React.ElementProps<typeof TitledList>
 
 /** Light wrapper around TitledList for PD-specific styles */
-export function PDTitledList(props: Props) {
+export function PDTitledList(props: Props): React.Node {
   return (
     <TitledList
       {...props}

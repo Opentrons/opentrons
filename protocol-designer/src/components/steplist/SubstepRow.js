@@ -34,7 +34,9 @@ type PillTooltipContentsProps = {
   ingredNames: WellIngredientNames,
   well: string,
 }
-export const PillTooltipContents = (props: PillTooltipContentsProps) => {
+export const PillTooltipContents = (
+  props: PillTooltipContentsProps
+): React.Node => {
   const totalLiquidVolume = reduce(
     props.ingreds,
     (acc, ingred) => acc + ingred.volume,
@@ -156,4 +158,6 @@ function SubstepRowComponent(props: SubstepRowProps) {
   )
 }
 
-export const SubstepRow = React.memo<SubstepRowProps>(SubstepRowComponent)
+export const SubstepRow: React.AbstractComponent<SubstepRowProps> = React.memo(
+  SubstepRowComponent
+)

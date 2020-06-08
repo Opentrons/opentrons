@@ -69,7 +69,7 @@ export const ModuleStatus = ({
   moduleState,
 }: {|
   moduleState: $PropertyType<ModuleTemporalProperties, 'moduleState'>,
-|}) => {
+|}): React.Node => {
   switch (moduleState.type) {
     case MAGNETIC_MODULE_TYPE:
       return (
@@ -189,4 +189,6 @@ const ModuleTagComponent = (props: Props) => {
   )
 }
 
-export const ModuleTag = React.memo<Props>(ModuleTagComponent)
+export const ModuleTag: React.AbstractComponent<Props> = React.memo(
+  ModuleTagComponent
+)

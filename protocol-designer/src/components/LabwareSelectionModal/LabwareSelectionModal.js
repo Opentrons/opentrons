@@ -1,11 +1,5 @@
 // @flow
-import React, {
-  useCallback,
-  useEffect,
-  useMemo,
-  useState,
-  type ElementProps,
-} from 'react'
+import * as React from 'react'
 import startCase from 'lodash/startCase'
 import reduce from 'lodash/reduce'
 import {
@@ -79,7 +73,7 @@ const RECOMMENDED_LABWARE_BY_MODULE: { [ModuleRealType]: Array<string> } = {
   [THERMOCYCLER_MODULE_TYPE]: ['nest_96_wellplate_100ul_pcr_full_skirt'],
 }
 
-export const LabwareSelectionModal = (props: Props) => {
+export const LabwareSelectionModal = (props: Props): React.Node => {
   const {
     customLabwareDefs,
     permittedTipracks,
@@ -91,14 +85,19 @@ export const LabwareSelectionModal = (props: Props) => {
     selectLabware,
   } = props
 
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
-  const [previewedLabware, setPreviewedLabware] = useState<?LabwareDefinition2>(
+  const [selectedCategory, setSelectedCategory] = React.useState<string | null>(
     null
   )
-  const [filterRecommended, setFilterRecommended] = useState<boolean>(false)
-  const [enqueuedLabwareType, setEnqueuedLabwareType] = useState<string | null>(
-    null
+  const [
+    previewedLabware,
+    setPreviewedLabware,
+  ] = React.useState<?LabwareDefinition2>(null)
+  const [filterRecommended, setFilterRecommended] = React.useState<boolean>(
+    false
   )
+  const [enqueuedLabwareType, setEnqueuedLabwareType] = React.useState<
+    string | null
+  >(null)
   const blockingCustomLabwareHint = useBlockingHint({
     enabled: enqueuedLabwareType !== null,
     hintKey: 'custom_labware_with_modules',
@@ -118,7 +117,7 @@ export const LabwareSelectionModal = (props: Props) => {
     },
   })
 
-  const handleSelectCustomLabware = useCallback(
+  const handleSelectCustomLabware = React.useCallback(
     (containerType: string) => {
       if (moduleType == null) {
         selectLabware(containerType)
@@ -131,11 +130,11 @@ export const LabwareSelectionModal = (props: Props) => {
   )
 
   // if you're adding labware to a module, check the recommended filter by default
-  useEffect(() => {
+  React.useEffect(() => {
     setFilterRecommended(moduleType != null)
   }, [moduleType])
 
-  const getLabwareRecommended = useCallback(
+  const getLabwareRecommended = React.useCallback(
     (def: LabwareDefinition2) => {
       return (
         moduleType &&
@@ -147,7 +146,7 @@ export const LabwareSelectionModal = (props: Props) => {
     [moduleType]
   )
 
-  const getLabwareCompatible = useCallback(
+  const getLabwareCompatible = React.useCallback(
     (def: LabwareDefinition2) => {
       // assume that custom (non-standard) labware is (potentially) compatible
       if (moduleType == null || !getLabwareDefIsStandard(def)) {
@@ -158,19 +157,19 @@ export const LabwareSelectionModal = (props: Props) => {
     [moduleType]
   )
 
-  const getLabwareDisabled = useCallback(
+  const getLabwareDisabled = React.useCallback(
     (labwareDef: LabwareDefinition2) =>
       (filterRecommended && !getLabwareRecommended(labwareDef)) ||
       !getLabwareCompatible(labwareDef),
     [filterRecommended, getLabwareCompatible, getLabwareRecommended]
   )
 
-  const customLabwareURIs: Array<string> = useMemo(
+  const customLabwareURIs: Array<string> = React.useMemo(
     () => Object.keys(customLabwareDefs),
     [customLabwareDefs]
   )
 
-  const labwareByCategory = useMemo(() => {
+  const labwareByCategory = React.useMemo(() => {
     const defs = getOnlyLatestDefs()
     return reduce<
       LabwareDefByDefURI,
@@ -196,7 +195,7 @@ export const LabwareSelectionModal = (props: Props) => {
     )
   }, [permittedTipracks])
 
-  const populatedCategories: { [category: string]: boolean } = useMemo(
+  const populatedCategories: { [category: string]: boolean } = React.useMemo(
     () =>
       orderedCategories.reduce(
         (acc, category) =>
@@ -251,7 +250,7 @@ export const LabwareSelectionModal = (props: Props) => {
   ) : null
 
   let moduleCompatibility: $PropertyType<
-    ElementProps<typeof LabwarePreview>,
+    React.ElementProps<typeof LabwarePreview>,
     'moduleCompatibility'
   > = null
   if (previewedLabware && moduleType) {

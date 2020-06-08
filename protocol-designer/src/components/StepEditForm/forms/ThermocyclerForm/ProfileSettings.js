@@ -11,7 +11,7 @@ import type { FocusHandlers } from '../../types'
 
 type Props = {| focusHandlers: FocusHandlers |}
 
-export const ProfileSettings = (props: Props) => {
+export const ProfileSettings = (props: Props): React.Node => {
   const { focusHandlers } = props
 
   return (
