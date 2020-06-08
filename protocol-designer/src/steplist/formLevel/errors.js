@@ -323,9 +323,12 @@ export const engageHeightRangeExceeded = (
  **     Helpers    **
  ********************/
 
-export const composeErrors = (...errorCheckers: Array<FormErrorChecker>) => (
-  value: mixed
-): Array<FormError> =>
+type ComposeErrors = (
+  ...errorCheckers: Array<FormErrorChecker>
+) => mixed => Array<FormError>
+export const composeErrors: ComposeErrors = (
+  ...errorCheckers: Array<FormErrorChecker>
+) => value =>
   errorCheckers.reduce((acc, errorChecker) => {
     const possibleError = errorChecker(value)
     return possibleError ? [...acc, possibleError] : acc

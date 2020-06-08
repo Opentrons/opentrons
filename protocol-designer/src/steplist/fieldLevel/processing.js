@@ -22,9 +22,9 @@ export const maskToFloat = (rawValue: mixed): string =>
     ? rawValue.replace(/[^-/.0-9]/g, '')
     : String(rawValue)
 
-export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
-  rawValue: mixed
-): string => {
+export const trimDecimals = (
+  decimals: number = DEFAULT_DECIMAL_PLACES
+): ValueCaster => (rawValue: mixed): string => {
   const trimRegex = new RegExp(`(\\d*[.]{1}\\d{${decimals}})(\\d*)`)
   return String(rawValue).replace(trimRegex, (match, group1) => group1)
 }
@@ -36,15 +36,19 @@ export const trimDecimals = (decimals: number = DEFAULT_DECIMAL_PLACES) => (
 // in practice they will always take parameters of one type (e.g. `(value: string)`)
 // For the sake of simplicity and flow happiness, they are equipped to deal with parameters of type `mixed`
 
-export const onlyPositiveNumbers = (value: mixed) =>
+export const onlyPositiveNumbers: ValueMasker = (value: mixed) =>
   value !== null && !Number.isNaN(value) && Number(value) >= 0 ? value : ''
-export const defaultTo = (defaultValue: mixed) => (value: mixed) =>
+export const defaultTo = (defaultValue: mixed): ValueMasker => (value: mixed) =>
   value === null || Number.isNaN(value) ? defaultValue : value
 
 /*******************
  **     Helpers    **
  ********************/
 
-export const composeMaskers = (...maskers: Array<ValueMasker>) => (
-  value: mixed
-) => maskers.reduce((maskingValue, masker) => masker(maskingValue), value)
+type ComposeMaskers = (
+  ...maskers: Array<ValueMasker>
+) => (value: mixed) => mixed
+export const composeMaskers: ComposeMaskers = (
+  ...maskers: Array<ValueMasker>
+) => value =>
+  maskers.reduce((maskingValue, masker) => masker(maskingValue), value)

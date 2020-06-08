@@ -94,7 +94,7 @@ function getPipetteCapacityLegacy(
 // should be taken from the default-values key
 export const INITIAL_DECK_SETUP_STEP_ID: '__INITIAL_DECK_SETUP_STEP__' =
   '__INITIAL_DECK_SETUP_STEP__'
-export const initialDeckSetupStepForm = {
+export const initialDeckSetupStepForm: FormData = {
   stepType: 'manualIntervention',
   id: INITIAL_DECK_SETUP_STEP_ID,
   labwareLocationUpdate: {
@@ -198,7 +198,9 @@ export function addInitialDeckSetupStep(
     (pipette: FilePipette) => pipette.mount
   )
 
-  const deckSetupStep = {
+  // TODO(IL, 2020-06-08): should be FormData but Flow get confused
+  // (Since this is a migration, any changes should be types-only!)
+  const deckSetupStep: any = {
     ...initialDeckSetupStepForm,
     labwareLocationUpdate: {
       ...initialDeckSetupStepForm.labwareLocationUpdate,

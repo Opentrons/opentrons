@@ -25,4 +25,6 @@ function _getDisabledFields(rawForm: FormData): Set<string> {
 
 // shallow-memoized because every disable-able field in the form calls this function once
 // WARNING: do not mutate the same rawForm obj or this memoization will break
-export const getDisabledFields = defaultMemoize(_getDisabledFields)
+export const getDisabledFields: (
+  rawForm: FormData
+) => Set<string> = defaultMemoize(_getDisabledFields)
