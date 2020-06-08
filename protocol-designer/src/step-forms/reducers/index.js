@@ -1257,7 +1257,7 @@ export type RootState = {
 // TODO Ian 2018-12-13: find some existing util to do this
 // semi-nested version of combineReducers?
 // TODO: Ian 2018-12-13 remove this 'action: any' type
-export const rootReducer = (state: RootState, action: any): RootState => {
+export const rootReducer: Reducer<RootState, any> = (state, action) => {
   const prevStateFallback = state || {}
   const nextState = {
     orderedStepIds: orderedStepIds(prevStateFallback.orderedStepIds, action),
@@ -1275,7 +1275,9 @@ export const rootReducer = (state: RootState, action: any): RootState => {
     ),
     labwareDefs: labwareDefsRootReducer(prevStateFallback.labwareDefs, action),
     // 'forms' reducers get full rootReducer state
+    // $FlowFixMe TODO(IL, 2020-06-08): savedStepForms should be typed as `Reducer` (which makes state: RootState | void)
     savedStepForms: savedStepForms(state, action),
+    // $FlowFixMe TODO(IL, 2020-06-08): unsavedForm should be typed as `Reducer` (which makes state: RootState | void)
     unsavedForm: unsavedForm(state, action),
     presavedStepForm: presavedStepForm(
       prevStateFallback.presavedStepForm,
