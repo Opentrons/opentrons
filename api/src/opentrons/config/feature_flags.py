@@ -31,7 +31,3 @@ def use_fast_api() -> bool:
 
 def enable_door_safety_switch():
     return advs.get_setting_with_env_overload('enableDoorSafetySwitch')
-
-
-def use_new_set_block_temperature():
-    return advs.get_setting_with_env_overload('useNewSetBlockTemp')

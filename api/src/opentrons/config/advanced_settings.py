@@ -158,14 +158,6 @@ settings = [
                     "Opening the robot door during a run will "
                     "pause your robot only after it has completed its "
                     "current motion."
-    ),
-    SettingDefinition(
-        _id='useNewSetBlockTemp',
-        title='Use new thermocycler set_block_temperature()',
-        description="Use the new set_block_temperature() which would wait "
-                    "until the thermocycler has stabilized before exiting."
-                    "This would add 15-20 seconds to"
-                    " time taken by set_block_temperature exit previously."
     )
 ]
 
@@ -332,18 +324,8 @@ def _migrate4to5(previous: SettingsMap) -> SettingsMap:
     return newmap
 
 
-def _migrate5to6(previous: SettingsMap) -> SettingsMap:
-    """
-    Migration to version 6 of the feature flags file. Adds the
-    useNewSetBlockTemp config element.
-    """
-    newmap = {k: v for k, v in previous.items()}
-    newmap['useNewSetBlockTemp'] = None
-    return newmap
-
-
 _MIGRATIONS = [_migrate0to1, _migrate1to2, _migrate2to3, _migrate3to4,
-               _migrate4to5, _migrate5to6]
+               _migrate4to5]
 """
 List of all migrations to apply, indexed by (version - 1). See _migrate below
 for how the migration functions are applied. Each migration function should

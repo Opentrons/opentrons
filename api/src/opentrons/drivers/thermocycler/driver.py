@@ -14,8 +14,6 @@ from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
-from opentrons.config import feature_flags as ff
-
 
 if TYPE_CHECKING:
     # avoid an issue where Queue doesn't support generics at runtime
@@ -534,9 +532,6 @@ class Thermocycler:
         the target temperature. Returns true only if all values in history are
         within threshold range of target temperature.
         """
-        if ff.use_new_set_block_temperature():
-            return abs(self.target - self.temperature) < TEMP_THRESHOLD
-
         if len(self._block_temp_buffer) < TEMP_BUFFER_MAX_LEN:
             # Not enough temp history
             return False
