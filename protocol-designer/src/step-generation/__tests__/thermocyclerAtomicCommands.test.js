@@ -5,9 +5,16 @@ import { thermocyclerAwaitBlockTemperature } from '../commandCreators/atomic/the
 import { thermocyclerAwaitLidTemperature } from '../commandCreators/atomic/thermocyclerAwaitLidTemperature'
 import { thermocyclerDeactivateBlock } from '../commandCreators/atomic/thermocyclerDeactivateBlock'
 import { thermocyclerDeactivateLid } from '../commandCreators/atomic/thermocyclerDeactivateLid'
+import { thermocyclerRunProfile } from '../commandCreators/atomic/thermocyclerRunProfile'
 import { thermocyclerCloseLid } from '../commandCreators/atomic/thermocyclerCloseLid'
 import { thermocyclerOpenLid } from '../commandCreators/atomic/thermocyclerOpenLid'
 import { getSuccessResult } from '../__fixtures__'
+
+import type {
+  ModuleOnlyParams,
+  TemperatureParams,
+  TCProfileParams,
+} from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import type { CommandCreator } from '../types'
 
 const getRobotInitialState = (): any => {
@@ -17,8 +24,16 @@ const getRobotInitialState = (): any => {
 // neither should InvariantContext
 const invariantContext: any = {}
 
-const module = 'someTCModuleId'
-const temperature = 42
+type ProfileItem = $ElementType<
+  $PropertyType<TCProfileParams, 'profile'>,
+  number // Using arrays, we don't statically know the size of the array, so `number` is the key
+>
+
+const module: $PropertyType<ModuleOnlyParams, 'module'> = 'someTCModuleId'
+const temperature: $PropertyType<TemperatureParams, 'temperature'> = 42
+const holdTime: $PropertyType<ProfileItem, 'holdTime'> = 10
+const volume: $PropertyType<TCProfileParams, 'volume'> = 10
+const profile = [{ temperature, holdTime }]
 
 describe('thermocycler atomic commands', () => {
   // NOTE(IL, 2020-05-11): splitting these into different arrays based on type of args
@@ -73,6 +88,14 @@ describe('thermocycler atomic commands', () => {
     },
   ]
 
+  const testCasesRunProfile = [
+    {
+      commandCreator: thermocyclerRunProfile,
+      expectedType: 'thermocycler/runProfile',
+      params: { module, profile, volume },
+    },
+  ]
+
   const testParams = <P>({
     commandCreator,
     params,
@@ -101,4 +124,5 @@ describe('thermocycler atomic commands', () => {
   testCasesSetBlock.forEach(testParams)
   testCasesWithTempParam.forEach(testParams)
   testCasesModuleOnly.forEach(testParams)
+  testCasesRunProfile.forEach(testParams)
 })
