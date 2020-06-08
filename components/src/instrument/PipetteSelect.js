@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-
+import { Flex } from '@opentrons/components'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -118,19 +118,18 @@ const PipetteNameItem = (props: PipetteNameSpecs) => {
   }
 
   return (
-    <div
+    <Flex
       data-id={dataIdFormat(
         'PipetteNameItem',
         volumeClass,
         channels,
         displayCategory
       )}
-      className={styles.pipette_container}
     >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
       <div className={styles.pipette_category}>{displayCategory}</div>
-    </div>
+    </Flex>
   )
 }
 
