@@ -1,4 +1,5 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { Alerts, type Props } from '../alerts/Alerts'
 import {
@@ -99,7 +100,14 @@ const mergeProps = (
   }
 }
 
-export const FormAlerts = connect<Props, OP, SP, {||}, _, _>(
+export const FormAlerts: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

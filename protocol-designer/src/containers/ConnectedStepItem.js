@@ -35,7 +35,7 @@ type Props = {|
   onStepContextMenu?: () => mixed,
 |}
 
-export const ConnectedStepItem = (props: Props) => {
+export const ConnectedStepItem = (props: Props): React.Node => {
   const { stepId, stepNumber } = props
 
   const step = useSelector(stepFormSelectors.getSavedStepForms)[stepId]

@@ -138,7 +138,14 @@ function mergeProps(
   }
 }
 
-export const LiquidPlacementForm = connect<Props, {||}, SP, {||}, _, _>(
+export const LiquidPlacementForm: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

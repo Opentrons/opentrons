@@ -41,7 +41,14 @@ const mergeProps = (stateProps: SP, dispatchProps: DP): Props => ({
   },
 })
 
-export const DeckSetup = connect<Props, {||}, SP, DP, _, _>(
+export const DeckSetup: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps,
   mergeProps

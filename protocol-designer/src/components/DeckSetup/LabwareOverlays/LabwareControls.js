@@ -1,5 +1,5 @@
 // @flow
-import React from 'react'
+import * as React from 'react'
 import cx from 'classnames'
 import { connect } from 'react-redux'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
@@ -81,6 +81,11 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
   highlighted: getHoveredStepLabware(state).includes(ownProps.labwareOnDeck.id),
 })
 
-export const LabwareControls = connect<Props, OP, SP, {||}, _, _>(
-  mapStateToProps
-)(LabwareControlsComponent)
+export const LabwareControls: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(mapStateToProps)(LabwareControlsComponent)

@@ -79,6 +79,11 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   return { iconClassNames }
 }
 
-export const WellOrderField = connect<Props, OP, SP, _, _, _>(mapSTP)(
-  WellOrderInput
-)
+export const WellOrderField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(WellOrderInput)

@@ -1,5 +1,5 @@
 // @flow
-import React, { useState, type ComponentType } from 'react'
+import * as React from 'react'
 import { useDispatch, connect } from 'react-redux'
 import get from 'lodash/get'
 import isEqual from 'lodash/isEqual'
@@ -31,7 +31,7 @@ import styles from './StepEditForm.css'
 import type { BaseState } from '../../types'
 import type { FormData, StepType, StepFieldName } from '../../form-types'
 
-const STEP_FORM_MAP: { [StepType]: ?ComponentType<any> } = {
+const STEP_FORM_MAP: { [StepType]: ?React.ComponentType<any> } = {
   mix: MixForm,
   pause: PauseForm,
   moveLiquid: MoveLiquidForm,
@@ -150,11 +150,12 @@ type StepEditFormManagerProps = {|
 
 const StepEditFormManager = (props: StepEditFormManagerProps) => {
   const { canSave, formData, isNewStep, isPristineSetTempForm } = props
-  const [showMoreOptionsModal, setShowMoreOptionsModal] = useState<boolean>(
-    false
-  )
-  const [focusedField, setFocusedField] = useState<string | null>(null)
-  const [dirtyFields, setDirtyFields] = useState<Array<StepFieldName>>(
+  const [
+    showMoreOptionsModal,
+    setShowMoreOptionsModal,
+  ] = React.useState<boolean>(false)
+  const [focusedField, setFocusedField] = React.useState<string | null>(null)
+  const [dirtyFields, setDirtyFields] = React.useState<Array<StepFieldName>>(
     getDirtyFields(isNewStep, formData)
   )
 
@@ -277,7 +278,14 @@ const mapStateToProps = (state: BaseState): StepEditFormManagerProps => {
 // It doesn't matter if the children are using connect or useSelector,
 // only the parent matters.)
 // https://react-redux.js.org/api/hooks#stale-props-and-zombie-children
-export const StepEditForm = connect<StepEditFormManagerProps, {||}, _, _, _, _>(
+export const StepEditForm: React.AbstractComponent<{||}> = connect<
+  StepEditFormManagerProps,
+  {||},
+  _,
+  _,
+  _,
+  _
+>(
   mapStateToProps,
   () => ({}) // no `dispatch` prop
 )((props: StepEditFormManagerProps) => (

@@ -106,7 +106,14 @@ const mapDispatchToProps = (dispatch: Dispatch<*>): DP => ({
   onClose: () => dispatch(stepsActions.clearWellSelectionLabwareKey()),
 })
 
-export const WellSelectionInput = connect<Props, OP, SP, DP, _, _>(
+export const WellSelectionInput: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(WellSelectionInputComponent)

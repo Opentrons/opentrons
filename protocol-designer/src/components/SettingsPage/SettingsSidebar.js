@@ -38,7 +38,14 @@ const DTP = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(actions.navigateToPage(pageName)),
 })
 
-export const SettingsSidebar = connect<Props, {||}, SP, DP, _, _>(
+export const SettingsSidebar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   STP,
   DTP
 )(SettingsSidebarComponent)

@@ -29,6 +29,11 @@ function STP(state: BaseState, ownProps: OP): SP {
   }
 }
 
-export const ConditionalOnField = connect<Props, OP, SP, _, _, _>(STP)(
-  ConditionalOnFieldComponent
-)
+export const ConditionalOnField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(STP)(ConditionalOnFieldComponent)

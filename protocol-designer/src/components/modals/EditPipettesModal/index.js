@@ -1,5 +1,5 @@
 // @flow
-import type { ElementProps } from 'react'
+import * as React from 'react'
 import { connect } from 'react-redux'
 import isEmpty from 'lodash/isEmpty'
 import last from 'lodash/last'
@@ -22,7 +22,7 @@ import type {
 } from '../../../step-forms'
 import type { StepIdType } from '../../../form-types'
 
-type Props = ElementProps<typeof FilePipettesModal>
+type Props = React.ElementProps<typeof FilePipettesModal>
 
 type SP = {|
   initialPipetteValues: FormPipettesByMount,
@@ -186,7 +186,14 @@ const mergeProps = (
   }
 }
 
-export const EditPipettesModal = connect<Props, OP, SP, {||}, _, _>(
+export const EditPipettesModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  {||},
+  _,
+  _
+>(
   mapSTP,
   null,
   mergeProps

@@ -262,7 +262,14 @@ const mapDTP = (dispatch: ThunkDispatch<*>, ownProps: OP): DP => {
   }
 }
 
-export const TipPositionModal = connect<Props, OP, {||}, DP, _, _>(
+export const TipPositionModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDTP
 )(TipPositionModalComponent)

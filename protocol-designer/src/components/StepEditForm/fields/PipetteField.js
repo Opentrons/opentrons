@@ -25,33 +25,38 @@ const PipetteFieldSTP = (state: BaseState, ownProps: OP): SP => ({
   pipetteOptions: stepFormSelectors.getEquippedPipetteOptions(state),
 })
 
-export const PipetteField = connect<Props, OP, SP, _, _, _>(PipetteFieldSTP)(
-  (props: Props) => (
-    <FieldConnector
-      name={props.name}
-      focusedField={props.focusedField}
-      dirtyFields={props.dirtyFields}
-      render={({ value, updateValue, hoverTooltipHandlers }) => (
-        <FormGroup
-          label={i18n.t('form.step_edit_form.field.pipette.label')}
-          className={styles.large_field}
-          hoverTooltipHandlers={hoverTooltipHandlers}
-        >
-          <DropdownField
-            options={props.pipetteOptions}
-            value={value ? String(value) : null}
-            onBlur={() => {
-              props.onFieldBlur(props.name)
-            }}
-            onFocus={() => {
-              props.onFieldFocus(props.name)
-            }}
-            onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
-              updateValue(e.currentTarget.value)
-            }}
-          />
-        </FormGroup>
-      )}
-    />
-  )
-)
+export const PipetteField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(PipetteFieldSTP)((props: Props) => (
+  <FieldConnector
+    name={props.name}
+    focusedField={props.focusedField}
+    dirtyFields={props.dirtyFields}
+    render={({ value, updateValue, hoverTooltipHandlers }) => (
+      <FormGroup
+        label={i18n.t('form.step_edit_form.field.pipette.label')}
+        className={styles.large_field}
+        hoverTooltipHandlers={hoverTooltipHandlers}
+      >
+        <DropdownField
+          options={props.pipetteOptions}
+          value={value ? String(value) : null}
+          onBlur={() => {
+            props.onFieldBlur(props.name)
+          }}
+          onFocus={() => {
+            props.onFieldFocus(props.name)
+          }}
+          onChange={(e: SyntheticEvent<HTMLSelectElement>) => {
+            updateValue(e.currentTarget.value)
+          }}
+        />
+      </FormGroup>
+    )}
+  />
+))

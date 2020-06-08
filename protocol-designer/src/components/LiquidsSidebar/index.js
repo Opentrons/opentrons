@@ -65,7 +65,14 @@ function mapDispatchToProps(dispatch: ThunkDispatch<*>): DP {
   }
 }
 
-export const LiquidsSidebar = connect<Props, {||}, SP, DP, _, _>(
+export const LiquidsSidebar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  DP,
+  _,
+  _
+>(
   mapStateToProps,
   mapDispatchToProps
 )(LiquidsSidebarComponent)

@@ -1,14 +1,15 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { ChangeTip } from './ChangeTip'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
-import type { ElementProps } from 'react'
+
 import type { BaseState } from '../../../../types'
 import type { FormData } from '../../../../form-types'
 import type { ChangeTipOptions } from '../../../../step-generation/types'
 
-type Props = ElementProps<typeof ChangeTip>
+type Props = React.ElementProps<typeof ChangeTip>
 type OP = {| name: $PropertyType<Props, 'name'> |}
 type SP = $Diff<$Exact<Props>, OP>
 
@@ -61,4 +62,11 @@ const mapSTP = (state: BaseState, ownProps: OP): SP => {
   }
 }
 
-export const ChangeTipField = connect<Props, OP, SP, _, _, _>(mapSTP)(ChangeTip)
+export const ChangeTipField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(ChangeTip)

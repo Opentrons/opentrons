@@ -59,7 +59,14 @@ function mergeProps(
   }
 }
 
-export const ConnectedFilePage = connect<Props, {||}, SP, {||}, _, _>(
+export const ConnectedFilePage: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps

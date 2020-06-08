@@ -1,16 +1,17 @@
 // @flow
+import * as React from 'react'
 import { connect } from 'react-redux'
 import { Path } from './Path'
 import { i18n } from '../../../../localization'
 import { selectors as stepFormSelectors } from '../../../../step-forms'
 import { getWellRatio } from '../../../../steplist/utils'
 import { volumeInCapacityForMulti } from '../../../../steplist/formLevel/handleFormChange/utils'
-import type { ElementProps } from 'react'
+
 import type { PipetteEntities } from '../../../../step-forms'
 import type { FormData, PathOption } from '../../../../form-types'
 import type { BaseState } from '../../../../types'
 
-type Props = ElementProps<typeof Path>
+type Props = React.ElementProps<typeof Path>
 type SP = {| disabledPathMap: $PropertyType<Props, 'disabledPathMap'> |}
 type OP = $Diff<$Exact<Props>, SP>
 
@@ -98,4 +99,11 @@ function mapSTP(state: BaseState): SP {
   }
 }
 
-export const PathField = connect<Props, OP, SP, _, _, _>(mapSTP)(Path)
+export const PathField: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  SP,
+  _,
+  _,
+  _
+>(mapSTP)(Path)

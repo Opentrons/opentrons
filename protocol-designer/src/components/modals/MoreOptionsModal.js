@@ -88,7 +88,14 @@ const mapDispatchToProps = (dispatch: ThunkDispatch<*>): DP => ({
     dispatch(steplistActions.changeFormInput({ update })),
 })
 
-export const MoreOptionsModal = connect<Props, OP, {||}, DP, _, _>(
+export const MoreOptionsModal: React.AbstractComponent<OP> = connect<
+  Props,
+  OP,
+  {||},
+  DP,
+  _,
+  _
+>(
   null,
   mapDispatchToProps
 )(MoreOptionsModalComponent)

@@ -207,7 +207,14 @@ const StickyTitleBar = (props: TitleBarProps) => (
   <TitleBar {...props} className={styles.sticky_bar} />
 )
 
-export const ConnectedTitleBar = connect<Props, {||}, SP, {||}, _, _>(
+export const ConnectedTitleBar: React.AbstractComponent<{||}> = connect<
+  Props,
+  {||},
+  SP,
+  {||},
+  _,
+  _
+>(
   mapStateToProps,
   null,
   mergeProps
