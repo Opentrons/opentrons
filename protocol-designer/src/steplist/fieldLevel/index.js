@@ -224,11 +224,7 @@ const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
     castValue: Number,
   },
   durationMinutes: {
-    maskValue: composeMaskers(
-      maskToFloat,
-      onlyPositiveNumbers,
-      trimDecimals(1)
-    ),
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
   durationSeconds: {
