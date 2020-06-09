@@ -16,6 +16,7 @@ import os
 import shutil
 
 from pathlib import Path
+from dataclasses import dataclass
 from collections import defaultdict
 from hashlib import sha256
 from itertools import takewhile, dropwhile
@@ -30,6 +31,8 @@ from opentrons.config import CONFIG, get_tip_length_cal_path
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
+from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
+                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
     from .dev_types import TipLengthCalibration, PipTipLengthCalibration
@@ -38,11 +41,6 @@ if TYPE_CHECKING:
 
 
 MODULE_LOG = logging.getLogger(__name__)
-
-# TODO: Ian 2019-05-23 where to store these constants?
-OPENTRONS_NAMESPACE = 'opentrons'
-CUSTOM_NAMESPACE = 'custom_beta'
-STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 
 class OutOfTipsError(Exception):
@@ -79,6 +77,50 @@ class DateTimeDecoder(json.JSONDecoder):
             return obj
         except TypeError:
             return self.dict_to_obj(obj)
+
+
+@dataclass
+class CalibrationData:
+    """
+    Class to categorize the shape of a
+    given calibration data.
+    TODO(6/8): Move to a separate file
+    """
+    value: Union[float, List]
+    lastModified: str
+
+
+@dataclass
+class CalibrationTypes:
+    """
+    Class to categorize what calibration
+    data might be stored for a labware.
+    TODO(6/8): Move to a separate file
+    """
+    offset: CalibrationData
+    tipLength: CalibrationData
+
+
+@dataclass
+class CalibrationInformation:
+    """
+    Class to store important calibration
+    info for labware.
+    TODO(6/8): Move to a separate file
+    """
+    calibration: CalibrationTypes
+    definition: LabwareDefinition
+    slot: str
+    module: ModuleData
+    labware_id: str,
+    uri: str
+
+
+@dataclass
+class UriDetails:
+    namespace: str
+    load_name: str
+    version: str
 
 
 class Well:
@@ -860,7 +902,7 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     :param labware: A labware object
     :param lw_hash: The labware hash of the calibration
     """
-    index_file = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    index_file = OFFSETS_PATH / 'index.json'
     uri = labware.uri
     if index_file.exists():
         blob = _read_file(str(index_file))
@@ -884,13 +926,12 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
 
 
 def _get_labware_offset_path(labware: Labware):
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
-    calibration_path.mkdir(parents=True, exist_ok=True)
+    OFFSETS_PATH.mkdir(parents=True, exist_ok=True)
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
     _add_to_index_offset_file(labware, labware_hash)
-    return calibration_path/f'{labware_hash}{parent_id}.json'
+    return OFFSETS_PATH/f'{labware_hash}{parent_id}.json'
 
 
 def save_calibration(labware: Labware, delta: Point):
@@ -1082,7 +1123,7 @@ def _get_path_to_labware(
         return get_shared_data_root() / STANDARD_DEFS_PATH \
                / load_name / f'{version}.json'
     if not base_path:
-        base_path = CONFIG['labware_user_definitions_dir_v2']
+        base_path = USER_DEFS_PATH
     def_path = base_path / namespace / load_name / f'{version}.json'
     return def_path
 
@@ -1128,9 +1169,8 @@ def save_definition(
 
 
 def delete_all_custom_labware() -> None:
-    custom_def_dir = CONFIG['labware_user_definitions_dir_v2']
-    if custom_def_dir.is_dir():
-        shutil.rmtree(custom_def_dir)
+    if USER_DEFS_PATH.is_dir():
+        shutil.rmtree(USER_DEFS_PATH)
 
 
 def _get_labware_definition_from_bundle(
@@ -1305,7 +1345,7 @@ def get_all_labware_definitions() -> List[str]:
     _check_for_subdirectories(get_shared_data_root() / STANDARD_DEFS_PATH)
 
     # check for custom labware
-    for namespace in os.scandir(CONFIG['labware_user_definitions_dir_v2']):
+    for namespace in os.scandir(USER_DEFS_PATH):
         _check_for_subdirectories(namespace)
 
     return labware_list
@@ -1318,25 +1358,32 @@ def get_all_calibrations() -> List[Dict[str, Any]]:
 
     :return: A list of dictionary objects representing all of the
     labware calibration files found on the robot.
+    TODO(6/8): Move to another location
     """
     all_calibrations: List[Dict[str, Any]] = []
-    offset_dir = CONFIG['labware_calibration_offsets_dir_v2']
-    index_path = offset_dir / 'index.json'
+    index_path = OFFSETS_PATH / 'index.json'
     if not index_path.exists():
         return all_calibrations
     index_file = _read_file(str(index_path))
     for key, data in index_file.items():
-        cal_path = offset_dir / f'{key}.json'
-        calibration = _read_file(str(cal_path))
-        ns, ln, v = details_from_uri(data['uri'])
-        definition = get_labware_definition(ln, ns, v)
+        cal_path = OFFSETS_PATH / f'{key}.json'
+        cal_blob = _read_file(str(cal_path))
+        calibration = CalibrationTypes(
+            offset=CalibrationData(**cal_blob['default']['offset'])
+            tipLength=CalibrationData(**cal_blob.get('tipLength', {}))
+        )
+        details = details_from_uri(data['uri'])
+        definition = get_labware_definition(
+            details.load_name, details.namespace, details.version)
         all_calibrations.append(
-            {'calibration': calibration,
-             'definition': definition,
-             'slot': data['slot'],
-             'module': data['module'],
-             'id': key,
-             'uri': data['uri']})
+            CalibrationInformation(
+                calibration=calibration,
+                definition=definition,
+                slot=data['slot'],
+                module=data['module'],
+                labware_id=key,
+                uri=data['uri']
+            ))
     return all_calibrations
 
 
@@ -1345,7 +1392,7 @@ def clear_calibrations():
     Delete all calibration files for labware. This includes deleting tip-length
     data for tipracks.
     """
-    calibration_path = CONFIG['labware_calibration_offsets_dir_v2']
+    calibration_path = OFFSETS_PATH
     try:
         targets = [
             f for f in calibration_path.iterdir() if f.suffix == '.json']
@@ -1363,11 +1410,8 @@ def _remove_offset_from_index(calibration_id: str):
     :raises FileNotFoundError: If index file does not exist or
     the specified id is not in the index file.
     """
-    index_path = CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
-    if index_path.exists():
-        blob = _read_file(str(index_path))
-    else:
-        raise FileNotFoundError()
+    index_path = OFFSETS_PATH / 'index.json'
+    blob = _read_file(str(index_path))
 
     del blob[calibration_id]
     with index_path.open('w') as f:
@@ -1380,8 +1424,7 @@ def delete_offset_file(calibration_id: str):
 
     :param calibration_id: labware hash
     """
-    offset =\
-        CONFIG['labware_calibration_offsets_dir_v2'] / f'{calibration_id}.json'
+    offset = OFFSETS_PATH / f'{calibration_id}.json'
     try:
         _remove_offset_from_index(calibration_id)
         offset.unlink()
@@ -1450,15 +1493,12 @@ def uri_from_details(namespace: str, load_name: str, version: Union[str, int],
     return f'{namespace}{delimiter}{load_name}{delimiter}{version}'
 
 
-def details_from_uri(uri: str, delimiter='/'):
+def details_from_uri(uri: str, delimiter='/') -> UriDetails:
     """
     Unpack a labware URI to get the namespace, loadname and version
     """
     info = uri.split(delimiter)
-    namespace = info[0]
-    load_name = info[1]
-    version = info[2]
-    return namespace, load_name, version
+    return UriDetails(namespace=info[0], load_name=info[1], version=info[2])
 
 
 def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:

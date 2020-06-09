@@ -19,37 +19,38 @@ These routes serve the current labware offsets on the robot to a client.
 """
 
 
-def _convert_time(specified_time: int):
-    return time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(specified_time))
+def _convert_time(specified_time: Optional[int]) -> Optional[datetime]:
+    if specified_time:
+        return datetime.utcfromtimestamp(specified_time).isoformat()
+    return None
 
 
-def _format_calibrations(calibrations: List[Dict[str, Any]]):
+def _format_calibrations(calibrations: List[Dict[str, Any]]) -> :
     formatted_calibrations = []
-    for calibration in calibrations:
+    for calInfo in calibrations:
         namespace, loadname, version =\
-            lw_funcs.details_from_uri(calibration['uri'])
-        if calibration['module']:
-            parent = list(calibration['module'].keys())[0]
+            lw_funcs.details_from_uri(calInfo.uri)
+        if calInfo.module:
+            parent = list(calInfo['module'].keys())[0]
         else:
-            parent = calibration['slot']
-        lw_offset = calibration['calibration']['default']
-        modified = _convert_time(lw_offset['lastModified'])
+            parent = calInfo.slot
+        lw_offset = calInfo.calibration.offset
+        modified = _convert_time(lw_offset.lastModified)
         offset = lw_models.OffsetData(
-            value=lw_offset['offset'],
+            value=lw_offset.value,
             lastModified=modified)
-        if calibration['calibration'].get('tipLength'):
-            tip_difference = calibration['calibration']['tipLength']
-            modified = _convert_time(tip_difference['lastModified'])
-            tip_length: Optional[lw_models.TipData] = lw_models.TipData(
-                value=tip_difference['length'],
-                lastModified=modified)
-        else:
-            tip_length = None
+
+        tip_cal = calInfo.calibration.tipLength.
+        modified = _convert_time(tip_cal.lastModified)
+        tip_length = lw_models.TipData(
+            value=tip_cal.value,
+            lastModified=modified)
+
         cal_data = lw_models.CalibrationData(
             offset=offset, tipLength=tip_length)
         formatted_cal = lw_models.LabwareCalibration(
             valueType='labwareCalibration',
-            calibrationId=calibration['id'],
+            calibrationId=calibration.labware_id,
             calibrationData=cal_data,
             loadName=loadname,
             namespace=namespace,
@@ -60,8 +61,10 @@ def _format_calibrations(calibrations: List[Dict[str, Any]]):
 
 
 def _grab_value(
-        calibration: Dict, filtering: str, comparison: Union[str, int]):
-    ns, ln, ver = lw_funcs.details_from_uri(calibration['uri'])
+        calibration: lw_funcs.CalibrationTypes,
+        filtering: str,
+        comparison: Union[str, int]) -> bool:
+    ns, ln, ver = lw_funcs.details_from_uri(calibration.uri)
     if filtering == 'namespace':
         return ns == comparison
     if filtering == 'loadname':
@@ -70,7 +73,7 @@ def _grab_value(
         return ver == str(comparison)
 
 
-def _check_parent(values: Dict[str, Any], parent: str):
+def _check_parent(values: Dict[str, Any], parent: str) -> bool:
     mod = values['module']
     slot = values['slot']
     if slot == parent:
@@ -85,8 +88,7 @@ def _check_parent(values: Dict[str, Any], parent: str):
             summary="Search the robot for any saved labware offsets"
                     "which allows you to check whether a particular"
                     "labware has been calibrated or not.",
-            response_model=lw_models.Calibrations,
-            status_code=status.HTTP_200_OK)
+            response_model=lw_models.Calibrations)
 async def get_all_labware_calibrations(
         loadName: str = None,
         namespace: str = None,
@@ -128,6 +130,7 @@ async def get_specific_labware_calibration(
     for cal in lw_funcs.get_all_calibrations():
         if calibrationId == cal['id']:
             calibration = cal
+            break
     if not calibration:
         error = Error(title='{calibrationId} does not exist.')
         raise RobotServerError(status_code=status.HTTP_404_NOT_FOUND,

@@ -537,11 +537,6 @@ def test_list_calibrations(set_up_index_file):
         assert list(cal.keys()) ==\
             ['calibration', 'definition', 'slot', 'module', 'id', 'uri']
 
-    for cal, lw_name in zip(all_cals, labware_list):
-        uri = cal['uri']
-        _, loadname, _ = labware.details_from_uri(uri)
-        assert loadname == lw_name
-
 
 def test_delete_one_calibration(set_up_index_file):
     lw_to_delete = 'nest_96_wellplate_2ml_deep'

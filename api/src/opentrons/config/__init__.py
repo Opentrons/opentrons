@@ -480,6 +480,14 @@ def reload():
     CONFIG.update(load_and_migrate())
 
 
+def get_opentrons_path(path_name: str):
+    # Helper function to look-up the path
+    # to specific configuration files for
+    # the Opentrons system
+    global CONFIG
+    CONFIG[path_name]
+
+
 CONFIG = load_and_migrate()
 #: The currently loaded config. This should not change for the lifetime
 #: of the program. This is a dict much like os.environ() where the keys
