@@ -10,6 +10,7 @@ from opentrons.calibration.session import CalibrationException, \
     NoPipetteException
 from opentrons.calibration.util import StateMachineError
 
+from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import CommandName, EmptyModel
 from robot_server.service.session.session_types import CheckSession, \
@@ -164,8 +165,10 @@ def test_get_response_details(check_session_instance, session_hardware_info):
 async def test_session_command_execute(check_session_instance,
                                        mock_cal_session):
     await check_session_instance.command_executor.execute(
-        CommandName.jog,
-        JogPosition(vector=(1, 2, 3)))
+        create_command(
+            CommandName.jog,
+            JogPosition(vector=(1, 2, 3)))
+    )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="jog",
@@ -176,8 +179,10 @@ async def test_session_command_execute(check_session_instance,
 async def test_session_command_execute_no_body(check_session_instance,
                                                mock_cal_session):
     await check_session_instance.command_executor.execute(
-        CommandName.load_labware,
-        EmptyModel())
+        create_command(
+            CommandName.load_labware,
+            EmptyModel())
+    )
 
     mock_cal_session.trigger_transition.assert_called_once_with(
         trigger="loadLabware"
@@ -200,5 +205,5 @@ async def test_session_command_execute_raise(check_session_instance,
 
     with pytest.raises(SessionCommandException):
         await check_session_instance.command_executor.execute(
-            CommandName.jog, JogPosition(vector=(1, 2, 3))
+            create_command(CommandName.jog, JogPosition(vector=(1, 2, 3)))
         )

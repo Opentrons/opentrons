@@ -4,9 +4,8 @@ from opentrons.calibration.session import CalibrationException
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import \
-    CommandQueue, StateMachineExecutor, Command
+    CommandQueue, StateMachineExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import CommandName, CommandDataType
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
 from robot_server.service.session.errors import SessionCreationException, \
@@ -15,10 +14,9 @@ from robot_server.service.session.errors import SessionCreationException, \
 
 class CheckSessionStateExecutor(StateMachineExecutor):
 
-    async def execute(self, command: CommandName,
-                      data: CommandDataType) -> Command:
+    async def execute(self, command: Command) -> CompletedCommand:
         try:
-            return await super().execute(command, data)
+            return await super().execute(command)
         except CalibrationException as e:
             raise CommandExecutionException(e)
 

@@ -9,6 +9,7 @@ from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
 from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
+from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import SessionCreationException, \
     SessionCommandException
 from robot_server.service.session.manager import SessionManager, BaseSession
@@ -164,9 +165,9 @@ async def session_command_execute_handler(
         )
 
     try:
-        command = await session_obj.command_executor.execute(
-            command=command_request.data.attributes.command,
-            data=command_request.data.attributes.data)
+        command = create_command(command_request.data.attributes.command,
+                                 command_request.data.attributes.data)
+        command_result = await session_obj.command_executor.execute(command)
         log.debug(f"Command completed {command}")
     except SessionCommandException as e:
         log.exception("Failed to execute command")
@@ -181,10 +182,10 @@ async def session_command_execute_handler(
     return route_models.CommandResponse(
         data=ResponseDataModel.create(
             attributes=route_models.SessionCommand(
-                data=command.data,
-                command=command.name,
-                status='executed'),
-            resource_id=command.identifier
+                data=command_result.content.data,
+                command=command_result.content.name,
+                status=command_result.result.status),
+            resource_id=command_result.meta.identifier
         ),
         links=get_valid_session_links(session_id, router)
     )

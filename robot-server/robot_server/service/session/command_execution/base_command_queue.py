@@ -1,4 +1,3 @@
-from robot_server.service.session.models import CommandName, CommandDataType
 from .command import Command
 from ..errors import UnsupportedFeature
 
@@ -6,8 +5,7 @@ from ..errors import UnsupportedFeature
 class CommandQueue:
     """Interface for command queue"""
 
-    async def enqueue(self, command: CommandName, data: CommandDataType) \
-            -> Command:
+    async def enqueue(self, command: Command):
         """Enqueue a command for later execution"""
         raise UnsupportedFeature()
 

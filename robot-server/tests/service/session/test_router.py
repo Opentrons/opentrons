@@ -10,6 +10,8 @@ from pydantic.main import BaseModel
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command
+from robot_server.service.session.command_execution.command import \
+    CommandResult, CompletedCommand, CommandContent, CommandMeta
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models import CommandName, EmptyModel
@@ -44,15 +46,30 @@ def command_id():
 
 
 @pytest.fixture
-def mock_command_executor(command_id):
+def command_created_at():
+    return datetime(2000, 1, 1)
+
+
+@pytest.fixture
+def patch_create_command(command_id, command_created_at):
+    with patch("robot_server.service.session.router.create_command") as p:
+        p.side_effect = lambda c, n: Command(
+            content=CommandContent(c, n),
+            meta=CommandMeta(command_id, command_created_at))
+        yield p
+
+
+@pytest.fixture
+def mock_command_executor():
     mock = MagicMock(spec=CommandExecutor)
 
-    async def func(command, data):
-        ret_val = Command(name=command,
-                          data=data)
-        ret_val._created_at = datetime(2020, 1, 1)
-        ret_val._id = command_id
-        return ret_val
+    async def func(command):
+        return CompletedCommand(content=command.content,
+                                meta=command.meta,
+                                result=CommandResult(
+                                    status="done",
+                                    completed_at=datetime(2020, 1, 1))
+                                )
 
     mock.execute.side_effect = func
     return mock
@@ -269,22 +286,31 @@ def test_execute_command(api_client,
                          session_manager_with_session,
                          mock_session_meta,
                          mock_command_executor,
-                         command_id):
+                         command_id,
+                         command_created_at,
+                         patch_create_command):
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",
         json=command("jog",
                      JogPosition(vector=(1, 2, 3,))))
 
     mock_command_executor.execute.assert_called_once_with(
-        command=CommandName.jog,
-        data=JogPosition(vector=(1, 2, 3,)))
+        Command(
+            content=CommandContent(
+                name=CommandName.jog,
+                data=JogPosition(vector=(1, 2, 3,))
+            ),
+            meta=CommandMeta(identifier=command_id,
+                             created_at=command_created_at)
+        )
+    )
 
     assert response.json() == {
         'data': {
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'executed'
+                'status': 'done'
             },
             'type': 'SessionCommand',
             'id': command_id,
@@ -307,7 +333,9 @@ def test_execute_command(api_client,
 def test_execute_command_no_body(api_client,
                                  session_manager_with_session,
                                  mock_session_meta,
+                                 patch_create_command,
                                  command_id,
+                                 command_created_at,
                                  mock_command_executor):
     """Test that a command with empty body can be accepted"""
     response = api_client.post(
@@ -316,8 +344,12 @@ def test_execute_command_no_body(api_client,
     )
 
     mock_command_executor.execute.assert_called_once_with(
-        command=CommandName.load_labware,
-        data=EmptyModel()
+        Command(
+            content=CommandContent(
+                name=CommandName.load_labware,
+                data=EmptyModel()),
+            meta=CommandMeta(command_id, command_created_at)
+        )
     )
 
     assert response.json() == {
@@ -325,7 +357,7 @@ def test_execute_command_no_body(api_client,
             'attributes': {
                 'command': 'loadLabware',
                 'data': {},
-                'status': 'executed'
+                'status': 'done'
             },
             'type': 'SessionCommand',
             'id': command_id

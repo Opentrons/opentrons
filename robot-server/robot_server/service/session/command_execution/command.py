@@ -1,39 +1,60 @@
 from datetime import datetime
+from dataclasses import dataclass, field
 
 from robot_server.service.session.models import IdentifierType, \
     create_identifier, CommandName, CommandDataType
 
 
+@dataclass(frozen=True)
+class CommandContent:
+    name: CommandName
+    data: CommandDataType
+
+
+@dataclass(frozen=True)
+class CommandMeta:
+    identifier: IdentifierType = field(default_factory=create_identifier)
+    created_at: datetime = field(default_factory=datetime.utcnow)
+
+
+@dataclass(frozen=True)
+class CommandResult:
+    status: str
+    completed_at: datetime = field(default_factory=datetime.utcnow)
+
+
+@dataclass(frozen=True)
 class Command:
-    def __init__(self,
-                 name: CommandName,
-                 data: CommandDataType):
-        self._name = name
-        self._data = data
-        # Create a unique identifier for the command
-        self._id = create_identifier()
-        self._created_at = datetime.utcnow()
+    content: CommandContent
+    meta: CommandMeta = field(default_factory=CommandMeta)
 
-    @property
-    def name(self) -> CommandName:
-        return self._name
 
-    @property
-    def data(self) -> CommandDataType:
-        return self._data
+@dataclass(frozen=True)
+class CompletedCommand:
+    content: CommandContent
+    meta: CommandMeta
+    result: CommandResult
 
-    @property
-    def identifier(self) -> IdentifierType:
-        return self._id
 
-    @property
-    def created_at(self) -> datetime:
-        return self._created_at
+def create_command(name: CommandName, data: CommandDataType) -> Command:
+    """Create a command object"""
+    return Command(
+        content=CommandContent(
+            name=name,
+            data=data
+        )
+    )
 
-    def __str__(self) -> str:
-        return f"Command(" \
-               f"name={self.name}, " \
-               f"identifier={self.identifier}," \
-               f"data={self.data}," \
-               f"created_at={self.created_at}," \
-               f")"
+
+def complete_command(command: Command, status: str) -> CompletedCommand:
+    """
+    Create a completed command
+
+    :param command: the originating command
+    :param status: description of the result
+    """
+    return CompletedCommand(
+        content=command.content,
+        meta=command.meta,
+        result=CommandResult(status=status)
+    )
