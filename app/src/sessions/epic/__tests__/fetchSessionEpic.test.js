@@ -74,6 +74,7 @@ describe('fetchSessionEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.fetchSessionFailure(
           mocks.robot.name,
+          Fixtures.mockSessionId,
           { errors: [{ status: 'went bad' }] },
           { ...mocks.meta, response: Fixtures.mockFetchSessionFailureMeta }
         ),

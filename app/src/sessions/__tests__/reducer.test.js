@@ -2,6 +2,7 @@
 import * as Fixtures from '../__fixtures__'
 import { sessionReducer } from '../reducer'
 
+import { mockV2ErrorResponse } from '../../robot-api/__fixtures__'
 import type { Action } from '../../types'
 import type { SessionState } from '../types'
 
@@ -223,6 +224,82 @@ const SPECS: Array<ReducerSpec> = [
     },
     expected: {
       'eggplant-parm': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'handles sessions:DELETE_SESSION_FAILURE',
+    action: {
+      type: 'sessions:DELETE_SESSION_FAILURE',
+      payload: {
+        robotName: 'frumious-bandersnatch',
+        sessionId: Fixtures.mockSessionId,
+        error: mockV2ErrorResponse,
+      },
+      meta: {
+        response: { ...Fixtures.mockDeleteSessionFailureMeta, status: 404 },
+      },
+    },
+    state: {
+      'frumious-bandersnatch': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionAttributes,
+            id: Fixtures.mockSessionId,
+          },
+        },
+      },
+    },
+    expected: {
+      'frumious-bandersnatch': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+        },
+      },
+    },
+  },
+  {
+    name: 'handles sessions:FETCH_SESSION_FAILURE',
+    action: {
+      type: 'sessions:FETCH_SESSION_FAILURE',
+      payload: {
+        robotName: 'detestable-moss',
+        sessionId: Fixtures.mockSessionId,
+        error: mockV2ErrorResponse,
+      },
+      meta: {
+        response: { ...Fixtures.mockFetchSessionFailureMeta, status: 404 },
+      },
+    },
+    state: {
+      'detestable-moss': {
+        robotSessions: {
+          existing_fake_session_id: {
+            ...Fixtures.mockSessionAttributes,
+            id: 'existing_fake_session_id',
+          },
+          [Fixtures.mockSessionId]: {
+            ...Fixtures.mockSessionAttributes,
+            id: Fixtures.mockSessionId,
+          },
+        },
+      },
+    },
+    expected: {
+      'detestable-moss': {
         robotSessions: {
           existing_fake_session_id: {
             ...Fixtures.mockSessionAttributes,

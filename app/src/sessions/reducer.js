@@ -67,16 +67,17 @@ export function sessionReducer(
       }
     }
 
+    case Constants.FETCH_SESSION_FAILURE:
     case Constants.DELETE_SESSION_FAILURE: {
-      const { robotName, ...sessionState } = action.payload
+      const { robotName, sessionId } = action.payload
       const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
+      // if session with this id not found, we should forget this id
       if (action.meta.response.status === 404) {
-        const id = action.meta.response.path.replace('/sessions/', '')
         return {
           ...state,
           [robotName]: {
             ...robotState,
-            robotSessions: omit(robotState.robotSessions, id),
+            robotSessions: omit(robotState.robotSessions, sessionId),
           },
         }
       } else {

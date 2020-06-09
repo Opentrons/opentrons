@@ -108,7 +108,11 @@ export type DeleteSessionSuccessAction = {|
 
 export type DeleteSessionFailureAction = {|
   type: DELETE_SESSION_FAILURE,
-  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  payload: {|
+    robotName: string,
+    sessionId: string,
+    error: RobotApiV2ErrorResponseBody,
+  |},
   meta: RobotApiRequestMeta,
 |}
 
@@ -126,7 +130,11 @@ export type FetchSessionSuccessAction = {|
 
 export type FetchSessionFailureAction = {|
   type: FETCH_SESSION_FAILURE,
-  payload: {| robotName: string, error: RobotApiV2ErrorResponseBody |},
+  payload: {|
+    robotName: string,
+    sessionId: string,
+    error: RobotApiV2ErrorResponseBody,
+  |},
   meta: RobotApiRequestMeta,
 |}
 

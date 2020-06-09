@@ -30,7 +30,12 @@ const mapResponseToAction: ResponseToActionMapper<FetchSessionAction> = (
 
   return response.ok
     ? Actions.fetchSessionSuccess(host.name, body, meta)
-    : Actions.fetchSessionFailure(host.name, body, meta)
+    : Actions.fetchSessionFailure(
+        host.name,
+        originalAction.payload.sessionId,
+        body,
+        meta
+      )
 }
 
 export const fetchSessionEpic: Epic = (action$, state$) => {

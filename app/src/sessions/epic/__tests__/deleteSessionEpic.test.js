@@ -73,6 +73,7 @@ describe('deleteSessionEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.deleteSessionFailure(
           mocks.robot.name,
+          Fixtures.mockSessionId,
           { errors: [{ status: 'went bad' }] },
           { ...mocks.meta, response: Fixtures.mockDeleteSessionFailureMeta }
         ),
