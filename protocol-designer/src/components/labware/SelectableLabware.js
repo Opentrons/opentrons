@@ -33,12 +33,14 @@ export type Props = {|
 |}
 
 export class SelectableLabware extends React.Component<Props> {
-  _getWellsFromRect = (rect: GenericRect): * => {
+  _getWellsFromRect: (rect: GenericRect) => WellGroup = rect => {
     const selectedWells = getCollidingWells(rect, SELECTABLE_WELL_CLASS)
     return this._wellsFromSelected(selectedWells)
   }
 
-  _wellsFromSelected = (selectedWells: WellGroup): WellGroup => {
+  _wellsFromSelected: (
+    selectedWells: WellGroup
+  ) => WellGroup = selectedWells => {
     const labwareDef = this.props.labwareProps.definition
     // Returns PRIMARY WELLS from the selection.
     if (this.props.pipetteChannels === 8) {
@@ -60,7 +62,10 @@ export class SelectableLabware extends React.Component<Props> {
     return selectedWells
   }
 
-  handleSelectionMove = (e: MouseEvent, rect: GenericRect) => {
+  handleSelectionMove: (e: MouseEvent, rect: GenericRect) => void = (
+    e,
+    rect
+  ) => {
     const labwareDef = this.props.labwareProps.definition
     if (!e.shiftKey) {
       if (this.props.pipetteChannels === 8) {
@@ -84,7 +89,10 @@ export class SelectableLabware extends React.Component<Props> {
       }
     }
   }
-  handleSelectionDone = (e: MouseEvent, rect: GenericRect) => {
+  handleSelectionDone: (e: MouseEvent, rect: GenericRect) => void = (
+    e,
+    rect
+  ) => {
     const wells = this._wellsFromSelected(this._getWellsFromRect(rect))
     if (e.shiftKey) {
       this.props.deselectWells(wells)
@@ -93,7 +101,7 @@ export class SelectableLabware extends React.Component<Props> {
     }
   }
 
-  handleMouseEnterWell = (args: WellMouseEvent) => {
+  handleMouseEnterWell: (args: WellMouseEvent) => void = args => {
     if (this.props.pipetteChannels === 8) {
       const labwareDef = this.props.labwareProps.definition
       const wellSet = getWellSetForMultichannel(labwareDef, args.wellName)
@@ -105,11 +113,11 @@ export class SelectableLabware extends React.Component<Props> {
     }
   }
 
-  handleMouseLeaveWell = (args: WellMouseEvent) => {
+  handleMouseLeaveWell: (args: WellMouseEvent) => void = args => {
     this.props.updateHighlightedWells({})
   }
 
-  render() {
+  render(): React.Node {
     const {
       labwareProps,
       ingredNames,

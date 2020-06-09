@@ -9,17 +9,18 @@ import { END_TERMINAL_TITLE } from '../../constants'
 import { END_TERMINAL_ITEM_ID } from '../../steplist'
 
 import { StepCreationButton } from '../StepCreationButton'
-import type { StepIdType } from '../../form-types'
 import { DraggableStepItems } from './DraggableStepItems'
 
-type Props = {
+import type { StepIdType } from '../../form-types'
+
+type Props = {|
   orderedStepIds: Array<StepIdType>,
   reorderSelectedStep: (delta: number) => mixed,
   reorderSteps: (Array<StepIdType>) => mixed,
-}
+|}
 
 export class StepList extends React.Component<Props> {
-  handleKeyDown = (e: SyntheticKeyboardEvent<*>) => {
+  handleKeyDown: (e: SyntheticKeyboardEvent<>) => void = e => {
     const { reorderSelectedStep } = this.props
     const key = e.key
     const altIsPressed = e.getModifierState('Alt')
@@ -44,7 +45,7 @@ export class StepList extends React.Component<Props> {
     global.removeEventListener('keydown', this.handleKeyDown, false)
   }
 
-  render() {
+  render(): React.Node {
     return (
       <React.Fragment>
         <SidePanel title="Protocol Timeline">

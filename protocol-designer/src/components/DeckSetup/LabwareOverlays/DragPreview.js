@@ -42,7 +42,12 @@ const LabwareDragPreview = (props: DragPreviewProps) => {
   )
 }
 
-export const DragPreview = DragLayer(monitor => ({
+export const DragPreview: React.AbstractComponent<
+  $Diff<
+    DragPreviewProps,
+    {| currentOffset: mixed, isDragging: mixed, itemType: mixed, item: mixed |}
+  >
+> = DragLayer(monitor => ({
   currentOffset: monitor.getSourceClientOffset(),
   isDragging: monitor.isDragging(),
   itemType: monitor.getItemType(),
