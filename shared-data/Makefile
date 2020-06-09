@@ -56,6 +56,7 @@ clean:
 wheel: $(wheel_file)
 
 $(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: python/setup.py $(py_sources)
+	$(SHX) mkdir -p build
 	$(SHX) cd python && $(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) mv python/dist/$(notdir $(wheel_file)) $(BUILD_DIR)/
 	$(SHX) rm -rf python/build python/dist *.egg_info
