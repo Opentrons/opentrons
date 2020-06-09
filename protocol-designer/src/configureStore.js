@@ -4,6 +4,7 @@ import thunk from 'redux-thunk'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
 
+import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
 
 const ReselectTools =
@@ -58,7 +59,11 @@ function getRootReducer() {
   }
 }
 
-export function configureStore() {
+export function configureStore(): Store<
+  BaseState,
+  Action,
+  ThunkDispatch<Action>
+> {
   const reducer = getRootReducer()
 
   const composeEnhancers: any =
@@ -111,5 +116,6 @@ export function configureStore() {
     )
   }
 
+  // $FlowFixMe(mc, 2020-06-09): Flow doesn't like mixture of exact and inexact action types
   return store
 }
