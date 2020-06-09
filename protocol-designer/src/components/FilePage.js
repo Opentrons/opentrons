@@ -190,6 +190,7 @@ export class FilePage extends React.Component<Props, State> {
               <PrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
+                name={'editPipettes'}
               >
                 {i18n.t('button.edit')}
               </PrimaryButton>
@@ -197,6 +198,7 @@ export class FilePage extends React.Component<Props, State> {
                 onClick={swapPipettes}
                 className={styles.swap_button}
                 iconName="swap-horizontal"
+                name={'swapPipettes'}
               >
                 {i18n.t('button.swap')}
               </OutlineButton>
@@ -215,6 +217,7 @@ export class FilePage extends React.Component<Props, State> {
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
+            name={'continueToLiquids'}
           >
             {i18n.t('button.continue_to_liquids')}
           </PrimaryButton>
