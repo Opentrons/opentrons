@@ -1,5 +1,7 @@
 // @flow
 import * as React from 'react'
+import { useDispatch } from 'react-redux'
+import upperFirst from 'lodash/upperFirst'
 import {
   LabeledValue,
   OutlineButton,
@@ -8,14 +10,12 @@ import {
   useHoverTooltip,
 } from '@opentrons/components'
 import { i18n } from '../../localization'
-import { useDispatch } from 'react-redux'
 import { actions as stepFormActions } from '../../step-forms'
-
-import { ModuleDiagram } from './ModuleDiagram'
 import {
   SPAN7_8_10_11_SLOT,
   DEFAULT_MODEL_FOR_MODULE_TYPE,
 } from '../../constants'
+import { ModuleDiagram } from './ModuleDiagram'
 import { isModuleWithCollisionIssue } from './utils'
 import styles from './styles.css'
 
@@ -145,6 +145,7 @@ export function ModuleRow(props: Props): React.Node {
             <OutlineButton
               className={styles.module_button}
               onClick={handleEditModule}
+              name={`edit${upperFirst(type)}`}
             >
               Edit
             </OutlineButton>
@@ -152,6 +153,7 @@ export function ModuleRow(props: Props): React.Node {
           <OutlineButton
             className={styles.module_button}
             onClick={handleAddOrRemove}
+            name={`${addRemoveText}${upperFirst(type)}`}
           >
             {addRemoveText}
           </OutlineButton>
