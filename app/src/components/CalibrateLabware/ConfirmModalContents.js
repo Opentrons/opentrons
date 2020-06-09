@@ -52,7 +52,7 @@ function ConfirmModalContentsComponent(props: Props) {
     case 'picking-up':
     case 'dropping-tip':
     case 'confirming':
-      return <InProgressContents {...props} />
+      return <InProgressContents />
 
     default:
       return null

@@ -37,42 +37,9 @@ esproposal.optional_chaining=enable
 ; default value of 19 (16 * 2^19 bytes > 8ish MB) isn't quite enough and can
 ; result in flow crashing with `Unhandled exception: SharedMem.Hash_table_full`
 sharedmemory.hash_table_pow=20
-; TODO(mc, 2020-06-01): prepare for types-first mode by
-; 1. Uncommenting + fixing remaining well_formed_exports items below
-; 2. Replacing `well_formed_exports` options with `types_first=true`
+; enable types-first mode for speed and explicitness
 ; https://flow.org/en/docs/lang/types-first/
-well_formed_exports=true
-well_formed_exports.whitelist=<PROJECT_ROOT>/app
-well_formed_exports.whitelist=<PROJECT_ROOT>/app-shell
-well_formed_exports.whitelist=<PROJECT_ROOT>/components
-well_formed_exports.whitelist=<PROJECT_ROOT>/discovery-client
-well_formed_exports.whitelist=<PROJECT_ROOT>/labware-designer
-well_formed_exports.whitelist=<PROJECT_ROOT>/labware-library
-; well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/analytics
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/components
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/containers
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/dismiss
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/feature-flags
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/file-data
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/labware-defs
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/labware-ingred
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/load-file
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/localization
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/modules
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/navigation
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/networking
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/pipettes
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/step-forms
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/step-generation
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/steplist
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/top-selectors
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/tutorial
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/ui
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/utils
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-designer/src/well-selection
-well_formed_exports.whitelist=<PROJECT_ROOT>/protocol-library-kludge
-well_formed_exports.whitelist=<PROJECT_ROOT>/shared-data
+types_first=true
 
 [strict]
 deprecated-type
