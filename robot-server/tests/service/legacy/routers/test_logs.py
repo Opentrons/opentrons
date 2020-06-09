@@ -126,7 +126,6 @@ def test_get_api_log_with_params(
     else:
         expected = logs
 
-
     async def mock_get_records_dumb(identifier, records, format_type):
         return res_bytes
 
