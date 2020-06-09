@@ -223,6 +223,18 @@ const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
+  durationMinutes: {
+    maskValue: composeMaskers(
+      maskToFloat,
+      onlyPositiveNumbers,
+      trimDecimals(1)
+    ),
+    castValue: Number,
+  },
+  durationSeconds: {
+    maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
+    castValue: Number,
+  },
   // profile cycle fields
   repetitions: {
     getErrors: composeErrors(requiredField),
