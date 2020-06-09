@@ -693,7 +693,7 @@ class ProtocolContext(CommandPublisher):
     @requires_version(2, 5)
     def rail_lights_on(self) -> bool:
         """ Returns True if the rail lights are on """
-        return self._hw_manager.hardware.get_lights['rails']
+        return self._hw_manager.hardware.get_lights()['rails']
 
     @property  # type: ignore
     @requires_version(2, 5)
