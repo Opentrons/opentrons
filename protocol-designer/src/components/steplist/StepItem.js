@@ -5,8 +5,8 @@ import {
   TEMPERATURE_MODULE_TYPE,
   THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
-import { THERMOCYCLER_STATE } from '../../constants'
-import { stepIconsByType } from '../../form-types'
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
+import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
 import { makeTemperatureText } from '../../utils'
 import { PDTitledList } from '../lists'
@@ -18,7 +18,12 @@ import { PauseStepItems } from './PauseStepItems'
 import { SourceDestSubstep } from './SourceDestSubstep'
 import styles from './StepItem.css'
 
-import type { FormData, StepType } from '../../form-types'
+import type {
+  FormData,
+  StepType,
+  ProfileCycleItem,
+  ProfileStepItem,
+} from '../../form-types'
 import type {
   SubstepIdentifier,
   SubstepItemData,
@@ -107,6 +112,43 @@ export type StepItemContentsProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
+type ProfileStepSubstepRowProps = {|
+  step: ProfileStepItem,
+  repetitionsDisplay: ?string,
+|}
+export const ProfileStepSubstepRow = (
+  props: ProfileStepSubstepRowProps
+): React.Node => {
+  const { repetitionsDisplay } = props
+  const { temperature, durationMinutes, durationSeconds } = props.step
+  const minutesText = Number(durationMinutes) > 0 ? `${durationMinutes}m ` : ''
+  return (
+    <li>
+      <span>{`${temperature}${i18n.t('application.units.degrees')}`}</span>
+      <span>{`${minutesText}${durationSeconds}s`}</span>
+      <span>{repetitionsDisplay ? `${repetitionsDisplay}x` : null}</span>
+    </li>
+  )
+}
+
+type ProfileCycleSubstepRowsProps = {| cycle: ProfileCycleItem |}
+export const ProfileCycleSubstepRows = (
+  props: ProfileCycleSubstepRowsProps
+): React.Node => {
+  const { steps, repetitions } = props.cycle
+  return (
+    <>
+      {steps.map((step, index) => (
+        <ProfileStepSubstepRow
+          key={index}
+          step={step}
+          repetitionsDisplay={index === 0 ? repetitions : ''}
+        />
+      ))}
+    </>
+  )
+}
+
 export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   const {
     rawForm,
@@ -155,6 +197,40 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         actionText={temperature}
         moduleType={TEMPERATURE_MODULE_TYPE}
       />
+    )
+  }
+
+  if (substeps && substeps.substepType === THERMOCYCLER_PROFILE) {
+    const lidTemperature = makeTemperatureText(substeps.profileTargetLidTemp)
+    const lidLabelText = i18n.t(`modules.lid_label`, {
+      lidStatus: i18n.t(
+        substeps.lidOpenHold ? 'modules.lid_open' : 'modules.lid_closed'
+      ),
+    })
+
+    return (
+      <ModuleStepItems
+        labwareDisplayName={substeps.labwareDisplayName}
+        labwareNickname={substeps.labwareNickname}
+        message={substeps.message}
+        action={i18n.t(`modules.actions.profile`)}
+        actionText={i18n.t(`modules.actions.cycling`)}
+        moduleType={THERMOCYCLER_MODULE_TYPE}
+      >
+        <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
+        {substeps.meta?.rawProfileItems.map((item, index) => {
+          if (item.type === PROFILE_CYCLE) {
+            return <ProfileCycleSubstepRows cycle={item} key={index} />
+          }
+          return (
+            <ProfileStepSubstepRow
+              step={item}
+              key={index}
+              repetitionsDisplay="1"
+            />
+          )
+        })}
+      </ModuleStepItems>
     )
   }
 

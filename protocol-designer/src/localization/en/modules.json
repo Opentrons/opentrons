@@ -24,10 +24,12 @@
   "actions": {
     "action": "action",
     "await_temperature": "pause until",
+    "cycling": "cycling",
     "disengage": "disengage",
     "engage": "engage",
     "go_to": "go to",
-    "hold": "hold"
+    "hold": "hold",
+    "profile": "profile"
   },
   "block_label": "Block",
   "lid_label": "Lid ({{lidStatus}})",

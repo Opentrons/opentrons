@@ -14,7 +14,7 @@ import {
   mix,
   curryCommandCreator,
 } from '../step-generation'
-import { THERMOCYCLER_STATE } from '../constants'
+import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
 
 import type { StepIdType } from '../form-types'
 import type {
@@ -423,6 +423,28 @@ export function generateSubsteps(
       labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
       message: stepArgs.message,
+    }
+  }
+
+  if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
+    const {
+      profileTargetLidTemp,
+      lidOpenHold,
+      profileVolume,
+      message,
+      meta,
+      profileSteps,
+    } = stepArgs
+    return {
+      substepType: THERMOCYCLER_PROFILE,
+      labwareDisplayName: labwareNames?.displayName,
+      labwareNickname: labwareNames?.nickname,
+      profileTargetLidTemp,
+      lidOpenHold,
+      profileVolume,
+      message,
+      meta,
+      profileSteps,
     }
   }
 

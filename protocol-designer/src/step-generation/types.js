@@ -6,6 +6,7 @@ import type {
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
 import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
+import type { ProfileItem } from '../form-types'
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -213,6 +214,9 @@ export type ThermocyclerProfileStepArgs = {|
   profileSteps: Array<AtomicProfileStep>,
   profileTargetLidTemp: number | null,
   profileVolume: number,
+  meta?: {|
+    rawProfileItems: Array<ProfileItem>,
+  |},
 |}
 
 export type ThermocyclerStateStepArgs = {|
