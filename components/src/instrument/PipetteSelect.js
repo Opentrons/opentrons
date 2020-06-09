@@ -1,7 +1,7 @@
 // @flow
 import * as React from 'react'
 import groupBy from 'lodash/groupBy'
-
+import { Flex } from '../primitives'
 import {
   getAllPipetteNames,
   getPipetteNameSpecs,
@@ -118,10 +118,31 @@ const PipetteNameItem = (props: PipetteNameSpecs) => {
   }
 
   return (
-    <>
+    <Flex
+      data-id={dataIdFormat(
+        'PipetteNameItem',
+        volumeClass,
+        channels,
+        displayCategory
+      )}
+    >
       <div className={styles.pipette_volume_class}>{volumeClass}</div>
       <div className={styles.pipette_channels}>{displayChannels}</div>
       <div className={styles.pipette_category}>{displayCategory}</div>
-    </>
+    </Flex>
   )
+}
+
+const dataIdFormat = (
+  componentName: string,
+  volumeClass: string,
+  channels: number,
+  displayCategory: string
+): string => {
+  const dataIdFormatVolumeClass = volumeClass.toLowerCase()
+  const dataIdFormatChannels = channels === 1 ? 'SingleChannel' : 'MultiChannel'
+  const dataIdFormatDisplayCategory =
+    displayCategory.charAt(0) + displayCategory.slice(1).toLowerCase()
+
+  return `${componentName}_${dataIdFormatVolumeClass}${dataIdFormatChannels}${dataIdFormatDisplayCategory}`
 }
