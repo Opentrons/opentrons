@@ -26,6 +26,8 @@ import {
   MAX_TC_BLOCK_TEMP,
   MIN_TC_LID_TEMP,
   MAX_TC_LID_TEMP,
+  MIN_TC_DURATION_SECONDS,
+  MAX_TC_DURATION_SECONDS,
 } from '../../constants'
 import type { StepFieldName } from '../../form-types'
 import type { LabwareEntity, PipetteEntity } from '../../step-forms'
@@ -228,6 +230,10 @@ const profileFieldHelperMap: { [string]: StepFieldHelpers } = {
     castValue: Number,
   },
   durationSeconds: {
+    getErrors: composeErrors(
+      minFieldValue(MIN_TC_DURATION_SECONDS),
+      maxFieldValue(MAX_TC_DURATION_SECONDS)
+    ),
     maskValue: composeMaskers(maskToInteger, onlyPositiveNumbers),
     castValue: Number,
   },
