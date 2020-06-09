@@ -18,7 +18,7 @@ SRC_PATH = robot_server
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver)
+wheel_file = dist/$(call python_get_wheelname,robot-server,robotserver,$(BUILD_NUMBER))
 
 
 # These variables can be overriden when make is invoked to customize the

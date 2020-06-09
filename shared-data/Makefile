@@ -17,7 +17,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
-wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data)
+wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER))
 
 py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data))
 

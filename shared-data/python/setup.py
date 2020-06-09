@@ -1,10 +1,13 @@
 import os
-import json
+import sys
 
 from setuptools.command import build_py, sdist
 from setuptools import setup, find_packages
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(HERE, '..', '..', 'scripts'))
+
+from python_build_utils import normalize_version
 
 DATA_ROOT = '..'
 DATA_SUBDIRS = ['deck',
@@ -71,9 +74,13 @@ class BuildWithData(build_py.build_py):
 
 
 def get_version():
-    with open(os.path.join(HERE, '..', 'package.json')) as pkg:
-        package_json = json.load(pkg)
-        return package_json['version']
+    buildno = os.getenv('BUILD_NUMBER')
+    if buildno:
+        normalize_opts = {'extra_tag': buildno}
+    else:
+        normalize_opts = {}
+    return normalize_version('shared-data', **normalize_opts)
+
 
 VERSION = get_version()
 

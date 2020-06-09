@@ -22,7 +22,7 @@ sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,opentrons)
+wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
 
 # These variables are for simulating python protocols
 sim_log_level ?= info
@@ -150,7 +150,7 @@ simulate:
 
 .PHONY: deploy
 deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file),$(BUILD_NUMBER))
 
 # User must currently specify host, e.g.: `make term host=169.254.202.176`
 .PHONY: term

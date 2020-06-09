@@ -16,6 +16,12 @@ UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 APP_SHELL_DIR := app-shell
 
+# This may be set as an environment variable (and is by CI tasks that upload
+# to test pypi) to add a .dev extension to the python package versions. If
+# empty, no .dev extension is appended, so this definition is here only as
+# documentation
+BUILD_NUMBER ?=
+
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
 # point to a python3.6.

@@ -12,17 +12,19 @@ pypi_test_upload_url := https://test.pypi.org/legacy/
 
 # get the python package version
 # (evaluates to that string)
-# paramter 1: name of the project (aka api, robot-server, etc)
+# parameter 1: name of the project (aka api, robot-server, etc)
+# parameter 2: an extra version tag string
 define python_package_version
-$(shell $(python) ../scripts/python_build_utils.py $(1) normalize_version)
+$(shell $(python) ../scripts/python_build_utils.py $(1) normalize_version $(if $(2),-e $(2)))
 endef
 
 
 # get the name of the wheel that setup.py will build
 # parameter 1: the name of the project (aka api, robot-server, etc)
 # parameter 2: the name of the python package (aka opentrons, robot_server, etc)
+# parameter 3: any extra version tags
 define python_get_wheelname
-$(2)-$(call python_package_version,$(1))-py2.py3-none-any.whl
+$(2)-$(call python_package_version,$(1),$(3))-py2.py3-none-any.whl
 endef
 
 # upload a package to a repository
