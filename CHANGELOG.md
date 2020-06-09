@@ -3,6 +3,60 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.19.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-09)
+
+
+### Bug Fixes
+
+* **api:** catch factory tests up to gpio changes ([#5747](https://github.com/opentrons/opentrons/issues/5747)) ([751d9a4](https://github.com/opentrons/opentrons/commit/751d9a4))
+* **api:** convert extra seconds to minutes in delay command ([#5755](https://github.com/opentrons/opentrons/issues/5755)) ([df26e07](https://github.com/opentrons/opentrons/commit/df26e07)), closes [#5414](https://github.com/opentrons/opentrons/issues/5414)
+* **api:** Enable audio on GPIO startup ([#5787](https://github.com/opentrons/opentrons/issues/5787)) ([907401c](https://github.com/opentrons/opentrons/commit/907401c)), closes [/github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py#L217](https://github.com//github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py/issues/L217)
+* **api:** Fix return tip behavior in check session ([#5772](https://github.com/opentrons/opentrons/issues/5772)) ([34ef09c](https://github.com/opentrons/opentrons/commit/34ef09c))
+* **api:** prevent thermocycler wait_for_temp() from exiting prematurely ([#5807](https://github.com/opentrons/opentrons/issues/5807)) ([7720b28](https://github.com/opentrons/opentrons/commit/7720b28)), closes [#5602](https://github.com/opentrons/opentrons/issues/5602)
+* **app:** clear <input> value after robot update file select ([#5789](https://github.com/opentrons/opentrons/issues/5789)) ([62372b0](https://github.com/opentrons/opentrons/commit/62372b0)), closes [#5781](https://github.com/opentrons/opentrons/issues/5781)
+* **app:** fix cal check tiprack images at large window sizes ([#5841](https://github.com/opentrons/opentrons/issues/5841)) ([065ce49](https://github.com/opentrons/opentrons/commit/065ce49))
+* **app:** fix up calibration check copy ([#5779](https://github.com/opentrons/opentrons/issues/5779)) ([57b9ca8](https://github.com/opentrons/opentrons/commit/57b9ca8))
+* **app:** interpolate session type into session exit event name ([#5804](https://github.com/opentrons/opentrons/issues/5804)) ([bee8cb0](https://github.com/opentrons/opentrons/commit/bee8cb0))
+* **build:** allow test pypi uploads to fail again ([#5849](https://github.com/opentrons/opentrons/issues/5849)) ([61b5eba](https://github.com/opentrons/opentrons/commit/61b5eba))
+* **protocol-designer:** Add scroll to top on export modal display ([#5744](https://github.com/opentrons/opentrons/issues/5744)) ([f797cdc](https://github.com/opentrons/opentrons/commit/f797cdc)), closes [#5422](https://github.com/opentrons/opentrons/issues/5422)
+* fix makefile refactor for push tasks ([#5773](https://github.com/opentrons/opentrons/issues/5773)) ([db743bc](https://github.com/opentrons/opentrons/commit/db743bc))
+* **protocol-designer:** Remove errant p tag ([#5786](https://github.com/opentrons/opentrons/issues/5786)) ([6695bd3](https://github.com/opentrons/opentrons/commit/6695bd3))
+* **robot-server:** make sure fastapi validation errors are properly documented ([#5748](https://github.com/opentrons/opentrons/issues/5748)) ([dbecbfc](https://github.com/opentrons/opentrons/commit/dbecbfc))
+* **robot-server:** preserve newlines in text logs ([#5850](https://github.com/opentrons/opentrons/issues/5850)) ([6420b5f](https://github.com/opentrons/opentrons/commit/6420b5f)), closes [#5846](https://github.com/opentrons/opentrons/issues/5846)
+* **shared-data:** recursively specify subpackages ([#5844](https://github.com/opentrons/opentrons/issues/5844)) ([3ccbbea](https://github.com/opentrons/opentrons/commit/3ccbbea))
+
+
+### Features
+
+* **api:** add info to debug warning on how IS_ROBOT is determined ([#5783](https://github.com/opentrons/opentrons/issues/5783)) ([fbbf1b6](https://github.com/opentrons/opentrons/commit/fbbf1b6))
+* **api:** add skeleton state machine instance for tip length calibration ([#5805](https://github.com/opentrons/opentrons/issues/5805)) ([dd36d53](https://github.com/opentrons/opentrons/commit/dd36d53)), closes [#5605](https://github.com/opentrons/opentrons/issues/5605)
+* **api, app:** implement automatic door safety stop feature ([#5706](https://github.com/opentrons/opentrons/issues/5706)) ([ad94d07](https://github.com/opentrons/opentrons/commit/ad94d07)), closes [#2820](https://github.com/opentrons/opentrons/issues/2820) [#2752](https://github.com/opentrons/opentrons/issues/2752)
+* **app:** add network interface collection to system-info ([#5764](https://github.com/opentrons/opentrons/issues/5764)) ([7d64efa](https://github.com/opentrons/opentrons/commit/7d64efa)), closes [#5397](https://github.com/opentrons/opentrons/issues/5397)
+* **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/opentrons/opentrons/commit/5ad57d9))
+* **components:** add useConditionalConfirm hook to shared components ([#5735](https://github.com/opentrons/opentrons/issues/5735)) ([8e5248f](https://github.com/opentrons/opentrons/commit/8e5248f))
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/opentrons/opentrons/commit/5a145dc))
+* **protocol-designer:** add atomic thermocyclerRunProfile command creator ([#5843](https://github.com/opentrons/opentrons/issues/5843)) ([e20bbda](https://github.com/opentrons/opentrons/commit/e20bbda)), closes [#5839](https://github.com/opentrons/opentrons/issues/5839)
+* **protocol-designer:** Add ending hold state fields to TC profile ([#5750](https://github.com/opentrons/opentrons/issues/5750)) ([d388237](https://github.com/opentrons/opentrons/commit/d388237)), closes [#5519](https://github.com/opentrons/opentrons/issues/5519)
+* **protocol-designer:** Add profile step numbers and tooltips ([#5819](https://github.com/opentrons/opentrons/issues/5819)) ([4cfc25d](https://github.com/opentrons/opentrons/commit/4cfc25d)), closes [#5515](https://github.com/opentrons/opentrons/issues/5515)
+* **protocol-designer:** Add profiles settings to TC profile form ([#5771](https://github.com/opentrons/opentrons/issues/5771)) ([ce484cb](https://github.com/opentrons/opentrons/commit/ce484cb))
+* **protocol-designer:** Add step grouping and styles for tc cycles ([#5836](https://github.com/opentrons/opentrons/issues/5836)) ([f335d77](https://github.com/opentrons/opentrons/commit/f335d77)), closes [#5516](https://github.com/opentrons/opentrons/issues/5516) [#5517](https://github.com/opentrons/opentrons/issues/5517) [#5518](https://github.com/opentrons/opentrons/issues/5518)
+* **protocol-designer:** add support for TC cycles ([#5809](https://github.com/opentrons/opentrons/issues/5809)) ([5cb55bc](https://github.com/opentrons/opentrons/commit/5cb55bc)), closes [#5516](https://github.com/opentrons/opentrons/issues/5516) [#5517](https://github.com/opentrons/opentrons/issues/5517) [#5518](https://github.com/opentrons/opentrons/issues/5518)
+* **protocol-designer:** Add validation to profile settings and end hold ([#5802](https://github.com/opentrons/opentrons/issues/5802)) ([c303e38](https://github.com/opentrons/opentrons/commit/c303e38)), closes [#5520](https://github.com/opentrons/opentrons/issues/5520) [#5753](https://github.com/opentrons/opentrons/issues/5753)
+* **protocol-designer:** create barebones setup for TC profile steps ([#5751](https://github.com/opentrons/opentrons/issues/5751)) ([a2c6ca6](https://github.com/opentrons/opentrons/commit/a2c6ca6))
+* **protocol-designer:** disable save for dynamic field errors ([#5769](https://github.com/opentrons/opentrons/issues/5769)) ([9a36b87](https://github.com/opentrons/opentrons/commit/9a36b87)), closes [#5737](https://github.com/opentrons/opentrons/issues/5737)
+* **protocol-designer:** finish form-level errors for dynamic fields ([#5818](https://github.com/opentrons/opentrons/issues/5818)) ([9ca9911](https://github.com/opentrons/opentrons/commit/9ca9911)), closes [#5814](https://github.com/opentrons/opentrons/issues/5814)
+* **protocol-designer:** implement form-level errors for dynamic profile fields ([#5784](https://github.com/opentrons/opentrons/issues/5784)) ([56588f0](https://github.com/opentrons/opentrons/commit/56588f0)), closes [#5737](https://github.com/opentrons/opentrons/issues/5737)
+* **protocol-designer:** implement formToArgs for TC profile ([#5842](https://github.com/opentrons/opentrons/issues/5842)) ([4b3e008](https://github.com/opentrons/opentrons/commit/4b3e008)), closes [#5838](https://github.com/opentrons/opentrons/issues/5838)
+* **protocol-designer:** Style dynamic step fields ([#5795](https://github.com/opentrons/opentrons/issues/5795)) ([eb950b6](https://github.com/opentrons/opentrons/commit/eb950b6)), closes [#5513](https://github.com/opentrons/opentrons/issues/5513)
+* **robot-server:** Mock up of access control models and router. ([#5749](https://github.com/opentrons/opentrons/issues/5749)) ([05348ec](https://github.com/opentrons/opentrons/commit/05348ec)), closes [#5746](https://github.com/opentrons/opentrons/issues/5746)
+* **robot-server:** session manager ([#5796](https://github.com/opentrons/opentrons/issues/5796)) ([c1fd7e8](https://github.com/opentrons/opentrons/commit/c1fd7e8)), closes [#5763](https://github.com/opentrons/opentrons/issues/5763) [#5765](https://github.com/opentrons/opentrons/issues/5765)
+* **test:** add button names to edit pipette, swap pipette, and continue to liquids ([#5826](https://github.com/opentrons/opentrons/issues/5826)) ([cc3ba61](https://github.com/opentrons/opentrons/commit/cc3ba61)), closes [#5724](https://github.com/opentrons/opentrons/issues/5724)
+* **test:** add test id to Pipette Select component ([#5791](https://github.com/opentrons/opentrons/issues/5791)) ([845b508](https://github.com/opentrons/opentrons/commit/845b508)), closes [#5724](https://github.com/opentrons/opentrons/issues/5724)
+
+
+
+
+
 
 
 **Note:** Version bump only for package opentrons
