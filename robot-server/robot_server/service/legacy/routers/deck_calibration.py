@@ -2,7 +2,7 @@ from uuid import UUID
 
 from starlette import status
 from fastapi import APIRouter, Depends
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 import opentrons.deck_calibration.endpoints as dc
 
 from robot_server.service.dependencies import get_hardware
@@ -24,7 +24,7 @@ router = APIRouter()
              status_code=status.HTTP_201_CREATED)
 async def post_calibration_deck_start(
         command: DeckStart = DeckStart(),
-        hardware: HardwareAPILike = Depends(get_hardware)) \
+        hardware: ThreadManager = Depends(get_hardware)) \
         -> DeckStartResponse:
     try:
         res = await dc.create_session(command.force, hardware)

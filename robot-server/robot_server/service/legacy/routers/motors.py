@@ -2,7 +2,7 @@ from starlette import status
 from fastapi import APIRouter, Depends
 from pydantic import ValidationError
 
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.types import Axis
 
 from robot_server.service.dependencies import get_hardware
@@ -16,7 +16,7 @@ router = APIRouter()
 @router.get("/motors/engaged",
             description="Query which motors are engaged and holding",
             response_model=model.EngagedMotors)
-async def get_engaged_motors(hardware: HardwareAPILike = Depends(get_hardware)
+async def get_engaged_motors(hardware: ThreadManager = Depends(get_hardware)
                              ) -> model.EngagedMotors:  # type: ignore
     try:
         engaged_axes = hardware.engaged_axes    # type: ignore
@@ -34,7 +34,7 @@ async def get_engaged_motors(hardware: HardwareAPILike = Depends(get_hardware)
              response_model=V1BasicResponse)
 async def post_disengage_motors(
         axes: model.Axes,
-        hardware: HardwareAPILike = Depends(get_hardware)) \
+        hardware: ThreadManager = Depends(get_hardware)) \
         -> V1BasicResponse:
 
     input_axes = [Axis[ax.upper()] for ax in axes.axes]

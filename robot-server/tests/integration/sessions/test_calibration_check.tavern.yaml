@@ -653,3 +653,68 @@ stages:
       status_code: 200
       json:
         data: []
+---
+test_name: Calibration check session errors
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: calibrationCheck
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+  - name: Send an unknown command
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: loadSomething
+            data: {}
+    response:
+      status_code: 422
+  - name: Send a command with invalid body
+    request:
+      <<: *post_command
+      json:
+        data:
+          id: "{session_id}"
+          type: SessionCommand
+          attributes:
+            command: preparePipette
+            data:
+              vector: [1, 2, 3]
+    response:
+      status_code: 422
+
+  - name: Send a command with empty body
+    request:
+      <<: *post_command
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: jog
+            data: {}
+    response:
+      status_code: 422
+
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
