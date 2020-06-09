@@ -544,6 +544,8 @@ Monitor Robot Door
 
 The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
 
+.. image:: ../img/feature_flags/door_safety_switch.png
+
 You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:attr:`.ProtocolContext.door_closed`:
 
 
@@ -552,4 +554,9 @@ You can also check whether or not the robot door is closed at a specific point i
     protocol.door_closed  # return True when the door is closed,
                           # False when the door is open
 
+.. warning::
+
+    If you chose to enable the door safety switch feature flag, you should only use :py:attr:`ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:attr:`ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+
 .. versionadded:: 2.5
+
