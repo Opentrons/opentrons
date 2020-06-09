@@ -554,6 +554,12 @@ You can also check whether or not the robot door is closed at a specific point i
     protocol.door_closed  # return True when the door is closed,
                           # False when the door is open
 
+
+.. note::
+
+    Both the top window and the front door must be closed in order for the robot to report the door is closed.
+
+
 .. warning::
 
     If you chose to enable the door safety switch feature flag, you should only use :py:attr:`ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:attr:`ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
