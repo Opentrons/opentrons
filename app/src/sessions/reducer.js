@@ -66,6 +66,23 @@ export function sessionReducer(
         },
       }
     }
+
+    case Constants.DELETE_SESSION_FAILURE: {
+      const { robotName, ...sessionState } = action.payload
+      const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
+      if (action.meta.response.status === 404) {
+        const id = action.meta.response.path.replace('/sessions/', '')
+        return {
+          ...state,
+          [robotName]: {
+            ...robotState,
+            robotSessions: omit(robotState.robotSessions, id),
+          },
+        }
+      } else {
+        return state
+      }
+    }
   }
 
   return state
