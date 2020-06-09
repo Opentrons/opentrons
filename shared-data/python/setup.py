@@ -9,6 +9,12 @@ sys.path.append(os.path.join(HERE, '..', '..', 'scripts'))
 
 from python_build_utils import normalize_version
 
+# make stdout blocking since Travis sets it to nonblocking
+if os.name == 'posix':
+    import fcntl
+    flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
+    fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
+
 DATA_ROOT = '..'
 DATA_SUBDIRS = ['deck',
                 'labware',
