@@ -540,6 +540,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if pip and pip.mount:
             pipette_type = str(self.pipettes[pip.mount]['model'])
         is_p1000 = pipette_type.startswith('p1000')
+        is_p20 = \
+            pipette_type.startswith('p20') or pipette_type.startswith('p10')
         height_states = [
             CalibrationCheckState.comparingFirstPipetteHeight,
             CalibrationCheckState.comparingSecondPipetteHeight]
@@ -552,9 +554,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         if is_p1000 and state in cross_states:
             return Point(2.7, 2.7, 0.0)
         elif is_p1000 and state in height_states:
-            return Point(0.0, 0.0, 1)
+            return Point(0.0, 0.0, 1.0)
+        elif is_p20 and state in cross_states:
+            return Point(1.4, 1.4, 0.0)
         elif state in cross_states:
-            return Point(1.79, 1.64, 0.0)
+            return Point(1.8, 1.8, 0.0)
         else:
             return Point(0.0, 0.0, 0.8)
 
