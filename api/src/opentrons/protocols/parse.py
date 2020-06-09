@@ -3,13 +3,14 @@ opentrons.protocols.parse: functions and state for parsing protocols
 """
 
 import ast
+import functools
 import itertools
 import json
 import logging
 import re
 from io import BytesIO
 from zipfile import ZipFile
-from typing import Any, Dict, Union, Tuple, TYPE_CHECKING
+from typing import Any, Dict, Optional, Union, Tuple, TYPE_CHECKING
 
 import jsonschema  # type: ignore
 
@@ -45,6 +46,11 @@ def _validate_v2_ast(protocol_ast: ast.Module):
     if not rundefs:
         raise MalformedProtocolError(
             "No function 'run(ctx)' defined")
+    if infer_version_from_imports(protocol_ast):
+        raise MalformedProtocolError(
+            'Protocol API v1 modules such as robot, instruments, and labware '
+            'may not be imported in Protocol API V2 protocols'
+        )
 
 
 def version_from_string(vstr: str) -> APIVersion:
@@ -205,7 +211,8 @@ def extract_metadata(parsed: ast.Module) -> Metadata:
     return metadata
 
 
-def infer_version_from_imports(parsed: ast.Module) -> APIVersion:
+@functools.lru_cache(1)
+def infer_version_from_imports(parsed: ast.Module) -> Optional[APIVersion]:
     # Imports in the form of `import opentrons.robot` will have an entry in
     # parsed.body[i].names[j].name in the form "opentrons.robot". Find those
     # imports and transform them to strip away the 'opentrons.' part.
@@ -234,7 +241,7 @@ def infer_version_from_imports(parsed: ast.Module) -> APIVersion:
     if v1evidence:
         return APIVersion(1, 0)
     else:
-        raise RuntimeError('Cannot infer API level')
+        return None
 
 
 def version_from_metadata(metadata: Metadata) -> APIVersion:
@@ -272,13 +279,13 @@ def get_version(metadata: Metadata, parsed: ast.Module) -> APIVersion:
         return version_from_metadata(metadata)
     except KeyError:  # No apiLevel key, may be apiv1
         pass
-    try:
-        return infer_version_from_imports(parsed)
-    except RuntimeError:
+    inferred = infer_version_from_imports(parsed)
+    if not inferred:
         raise RuntimeError(
             'If this is not an API v1 protocol, you must specify the target '
             'api level in the apiLevel key of the metadata. For instance, '
             'metadata={"apiLevel": "2.0"}')
+    return inferred
 
 
 def _get_protocol_schema_version(protocol_json: Dict[Any, Any]) -> int:

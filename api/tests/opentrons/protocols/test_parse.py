@@ -67,16 +67,6 @@ metadata = {
 p = instruments.P10_Single(mount='right')
 """, APIVersion(1, 0)),
     ("""
-from opentrons import instruments
-
-metadata = {
-  'apiLevel': '2.0'
-  }
-
-p = instruments.P10_Single(mount='right')
-def run(ctx): pass
-""", APIVersion(2, 0)),
-    ("""
 from opentrons import types
 
 metadata = {
@@ -304,7 +294,13 @@ def test_extra_contents(
     '''
 from opentrons import robot
 metadata={"apiLevel": "2.0"}
-print("hi")''',
+def run(ctx): pass
+''',
+    '''
+metadata = {"apiLevel": "2.0"}
+
+print('hi')
+''',
     '''
 metadata = {"apiLevel": "2.0"}
 def run(ctx):
@@ -312,7 +308,7 @@ def run(ctx):
 
 def run(blahblah):
   pass
-    '''
+'''
 ])
 def test_bad_structure(bad_protocol):
     with pytest.raises(MalformedProtocolError):
