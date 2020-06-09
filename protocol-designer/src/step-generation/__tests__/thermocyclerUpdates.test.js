@@ -12,6 +12,7 @@ import {
   forThermocyclerAwaitLidTemperature as _forThermocyclerAwaitLidTemperature,
   forThermocyclerDeactivateBlock as _forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid as _forThermocyclerDeactivateLid,
+  forThermocyclerRunProfile as _forThermocyclerRunProfile,
   forThermocyclerCloseLid as _forThermocyclerCloseLid,
   forThermocyclerOpenLid as _forThermocyclerOpenLid,
 } from '../getNextRobotStateAndWarnings/thermocyclerUpdates'
@@ -22,6 +23,7 @@ import {
 import { makeContext, getInitialRobotStateStandard } from '../__fixtures__'
 import type {
   ModuleOnlyParams,
+  TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
@@ -50,6 +52,9 @@ const forThermocyclerCloseLid = makeImmutableStateUpdater(
 )
 const forThermocyclerOpenLid = makeImmutableStateUpdater(
   _forThermocyclerOpenLid
+)
+const forThermocyclerRunProfile = makeImmutableStateUpdater(
+  _forThermocyclerRunProfile
 )
 
 const moduleId = 'thermocyclerModuleId'
@@ -161,6 +166,56 @@ describe('thermocycler state updaters', () => {
     },
   ]
 
+  const profileCases: TestCases<TCProfileParams> = [
+    {
+      params: {
+        module: moduleId,
+        profile: [
+          { holdTime: 10, temperature: 50 },
+          { holdTime: 10, temperature: 30 },
+          { holdTime: 10, temperature: 0 },
+        ],
+        volume: 10,
+      },
+      moduleStateBefore: {
+        blockTargetTemp: 42,
+      },
+      expectedUpdate: { blockTargetTemp: 0 },
+      fn: forThermocyclerRunProfile,
+      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 0',
+    },
+    {
+      params: {
+        module: moduleId,
+        profile: [
+          { holdTime: 10, temperature: 0 },
+          { holdTime: 10, temperature: 50 },
+          { holdTime: 10, temperature: 20 },
+        ],
+        volume: 10,
+      },
+      moduleStateBefore: {
+        blockTargetTemp: 42,
+      },
+      expectedUpdate: { blockTargetTemp: 20 },
+      fn: forThermocyclerRunProfile,
+      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 20',
+    },
+    {
+      params: {
+        module: moduleId,
+        profile: [{ holdTime: 10, temperature: 30 }],
+        volume: 10,
+      },
+      moduleStateBefore: {
+        blockTargetTemp: 42,
+      },
+      expectedUpdate: { blockTargetTemp: 30 },
+      fn: forThermocyclerRunProfile,
+      testName: 'forThermocyclerRunProfile should set blockTargetTemp to 30',
+    },
+  ]
+
   const runTest = <P>({
     params,
     moduleStateBefore,
@@ -194,4 +249,5 @@ describe('thermocycler state updaters', () => {
   blockTempTestCase.forEach(runTest)
   temperatureParamsCases.forEach(runTest)
   moduleOnlyParamsCases.forEach(runTest)
+  profileCases.forEach(runTest)
 })

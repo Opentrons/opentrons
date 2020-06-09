@@ -1,8 +1,10 @@
 // @flow
+import last from 'lodash/last'
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { getModuleState } from '../robotStateSelectors'
 import type {
   ModuleOnlyParams,
+  TCProfileParams,
   TemperatureParams,
   ThermocyclerSetTargetBlockTemperatureArgs,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
@@ -116,4 +118,17 @@ export const forThermocyclerOpenLid = (
 
   const moduleState = _getThermocyclerModuleState(robotState, module)
   moduleState.lidOpen = true
+}
+
+export const forThermocyclerRunProfile = (
+  params: TCProfileParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  const { module, profile } = params
+  const { robotState } = robotStateAndWarnings
+
+  const moduleState = _getThermocyclerModuleState(robotState, module)
+
+  moduleState.blockTargetTemp = last(profile).temperature
 }

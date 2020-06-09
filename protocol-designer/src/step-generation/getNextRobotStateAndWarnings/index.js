@@ -14,6 +14,7 @@ import {
   forThermocyclerDeactivateLid,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
+  forThermocyclerRunProfile,
   forThermocyclerCloseLid,
   forThermocyclerOpenLid,
 } from './thermocyclerUpdates'
@@ -145,6 +146,12 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'thermocycler/runProfile':
+      forThermocyclerRunProfile(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
+      break
     case 'thermocycler/awaitProfileComplete':
       console.warn(`NOT IMPLEMENTED: ${command.command}`)
       break
