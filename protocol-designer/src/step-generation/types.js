@@ -1,11 +1,11 @@
 // @flow
-import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
 import type {
+  AtomicProfileStep,
   Command,
   EngageMagnetParams,
   ModuleOnlyParams,
 } from '@opentrons/shared-data/protocol/flowTypes/schemaV4'
-
+import typeof { THERMOCYCLER_STATE, THERMOCYCLER_PROFILE } from '../constants'
 import type {
   LabwareTemporalProperties,
   ModuleTemporalProperties,
@@ -210,7 +210,7 @@ export type ThermocyclerProfileStepArgs = {|
   lidOpenHold: boolean,
   lidTargetTempHold: number | null,
   message?: string,
-  profileSteps: Array<{| temperature: number, holdTime: number |}>,
+  profileSteps: Array<AtomicProfileStep>,
   profileTargetLidTemp: number | null,
   profileVolume: number,
 |}

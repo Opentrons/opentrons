@@ -1,7 +1,7 @@
 // @flow
-import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
-import { getDefaultsForStepType } from '../../getDefaultsForStepType'
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../../../constants'
+import { getDefaultsForStepType } from '../../getDefaultsForStepType'
+import { thermocyclerFormToArgs } from '../thermocyclerFormToArgs'
 import type { FormData } from '../../../../form-types'
 import type { ThermocyclerStateStepArgs } from '../../../../step-generation/types'
 
