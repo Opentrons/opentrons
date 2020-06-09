@@ -16,6 +16,11 @@ from opentrons.calibration.helper_classes import (
 from opentrons.hardware_control import ThreadManager
 from opentrons.protocol_api import labware
 
+from .constants import (PIPETTE_TOLERANCES,
+                        P1000_OK_TIP_PICK_UP_VECTOR,
+                        DEFAULT_OK_TIP_PICK_UP_VECTOR,
+                        MOVE_TO_TIP_RACK_SAFETY_BUFFER)
+
 MODULE_LOG = logging.getLogger(__name__)
 
 """
@@ -267,15 +272,6 @@ CHECK_TRANSITIONS: typing.List[typing.Dict[str, typing.Any]] = [
         "to_state": CalibrationCheckState.badCalibrationData
     }
 ]
-
-
-MOVE_TO_TIP_RACK_SAFETY_BUFFER = Point(0, 0, 10)
-
-# Add in a 2mm buffer to tiprack thresholds on top of
-# the max acceptable range for a given pipette based
-# on calibration research data.
-DEFAULT_OK_TIP_PICK_UP_VECTOR = Point(3.79, 3.64, 2.8)
-P1000_OK_TIP_PICK_UP_VECTOR = Point(4.7, 4.7, 2.8)
 
 
 @dataclass
@@ -538,8 +534,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
         pipette_type = ''
         if pip and pip.mount:
-            pipette_type = str(self.pipettes[pip.mount]['model'])
-        is_p1000 = pipette_type.startswith('p1000')
+            pipette_type = str(self.pipettes[pip.mount]['name'])
+
+        is_p1000 = pipette_type in ['p1000_single_gen2', 'p1000_single']
+        is_p20 = pipette_type in \
+            ['p20_single_gen2', 'p10_single', 'p20_multi_gen2', 'p10_multi']
         height_states = [
             CalibrationCheckState.comparingFirstPipetteHeight,
             CalibrationCheckState.comparingSecondPipetteHeight]
@@ -550,13 +549,15 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             CalibrationCheckState.comparingSecondPipettePointOne
         ]
         if is_p1000 and state in cross_states:
-            return Point(2.7, 2.7, 0.0)
+            return PIPETTE_TOLERANCES['p1000_crosses']
         elif is_p1000 and state in height_states:
-            return Point(0.0, 0.0, 1)
+            return PIPETTE_TOLERANCES['p1000_height']
+        elif is_p20 and state in cross_states:
+            return PIPETTE_TOLERANCES['p20_crosses']
         elif state in cross_states:
-            return Point(1.79, 1.64, 0.0)
+            return PIPETTE_TOLERANCES['p300_crosses']
         else:
-            return Point(0.0, 0.0, 0.8)
+            return PIPETTE_TOLERANCES['other_height']
 
     def _is_instr_offset_diff(
             self,
