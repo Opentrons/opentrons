@@ -46,6 +46,14 @@ usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fef
 .PHONY: setup
 setup: setup-js setup-py
 
+.PHONY: clean-py
+clean-py:
+	$(MAKE) -C $(API_DIR) clean
+	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
+	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
+	$(MAKE) -C $(SHARED_DATA_DIR) clean
+
+
 .PHONY: setup-py
 setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
@@ -53,6 +61,7 @@ setup-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
