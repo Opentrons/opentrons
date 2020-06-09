@@ -35,7 +35,8 @@ HEIGHT_SAFETY_BUFFER = Point(0, 0, 5.0)
 
 class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
-    def __init__(self, hardware: ThreadManager, lights_on_before: bool = False):
+    def __init__(self, hardware: ThreadManager,
+                 lights_on_before: bool = False):
         self._hardware = hardware
         self._lights_on_before = lights_on_before
         self._deck = geometry.Deck()

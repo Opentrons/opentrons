@@ -256,6 +256,26 @@ def test_session_started(check_calibration_session):
            session.CalibrationCheckState.sessionStarted
 
 
+async def test_lights_from_off(check_calibration_session):
+    # lights were off before starting session
+    assert check_calibration_session._lights_on_before is False
+    # lights are on after starting session
+    assert check_calibration_session._hardware.get_lights()['rails'] is True
+    await check_calibration_session.delete_session()
+    # lights should be off after deleting session
+    assert check_calibration_session._hardware.get_lights()['rails'] is False
+
+
+async def test_lights_from_on(check_calibration_session):
+    # lights were on before starting session
+    check_calibration_session._lights_on_before = True
+    # lights were still on after starting session
+    assert check_calibration_session._hardware.get_lights()['rails'] is True
+    await check_calibration_session.delete_session()
+    # lights should still be on after deleting session
+    assert check_calibration_session._hardware.get_lights()['rails'] is True
+
+
 async def test_pick_up_tip_sets_current(check_calibration_session_shared_tips):
     sess = check_calibration_session_shared_tips
     await sess.trigger_transition(
