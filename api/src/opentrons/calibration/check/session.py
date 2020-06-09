@@ -302,8 +302,9 @@ COMPARISON_STATE_MAP: typing.Dict[CalibrationCheckState, ComparisonParams] = {
 
 
 class CheckCalibrationSession(CalibrationSession, StateMachine):
-    def __init__(self, hardware: 'ThreadManager'):
-        CalibrationSession.__init__(self, hardware)
+    def __init__(self, hardware: 'ThreadManager',
+                 lights_on_before: bool = False):
+        CalibrationSession.__init__(self, hardware, lights_on_before)
         StateMachine.__init__(self, states=[s for s in CalibrationCheckState],
                               transitions=CHECK_TRANSITIONS,
                               initial_state="sessionStarted")
@@ -388,7 +389,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 except (CalibrationException, AssertionError):
                     pass
         await self.hardware.home()
-        await self.hardware.set_lights(rails=False)
+        if not self._lights_on_before:
+            await self.hardware.set_lights(rails=False)
 
     def _get_preparing_state_mount(self) -> typing.Optional[Mount]:
         pip = None

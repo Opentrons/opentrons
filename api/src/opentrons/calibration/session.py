@@ -35,8 +35,10 @@ HEIGHT_SAFETY_BUFFER = Point(0, 0, 5.0)
 
 class CalibrationSession:
     """Class that controls state of the current robot calibration session"""
-    def __init__(self, hardware: ThreadManager):
+    def __init__(self, hardware: ThreadManager,
+                 lights_on_before: bool = False):
         self._hardware = hardware
+        self._lights_on_before = lights_on_before
         self._deck = geometry.Deck()
         self._pip_info_by_mount = self._get_pip_info_by_mount(
                 hardware.get_attached_instruments())
@@ -55,10 +57,11 @@ class CalibrationSession:
 
     @classmethod
     async def build(cls, hardware: ThreadManager):
+        lights_on = hardware.get_lights()['rails']
         await hardware.cache_instruments()
         await hardware.set_lights(rails=True)
         await hardware.home()
-        return cls(hardware=hardware)
+        return cls(hardware=hardware, lights_on_before=lights_on)
 
     @staticmethod
     def _get_pip_info_by_mount(
