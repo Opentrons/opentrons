@@ -1084,7 +1084,7 @@ class SmoothieDriver_3_0_0:
                 raise SmoothieError(ret_code)
         else:
             if is_alarm or is_error:
-                # info-level logging for errors of form: "no L instrument found"
+                # info-level logging for errors of form "no L instrument found"
                 if 'instrument found' in ret_code.lower():
                     log.info(f"smoothie: {ret_code}")
                     raise SmoothieError(ret_code)
