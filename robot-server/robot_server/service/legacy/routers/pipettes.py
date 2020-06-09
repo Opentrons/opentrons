@@ -1,6 +1,6 @@
 import typing
 from fastapi import APIRouter, Query, Depends
-from opentrons.hardware_control import HardwareAPILike
+from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.types import Axis
 
 from robot_server.service.dependencies import get_hardware
@@ -27,7 +27,7 @@ async def get_pipettes(
                         " this requires  disabling the pipette motors and"
                         " should only be done when no  protocol is running "
                         "and you know  it won't cause a problem"),
-        hardware: HardwareAPILike = Depends(get_hardware))\
+        hardware: ThreadManager = Depends(get_hardware))\
         -> pipettes.PipettesByMount:
     """
     Query robot for model strings on 'left' and 'right' mounts, and return a

@@ -160,10 +160,10 @@ export class FilePipettesModal extends React.Component<Props, State> {
       this.setState({ showEditPipetteConfirmation: false })
   }
 
-  getCrashableModuleSelected = (
+  getCrashableModuleSelected: (
     modules: FormModulesByType,
     moduleType: ModuleRealType
-  ) => {
+  ) => boolean = (modules, moduleType) => {
     const formModule = modules[moduleType]
     const crashableModuleOnDeck =
       formModule.onDeck && formModule.model
@@ -173,7 +173,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     return crashableModuleOnDeck
   }
 
-  handleSubmit = (values: FormState) => {
+  handleSubmit: (values: FormState) => void = values => {
     const { showProtocolFields } = this.props
     const { showEditPipetteConfirmation } = this.state
 
@@ -225,15 +225,15 @@ export class FilePipettesModal extends React.Component<Props, State> {
     this.props.onSave({ modules, newProtocolFields, pipettes })
   }
 
-  showEditPipetteConfirmationModal = () => {
+  showEditPipetteConfirmationModal: () => void = () => {
     this.setState({ showEditPipetteConfirmation: true })
   }
 
-  handleCancel = () => {
+  handleCancel: () => void = () => {
     this.setState({ showEditPipetteConfirmation: false })
   }
 
-  getInitialValues = () => {
+  getInitialValues: () => FormState = () => {
     return {
       ...initialFormState,
       pipettesByMount: {
@@ -247,7 +247,7 @@ export class FilePipettesModal extends React.Component<Props, State> {
     }
   }
 
-  render() {
+  render(): React.Node {
     if (this.props.hideModal) return null
     const { showProtocolFields, moduleRestrictionsDisabled } = this.props
 

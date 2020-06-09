@@ -29,7 +29,7 @@ export type LiquidPlacementFormValues = {|
   volume: ?string,
 |}
 
-type Props = {
+type Props = {|
   commonSelectedLiquidId: ?string,
   commonSelectedVolume: ?number,
   liquidSelectionOptions: Options,
@@ -39,10 +39,10 @@ type Props = {
   cancelForm: () => mixed,
   clearWells: ?() => mixed,
   saveForm: LiquidPlacementFormValues => mixed,
-}
+|}
 
 export class LiquidPlacementForm extends React.Component<Props> {
-  getInitialValues = (): ValidFormValues => {
+  getInitialValues: () => ValidFormValues = () => {
     const { commonSelectedLiquidId, commonSelectedVolume } = this.props
     return {
       selectedLiquidId: commonSelectedLiquidId || '',
@@ -50,8 +50,13 @@ export class LiquidPlacementForm extends React.Component<Props> {
     }
   }
 
-  // TODO(IL, 2020-03-09): type defs for Yup
-  getValidationSchema = (): any => {
+  getValidationSchema: () => Yup.Schema<
+    {|
+      selectedLiquidId: string,
+      volume: number,
+    |},
+    any
+  > = () => {
     const { selectedWellsMaxVolume } = this.props
     return Yup.object().shape({
       selectedLiquidId: Yup.string().required(
@@ -76,15 +81,17 @@ export class LiquidPlacementForm extends React.Component<Props> {
     })
   }
 
-  handleCancelForm = () => {
+  handleCancelForm: () => void = () => {
     this.props.cancelForm()
   }
 
-  handleClearWells = () => {
+  handleClearWells: () => void = () => {
     this.props.clearWells && this.props.clearWells()
   }
 
-  handleChangeVolume = (setFieldValue: *) => (e: SyntheticInputEvent<*>) => {
+  handleChangeVolume: (
+    setFieldValue: (fieldName: string, value: mixed) => mixed
+  ) => (e: SyntheticInputEvent<*>) => void = setFieldValue => e => {
     const value: ?string = e.currentTarget.value
     const masked = fieldProcessors.composeMaskers(
       fieldProcessors.maskToFloat,
@@ -94,11 +101,11 @@ export class LiquidPlacementForm extends React.Component<Props> {
     setFieldValue('volume', masked)
   }
 
-  handleSubmit = (values: LiquidPlacementFormValues) => {
+  handleSubmit: (values: LiquidPlacementFormValues) => void = values => {
     this.props.saveForm(values)
   }
 
-  render() {
+  render(): React.Node {
     const { liquidSelectionOptions, showForm } = this.props
     if (!showForm) return null
     return (

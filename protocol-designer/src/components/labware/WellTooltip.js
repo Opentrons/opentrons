@@ -45,10 +45,10 @@ const initialState: State = {
 export class WellTooltip extends React.Component<Props, State> {
   state: State = initialState
 
-  makeHandleMouseEnterWell = (
+  makeHandleMouseEnterWell: (
     wellName: string,
     wellIngreds: LocationLiquidState
-  ) => (e: SyntheticMouseEvent<*>) => {
+  ) => (e: SyntheticMouseEvent<>) => void = (wellName, wellIngreds) => e => {
     const { target } = e
     if (target instanceof Element) {
       const wellBoundingRect = target.getBoundingClientRect()
@@ -65,11 +65,11 @@ export class WellTooltip extends React.Component<Props, State> {
     }
   }
 
-  handleMouseLeaveWell = () => {
+  handleMouseLeaveWell: () => void = () => {
     this.setState(initialState)
   }
 
-  render() {
+  render(): React.Node {
     const { tooltipX, tooltipY, tooltipOffset } = this.state
 
     return (

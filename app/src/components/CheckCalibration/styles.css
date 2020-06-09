@@ -162,11 +162,13 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 14rem;
+  height: 15rem;
 }
 
 .tiprack_image {
   width: 100%;
+  max-height: 15rem;
+  max-width: 15.25rem;
 }
 
 .tiprack_display_name {

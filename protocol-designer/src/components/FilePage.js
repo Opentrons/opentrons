@@ -50,7 +50,7 @@ const DATETIME_FORMAT = 'MMM dd, yyyy | h:mm a'
 
 // TODO: Ian 2019-03-15 use i18n for labels
 export class FilePage extends React.Component<Props, State> {
-  state = {
+  state: State = {
     isEditPipetteModalOpen: false,
     moduleToEdit: null,
   }
@@ -58,31 +58,36 @@ export class FilePage extends React.Component<Props, State> {
   // TODO (ka 2019-10-28): This is a workaround, see #4446
   // but it solves the modal positioning problem caused by main page wrapper
   // being positioned absolute until we can figure out something better
-  scrollToTop = () => {
+  scrollToTop: () => void = () => {
     const editPage = document.getElementById('main-page')
     if (editPage) editPage.scrollTop = 0
   }
 
-  openEditPipetteModal = () => {
+  openEditPipetteModal: () => void = () => {
     this.scrollToTop()
     this.setState({ isEditPipetteModalOpen: true })
   }
-  closeEditPipetteModal = () => this.setState({ isEditPipetteModalOpen: false })
 
-  handleEditModule = (moduleType: ModuleRealType, moduleId?: string) => {
+  closeEditPipetteModal: () => void = () =>
+    this.setState({ isEditPipetteModalOpen: false })
+
+  handleEditModule: (moduleType: ModuleRealType, moduleId?: string) => void = (
+    moduleType,
+    moduleId
+  ) => {
     this.scrollToTop()
     this.setState({
       moduleToEdit: { moduleType: moduleType, moduleId: moduleId },
     })
   }
 
-  closeEditModulesModal = () => {
+  closeEditModulesModal: () => void = () => {
     this.setState({
       moduleToEdit: null,
     })
   }
 
-  render() {
+  render(): React.Node {
     const {
       formValues,
       instruments,
@@ -185,6 +190,7 @@ export class FilePage extends React.Component<Props, State> {
               <PrimaryButton
                 onClick={this.openEditPipetteModal}
                 className={styles.edit_button}
+                name={'editPipettes'}
               >
                 {i18n.t('button.edit')}
               </PrimaryButton>
@@ -192,6 +198,7 @@ export class FilePage extends React.Component<Props, State> {
                 onClick={swapPipettes}
                 className={styles.swap_button}
                 iconName="swap-horizontal"
+                name={'swapPipettes'}
               >
                 {i18n.t('button.swap')}
               </OutlineButton>
@@ -210,6 +217,7 @@ export class FilePage extends React.Component<Props, State> {
             onClick={goToNextPage}
             className={styles.continue_button}
             iconName="arrow-right"
+            name={'continueToLiquids'}
           >
             {i18n.t('button.continue_to_liquids')}
           </PrimaryButton>

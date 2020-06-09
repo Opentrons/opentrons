@@ -320,9 +320,9 @@ and when that is implemented.
   @apply --font-form-default;
 
   display: grid;
-  grid-template-columns: 13.5rem 7.25rem 7.25rem;
+  grid-template-columns: 14.5rem 7.25rem 7.25rem;
   font-weight: var(--fw-semibold);
-  padding: 1rem 0 0.25rem 0.625rem;
+  padding: 1rem 0 0.25rem 2.125rem;
 }
 
 .profile_step_number {
@@ -337,6 +337,10 @@ and when that is implemented.
   display: flex;
   align-items: center;
   padding: 0.25rem 0;
+
+  &.cycle {
+    padding: 0;
+  }
 }
 
 .profile_step_fields {
@@ -345,6 +349,11 @@ and when that is implemented.
   border: var(--bd-light);
   width: 100%;
   padding: 0.5rem;
+}
+
+.profile_cycle_fields {
+  width: 31.5rem;
+  border: none;
 }
 
 .step_input_wrapper {
@@ -363,7 +372,73 @@ and when that is implemented.
   cursor: pointer;
 }
 
+.profile_cycle_wrapper {
+  display: flex;
+  width: 100%;
+}
+
+.cycle_steps {
+  display: flex;
+}
+
+.cycle_row {
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  border-right: 1px solid var(--c-light-gray);
+  padding: 0;
+  margin-top: 0.25rem;
+  margin-right: 0.75rem;
+
+  &::before {
+    content: '';
+    background: var(--c-light-gray);
+    position: absolute;
+    top: 0;
+    right: 0;
+    height: 1px;
+    width: 1rem;
+  }
+
+  &::after {
+    content: '';
+    background: var(--c-light-gray);
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    height: 1px;
+    width: 1rem;
+  }
+}
+
+.profile_cycle_group {
+  border: var(--bd-light);
+  width: 100%;
+  padding-right: 0.5rem;
+}
+
+.cycle_step_delete {
+  height: 3rem;
+
+  & > .delete_step_icon {
+    margin-top: 0.75rem;
+  }
+}
+
+.cycles_field {
+  margin-top: 1rem;
+}
+
+.add_cycle_step {
+  text-align: right;
+  margin: 0.75rem 0 1rem;
+}
+
 .profile_button_group {
   padding: 1rem 1.5rem 0;
   text-align: right;
+
+  & :first-child {
+    margin-right: 1.5rem;
+  }
 }

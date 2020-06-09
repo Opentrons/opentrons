@@ -49,6 +49,9 @@
     },
     "profileStepRow": {
       "deleteStep": "Delete profile step"
+    },
+    "profileCycle": {
+      "deleteCycle": "Delete cycle and steps"
     }
   },
   "edit_module_card": {

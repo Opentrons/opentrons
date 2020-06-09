@@ -9,7 +9,8 @@ try:
 except ModuleNotFoundError:
     select = None  # type: ignore
 from time import sleep
-from typing import Callable, Optional, Mapping, Tuple, TYPE_CHECKING
+from collections import deque
+from typing import Callable, Optional, Mapping, Tuple, Deque, TYPE_CHECKING
 from serial.serialutil import SerialException  # type: ignore
 from opentrons.drivers import serial_communication, utils
 from opentrons.drivers.serial_communication import SerialNoResponse
@@ -44,6 +45,7 @@ LID_TARGET_MAX = 110
 BLOCK_TARGET_MIN = 0
 BLOCK_TARGET_MAX = 99
 TEMP_UPDATE_RETRIES = 15
+TEMP_BUFFER_MAX_LEN = 10
 
 
 def _build_temp_code(temp: float,
@@ -74,7 +76,7 @@ DEFAULT_TC_TIMEOUT = 40
 DEFAULT_COMMAND_RETRIES = 3
 DEFAULT_STABILIZE_DELAY = 0.1
 POLLING_FREQUENCY_MS = 1000
-TEMP_THRESHOLD = 0.5
+TEMP_THRESHOLD = 0.3
 
 
 class ThermocyclerError(Exception):
@@ -350,6 +352,8 @@ class Thermocycler:
         self._interrupt_cb = interrupt_callback
         self._lid_target = None
         self._lid_temp = None
+        # to store previous _current_temp values:
+        self._block_temp_buffer: Deque = deque(maxlen=TEMP_BUFFER_MAX_LEN)
 
     async def connect(self, port: str) -> 'Thermocycler':
         self.disconnect()
@@ -453,6 +457,7 @@ class Thermocycler:
         self._current_temp = val_dict['C']
         self._target_temp = val_dict['T']
         self._hold_time = val_dict['H']
+        self._block_temp_buffer.append(self._current_temp)
 
     def _lid_temp_status_callback(self, lid_temp_res):
         # Payload is shaped like `T:95.0 C:77.4` where T is the
@@ -513,13 +518,26 @@ class Thermocycler:
             _status = 'idle'
         else:
             diff = self.target - self.temperature
-            if abs(diff) < TEMP_THRESHOLD:
+            if self._is_holding_at_target():
                 _status = 'holding at target'
             elif diff < 0:
                 _status = 'cooling'
             else:
                 _status = 'heating'
         return _status
+
+    def _is_holding_at_target(self) -> bool:
+        """
+        Checks block temp history to determine if block temp has stabilized at
+        the target temperature. Returns true only if all values in history are
+        within threshold range of target temperature.
+        """
+        if len(self._block_temp_buffer) < TEMP_BUFFER_MAX_LEN:
+            # Not enough temp history
+            return False
+        else:
+            return all(abs(self.target - t) < TEMP_THRESHOLD
+                       for t in self._block_temp_buffer)
 
     @property
     def port(self) -> Optional[str]:

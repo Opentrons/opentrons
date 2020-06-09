@@ -23,16 +23,17 @@ import {
 import type { FocusHandlers } from '../types'
 import styles from '../StepEditForm.css'
 
-type Props = { focusHandlers: FocusHandlers }
-type State = { collapsed?: boolean }
+type Props = {| focusHandlers: FocusHandlers |}
+type State = {| collapsed?: boolean |}
 
 export class MixForm extends React.Component<Props, State> {
-  state = { collapsed: true }
+  state: State = { collapsed: true }
 
-  toggleCollapsed = () => {
+  toggleCollapsed: () => void = () => {
     this.setState({ collapsed: !this.state.collapsed })
   }
-  render() {
+
+  render(): React.Node {
     const { focusHandlers } = this.props
     const { collapsed } = this.state
     return (

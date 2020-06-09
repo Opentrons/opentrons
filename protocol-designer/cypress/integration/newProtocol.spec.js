@@ -148,15 +148,9 @@ describe('Desktop Navigation', () => {
         .next()
         .contains('Opentrons 96 Filter Tip Rack 20 µL')
         .should('exist')
-      cy.get('button')
-        .contains('edit')
-        .should('exist')
-      cy.get('button')
-        .contains('swap')
-        .should('exist')
-      cy.get('button')
-        .contains('Continue to Liquids')
-        .should('exist')
+      cy.get("button[name='editPipettes']").should('exist')
+      cy.get("button[name='swapPipettes']").should('exist')
+      cy.get("button[name='continueToLiquids']").should('exist')
     })
 
     it('fills out the file details form', () => {
@@ -226,9 +220,7 @@ describe('Desktop Navigation', () => {
   describe('editing the pipettes', () => {
     // Use the edit button to make changes to our pipettes
     it('edits the pipettes', () => {
-      cy.get('button')
-        .contains('edit')
-        .click()
+      cy.get("button[name='editPipettes']").click()
       cy.contains('Right Pipette')
         .next()
         .contains('P300')
@@ -273,9 +265,7 @@ describe('Desktop Navigation', () => {
 
     it('edits the pipettes again', () => {
       // Same edits as above
-      cy.get('button')
-        .contains('edit')
-        .click()
+      cy.get("button[name='editPipettes']").click()
       cy.contains('Right Pipette')
         .next()
         .contains('P300')
@@ -354,9 +344,7 @@ describe('Desktop Navigation', () => {
   describe('pipette swapping', () => {
     it('swaps the pipettes', () => {
       // Click the swap button
-      cy.get('button')
-        .contains('swap')
-        .click()
+      cy.get("button[name='swapPipettes']").click()
       // What was left is now right and vice versa
       cy.contains('left pipette')
         .next()
@@ -386,9 +374,7 @@ describe('Desktop Navigation', () => {
   describe('the new liquid form', () => {
     it('displays the new liquid form', () => {
       // Check to make sure all the form elements are present
-      cy.get('button')
-        .contains('Continue to Liquids')
-        .click()
+      cy.get("button[name='continueToLiquids']").click()
       cy.get('button')
         .contains('New Liquid')
         .should('exist')

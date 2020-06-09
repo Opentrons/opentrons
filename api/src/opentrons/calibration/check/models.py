@@ -19,6 +19,8 @@ class TiprackPosition(BaseModel):
 
 class SessionType(str, Enum):
     """The available session types"""
+    null = 'null'
+    default = 'default'
     calibration_check = 'calibrationCheck'
 
 

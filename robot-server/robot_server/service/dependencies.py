@@ -1,10 +1,10 @@
 from functools import lru_cache
 
+from fastapi import Depends
 from opentrons.api import MainRouter
-from opentrons.hardware_control import HardwareAPILike, ThreadedAsyncLock
-from opentrons.calibration.session import SessionManager \
-    as CalibrationSessionManager
+from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
 
+from robot_server.service.session.manager import SessionManager
 from robot_server.service.legacy.rpc import RPCServer
 from . import HARDWARE_APP_KEY
 
@@ -12,8 +12,11 @@ from . import HARDWARE_APP_KEY
 # The single instance of the RPCServer
 _rpc_server_instance = None
 
+# The single instance of the SessionManager
+_session_manager_inst = None
 
-async def get_hardware() -> HardwareAPILike:
+
+async def get_hardware() -> ThreadManager:
     """Hardware dependency"""
     from .app import app
     # todo Amit 2/11/2020. This function should create and return a singleton
@@ -41,7 +44,10 @@ async def get_rpc_server() -> RPCServer:
     return _rpc_server_instance
 
 
-@lru_cache(maxsize=1)
-def get_session_manager() -> CalibrationSessionManager:
+def get_session_manager(hardware: ThreadManager = Depends(get_hardware)) \
+        -> SessionManager:
     """The single session manager instance"""
-    return CalibrationSessionManager()
+    global _session_manager_inst
+    if not _session_manager_inst:
+        _session_manager_inst = SessionManager(hardware=hardware)
+    return _session_manager_inst
