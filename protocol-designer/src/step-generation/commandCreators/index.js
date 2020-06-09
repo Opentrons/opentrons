@@ -4,6 +4,7 @@ export {
   mix,
   consolidate,
   distribute,
+  thermocyclerProfileStep,
   thermocyclerStateStep,
 } from './compound'
 

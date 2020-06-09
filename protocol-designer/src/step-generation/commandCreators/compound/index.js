@@ -1,8 +1,7 @@
 // @flow
-import { consolidate } from './consolidate'
-import { distribute } from './distribute'
-import { mix } from './mix'
-import { thermocyclerStateStep } from './thermocyclerStateStep'
-import { transfer } from './transfer'
-
-export { consolidate, distribute, mix, thermocyclerStateStep, transfer }
+export { consolidate } from './consolidate'
+export { distribute } from './distribute'
+export { mix } from './mix'
+export { thermocyclerProfileStep } from './thermocyclerProfileStep'
+export { thermocyclerStateStep } from './thermocyclerStateStep'
+export { transfer } from './transfer'
