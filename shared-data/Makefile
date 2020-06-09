@@ -17,7 +17,7 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
-wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data)
+wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER))
 
 py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data))
 
@@ -56,6 +56,7 @@ clean:
 wheel: $(wheel_file)
 
 $(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: python/setup.py $(py_sources)
+	$(SHX) mkdir -p build
 	$(SHX) cd python && $(python) setup.py $(wheel_opts) bdist_wheel
 	$(SHX) mv python/dist/$(notdir $(wheel_file)) $(BUILD_DIR)/
 	$(SHX) rm -rf python/build python/dist *.egg_info

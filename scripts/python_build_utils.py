@@ -37,12 +37,18 @@ package_entries = {
 }
 
 
-def get_version(project):
+def get_version(project, extra_tag=''):
     pkg_json_path = package_entries[project].pkg_json
-    return json.load(open(pkg_json_path))['version']
+    builtin_ver = json.load(open(pkg_json_path))['version']
+    if extra_tag:
+        version = builtin_ver + f'.dev{extra_tag}'
+    else:
+        version = builtin_ver
+    return version
 
 
-def normalize_version(project):
+
+def normalize_version(project, extra_tag=''):
     # Pipenv requires setuptools >= 36.2.1. Since 36.2.1, setuptools changed
     # the way they vendor dependencies, like the packaging module that
     # provides the way to normalize version numbers for wheel file names. So
@@ -53,7 +59,7 @@ def normalize_version(project):
     except ImportError:
         # old way
         from pkg_resources.extern import packaging
-    vers_obj = packaging.version.Version(get_version(project))
+    vers_obj = packaging.version.Version(get_version(project, extra_tag))
     return str(vers_obj)
 
 
@@ -89,13 +95,13 @@ def _ref_from_sha(sha):
     return sha[:12]
 
 
-def dump_br_version(project):
+def dump_br_version(project, extra_tag=''):
     """ Dump an enhanced version json including
     - The version from package.json
     - The current branch (if it can be found)
     - The current sha
     """
-    normalized = get_version(project)
+    normalized = get_version(project, extra_tag)
     sha = subprocess.check_output(
         ['git', 'rev-parse', 'HEAD'], cwd=CWD).strip().decode()
     branch = _ref_from_sha(sha)
@@ -112,5 +118,8 @@ if __name__ == '__main__':
                         choices=package_entries.keys())
     parser.add_argument(dest='task', metavar='TASK', type=str,
                         choices=['normalize_version', 'dump_br_version'])
+    parser.add_argument('-e', '--extra-tag', type=str, default='',
+                        help='Extra version tag like a build number',
+                        dest='extra_tag')
     args = parser.parse_args()
-    print(locals()[args.task](args.project))
+    print(locals()[args.task](args.project, args.extra_tag))

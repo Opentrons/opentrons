@@ -6,8 +6,6 @@ import os
 import os.path
 from setuptools import setup, find_packages
 
-import json
-
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == 'posix':
     import fcntl
@@ -15,12 +13,18 @@ if os.name == 'posix':
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
 HERE = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(HERE, '..', 'scripts'))
+
+from python_build_utils import normalize_version
 
 
 def get_version():
-    with open(os.path.join(HERE, 'robot_server', 'package.json')) as pkg:
-        package_json = json.load(pkg)
-        return package_json.get('version')
+    buildno = os.getenv('BUILD_NUMBER')
+    if buildno:
+        normalize_opts = {'extra_tag': buildno}
+    else:
+        normalize_opts = {}
+    return normalize_version('shared-data', **normalize_opts)
 
 
 VERSION = get_version()

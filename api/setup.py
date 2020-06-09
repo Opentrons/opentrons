@@ -4,9 +4,14 @@ import sys
 import codecs
 import os
 import os.path
+
 from setuptools import setup, find_packages
 
-import json
+HERE = os.path.abspath(os.path.dirname(__file__))
+sys.path.append(os.path.join(HERE, '..', 'scripts'))
+
+from python_build_utils import normalize_version
+
 
 # make stdout blocking since Travis sets it to nonblocking
 if os.name == 'posix':
@@ -14,14 +19,14 @@ if os.name == 'posix':
     flags = fcntl.fcntl(sys.stdout, fcntl.F_GETFL)
     fcntl.fcntl(sys.stdout, fcntl.F_SETFL, flags & ~os.O_NONBLOCK)
 
-HERE = os.path.abspath(os.path.dirname(__file__))
-
 
 def get_version():
-    with open(os.path.join(HERE, 'src', 'opentrons', 'package.json')) as pkg:
-        package_json = json.load(pkg)
-        return package_json.get('version')
-
+    buildno = os.getenv('BUILD_NUMBER')
+    if buildno:
+        normalize_opts = {'extra_tag': buildno}
+    else:
+        normalize_opts = {}
+    return normalize_version('api', **normalize_opts)
 
 VERSION = get_version()
 

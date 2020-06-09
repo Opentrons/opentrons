@@ -22,7 +22,7 @@ sphinx_build := $(pipenv_envvars) pipenv run sphinx-build
 # Find the version of the wheel from package.json using a helper script. We
 # use python here so we can use the same version normalization that will be
 # used to create the wheel.
-wheel_file = dist/$(call python_get_wheelname,api,opentrons)
+wheel_file = dist/$(call python_get_wheelname,api,opentrons,$(BUILD_NUMBER))
 
 # These variables are for simulating python protocols
 sim_log_level ?= info

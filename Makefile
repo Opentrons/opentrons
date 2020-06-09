@@ -16,6 +16,12 @@ UPDATE_SERVER_DIR := update-server
 ROBOT_SERVER_DIR := robot-server
 APP_SHELL_DIR := app-shell
 
+# This may be set as an environment variable (and is by CI tasks that upload
+# to test pypi) to add a .dev extension to the python package versions. If
+# empty, no .dev extension is appended, so this definition is here only as
+# documentation
+BUILD_NUMBER ?=
+
 # this may be set as an environment variable to select the version of
 # python to run if pyenv is not available. it should always be set to
 # point to a python3.6.
@@ -40,6 +46,14 @@ usb_host=$(shell yarn run -s discovery find -i 169.254 fd00 -c "[fd00:0:cafe:fef
 .PHONY: setup
 setup: setup-js setup-py
 
+.PHONY: clean-py
+clean-py:
+	$(MAKE) -C $(API_DIR) clean
+	$(MAKE) -C $(UPDATE_SERVER_DIR) clean
+	$(MAKE) -C $(ROBOT_SERVER_DIR) clean
+	$(MAKE) -C $(SHARED_DATA_DIR) clean
+
+
 .PHONY: setup-py
 setup-py:
 	$(OT_PYTHON) -m pip install pipenv==2018.10.9
@@ -47,6 +61,7 @@ setup-py:
 	$(MAKE) -C $(UPDATE_SERVER_DIR) setup
 	$(MAKE) -C $(ROBOT_SERVER_DIR) setup
 	$(MAKE) -C $(SHARED_DATA_DIR) setup-py
+
 
 # front-end dependecies handled by yarn
 .PHONY: setup-js
