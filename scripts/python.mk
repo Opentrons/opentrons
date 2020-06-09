@@ -5,7 +5,7 @@ pytest := $(pipenv_envvars) pipenv run py.test
 
 pipenv_opts := --dev
 pipenv_opts += $(and $(CI),--keep-outdated --clear)
-wheel_opts := $(if $(or $(CI),$(V),$(VERBOSE)),,-q)
+wheel_opts := $(if $(and $(or $(CI),$(V),$(VERBOSE)),$(not $(QUIET))),,-q)
 
 pypi_upload_url := https://upload.pypi.org/legacy/
 pypi_test_upload_url := https://test.pypi.org/legacy/
