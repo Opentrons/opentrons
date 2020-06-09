@@ -370,6 +370,8 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 
 **********************
 
+.. _new-utility-commands:
+
 ****************
 Utility Commands
 ****************
@@ -502,3 +504,52 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
         protocol.comment('Hello, world!')
 
 .. versionadded:: 2.0
+
+
+Control and Monitor Robot Rail Lights
+=====================================
+
+You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
+
+
+.. code-block:: python
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.5'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        # turn on robot rail lights
+        protocol.set_rail_lights(True)
+
+        # turn off robot rail lights
+        protocol.set_rail_lights(False)
+
+.. versionadded:: 2.5
+
+
+You can also check whether the rail lights are on or off in the protocol using :py:attr:`.ProtocolContext.rail_lights_on`:
+
+
+.. code-block:: python
+
+    protocol.rail_lights_on  # returns True when the lights are on,
+                             # False when the lights are off
+
+.. versionadded:: 2.5
+
+
+Monitor Robot Door
+==================
+
+The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
+
+You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:attr:`.ProtocolContext.door_closed`:
+
+
+.. code-block:: python
+
+    protocol.door_closed  # return True when the door is closed,
+                          # False when the door is open
+
+.. versionadded:: 2.5
