@@ -76,7 +76,7 @@ push: push-no-restart
 
 .PHONY: deploy
 deploy-py: wheel
-	$(SHX) cd python && $(call python_upload_package,$(twine_auth_args),$(twine_repository_url),../$(wheel_file))
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),../$(wheel_file),$(SHX) cd python)
 
 .PHONY: test
 test-py:

@@ -29,6 +29,7 @@ endef
 # parameter 1: auth arguments for twine
 # parameter 2: repository url
 # parameter 3: the wheel file to upload
+# parameter 4 (optional): a prefix command, like changing directory
 define python_upload_package
-$(python) -m twine upload --repository-url $(2) $(1) $(3)
+$(if $(findstring test,$(2)),-)$(if $(4),$(4) &&)$(python) -m twine upload --repository-url $(2) $(1) $(3)
 endef
