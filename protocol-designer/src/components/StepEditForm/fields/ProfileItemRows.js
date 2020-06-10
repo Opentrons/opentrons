@@ -263,18 +263,22 @@ const ProfileStepRow = (props: ProfileStepRowProps) => {
   const [targetProps, tooltipProps] = useHoverTooltip({
     placement: 'top',
   })
-  const fields = names.map(name => (
-    <ProfileField
-      key={name}
-      units={units[name]}
-      {...{
-        name,
-        focusHandlers,
-        profileItem: profileStepItem,
-        updateValue: updateStepFieldValue,
-      }}
-    />
-  ))
+  const fields = names.map(name => {
+    const className = name === 'title' ? styles.title : styles.profile_field
+    return (
+      <ProfileField
+        key={name}
+        units={units[name]}
+        className={className}
+        {...{
+          name,
+          focusHandlers,
+          profileItem: profileStepItem,
+          updateValue: updateStepFieldValue,
+        }}
+      />
+    )
+  })
   return (
     <div className={cx(styles.profile_step_row, { [styles.cycle]: isCycle })}>
       <div
