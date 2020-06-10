@@ -78,3 +78,6 @@ class SimulatingDriver:
 
     def set_dwelling_current(self, settings):
         pass
+    
+    def set_acceleration(self, settings):
+        pass
