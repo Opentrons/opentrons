@@ -1,6 +1,10 @@
 // @flow
-import typeof { THERMOCYCLER_STATE } from '../constants'
-import type { CommandCreatorArgs, PauseArgs } from '../step-generation'
+import typeof { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../constants'
+import type {
+  CommandCreatorArgs,
+  PauseArgs,
+  ThermocyclerProfileStepArgs,
+} from '../step-generation'
 import type { StepIdType } from '../form-types'
 import type { FormError } from './formLevel/errors'
 
@@ -129,6 +133,18 @@ export type AwaitTemperatureSubstepItem = {|
   message?: string,
 |}
 
+export type ThermocyclerProfileSubstepItem = {|
+  substepType: THERMOCYCLER_PROFILE,
+  labwareDisplayName: ?string,
+  labwareNickname: ?string,
+  profileTargetLidTemp: number | null,
+  lidOpenHold: boolean,
+  profileVolume: number,
+  profileSteps: $PropertyType<ThermocyclerProfileStepArgs, 'profileSteps'>,
+  meta: $PropertyType<ThermocyclerProfileStepArgs, 'meta'>,
+  message?: string,
+|}
+
 export type ThermocyclerStateSubstepItem = {|
   substepType: THERMOCYCLER_STATE,
   labwareDisplayName: ?string,
@@ -145,6 +161,7 @@ export type SubstepItemData =
   | MagnetSubstepItem
   | TemperatureSubstepItem
   | AwaitTemperatureSubstepItem
+  | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
 
 export type SubSteps = { [StepIdType]: ?SubstepItemData }

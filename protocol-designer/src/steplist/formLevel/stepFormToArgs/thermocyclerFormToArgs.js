@@ -86,6 +86,11 @@ export const thermocyclerFormToArgs = (
           formData.lidIsActiveHold && formData.lidTargetTempHold !== null
             ? Number(formData.lidTargetTempHold)
             : null,
+        meta: {
+          rawProfileItems: formData.orderedProfileItems.map(
+            itemId => formData.profileItemsById[itemId]
+          ),
+        },
         profileSteps,
         profileTargetLidTemp: Number(formData.profileTargetLidTemp),
         profileVolume: Number(formData.profileVolume),
