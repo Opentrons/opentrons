@@ -1,5 +1,8 @@
 // @flow
 import * as React from 'react'
+import cx from 'classnames'
+import sum from 'lodash/sum'
+import { Icon } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
   TEMPERATURE_MODULE_TYPE,
@@ -9,7 +12,7 @@ import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
 import { makeTemperatureText } from '../../utils'
-import { PDTitledList } from '../lists'
+import { PDListItem, PDTitledList } from '../lists'
 import { StepDescription } from '../StepDescription'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
 import { MixHeader } from './MixHeader'
@@ -112,6 +115,14 @@ export type StepItemContentsProps = {|
   hoveredSubstep: ?SubstepIdentifier,
 |}
 
+const makeDurationText = (
+  durationMinutes: string,
+  durationSeconds: string
+): string => {
+  const minutesText = Number(durationMinutes) > 0 ? `${durationMinutes}m ` : ''
+  return `${minutesText}${durationSeconds || 0}s`
+}
+
 type ProfileStepSubstepRowProps = {|
   step: ProfileStepItem,
   repetitionsDisplay: ?string,
@@ -121,30 +132,83 @@ export const ProfileStepSubstepRow = (
 ): React.Node => {
   const { repetitionsDisplay } = props
   const { temperature, durationMinutes, durationSeconds } = props.step
-  const minutesText = Number(durationMinutes) > 0 ? `${durationMinutes}m ` : ''
   return (
-    <li>
-      <span>{`${temperature}${i18n.t('application.units.degrees')}`}</span>
-      <span>{`${minutesText}${durationSeconds}s`}</span>
-      <span>{repetitionsDisplay ? `${repetitionsDisplay}x` : null}</span>
-    </li>
+    // TODO IMMEDIATELY: rename .step_subitem_channel_row class to more generic name
+    <PDListItem
+      className={cx(
+        styles.step_subitem_channel_row,
+        styles.profile_step_substep_row
+      )}
+    >
+      <span
+        className={styles.profile_step_substep_column}
+      >{`${temperature} ${i18n.t('application.units.degrees')}`}</span>
+      <span
+        className={cx(
+          styles.profile_step_substep_column,
+          styles.profile_center_column
+        )}
+      >
+        {makeDurationText(durationMinutes, durationSeconds)}
+      </span>
+      <span className={styles.profile_step_substep_column}>
+        {repetitionsDisplay ? `${repetitionsDisplay}x` : null}
+      </span>
+    </PDListItem>
   )
 }
 
-type ProfileCycleSubstepRowsProps = {| cycle: ProfileCycleItem |}
-export const ProfileCycleSubstepRows = (
-  props: ProfileCycleSubstepRowsProps
+// this is a row under a cycle under a substep
+type ProfileCycleRowProps = {| step: ProfileStepItem |}
+const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
+  const { step } = props
+  return (
+    <div className={styles.cycle_step_row}>
+      <span>{`${step.temperature} ${i18n.t(
+        'application.units.degrees'
+      )}`}</span>
+      <span>
+        {makeDurationText(step.durationMinutes, step.durationSeconds)}
+      </span>
+    </div>
+  )
+}
+
+type ProfileCycleSubstepGroupProps = {| cycle: ProfileCycleItem |}
+export const ProfileCycleSubstepGroup = (
+  props: ProfileCycleSubstepGroupProps
 ): React.Node => {
   const { steps, repetitions } = props.cycle
   return (
+    <div className={styles.profile_substep_cycle}>
+      <div className={styles.cycle_group}>
+        {steps.map((step, index) => (
+          <ProfileCycleRow key={index} step={step} />
+        ))}
+      </div>
+      <div className={styles.cycle_repetitions}>{`${repetitions}x`}</div>
+    </div>
+  )
+}
+
+type CollapsibleSubstepProps = {|
+  children: React.Node,
+  headerContent: React.Node,
+|}
+const CollapsibleSubstep = (props: CollapsibleSubstepProps) => {
+  const [contentCollapsed, setContentCollapsed] = React.useState<boolean>(true)
+  return (
     <>
-      {steps.map((step, index) => (
-        <ProfileStepSubstepRow
-          key={index}
-          step={step}
-          repetitionsDisplay={index === 0 ? repetitions : ''}
-        />
-      ))}
+      <PDListItem border className={styles.step_subitem}>
+        {props.headerContent}
+        <span
+          className={styles.inner_carat}
+          onClick={() => setContentCollapsed(!contentCollapsed)}
+        >
+          <Icon name={contentCollapsed ? 'chevron-up' : 'chevron-down'} />
+        </span>
+      </PDListItem>
+      {!contentCollapsed && props.children}
     </>
   )
 }
@@ -218,18 +282,42 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         moduleType={THERMOCYCLER_MODULE_TYPE}
       >
         <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
-        {substeps.meta?.rawProfileItems.map((item, index) => {
-          if (item.type === PROFILE_CYCLE) {
-            return <ProfileCycleSubstepRows cycle={item} key={index} />
+        <CollapsibleSubstep
+          headerContent={
+            <span>{`Profile steps (${Math.floor(
+              sum(
+                substeps.profileSteps.map(atomicStep => atomicStep.holdTime)
+              ) / 60
+            )}+ min)`}</span>
           }
-          return (
-            <ProfileStepSubstepRow
-              step={item}
-              key={index}
-              repetitionsDisplay="1"
-            />
-          )
-        })}
+        >
+          <li className={cx(styles.profile_substep_header, styles.uppercase)}>
+            <span className={styles.profile_step_substep_column}>
+              block temp
+            </span>
+            <span
+              className={cx(
+                styles.profile_center_column,
+                styles.profile_step_substep_column
+              )}
+            >
+              duration{' '}
+            </span>
+            <span className={styles.profile_step_substep_column}>cycles</span>
+          </li>
+          {substeps.meta?.rawProfileItems.map((item, index) => {
+            if (item.type === PROFILE_CYCLE) {
+              return <ProfileCycleSubstepGroup cycle={item} key={index} />
+            }
+            return (
+              <ProfileStepSubstepRow
+                step={item}
+                key={index}
+                repetitionsDisplay="1"
+              />
+            )
+          })}
+        </CollapsibleSubstep>
       </ModuleStepItems>
     )
   }
