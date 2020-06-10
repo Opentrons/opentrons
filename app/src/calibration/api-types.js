@@ -28,6 +28,8 @@ import typeof {
   CHECK_TRANSFORM_TYPE_DECK,
 } from './constants'
 
+/* Robot Calibration Check Types */
+
 export type RobotCalibrationCheckStep =
   | CHECK_STEP_SESSION_STARTED
   | CHECK_STEP_LABWARE_LOADED
@@ -94,3 +96,14 @@ export type RobotCalibrationCheckSessionDetails = {|
   },
   labware: Array<RobotCalibrationCheckLabware>,
 |}
+
+/* Tip Length Calibration Types */
+
+export type TipLengthCalibrationStep =
+  | TIP_LENGTH_STEP_SESSION_STARTED
+  | TIP_LENGTH_STEP_LABWARE_LOADED
+  | TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET
+  | TIP_LENGTH_STEP_PREPARING_PIPETTE
+  | TIP_LENGTH_STEP_INSPECTING_TIP
+  | TIP_LENGTH_STEP_MEASURING_TIP_OFFSET
+  | TIP_LENGTH_STEP_CALIBRATION_COMPLETE

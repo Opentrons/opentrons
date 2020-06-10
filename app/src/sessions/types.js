@@ -17,6 +17,7 @@ import typeof {
   CREATE_SESSION_COMMAND_SUCCESS,
   CREATE_SESSION_COMMAND_FAILURE,
   SESSION_TYPE_CALIBRATION_CHECK,
+  SESSION_TYPE_TIP_LENGTH_CALIBRATION,
 } from './constants'
 
 import type {
@@ -27,7 +28,9 @@ import type {
 import * as Calibration from '../calibration'
 
 // The available session types
-export type SessionType = SESSION_TYPE_CALIBRATION_CHECK
+export type SessionType =
+  | SESSION_TYPE_CALIBRATION_CHECK
+  | SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
 // The details associated with available session types
 type SessionDetails = Calibration.RobotCalibrationCheckSessionDetails

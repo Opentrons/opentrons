@@ -38,11 +38,11 @@ const PANEL_BY_STEP: {
 export function CalibrateTipLength(
   props: CalibrateTipLengthParentProps
 ): React.Node {
-  const { mount, probed } = props
+  const { mount, probed, session } = props
   // TODO: get real session
-  const tipLengthCalSession = {}
+  const tipLengthCalSession = session || {}
   // TODO: get real currentStep from session
-  const currentStep = ''
+  const currentStep = session?.details?.currentStep || ''
   const robotName = ''
 
   const title = `${mount} pipette calibration`

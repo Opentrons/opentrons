@@ -1,5 +1,7 @@
 // @flow
 
+/* Robot Calibration Check Constants */
+
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
 export const CHECK_STEP_PREPARING_FIRST_PIPETTE: 'preparingFirstPipette' =
@@ -66,3 +68,18 @@ export const checkCommands = {
 export const CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET = 'BAD_INSTRUMENT_OFFSET'
 export const CHECK_TRANSFORM_TYPE_UNKNOWN = 'UNKNOWN'
 export const CHECK_TRANSFORM_TYPE_DECK = 'BAD_DECK_TRANSFORM'
+
+/* Tip Length Calibration Constants */
+
+export const TIP_LENGTH_STEP_SESSION_STARTED: 'sessionStarted' =
+  'sessionStarted'
+export const TIP_LENGTH_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
+export const TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET: 'measuringNozzleOffset' =
+  'measuringNozzleOffset'
+export const TIP_LENGTH_STEP_PREPARING_PIPETTE: 'preparingPipette' =
+  'preparingPipette'
+export const TIP_LENGTH_STEP_INSPECTING_TIP: 'inspectingTip' = 'inspectingTip'
+export const TIP_LENGTH_STEP_MEASURING_TIP_OFFSET: 'measuringTipOffset' =
+  'measuringTipOffset'
+export const TIP_LENGTH_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
+  'calibrationComplete'
