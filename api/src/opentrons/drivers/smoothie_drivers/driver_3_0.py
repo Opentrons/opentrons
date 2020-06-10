@@ -1084,7 +1084,12 @@ class SmoothieDriver_3_0_0:
                 raise SmoothieError(ret_code)
         else:
             if is_alarm or is_error:
-                # these two errors happen when we're recovering from a hard
+                # info-level logging for errors of form "no L instrument found"
+                if 'instrument found' in ret_code.lower():
+                    log.info(f"smoothie: {ret_code}")
+                    raise SmoothieError(ret_code)
+
+                # the two errors below happen when we're recovering from a hard
                 # halt. in that case, some try/finallys above us may send
                 # further commands. smoothie responds to those commands with
                 # errors like these. if we raise exceptions here, they
