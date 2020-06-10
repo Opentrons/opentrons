@@ -1,8 +1,9 @@
 // @flow
 import * as React from 'react'
-import { SecondaryButton, Link } from '@opentrons/components'
+import { Link, OutlineButton } from '@opentrons/components'
 
 import styles from './styles.css'
+import type { CalibrateTipLengthChildProps } from './types'
 
 const INTRO_TIP_LENGTH_CAL_HEADER = 'Tip length calibration'
 const INTRO_TIP_LENGTH_CAL_BODY =
@@ -19,8 +20,7 @@ const USE_TRASH = 'Use trash bin for now'
 
 const SUPPORT_URL = 'https://www.opentrons.com/contact-support'
 
-type IntroductionProps = {||}
-export function Introduction(props: IntroductionProps): React.Node {
+export function Introduction(props: CalibrateTipLengthChildProps): React.Node {
   return (
     <>
       <div className={styles.modal_header}>
@@ -48,14 +48,14 @@ export function Introduction(props: IntroductionProps): React.Node {
         <div>{/*  TODO: insert image of calibration block here */}</div>
       </div>
       <div className={styles.button_row}>
-        <SecondaryButton onClick={() => console.log('TODO: handle use block')}>
+        <OutlineButton onClick={() => console.log('TODO: handle use block')}>
           {HAVE_BLOCK}
-        </SecondaryButton>
-        <SecondaryButton
+        </OutlineButton>
+        <OutlineButton
           onClick={() => console.log('TODO: handle use trash edge')}
         >
           {USE_TRASH}
-        </SecondaryButton>
+        </OutlineButton>
       </div>
     </>
   )

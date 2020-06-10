@@ -57,7 +57,7 @@ export function Pipettes(props: Props): React.Node {
       />
       {!!currentPipette &&
         (ff.enableTipLengthCal ? (
-          <CalibrateTipLength {...currentPipette} />
+          <CalibrateTipLength {...currentPipette} robotName={robotName} />
         ) : (
           <TipProbe {...currentPipette} />
         ))}

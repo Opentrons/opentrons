@@ -17,6 +17,7 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 
 import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
+import type { CalibrateTipLengthChildProps } from './types'
 import styles from './styles.css'
 
 const DECK_SETUP_WITH_BLOCK_PROMPT =
@@ -29,12 +30,17 @@ type DeckSetupProps = {|
   labware: Array<RobotCalibrationCheckLabware>,
   proceed: () => mixed,
 |}
-export function DeckSetup(props: DeckSetupProps): React.Node {
-  const { labware, proceed } = props
+export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
   const deckDef = React.useMemo(() => getDeckDefinitions()['ot2_standard'], [])
 
-  // TODO: get real has_block value from tip length calibration session
+  // TODO: get real has_block value and labware from tip length calibration session
   const has_block = true
+  const labware = {}
+
+  const proceed = () => {
+    console.log('TODO: wire up command')
+    // props.sendSessionCommand('loadLabware')
+  }
 
   return (
     <>

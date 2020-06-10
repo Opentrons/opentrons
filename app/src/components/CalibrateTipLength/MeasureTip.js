@@ -10,15 +10,15 @@ import type { CalibrateTipLengthChildProps } from './types'
 // TODO: fill with real video assets keyed by mount and then channels
 const assetMap = {}
 
-const HEADER = 'Save the nozzle z-axis'
-const JOG_UNTIL = 'Jog the robot until nozzle is'
+const HEADER = 'Save the tip length'
+const JOG_UNTIL = 'Jog the robot until tip is'
 const JUST_BARELY = 'just barely'
 // TODO: check copy here, should be touching the calibration block if present
 // and the top of the trash if not
 const TOUCHING = 'touching the deck in'
-const SAVE_NOZZLE_Z_AXIS = 'Save nozzle z-axis'
+const SAVE_NOZZLE_Z_AXIS = 'Save the tip length'
 
-export function MeasureNozzle(props: CalibrateTipLengthChildProps): React.Node {
+export function MeasureTip(props: CalibrateTipLengthChildProps): React.Node {
   // TODO: get real isMulti and mount and slotName from the session
   const isMulti = false
   const mount = 'left'
