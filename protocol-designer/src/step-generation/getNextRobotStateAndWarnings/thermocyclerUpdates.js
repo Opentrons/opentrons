@@ -130,5 +130,7 @@ export const forThermocyclerRunProfile = (
 
   const moduleState = _getThermocyclerModuleState(robotState, module)
 
-  moduleState.blockTargetTemp = last(profile).temperature
+  if (profile.length > 0) {
+    moduleState.blockTargetTemp = last(profile).temperature
+  }
 }
