@@ -151,5 +151,5 @@ Version 2.5
 
 - New :ref:`new-utility-commands` were added:
     - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
-    - :py:attr:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
-    - :py:attr:`.ProtocolContext.door_closed`: describes whether the robot door is closed
+    - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
+    - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed

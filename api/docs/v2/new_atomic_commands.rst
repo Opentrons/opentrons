@@ -155,7 +155,7 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
 
-To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
+To change the location of the first tip used by the pipette, you can use :py:obj:`.InstrumentContext.starting_tip`:
 
 .. code-block:: python
 
@@ -241,7 +241,7 @@ Now our pipette's tip is holding 100 µL.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. versionadded:: 2.0
 
@@ -268,7 +268,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. note::
 
@@ -528,7 +528,7 @@ You can turn the robot rail lights on or off in the protocol using :py:meth:`.Pr
 .. versionadded:: 2.5
 
 
-You can also check whether the rail lights are on or off in the protocol using :py:attr:`.ProtocolContext.rail_lights_on`:
+You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
 
 
 .. code-block:: python
@@ -546,7 +546,7 @@ The door safety switch feature flag has been added to the OT-2 software since th
 
 .. image:: ../img/feature_flags/door_safety_switch.png
 
-You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:attr:`.ProtocolContext.door_closed`:
+You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
 
 
 .. code-block:: python
@@ -562,7 +562,7 @@ You can also check whether or not the robot door is closed at a specific point i
 
 .. warning::
 
-    If you chose to enable the door safety switch feature flag, you should only use :py:attr:`ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:attr:`ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+    If you chose to enable the door safety switch feature flag, you should only use :py:obj:`.ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:obj:`.ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
 
 .. versionadded:: 2.5
 

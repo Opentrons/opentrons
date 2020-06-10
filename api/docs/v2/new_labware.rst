@@ -269,7 +269,7 @@ numbers move down):
    If you are using this to change the position at which the robot does
    :ref:`new-aspirate` or :ref:`new-dispense` throughout the protocol, consider
    setting the default aspirate or dispense offset with
-   :py:attr:`.InstrumentContext.well_bottom_clearance`
+   :py:obj:`.InstrumentContext.well_bottom_clearance`
    (see :ref:`new-default-op-positions`).
 
 .. versionadded:: 2.0
