@@ -212,7 +212,7 @@ export type ThermocyclerProfileStepArgs = {|
   lidTargetTempHold: number | null,
   message?: string,
   profileSteps: Array<AtomicProfileStep>,
-  profileTargetLidTemp: number | null,
+  profileTargetLidTemp: number,
   profileVolume: number,
   meta?: {|
     rawProfileItems: Array<ProfileItem>,

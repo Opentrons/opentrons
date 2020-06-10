@@ -15,6 +15,7 @@ export {
   mix,
   replaceTip,
   setTemperature,
+  thermocyclerProfileStep,
   thermocyclerStateStep,
   touchTip,
   transfer,

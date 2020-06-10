@@ -152,6 +152,11 @@ const commandCreatorFromStepArgs = (
         StepGeneration.awaitTemperature,
         args
       )
+    case 'thermocyclerProfile':
+      return StepGeneration.curryCommandCreator(
+        StepGeneration.thermocyclerProfileStep,
+        args
+      )
     case 'thermocyclerState':
       return StepGeneration.curryCommandCreator(
         StepGeneration.thermocyclerStateStep,
