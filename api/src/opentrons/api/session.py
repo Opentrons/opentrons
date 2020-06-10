@@ -47,7 +47,7 @@ def _motion_lock(func):
     def decorated(*args, **kwargs):
         self = args[0]
         if self._motion_lock:
-            with self._motion_lock:
+            with self._motion_lock.forbid():
                 return func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
@@ -462,7 +462,7 @@ class Session(object):
 
     def stop(self):
         self._hw_iface().halt()
-        with self._motion_lock:
+        with self._motion_lock.lock():
             try:
                 self._hw_iface().stop()
             except asyncio.CancelledError:

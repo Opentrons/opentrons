@@ -34,7 +34,7 @@ def _require_lock(func):
     def decorated(*args, **kwargs):
         self = args[0]
         if self._lock:
-            with self._lock:
+            with self._lock.forbid():
                 return func(*args, **kwargs)
         else:
             return func(*args, **kwargs)
