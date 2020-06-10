@@ -320,7 +320,7 @@ and when that is implemented.
   @apply --font-form-default;
 
   display: grid;
-  grid-template-columns: 14.5rem 7.25rem 7.25rem;
+  grid-template-columns: 12.5rem 7.25rem 7.25rem;
   font-weight: var(--fw-semibold);
   padding: 1rem 0 0.25rem 2.125rem;
 }
@@ -348,21 +348,25 @@ and when that is implemented.
   align-items: center;
   border: var(--bd-light);
   width: 100%;
+  min-width: 36rem;
   padding: 0.5rem;
 }
 
 .profile_cycle_fields {
-  width: 31.5rem;
+  width: 36rem;
   border: none;
 }
 
 .step_input_wrapper {
   margin-right: 1.5rem;
-  width: 5.75rem;
+}
 
-  &:first-child {
-    width: 12rem;
-  }
+.title {
+  width: 11rem;
+}
+
+.profile_field {
+  width: 5.75rem;
 }
 
 .delete_step_icon {
@@ -415,6 +419,7 @@ and when that is implemented.
   border: var(--bd-light);
   width: 100%;
   padding-right: 0.5rem;
+  padding-left: 0.375rem;
 }
 
 .cycle_step_delete {
