@@ -2,13 +2,13 @@
 import * as React from 'react'
 import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
-import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
+import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
+import { mockTipLengthCalibrationSessionDetails } from '../../../calibration/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
 import { Introduction } from '../Introduction'
@@ -20,6 +20,7 @@ import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
 import type { State } from '../../../types'
+import { SESSION_TYPE_TIP_LENGTH_CALIBRATION } from '../../../sessions'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
@@ -27,7 +28,7 @@ jest.mock('../../../sessions/selectors')
 type CalibrateTipLengthSpec = {
   component: React.AbstractComponent<any>,
   childProps?: {},
-  currentStep: Calibration.RobotCalibrationCheckStep,
+  currentStep: Calibration.TipLengthCalibrationStep,
   ...
 }
 
@@ -45,6 +46,7 @@ describe('CalibrateTipLength', () => {
   let mockStore
   let render
   let dispatch
+  let mockTipLengthSession: Sessions.TipLengthCalibrationSession | null = null
 
   const mockCloseCalibrationCheck = jest.fn()
 
@@ -82,11 +84,24 @@ describe('CalibrateTipLength', () => {
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
-    render = () => {
+    render = (
+      currentStep: Calibration.TipLengthCalibrationStep = 'sessionStarted'
+    ) => {
+      mockTipLengthSession = {
+        id: 'fake_session_id',
+        ...mockTipLengthCalibrationSessionAttributes,
+        details: {
+          ...mockTipLengthCalibrationSessionAttributes.details,
+          currentStep,
+        },
+      }
       return mount(
-        <ChecTipLengthk
+        <CalibrateTipLength
           robotName="robot-name"
-          closeCalibrationCheck={mockCloseCalibrationCheck}
+          session={mockTipLengthSession}
+          mount="left"
+          isMulti
+          probed
         />,
         {
           wrappingComponent: Provider,
@@ -100,46 +115,9 @@ describe('CalibrateTipLength', () => {
     jest.resetAllMocks()
   })
 
-  it('fetches robot cal check session on mount if session in state', () => {
-    getRobotSessionOfType.mockReturnValue({
-      id: 'fake_check_session_id',
-      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-      details: mockRobotCalibrationCheckSessionDetails,
-    })
-    render()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.fetchSession('robot-name', 'fake_check_session_id'),
-        meta: { requestId: expect.any(String) },
-      })
-    )
-  })
-
-  it('creates robot cal check session on mount if no session already in state', () => {
-    getRobotSessionOfType.mockReturnValue(null)
-    render()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.createSession(
-          'robot-name',
-          Sessions.SESSION_TYPE_CALIBRATION_CHECK
-        ),
-        meta: { requestId: expect.any(String) },
-      })
-    )
-  })
-
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      getRobotSessionOfType.mockReturnValue({
-        id: 'fake_check_session_id',
-        sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-        details: {
-          ...mockRobotCalibrationCheckSessionDetails,
-          currentStep: spec.currentStep,
-        },
-      })
-      const wrapper = render()
+      const wrapper = render(spec.currentStep)
 
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
@@ -149,27 +127,5 @@ describe('CalibrateTipLength', () => {
         }
       })
     })
-  })
-
-  it('calls deleteRobotCalibrationCheckSession on exit click', () => {
-    getRobotSessionOfType.mockReturnValue({
-      id: 'fake_check_session_id',
-      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-      details: mockRobotCalibrationCheckSessionDetails,
-    })
-    const wrapper = render()
-
-    act(() => {
-      getBackButton(wrapper).invoke('onClick')()
-    })
-    wrapper.update()
-
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.deleteSession('robot-name', 'fake_check_session_id'),
-        meta: { requestId: expect.any(String) },
-      })
-    )
-    expect(mockCloseCalibrationCheck).toHaveBeenCalled()
   })
 })

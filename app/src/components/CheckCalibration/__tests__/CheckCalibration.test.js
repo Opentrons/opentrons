@@ -19,6 +19,7 @@ import { CheckHeight } from '../CheckHeight'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
 import type { State } from '../../../types'
+import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
@@ -44,6 +45,10 @@ describe('CheckCalibration', () => {
   let mockStore
   let render
   let dispatch
+  let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
+    id: 'fake_check_session_id',
+    ...mockCalibrationCheckSessionAttributes,
+  }
 
   const mockCloseCalibrationCheck = jest.fn()
 
@@ -92,7 +97,17 @@ describe('CheckCalibration', () => {
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
-    render = () => {
+    render = (
+      currentStep: Calibration.RobotCalibrationCheckStep = 'sessionStarted'
+    ) => {
+      mockCalibrationCheckSession = {
+        id: 'fake_check_session_id',
+        ...mockCalibrationCheckSessionAttributes,
+        details: {
+          ...mockCalibrationCheckSessionAttributes.details,
+          currentStep,
+        },
+      }
       return mount(
         <CheckCalibration
           robotName="robot-name"
@@ -111,11 +126,7 @@ describe('CheckCalibration', () => {
   })
 
   it('fetches robot cal check session on mount if session in state', () => {
-    getRobotSessionOfType.mockReturnValue({
-      id: 'fake_check_session_id',
-      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-      details: mockRobotCalibrationCheckSessionDetails,
-    })
+    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
     render()
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -141,15 +152,8 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      getRobotSessionOfType.mockReturnValue({
-        id: 'fake_check_session_id',
-        sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-        details: {
-          ...mockRobotCalibrationCheckSessionDetails,
-          currentStep: spec.currentStep,
-        },
-      })
-      const wrapper = render()
+      const wrapper = render(spec.currentStep)
+      getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
 
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
@@ -162,12 +166,8 @@ describe('CheckCalibration', () => {
   })
 
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {
-    getRobotSessionOfType.mockReturnValue({
-      id: 'fake_check_session_id',
-      sessionType: Sessions.SESSION_TYPE_CALIBRATION_CHECK,
-      details: mockRobotCalibrationCheckSessionDetails,
-    })
     const wrapper = render()
+    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
 
     act(() => {
       getBackButton(wrapper).invoke('onClick')()

@@ -7,6 +7,8 @@ import { selectors as robotSelectors } from '../../robot'
 import { PIPETTE_MOUNTS, fetchPipettes } from '../../pipettes'
 import { getConnectedRobot } from '../../discovery'
 import { getFeatureFlags } from '../../config'
+import { mockSession } from '../../sessions/__fixtures__'
+import { mockTipLengthCalibrationSessionDetails } from '../../calibration/__fixtures__'
 
 import { Page } from '../../components/Page'
 import { TipProbe } from '../../components/TipProbe'
@@ -44,6 +46,12 @@ export function Pipettes(props: Props): React.Node {
 
   const currentPipette = pipettes.find(p => p.mount === currentMount) || null
 
+  // TODO: get real session
+  const tipLengthCalibrationSession = {
+    ...mockSession,
+    details: mockTipLengthCalibrationSessionDetails,
+  }
+
   return (
     <Page titleBarProps={{ title: <SessionHeader /> }}>
       <PipetteTabs currentMount={currentMount} />
@@ -57,7 +65,13 @@ export function Pipettes(props: Props): React.Node {
       />
       {!!currentPipette &&
         (ff.enableTipLengthCal ? (
-          <CalibrateTipLength {...currentPipette} robotName={robotName} />
+          <CalibrateTipLength
+            mount={currentPipette.mount}
+            isMulti={currentPipette.channels > 1}
+            probed={currentPipette.probed}
+            robotName={robotName}
+            session={tipLengthCalibrationSession}
+          />
         ) : (
           <TipProbe {...currentPipette} />
         ))}

@@ -177,7 +177,7 @@ const SPECS: Array<ReducerSpec> = [
       'rock-lobster': {
         robotSessions: {
           fake_stale_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'fake_stale_session_id',
           },
         },
@@ -212,11 +212,11 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -226,7 +226,7 @@ const SPECS: Array<ReducerSpec> = [
       'eggplant-parm': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },

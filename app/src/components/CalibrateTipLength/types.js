@@ -1,4 +1,5 @@
 // @flow
+import type { Mount } from '@opentrons/components'
 import type { Pipette } from '../../robot'
 import type {
   SessionCommandString,
@@ -7,7 +8,9 @@ import type {
 } from '../../sessions/types'
 
 export type CalibrateTipLengthParentProps = {|
-  ...Pipette,
+  isMulti: boolean,
+  mount: Mount,
+  probed: boolean,
   robotName: string | null,
   session: Session,
 |}
