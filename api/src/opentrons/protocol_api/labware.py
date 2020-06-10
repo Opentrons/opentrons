@@ -43,11 +43,17 @@ CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 
+# TODO: AA 2020-06-10 move these out of protocol_api
 TipLengthCalibration = Dict[str, float]
 PipTipLengthCalibration = Dict[str, TipLengthCalibration]
 
 
 class OutOfTipsError(Exception):
+    pass
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class TipLengthCalNotFound(Exception):
     pass
 
 
