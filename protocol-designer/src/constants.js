@@ -102,6 +102,9 @@ export const MAX_TC_BLOCK_TEMP = 99
 export const MIN_TC_LID_TEMP = 37
 export const MAX_TC_LID_TEMP = 110
 
+export const MIN_TC_DURATION_SECONDS = 0
+export const MAX_TC_DURATION_SECONDS = 60
+
 // Temperature statuses
 export const TEMPERATURE_DEACTIVATED: 'TEMPERATURE_DEACTIVATED' =
   'TEMPERATURE_DEACTIVATED'
