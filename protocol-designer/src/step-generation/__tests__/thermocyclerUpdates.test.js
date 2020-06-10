@@ -170,6 +170,17 @@ describe('thermocycler state updaters', () => {
     {
       params: {
         module: moduleId,
+        profile: [],
+        volume: 10,
+      },
+      moduleStateBefore: {},
+      expectedUpdate: {},
+      fn: forThermocyclerRunProfile,
+      testName: 'forThermocyclerRunProfile should not make any updates',
+    },
+    {
+      params: {
+        module: moduleId,
         profile: [
           { holdTime: 10, temperature: 50 },
           { holdTime: 10, temperature: 30 },
