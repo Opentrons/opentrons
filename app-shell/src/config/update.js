@@ -5,6 +5,7 @@ import union from 'lodash/union'
 import without from 'lodash/without'
 
 import {
+  UPDATE_VALUE,
   TOGGLE_VALUE,
   RESET_VALUE,
   ADD_UNIQUE_VALUE,
@@ -25,6 +26,10 @@ export function getNextValue(
   config: Config
 ): mixed {
   switch (action.type) {
+    case UPDATE_VALUE: {
+      return action.payload.value
+    }
+
     case RESET_VALUE: {
       return get(DEFAULTS, action.payload.path)
     }
@@ -46,6 +51,4 @@ export function getNextValue(
       return Array.isArray(value) ? without(value, action.payload.value) : value
     }
   }
-
-  return action.payload.value
 }

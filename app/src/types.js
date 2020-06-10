@@ -85,9 +85,9 @@ export type Action =
 
 export type GetState = () => State
 
-export type ThunkAction = (Dispatch, GetState) => Action | void
+export type ThunkAction = (Dispatch, GetState) => ?Action
 
-export type ThunkPromiseAction = (Dispatch, GetState) => Promise<Action | void>
+export type ThunkPromiseAction = (Dispatch, GetState) => Promise<?Action>
 
 export type Store = ReduxStore<State, Action>
 
@@ -102,11 +102,9 @@ type MwStore = {
 
 type PlainDispatch = ReduxDispatch<Action>
 
-type ThunkDispatch = (thunk: ThunkAction) => Action | void
+type ThunkDispatch = (thunk: ThunkAction) => ?Action
 
-type ThunkPromiseDispatch = (
-  thunk: ThunkPromiseAction
-) => Promise<Action | void>
+type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
 
 export type Epic = (
   action$: Observable<Action>,

@@ -10,7 +10,7 @@ import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as Cfg from '@opentrons/app/src/config'
 
 import { createLogger } from '../log'
-import { DEFAULTS_V0, DEFAULTS, migrate } from './migrate'
+import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
 import type { Action, Dispatch } from '../types'
