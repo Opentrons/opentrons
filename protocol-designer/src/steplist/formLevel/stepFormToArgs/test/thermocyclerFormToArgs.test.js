@@ -135,6 +135,41 @@ describe('thermocyclerFormToArgs', () => {
         ],
         profileTargetLidTemp: 40,
         profileVolume: 4,
+        meta: {
+          rawProfileItems: [
+            {
+              type: 'profileStep',
+              id: 'profileItem1',
+              title: 'Top level step',
+              temperature: '5',
+              durationMinutes: '',
+              durationSeconds: '50',
+            },
+            {
+              id: 'profileItem2',
+              type: 'profileCycle',
+              repetitions: '2',
+              steps: [
+                {
+                  type: 'profileStep',
+                  id: 'item2A',
+                  title: 'Step A in cycle',
+                  temperature: '12',
+                  durationMinutes: '1',
+                  durationSeconds: '2',
+                },
+                {
+                  type: 'profileStep',
+                  id: 'item2B',
+                  title: 'Step B in cycle',
+                  temperature: '99',
+                  durationMinutes: '',
+                  durationSeconds: '45',
+                },
+              ],
+            },
+          ],
+        },
       },
     },
   ]
