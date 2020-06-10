@@ -3,6 +3,7 @@ import base64
 from copy import copy
 from functools import reduce, wraps
 import logging
+from threading import Lock, Event
 from time import time, sleep
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
@@ -275,6 +276,9 @@ class Session(object):
         self._event_watcher = None
         self.door_state: Optional[str] = None
         self.blocked: Optional[bool] = None
+
+        self._run_lock: Lock = Lock()
+        self._is_running: Event = Event()
 
     def _hw_iface(self):
         if self._use_v2:
@@ -605,6 +609,12 @@ class Session(object):
 
     def run(self):
         if not self.blocked:
+            # Inhibit starting a protocol run while one is running.
+            with self._run_lock:
+                if self._is_running.is_set():
+                    raise RuntimeError("Protocol cannot be started "
+                                       "while already running")
+                self._is_running.set()
             try:
                 self._broker.set_logger(self._run_logger)
                 self._run()
@@ -612,6 +622,7 @@ class Session(object):
                 raise
             finally:
                 self._broker.set_logger(self._default_logger)
+                self._is_running.clear()
             return self
         else:
             raise RuntimeError(

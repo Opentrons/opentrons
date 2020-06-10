@@ -420,3 +420,58 @@ robot.connect()
 
     with pytest.raises(RuntimeError, match='.*robot.connect.*'):
         main_router.session_manager.create('calls-connect', proto)
+
+
+async def test_session_run_concurrently(
+        main_router,
+        get_labware_fixture,
+        virtual_smoothie_env):
+    """This test proves that we are not able to start a protocol run while
+    one is active.
+
+    This cross boundaries into the RPC because it emulates how the RPC server
+    handles requests. It uses a thread executor with two threads.
+
+    This test was added to prove that there's a deadlock if a protocol with
+    a pause is started twice.
+    """
+    # Create a protocol that does nothing but pause.
+    proto = '''
+metadata = {"apiLevel": "2.0"}
+
+def run(ctx):
+    ctx.pause()
+'''
+    session = main_router.session_manager.create_with_extra_labware(
+        name='<blank>',
+        contents=proto,
+        extra_labware=[]
+    )
+
+    from concurrent.futures import ThreadPoolExecutor, as_completed
+    from time import sleep
+
+    def run_while_running():
+        """The entry point to threads that try to run while a protocol is
+        running"""
+        with pytest.raises(RuntimeError):
+            session.run()
+
+    # Do this twice to prove we run again after completion.
+    for _ in range(2):
+        # Use two as the max workers, just like RPC.
+        max_workers = 2
+        with ThreadPoolExecutor(max_workers=max_workers) as m:
+            tasks = list()
+            # Start the run.
+            tasks.append(m.submit(lambda: session.run()))
+            # Try to start running the protocol a whole bunch of times.
+            for _ in range(max_workers * 5):
+                tasks.append(m.submit(run_while_running))
+            # wait to enter pause
+            sleep(0.05)
+            # Now resume
+            tasks.append(m.submit(lambda: session.resume()))
+
+            for future in as_completed(tasks):
+                future.result()
