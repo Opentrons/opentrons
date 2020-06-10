@@ -33,10 +33,7 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
 
   const commandCreators: Array<CurriedCommandCreator> = []
 
-  if (
-    profileTargetLidTemp !== null && // TODO IMMEDIATELY should `profileTargetLidTemp` be number (not `number | null`)? Check designs: form validation
-    profileTargetLidTemp !== thermocyclerState.lidTargetTemp
-  ) {
+  if (profileTargetLidTemp !== thermocyclerState.lidTargetTemp) {
     commandCreators.push(
       curryCommandCreator(thermocyclerSetTargetLidTemperature, {
         module: moduleId,

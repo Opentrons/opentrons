@@ -2,6 +2,7 @@
 import { THERMOCYCLER_MODULE_TYPE } from '@opentrons/shared-data'
 import { thermocyclerProfileStep } from '../commandCreators/compound/thermocyclerProfileStep'
 import {
+  getErrorResult,
   getStateAndContextTempTCModules,
   getSuccessResult,
 } from '../__fixtures__'
@@ -13,8 +14,6 @@ const temperatureModuleId = 'temperatureModuleId'
 const thermocyclerId = 'thermocyclerId'
 
 describe('thermocyclerProfileStep', () => {
-  // TODO: case with bad module ID should error
-
   const testCases: Array<{|
     testName: string,
     initialThermocyclerModuleState?: ThermocyclerModuleState,
@@ -85,7 +84,7 @@ describe('thermocyclerProfileStep', () => {
         lidTargetTempHold: null,
         lidOpenHold: true,
         module: thermocyclerId,
-        profileSteps: [],
+        profileSteps: [{ temperature: 61, holdTime: 99 }],
         profileTargetLidTemp: 55,
         profileVolume: 42,
       },
@@ -94,7 +93,7 @@ describe('thermocyclerProfileStep', () => {
           command: 'thermocycler/runProfile',
           params: {
             module: 'thermocyclerId',
-            profile: [],
+            profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
           },
         },
@@ -148,4 +147,29 @@ describe('thermocyclerProfileStep', () => {
       })
     }
   )
+
+  it('should return timeline error with bad moduleId', () => {
+    const { robotState, invariantContext } = getStateAndContextTempTCModules({
+      temperatureModuleId,
+      thermocyclerId,
+    })
+
+    const args = {
+      commandCreatorFnName: 'thermocyclerProfile',
+      blockTargetTempHold: 4,
+      lidTargetTempHold: null,
+      lidOpenHold: true,
+      module: 'badModuleId',
+      profileSteps: [],
+      profileTargetLidTemp: 55,
+      profileVolume: 42,
+    }
+
+    const result = thermocyclerProfileStep(args, invariantContext, robotState)
+
+    expect(getErrorResult(result).errors).toHaveLength(1)
+    expect(getErrorResult(result).errors[0]).toMatchObject({
+      type: 'MISSING_MODULE',
+    })
+  })
 })
