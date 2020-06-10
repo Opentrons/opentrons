@@ -1,7 +1,6 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
-import { Icon, PrimaryButton, IconButton } from '@opentrons/components'
+import { Icon, PrimaryButton } from '@opentrons/components'
 import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 

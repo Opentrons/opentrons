@@ -32,10 +32,6 @@ export type SessionType =
   | SESSION_TYPE_CALIBRATION_CHECK
   | SESSION_TYPE_TIP_LENGTH_CALIBRATION
 
-// The details associated with available session types
-type SessionDetails =
-  | Calibration.RobotCalibrationCheckSessionDetails
-  | Calibration.TipLengthCalibrationSessionDetails
 export type SessionCommandString = $Values<typeof Calibration.checkCommands>
 
 // TODO(al, 2020-05-11): data should be properly typed with all

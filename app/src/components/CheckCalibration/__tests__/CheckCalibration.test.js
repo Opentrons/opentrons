@@ -8,7 +8,6 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 
 import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
-import { mockRobotCalibrationCheckSessionDetails } from '../../../calibration/__fixtures__'
 
 import { CheckCalibration } from '../index'
 import { Introduction } from '../Introduction'
@@ -102,17 +101,12 @@ describe('CheckCalibration', () => {
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
-    render = (
-      currentStep: Calibration.RobotCalibrationCheckStep = 'sessionStarted'
-    ) => {
-      mockCalibrationCheckSession = {
-        id: 'fake_check_session_id',
-        ...mockCalibrationCheckSessionAttributes,
-        details: {
-          ...mockCalibrationCheckSessionAttributes.details,
-          currentStep,
-        },
-      }
+    mockCalibrationCheckSession = {
+      id: 'fake_check_session_id',
+      ...mockCalibrationCheckSessionAttributes,
+    }
+
+    render = () => {
       return mount(
         <CheckCalibration
           robotName="robot-name"
@@ -157,8 +151,16 @@ describe('CheckCalibration', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const wrapper = render(spec.currentStep)
+      mockCalibrationCheckSession = {
+        ...mockCalibrationCheckSession,
+        details: {
+          ...mockCalibrationCheckSession.details,
+          currentStep: spec.currentStep,
+        },
+      }
       getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
+
+      const wrapper = render()
 
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
@@ -171,8 +173,8 @@ describe('CheckCalibration', () => {
   })
 
   it('calls deleteRobotCalibrationCheckSession on exit click', () => {
-    const wrapper = render()
     getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
+    const wrapper = render()
 
     act(() => {
       getBackButton(wrapper).invoke('onClick')()

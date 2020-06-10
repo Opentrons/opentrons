@@ -1,6 +1,5 @@
 // @flow
 import type { Mount } from '@opentrons/components'
-import type { Pipette } from '../../robot'
 import type {
   SessionCommandString,
   SessionCommandData,

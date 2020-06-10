@@ -3,7 +3,6 @@ import * as React from 'react'
 import { PrimaryButton } from '@opentrons/components'
 import { getLabwareDisplayName } from '@opentrons/shared-data'
 
-import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getLatestLabwareDef } from '../../getLabware'
 import { JogControls } from '../JogControls'

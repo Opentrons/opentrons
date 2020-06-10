@@ -48,7 +48,7 @@ export function CalibrateTipLength(
   const title = `${mount} pipette calibration`
   const Panel = PANEL_BY_STEP[currentStep]
 
-  const [dispatchRequest, requestIds] = useDispatchApiRequest()
+  const [dispatchRequest] = useDispatchApiRequest()
 
   function sendCommand(
     command: SessionCommandString,

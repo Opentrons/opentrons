@@ -1,6 +1,5 @@
 // @flow
 import * as React from 'react'
-import { useDispatch } from 'react-redux'
 
 import { PrimaryButton } from '@opentrons/components'
 import { CalibrationInfoContent } from '../CalibrationInfoContent'
@@ -10,7 +9,6 @@ const IS_CALIBRATED = 'Pipette tip height is calibrated'
 const IS_NOT_CALIBRATED = 'Pipette tip height is not calibrated'
 const CALIBRATE_TIP_LENGTH = 'Calibrate tip length'
 const RECALIBRATE_TIP_LENGTH = 'Re-Calibrate tip length'
-const CONTINUE = 'Continue to labware setup'
 
 export function UncalibratedInfo(
   props: CalibrateTipLengthChildProps

@@ -8,7 +8,6 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
-import { mockTipLengthCalibrationSessionDetails } from '../../../calibration/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
 import { Introduction } from '../Introduction'
@@ -18,9 +17,6 @@ import { TipPickUp } from '../TipPickUp'
 import { InspectingTip } from '../InspectingTip'
 import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
-
-import type { State } from '../../../types'
-import { SESSION_TYPE_TIP_LENGTH_CALIBRATION } from '../../../sessions'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
@@ -32,15 +28,15 @@ type CalibrateTipLengthSpec = {
   ...
 }
 
-const getRobotSessionOfType: JestMockFn<
-  [State, string, Sessions.SessionType],
-  $Call<
-    typeof Sessions.getRobotSessionOfType,
-    State,
-    string,
-    Sessions.SessionType
-  >
-> = Sessions.getRobotSessionOfType
+// const getRobotSessionOfType: JestMockFn<
+//   [State, string, Sessions.SessionType],
+//   $Call<
+//     typeof Sessions.getRobotSessionOfType,
+//     State,
+//     string,
+//     Sessions.SessionType
+//   >
+// > = Sessions.getRobotSessionOfType
 
 const mockGetDeckDefinitions: JestMockFn<
   [],
@@ -51,12 +47,13 @@ describe('CalibrateTipLength', () => {
   let mockStore
   let render
   let dispatch
-  let mockTipLengthSession: Sessions.TipLengthCalibrationSession | null = null
+  let mockTipLengthSession: Sessions.TipLengthCalibrationSession = {
+    id: 'fake_session_id',
+    ...mockTipLengthCalibrationSessionAttributes,
+  }
 
-  const mockCloseCalibrationCheck = jest.fn()
-
-  const getBackButton = wrapper =>
-    wrapper.find({ title: 'exit' }).find('button')
+  // const getBackButton = wrapper =>
+  //   wrapper.find({ title: 'exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
@@ -89,17 +86,12 @@ describe('CalibrateTipLength', () => {
     }
     mockGetDeckDefinitions.mockReturnValue({})
 
-    render = (
-      currentStep: Calibration.TipLengthCalibrationStep = 'sessionStarted'
-    ) => {
-      mockTipLengthSession = {
-        id: 'fake_session_id',
-        ...mockTipLengthCalibrationSessionAttributes,
-        details: {
-          ...mockTipLengthCalibrationSessionAttributes.details,
-          currentStep,
-        },
-      }
+    mockTipLengthSession = {
+      id: 'fake_session_id',
+      ...mockTipLengthCalibrationSessionAttributes,
+    }
+
+    render = () => {
       return mount(
         <CalibrateTipLength
           robotName="robot-name"
@@ -122,7 +114,14 @@ describe('CalibrateTipLength', () => {
 
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
-      const wrapper = render(spec.currentStep)
+      mockTipLengthSession = {
+        ...mockTipLengthSession,
+        details: {
+          ...mockTipLengthSession.details,
+          currentStep: spec.currentStep,
+        },
+      }
+      const wrapper = render()
 
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
