@@ -134,6 +134,8 @@ export const StepCreationButton = (): React.Node => {
     <>
       {enqueuedStepType !== null && (
         <ConfirmDeleteStepModal
+          heading="Unsaved step form"
+          alertOverlay
           onCancelClick={() => setEnqueuedStepType(null)}
           onContinueClick={() => {
             if (enqueuedStepType !== null) {

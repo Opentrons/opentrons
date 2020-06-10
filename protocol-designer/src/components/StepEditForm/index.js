@@ -227,6 +227,8 @@ const StepEditFormManager = (props: StepEditFormManagerProps) => {
       )}
       {showConfirmCancelModal && (
         <ConfirmDeleteStepModal
+          heading="Unsaved Step form"
+          alertOverlay
           close
           onCancelClick={cancelClose}
           onContinueClick={confirmClose}
