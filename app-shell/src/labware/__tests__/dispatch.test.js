@@ -191,7 +191,7 @@ describe('labware module dispatches', () => {
 
     return flush().then(() => {
       expect(dispatch).toHaveBeenCalledWith({
-        type: 'config:UPDATE',
+        type: 'config:UPDATE_VALUE',
         payload: { path: 'labware.directory', value: '/path/to/labware' },
         meta: { shell: true },
       })

@@ -6,7 +6,7 @@ import { createLogger } from './logger'
 
 type Chainable = Action | ThunkAction | ThunkPromiseAction
 
-type ChainAction = Promise<?Action>
+type ChainAction = Promise<Action | void>
 
 const log = createLogger(__filename)
 
@@ -16,7 +16,7 @@ const log = createLogger(__filename)
 //   npm for available ecosystem solutions soon
 export function chainActions(...actions: Array<Chainable>): ThunkPromiseAction {
   let i = 0
-  let result: ?Action = null
+  let result: Action | void
 
   return dispatch => {
     return next()
@@ -47,7 +47,6 @@ export function chainActions(...actions: Array<Chainable>): ThunkPromiseAction {
 
     function handleError(error): ChainAction {
       log.error('ThunkPromiseAction in chain rejected', { error })
-      result = null
       return resolveResult()
     }
 

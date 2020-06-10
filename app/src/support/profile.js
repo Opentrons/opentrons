@@ -42,7 +42,9 @@ export function initializeProfile(config: SupportConfig): void {
 }
 
 export function updateProfile(update: SupportProfileUpdate): void {
-  callIntercom(Constants.INTERCOM_UPDATE, { ...update, user_id: userId })
+  if (userId) {
+    callIntercom(Constants.INTERCOM_UPDATE, { ...update, user_id: userId })
+  }
 }
 
 export function makeProfileUpdate(

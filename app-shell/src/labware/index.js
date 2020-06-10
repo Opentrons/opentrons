@@ -113,7 +113,7 @@ export function registerLabware(
         showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
           if (filePaths.length > 0) {
             const dir = filePaths[0]
-            dispatch(ConfigActions.updateConfig('labware.directory', dir))
+            dispatch(ConfigActions.updateConfigValue('labware.directory', dir))
           }
         })
         break

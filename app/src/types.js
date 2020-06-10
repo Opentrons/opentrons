@@ -20,7 +20,7 @@ import type {
 } from './http-api-client'
 import type { RobotState, Action as RobotAction } from './robot'
 import type { ShellState, ShellAction } from './shell/types'
-import type { Config as ConfigState, ConfigAction } from './config/types'
+import type { ConfigState, ConfigAction } from './config/types'
 import type { DiscoveryState, DiscoveryAction } from './discovery/types'
 import type { NetworkingState, NetworkingAction } from './networking/types'
 import type { ProtocolState, ProtocolAction } from './protocol/types'
@@ -85,9 +85,9 @@ export type Action =
 
 export type GetState = () => State
 
-export type ThunkAction = (Dispatch, GetState) => ?Action
+export type ThunkAction = (Dispatch, GetState) => Action | void
 
-export type ThunkPromiseAction = (Dispatch, GetState) => Promise<?Action>
+export type ThunkPromiseAction = (Dispatch, GetState) => Promise<Action | void>
 
 export type Store = ReduxStore<State, Action>
 
@@ -102,9 +102,11 @@ type MwStore = {
 
 type PlainDispatch = ReduxDispatch<Action>
 
-type ThunkDispatch = (thunk: ThunkAction) => ?Action
+type ThunkDispatch = (thunk: ThunkAction) => Action | void
 
-type ThunkPromiseDispatch = (thunk: ThunkPromiseAction) => Promise<?Action>
+type ThunkPromiseDispatch = (
+  thunk: ThunkPromiseAction
+) => Promise<Action | void>
 
 export type Epic = (
   action$: Observable<Action>,

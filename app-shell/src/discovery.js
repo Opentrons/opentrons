@@ -10,6 +10,14 @@ import {
   SERVICE_REMOVED_EVENT,
 } from '@opentrons/discovery-client'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
+import {
+  DISCOVERY_START,
+  DISCOVERY_FINISH,
+  DISCOVERY_REMOVE,
+  CLEAR_CACHE,
+} from '@opentrons/app/src/discovery/actions'
+
 import { getConfig, getOverrides, handleConfigChange } from './config'
 import { createLogger } from './log'
 
@@ -65,17 +73,18 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     log.debug('handling action in discovery', { action })
 
     switch (action.type) {
-      case 'discovery:START':
+      case UI_INITIALIZED:
+      case DISCOVERY_START:
         handleServices()
-        return client.setPollInterval(FAST_POLL_INTERVAL_MS).start()
+        return client.setPollInterval(FAST_POLL_INTERVAL_MS)
 
-      case 'discovery:FINISH':
+      case DISCOVERY_FINISH:
         return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
 
-      case 'discovery:REMOVE':
+      case DISCOVERY_REMOVE:
         return client.remove(action.payload.robotName)
 
-      case 'discovery:CLEAR_CACHE':
+      case CLEAR_CACHE:
         return clearCache()
     }
   }

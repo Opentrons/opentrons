@@ -40,7 +40,7 @@ describe('app-shell/discovery', () => {
   })
 
   afterEach(() => {
-    jest.clearAllMocks()
+    jest.resetAllMocks()
   })
 
   it('registerDiscovery creates a DiscoveryClient', () => {
@@ -58,12 +58,7 @@ describe('app-shell/discovery', () => {
 
   it('calls client.start on discovery registration', () => {
     registerDiscovery(dispatch)
-    expect(mockClient.start).toHaveBeenCalled()
-  })
-
-  it('calls client.start on "discovery:START"', () => {
-    registerDiscovery(dispatch)({ type: 'discovery:START' })
-    expect(mockClient.start).toHaveBeenCalledTimes(2)
+    expect(mockClient.start).toHaveBeenCalledTimes(1)
   })
 
   it('calls client.stop when electron app emits "will-quit"', () => {
@@ -98,6 +93,24 @@ describe('app-shell/discovery', () => {
     const fastPoll = mockClient.setPollInterval.mock.calls[0][0]
     const slowPoll = mockClient.setPollInterval.mock.calls[1][0]
     expect(fastPoll).toBeLessThan(slowPoll)
+  })
+
+  it('sets poll speed on "shell:UI_INTIALIZED"', () => {
+    const handleAction = registerDiscovery(dispatch)
+
+    handleAction({ type: 'discovery:START' })
+    expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
+      expect.any(Number)
+    )
+    handleAction({ type: 'shell:UI_INITIALIZED' })
+    expect(mockClient.setPollInterval).toHaveBeenLastCalledWith(
+      expect.any(Number)
+    )
+
+    expect(mockClient.setPollInterval).toHaveBeenCalledTimes(2)
+    const startPollSpeed = mockClient.setPollInterval.mock.calls[0][0]
+    const uiInitializedPollSpeed = mockClient.setPollInterval.mock.calls[1][0]
+    expect(startPollSpeed).toEqual(uiInitializedPollSpeed)
   })
 
   it('always sends "discovery:UPDATE_LIST" on "discovery:START"', () => {

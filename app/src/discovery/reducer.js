@@ -1,6 +1,7 @@
 // @flow
 // robot discovery state
 import groupBy from 'lodash/groupBy'
+import { UI_INITIALIZED } from '../shell'
 import { remote } from '../shell/remote'
 import * as actions from './actions'
 
@@ -21,6 +22,7 @@ export function discoveryReducer(
   action: Action
 ): DiscoveryState {
   switch (action.type) {
+    case UI_INITIALIZED:
     case actions.DISCOVERY_START:
       return { ...state, scanning: true }
 

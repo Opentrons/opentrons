@@ -6,9 +6,11 @@ import { withRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 
 import {
-  getConfig,
+  getDevtoolsEnabled,
+  getFeatureFlags,
+  getUpdateChannel,
   getUpdateChannelOptions,
-  updateConfig,
+  updateConfigValue,
   toggleDevTools,
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
@@ -93,12 +95,10 @@ function AdvancedSettingsCardComponent(props: Props) {
 }
 
 function mapStateToProps(state: State): SP {
-  const config = getConfig(state)
-
   return {
-    devToolsOn: config.devtools,
-    devInternal: config.devInternal,
-    channel: config.update.channel,
+    devToolsOn: getDevtoolsEnabled(state),
+    devInternal: getFeatureFlags(state),
+    channel: getUpdateChannel(state),
     channelOptions: getUpdateChannelOptions(state),
   }
 }
@@ -109,7 +109,7 @@ function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
     toggleDevInternalFlag: (flag: DevInternalFlag) =>
       dispatch(toggleDevInternalFlag(flag)),
     handleChannel: event => {
-      dispatch(updateConfig('update.channel', event.target.value))
+      dispatch(updateConfigValue('update.channel', event.target.value))
 
       // TODO(mc, 2018-08-03): refactor app update interface to be more
       // reactive and teach it to re-check on release channel change

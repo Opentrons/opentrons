@@ -9,13 +9,8 @@ import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
 import { createLogger } from './logger'
-import { uiInitialized, checkShellUpdate } from './shell'
-
-import { apiClientMiddleware as robotApiMiddleware } from './robot'
-import { initializeAnalytics } from './analytics'
-import { initializeSupport } from './support'
-import { startDiscovery } from './discovery'
-
+import { uiInitialized } from './shell'
+import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
 import { rootReducer, history } from './reducer'
 import { rootEpic } from './epic'
 
@@ -42,21 +37,16 @@ const store = createStore(rootReducer, composeEnhancers(middleware))
 
 epicMiddleware.run(rootEpic)
 
-const { config } = store.getState()
-
 // attach store to window if devtools are on
-if (config.devtools) window.store = store
+const unsubscribe = store.subscribe(() => {
+  if (store.getState().config?.devtools) {
+    window.store = store
+    unsubscribe()
+  }
+})
 
-// initialize analytics and support after first render
-store.dispatch(initializeAnalytics())
-initializeSupport(config.support)
-
-// kickoff shell initializations and initial app update check at launch
+// kickoff app-shell initializations
 store.dispatch(uiInitialized())
-store.dispatch(checkShellUpdate())
-
-// kickoff a discovery run immediately
-store.dispatch(startDiscovery())
 
 log.info('Rendering app UI')
 
