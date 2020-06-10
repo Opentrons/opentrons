@@ -11,7 +11,7 @@ import {
   getUpdateChannel,
   getUpdateChannelOptions,
   updateConfigValue,
-  toggleDevTools,
+  toggleDevtools,
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
 } from '../../config'
@@ -36,7 +36,7 @@ type SP = {|
 |}
 
 type DP = {|
-  toggleDevTools: () => mixed,
+  toggleDevtools: () => mixed,
   toggleDevInternalFlag: DevInternalFlag => mixed,
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
@@ -73,7 +73,7 @@ function AdvancedSettingsCardComponent(props: Props) {
       <LabeledToggle
         label="Enable Developer Tools"
         toggledOn={props.devToolsOn}
-        onClick={props.toggleDevTools}
+        onClick={props.toggleDevtools}
       >
         <p>
           Requires restart. Turns on the app&#39;s developer tools, which
@@ -105,7 +105,7 @@ function mapStateToProps(state: State): SP {
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    toggleDevTools: () => dispatch(toggleDevTools()),
+    toggleDevtools: () => dispatch(toggleDevtools()),
     toggleDevInternalFlag: (flag: DevInternalFlag) =>
       dispatch(toggleDevInternalFlag(flag)),
     handleChannel: event => {

@@ -47,7 +47,7 @@ describe('config updates', () => {
   })
 
   it('should handle a toggle action for a missing setting', () => {
-    const action = Cfg.toggleConfigValue('devInteral.someFeatureFlag')
+    const action = Cfg.toggleConfigValue('devInternal.someFeatureFlag')
     const nextValue = getNextValue(action, CONFIG)
 
     expect(nextValue).toEqual(true)

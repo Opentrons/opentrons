@@ -37,10 +37,11 @@ const store = createStore(rootReducer, composeEnhancers(middleware))
 
 epicMiddleware.run(rootEpic)
 
-// attach store to window if devtools are on
+// attach store to window if devtools are on once config initializes
 const unsubscribe = store.subscribe(() => {
-  if (store.getState().config?.devtools) {
-    window.store = store
+  const { config } = store.getState()
+  if (config !== null) {
+    if (config.devtools) window.store = store
     unsubscribe()
   }
 })

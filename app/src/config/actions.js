@@ -67,8 +67,7 @@ export const configValueUpdated = (
   payload: { path, value },
 })
 
-// TODO(mc, 2020-02-05): move to `shell` module
-export function toggleDevTools(): Types.ToggleConfigValueAction {
+export function toggleDevtools(): Types.ToggleConfigValueAction {
   return toggleConfigValue('devtools')
 }
 

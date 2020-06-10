@@ -8,6 +8,7 @@ import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
 
+import { uiInitialized } from '@opentrons/app/src/shell/actions'
 import * as CustomLabware from '@opentrons/app/src/custom-labware'
 import * as CustomLabwareFixtures from '@opentrons/app/src/custom-labware/__fixtures__'
 
@@ -114,9 +115,8 @@ describe('labware module dispatches', () => {
     )
   })
 
-  // TODO(mc, 2019-11-25): refactor this action to be shell:INITIALIZE
-  it('reads labware directory on shell:CHECK_UPDATE', () => {
-    handleAction({ type: 'shell:CHECK_UPDATE', meta: { shell: true } })
+  it('reads labware directory on shell:UI_INITIALIZED', () => {
+    handleAction(uiInitialized())
 
     return flush().then(() =>
       expect(readLabwareDirectory).toHaveBeenCalledWith(labwareDir)

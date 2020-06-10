@@ -10,7 +10,7 @@ import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import * as Cfg from '@opentrons/app/src/config'
 
 import { createLogger } from '../log'
-import { DEFAULTS, migrate } from './migrate'
+import { DEFAULTS_V0, DEFAULTS, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
 import type { Action, Dispatch } from '../types'
@@ -36,7 +36,7 @@ let _log
 const store = () => {
   if (_store == null) {
     // perform store migration if loading for the first time
-    _store = new Store({ defaults: DEFAULTS })
+    _store = new Store({ defaults: DEFAULTS_V0 })
     _store.store = migrate(_store.store)
   }
   return _store

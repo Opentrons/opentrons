@@ -9,9 +9,9 @@ import type { AlertId } from './types'
 
 const getIgnoredAlertsFromConfig: (
   state: State
-) => $ReadOnlyArray<string> = createSelector(
+) => null | $ReadOnlyArray<string> = createSelector(
   getConfig,
-  config => config?.alerts.ignored ?? []
+  config => config?.alerts.ignored ?? null
 )
 
 export const getActiveAlerts: (
@@ -20,6 +20,10 @@ export const getActiveAlerts: (
   state => state.alerts,
   getIgnoredAlertsFromConfig,
   (alerts, ignoredAlerts) => {
-    return without(alerts.active, ...alerts.ignored, ...ignoredAlerts)
+    // only return active alerts if we know which alerts (if any) have been
+    // permanently ignored
+    return ignoredAlerts !== null
+      ? without(alerts.active, ...alerts.ignored, ...ignoredAlerts)
+      : []
   }
 )

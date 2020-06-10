@@ -35,6 +35,14 @@ describe('alerts selectors', () => {
     ])
   })
 
+  it('should show no active alerts until config is loaded', () => {
+    getConfig.mockReturnValue(null)
+    state = ({
+      alerts: { active: [MOCK_ALERT_1, MOCK_ALERT_2], ignored: [] },
+    }: $Shape<State>)
+    expect(Selectors.getActiveAlerts(state)).toEqual([])
+  })
+
   it('should filter ignored alerts from active alerts', () => {
     // the reducer should never let this state happen, but let's protect
     // against it in the selector, too
