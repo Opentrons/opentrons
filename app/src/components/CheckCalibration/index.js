@@ -55,12 +55,18 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   const pending = requestStatus === PENDING
 
   const robotCalCheckSession = useSelector((state: State) => {
-    const session: Sessions.CalibrationCheckSession | null = Sessions.getRobotSessionOfType<Sessions.CalibrationCheckSession>(
+    const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
       state,
       robotName,
       Sessions.SESSION_TYPE_CALIBRATION_CHECK
     )
-    return session ?? {}
+    if (
+      session &&
+      session.sessionType === Sessions.SESSION_TYPE_CALIBRATION_CHECK
+    ) {
+      return session
+    }
+    return {}
   })
   const { currentStep, labware, instruments, comparisonsByStep } =
     robotCalCheckSession.details || {}

@@ -56,16 +56,6 @@ export type SessionResponseAttributes =
   | CalibrationCheckSessionResponseAttributes
   | TipLengthCalibrationSessionResponseAttributes
 
-export type Session = {|
-  id: string,
-  +sessionType:
-    | SESSION_TYPE_CALIBRATION_CHECK
-    | SESSION_TYPE_TIP_LENGTH_CALIBRATION,
-  +details:
-    | Calibration.TipLengthCalibrationSessionDetails
-    | Calibration.RobotCalibrationCheckSessionDetails,
-|}
-
 export type CalibrationCheckSession = {|
   ...CalibrationCheckSessionResponseAttributes,
   id: string,
@@ -75,6 +65,8 @@ export type TipLengthCalibrationSession = {|
   ...TipLengthCalibrationSessionResponseAttributes,
   id: string,
 |}
+
+export type Session = CalibrationCheckSession | TipLengthCalibrationSession
 
 export type SessionCommandAttributes = {|
   command: SessionCommandString,

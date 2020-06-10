@@ -33,8 +33,13 @@ type CalibrateTipLengthSpec = {
 }
 
 const getRobotSessionOfType: JestMockFn<
-  [State, string, string],
-  $Call<typeof Sessions.getRobotSessionOfType, State, string, string>
+  [State, string, Sessions.SessionType],
+  $Call<
+    typeof Sessions.getRobotSessionOfType,
+    State,
+    string,
+    Sessions.SessionType
+  >
 > = Sessions.getRobotSessionOfType
 
 const mockGetDeckDefinitions: JestMockFn<

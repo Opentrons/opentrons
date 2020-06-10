@@ -5,7 +5,13 @@ export * from './constants'
 export * from './selectors'
 import type {
   Session,
+  SessionType,
   CalibrationCheckSession,
   TipLengthCalibrationSession,
 } from './types'
-export type { Session, CalibrationCheckSession, TipLengthCalibrationSession }
+export type {
+  Session,
+  SessionType,
+  CalibrationCheckSession,
+  TipLengthCalibrationSession,
+}

@@ -18,11 +18,11 @@ export const getRobotSessionById: (
   return (getRobotSessions(state, robotName) || {})[sessionId] ?? null
 }
 
-export function getRobotSessionOfType<T: Types.Session>(
+export function getRobotSessionOfType(
   state: State,
   robotName: string,
   sessionType: Types.SessionType
-): T | null {
+): Types.Session | null {
   const sessionsById = getRobotSessions(state, robotName) || {}
   const foundSessionId =
     Object.keys(sessionsById).find(
@@ -40,7 +40,6 @@ export const getAnalyticsPropsForRobotSessionById: (
   if (!session) return null
 
   if (session.sessionType === Constants.SESSION_TYPE_CALIBRATION_CHECK) {
-    // $FlowFixMe (bc, 2020-6-10) we know that this property exists in a session of this type, but flow doesn't
     const { instruments, comparisonsByStep } = session.details
     const initialModelsByMount: $Shape<Types.AnalyticsModelsByMount> = {}
     const modelsByMount: Types.AnalyticsModelsByMount = Object.keys(
