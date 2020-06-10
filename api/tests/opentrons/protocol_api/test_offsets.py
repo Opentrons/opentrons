@@ -4,6 +4,7 @@ import os
 import time
 
 import pytest
+import datetime
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 from opentrons import config
@@ -142,9 +143,15 @@ def test_save_tip_length(monkeypatch, clear_calibration):
 
 
 def test_create_tip_length_calibration_data(monkeypatch):
-    def fake_time():
-        return 1
-    monkeypatch.setattr(time, 'time', fake_time)
+
+    fake_time = datetime.datetime.utcnow()
+
+    class fake_datetime:
+        @classmethod
+        def utcnow(cls):
+            return fake_time
+
+    monkeypatch.setattr(datetime, 'datetime', fake_datetime)
 
     monkeypatch.setattr(
         labware,
@@ -156,7 +163,7 @@ def test_create_tip_length_calibration_data(monkeypatch):
     expected_data = {
         MOCK_HASH: {
             'tipLength': tip_length,
-            'lastModified': 1
+            'lastModified': fake_time.strftime("%B %d %Y, %H:%M:%S")
         }
     }
     result = labware.create_tip_length_data(test_labware, tip_length)
@@ -198,10 +205,6 @@ def test_add_index_file(monkeypatch, clear_tlc_calibration):
 def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
     assert not os.path.exists(tlc_path(PIPETTE_ID))
 
-    def fake_time():
-        return 1
-
-    monkeypatch.setattr(time, 'time', fake_time)
     monkeypatch.setattr(
         labware,
         '_hash_labware_def', mock_hash_labware)

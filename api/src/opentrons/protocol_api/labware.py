@@ -14,6 +14,7 @@ import time
 import os
 import shutil
 
+from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
 from hashlib import sha256
@@ -31,6 +32,7 @@ from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
+    from .dev_types import TipLengthCalibration, PipTipLengthCalibration
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 
@@ -41,11 +43,6 @@ MODULE_LOG = logging.getLogger(__name__)
 OPENTRONS_NAMESPACE = 'opentrons'
 CUSTOM_NAMESPACE = 'custom_beta'
 STANDARD_DEFS_PATH = Path("labware/definitions/2")
-
-
-# TODO: AA 2020-06-10 move these out of protocol_api
-TipLengthCalibration = Dict[str, float]
-PipTipLengthCalibration = Dict[str, TipLengthCalibration]
 
 
 class OutOfTipsError(Exception):
@@ -891,13 +888,6 @@ def save_tip_length(labware: Labware, length: float):
 
 
 # TODO: AA - move out of protocol_api
-def _get_pip_tip_length_path(pip_id: str) -> Path:
-    tip_length_path = get_tip_length_cal_path()
-    tip_length_path.mkdir(parents=True, exist_ok=True)
-    return tip_length_path/f'{pip_id}.json'
-
-
-# TODO: AA - move out of protocol_api
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
     index_file = get_tip_length_cal_path()/'index.json'
     try:
@@ -916,8 +906,10 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 
 # TODO: AA - move out of protocol_api
 def save_tip_length_calibration(
-        pip_id: str, tip_length_cal: PipTipLengthCalibration):
-    pip_tip_length_path = _get_pip_tip_length_path(pip_id)
+        pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
+    tip_length_dir_path = get_tip_length_cal_path()
+    tip_length_dir_path.mkdir(parents=True, exist_ok=True)
+    pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
 
     for lw_hash in tip_length_cal.keys():
         _append_to_index_tip_length_file(pip_id, lw_hash)
@@ -935,29 +927,30 @@ def save_tip_length_calibration(
 
 # TODO: AA - move out of protocol_api
 def create_tip_length_data(
-        labware: Labware, length: float) -> PipTipLengthCalibration:
+        labware: Labware, length: float) -> 'PipTipLengthCalibration':
     assert labware._is_tiprack, \
         'cannot save tip length for non-tiprack labware'
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
-    data = {
-        labware_hash + parent_id: {
-            'tipLength': length,
-            'lastModified': time.time()
-        }
+
+    tip_length_data: 'TipLengthCalibration' = {
+        'tipLength': length,
+        'lastModified': datetime.utcnow().strftime("%B %d %Y, %H:%M:%S")
     }
+
+    data = {labware_hash + parent_id: tip_length_data}
     return data
 
 
 # TODO: AA - move out of protocol_api
 def load_tip_length_calibration(
-        pip_id: str, labware: Labware) -> TipLengthCalibration:
+        pip_id: str, labware: Labware) -> 'TipLengthCalibration':
     assert labware._is_tiprack, \
         'cannot load tip length for non-tiprack labware'
-    pip_tip_length_path = _get_pip_tip_length_path(pip_id)
-    parent_id = _get_parent_identifier(labware.parent)
-    labware_hash = _hash_labware_def(labware._definition)
     try:
+        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
+        parent_id = _get_parent_identifier(labware.parent)
+        labware_hash = _hash_labware_def(labware._definition)
         tip_length_data = _read_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash + parent_id]
     except (FileNotFoundError, AttributeError):

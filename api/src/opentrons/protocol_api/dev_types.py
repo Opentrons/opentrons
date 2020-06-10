@@ -129,3 +129,12 @@ JsonV4ThermocyclerDispatch = TypedDict(
             ['ThermocyclerContext', 'ModuleIDParams'], None]
     }
 )
+
+
+# TODO: AA 2020-06-10 move these out of protocol_api
+class TipLengthCalibration(TypedDict):
+    tipLength: float
+    lastModified: str
+
+
+PipTipLengthCalibration = Dict[str, TipLengthCalibration]
