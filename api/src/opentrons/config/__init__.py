@@ -480,12 +480,12 @@ def reload():
     CONFIG.update(load_and_migrate())
 
 
-def get_opentrons_path(path_name: str):
+def get_opentrons_path(path_name: str) -> Path:
     # Helper function to look-up the path
     # to specific configuration files for
     # the Opentrons system
     global CONFIG
-    CONFIG[path_name]
+    return CONFIG[path_name]
 
 
 CONFIG = load_and_migrate()

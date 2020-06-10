@@ -1,5 +1,5 @@
 import typing
-import datetime
+from datetime import datetime
 
 from functools import partial
 from pydantic import BaseModel, Field

@@ -35,10 +35,9 @@ test_data = {
 
 
 @pytest.fixture
-def index_file_dir(tmpdir):
-    config.CONFIG['labware_calibration_offsets_dir_v2'] = Path(tmpdir)
+def index_file_dir(tmpdir, monkeypatch):
+    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
     yield tmpdir
-    config.reload()
 
 
 @pytest.fixture
@@ -532,10 +531,7 @@ def test_list_calibrations(set_up_index_file):
     labware_list = set_up_index_file
 
     all_cals = labware.get_all_calibrations()
-
-    for cal in all_cals:
-        assert list(cal.keys()) ==\
-            ['calibration', 'definition', 'slot', 'module', 'id', 'uri']
+    assert isinstance(all_cals[0], labware.CalibrationInformation)
 
 
 def test_delete_one_calibration(set_up_index_file):
@@ -547,11 +543,11 @@ def test_delete_one_calibration(set_up_index_file):
         nonlocal id_saved
         load_names = []
         for cal in all_cals:
-            uri = cal['uri']
-            _, loadname, _ = labware.details_from_uri(uri)
-            if loadname == lw_to_delete:
-                id_saved = cal['id']
-            load_names.append(loadname)
+            uri = cal.uri
+            dets = labware.details_from_uri(uri)
+            if dets.load_name == lw_to_delete:
+                id_saved = cal.labware_id
+            load_names.append(dets.load_name)
         return load_names
 
     load_names = get_load_names(all_cals)

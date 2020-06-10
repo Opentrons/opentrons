@@ -1,6 +1,6 @@
 from typing import Dict, List, Any, Optional, Union
 
-import time
+from datetime import datetime
 from starlette import status
 from fastapi import APIRouter
 from functools import partial
@@ -25,13 +25,14 @@ def _convert_time(specified_time: Optional[int]) -> Optional[datetime]:
     return None
 
 
-def _format_calibrations(calibrations: List[Dict[str, Any]]) -> :
+def _format_calibrations(
+        calibrations: List[lw_funcs.CalibrationInformation])\
+        -> List[lw_models.LabwareCalibration]:
     formatted_calibrations = []
     for calInfo in calibrations:
-        namespace, loadname, version =\
-            lw_funcs.details_from_uri(calInfo.uri)
+        details = lw_funcs.details_from_uri(calInfo.uri)
         if calInfo.module:
-            parent = list(calInfo['module'].keys())[0]
+            parent = list(calInfo.module.keys())[0]
         else:
             parent = calInfo.slot
         lw_offset = calInfo.calibration.offset
@@ -40,7 +41,7 @@ def _format_calibrations(calibrations: List[Dict[str, Any]]) -> :
             value=lw_offset.value,
             lastModified=modified)
 
-        tip_cal = calInfo.calibration.tipLength.
+        tip_cal = calInfo.calibration.tipLength
         modified = _convert_time(tip_cal.lastModified)
         tip_length = lw_models.TipData(
             value=tip_cal.value,
@@ -52,9 +53,9 @@ def _format_calibrations(calibrations: List[Dict[str, Any]]) -> :
             valueType='labwareCalibration',
             calibrationId=calibration.labware_id,
             calibrationData=cal_data,
-            loadName=loadname,
-            namespace=namespace,
-            version=version,
+            loadName=details.load_name,
+            namespace=details.namespace,
+            version=details.version,
             parent=parent)
         formatted_calibrations.append(formatted_cal)
     return formatted_calibrations

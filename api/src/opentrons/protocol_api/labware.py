@@ -112,7 +112,7 @@ class CalibrationInformation:
     definition: LabwareDefinition
     slot: str
     module: ModuleData
-    labware_id: str,
+    labware_id: str
     uri: str
 
 
@@ -120,7 +120,7 @@ class CalibrationInformation:
 class UriDetails:
     namespace: str
     load_name: str
-    version: str
+    version: int
 
 
 class Well:
@@ -902,6 +902,8 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     :param labware: A labware object
     :param lw_hash: The labware hash of the calibration
     """
+    print("OFFSETS PATH")
+    print(OFFSETS_PATH)
     index_file = OFFSETS_PATH / 'index.json'
     uri = labware.uri
     if index_file.exists():
@@ -1350,8 +1352,28 @@ def get_all_labware_definitions() -> List[str]:
 
     return labware_list
 
+def _format_calibration_type(data: Dict) -> CalibrationTypes:
+    offset = CalibrationData(
+        value=data['default']['offset'],
+        lastModified=data['default']['lastModified']
+    )
+    if data.get('tipLength'):
+        length=data['tipLength']['length']
+        tip_mod=data['tipLength']['lastModified']
+    else:
+        length=None
+        tip_mod=None
+    tip_length = CalibrationData(
+        value=length,
+        lastModified=tip_mod
+    )
+    return CalibrationTypes(
+            offset=offset,
+            tipLength=tip_length
+        )
 
-def get_all_calibrations() -> List[Dict[str, Any]]:
+
+def get_all_calibrations() -> List[CalibrationInformation]:
     """
     A helper function that will list all of the given calibrations
     in a succinct way.
@@ -1360,7 +1382,7 @@ def get_all_calibrations() -> List[Dict[str, Any]]:
     labware calibration files found on the robot.
     TODO(6/8): Move to another location
     """
-    all_calibrations: List[Dict[str, Any]] = []
+    all_calibrations: List[CalibrationInformation] = []
     index_path = OFFSETS_PATH / 'index.json'
     if not index_path.exists():
         return all_calibrations
@@ -1368,10 +1390,7 @@ def get_all_calibrations() -> List[Dict[str, Any]]:
     for key, data in index_file.items():
         cal_path = OFFSETS_PATH / f'{key}.json'
         cal_blob = _read_file(str(cal_path))
-        calibration = CalibrationTypes(
-            offset=CalibrationData(**cal_blob['default']['offset'])
-            tipLength=CalibrationData(**cal_blob.get('tipLength', {}))
-        )
+        calibration = _format_calibration_type(cal_blob)
         details = details_from_uri(data['uri'])
         definition = get_labware_definition(
             details.load_name, details.namespace, details.version)
@@ -1498,7 +1517,7 @@ def details_from_uri(uri: str, delimiter='/') -> UriDetails:
     Unpack a labware URI to get the namespace, loadname and version
     """
     info = uri.split(delimiter)
-    return UriDetails(namespace=info[0], load_name=info[1], version=info[2])
+    return UriDetails(namespace=info[0], load_name=info[1], version=int(info[2]))
 
 
 def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
