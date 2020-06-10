@@ -66,6 +66,24 @@ export function sessionReducer(
         },
       }
     }
+
+    case Constants.FETCH_SESSION_FAILURE:
+    case Constants.DELETE_SESSION_FAILURE: {
+      const { robotName, sessionId } = action.payload
+      const robotState = state[robotName] || INITIAL_PER_ROBOT_STATE
+      // if session with this id not found, we should forget this id
+      if (action.meta.response.status === 404) {
+        return {
+          ...state,
+          [robotName]: {
+            ...robotState,
+            robotSessions: omit(robotState.robotSessions, sessionId),
+          },
+        }
+      } else {
+        return state
+      }
+    }
   }
 
   return state

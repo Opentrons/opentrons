@@ -57,11 +57,12 @@ export const deleteSessionSuccess = (
 
 export const deleteSessionFailure = (
   robotName: string,
+  sessionId: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
 ): Types.DeleteSessionFailureAction => ({
   type: Constants.DELETE_SESSION_FAILURE,
-  payload: { robotName, error },
+  payload: { robotName, sessionId, error },
   meta: meta,
 })
 
@@ -86,11 +87,12 @@ export const fetchSessionSuccess = (
 
 export const fetchSessionFailure = (
   robotName: string,
+  sessionId: string,
   error: RobotApiV2ErrorResponseBody,
   meta: RobotApiRequestMeta
 ): Types.FetchSessionFailureAction => ({
   type: Constants.FETCH_SESSION_FAILURE,
-  payload: { robotName, error },
+  payload: { robotName, sessionId, error },
   meta: meta,
 })
 

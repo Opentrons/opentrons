@@ -5,7 +5,8 @@ import * as Fixtures from '../../__fixtures__'
 import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 
-const makeTriggerAction = robotName => Actions.deleteSession(robotName, '1234')
+const makeTriggerAction = robotName =>
+  Actions.deleteSession(robotName, Fixtures.mockSessionId)
 
 describe('deleteSessionEpic', () => {
   afterEach(() => {
@@ -14,10 +15,10 @@ describe('deleteSessionEpic', () => {
 
   const expectedRequest = {
     method: 'DELETE',
-    path: '/sessions/1234',
+    path: `/sessions/${Fixtures.mockSessionId}`,
   }
 
-  it('calls DELETE /sessions/1234', () => {
+  it('calls DELETE /sessions/{id}', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
       Fixtures.mockDeleteSessionSuccess
@@ -73,6 +74,7 @@ describe('deleteSessionEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.deleteSessionFailure(
           mocks.robot.name,
+          Fixtures.mockSessionId,
           { errors: [{ status: 'went bad' }] },
           { ...mocks.meta, response: Fixtures.mockDeleteSessionFailureMeta }
         ),
