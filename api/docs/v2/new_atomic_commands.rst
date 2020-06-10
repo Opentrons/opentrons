@@ -155,7 +155,7 @@ If you try to :py:meth:`.InstrumentContext.pick_up_tip()` again when all the tip
     # this will raise an exception if run after the previous code block
     pipette.pick_up_tip()
 
-To change the location of the first tip used by the pipette, you can use :py:attr:`.InstrumentContext.starting_tip`:
+To change the location of the first tip used by the pipette, you can use :py:obj:`.InstrumentContext.starting_tip`:
 
 .. code-block:: python
 
@@ -241,7 +241,7 @@ Now our pipette's tip is holding 100 µL.
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``aspirate``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. versionadded:: 2.0
 
@@ -268,7 +268,7 @@ The ``rate`` parameter is a multiplication factor of the pipette's default dispe
     You can change this by using a well position function like :py:meth:`.Well.bottom` (see
     :ref:`v2-location-within-wells`) every time you call ``dispense``, or - if you want to change
     the default throughout your protocol - you can change the default offset with
-    :py:attr:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
+    :py:obj:`.InstrumentContext.well_bottom_clearance` (see :ref:`new-default-op-positions`).
 
 .. note::
 
@@ -369,6 +369,8 @@ When dealing with certain liquids, you may need to aspirate air after aspirating
 .. versionadded:: 2.0
 
 **********************
+
+.. _new-utility-commands:
 
 ****************
 Utility Commands
@@ -502,3 +504,65 @@ The method :py:meth:`.ProtocolContext.comment` lets you display messages in the 
         protocol.comment('Hello, world!')
 
 .. versionadded:: 2.0
+
+
+Control and Monitor Robot Rail Lights
+=====================================
+
+You can turn the robot rail lights on or off in the protocol using :py:meth:`.ProtocolContext.set_rail_lights`:
+
+
+.. code-block:: python
+
+    from opentrons import protocol_api
+
+    metadata = {'apiLevel': '2.5'}
+
+    def run(protocol: protocol_api.ProtocolContext):
+        # turn on robot rail lights
+        protocol.set_rail_lights(True)
+
+        # turn off robot rail lights
+        protocol.set_rail_lights(False)
+
+.. versionadded:: 2.5
+
+
+You can also check whether the rail lights are on or off in the protocol using :py:obj:`.ProtocolContext.rail_lights_on`:
+
+
+.. code-block:: python
+
+    protocol.rail_lights_on  # returns True when the lights are on,
+                             # False when the lights are off
+
+.. versionadded:: 2.5
+
+
+Monitor Robot Door
+==================
+
+The door safety switch feature flag has been added to the OT-2 software since the 3.19.0 release. Enabling the feature flag allows your robot to pause a running protocol and prohibit the protocol from running when the robot door is open.
+
+.. image:: ../img/feature_flags/door_safety_switch.png
+
+You can also check whether or not the robot door is closed at a specific point in time in the protocol using :py:obj:`.ProtocolContext.door_closed`:
+
+
+.. code-block:: python
+
+    protocol.door_closed  # return True when the door is closed,
+                          # False when the door is open
+
+
+.. note::
+
+    Both the top window and the front door must be closed in order for the robot to report the door is closed.
+
+
+.. warning::
+
+    If you chose to enable the door safety switch feature flag, you should only use :py:obj:`.ProtocolContext.door_closed` as a form of status check, and should not use it to control robot behavior. If you wish to implement custom method to pause or resume protocol using :py:obj:`.ProtocolContext.door_closed`, make sure you have first disabled the feature flag.
+
+.. versionadded:: 2.5
+

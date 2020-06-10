@@ -163,7 +163,7 @@ Plunger Flow Rates
 
 Opentrons pipettes aspirate or dispense at different rates. These flow rates can be changed on a loaded
 :py:class:`.InstrumentContext` at any time, in units of µL/sec by altering
-:py:attr:`.InstrumentContext.flow_rate`. This has the following attributes:
+:py:obj:`.InstrumentContext.flow_rate`. This has the following attributes:
 
 * ``InstrumentContext.flow_rate.aspirate``: The aspirate flow rate, in µL/s
 * ``InstrumentContext.flow_rate.dispense``: The dispense flow rate, in µL/s
@@ -212,7 +212,7 @@ Each of these attributes can be altered without affecting the others.
         pipette.drop_tip()
 
 
-:py:attr:`.InstrumentContext.speed` offers the same functionality, but controlled in
+:py:obj:`.InstrumentContext.speed` offers the same functionality, but controlled in
 units of mm/s of plunger speed. This does not have a linear transfer to flow rate and
 should only be used if you have a specific need.
 
@@ -231,7 +231,7 @@ protocols. While you can specify the exact location within a well in direct call
 complex commands like :py:meth:`.InstrumentContext.transfer`, and it can be
 cumbersome to specify the position every time.
 
-Instead, you can use the attribute :py:attr:`.InstrumentContext.well_bottom_clearance`
+Instead, you can use the attribute :py:obj:`.InstrumentContext.well_bottom_clearance`
 to specify the height above the bottom of a well to either aspirate or dispense:
 
 1) Editing ``pipette.well_bottom_clearance.aspirate`` changes the height of aspiration
@@ -278,7 +278,7 @@ The OT-2's gantry usually moves as fast as it can given its construction; this m
 protocol execution faster and saves time. However, some experiments or liquids may
 require slower, gentler movements over protocol execution time. In this case, you
 can alter the OT-2 gantry's speed when a specific pipette is moving by setting
-:py:attr:`.InstrumentContext.default_speed`. This is a value in mm/s that controls
+:py:obj:`.InstrumentContext.default_speed`. This is a value in mm/s that controls
 the overall speed of the gantry. Its default is 400 mm/s.
 
 .. warning::
@@ -313,7 +313,7 @@ for the OT-2's axes. Unlike the overall speed, which is controlled per-instrumen
 speed limits take effect for both pipettes and all motions. These can be set for the
 ``X`` (left-and-right gantry motion), ``Y`` (forward-and-back gantry motion), ``Z``
 (left pipette up-and-down motion), and ``A`` (right pipette up-and-down motion) using
-:py:attr:`.ProtocolContext.max_speeds`. This works like a dictionary, where the keys are
+:py:obj:`.ProtocolContext.max_speeds`. This works like a dictionary, where the keys are
 axes, assigning to a key sets a max speed, and deleting a key or setting it to ``None``
 resets that axis's limit to the default:
 

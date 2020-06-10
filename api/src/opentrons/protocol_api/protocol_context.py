@@ -23,7 +23,8 @@ from .module_contexts import (
     ModuleContext, MagneticModuleContext, TemperatureModuleContext,
     ThermocyclerContext)
 from .util import (AxisMaxSpeeds, HardwareManager,
-                   requires_version, HardwareToManage, APIVersionError)
+                   requires_version, HardwareToManage, APIVersionError,
+                   convert_door_state_to_bool)
 if TYPE_CHECKING:
     from opentrons_shared_data.labware.dev_types import LabwareDefinition
 
@@ -678,3 +679,25 @@ class ProtocolContext(CommandPublisher):
         if not trash:
             raise RuntimeError("Robot must have a trash container in 12")
         return trash  # type: ignore
+
+    @requires_version(2, 5)
+    def set_rail_lights(self, on: bool):
+        """
+        Controls the robot rail lights
+
+        :param bool on: If true, turn on rail lights; otherwise, turn off.
+        """
+        self._hw_manager.hardware.set_lights(rails=on)
+
+    @property  # type: ignore
+    @requires_version(2, 5)
+    def rail_lights_on(self) -> bool:
+        """ Returns True if the rail lights are on """
+        return self._hw_manager.hardware.get_lights()['rails']
+
+    @property  # type: ignore
+    @requires_version(2, 5)
+    def door_closed(self) -> bool:
+        """ Returns True if the robot door is closed """
+        return convert_door_state_to_bool(
+            self._hw_manager.hardware.door_state)

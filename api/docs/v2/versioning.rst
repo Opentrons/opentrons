@@ -101,6 +101,8 @@ This table lists the correspondence between Protocol API versions and robot soft
 +-------------+-----------------------------+
 |     2.4     |          3.17.1             |
 +-------------+-----------------------------+
+|     2.5     |          3.19.0             |
++-------------+-----------------------------+
 
 Changes in API Versions
 -----------------------
@@ -142,3 +144,12 @@ Version 2.4
     - The speed for `touch_tip` can now be lowered down to 1 mm/s
     - `touch_tip` no longer moves diagonally from the X direction -> Y direction
     - Takes into account geometry of the deck and modules
+
+
+Version 2.5
++++++++++++
+
+- New :ref:`new-utility-commands` were added:
+    - :py:meth:`.ProtocolContext.set_rail_lights`: turns robot rail lights on or off
+    - :py:obj:`.ProtocolContext.rail_lights_on`: describes whether or not the rail lights are on
+    - :py:obj:`.ProtocolContext.door_closed`: describes whether the robot door is closed
