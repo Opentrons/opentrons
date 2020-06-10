@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
+
+
+### Bug Fixes
+
+* **build:** allow test pypi uploads to fail again ([#5849](https://github.com/Opentrons/opentrons/issues/5849)) ([61b5eba](https://github.com/Opentrons/opentrons/commit/61b5eba))
+* **shared-data:** recursively specify subpackages ([#5844](https://github.com/Opentrons/opentrons/issues/5844)) ([3ccbbea](https://github.com/Opentrons/opentrons/commit/3ccbbea))
+
+
+### Features
+
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
+* **protocol-designer:** add atomic thermocyclerRunProfile command creator ([#5843](https://github.com/Opentrons/opentrons/issues/5843)) ([e20bbda](https://github.com/Opentrons/opentrons/commit/e20bbda)), closes [#5839](https://github.com/Opentrons/opentrons/issues/5839)
+
+
+
+
+
 
 
 **Note:** Version bump only for package @opentrons/shared-data
