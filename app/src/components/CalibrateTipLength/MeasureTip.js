@@ -8,7 +8,10 @@ import styles from './styles.css'
 import type { CalibrateTipLengthChildProps } from './types'
 
 // TODO: fill with real video assets keyed by mount and then channels
-const assetMap = {}
+const assetMap = {
+  left: {},
+  right: {},
+}
 
 const HEADER = 'Save the tip length'
 const JOG_UNTIL = 'Jog the robot until tip is'
