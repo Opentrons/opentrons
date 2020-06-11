@@ -290,13 +290,7 @@ def test_execute_module_command_bad_command(api_client, hardware, magdeck):
 def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    async def mock_set_temperature(temperature, hold_secs, hold_mins,
-                                   ramp_rate, vol):
-        while temperature > Thermocycler.target:
-            pass
-        return
-
-    Thermocycler.set_temperature.side_effect = mock_set_temperature
+    Thermocycler.wait_for_temp.side_effect = TypeError("found a 'str'")
 
     resp = api_client.post('modules/dummySerialTC',
                            json={'command_type': 'set_temperature',
