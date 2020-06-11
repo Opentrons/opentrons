@@ -1,5 +1,5 @@
 from pathlib import Path
-from unittest.mock import patch, PropertyMock
+from unittest.mock import patch, PropertyMock, MagicMock
 
 import pytest
 import asyncio
@@ -290,13 +290,14 @@ def test_execute_module_command_bad_command(api_client, hardware, magdeck):
 def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
     hardware.attached_modules = [thermocycler]
 
-    Thermocycler.wait_for_temp.side_effect = TypeError("found a 'str'")
+    thermocycler.wait_for_temp = MagicMock(side_effect=
+                                           TypeError("found a 'str'"))
 
     resp = api_client.post('modules/dummySerialTC',
                            json={'command_type': 'set_temperature',
                                  'args': ['30']})
     body = resp.json()
-    assert resp.status_code == 500
+    assert resp.status_code == 400
     assert 'message' in body
     assert 'TypeError' in body['message']
 
