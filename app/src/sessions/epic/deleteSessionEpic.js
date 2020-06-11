@@ -30,7 +30,12 @@ const mapResponseToAction: ResponseToActionMapper<DeleteSessionAction> = (
 
   return response.ok
     ? Actions.deleteSessionSuccess(host.name, body, meta)
-    : Actions.deleteSessionFailure(host.name, body, meta)
+    : Actions.deleteSessionFailure(
+        host.name,
+        originalAction.payload.sessionId,
+        body,
+        meta
+      )
 }
 
 export const deleteSessionEpic: Epic = (action$, state$) => {

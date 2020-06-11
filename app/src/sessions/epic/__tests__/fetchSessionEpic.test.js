@@ -6,7 +6,8 @@ import * as Actions from '../../actions'
 import { sessionsEpic } from '..'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 
-const makeTriggerAction = robotName => Actions.fetchSession(robotName, '1234')
+const makeTriggerAction = robotName =>
+  Actions.fetchSession(robotName, Fixtures.mockSessionId)
 
 describe('fetchSessionEpic', () => {
   afterEach(() => {
@@ -15,10 +16,10 @@ describe('fetchSessionEpic', () => {
 
   const expectedRequest = {
     method: 'GET',
-    path: '/sessions/1234',
+    path: `/sessions/${Fixtures.mockSessionId}`,
   }
 
-  it('calls GET /sessions/1234', () => {
+  it('calls GET /sessions/{id}', () => {
     const mocks = setupEpicTestMocks(
       makeTriggerAction,
       Fixtures.mockFetchSessionSuccess
@@ -74,6 +75,7 @@ describe('fetchSessionEpic', () => {
       expectObservable(output$).toBe('--a', {
         a: Actions.fetchSessionFailure(
           mocks.robot.name,
+          Fixtures.mockSessionId,
           { errors: [{ status: 'went bad' }] },
           { ...mocks.meta, response: Fixtures.mockFetchSessionFailureMeta }
         ),

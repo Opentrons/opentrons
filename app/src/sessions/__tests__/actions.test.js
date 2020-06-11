@@ -75,10 +75,14 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:DELETE_SESSION_FAILURE',
       creator: Actions.deleteSessionFailure,
-      args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
+      args: ['robot-name', '1234', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:DELETE_SESSION_FAILURE',
-        payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
+        payload: {
+          robotName: 'robot-name',
+          sessionId: '1234',
+          error: mockV2ErrorResponse,
+        },
         meta: { requestId: 'abc' },
       },
     },
@@ -108,10 +112,14 @@ describe('robot session check actions', () => {
     {
       name: 'sessions:FETCH_SESSION_FAILURE',
       creator: Actions.fetchSessionFailure,
-      args: ['robot-name', mockV2ErrorResponse, { requestId: 'abc' }],
+      args: ['robot-name', '1234', mockV2ErrorResponse, { requestId: 'abc' }],
       expected: {
         type: 'sessions:FETCH_SESSION_FAILURE',
-        payload: { robotName: 'robot-name', error: mockV2ErrorResponse },
+        payload: {
+          robotName: 'robot-name',
+          sessionId: '1234',
+          error: mockV2ErrorResponse,
+        },
         meta: { requestId: 'abc' },
       },
     },
