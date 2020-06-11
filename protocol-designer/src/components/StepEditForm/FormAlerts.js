@@ -63,7 +63,6 @@ const mapStateToProps = (state: BaseState, ownProps: OP): SP => {
       errors: dynamicFieldFormErrors,
       profileItemsById,
     })
-    console.log({ dynamicFieldFormErrors, visibleDynamicFieldFormErrors })
   }
 
   return {
