@@ -602,12 +602,6 @@ class Session(RobotBusy):
 
     def run(self):
         if not self.blocked:
-            # Inhibit starting a protocol run while one is running.
-            with self._run_lock:
-                if self._is_running.is_set():
-                    raise RuntimeError("Protocol cannot be started "
-                                       "while already running")
-                self._is_running.set()
             try:
                 self._broker.set_logger(self._run_logger)
                 self._run()
@@ -615,7 +609,6 @@ class Session(RobotBusy):
                 raise
             finally:
                 self._broker.set_logger(self._default_logger)
-                self._is_running.clear()
             return self
         else:
             raise RuntimeError(
