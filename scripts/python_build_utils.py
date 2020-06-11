@@ -41,7 +41,7 @@ def get_version(project, extra_tag=''):
     pkg_json_path = package_entries[project].pkg_json
     builtin_ver = json.load(open(pkg_json_path))['version']
     if extra_tag:
-        version = builtin_ver + f'.dev{extra_tag}'
+        version = builtin_ver + '.dev{}'.format(extra_tag)
     else:
         version = builtin_ver
     return version
