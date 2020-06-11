@@ -108,7 +108,7 @@
 
 .thermocycler_icon {
   height: 60%;
-  color: var(--c-selected-dark)
+  color: var(--c-selected-dark);
 }
 
 .blocked_slot_background {
