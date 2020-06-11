@@ -33,13 +33,14 @@ export const ModuleStepItemRow = (
 )
 
 type Props = {|
-  action: string,
+  action?: string,
   moduleType: ModuleRealType,
   actionText: string,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
   message?: ?string,
   children?: React.Node,
+  hideHeader?: boolean,
 |}
 
 export const ModuleStepItems = (props: Props): React.Node => {
@@ -49,10 +50,12 @@ export const ModuleStepItems = (props: Props): React.Node => {
   })
   return (
     <>
-      <li className={styles.substep_header}>
-        <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
-        <span>{props.action}</span>
-      </li>
+      {!props.hideHeader && (
+        <li className={styles.substep_header}>
+          <span>{i18n.t(`modules.module_long_names.${props.moduleType}`)}</span>
+          <span>{props.action}</span>
+        </li>
+      )}
       <Tooltip {...tooltipProps}>
         <LabwareTooltipContents
           labwareNickname={props.labwareNickname}

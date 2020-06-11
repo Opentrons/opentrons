@@ -428,23 +428,27 @@ export function generateSubsteps(
 
   if (stepArgs.commandCreatorFnName === THERMOCYCLER_PROFILE) {
     const {
-      profileTargetLidTemp,
+      blockTargetTempHold,
       lidOpenHold,
-      profileVolume,
+      lidTargetTempHold,
       message,
       meta,
       profileSteps,
+      profileTargetLidTemp,
+      profileVolume,
     } = stepArgs
     return {
       substepType: THERMOCYCLER_PROFILE,
+      blockTargetTempHold,
       labwareDisplayName: labwareNames?.displayName,
       labwareNickname: labwareNames?.nickname,
-      profileTargetLidTemp,
       lidOpenHold,
-      profileVolume,
+      lidTargetTempHold,
       message,
       meta,
       profileSteps,
+      profileTargetLidTemp,
+      profileVolume,
     }
   }
 

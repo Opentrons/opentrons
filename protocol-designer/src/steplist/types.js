@@ -135,14 +135,16 @@ export type AwaitTemperatureSubstepItem = {|
 
 export type ThermocyclerProfileSubstepItem = {|
   substepType: THERMOCYCLER_PROFILE,
+  blockTargetTempHold: number | null,
   labwareDisplayName: ?string,
   labwareNickname: ?string,
-  profileTargetLidTemp: number | null,
   lidOpenHold: boolean,
-  profileVolume: number,
-  profileSteps: $PropertyType<ThermocyclerProfileStepArgs, 'profileSteps'>,
-  meta: $PropertyType<ThermocyclerProfileStepArgs, 'meta'>,
+  lidTargetTempHold: number | null,
   message?: string,
+  meta: $PropertyType<ThermocyclerProfileStepArgs, 'meta'>,
+  profileSteps: $PropertyType<ThermocyclerProfileStepArgs, 'profileSteps'>,
+  profileTargetLidTemp: number | null,
+  profileVolume: number,
 |}
 
 export type ThermocyclerStateSubstepItem = {|

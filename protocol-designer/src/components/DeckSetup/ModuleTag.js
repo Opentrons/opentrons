@@ -96,7 +96,7 @@ export const ModuleStatus = ({
         default:
           lidStatus = i18n.t('modules.lid_undefined')
       }
-      const lidText = `Lid (${lidStatus}):`
+      const lidText = `${i18n.t('modules.lid_label', { lidStatus })}:`
 
       return (
         <>

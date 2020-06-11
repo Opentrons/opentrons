@@ -11,7 +11,7 @@ import {
 import { THERMOCYCLER_PROFILE, THERMOCYCLER_STATE } from '../../constants'
 import { stepIconsByType, PROFILE_CYCLE } from '../../form-types'
 import { i18n } from '../../localization'
-import { makeTemperatureText } from '../../utils'
+import { makeLidLabelText, makeTemperatureText } from '../../utils'
 import { PDListItem, PDTitledList } from '../lists'
 import { StepDescription } from '../StepDescription'
 import { AspirateDispenseHeader } from './AspirateDispenseHeader'
@@ -140,9 +140,9 @@ export const ProfileStepSubstepRow = (
         styles.profile_step_substep_row
       )}
     >
-      <span
-        className={styles.profile_step_substep_column}
-      >{`${temperature} ${i18n.t('application.units.degrees')}`}</span>
+      <span className={styles.profile_step_substep_column}>
+        {makeTemperatureText(temperature)}
+      </span>
       <span
         className={cx(
           styles.profile_step_substep_column,
@@ -164,9 +164,7 @@ const ProfileCycleRow = (props: ProfileCycleRowProps): React.Node => {
   const { step } = props
   return (
     <div className={styles.cycle_step_row}>
-      <span>{`${step.temperature} ${i18n.t(
-        'application.units.degrees'
-      )}`}</span>
+      <span>{makeTemperatureText(step.temperature)}</span>
       <span>
         {makeDurationText(step.durationMinutes, step.durationSeconds)}
       </span>
@@ -266,11 +264,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
 
   if (substeps && substeps.substepType === THERMOCYCLER_PROFILE) {
     const lidTemperature = makeTemperatureText(substeps.profileTargetLidTemp)
-    const lidLabelText = i18n.t(`modules.lid_label`, {
-      lidStatus: i18n.t(
-        substeps.lidOpenHold ? 'modules.lid_open' : 'modules.lid_closed'
-      ),
-    })
+    const lidLabelText = makeLidLabelText(substeps.lidOpenHold)
 
     return (
       <ModuleStepItems
@@ -284,7 +278,9 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
         <CollapsibleSubstep
           headerContent={
-            <span>{`Profile steps (${Math.floor(
+            <span
+              className={styles.collapsible_substep_header}
+            >{`Profile steps (${Math.floor(
               sum(
                 substeps.profileSteps.map(atomicStep => atomicStep.holdTime)
               ) / 60
@@ -318,6 +314,26 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
             )
           })}
         </CollapsibleSubstep>
+
+        <CollapsibleSubstep
+          headerContent={
+            <span className={styles.collapsible_substep_header}>
+              Ending hold
+            </span>
+          }
+        >
+          <ModuleStepItems
+            labwareDisplayName={substeps.labwareDisplayName}
+            labwareNickname={substeps.labwareNickname}
+            actionText={makeTemperatureText(substeps.blockTargetTempHold)}
+            moduleType={THERMOCYCLER_MODULE_TYPE}
+            hideHeader
+          />
+          <ModuleStepItemRow
+            label={`Lid (${substeps.lidOpenHold ? 'open' : 'closed'})`}
+            value={makeTemperatureText(substeps.lidTargetTempHold)}
+          />
+        </CollapsibleSubstep>
       </ModuleStepItems>
     )
   }
@@ -325,11 +341,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   if (substeps && substeps.substepType === THERMOCYCLER_STATE) {
     const blockTemperature = makeTemperatureText(substeps.blockTargetTemp)
     const lidTemperature = makeTemperatureText(substeps.lidTargetTemp)
-    const lidLabelText = i18n.t(`modules.lid_label`, {
-      lidStatus: i18n.t(
-        substeps.lidOpen ? 'modules.lid_open' : 'modules.lid_closed'
-      ),
-    })
+    const lidLabelText = makeLidLabelText(substeps.lidOpen)
 
     return (
       <ModuleStepItems
@@ -346,9 +358,7 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
   }
 
   if (substeps && substeps.substepType === 'awaitTemperature') {
-    const temperature = `${substeps.temperature} ${i18n.t(
-      'application.units.degrees'
-    )}`
+    const temperature = makeTemperatureText(substeps.temperature)
 
     return (
       <ModuleStepItems
