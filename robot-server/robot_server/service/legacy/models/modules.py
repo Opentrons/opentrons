@@ -216,9 +216,7 @@ class SerialCommand(BaseModel):
     command_type: str = \
         Field(...,
               description="The name of the module function to call")
-    args: typing.Optional[typing.List[typing.Union[int,
-                                                   float,
-                                                   typing.List[dict]]]] = \
+    args: typing.Optional[typing.List[typing.Any]] = \
         Field(None,
               description="The ordered args list for the call")
 

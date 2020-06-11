@@ -96,12 +96,18 @@ async def post_serial_command(
     if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
         method = getattr(matching_mod, command.command_type)
-        if asyncio.iscoroutinefunction(method):
-            val = await method(*clean_args)
+        try:
+            if asyncio.iscoroutinefunction(method):
+                val = await method(*clean_args)
+            else:
+                val = method(*clean_args)
+        except TypeError as e:
+            raise V1HandlerError(
+                message=f'Server encountered a TypeError '
+                        f'while running {method} : {e}',
+                status_code=status.HTTP_500_INTERNAL_SERVER_ERROR)
         else:
-            val = method(*clean_args)
-
-        return SerialCommandResponse(message='Success', returnValue=val)
+            return SerialCommandResponse(message='Success', returnValue=val)
     else:
         raise V1HandlerError(
             message=f'Module does not have command: {command.command_type}',
