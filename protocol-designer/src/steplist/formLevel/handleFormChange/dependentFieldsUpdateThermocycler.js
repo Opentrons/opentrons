@@ -9,6 +9,35 @@ import type { FormPatch } from '../../actions/types'
 const getDefaultFields = (...fields: Array<StepFieldName>): FormPatch =>
   pick(getDefaultsForStepType('thermocycler'), fields)
 
+const updatePatchOnThermocyclerFormType = (
+  patch: FormPatch,
+  rawForm: FormData
+) => {
+  // Profile => State
+  if (fieldHasChanged(rawForm, patch, 'thermocyclerFormType')) {
+    return {
+      ...patch,
+      ...getDefaultFields(
+        'blockIsActive',
+        'blockTargetTemp',
+        'lidIsActive',
+        'lidTargetTemp',
+        'lidOpen',
+        'profileVolume',
+        'profileTargetLidTemp',
+        'orderedProfileItems',
+        'profileItemsById',
+        'blockIsActiveHold',
+        'blockTargetTempHold',
+        'lidIsActiveHold',
+        'lidTargetTempHold',
+        'lidOpenHold'
+      ),
+    }
+  }
+  return patch
+}
+
 const updatePatchOnBlockChange = (patch: FormPatch, rawForm: FormData) => {
   if (fieldHasChanged(rawForm, patch, 'blockIsActive')) {
     return {
@@ -45,6 +74,7 @@ export function dependentFieldsUpdateThermocycler(
 ): FormPatch {
   // sequentially modify parts of the patch until it's fully updated
   return chainPatchUpdaters(originalPatch, [
+    chainPatch => updatePatchOnThermocyclerFormType(chainPatch, rawForm),
     chainPatch => updatePatchOnBlockChange(chainPatch, rawForm),
     chainPatch => updatePatchOnLidChange(chainPatch, rawForm),
   ])
