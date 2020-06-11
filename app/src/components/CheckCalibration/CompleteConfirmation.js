@@ -8,9 +8,8 @@ import type {
 } from '../../calibration'
 import styles from './styles.css'
 
-const DELETE_ROBOT_CALIBRATION_CHECK_HEADER =
-  'Robot calibration check is complete'
-const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
+const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
+const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
 const CHECK = 'check'
 const CHECKS = 'checks'
 const PASSED = 'passed'
@@ -40,7 +39,7 @@ export function CompleteConfirmation(
   return (
     <>
       <div className={styles.modal_icon_wrapper}>
-        <h3>{DELETE_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
+        <h3>{ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}</h3>
       </div>
       <div className={styles.complete_summary}>
         {stepsPassed > 0 && (
@@ -117,9 +116,7 @@ export function CompleteConfirmation(
           name="ot-copy-text"
         />
       </div>
-      <PrimaryButton onClick={exit}>
-        {DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
-      </PrimaryButton>
+      <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
     </>
   )
 }
