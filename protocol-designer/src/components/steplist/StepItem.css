@@ -309,3 +309,8 @@
   margin-top: 0.75rem;
   font-size: var(--fs-body-1);
 }
+
+.collapsible_substep_header {
+  overflow: visible;
+  text-align: left;
+}

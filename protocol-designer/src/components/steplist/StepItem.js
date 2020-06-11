@@ -278,7 +278,9 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
         <ModuleStepItemRow label={lidLabelText} value={lidTemperature} />
         <CollapsibleSubstep
           headerContent={
-            <span>{`Profile steps (${Math.floor(
+            <span
+              className={styles.collapsible_substep_header}
+            >{`Profile steps (${Math.floor(
               sum(
                 substeps.profileSteps.map(atomicStep => atomicStep.holdTime)
               ) / 60
@@ -313,7 +315,13 @@ export const StepItemContents = (props: StepItemContentsProps): React.Node => {
           })}
         </CollapsibleSubstep>
 
-        <CollapsibleSubstep headerContent={<span>Ending hold</span>}>
+        <CollapsibleSubstep
+          headerContent={
+            <span className={styles.collapsible_substep_header}>
+              Ending hold
+            </span>
+          }
+        >
           <ModuleStepItems
             labwareDisplayName={substeps.labwareDisplayName}
             labwareNickname={substeps.labwareNickname}
