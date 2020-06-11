@@ -10,7 +10,7 @@ import styles from './styles.css'
 
 const DELETE_ROBOT_CALIBRATION_CHECK_HEADER =
   'Robot calibration check is complete'
-const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip and exit'
+const DELETE_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
 const CHECK = 'check'
 const CHECKS = 'checks'
 const PASSED = 'passed'

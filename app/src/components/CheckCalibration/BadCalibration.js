@@ -14,7 +14,7 @@ const PERFORM_CALIBRATION =
 const THIS_ARTICLE = 'this article'
 const LEARN_MORE = 'to learn more'
 const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT =
-  'Drop tip and exit robot calibration check'
+  'Drop tip in trash and exit robot calibration check'
 
 const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'

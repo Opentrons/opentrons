@@ -11,7 +11,7 @@ describe('CompleteConfirmation', () => {
   const mockExit = jest.fn()
 
   const getExitButton = wrapper =>
-    wrapper.find('PrimaryButton[children="Drop tip and exit"]').find('button')
+    wrapper.find('PrimaryButton[children="Drop tip in trash and exit"]').find('button')
 
   beforeEach(() => {
     render = ({

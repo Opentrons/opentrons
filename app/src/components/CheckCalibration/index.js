@@ -35,7 +35,7 @@ const ROBOT_CALIBRATION_CHECK_SUBTITLE = 'Robot calibration check'
 const MOVE_TO_NEXT = 'move to next check'
 const CONTINUE = 'continue'
 const EXIT = 'exit'
-const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip and continue to 2nd pipette'
+const DROP_TIP_AND_DO_SECOND_PIPETTE = 'drop tip in trash and continue to 2nd pipette'
 const CHECK_X_Y_AXES = 'check x and y-axis'
 const CHECK_Z_AXIS = 'check z-axis'
 
