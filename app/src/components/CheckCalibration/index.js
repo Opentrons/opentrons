@@ -4,7 +4,7 @@ import { useSelector, useDispatch } from 'react-redux'
 import last from 'lodash/last'
 import {
   ModalPage,
-  SpinnerModal,
+  SpinnerModalPage,
   LEFT,
   RIGHT,
   type Mount,
@@ -177,6 +177,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       )
   }
 
+  let showSpinner = false
   let stepContents
   let modalContentsClassName = styles.modal_contents
   let shouldDisplayTitleBarExit = !pending
@@ -325,27 +326,29 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       break
     }
     default: {
-      stepContents = <SpinnerModal />
+      showSpinner = true
     }
   }
-
-  return (
+  const titleBarProps = {
+    title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+    back: {
+      onClick: confirmExit,
+      title: EXIT,
+      children: EXIT,
+      className: !shouldDisplayTitleBarExit
+        ? styles.suppress_exit_button
+        : undefined,
+    },
+  }
+  return showSpinner || pending ? (
+    <SpinnerModalPage titleBar={titleBarProps} />
+  ) : (
     <>
       <ModalPage
-        titleBar={{
-          title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-          back: {
-            onClick: confirmExit,
-            title: EXIT,
-            children: EXIT,
-            className: !shouldDisplayTitleBarExit
-              ? styles.suppress_exit_button
-              : undefined,
-          },
-        }}
+        titleBar={titleBarProps}
         contentsClassName={modalContentsClassName}
       >
-        {pending ? <SpinnerModal /> : stepContents}
+        {stepContents}
       </ModalPage>
       {showConfirmExit && (
         <ConfirmExitModal exit={confirmExit} back={cancelExit} />
