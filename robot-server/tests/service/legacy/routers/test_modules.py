@@ -7,6 +7,7 @@ from opentrons.hardware_control import ExecutionManager
 from opentrons.hardware_control.modules import MagDeck, Thermocycler, TempDeck
 from opentrons.hardware_control.modules import utils, UpdateError, \
     BundledFirmware
+from typing import List
 
 
 @pytest.fixture
@@ -284,6 +285,54 @@ def test_execute_module_command_bad_command(api_client, hardware, magdeck):
     assert resp.status_code == 400
     assert 'message' in body
     assert body['message'] == f'Module does not have command: {command_type}'
+
+
+def test_execute_module_command_bad_args(api_client, hardware, thermocycler):
+    hardware.attached_modules = [thermocycler]
+
+    resp = api_client.post('modules/dummySerialTC',
+                           json={'command_type': 'set_temperature',
+                                 'args': ['hello']})
+    body = resp.json()
+    assert resp.status_code == 422
+    assert 'message' in body
+    # assert body['message'] == "command.args.0: value is not a valid float. command.args.0: value is not a valid list"
+
+
+def test_execute_module_command_valid_args(api_client, hardware, thermocycler):
+    hardware.attached_modules = [thermocycler]
+
+    resp = api_client.post('modules/dummySerialTC',
+                           json={'command_type': 'set_temperature',
+                                 'args': [30]})
+    assert resp.status_code == 200
+
+
+def test_execute_module_command_float_to_int_args(api_client,
+                                                  hardware,
+                                                  thermocycler):
+    hardware.attached_modules = [thermocycler]
+    the_args = []
+
+    def mock_cycle_temperatures(steps: List,
+                                repetitions: int,
+                                volume: float = None):
+        the_args = [steps, repetitions, volume]
+
+    Thermocycler.cycle_temperatures.side_effect = mock_cycle_temperatures
+
+    resp = api_client.post('modules/dummySerialTC',
+                           json={'command_type': 'cycle_temperatures',
+                                 'args': [
+                                    [{"temperature": 30,
+                                      "hold_time_seconds": 20},
+                                     {"temperature": 40,
+                                      "hold_time_seconds": 35}],
+                                    10]})
+    assert resp.status_code == 200
+    assert type(the_args[0]) == list
+    assert type(the_args[1]) == int
+    assert type(the_args[2]) == float
 
 
 def test_post_serial_update_no_bundled_fw(api_client, hardware, magdeck):

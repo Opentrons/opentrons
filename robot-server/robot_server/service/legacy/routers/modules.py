@@ -1,6 +1,5 @@
 import typing
 import asyncio
-
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
@@ -12,7 +11,6 @@ from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models.modules import Module, ModuleSerial,\
     Modules, SerialCommandResponse, SerialCommand
-
 
 router = APIRouter()
 
