@@ -41,7 +41,7 @@ class ThreadedAsyncForbidden(Exception):
     is forbidden"""
 
     def __init__(self, msg="Robot is currently moving. Please wait and try "
-                           "again this command"):
+                           "this command again."):
         super().__init__(msg)
 
 

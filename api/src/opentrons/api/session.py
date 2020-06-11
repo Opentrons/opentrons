@@ -1,12 +1,14 @@
 import asyncio
 import base64
 from copy import copy
-from functools import reduce, wraps
+from functools import reduce
 import logging
 from threading import Lock, Event
 from time import time, sleep
 from typing import List, Dict, Any, Optional, Set, TYPE_CHECKING
 from uuid import uuid4
+
+from opentrons.api.util import RobotBusy, robot_is_busy
 from opentrons.drivers.smoothie_drivers.driver_3_0 import SmoothieAlarm
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 from opentrons import robot
@@ -21,7 +23,8 @@ from opentrons.protocol_api import (ProtocolContext,
                                     labware, module_geometry)
 from opentrons.protocol_api.execute import run_protocol
 from opentrons.hardware_control import (API, ThreadManager,
-                                        ExecutionCancelledError)
+                                        ExecutionCancelledError,
+                                        ThreadedAsyncLock)
 from opentrons.hardware_control.types import (DoorState, HardwareEventType,
                                               HardwareEvent)
 from .models import Container, Instrument, Module
@@ -40,21 +43,7 @@ VALID_STATES: Set['State'] = {
     'loaded', 'running', 'finished', 'stopped', 'paused', 'error'}
 
 
-def _motion_lock(func):
-    """ Decorator to make a function require a lock. Only works for instance
-    methods of Session (or SessionManager) """
-    @wraps(func)
-    def decorated(*args, **kwargs):
-        self = args[0]
-        if self._motion_lock:
-            with self._motion_lock.forbid():
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return decorated
-
-
-class SessionManager(object):
+class SessionManager:
     def __init__(
             self, hardware, loop=None, broker=None, lock=None):
         self._broker = broker or Broker()
@@ -218,7 +207,7 @@ class SessionManager(object):
         return self.session
 
 
-class Session(object):
+class Session(RobotBusy):
     TOPIC = 'session'
 
     @classmethod
@@ -280,6 +269,10 @@ class Session(object):
         self._run_lock: Lock = Lock()
         self._is_running: Event = Event()
 
+    @property
+    def busy_lock(self) -> ThreadedAsyncLock:
+        return self._motion_lock
+
     def _hw_iface(self):
         if self._use_v2:
             return self._hardware
@@ -331,7 +324,7 @@ class Session(object):
         self.command_log.clear()
         self.errors.clear()
 
-    @_motion_lock
+    @robot_is_busy
     def _simulate(self):
         self._reset()
 
@@ -532,7 +525,7 @@ class Session(object):
         else:
             self.blocked = False
 
-    @_motion_lock  # noqa(C901)
+    @robot_is_busy  # noqa(C901)
     def _run(self):
         def on_command(message):
             if message['$'] == 'before':

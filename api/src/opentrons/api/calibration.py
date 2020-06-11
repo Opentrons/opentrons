@@ -8,9 +8,11 @@ from opentrons.config import feature_flags as ff
 from opentrons.broker import Broker
 from opentrons.types import Point, Mount, Location
 from opentrons.protocol_api import labware
-from opentrons.hardware_control import CriticalPoint
+from opentrons.hardware_control import CriticalPoint, ThreadedAsyncLock
 
 from .models import Container
+from .util import robot_is_busy, RobotBusy
+
 
 log = logging.getLogger(__name__)
 
@@ -27,20 +29,6 @@ def _well0(cont):
         return cont.wells(0)
 
 
-def _require_lock(func):
-    """ Decorator to make a function require a lock. Only works for instance
-    methods of CalibrationManager """
-    @functools.wraps(func)
-    def decorated(*args, **kwargs):
-        self = args[0]
-        if self._lock:
-            with self._lock.forbid():
-                return func(*args, **kwargs)
-        else:
-            return func(*args, **kwargs)
-    return decorated
-
-
 def _home_if_first_call(func):
     """ Decorator to make a function home if it is the first one called in
     this session."""
@@ -55,7 +43,7 @@ def _home_if_first_call(func):
     return decorated
 
 
-class CalibrationManager:
+class CalibrationManager(RobotBusy):
     """
     Serves endpoints that are primarily used in
     opentrons/app/ui/robot/api-client/client.js
@@ -70,6 +58,10 @@ class CalibrationManager:
         self._lock = lock
         self._has_homed = False
 
+    @property
+    def busy_lock(self) -> ThreadedAsyncLock:
+        return self._lock
+
     def _set_state(self, state):
         if state not in VALID_STATES:
             raise ValueError(
@@ -77,7 +69,7 @@ class CalibrationManager:
         self.state = state
         self._on_state_changed()
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def tip_probe(self, instrument):
         inst = instrument._instrument
@@ -116,10 +108,10 @@ class CalibrationManager:
 
         log.info('New config: {0}'.format(config))
 
-        self.move_to_front(instrument)
+        self._move_to_front(instrument)
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def pick_up_tip(self, instrument, container):
         if not isinstance(container, Container):
@@ -146,7 +138,7 @@ class CalibrationManager:
             inst.pick_up_tip(_well0(container._container))
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def drop_tip(self, instrument, container):
         if not isinstance(container, Container):
@@ -166,7 +158,7 @@ class CalibrationManager:
             inst.drop_tip(_well0(container._container))
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def return_tip(self, instrument):
         inst = instrument._instrument
@@ -180,9 +172,14 @@ class CalibrationManager:
             inst.return_tip()
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def move_to_front(self, instrument):
+        """Public face of move_to_front"""
+        self._move_to_front(instrument)
+
+    def _move_to_front(self, instrument):
+        """Private move_to_front that can be called internally"""
         inst = instrument._instrument
         log.info('Moving {}'.format(instrument.name))
         self._set_state('moving')
@@ -191,8 +188,8 @@ class CalibrationManager:
                 Mount[inst.mount.upper()],
                 critical_point=CriticalPoint.NOZZLE,
                 refresh=True)
-            dest = instrument._context.deck.position_for(5)\
-                                           .point._replace(z=150)
+            dest = instrument._context.deck.position_for(5) \
+                .point._replace(z=150)
             self._hardware.move_to(Mount[inst.mount.upper()],
                                    current,
                                    critical_point=CriticalPoint.NOZZLE)
@@ -206,7 +203,7 @@ class CalibrationManager:
                 inst, inst.robot)
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def move_to(self, instrument, container):
         if not isinstance(container, Container):
@@ -231,7 +228,7 @@ class CalibrationManager:
 
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def jog(self, instrument, distance, axis):
         inst = instrument._instrument
@@ -249,7 +246,7 @@ class CalibrationManager:
                 robot=inst.robot)
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     @_home_if_first_call
     def home(self, instrument):
         inst = instrument._instrument
@@ -263,7 +260,7 @@ class CalibrationManager:
             inst.home()
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     def home_all(self, instrument):
         # NOTE: this only takes instrument as a param, because we need
         # its reference to the ProtocolContext. This is code smell that
@@ -277,7 +274,7 @@ class CalibrationManager:
             self._hardware.home()
         self._set_state('ready')
 
-    @_require_lock
+    @robot_is_busy
     def update_container_offset(self, container, instrument):
         inst = instrument._instrument
         log.info('Updating {} in {}'.format(container.name, container.slot))
