@@ -150,4 +150,4 @@ async def _do_move(hardware: ThreadManager,
                   critical_point=critical_point)
     # Move to requested z position
     await move_to(mount, target_pos, critical_point=critical_point)
-    return  await gantry_position(mount)
+    return await gantry_position(mount)
