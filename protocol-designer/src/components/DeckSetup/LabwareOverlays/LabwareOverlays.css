@@ -99,6 +99,18 @@
   border-radius: 0.5rem;
 }
 
+.highlight_fill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: color-mod(var(--c-highlight) alpha(0.5));
+}
+
+.thermocycler_icon {
+  height: 60%;
+  color: var(--c-selected-dark)
+}
+
 .blocked_slot_background {
   fill: rgba(200, 115, 0, 0.75);
   stroke: var(--c-red);
