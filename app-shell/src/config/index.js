@@ -13,8 +13,8 @@ import { createLogger } from '../log'
 import { DEFAULTS_V0, migrate } from './migrate'
 import { shouldUpdate, getNextValue } from './update'
 
-import type { Action, Dispatch } from '../types'
-import type { Config } from './types'
+import type { Action, Dispatch, Logger } from '../types'
+import type { Config, Overrides } from './types'
 
 export type * from './types'
 
@@ -31,8 +31,9 @@ const PARSE_ARGS_OPTS = {
 
 // lazy load store, overrides, and log because of config/log interdependency
 let _store
-let _over
-let _log
+let _over: Overrides | void
+let _log: Logger | void
+
 const store = () => {
   if (_store == null) {
     // perform store migration if loading for the first time
@@ -41,8 +42,12 @@ const store = () => {
   }
   return _store
 }
-const overrides = () => _over || (_over = yargsParser(argv, PARSE_ARGS_OPTS))
-const log = () => _log || (_log = createLogger('config'))
+
+const overrides = (): Overrides => {
+  return _over ?? (_over = yargsParser(argv, PARSE_ARGS_OPTS))
+}
+
+const log = (): Logger => _log ?? (_log = createLogger('config'))
 
 // initialize and register the config module with dispatches from the UI
 export function registerConfig(dispatch: Dispatch): Action => void {
@@ -76,14 +81,14 @@ export function getStore(): Config {
 }
 
 export function getOverrides(path?: string): mixed {
-  return get(overrides(), path)
+  return path != null ? get(overrides(), path) : overrides()
 }
 
 // TODO(mc, 2010-07-01): getConfig with path parameter can't be typed
 // Remove the path parameter
 export function getConfig(path?: string): any {
   const result = store().get(path)
-  const over = get(overrides(), path)
+  const over = getOverrides(path)
 
   if (over != null) {
     if (typeof result === 'object' && result != null) {
