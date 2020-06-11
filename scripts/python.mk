@@ -14,8 +14,9 @@ pypi_test_upload_url := https://test.pypi.org/legacy/
 # (evaluates to that string)
 # parameter 1: name of the project (aka api, robot-server, etc)
 # parameter 2: an extra version tag string
+# parameter 3: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
 define python_package_version
-$(shell $(python) ../scripts/python_build_utils.py $(1) normalize_version $(if $(2),-e $(2)))
+$(shell $(python) $(if $(3),$(3),../scripts/python_build_utils.py) $(1) normalize_version $(if $(2),-e $(2)))
 endef
 
 
@@ -23,15 +24,16 @@ endef
 # parameter 1: the name of the project (aka api, robot-server, etc)
 # parameter 2: the name of the python package (aka opentrons, robot_server, etc)
 # parameter 3: any extra version tags
+# parameter 4: override python_build_utils.py path (default: ../scripts/python_build_utils.py)
+
 define python_get_wheelname
-$(2)-$(call python_package_version,$(1),$(3))-py2.py3-none-any.whl
+$(2)-$(call python_package_version,$(1),$(3),$(4))-py2.py3-none-any.whl
 endef
 
 # upload a package to a repository
 # parameter 1: auth arguments for twine
 # parameter 2: repository url
 # parameter 3: the wheel file to upload
-# parameter 4 (optional): a prefix command, like changing directory
 define python_upload_package
-$(if $(4),$(4) &&)$(python) -m twine upload --repository-url $(2) $(1) $(3)
+$(python) -m twine upload --repository-url $(2) $(1) $(3)
 endef

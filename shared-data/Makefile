@@ -1,12 +1,4 @@
 # shared-data makefile
-include ../scripts/python.mk
-include ../scripts/push.mk
-
-# Host key location for buildroot robot
-br_ssh_key ?= $(default_ssh_key)
-# Other SSH args for buildroot robots
-ssh_opts ?= $(default_ssh_opts)
-
 
 # using bash instead of /bin/bash in SHELL prevents macOS optimizing away our PATH update
 SHELL := bash
@@ -17,17 +9,11 @@ PATH := $(shell cd .. && yarn bin):$(PATH)
 # TODO(mc, 2018-10-25): use dist to match other projects
 BUILD_DIR := build
 
-wheel_file = $(BUILD_DIR)/$(call python_get_wheelname,shared-data,opentrons_shared_data,$(BUILD_NUMBER))
-
-py_sources = $(filter %.py,$(shell $(SHX) find python/opentrons_shared_data))
-
-twine_auth_args := --username $(pypi_username) --password $(pypi_password)
-twine_repository_url ?= $(pypi_test_upload_url)
 
 #######################################
 
 .PHONY: all
-all: clean dist
+all: clean dist dist-py
 
 .PHONY: setup-js
 setup-js:
@@ -35,8 +21,8 @@ setup-js:
 
 .PHONY: setup-py
 setup-py:
-	cd python && $(pipenv_envvars) pipenv sync $(pipenv_opts)
-	cd python && $(pipenv_envvars) pipenv run pip freeze
+	$(MAKE) -C python setup-py
+
 
 .PHONY: setup
 setup: setup-py setup-js
@@ -47,38 +33,41 @@ dist:
 	@shx mkdir -p $(BUILD_DIR)
 	node js/scripts/build.js $(BUILD_DIR)
 
+
+.PHONY: dist-py
+dist-py:
+	$(MAKE) -C python wheel
+
+
+.PHONY: clean-py
+clean-py:
+	$(MAKE) -C python clean
+
+
 .PHONY: clean
-clean:
+clean: clean-py
 	shx rm -rf $(BUILD_DIR)
 
 
-.PHONY: wheel
-wheel: $(wheel_file)
-
-$(BUILD_DIR)/opentrons_shared_data-%-py2.py3-none-any.whl: python/setup.py $(py_sources)
-	$(SHX) mkdir -p build
-	$(SHX) cd python && $(python) setup.py $(wheel_opts) bdist_wheel
-	$(SHX) mv python/dist/$(notdir $(wheel_file)) $(BUILD_DIR)/
-	$(SHX) rm -rf python/build python/dist *.egg_info
-	$(SHX) ls $(BUILD_DIR)
 
 .PHONY: lint-py
-lint-py: $(py_sources)
-	$(SHX) cd python && $(python) -m mypy opentrons_shared_data
-	$(SHX) cd python && $(python) -m pylama opentrons_shared_data
+lint-py:
+	$(MAKE) -C python lint
 
 .PHONY: push-no-restart
-push-no-restart: $(wheel_file)
-	$(call push-python-package,$(host),$(br_ssh_key),$(ssh_opts),$(wheel_file))
+push-no-restart:
+	$(MAKE) -C python push-no-restart
+
 
 .PHONY: push
-push: push-no-restart
-	$(call restart-service,$(host),$(br_ssh_key),$(ssh_opts),opentrons-robot-server)
+push:
+	$(MAKE) -C python push
 
-.PHONY: deploy
-deploy-py: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),../$(wheel_file),$(SHX) cd python)
+.PHONY: deploy-py
+deploy-py:
+	$(MAKE) -C python deploy
 
-.PHONY: test
+
+.PHONY: test-py
 test-py:
-	$(SHX) cd python && $(python) -m pytest tests
+	$(MAKE) -C python test
