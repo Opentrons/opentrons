@@ -89,7 +89,14 @@ export {
   getWellSetForMultichannel,
 }
 
-export const makeTemperatureText = (temperature: number | null): string =>
+export const makeTemperatureText = (
+  temperature: number | string | null
+): string =>
   temperature === null
     ? i18n.t('modules.status.deactivated')
     : `${temperature} ${i18n.t('application.units.degrees')}`
+
+export const makeLidLabelText = (lidOpen: boolean): string =>
+  i18n.t(`modules.lid_label`, {
+    lidStatus: i18n.t(lidOpen ? 'modules.lid_open' : 'modules.lid_closed'),
+  })
