@@ -8,6 +8,7 @@ import {
   useHoverTooltip,
   TOOLTIP_RIGHT,
   TOOLTIP_FIXED,
+  AlertModal,
 } from '@opentrons/components'
 import {
   MAGNETIC_MODULE_TYPE,
@@ -20,7 +21,7 @@ import {
   selectors as stepFormSelectors,
   getIsModuleOnDeck,
 } from '../step-forms'
-import { ConfirmDeleteStepModal } from './modals/ConfirmDeleteStepModal'
+import { Portal } from './portals/MainPageModalPortal'
 import { stepIconsByType, type StepType } from '../form-types'
 import styles from './listButtons.css'
 
@@ -133,15 +134,31 @@ export const StepCreationButton = (): React.Node => {
   return (
     <>
       {enqueuedStepType !== null && (
-        <ConfirmDeleteStepModal
-          onCancelClick={() => setEnqueuedStepType(null)}
-          onContinueClick={() => {
-            if (enqueuedStepType !== null) {
-              addStep(enqueuedStepType)
-              setEnqueuedStepType(null)
-            }
-          }}
-        />
+        <Portal>
+          <AlertModal
+            heading="Unsaved step form"
+            alertOverlay
+            buttons={[
+              {
+                children: 'Continue',
+                onClick: () => setEnqueuedStepType(null),
+              },
+              {
+                children: 'Delete Step',
+                onClick: () => {
+                  if (enqueuedStepType !== null) {
+                    addStep(enqueuedStepType)
+                    setEnqueuedStepType(null)
+                  }
+                },
+              },
+            ]}
+          >
+            <p style={{ lineHeight: 1.5 }}>
+              {i18n.t('modal.delete_step.body')}
+            </p>
+          </AlertModal>
+        </Portal>
       )}
       <StepCreationButtonComponent
         expanded={expanded}

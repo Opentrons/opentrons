@@ -15,9 +15,7 @@ export function ConfirmDeleteStepModal(props: Props): React.Node {
   return (
     <Portal>
       <ContinueModal className={modalStyles.modal} {...continueModalProps}>
-        {close
-          ? i18n.t('modal.close_step.body')
-          : i18n.t('modal.delete_step.body')}
+        <p>{i18n.t('modal.close_step.body')}</p>
       </ContinueModal>
     </Portal>
   )
