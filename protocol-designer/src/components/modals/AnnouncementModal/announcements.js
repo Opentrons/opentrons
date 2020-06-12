@@ -37,4 +37,27 @@ export const announcements: Array<Announcement> = [
       </>
     ),
   },
+  {
+    announcementKey: 'thermocyclerSupport',
+    image: (
+      <div className={styles.thermocycler_diagram_row}>
+        <img
+          className={styles.modules_diagram}
+          src={require('../../../images/modules/thermocycler.jpg')}
+        />
+      </div>
+    ),
+    heading: "We've updated the Protocol Designer",
+    message: (
+      <>
+        <p>Protocol Designer Beta now includes support for the Thermocycler!</p>
+        <p>
+          Note: Protocols with modules{' '}
+          <strong>may require an app and robot update to run</strong>. You will
+          need to have the OT-2 app and robot on the latest versions (
+          <strong>3.18 or higher</strong>).
+        </p>
+      </>
+    ),
+  },
 ]
