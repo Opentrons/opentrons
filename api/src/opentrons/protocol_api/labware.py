@@ -1006,6 +1006,11 @@ def clear_tip_length_calibration():
 def _read_cal_file(filepath: str) -> dict:
     with open(filepath, 'r') as f:
         calibration_data = json.load(f, cls=DateTimeDecoder)
+    for value in calibration_data.values():
+        if value.get('lastModified'):
+            assert isinstance(value['lastModified'], datetime.datetime), \
+                "invalid decoded value type for lastModified: got " \
+                f"{type(value['lastModified']).__name__}, expected datetime"
     return calibration_data
 
 
