@@ -1,21 +1,19 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { connect } from 'react-redux'
 import { RobotCoordsForeignDiv } from '@opentrons/components'
 import type { DeckSlot } from '@opentrons/shared-data'
 
-import type { BaseState } from '../../../types'
 import { START_TERMINAL_ITEM_ID, type TerminalItemId } from '../../../steplist'
 import type { LabwareOnDeck } from '../../../step-forms'
-import { getHoveredStepLabware } from '../../../ui/steps'
 import { BlockedSlot } from './BlockedSlot'
 import { BrowseLabware } from './BrowseLabware'
 import { EditLabware } from './EditLabware'
 import { LabwareName } from './LabwareName'
+import { LabwareHighlight } from './LabwareHighlight'
 import styles from './LabwareOverlays.css'
 
-type OP = {|
+type LabwareControlsProps = {|
   labwareOnDeck: LabwareOnDeck,
   selectedTerminalItemId: ?TerminalItemId,
   slot: DeckSlot,
@@ -24,18 +22,11 @@ type OP = {|
   swapBlocked: boolean,
 |}
 
-type SP = {|
-  highlighted: boolean,
-|}
-
-type Props = { ...OP, ...SP }
-
-const LabwareControlsComponent = (props: Props) => {
+export const LabwareControls = (props: LabwareControlsProps): React.Node => {
   const {
     labwareOnDeck,
     slot,
     selectedTerminalItemId,
-    highlighted,
     setHoveredLabware,
     setDraggedLabware,
     swapBlocked,
@@ -54,7 +45,7 @@ const LabwareControlsComponent = (props: Props) => {
           }),
         }}
       >
-        {highlighted && <div className={styles.highlighted_border_div} />}
+        <LabwareHighlight labwareOnDeck={labwareOnDeck} />
         {canEdit ? (
           <EditLabware
             labwareOnDeck={labwareOnDeck}
@@ -76,16 +67,3 @@ const LabwareControlsComponent = (props: Props) => {
     </>
   )
 }
-
-const mapStateToProps = (state: BaseState, ownProps: OP): SP => ({
-  highlighted: getHoveredStepLabware(state).includes(ownProps.labwareOnDeck.id),
-})
-
-export const LabwareControls: React.AbstractComponent<OP> = connect<
-  Props,
-  OP,
-  SP,
-  {||},
-  _,
-  _
->(mapStateToProps)(LabwareControlsComponent)
