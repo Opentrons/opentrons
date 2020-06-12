@@ -14,6 +14,7 @@ def test_health(api_client, hardware):
         'logs': ['/logs/serial.log', '/logs/api.log'],
         'system_version': '0.0.0',
         'protocol_api_version': list(MAX_SUPPORTED_VERSION),
+        'calibration': "IDENTITY",
         "links": {
             "apiLog": "/logs/api.log",
             "serialLog": "/logs/serial.log",

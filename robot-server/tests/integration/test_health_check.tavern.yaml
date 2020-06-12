@@ -14,6 +14,7 @@ stages:
         name: opentrons-dev
         # starts with semantic version
         api_version: !re_match "\\d+\\.\\d+\\.\\d+"
+        calibration: "IDENTITY"
         fw_version: Virtual Smoothie
         board_revision: !re_match "\\d+\\.\\d+"
         logs:

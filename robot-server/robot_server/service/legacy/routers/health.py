@@ -36,9 +36,9 @@ async def get_health(
         max_supported = protocol_api.MAX_SUPPORTED_VERSION
     else:
         max_supported = APIVersion(1, 0)
-
-    hardware.validate_calibration
+    
     return Health(name=config.name(),
+                  calibration=hardware.validate_calibration(),
                   api_version=__version__,
                   fw_version=fw_version,
                   board_revision=hardware.board_revision,

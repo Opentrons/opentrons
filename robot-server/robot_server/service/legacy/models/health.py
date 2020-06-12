@@ -1,6 +1,8 @@
 import typing
 from pydantic import BaseModel, Field
 
+from opentrons.hardware_control.util import DeckTransformState
+
 
 class Links(BaseModel):
     """A set of useful links"""
@@ -22,7 +24,7 @@ class Health(BaseModel):
               description="The robot's name. In most cases the same as its "
                           "mDNS advertisement domain name but this can get out"
                           " of sync. Mostly useful for user-facing titles.")
-    valid_calibration: bool = \
+    deck_calibration: DeckTransformState = \
         Field(...,
               description="A boolean determining whether a user has a "
                           "valid robot deck calibration.")
@@ -58,6 +60,7 @@ class Health(BaseModel):
                   "api_version": "3.15.2",
                   "fw_version": "v2.15.0",
                   "board_revision": "2.1",
+                  "deck_calibration": "OK",
                   "logs": ["/logs/serial.log", "/logs/api.log"],
                   "system_version": "1.2.1",
                   "protocol_api_version": [2, 0],
@@ -67,4 +70,7 @@ class Health(BaseModel):
                     "apiSpec": "/openapi.json"
                   }
                 }
+        }
+        json_encoders = {
+            DeckTransformState: lambda v: str(v)
         }

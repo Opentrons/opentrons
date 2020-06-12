@@ -10,10 +10,11 @@ from opentrons_shared_data.pipette import name_for_model
 
 from opentrons import types as top_types
 from opentrons.util import linal
+from functools import lru_cache
 from opentrons.config import robot_configs, pipette_config
 from opentrons.drivers.types import MoveSplit
 
-from .util import use_or_initialize_loop
+from .util import use_or_initialize_loop, DeckTransformState
 from .pipette import Pipette
 from .controller import Controller
 from .simulator import Simulator
@@ -84,7 +85,6 @@ class API(HardwareAPILike):
         # home() call succeeds or fails.
         self._motion_lock = asyncio.Lock(loop=self._loop)
         self._door_state = DoorState.CLOSED
-        self._valid_transform = True
 
     @property
     def door_state(self) -> DoorState:
@@ -221,30 +221,34 @@ class API(HardwareAPILike):
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
 
-    @property
-    def valid_transform(self):
-        return self._valid_transform
-
+    @lru_cache(maxsize=1)
     def validate_calibration(self):
         """
         This function determines whether the current gantry
         calibration is valid or not based on the following use-cases:
 
         """
-        curr_cal = self._backend.config.gantry_calibration
-        print(type(curr_cal))
-        id_matrix = linal.identity_deck_transform
-        singular = curr_cal * inv(curr_cal) == id_matrix
-        is_identity = id_matrix == curr_cal
-        outofrange = False
-        # Check that the matrix is non-singular
-        if singular:
-            self._valid_transform = False
-        elif is_identity:
-            self._valid_transform = False
+        curr_cal = np.array(self._config.gantry_calibration)
+        row, col = curr_cal.shape
+        rank = np.linalg.matrix_rank(curr_cal)
+
+        id_matrix = linal.identity_deck_transform()
+
+        z = abs(curr_cal[2][-1])
+
+        outofrange = z < 20 or z > 30
+        if row != rank:
+            # Check that the matrix is non-singular
+            return DeckTransformState.SINGULARITY
+        elif np.array_equal(curr_cal, id_matrix):
+            # Check that the matrix is not an identity
+            return DeckTransformState.IDENTITY
         elif outofrange:
-            self._valid_transform = False
-        self._valid_transform = True
+            # Check that the matrix is not out of range.
+            return DeckTransformState.BAD_CALIBRATION
+        else:
+            # Transform as it stands is sufficient.
+            return DeckTransformState.OK
 
     async def register_callback(self, cb):
         """ Allows the caller to register a callback, and returns a closure
@@ -1027,6 +1031,8 @@ class API(HardwareAPILike):
         Documentation on keys can be found in the documentation for
         :py:class:`.robot_config`.
         """
+        if kwargs.get('gantry_calibration'):
+            self.validate_calibration.cache_clear()
         self._config = self._config._replace(**kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):
