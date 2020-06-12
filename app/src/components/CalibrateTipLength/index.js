@@ -1,5 +1,5 @@
 // @flow
-// TipProbe controls
+// Tip Length Calibration Orchestration Component
 import * as React from 'react'
 
 import type {

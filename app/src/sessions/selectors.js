@@ -52,7 +52,6 @@ export const getAnalyticsPropsForRobotSessionById: (
       initialModelsByMount
     )
     const initialStepData: $Shape<Types.CalibrationCheckAnalyticsData> = {}
-    // $FlowFixMe (bc, 2020-6-10) we know that this property exists in a session of this type, but flow doesn't
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
       (
         acc: Types.CalibrationCheckAnalyticsData,
