@@ -224,7 +224,7 @@ describe('FileSidebar', () => {
     // Before save button is clicked, enabled should be false
     expect(mockUseBlockingHint).toHaveBeenNthCalledWith(1, {
       enabled: false,
-      hintKey: 'export_v4_protocol',
+      hintKey: 'export_v4_protocol_3_18',
       content: v4WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
@@ -236,7 +236,7 @@ describe('FileSidebar', () => {
     // After save button is clicked, enabled should be true
     expect(mockUseBlockingHint).toHaveBeenLastCalledWith({
       enabled: true,
-      hintKey: 'export_v4_protocol',
+      hintKey: 'export_v4_protocol_3_18',
       content: v4WarningContent,
       handleCancel: expect.any(Function),
       handleContinue: expect.any(Function),
