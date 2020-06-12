@@ -30,10 +30,10 @@
       "title": "Missing labware",
       "body": "Your module has no labware on it. We recommend you add labware before proceeding."
     },
-    "export_v4_protocol": {
+    "export_v4_protocol_3_18": {
       "title": "Robot requirements for running module inclusive JSON protocols",
       "body1": "This protocol utilizes modules and can only run on app and robot server version",
-      "body2": "3.17 or higher",
+      "body2": "3.18 or higher",
       "body3": ". Please ensure your OT-2 is updated to the correct version."
     },
     "change_magnet_module_model": {

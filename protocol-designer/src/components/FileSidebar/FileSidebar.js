@@ -149,20 +149,13 @@ function getWarningContent({
   return null
 }
 
-// TODO (ka 2020-2-26): Update this knowledgebase link when available
 export const v4WarningContent: React.Node = (
   <div>
     <p>
-      {i18n.t(`alert.hint.export_v4_protocol.body1`)}{' '}
-      <strong>{i18n.t(`alert.hint.export_v4_protocol.body2`)}</strong>
-      {i18n.t(`alert.hint.export_v4_protocol.body3`)}
+      {i18n.t(`alert.hint.export_v4_protocol_3_18.body1`)}{' '}
+      <strong>{i18n.t(`alert.hint.export_v4_protocol_3_18.body2`)}</strong>
+      {i18n.t(`alert.hint.export_v4_protocol_3_18.body3`)}
     </p>
-    {/* 
-    <p>
-      <KnowledgeBaseLink to="betaReleases">
-        Learn more about Beta releases here
-      </KnowledgeBaseLink>
-    </p> */}
   </div>
 )
 
@@ -214,7 +207,7 @@ export function FileSidebar(props: Props): React.Node {
 
   const blockingV4ExportHint = useBlockingHint({
     enabled: isV4Protocol && showV4ExportWarning,
-    hintKey: 'export_v4_protocol',
+    hintKey: 'export_v4_protocol_3_18',
     content: v4WarningContent,
     handleCancel: () => setShowV4ExportWarning(false),
     handleContinue: () => {
