@@ -104,8 +104,8 @@ async def post_serial_command(
         except TypeError as e:
             raise V1HandlerError(
                 message=f'Server encountered a TypeError '
-                        f'while running {method} : {e}. \n'
-                        f'Possibly type mismatch in args',
+                        f'while running {method} : {e}. '
+                        f'Possibly a type mismatch in args',
                 status_code=status.HTTP_400_BAD_REQUEST)
         else:
             return SerialCommandResponse(message='Success', returnValue=val)
