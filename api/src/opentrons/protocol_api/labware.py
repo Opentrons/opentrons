@@ -7,6 +7,7 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
+import datetime
 import logging
 import json
 import re
@@ -14,7 +15,6 @@ import time
 import os
 import shutil
 
-from datetime import datetime
 from pathlib import Path
 from collections import defaultdict
 from hashlib import sha256
@@ -52,6 +52,33 @@ class OutOfTipsError(Exception):
 # TODO: AA 2020-06-10 move out of protocol_api
 class TipLengthCalNotFound(Exception):
     pass
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class DateTimeDecoder(json.JSONDecoder):
+    def __init__(self):
+        super().__init__(object_hook=self.dict_to_obj)
+
+    def dict_to_obj(self, d):
+        if isinstance(d, dict):
+            d = {k: self._decode_datetime(v) for k, v in d.items()}
+        return d
+
+    def _decode_datetime(self, obj):
+        try:
+            return datetime.datetime.fromisoformat(obj)
+        except ValueError:
+            return obj
+        except TypeError:
+            return self.dict_to_obj(obj)
 
 
 class Well:
@@ -915,14 +942,14 @@ def save_tip_length_calibration(
         _append_to_index_tip_length_file(pip_id, lw_hash)
 
     try:
-        tip_length_data = _read_file(str(pip_tip_length_path))
+        tip_length_data = _read_cal_file(str(pip_tip_length_path))
     except FileNotFoundError:
         tip_length_data = {}
 
     tip_length_data.update(tip_length_cal)
 
     with pip_tip_length_path.open('w') as f:
-        json.dump(tip_length_data, f)
+        json.dump(tip_length_data, f, cls=DateTimeEncoder)
 
 
 # TODO: AA - move out of protocol_api
@@ -935,7 +962,7 @@ def create_tip_length_data(
 
     tip_length_data: 'TipLengthCalibration' = {
         'tipLength': length,
-        'lastModified': datetime.utcnow().strftime("%B %d %Y, %H:%M:%S")
+        'lastModified': datetime.datetime.utcnow()
     }
 
     data = {labware_hash + parent_id: tip_length_data}
@@ -951,7 +978,7 @@ def load_tip_length_calibration(
         pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
         parent_id = _get_parent_identifier(labware.parent)
         labware_hash = _hash_labware_def(labware._definition)
-        tip_length_data = _read_file(str(pip_tip_length_path))
+        tip_length_data = _read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash + parent_id]
     except (FileNotFoundError, AttributeError):
         raise TipLengthCalNotFound(
@@ -973,6 +1000,13 @@ def clear_tip_length_calibration():
             target.unlink()
     except FileNotFoundError:
         pass
+
+
+# TODO: AA - move out of protocol_api
+def _read_cal_file(filepath: str) -> dict:
+    with open(filepath, 'r') as f:
+        calibration_data = json.load(f, cls=DateTimeDecoder)
+    return calibration_data
 
 
 def load_calibration(labware: Labware):

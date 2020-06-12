@@ -1,3 +1,4 @@
+from datetime import datetime
 from typing import Callable, Dict, TYPE_CHECKING
 
 from typing_extensions import Protocol, TypedDict
@@ -134,7 +135,7 @@ JsonV4ThermocyclerDispatch = TypedDict(
 # TODO: AA 2020-06-10 move these out of protocol_api
 class TipLengthCalibration(TypedDict):
     tipLength: float
-    lastModified: str
+    lastModified: datetime
 
 
 PipTipLengthCalibration = Dict[str, TipLengthCalibration]

@@ -124,6 +124,15 @@ def test_save_calibration(monkeypatch, clear_calibration):
     assert calibration_point == Point(1, 1, 1)
 
 
+def test_json_datetime_encoder():
+    fake_time = datetime.datetime.utcnow()
+    original = {'mock_hash': {'tipLength': 25.0, 'lastModified': fake_time}}
+
+    encoded = json.dumps(original, cls=labware.DateTimeEncoder)
+    decoded = json.loads(encoded, cls=labware.DateTimeDecoder)
+    assert decoded == original
+
+
 def test_save_tip_length(monkeypatch, clear_calibration):
     assert not os.path.exists(path(MOCK_HASH))
 
@@ -163,7 +172,7 @@ def test_create_tip_length_calibration_data(monkeypatch):
     expected_data = {
         MOCK_HASH: {
             'tipLength': tip_length,
-            'lastModified': fake_time.strftime("%B %d %Y, %H:%M:%S")
+            'lastModified': fake_time
         }
     }
     result = labware.create_tip_length_data(test_labware, tip_length)
