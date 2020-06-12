@@ -16,6 +16,7 @@ import { TipPickUp } from '../TipPickUp'
 import { CheckXYPoint } from '../CheckXYPoint'
 import { CheckHeight } from '../CheckHeight'
 import { CompleteConfirmation } from '../CompleteConfirmation'
+import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import type { State } from '../../../types'
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
@@ -58,6 +59,9 @@ describe('CheckCalibration', () => {
 
   const getBackButton = wrapper =>
     wrapper.find({ title: 'exit' }).find('button')
+
+  const getConfirmExitButton = wrapper =>
+    wrapper.find({ title: 'confirm exit' }).find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,
@@ -172,7 +176,7 @@ describe('CheckCalibration', () => {
     })
   })
 
-  it('calls deleteRobotCalibrationCheckSession on exit click', () => {
+  it('pops a confirm exit modal on exit click', () => {
     getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
     const wrapper = render()
 
@@ -180,6 +184,22 @@ describe('CheckCalibration', () => {
       getBackButton(wrapper).invoke('onClick')()
     })
     wrapper.update()
+    expect(wrapper.exists(ConfirmExitModal)).toBe(true)
+    expect(mockCloseCalibrationCheck).not.toHaveBeenCalled()
+  })
+
+  it('calls deleteRobotCalibrationCheckSession when exit is confirmed', () => {
+    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
+    const wrapper = render()
+
+    act(() => {
+      getBackButton(wrapper).invoke('onClick')()
+    })
+    wrapper.update()
+
+    act(() => {
+      getConfirmExitButton(wrapper).invoke('onClick')()
+    })
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({

@@ -1,5 +1,9 @@
 @import '@opentrons/components';
 
+.suppress_exit_button {
+  visibility: hidden
+}
+
 .success_status_icon {
   width: 2.5rem;
   margin-right: 0.75rem;
