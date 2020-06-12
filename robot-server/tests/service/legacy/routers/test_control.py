@@ -1,8 +1,11 @@
-from unittest.mock import call
+from asyncio import Event
+from unittest.mock import call, MagicMock
 
 import pytest
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
+
+from robot_server.service.legacy.routers import control
 
 
 def test_robot_info(api_client):
@@ -241,3 +244,77 @@ def test_identify(api_client, hardware):
     assert res.json() == {"message": "identifying"}
 
     hardware.identify.assert_called_once_with(100)
+
+
+@pytest.mark.parametrize(argnames="blocking_call,blocking_call_data",
+                         argvalues=[
+                             # The blocking call is a home
+                             [control.post_home_robot,
+                              control.control.RobotHomeTarget(
+                                  target=control.control.HomeTarget.robot
+                              )
+                              ],
+                             # The blocking call is a move
+                             [control.post_move_robot,
+                              None
+                              ]
+                         ])
+async def test_concurrent_motion_fails(hardware,
+                                       loop,
+                                       blocking_call,
+                                       blocking_call_data):
+    """A test that while a HOME or MOVE is happening, other HOME and MOVE
+     requests will fail."""
+
+    event = Event()
+
+    # A wait that will happen within motion lock
+    async def wait_on_event(*args, **kwargs):
+        await event.wait()
+
+    # Mock HOME to wait on event
+    hardware.home.side_effect = wait_on_event
+
+    # Mock _do_move to wait on event
+    control._do_move = MagicMock(side_effect=wait_on_event)
+
+    lock = control.ThreadedAsyncLock()
+
+    # Call will pause on event.
+    blocking = loop.create_task(blocking_call(
+        blocking_call_data,
+        hardware=hardware,
+        motion_lock=lock
+    ))
+
+    # Wrap a failing coroutine
+    async def failure(func):
+        with pytest.raises(control.V1HandlerError) as exc_info:
+            await func
+        assert exc_info.value.status_code == 403
+        assert exc_info.value.message.find('Robot is currently moving') == 0
+
+    forbidden_home = loop.create_task(
+        failure(
+            control.post_home_robot(
+                robot_home_target=control.control.RobotHomeTarget(
+                    target=control.control.HomeTarget.robot
+                ),
+                hardware=hardware,
+                motion_lock=lock
+            )
+        )
+    )
+    forbidden_move = loop.create_task(
+        failure(
+            control.post_move_robot(
+                robot_move_target=None,
+                hardware=hardware,
+                motion_lock=lock
+            )
+        )
+    )
+    await forbidden_home
+    await forbidden_move
+    event.set()
+    await blocking
