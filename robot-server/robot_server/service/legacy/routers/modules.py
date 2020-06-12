@@ -1,6 +1,5 @@
 import typing
 import asyncio
-
 from starlette import status
 from fastapi import Path, APIRouter, Depends
 
@@ -12,7 +11,6 @@ from robot_server.service.legacy.models import V1BasicResponse
 from robot_server.service.errors import V1HandlerError
 from robot_server.service.legacy.models.modules import Module, ModuleSerial,\
     Modules, SerialCommandResponse, SerialCommand
-
 
 router = APIRouter()
 
@@ -98,12 +96,19 @@ async def post_serial_command(
     if hasattr(matching_mod, command.command_type):
         clean_args = command.args or []
         method = getattr(matching_mod, command.command_type)
-        if asyncio.iscoroutinefunction(method):
-            val = await method(*clean_args)
+        try:
+            if asyncio.iscoroutinefunction(method):
+                val = await method(*clean_args)
+            else:
+                val = method(*clean_args)
+        except TypeError as e:
+            raise V1HandlerError(
+                message=f'Server encountered a TypeError '
+                        f'while running {method} : {e}. '
+                        f'Possibly a type mismatch in args',
+                status_code=status.HTTP_400_BAD_REQUEST)
         else:
-            val = method(*clean_args)
-
-        return SerialCommandResponse(message='Success', returnValue=val)
+            return SerialCommandResponse(message='Success', returnValue=val)
     else:
         raise V1HandlerError(
             message=f'Module does not have command: {command.command_type}',
