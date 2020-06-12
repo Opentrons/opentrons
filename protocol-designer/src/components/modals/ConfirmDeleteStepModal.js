@@ -10,32 +10,12 @@ type Props = {|
   close?: boolean,
 |}
 
-const CANCEL = 'Cancel'
-const DELETE_STEP = 'Delete Step'
-
 export function ConfirmDeleteStepModal(props: Props): React.Node {
   const { close, ...continueModalProps } = props
-
-  const buttons = close
-    ? []
-    : [
-        { title: CANCEL, children: CANCEL, onClick: props.onCancelClick },
-        {
-          title: DELETE_STEP,
-          children: DELETE_STEP,
-          onClick: props.onContinueClick,
-        },
-      ]
   return (
     <Portal>
-      <ContinueModal
-        className={modalStyles.modal}
-        {...continueModalProps}
-        buttons={buttons}
-      >
-        {close
-          ? i18n.t('modal.close_step.body')
-          : i18n.t('modal.delete_step.body')}
+      <ContinueModal className={modalStyles.modal} {...continueModalProps}>
+        <p>{i18n.t('modal.close_step.body')}</p>
       </ContinueModal>
     </Portal>
   )

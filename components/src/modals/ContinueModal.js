@@ -6,7 +6,7 @@ import { AlertModal } from './AlertModal'
 import type { AlertModalProps } from './AlertModal'
 
 export type ContinueModalProps = {|
-  ...$Diff<AlertModalProps, { buttons?: mixed }>,
+  ...$Diff<AlertModalProps, { buttons: mixed }>,
   onCancelClick: () => mixed,
   onContinueClick: () => mixed,
 |}
@@ -19,13 +19,10 @@ const CONTINUE = 'Continue'
  */
 export function ContinueModal(props: ContinueModalProps): React.Node {
   const { onCancelClick, onContinueClick, ...passThruProps } = props
-  const buttonOverride = props.buttons && props.buttons.length > 0
-  const buttons = buttonOverride
-    ? props.buttons
-    : [
-        { title: CANCEL, children: CANCEL, onClick: onCancelClick },
-        { title: CONTINUE, children: CONTINUE, onClick: onContinueClick },
-      ]
+  const buttons = [
+    { title: CANCEL, children: CANCEL, onClick: onCancelClick },
+    { title: CONTINUE, children: CONTINUE, onClick: onContinueClick },
+  ]
 
   return (
     <AlertModal
