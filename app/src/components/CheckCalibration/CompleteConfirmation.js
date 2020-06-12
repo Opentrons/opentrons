@@ -1,4 +1,5 @@
 // @flow
+import { download } from 'electron-dl'
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon, PrimaryButton, IconButton } from '@opentrons/components'
@@ -35,6 +36,13 @@ export function CompleteConfirmation(
       rawDataRef.current.select()
       document.execCommand('copy')
     }
+  }
+
+  function handleDownload() {
+    download(window, url, {
+      saveAs: true,
+      openFolderWhenDone: index === logUrls.length - 1,
+    })
   }
   return (
     <>
@@ -110,6 +118,7 @@ export function CompleteConfirmation(
           onFocus={e => e.currentTarget.select()}
           readOnly
         />
+
         <IconButton
           className={styles.copy_icon}
           onClick={handleCopyButtonClick}
