@@ -621,6 +621,10 @@ class ProtocolContext(CommandPublisher):
         """
         Add a user-readable comment string that will be echoed to the Opentrons
         app.
+
+        The value of the message is computed during protocol simulation,
+        so cannot be used to communicate real-time information from the robot's
+        actual run.
         """
         pass
 
