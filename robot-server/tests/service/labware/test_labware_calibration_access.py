@@ -3,16 +3,14 @@ from pathlib import Path
 import pytest
 
 from opentrons.protocol_api import labware
-from opentrons import config
 from opentrons.types import Point
 from opentrons.protocol_api.geometry import Deck
 
 
 @pytest.fixture
-def index_file_dir(tmpdir):
-    config.CONFIG['labware_calibration_offsets_dir_v2'] = Path(tmpdir)
+def index_file_dir(tmpdir, monkeypatch):
+    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
     yield tmpdir
-    config.reload()
 
 
 @pytest.fixture
@@ -40,63 +38,13 @@ def grab_id(set_up_index_file):
     labware_to_access = 'opentrons_96_tiprack_10ul'
     uri_to_check = f'opentrons/{labware_to_access}/1'
 
-    index_path =\
-        config.CONFIG['labware_calibration_offsets_dir_v2'] / 'index.json'
+    index_path = labware.OFFSETS_PATH / 'index.json'
     index_file = labware._read_file(str(index_path))
     calibration_id = ''
     for key, data in index_file.items():
         if data['uri'] == uri_to_check:
             calibration_id = key
     return calibration_id
-
-
-def test_calibration_collections(api_client, set_up_index_file):
-    labware_list = set_up_index_file
-    resp = api_client.get('/labware/calibrations')
-    assert resp.status_code == 200
-    body = resp.json()
-    assert body['valueType'] == 'collection'
-    for cal in body['value']:
-        assert cal['loadName'] in labware_list
-
-    curr_id =\
-        'c9ec449a5349ec5a7a433c97f2d6fe75f6f00544d014a9a741be029de15f198f'
-    expected = {
-        'valueType': 'collection',
-        'value': [
-            {'calibrationId': curr_id,
-             'calibrationData': {
-                    'offset': {
-                        'value': [0.0, 0.0, 0.0],
-                        'lastModified': None},
-                    'tipLength': None},
-             'loadName': 'nest_96_wellplate_2ml_deep',
-             'namespace': 'opentrons',
-             'version': 1,
-             'parent': curr_id,
-             'valueType': 'labwareCalibration'}]}
-    resp = api_client.get(
-        '/labware/calibrations',
-        params={'loadName': 'nest_96_wellplate_2ml_deep'})
-    assert resp.status_code == 200
-    body = resp.json()
-    assert len(body['value']) == 1
-    body['value'][0]['calibrationData']['offset']['lastModified'] = None
-    assert body == expected
-
-    resp = api_client.get(
-        '/labware/calibrations',
-        params={'version': 1, 'namespace': 'opentrons'})
-    assert resp.status_code == 200
-    body = resp.json()
-    assert len(body['value']) == len(labware_list)
-
-    resp = api_client.get(
-        '/labware/calibrations',
-        params={'version': 1, 'namespace': 'outerspace'})
-    assert resp.status_code == 200
-    body = resp.json()
-    assert len(body['value']) == 0
 
 
 def test_access_individual_labware(api_client, grab_id):
@@ -119,9 +67,11 @@ def test_access_individual_labware(api_client, grab_id):
     resp = api_client.get(f'/labware/calibrations/{calibration_id}')
     assert resp.status_code == 200
     body = resp.json()
-    body['calibrationData']['offset']['lastModified'] = None
-    body['calibrationData']['tipLength']['lastModified'] = None
-    assert body == expected
+    data = body['data']
+    assert data['type'] == 'LabwareCalibration'
+    data['attributes']['calibrationData']['offset']['lastModified'] = None
+    data['attributes']['calibrationData']['tipLength']['lastModified'] = None
+    assert data['attributes'] == expected
 
     resp = api_client.get('/labware/calibrations/funnyId')
     assert resp.status_code == 404

@@ -21,7 +21,10 @@ from collections import defaultdict
 from hashlib import sha256
 from itertools import takewhile, dropwhile
 from typing import (
-    Any, AnyStr, List, Dict, Optional, Union, Sequence, Tuple, TYPE_CHECKING)
+    Any, AnyStr, List, Dict,
+    Optional, Union, Sequence, Tuple,
+    TYPE_CHECKING, NewType)
+from typing_extensions import TypedDict
 
 import jsonschema  # type: ignore
 
@@ -42,10 +45,14 @@ if TYPE_CHECKING:
 
 MODULE_LOG = logging.getLogger(__name__)
 
+CalibrationID = NewType('CalibrationID', str)
 
 class OutOfTipsError(Exception):
     pass
 
+class ModuleDict(TypedDict):
+    parent: str
+    full_parent: str
 
 # TODO: AA 2020-06-10 move out of protocol_api
 class TipLengthCalNotFound(Exception):
@@ -59,6 +66,25 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
+
+class CalibrationIndexDict(TypedDict):
+    """
+    The dict that is returned from
+    the index.json file.
+    """
+    uri: str
+    slot: str
+    module: ModuleDict
+
+
+class OffsetDict(TypedDict):
+    offset: List
+    lastModified: str
+
+
+class TipLengthDict(TypedDict):
+    length: float
+    lastModified: str
 
 # TODO: AA 2020-06-10 move out of protocol_api
 class DateTimeDecoder(json.JSONDecoder):
@@ -79,6 +105,15 @@ class DateTimeDecoder(json.JSONDecoder):
             return self.dict_to_obj(obj)
 
 
+class CalibrationDict(TypedDict):
+    """
+    The dict that is returned from a labware
+    offset file.
+    """
+    default: OffsetDict
+    tipLength: TipLengthDict
+
+
 @dataclass
 class CalibrationData:
     """
@@ -86,8 +121,21 @@ class CalibrationData:
     given calibration data.
     TODO(6/8): Move to a separate file
     """
-    value: Union[float, List]
-    lastModified: str
+    value: Union[Optional[float], List]
+    last_modified: Optional[str]
+
+
+@dataclass
+class ParentOptions:
+    """
+    Class to store whether a labware calibration has
+    a module, as well the original parent (slot).
+    As of now, the slot is not saved in association
+    with labware calibrations.
+    TODO(6/8): Move to a separate file
+    """
+    slot: str
+    module: str
 
 
 @dataclass
@@ -98,7 +146,7 @@ class CalibrationTypes:
     TODO(6/8): Move to a separate file
     """
     offset: CalibrationData
-    tipLength: CalibrationData
+    tip_length: CalibrationData
 
 
 @dataclass
@@ -109,9 +157,8 @@ class CalibrationInformation:
     TODO(6/8): Move to a separate file
     """
     calibration: CalibrationTypes
-    definition: LabwareDefinition
-    slot: str
-    module: ModuleData
+    definition: 'LabwareDefinition'
+    parent: ParentOptions
     labware_id: str
     uri: str
 
@@ -874,6 +921,13 @@ class Labware(DeckItem):
                 well.has_tip = True
 
 
+def _combine_strings(*args, delimiter=''):
+    string_to_return = ''
+    for arg in args:
+        string_to_return += arg + delimiter
+    return string_to_return
+
+
 def _get_parent_identifier(
         parent: Union[Well, str, DeckItem, None]) -> str:
     if isinstance(parent, DeckItem) and parent.separate_calibration:
@@ -902,8 +956,6 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     :param labware: A labware object
     :param lw_hash: The labware hash of the calibration
     """
-    print("OFFSETS PATH")
-    print(OFFSETS_PATH)
     index_file = OFFSETS_PATH / 'index.json'
     uri = labware.uri
     if index_file.exists():
@@ -914,10 +966,12 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     mod_parent = _get_parent_identifier(labware.parent)
     slot = first_parent(labware)
     if mod_parent:
-        mod_dict = {mod_parent: f'{slot}-{mod_parent}'}
+        mod_dict = {
+            'parent': mod_parent,
+            'full_parent': _combine_strings(slot, mod_parent, delimiter='-')}
     else:
         mod_dict = {}
-    full_id = f'{lw_hash}{mod_parent}'
+    full_id = _combine_strings(lw_hash, mod_parent)
     blob[full_id] = {
             "uri": f'{uri}',
             "slot": full_id,
@@ -1111,9 +1165,17 @@ def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
     return calibration_data
 
 
-def _read_file(filepath: str) -> dict:
+def _read_file(filepath: str):
+    """
+    :Note: The return type of this function is actually
+    Union[Dict[str, str], CalibrationDict, CalibrationIndexDict]
+    however, mypy cannot correctly interpret unions when
+    setting variables. To make typing clear in other
+    places, the return type here was removed.
+    """
     with open(filepath, 'r') as f:
         calibration_data = json.load(f)
+
     return calibration_data
 
 
@@ -1352,25 +1414,37 @@ def get_all_labware_definitions() -> List[str]:
 
     return labware_list
 
-def _format_calibration_type(data: Dict) -> CalibrationTypes:
+
+def _format_calibration_type(
+        data: CalibrationDict) -> CalibrationTypes:  # type: ignore
     offset = CalibrationData(
         value=data['default']['offset'],
-        lastModified=data['default']['lastModified']
+        last_modified=data['default']['lastModified']
     )
     if data.get('tipLength'):
-        length=data['tipLength']['length']
-        tip_mod=data['tipLength']['lastModified']
+        length: Optional[float] = data['tipLength']['length']
+        tip_mod: Optional[str] = data['tipLength']['lastModified']
     else:
-        length=None
-        tip_mod=None
+        length = None
+        tip_mod = None
     tip_length = CalibrationData(
         value=length,
-        lastModified=tip_mod
+        last_modified=tip_mod
     )
     return CalibrationTypes(
             offset=offset,
-            tipLength=tip_length
+            tip_length=tip_length
         )
+
+
+def _format_parent(data: CalibrationIndexDict) -> ParentOptions:
+    if data['module']:
+        mod = data['module']['parent']
+    else:
+        mod = ''
+    return ParentOptions(
+        slot=data['slot'],
+        module=mod)
 
 
 def get_all_calibrations() -> List[CalibrationInformation]:
@@ -1389,7 +1463,7 @@ def get_all_calibrations() -> List[CalibrationInformation]:
     index_file = _read_file(str(index_path))
     for key, data in index_file.items():
         cal_path = OFFSETS_PATH / f'{key}.json'
-        cal_blob = _read_file(str(cal_path))
+        cal_blob: CalibrationDict = _read_file(str(cal_path))
         calibration = _format_calibration_type(cal_blob)
         details = details_from_uri(data['uri'])
         definition = get_labware_definition(
@@ -1398,8 +1472,7 @@ def get_all_calibrations() -> List[CalibrationInformation]:
             CalibrationInformation(
                 calibration=calibration,
                 definition=definition,
-                slot=data['slot'],
-                module=data['module'],
+                parent=_format_parent(data),
                 labware_id=key,
                 uri=data['uri']
             ))
@@ -1421,7 +1494,7 @@ def clear_calibrations():
         pass
 
 
-def _remove_offset_from_index(calibration_id: str):
+def _remove_offset_from_index(calibration_id: CalibrationID):
     """
     Helper function to remove an individual offset file.
 
@@ -1437,7 +1510,7 @@ def _remove_offset_from_index(calibration_id: str):
         json.dump(blob, f)
 
 
-def delete_offset_file(calibration_id: str):
+def delete_offset_file(calibration_id: CalibrationID):
     """
     Given a labware's hash, delete the file and remove it from the index file.
 
@@ -1517,10 +1590,11 @@ def details_from_uri(uri: str, delimiter='/') -> UriDetails:
     Unpack a labware URI to get the namespace, loadname and version
     """
     info = uri.split(delimiter)
-    return UriDetails(namespace=info[0], load_name=info[1], version=int(info[2]))
+    return UriDetails(
+        namespace=info[0], load_name=info[1], version=int(info[2]))
 
 
-def uri_from_definition(definition: LabwareDefinition, delimiter='/') -> str:
+def uri_from_definition(definition: 'LabwareDefinition', delimiter='/') -> str:
     """ Build a labware URI from its definition.
 
     A labware URI is a string that uniquely specifies a labware definition.

@@ -1,4 +1,3 @@
-import enum
 from pathlib import Path
 
 from opentrons.config import get_opentrons_path

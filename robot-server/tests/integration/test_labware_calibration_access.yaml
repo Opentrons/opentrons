@@ -11,20 +11,10 @@ stages:
     response:
       status_code: 200
       json:
-        name: opentrons-dev
-        # starts with semantic version
-        api_version: !re_match "\\d+\\.\\d+\\.\\d+"
-        fw_version: Virtual Smoothie
-        board_revision: !re_match "\\d+\\.\\d+"
-        logs:
-        - /logs/serial.log
-        - /logs/api.log
-        system_version: 0.0.0
-        protocol_api_version:
-          - 2
-          - 4
-        links:
-          apiLog: /logs/api.log
-          serialLog: /logs/serial.log
-          # Specific link can change.
-          apiSpec: !re_match "/openapi.*"
+        links: !anydict
+        data:
+          <<: *calibration_data
+          attributes:
+            <<: *calibration_data_attributes
+            details:
+              <<: *calibration_data_attribute_details

@@ -5,8 +5,8 @@ import pytest
 
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
+
 from opentrons_shared_data import load_shared_data
-from opentrons import config
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
@@ -525,13 +525,6 @@ def test_add_index_file(labware_name, index_file_dir):
     lw_path = index_file_dir / 'index.json'
     info = labware._read_file(lw_path)
     assert info[full_id] == blob
-
-
-def test_list_calibrations(set_up_index_file):
-    labware_list = set_up_index_file
-
-    all_cals = labware.get_all_calibrations()
-    assert isinstance(all_cals[0], labware.CalibrationInformation)
 
 
 def test_delete_one_calibration(set_up_index_file):

@@ -4,6 +4,8 @@ from datetime import datetime
 from functools import partial
 from pydantic import BaseModel, Field
 
+from robot_server.service.json_api import \
+    ResponseDataModel, ResponseModel
 
 OffsetVector = typing.Tuple[float, float, float]
 
@@ -18,13 +20,13 @@ class OffsetData(BaseModel):
 
 
 class TipData(BaseModel):
-    value: float
-    lastModified: datetime
+    value: typing.Optional[float]
+    lastModified: typing.Optional[datetime]
 
 
 class CalibrationData(BaseModel):
     offset: OffsetData
-    tipLength: typing.Optional[TipData]
+    tipLength: TipData
 
 
 class LabwareCalibration(BaseModel):
@@ -40,3 +42,11 @@ class LabwareCalibration(BaseModel):
 class Calibrations(BaseModel):
     valueType: str
     value: typing.List[typing.Optional[LabwareCalibration]]
+
+
+MultipleCalibrationsResponse = ResponseModel[
+    ResponseDataModel[Calibrations], dict
+]
+SingleCalibrationResponse = ResponseModel[
+    ResponseDataModel[LabwareCalibration], dict
+]
