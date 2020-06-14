@@ -11,7 +11,7 @@ export type RobotWorkSpaceProps = {|
   viewBox?: string,
   className?: string,
   children?: RobotWorkSpaceRenderProps => React.Node,
-  deckLayerBlacklist?: Array<string>,
+  deckLayerBlocklist?: Array<string>,
 |}
 
 type GetRobotCoordsFromDOMCoords = $PropertyType<
@@ -20,7 +20,7 @@ type GetRobotCoordsFromDOMCoords = $PropertyType<
 >
 
 export function RobotWorkSpace(props: RobotWorkSpaceProps): React.Node {
-  const { children, deckDef, deckLayerBlacklist = [], viewBox } = props
+  const { children, deckDef, deckLayerBlocklist = [], viewBox } = props
   const wrapperRef: {| current: Element | null |} = React.useRef(null)
 
   // NOTE: getScreenCTM in Chrome a DOMMatrix type,
@@ -63,7 +63,7 @@ export function RobotWorkSpace(props: RobotWorkSpaceProps): React.Node {
       ref={wrapperRef}
     >
       {deckDef && (
-        <DeckFromData def={deckDef} layerBlacklist={deckLayerBlacklist} />
+        <DeckFromData def={deckDef} layerBlocklist={deckLayerBlocklist} />
       )}
       {children && children({ deckSlotsById, getRobotCoordsFromDOMCoords })}
     </svg>

@@ -29,7 +29,7 @@ type UrlData = {
 
 const DECK_DEF = getDeckDefinitions()['ot2_standard']
 
-const DECK_LAYER_BLACKLIST = [
+const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -70,7 +70,7 @@ export class URLDeck extends React.Component<{||}> {
     return (
       <RobotWorkSpace
         deckDef={DECK_DEF}
-        deckLayerBlacklist={DECK_LAYER_BLACKLIST}
+        deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
         viewBox={`-35 -35 ${488} ${390}`} // TODO: put these in variables
         className={styles.url_deck}
       >

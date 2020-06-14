@@ -20,7 +20,7 @@ export type PipetteSelectProps = {|
   /** react-select change handler */
   onPipetteChange: (pipetteName: string | null) => mixed,
   /** list of pipette names to omit */
-  nameBlacklist?: Array<string>,
+  nameBlocklist?: Array<string>,
   /** whether or not "None" shows up as the default option */
   enableNoneOption?: boolean,
   /** input tabIndex */
@@ -55,13 +55,13 @@ export const PipetteSelect = (props: PipetteSelectProps): React.Node => {
     className,
     enableNoneOption,
     id,
-    nameBlacklist = [],
+    nameBlocklist = [],
   } = props
-  const whitelist = ({ value }: SelectOption) => {
-    return !nameBlacklist.some(n => n === value)
+  const allowlist = ({ value }: SelectOption) => {
+    return !nameBlocklist.some(n => n === value)
   }
-  const gen2Options = specsByCategory[GEN2].map(specToOption).filter(whitelist)
-  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(whitelist)
+  const gen2Options = specsByCategory[GEN2].map(specToOption).filter(allowlist)
+  const gen1Options = specsByCategory[GEN1].map(specToOption).filter(allowlist)
   const groupedOptions = [
     ...(enableNoneOption ? [OPTION_NONE] : []),
     ...(gen2Options.length > 0 ? [{ options: gen2Options }] : []),

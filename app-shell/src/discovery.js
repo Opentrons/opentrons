@@ -108,6 +108,6 @@ function filterServicesToPersist(services: Array<Service>) {
   const candidateOverrides = getOverrides('discovery.candidates')
   if (!candidateOverrides) return client.services
 
-  const blacklist = [].concat(candidateOverrides)
-  return client.services.filter(s => blacklist.every(ip => ip !== s.ip))
+  const blocklist = [].concat(candidateOverrides)
+  return client.services.filter(s => blocklist.every(ip => ip !== s.ip))
 }

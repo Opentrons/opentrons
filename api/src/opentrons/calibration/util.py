@@ -162,9 +162,9 @@ class StateMachine:
         return getattr(self, method_name) if method_name else None
 
     def _bind_cb_kwarg(self, key, value):
-        cb_whitelist = ['before', 'after']
+        cb_allowlist = ['before', 'after']
         if key in enum_to_set(CallbackKeys):
-            if key in cb_whitelist and isinstance(value, list):
+            if key in cb_allowlist and isinstance(value, list):
                 to_return = []
                 for m in value:
                     to_return.append(self._get_cb(m))

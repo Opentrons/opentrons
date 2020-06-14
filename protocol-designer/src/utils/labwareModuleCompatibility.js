@@ -10,7 +10,7 @@ import type { LabwareDefinition2, ModuleRealType } from '@opentrons/shared-data'
 import type { LabwareDefByDefURI } from '../labware-defs'
 import type { LabwareOnDeck } from '../step-forms'
 // NOTE: this does not distinguish btw versions. Standard labware only (assumes namespace is 'opentrons')
-const COMPATIBLE_LABWARE_WHITELIST_BY_MODULE_TYPE: {
+const COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE: {
   [ModuleRealType]: $ReadOnlyArray<string>,
 } = {
   [TEMPERATURE_MODULE_TYPE]: [
@@ -55,12 +55,12 @@ export const getLabwareIsCompatible = (
   moduleType: ModuleRealType
 ): boolean => {
   assert(
-    moduleType in COMPATIBLE_LABWARE_WHITELIST_BY_MODULE_TYPE,
-    `expected ${moduleType} in labware<>module compatibility whitelist`
+    moduleType in COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE,
+    `expected ${moduleType} in labware<>module compatibility allowlist`
   )
-  const whitelist =
-    COMPATIBLE_LABWARE_WHITELIST_BY_MODULE_TYPE[moduleType] || []
-  return whitelist.includes(def.parameters.loadName)
+  const allowlist =
+    COMPATIBLE_LABWARE_ALLOWLIST_BY_MODULE_TYPE[moduleType] || []
+  return allowlist.includes(def.parameters.loadName)
 }
 
 export const getLabwareIsCustom = (

@@ -131,16 +131,16 @@ function renderLabware(
 
 export type DeckFromDataProps = {|
   def: DeckDefinition,
-  layerBlacklist: Array<string>,
+  layerBlocklist: Array<string>,
 |}
 
 export class DeckFromData extends React.PureComponent<DeckFromDataProps> {
   render(): React.Node {
-    const { def, layerBlacklist } = this.props
+    const { def, layerBlocklist } = this.props
     return (
       <g>
         {map(def.layers, (layer: DeckLayer, layerId: string) => {
-          if (layerBlacklist.includes(layerId)) return null
+          if (layerBlocklist.includes(layerId)) return null
           return (
             <g id={layerId} key={layerId}>
               <path

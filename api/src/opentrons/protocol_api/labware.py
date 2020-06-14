@@ -809,9 +809,9 @@ def _get_parent_identifier(
 
 def _hash_labware_def(labware_def: 'LabwareDefinition') -> str:
     # remove keys that do not affect run
-    blacklist = ['metadata', 'brand', 'groups']
+    blocklist = ['metadata', 'brand', 'groups']
     def_no_metadata = {
-        k: v for k, v in labware_def.items() if k not in blacklist}
+        k: v for k, v in labware_def.items() if k not in blocklist}
     sorted_def_str = json.dumps(
         def_no_metadata, sort_keys=True, separators=(',', ':'))
     return sha256(sorted_def_str.encode('utf-8')).hexdigest()
