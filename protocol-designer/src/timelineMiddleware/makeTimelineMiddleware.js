@@ -12,15 +12,6 @@ import type { Middleware } from 'redux'
 import type { Action, BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 
-// TODO: relate types to `generateRobotStateTimeline` args
-// const getDependentSelectors = () => ({
-//   getArgsAndErrorsByStepId,
-//   getOrderedStepIds,
-//   getInvariantContext,
-//   getInitialRobotState,
-//   getFeatureFlagData,
-// })
-
 const getSelectorResults = (
   state: BaseState
 ): GenerateRobotStateTimelineArgs => ({
@@ -52,21 +43,6 @@ export const makeTimelineMiddleware: () => Middleware<
 
     prevMemo = nextSelectorResults // update memoized value
     return needsRecompute
-
-    // const dependentSelectors = getDependentSelectors()
-    // Object.keys(dependentSelectors).forEach((selectorKey: string) => {
-    //   const selector = dependentSelectors[selectorKey]
-    //   const prevSelectorValue = prevMemo[selectorKey]
-    //   const newSelectorValue = selector(state)
-    //   if (
-    //     prevSelectorValue === undefined ||
-    //     prevSelectorValue !== newSelectorValue
-    //   ) {
-    //     needsRecompute = true
-    //   }
-    //   prevMemo = { ...prevMemo, [selectorKey]: newSelectorValue }
-    // })
-    // return needsRecompute
   }
 
   return ({ getState, dispatch }) => next => action => {
