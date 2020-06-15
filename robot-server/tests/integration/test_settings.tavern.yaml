@@ -60,6 +60,12 @@ stages:
           description: !re_search "Automatically pause protocols when robot door opens"
           restart_required: false
           value: !anything
+        - id: enableTipLengthCalibration
+          old_id: Null
+          title: Enable Tip Length Calibration
+          description: !re_search "Measure the tip length based on each unique pipette"
+          restart_required: false
+          value: !anything
         links: !anydict 
 
 ---

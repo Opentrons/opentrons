@@ -4,11 +4,13 @@ import os
 import time
 
 import pytest
+import datetime
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 from opentrons import config
 
 MOCK_HASH = 'mock_hash'
+PIPETTE_ID = 'pipette_id'
 
 minimalLabwareDef = {
     "metadata": {
@@ -61,6 +63,11 @@ def path(calibration_name):
         / '{}.json'.format(calibration_name)
 
 
+def tlc_path(pip_id):
+    return config.CONFIG['tip_length_calibration_dir']\
+        / '{}.json'.format(pip_id)
+
+
 def mock_hash_labware(labware_def):
     return MOCK_HASH
 
@@ -68,12 +75,25 @@ def mock_hash_labware(labware_def):
 @pytest.fixture
 def clear_calibration(monkeypatch):
     try:
-        os.remove(path(MOCK_HASH))
+        os.remove(path({MOCK_HASH}))
     except FileNotFoundError:
         pass
     yield
     try:
         os.remove(path(MOCK_HASH))
+    except FileNotFoundError:
+        pass
+
+
+@pytest.fixture
+def clear_tlc_calibration(monkeypatch):
+    try:
+        os.remove(tlc_path(PIPETTE_ID))
+    except FileNotFoundError:
+        pass
+    yield
+    try:
+        os.remove(tlc_path('index'))
     except FileNotFoundError:
         pass
 
@@ -104,6 +124,15 @@ def test_save_calibration(monkeypatch, clear_calibration):
     assert calibration_point == Point(1, 1, 1)
 
 
+def test_json_datetime_encoder():
+    fake_time = datetime.datetime.utcnow()
+    original = {'mock_hash': {'tipLength': 25.0, 'lastModified': fake_time}}
+
+    encoded = json.dumps(original, cls=labware.DateTimeEncoder)
+    decoded = json.loads(encoded, cls=labware.DateTimeDecoder)
+    assert decoded == original
+
+
 def test_save_tip_length(monkeypatch, clear_calibration):
     assert not os.path.exists(path(MOCK_HASH))
 
@@ -120,6 +149,99 @@ def test_save_tip_length(monkeypatch, clear_calibration):
     with open(path(MOCK_HASH)) as calibration_file:
         data = json.load(calibration_file)
         assert data['tipLength']['length'] == calibrated_length
+
+
+def test_create_tip_length_calibration_data(monkeypatch):
+
+    fake_time = datetime.datetime.utcnow()
+
+    class fake_datetime:
+        @classmethod
+        def utcnow(cls):
+            return fake_time
+
+    monkeypatch.setattr(datetime, 'datetime', fake_datetime)
+
+    monkeypatch.setattr(
+        labware,
+        '_hash_labware_def', mock_hash_labware)
+
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
+    tip_length = 22.0
+    expected_data = {
+        MOCK_HASH: {
+            'tipLength': tip_length,
+            'lastModified': fake_time
+        }
+    }
+    result = labware.create_tip_length_data(test_labware, tip_length)
+    assert result == expected_data
+
+
+def test_save_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
+    assert not os.path.exists(tlc_path(PIPETTE_ID))
+
+    test_data = {
+        MOCK_HASH: {
+            'tipLength': 22.0,
+            'lastModified': 1
+        }
+    }
+    labware.save_tip_length_calibration(PIPETTE_ID, test_data)
+    assert os.path.exists(tlc_path(PIPETTE_ID))
+    # test an index file is also created
+    assert os.path.exists(tlc_path('index'))
+
+
+def test_add_index_file(monkeypatch, clear_tlc_calibration):
+
+    def get_result():
+        with open(tlc_path('index')) as f:
+            result = json.load(f)
+        return result
+
+    labware._append_to_index_tip_length_file('pip_1', 'lw_1')
+    assert get_result() == {'lw_1': ['pip_1']}
+
+    labware._append_to_index_tip_length_file('pip_2', 'lw_1')
+    assert get_result() == {'lw_1': ['pip_1', 'pip_2']}
+
+    labware._append_to_index_tip_length_file('pip_2', 'lw_2')
+    assert get_result() == {'lw_1': ['pip_1', 'pip_2'], 'lw_2': ['pip_2']}
+
+
+def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
+    assert not os.path.exists(tlc_path(PIPETTE_ID))
+
+    monkeypatch.setattr(
+        labware,
+        '_hash_labware_def', mock_hash_labware)
+
+    test_labware = labware.Labware(minimalLabwareDef,
+                                   Location(Point(0, 0, 0), 'deck'))
+    tip_length = 22.0
+    test_data = labware.create_tip_length_data(test_labware, tip_length)
+    labware.save_tip_length_calibration(PIPETTE_ID, test_data)
+    result = labware.load_tip_length_calibration(PIPETTE_ID, test_labware)
+
+    assert result == test_data[MOCK_HASH]
+
+
+def test_clear_tip_length_calibration_data(monkeypatch):
+    calpath = config.get_tip_length_cal_path()
+    with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
+        test_offset = {
+            MOCK_HASH: {
+                'tip_length': 22.0,
+                'lastModified': 1
+            }
+        }
+        json.dump(test_offset, offset_file)
+
+    assert len(os.listdir(calpath)) > 0
+    labware.clear_tip_length_calibration()
+    assert len(os.listdir(calpath)) == 0
 
 
 def test_schema_shape(monkeypatch, clear_calibration):

@@ -185,7 +185,13 @@ CONFIG_ELEMENTS = (
                   'Pipette Config User Overrides',
                   Path('pipettes'),
                   ConfigElementType.DIR,
-                  'The dir where settings overrides for pipettes are stored')
+                  'The dir where settings overrides for pipettes are stored'),
+    ConfigElement('tip_length_calibration_dir',
+                  'Tip Length Calibration Directory',
+                  Path('tip_lengths'),
+                  ConfigElementType.DIR,
+                  'The dir where tip length calibration of each tiprack for '
+                  'each unique pipette is stored')
 )
 #: The available configuration file elements to modify. All of these can be
 #: changed by editing opentrons.json, where the keys are the name elements,
@@ -478,3 +484,7 @@ CONFIG = load_and_migrate()
 #: The currently loaded config. This should not change for the lifetime
 #: of the program. This is a dict much like os.environ() where the keys
 #: are config element names
+
+
+def get_tip_length_cal_path() -> Path:
+    return CONFIG['tip_length_calibration_dir']

@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import NamedTuple, Dict, Set
 
 from opentrons.config import (robot_configs as rc,
-                              IS_ROBOT)
+                              IS_ROBOT, feature_flags as ff)
 from opentrons.data_storage import database as db
 from opentrons.protocol_api import labware
 
@@ -88,5 +88,8 @@ def reset_tip_probe():
     config = rc.load()
     config = config._replace(
         instrument_offset=rc.build_fallback_instrument_offset({}))
-    config.tip_length.clear()
+    if ff.enable_tip_length_calibration():
+        labware.clear_tip_length_calibration()
+    else:
+        config.tip_length.clear()
     rc.save_robot_settings(config)

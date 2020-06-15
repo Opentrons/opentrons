@@ -7,6 +7,7 @@ and labware calibration offsets. It contains all the code necessary to
 transform from labware symbolic points (such as "well a1 of an opentrons
 tiprack") to points in deck coordinates.
 """
+import datetime
 import logging
 import json
 import re
@@ -25,12 +26,13 @@ import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
-from opentrons.config import CONFIG
+from opentrons.config import CONFIG, get_tip_length_cal_path
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
+    from .dev_types import TipLengthCalibration, PipTipLengthCalibration
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 
@@ -45,6 +47,38 @@ STANDARD_DEFS_PATH = Path("labware/definitions/2")
 
 class OutOfTipsError(Exception):
     pass
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class TipLengthCalNotFound(Exception):
+    pass
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class DateTimeEncoder(json.JSONEncoder):
+    def default(self, obj):
+        if isinstance(obj, datetime.datetime):
+            return obj.isoformat()
+        return json.JSONEncoder.default(self, obj)
+
+
+# TODO: AA 2020-06-10 move out of protocol_api
+class DateTimeDecoder(json.JSONDecoder):
+    def __init__(self):
+        super().__init__(object_hook=self.dict_to_obj)
+
+    def dict_to_obj(self, d):
+        if isinstance(d, dict):
+            d = {k: self._decode_datetime(v) for k, v in d.items()}
+        return d
+
+    def _decode_datetime(self, obj):
+        try:
+            return datetime.datetime.fromisoformat(obj)
+        except ValueError:
+            return obj
+        except TypeError:
+            return self.dict_to_obj(obj)
 
 
 class Well:
@@ -799,7 +833,7 @@ class Labware(DeckItem):
 
 
 def _get_parent_identifier(
-        parent: Union[Well, str, DeckItem, None]):
+        parent: Union[Well, str, DeckItem, None]) -> str:
     if isinstance(parent, DeckItem) and parent.separate_calibration:
         # treat a given labware on a given module type as same
         return parent.load_name
@@ -878,6 +912,106 @@ def save_tip_length(labware: Labware, length: float):
     with labware_offset_path.open('w') as f:
         json.dump(calibration_data, f)
     labware.tip_length = length
+
+
+# TODO: AA - move out of protocol_api
+def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
+    index_file = get_tip_length_cal_path()/'index.json'
+    try:
+        index_data = _read_file(str(index_file))
+    except FileNotFoundError:
+        index_data = {}
+
+    if lw_hash not in index_data:
+        index_data[lw_hash] = [pip_id]
+    elif pip_id not in index_data[lw_hash]:
+        index_data[lw_hash].append(pip_id)
+
+    with index_file.open('w') as f:
+        json.dump(index_data, f)
+
+
+# TODO: AA - move out of protocol_api
+def save_tip_length_calibration(
+        pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
+    tip_length_dir_path = get_tip_length_cal_path()
+    tip_length_dir_path.mkdir(parents=True, exist_ok=True)
+    pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
+
+    for lw_hash in tip_length_cal.keys():
+        _append_to_index_tip_length_file(pip_id, lw_hash)
+
+    try:
+        tip_length_data = _read_cal_file(str(pip_tip_length_path))
+    except FileNotFoundError:
+        tip_length_data = {}
+
+    tip_length_data.update(tip_length_cal)
+
+    with pip_tip_length_path.open('w') as f:
+        json.dump(tip_length_data, f, cls=DateTimeEncoder)
+
+
+# TODO: AA - move out of protocol_api
+def create_tip_length_data(
+        labware: Labware, length: float) -> 'PipTipLengthCalibration':
+    assert labware._is_tiprack, \
+        'cannot save tip length for non-tiprack labware'
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+
+    tip_length_data: 'TipLengthCalibration' = {
+        'tipLength': length,
+        'lastModified': datetime.datetime.utcnow()
+    }
+
+    data = {labware_hash + parent_id: tip_length_data}
+    return data
+
+
+# TODO: AA - move out of protocol_api
+def load_tip_length_calibration(
+        pip_id: str, labware: Labware) -> 'TipLengthCalibration':
+    assert labware._is_tiprack, \
+        'cannot load tip length for non-tiprack labware'
+    try:
+        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
+        parent_id = _get_parent_identifier(labware.parent)
+        labware_hash = _hash_labware_def(labware._definition)
+        tip_length_data = _read_cal_file(str(pip_tip_length_path))
+        return tip_length_data[labware_hash + parent_id]
+    except (FileNotFoundError, AttributeError):
+        raise TipLengthCalNotFound(
+            f'Tip length of {labware.load_name} has not been '
+            f'calibrated for this pipette: {pip_id} and cannot'
+            'be loaded')
+
+
+# TODO: AA - move out of protocol_api
+def clear_tip_length_calibration():
+    """
+    Delete all tip length calibration files.
+    """
+    tip_length_path = get_tip_length_cal_path()
+    try:
+        targets = (
+            f for f in tip_length_path.iterdir() if f.suffix == '.json')
+        for target in targets:
+            target.unlink()
+    except FileNotFoundError:
+        pass
+
+
+# TODO: AA - move out of protocol_api
+def _read_cal_file(filepath: str) -> dict:
+    with open(filepath, 'r') as f:
+        calibration_data = json.load(f, cls=DateTimeDecoder)
+    for value in calibration_data.values():
+        if value.get('lastModified'):
+            assert isinstance(value['lastModified'], datetime.datetime), \
+                "invalid decoded value type for lastModified: got " \
+                f"{type(value['lastModified']).__name__}, expected datetime"
+    return calibration_data
 
 
 def load_calibration(labware: Labware):
