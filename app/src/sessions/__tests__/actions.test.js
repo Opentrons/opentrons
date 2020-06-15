@@ -143,7 +143,7 @@ describe('robot session check actions', () => {
       args: [
         'robot-name',
         '1234',
-        Fixtures.mockSessionCommandResponse,
+        Fixtures.mockSessionResponse,
         { requestId: 'abc' },
       ],
       expected: {
@@ -151,7 +151,7 @@ describe('robot session check actions', () => {
         payload: {
           robotName: 'robot-name',
           sessionId: '1234',
-          ...Fixtures.mockSessionCommandResponse,
+          ...Fixtures.mockSessionResponse,
         },
         meta: { requestId: 'abc' },
       },

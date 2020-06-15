@@ -174,7 +174,7 @@ export type CreateSessionCommandSuccessAction = {|
   payload: {|
     robotName: string,
     sessionId: string,
-    ...SessionCommandResponse,
+    ...SessionResponse,
   |},
   meta: RobotApiRequestMeta,
 |}

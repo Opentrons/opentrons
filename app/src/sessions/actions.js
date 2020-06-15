@@ -137,7 +137,7 @@ export const createSessionCommand = (
 export const createSessionCommandSuccess = (
   robotName: string,
   sessionId: string,
-  body: Types.SessionCommandResponse,
+  body: Types.SessionResponse,
   meta: RobotApiRequestMeta
 ): Types.CreateSessionCommandSuccessAction => ({
   type: Constants.CREATE_SESSION_COMMAND_SUCCESS,
