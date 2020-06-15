@@ -105,11 +105,10 @@ async def test_max_speeds(loop, monkeypatch, hardware):
 
 
 async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
-    hardware._config = hardware._config._replace(
-        gantry_calibration=identity_deck_transform()
-    )
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
+    ctx._hw_manager.hardware.update_config(
+        gantry_calibration=identity_deck_transform())
     right = ctx.load_instrument('p10_single', Mount.RIGHT)
     lw = ctx.load_labware('corning_96_wellplate_360ul_flat', 1)
     ctx.home()
