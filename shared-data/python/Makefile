@@ -73,7 +73,7 @@ push: push-no-restart
 
 .PHONY: deploy
 deploy: wheel
-	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),../$(wheel_file))
+	$(call python_upload_package,$(twine_auth_args),$(twine_repository_url),$(wheel_file))
 
 .PHONY: test
 test:
