@@ -1,0 +1,64 @@
+---
+test_name: Tip length calibration session full flow
+strict:
+  - json:on
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: tipLengthCalibration
+    response:
+      status_code: 201
+      save:
+        json:
+          session_id: data.id
+  - name: Get the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: "{session_id}"
+          type: Session
+          attributes:
+            sessionType: tipLengthCalibration
+            details: {}
+
+  - name: Load labware
+    request: &post_command
+      url: "{host:s}:{port:d}/sessions/{session_id}/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: loadLabware
+            data: {}
+
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/{session_id}"
+      method: DELETE
+    response:
+      status_code: 200
+
+  - name: There are no sessions
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        data: []
+
