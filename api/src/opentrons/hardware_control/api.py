@@ -204,7 +204,8 @@ class API(HardwareAPILike):
             [0.0, 1.0, 0.0, 0.0],
             [0.0, 0.0, 1.0, -25.0],
             [0.0, 0.0, 0.0, 1.0]]
-        await api_instance.update_config(gantry_calibration=simulator_calibration)
+        await api_instance.update_config(
+            gantry_calibration=simulator_calibration)
         return api_instance
 
     def __repr__(self):
@@ -669,10 +670,13 @@ class API(HardwareAPILike):
         left = (with_enum[Axis.X],
                 with_enum[Axis.Y],
                 with_enum[Axis.by_mount(top_types.Mount.LEFT)])
+
         right_deck = linal.apply_reverse(self._config.gantry_calibration,
                                          right)
+
         left_deck = linal.apply_reverse(self._config.gantry_calibration,
                                         left)
+
         deck_pos = {Axis.X: right_deck[0],
                     Axis.Y: right_deck[1],
                     Axis.by_mount(top_types.Mount.RIGHT): right_deck[2],

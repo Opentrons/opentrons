@@ -13,6 +13,7 @@ from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models
 from opentrons.protocol_api import transfers as tf
 from opentrons.protocols.types import APIVersion
+from opentrons.util.linal import identity_deck_transform
 
 import pytest
 
@@ -104,6 +105,9 @@ async def test_max_speeds(loop, monkeypatch, hardware):
 
 
 async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
+    hardware._config = hardware._config._replace(
+        gantry_calibration=identity_deck_transform()
+    )
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
     right = ctx.load_instrument('p10_single', Mount.RIGHT)

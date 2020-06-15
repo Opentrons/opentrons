@@ -8,6 +8,7 @@ import pytest
 from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.hardware_control.types import Axis
+from opentrons.util.linal import identity_deck_transform
 
 
 LEFT_PIPETTE_PREFIX = 'p10_single'
@@ -334,6 +335,9 @@ async def test_pick_up_tip(dummy_instruments, loop):
     hw_api = await hc.API.build_hardware_simulator(
         attached_instruments=dummy_instruments, loop=loop)
     mount = types.Mount.LEFT
+    hw_api._config = hw_api._config._replace(
+        gantry_calibration=identity_deck_transform()
+    )
     await hw_api.home()
     await hw_api.cache_instruments()
     tip_position = types.Point(12.13, 9, 150)
