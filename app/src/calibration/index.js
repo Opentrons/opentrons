@@ -3,6 +3,9 @@
 import type {
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
+  RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckInstrument,
+  RobotCalibrationCheckPipetteRank,
   RobotCalibrationCheckSessionDetails,
   TipLengthCalibrationStep,
   TipLengthCalibrationSessionDetails,
@@ -12,6 +15,9 @@ export * from './constants'
 export type {
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
+  RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckInstrument,
+  RobotCalibrationCheckPipetteRank,
   RobotCalibrationCheckSessionDetails,
   TipLengthCalibrationStep,
   TipLengthCalibrationSessionDetails,

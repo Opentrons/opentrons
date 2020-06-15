@@ -26,6 +26,8 @@ import typeof {
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
   CHECK_TRANSFORM_TYPE_DECK,
+  CHECK_PIPETTE_RANK_FIRST,
+  CHECK_PIPETTE_RANK_SECOND,
   TIP_LENGTH_STEP_SESSION_STARTED,
   TIP_LENGTH_STEP_LABWARE_LOADED,
   TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
@@ -61,7 +63,9 @@ export type RobotCalibrationCheckStep =
   | CHECK_STEP_BAD_ROBOT_CALIBRATION
   | CHECK_STEP_NO_PIPETTES_ATTACHED
 
-type RobotCalibrationCheckPipetteRank = 'first' | 'second'
+export type RobotCalibrationCheckPipetteRank =
+  | CHECK_PIPETTE_RANK_FIRST
+  | CHECK_PIPETTE_RANK_SECOND
 export type RobotCalibrationCheckInstrument = {|
   model: string,
   name: string,
@@ -91,8 +95,13 @@ export type RobotCalibrationCheckComparison = {|
   transformType: CHECK_TRANSFORM_TYPE,
 |}
 
+export type RobotCalibrationCheckComparisonsByStep = {
+  [mount: string]: RobotCalibrationCheckInstrument,
+  ...,
+}
+
 export type RobotCalibrationCheckSessionDetails = {|
-  instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
+  instruments: RobotCalibrationCheckComparisonsByStep,
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {|
     links: { [RobotCalibrationCheckStep]: string, ... },

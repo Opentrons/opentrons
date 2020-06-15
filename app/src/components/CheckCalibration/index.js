@@ -298,16 +298,11 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
-      const stepsPassed = Object.keys(comparisonsByStep).reduce((acc, step) => {
-        return acc + (comparisonsByStep[step].exceedsThreshold ? 0 : 1)
-      }, 0)
-      const stepsFailed = Object.keys(comparisonsByStep).length - stepsPassed
       stepContents = (
         <CompleteConfirmation
           exit={exit}
-          stepsFailed={stepsFailed}
-          stepsPassed={stepsPassed}
           comparisonsByStep={comparisonsByStep}
+          instrumentsByMount={instruments}
         />
       )
       modalContentsClassName = styles.terminal_modal_contents
@@ -393,7 +388,7 @@ const getSlotNumberFromStep = (
 
 const getPipetteRankForStep = (
   step: Calibration.RobotCalibrationCheckStep
-): string => {
+): Calibration.RobotCalibrationCheckPipetteRank | null => {
   switch (step) {
     case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
     case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
@@ -405,7 +400,7 @@ const getPipetteRankForStep = (
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
     case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
     case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
-      return 'first'
+      return Calibration.CHECK_PIPETTE_RANK_FIRST
     }
     case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
     case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE:
@@ -413,10 +408,10 @@ const getPipetteRankForStep = (
     case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT:
     case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
     case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      return 'second'
+      return Calibration.CHECK_PIPETTE_RANK_SECOND
     }
     default:
       // should never reach this case, func only called when currentStep listed above
-      return ''
+      return null
   }
 }
