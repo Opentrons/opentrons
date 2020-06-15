@@ -6,6 +6,7 @@ import { thermocyclerAwaitLidTemperature } from '../atomic/thermocyclerAwaitLidT
 import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
 import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerAwaitProfileComplete } from '../atomic/thermocyclerAwaitProfileComplete'
+import { thermocyclerCloseLid } from '../atomic/thermocyclerCloseLid'
 import { thermocyclerStateStep } from './thermocyclerStateStep'
 import type {
   CommandCreator,
@@ -34,6 +35,14 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
   }
 
   const commandCreators: Array<CurriedCommandCreator> = []
+
+  if (thermocyclerState.lidOpen !== false) {
+    commandCreators.push(
+      curryCommandCreator(thermocyclerCloseLid, {
+        module: moduleId,
+      })
+    )
+  }
 
   if (profileTargetLidTemp !== thermocyclerState.lidTargetTemp) {
     commandCreators.push(
