@@ -11,7 +11,7 @@ describe('Introduction', () => {
   const getExitButton = wrapper =>
     wrapper
       .find(
-        'PrimaryButton[children="Drop tip and exit robot calibration check"]'
+        'PrimaryButton[children="Drop tip in trash and exit robot calibration check"]'
       )
       .find('button')
 
