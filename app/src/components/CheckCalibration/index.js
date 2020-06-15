@@ -8,6 +8,7 @@ import {
   LEFT,
   RIGHT,
   type Mount,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
@@ -146,12 +147,11 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     closeCalibrationCheck()
   }
 
-  const [inExitModal, setInExitModal] = React.useState(false)
-
-  const confirmExit = () => {
-    console.log('confirm exit clicked')
-    setInExitModal(true)
-  }
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(exit, true)
 
   function sendCommand(
     command: SessionCommandString,
@@ -347,13 +347,8 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       >
         {pending ? <SpinnerModal /> : stepContents}
       </ModalPage>
-      {inExitModal && (
-        <ConfirmExitModal
-          exit={exit}
-          back={() => {
-            setInExitModal(false)
-          }}
-        />
+      {showConfirmExit && (
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
       )}
     </>
   )

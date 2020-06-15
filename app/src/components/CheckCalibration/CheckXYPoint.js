@@ -91,7 +91,7 @@ type CheckXYPointProps = {|
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
   nextButtonText: string,
-  exit: () => void,
+  exit: () => mixed,
   comparePoint: () => void,
   goToNextCheck: () => void,
   jog: (JogAxis, JogDirection, JogStep) => void,
@@ -177,7 +177,7 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
 type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
-  exit: () => void,
+  exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareXY(props: CompareXYProps) {
