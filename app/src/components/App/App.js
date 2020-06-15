@@ -1,11 +1,19 @@
 // @flow
 import * as React from 'react'
 import { Switch, Route, Redirect } from 'react-router-dom'
-import styled, { createGlobalStyle } from 'styled-components'
+import { createGlobalStyle } from 'styled-components'
 
 import 'typeface-open-sans'
 
-import { C_DARK_GRAY } from '@opentrons/components'
+import {
+  Flex,
+  Box,
+  C_DARK_GRAY,
+  POSITION_RELATIVE,
+  POSITION_FIXED,
+  DIRECTION_ROW,
+} from '@opentrons/components'
+
 import { Robots } from '../../pages/Robots'
 import { More } from '../../pages/More'
 import { Upload } from '../../pages/Upload'
@@ -15,23 +23,6 @@ import { SidePanel } from '../../pages/SidePanel'
 import { NavBar } from '../nav-bar'
 import { Alerts } from '../Alerts'
 import { PortalRoot as ModalPortalRoot } from '../portal'
-
-import type { StyledComponent } from 'styled-components'
-
-const Wrapper: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
-  display: flex;
-  position: fixed;
-  width: 100%;
-  height: 100vh;
-  flex-direction: row;
-  font-family: 'Open Sans';
-`
-
-const PageWrapper: StyledComponent<{||}, {||}, HTMLDivElement> = styled.div`
-  position: relative;
-  width: 100%;
-  height: 100%;
-`
 
 const GlobalStyle = createGlobalStyle`
   * {
@@ -68,10 +59,17 @@ export function App(): React.Node {
   return (
     <>
       <GlobalStyle />
-      <Wrapper onDragOver={stopEvent} onDrop={stopEvent}>
+      <Flex
+        position={POSITION_FIXED}
+        flexDirection={DIRECTION_ROW}
+        width="100%"
+        height="100vh"
+        onDragOver={stopEvent}
+        onDrop={stopEvent}
+      >
         <NavBar />
         <SidePanel />
-        <PageWrapper>
+        <Box position={POSITION_RELATIVE} width="100%" height="100%">
           <Switch>
             <Route path="/robots/:name?">
               <Robots />
@@ -92,8 +90,8 @@ export function App(): React.Node {
           </Switch>
           <ModalPortalRoot />
           <Alerts />
-        </PageWrapper>
-      </Wrapper>
+        </Box>
+      </Flex>
     </>
   )
 }
