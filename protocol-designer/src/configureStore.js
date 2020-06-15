@@ -3,9 +3,11 @@ import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
 import thunk from 'redux-thunk'
 import { makePersistSubscriber, rehydratePersistedAction } from './persist'
 import { fileUploadMessage } from './load-file/actions'
-
+import { makeTimelineMiddleware } from './timelineMiddleware/makeTimelineMiddleware'
 import type { Store } from 'redux'
 import type { BaseState, Action, ThunkDispatch } from './types'
+
+const timelineMiddleware = makeTimelineMiddleware()
 
 const ReselectTools =
   process.env.NODE_ENV === 'development' ? require('reselect-tools') : undefined
@@ -72,7 +74,7 @@ export function configureStore(): Store<
   const store = createStore<BaseState, Action, ThunkDispatch<*>>(
     reducer,
     /* preloadedState, */
-    composeEnhancers(applyMiddleware(thunk))
+    composeEnhancers(applyMiddleware(timelineMiddleware, thunk))
   )
 
   // give reselect tools access to state if in dev env

@@ -521,6 +521,7 @@ export const getCurrentFormCanBeSaved: Selector<boolean> = createSelector(
 
 export const getArgsAndErrorsByStepId: Selector<{
   [StepIdType]: StepArgsAndErrors,
+  ...,
 }> = createSelector(
   getOrderedSavedForms,
   getInvariantContext,

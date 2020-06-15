@@ -108,7 +108,7 @@ export const getInitialRobotState: BaseState => StepGeneration.RobotState = crea
   }
 )
 
-const commandCreatorFromStepArgs = (
+export const commandCreatorFromStepArgs = (
   args: StepGeneration.CommandCreatorArgs
 ): StepGeneration.CurriedCommandCreator | null => {
   switch (args.commandCreatorFnName) {
