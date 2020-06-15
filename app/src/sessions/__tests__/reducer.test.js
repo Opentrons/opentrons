@@ -250,11 +250,11 @@ const SPECS: Array<ReducerSpec> = [
       'frumious-bandersnatch': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -264,7 +264,7 @@ const SPECS: Array<ReducerSpec> = [
       'frumious-bandersnatch': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockTipLengthCalibrationSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },
@@ -288,11 +288,11 @@ const SPECS: Array<ReducerSpec> = [
       'detestable-moss': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
           [Fixtures.mockSessionId]: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: Fixtures.mockSessionId,
           },
         },
@@ -302,7 +302,7 @@ const SPECS: Array<ReducerSpec> = [
       'detestable-moss': {
         robotSessions: {
           existing_fake_session_id: {
-            ...Fixtures.mockSessionAttributes,
+            ...Fixtures.mockCalibrationCheckSessionAttributes,
             id: 'existing_fake_session_id',
           },
         },

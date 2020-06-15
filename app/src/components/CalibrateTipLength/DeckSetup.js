@@ -55,7 +55,7 @@ export function DeckSetup(props: CalibrateTipLengthChildProps): React.Node {
       </div>
       <div className={styles.deck_map_wrapper}>
         <RobotWorkSpace
-          deckLayerBlacklist={[
+          deckLayerBlocklist={[
             'fixedBase',
             'doorStops',
             'metalFrame',
