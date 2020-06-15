@@ -1,6 +1,5 @@
 import logging
 
-from . import endpoints as endp
 from opentrons import config
 from .endpoints import (networking, control, settings, update,
                         deck_calibration)
@@ -14,10 +13,6 @@ class HTTPServer(object):
     def __init__(self, app, log_file_path):
         self.app = app
         self.log_file_path = log_file_path
-        self.app.router.add_get(
-            '/openapi', endp.get_openapi_spec)
-        self.app.router.add_get(
-            '/health', endp.health)
         self.app.router.add_get(
             '/networking/status', networking.status)
         # TODO(mc, 2018-10-12): s/wifi/networking
