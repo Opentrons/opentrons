@@ -11,15 +11,15 @@ import type { Timeline } from '../../step-generation'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
-    GET_ROBOT_STATE_TIMELINE_REQUEST: () => true,
-    GET_ROBOT_STATE_TIMELINE_SUCCESS: () => false,
+    COMPUTE_ROBOT_STATE_TIMELINE_REQUEST: () => true,
+    COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: () => false,
   },
   false
 )
 
 export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
   {
-    GET_ROBOT_STATE_TIMELINE_SUCCESS: (
+    COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
     ) => action.payload,
