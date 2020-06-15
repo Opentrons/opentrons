@@ -56,6 +56,12 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
           command: 'thermocycler/openLid',
           params: {
             module: 'thermocyclerId',
@@ -109,6 +115,12 @@ describe('thermocyclerProfileStep', () => {
             module: 'thermocyclerId',
             profile: [{ temperature: 61, holdTime: 99 }],
             volume: 42,
+          },
+        },
+        {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
           },
         },
         {

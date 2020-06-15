@@ -72,6 +72,14 @@ export const forThermocyclerAwaitLidTemperature = (
   // nothing to be done
 }
 
+export const forThermocyclerAwaitProfileComplete = (
+  params: ModuleOnlyParams,
+  invariantContext: InvariantContext,
+  robotStateAndWarnings: RobotStateAndWarnings
+): void => {
+  // nothing to be done
+}
+
 export const forThermocyclerDeactivateBlock = (
   params: ModuleOnlyParams,
   invariantContext: InvariantContext,
