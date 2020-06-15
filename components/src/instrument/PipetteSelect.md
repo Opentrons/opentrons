@@ -10,7 +10,7 @@ const [state, setState] = React.useState({ pipetteName: null })
     setState({ pipetteName })
   }}
   pipetteName={state.pipetteName}
-  nameBlacklist={['p20_multi_gen2', 'p300_multi_gen2']}
+  nameBlocklist={['p20_multi_gen2', 'p300_multi_gen2']}
 />
 ```
 

@@ -48,7 +48,7 @@ import type { LabwareDefByDefURI } from '../../labware-defs'
 
 import styles from './DeckSetup.css'
 
-const DECK_LAYER_BLACKLIST = [
+const DECK_LAYER_BLOCKLIST = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -375,7 +375,7 @@ export const DeckSetup = (props: Props): React.Node => {
         {props.drilledDown && <BrowseLabwareModal />}
         <div ref={wrapperRef} className={styles.deck_wrapper}>
           <RobotWorkSpace
-            deckLayerBlacklist={DECK_LAYER_BLACKLIST}
+            deckLayerBlocklist={DECK_LAYER_BLOCKLIST}
             deckDef={deckDef}
             viewBox={`${VIEWBOX_MIN_X} ${VIEWBOX_MIN_Y} ${VIEWBOX_WIDTH} ${VIEWBOX_HEIGHT}`}
             className={styles.robot_workspace}

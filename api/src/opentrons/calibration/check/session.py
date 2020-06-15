@@ -661,11 +661,11 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                                        self.current_state_name).position,
                                None)
 
-        saved_z_whitelist = \
+        saved_z_allowlist = \
             [CalibrationCheckState.joggingFirstPipetteToPointOne,
              CalibrationCheckState.joggingFirstPipetteToPointTwo,
              CalibrationCheckState.joggingFirstPipetteToPointThree]
-        if self.current_state_name in saved_z_whitelist:
+        if self.current_state_name in saved_z_allowlist:
             saved_height =\
                 self._saved_points[getattr(CalibrationCheckState,
                                            'comparingFirstPipetteHeight')]

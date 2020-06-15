@@ -43,7 +43,7 @@ function _getAllDefs(): Array<LabwareDefinition2> {
 }
 
 let allLoadNames: Array<string> | null = null
-// ALL unique load names, not just the non-blacklisted ones
+// ALL unique load names, not just the allowed ones
 export function getAllLoadNames(): Array<string> {
   if (!allLoadNames) {
     allLoadNames = uniq(_getAllDefs().map(def => def.parameters.loadName))
@@ -52,7 +52,7 @@ export function getAllLoadNames(): Array<string> {
 }
 
 let allDisplayNames: Array<string> | null = null
-// ALL unique display names, not just the non-blacklisted ones
+// ALL unique display names, not just the allowed ones
 export function getAllDisplayNames(): Array<string> {
   if (!allDisplayNames) {
     allDisplayNames = uniq(_getAllDefs().map(def => def.metadata.displayName))

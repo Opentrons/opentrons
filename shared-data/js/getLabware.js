@@ -51,10 +51,10 @@ export function getIsTiprack(labwareDef: LabwareDefinition2): boolean {
 // NOTE: these labware definitions in _SHORT_MM_LABWARE_DEF_LOADNAMES
 // were written in "short mm" = 0.5mm, but
 // we will write all future definitions in actual mm.
-// These whitelisted labware also have engage heights measured from home switch
+// These allowed labware also have engage heights measured from home switch
 // instead of from labware bottom, which is why we add ENGAGE_HEIGHT_OFFSET.
 //
-// Ideally instead of using this whitelist, we would publish a new version
+// Ideally instead of using this allow-list, we would publish a new version
 // of these definitions with corrected labware heights. However, we don't
 // support labware versioning well enough yet.
 const _SHORT_MM_LABWARE_DEF_LOADNAMES = [

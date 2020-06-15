@@ -49,7 +49,7 @@ type SP = {|
 
 type Props = {| ...OP, ...SP, ...DP |}
 
-const deckSetupLayerBlacklist = [
+const deckSetupLayerBlocklist = [
   'calibrationMarkings',
   'fixedBase',
   'doorStops',
@@ -70,7 +70,7 @@ function DeckMapComponent(props: Props) {
   } = props
   return (
     <RobotWorkSpace
-      deckLayerBlacklist={deckSetupLayerBlacklist}
+      deckLayerBlocklist={deckSetupLayerBlocklist}
       deckDef={deckDef}
       viewBox={`-46 -10 ${488} ${390}`} // TODO: put these in variables
       className={className}
