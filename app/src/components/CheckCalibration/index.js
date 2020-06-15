@@ -330,7 +330,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   }
 
   return (
-    <React.Fragment>
+    <>
       <ModalPage
         titleBar={{
           title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
@@ -338,7 +338,6 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
             onClick: confirmExit,
             title: EXIT,
             children: EXIT,
-            disabled: !shouldDisplayTitleBarExit,
             className: !shouldDisplayTitleBarExit
               ? styles.suppress_exit_button
               : undefined,
@@ -356,7 +355,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           }}
         />
       )}
-    </React.Fragment>
+    </>
   )
 }
 

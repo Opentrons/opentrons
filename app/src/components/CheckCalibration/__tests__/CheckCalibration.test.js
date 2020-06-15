@@ -61,7 +61,10 @@ describe('CheckCalibration', () => {
     wrapper.find({ title: 'exit' }).find('button')
 
   const getConfirmExitButton = wrapper =>
-    wrapper.find({ title: 'confirm exit' }).find('button')
+    wrapper
+      .find(ConfirmExitModal)
+      .find({ children: 'confirm exit' })
+      .find('button')
 
   const POSSIBLE_CHILDREN = [
     Introduction,

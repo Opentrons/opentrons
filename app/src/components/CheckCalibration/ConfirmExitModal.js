@@ -21,8 +21,8 @@ export function ConfirmExitModal(props: ConfirmExitModalProps): React.Node {
     <AlertModal
       heading={HEADING}
       buttons={[
-        { title: 'go back', children: GO_BACK, onClick: back },
-        { title: 'confirm exit', children: EXIT, onClick: exit },
+        { children: GO_BACK, onClick: back },
+        { children: EXIT, onClick: exit },
       ]}
       alertOverlay
     >
