@@ -95,5 +95,5 @@ class CheckSession(BaseSession):
         return self._command_queue
 
     @property
-    def session_type(self) -> calibration_models.SessionType:
-        return calibration_models.SessionType.calibration_check
+    def session_type(self) -> models.SessionType:
+        return models.SessionType.calibration_check

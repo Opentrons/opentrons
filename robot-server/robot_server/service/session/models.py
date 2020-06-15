@@ -22,6 +22,13 @@ class EmptyModel(BaseModel):
     pass
 
 
+class SessionType(str, Enum):
+    """The available session types"""
+    null = 'null'
+    default = 'default'
+    calibration_check = 'calibrationCheck'
+
+
 SessionDetails = typing.Union[
     calibration_models.CalibrationSessionStatus,
     EmptyModel
@@ -61,7 +68,7 @@ CommandDataType = typing.Union[
 
 class BasicSession(BaseModel):
     """Minimal session description"""
-    sessionType: calibration_models.SessionType =\
+    sessionType: SessionType =\
         Field(...,
               description="The type of the session")
 

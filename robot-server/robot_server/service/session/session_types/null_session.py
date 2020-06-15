@@ -1,10 +1,8 @@
-from opentrons.calibration.check.models import SessionType
-
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import EmptyModel
+from robot_server.service.session.models import EmptyModel, SessionType
 from robot_server.service.session.session_types.base_session import \
     BaseSession, SessionMetaData
 

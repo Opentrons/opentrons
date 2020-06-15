@@ -1,5 +1,4 @@
 from uuid import UUID
-from enum import Enum
 from typing import Dict, Optional, List, Any, Tuple
 from functools import partial
 from pydantic import BaseModel, Field
@@ -15,14 +14,6 @@ OffsetVectorField = partial(Field, ...,
 class TiprackPosition(BaseModel):
     locationId: UUID
     offset: OffsetVector = OffsetVectorField()
-
-
-class SessionType(str, Enum):
-    """The available session types"""
-    null = 'null'
-    default = 'default'
-    calibration_check = 'calibrationCheck'
-    tip_length_calibration = 'tipLengthCalibration'
 
 
 class SpecificPipette(BaseModel):
