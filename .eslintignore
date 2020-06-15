@@ -1,6 +1,7 @@
 api/**
 update-server/**
 robot-server/**
+shared-data/python/**
 **/node_modules/**
 **/coverage/**
 **/dist/**
@@ -18,3 +19,6 @@ discovery-client/lib/**
 **/package.json
 **/CHANGELOG.md
 lerna.json
+
+# mypy
+**/.mypy_cache/**
