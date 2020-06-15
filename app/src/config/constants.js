@@ -8,6 +8,7 @@ export const DEV_INTERNAL_FLAGS: Array<DevInternalFlag> = [
   'allPipetteConfig',
   'enableBundleUpload',
   'enableRobotCalCheck',
+  'enableTipLengthCal',
 ]
 
 // action type constants

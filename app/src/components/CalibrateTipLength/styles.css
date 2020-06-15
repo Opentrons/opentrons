@@ -1,0 +1,294 @@
+@import '@opentrons/components';
+
+.success_status_icon {
+  width: 2.5rem;
+  margin-right: 0.75rem;
+  color: var(--c-success);
+}
+
+.modal_header {
+  display: flex;
+  text-transform: uppercase;
+}
+
+.modal_icon_wrapper {
+  display: flex;
+  align-items: center;
+}
+
+.terminal_modal_contents,
+.modal_contents {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: flex-start;
+  max-width: 48rem;
+  min-height: 14rem;
+  padding: 1rem;
+}
+
+.terminal_modal_contents {
+  padding: 2rem 3.5rem;
+}
+
+.complete_summary {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  width: 100%;
+  margin: 2rem 0;
+}
+
+.summary_section {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: flex-start;
+  height: 3rem;
+  width: 10.25rem;
+  padding: 0.75rem;
+  margin-right: 1rem;
+  border-radius: var(--bd-radius-default);
+  border-width: var(--bd-width-default);
+  border-style: solid;
+}
+
+.summary_section:last-child {
+  margin-right: 0;
+}
+
+.summary_icon {
+  height: 1.25rem;
+  width: 1.25rem;
+}
+
+.copy_icon {
+  height: 2rem;
+  width: 2rem;
+  margin-bottom: 2rem;
+}
+
+.error_explanation {
+  @apply --font-body-2-dark;
+
+  margin: 0.75rem 0;
+}
+
+.padded_contents_wrapper {
+  margin: 1rem 3rem;
+}
+
+.button_row {
+  width: 100%;
+  display: flex;
+}
+
+.button_stack {
+  margin: 1rem 0;
+}
+
+.button_stack > button {
+  margin: 0.5rem 0;
+}
+
+.continue_button {
+  margin: 2rem 5rem;
+}
+
+.required_tipracks_wrapper {
+  width: 100%;
+  display: flex;
+}
+
+.required_tiprack {
+  width: 50%;
+  border: 1px solid var('--c-med-gray');
+  padding: 0 1.5rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 1rem 0;
+}
+
+.required_tiprack:not(:last-child) {
+  margin-right: 0.625rem;
+}
+
+.tiprack_image_container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  height: 15rem;
+}
+
+.tiprack_image {
+  width: 100%;
+  max-height: 15rem;
+  max-width: 15.25rem;
+}
+
+.tiprack_display_name {
+  font-size: var('--fs-body-2');
+}
+
+/*
+TODO: BC 2020-04-01 consider abstracting this to a shared place
+ these styles were mostly copped from PD's VIEW MEASUREMENTs button
+ ideally these would both use the same component
+*/
+.tiprack_measurements_link {
+  padding: 1rem 0.5rem;
+  flex: 0.6;
+  text-transform: uppercase;
+  text-align: center;
+  cursor: pointer;
+  text-decoration: none;
+  color: inherit;
+  font-size: var('--fs-body-2');
+
+  &:hover {
+    background-color: var(--c-bg-hover);
+  }
+}
+
+.tipracks_note_header {
+  text-transform: uppercase;
+}
+
+.tipracks_note_body {
+  font-size: var('--fs-body-1');
+}
+
+/* end copped styles */
+
+.prompt {
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.prompt_text {
+  @apply --font-header-light;
+
+  font-weight: normal;
+  margin: 0.5rem 0;
+  text-align: center;
+}
+
+.prompt_button {
+  display: block;
+  width: auto;
+  margin: 0.5rem 0 1rem 0;
+  padding-left: 3rem;
+  padding-right: 3rem;
+}
+
+.page_content_dark {
+  display: flex;
+  padding: 1rem;
+  flex-direction: column;
+  align-items: center;
+  background-color: transparent;
+  height: 100%;
+}
+
+.deck_map_wrapper {
+  flex: 1 1 0;
+  align-self: stretch;
+  display: flex;
+  background-color: var(--c-bg-light);
+  border-radius: 6px;
+}
+
+.deck_map {
+  flex: 1;
+}
+
+.labware_ui_wrapper {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.labware_ui_content {
+  height: 100%;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+}
+
+.name_overlay {
+  font-size: 0.5rem;
+  color: var(--c-font-light);
+  background-color: color-mod(var(--c-black) alpha(0.75));
+  padding: 0.25rem;
+  border-radius: 0 0 3px 3px;
+}
+
+.display_name {
+  @apply --truncate;
+
+  font-weight: var(--fw-semibold);
+  color: var(--c-font-light);
+  text-transform: uppercase;
+}
+
+.tip_pick_up_demo_wrapper {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  border: 2px solid var(--c-lightest-gray);
+  padding: 1rem 0;
+  margin-top: 1rem;
+  text-align: center;
+}
+
+.tip_pick_up_demo_body {
+  @apply --font-body-2-dark;
+
+  margin: 0 1rem;
+}
+
+.command_button {
+  margin: 0 5rem;
+}
+
+.tip_pick_up_confirmation_wrapper {
+  align-self: stretch;
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  margin: 1rem;
+}
+
+.pick_up_tip_confirmation_body {
+  margin: 1rem 0;
+}
+
+.pick_up_tip_confirmation_button {
+  margin-top: 1rem;
+  width: 80%;
+}
+
+.step_check_video_wrapper {
+  margin-top: 1rem;
+}
+
+.step_check_video {
+  max-width: 100%;
+  max-height: 15rem;
+}
+
+.loading_spinner {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}

@@ -8,7 +8,10 @@ import {
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../constants'
-import type { RobotCalibrationCheckSessionDetails } from '../api-types'
+import type {
+  RobotCalibrationCheckSessionDetails,
+  TipLengthCalibrationSessionDetails,
+} from '../api-types'
 
 export const badZComparison = {
   differenceVector: [0, 0, 4],
@@ -66,6 +69,48 @@ export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessi
     [CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: goodZComparison,
     [CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: goodXYComparison,
   },
+  labware: [
+    {
+      alternatives: ['fake_tiprack_load_name'],
+      slot: '8',
+      id: 'abc123_labware_uuid',
+      forMounts: ['left'],
+      loadName: 'opentrons_96_tiprack_300ul',
+      namespace: 'opentrons',
+      version: 1,
+    },
+    {
+      alternatives: ['fake_other_tiprack_load_name'],
+      slot: '6',
+      id: 'def456_labware_uuid',
+      forMounts: ['right'],
+      loadName: 'opentrons_96_tiprack_20ul',
+      namespace: 'opentrons',
+      version: 1,
+    },
+  ],
+}
+
+export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSessionDetails = {
+  instruments: {
+    left: {
+      model: 'fake_pipette_model',
+      name: 'fake_pipette_name',
+      tip_length: 42,
+      mount: 'left',
+      tiprack_id: 'abc123_labware_uuid',
+      rank: 'first',
+    },
+    right: {
+      model: 'fake_pipette_model',
+      name: 'fake_pipette_name',
+      tip_length: 42,
+      mount: 'right',
+      tiprack_id: 'def456_labware_uuid',
+      rank: 'second',
+    },
+  },
+  currentStep: 'sessionStarted',
   labware: [
     {
       alternatives: ['fake_tiprack_load_name'],

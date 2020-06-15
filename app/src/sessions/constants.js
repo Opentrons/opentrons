@@ -51,4 +51,7 @@ export const CREATE_SESSION_COMMAND_SUCCESS: 'sessions:CREATE_SESSION_COMMAND_SU
 export const CREATE_SESSION_COMMAND_FAILURE: 'sessions:CREATE_SESSION_COMMAND_FAILURE' =
   'sessions:CREATE_SESSION_COMMAND_FAILURE'
 
-export const SESSION_TYPE_CALIBRATION_CHECK = 'calibrationCheck'
+export const SESSION_TYPE_CALIBRATION_CHECK: 'calibrationCheck' =
+  'calibrationCheck'
+export const SESSION_TYPE_TIP_LENGTH_CALIBRATION: 'tipLengthCalibration' =
+  'tipLengthCalibration'
