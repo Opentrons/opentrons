@@ -112,56 +112,8 @@ describe('thermocyclerStateStep', () => {
             temperature: 10,
           },
         },
-      ],
-    },
-    {
-      testMsg:
-        'should decativate the block when diff includes deactivateBlockTemperature',
-      thermocyclerStateArgs: {
-        module: thermocyclerId,
-        commandCreatorFnName: 'thermocyclerState',
-        blockTargetTemp: null,
-        lidTargetTemp: null,
-        lidOpen: false,
-      },
-      ...getStateAndContextTempTCModules({
-        temperatureModuleId,
-        thermocyclerId,
-      }),
-      thermocyclerStateDiff: {
-        ...getInitialDiff(),
-        deactivateBlockTemperature: true,
-      },
-      expected: [
         {
-          command: 'thermocycler/deactivateBlock',
-          params: {
-            module: thermocyclerId,
-          },
-        },
-      ],
-    },
-    {
-      testMsg:
-        'should set the lid temperature when diff includes setLidTemperature',
-      thermocyclerStateArgs: {
-        module: thermocyclerId,
-        commandCreatorFnName: 'thermocyclerState',
-        blockTargetTemp: null,
-        lidTargetTemp: 10,
-        lidOpen: false,
-      },
-      ...getStateAndContextTempTCModules({
-        temperatureModuleId,
-        thermocyclerId,
-      }),
-      thermocyclerStateDiff: {
-        ...getInitialDiff(),
-        setLidTemperature: true,
-      },
-      expected: [
-        {
-          command: 'thermocycler/setTargetLidTemperature',
+          command: 'thermocycler/awaitBlockTemperature',
           params: {
             module: thermocyclerId,
             temperature: 10,
@@ -217,6 +169,75 @@ describe('thermocyclerStateStep', () => {
       expected: [
         {
           command: 'thermocycler/setTargetLidTemperature',
+          params: {
+            module: thermocyclerId,
+            temperature: 10,
+          },
+        },
+        {
+          command: 'thermocycler/awaitLidTemperature',
+          params: {
+            module: thermocyclerId,
+            temperature: 10,
+          },
+        },
+      ],
+    },
+    {
+      testMsg:
+        'should decativate the block when diff includes deactivateBlockTemperature',
+      thermocyclerStateArgs: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: null,
+        lidOpen: false,
+      },
+      ...getStateAndContextTempTCModules({
+        temperatureModuleId,
+        thermocyclerId,
+      }),
+      thermocyclerStateDiff: {
+        ...getInitialDiff(),
+        deactivateBlockTemperature: true,
+      },
+      expected: [
+        {
+          command: 'thermocycler/deactivateBlock',
+          params: {
+            module: thermocyclerId,
+          },
+        },
+      ],
+    },
+    {
+      testMsg:
+        'should set the lid temperature when diff includes setLidTemperature',
+      thermocyclerStateArgs: {
+        module: thermocyclerId,
+        commandCreatorFnName: 'thermocyclerState',
+        blockTargetTemp: null,
+        lidTargetTemp: 10,
+        lidOpen: false,
+      },
+      ...getStateAndContextTempTCModules({
+        temperatureModuleId,
+        thermocyclerId,
+      }),
+      thermocyclerStateDiff: {
+        ...getInitialDiff(),
+        setLidTemperature: true,
+      },
+      expected: [
+        {
+          command: 'thermocycler/setTargetLidTemperature',
+          params: {
+            module: thermocyclerId,
+            temperature: 10,
+          },
+        },
+        {
+          command: 'thermocycler/awaitLidTemperature',
           params: {
             module: thermocyclerId,
             temperature: 10,
@@ -299,6 +320,13 @@ describe('thermocyclerStateStep', () => {
           },
         },
         {
+          command: 'thermocycler/awaitBlockTemperature',
+          params: {
+            module: thermocyclerId,
+            temperature: 10,
+          },
+        },
+        {
           command: 'thermocycler/deactivateLid',
           params: {
             module: thermocyclerId,
@@ -306,6 +334,13 @@ describe('thermocyclerStateStep', () => {
         },
         {
           command: 'thermocycler/setTargetLidTemperature',
+          params: {
+            module: thermocyclerId,
+            temperature: 20,
+          },
+        },
+        {
+          command: 'thermocycler/awaitLidTemperature',
           params: {
             module: thermocyclerId,
             temperature: 20,

@@ -2,8 +2,9 @@
 import { curryCommandCreator, reduceCommandCreators } from '../../utils'
 import { thermocyclerStateGetter } from '../../robotStateSelectors'
 import * as errorCreators from '../../errorCreators'
-import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
+import { thermocyclerAwaitLidTemperature } from '../atomic/thermocyclerAwaitLidTemperature'
 import { thermocyclerRunProfile } from '../atomic/thermocyclerRunProfile'
+import { thermocyclerSetTargetLidTemperature } from '../atomic/thermocyclerSetTargetLidTemperature'
 import { thermocyclerStateStep } from './thermocyclerStateStep'
 import type {
   CommandCreator,
@@ -36,6 +37,12 @@ export const thermocyclerProfileStep: CommandCreator<ThermocyclerProfileStepArgs
   if (profileTargetLidTemp !== thermocyclerState.lidTargetTemp) {
     commandCreators.push(
       curryCommandCreator(thermocyclerSetTargetLidTemperature, {
+        module: moduleId,
+        temperature: profileTargetLidTemp,
+      })
+    )
+    commandCreators.push(
+      curryCommandCreator(thermocyclerAwaitLidTemperature, {
         module: moduleId,
         temperature: profileTargetLidTemp,
       })
