@@ -5,11 +5,15 @@ import {
   getInvariantContext,
 } from '../step-forms/selectors'
 import { getInitialRobotState } from '../file-data/selectors'
+import {
+  computeRobotStateTimelineRequest,
+  computeRobotStateTimelineSuccess,
+} from '../file-data/actions'
 // import { getFeatureFlagData } from '../feature-flags/selectors' // TODO: break memoization w/ FF changes
 import Worker from './worker'
 
 import type { Middleware } from 'redux'
-import type { Action, BaseState } from '../types'
+import type { BaseState } from '../types'
 import type { GenerateRobotStateTimelineArgs } from './generateRobotStateTimeline'
 
 const getSelectorResults = (
@@ -22,10 +26,8 @@ const getSelectorResults = (
   // featureFlagData: getFeatureFlagData(state),
 })
 
-export const makeTimelineMiddleware: () => Middleware<
-  BaseState,
-  Action
-> = () => {
+// TODO(IL, 2020-06-15): once we create an Action union for PD, use that instead of `any` for Middleware<S, A>
+export const makeTimelineMiddleware: () => Middleware<BaseState, any> = () => {
   const worker = new Worker()
   let prevMemo: GenerateRobotStateTimelineArgs | null = null // caches results of dependent selectors, eg {[selectorIndex]: lastCachedSelectorValue}
   const timelineNeedsRecompute = (state: BaseState): boolean => {
@@ -52,17 +54,10 @@ export const makeTimelineMiddleware: () => Middleware<
     const nextState = getState()
     const shouldRecompute = timelineNeedsRecompute(nextState)
 
-    console.log({
-      nextState,
-      shouldRecompute,
-    })
-
     if (shouldRecompute) {
-      next({ type: 'GET_ROBOT_STATE_TIMELINE_REQUEST' })
-
+      next(computeRobotStateTimelineRequest())
       worker.onmessage = e => {
-        console.log('worker said', e.data)
-        next({ type: 'GET_ROBOT_STATE_TIMELINE_SUCCESS', payload: e.data })
+        next(computeRobotStateTimelineSuccess(e.data))
       }
 
       if (prevMemo !== null) {

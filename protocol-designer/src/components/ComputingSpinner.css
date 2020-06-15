@@ -1,0 +1,18 @@
+@import '@opentrons/components';
+
+.overlay {
+  @apply --center-children;
+
+  background-color: rgba(115, 115, 115, 0.9);
+  z-index: 999;
+  position: fixed;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+}
+
+.spinner_icon {
+  width: 7.5rem;
+  margin-bottom: 3rem;
+}

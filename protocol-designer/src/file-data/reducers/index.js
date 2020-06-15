@@ -6,6 +6,26 @@ import type { Reducer } from 'redux'
 import type { Action } from '../../types'
 import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
+import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
+import type { Timeline } from '../../step-generation'
+
+export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
+  {
+    GET_ROBOT_STATE_TIMELINE_REQUEST: () => true,
+    GET_ROBOT_STATE_TIMELINE_SUCCESS: () => false,
+  },
+  false
+)
+
+export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
+  {
+    GET_ROBOT_STATE_TIMELINE_SUCCESS: (
+      state,
+      action: ComputeRobotStateTimelineSuccessAction
+    ) => action.payload,
+  },
+  { timeline: [] }
+)
 
 const defaultFields = {
   protocolName: '',
@@ -61,13 +81,17 @@ const fileMetadata = handleActions(
 )
 
 export type RootState = {|
+  computedRobotStateTimeline: Timeline,
   currentProtocolExists: boolean,
   fileMetadata: FileMetadataFields,
+  timelineIsBeingComputed: boolean,
 |}
 
 const _allReducers = {
+  computedRobotStateTimeline,
   currentProtocolExists,
   fileMetadata,
+  timelineIsBeingComputed,
 }
 
 export const rootReducer: Reducer<RootState, Action> = combineReducers(
