@@ -27,6 +27,7 @@ class SessionType(str, Enum):
     null = 'null'
     default = 'default'
     calibration_check = 'calibrationCheck'
+    tip_length_calibration = 'tipLengthCalibration'
 
 
 SessionDetails = typing.Union[

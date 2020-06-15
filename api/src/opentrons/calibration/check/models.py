@@ -11,15 +11,6 @@ OffsetVectorField = partial(Field, ...,
                                         "coordinates (x, y, z)")
 
 
-class TiprackPosition(BaseModel):
-    locationId: UUID
-    offset: OffsetVector = OffsetVectorField()
-
-
-class SpecificPipette(BaseModel):
-    pipetteId: Optional[UUID] = Field(None)
-
-
 class JogPosition(BaseModel):
     vector: OffsetVector
 
