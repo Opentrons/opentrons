@@ -22,7 +22,6 @@ export const generateRobotStateTimeline = (
     initialRobotState,
     invariantContext,
   } = args
-  console.log('got args', args)
 
   const allStepArgs: Array<StepGeneration.CommandCreatorArgs | null> = orderedStepIds.map(
     stepId => {
