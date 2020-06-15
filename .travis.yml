@@ -85,7 +85,7 @@ jobs:
             QUIET=1 BUILD_NUMBER=${TRAVIS_BUILD_NUMBER} make clean-py deploy-py pypi_username=${TEST_PYPI_USER} pypi_password=${TEST_PYPI_PASSWORD} twine_repository_url="https://test.pypi.org/legacy/"
           on:
             repo: Opentrons/opentrons
-            branch: edge
+            all_branches: true
 
     # test, build, and upload for JavaScript projects
     - stage: test
