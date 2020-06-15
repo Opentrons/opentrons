@@ -13,6 +13,7 @@ import {
 } from 'rxjs/operators'
 
 import * as Cfg from '../config'
+import { getAnalyticsConfig } from './selectors'
 import { initializeMixpanel, setMixpanelTracking, trackEvent } from './mixpanel'
 import { makeEvent } from './make-event'
 
@@ -36,7 +37,7 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
     withLatestFrom(state$),
     switchMap<[Action, State], _, TrackEventArgs>(([action, state]) => {
       const event$ = from(makeEvent(action, state))
-      return zip(event$, of(state.config?.analytics ?? null))
+      return zip(event$, of(getAnalyticsConfig(state)))
     }),
     filter(([maybeEvent, maybeConfig]: TrackEventArgs) =>
       Boolean(maybeEvent && maybeConfig)
@@ -50,9 +51,7 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
 
 const optIntoAnalyticsEpic: Epic = (_, state$) => {
   return state$.pipe(
-    map<State, AnalyticsConfig | null>(
-      state => state.config?.analytics ?? null
-    ),
+    map<State, AnalyticsConfig | null>(getAnalyticsConfig),
     pairwise(),
     filter(([prev, next]) => next !== null && prev?.optedIn !== next?.optedIn),
     tap(([_, config]: [mixed, AnalyticsConfig]) => setMixpanelTracking(config)),

@@ -2,7 +2,6 @@
 // analytics module
 import { toggleConfigValue, updateConfigValue } from '../config'
 
-import type { State } from '../types'
 import type {
   ToggleConfigValueAction,
   UpdateConfigValueAction,
@@ -15,14 +14,6 @@ export function toggleAnalyticsOptedIn(): ToggleConfigValueAction {
   return toggleConfigValue('analytics.optedIn')
 }
 
-export function setAnalyticsSeen(): UpdateConfigValueAction {
+export function setAnalyticsOptInSeen(): UpdateConfigValueAction {
   return updateConfigValue('analytics.seenOptIn', true)
-}
-
-export function getAnalyticsOptedIn(state: State): boolean {
-  return state.config?.analytics.optedIn ?? false
-}
-
-export function getAnalyticsSeen(state: State): boolean {
-  return state.config?.analytics.seenOptIn ?? true
 }
