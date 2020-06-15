@@ -10,13 +10,14 @@ import { forEngageMagnet, forDisengageMagnet } from './magnetUpdates'
 import {
   forThermocyclerAwaitBlockTemperature,
   forThermocyclerAwaitLidTemperature,
+  forThermocyclerAwaitProfileComplete,
+  forThermocyclerCloseLid,
   forThermocyclerDeactivateBlock,
   forThermocyclerDeactivateLid,
+  forThermocyclerOpenLid,
+  forThermocyclerRunProfile,
   forThermocyclerSetTargetBlockTemperature,
   forThermocyclerSetTargetLidTemperature,
-  forThermocyclerRunProfile,
-  forThermocyclerCloseLid,
-  forThermocyclerOpenLid,
 } from './thermocyclerUpdates'
 
 import {
@@ -153,7 +154,11 @@ function _getNextRobotStateAndWarningsSingleCommand(
       )
       break
     case 'thermocycler/awaitProfileComplete':
-      console.warn(`NOT IMPLEMENTED: ${command.command}`)
+      forThermocyclerAwaitProfileComplete(
+        command.params,
+        invariantContext,
+        robotStateAndWarnings
+      )
       break
 
     default:

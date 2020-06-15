@@ -41,11 +41,24 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
+          command: 'thermocycler/awaitLidTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 55,
+          },
+        },
+        {
           command: 'thermocycler/runProfile',
           params: {
             module: 'thermocyclerId',
             profile: [],
             volume: 42,
+          },
+        },
+        {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
           },
         },
         {
@@ -56,6 +69,13 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           command: 'thermocycler/setTargetBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/awaitBlockTemperature',
           params: {
             module: 'thermocyclerId',
             temperature: 4,
@@ -98,6 +118,12 @@ describe('thermocyclerProfileStep', () => {
           },
         },
         {
+          command: 'thermocycler/awaitProfileComplete',
+          params: {
+            module: 'thermocyclerId',
+          },
+        },
+        {
           command: 'thermocycler/openLid',
           params: {
             module: 'thermocyclerId',
@@ -105,6 +131,13 @@ describe('thermocyclerProfileStep', () => {
         },
         {
           command: 'thermocycler/setTargetBlockTemperature',
+          params: {
+            module: 'thermocyclerId',
+            temperature: 4,
+          },
+        },
+        {
+          command: 'thermocycler/awaitBlockTemperature',
           params: {
             module: 'thermocyclerId',
             temperature: 4,
