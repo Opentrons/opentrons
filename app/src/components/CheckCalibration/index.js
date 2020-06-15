@@ -339,8 +339,9 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
             title: EXIT,
             children: EXIT,
             disabled: !shouldDisplayTitleBarExit,
-            className:
-            (!shouldDisplayTitleBarExit ? styles.suppress_exit_button : undefined),
+            className: !shouldDisplayTitleBarExit
+              ? styles.suppress_exit_button
+              : undefined,
           },
         }}
         contentsClassName={modalContentsClassName}

@@ -1,7 +1,7 @@
 @import '@opentrons/components';
 
 .suppress_exit_button {
-  visibility: hidden
+  visibility: hidden;
 }
 
 .success_status_icon {
