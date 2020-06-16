@@ -15,7 +15,7 @@ import { PipetteComparisons } from './PipetteComparisons'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
-const DOWNLOAD_SUMMARY = 'Download JSON summary'
+const DOWNLOAD_SUMMARY = 'Copy JSON summary to clipboard'
 
 type CompleteConfirmationProps = {|
   exit: () => mixed,
@@ -80,7 +80,7 @@ export function CompleteConfirmation(
           value={JSON.stringify(comparisonsByStep)}
           onFocus={e => e.currentTarget.select()}
           readOnly
-          hidden
+          style={{ opacity: 0 }}
         />
       </div>
       <OutlineButton
