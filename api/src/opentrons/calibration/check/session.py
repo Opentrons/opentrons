@@ -330,7 +330,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
 
     @property
     def _initial_z_offset(self):
-        return Point(0, 0, 0.5)
+        return Point(0, 0, 0.3)
 
     async def _is_checking_both_mounts(self):
         return len(self._pip_info_by_mount) == 2
