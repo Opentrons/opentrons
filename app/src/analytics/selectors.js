@@ -35,6 +35,7 @@ import type { OutputSelector } from 'reselect'
 import type { State } from '../types'
 
 import type {
+  AnalyticsConfig,
   ProtocolAnalyticsData,
   RobotAnalyticsData,
   BuildrootAnalyticsData,
@@ -137,4 +138,16 @@ export function getBuildrootAnalyticsData(
     updateVersion,
     error: session?.error || null,
   }
+}
+
+export function getAnalyticsConfig(state: State): AnalyticsConfig | null {
+  return state.config?.analytics ?? null
+}
+
+export function getAnalyticsOptedIn(state: State): boolean {
+  return state.config?.analytics.optedIn ?? false
+}
+
+export function getAnalyticsOptInSeen(state: State): boolean {
+  return state.config?.analytics.seenOptIn ?? true
 }

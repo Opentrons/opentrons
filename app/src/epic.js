@@ -2,7 +2,7 @@
 // root application epic
 import { combineEpics } from 'redux-observable'
 
-import { analyticsEpic } from './analytics'
+import { analyticsEpic } from './analytics/epic'
 import { supportEpic } from './support/epic'
 import { calibrationEpic } from './calibration/epic'
 import { discoveryEpic } from './discovery/epic'

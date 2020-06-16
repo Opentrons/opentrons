@@ -24,7 +24,7 @@ type Props = {| ...SP, ...DP |}
 
 function IpListComponent(props: Props) {
   const { candidates, removeManualIp, robots } = props
-  const candidateList = [].concat(candidates)
+  const candidateList: Array<string> = [].concat(candidates)
 
   return (
     <div>
@@ -47,7 +47,7 @@ function IpListComponent(props: Props) {
 function mapStateToProps(state: State): SP {
   return {
     robots: getViewableRobots(state),
-    candidates: getConfig(state).discovery.candidates,
+    candidates: getConfig(state)?.discovery.candidates ?? [],
   }
 }
 

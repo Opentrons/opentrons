@@ -4,6 +4,7 @@ import path from 'path'
 import { readFile, ensureDir } from 'fs-extra'
 import { app } from 'electron'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { createLogger } from '../log'
 import { getConfig } from '../config'
 import { CURRENT_VERSION } from '../update'
@@ -32,6 +33,7 @@ let updateSet: ReleaseSetFilepaths | null = null
 export function registerBuildrootUpdate(dispatch: Dispatch): Action => void {
   return function handleAction(action: Action) {
     switch (action.type) {
+      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         if (!checkingForUpdates) {
           checkingForUpdates = true

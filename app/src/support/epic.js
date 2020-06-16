@@ -1,12 +1,25 @@
 // @flow
 // support profile epic
+import { combineEpics, ofType } from 'redux-observable'
 import { tap, filter, withLatestFrom, ignoreElements } from 'rxjs/operators'
 
-import { makeProfileUpdate, updateProfile } from './profile'
+import * as Cfg from '../config'
+import { initializeProfile, makeProfileUpdate, updateProfile } from './profile'
 
 import type { Epic } from '../types'
+import type { ConfigInitializedAction } from '../config/types'
 
-export const supportEpic: Epic = (action$, state$) => {
+const initializeSupportEpic: Epic = action$ => {
+  return action$.pipe(
+    ofType(Cfg.INITIALIZED),
+    tap((a: ConfigInitializedAction) => {
+      initializeProfile(a.payload.config.support)
+    }),
+    ignoreElements()
+  )
+}
+
+const updateProfileEpic: Epic = (action$, state$) => {
   return action$.pipe(
     withLatestFrom(state$, makeProfileUpdate),
     filter(maybeUpdate => maybeUpdate !== null),
@@ -14,3 +27,8 @@ export const supportEpic: Epic = (action$, state$) => {
     ignoreElements()
   )
 }
+
+export const supportEpic: Epic = combineEpics(
+  initializeSupportEpic,
+  updateProfileEpic
+)

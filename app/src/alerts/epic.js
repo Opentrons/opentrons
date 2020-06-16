@@ -1,8 +1,7 @@
 // @flow
-import { filter, withLatestFrom } from 'rxjs/operators'
-import union from 'lodash/union'
+import { filter, map } from 'rxjs/operators'
 
-import { getConfig, updateConfig } from '../config'
+import { addUniqueConfigValue } from '../config'
 import { ALERT_DISMISSED } from './constants'
 
 import type { Action, Epic } from '../types'
@@ -15,14 +14,11 @@ export const alertsEpic: Epic = (action$, state$) => {
     filter<Action, AlertDismissedAction>(
       a => a.type === ALERT_DISMISSED && a.payload.remember
     ),
-    // TODO(mc, 2020-05-06): we need to pull in state here because we don't
-    // have a config update action to append a value to an array config. We
-    // have several array config values, so we should have an append action
-    withLatestFrom(state$, (dismissAction, state) => {
-      const { alertId } = dismissAction.payload
-      const ignored = getConfig(state).alerts.ignored
-
-      return updateConfig('alerts.ignored', union(ignored, [alertId]))
+    map(dismissAction => {
+      return addUniqueConfigValue(
+        'alerts.ignored',
+        dismissAction.payload.alertId
+      )
     })
   )
 }

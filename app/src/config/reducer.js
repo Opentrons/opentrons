@@ -1,19 +1,25 @@
 // @flow
 
 import { setIn } from '@thi.ng/paths'
-import { remote } from '../shell/remote'
+import { INITIALIZED, VALUE_UPDATED } from './constants'
 
 import type { Action } from '../types'
-import type { Config } from './types'
+import type { ConfigState } from './types'
 
 // config reducer
-export function configReducer(state: ?Config, action: Action): Config {
-  // initial state from app-shell preloaded remote
-  if (!state) return remote.INITIAL_CONFIG
-
+export function configReducer(
+  state: ConfigState = null,
+  action: Action
+): ConfigState {
   switch (action.type) {
-    case 'config:SET':
+    case INITIALIZED: {
+      return action.payload.config
+    }
+
+    case VALUE_UPDATED: {
+      if (state === null) return state
       return setIn(state, action.payload.path, action.payload.value)
+    }
   }
 
   return state

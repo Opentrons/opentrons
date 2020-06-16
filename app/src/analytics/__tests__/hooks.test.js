@@ -15,7 +15,7 @@ import type { AnalyticsEvent, AnalyticsConfig } from '../types'
 jest.mock('../../config')
 jest.mock('../mixpanel')
 
-const getConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
+const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
 const trackEvent: JestMockFn<[AnalyticsEvent, AnalyticsConfig], void> =
   Mixpanel.trackEvent
 
@@ -67,6 +67,16 @@ describe('analytics hooks', () => {
       trackEventResult(event)
 
       expect(trackEvent).toHaveBeenCalledWith(event, MOCK_ANALYTICS_CONFIG)
+    })
+
+    it('should noop if config not loaded', () => {
+      const event = { name: 'someEvent', properties: { foo: 'bar' } }
+
+      getConfig.mockReturnValue(null)
+      render()
+      trackEventResult(event)
+
+      expect(trackEvent).toHaveBeenCalledTimes(0)
     })
   })
 })

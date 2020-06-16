@@ -26,7 +26,7 @@ export const VALID_LABWARE_FILE: 'VALID_LABWARE_FILE' = 'VALID_LABWARE_FILE'
 
 export const getCustomLabwareDirectory: State => string = createSelector(
   getConfig,
-  config => config.labware.directory
+  config => config?.labware.directory ?? ''
 )
 
 export const getCustomLabware: State => Array<CheckedLabwareFile> = createSelector(

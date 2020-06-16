@@ -15,7 +15,7 @@ import type {
 // base config v0 defaults
 // any default values for later config versions are specified in the migration
 // functions for those version below
-export const DEFAULTS: ConfigV0 = {
+export const DEFAULTS_V0: ConfigV0 = {
   version: 0,
   devtools: false,
   reinstallDevtools: false,
@@ -99,6 +99,8 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
 }
 
 const MIGRATIONS: [(ConfigV0) => ConfigV1] = [toVersion1]
+
+export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 
 export function migrate(prevConfig: ConfigV0 | ConfigV1): Config {
   const prevVersion = prevConfig.version

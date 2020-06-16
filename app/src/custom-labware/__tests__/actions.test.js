@@ -145,7 +145,7 @@ describe('custom labware actions', () => {
       creator: actions.resetCustomLabwareDirectory,
       args: [],
       expected: {
-        type: 'config:RESET',
+        type: 'config:RESET_VALUE',
         payload: { path: 'labware.directory' },
         meta: { shell: true },
       },

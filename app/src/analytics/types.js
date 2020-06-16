@@ -43,4 +43,4 @@ export type AnalyticsEvent =
     |}
   | {| superProperties: { ... } |}
 
-export type TrackEventArgs = [AnalyticsEvent, AnalyticsConfig]
+export type TrackEventArgs = [AnalyticsEvent | null, AnalyticsConfig | null]

@@ -35,6 +35,12 @@ describe('discoveryReducer', () => {
       expectedState: { scanning: true },
     },
     {
+      name: 'shell:UI_INITIALIZED sets scanning: true',
+      action: { type: 'shell:UI_INITIALIZED' },
+      initialState: { scanning: false },
+      expectedState: { scanning: true },
+    },
+    {
       name: 'discovery:FINISH sets scanning: false',
       action: { type: 'discovery:FINISH' },
       initialState: { scanning: true },

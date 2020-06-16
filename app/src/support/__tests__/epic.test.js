@@ -1,11 +1,13 @@
 // @flow
 // support profile epic test
 import { TestScheduler } from 'rxjs/testing'
+import { configInitialized } from '../../config'
 import * as Profile from '../profile'
 import { supportEpic } from '../epic'
 
 import type { Action, State } from '../../types'
-import type { SupportProfileUpdate } from '../types'
+import type { Config } from '../../config/types'
+import type { SupportConfig, SupportProfileUpdate } from '../types'
 
 jest.mock('../profile')
 
@@ -14,11 +16,18 @@ const makeProfileUpdate: JestMockFn<
   SupportProfileUpdate | null
 > = Profile.makeProfileUpdate
 
+const initializeProfile: JestMockFn<[SupportConfig], void> =
+  Profile.initializeProfile
+
 const updateProfile: JestMockFn<[SupportProfileUpdate], void> =
   Profile.updateProfile
 
 const MOCK_ACTION: Action = ({ type: 'MOCK_ACTION' }: any)
-const MOCK_STATE: State = ({ mockState: true }: any)
+const MOCK_STATE: $Shape<{| ...State, config: $Shape<Config> |}> = {
+  config: {
+    support: { userId: 'foo', createdAt: 42, name: 'bar', email: null },
+  },
+}
 
 describe('support profile epic', () => {
   let testScheduler
@@ -33,6 +42,19 @@ describe('support profile epic', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  it('should initialize support profile on config:INITIALIZED', () => {
+    testScheduler.run(({ hot, expectObservable, flush }) => {
+      const action$ = hot('-a', { a: configInitialized(MOCK_STATE.config) })
+      const state$ = hot('--')
+      const result$ = supportEpic(action$, state$)
+
+      expectObservable(result$, '--')
+      flush()
+
+      expect(initializeProfile).toHaveBeenCalledWith(MOCK_STATE.config.support)
+    })
   })
 
   it('should do nothing with actions that do not map to a profile update', () => {

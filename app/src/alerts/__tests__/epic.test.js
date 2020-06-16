@@ -11,7 +11,7 @@ import type { AlertId } from '../types'
 
 jest.mock('../../config/selectors')
 
-const getConfig: JestMockFn<[State], $Shape<Config>> = Cfg.getConfig
+const getConfig: JestMockFn<[State], $Shape<Config> | null> = Cfg.getConfig
 
 const MOCK_STATE: State = ({ mockState: true }: any)
 const MOCK_ALERT_1: AlertId = ('mockAlert1': any)
@@ -30,7 +30,7 @@ describe('alerts epic', () => {
     jest.resetAllMocks()
   })
 
-  it('should trigger a config:SET to save persistent alert ignores', () => {
+  it('should trigger a config:ADD_UNIQUE_VALUE to save persistent alert ignores', () => {
     getConfig.mockImplementation(state => {
       expect(state).toEqual(MOCK_STATE)
       return { alerts: { ignored: [MOCK_ALERT_1] } }
@@ -44,7 +44,7 @@ describe('alerts epic', () => {
       const output$ = alertsEpic(action$, state$)
 
       expectObservable(output$).toBe('-a', {
-        a: Cfg.updateConfig('alerts.ignored', [MOCK_ALERT_1, MOCK_ALERT_2]),
+        a: Cfg.addUniqueConfigValue('alerts.ignored', MOCK_ALERT_2),
       })
     })
   })

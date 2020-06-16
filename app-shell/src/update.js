@@ -4,6 +4,7 @@ import path from 'path'
 import fs from 'fs'
 import { autoUpdater as updater } from 'electron-updater'
 
+import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
 import { createLogger } from './log'
 import { getConfig } from './config'
 
@@ -23,6 +24,7 @@ export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
 export function registerUpdate(dispatch: Dispatch): Action => mixed {
   return function handleAction(action: Action) {
     switch (action.type) {
+      case UI_INITIALIZED:
       case 'shell:CHECK_UPDATE':
         return checkUpdate(dispatch)
 

@@ -6,10 +6,12 @@ import { withRouter } from 'react-router-dom'
 import startCase from 'lodash/startCase'
 
 import {
-  getConfig,
+  getDevtoolsEnabled,
+  getFeatureFlags,
+  getUpdateChannel,
   getUpdateChannelOptions,
-  updateConfig,
-  toggleDevTools,
+  updateConfigValue,
+  toggleDevtools,
   toggleDevInternalFlag,
   DEV_INTERNAL_FLAGS,
 } from '../../config'
@@ -34,7 +36,7 @@ type SP = {|
 |}
 
 type DP = {|
-  toggleDevTools: () => mixed,
+  toggleDevtools: () => mixed,
   toggleDevInternalFlag: DevInternalFlag => mixed,
   handleChannel: (event: SyntheticInputEvent<HTMLSelectElement>) => mixed,
 |}
@@ -71,7 +73,7 @@ function AdvancedSettingsCardComponent(props: Props) {
       <LabeledToggle
         label="Enable Developer Tools"
         toggledOn={props.devToolsOn}
-        onClick={props.toggleDevTools}
+        onClick={props.toggleDevtools}
       >
         <p>
           Requires restart. Turns on the app&#39;s developer tools, which
@@ -93,23 +95,21 @@ function AdvancedSettingsCardComponent(props: Props) {
 }
 
 function mapStateToProps(state: State): SP {
-  const config = getConfig(state)
-
   return {
-    devToolsOn: config.devtools,
-    devInternal: config.devInternal,
-    channel: config.update.channel,
+    devToolsOn: getDevtoolsEnabled(state),
+    devInternal: getFeatureFlags(state),
+    channel: getUpdateChannel(state),
     channelOptions: getUpdateChannelOptions(state),
   }
 }
 
 function mapDispatchToProps(dispatch: Dispatch, ownProps: OP): DP {
   return {
-    toggleDevTools: () => dispatch(toggleDevTools()),
+    toggleDevtools: () => dispatch(toggleDevtools()),
     toggleDevInternalFlag: (flag: DevInternalFlag) =>
       dispatch(toggleDevInternalFlag(flag)),
     handleChannel: event => {
-      dispatch(updateConfig('update.channel', event.target.value))
+      dispatch(updateConfigValue('update.channel', event.target.value))
 
       // TODO(mc, 2018-08-03): refactor app update interface to be more
       // reactive and teach it to re-check on release channel change

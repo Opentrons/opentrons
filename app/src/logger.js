@@ -15,7 +15,7 @@ export type LogLevel =
 
 export type Log = (message: string, meta?: {}) => void
 
-type Logger = {|
+export type Logger = {|
   error: Log,
   warn: Log,
   info: Log,

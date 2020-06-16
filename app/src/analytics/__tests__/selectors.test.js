@@ -4,16 +4,19 @@ import * as Protocol from '../../protocol'
 import * as RobotSelectors from '../../robot/selectors'
 import * as Hash from '../hash'
 
-import { getProtocolAnalyticsData } from '../selectors'
+import * as Selectors from '../selectors'
 
 import type { State } from '../../types'
+import type { Config } from '../../config/types'
+
+type MockState = $Shape<{| ...State, config: null | $Shape<Config> |}>
 
 jest.mock('../../protocol/selectors')
 jest.mock('../../robot/selectors')
 jest.mock('../hash')
 
 describe('analytics selectors', () => {
-  let mockState: State
+  let mockState: MockState
 
   beforeEach(() => {
     mockState = ({ mockState: true }: any)
@@ -21,6 +24,54 @@ describe('analytics selectors', () => {
 
   afterEach(() => {
     jest.resetAllMocks()
+  })
+
+  describe('analytics config selectors', () => {
+    it('should return null with getAnalyticsConfig if no config', () => {
+      const mockState: MockState = { config: null }
+      expect(Selectors.getAnalyticsConfig(mockState)).toBe(null)
+    })
+
+    it('should return config.analytics with getAnalyticsConfig', () => {
+      const mockState: MockState = {
+        config: {
+          analytics: { appId: 'foobar', optedIn: true, seenOptIn: true },
+        },
+      }
+      expect(Selectors.getAnalyticsConfig(mockState)).toEqual({
+        appId: 'foobar',
+        optedIn: true,
+        seenOptIn: true,
+      })
+    })
+
+    it('should return false with getAnalyticsOptedIn if no config', () => {
+      const mockState: MockState = { config: null }
+      expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(false)
+    })
+
+    it('should return config.analytics.optedIn with getAnalyticsOptedIn', () => {
+      const mockState: MockState = {
+        config: {
+          analytics: { appId: 'foobar', optedIn: true, seenOptIn: true },
+        },
+      }
+      expect(Selectors.getAnalyticsOptedIn(mockState)).toBe(true)
+    })
+
+    it('should return true for getAnalyticsOptInSeen if no config', () => {
+      const mockState: MockState = { config: null }
+      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(true)
+    })
+
+    it('should return config.analytics.seenOptIn with getAnalyticsOptInSeen', () => {
+      const mockState: MockState = {
+        config: {
+          analytics: { appId: 'foobar', optedIn: false, seenOptIn: false },
+        },
+      }
+      expect(Selectors.getAnalyticsOptInSeen(mockState)).toBe(false)
+    })
   })
 
   describe('get protocol analytics data', () => {
@@ -85,7 +136,7 @@ describe('analytics selectors', () => {
     })
 
     it('should have information about the protocol', () => {
-      const result = getProtocolAnalyticsData(mockState)
+      const result = Selectors.getProtocolAnalyticsData(mockState)
 
       return expect(result).resolves.toEqual({
         protocolType: '',
@@ -108,7 +159,7 @@ describe('analytics selectors', () => {
       getProtocolName.mockReturnValue('Awesome Protocol')
       getProtocolSource.mockReturnValue('Opentrons Test')
 
-      return getProtocolAnalyticsData(mockState).then(result => {
+      return Selectors.getProtocolAnalyticsData(mockState).then(result => {
         expect(getProtocolType).toHaveBeenCalledWith(mockState)
         expect(getProtocolCreatorApp).toHaveBeenCalledWith(mockState)
         expect(getProtocolApiVersion).toHaveBeenCalledWith(mockState)
@@ -130,7 +181,7 @@ describe('analytics selectors', () => {
       getProtocolAuthor.mockReturnValue('Private Author')
       getProtocolContents.mockReturnValue('Private Contents')
 
-      return getProtocolAnalyticsData(mockState).then(result => {
+      return Selectors.getProtocolAnalyticsData(mockState).then(result => {
         expect(getProtocolAuthor).toHaveBeenCalledWith(mockState)
         expect(getProtocolContents).toHaveBeenCalledWith(mockState)
 
@@ -167,7 +218,7 @@ describe('analytics selectors', () => {
         },
       ])
 
-      const result = getProtocolAnalyticsData(mockState)
+      const result = Selectors.getProtocolAnalyticsData(mockState)
 
       return expect(result).resolves.toMatchObject({
         pipettes: 'p300_single,p20_multi_v2.0',
@@ -180,7 +231,7 @@ describe('analytics selectors', () => {
         { _id: 1, slot: '2', model: 'magneticModuleV2' },
       ])
 
-      const result = getProtocolAnalyticsData(mockState)
+      const result = Selectors.getProtocolAnalyticsData(mockState)
 
       return expect(result).resolves.toMatchObject({
         modules: 'temperatureModuleV1,magneticModuleV2',
