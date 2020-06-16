@@ -9,6 +9,7 @@ import {
   RIGHT,
   type Mount,
   useConditionalConfirm,
+  type TitleBarProps,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
@@ -54,7 +55,6 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   const requestStatus = useSelector<State, RequestState | null>(state =>
     getRequestById(state, last(requestIds))
   )?.status
-  const pending = requestStatus === PENDING
 
   const robotCalCheckSession = useSelector((state: State) => {
     const session: Sessions.Session | null = Sessions.getRobotSessionOfType(
@@ -177,10 +177,15 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       )
   }
 
-  let showSpinner = false
+  if (requestStatus === PENDING) {
+    return (
+      <SpinnerModalPage titleBar={buildTitleBarProps(false, confirmExit)} />
+    )
+  }
+
   let stepContents
   let modalContentsClassName = styles.modal_contents
-  let shouldDisplayTitleBarExit = !pending
+  let shouldDisplayTitleBarExit = true
 
   switch (currentStep) {
     case Calibration.CHECK_STEP_SESSION_STARTED: {
@@ -326,26 +331,13 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       break
     }
     default: {
-      showSpinner = true
     }
   }
-  const titleBarProps = {
-    title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-    back: {
-      onClick: confirmExit,
-      title: EXIT,
-      children: EXIT,
-      className: !shouldDisplayTitleBarExit
-        ? styles.suppress_exit_button
-        : undefined,
-    },
-  }
-  return showSpinner || pending ? (
-    <SpinnerModalPage titleBar={titleBarProps} />
-  ) : (
+
+  return (
     <>
       <ModalPage
-        titleBar={titleBarProps}
+        titleBar={buildTitleBarProps(shouldDisplayTitleBarExit, confirmExit)}
         contentsClassName={modalContentsClassName}
       >
         {stepContents}
@@ -444,5 +436,22 @@ const getPipetteRankForStep = (
     default:
       // should never reach this case, func only called when currentStep listed above
       return ''
+  }
+}
+
+const buildTitleBarProps = (
+  shouldDisplayTitleBarExit: boolean,
+  confirmExit: () => mixed
+): TitleBarProps => {
+  return {
+    title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+    back: {
+      onClick: confirmExit,
+      title: EXIT,
+      children: EXIT,
+      className: !shouldDisplayTitleBarExit
+        ? styles.suppress_exit_button
+        : undefined,
+    },
   }
 }
