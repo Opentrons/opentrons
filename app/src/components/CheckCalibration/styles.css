@@ -64,14 +64,6 @@
   padding: 2rem 3.5rem;
 }
 
-.complete_body_passed {
-  @apply --font-body-2-dark;
-}
-
-.complete_body_failed {
-  @apply --font-body-2-dark;
-}
-
 .complete_summary {
   display: flex;
   flex-direction: row;
@@ -80,22 +72,12 @@
   margin: 2rem 0;
 }
 
-.summary_section {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  height: 3rem;
-  width: 10.25rem;
-  padding: 0.75rem;
-  margin-right: 1rem;
-  border-radius: var(--bd-radius-default);
-  border-width: var(--bd-width-default);
-  border-style: solid;
+.summary_page_header {
+  margin-bottom: 1.75rem;
 }
 
-.summary_section:last-child {
-  margin-right: 0;
+.summary_section {
+  margin-bottom: 1.25rem;
 }
 
 .summary_icon {
@@ -103,35 +85,79 @@
   width: 1.25rem;
 }
 
-.raw_data_wrapper {
+.summary_page_contents {
+  width: 100%;
+}
+
+.download_summary_button {
+  align-self: flex-end;
+  width: 18rem;
+  margin-bottom: 2rem;
+}
+
+.pipette_data_wrapper {
   align-self: stretch;
 }
 
-.raw_data_table {
+.pipette_data_table {
+  @apply --font-body-1-dark;
+
   font-size: 0.75rem;
   width: 100%;
+  text-align: left;
+  border-collapse: collapse;
+}
+
+.pipette_data_table > thead > tr > th {
+  text-transform: capitalize;
+  font-weight: var(--fw-semibold);
+}
+
+.pipette_data_table > tbody > tr > td {
+  height: 2rem;
+}
+
+.pipette_data_table > tbody > tr:not(:last-child) {
+  border-bottom: 1px solid #d8d8d8;
+}
+
+.pipette_data_header {
+  @apply --font-body-2-dark;
+
+  font-weight: var(--fw-semibold);
+  display: flex;
+  text-transform: capitalize;
+  margin-bottom: 0.75rem;
+}
+
+.inline_step_status {
+  display: flex;
+  align-items: center;
+  text-transform: capitalize;
+}
+
+.difference_value_data_cell {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.data_axis_label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+  max-width: 4rem;
+}
+
+.data_axis_label:not(:last-child) {
+  margin-right: 1rem;
 }
 
 .copy_icon {
   height: 2rem;
   width: 2rem;
   margin-bottom: 2rem;
-}
-
-.passed_row {
-  color: var(--c-success);
-}
-
-.failed_row {
-  color: var(--c-error);
-}
-
-.summary_section.passed {
-  border-color: var(--c-success);
-}
-
-.summary_section.failed {
-  border-color: var(--c-error);
 }
 
 .error_explanation {
