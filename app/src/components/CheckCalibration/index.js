@@ -8,6 +8,7 @@ import {
   LEFT,
   RIGHT,
   type Mount,
+  useConditionalConfirm,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type { State, Dispatch } from '../../types'
@@ -28,6 +29,7 @@ import { CompleteConfirmation } from './CompleteConfirmation'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
 import { BadCalibration } from './BadCalibration'
+import { ConfirmExitModal } from './ConfirmExitModal'
 import { formatJogVector } from './utils'
 import styles from './styles.css'
 
@@ -145,6 +147,12 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     closeCalibrationCheck()
   }
 
+  const {
+    showConfirmation: showConfirmExit,
+    confirm: confirmExit,
+    cancel: cancelExit,
+  } = useConditionalConfirm(exit, true)
+
   function sendCommand(
     command: SessionCommandString,
     data: SessionCommandData = {}
@@ -171,12 +179,13 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
 
   let stepContents
   let modalContentsClassName = styles.modal_contents
+  let shouldDisplayTitleBarExit = !pending
 
   switch (currentStep) {
     case Calibration.CHECK_STEP_SESSION_STARTED: {
       stepContents = (
         <Introduction
-          exit={exit}
+          exit={confirmExit}
           proceed={() => sendCommand(Calibration.checkCommands.LOAD_LABWARE)}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
@@ -244,7 +253,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           slotNumber={slotNumber}
           isMulti={isActiveInstrumentMultiChannel}
           mount={activeMount}
-          exit={exit}
+          exit={confirmExit}
           isInspecting={isInspecting}
           comparison={comparison}
           nextButtonText={nextButtonText}
@@ -279,7 +288,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           isInspecting={isInspecting}
           comparison={comparison}
           nextButtonText={nextButtonText}
-          exit={exit}
+          exit={confirmExit}
           comparePoint={() =>
             sendCommand(Calibration.checkCommands.COMPARE_POINT)
           }
@@ -292,6 +301,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
       break
     }
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
+      shouldDisplayTitleBarExit = false
       stepContents = <BadCalibration exit={exit} />
       break
     }
@@ -311,6 +321,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
         />
       )
       modalContentsClassName = styles.terminal_modal_contents
+      shouldDisplayTitleBarExit = false
       break
     }
     default: {
@@ -319,15 +330,27 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   }
 
   return (
-    <ModalPage
-      titleBar={{
-        title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
-        back: { onClick: exit, children: EXIT, title: EXIT },
-      }}
-      contentsClassName={modalContentsClassName}
-    >
-      {pending ? <SpinnerModal /> : stepContents}
-    </ModalPage>
+    <>
+      <ModalPage
+        titleBar={{
+          title: ROBOT_CALIBRATION_CHECK_SUBTITLE,
+          back: {
+            onClick: confirmExit,
+            title: EXIT,
+            children: EXIT,
+            className: !shouldDisplayTitleBarExit
+              ? styles.suppress_exit_button
+              : undefined,
+          },
+        }}
+        contentsClassName={modalContentsClassName}
+      >
+        {pending ? <SpinnerModal /> : stepContents}
+      </ModalPage>
+      {showConfirmExit && (
+        <ConfirmExitModal exit={confirmExit} back={cancelExit} />
+      )}
+    </>
   )
 }
 

@@ -61,7 +61,7 @@ type CheckHeightProps = {|
   mount: Mount | null,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
-  exit: () => void,
+  exit: () => mixed,
   nextButtonText: string,
   comparePoint: () => void,
   goToNextCheck: () => void,
@@ -142,7 +142,7 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
 type CompareZProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
-  exit: () => void,
+  exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareZ(props: CompareZProps) {
