@@ -27,7 +27,7 @@ async def test_tip_probe_v2(main_router, model, monkeypatch):
 
     monkeypatch.setattr(API, 'update_instrument_offset', fake_update)
     monkeypatch.setattr(main_router.calibration_manager,
-                        'move_to_front', fake_move)
+                        '_move_to_front', fake_move)
 
     tr = labware.load('opentrons_96_tiprack_300ul', Location(Point(), 'test'))
 
@@ -215,6 +215,30 @@ async def test_home_api1(main_router, model):
             model.instrument)
 
         home.assert_called_with()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
+@pytest.mark.api2_only
+async def test_home_all_api2(main_router, model):
+    with mock.patch.object(model.instrument._context, 'home') as home:
+        main_router.calibration_manager.home_all(
+            model.instrument)
+
+        home.assert_called_once()
+
+        await main_router.wait_until(state('moving'))
+        await main_router.wait_until(state('ready'))
+
+
+@pytest.mark.api1_only
+async def test_home_all_api1(main_router, model):
+    with mock.patch.object(main_router.calibration_manager, '_hardware') as hardware:  # noqa: e501
+        main_router.calibration_manager.home_all(
+            model.instrument)
+
+        hardware.home.assert_called_with()
 
         await main_router.wait_until(state('moving'))
         await main_router.wait_until(state('ready'))

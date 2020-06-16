@@ -3,7 +3,8 @@ import asyncio
 from fastapi import APIRouter, Query, Depends
 from starlette import status
 
-from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock
+from opentrons.hardware_control import ThreadManager, ThreadedAsyncLock, \
+    ThreadedAsyncForbidden
 from opentrons.hardware_control.types import Axis, CriticalPoint
 from opentrons.types import Mount, Point
 
@@ -58,31 +59,16 @@ async def post_move_robot(
         motion_lock: ThreadedAsyncLock = Depends(get_motion_lock))\
         -> V1BasicResponse:
     """Move the robot"""
-    async with motion_lock:
-        await hardware.cache_instruments()  # type: ignore
-
-        critical_point = None
-        if robot_move_target.target == control.MotionTarget.mount:
-            critical_point = CriticalPoint.MOUNT
-
-        mount = Mount[robot_move_target.mount.upper()]
-        target_pos = Point(*robot_move_target.point)
-
-        # Reset z position
-        await hardware.home_z()  # type: ignore
-
-        gantry_position = hardware.gantry_position  # type: ignore
-        move_to = hardware.move_to  # type: ignore
-
-        pos = await gantry_position(mount, critical_point=critical_point)
-        # Move to requested x, y and current z position
-        await move_to(mount, Point(x=target_pos.x, y=target_pos.y, z=pos.z),
-                      critical_point=critical_point)
-        # Move to requested z position
-        await move_to(mount, target_pos, critical_point=critical_point)
-        pos = await gantry_position(mount)
-
-        return V1BasicResponse(message=f"Move complete. New position: {pos}")
+    try:
+        async with motion_lock.forbid():
+            pos = await _do_move(hardware=hardware,
+                                 robot_move_target=robot_move_target)
+            return V1BasicResponse(
+                message=f"Move complete. New position: {pos}"
+            )
+    except ThreadedAsyncForbidden as e:
+        raise V1HandlerError(status_code=status.HTTP_403_FORBIDDEN,
+                             message=str(e))
 
 
 @router.post("/robot/home",
@@ -94,25 +80,29 @@ async def post_home_robot(
         motion_lock: ThreadedAsyncLock = Depends(get_motion_lock)) \
         -> V1BasicResponse:
     """Home the robot or one of the pipettes"""
-    async with motion_lock:
-        mount = robot_home_target.mount
-        target = robot_home_target.target
+    try:
+        async with motion_lock.forbid():
+            mount = robot_home_target.mount
+            target = robot_home_target.target
 
-        home = hardware.home  # type: ignore
-        home_plunger = hardware.home_plunger  # type: ignore
+            home = hardware.home  # type: ignore
+            home_plunger = hardware.home_plunger  # type: ignore
 
-        if target == control.HomeTarget.pipette and mount:
-            await home([Axis.by_mount(Mount[mount.upper()])])
-            await home_plunger(Mount[mount.upper()])
-            message = f"Pipette on {mount} homed successfully"
-        elif target == control.HomeTarget.robot:
-            await home()
-            message = "Homing robot."
-        else:
-            raise V1HandlerError(message=f"{target} is invalid",
-                                 status_code=status.HTTP_400_BAD_REQUEST)
+            if target == control.HomeTarget.pipette and mount:
+                await home([Axis.by_mount(Mount[mount.upper()])])
+                await home_plunger(Mount[mount.upper()])
+                message = f"Pipette on {mount} homed successfully"
+            elif target == control.HomeTarget.robot:
+                await home()
+                message = "Homing robot."
+            else:
+                raise V1HandlerError(message=f"{target} is invalid",
+                                     status_code=status.HTTP_400_BAD_REQUEST)
 
-        return V1BasicResponse(message=message)
+            return V1BasicResponse(message=message)
+    except ThreadedAsyncForbidden as e:
+        raise V1HandlerError(status_code=status.HTTP_403_FORBIDDEN,
+                             message=str(e))
 
 
 @router.get("/robot/lights",
@@ -134,3 +124,30 @@ async def post_robot_light_state(
         -> control.RobotLightState:
     await hardware.set_lights(rails=robot_light_state.on)  # type: ignore
     return robot_light_state
+
+
+async def _do_move(hardware: ThreadManager,
+                   robot_move_target: control.RobotMoveTarget):
+    """Perform the move"""
+    await hardware.cache_instruments()  # type: ignore
+
+    critical_point = None
+    if robot_move_target.target == control.MotionTarget.mount:
+        critical_point = CriticalPoint.MOUNT
+
+    mount = Mount[robot_move_target.mount.upper()]
+    target_pos = Point(*robot_move_target.point)
+
+    # Reset z position
+    await hardware.home_z()  # type: ignore
+
+    gantry_position = hardware.gantry_position  # type: ignore
+    move_to = hardware.move_to  # type: ignore
+
+    pos = await gantry_position(mount, critical_point=critical_point)
+    # Move to requested x, y and current z position
+    await move_to(mount, Point(x=target_pos.x, y=target_pos.y, z=pos.z),
+                  critical_point=critical_point)
+    # Move to requested z position
+    await move_to(mount, target_pos, critical_point=critical_point)
+    return await gantry_position(mount)

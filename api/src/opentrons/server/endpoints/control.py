@@ -24,7 +24,7 @@ log = logging.getLogger(__name__)
 def _motion_lock(func):
     @functools.wraps(func)
     async def decorated(request):
-        async with request.app['com.opentrons.motion_lock']:
+        async with request.app['com.opentrons.motion_lock'].forbid():
             return await func(request)
     return decorated
 

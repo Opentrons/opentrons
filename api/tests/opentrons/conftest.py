@@ -33,7 +33,7 @@ from opentrons import config, types
 from opentrons.server import init
 from opentrons.deck_calibration import endpoints
 from opentrons import hardware_control as hc
-from opentrons.hardware_control import API, ThreadManager
+from opentrons.hardware_control import API, ThreadManager, ThreadedAsyncLock
 from opentrons.protocol_api import ProtocolContext
 from opentrons.types import Mount
 from opentrons import (robot as rb,
@@ -374,7 +374,7 @@ def sync_hardware(request, loop, virtual_smoothie_env):
 
 @pytest.fixture
 def main_router(loop, virtual_smoothie_env, hardware):
-    router = MainRouter(hardware, loop)
+    router = MainRouter(hardware=hardware, loop=loop, lock=ThreadedAsyncLock())
     router.wait_until = partial(
         wait_until,
         notifications=router.notifications,
