@@ -55,7 +55,7 @@ def test_access_individual_labware(api_client, grab_id):
                 'value': [0.0, 0.0, 0.0],
                 'lastModified': None},
             'tipLength': {
-                'value': 30.0,
+                'value': None,
                 'lastModified': None}},
         'loadName': 'opentrons_96_tiprack_10ul',
         'namespace': 'opentrons',
