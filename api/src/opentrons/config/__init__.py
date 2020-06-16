@@ -217,7 +217,9 @@ def infer_config_base_dir() -> Path:
 
     :return pathlib.Path: The path to the desired root settings dir.
     """
+    print("inferring base")
     if 'OT_API_CONFIG_DIR' in os.environ:
+        print("Conferring base here")
         return Path(os.environ['OT_API_CONFIG_DIR'])
     elif IS_ROBOT:
         return Path('/data')

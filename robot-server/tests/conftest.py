@@ -5,6 +5,7 @@ import tempfile
 import os
 import shutil
 from unittest.mock import MagicMock
+from pathlib import Path
 
 import pytest
 from starlette.testclient import TestClient
@@ -12,6 +13,10 @@ from robot_server.service.app import app
 from robot_server.service.dependencies import get_hardware
 from opentrons.hardware_control import API, HardwareAPILike
 from opentrons import config
+
+from opentrons.protocol_api import labware
+from opentrons.types import Point
+from opentrons.protocol_api.geometry import Deck
 
 
 @pytest.fixture
@@ -74,3 +79,26 @@ def attach_pipettes(server_temp_directory):
         json.dump(pipette, pipette_file)
     yield
     os.remove(pipette_file_path)
+
+
+@pytest.fixture
+def set_up_index_file_temporary_directory(monkeypatch):
+    temp_dir = os.getenv('OT_API_CONFIG_DIR')
+    print(temp_dir)
+    # monkeypatch.setattr(labware, 'OFFSETS_PATH', temp_dir)
+    deck = Deck()
+    labware_list = [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml',
+        'opentrons_96_tiprack_10ul']
+    for idx, name in enumerate(labware_list):
+        parent = deck.position_for(idx+1)
+        definition = labware.get_labware_definition(name)
+        lw = labware.Labware(definition, parent)
+        labware.save_calibration(lw, Point(0, 0, 0))
+        if name == 'opentrons_96_tiprack_10ul':
+            labware.save_tip_length(lw, 30)
+
+    return labware_list

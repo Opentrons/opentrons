@@ -1,0 +1,94 @@
+---
+test_name: GET Labware Calibrations, No Calibrations
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Labware Calibrations GET request returns an empty list
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data: !anydict
+          id: ""
+          type: LabwareCalibration
+          attributes: ""
+---
+test_name: GET Labware Calibrations, All Calibrations
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file_temporary_directory
+stages:
+  - name: GET request returns all calibrations from fixture
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+    response:
+      status_code: 200
+      save:
+        json:
+          calibration_id: data.id
+      json:
+        links: !anydict
+        data: &calibration_data
+          id: "{calibration_id}"
+          type: LabwareCalibration
+          attributes: &calibration_data_attributes
+            details: &session_data_attribute_details
+---
+test_name: GET Labware Calibrations, Filter LoadName
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file
+stages:
+  - name: GET request returns the calibration for deep well plate
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+      params:
+        loadName: 'nest_96_wellplate_2ml_deep'
+    response:
+      status_code: 200
+      save:
+        json:
+          calibration_id: data.id
+      json:
+        links: !anydict
+        data:
+          <<: *calibration_data
+          id: "{calibration_id}"
+          type: LabwareCalibration
+          attributes:
+            <<: *calibration_data_attributes
+---
+test_name: GET Labware Calibrations, Filter Version & namespace
+marks:
+  - usefixtures:
+      - run_server
+      - set_up_index_file
+stages:
+  - name: Labware Calibrations GET request returns an empty list
+    request:
+      url: "{host:s}:{port:d}/labware/calibrations"
+      method: GET
+      params:
+        version: 1
+        namespace: "opentrons"
+    response:
+      status_code: 200
+      save:
+        json:
+          calibration_id: data.id
+      json:
+        links: !anydict
+        data:
+          <<: *calibration_data
+          id: "{calibration_id}"
+          type: LabwareCalibration
+          attributes:
+            <<: *calibration_data_attributes
