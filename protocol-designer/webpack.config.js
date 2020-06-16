@@ -42,15 +42,10 @@ console.log(`PD version: ${OT_PD_VERSION || 'UNKNOWN!'}`)
 module.exports = merge(baseConfig, {
   entry: [JS_ENTRY],
 
-  output: Object.assign(
-    {
-      path: path.join(__dirname, 'dist'),
-      publicPath: DEV_MODE ? '' : './',
-    },
-    // workaround for worker-loader HMR
-    // see https://github.com/webpack/webpack/issues/6642
-    DEV_MODE ? { globalObject: 'this' } : {}
-  ),
+  output: {
+    path: path.join(__dirname, 'dist'),
+    publicPath: DEV_MODE ? '' : './',
+  },
 
   plugins: [
     new webpack.EnvironmentPlugin(envVars),
