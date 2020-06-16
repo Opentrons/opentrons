@@ -33,10 +33,6 @@ describe('CompleteConfirmation', () => {
     }
   })
 
-  afterEach(() => {
-    jest.resetAllMocks()
-  })
-
   it('renders good Z comparison', () => {
     const wrapper = render()
 
