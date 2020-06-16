@@ -61,12 +61,12 @@ const assetMap = {
 const CHECK_POINT_XY_HEADER = 'Check the X and Y-axis in'
 const SLOT = 'slot'
 const JOG_UNTIL = 'Jog the robot until the tip is'
-const JUST_BARELY = 'just barely'
-const TOUCHING_THE_CROSS = 'touching the cross in'
-const THEN = 'Then'
+const PRECISELY_CENTERED = 'precisely centered'
+const ABOVE_THE_CROSS = 'above the cross in'
+const THEN = 'Then press the'
 const CHECK_AXES = 'check x and y-axis'
 const TO_DETERMINE_MATCH =
-  'to see if the position matches the calibration co-ordinate.'
+  'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
 const EXIT_CHECK = 'Exit robot calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
@@ -134,17 +134,20 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
         />
       ) : (
         <>
-          <div className={styles.tip_pick_up_demo_wrapper}>
+          <div className={styles.step_check_wrapper}>
+            <div className = {styles.step_check_body_wrapper}>
             <p className={styles.tip_pick_up_demo_body}>
               {JOG_UNTIL}
-              <b>&nbsp;{JUST_BARELY}&nbsp;</b>
-              {TOUCHING_THE_CROSS}
+              <b>&nbsp;{PRECISELY_CENTERED}&nbsp;</b>
+              {ABOVE_THE_CROSS}
               <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
+              <br />
               <br />
               {THEN}
               <b>&nbsp;{CHECK_AXES}&nbsp;</b>
               {TO_DETERMINE_MATCH}
             </p>
+        </div>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={String(demoAsset)}
