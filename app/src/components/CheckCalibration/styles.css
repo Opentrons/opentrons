@@ -91,7 +91,7 @@
 }
 
 .pipette_data_table > tbody > tr:not(:last-child) {
-  border-bottom: 1px solid #D8D8D8;
+  border-bottom: 1px solid #d8d8d8;
 }
 
 .pipette_data_header {
