@@ -14,7 +14,6 @@ module.exports = {
       to: './ui',
       filter: ['**/*'],
     },
-    'build/release-notes.md',
     'build/br-premigration-wheels',
     '!Makefile',
   ],
