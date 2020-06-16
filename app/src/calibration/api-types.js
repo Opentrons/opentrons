@@ -95,21 +95,22 @@ export type RobotCalibrationCheckComparison = {|
   transformType: CHECK_TRANSFORM_TYPE,
 |}
 
-export type RobotCalibrationCheckComparisonsByStep = {
+export type RobotCalibrationCheckInstrumentsByMount = {
   [mount: string]: RobotCalibrationCheckInstrument,
+  ...,
+}
+export type RobotCalibrationCheckComparisonsByStep = {
+  [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
   ...,
 }
 
 export type RobotCalibrationCheckSessionDetails = {|
-  instruments: RobotCalibrationCheckComparisonsByStep,
+  instruments: RobotCalibrationCheckInstrumentsByMount,
   currentStep: RobotCalibrationCheckStep,
   nextSteps: {|
     links: { [RobotCalibrationCheckStep]: string, ... },
   |},
-  comparisonsByStep: {
-    [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
-    ...,
-  },
+  comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
   labware: Array<RobotCalibrationCheckLabware>,
 |}
 

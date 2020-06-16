@@ -27,7 +27,10 @@ export function DifferenceValue(props: Props): React.Node {
         const rawValue = differenceVector[axisIndex]
         const formattedValue = parseFloat(rawValue).toFixed(1)
         return (
-          <div className={styles.data_axis_label}>
+          <div
+            key={`${axisIndex}${stepName}`}
+            className={styles.data_axis_label}
+          >
             <p>{AXIS_NAMES[axisIndex]}</p>
             <p>{`${rawValue > 0 ? '+' : ''}${formattedValue} mm`}</p>
           </div>

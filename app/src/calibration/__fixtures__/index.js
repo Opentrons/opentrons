@@ -10,28 +10,29 @@ import {
 } from '../constants'
 import type {
   RobotCalibrationCheckSessionDetails,
+  RobotCalibrationCheckComparison,
   TipLengthCalibrationSessionDetails,
 } from '../api-types'
 
-export const badZComparison = {
+export const badZComparison: RobotCalibrationCheckComparison = {
   differenceVector: [0, 0, 4],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: true,
   transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
-export const goodZComparison = {
+export const goodZComparison: RobotCalibrationCheckComparison = {
   differenceVector: [0, 0, 0.1],
   thresholdVector: [0, 0, 1],
   exceedsThreshold: false,
   transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
-export const badXYComparison = {
+export const badXYComparison: RobotCalibrationCheckComparison = {
   differenceVector: [4, 4, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: true,
   transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
 }
-export const goodXYComparison = {
+export const goodXYComparison: RobotCalibrationCheckComparison = {
   differenceVector: [0.1, 0.1, 0],
   thresholdVector: [1, 1, 0],
   exceedsThreshold: false,
@@ -46,7 +47,7 @@ export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessi
       tip_length: 42,
       mount: 'left',
       tiprack_id: 'abc123_labware_uuid',
-      rank: 'first',
+      rank: 'second',
     },
     right: {
       model: 'fake_pipette_model',
@@ -54,7 +55,7 @@ export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessi
       tip_length: 42,
       mount: 'right',
       tiprack_id: 'def456_labware_uuid',
-      rank: 'second',
+      rank: 'first',
     },
   },
   currentStep: 'sessionStarted',
