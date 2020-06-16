@@ -2,9 +2,9 @@
 import { useEffect } from 'react'
 
 /**
- * React hook to call a function on component mount
+ * React hook to call a function on component mount and unmount
  *
- * @param {() => mixed} callback (function to call on mount)
+ * @param {() => void | (() => void)} callback (function to call on mount that optionally returns a cleanup function to call on unmount)
  * @returns {void}
  */
 export function useMountEffect(callback: () => void | (() => void)): void {
