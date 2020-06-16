@@ -95,23 +95,9 @@
   }
 }
 
-.cal_check_error {
-  font-size: var(--fs-body-1);
-
-  color: var(--c-error);
-  margin-right: auto;
-
-}
 
 .cal_check_error_icon {
-  color: var(--c-error);
   width: 1.5rem;
   height: 1.5rem;
   padding-right: 0.25rem;
-}
-
-
-.cal_check_error_wrapper {
-    display: flex;
-    align-items: center;
 }
