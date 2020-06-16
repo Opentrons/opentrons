@@ -14,7 +14,9 @@ import type {
   RobotCalibrationCheckInstrument,
 } from '../../calibration'
 import * as Calibration from '../../calibration'
+import DifferenceValue from './DifferenceValue'
 import styles from './styles.css'
+import { ThresholdValue } from './ThresholdValue'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
@@ -127,15 +129,6 @@ const stepDisplayNameMap: { [RobotCalibrationCheckStep]: string, ... } = {
   [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
 }
 
-const axisIndicesByStep: { [RobotCalibrationCheckStep]: Array<number>, ... } = {
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: [2],
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: [0, 1],
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: [0, 1],
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: [0, 1],
-  [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: [2],
-  [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: [0, 1],
-}
-const AXIS_NAMES = ['X', 'Y', 'Z']
 type PipetteStepsSummaryProps = {|
   pipette: RobotCalibrationCheckInstrument,
   comparisonsByStep: {
@@ -164,30 +157,12 @@ function PipetteStepsSummary(props: PipetteStepsSummaryProps) {
         </thead>
         <tbody>
           {Object.keys(comparisonsByStep).map(step => {
-            const comparison = comparisonsByStep[step]
-            const formatFloat = float => parseFloat(float).toFixed(2)
-            const formatThreshold = vector => {
-              const value = vector.find(axis => axis > 0)
-              return `±${formatFloat(value)} mm`
-            }
-            const formatDifference = vector => {
-              console.log(vector)
-              return axisIndicesByStep[step].map(axisIndex => (
-                <span className={styles.data_axis_label}>
-                  <span>{AXIS_NAMES[axisIndex]}</span>
-                  &nbsp; &nbsp;
-                  <span>
-                    {vector[axisIndex] !== 0
-                      ? vector[axisIndex] > 0
-                        ? '+'
-                        : '-'
-                      : ' '}
-                  </span>
-                  <span>{vector[axisIndex]} mm</span>
-                </span>
-              ))
-            }
-            const passedCheck = !comparison.exceedsThreshold
+            const {
+              exceedsThreshold,
+              thresholdVector,
+              differenceVector,
+            } = comparisonsByStep[step]
+            const passedCheck = !exceedsThreshold
             return (
               <tr key={step}>
                 <td>{stepDisplayNameMap[step]}</td>
@@ -203,8 +178,15 @@ function PipetteStepsSummary(props: PipetteStepsSummaryProps) {
                     {passedCheck ? PASS : FAIL}
                   </div>
                 </td>
-                <td>{formatThreshold(comparison.thresholdVector)}</td>
-                <td>{formatDifference(comparison.differenceVector)}</td>
+                <td>
+                  <ThresholdValue thresholdVector={thresholdVector} />
+                </td>
+                <td>
+                  <DifferenceValue
+                    differenceVector={differenceVector}
+                    stepName={step}
+                  />
+                </td>
               </tr>
             )
           })}
