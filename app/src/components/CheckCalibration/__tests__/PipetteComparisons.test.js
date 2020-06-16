@@ -1,10 +1,7 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import { act } from 'react-dom/test-utils'
-import omit from 'lodash/omit'
 import * as Fixtures from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
 import type {
   RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckInstrument,

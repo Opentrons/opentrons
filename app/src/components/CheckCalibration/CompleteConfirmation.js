@@ -6,8 +6,6 @@ import pick from 'lodash/pick'
 import some from 'lodash/some'
 import partition from 'lodash/partition'
 import type {
-  RobotCalibrationCheckStep,
-  RobotCalibrationCheckComparison,
   RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckInstrument,
 } from '../../calibration'

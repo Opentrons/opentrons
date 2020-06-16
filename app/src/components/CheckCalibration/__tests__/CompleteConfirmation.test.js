@@ -81,4 +81,13 @@ describe('CompleteConfirmation', () => {
         .exists()
     ).toBe(false)
   })
+
+  it('exits when button is clicked', () => {
+    const wrapper = render()
+
+    act(() => getExitButton(wrapper).invoke('onClick')())
+    wrapper.update()
+
+    expect(mockExit).toHaveBeenCalled()
+  })
 })

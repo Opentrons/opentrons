@@ -1,8 +1,5 @@
 // @flow
 import * as React from 'react'
-import type { RobotCalibrationCheckStep } from '../../calibration'
-import * as Calibration from '../../calibration'
-import styles from './styles.css'
 
 type Props = {|
   thresholdVector: [number, number, number],

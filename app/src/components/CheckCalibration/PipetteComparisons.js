@@ -3,9 +3,7 @@ import * as React from 'react'
 import cx from 'classnames'
 import { Icon } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import map from 'lodash/map'
 import type {
-  RobotCalibrationCheckComparison,
   RobotCalibrationCheckInstrument,
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparisonsByStep,
