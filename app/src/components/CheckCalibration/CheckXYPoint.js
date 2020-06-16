@@ -135,19 +135,19 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
       ) : (
         <>
           <div className={styles.step_check_wrapper}>
-            <div className = {styles.step_check_body_wrapper}>
-            <p className={styles.tip_pick_up_demo_body}>
-              {JOG_UNTIL}
-              <b>&nbsp;{PRECISELY_CENTERED}&nbsp;</b>
-              {ABOVE_THE_CROSS}
-              <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
-              <br />
-              <br />
-              {THEN}
-              <b>&nbsp;{CHECK_AXES}&nbsp;</b>
-              {TO_DETERMINE_MATCH}
-            </p>
-        </div>
+            <div className={styles.step_check_body_wrapper}>
+              <p className={styles.tip_pick_up_demo_body}>
+                {JOG_UNTIL}
+                <b>&nbsp;{PRECISELY_CENTERED}&nbsp;</b>
+                {ABOVE_THE_CROSS}
+                <b>&nbsp;{`${SLOT} ${slotNumber || ''}`}.&nbsp;</b>
+                <br />
+                <br />
+                {THEN}
+                <b>&nbsp;{CHECK_AXES}&nbsp;</b>
+                {TO_DETERMINE_MATCH}
+              </p>
+            </div>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={String(demoAsset)}

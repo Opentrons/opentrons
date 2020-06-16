@@ -73,15 +73,15 @@ describe('CheckHeight', () => {
     jest.resetAllMocks()
   })
 
-  it('displays proper demo asset', () => {
+  it('displays proper asset', () => {
     const assetMap = {
       left: {
-        multi: 'SLOT_5_LEFT_MULTI_Z_(640X480)_REV3.webm',
-        single: 'SLOT_5_LEFT_SINGLE_Z_(640X480)_REV3.webm',
+        multi: 'SLOT_5_LEFT_MULTI_Z.webm',
+        single: 'SLOT_5_LEFT_SINGLE_Z.webm',
       },
       right: {
-        multi: 'SLOT_5_RIGHT_MULTI_Z_(640X480)_REV3.webm',
-        single: 'SLOT_5_RIGHT_SINGLE_Z_(640X480)_REV3.webm',
+        multi: 'SLOT_5_RIGHT_MULTI_Z.webm',
+        single: 'SLOT_5_RIGHT_SINGLE_Z.webm',
       },
     }
 
