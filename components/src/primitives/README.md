@@ -71,7 +71,7 @@ import { Box, SPACING_AUTO, SPACING_3 } from '@opentrons/components'
 const Heading = () => <Box marginX={SPACING_AUTO} paddingY={SPACING_3} />
 ```
 
-Note: If you specify both of a shorthand prop and the explicit prop (e.g. `marginX` and `marginLeft`, the more explicit prop will be preferred).
+Note: If you specify both of a shorthand prop and the explicit prop (e.g. `marginX` and `marginLeft`), the more explicit prop will be preferred.
 
 ### borders
 
