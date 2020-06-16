@@ -45,14 +45,14 @@ describe('CompleteConfirmation', () => {
 
     expect(
       wrapper
-        .find('PipetteStepsSummary')
+        .find('PipetteComparisons')
         .at(0)
         .find('h5')
         .text()
     ).toEqual(expect.stringContaining('right'))
     expect(
       wrapper
-        .find('PipetteStepsSummary')
+        .find('PipetteComparisons')
         .at(1)
         .find('h5')
         .text()
@@ -69,14 +69,14 @@ describe('CompleteConfirmation', () => {
 
     expect(
       wrapper
-        .find('PipetteStepsSummary')
+        .find('PipetteComparisons')
         .at(0)
         .find('h5')
         .text()
     ).toEqual(expect.stringContaining('right'))
     expect(
       wrapper
-        .find('PipetteStepsSummary')
+        .find('PipetteComparisons')
         .at(1)
         .exists()
     ).toBe(false)
