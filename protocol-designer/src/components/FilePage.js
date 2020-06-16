@@ -32,7 +32,6 @@ export type Props = {|
   goToNextPage: () => mixed,
   saveFileMetadata: FileMetadataFields => mixed,
   swapPipettes: () => mixed,
-  thermocyclerEnabled: ?boolean,
   modules: ModulesForEditModulesCard,
 |}
 
@@ -208,7 +207,6 @@ export class FilePage extends React.Component<Props, State> {
 
         <EditModulesCard
           modules={modules}
-          thermocyclerEnabled={this.props.thermocyclerEnabled}
           openEditModuleModal={this.handleEditModule}
         />
 
