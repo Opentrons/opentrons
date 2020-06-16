@@ -137,5 +137,9 @@ context('File Import', () => {
           })
         })
       })
+
+    cy.window()
+      .its('__lastSavedFileName__')
+      .should('equal', 'TestPro 15 Well Plate 5 µL.zip')
   })
 })

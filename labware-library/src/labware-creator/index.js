@@ -493,13 +493,7 @@ export const LabwareCreator = (): React.Node => {
             labwareTestProtocol({ pipetteName, definition: def })
           )
           zip.generateAsync({ type: 'blob' }).then(blob => {
-            if (global.Cypress) {
-              // HACK(IL, 2020-04-02): can't figure out a better way to do this yet
-              // https://docs.cypress.io/faq/questions/using-cypress-faq.html#Can-my-tests-interact-with-Redux-Vuex-data-store
-              global.__lastSavedBlobZip__ = blob
-            } else {
-              saveAs(blob, `${displayName}.zip`)
-            }
+            saveAs(blob, `${displayName}.zip`)
           })
 
           reportEvent({

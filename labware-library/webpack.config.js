@@ -30,6 +30,13 @@ const envVars = passThruEnvVars.reduce(
   { ...envVarsWithDefaults }
 )
 
+const testAliases =
+  process.env.CYPRESS === '1'
+    ? {
+        'file-saver': path.resolve(__dirname, 'cypress/mocks/file-saver.js'),
+      }
+    : {}
+
 module.exports = merge(baseConfig, {
   entry: JS_ENTRY,
 
@@ -66,4 +73,8 @@ module.exports = merge(baseConfig, {
       },
     }),
   ],
+
+  resolve: {
+    alias: testAliases,
+  },
 })
