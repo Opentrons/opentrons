@@ -1,11 +1,10 @@
 // @flow
 // functions for downloading and storing release files
-// TODO(mc, 2019-07-02): cleanup old downloads
 import assert from 'assert'
 import path from 'path'
 import { promisify } from 'util'
 import tempy from 'tempy'
-import { move, readdir } from 'fs-extra'
+import { move, readdir, remove } from 'fs-extra'
 import StreamZip from 'node-stream-zip'
 import getStream from 'get-stream'
 
@@ -124,4 +123,17 @@ export function readUserFileInfo(systemFile: string): Promise<UserFileInfo> {
 
     return result
   })
+}
+
+export function cleanupReleaseFiles(
+  downloadsDir: string,
+  currentRelease: string
+): void {
+  return readdir(downloadsDir)
+    .then(files => {
+      return files
+        .filter(f => f !== currentRelease)
+        .map(f => path.join(downloadsDir, f))
+    })
+    .then(removals => Promise.all(removals.map(f => remove(f))))
 }
