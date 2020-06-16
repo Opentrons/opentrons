@@ -5,9 +5,12 @@ import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
+import { SpinnerModalPage } from '@opentrons/components'
 
 import * as Sessions from '../../../sessions'
 import * as Calibration from '../../../calibration'
+
+import * as RobotApi from '../../../robot-api'
 
 import { CheckCalibration } from '../index'
 import { Introduction } from '../Introduction'
@@ -18,11 +21,14 @@ import { CheckHeight } from '../CheckHeight'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
+import type { RequestState } from '../../../robot-api/types'
+
 import type { State } from '../../../types'
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
+jest.mock('../../../robot-api/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
@@ -41,6 +47,11 @@ const getRobotSessionOfType: JestMockFn<
   >
 > = Sessions.getRobotSessionOfType
 
+const getRequestById: JestMockFn<
+  [State, string],
+  $Call<typeof RobotApi.getRequestById, State, string>
+> = RobotApi.getRequestById
+
 const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
@@ -53,6 +64,15 @@ describe('CheckCalibration', () => {
   let mockCalibrationCheckSession: Sessions.CalibrationCheckSession = {
     id: 'fake_check_session_id',
     ...mockCalibrationCheckSessionAttributes,
+  }
+  let mockRequestState: RequestState = {
+    status: 'success',
+    response: {
+      path: '/fake/api/path',
+      method: 'POST',
+      status: 200,
+      ok: true,
+    },
   }
 
   const mockCloseCalibrationCheck = jest.fn()
@@ -166,9 +186,7 @@ describe('CheckCalibration', () => {
         },
       }
       getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
-
       const wrapper = render()
-
       POSSIBLE_CHILDREN.forEach(child => {
         if (child === spec.component) {
           expect(wrapper.exists(child)).toBe(true)
@@ -176,6 +194,26 @@ describe('CheckCalibration', () => {
           expect(wrapper.exists(child)).toBe(false)
         }
       })
+    })
+
+    it(`renders a spinner when a request is pending in ${spec.currentStep}`, () => {
+      mockCalibrationCheckSession = {
+        ...mockCalibrationCheckSession,
+        details: {
+          ...mockCalibrationCheckSession.details,
+          currentStep: spec.currentStep,
+        },
+      }
+
+      getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
+
+      mockRequestState = {
+        status: 'pending',
+      }
+      getRequestById.mockReturnValue(mockRequestState)
+
+      const wrapper = render()
+      expect(wrapper.exists(SpinnerModalPage)).toBe(true)
     })
   })
 
