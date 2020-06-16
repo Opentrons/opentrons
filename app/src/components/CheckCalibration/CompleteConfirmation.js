@@ -29,7 +29,6 @@ export function CompleteConfirmation(
 
   const rawDataRef = React.useRef<HTMLInputElement | null>(null)
   const handleCopyButtonClick = () => {
-    console.log(rawDataRef.current)
     if (rawDataRef.current) {
       rawDataRef.current.select()
       document.execCommand('copy')
@@ -51,7 +50,6 @@ export function CompleteConfirmation(
     compStep => Calibration.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
   ).map(stepNames => pick(comparisonsByStep, stepNames))
 
-  console.log(firstComparisonsByStep, secondComparisonsByStep)
   return (
     <>
       <h3 className={styles.summary_page_header}>
