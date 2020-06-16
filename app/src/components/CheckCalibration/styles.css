@@ -288,19 +288,22 @@ TODO: BC 2020-04-01 consider abstracting this to a shared place
 
 .tip_pick_up_demo_wrapper {
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   justify-content: center;
   align-items: center;
   border: 2px solid var(--c-lightest-gray);
   padding: 1rem 0;
   margin-top: 1rem;
-  text-align: center;
 }
 
 .tip_pick_up_demo_body {
   @apply --font-body-2-dark;
 
   margin: 0 1rem;
+}
+
+.tip_pick_up_demo_body_wrapper {
+  max-width: 49%;
 }
 
 .command_button {

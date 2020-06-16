@@ -28,16 +28,16 @@ const assetMap = {
   },
 }
 
-const CHECK_Z_HEADER = 'Check the Z-axis'
+const CHECK_Z_HEADER = 'check z-axis in slot 5'
 
-const JOG_UNTIL = 'Jog pipette until tip is'
-const JUST_BARELY = 'just barely'
-const TOUCHING = 'touching the deck in'
+const JOG_UNTIL = 'Jog the pipette until the tip is'
+const JUST_BARELY = 'barely touching (less than 0.1mm)'
+const TOUCHING = 'the deck in'
 const SLOT_5 = 'slot 5'
-const THEN = 'Then'
+const THEN = 'Then press the'
 const CHECK_AXES = 'check z-axis'
 const TO_DETERMINE_MATCH =
-  'to see if the position matches the calibration co-ordinate.'
+  'button to determine how this position compares to the previously-saved z-axis calibration coordinate.'
 
 const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
 
@@ -100,16 +100,19 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
       ) : (
         <>
           <div className={styles.tip_pick_up_demo_wrapper}>
+            <div className={styles.tip_pick_up_demo_body_wrapper}>
             <p className={styles.tip_pick_up_demo_body}>
               {JOG_UNTIL}
               <b>&nbsp;{JUST_BARELY}&nbsp;</b>
               {TOUCHING}
               <b>&nbsp;{SLOT_5}.&nbsp;</b>
               <br />
+              <br />
               {THEN}
               <b>&nbsp;{CHECK_AXES}&nbsp;</b>
               {TO_DETERMINE_MATCH}
             </p>
+            </div>
             <div className={styles.step_check_video_wrapper}>
               <video
                 key={demoAsset}
