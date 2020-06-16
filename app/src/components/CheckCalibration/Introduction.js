@@ -8,9 +8,15 @@ import { tiprackImages } from './tiprackImages'
 
 const LABWARE_LIBRARY_PAGE_PATH = 'https://labware.opentrons.com'
 
-const INTRO_ROBOT_CALIBRATION_CHECK_HEADER = 'Robot calibration check'
-const INTRO_ROBOT_CALIBRATION_CHECK_BODY =
-  "Checking your robot calibration assesses your OT-2's ability to position pipettes accurately relative to the deck. If at any point the robot does not go to the positions as expected, exit this process and follow the instructions provided to help resolve the issue."
+const ROBOT_CALIBRATION_INTRO_HEADER =
+  'Checking the OT-2’s calibration is a first step towards diagnosing and troubleshooting common pipette positioning problems you may be experiencing.'
+
+const ROBOT_CALIBRATION_INTRO_INSTRUCTION =
+  'For this process you will be asked to manually jog each attached pipette to designated positions on the robot’s deck. You will then prompt the robot to check how this positional coordinate compares to your previously saved calibration coordinate. Note that this process does not overwrite your existing calibration data.'
+
+const ROBOT_CALIBRATION_INTRO_OUTCOMES =
+  'If the difference between the two coordinates falls within the acceptable tolerance range for the given pipette, the check will pass. Otherwise, it will fail and you’ll be provided with troubleshooting guidance. You may exit at any point or continue through to the end to check the overall calibration status of your robot.'
+
 const TIPRACK_REQS = 'For this process you will require:'
 const VIEW_TIPRACK_MEASUREMENTS = 'View measurements'
 const NOTE_HEADER = 'Please note: '
@@ -36,12 +42,15 @@ export function Introduction(props: IntroductionProps): React.Node {
 
   return (
     <>
-      <div className={styles.modal_header}>
-        <h3>{INTRO_ROBOT_CALIBRATION_CHECK_HEADER}</h3>
+      <div className={styles.calcheck_intro_div}>
+        <p className={styles.intro_header}>{ROBOT_CALIBRATION_INTRO_HEADER}</p>
+        <p className={styles.intro_content}>
+          {ROBOT_CALIBRATION_INTRO_INSTRUCTION}
+        </p>
+        <p className={styles.intro_content}>
+          {ROBOT_CALIBRATION_INTRO_OUTCOMES}
+        </p>
       </div>
-      <p className={styles.complete_body}>
-        {INTRO_ROBOT_CALIBRATION_CHECK_BODY}
-      </p>
       <h5>{TIPRACK_REQS}</h5>
       <div className={styles.required_tipracks_wrapper}>
         {labwareLoadNames.map(loadName => (
@@ -67,7 +76,6 @@ export function Introduction(props: IntroductionProps): React.Node {
           </div>
         ))}
       </div>
-
       <p className={styles.tipracks_note_body}>
         <b className={styles.tipracks_note_header}>{NOTE_HEADER}</b>
         {NOTE_BODY}
