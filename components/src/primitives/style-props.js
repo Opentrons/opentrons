@@ -67,6 +67,8 @@ const LAYOUT_PROPS = [
   'overflowY',
 ]
 
+const POSITION_PROPS = ['position', 'zIndex', 'top', 'right', 'bottom', 'left']
+
 const STYLE_PROPS = [
   ...COLOR_PROPS,
   ...TYPOGRAPHY_PROPS,
@@ -74,6 +76,7 @@ const STYLE_PROPS = [
   ...BORDER_PROPS,
   ...FLEXBOX_PROPS,
   ...LAYOUT_PROPS,
+  ...POSITION_PROPS,
 ]
 
 const colorStyles = (props: { ...Types.ColorProps, ... }) => {
@@ -129,6 +132,10 @@ const layoutStyles = (props: { ...Types.LayoutProps, ... }) => {
   return styles
 }
 
+const positionStyles = (props: { ...Types.PositionProps, ... }) => {
+  return (pick(props, POSITION_PROPS): Types.PositionProps)
+}
+
 export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...colorStyles(props),
   ...typographyStyles(props),
@@ -136,6 +143,7 @@ export const styleProps = (props: { ...Types.StyleProps, ... }): Styles => ({
   ...borderStyles(props),
   ...flexboxStyles(props),
   ...layoutStyles(props),
+  ...positionStyles(props),
 })
 
 export const isntStyleProp = (prop: string): boolean =>
