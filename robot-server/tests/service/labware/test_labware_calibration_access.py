@@ -50,7 +50,6 @@ def grab_id(set_up_index_file):
 def test_access_individual_labware(api_client, grab_id):
     calibration_id = grab_id
     expected = {
-        'calibrationId': calibration_id,
         'calibrationData': {
             'offset': {
                 'value': [0.0, 0.0, 0.0],
@@ -61,14 +60,14 @@ def test_access_individual_labware(api_client, grab_id):
         'loadName': 'opentrons_96_tiprack_10ul',
         'namespace': 'opentrons',
         'version': 1,
-        'parent': calibration_id,
-        'valueType': 'labwareCalibration'}
+        'parent': calibration_id}
 
     resp = api_client.get(f'/labware/calibrations/{calibration_id}')
     assert resp.status_code == 200
     body = resp.json()
     data = body['data']
     assert data['type'] == 'LabwareCalibration'
+    assert data['id'] == calibration_id
     data['attributes']['calibrationData']['offset']['lastModified'] = None
     data['attributes']['calibrationData']['tipLength']['lastModified'] = None
     assert data['attributes'] == expected

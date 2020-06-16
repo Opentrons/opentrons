@@ -63,7 +63,7 @@ def path(calibration_name):
 
 
 def tlc_path(pip_id):
-    return config.CONFIG['tip_length_calibration_dir']\
+    return labware.TIP_LENGTH_CALIBRATION_PATH \
         / '{}.json'.format(pip_id)
 
 
@@ -228,7 +228,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
 
 
 def test_clear_tip_length_calibration_data(monkeypatch):
-    calpath = config.get_tip_length_cal_path()
+    calpath = labware.TIP_LENGTH_CALIBRATION_PATH
     with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
         test_offset = {
             MOCK_HASH: {

@@ -1,4 +1,3 @@
-import secrets
 from typing import List, Optional, Union
 
 from starlette import status
@@ -44,14 +43,15 @@ def _format_calibrations(
         cal_data = lw_models.CalibrationData(
             offset=offset, tipLength=tip_length)
         formatted_cal = lw_models.LabwareCalibration(
-            valueType='labwareCalibration',
-            calibrationId=calInfo.labware_id,
             calibrationData=cal_data,
             loadName=details.load_name,
             namespace=details.namespace,
             version=details.version,
             parent=parent_info)
-        formatted_calibrations.append(formatted_cal)
+        formatted_calibrations.append(
+                lw_models.ResponseDataModel.create(
+                    attributes=formatted_cal,
+                    resource_id=calInfo.labware_id))
     return formatted_calibrations
 
 
@@ -106,18 +106,9 @@ async def get_all_labware_calibrations(
         version: int = None,
         parent: str = None) -> lw_models.MultipleCalibrationsResponse:
     all_calibrations = lw_funcs.get_all_calibrations()
-    # Note: Not sure we need a token for this resource? Or what
-    # the token should actually be.
-    token = secrets.token_urlsafe(nbytes=8)
+
     if not all_calibrations:
-        lw_models.MultipleCalibrationsResponse(
-            data=lw_models.ResponseDataModel.create(
-                attributes=lw_models.Calibrations(
-                    valueType='collection',
-                    value=all_calibrations
-                ),
-                resource_id=token,
-            ))
+        lw_models.MultipleCalibrationsResponse(data=all_calibrations)
 
     if namespace:
         all_calibrations = list(filter(
@@ -137,14 +128,7 @@ async def get_all_labware_calibrations(
           all_calibrations))
     calibrations = _format_calibrations(all_calibrations)
 
-    return lw_models.MultipleCalibrationsResponse(
-        data=lw_models.ResponseDataModel.create(
-            attributes=lw_models.Calibrations(
-                valueType='collection',
-                value=calibrations
-            ),
-            resource_id=token,
-        ))
+    return lw_models.MultipleCalibrationsResponse(data=calibrations)
 
 
 @router.get("/labware/calibrations/{calibrationId}",
@@ -164,14 +148,8 @@ async def get_specific_labware_calibration(
                                error=error)
 
     formatted_calibrations = _format_calibrations([calibration])
-    # Note: Not sure we need a token for this resource? Or what
-    # the token should actually be.
-    token = secrets.token_urlsafe(nbytes=8)
     return lw_models.SingleCalibrationResponse(
-        data=lw_models.ResponseDataModel.create(
-            attributes=formatted_calibrations[0],
-            resource_id=token,
-        ))
+        data=formatted_calibrations[0])
 
 
 @router.delete("/labware/calibrations/{calibrationId}",

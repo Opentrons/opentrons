@@ -30,23 +30,18 @@ class CalibrationData(BaseModel):
 
 
 class LabwareCalibration(BaseModel):
-    calibrationId: str
     calibrationData: CalibrationData
     loadName: str
     namespace: str
     version: int
     parent: str
-    valueType: str
-
-
-class Calibrations(BaseModel):
-    valueType: str
-    value: typing.List[typing.Optional[LabwareCalibration]]
 
 
 MultipleCalibrationsResponse = ResponseModel[
-    ResponseDataModel[Calibrations], dict
+    typing.List[ResponseDataModel[LabwareCalibration]], dict
 ]
+
+
 SingleCalibrationResponse = ResponseModel[
     ResponseDataModel[LabwareCalibration], dict
 ]

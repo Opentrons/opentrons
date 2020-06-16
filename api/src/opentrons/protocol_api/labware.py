@@ -24,21 +24,22 @@ from typing import (
     Any, AnyStr, List, Dict,
     Optional, Union, Sequence, Tuple,
     TYPE_CHECKING, NewType)
-from typing_extensions import TypedDict
 
 import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version, first_parent
 from opentrons.types import Location, Point
-from opentrons.config import CONFIG, get_tip_length_cal_path
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
-                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH)
+                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH,
+                        TIP_LENGTH_CALIBRATION_PATH)
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
-    from .dev_types import TipLengthCalibration, PipTipLengthCalibration
+    from .dev_types import (
+        TipLengthCalibration, PipTipLengthCalibration,
+        CalibrationDict, CalibrationIndexDict)
     from opentrons_shared_data.labware.dev_types import (
         LabwareDefinition, LabwareParameters, WellDefinition)
 
@@ -47,12 +48,10 @@ MODULE_LOG = logging.getLogger(__name__)
 
 CalibrationID = NewType('CalibrationID', str)
 
+
 class OutOfTipsError(Exception):
     pass
 
-class ModuleDict(TypedDict):
-    parent: str
-    full_parent: str
 
 # TODO: AA 2020-06-10 move out of protocol_api
 class TipLengthCalNotFound(Exception):
@@ -66,25 +65,6 @@ class DateTimeEncoder(json.JSONEncoder):
             return obj.isoformat()
         return json.JSONEncoder.default(self, obj)
 
-
-class CalibrationIndexDict(TypedDict):
-    """
-    The dict that is returned from
-    the index.json file.
-    """
-    uri: str
-    slot: str
-    module: ModuleDict
-
-
-class OffsetDict(TypedDict):
-    offset: List
-    lastModified: str
-
-
-class TipLengthDict(TypedDict):
-    length: float
-    lastModified: str
 
 # TODO: AA 2020-06-10 move out of protocol_api
 class DateTimeDecoder(json.JSONDecoder):
@@ -105,15 +85,6 @@ class DateTimeDecoder(json.JSONDecoder):
             return self.dict_to_obj(obj)
 
 
-class CalibrationDict(TypedDict):
-    """
-    The dict that is returned from a labware
-    offset file.
-    """
-    default: OffsetDict
-    tipLength: TipLengthDict
-
-
 @dataclass
 class CalibrationData:
     """
@@ -121,7 +92,7 @@ class CalibrationData:
     given calibration data.
     TODO(6/8): Move to a separate file
     """
-    value: Union[Optional[float], List]
+    value: Union[Optional[float], List[float]]
     last_modified: Optional[str]
 
 
@@ -921,13 +892,6 @@ class Labware(DeckItem):
                 well.has_tip = True
 
 
-def _combine_strings(*args, delimiter=''):
-    string_to_return = ''
-    for arg in args:
-        string_to_return += arg + delimiter
-    return string_to_return
-
-
 def _get_parent_identifier(
         parent: Union[Well, str, DeckItem, None]) -> str:
     if isinstance(parent, DeckItem) and parent.separate_calibration:
@@ -968,10 +932,10 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     if mod_parent:
         mod_dict = {
             'parent': mod_parent,
-            'full_parent': _combine_strings(slot, mod_parent, delimiter='-')}
+            'full_parent': f'{slot}-{mod_parent}'}
     else:
         mod_dict = {}
-    full_id = _combine_strings(lw_hash, mod_parent)
+    full_id = f'{lw_hash}{mod_parent}'
     blob[full_id] = {
             "uri": f'{uri}',
             "slot": full_id,
@@ -1022,7 +986,7 @@ def save_tip_length(labware: Labware, length: float):
 
 # TODO: AA - move out of protocol_api
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
-    index_file = get_tip_length_cal_path()/'index.json'
+    index_file = TIP_LENGTH_CALIBRATION_PATH/'index.json'
     try:
         index_data = _read_file(str(index_file))
     except FileNotFoundError:
@@ -1040,7 +1004,7 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 # TODO: AA - move out of protocol_api
 def save_tip_length_calibration(
         pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
-    tip_length_dir_path = get_tip_length_cal_path()
+    tip_length_dir_path = TIP_LENGTH_CALIBRATION_PATH
     tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
 
@@ -1081,7 +1045,7 @@ def load_tip_length_calibration(
     assert labware._is_tiprack, \
         'cannot load tip length for non-tiprack labware'
     try:
-        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
+        pip_tip_length_path = TIP_LENGTH_CALIBRATION_PATH/f'{pip_id}.json'
         parent_id = _get_parent_identifier(labware.parent)
         labware_hash = _hash_labware_def(labware._definition)
         tip_length_data = _read_cal_file(str(pip_tip_length_path))
@@ -1098,7 +1062,7 @@ def clear_tip_length_calibration():
     """
     Delete all tip length calibration files.
     """
-    tip_length_path = get_tip_length_cal_path()
+    tip_length_path = TIP_LENGTH_CALIBRATION_PATH
     try:
         targets = (
             f for f in tip_length_path.iterdir() if f.suffix == '.json')
@@ -1166,16 +1130,14 @@ def _helper_tip_length_data_format(filepath: str, length: float) -> dict:
 
 
 def _read_file(filepath: str):
-    """
-    :Note: The return type of this function is actually
-    Union[Dict[str, str], CalibrationDict, CalibrationIndexDict]
-    however, mypy cannot correctly interpret unions when
-    setting variables. To make typing clear in other
-    places, the return type here was removed.
-    """
+    # TODO(6/16): We should use tagged unions for
+    # both the calibration and tip length dicts to better
+    # categorize the Typed Dicts used here.
+    # This can be done when the labware endpoints
+    # are refactored to grab tip length calibration
+    # from the correct locations.
     with open(filepath, 'r') as f:
         calibration_data = json.load(f)
-
     return calibration_data
 
 
@@ -1416,20 +1378,18 @@ def get_all_labware_definitions() -> List[str]:
 
 
 def _format_calibration_type(
-        data: CalibrationDict) -> CalibrationTypes:  # type: ignore
+        data: 'CalibrationDict') -> 'CalibrationTypes':
     offset = CalibrationData(
         value=data['default']['offset'],
         last_modified=data['default']['lastModified']
     )
-    if data.get('tipLength'):
-        length: Optional[float] = data['tipLength']['length']
-        tip_mod: Optional[str] = data['tipLength']['lastModified']
-    else:
-        length = None
-        tip_mod = None
+    # TODO(6/16): Tip calibration no longer exists in
+    # the labware calibraiton file. We should
+    # have a follow-up PR to grab tip lengths
+    # based on the loaded pips + labware
     tip_length = CalibrationData(
-        value=length,
-        last_modified=tip_mod
+        value=None,
+        last_modified=None
     )
     return CalibrationTypes(
             offset=offset,
@@ -1437,7 +1397,7 @@ def _format_calibration_type(
         )
 
 
-def _format_parent(data: CalibrationIndexDict) -> ParentOptions:
+def _format_parent(data: 'CalibrationIndexDict') -> ParentOptions:
     if data['module']:
         mod = data['module']['parent']
     else:
@@ -1463,7 +1423,7 @@ def get_all_calibrations() -> List[CalibrationInformation]:
     index_file = _read_file(str(index_path))
     for key, data in index_file.items():
         cal_path = OFFSETS_PATH / f'{key}.json'
-        cal_blob: CalibrationDict = _read_file(str(cal_path))
+        cal_blob = _read_file(str(cal_path))
         calibration = _format_calibration_type(cal_blob)
         details = details_from_uri(data['uri'])
         definition = get_labware_definition(
