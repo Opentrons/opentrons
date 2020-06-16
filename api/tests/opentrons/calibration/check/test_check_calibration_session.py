@@ -61,7 +61,7 @@ def check_calibration_session_only_left(hardware) \
 
 
 BAD_DIFF_VECTOR = types.Point(30, 30, 30)
-OK_DIFF_VECTOR = types.Point(1, 1, 0.5)
+OK_DIFF_VECTOR = types.Point(1, 1, 0.3)
 
 # helpers
 
@@ -201,7 +201,7 @@ async def in_inspecting_second_tip(check_calibration_session):
     )
     await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.jog,
-        types.Point(0, 0, -0.5)
+        types.Point(0, 0, -0.3)
     )
     await check_calibration_session.trigger_transition(
         session.CalibrationCheckTrigger.pick_up_tip,
@@ -318,7 +318,7 @@ async def test_ensure_safety_removed_for_comparison(
     # removing z buffer and jog move.
     no_jog_and_buffer =\
         last_point + types.Point(0, 0, .8) -\
-        types.Point(0, 0, 0.5)
+        types.Point(0, 0, 0.3)
     assert sess._saved_points['joggingFirstPipetteToHeight'].z\
         == no_jog_and_buffer.z
 
@@ -545,7 +545,7 @@ async def test_comparing_first_pipette_height_to_jogging_point_one(
     tip_pt = sess._moves.joggingFirstPipetteToPointOne.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
+    assert curr_pos == tip_pt + types.Point(0, 0, 5.3)
     assert check_calibration_session.current_state.name == \
            session.CalibrationCheckState.joggingFirstPipetteToPointOne
     await check_calibration_session.trigger_transition(
@@ -568,7 +568,7 @@ async def test_comparing_first_pipette_point_one_to_jogging_point_two(
     tip_pt = sess._moves.joggingFirstPipetteToPointTwo.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
+    assert curr_pos == tip_pt + types.Point(0, 0, 5.3)
     assert check_calibration_session.current_state.name == \
            session.CalibrationCheckState.joggingFirstPipetteToPointTwo
     await check_calibration_session.trigger_transition(
@@ -591,7 +591,7 @@ async def test_comparing_first_pipette_point_two_to_jogging_point_three(
     tip_pt = sess._moves.joggingFirstPipetteToPointThree.position
     curr_pos = await sess.hardware.gantry_position(
             sess._get_pipette_by_rank(session.PipetteRank.first).mount)
-    assert curr_pos == tip_pt + types.Point(0, 0, 5.5)
+    assert curr_pos == tip_pt + types.Point(0, 0, 5.3)
     assert check_calibration_session.current_state.name == \
            session.CalibrationCheckState.joggingFirstPipetteToPointThree
     await check_calibration_session.trigger_transition(
@@ -663,7 +663,7 @@ async def test_comparing_second_pipette_height_to_jogging_point_one(
         round(curr_pos[0], 2),
         round(curr_pos[1], 2),
         round(curr_pos[2], 2))
-    assert rounded_pos == tip_pt + types.Point(0, 0, 5.5)
+    assert rounded_pos == tip_pt + types.Point(0, 0, 5.3)
     assert check_calibration_session.current_state.name == \
            session.CalibrationCheckState.joggingSecondPipetteToPointOne
     await check_calibration_session.trigger_transition(
