@@ -87,7 +87,7 @@ export class MultiChannelSubstep extends React.PureComponent<
             className={styles.inner_carat}
             onClick={this.handleToggleCollapsed}
           >
-            <Icon name={collapsed ? 'chevron-up' : 'chevron-down'} />
+            <Icon name={collapsed ? 'chevron-down' : 'chevron-up'} />
           </span>
         </PDListItem>
 
