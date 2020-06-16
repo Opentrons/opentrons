@@ -10,6 +10,6 @@ type Props = {|
 
 export function ThresholdValue(props: Props): React.Node {
   const value = props.thresholdVector.find(axis => axis > 0)
-  const formattedValue = parseFloat(value).toFixed(2)
+  const formattedValue = parseFloat(value).toFixed(1)
   return <span>{`±${formattedValue} mm`}</span>
 }

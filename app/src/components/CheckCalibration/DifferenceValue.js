@@ -22,21 +22,17 @@ type Props = {|
 export function DifferenceValue(props: Props): React.Node {
   const { stepName, differenceVector } = props
   return (
-    <>
-      {axisIndicesByStep[stepName].map(axisIndex => (
-        <span className={styles.data_axis_label}>
-          <span>{AXIS_NAMES[axisIndex]}</span>
-          &nbsp; &nbsp;
-          <span>
-            {differenceVector[axisIndex] !== 0
-              ? differenceVector[axisIndex] > 0
-                ? '+'
-                : '-'
-              : ' '}
-          </span>
-          <span>{differenceVector[axisIndex]} mm</span>
-        </span>
-      ))}
-    </>
+    <div className={styles.difference_value_data_cell}>
+      {axisIndicesByStep[stepName].map(axisIndex => {
+        const rawValue = differenceVector[axisIndex]
+        const formattedValue = parseFloat(rawValue).toFixed(1)
+        return (
+          <div className={styles.data_axis_label}>
+            <p>{AXIS_NAMES[axisIndex]}</p>
+            <p>{`${rawValue > 0 ? '+' : ''}${formattedValue} mm`}</p>
+          </div>
+        )
+      })}
+    </div>
   )
 }

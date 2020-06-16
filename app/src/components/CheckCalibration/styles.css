@@ -45,22 +45,12 @@
   margin: 2rem 0;
 }
 
-.summary_section {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  justify-content: flex-start;
-  height: 3rem;
-  width: 10.25rem;
-  padding: 0.75rem;
-  margin-right: 1rem;
-  border-radius: var(--bd-radius-default);
-  border-width: var(--bd-width-default);
-  border-style: solid;
+.summary_page_header {
+  margin-bottom: 1.75rem;
 }
 
-.summary_section:last-child {
-  margin-right: 0;
+.summary_section {
+  margin-bottom: 1.25rem;
 }
 
 .summary_icon {
@@ -72,12 +62,18 @@
   width: 100%;
 }
 
+.download_summary_button {
+  align-self: flex-end;
+  width: 18rem;
+  margin-bottom: 2rem;
+}
+
 .pipette_data_wrapper {
   align-self: stretch;
 }
 
 .pipette_data_table {
-  @apply --font-body-2-dark;
+  @apply --font-body-1-dark;
 
   font-size: 0.75rem;
   width: 100%;
@@ -101,14 +97,30 @@
 .pipette_data_header {
   @apply --font-body-2-dark;
 
+  font-weight: var(--fw-semibold);
   display: flex;
   text-transform: capitalize;
+  margin-bottom: 0.75rem;
 }
 
 .inline_step_status {
   display: flex;
   align-items: center;
   text-transform: capitalize;
+}
+
+.difference_value_data_cell {
+  display: flex;
+  flex-direction: row;
+  width: 100%;
+}
+
+.data_axis_label {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex: 1;
+  max-width: 4rem;
 }
 
 .data_axis_label:not(:last-child) {

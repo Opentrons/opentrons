@@ -1,7 +1,12 @@
 // @flow
 import * as React from 'react'
 import cx from 'classnames'
-import { Icon, PrimaryButton, IconButton } from '@opentrons/components'
+import {
+  Icon,
+  PrimaryButton,
+  IconButton,
+  OutlineButton,
+} from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
@@ -14,8 +19,8 @@ import type {
   RobotCalibrationCheckInstrument,
 } from '../../calibration'
 import * as Calibration from '../../calibration'
-import DifferenceValue from './DifferenceValue'
 import styles from './styles.css'
+import { DifferenceValue } from './DifferenceValue'
 import { ThresholdValue } from './ThresholdValue'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
@@ -33,6 +38,7 @@ const HEIGHT_CHECK_DISPLAY_NAME = 'Slot 5 Z-axis'
 const POINT_ONE_CHECK_DISPLAY_NAME = 'Slot 1 X/Y-axis'
 const POINT_TWO_CHECK_DISPLAY_NAME = 'Slot 3 X/Y-axis'
 const POINT_THREE_CHECK_DISPLAY_NAME = 'Slot 7 X/Y-axis'
+const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 type CompleteConfirmationProps = {|
   exit: () => mixed,
@@ -83,22 +89,26 @@ export function CompleteConfirmation(
   )
   return (
     <>
-      <div className={styles.modal_icon_wrapper}>
-        <h3>{ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}</h3>
-      </div>
+      <h3 className={styles.summary_page_header}>
+        {ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER}
+      </h3>
 
       <div className={styles.summary_page_contents}>
         {some(firstComparisonsByStep) && (
-          <PipetteStepsSummary
-            pipette={firstPipette}
-            comparisonsByStep={firstComparisonsByStep}
-          />
+          <div className={styles.summary_section}>
+            <PipetteStepsSummary
+              pipette={firstPipette}
+              comparisonsByStep={firstComparisonsByStep}
+            />
+          </div>
         )}
         {some(secondComparisonsByStep) && (
-          <PipetteStepsSummary
-            pipette={secondPipette}
-            comparisonsByStep={secondComparisonsByStep}
-          />
+          <div className={styles.summary_section}>
+            <PipetteStepsSummary
+              pipette={secondPipette}
+              comparisonsByStep={secondComparisonsByStep}
+            />
+          </div>
         )}
 
         <input
@@ -107,14 +117,15 @@ export function CompleteConfirmation(
           value={JSON.stringify(comparisonsByStep)}
           onFocus={e => e.currentTarget.select()}
           readOnly
-        />
-
-        <IconButton
-          className={styles.copy_icon}
-          onClick={handleCopyButtonClick}
-          name="ot-copy-text"
+          hidden
         />
       </div>
+      <OutlineButton
+        className={styles.download_summary_button}
+        onClick={handleCopyButtonClick}
+      >
+        {DOWNLOAD_SUMMARY}
+      </OutlineButton>
       <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
     </>
   )
@@ -142,10 +153,10 @@ function PipetteStepsSummary(props: PipetteStepsSummaryProps) {
   const { displayName } = getPipetteModelSpecs(pipette.model) || {}
   return (
     <div className={styles.pipette_data_wrapper}>
-      <div className={styles.pipette_data_header}>
-        <h5>{`${pipette.mount.toLowerCase()} ${PIPETTE}: ${displayName}`}</h5>
+      <h5 className={styles.pipette_data_header}>
+        {`${pipette.mount.toLowerCase()} ${PIPETTE}: ${displayName}`}
         {/* <p>{`(TODO: put pipette serial here)`}</p> */}
-      </div>
+      </h5>
       <table className={styles.pipette_data_table}>
         <thead>
           <tr>
