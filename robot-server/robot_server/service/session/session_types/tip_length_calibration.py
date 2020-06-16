@@ -6,6 +6,7 @@ from ..command_execution import CommandQueue, CommandExecutor, \
     CallableExecutor
 from ..configuration import SessionConfiguration
 from ..models import EmptyModel, SessionType, SessionDetails
+from ..errors import UnsupportedFeature
 
 
 class TipLengthCalibration(BaseSession):
@@ -19,7 +20,6 @@ class TipLengthCalibration(BaseSession):
         self._command_executor = CallableExecutor(
             self._tip_length_calibration.handle_command
         )
-        self._command_queue = CommandQueue()
 
     @classmethod
     async def create(cls, configuration: SessionConfiguration,
@@ -34,7 +34,7 @@ class TipLengthCalibration(BaseSession):
 
     @property
     def command_queue(self) -> CommandQueue:
-        return self._command_queue
+        raise UnsupportedFeature()
 
     @property
     def session_type(self) -> SessionType:

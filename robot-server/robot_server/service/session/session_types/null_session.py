@@ -2,6 +2,7 @@ from robot_server.service.session import models
 from robot_server.service.session.command_execution import CommandQueue,\
     CommandExecutor
 from robot_server.service.session.configuration import SessionConfiguration
+from robot_server.service.session.errors import UnsupportedFeature
 from robot_server.service.session.models import EmptyModel, SessionType
 from robot_server.service.session.session_types.base_session import \
     BaseSession, SessionMetaData
@@ -16,7 +17,6 @@ class NullSession(BaseSession):
         """Constructor"""
         super().__init__(configuration, instance_meta=instance_meta)
         self._command_executor = CommandExecutor()
-        self._command_queue = CommandQueue()
 
     @property
     def command_executor(self) -> CommandExecutor:
@@ -24,7 +24,7 @@ class NullSession(BaseSession):
 
     @property
     def command_queue(self) -> CommandQueue:
-        return self._command_queue
+        raise UnsupportedFeature()
 
     def _get_response_details(self) -> models.SessionDetails:
         return EmptyModel()

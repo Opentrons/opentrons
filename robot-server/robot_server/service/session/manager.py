@@ -8,14 +8,16 @@ from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import NullSession, \
-    CheckSession, SessionMetaData, TipLengthCalibration
+    CheckSession, SessionMetaData, TipLengthCalibration, DefaultSession
+
 
 log = logging.getLogger(__name__)
 
 SessionTypeToClass: Dict[SessionType, Type[BaseSession]] = {
     SessionType.null: NullSession,
     SessionType.calibration_check: CheckSession,
-    SessionType.tip_length_calibration: TipLengthCalibration
+    SessionType.tip_length_calibration: TipLengthCalibration,
+    SessionType.default: DefaultSession
 }
 
 
