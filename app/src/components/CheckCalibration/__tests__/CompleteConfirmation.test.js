@@ -7,6 +7,14 @@ import * as Fixtures from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
 import type { RobotCalibrationCheckComparisonsByStep } from '../../../calibration'
 import { CompleteConfirmation } from '../CompleteConfirmation'
+import { saveAs } from 'file-saver'
+
+jest.mock('file-saver')
+
+const mockSaveAs: JestMockFn<
+  [Blob, string],
+  $Call<typeof saveAs, Blob, string>
+> = saveAs
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
@@ -18,6 +26,11 @@ describe('CompleteConfirmation', () => {
   const getExitButton = wrapper =>
     wrapper
       .find('PrimaryButton[children="Drop tip in trash and exit"]')
+      .find('button')
+
+  const getSaveButton = wrapper =>
+    wrapper
+      .find('OutlineButton[children="Download JSON summary"]')
       .find('button')
 
   beforeEach(() => {
@@ -89,5 +102,12 @@ describe('CompleteConfirmation', () => {
     wrapper.update()
 
     expect(mockExit).toHaveBeenCalled()
+  })
+
+  it('saves the calibration report when the button is clicked', () => {
+    const wrapper = render()
+    act(() => getSaveButton(wrapper).invoke('onClick')())
+    wrapper.update()
+    expect(mockSaveAs).toHaveBeenCalled()
   })
 })
