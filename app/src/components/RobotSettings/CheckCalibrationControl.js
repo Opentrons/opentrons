@@ -6,14 +6,11 @@ import * as RobotApi from '../../robot-api'
 import * as Sessions from '../../sessions'
 
 import {
-  OutlineButton,
   Icon,
   Flex,
   Box,
   Text,
   ALIGN_CENTER,
-  ALIGN_START,
-  SPACING_AUTO,
   SIZE_2,
   SPACING_1,
   SPACING_2,
@@ -26,6 +23,7 @@ import {
 
 import { Portal } from '../portal'
 import { CheckCalibration } from '../CheckCalibration'
+import { TitledButton } from '../TitledButton'
 
 import type { State } from '../../types'
 
@@ -71,32 +69,19 @@ export function CheckCalibrationControl({
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
   }, [requestStatus])
 
-  // TODO(mc, 2020-06-17): extract all this presentational stuff into some sort
-  // of replacement for LabeledControl that allows full-width children
+  // TODO(mc, 2020-06-17): extract alert presentational stuff
   return (
     <>
-      <Box
-        fontSize={FONT_SIZE_BODY_1}
-        padding={SPACING_3}
+      <TitledButton
         borderBottom={BORDER_SOLID_LIGHT}
+        title={CHECK_ROBOT_CAL}
+        description={<Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>}
+        buttonProps={{
+          children: buttonChildren,
+          disabled: buttonDisabled,
+          onClick: ensureSession,
+        }}
       >
-        <Flex alignItems={ALIGN_START}>
-          <Box marginRight={SPACING_AUTO}>
-            <Text
-              as="h4"
-              fontWeight={FONT_WEIGHT_SEMIBOLD}
-              marginBottom={SPACING_2}
-            >
-              {CHECK_ROBOT_CAL}
-            </Text>
-            <Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>
-          </Box>
-          <Box paddingTop={SPACING_1}>
-            <OutlineButton disabled={buttonDisabled} onClick={ensureSession}>
-              {buttonChildren}
-            </OutlineButton>
-          </Box>
-        </Flex>
         {requestState && requestState.status === RobotApi.FAILURE && (
           <Flex
             alignItems={ALIGN_CENTER}
@@ -113,7 +98,7 @@ export function CheckCalibrationControl({
             </Box>
           </Flex>
         )}
-      </Box>
+      </TitledButton>
       {showWizard && (
         <Portal>
           <CheckCalibration
