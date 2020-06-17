@@ -1,13 +1,12 @@
 import logging
 from typing import Optional, Tuple, Dict, Type
 
-from opentrons.calibration.check.models import SessionType
 from opentrons.hardware_control import ThreadManager
 
 from robot_server.service.session.errors import SessionCreationException
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
-from robot_server.service.session.models import IdentifierType
+from robot_server.service.session.models import IdentifierType, SessionType
 from robot_server.service.session.session_types import NullSession, \
     CheckSession, SessionMetaData, TipLengthCalibration
 

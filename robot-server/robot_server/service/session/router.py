@@ -3,7 +3,6 @@ import typing
 
 from starlette import status as http_status_codes
 from fastapi import APIRouter, Query, Depends
-from opentrons.calibration.check import models
 
 from robot_server.service.dependencies import get_session_manager
 from robot_server.service.errors import RobotServerError
@@ -125,7 +124,7 @@ async def get_session_handler(
             response_model_exclude_unset=True,
             response_model=route_models.MultiSessionResponse)
 async def get_sessions_handler(
-        type_filter: models.SessionType = Query(
+        type_filter: route_models.SessionType = Query(
             None,
             description="Will limit the results to only this session type"),
         session_manager: SessionManager = Depends(get_session_manager)) \

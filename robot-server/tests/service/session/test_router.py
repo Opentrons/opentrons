@@ -4,7 +4,7 @@ from datetime import datetime
 
 import typing
 
-from opentrons.calibration.check.models import SessionType, JogPosition
+from opentrons.calibration.check.models import JogPosition
 from pydantic.main import BaseModel
 
 from robot_server.service.dependencies import get_session_manager
@@ -14,7 +14,8 @@ from robot_server.service.session.command_execution.command import \
     CommandResult, CompletedCommand, CommandContent, CommandMeta
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
-from robot_server.service.session.models import CommandName, EmptyModel
+from robot_server.service.session.models import CommandName, EmptyModel, \
+    SessionType
 from robot_server.service.session.session_types import NullSession, \
     SessionMetaData
 

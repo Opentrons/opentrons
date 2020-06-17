@@ -1,13 +1,11 @@
-from opentrons.calibration.check.models import SessionType
 from opentrons.calibration.tip_length.state_machine import \
     TipCalibrationStateMachine
 
 from .base_session import BaseSession, SessionMetaData
-from .. import models
 from ..command_execution import CommandQueue, CommandExecutor, \
     StateMachineExecutor
 from ..configuration import SessionConfiguration
-from ..models import EmptyModel
+from ..models import EmptyModel, SessionType, SessionDetails
 
 
 class TipLengthCalibration(BaseSession):
@@ -42,7 +40,7 @@ class TipLengthCalibration(BaseSession):
     def session_type(self) -> SessionType:
         return SessionType.tip_length_calibration
 
-    def _get_response_details(self) -> models.SessionDetails:
+    def _get_response_details(self) -> SessionDetails:
         # TODO: Create a proper model for the session details. Add it to
         #   SessionDetails Union
         return EmptyModel()
