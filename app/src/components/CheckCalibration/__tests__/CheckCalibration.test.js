@@ -18,7 +18,7 @@ import { DeckSetup } from '../DeckSetup'
 import { TipPickUp } from '../TipPickUp'
 import { CheckXYPoint } from '../CheckXYPoint'
 import { CheckHeight } from '../CheckHeight'
-import { CompleteConfirmation } from '../CompleteConfirmation'
+import { ResultsSummary } from '../ResultsSummary'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import type { RequestState } from '../../../robot-api/types'
@@ -92,7 +92,7 @@ describe('CheckCalibration', () => {
     TipPickUp,
     CheckXYPoint,
     CheckHeight,
-    CompleteConfirmation,
+    ResultsSummary,
   ]
 
   const SPECS: Array<CheckCalibrationSpec> = [
@@ -114,7 +114,7 @@ describe('CheckCalibration', () => {
     { component: CheckHeight, currentStep: 'comparingFirstPipetteHeight' },
     { component: CheckHeight, currentStep: 'joggingSecondPipetteToHeight' },
     { component: CheckHeight, currentStep: 'comparingSecondPipetteHeight' },
-    { component: CompleteConfirmation, currentStep: 'checkComplete' },
+    { component: ResultsSummary, currentStep: 'checkComplete' },
   ]
 
   beforeEach(() => {

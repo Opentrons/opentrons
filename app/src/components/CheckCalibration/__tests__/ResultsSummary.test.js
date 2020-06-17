@@ -6,14 +6,14 @@ import omit from 'lodash/omit'
 import * as Fixtures from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
 import type { RobotCalibrationCheckComparisonsByStep } from '../../../calibration'
-import { CompleteConfirmation } from '../CompleteConfirmation'
+import { ResultsSummary } from '../ResultsSummary'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
-describe('CompleteConfirmation', () => {
+describe('ResultsSummary', () => {
   let render
 
-  const mockExit = jest.fn()
+  const mockDeleteSession = jest.fn()
 
   const getExitButton = wrapper =>
     wrapper
@@ -27,10 +27,10 @@ describe('CompleteConfirmation', () => {
       comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
     } = {}) => {
       return mount(
-        <CompleteConfirmation
+        <ResultsSummary
           instrumentsByMount={mockSessionDetails.instruments}
           comparisonsByStep={comparisonsByStep}
-          exit={mockExit}
+          deleteSession={mockDeleteSession}
         />
       )
     }
@@ -59,7 +59,7 @@ describe('CompleteConfirmation', () => {
     ).toEqual(expect.stringContaining('left'))
   })
 
-  it('does not summarize second pipette if no comparisons have been made', () => {
+  it('summarizes both pipettes if no comparisons have been made', () => {
     const wrapper = render({
       comparisonsByStep: omit(
         mockSessionDetails.comparisonsByStep,
@@ -78,8 +78,9 @@ describe('CompleteConfirmation', () => {
       wrapper
         .find('PipetteComparisons')
         .at(1)
-        .exists()
-    ).toBe(false)
+        .find('h5')
+        .text()
+    ).toEqual(expect.stringContaining('left'))
   })
 
   it('exits when button is clicked', () => {
@@ -88,6 +89,6 @@ describe('CompleteConfirmation', () => {
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockExit).toHaveBeenCalled()
+    expect(mockDeleteSession).toHaveBeenCalled()
   })
 })

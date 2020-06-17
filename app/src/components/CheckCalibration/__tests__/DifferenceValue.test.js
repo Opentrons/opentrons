@@ -13,7 +13,7 @@ const {
   goodXYComparison,
 } = Fixtures
 
-describe('CompleteConfirmation', () => {
+describe('DifferenceValue', () => {
   let render
 
   beforeEach(() => {

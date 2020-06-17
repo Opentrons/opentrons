@@ -26,7 +26,7 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
-import { CompleteConfirmation } from './CompleteConfirmation'
+import { ResultsSummary } from './ResultsSummary'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
 import { BadCalibration } from './BadCalibration'
@@ -318,7 +318,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = (
-        <CompleteConfirmation
+        <ResultsSummary
           deleteSession={deleteSession}
           comparisonsByStep={comparisonsByStep}
           instrumentsByMount={instruments}

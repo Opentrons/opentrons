@@ -3,7 +3,6 @@ import * as React from 'react'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
-import some from 'lodash/some'
 import partition from 'lodash/partition'
 import type {
   RobotCalibrationCheckComparisonsByStep,
@@ -16,16 +15,13 @@ import { PipetteComparisons } from './PipetteComparisons'
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
 const DOWNLOAD_SUMMARY = 'Copy JSON summary to clipboard'
-const NONE_COMPLETED = 'No checks completed'
 
-type CompleteConfirmationProps = {|
+type ResultsSummaryProps = {|
   deleteSession: () => mixed,
   comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
   instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
 |}
-export function CompleteConfirmation(
-  props: CompleteConfirmationProps
-): React.Node {
+export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const { deleteSession, comparisonsByStep, instrumentsByMount } = props
 
   const rawDataRef = React.useRef<HTMLInputElement | null>(null)

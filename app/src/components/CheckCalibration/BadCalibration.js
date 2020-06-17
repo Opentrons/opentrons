@@ -17,10 +17,10 @@ const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
 
 const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
-type CompleteConfirmationProps = {|
+type BadCalibrationProps = {|
   deleteSession: () => mixed,
 |}
-export function BadCalibration(props: CompleteConfirmationProps): React.Node {
+export function BadCalibration(props: BadCalibrationProps): React.Node {
   const { deleteSession } = props
 
   return (
