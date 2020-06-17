@@ -130,6 +130,10 @@
   margin-bottom: 0.75rem;
 }
 
+.individual_step_comparison_wrapper {
+  max-width: 66%;
+}
+
 .inline_step_status {
   display: flex;
   align-items: center;
@@ -148,6 +152,11 @@
   justify-content: space-between;
   flex: 1;
   max-width: 4rem;
+}
+
+.compare_axis_label {
+  font-weight: var(--fw-semibold);
+  margin-right: 1rem;
 }
 
 .data_axis_label:not(:last-child) {

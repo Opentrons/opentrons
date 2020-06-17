@@ -39,3 +39,23 @@ export function DifferenceValue(props: Props): React.Node {
     </div>
   )
 }
+
+type IndividualDifferenceVector = {|
+  value: number,
+|}
+type IndividualAxisDifferenceProps = {|
+  difference: IndividualDifferenceVector,
+|}
+export function IndividualAxisDifferenceValue(
+  props: IndividualAxisDifferenceProps
+): React.Node {
+  const { value } = props.difference
+  const formattedValue = parseFloat(value).toFixed(1)
+  return (
+    <div className={styles.difference_value_data_cell}>
+      <div className={styles.data_axis_label}>
+        <p>{`${value > 0 ? '+' : ''}${formattedValue} mm`}</p>
+      </div>
+    </div>
+  )
+}

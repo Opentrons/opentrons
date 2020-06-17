@@ -45,9 +45,11 @@ export function CompleteConfirmation(
     (p: RobotCalibrationCheckInstrument) =>
       p.rank === Calibration.CHECK_PIPETTE_RANK_SECOND
   )
-  const [firstComparisonsByStep, secondComparisonsByStep] = partition(
-    Object.keys(comparisonsByStep),
-    compStep => Calibration.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
+  const [
+    firstComparisonsByStep,
+    secondComparisonsByStep,
+  ] = partition(Object.keys(comparisonsByStep), compStep =>
+    Calibration.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
   ).map(stepNames => pick(comparisonsByStep, stepNames))
 
   return (

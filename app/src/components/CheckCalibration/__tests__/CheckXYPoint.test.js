@@ -50,6 +50,7 @@ describe('CheckXYPoint', () => {
           exceedsThreshold: false,
           transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
+        pipetteModel = 'p300_single_v2.1',
         nextButtonText = 'continue',
       } = props
       return mount(
@@ -59,6 +60,7 @@ describe('CheckXYPoint', () => {
           mount={mountProp}
           isInspecting={isInspecting}
           comparison={comparison}
+          pipetteModel={pipetteModel}
           nextButtonText={nextButtonText}
           exit={mockExit}
           comparePoint={mockComparePoint}

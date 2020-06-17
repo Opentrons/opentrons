@@ -121,6 +121,11 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     return spec ? spec.channels > 1 : false
   }, [activeInstrument, instruments])
 
+  const activeInstrumentModel = React.useMemo(() => {
+    const spec = instruments && activeInstrument && activeInstrument.model
+    return spec ? spec : ''
+  }, [activeInstrument, instruments])
+
   const tipRackWellName: string = React.useMemo(() => {
     const instr_ids = instruments ? Object.keys(instruments) : []
     if (!activeInstrument) {
@@ -262,6 +267,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           exit={confirmExit}
           isInspecting={isInspecting}
           comparison={comparison}
+          pipetteModel={activeInstrumentModel}
           nextButtonText={nextButtonText}
           comparePoint={() =>
             sendCommand(Calibration.checkCommands.COMPARE_POINT)
@@ -293,6 +299,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           mount={activeMount}
           isInspecting={isInspecting}
           comparison={comparison}
+          pipetteModel={activeInstrumentModel}
           nextButtonText={nextButtonText}
           exit={confirmExit}
           comparePoint={() =>

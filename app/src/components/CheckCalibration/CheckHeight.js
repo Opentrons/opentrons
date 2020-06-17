@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { PrimaryButton, Icon, Link, type Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import {
   type RobotCalibrationCheckComparison,
@@ -11,6 +12,7 @@ import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import { formatOffsetValue } from './utils'
+import { EndOfStepComparison } from './EndOfStepComparisons'
 
 import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z_(640X480)_REV3.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z_(640X480)_REV3.webm'
@@ -43,11 +45,12 @@ const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
-const BAD_INSPECTING_BODY =
-  "Your current pipette tip position does not match your robot's saved calibration data"
-const GOOD_INSPECTING_BODY =
-  "Your current pipette tip position matches your robot's saved calibration data"
-const DIFFERENCE = 'Difference'
+const BAD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls outside the acceptable tolerance range for a'
+const GOOD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls within the acceptable tolerance range for a '
+const INSPECTING_COMPARISON =
+  "pipette when compared to your robot's saved Z-axis calibration coordinates."
 const DECK_CAL_BLURB =
   'To resolve this, you will need to perform deck calibration. Read'
 const THIS_ARTICLE = 'this article'
@@ -61,6 +64,7 @@ type CheckHeightProps = {|
   mount: Mount | null,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
+  pipetteModel: string,
   exit: () => mixed,
   nextButtonText: string,
   comparePoint: () => void,
@@ -73,6 +77,7 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
     mount,
     isInspecting,
     comparison,
+    pipetteModel,
     exit,
     nextButtonText,
     comparePoint,
@@ -94,6 +99,7 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
         <CompareZ
           comparison={comparison}
           goToNextCheck={goToNextCheck}
+          pipetteModel={pipetteModel}
           exit={exit}
           nextButtonText={nextButtonText}
         />
@@ -142,21 +148,28 @@ export function CheckHeight(props: CheckHeightProps): React.Node {
 type CompareZProps = {|
   comparison: RobotCalibrationCheckComparison,
   goToNextCheck: () => void,
+  pipetteModel: string,
   exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareZ(props: CompareZProps) {
-  const { comparison, goToNextCheck, exit, nextButtonText } = props
-  const { differenceVector, exceedsThreshold } = comparison
-
+  const {
+    comparison,
+    pipetteModel,
+    goToNextCheck,
+    exit,
+    nextButtonText,
+  } = props
+  const { exceedsThreshold } = comparison
+  const { displayName } = getPipetteModelSpecs(pipetteModel) || {}
   let header = GOOD_INSPECTING_HEADER
-  let body = GOOD_INSPECTING_BODY
+  let preamble = GOOD_INSPECTING_PREAMBLE
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
   let differenceClass = styles.difference_good
 
   if (exceedsThreshold) {
     header = BAD_INSPECTING_HEADER
-    body = BAD_INSPECTING_BODY
+    preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
     differenceClass = styles.difference_bad
   }
@@ -167,18 +180,14 @@ function CompareZ(props: CompareZProps) {
         {icon}
         <h3>{header}</h3>
       </div>
-      <p className={styles.difference_body}>{body}</p>
-      <div className={cx(styles.difference_wrapper, differenceClass)}>
-        <h5>{DIFFERENCE}</h5>
-        <div className={styles.difference_values}>
-          <div className={styles.difference_value_wrapper}>
-            <h5>Z</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[2])}
-            </span>
-          </div>
-        </div>
-      </div>
+      <p className={styles.difference_body}>
+        {preamble}
+        &nbsp;
+        {displayName}
+        &nbsp;
+        {INSPECTING_COMPARISON}
+      </p>
+      <EndOfStepComparison comparison={comparison} forAxes={['z']} />
       {exceedsThreshold &&
         (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
           <p className={styles.difference_body}>

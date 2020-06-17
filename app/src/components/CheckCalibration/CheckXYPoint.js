@@ -2,6 +2,7 @@
 import * as React from 'react'
 import cx from 'classnames'
 import { Icon, PrimaryButton, Link, type Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import {
   type RobotCalibrationCheckComparison,
@@ -11,6 +12,7 @@ import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
 import { formatOffsetValue } from './utils'
+import { EndOfStepComparison } from './EndOfStepComparisons'
 
 import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
 import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
@@ -71,10 +73,12 @@ const EXIT_CHECK = 'Exit robot calibration check'
 
 const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
-const BAD_INSPECTING_BODY =
-  "Your current pipette tip position does not match your robot's saved calibration data."
-const GOOD_INSPECTING_BODY =
-  "Your current pipette tip position matches your robot's saved calibration data."
+const BAD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls outside the acceptable tolerance range for a'
+const INSPECTING_COMPARISON =
+  "pipette when compared to your robot's saved X and Y-axis calibration coordinates."
+const GOOD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls within the acceptable tolerance range for a '
 const DIFFERENCE = 'Difference'
 const DECK_CAL_BLURB =
   'To resolve this, you will need to perform deck calibration. Read'
@@ -90,6 +94,7 @@ type CheckXYPointProps = {|
   mount: ?Mount,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
+  pipetteModel: string,
   nextButtonText: string,
   exit: () => mixed,
   comparePoint: () => void,
@@ -103,6 +108,7 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
     mount,
     isInspecting,
     comparison,
+    pipetteModel,
     exit,
     nextButtonText,
     comparePoint,
@@ -128,6 +134,7 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
       {isInspecting ? (
         <CompareXY
           comparison={comparison}
+          pipetteModel={pipetteModel}
           goToNextCheck={goToNextCheck}
           exit={exit}
           nextButtonText={nextButtonText}
@@ -176,22 +183,29 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
 
 type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
+  pipetteModel: string,
   goToNextCheck: () => void,
   exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareXY(props: CompareXYProps) {
-  const { comparison, goToNextCheck, exit, nextButtonText } = props
+  const {
+    comparison,
+    pipetteModel,
+    goToNextCheck,
+    exit,
+    nextButtonText,
+  } = props
   const { differenceVector, exceedsThreshold } = comparison
-
+  const { displayName } = getPipetteModelSpecs(pipetteModel) || {}
   let header = GOOD_INSPECTING_HEADER
-  let body = GOOD_INSPECTING_BODY
+  let preamble = GOOD_INSPECTING_PREAMBLE
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
   let differenceClass = styles.difference_good
 
   if (exceedsThreshold) {
     header = BAD_INSPECTING_HEADER
-    body = BAD_INSPECTING_BODY
+    preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
     differenceClass = styles.difference_bad
   }
@@ -202,24 +216,14 @@ function CompareXY(props: CompareXYProps) {
         {icon}
         <h3>{header}</h3>
       </div>
-      <p className={styles.difference_body}>{body}</p>
-      <div className={cx(styles.difference_wrapper, differenceClass)}>
-        <h5>{DIFFERENCE}</h5>
-        <div className={styles.difference_values}>
-          <div className={styles.difference_value_wrapper}>
-            <h5>X</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[0])}
-            </span>
-          </div>
-          <div className={styles.difference_value_wrapper}>
-            <h5>Y</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[1])}
-            </span>
-          </div>
-        </div>
-      </div>
+      <p className={styles.difference_body}>
+        {preamble}
+        &nbsp;
+        {displayName}
+        &nbsp;
+        {INSPECTING_COMPARISON}
+      </p>
+      <EndOfStepComparison comparison={comparison} forAxes={['x', 'y']} />
       {exceedsThreshold &&
         (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
           <p className={styles.difference_body}>

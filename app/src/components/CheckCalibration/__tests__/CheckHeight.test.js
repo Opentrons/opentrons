@@ -53,6 +53,7 @@ describe('CheckHeight', () => {
           exceedsThreshold: false,
           transformType: CHECK_TRANSFORM_TYPE_UNKNOWN,
         },
+        pipetteModel = 'p300_single_v2.1',
       } = props
       return mount(
         <CheckHeight
@@ -62,6 +63,7 @@ describe('CheckHeight', () => {
           mount={mountProp}
           nextButtonText="Go To Next Check"
           comparePoint={mockComparePoint}
+          pipetteModel={pipetteModel}
           goToNextCheck={mockGoToNextCheck}
           jog={mockJog}
           exit={mockExit}
