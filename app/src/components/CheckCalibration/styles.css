@@ -128,6 +128,12 @@
   display: flex;
   text-transform: capitalize;
   margin-bottom: 0.75rem;
+  align-items: baseline;
+}
+
+.pipette_serial {
+  font-size: var(--fs-body-1);
+  font-weight: var(--fw-regular);
 }
 
 .inline_step_status {

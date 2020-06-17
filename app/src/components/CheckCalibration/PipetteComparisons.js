@@ -49,7 +49,8 @@ export function PipetteComparisons(props: PipetteComparisonsProps): React.Node {
     <div className={styles.pipette_data_wrapper}>
       <h5 className={styles.pipette_data_header}>
         {`${pipette.mount.toLowerCase()} ${PIPETTE}: ${displayName}`}
-        {/* <p>{`(TODO: put pipette serial here)`}</p> */}
+        &nbsp;
+        <p className={styles.pipette_serial}>{`(#${pipette.serial})`}</p>
       </h5>
       <table className={styles.pipette_data_table}>
         <thead>
