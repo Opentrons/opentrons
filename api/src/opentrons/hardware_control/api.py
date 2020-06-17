@@ -221,7 +221,7 @@ class API(HardwareAPILike):
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
 
-    @lru_cache(maxsize=1)
+    # @lru_cache(maxsize=1)
     def validate_calibration(self):
         """
         This function determines whether the current gantry
