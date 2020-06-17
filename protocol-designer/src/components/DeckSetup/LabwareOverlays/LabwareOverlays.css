@@ -103,7 +103,7 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background-color: color-mod(var(--c-highlight) alpha(0.5));
+  background-color: color-mod(var(--c-highlight) alpha(0.25));
 }
 
 .thermocycler_icon {
