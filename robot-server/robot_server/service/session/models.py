@@ -1,6 +1,7 @@
 from enum import Enum
 import typing
 from uuid import uuid4
+from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 from opentrons.calibration.check import models as calibration_models
@@ -81,13 +82,12 @@ class Session(BasicSession):
               description="Detailed session specific status")
 
 
-class SessionCommand(BaseModel):
+class BasicSessionCommand(BaseModel):
     """A session command"""
     data: CommandDataType
     # For validation, command MUST appear after data
     command: CommandName = Field(...,
                                  description="The command description")
-    status: typing.Optional[str]
 
     @validator('command', always=True)
     def check_data_type(cls, v, values):
@@ -97,6 +97,14 @@ class SessionCommand(BaseModel):
             raise ValueError(f"Invalid command data for command type {v}. "
                              f"Expecting {v.model}")
         return v
+
+
+class SessionCommand(BasicSessionCommand):
+    """A session command response"""
+    status: str
+    created_at: datetime
+    started_at: typing.Optional[datetime]
+    completed_at: typing.Optional[datetime]
 
 
 # Session create and query requests/responses
@@ -112,7 +120,7 @@ MultiSessionResponse = ResponseModel[
 
 # Session command requests/responses
 CommandRequest = RequestModel[
-    RequestDataModel[SessionCommand]
+    RequestDataModel[BasicSessionCommand]
 ]
 CommandResponse = ResponseModel[
     ResponseDataModel[SessionCommand], dict

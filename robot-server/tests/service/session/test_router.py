@@ -69,6 +69,7 @@ def mock_command_executor():
                                 meta=command.meta,
                                 result=CommandResult(
                                     status="done",
+                                    started_at=datetime(2019, 1, 1),
                                     completed_at=datetime(2020, 1, 1))
                                 )
 
@@ -311,7 +312,10 @@ def test_execute_command(api_client,
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'done'
+                'status': 'done',
+                'created_at': '2000-01-01T00:00:00',
+                'started_at': '2019-01-01T00:00:00',
+                'completed_at': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id,
@@ -358,7 +362,10 @@ def test_execute_command_no_body(api_client,
             'attributes': {
                 'command': 'loadLabware',
                 'data': {},
-                'status': 'done'
+                'status': 'done',
+                'created_at': '2000-01-01T00:00:00',
+                'started_at': '2019-01-01T00:00:00',
+                'completed_at': '2020-01-01T00:00:00',
             },
             'type': 'SessionCommand',
             'id': command_id

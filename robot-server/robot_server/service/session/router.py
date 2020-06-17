@@ -183,7 +183,11 @@ async def session_command_execute_handler(
             attributes=route_models.SessionCommand(
                 data=command_result.content.data,
                 command=command_result.content.name,
-                status=command_result.result.status),
+                status=command_result.result.status,
+                created_at=command_result.meta.created_at,
+                started_at=command_result.result.started_at,
+                completed_at=command_result.result.completed_at
+            ),
             resource_id=command_result.meta.identifier
         ),
         links=get_valid_session_links(session_id, router)

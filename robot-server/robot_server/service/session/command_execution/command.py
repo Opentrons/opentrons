@@ -1,3 +1,4 @@
+import typing
 from datetime import datetime
 from dataclasses import dataclass, field
 
@@ -20,6 +21,7 @@ class CommandMeta:
 @dataclass(frozen=True)
 class CommandResult:
     status: str
+    started_at: datetime
     completed_at: datetime = field(default_factory=datetime.utcnow)
 
 
@@ -46,15 +48,45 @@ def create_command(name: CommandName, data: CommandDataType) -> Command:
     )
 
 
-def complete_command(command: Command, status: str) -> CompletedCommand:
-    """
-    Create a completed command
+class Completer:
+    """Context manager to assist in marking a command complete"""
 
-    :param command: the originating command
-    :param status: description of the result
-    """
-    return CompletedCommand(
-        content=command.content,
-        meta=command.meta,
-        result=CommandResult(status=status)
-    )
+    def __init__(self,
+                 command: Command,
+                 *exceptions,
+                 success_status: str = "executed"):
+        """
+        Constructor
+
+        :param command: The command being executed in the context manager
+        :param exceptions: Exception types that will be caught and used to
+            create the status of the command result. Other exception types
+            will result in error response to client
+        :param success_status: string used to indicate success.
+        """
+        self._command = command
+        self._exec_time = None
+        self._success_status = success_status
+        self._exception_types = set(exceptions)
+        self.completed: typing.Optional[CompletedCommand] = None
+
+    def __enter__(self):
+        self._exec_time = datetime.utcnow()
+        return self
+
+    def __exit__(self, exc_type, exc_val, exc_tb):
+        if not exc_type or exc_type in self._exception_types:
+            # There is no exception or it is a type we can use for a status
+            # string.
+            status = self._success_status if not exc_val else str(exc_val)
+
+            self.completed = CompletedCommand(
+                content=self._command.content,
+                meta=self._command.meta,
+                result=CommandResult(status=status,
+                                     started_at=self._exec_time,
+                                     completed_at=datetime.utcnow())
+            )
+            return True
+        else:
+            return False
