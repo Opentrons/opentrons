@@ -103,3 +103,4 @@ class PipetteStatus:
     has_tip: bool
     rank: str
     tiprack_id: typing.Optional[UUID]
+    serial: str

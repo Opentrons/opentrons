@@ -40,6 +40,8 @@ class AttachedPipette(BaseModel):
         Field(None, description="Id of tiprack associated with this pipette.")
     rank: Optional[str] =\
         Field(None, description="Rank in the order of pipettes used for flow")
+    serial: Optional[str] =\
+        Field(None, description="The serial number of the attached pipette")
 
 
 class LabwareStatus(BaseModel):

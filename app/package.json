@@ -26,6 +26,7 @@
     "core-js": "3.2.1",
     "date-fns": "2.10.0",
     "events": "3.0.0",
+    "file-saver": "2.0.1",
     "formik": "2.1.4",
     "history": "4.7.2",
     "lodash": "4.17.15",

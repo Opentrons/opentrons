@@ -48,6 +48,7 @@ export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessi
       mount: 'left',
       tiprack_id: 'abc123_labware_uuid',
       rank: 'second',
+      serial: 'fake pipette serial 1',
     },
     right: {
       model: 'fake_pipette_model',
@@ -56,6 +57,7 @@ export const mockRobotCalibrationCheckSessionDetails: RobotCalibrationCheckSessi
       mount: 'right',
       tiprack_id: 'def456_labware_uuid',
       rank: 'first',
+      serial: 'fake pipette serial 2',
     },
   },
   currentStep: 'sessionStarted',
@@ -101,6 +103,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       mount: 'left',
       tiprack_id: 'abc123_labware_uuid',
       rank: 'first',
+      serial: 'fake serial 1',
     },
     right: {
       model: 'fake_pipette_model',
@@ -109,6 +112,7 @@ export const mockTipLengthCalibrationSessionDetails: TipLengthCalibrationSession
       mount: 'right',
       tiprack_id: 'def456_labware_uuid',
       rank: 'second',
+      serial: 'fake serial 2',
     },
   },
   currentStep: 'sessionStarted',

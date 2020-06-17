@@ -11,10 +11,11 @@ import type {
 import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
+import { saveAs } from 'file-saver'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
-const DOWNLOAD_SUMMARY = 'Copy JSON summary to clipboard'
+const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
 type ResultsSummaryProps = {|
   deleteSession: () => mixed,
@@ -24,12 +25,13 @@ type ResultsSummaryProps = {|
 export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const { deleteSession, comparisonsByStep, instrumentsByMount } = props
 
-  const rawDataRef = React.useRef<HTMLInputElement | null>(null)
-  const handleCopyButtonClick = () => {
-    if (rawDataRef.current) {
-      rawDataRef.current.select()
-      document.execCommand('copy')
-    }
+  const handleDownloadButtonClick = () => {
+    const now = new Date()
+    const report = { ...comparisonsByStep, savedAt: now.toISOString() }
+    const data = new Blob([JSON.stringify(report)], {
+      type: 'application/json',
+    })
+    saveAs(data, 'OT-2 Robot Calibration Check Report.json')
   }
 
   const firstPipette = find(
@@ -70,19 +72,10 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
             />
           </div>
         )}
-
-        <input
-          ref={rawDataRef}
-          type="text"
-          value={JSON.stringify(comparisonsByStep)}
-          onFocus={e => e.currentTarget.select()}
-          readOnly
-          style={{ opacity: 0 }}
-        />
       </div>
       <OutlineButton
         className={styles.download_summary_button}
-        onClick={handleCopyButtonClick}
+        onClick={handleDownloadButtonClick}
       >
         {DOWNLOAD_SUMMARY}
       </OutlineButton>

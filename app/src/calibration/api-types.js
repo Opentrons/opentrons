@@ -73,6 +73,7 @@ export type RobotCalibrationCheckInstrument = {|
   mount: string,
   tiprack_id: string,
   rank: RobotCalibrationCheckPipetteRank,
+  serial: string,
 |}
 export type RobotCalibrationCheckLabware = {|
   alternatives: Array<string>,
