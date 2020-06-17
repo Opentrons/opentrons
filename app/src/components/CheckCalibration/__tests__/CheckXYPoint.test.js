@@ -72,19 +72,19 @@ describe('CheckXYPoint', () => {
     jest.resetAllMocks()
   })
 
-  it('displays proper demo asset', () => {
-    const slot1LeftMultiSrc = 'SLOT_1_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y_(640X480)_REV1.webm'
-    const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y_(640X480)_REV1.webm'
-    const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y_(640X480)_REV1.webm'
+  it('displays proper asset', () => {
+    const slot1LeftMultiSrc = 'SLOT_1_LEFT_MULTI_X-Y.webm'
+    const slot1LeftSingleSrc = 'SLOT_1_LEFT_SINGLE_X-Y.webm'
+    const slot1RightMultiSrc = 'SLOT_1_RIGHT_MULTI_X-Y.webm'
+    const slot1RightSingleSrc = 'SLOT_1_RIGHT_SINGLE_X-Y.webm'
+    const slot3LeftMultiSrc = 'SLOT_3_LEFT_MULTI_X-Y.webm'
+    const slot3LeftSingleSrc = 'SLOT_3_LEFT_SINGLE_X-Y.webm'
+    const slot3RightMultiSrc = 'SLOT_3_RIGHT_MULTI_X-Y.webm'
+    const slot3RightSingleSrc = 'SLOT_3_RIGHT_SINGLE_X-Y.webm'
+    const slot7LeftMultiSrc = 'SLOT_7_LEFT_MULTI_X-Y.webm'
+    const slot7LeftSingleSrc = 'SLOT_7_LEFT_SINGLE_X-Y.webm'
+    const slot7RightMultiSrc = 'SLOT_7_RIGHT_MULTI_X-Y.webm'
+    const slot7RightSingleSrc = 'SLOT_7_RIGHT_SINGLE_X-Y.webm'
     const assetMap: { [string]: { [Mount]: { ... }, ... }, ... } = {
       '1': {
         left: {
