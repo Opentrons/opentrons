@@ -757,9 +757,9 @@ describe('savedStepForms reducer: initial deck setup step', () => {
       )
     })
     describe('existing steps', () => {
-      let prevRootStateWithMagStep
+      let prevRootStateWithMagAndTCSteps
       beforeEach(() => {
-        prevRootStateWithMagStep = {
+        prevRootStateWithMagAndTCSteps = {
           savedStepForms: {
             ...makePrevRootState().savedStepForms,
             ...{
@@ -768,10 +768,16 @@ describe('savedStepForms reducer: initial deck setup step', () => {
                 moduleId: 'magdeckId',
               },
             },
+            ...{
+              TC_step_form_id: {
+                stepType: 'thermocycler',
+                moduleId: 'TCId',
+              },
+            },
           },
         }
       })
-      const testCases = [
+      const magneticStepCases = [
         {
           testName: 'create mag mod -> override mag step module id',
           action: {
@@ -813,10 +819,61 @@ describe('savedStepForms reducer: initial deck setup step', () => {
         },
       ]
 
-      testCases.forEach(({ testName, action, expectedModuleId }) => {
+      const TCStepCases = [
+        {
+          testName: 'create TC -> override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'NewTCId',
+              slot: SPAN7_8_10_11_SLOT,
+              type: THERMOCYCLER_MODULE_TYPE,
+              model: 'someTCModel',
+            },
+          },
+          expectedModuleId: 'NewTCId',
+        },
+        {
+          testName: 'create temp mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'tempdeckId',
+              slot: '1',
+              type: TEMPERATURE_MODULE_TYPE,
+              model: 'someTempModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+        {
+          testName: 'create magnetic mod -> DO NOT override TC step module id',
+          action: {
+            type: 'CREATE_MODULE',
+            payload: {
+              id: 'newMagdeckId',
+              slot: '1',
+              type: MAGNETIC_MODULE_TYPE,
+              model: 'someMagModel',
+            },
+          },
+          expectedModuleId: 'TCId',
+        },
+      ]
+
+      magneticStepCases.forEach(({ testName, action, expectedModuleId }) => {
         it(testName, () => {
-          const result = savedStepForms(prevRootStateWithMagStep, action)
-          expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.mag_step_form_id.moduleId).toBe(expectedModuleId)
+        })
+      })
+
+      TCStepCases.forEach(({ testName, action, expectedModuleId }) => {
+        it(testName, () => {
+          const result = savedStepForms(prevRootStateWithMagAndTCSteps, action)
+          if (action.payload.type)
+            expect(result.TC_step_form_id.moduleId).toBe(expectedModuleId)
         })
       })
     })
