@@ -377,6 +377,7 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 has_tip=bool(hw_pip['has_tip']),
                 tiprack_id=pip_info.tiprack_id,
                 rank=str(pip_info.rank),
+                serial=str(hw_pip['pipette_id']),
             )
             to_dict[mount] = p
         return to_dict

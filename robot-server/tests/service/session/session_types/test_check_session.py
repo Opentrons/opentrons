@@ -27,7 +27,7 @@ def mock_cal_session(hardware):
             tiprack_id=None,
             critical_point=None,
             rank=PipetteRank.second,
-            mount=types.Mount.LEFT
+            mount=types.Mount.LEFT,
         ),
         types.Mount.RIGHT: PipetteInfo(
             tiprack_id=None,
@@ -43,14 +43,16 @@ def mock_cal_session(hardware):
             'max_volume': 10,
             'name': 'p10_single',
             'tip_length': 0,
-            'channels': 1},
+            'channels': 1,
+            'pipette_id': 'pipette id 1'},
         types.Mount.RIGHT: {
             'model': 'p300_single_v1',
             'has_tip': False,
             'max_volume': 300,
             'name': 'p300_single',
             'tip_length': 0,
-            'channels': 1}
+            'channels': 1,
+            'pipette_id': 'pipette id 2'}
     }
 
     CheckCalibrationSession._get_pip_info_by_mount =\
@@ -112,7 +114,8 @@ def session_hardware_info(mock_cal_session):
                  'mount': v.mount,
                  'has_tip': v.has_tip,
                  'tiprack_id': v.tiprack_id,
-                 'rank': v.rank}
+                 'rank': v.rank,
+                 'serial': v.serial}
         for k, v in mock_cal_session.pipette_status().items()
     }
     info = {
