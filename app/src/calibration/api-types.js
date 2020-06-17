@@ -83,7 +83,7 @@ export type RobotCalibrationCheckLabware = {|
   namespace: string,
   version: number,
 |}
-type CHECK_TRANSFORM_TYPE =
+export type CHECK_TRANSFORM_TYPE =
   | CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET
   | CHECK_TRANSFORM_TYPE_UNKNOWN
   | CHECK_TRANSFORM_TYPE_DECK

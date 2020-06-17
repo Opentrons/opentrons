@@ -123,7 +123,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
 
   const activeInstrumentModel = React.useMemo(() => {
     const spec = instruments && activeInstrument && activeInstrument.model
-    return spec ? spec : ''
+    return spec || ''
   }, [activeInstrument, instruments])
 
   const tipRackWellName: string = React.useMemo(() => {
