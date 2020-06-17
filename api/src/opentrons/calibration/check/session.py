@@ -562,10 +562,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         else:
             return PIPETTE_TOLERANCES['other_height']
 
-    def _is_instr_offset_diff(
+    def _get_error_source(
             self,
             comparisons: typing.Dict[CalibrationCheckState, ComparisonStatus],
-            jogged_state: CalibrationCheckState):
+            jogged_state: CalibrationCheckState) -> DeckCalibrationError:
         is_second_pip = jogged_state in [
             CalibrationCheckState.joggingSecondPipetteToHeight,
             CalibrationCheckState.joggingSecondPipetteToPointOne,
@@ -583,7 +583,12 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
             if c and c.exceedsThreshold:
                 first_pip_steps_passed = False
                 break
-        return is_second_pip and first_pip_steps_passed
+        if is_second_pip and first_pip_steps_passed:
+            return DeckCalibrationError.BAD_INSTRUMENT_OFFSET
+        elif self.can_distinguish_instr_offset() and not is_second_pip:
+            return DeckCalibrationError.BAD_DECK_TRANSFORM
+        else:
+            return DeckCalibrationError.UNKNOWN
 
     def get_comparisons_by_step(
             self) -> typing.Dict[CalibrationCheckState, ComparisonStatus]:
@@ -615,11 +620,9 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 exceeds = diff_magnitude > threshold_mag
                 tform_type = DeckCalibrationError.UNKNOWN
 
-                if exceeds and self._is_instr_offset_diff(comparisons,
-                                                          jogged_state):
-                    tform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
-                elif exceeds and self.can_distinguish_instr_offset():
-                    tform_type = DeckCalibrationError.BAD_DECK_TRANSFORM
+                if exceeds:
+                    tform_type = self._get_error_source(comparisons,
+                                                        jogged_state)
                 comparisons[getattr(CalibrationCheckState, jogged_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=threshold_vector,
