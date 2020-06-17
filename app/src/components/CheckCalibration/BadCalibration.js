@@ -10,11 +10,10 @@ const TO_TROUBLESHOOT = 'To troubleshoot this issue:'
 const TIP_RACK_CENTERED = 'Confirm your tip rack is centered in its slot'
 const USE_OPENTRONS_TIPS = 'Confirm you are using Opentrons brand tips'
 const PERFORM_CALIBRATION =
-  'If you continue to see this error, exit calibration check and complete a deck calibration. View'
+  'If you continue to see this error, please perform a deck calibration and then try again. View'
 const THIS_ARTICLE = 'this article'
 const LEARN_MORE = 'to learn more'
-const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT =
-  'Drop tip in trash and exit robot calibration check'
+const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
 
 const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
