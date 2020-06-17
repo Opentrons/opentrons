@@ -5,7 +5,7 @@ import type {
   Method,
   RobotHost,
   RobotApiRequestMeta,
-  RequestState,
+  RobotApiResponseMeta,
   RobotApiV2Error,
   RobotApiV2ErrorResponseBody,
 } from '../types'
@@ -50,7 +50,11 @@ export const mockRequestMeta: RobotApiRequestMeta = { requestId: 'abc' }
 
 export const mockFailureBody = { message: 'AH' }
 
-export const mockFailedRequestState: RequestState = {
+export const mockFailedRequestState: {|
+  status: 'failure',
+  response: RobotApiResponseMeta,
+  error: {| message?: string |},
+|} = {
   response: {
     path: '/modules/abc123/update',
     method: 'POST',

@@ -170,6 +170,16 @@ describe('robot session check actions', () => {
         meta: { requestId: 'abc' },
       },
     },
+    {
+      name: 'sessions:ENSURE_SESSION',
+      creator: Actions.ensureSession,
+      args: ['robot-name', 'calibrationCheck'],
+      expected: {
+        type: 'sessions:ENSURE_SESSION',
+        payload: { robotName: 'robot-name', sessionType: 'calibrationCheck' },
+        meta: {},
+      },
+    },
   ]
 
   SPECS.forEach(spec => {

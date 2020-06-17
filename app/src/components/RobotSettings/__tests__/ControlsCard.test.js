@@ -8,6 +8,7 @@ import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
 import * as ConfigSelectors from '../../../config/selectors'
 import { ControlsCard } from '../ControlsCard'
+import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
 
@@ -17,6 +18,10 @@ import type { ViewableRobot } from '../../../discovery/types'
 jest.mock('../../../robot-controls/selectors')
 jest.mock('../../../robot/selectors')
 jest.mock('../../../config/selectors')
+
+jest.mock('../CheckCalibrationControl', () => ({
+  CheckCalibrationControl: () => <></>,
+}))
 
 const mockRobot: ViewableRobot = ({
   name: 'robot-name',
@@ -55,11 +60,8 @@ describe('ControlsCard', () => {
       .find(LabeledButton)
       .find('button')
 
-  const getRobotCalibrationCheckButton = wrapper =>
-    wrapper
-      .find({ label: 'Check robot calibration' })
-      .find(LabeledButton)
-      .find('button')
+  const getCheckCalibrationControl = wrapper =>
+    wrapper.find(CheckCalibrationControl)
 
   const getHomeButton = wrapper =>
     wrapper
@@ -150,7 +152,7 @@ describe('ControlsCard', () => {
     const wrapper = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(false)
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(false)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(false)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(false)
   })
@@ -159,7 +161,7 @@ describe('ControlsCard', () => {
     const wrapper = render(mockUnconnectableRobot)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -174,7 +176,7 @@ describe('ControlsCard', () => {
     const wrapper = render(mockRobotNotConnected)
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -185,7 +187,7 @@ describe('ControlsCard', () => {
     const wrapper = render()
 
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
-    expect(getRobotCalibrationCheckButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(true)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(true)
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
@@ -199,6 +201,6 @@ describe('ControlsCard', () => {
 
     const wrapper = render()
 
-    expect(wrapper.exists({ label: 'Check deck calibration' })).toBe(false)
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 })

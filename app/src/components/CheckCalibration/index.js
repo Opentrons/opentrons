@@ -73,19 +73,6 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   const { currentStep, labware, instruments, comparisonsByStep } =
     robotCalCheckSession.details || {}
 
-  React.useEffect(() => {
-    if (robotCalCheckSession.id) {
-      dispatchRequest(Sessions.fetchSession(robotName, robotCalCheckSession.id))
-    } else {
-      dispatchRequest(
-        Sessions.createSession(
-          robotName,
-          Sessions.SESSION_TYPE_CALIBRATION_CHECK
-        )
-      )
-    }
-  }, [dispatchRequest, robotName, robotCalCheckSession.id])
-
   const hasTwoPipettes = React.useMemo(
     () => instruments && Object.keys(instruments).length === 2,
     [instruments]
