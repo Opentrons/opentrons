@@ -9,7 +9,7 @@ import {
   LabeledButton,
   Tooltip,
   useHoverTooltip,
-  TOOLTIP_RIGHT,
+  TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
 } from '@opentrons/components'
 
@@ -50,7 +50,7 @@ const DECK_CAL_TOOL_TIP_MESSAGE =
 export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
-  const { name: robotName, status } = robot
+  const { name: robotName, status, health } = robot
   const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
@@ -65,17 +65,18 @@ export function ControlsCard(props: Props): React.Node {
     )
   }
 
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_RIGHT,
-    strategy: TOOLTIP_FIXED,
-  })
-
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
 
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+    strategy: TOOLTIP_FIXED,
+  })
+
   const buttonDisabled = notConnectable || !canControl
-  const calCheckDisabled = notConnectable || !canControl
+  const calCheckDisabled =
+    buttonDisabled || (health && health.calibration !== 'OK')
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
@@ -126,18 +127,22 @@ export function ControlsCard(props: Props): React.Node {
 
       {ff.enableRobotCalCheck && (
         <>
-          <LabeledButton
-            label="Check deck calibration"
-            buttonProps={{
-              onClick: () => setIsCheckingRobotCal(true),
-              disabled: { calCheckDisabled },
-              children: 'Check',
-            }}
-            hoverTooltipHandlers={targetProps}
-          >
-            <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
-          </LabeledButton>
-          <Tooltip {...tooltipProps}>{DECK_CAL_TOOL_TIP_MESSAGE}</Tooltip>
+          <span {...targetProps}>
+            <LabeledButton
+              label="Check deck calibration"
+              buttonProps={{
+                onClick: () => setIsCheckingRobotCal(true),
+                disabled: calCheckDisabled,
+                children: 'Check',
+              }}
+            >
+              <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
+            </LabeledButton>
+          </span>
+
+          {calCheckDisabled && (
+            <Tooltip {...tooltipProps}>{DECK_CAL_TOOL_TIP_MESSAGE}</Tooltip>
+          )}
         </>
       )}
     </Card>

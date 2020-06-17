@@ -20,25 +20,24 @@ const ROBOT_CAL_WARNING = "This robot's deck has not yet been calibrated."
 const ROBOT_CAL_RESOLUTION =
   'Please perform a deck calibration prior to uploading a protocol.'
 const ROBOT_CAL_ERROR =
-  'Bad deck calibraiton detected! This robot is likely to experience a crash.'
+  'Bad deck calibration detected! This robot is likely to experience a crash.'
 
 export function DeckCalibrationWarning(props: ViewableRobot): React.Node {
   const { robot } = props
   const { health } = robot
   const isVisible = health && health.calibration !== 'OK'
-  const isDefaultCalibration = health && health.calibration === 'IDENTITY'
-  const message = isDefaultCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR
-  const colorType = isDefaultCalibration ? COLOR_WARNING : COLOR_ERROR
+  const isNoCalibration = health && health.calibration === 'IDENTITY'
+  const message = isNoCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR
+  const colorType = isNoCalibration ? COLOR_WARNING : COLOR_ERROR
+  const styleType = isNoCalibration
+    ? styles.cal_check_warning_icon
+    : styles.cal_check_error_icon
 
   if (!isVisible) return null
 
   return (
     <Flex alignItems={ALIGN_CENTER}>
-      <Icon
-        name={'alert-circle'}
-        color={colorType}
-        className={styles.cal_check_error_icon}
-      />
+      <Icon name={'alert-circle'} className={styleType} />
       <Box fontSize={FONT_SIZE_BODY_1} paddingRight={SPACING_1}>
         <Text color={colorType} marginRight={SPACING_AUTO}>
           {message}
