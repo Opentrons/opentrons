@@ -151,31 +151,6 @@ describe('CheckCalibration', () => {
     jest.resetAllMocks()
   })
 
-  it('fetches robot cal check session on mount if session in state', () => {
-    getRobotSessionOfType.mockReturnValue(mockCalibrationCheckSession)
-    render()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.fetchSession('robot-name', 'fake_check_session_id'),
-        meta: { requestId: expect.any(String) },
-      })
-    )
-  })
-
-  it('creates robot cal check session on mount if no session already in state', () => {
-    getRobotSessionOfType.mockReturnValue(null)
-    render()
-    expect(mockStore.dispatch).toHaveBeenCalledWith(
-      expect.objectContaining({
-        ...Sessions.createSession(
-          'robot-name',
-          Sessions.SESSION_TYPE_CALIBRATION_CHECK
-        ),
-        meta: { requestId: expect.any(String) },
-      })
-    )
-  })
-
   SPECS.forEach(spec => {
     it(`renders correct contents when currentStep is ${spec.currentStep}`, () => {
       mockCalibrationCheckSession = {

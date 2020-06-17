@@ -21,8 +21,7 @@ import { CONNECTABLE } from '../../discovery'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
-import { Portal } from '../portal'
-import { CheckCalibration } from '../CheckCalibration'
+import { CheckCalibrationControl } from './CheckCalibrationControl'
 
 type Props = {|
   robot: ViewableRobot,
@@ -34,8 +33,6 @@ const TITLE = 'Robot Controls'
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
-const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
-
 export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
@@ -43,10 +40,6 @@ export function ControlsCard(props: Props): React.Node {
   const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
-
-  // TODO: next BC 2020-03-31 derive this initial robot cal check state from
-  // GET request response to /calibration/check/session
-  const [isCheckingRobotCal, setIsCheckingRobotCal] = React.useState(false)
 
   const notConnectable = status !== CONNECTABLE
   const toggleLights = () => dispatch(updateLights(robotName, !lightsOn))
@@ -67,16 +60,10 @@ export function ControlsCard(props: Props): React.Node {
   return (
     <Card title={TITLE} disabled={notConnectable}>
       {ff.enableRobotCalCheck && (
-        <LabeledButton
-          label="Check robot calibration"
-          buttonProps={{
-            onClick: () => setIsCheckingRobotCal(true),
-            disabled: buttonDisabled,
-            children: 'Check',
-          }}
-        >
-          <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
-        </LabeledButton>
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabled={buttonDisabled}
+        />
       )}
       <LabeledButton
         label="Calibrate deck"
@@ -115,14 +102,6 @@ export function ControlsCard(props: Props): React.Node {
       >
         <p>Control lights on deck.</p>
       </LabeledToggle>
-      {isCheckingRobotCal && (
-        <Portal>
-          <CheckCalibration
-            robotName={robotName}
-            closeCalibrationCheck={() => setIsCheckingRobotCal(false)}
-          />
-        </Portal>
-      )}
     </Card>
   )
 }

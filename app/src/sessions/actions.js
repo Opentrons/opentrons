@@ -155,3 +155,12 @@ export const createSessionCommandFailure = (
   payload: { robotName, sessionId, error },
   meta: meta,
 })
+
+export const ensureSession = (
+  robotName: string,
+  sessionType: Types.SessionType
+): Types.EnsureSessionAction => ({
+  type: Constants.ENSURE_SESSION,
+  payload: { robotName, sessionType },
+  meta: {},
+})

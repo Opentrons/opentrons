@@ -7,16 +7,17 @@ import { mapToRobotApiRequest } from '../../robot-api/operators'
 import * as Actions from '../actions'
 import * as Constants from '../constants'
 
-import type { Epic } from '../../types'
+import type { Action, Epic } from '../../types'
 
 import type {
-  ActionToRequestMapper,
-  ResponseToActionMapper,
-} from '../../robot-api/operators'
+  RobotApiRequestOptions,
+  RobotApiResponse,
+} from '../../robot-api/types'
+import type { CreateSessionAction, EnsureSessionAction } from '../types'
 
-import type { CreateSessionAction } from '../types'
-
-const mapActionToRequest: ActionToRequestMapper<CreateSessionAction> = action => ({
+export const mapActionToRequest = (
+  action: CreateSessionAction | EnsureSessionAction
+): RobotApiRequestOptions => ({
   method: POST,
   path: Constants.SESSIONS_PATH,
   body: {
@@ -29,10 +30,10 @@ const mapActionToRequest: ActionToRequestMapper<CreateSessionAction> = action =>
   },
 })
 
-const mapResponseToAction: ResponseToActionMapper<CreateSessionAction> = (
-  response,
-  originalAction
-) => {
+export const mapResponseToAction = (
+  response: RobotApiResponse,
+  originalAction: CreateSessionAction | EnsureSessionAction
+): Action => {
   const { host, body, ...responseMeta } = response
   const meta = { ...originalAction.meta, response: responseMeta }
   return response.ok
