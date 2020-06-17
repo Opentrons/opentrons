@@ -2,6 +2,8 @@
 
 import * as React from 'react'
 
+import cx from 'classnames'
+
 import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { ThresholdValue } from './ThresholdValue'
 import { IndividualAxisDifferenceValue } from './DifferenceValue'
@@ -31,7 +33,7 @@ export function EndOfStepComparison(
   const { thresholdVector, differenceVector } = props.comparison
   return (
     <div className={styles.individual_step_comparison_wrapper}>
-      <table className={styles.pipette_data_table}>
+      <table className={cx(styles.pipette_data_table, styles.individual_data)}>
         <thead>
           <tr>
             <th>{TOLERANCE_RANGE}</th>

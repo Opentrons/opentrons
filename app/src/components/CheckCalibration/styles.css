@@ -117,7 +117,7 @@
   height: 2rem;
 }
 
-.pipette_data_table > tbody > tr:not(:last-child) {
+.pipette_data_table:not(.individual_data) > tbody > tr:not(:last-child) {
   border-bottom: 1px solid #d8d8d8;
 }
 

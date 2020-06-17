@@ -142,7 +142,7 @@ function BadOutcomeBody(props: {|
         </p>
       )
     default:
-      return <></>
+      return null
   }
 }
 
