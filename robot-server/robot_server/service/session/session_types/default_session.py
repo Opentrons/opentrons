@@ -2,7 +2,7 @@ from opentrons.calibration.check.models import SessionType
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import CommandQueue, \
-    CommandExecutor, HardwareExecutor
+    CommandExecutor, DefaultHardwareExecutor
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.errors import UnsupportedFeature
 from robot_server.service.session.session_types import BaseSession, \
@@ -15,7 +15,7 @@ class DefaultSession(BaseSession):
                  instance_meta: SessionMetaData):
         """Constructor"""
         super().__init__(configuration, instance_meta)
-        self._executor = HardwareExecutor(configuration.hardware)
+        self._executor = DefaultHardwareExecutor(configuration.hardware)
 
     @property
     def command_executor(self) -> CommandExecutor:
