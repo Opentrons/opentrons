@@ -166,6 +166,10 @@
   margin: 0.75rem 0;
 }
 
+.error_explanation_list {
+  list-style-position: inside;
+}
+
 .padded_contents_wrapper {
   margin: 1rem 3rem;
 }

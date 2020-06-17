@@ -6,6 +6,7 @@ import { getPipetteModelSpecs } from '@opentrons/shared-data'
 import type {
   RobotCalibrationCheckInstrument,
   RobotCalibrationCheckStep,
+  RobotCalibrationCheckComparison,
   RobotCalibrationCheckComparisonsByStep,
 } from '../../calibration'
 import * as Calibration from '../../calibration'
@@ -15,6 +16,8 @@ import styles from './styles.css'
 
 const PASS = 'pass'
 const FAIL = 'fail'
+const INCOMPLETE = 'incomplete'
+const NA = 'N/A'
 
 const PIPETTE = 'pipette'
 const POSITION = 'position'
@@ -39,10 +42,11 @@ const stepDisplayNameMap: { [RobotCalibrationCheckStep]: string, ... } = {
 type PipetteComparisonsProps = {|
   pipette: RobotCalibrationCheckInstrument,
   comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
+  allSteps: Array<RobotCalibrationCheckStep>,
 |}
 
 export function PipetteComparisons(props: PipetteComparisonsProps): React.Node {
-  const { pipette, comparisonsByStep } = props
+  const { pipette, comparisonsByStep, allSteps } = props
 
   const { displayName } = getPipetteModelSpecs(pipette.model) || {}
   return (
@@ -61,44 +65,62 @@ export function PipetteComparisons(props: PipetteComparisonsProps): React.Node {
           </tr>
         </thead>
         <tbody>
-          {Object.keys(comparisonsByStep).map(
-            (step: RobotCalibrationCheckStep) => {
-              const {
-                exceedsThreshold,
-                thresholdVector,
-                differenceVector,
-              } = comparisonsByStep[step]
-              const passedCheck = !exceedsThreshold
-              return (
-                <tr key={step}>
-                  <td>{stepDisplayNameMap[step]}</td>
-                  <td>
-                    <div className={styles.inline_step_status}>
-                      <Icon
-                        name={passedCheck ? 'check-circle' : 'close-circle'}
-                        className={cx(styles.summary_icon, {
-                          [styles.success_status_icon]: passedCheck,
-                          [styles.error_status_icon]: !passedCheck,
-                        })}
-                      />
-                      {passedCheck ? PASS : FAIL}
-                    </div>
-                  </td>
-                  <td>
-                    <ThresholdValue thresholdVector={thresholdVector} />
-                  </td>
-                  <td>
+          {allSteps.map((step: RobotCalibrationCheckStep) => {
+            const comparison = comparisonsByStep[step]
+            return (
+              <tr key={step}>
+                <td>{stepDisplayNameMap[step]}</td>
+                <td>
+                  <StepStatus comparison={comparison} />
+                </td>
+                <td>
+                  {comparison ? (
+                    <ThresholdValue
+                      thresholdVector={comparison.thresholdVector}
+                    />
+                  ) : (
+                    NA
+                  )}
+                </td>
+                <td>
+                  {comparison ? (
                     <DifferenceValue
-                      differenceVector={differenceVector}
+                      differenceVector={comparison.differenceVector}
                       stepName={step}
                     />
-                  </td>
-                </tr>
-              )
-            }
-          )}
+                  ) : (
+                    NA
+                  )}
+                </td>
+              </tr>
+            )
+          })}
         </tbody>
       </table>
     </div>
   )
+}
+
+type StepStatusProps = {|
+  comparison: RobotCalibrationCheckComparison | null,
+|}
+
+const StepStatus = (props: StepStatusProps): React.Node => {
+  if (props.comparison) {
+    const passedCheck = !props.comparison.exceedsThreshold
+    return (
+      <div className={styles.inline_step_status}>
+        <Icon
+          name={passedCheck ? 'check-circle' : 'close-circle'}
+          className={cx(styles.summary_icon, {
+            [styles.success_status_icon]: passedCheck,
+            [styles.error_status_icon]: !passedCheck,
+          })}
+        />
+        {passedCheck ? PASS : FAIL}
+      </div>
+    )
+  } else {
+    return <div className={styles.inline_step_status}>{INCOMPLETE}</div>
+  }
 }

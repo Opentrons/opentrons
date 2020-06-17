@@ -139,7 +139,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     }
   }, [instruments, activeInstrument, hasTwoPipettes])
 
-  function exit() {
+  function deleteSession() {
     robotCalCheckSession.id &&
       dispatchRequest(
         Sessions.deleteSession(robotName, robotCalCheckSession.id)
@@ -151,7 +151,10 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(exit, true)
+  } = useConditionalConfirm(
+    () => sendCommand(Calibration.checkCommands.EXIT),
+    true
+  )
 
   function sendCommand(
     command: SessionCommandString,
@@ -308,7 +311,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     }
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
       shouldDisplayTitleBarExit = false
-      stepContents = <BadCalibration exit={exit} />
+      stepContents = <BadCalibration deleteSession={deleteSession} />
       break
     }
     case Calibration.CHECK_STEP_SESSION_EXITED:
@@ -316,7 +319,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = (
         <CompleteConfirmation
-          exit={exit}
+          deleteSession={deleteSession}
           comparisonsByStep={comparisonsByStep}
           instrumentsByMount={instruments}
         />
