@@ -614,7 +614,10 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                         threshold_vector)
                 exceeds = diff_magnitude > threshold_mag
                 tform_type = DeckCalibrationError.UNKNOWN
-
+                MODULE_LOG.info(
+                    f'threshold {threshold_vector} mag {threshold_mag}'
+                    f' ref {ref_pt} jog {jogged_pt} diff mag {diff_magnitude}'
+                    f' exceeds {exceeds}')
                 if exceeds and self._is_instr_offset_diff(comparisons,
                                                           jogged_state):
                     tform_type = DeckCalibrationError.BAD_INSTRUMENT_OFFSET
