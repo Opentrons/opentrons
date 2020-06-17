@@ -20,6 +20,7 @@ import {
 
 import { getConfig, getOverrides, handleConfigChange } from './config'
 import { createLogger } from './log'
+import { createNetworkInterfaceMonitor } from './system-info'
 
 import type { Service } from '@opentrons/discovery-client'
 
@@ -31,6 +32,8 @@ const log = createLogger('discovery')
 const FAST_POLL_INTERVAL_MS = 3000
 const SLOW_POLL_INTERVAL_MS = 15000
 const UPDATE_THROTTLE_MS = 500
+const IFACE_MONITOR_SLOW_INTERVAL_MS = 30000
+const IFACE_MONITOR_FAST_INTERVAL_MS = 5000
 
 let config
 let store
@@ -67,7 +70,21 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
     disableCache = value
   })
 
-  app.once('will-quit', () => client.stop())
+  let ifaceMonitor
+  const startIfaceMonitor = pollInterval => {
+    ifaceMonitor && ifaceMonitor.stop()
+    ifaceMonitor = createNetworkInterfaceMonitor({
+      pollInterval,
+      onInterfaceChange: () => client.start(),
+    })
+  }
+
+  app.once('will-quit', () => {
+    ifaceMonitor && ifaceMonitor.stop()
+    client.stop()
+  })
+
+  startIfaceMonitor(IFACE_MONITOR_SLOW_INTERVAL_MS)
 
   return function handleIncomingAction(action: Action) {
     log.debug('handling action in discovery', { action })
@@ -76,9 +93,11 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
       case UI_INITIALIZED:
       case DISCOVERY_START:
         handleServices()
+        startIfaceMonitor(IFACE_MONITOR_FAST_INTERVAL_MS)
         return client.setPollInterval(FAST_POLL_INTERVAL_MS)
 
       case DISCOVERY_FINISH:
+        startIfaceMonitor(IFACE_MONITOR_SLOW_INTERVAL_MS)
         return client.setPollInterval(SLOW_POLL_INTERVAL_MS)
 
       case DISCOVERY_REMOVE:
