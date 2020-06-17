@@ -5,7 +5,10 @@ import { act } from 'react-dom/test-utils'
 import omit from 'lodash/omit'
 import * as Fixtures from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
-import type { RobotCalibrationCheckComparisonsByStep } from '../../../calibration'
+import type {
+  RobotCalibrationCheckInstrumentsByMount,
+  RobotCalibrationCheckComparisonsByStep,
+} from '../../../calibration'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 
@@ -35,13 +38,15 @@ describe('ResultsSummary', () => {
 
   beforeEach(() => {
     render = ({
+      instrumentsByMount = mockSessionDetails.instruments,
       comparisonsByStep = mockSessionDetails.comparisonsByStep,
     }: {
+      instrumentsByMount?: RobotCalibrationCheckInstrumentsByMount,
       comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
     } = {}) => {
       return mount(
         <ResultsSummary
-          instrumentsByMount={mockSessionDetails.instruments}
+          instrumentsByMount={instrumentsByMount}
           comparisonsByStep={comparisonsByStep}
           deleteSession={mockDeleteSession}
         />
@@ -94,6 +99,26 @@ describe('ResultsSummary', () => {
         .find('h5')
         .text()
     ).toEqual(expect.stringContaining('left'))
+  })
+
+  it('does not summarizes second pipette if none present', () => {
+    const wrapper = render({
+      instrumentsByMount: omit(mockSessionDetails.instruments, 'left'),
+    })
+
+    expect(
+      wrapper
+        .find('PipetteComparisons')
+        .at(0)
+        .find('h5')
+        .text()
+    ).toEqual(expect.stringContaining('right'))
+    expect(
+      wrapper
+        .find('PipetteComparisons')
+        .at(1)
+        .exists()
+    ).toBe(false)
   })
 
   it('exits when button is clicked', () => {
