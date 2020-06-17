@@ -5,13 +5,9 @@ import * as React from 'react'
 import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { ThresholdValue } from './ThresholdValue'
 import { IndividualAxisDifferenceValue } from './DifferenceValue'
+import { type Axis } from '../../robot'
 
 import styles from './styles.css'
-
-type xAxis = 'x'
-type yAxis = 'y'
-type zAxis = 'z'
-type Axis = xAxis | yAxis | zAxis
 
 type EndOfStepComparisonsProps = {|
   comparison: RobotCalibrationCheckComparison,
