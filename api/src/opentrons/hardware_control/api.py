@@ -221,8 +221,18 @@ class API(HardwareAPILike):
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
 
-    # @lru_cache(maxsize=1)
     def validate_calibration(self):
+        """
+        The lru cache decorator is currently not supported by the
+        ThreadManager. To work around this, we need to wrap the
+        actualy function around a dummy outer function.
+
+        Once decorators are more fully supported, we can remove this.
+        """
+        return self._calculate_valid_calibration()
+
+    @lru_cache(maxsize=1)
+    def _calculate_valid_calibration(self):
         """
         This function determines whether the current gantry
         calibration is valid or not based on the following use-cases:
@@ -1032,7 +1042,7 @@ class API(HardwareAPILike):
         :py:class:`.robot_config`.
         """
         if kwargs.get('gantry_calibration'):
-            self.validate_calibration.cache_clear()
+            self._calculate_valid_calibration.cache_clear()
         self._config = self._config._replace(**kwargs)  # type: ignore
 
     async def update_deck_calibration(self, new_transform):

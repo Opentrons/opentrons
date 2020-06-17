@@ -10,7 +10,8 @@ def test_health(api_client, hardware):
     hardware.fw_version = "FW111"
     hardware.board_revision = "BR2.1"
 
-    hardware.validate_calibration = Mock(return_value=DeckTransformState.IDENTITY)
+    hardware.validate_calibration = \
+        Mock(return_value=DeckTransformState.IDENTITY)
     expected = {
         'name': 'opentrons-dev',
         'api_version': __version__,
