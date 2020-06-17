@@ -83,7 +83,7 @@ describe('CheckCalibration', () => {
   const getConfirmExitButton = wrapper =>
     wrapper
       .find(ConfirmExitModal)
-      .find({ children: 'confirm exit' })
+      .find({ children: 'continue' })
       .find('button')
 
   const POSSIBLE_CHILDREN = [
@@ -114,6 +114,7 @@ describe('CheckCalibration', () => {
     { component: CheckHeight, currentStep: 'comparingFirstPipetteHeight' },
     { component: CheckHeight, currentStep: 'joggingSecondPipetteToHeight' },
     { component: CheckHeight, currentStep: 'comparingSecondPipetteHeight' },
+    { component: ResultsSummary, currentStep: 'sessionExited' },
     { component: ResultsSummary, currentStep: 'checkComplete' },
   ]
 
@@ -241,13 +242,20 @@ describe('CheckCalibration', () => {
     act(() => {
       getConfirmExitButton(wrapper).invoke('onClick')()
     })
+    wrapper.update()
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       expect.objectContaining({
-        ...Sessions.deleteSession('robot-name', 'fake_check_session_id'),
+        ...Sessions.createSessionCommand(
+          'robot-name',
+          'fake_check_session_id',
+          {
+            command: Calibration.checkCommands.EXIT,
+            data: {},
+          }
+        ),
         meta: { requestId: expect.any(String) },
       })
     )
-    expect(mockCloseCalibrationCheck).toHaveBeenCalled()
   })
 })
