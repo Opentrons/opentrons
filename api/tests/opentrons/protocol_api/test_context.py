@@ -13,7 +13,6 @@ from opentrons.hardware_control.types import Axis
 from opentrons.config.pipette_config import config_models
 from opentrons.protocol_api import transfers as tf
 from opentrons.protocols.types import APIVersion
-from opentrons.util.linal import identity_deck_transform
 
 import pytest
 
