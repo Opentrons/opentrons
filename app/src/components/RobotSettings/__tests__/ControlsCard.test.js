@@ -57,10 +57,7 @@ describe('ControlsCard', () => {
   let render
 
   const getDeckCalButton = wrapper =>
-    wrapper
-      .find({ label: 'Calibrate deck' })
-      .find(LabeledButton)
-      .find('button')
+    wrapper.find('TitledButton[title="Calibrate deck"]').find('button')
 
   const getCheckCalibrationControl = wrapper =>
     wrapper.find(CheckCalibrationControl)
@@ -153,7 +150,6 @@ describe('ControlsCard', () => {
 
     const wrapper = render()
 
-    console.log(wrapper.exists('LabeledButton[label="Check deck calibration"]'))
     expect(getDeckCalButton(wrapper).prop('disabled')).toBe(false)
     expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(false)
     expect(getHomeButton(wrapper).prop('disabled')).toBe(false)
@@ -213,7 +209,7 @@ describe('ControlsCard', () => {
       health: { calibration: 'IDENTITY' },
     })
 
-    expect(getDeckCalButton(wrapper).prop('disabled')).toBe(true)
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(true)
   })
 
   it('DeckCalibrationWarning component renders if deck calibration is bad', () => {

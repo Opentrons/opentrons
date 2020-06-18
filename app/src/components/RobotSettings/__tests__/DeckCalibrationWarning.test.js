@@ -83,7 +83,7 @@ describe('Calibration Warning Component', () => {
 
     expect(icon.prop('className')).toEqual('cal_check_error_icon')
     expect(toSplit[0]).toEqual(
-      expect.stringContaining('Bad calibration detected')
+      expect.stringContaining('Bad deck calibration detected')
     )
   })
 })

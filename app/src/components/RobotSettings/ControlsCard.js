@@ -11,6 +11,7 @@ import {
   useHoverTooltip,
   TOOLTIP_BOTTOM,
   TOOLTIP_FIXED,
+  BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
@@ -29,6 +30,7 @@ import { CONNECTABLE } from '../../discovery'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { TitledButton } from '../TitledButton'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { DeckCalibrationWarning } from './DeckCalibrationWarning'
 
@@ -41,8 +43,6 @@ const TITLE = 'Robot Controls'
 
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
-
-const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
 
 const DECK_CAL_TOOL_TIP_MESSAGE =
   'Perform a deck calibration to enable this feature.'
@@ -76,21 +76,22 @@ export function ControlsCard(props: Props): React.Node {
 
   const buttonDisabled = notConnectable || !canControl
   const calCheckDisabled =
-    buttonDisabled || (health && health.calibration !== 'OK')
+    buttonDisabled || !!(health && health.calibration !== 'OK')
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      <LabeledButton
-        label="Calibrate deck"
+      <TitledButton
+        borderBottom={BORDER_SOLID_LIGHT}
+        title="Calibrate deck"
+        description={CALIBRATE_DECK_DESCRIPTION}
         buttonProps={{
           onClick: startCalibration,
           disabled: buttonDisabled,
           children: 'Calibrate',
         }}
       >
-        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
         <DeckCalibrationWarning robot={robot} />
-      </LabeledButton>
+      </TitledButton>
       <LabeledButton
         label="Home all axes"
         buttonProps={{
@@ -126,16 +127,6 @@ export function ControlsCard(props: Props): React.Node {
               robotName={robotName}
               disabled={calCheckDisabled}
             />
-            {/* <LabeledButton
-              label="Check deck calibration"
-              buttonProps={{
-                onClick: () => setIsCheckingRobotCal(true),
-                disabled: calCheckDisabled,
-                children: 'Check',
-              }}
-            >
-              <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
-            </LabeledButton> */}
           </span>
 
           {calCheckDisabled && (
