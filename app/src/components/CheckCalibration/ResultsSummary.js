@@ -1,16 +1,20 @@
 // @flow
 import * as React from 'react'
+import { useSelector } from 'react-redux'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
 import partition from 'lodash/partition'
+import type { State } from '../../types'
 import * as Sessions from '../../sessions'
+import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
 import { saveAs } from 'file-saver'
 import { getBadOutcomeHeader } from './utils'
 
+import type { CalibrationStatus } from '../../calibration/types'
 import type {
   RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckComparison,
@@ -24,16 +28,31 @@ const STILL_HAVING_PROBLEMS =
   'If you are still experiencing issues, please download the JSON summary and share it with our support team who will then follow up with you.'
 
 type ResultsSummaryProps = {|
+  robotName: string,
   deleteSession: () => mixed,
   comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
   instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
 |}
 export function ResultsSummary(props: ResultsSummaryProps): React.Node {
-  const { deleteSession, comparisonsByStep, instrumentsByMount } = props
+  const {
+    robotName,
+    deleteSession,
+    comparisonsByStep,
+    instrumentsByMount,
+  } = props
+
+  const calibrationStatus = useSelector<State, CalibrationStatus | null>(
+    state => Calibration.getCalibrationStatus(state, robotName)
+  )
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
-    const report = { ...comparisonsByStep, savedAt: now.toISOString() }
+    const report = {
+      comparisonsByStep,
+      instrumentsByMount,
+      calibrationStatus,
+      savedAt: now.toISOString(),
+    }
     const data = new Blob([JSON.stringify(report)], {
       type: 'application/json',
     })

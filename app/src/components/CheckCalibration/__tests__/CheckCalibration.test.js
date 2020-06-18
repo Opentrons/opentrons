@@ -7,6 +7,7 @@ import { act } from 'react-dom/test-utils'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 import { SpinnerModalPage } from '@opentrons/components'
 
+import * as Calibration from '../../../calibration'
 import * as Sessions from '../../../sessions'
 import * as RobotApi from '../../../robot-api'
 
@@ -20,6 +21,7 @@ import { ResultsSummary } from '../ResultsSummary'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
 import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
+import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 
 import type { State } from '../../../types'
 import type { RequestState } from '../../../robot-api/types'
@@ -28,6 +30,7 @@ import type { RobotCalibrationCheckStep } from '../../../sessions/types'
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
 jest.mock('../../../robot-api/selectors')
+jest.mock('../../../calibration/selectors')
 
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
@@ -55,6 +58,11 @@ const mockGetDeckDefinitions: JestMockFn<
   [],
   $Call<typeof getDeckDefinitions, any>
 > = getDeckDefinitions
+
+const mockGetCalibrationStatus: JestMockFn<
+  [State, string],
+  $Call<typeof Calibration.getCalibrationStatus, State, string>
+> = Calibration.getCalibrationStatus
 
 describe('CheckCalibration', () => {
   let mockStore
@@ -127,6 +135,7 @@ describe('CheckCalibration', () => {
       dispatch,
     }
     mockGetDeckDefinitions.mockReturnValue({})
+    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
 
     mockCalibrationCheckSession = {
       id: 'fake_check_session_id',
