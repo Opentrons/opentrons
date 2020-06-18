@@ -133,7 +133,7 @@ class Robot(CommandPublisher):
         only once instance of a robot.
         """
         super().__init__(broker)
-        self.config = config or load()
+        self.config = config or load(api_v1=True)
         self._driver = driver_3_0.SmoothieDriver_3_0_0(
             config=self.config)
         self._attached_modules: Dict[str, Any] = {}  # key is port + model
