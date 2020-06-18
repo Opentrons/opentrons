@@ -121,6 +121,24 @@ describe('ResultsSummary', () => {
     ).toBe(false)
   })
 
+  it('does not show troubleshooting intstructions if no failures', () => {
+    const wrapper = render()
+
+    expect(wrapper.find('TroubleshootingInstructions').exists()).toBe(false)
+  })
+
+  it('does show troubleshooting intstructions at least one failed check', () => {
+    const wrapper = render({
+      comparisonsByStep: {
+        ...mockSessionDetails.comparisonsByStep,
+        [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]:
+          Fixtures.badXYComparison,
+      },
+    })
+
+    expect(wrapper.find('TroubleshootingInstructions').exists()).toBe(true)
+  })
+
   it('exits when button is clicked', () => {
     const wrapper = render()
 
