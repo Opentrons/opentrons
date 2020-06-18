@@ -1,16 +1,19 @@
 // @flow
 import * as React from 'react'
-import cx from 'classnames'
 import { Icon, PrimaryButton, Link, type Mount } from '@opentrons/components'
+import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import {
   type RobotCalibrationCheckComparison,
   CHECK_TRANSFORM_TYPE_DECK,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+  type CHECK_TRANSFORM_TYPE,
 } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
-import { formatOffsetValue } from './utils'
+import { EndOfStepComparison } from './EndOfStepComparisons'
 
 import slot1LeftMultiDemoAsset from './videos/SLOT_1_LEFT_MULTI_X-Y.webm'
 import slot1LeftSingleDemoAsset from './videos/SLOT_1_LEFT_SINGLE_X-Y.webm'
@@ -69,20 +72,79 @@ const TO_DETERMINE_MATCH =
   'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
 const EXIT_CHECK = 'Exit robot calibration check'
 
-const BAD_INSPECTING_HEADER = 'Bad calibration data detected'
+const BAD = 'Bad'
+const DETECTED = 'detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
-const BAD_INSPECTING_BODY =
-  "Your current pipette tip position does not match your robot's saved calibration data."
-const GOOD_INSPECTING_BODY =
-  "Your current pipette tip position matches your robot's saved calibration data."
-const DIFFERENCE = 'Difference'
+const BAD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls outside the acceptable tolerance range for a'
+const INSPECTING_COMPARISON =
+  "pipette when compared to your robot's saved X and Y-axis calibration coordinates."
+const GOOD_INSPECTING_PREAMBLE =
+  'Your current pipette tip position falls within the acceptable tolerance range for a '
 const DECK_CAL_BLURB =
-  'To resolve this, you will need to perform deck calibration. Read'
+  'To resolve this issue, please exit robot calibration check and perform a deck calibration. View'
+
 const THIS_ARTICLE = 'this article'
 const TO_LEARN = 'to learn more'
-const DECK_CAL_ARTICLE_URL =
-  'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
-const CONTACT_SUPPORT = 'Please contact Opentrons support for next steps.'
+const FOLLOW_INSTRUCTIONS = 'and follow the instructions provided.'
+const TROUBLESHOOT_BLURB = 'To troubleshoot this issue, please consult'
+const BAD_OUTCOME_URL =
+  'http://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
+const CONTINUE_BLURB = 'You may also continue forward to the next check.'
+
+function buildBadOutcomeHeader(transform: CHECK_TRANSFORM_TYPE): string {
+  let outcome = ''
+  switch (transform) {
+    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
+      outcome = 'pipette offset calibration data'
+      break
+    case CHECK_TRANSFORM_TYPE_DECK:
+      outcome = 'deck calibration data'
+      break
+    case CHECK_TRANSFORM_TYPE_UNKNOWN:
+      outcome = 'deck calibration data or pipette offset calibration data'
+      break
+  }
+  return `${BAD} ${outcome} ${DETECTED}`
+}
+
+function BadOutcomeBody(props: {|
+  transform: CHECK_TRANSFORM_TYPE,
+|}): React.Node {
+  const { transform } = props
+  switch (transform) {
+    case CHECK_TRANSFORM_TYPE_DECK:
+      return (
+        <>
+          <p className={styles.difference_body}>
+            {DECK_CAL_BLURB}
+            &nbsp;
+            <Link href={BAD_OUTCOME_URL} external>
+              {THIS_ARTICLE}
+            </Link>
+            &nbsp;
+            {TO_LEARN}
+          </p>
+          <p className={styles.difference_body}>{CONTINUE_BLURB}</p>
+        </>
+      )
+    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
+    case CHECK_TRANSFORM_TYPE_UNKNOWN:
+      return (
+        <p className={styles.difference_body}>
+          {TROUBLESHOOT_BLURB}
+          &nbsp;
+          <Link href={BAD_OUTCOME_URL} external>
+            {THIS_ARTICLE}
+          </Link>
+          &nbsp;
+          {FOLLOW_INSTRUCTIONS}
+        </p>
+      )
+    default:
+      return null
+  }
+}
 
 type CheckXYPointProps = {|
   slotNumber: string | null,
@@ -90,6 +152,7 @@ type CheckXYPointProps = {|
   mount: ?Mount,
   isInspecting: boolean,
   comparison: RobotCalibrationCheckComparison,
+  pipetteModel: string,
   nextButtonText: string,
   exit: () => mixed,
   comparePoint: () => void,
@@ -103,6 +166,7 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
     mount,
     isInspecting,
     comparison,
+    pipetteModel,
     exit,
     nextButtonText,
     comparePoint,
@@ -128,6 +192,7 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
       {isInspecting ? (
         <CompareXY
           comparison={comparison}
+          pipetteModel={pipetteModel}
           goToNextCheck={goToNextCheck}
           exit={exit}
           nextButtonText={nextButtonText}
@@ -179,24 +244,29 @@ export function CheckXYPoint(props: CheckXYPointProps): React.Node {
 
 type CompareXYProps = {|
   comparison: RobotCalibrationCheckComparison,
+  pipetteModel: string,
   goToNextCheck: () => void,
   exit: () => mixed,
   nextButtonText: string,
 |}
 function CompareXY(props: CompareXYProps) {
-  const { comparison, goToNextCheck, exit, nextButtonText } = props
-  const { differenceVector, exceedsThreshold } = comparison
-
+  const {
+    comparison,
+    pipetteModel,
+    goToNextCheck,
+    exit,
+    nextButtonText,
+  } = props
+  const { exceedsThreshold, transformType } = comparison
+  const { displayName } = getPipetteModelSpecs(pipetteModel) || {}
   let header = GOOD_INSPECTING_HEADER
-  let body = GOOD_INSPECTING_BODY
+  let preamble = GOOD_INSPECTING_PREAMBLE
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
-  let differenceClass = styles.difference_good
 
   if (exceedsThreshold) {
-    header = BAD_INSPECTING_HEADER
-    body = BAD_INSPECTING_BODY
+    header = buildBadOutcomeHeader(transformType)
+    preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
-    differenceClass = styles.difference_bad
   }
 
   return (
@@ -205,38 +275,15 @@ function CompareXY(props: CompareXYProps) {
         {icon}
         <h3>{header}</h3>
       </div>
-      <p className={styles.difference_body}>{body}</p>
-      <div className={cx(styles.difference_wrapper, differenceClass)}>
-        <h5>{DIFFERENCE}</h5>
-        <div className={styles.difference_values}>
-          <div className={styles.difference_value_wrapper}>
-            <h5>X</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[0])}
-            </span>
-          </div>
-          <div className={styles.difference_value_wrapper}>
-            <h5>Y</h5>
-            <span className={cx(styles.difference_value, differenceClass)}>
-              {formatOffsetValue(differenceVector[1])}
-            </span>
-          </div>
-        </div>
-      </div>
-      {exceedsThreshold &&
-        (comparison.transformType === CHECK_TRANSFORM_TYPE_DECK ? (
-          <p className={styles.difference_body}>
-            {DECK_CAL_BLURB}
-            &nbsp;
-            <Link href={DECK_CAL_ARTICLE_URL} external>
-              {THIS_ARTICLE}
-            </Link>
-            &nbsp;
-            {TO_LEARN}
-          </p>
-        ) : (
-          <p className={styles.difference_body}>{CONTACT_SUPPORT}</p>
-        ))}
+      <p className={styles.difference_body}>
+        {preamble}
+        &nbsp;
+        {displayName}
+        &nbsp;
+        {INSPECTING_COMPARISON}
+      </p>
+      <EndOfStepComparison comparison={comparison} forAxes={['x', 'y']} />
+      {exceedsThreshold && <BadOutcomeBody transform={transformType} />}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
           <PrimaryButton onClick={exit}>{EXIT_CHECK}</PrimaryButton>
