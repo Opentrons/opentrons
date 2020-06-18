@@ -1,27 +1,20 @@
 // @flow
 import * as React from 'react'
-import { PrimaryButton, Icon, Link, type Mount } from '@opentrons/components'
+import { PrimaryButton, Icon, type Mount } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import {
-  CHECK_TRANSFORM_TYPE_DECK,
-  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
-  CHECK_TRANSFORM_TYPE_UNKNOWN,
-} from '../../sessions'
-import { JogControls } from '../JogControls'
+import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { JogControls } from '../JogControls'
 import styles from './styles.css'
+import { getBadOutcomeHeader } from './utils'
 import { EndOfStepComparison } from './EndOfStepComparisons'
+import { BadOutcomeBody } from './BadOutcomeBody'
 
 import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z.webm'
 import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z.webm'
 import slot5RightSingleDemoAsset from './videos/SLOT_5_RIGHT_SINGLE_Z.webm'
-
-import type {
-  CheckTransformType,
-  RobotCalibrationCheckComparison,
-} from '../../sessions/types'
 
 const assetMap = {
   left: {
@@ -47,8 +40,6 @@ const TO_DETERMINE_MATCH =
 
 const EXIT_CALIBRATION_CHECK = 'exit robot calibration check'
 
-const BAD = 'Bad'
-const DETECTED = 'detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
 const BAD_INSPECTING_PREAMBLE =
   'Your current pipette tip position falls outside the acceptable tolerance range for a'
@@ -56,71 +47,7 @@ const GOOD_INSPECTING_PREAMBLE =
   'Your current pipette tip position falls within the acceptable tolerance range for a '
 const INSPECTING_COMPARISON =
   "pipette when compared to your robot's saved Z-axis calibration coordinates."
-const DECK_CAL_BLURB =
-  'To resolve this issue, please exit robot calibration check and perform a deck calibration. View'
-const TROUBLESHOOT_BLURB = 'To troubleshoot this issue, please consult'
-const THIS_ARTICLE = 'this article'
-const TO_LEARN = 'to learn more'
-const FOLLOW_INSTRUCTIONS = 'and follow the instructions provided.'
-const BAD_OUTCOME_URL =
-  'http://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
 const CONTINUE_BLURB = 'You may also continue forward to the next check.'
-
-function buildBadOutcomeHeader(transform: CheckTransformType): string {
-  let outcome = ''
-  switch (transform) {
-    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
-      outcome = 'pipette offset calibration data'
-      break
-    case CHECK_TRANSFORM_TYPE_DECK:
-      outcome = 'deck calibration data'
-      break
-    case CHECK_TRANSFORM_TYPE_UNKNOWN:
-      outcome = 'deck calibration data or pipette offset calibration data'
-      break
-  }
-  return `${BAD} ${outcome} ${DETECTED}`
-}
-
-function BadOutcomeBody(props: {|
-  transform: CheckTransformType,
-|}): React.Node {
-  const { transform } = props
-  switch (transform) {
-    case CHECK_TRANSFORM_TYPE_DECK: {
-      return (
-        <>
-          <p className={styles.difference_body}>
-            {DECK_CAL_BLURB}
-            &nbsp;
-            <Link href={BAD_OUTCOME_URL} external>
-              {THIS_ARTICLE}
-            </Link>
-            &nbsp;
-            {TO_LEARN}
-          </p>
-          <p className={styles.difference_body}>{CONTINUE_BLURB}</p>
-        </>
-      )
-    }
-    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
-    case CHECK_TRANSFORM_TYPE_UNKNOWN: {
-      return (
-        <p className={styles.difference_body}>
-          {TROUBLESHOOT_BLURB}
-          &nbsp;
-          <Link href={BAD_OUTCOME_URL} external>
-            {THIS_ARTICLE}
-          </Link>
-          &nbsp;
-          {FOLLOW_INSTRUCTIONS}
-        </p>
-      )
-    }
-    default:
-      return null
-  }
-}
 
 type CheckHeightProps = {|
   isMulti: boolean,
@@ -233,7 +160,7 @@ function CompareZ(props: CompareZProps) {
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
 
   if (exceedsThreshold) {
-    header = buildBadOutcomeHeader(transformType)
+    header = getBadOutcomeHeader(transformType)
     preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
   }
@@ -253,7 +180,12 @@ function CompareZ(props: CompareZProps) {
       </p>
       <EndOfStepComparison comparison={comparison} forAxes={['z']} />
       {exceedsThreshold && (
-        <BadOutcomeBody transform={comparison.transformType} />
+        <>
+          <p className={styles.difference_body}>
+            <BadOutcomeBody transform={comparison.transformType} />
+          </p>
+          <p className={styles.difference_body}>{CONTINUE_BLURB}</p>
+        </>
       )}
       <div className={styles.button_stack}>
         {exceedsThreshold && (
