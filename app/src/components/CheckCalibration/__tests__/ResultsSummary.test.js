@@ -101,7 +101,7 @@ describe('ResultsSummary', () => {
     ).toEqual(expect.stringContaining('left'))
   })
 
-  it('does not summarizes second pipette if none present', () => {
+  it('does not summarize second pipette if none present', () => {
     const wrapper = render({
       instrumentsByMount: omit(mockSessionDetails.instruments, 'left'),
     })
