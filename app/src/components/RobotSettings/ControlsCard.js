@@ -80,12 +80,6 @@ export function ControlsCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      {ff.enableRobotCalCheck && (
-        <CheckCalibrationControl
-          robotName={robotName}
-          disabled={buttonDisabled}
-        />
-      )}
       <LabeledButton
         label="Calibrate deck"
         buttonProps={{
@@ -128,7 +122,11 @@ export function ControlsCard(props: Props): React.Node {
       {ff.enableRobotCalCheck && (
         <>
           <span {...targetProps}>
-            <LabeledButton
+            <CheckCalibrationControl
+              robotName={robotName}
+              disabled={calCheckDisabled}
+            />
+            {/* <LabeledButton
               label="Check deck calibration"
               buttonProps={{
                 onClick: () => setIsCheckingRobotCal(true),
@@ -137,7 +135,7 @@ export function ControlsCard(props: Props): React.Node {
               }}
             >
               <p>{CHECK_ROBOT_CAL_DESCRIPTION}</p>
-            </LabeledButton>
+            </LabeledButton> */}
           </span>
 
           {calCheckDisabled && (
