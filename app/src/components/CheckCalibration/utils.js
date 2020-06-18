@@ -3,8 +3,8 @@ import {
   CHECK_TRANSFORM_TYPE_DECK,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
-  type CHECK_TRANSFORM_TYPE,
 } from '../../sessions'
+import type { CheckTransformType } from '../../sessions/types'
 import type { JogAxis } from '../../http-api-client'
 
 const BAD = 'Bad'
@@ -31,7 +31,7 @@ export function formatOffsetValue(value: number): string {
   return parseFloat(rounded).toFixed(2)
 }
 
-export function getBadOutcomeHeader(transform: CHECK_TRANSFORM_TYPE): string {
+export function getBadOutcomeHeader(transform: CheckTransformType): string {
   let outcome = ''
   switch (transform) {
     case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:

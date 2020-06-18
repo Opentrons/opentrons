@@ -7,7 +7,7 @@ import {
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
 } from '../../sessions'
-import type { CHECK_TRANSFORM_TYPE } from '../../sessions/types'
+import type { CheckTransformType } from '../../sessions/types'
 
 const DECK_CAL_BLURB =
   'To resolve this issue, please exit robot calibration check and perform a deck calibration. View'
@@ -19,7 +19,7 @@ const BAD_OUTCOME_URL =
   'http://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
 
 export function BadOutcomeBody(props: {|
-  transform: CHECK_TRANSFORM_TYPE,
+  transform: CheckTransformType,
 |}): React.Node {
   const { transform } = props
   switch (transform) {

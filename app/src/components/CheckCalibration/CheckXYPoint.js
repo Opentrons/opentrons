@@ -3,10 +3,7 @@ import * as React from 'react'
 import { Icon, PrimaryButton, type Mount } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
-import type {
-  CheckTransformType,
-  RobotCalibrationCheckComparison,
-} from '../../sessions/types'
+import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { getBadOutcomeHeader } from './utils'
 import styles from './styles.css'
