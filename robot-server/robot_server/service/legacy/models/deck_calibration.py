@@ -148,14 +148,31 @@ class DeckCalibrationDispatch(BaseModel):
               }}
 
 
-class CalibrationStatus(BaseModel):
-    """The calibration status"""
-    deckCalibration: DeckTransformState = \
+Offset = typing.Tuple[float, float, float]
+
+
+class InstrumentOffset(BaseModel):
+    single: Offset
+    multi: Offset
+
+
+class InstrumentCalibrationStatus(BaseModel):
+    right: InstrumentOffset
+    left: InstrumentOffset
+
+
+class DeckCalibrationStatus(BaseModel):
+    status: DeckTransformState = \
         Field(...,
               description="An enum stating whether a user has a valid robot"
                           "deck calibration. See DeckTransformState"
                           "class for more information.")
-    instrumentCalibration: typing.Dict[str, typing.Dict[str, typing.List[float]]]
     data: typing.List[typing.List[float]] = \
         Field(...,
               description="The deck calibration transform matrix")
+
+
+class CalibrationStatus(BaseModel):
+    """The calibration status"""
+    deckCalibration: DeckCalibrationStatus
+    instrumentCalibration: InstrumentCalibrationStatus

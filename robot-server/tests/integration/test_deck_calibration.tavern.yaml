@@ -211,7 +211,17 @@ stages:
     response:
       status_code: 200
       json:
-        deckCalibration: IDENTITY
+        deckCalibration:
+          status: IDENTITY
+          data:
+            - &matrix_row
+              - !anyfloat
+              - !anyfloat
+              - !anyfloat
+              - !anyfloat
+            - *matrix_row
+            - *matrix_row
+            - *matrix_row
         instrumentCalibration:
           right: &inst
             single: &vector
@@ -220,12 +230,3 @@ stages:
             - !anyfloat
             multi: *vector
           left: *inst
-        data:
-          - &matrix_row
-            - !anyfloat
-            - !anyfloat
-            - !anyfloat
-            - !anyfloat
-          - *matrix_row
-          - *matrix_row
-          - *matrix_row
