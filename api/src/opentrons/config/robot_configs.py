@@ -3,6 +3,8 @@ import json
 import logging
 import os
 
+from numpy import array, array_equal  # type: ignore
+from opentrons.util import linal
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
 from opentrons.config import CONFIG, feature_flags as fflags, IS_ROBOT
@@ -325,10 +327,13 @@ def _determine_calibration_to_use(deck_cal_to_check, api_v1):
     matrix with a Z offset if we are not running on a
     robot.
     """
-    if not IS_ROBOT and not api_v1 and not deck_cal_to_check:
-        deck_cal_to_use = DEFAULT_SIMULATION_CALIBRATION
-    else:
-        deck_cal_to_use = deck_cal_to_check
+    id_matrix = linal.identity_deck_transform()
+    if not IS_ROBOT and not api_v1:
+        if not deck_cal_to_check:
+            deck_cal_to_use = DEFAULT_SIMULATION_CALIBRATION
+        elif deck_cal_to_check and\
+                array_equal(array(deck_cal_to_check), id_matrix):
+            deck_cal_to_use = deck_cal_to_check
     return deck_cal_to_use
 
 
