@@ -1,6 +1,8 @@
 import typing
 from pydantic import BaseModel, Field
 
+from opentrons.hardware_control.util import DeckTransformState
+
 
 class Links(BaseModel):
     """A set of useful links"""
@@ -22,10 +24,10 @@ class Health(BaseModel):
               description="The robot's name. In most cases the same as its "
                           "mDNS advertisement domain name but this can get out"
                           " of sync. Mostly useful for user-facing titles.")
-    calibration: str = \
+    calibration: DeckTransformState = \
         Field(...,
-              description="A string determining whether a user has a "
-                          "valid robot deck calibration. See DeckTransformState"
+              description="An enum stating whether a user has a valid robot"
+                          "deck calibration. See DeckTransformState"
                           "class for more information.")
     api_version: str = \
         Field(...,

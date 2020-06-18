@@ -1,5 +1,3 @@
-import numpy as np
-
 from opentrons.hardware_control.util import DeckTransformState
 
 

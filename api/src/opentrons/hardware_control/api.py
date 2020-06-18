@@ -221,7 +221,7 @@ class API(HardwareAPILike):
         """ `True` if this is a simulator; `False` otherwise. """
         return isinstance(self._backend, Simulator)
 
-    def validate_calibration(self):
+    def validate_calibration(self) -> DeckTransformState:
         """
         The lru cache decorator is currently not supported by the
         ThreadManager. To work around this, we need to wrap the
@@ -232,7 +232,7 @@ class API(HardwareAPILike):
         return self._calculate_valid_calibration()
 
     @lru_cache(maxsize=1)
-    def _calculate_valid_calibration(self):
+    def _calculate_valid_calibration(self) -> DeckTransformState:
         """
         This function determines whether the current gantry
         calibration is valid or not based on the following use-cases:
@@ -246,7 +246,7 @@ class API(HardwareAPILike):
 
         z = abs(curr_cal[2][-1])
 
-        outofrange = z < 20 or z > 30
+        outofrange = z < 16 or z > 34
         if row != rank:
             # Check that the matrix is non-singular
             return DeckTransformState.SINGULARITY

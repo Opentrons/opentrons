@@ -25,7 +25,7 @@ router = APIRouter()
 async def get_health(
         hardware: ThreadManager = Depends(get_hardware)) -> Health:
     static_paths = ['/logs/serial.log', '/logs/api.log']
-    # This conditional handles the case where we have just changed 
+    # This conditional handles the case where we have just changed
     # the use protocol api v2 feature flag, so it does not match
     # the type of hardware we're actually using.
     fw_version = hardware.fw_version  # type: ignore
@@ -38,11 +38,10 @@ async def get_health(
         max_supported = APIVersion(1, 0)
 
     return Health(name=config.name(),
-                  calibration=str(hardware.validate_calibration()),
+                  calibration=hardware.validate_calibration(),
                   api_version=__version__,
                   fw_version=fw_version,
                   board_revision=hardware.board_revision,
-                  valid_calibration=hardware.valid_transform,
                   logs=static_paths,
                   system_version=config.OT_SYSTEM_VERSION,
                   protocol_api_version=list(max_supported),

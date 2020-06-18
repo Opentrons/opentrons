@@ -12,7 +12,6 @@ from opentrons.drivers.smoothie_drivers import SimulatingDriver
 from opentrons.drivers.rpi_drivers.gpio_simulator import SimulatingGPIOCharDev
 
 from . import modules
-from .util import DeckTransformState
 from .execution_manager import ExecutionManager
 from .types import BoardRevision
 
@@ -278,9 +277,6 @@ class Simulator:
 
     async def update_fw_version(self):
         pass
-
-    def validate_calibration(self):
-        return DeckTransformState.IDENTITY
 
     @property
     def board_revision(self) -> BoardRevision:

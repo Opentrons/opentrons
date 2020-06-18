@@ -1,7 +1,7 @@
 """ Utility functions and classes for the hardware controller"""
 import asyncio
 import logging
-from enum import Enum, auto
+from enum import Enum
 from typing import Dict, Any, Optional, List, Tuple
 
 from .types import CriticalPoint
@@ -41,10 +41,10 @@ def plan_arc(
 
 
 class DeckTransformState(Enum):
-    OK = auto()
-    IDENTITY = auto()
-    BAD_CALIBRATION = auto()
-    SINGULARITY = auto()
+    OK = "OK"
+    IDENTITY = "IDENTITY"
+    BAD_CALIBRATION = "BAD_CALIBRATION"
+    SINGULARITY = "SINGULARITY"
 
     def __str__(self):
         return self.name
