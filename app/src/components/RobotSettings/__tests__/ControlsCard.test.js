@@ -6,7 +6,6 @@ import { mount } from 'enzyme'
 import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as RobotSelectors from '../../../robot/selectors'
-import * as ConfigSelectors from '../../../config/selectors'
 import { ControlsCard } from '../ControlsCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
@@ -45,11 +44,6 @@ const mockGetIsRunning: JestMockFn<
   [State],
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
-
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof ConfigSelectors.getFeatureFlags, State>
-> = ConfigSelectors.getFeatureFlags
 
 describe('ControlsCard', () => {
   let mockStore
