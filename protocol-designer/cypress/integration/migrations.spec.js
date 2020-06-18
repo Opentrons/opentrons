@@ -121,29 +121,35 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               .click()
           }
 
-          cy.window().then(async window => {
-            const blobText = await window.__lastSavedFileBlob__.text()
-            const savedFile = cloneDeep(JSON.parse(blobText))
-            const expectedFile = cloneDeep(expectedExportProtocol)
-            const fileName = window.__lastSavedFileName__
+          cy.window()
+            .its('__lastSavedFileBlob__')
+            .should('be.a', 'blob')
+            .then(blob => blob.text())
+            .then(blobText => {
+              const savedFile = JSON.parse(blobText)
+              const expectedFile = cloneDeep(expectedExportProtocol)
 
-            assert.match(
-              savedFile.designerApplication.version,
-              /^4\.0\.\d+$/,
-              'designerApplication.version is 4.0.x'
-            )
-            ;[savedFile, expectedFile].forEach(f => {
-              // Homogenize fields we don't want to compare
-              f.metadata.lastModified = 123
-              f.designerApplication.data._internalAppBuildDate = 'Foo Date'
-              f.designerApplication.version = 'x.x.x'
+              assert.match(
+                savedFile.designerApplication.version,
+                /^4\.0\.\d+$/,
+                'designerApplication.version is 4.0.x'
+              )
+              ;[savedFile, expectedFile].forEach(f => {
+                // Homogenize fields we don't want to compare
+                f.metadata.lastModified = 123
+                f.designerApplication.data._internalAppBuildDate = 'Foo Date'
+                f.designerApplication.version = 'x.x.x'
+              })
+
+              expectDeepEqual(assert, savedFile, expectedFile)
             })
 
-            expectDeepEqual(assert, savedFile, expectedFile)
-            expect(fileName).to.equal(
-              `${expectedFile.metadata.protocolName}.json`
+          cy.window()
+            .its('__lastSavedFileName__')
+            .should(
+              'equal',
+              `${expectedExportProtocol.metadata.protocolName}.json`
             )
-          })
         })
       })
     }
