@@ -85,10 +85,6 @@ describe('ControlsCard', () => {
       dispatch: jest.fn(),
     }
 
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: true,
-    })
-
     render = (robot: ViewableRobot = mockRobot) => {
       return mount(
         <ControlsCard robot={robot} calibrateDeckUrl="/deck/calibrate" />,
@@ -190,17 +186,6 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('Check cal button does not render if feature flag off', () => {
-    mockGetIsRunning.mockReturnValue(true)
-
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: false,
-    })
-
-    const wrapper = render()
-
-    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
-  })
 
   it('Check cal button is disabled if deck calibration is bad', () => {
     const wrapper = render()

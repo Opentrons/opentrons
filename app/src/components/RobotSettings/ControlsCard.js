@@ -109,12 +109,10 @@ export function ControlsCard(props: Props): React.Node {
         <p>Control lights on deck.</p>
       </LabeledToggle>
 
-      {ff.enableRobotCalCheck && (
-        <CheckCalibrationControl
-          robotName={robotName}
-          disabled={calCheckDisabled}
-        />
-      )}
+      <CheckCalibrationControl
+        robotName={robotName}
+        disabled={calCheckDisabled}
+      />
     </Card>
   )
 }
