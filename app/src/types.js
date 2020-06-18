@@ -34,6 +34,8 @@ import type {
   RobotSettingsAction,
 } from './robot-settings/types'
 
+import type { CalibrationState, CalibrationAction } from './calibration/types'
+
 import type { SystemInfoState, SystemInfoAction } from './system-info/types'
 
 import type { AlertsState, AlertsAction } from './alerts/types'
@@ -59,6 +61,7 @@ export type State = $ReadOnly<{|
   systemInfo: SystemInfoState,
   alerts: AlertsState,
   sessions: SessionState,
+  calibration: CalibrationState,
   router: RouterState,
 |}>
 
@@ -82,6 +85,7 @@ export type Action =
   | SystemInfoAction
   | AlertsAction
   | SessionsAction
+  | CalibrationAction
 
 export type GetState = () => State
 

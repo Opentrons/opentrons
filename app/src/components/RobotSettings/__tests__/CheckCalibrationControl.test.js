@@ -8,7 +8,7 @@ import * as Sessions from '../../../sessions'
 import * as RobotApi from '../../../robot-api'
 import { mockRobot } from '../../../robot-api/__fixtures__'
 
-import { Icon } from '@opentrons/components'
+import { Icon, Tooltip } from '@opentrons/components'
 import { Portal } from '../../portal'
 import { TitledButton } from '../../TitledButton'
 import { CheckCalibration } from '../../CheckCalibration'
@@ -47,7 +47,7 @@ describe('CheckCalibrationControl', () => {
   })
 
   it('should render a TitledButton', () => {
-    const wrapper = render({ disabled: false })
+    const wrapper = render({ disabledReason: null })
     const titledButton = wrapper.find(TitledButton)
 
     expect(titledButton.prop('title')).toBe('Check robot calibration')
@@ -59,14 +59,16 @@ describe('CheckCalibrationControl', () => {
   })
 
   it('should be able to disable the button', () => {
-    const wrapper = render({ disabled: true })
+    const wrapper = render({ disabledReason: 'oh no!' })
     const button = wrapper.find('button')
+    const tooltip = wrapper.find(Tooltip)
 
     expect(button.prop('disabled')).toBe(true)
+    expect(tooltip.prop('children')).toBe('oh no!')
   })
 
   it('should ensure a calibration check session exists on click', () => {
-    const wrapper = render({ disabled: false })
+    const wrapper = render({ disabledReason: null })
 
     wrapper.find('button').invoke('onClick')()
 
@@ -80,7 +82,7 @@ describe('CheckCalibrationControl', () => {
   })
 
   it('should show a spinner in the button while request is pending', () => {
-    const wrapper = render({ disabled: false })
+    const wrapper = render({ disabledReason: null })
     wrapper.find('button').invoke('onClick')()
 
     const action = dispatch.mock.calls[0][0]
@@ -103,7 +105,7 @@ describe('CheckCalibrationControl', () => {
   })
 
   it('should show a CheckCalbration wizard in a Portal when request succeeds', () => {
-    const wrapper = render({ disabled: false })
+    const wrapper = render({ disabledReason: null })
 
     wrapper.find('button').invoke('onClick')()
     getRequestById.mockReturnValue(({ status: RobotApi.SUCCESS }: any))
@@ -118,7 +120,7 @@ describe('CheckCalibrationControl', () => {
   })
 
   it('should show a warning message if the request fails', () => {
-    const wrapper = render({ disabled: false })
+    const wrapper = render({ disabledReason: null })
 
     wrapper.find('button').invoke('onClick')()
     getRequestById.mockReturnValue({
