@@ -146,3 +146,17 @@ async def test_deactivate_unknown_session(manager):
 def test_deactivate_non_active(manager):
     manager._active_session_id = None
     assert manager.deactivate(create_identifier()) is None
+
+
+class TestDefaultSession:
+
+    def test_always_present(self, manager):
+        assert manager.get_by_id("default") is not None
+
+    def test_default_is_active(self, manager):
+        """Test that default is active if no other session is active"""
+        assert manager.is_active("default") is True
+
+    def test_add_fails(self, manager):
+        with pytest.raises(SessionCreationException):
+            manager.add(session_type=SessionType.default)
