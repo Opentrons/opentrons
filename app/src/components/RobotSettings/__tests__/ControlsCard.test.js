@@ -7,7 +7,6 @@ import * as RobotControls from '../../../robot-controls'
 import * as RobotAdmin from '../../../robot-admin'
 import * as Calibration from '../../../calibration'
 import * as RobotSelectors from '../../../robot/selectors'
-import * as ConfigSelectors from '../../../config/selectors'
 
 import { ControlsCard } from '../ControlsCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
@@ -49,11 +48,6 @@ const mockGetIsRunning: JestMockFn<
   $Call<typeof RobotSelectors.getIsRunning, State>
 > = RobotSelectors.getIsRunning
 
-const getFeatureFlags: JestMockFn<
-  [State],
-  $Call<typeof ConfigSelectors.getFeatureFlags, State>
-> = ConfigSelectors.getFeatureFlags
-
 const getDeckCalibrationStatus: JestMockFn<
   [State, string],
   $Call<typeof Calibration.getDeckCalibrationStatus, State, string>
@@ -93,10 +87,6 @@ describe('ControlsCard', () => {
       }),
       dispatch: jest.fn(),
     }
-
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: true,
-    })
 
     getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
 
@@ -230,21 +220,10 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('does not render check cal button if feature flag off', () => {
-    getFeatureFlags.mockReturnValue({
-      enableRobotCalCheck: false,
-    })
-
-    const wrapper = render()
-
-    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
-  })
-
   it('does not render check cal button if GET /calibration/status has not responded', () => {
     getDeckCalibrationStatus.mockReturnValue(null)
 
     const wrapper = render()
-
     expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
   })
 

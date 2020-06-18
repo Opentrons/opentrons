@@ -14,7 +14,7 @@ import {
 } from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
-import { getFeatureFlags } from '../../config'
+
 import {
   home,
   fetchLights,
@@ -56,7 +56,6 @@ export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
   const { name: robotName, status } = robot
-  const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
   const deckCalStatus = useSelector((state: State) => {
@@ -144,7 +143,7 @@ export function ControlsCard(props: Props): React.Node {
         <p>Control lights on deck.</p>
       </LabeledToggle>
 
-      {ff.enableRobotCalCheck && deckCalStatus !== null && (
+      {deckCalStatus !== null && (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={calCheckDisabledReason}
