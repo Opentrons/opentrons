@@ -70,7 +70,7 @@ CALIBRATION_CROSS_COORDS = {
     }
 }
 CALIBRATION_CROSS_SLOTS = ['1', '3', '7']
-TEST_LABWARE_SLOT = '3'
+TEST_LABWARE_SLOT = '2'
 
 RATE = 0.25  # % of default speeds
 SLOWER_RATE = 0.1
