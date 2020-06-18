@@ -12,6 +12,7 @@ import type {
 import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
+import { BadOutcomeBody } from './BadOutcomeBody'
 import { saveAs } from 'file-saver'
 import { getBadOutcomeHeader } from './utils'
 
@@ -56,10 +57,12 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const lastFailedComparison = [
     ...Calibration.FIRST_PIPETTE_COMPARISON_STEPS,
     ...Calibration.SECOND_PIPETTE_COMPARISON_STEPS,
-  ].reduce((acc, step) => {
+  ].reduce((acc, step): RobotCalibrationCheckComparison | null => {
     const comparison = comparisonsByStep[step]
     if (comparison && comparison.exceedsThreshold) {
       return comparison
+    } else {
+      return acc
     }
   }, null)
 
@@ -97,7 +100,12 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
         <TroubleshootingInstructions comparison={lastFailedComparison} />
       )}
 
-      <PrimaryButton onClick={deleteSession}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+      <PrimaryButton
+        className={styles.summary_exit_button}
+        onClick={deleteSession}
+      >
+        {DROP_TIP_AND_EXIT}
+      </PrimaryButton>
     </>
   )
 }
@@ -111,9 +119,13 @@ function TroubleshootingInstructions(
   const { comparison } = props
   return (
     <div>
-      <h3>{getBadOutcomeHeader(comparison.transformType)}</h3>
-      <p>{STILL_HAVING_PROBLEMS}</p>
-      <p>{STILL_HAVING_PROBLEMS}</p>
+      <p className={styles.summary_bad_outcome_header}>
+        {getBadOutcomeHeader(comparison.transformType)}
+      </p>
+      <p className={styles.summary_bad_outcome_body}>
+        <BadOutcomeBody transform={comparison.transformType} />
+      </p>
+      <p className={styles.summary_bad_outcome_body}>{STILL_HAVING_PROBLEMS}</p>
     </div>
   )
 }

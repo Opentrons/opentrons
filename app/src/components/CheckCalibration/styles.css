@@ -61,7 +61,7 @@
 }
 
 .terminal_modal_contents {
-  padding: 2rem 3.5rem;
+  padding: 1rem 3.5rem;
 }
 
 .complete_summary {
@@ -92,7 +92,25 @@
 .download_summary_button {
   align-self: flex-end;
   width: 18rem;
-  margin-bottom: 2rem;
+  margin-bottom: 1rem;
+}
+
+.summary_bad_outcome_header{
+  @apply --font-header-dark;
+  margin-bottom: 0.5rem
+}
+
+.summary_bad_outcome_body {
+  @apply --font-body-2-dark;
+  margin-bottom: 0.25rem;
+}
+
+.summary_bad_outcome_body:last-child {
+  margin-bottom: 0.75rem;
+}
+
+.summary_exit_button {
+  margin-bottom: 0;
 }
 
 .pipette_data_wrapper {

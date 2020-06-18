@@ -32,12 +32,6 @@ describe('CheckHeight', () => {
   const getVideo = wrapper => wrapper.find(`source`)
 
   const getBadOutcomeBody = wrapper => wrapper.find('BadOutcomeBody')
-  /* call on the output of getBadOutcomeBody */
-  const getBadOutcomeBlurb = wrapper =>
-    wrapper
-      .find('p')
-      .first()
-      .text()
   const getOutcomeHeader = wrapper =>
     wrapper
       .find('h3')
@@ -172,9 +166,6 @@ describe('CheckHeight', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
     expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
-    expect(getBadOutcomeBlurb(getBadOutcomeBody(wrapper))).toEqual(
-      expect.stringMatching(/perform a deck calibration/)
-    )
     expect(getOutcomeHeader(wrapper)).toEqual(
       expect.stringMatching(/Bad deck calibration data detected/)
     )
@@ -190,9 +181,6 @@ describe('CheckHeight', () => {
     const wrapper = render({ isInspecting: true, comparison })
 
     expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
-    expect(getBadOutcomeBlurb(getBadOutcomeBody(wrapper))).toEqual(
-      expect.stringMatching(/troubleshoot/)
-    )
     expect(getOutcomeHeader(wrapper)).toEqual(
       expect.stringMatching(/Bad pipette offset calibration data detected/)
     )
@@ -207,9 +195,6 @@ describe('CheckHeight', () => {
     }
     const wrapper = render({ isInspecting: true, comparison })
     expect(getBadOutcomeBody(wrapper).exists()).toBe(true)
-    expect(getBadOutcomeBlurb(getBadOutcomeBody(wrapper))).toEqual(
-      expect.stringMatching(/troubleshoot/)
-    )
     expect(getOutcomeHeader(wrapper)).toEqual(
       expect.stringMatching(
         /Bad deck calibration data or pipette offset calibration data detected/
