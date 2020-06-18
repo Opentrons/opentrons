@@ -2,9 +2,10 @@ from collections import namedtuple
 import json
 import logging
 import os
+
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
-from opentrons.config import CONFIG, feature_flags as fflags
+from opentrons.config import CONFIG, feature_flags as fflags, IS_ROBOT
 
 log = logging.getLogger(__name__)
 
@@ -309,10 +310,31 @@ def config_to_save(
     return gc, top
 
 
+def _determine_calibration_to_use(deck_cal_to_check):
+    """
+    The default calibration loaded in simulation is not
+    a valid way to check whether labware exceeds a given
+    height. As a workaround, we should load the identity
+    matrix with a Z offset if we are not running on a
+    robot.
+    """
+    identity_with_z_offset = [
+            [1.0, 0.0, 0.0, 0.0],
+            [0.0, 1.0, 0.0, 0.0],
+            [0.0, 0.0, 1.0, -25.0],
+            [0.0, 0.0, 0.0, 1.0]]
+    if not IS_ROBOT and not deck_cal_to_check:
+        deck_cal_to_use = identity_with_z_offset
+    else:
+        deck_cal_to_use = deck_cal_to_check
+    return deck_cal_to_use
+
+
 def load(deck_cal_file=None):
     deck_cal_file = deck_cal_file or CONFIG['deck_calibration_file']
     log.debug("Loading deck calibration from {}".format(deck_cal_file))
-    deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
+    current_deck_cal = _load_json(deck_cal_file).get('gantry_calibration', {})
+    deck_cal = _determine_calibration_to_use(current_deck_cal)
     settings_file = CONFIG['robot_settings_file']
     log.debug("Loading robot settings from {}".format(settings_file))
     robot_settings = _load_json(settings_file) or {}

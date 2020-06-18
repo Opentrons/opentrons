@@ -199,13 +199,6 @@ class API(HardwareAPILike):
         await api_instance.cache_instruments()
         await backend.watch_modules(
                 register_modules=api_instance.register_modules)
-        simulator_calibration = [
-            [1.0, 0.0, 0.0, 0.0],
-            [0.0, 1.0, 0.0, 0.0],
-            [0.0, 0.0, 1.0, -25.0],
-            [0.0, 0.0, 0.0, 1.0]]
-        await api_instance.update_config(
-            gantry_calibration=simulator_calibration)
         return api_instance
 
     def __repr__(self):
