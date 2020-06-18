@@ -107,6 +107,8 @@ async def test_max_speeds(loop, monkeypatch, hardware):
 async def test_location_cache(loop, monkeypatch, get_labware_def, hardware):
     ctx = papi.ProtocolContext(loop)
     ctx.connect(hardware)
+    # To avoid modifying the hardware fixture, we should change the
+    # gantry calibration inside this test.
     ctx._hw_manager.hardware.update_config(
         gantry_calibration=identity_deck_transform())
     right = ctx.load_instrument('p10_single', Mount.RIGHT)

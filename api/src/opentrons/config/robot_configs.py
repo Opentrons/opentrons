@@ -7,7 +7,8 @@ from numpy import array, array_equal  # type: ignore
 from opentrons.util import linal
 from typing import Any, Dict, List, NamedTuple, Tuple, Union
 
-from opentrons.config import CONFIG, feature_flags as fflags, IS_ROBOT
+from opentrons import config
+from opentrons.config import CONFIG, feature_flags as fflags
 
 log = logging.getLogger(__name__)
 
@@ -328,7 +329,8 @@ def _determine_calibration_to_use(deck_cal_to_check, api_v1):
     robot.
     """
     id_matrix = linal.identity_deck_transform()
-    if not IS_ROBOT and not api_v1:
+    deck_cal_to_use = deck_cal_to_check
+    if not config.IS_ROBOT and not api_v1:
         if not deck_cal_to_check:
             deck_cal_to_use = DEFAULT_SIMULATION_CALIBRATION
         elif deck_cal_to_check and\

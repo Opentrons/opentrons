@@ -4,15 +4,12 @@ from opentrons import types
 from opentrons import hardware_control as hc
 from opentrons.config import robot_configs
 from opentrons.hardware_control.types import Axis, CriticalPoint
-from opentrons.util.linal import identity_deck_transform
 
 
-async def test_controller_home(loop):
+async def test_controller_home(loop, is_robot):
     c = await hc.API.build_hardware_simulator(
         loop=loop,
         config=robot_configs.build_config({}, {}))
-    c._config = c._config._replace(
-        gantry_calibration=identity_deck_transform())
     await c.home()
 
     assert c._current_position == {Axis.X: 418,
@@ -59,9 +56,7 @@ async def test_controller_musthome(hardware_api):
     assert home.called_once()
 
 
-async def test_home_specific_sim(hardware_api, monkeypatch):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
+async def test_home_specific_sim(hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     # Avoid the autoretract when moving two difference instruments
@@ -77,8 +72,6 @@ async def test_home_specific_sim(hardware_api, monkeypatch):
 
 
 async def test_retract(hardware_api):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 10, 20))
     await hardware_api.retract(types.Mount.RIGHT, 10)
@@ -90,7 +83,7 @@ async def test_retract(hardware_api):
                                               Axis.C: 19}
 
 
-async def test_move(hardware_api):
+async def test_move(hardware_api, is_robot):
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.RIGHT
     target_position1 = {Axis.X: 30,
@@ -99,8 +92,6 @@ async def test_move(hardware_api):
                         Axis.A: 10,
                         Axis.B: 19,
                         Axis.C: 19}
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
     await hardware_api.home()
     await hardware_api.move_to(mount, abs_position)
     assert hardware_api._current_position == target_position1
@@ -144,9 +135,7 @@ async def test_move_extras_passed_through(hardware_api, monkeypatch):
     assert mock_be_move.call_args_list[0][1]['axis_max_speeds'] == {'Y': 20}
 
 
-async def test_mount_offset_applied(hardware_api):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
+async def test_mount_offset_applied(hardware_api, is_robot):
     await hardware_api.home()
     abs_position = types.Point(30, 20, 10)
     mount = types.Mount.LEFT
@@ -160,9 +149,7 @@ async def test_mount_offset_applied(hardware_api):
     assert hardware_api._current_position == target_position
 
 
-async def test_critical_point_applied(hardware_api, monkeypatch):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
+async def test_critical_point_applied(hardware_api, monkeypatch, is_robot):
     await hardware_api.home()
     hardware_api._backend._attached_instruments\
         = {types.Mount.LEFT: {'model': None, 'id': None},
@@ -256,9 +243,7 @@ async def test_deck_cal_applied(monkeypatch, loop):
     assert called_with['Z'] == 30
 
 
-async def test_other_mount_retracted(hardware_api):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
+async def test_other_mount_retracted(hardware_api, is_robot):
     await hardware_api.home()
     await hardware_api.move_to(types.Mount.RIGHT, types.Point(0, 0, 0))
     assert await hardware_api.gantry_position(types.Mount.RIGHT)\
@@ -268,9 +253,7 @@ async def test_other_mount_retracted(hardware_api):
         == types.Point(54, 20, 218)
 
 
-async def catch_oob_moves(hardware_api):
-    hardware_api._config = hardware_api._config._replace(
-        gantry_calibration=identity_deck_transform())
+async def catch_oob_moves(hardware_api, is_robot):
     await hardware_api.home()
     # Check axis max checking for move and move rel
     with pytest.raises(RuntimeError):
