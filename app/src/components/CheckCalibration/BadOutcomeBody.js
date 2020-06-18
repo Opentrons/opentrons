@@ -6,8 +6,8 @@ import {
   CHECK_TRANSFORM_TYPE_DECK,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
-  type CHECK_TRANSFORM_TYPE,
-} from '../../calibration'
+} from '../../sessions'
+import type { CHECK_TRANSFORM_TYPE } from '../../sessions/types'
 
 const DECK_CAL_BLURB =
   'To resolve this issue, please exit robot calibration check and perform a deck calibration. View'
