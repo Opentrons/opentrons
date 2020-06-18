@@ -56,7 +56,11 @@ import { systemInfoReducer } from './system-info/reducer'
 // app-wide alerts state
 import { alertsReducer } from './alerts/reducer'
 
+// robot  calibration and (eventually) protocol sessions state
 import { sessionReducer } from './sessions/reducer'
+
+// calibration data state
+import { calibrationReducer } from './calibration/reducer'
 
 import type { Reducer } from 'redux'
 import type { HashHistory } from 'history/createHashHistory'
@@ -83,5 +87,6 @@ export const rootReducer: Reducer<State, Action> = combineReducers<_, Action>({
   systemInfo: systemInfoReducer,
   alerts: alertsReducer,
   sessions: sessionReducer,
+  calibration: calibrationReducer,
   router: connectRouter<_, Action>(history),
 })
