@@ -186,7 +186,6 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-
   it('Check cal button is disabled if deck calibration is bad', () => {
     const wrapper = render()
 
