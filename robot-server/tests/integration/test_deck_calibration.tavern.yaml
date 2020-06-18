@@ -198,3 +198,19 @@ stages:
       status_code: 418
       json:
         message: "Session must be started before issuing commands"
+---
+test_name: Get calibration status
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Get the status
+    request:
+      url: "{host:s}:{port:d}/calibration/status"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        deckCalibration: IDENTITY
+        instrumentCalibration: {}
+        data: {}

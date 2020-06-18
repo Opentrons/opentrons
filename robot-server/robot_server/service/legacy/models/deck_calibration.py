@@ -2,6 +2,7 @@ import typing
 from enum import Enum
 from uuid import UUID
 
+from opentrons.hardware_control.util import DeckTransformState
 from pydantic import BaseModel, Field
 from opentrons.deck_calibration.endpoints import CalibrationCommand, \
     DeckCalibrationPoint
@@ -145,3 +146,14 @@ class DeckCalibrationDispatch(BaseModel):
                   }
                 }
               }}
+
+
+class CalibrationStatus(BaseModel):
+    """The calibration status"""
+    deckCalibration: DeckTransformState = \
+        Field(...,
+              description="An enum stating whether a user has a valid robot"
+                          "deck calibration. See DeckTransformState"
+                          "class for more information.")
+    instrumentCalibration: typing.Dict[str, typing.Tuple[float, float, float]]
+    data: typing.Dict[typing.Any, typing.Any]
