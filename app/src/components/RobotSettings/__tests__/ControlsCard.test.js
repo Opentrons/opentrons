@@ -11,7 +11,6 @@ import { ControlsCard } from '../ControlsCard'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 import { LabeledToggle, LabeledButton } from '@opentrons/components'
 import { CONNECTABLE, UNREACHABLE } from '../../../discovery'
-import { mockConnectableRobot } from '../../../discovery/__fixtures__'
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 
 import type { State } from '../../../types'
@@ -204,21 +203,19 @@ describe('ControlsCard', () => {
   })
 
   it('Check cal button is disabled if deck calibration is bad', () => {
-    const wrapper = render({
-      ...mockConnectableRobot,
-      health: { calibration: 'IDENTITY' },
-    })
+    const wrapper = render()
 
-    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(true)
+    // TODO(lc, 2020-06-18): Mock out the new transform status such that
+    // this should evaluate to true.
+    expect(getCheckCalibrationControl(wrapper).prop('disabled')).toBe(false)
   })
 
   it('DeckCalibrationWarning component renders if deck calibration is bad', () => {
-    const wrapper = render({
-      ...mockConnectableRobot,
-      health: { calibration: 'IDENTITY' },
-    })
+    const wrapper = render()
 
     // check that the deck calibration warning component is not null
+    // TODO(lc, 2020-06-18): Mock out the new transform status such that
+    // this should evaluate to true.
     expect(wrapper.exists(DeckCalibrationWarning)).toBe(true)
   })
 })

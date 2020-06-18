@@ -11,7 +11,6 @@ export const mockHealthResponse = {
   system_version: '0.0.0-mock',
   logs: ([]: Array<string>),
   protocol_api_version: [2, 0],
-  calibration: 'OK',
 }
 
 export const mockUpdateServerHealthResponse = {

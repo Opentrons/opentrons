@@ -5,8 +5,6 @@ import { mount } from 'enzyme'
 
 import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 import { Icon, Flex, ALIGN_CENTER, Box } from '@opentrons/components'
-import { mockConnectableRobot } from '../../../discovery/__fixtures__'
-import type { ViewableRobot } from '../../../discovery/types'
 
 describe('Calibration Warning Component', () => {
   let mockStore
@@ -21,8 +19,8 @@ describe('Calibration Warning Component', () => {
       dispatch: jest.fn(),
     }
 
-    render = (robot: ViewableRobot = mockConnectableRobot) => {
-      return mount(<DeckCalibrationWarning robot={robot} />, {
+    render = (status: string = 'OK') => {
+      return mount(<DeckCalibrationWarning calibrationStatus={status} />, {
         wrappingComponent: Provider,
         wrappingComponentProps: { store: mockStore },
       })
@@ -39,10 +37,7 @@ describe('Calibration Warning Component', () => {
   })
 
   it('Check warning generates specific components', () => {
-    const wrapper = render({
-      ...mockConnectableRobot,
-      health: { calibration: 'IDENTITY' },
-    })
+    const wrapper = render('IDENTITY')
     const flex = wrapper.find(Flex)
     const icon = wrapper.find(Icon)
     const box = wrapper.find(Box)
@@ -55,10 +50,7 @@ describe('Calibration Warning Component', () => {
   })
 
   it('Check calibration is identity', () => {
-    const wrapper = render({
-      ...mockConnectableRobot,
-      health: { calibration: 'IDENTITY' },
-    })
+    const wrapper = render('IDENTITY')
     const icon = wrapper.find(Icon)
     const box = wrapper.find(Box)
     const fullText = box.text()
@@ -71,10 +63,7 @@ describe('Calibration Warning Component', () => {
   })
 
   it('Check calibration is singular or bad', () => {
-    const wrapper = render({
-      ...mockConnectableRobot,
-      health: { calibration: 'SINGULAR' },
-    })
+    const wrapper = render('SINGULARITY')
 
     const icon = wrapper.find(Icon)
     const box = wrapper.find(Box)

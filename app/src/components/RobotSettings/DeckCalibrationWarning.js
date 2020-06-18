@@ -14,7 +14,10 @@ import {
 } from '@opentrons/components'
 
 import styles from './styles.css'
-import type { ViewableRobot } from '../../discovery/types'
+
+export type DeckCalibrationWarningProps = {|
+  calibrationStatus: string,
+|}
 
 const ROBOT_CAL_WARNING = "This robot's deck has not yet been calibrated."
 const ROBOT_CAL_RESOLUTION =
@@ -22,11 +25,11 @@ const ROBOT_CAL_RESOLUTION =
 const ROBOT_CAL_ERROR =
   'Bad deck calibration detected! This robot is likely to experience a crash.'
 
-export function DeckCalibrationWarning(props: ViewableRobot): React.Node {
-  const { robot } = props
-  const { health } = robot
-  const isVisible = health && health.calibration !== 'OK'
-  const isNoCalibration = health && health.calibration === 'IDENTITY'
+export function DeckCalibrationWarning({
+  calibrationStatus,
+}: DeckCalibrationWarningProps): React.Node {
+  const isVisible = calibrationStatus !== 'OK'
+  const isNoCalibration = calibrationStatus === 'IDENTITY'
   const message = isNoCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR
   const colorType = isNoCalibration ? COLOR_WARNING : COLOR_ERROR
   const styleType = isNoCalibration

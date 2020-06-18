@@ -5,7 +5,6 @@ export type HealthResponse = {
   name: string,
   api_version: string,
   fw_version: string,
-  calibration: string,
   system_version?: string,
   logs?: Array<string>,
   protocol_api_version?: [number, number],

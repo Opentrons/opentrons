@@ -7,10 +7,6 @@ import {
   Card,
   LabeledToggle,
   LabeledButton,
-  Tooltip,
-  useHoverTooltip,
-  TOOLTIP_BOTTOM,
-  TOOLTIP_FIXED,
   BORDER_SOLID_LIGHT,
 } from '@opentrons/components'
 
@@ -44,13 +40,10 @@ const TITLE = 'Robot Controls'
 const CALIBRATE_DECK_DESCRIPTION =
   "Calibrate the position of the robot's deck. Recommended for all new robots and after moving robots."
 
-const DECK_CAL_TOOL_TIP_MESSAGE =
-  'Perform a deck calibration to enable this feature.'
-
 export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
-  const { name: robotName, status, health } = robot
+  const { name: robotName, status } = robot
   const ff = useSelector(getFeatureFlags)
   const lightsOn = useSelector((state: State) => getLightsOn(state, robotName))
   const isRunning = useSelector(robotSelectors.getIsRunning)
@@ -69,14 +62,10 @@ export function ControlsCard(props: Props): React.Node {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
 
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_BOTTOM,
-    strategy: TOOLTIP_FIXED,
-  })
-
   const buttonDisabled = notConnectable || !canControl
-  const calCheckDisabled =
-    buttonDisabled || !!(health && health.calibration !== 'OK')
+  const calCheckDisabled = buttonDisabled || false
+
+  const deckTransformStatus = 'OK'
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
@@ -90,7 +79,7 @@ export function ControlsCard(props: Props): React.Node {
           children: 'Calibrate',
         }}
       >
-        <DeckCalibrationWarning robot={robot} />
+        <DeckCalibrationWarning calibrationStatus={deckTransformStatus} />
       </TitledButton>
       <LabeledButton
         label="Home all axes"
@@ -121,18 +110,10 @@ export function ControlsCard(props: Props): React.Node {
       </LabeledToggle>
 
       {ff.enableRobotCalCheck && (
-        <>
-          <span {...targetProps}>
-            <CheckCalibrationControl
-              robotName={robotName}
-              disabled={calCheckDisabled}
-            />
-          </span>
-
-          {calCheckDisabled && (
-            <Tooltip {...tooltipProps}>{DECK_CAL_TOOL_TIP_MESSAGE}</Tooltip>
-          )}
-        </>
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabled={calCheckDisabled}
+        />
       )}
     </Card>
   )
