@@ -212,7 +212,7 @@ stages:
       status_code: 200
       json:
         deckCalibration:
-          status: IDENTITY
+          status: OK
           data:
             - &matrix_row
               - !anyfloat
