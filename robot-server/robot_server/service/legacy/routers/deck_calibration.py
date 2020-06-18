@@ -1,5 +1,7 @@
 from uuid import UUID
 
+from opentrons import config
+from opentrons.config import robot_configs
 from starlette import status
 from fastapi import APIRouter, Depends
 from opentrons.hardware_control import ThreadManager
@@ -81,6 +83,7 @@ async def post_calibration_deck(operation: DeckCalibrationDispatch) \
             response_model=CalibrationStatus)
 async def get_calibration_status(
         hardware: ThreadManager = Depends(get_hardware)) -> CalibrationStatus:
+    robot_conf = robot_configs.load()
     return CalibrationStatus(deckCalibration=hardware.validate_calibration(),
-                             instrumentCalibration={},
-                             data={})
+                             instrumentCalibration=robot_conf.instrument_offset,
+                             data=robot_conf.gantry_calibration)

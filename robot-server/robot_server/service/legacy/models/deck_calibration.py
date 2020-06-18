@@ -155,5 +155,7 @@ class CalibrationStatus(BaseModel):
               description="An enum stating whether a user has a valid robot"
                           "deck calibration. See DeckTransformState"
                           "class for more information.")
-    instrumentCalibration: typing.Dict[str, typing.Tuple[float, float, float]]
-    data: typing.Dict[typing.Any, typing.Any]
+    instrumentCalibration: typing.Dict[str, typing.Dict[str, typing.List[float]]]
+    data: typing.List[typing.List[float]] = \
+        Field(...,
+              description="The deck calibration transform matrix")
