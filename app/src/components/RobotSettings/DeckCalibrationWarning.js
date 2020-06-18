@@ -35,7 +35,9 @@ export function DeckCalibrationWarning({
   deckCalibrationStatus: status,
   ...styleProps
 }: DeckCalibrationWarningProps): React.Node {
-  if (status === Calibration.DECK_CAL_STATUS_OK) return null
+  if (status === null || status === Calibration.DECK_CAL_STATUS_OK) {
+    return null
+  }
 
   const isNoCalibration = status === Calibration.DECK_CAL_STATUS_IDENTITY
   const message = isNoCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR

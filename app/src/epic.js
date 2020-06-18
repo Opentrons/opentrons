@@ -16,6 +16,7 @@ import { shellEpic } from './shell/epic'
 import { alertsEpic } from './alerts/epic'
 import { systemInfoEpic } from './system-info/epic'
 import { sessionsEpic } from './sessions/epic'
+import { calibrationEpic } from './calibration/epic'
 
 import type { Epic } from './types'
 
@@ -33,5 +34,6 @@ export const rootEpic: Epic = combineEpics(
   shellEpic,
   alertsEpic,
   systemInfoEpic,
-  sessionsEpic
+  sessionsEpic,
+  calibrationEpic
 )

@@ -9,9 +9,14 @@ import { DeckCalibrationWarning } from '../DeckCalibrationWarning'
 import type { DeckCalibrationStatus } from '../../../calibration/types'
 
 describe('Calibration Warning Component', () => {
-  const render = (status: DeckCalibrationStatus) => {
+  const render = (status: DeckCalibrationStatus | null) => {
     return mount(<DeckCalibrationWarning deckCalibrationStatus={status} />)
   }
+
+  it('renders nothing when calibration is unknown', () => {
+    const wrapper = render(null)
+    expect(wrapper).toEqual({})
+  })
 
   it('renders nothing when calibration is OK', () => {
     const wrapper = render(Calibration.DECK_CAL_STATUS_OK)
