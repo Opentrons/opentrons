@@ -1,4 +1,5 @@
 // @flow
+// calibration check session types
 
 import typeof {
   CHECK_STEP_SESSION_STARTED,
@@ -28,13 +29,6 @@ import typeof {
   CHECK_TRANSFORM_TYPE_DECK,
   CHECK_PIPETTE_RANK_FIRST,
   CHECK_PIPETTE_RANK_SECOND,
-  TIP_LENGTH_STEP_SESSION_STARTED,
-  TIP_LENGTH_STEP_LABWARE_LOADED,
-  TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET,
-  TIP_LENGTH_STEP_PREPARING_PIPETTE,
-  TIP_LENGTH_STEP_INSPECTING_TIP,
-  TIP_LENGTH_STEP_MEASURING_TIP_OFFSET,
-  TIP_LENGTH_STEP_CALIBRATION_COMPLETE,
 } from './constants'
 
 /* Robot Calibration Check Types */
@@ -66,6 +60,7 @@ export type RobotCalibrationCheckStep =
 export type RobotCalibrationCheckPipetteRank =
   | CHECK_PIPETTE_RANK_FIRST
   | CHECK_PIPETTE_RANK_SECOND
+
 export type RobotCalibrationCheckInstrument = {|
   model: string,
   name: string,
@@ -75,6 +70,7 @@ export type RobotCalibrationCheckInstrument = {|
   rank: RobotCalibrationCheckPipetteRank,
   serial: string,
 |}
+
 export type RobotCalibrationCheckLabware = {|
   alternatives: Array<string>,
   slot: string,
@@ -84,7 +80,8 @@ export type RobotCalibrationCheckLabware = {|
   namespace: string,
   version: number,
 |}
-export type CHECK_TRANSFORM_TYPE =
+
+export type CheckTransformType =
   | CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET
   | CHECK_TRANSFORM_TYPE_UNKNOWN
   | CHECK_TRANSFORM_TYPE_DECK
@@ -93,13 +90,14 @@ export type RobotCalibrationCheckComparison = {|
   differenceVector: [number, number, number],
   thresholdVector: [number, number, number],
   exceedsThreshold: boolean,
-  transformType: CHECK_TRANSFORM_TYPE,
+  transformType: CheckTransformType,
 |}
 
 export type RobotCalibrationCheckInstrumentsByMount = {
   [mount: string]: RobotCalibrationCheckInstrument,
   ...,
 }
+
 export type RobotCalibrationCheckComparisonsByStep = {
   [RobotCalibrationCheckStep]: RobotCalibrationCheckComparison,
   ...,
@@ -112,23 +110,5 @@ export type RobotCalibrationCheckSessionDetails = {|
     links: { [RobotCalibrationCheckStep]: string, ... },
   |},
   comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
-  labware: Array<RobotCalibrationCheckLabware>,
-|}
-
-/* Tip Length Calibration Types */
-
-export type TipLengthCalibrationStep =
-  | TIP_LENGTH_STEP_SESSION_STARTED
-  | TIP_LENGTH_STEP_LABWARE_LOADED
-  | TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET
-  | TIP_LENGTH_STEP_PREPARING_PIPETTE
-  | TIP_LENGTH_STEP_INSPECTING_TIP
-  | TIP_LENGTH_STEP_MEASURING_TIP_OFFSET
-  | TIP_LENGTH_STEP_CALIBRATION_COMPLETE
-
-// TODO: update this type once the session details settle
-export type TipLengthCalibrationSessionDetails = {|
-  instruments: { [mount: string]: RobotCalibrationCheckInstrument, ... },
-  currentStep: TipLengthCalibrationStep,
   labware: Array<RobotCalibrationCheckLabware>,
 |}

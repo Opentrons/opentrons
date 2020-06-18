@@ -8,8 +8,6 @@ import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefini
 import { SpinnerModalPage } from '@opentrons/components'
 
 import * as Sessions from '../../../sessions'
-import * as Calibration from '../../../calibration'
-
 import * as RobotApi from '../../../robot-api'
 
 import { CheckCalibration } from '../index'
@@ -21,10 +19,11 @@ import { CheckHeight } from '../CheckHeight'
 import { ResultsSummary } from '../ResultsSummary'
 import { ConfirmExitModal } from '../ConfirmExitModal'
 
-import type { RequestState } from '../../../robot-api/types'
+import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
 
 import type { State } from '../../../types'
-import { mockCalibrationCheckSessionAttributes } from '../../../sessions/__fixtures__'
+import type { RequestState } from '../../../robot-api/types'
+import type { RobotCalibrationCheckStep } from '../../../sessions/types'
 
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
@@ -33,7 +32,7 @@ jest.mock('../../../robot-api/selectors')
 type CheckCalibrationSpec = {
   component: React.AbstractComponent<any>,
   childProps?: {},
-  currentStep: Calibration.RobotCalibrationCheckStep,
+  currentStep: RobotCalibrationCheckStep,
   ...
 }
 
@@ -225,7 +224,7 @@ describe('CheckCalibration', () => {
           'robot-name',
           'fake_check_session_id',
           {
-            command: Calibration.checkCommands.EXIT,
+            command: Sessions.checkCommands.EXIT,
             data: {},
           }
         ),

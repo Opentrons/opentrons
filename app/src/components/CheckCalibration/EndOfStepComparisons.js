@@ -4,10 +4,11 @@ import * as React from 'react'
 
 import cx from 'classnames'
 
-import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { ThresholdValue } from './ThresholdValue'
 import { IndividualAxisDifferenceValue } from './DifferenceValue'
-import { type Axis } from '../../robot'
+
+import type { Axis } from '../../robot/types'
+import type { RobotCalibrationCheckComparison } from '../../sessions/types'
 
 import styles from './styles.css'
 
