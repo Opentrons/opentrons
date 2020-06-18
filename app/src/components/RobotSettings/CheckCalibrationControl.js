@@ -19,6 +19,10 @@ import {
   COLOR_WARNING,
   FONT_SIZE_BODY_1,
   FONT_WEIGHT_SEMIBOLD,
+  Tooltip,
+  useHoverTooltip,
+  TOOLTIP_BOTTOM,
+  TOOLTIP_FIXED,
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
@@ -38,6 +42,9 @@ const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
 const COULD_NOT_START = 'Could not start Robot Calibration Check'
 const PLEASE_TRY_AGAIN =
   'Please try again or contact support if you continue to experience issues'
+
+const DECK_CAL_TOOL_TIP_MESSAGE =
+  'Perform a deck calibration to enable this feature.'
 
 export function CheckCalibrationControl({
   robotName,
@@ -65,11 +72,19 @@ export function CheckCalibrationControl({
       <Icon name="ot-spinner" height="1em" spin />
     )
 
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_BOTTOM,
+    strategy: TOOLTIP_FIXED,
+  })
+
+  const calCheckDisabled = false
+
   React.useEffect(() => {
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
   }, [requestStatus])
 
   // TODO(mc, 2020-06-17): extract alert presentational stuff
+  // TODO(lc, 2020-06-18): edit calCheckDisabled to check for a bad calibration status from the new endpoint
   return (
     <>
       <TitledButton
@@ -80,8 +95,12 @@ export function CheckCalibrationControl({
           children: buttonChildren,
           disabled: buttonDisabled,
           onClick: ensureSession,
+          hoverToolTipHandler: targetProps,
         }}
       >
+        {calCheckDisabled && (
+          <Tooltip {...tooltipProps}>{DECK_CAL_TOOL_TIP_MESSAGE}</Tooltip>
+        )}
         {requestState && requestState.status === RobotApi.FAILURE && (
           <Flex
             alignItems={ALIGN_CENTER}

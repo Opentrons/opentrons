@@ -30,7 +30,7 @@ type SP = {|
 |}
 
 type DP = {|
-  checkUpdate: () => mixed,
+  checkUpdate: () => void,
   downloadUpdate: () => mixed,
   applyUpdate: () => mixed,
   closeModal: () => mixed,
@@ -113,7 +113,9 @@ function mapStateToProps(state: State): SP {
 
 function mapDispatchToProps(dispatch: Dispatch): DP {
   return {
-    checkUpdate: () => dispatch(checkShellUpdate()),
+    checkUpdate: () => {
+      dispatch(checkShellUpdate())
+    },
     downloadUpdate: () => dispatch(downloadShellUpdate()),
     applyUpdate: () => dispatch(applyShellUpdate()),
     closeModal: () => {

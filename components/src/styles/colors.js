@@ -12,6 +12,7 @@ export const C_ORANGE = '#f5a623'
 export const COLOR_DISABLED = '#9c9c9c'
 export const COLOR_WARNING = '#e28200'
 export const COLOR_WARNING_LIGHT = '#ffd58f'
+export const COLOR_ERROR = '#d12929'
 
 // opacities
 export const OPACITY_DISABLED = 0.3

@@ -3,7 +3,12 @@
 import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
-import { Card, LabeledToggle, LabeledButton } from '@opentrons/components'
+import {
+  Card,
+  LabeledToggle,
+  LabeledButton,
+  BORDER_SOLID_LIGHT,
+} from '@opentrons/components'
 
 import { startDeckCalibration } from '../../http-api-client'
 import { getFeatureFlags } from '../../config'
@@ -21,7 +26,9 @@ import { CONNECTABLE } from '../../discovery'
 
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
+import { TitledButton } from '../TitledButton'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
+import { DeckCalibrationWarning } from './DeckCalibrationWarning'
 
 type Props = {|
   robot: ViewableRobot,
@@ -56,25 +63,24 @@ export function ControlsCard(props: Props): React.Node {
   }, [dispatch, robotName])
 
   const buttonDisabled = notConnectable || !canControl
+  const calCheckDisabled = buttonDisabled || false
+
+  const deckTransformStatus = 'OK'
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      {ff.enableRobotCalCheck && (
-        <CheckCalibrationControl
-          robotName={robotName}
-          disabled={buttonDisabled}
-        />
-      )}
-      <LabeledButton
-        label="Calibrate deck"
+      <TitledButton
+        borderBottom={BORDER_SOLID_LIGHT}
+        title="Calibrate deck"
+        description={CALIBRATE_DECK_DESCRIPTION}
         buttonProps={{
           onClick: startCalibration,
           disabled: buttonDisabled,
           children: 'Calibrate',
         }}
       >
-        <p>{CALIBRATE_DECK_DESCRIPTION}</p>
-      </LabeledButton>
+        <DeckCalibrationWarning calibrationStatus={deckTransformStatus} />
+      </TitledButton>
       <LabeledButton
         label="Home all axes"
         buttonProps={{
@@ -102,6 +108,13 @@ export function ControlsCard(props: Props): React.Node {
       >
         <p>Control lights on deck.</p>
       </LabeledToggle>
+
+      {ff.enableRobotCalCheck && (
+        <CheckCalibrationControl
+          robotName={robotName}
+          disabled={calCheckDisabled}
+        />
+      )}
     </Card>
   )
 }
