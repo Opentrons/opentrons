@@ -4,6 +4,7 @@ import * as React from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { push } from 'connected-react-router'
 import {
+  useInterval,
   Card,
   Text,
   LabeledToggle,
@@ -49,6 +50,8 @@ const BAD_DECK_CALIBRATION =
   'Bad deck calibration detected. Please perform a full deck calibration.'
 const NO_DECK_CALIBRATION = 'Please perform a full deck calibration.'
 
+const DECK_CAL_STATUS_POLL_INTERVAL = 10000
+
 export function ControlsCard(props: Props): React.Node {
   const dispatch = useDispatch<Dispatch>()
   const { robot, calibrateDeckUrl } = props
@@ -70,6 +73,12 @@ export function ControlsCard(props: Props): React.Node {
   React.useEffect(() => {
     dispatch(fetchLights(robotName))
   }, [dispatch, robotName])
+
+  useInterval(
+    () => dispatch(Calibration.fetchCalibrationStatus(robotName)),
+    DECK_CAL_STATUS_POLL_INTERVAL,
+    true
+  )
 
   let buttonDisabledReason = null
   if (notConnectable || !robot.connected) {
@@ -135,7 +144,7 @@ export function ControlsCard(props: Props): React.Node {
         <p>Control lights on deck.</p>
       </LabeledToggle>
 
-      {ff.enableRobotCalCheck && (
+      {ff.enableRobotCalCheck && deckCalStatus !== null && (
         <CheckCalibrationControl
           robotName={robotName}
           disabledReason={calCheckDisabledReason}

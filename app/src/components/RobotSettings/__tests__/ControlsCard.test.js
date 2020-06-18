@@ -85,6 +85,7 @@ describe('ControlsCard', () => {
     wrapper.find({ label: 'Lights' }).find(LabeledToggle)
 
   beforeEach(() => {
+    jest.useFakeTimers()
     mockStore = {
       subscribe: () => {},
       getState: () => ({
@@ -97,7 +98,7 @@ describe('ControlsCard', () => {
       enableRobotCalCheck: true,
     })
 
-    getDeckCalibrationStatus.mockReturnValue(null)
+    getDeckCalibrationStatus.mockReturnValue(Calibration.DECK_CAL_STATUS_OK)
 
     render = (robot: ViewableRobot = mockRobot) => {
       return mount(
@@ -111,7 +112,9 @@ describe('ControlsCard', () => {
   })
 
   afterEach(() => {
+    jest.clearAllTimers()
     jest.resetAllMocks()
+    jest.useRealTimers()
   })
 
   it('calls fetchLights on mount', () => {
@@ -119,6 +122,25 @@ describe('ControlsCard', () => {
 
     expect(mockStore.dispatch).toHaveBeenCalledWith(
       RobotControls.fetchLights(mockRobot.name)
+    )
+  })
+
+  it('calls fetchCalibrationStatus on mount and on a 10s interval', () => {
+    render()
+
+    expect(mockStore.dispatch).toHaveBeenCalledWith(
+      Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    mockStore.dispatch.mockReset()
+    jest.advanceTimersByTime(20000)
+    expect(mockStore.dispatch).toHaveBeenCalledTimes(2)
+    expect(mockStore.dispatch).toHaveBeenNthCalledWith(
+      1,
+      Calibration.fetchCalibrationStatus(mockRobot.name)
+    )
+    expect(mockStore.dispatch).toHaveBeenNthCalledWith(
+      2,
+      Calibration.fetchCalibrationStatus(mockRobot.name)
     )
   })
 
@@ -208,12 +230,18 @@ describe('ControlsCard', () => {
     expect(getRestartButton(wrapper).prop('disabled')).toBe(true)
   })
 
-  it('Check cal button does not render if feature flag off', () => {
-    mockGetIsRunning.mockReturnValue(true)
-
+  it('does not render check cal button if feature flag off', () => {
     getFeatureFlags.mockReturnValue({
       enableRobotCalCheck: false,
     })
+
+    const wrapper = render()
+
+    expect(wrapper.exists(CheckCalibrationControl)).toBe(false)
+  })
+
+  it('does not render check cal button if GET /calibration/status has not responded', () => {
+    getDeckCalibrationStatus.mockReturnValue(null)
 
     const wrapper = render()
 
