@@ -623,7 +623,8 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
                 if exceeds:
                     tform_type = self._get_error_source(comparisons,
                                                         comparison_state)
-                comparisons[getattr(CalibrationCheckState, comparison_state)] = \
+                comparisons[getattr(CalibrationCheckState,
+                                    comparison_state)] = \
                     ComparisonStatus(differenceVector=(jogged_pt - ref_pt),
                                      thresholdVector=threshold_vector,
                                      exceedsThreshold=exceeds,
