@@ -4,6 +4,7 @@ import * as React from 'react'
 
 import cx from 'classnames'
 
+import { Tooltip, useHoverTooltip, TOOLTIP_TOP } from '@opentrons/components'
 import { type RobotCalibrationCheckComparison } from '../../calibration'
 import { ThresholdValue } from './ThresholdValue'
 import { IndividualAxisDifferenceValue } from './DifferenceValue'
@@ -18,6 +19,8 @@ type EndOfStepComparisonsProps = {|
 
 const TOLERANCE_RANGE = 'tolerance range'
 const DIFFERENCE = 'difference'
+const DIFFERENCE_TOOLTIP =
+  'The difference between jogged tip position and saved calibration coordinate.'
 
 const axisToIndex: { [Axis]: number } = {
   x: 0,
@@ -31,13 +34,19 @@ export function EndOfStepComparison(
   props: EndOfStepComparisonsProps
 ): React.Node {
   const { thresholdVector, differenceVector } = props.comparison
+  const [targetProps, tooltipProps] = useHoverTooltip({
+    placement: TOOLTIP_TOP,
+  })
   return (
     <div className={styles.individual_step_comparison_wrapper}>
       <table className={cx(styles.pipette_data_table, styles.individual_data)}>
         <thead>
           <tr>
             <th>{TOLERANCE_RANGE}</th>
-            <th>{DIFFERENCE}</th>
+            <th>
+              <span {...targetProps}>{DIFFERENCE}</span>
+            </th>
+            <Tooltip {...tooltipProps}>{DIFFERENCE_TOOLTIP}</Tooltip>
           </tr>
         </thead>
         <tbody>
