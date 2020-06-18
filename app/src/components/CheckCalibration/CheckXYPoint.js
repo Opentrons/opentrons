@@ -12,6 +12,7 @@ import {
 } from '../../calibration'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import { getBadOutcomeHeader } from './utils'
 import styles from './styles.css'
 import { EndOfStepComparison } from './EndOfStepComparisons'
 
@@ -72,8 +73,6 @@ const TO_DETERMINE_MATCH =
   'button to determine how this position compares to the previously-saved x and y-axis calibration coordinates.'
 const EXIT_CHECK = 'Exit robot calibration check'
 
-const BAD = 'Bad'
-const DETECTED = 'detected'
 const GOOD_INSPECTING_HEADER = 'Good calibration'
 const BAD_INSPECTING_PREAMBLE =
   'Your current pipette tip position falls outside the acceptable tolerance range for a'
@@ -91,22 +90,6 @@ const TROUBLESHOOT_BLURB = 'To troubleshoot this issue, please consult'
 const BAD_OUTCOME_URL =
   'http://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
 const CONTINUE_BLURB = 'You may also continue forward to the next check.'
-
-function buildBadOutcomeHeader(transform: CHECK_TRANSFORM_TYPE): string {
-  let outcome = ''
-  switch (transform) {
-    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
-      outcome = 'pipette offset calibration data'
-      break
-    case CHECK_TRANSFORM_TYPE_DECK:
-      outcome = 'deck calibration data'
-      break
-    case CHECK_TRANSFORM_TYPE_UNKNOWN:
-      outcome = 'deck calibration data or pipette offset calibration data'
-      break
-  }
-  return `${BAD} ${outcome} ${DETECTED}`
-}
 
 function BadOutcomeBody(props: {|
   transform: CHECK_TRANSFORM_TYPE,
@@ -264,7 +247,7 @@ function CompareXY(props: CompareXYProps) {
   let icon = <Icon name="check-circle" className={styles.success_status_icon} />
 
   if (exceedsThreshold) {
-    header = buildBadOutcomeHeader(transformType)
+    header = getBadOutcomeHeader(transformType)
     preamble = BAD_INSPECTING_PREAMBLE
     icon = <Icon name="close-circle" className={styles.error_status_icon} />
   }

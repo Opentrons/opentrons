@@ -6,16 +6,20 @@ import pick from 'lodash/pick'
 import partition from 'lodash/partition'
 import type {
   RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckComparison,
   RobotCalibrationCheckInstrument,
 } from '../../calibration'
 import * as Calibration from '../../calibration'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { saveAs } from 'file-saver'
+import { getBadOutcomeHeader } from './utils'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
+const STILL_HAVING_PROBLEMS =
+  'If you are still experiencing issues, please download the JSON summary and share it with our support team who will then follow up with you.'
 
 type ResultsSummaryProps = {|
   deleteSession: () => mixed,
@@ -49,6 +53,16 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
     compStep => Calibration.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
   ).map(stepNames => pick(comparisonsByStep, stepNames))
 
+  const lastFailedComparison = [
+    ...Calibration.FIRST_PIPETTE_COMPARISON_STEPS,
+    ...Calibration.SECOND_PIPETTE_COMPARISON_STEPS,
+  ].reduce((acc, step) => {
+    const comparison = comparisonsByStep[step]
+    if (comparison && comparison.exceedsThreshold) {
+      return comparison
+    }
+  }, null)
+
   return (
     <>
       <h3 className={styles.summary_page_header}>
@@ -79,7 +93,27 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
       >
         {DOWNLOAD_SUMMARY}
       </OutlineButton>
+      {lastFailedComparison && (
+        <TroubleshootingInstructions comparison={lastFailedComparison} />
+      )}
+
       <PrimaryButton onClick={deleteSession}>{DROP_TIP_AND_EXIT}</PrimaryButton>
     </>
+  )
+}
+
+type TroubleshootingInstructionsProps = {
+  comparison: RobotCalibrationCheckComparison,
+}
+function TroubleshootingInstructions(
+  props: TroubleshootingInstructionsProps
+): React.Node {
+  const { comparison } = props
+  return (
+    <div>
+      <h3>{getBadOutcomeHeader(comparison.transformType)}</h3>
+      <p>{STILL_HAVING_PROBLEMS}</p>
+      <p>{STILL_HAVING_PROBLEMS}</p>
+    </div>
   )
 }
