@@ -1,10 +1,14 @@
 // @flow
 import * as React from 'react'
+import { Provider } from 'react-redux'
 import { mount } from 'enzyme'
 import { act } from 'react-dom/test-utils'
 import omit from 'lodash/omit'
+import * as Calibration from '../../../calibration'
+import { mockCalibrationStatus } from '../../../calibration/__fixtures__'
 import * as Fixtures from '../../../sessions/__fixtures__'
 import * as Sessions from '../../../sessions'
+import type { State } from '../../../types'
 import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 
@@ -14,16 +18,24 @@ import type {
 } from '../../../sessions/types'
 
 jest.mock('file-saver')
+jest.mock('../../../calibration/selectors')
 
 const mockSaveAs: JestMockFn<
   [Blob, string],
   $Call<typeof saveAs, Blob, string>
 > = saveAs
 
+const mockGetCalibrationStatus: JestMockFn<
+  [State, string],
+  $Call<typeof Calibration.getCalibrationStatus, State, string>
+> = Calibration.getCalibrationStatus
+
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
 describe('ResultsSummary', () => {
   let render
+  let mockStore
+  let dispatch
 
   const mockDeleteSession = jest.fn()
 
@@ -38,6 +50,15 @@ describe('ResultsSummary', () => {
       .find('button')
 
   beforeEach(() => {
+    dispatch = jest.fn()
+    mockStore = {
+      subscribe: () => {},
+      getState: () => ({
+        robotApi: {},
+      }),
+      dispatch,
+    }
+    mockGetCalibrationStatus.mockReturnValue(mockCalibrationStatus)
     render = ({
       instrumentsByMount = mockSessionDetails.instruments,
       comparisonsByStep = mockSessionDetails.comparisonsByStep,
@@ -47,10 +68,15 @@ describe('ResultsSummary', () => {
     } = {}) => {
       return mount(
         <ResultsSummary
+          robotName="robot-name"
           instrumentsByMount={instrumentsByMount}
           comparisonsByStep={comparisonsByStep}
           deleteSession={mockDeleteSession}
-        />
+        />,
+        {
+          wrappingComponent: Provider,
+          wrappingComponentProps: { store: mockStore },
+        }
       )
     }
   })

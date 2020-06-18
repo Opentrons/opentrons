@@ -306,6 +306,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     case Sessions.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = (
         <ResultsSummary
+          robotName={robotName}
           deleteSession={deleteSession}
           comparisonsByStep={comparisonsByStep}
           instrumentsByMount={instruments}
