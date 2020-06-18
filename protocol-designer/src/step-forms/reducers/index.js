@@ -13,6 +13,7 @@ import {
   getModuleType,
   MAGNETIC_MODULE_TYPE,
   MAGNETIC_MODULE_V1,
+  THERMOCYCLER_MODULE_TYPE,
 } from '@opentrons/shared-data'
 import {
   rootReducer as labwareDefsRootReducer,
@@ -623,6 +624,13 @@ export const savedStepForms = (
         if (
           savedForm.stepType === 'magnet' &&
           action.payload.type === MAGNETIC_MODULE_TYPE
+        ) {
+          return { ...savedForm, moduleId }
+        }
+        // same logic applies to Thermocycler
+        if (
+          savedForm.stepType === 'thermocycler' &&
+          action.payload.type === THERMOCYCLER_MODULE_TYPE
         ) {
           return { ...savedForm, moduleId }
         }
