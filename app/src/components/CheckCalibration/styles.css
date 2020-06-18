@@ -95,13 +95,15 @@
   margin-bottom: 1rem;
 }
 
-.summary_bad_outcome_header{
+.summary_bad_outcome_header {
   @apply --font-header-dark;
-  margin-bottom: 0.5rem
+
+  margin-bottom: 0.5rem;
 }
 
 .summary_bad_outcome_body {
   @apply --font-body-2-dark;
+
   margin-bottom: 0.25rem;
 }
 
