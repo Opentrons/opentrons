@@ -4,12 +4,10 @@ import { PrimaryButton, Icon, Link, type Mount } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
 
 import {
-  type RobotCalibrationCheckComparison,
   CHECK_TRANSFORM_TYPE_DECK,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
-  type CHECK_TRANSFORM_TYPE,
-} from '../../calibration'
+} from '../../sessions'
 import { JogControls } from '../JogControls'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import styles from './styles.css'
@@ -19,6 +17,11 @@ import slot5LeftMultiDemoAsset from './videos/SLOT_5_LEFT_MULTI_Z.webm'
 import slot5LeftSingleDemoAsset from './videos/SLOT_5_LEFT_SINGLE_Z.webm'
 import slot5RightMultiDemoAsset from './videos/SLOT_5_RIGHT_MULTI_Z.webm'
 import slot5RightSingleDemoAsset from './videos/SLOT_5_RIGHT_SINGLE_Z.webm'
+
+import type {
+  CheckTransformType,
+  RobotCalibrationCheckComparison,
+} from '../../sessions/types'
 
 const assetMap = {
   left: {
@@ -63,7 +66,7 @@ const BAD_OUTCOME_URL =
   'http://support.opentrons.com/en/articles/4028788-checking-your-ot-2-s-calibration'
 const CONTINUE_BLURB = 'You may also continue forward to the next check.'
 
-function buildBadOutcomeHeader(transform: CHECK_TRANSFORM_TYPE): string {
+function buildBadOutcomeHeader(transform: CheckTransformType): string {
   let outcome = ''
   switch (transform) {
     case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
@@ -80,7 +83,7 @@ function buildBadOutcomeHeader(transform: CHECK_TRANSFORM_TYPE): string {
 }
 
 function BadOutcomeBody(props: {|
-  transform: CHECK_TRANSFORM_TYPE,
+  transform: CheckTransformType,
 |}): React.Node {
   const { transform } = props
   switch (transform) {

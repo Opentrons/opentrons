@@ -6,7 +6,6 @@ import { mount } from 'enzyme'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
 
 import * as Sessions from '../../../sessions'
-import * as Calibration from '../../../calibration'
 import { mockTipLengthCalibrationSessionAttributes } from '../../../sessions/__fixtures__'
 
 import { CalibrateTipLength } from '../index'
@@ -18,13 +17,15 @@ import { InspectingTip } from '../InspectingTip'
 import { MeasureTip } from '../MeasureTip'
 import { CompleteConfirmation } from '../CompleteConfirmation'
 
+import type { TipLengthCalibrationStep } from '../../../sessions/types'
+
 jest.mock('@opentrons/components/src/deck/getDeckDefinitions')
 jest.mock('../../../sessions/selectors')
 
 type CalibrateTipLengthSpec = {
   component: React.AbstractComponent<any>,
   childProps?: {},
-  currentStep: Calibration.TipLengthCalibrationStep,
+  currentStep: TipLengthCalibrationStep,
   ...
 }
 

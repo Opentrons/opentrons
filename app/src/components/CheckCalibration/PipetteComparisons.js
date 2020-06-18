@@ -8,16 +8,18 @@ import {
   TOOLTIP_TOP,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
+
+import * as Sessions from '../../sessions'
+import { DifferenceValue } from './DifferenceValue'
+import { ThresholdValue } from './ThresholdValue'
+import styles from './styles.css'
+
 import type {
   RobotCalibrationCheckInstrument,
   RobotCalibrationCheckStep,
   RobotCalibrationCheckComparison,
   RobotCalibrationCheckComparisonsByStep,
-} from '../../calibration'
-import * as Calibration from '../../calibration'
-import { DifferenceValue } from './DifferenceValue'
-import { ThresholdValue } from './ThresholdValue'
-import styles from './styles.css'
+} from '../../sessions/types'
 
 const PASS = 'pass'
 const FAIL = 'fail'
@@ -38,12 +40,12 @@ const POINT_TWO_CHECK_DISPLAY_NAME = 'Slot 3 X/Y-axis'
 const POINT_THREE_CHECK_DISPLAY_NAME = 'Slot 7 X/Y-axis'
 
 const stepDisplayNameMap: { [RobotCalibrationCheckStep]: string, ... } = {
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: POINT_TWO_CHECK_DISPLAY_NAME,
-  [Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: POINT_THREE_CHECK_DISPLAY_NAME,
-  [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
-  [Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO]: POINT_TWO_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE]: POINT_THREE_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT]: HEIGHT_CHECK_DISPLAY_NAME,
+  [Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE]: POINT_ONE_CHECK_DISPLAY_NAME,
 }
 
 type PipetteComparisonsProps = {|

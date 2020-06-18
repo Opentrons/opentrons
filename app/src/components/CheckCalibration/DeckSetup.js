@@ -8,16 +8,13 @@ import {
   LabwareNameOverlay,
   RobotCoordsForeignDiv,
 } from '@opentrons/components'
-import {
-  type LabwareDefinition2,
-  type DeckSlot,
-  getLabwareDisplayName,
-} from '@opentrons/shared-data'
+import { getLabwareDisplayName } from '@opentrons/shared-data'
 import { getDeckDefinitions } from '@opentrons/components/src/deck/getDeckDefinitions'
-
-import type { RobotCalibrationCheckLabware } from '../../calibration/api-types'
 import { getLatestLabwareDef } from '../../getLabware'
 import styles from './styles.css'
+
+import type { LabwareDefinition2, DeckSlot } from '@opentrons/shared-data'
+import type { RobotCalibrationCheckLabware } from '../../sessions/types'
 
 const DECK_SETUP_PROMPT =
   'Place full tip rack(s) on the deck, in their designated slots, as illustrated below.'
