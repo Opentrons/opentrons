@@ -94,18 +94,3 @@
     margin-right: auto;
   }
 }
-
-.cal_check_error_icon {
-  color: var(--c-error);
-  width: 1.5rem;
-  height: 1.5rem;
-  padding-right: 0.25rem;
-}
-
-.cal_check_warning_icon {
-  color: var(--c-warning);
-  width: 1.5rem;
-  height: 1.5rem;
-  padding-right: 0.25rem;
-  padding-left: 0.25rem;
-}

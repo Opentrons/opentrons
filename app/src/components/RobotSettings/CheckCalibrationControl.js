@@ -21,8 +21,6 @@ import {
   FONT_WEIGHT_SEMIBOLD,
   Tooltip,
   useHoverTooltip,
-  TOOLTIP_BOTTOM,
-  TOOLTIP_FIXED,
 } from '@opentrons/components'
 
 import { Portal } from '../portal'
@@ -33,7 +31,7 @@ import type { State } from '../../types'
 
 export type CheckCalibrationControlProps = {|
   robotName: string,
-  disabled: boolean,
+  disabledReason: string | null,
 |}
 
 const CHECK = 'Check'
@@ -43,15 +41,14 @@ const COULD_NOT_START = 'Could not start Robot Calibration Check'
 const PLEASE_TRY_AGAIN =
   'Please try again or contact support if you continue to experience issues'
 
-const DECK_CAL_TOOL_TIP_MESSAGE =
-  'Perform a deck calibration to enable this feature.'
-
 export function CheckCalibrationControl({
   robotName,
-  disabled,
+  disabledReason,
 }: CheckCalibrationControlProps): React.Node {
   const [showWizard, setShowWizard] = React.useState(false)
   const [dispatch, requestIds] = RobotApi.useDispatchApiRequest()
+  const [targetProps, tooltipProps] = useHoverTooltip()
+
   const requestState = useSelector((state: State) => {
     const reqId = last(requestIds) ?? null
     return RobotApi.getRequestById(state, reqId)
@@ -64,20 +61,15 @@ export function CheckCalibrationControl({
     )
   }
 
-  const buttonDisabled = disabled || requestStatus === RobotApi.PENDING
+  const buttonDisabled =
+    Boolean(disabledReason) || requestStatus === RobotApi.PENDING
+
   const buttonChildren =
     requestStatus !== RobotApi.PENDING ? (
       CHECK
     ) : (
       <Icon name="ot-spinner" height="1em" spin />
     )
-
-  const [targetProps, tooltipProps] = useHoverTooltip({
-    placement: TOOLTIP_BOTTOM,
-    strategy: TOOLTIP_FIXED,
-  })
-
-  const calCheckDisabled = false
 
   React.useEffect(() => {
     if (requestStatus === RobotApi.SUCCESS) setShowWizard(true)
@@ -95,11 +87,13 @@ export function CheckCalibrationControl({
           children: buttonChildren,
           disabled: buttonDisabled,
           onClick: ensureSession,
+          // TODO(mc, 2020-06-18): we _still_ can't attach tooltips directly
+          // to disabled buttons because of pointer-events: none. fix this
           hoverToolTipHandler: targetProps,
         }}
       >
-        {calCheckDisabled && (
-          <Tooltip {...tooltipProps}>{DECK_CAL_TOOL_TIP_MESSAGE}</Tooltip>
+        {disabledReason !== null && (
+          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
         )}
         {requestState && requestState.status === RobotApi.FAILURE && (
           <Flex

@@ -8,46 +8,51 @@ import {
   FONT_SIZE_BODY_1,
   COLOR_WARNING,
   COLOR_ERROR,
+  SIZE_2,
   SPACING_AUTO,
   SPACING_1,
+  SPACING_2,
   ALIGN_CENTER,
 } from '@opentrons/components'
 
-import styles from './styles.css'
+import * as Calibration from '../../calibration'
+
+import type { StyleProps } from '@opentrons/components'
+import type { DeckCalibrationStatus } from '../../calibration/types'
 
 export type DeckCalibrationWarningProps = {|
-  calibrationStatus: string,
+  deckCalibrationStatus: DeckCalibrationStatus | null,
+  ...StyleProps,
 |}
 
 const ROBOT_CAL_WARNING = "This robot's deck has not yet been calibrated."
-const ROBOT_CAL_RESOLUTION =
-  'Please perform a deck calibration prior to uploading a protocol.'
 const ROBOT_CAL_ERROR =
   'Bad deck calibration detected! This robot is likely to experience a crash.'
+const ROBOT_CAL_RESOLUTION =
+  'Please perform a deck calibration prior to uploading a protocol.'
 
 export function DeckCalibrationWarning({
-  calibrationStatus,
+  deckCalibrationStatus: status,
+  ...styleProps
 }: DeckCalibrationWarningProps): React.Node {
-  const isVisible = calibrationStatus !== 'OK'
-  const isNoCalibration = calibrationStatus === 'IDENTITY'
-  const message = isNoCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR
-  const colorType = isNoCalibration ? COLOR_WARNING : COLOR_ERROR
-  const styleType = isNoCalibration
-    ? styles.cal_check_warning_icon
-    : styles.cal_check_error_icon
+  if (status === Calibration.DECK_CAL_STATUS_OK) return null
 
-  if (!isVisible) return null
+  const isNoCalibration = status === Calibration.DECK_CAL_STATUS_IDENTITY
+  const message = isNoCalibration ? ROBOT_CAL_WARNING : ROBOT_CAL_ERROR
+  const color = isNoCalibration ? COLOR_WARNING : COLOR_ERROR
 
   return (
-    <Flex alignItems={ALIGN_CENTER}>
-      <Icon name={'alert-circle'} className={styleType} />
-      <Box fontSize={FONT_SIZE_BODY_1} paddingRight={SPACING_1}>
-        <Text color={colorType} marginRight={SPACING_AUTO}>
-          {message}
-        </Text>
-        <Text color={colorType} marginRight={SPACING_AUTO}>
-          {ROBOT_CAL_RESOLUTION}
-        </Text>
+    <Flex alignItems={ALIGN_CENTER} color={color} {...styleProps}>
+      <Box size={SIZE_2} paddingY={SPACING_1} paddingRight={SPACING_2}>
+        <Icon name="alert-circle" />
+      </Box>
+      <Box
+        fontSize={FONT_SIZE_BODY_1}
+        paddingRight={SPACING_1}
+        marginRight={SPACING_AUTO}
+      >
+        <Text>{message}</Text>
+        <Text>{ROBOT_CAL_RESOLUTION}</Text>
       </Box>
     </Flex>
   )
