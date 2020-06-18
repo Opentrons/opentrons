@@ -124,8 +124,8 @@ describe('Protocol fixtures migrate and match snapshots', () => {
           cy.window()
             .its('__lastSavedFileBlob__')
             .should('be.a', 'blob')
-            .then(blob => blob.text())
-            .then(blobText => {
+            .should(async blob => {
+              const blobText = await blob.text()
               const savedFile = JSON.parse(blobText)
               const expectedFile = cloneDeep(expectedExportProtocol)
 
