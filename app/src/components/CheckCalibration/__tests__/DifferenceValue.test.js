@@ -1,10 +1,11 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Fixtures from '../../../calibration/__fixtures__'
-import * as Calibration from '../../../calibration'
-import type { RobotCalibrationCheckStep } from '../../../calibration'
+import * as Fixtures from '../../../sessions/__fixtures__'
+import * as Sessions from '../../../sessions'
 import { DifferenceValue } from '../DifferenceValue'
+
+import type { RobotCalibrationCheckStep } from '../../../sessions/types'
 
 const {
   badZComparison,
@@ -18,7 +19,7 @@ describe('DifferenceValue', () => {
 
   beforeEach(() => {
     render = ({
-      stepName = Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName = Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
       differenceVector = goodZComparison.differenceVector,
     }: {
       stepName?: RobotCalibrationCheckStep,
@@ -71,7 +72,7 @@ describe('DifferenceValue', () => {
 
   it('renders good X/Y comparison', () => {
     const wrapper = render({
-      stepName: Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
       differenceVector: goodXYComparison.differenceVector,
     })
 
@@ -103,7 +104,7 @@ describe('DifferenceValue', () => {
 
   it('renders bad X/Y comparison', () => {
     const wrapper = render({
-      stepName: Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
       differenceVector: badXYComparison.differenceVector,
     })
 
@@ -135,7 +136,7 @@ describe('DifferenceValue', () => {
 
   it('renders no sign with zero value', () => {
     const wrapper = render({
-      stepName: Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
       differenceVector: [0, 0, 0],
     })
 
@@ -149,7 +150,7 @@ describe('DifferenceValue', () => {
 
   it('renders plus sign with positive value', () => {
     const wrapper = render({
-      stepName: Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
       differenceVector: [0, 0, 5.2],
     })
 
@@ -163,7 +164,7 @@ describe('DifferenceValue', () => {
 
   it('renders minus sign with negative value', () => {
     const wrapper = render({
-      stepName: Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+      stepName: Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
       differenceVector: [0, 0, -3.1],
     })
 

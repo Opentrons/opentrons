@@ -167,6 +167,14 @@ def wifi_keys_tempdir():
         config.CONFIG['wifi_keys_dir'] = old_wifi_keys
 
 
+@pytest.fixture
+def is_robot(monkeypatch):
+    print("in here")
+    monkeypatch.setattr(config, 'IS_ROBOT', True)
+    yield
+    monkeypatch.setattr(config, 'IS_ROBOT', False)
+
+
 # -------feature flag fixtures-------------
 @pytest.fixture
 async def calibrate_bottom_flag():
@@ -361,7 +369,7 @@ async def hardware(request, loop, virtual_smoothie_env):
 @pytest.mark.skipif(aionotify is None,
                     reason="requires inotify (linux only)")
 @pytest.fixture
-def sync_hardware(request, loop, virtual_smoothie_env):
+def sync_hardware(request, loop, virtual_smoothie_env, is_robot):
     thread_manager = ThreadManager(API.build_hardware_controller)
     hardware = thread_manager.sync
     try:
@@ -522,7 +530,7 @@ def cntrlr_mock_connect(monkeypatch):
 
 
 @pytest.fixture
-async def hardware_api(loop):
+async def hardware_api(loop, is_robot):
     hw_api = await API.build_hardware_simulator(loop=loop)
     return hw_api
 

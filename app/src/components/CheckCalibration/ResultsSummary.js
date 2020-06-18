@@ -4,17 +4,18 @@ import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
 import partition from 'lodash/partition'
-import type {
-  RobotCalibrationCheckComparisonsByStep,
-  RobotCalibrationCheckComparison,
-  RobotCalibrationCheckInstrument,
-} from '../../calibration'
-import * as Calibration from '../../calibration'
+import * as Sessions from '../../sessions'
 import styles from './styles.css'
 import { PipetteComparisons } from './PipetteComparisons'
 import { BadOutcomeBody } from './BadOutcomeBody'
 import { saveAs } from 'file-saver'
 import { getBadOutcomeHeader } from './utils'
+
+import type {
+  RobotCalibrationCheckComparisonsByStep,
+  RobotCalibrationCheckComparison,
+  RobotCalibrationCheckInstrument,
+} from '../../sessions/types'
 
 const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
@@ -42,21 +43,21 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
   const firstPipette = find(
     instrumentsByMount,
     (p: RobotCalibrationCheckInstrument) =>
-      p.rank === Calibration.CHECK_PIPETTE_RANK_FIRST
+      p.rank === Sessions.CHECK_PIPETTE_RANK_FIRST
   )
   const secondPipette = find(
     instrumentsByMount,
     (p: RobotCalibrationCheckInstrument) =>
-      p.rank === Calibration.CHECK_PIPETTE_RANK_SECOND
+      p.rank === Sessions.CHECK_PIPETTE_RANK_SECOND
   )
   const [firstComparisonsByStep, secondComparisonsByStep] = partition(
     Object.keys(comparisonsByStep),
-    compStep => Calibration.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
+    compStep => Sessions.FIRST_PIPETTE_COMPARISON_STEPS.includes(compStep)
   ).map(stepNames => pick(comparisonsByStep, stepNames))
 
   const lastFailedComparison = [
-    ...Calibration.FIRST_PIPETTE_COMPARISON_STEPS,
-    ...Calibration.SECOND_PIPETTE_COMPARISON_STEPS,
+    ...Sessions.FIRST_PIPETTE_COMPARISON_STEPS,
+    ...Sessions.SECOND_PIPETTE_COMPARISON_STEPS,
   ].reduce((acc, step): RobotCalibrationCheckComparison | null => {
     const comparison = comparisonsByStep[step]
     if (comparison && comparison.exceedsThreshold) {
@@ -77,7 +78,7 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
           <PipetteComparisons
             pipette={firstPipette}
             comparisonsByStep={firstComparisonsByStep}
-            allSteps={Calibration.FIRST_PIPETTE_COMPARISON_STEPS}
+            allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
           />
         </div>
         {secondPipette && (
@@ -85,7 +86,7 @@ export function ResultsSummary(props: ResultsSummaryProps): React.Node {
             <PipetteComparisons
               pipette={secondPipette}
               comparisonsByStep={secondComparisonsByStep}
-              allSteps={Calibration.SECOND_PIPETTE_COMPARISON_STEPS}
+              allSteps={Sessions.SECOND_PIPETTE_COMPARISON_STEPS}
             />
           </div>
         )}

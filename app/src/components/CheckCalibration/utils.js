@@ -4,7 +4,7 @@ import {
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_UNKNOWN,
   type CHECK_TRANSFORM_TYPE,
-} from '../../calibration'
+} from '../../sessions'
 import type { JogAxis } from '../../http-api-client'
 
 const BAD = 'Bad'

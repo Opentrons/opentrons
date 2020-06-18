@@ -8,7 +8,7 @@ import {
   CHECK_TRANSFORM_TYPE_UNKNOWN,
   CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
   CHECK_TRANSFORM_TYPE_DECK,
-} from '../../../calibration'
+} from '../../../sessions'
 import { CheckXYPoint } from '../CheckXYPoint'
 
 describe('CheckXYPoint', () => {

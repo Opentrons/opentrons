@@ -1,6 +1,5 @@
 // @flow
-
-/* Robot Calibration Check Constants */
+// calibration check session contants
 
 export const CHECK_STEP_SESSION_STARTED: 'sessionStarted' = 'sessionStarted'
 export const CHECK_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
@@ -83,18 +82,3 @@ export const SECOND_PIPETTE_COMPARISON_STEPS = [
   CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
   CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
 ]
-
-/* Tip Length Calibration Constants */
-
-export const TIP_LENGTH_STEP_SESSION_STARTED: 'sessionStarted' =
-  'sessionStarted'
-export const TIP_LENGTH_STEP_LABWARE_LOADED: 'labwareLoaded' = 'labwareLoaded'
-export const TIP_LENGTH_STEP_MEASURING_NOZZLE_OFFSET: 'measuringNozzleOffset' =
-  'measuringNozzleOffset'
-export const TIP_LENGTH_STEP_PREPARING_PIPETTE: 'preparingPipette' =
-  'preparingPipette'
-export const TIP_LENGTH_STEP_INSPECTING_TIP: 'inspectingTip' = 'inspectingTip'
-export const TIP_LENGTH_STEP_MEASURING_TIP_OFFSET: 'measuringTipOffset' =
-  'measuringTipOffset'
-export const TIP_LENGTH_STEP_CALIBRATION_COMPLETE: 'calibrationComplete' =
-  'calibrationComplete'

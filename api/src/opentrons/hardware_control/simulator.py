@@ -95,7 +95,7 @@ class Simulator:
                                             requesting instruments that _are_
                                             present get the full number.
         """
-        self._config = config
+        self.config = config
         self._loop = loop
 
         def _sanitize_attached_instrument(
