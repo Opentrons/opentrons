@@ -5,6 +5,7 @@ import {
   Box,
   Flex,
   Text,
+  FLEX_NONE,
   ALIGN_START,
   SPACING_AUTO,
   SPACING_1,
@@ -34,7 +35,7 @@ export function TitledButton({
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
       <Flex alignItems={ALIGN_START}>
-        <Box marginRight={SPACING_AUTO} maxWidth="75%">
+        <Box paddingRight={SPACING_3} marginRight={SPACING_AUTO}>
           <Text
             as="h4"
             fontWeight={FONT_WEIGHT_SEMIBOLD}
@@ -44,7 +45,7 @@ export function TitledButton({
           </Text>
           {description}
         </Box>
-        <Box paddingTop={SPACING_1}>
+        <Box paddingTop={SPACING_1} flex={FLEX_NONE}>
           <OutlineButton {...buttonProps} />
         </Box>
       </Flex>

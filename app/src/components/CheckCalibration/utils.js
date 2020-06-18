@@ -1,5 +1,14 @@
 // @flow
+import {
+  CHECK_TRANSFORM_TYPE_DECK,
+  CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET,
+  CHECK_TRANSFORM_TYPE_UNKNOWN,
+} from '../../sessions'
+import type { CheckTransformType } from '../../sessions/types'
 import type { JogAxis } from '../../http-api-client'
+
+const BAD = 'Bad'
+const DETECTED = 'detected'
 
 const ORDERED_AXES: [JogAxis, JogAxis, JogAxis] = ['x', 'y', 'z']
 
@@ -20,4 +29,20 @@ export function formatJogVector(
 export function formatOffsetValue(value: number): string {
   const rounded = Math.round((value + Number.EPSILON) * 100) / 100
   return parseFloat(rounded).toFixed(2)
+}
+
+export function getBadOutcomeHeader(transform: CheckTransformType): string {
+  let outcome = ''
+  switch (transform) {
+    case CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET:
+      outcome = 'pipette offset calibration data'
+      break
+    case CHECK_TRANSFORM_TYPE_DECK:
+      outcome = 'deck calibration data'
+      break
+    case CHECK_TRANSFORM_TYPE_UNKNOWN:
+      outcome = 'deck calibration data or pipette offset calibration data'
+      break
+  }
+  return `${BAD} ${outcome} ${DETECTED}`
 }

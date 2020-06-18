@@ -66,7 +66,7 @@ export const checkCommands = {
 
 export const CHECK_TRANSFORM_TYPE_INSTRUMENT_OFFSET = 'BAD_INSTRUMENT_OFFSET'
 export const CHECK_TRANSFORM_TYPE_UNKNOWN = 'UNKNOWN'
-export const CHECK_TRANSFORM_TYPE_DECK = 'BAD_DECK_TRANSFORM'
+export const CHECK_TRANSFORM_TYPE_DECK = 'BAD_DECK_CAL_STATUS'
 
 export const CHECK_PIPETTE_RANK_FIRST: 'first' = 'first'
 export const CHECK_PIPETTE_RANK_SECOND: 'second' = 'second'
