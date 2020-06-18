@@ -10,7 +10,7 @@ export type ConfirmExitModalProps = {|
 
 const HEADING = 'Are you sure you want to exit?'
 const GO_BACK = 'go back'
-const EXIT = 'confirm exit'
+const EXIT = 'continue'
 const WARNING =
   'Doing so will take you to the summary page and prompt you to drop the tip.'
 

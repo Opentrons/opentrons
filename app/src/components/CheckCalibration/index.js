@@ -26,7 +26,7 @@ import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
 import { TipPickUp } from './TipPickUp'
-import { CompleteConfirmation } from './CompleteConfirmation'
+import { ResultsSummary } from './ResultsSummary'
 import { CheckXYPoint } from './CheckXYPoint'
 import { CheckHeight } from './CheckHeight'
 import { BadCalibration } from './BadCalibration'
@@ -131,7 +131,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     }
   }, [instruments, activeInstrument, hasTwoPipettes])
 
-  function exit() {
+  function deleteSession() {
     robotCalCheckSession.id &&
       dispatchRequest(
         Sessions.deleteSession(robotName, robotCalCheckSession.id)
@@ -143,7 +143,10 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     showConfirmation: showConfirmExit,
     confirm: confirmExit,
     cancel: cancelExit,
-  } = useConditionalConfirm(exit, true)
+  } = useConditionalConfirm(
+    () => sendCommand(Calibration.checkCommands.EXIT),
+    true
+  )
 
   function sendCommand(
     command: SessionCommandString,
@@ -302,15 +305,15 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     }
     case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
       shouldDisplayTitleBarExit = false
-      stepContents = <BadCalibration exit={exit} />
+      stepContents = <BadCalibration deleteSession={deleteSession} />
       break
     }
     case Calibration.CHECK_STEP_SESSION_EXITED:
     case Calibration.CHECK_STEP_CHECK_COMPLETE:
     case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = (
-        <CompleteConfirmation
-          exit={exit}
+        <ResultsSummary
+          deleteSession={deleteSession}
           comparisonsByStep={comparisonsByStep}
           instrumentsByMount={instruments}
         />

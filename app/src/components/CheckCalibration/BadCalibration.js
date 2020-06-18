@@ -17,11 +17,11 @@ const BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT = 'Drop tip in trash and exit'
 
 const DECK_CAL_ARTICLE_URL =
   'https://support.opentrons.com/en/articles/2687620-get-started-calibrate-the-deck'
-type CompleteConfirmationProps = {|
-  exit: () => mixed,
+type BadCalibrationProps = {|
+  deleteSession: () => mixed,
 |}
-export function BadCalibration(props: CompleteConfirmationProps): React.Node {
-  const { exit } = props
+export function BadCalibration(props: BadCalibrationProps): React.Node {
+  const { deleteSession } = props
 
   return (
     <div className={styles.padded_contents_wrapper}>
@@ -32,7 +32,7 @@ export function BadCalibration(props: CompleteConfirmationProps): React.Node {
       <div className={styles.bad_cal_body}>
         <p className={styles.error_explanation}>{SUMMARY}</p>
         <p className={styles.error_explanation}>{TO_TROUBLESHOOT}</p>
-        <ul>
+        <ul className={styles.error_explanation_list}>
           <li className={styles.error_explanation}>{TIP_RACK_CENTERED}</li>
           <li className={styles.error_explanation}>{USE_OPENTRONS_TIPS}</li>
         </ul>
@@ -46,7 +46,7 @@ export function BadCalibration(props: CompleteConfirmationProps): React.Node {
           {LEARN_MORE}
         </p>
       </div>
-      <PrimaryButton onClick={exit}>
+      <PrimaryButton onClick={deleteSession}>
         {BAD_ROBOT_CALIBRATION_CHECK_BUTTON_TEXT}
       </PrimaryButton>
     </div>

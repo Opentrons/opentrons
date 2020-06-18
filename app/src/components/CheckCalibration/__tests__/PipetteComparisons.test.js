@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
+import * as Calibration from '../../../calibration'
 import * as Fixtures from '../../../calibration/__fixtures__'
 import type {
   RobotCalibrationCheckComparisonsByStep,
@@ -10,7 +11,7 @@ import { PipetteComparisons } from '../PipetteComparisons'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
-describe('CompleteConfirmation', () => {
+describe('PipetteComparisons', () => {
   let render
 
   const getFirstDataRow = wrapper =>
@@ -31,6 +32,7 @@ describe('CompleteConfirmation', () => {
         <PipetteComparisons
           pipette={pipette}
           comparisonsByStep={comparisonsByStep}
+          allSteps={Calibration.FIRST_PIPETTE_COMPARISON_STEPS}
         />
       )
     }
@@ -40,10 +42,10 @@ describe('CompleteConfirmation', () => {
     jest.resetAllMocks()
   })
 
-  it('renders a row for each comparison passed in', () => {
+  it('renders a row for each step name passed in', () => {
     const wrapper = render()
 
-    expect(wrapper.find('tbody').find('tr').length).toEqual(6)
+    expect(wrapper.find('tbody').find('tr').length).toEqual(4)
   })
 
   it('correctly formats comparison data', () => {
@@ -59,6 +61,7 @@ describe('CompleteConfirmation', () => {
       getFirstDataRow(wrapper)
         .find('td')
         .at(1)
+        .find('StepStatus')
         .text()
     ).toEqual('pass')
     expect(
@@ -75,5 +78,35 @@ describe('CompleteConfirmation', () => {
         .find('DifferenceValue')
         .exists()
     ).toBe(true)
+  })
+
+  it('correctly formats incomplete comparison data', () => {
+    const wrapper = render({ comparisonsByStep: {} })
+
+    expect(
+      getFirstDataRow(wrapper)
+        .find('td')
+        .at(0)
+        .text()
+    ).toEqual('Slot 5 Z-axis')
+    expect(
+      getFirstDataRow(wrapper)
+        .find('td')
+        .at(1)
+        .find('StepStatus')
+        .text()
+    ).toEqual('incomplete')
+    expect(
+      getFirstDataRow(wrapper)
+        .find('td')
+        .at(2)
+        .text()
+    ).toEqual('N/A')
+    expect(
+      getFirstDataRow(wrapper)
+        .find('td')
+        .at(3)
+        .text()
+    ).toEqual('N/A')
   })
 })

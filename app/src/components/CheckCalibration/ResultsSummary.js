@@ -3,7 +3,6 @@ import * as React from 'react'
 import { PrimaryButton, OutlineButton } from '@opentrons/components'
 import find from 'lodash/find'
 import pick from 'lodash/pick'
-import some from 'lodash/some'
 import partition from 'lodash/partition'
 import type {
   RobotCalibrationCheckComparisonsByStep,
@@ -18,15 +17,13 @@ const ROBOT_CALIBRATION_CHECK_SUMMARY_HEADER = 'Calibration check summary:'
 const DROP_TIP_AND_EXIT = 'Drop tip in trash and exit'
 const DOWNLOAD_SUMMARY = 'Download JSON summary'
 
-type CompleteConfirmationProps = {|
-  exit: () => mixed,
+type ResultsSummaryProps = {|
+  deleteSession: () => mixed,
   comparisonsByStep: RobotCalibrationCheckComparisonsByStep,
   instrumentsByMount: { [mount: string]: RobotCalibrationCheckInstrument, ... },
 |}
-export function CompleteConfirmation(
-  props: CompleteConfirmationProps
-): React.Node {
-  const { exit, comparisonsByStep, instrumentsByMount } = props
+export function ResultsSummary(props: ResultsSummaryProps): React.Node {
+  const { deleteSession, comparisonsByStep, instrumentsByMount } = props
 
   const handleDownloadButtonClick = () => {
     const now = new Date()
@@ -59,19 +56,19 @@ export function CompleteConfirmation(
       </h3>
 
       <div className={styles.summary_page_contents}>
-        {some(firstComparisonsByStep) && (
-          <div className={styles.summary_section}>
-            <PipetteComparisons
-              pipette={firstPipette}
-              comparisonsByStep={firstComparisonsByStep}
-            />
-          </div>
-        )}
-        {some(secondComparisonsByStep) && (
+        <div className={styles.summary_section}>
+          <PipetteComparisons
+            pipette={firstPipette}
+            comparisonsByStep={firstComparisonsByStep}
+            allSteps={Calibration.FIRST_PIPETTE_COMPARISON_STEPS}
+          />
+        </div>
+        {secondPipette && (
           <div className={styles.summary_section}>
             <PipetteComparisons
               pipette={secondPipette}
               comparisonsByStep={secondComparisonsByStep}
+              allSteps={Calibration.SECOND_PIPETTE_COMPARISON_STEPS}
             />
           </div>
         )}
@@ -82,7 +79,7 @@ export function CompleteConfirmation(
       >
         {DOWNLOAD_SUMMARY}
       </OutlineButton>
-      <PrimaryButton onClick={exit}>{DROP_TIP_AND_EXIT}</PrimaryButton>
+      <PrimaryButton onClick={deleteSession}>{DROP_TIP_AND_EXIT}</PrimaryButton>
     </>
   )
 }

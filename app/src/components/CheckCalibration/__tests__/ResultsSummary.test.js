@@ -5,8 +5,11 @@ import { act } from 'react-dom/test-utils'
 import omit from 'lodash/omit'
 import * as Fixtures from '../../../calibration/__fixtures__'
 import * as Calibration from '../../../calibration'
-import type { RobotCalibrationCheckComparisonsByStep } from '../../../calibration'
-import { CompleteConfirmation } from '../CompleteConfirmation'
+import type {
+  RobotCalibrationCheckInstrumentsByMount,
+  RobotCalibrationCheckComparisonsByStep,
+} from '../../../calibration'
+import { ResultsSummary } from '../ResultsSummary'
 import { saveAs } from 'file-saver'
 
 jest.mock('file-saver')
@@ -18,10 +21,10 @@ const mockSaveAs: JestMockFn<
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
 
-describe('CompleteConfirmation', () => {
+describe('ResultsSummary', () => {
   let render
 
-  const mockExit = jest.fn()
+  const mockDeleteSession = jest.fn()
 
   const getExitButton = wrapper =>
     wrapper
@@ -35,15 +38,17 @@ describe('CompleteConfirmation', () => {
 
   beforeEach(() => {
     render = ({
+      instrumentsByMount = mockSessionDetails.instruments,
       comparisonsByStep = mockSessionDetails.comparisonsByStep,
     }: {
+      instrumentsByMount?: RobotCalibrationCheckInstrumentsByMount,
       comparisonsByStep?: RobotCalibrationCheckComparisonsByStep,
     } = {}) => {
       return mount(
-        <CompleteConfirmation
-          instrumentsByMount={mockSessionDetails.instruments}
+        <ResultsSummary
+          instrumentsByMount={instrumentsByMount}
           comparisonsByStep={comparisonsByStep}
-          exit={mockExit}
+          deleteSession={mockDeleteSession}
         />
       )
     }
@@ -72,12 +77,33 @@ describe('CompleteConfirmation', () => {
     ).toEqual(expect.stringContaining('left'))
   })
 
-  it('does not summarize second pipette if no comparisons have been made', () => {
+  it('summarizes both pipettes if no comparisons have been made', () => {
     const wrapper = render({
       comparisonsByStep: omit(
         mockSessionDetails.comparisonsByStep,
         Calibration.SECOND_PIPETTE_COMPARISON_STEPS
       ),
+    })
+
+    expect(
+      wrapper
+        .find('PipetteComparisons')
+        .at(0)
+        .find('h5')
+        .text()
+    ).toEqual(expect.stringContaining('right'))
+    expect(
+      wrapper
+        .find('PipetteComparisons')
+        .at(1)
+        .find('h5')
+        .text()
+    ).toEqual(expect.stringContaining('left'))
+  })
+
+  it('does not summarize second pipette if none present', () => {
+    const wrapper = render({
+      instrumentsByMount: omit(mockSessionDetails.instruments, 'left'),
     })
 
     expect(
@@ -101,7 +127,7 @@ describe('CompleteConfirmation', () => {
     act(() => getExitButton(wrapper).invoke('onClick')())
     wrapper.update()
 
-    expect(mockExit).toHaveBeenCalled()
+    expect(mockDeleteSession).toHaveBeenCalled()
   })
 
   it('saves the calibration report when the button is clicked', () => {
