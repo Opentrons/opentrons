@@ -1,6 +1,5 @@
 // @flow
 import type { State } from '../types'
-import * as Calibration from '../calibration'
 import * as Constants from './constants'
 import * as Types from './types'
 
@@ -55,7 +54,7 @@ export const getAnalyticsPropsForRobotSessionById: (
     const normalizedStepData = Object.keys(comparisonsByStep).reduce(
       (
         acc: Types.CalibrationCheckAnalyticsData,
-        stepName: Calibration.RobotCalibrationCheckStep
+        stepName: Types.RobotCalibrationCheckStep
       ) => {
         const {
           differenceVector,

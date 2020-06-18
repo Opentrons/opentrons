@@ -9,19 +9,16 @@ import {
   RIGHT,
   type Mount,
   useConditionalConfirm,
-  type TitleBarProps,
 } from '@opentrons/components'
 import { getPipetteModelSpecs } from '@opentrons/shared-data'
-import type { State, Dispatch } from '../../types'
 import { useDispatchApiRequest, getRequestById, PENDING } from '../../robot-api'
-import type { RequestState } from '../../robot-api/types'
-import * as Calibration from '../../calibration'
 import * as Sessions from '../../sessions'
-import type {
-  SessionCommandString,
-  SessionCommandData,
-} from '../../sessions/types'
+
+import type { TitleBarProps } from '@opentrons/components'
+import type { State, Dispatch } from '../../types'
+import type { RequestState } from '../../robot-api/types'
 import type { JogAxis, JogDirection, JogStep } from '../../http-api-client'
+import * as SessionTypes from '../../sessions/types'
 
 import { Introduction } from './Introduction'
 import { DeckSetup } from './DeckSetup'
@@ -144,13 +141,13 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     confirm: confirmExit,
     cancel: cancelExit,
   } = useConditionalConfirm(
-    () => sendCommand(Calibration.checkCommands.EXIT),
+    () => sendCommand(Sessions.checkCommands.EXIT),
     true
   )
 
   function sendCommand(
-    command: SessionCommandString,
-    data: SessionCommandData = {}
+    command: SessionTypes.SessionCommandString,
+    data: SessionTypes.SessionCommandData = {}
   ) {
     robotCalCheckSession.id &&
       dispatchRequest(
@@ -164,7 +161,7 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
     robotCalCheckSession.id &&
       dispatch(
         Sessions.createSessionCommand(robotName, robotCalCheckSession.id, {
-          command: Calibration.checkCommands.JOG,
+          command: Sessions.checkCommands.JOG,
           data: {
             vector: formatJogVector(axis, direction, step),
           },
@@ -183,33 +180,33 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
   let shouldDisplayTitleBarExit = true
 
   switch (currentStep) {
-    case Calibration.CHECK_STEP_SESSION_STARTED: {
+    case Sessions.CHECK_STEP_SESSION_STARTED: {
       stepContents = (
         <Introduction
           exit={confirmExit}
-          proceed={() => sendCommand(Calibration.checkCommands.LOAD_LABWARE)}
+          proceed={() => sendCommand(Sessions.checkCommands.LOAD_LABWARE)}
           labwareLoadNames={labware.map(l => l.loadName)}
         />
       )
       break
     }
-    case Calibration.CHECK_STEP_LABWARE_LOADED: {
+    case Sessions.CHECK_STEP_LABWARE_LOADED: {
       stepContents = (
         <DeckSetup
-          proceed={() => sendCommand(Calibration.checkCommands.PREPARE_PIPETTE)}
+          proceed={() => sendCommand(Sessions.checkCommands.PREPARE_PIPETTE)}
           labware={labware}
         />
       )
       modalContentsClassName = styles.page_content_dark
       break
     }
-    case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
-    case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
-    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
-    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE: {
+    case Sessions.CHECK_STEP_INSPECTING_FIRST_TIP:
+    case Sessions.CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case Sessions.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Sessions.CHECK_STEP_PREPARING_SECOND_PIPETTE: {
       const isInspecting = [
-        Calibration.CHECK_STEP_INSPECTING_FIRST_TIP,
-        Calibration.CHECK_STEP_INSPECTING_SECOND_TIP,
+        Sessions.CHECK_STEP_INSPECTING_FIRST_TIP,
+        Sessions.CHECK_STEP_INSPECTING_SECOND_TIP,
       ].includes(currentStep)
 
       stepContents = activeLabware ? (
@@ -218,31 +215,31 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           isMulti={isActiveInstrumentMultiChannel}
           isInspecting={isInspecting}
           tipRackWellName={tipRackWellName}
-          pickUpTip={() => sendCommand(Calibration.checkCommands.PICK_UP_TIP)}
-          confirmTip={() => sendCommand(Calibration.checkCommands.CONFIRM_TIP)}
+          pickUpTip={() => sendCommand(Sessions.checkCommands.PICK_UP_TIP)}
+          confirmTip={() => sendCommand(Sessions.checkCommands.CONFIRM_TIP)}
           invalidateTip={() =>
-            sendCommand(Calibration.checkCommands.INVALIDATE_TIP)
+            sendCommand(Sessions.checkCommands.INVALIDATE_TIP)
           }
           jog={jog}
         />
       ) : null
       break
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
       const slotNumber = getSlotNumberFromStep(currentStep)
 
       const isInspecting = [
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
-        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
+        Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE,
+        Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO,
+        Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE,
+        Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE,
       ].includes(currentStep)
       const nextButtonText = getNextButtonTextForStep(
         currentStep,
@@ -259,24 +256,22 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           comparison={comparison}
           pipetteModel={activeInstrumentModel}
           nextButtonText={nextButtonText}
-          comparePoint={() =>
-            sendCommand(Calibration.checkCommands.COMPARE_POINT)
-          }
+          comparePoint={() => sendCommand(Sessions.checkCommands.COMPARE_POINT)}
           goToNextCheck={() =>
-            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
+            sendCommand(Sessions.checkCommands.GO_TO_NEXT_CHECK)
           }
           jog={jog}
         />
       )
       break
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
       const isInspecting = [
-        Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
-        Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
+        Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT,
+        Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT,
       ].includes(currentStep)
       const nextButtonText = getNextButtonTextForStep(
         currentStep,
@@ -292,25 +287,23 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
           pipetteModel={activeInstrumentModel}
           nextButtonText={nextButtonText}
           exit={confirmExit}
-          comparePoint={() =>
-            sendCommand(Calibration.checkCommands.COMPARE_POINT)
-          }
+          comparePoint={() => sendCommand(Sessions.checkCommands.COMPARE_POINT)}
           goToNextCheck={() =>
-            sendCommand(Calibration.checkCommands.GO_TO_NEXT_CHECK)
+            sendCommand(Sessions.checkCommands.GO_TO_NEXT_CHECK)
           }
           jog={jog}
         />
       )
       break
     }
-    case Calibration.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
+    case Sessions.CHECK_STEP_BAD_ROBOT_CALIBRATION: {
       shouldDisplayTitleBarExit = false
       stepContents = <BadCalibration deleteSession={deleteSession} />
       break
     }
-    case Calibration.CHECK_STEP_SESSION_EXITED:
-    case Calibration.CHECK_STEP_CHECK_COMPLETE:
-    case Calibration.CHECK_STEP_NO_PIPETTES_ATTACHED: {
+    case Sessions.CHECK_STEP_SESSION_EXITED:
+    case Sessions.CHECK_STEP_CHECK_COMPLETE:
+    case Sessions.CHECK_STEP_NO_PIPETTES_ATTACHED: {
       stepContents = (
         <ResultsSummary
           deleteSession={deleteSession}
@@ -344,30 +337,30 @@ export function CheckCalibration(props: CheckCalibrationProps): React.Node {
 // helpers
 
 const getNextButtonTextForStep = (
-  step: Calibration.RobotCalibrationCheckStep,
+  step: SessionTypes.RobotCalibrationCheckStep,
   hasTwoPipettes: boolean
 ): string => {
   switch (step) {
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE: {
       return CHECK_X_Y_AXES
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT: {
       return CHECK_Z_AXIS
     }
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT: {
       return MOVE_TO_NEXT
     }
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
       return hasTwoPipettes ? DROP_TIP_AND_DO_SECOND_PIPETTE : CONTINUE
     }
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
       return CONTINUE
     }
     default: {
@@ -378,21 +371,21 @@ const getNextButtonTextForStep = (
 }
 
 const getSlotNumberFromStep = (
-  step: Calibration.RobotCalibrationCheckStep
+  step: SessionTypes.RobotCalibrationCheckStep
 ): string => {
   switch (step) {
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
       return '1'
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO: {
       return '3'
     }
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
       return '7'
     }
     default:
@@ -402,28 +395,28 @@ const getSlotNumberFromStep = (
 }
 
 const getPipetteRankForStep = (
-  step: Calibration.RobotCalibrationCheckStep
-): Calibration.RobotCalibrationCheckPipetteRank | null => {
+  step: SessionTypes.RobotCalibrationCheckStep
+): SessionTypes.RobotCalibrationCheckPipetteRank | null => {
   switch (step) {
-    case Calibration.CHECK_STEP_INSPECTING_FIRST_TIP:
-    case Calibration.CHECK_STEP_PREPARING_FIRST_PIPETTE:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
-    case Calibration.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
-    case Calibration.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
-      return Calibration.CHECK_PIPETTE_RANK_FIRST
+    case Sessions.CHECK_STEP_INSPECTING_FIRST_TIP:
+    case Sessions.CHECK_STEP_PREPARING_FIRST_PIPETTE:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_TWO:
+    case Sessions.CHECK_STEP_JOGGING_FIRST_PIPETTE_POINT_THREE:
+    case Sessions.CHECK_STEP_COMPARING_FIRST_PIPETTE_POINT_THREE: {
+      return Sessions.CHECK_PIPETTE_RANK_FIRST
     }
-    case Calibration.CHECK_STEP_INSPECTING_SECOND_TIP:
-    case Calibration.CHECK_STEP_PREPARING_SECOND_PIPETTE:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT:
-    case Calibration.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
-    case Calibration.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
-      return Calibration.CHECK_PIPETTE_RANK_SECOND
+    case Sessions.CHECK_STEP_INSPECTING_SECOND_TIP:
+    case Sessions.CHECK_STEP_PREPARING_SECOND_PIPETTE:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_HEIGHT:
+    case Sessions.CHECK_STEP_JOGGING_SECOND_PIPETTE_POINT_ONE:
+    case Sessions.CHECK_STEP_COMPARING_SECOND_PIPETTE_POINT_ONE: {
+      return Sessions.CHECK_PIPETTE_RANK_SECOND
     }
     default:
       // should never reach this case, func only called when currentStep listed above

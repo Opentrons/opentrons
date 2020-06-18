@@ -1,4 +1,6 @@
 import copy
+import pytest
+
 from opentrons.config import robot_configs
 
 
@@ -9,6 +11,12 @@ dummy_cal = [
     [1.23, 1.23, 1.23,  1.23]
 ]
 
+DEFAULT_SIMULATION_CALIBRATION = [
+    [1.0, 0.0, 0.0, 0.0],
+    [0.0, 1.0, 0.0, 0.0],
+    [0.0, 0.0, 1.0, -25.0],
+    [0.0, 0.0, 0.0, 1.0]
+]
 
 dummy_settings = {
     'name': 'Andy',
@@ -52,17 +60,20 @@ dummy_settings = {
 }
 
 
-def test_old_probe_height(short_trash_flag):
+@pytest.mark.xfail
+async def test_old_probe_height(short_trash_flag):
     cfg = robot_configs.load()
 
     assert cfg.tip_probe.center[2] == 55.0
     assert cfg.tip_probe.dimensions[2] == 60.0
+    assert cfg.gantry_calibration == DEFAULT_SIMULATION_CALIBRATION
 
 
 def test_default_probe_height():
     cfg = robot_configs.load()
     assert cfg.tip_probe.center[2] == 74.3
     assert cfg.tip_probe.dimensions[2] == 79.3
+    assert cfg.gantry_calibration == DEFAULT_SIMULATION_CALIBRATION
 
 
 def test_load_corrupt_json():

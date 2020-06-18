@@ -1,12 +1,12 @@
 // @flow
 import * as React from 'react'
 import { mount } from 'enzyme'
-import * as Calibration from '../../../calibration'
-import * as Fixtures from '../../../calibration/__fixtures__'
+import * as Sessions from '../../../sessions'
+import * as Fixtures from '../../../sessions/__fixtures__'
 import type {
   RobotCalibrationCheckComparisonsByStep,
   RobotCalibrationCheckInstrument,
-} from '../../../calibration'
+} from '../../../sessions/types'
 import { PipetteComparisons } from '../PipetteComparisons'
 
 const mockSessionDetails = Fixtures.mockRobotCalibrationCheckSessionDetails
@@ -32,7 +32,7 @@ describe('PipetteComparisons', () => {
         <PipetteComparisons
           pipette={pipette}
           comparisonsByStep={comparisonsByStep}
-          allSteps={Calibration.FIRST_PIPETTE_COMPARISON_STEPS}
+          allSteps={Sessions.FIRST_PIPETTE_COMPARISON_STEPS}
         />
       )
     }
