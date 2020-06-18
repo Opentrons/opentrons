@@ -1,6 +1,7 @@
 """ Utility functions and classes for the hardware controller"""
 import asyncio
 import logging
+from enum import Enum
 from typing import Dict, Any, Optional, List, Tuple
 
 from .types import CriticalPoint
@@ -37,3 +38,13 @@ def plan_arc(
            for wp in checked_wp]\
         + [(dest_point._replace(z=z_height), dest_cp),
            (dest_point, dest_cp)]
+
+
+class DeckTransformState(Enum):
+    OK = "OK"
+    IDENTITY = "IDENTITY"
+    BAD_CALIBRATION = "BAD_CALIBRATION"
+    SINGULARITY = "SINGULARITY"
+
+    def __str__(self):
+        return self.name

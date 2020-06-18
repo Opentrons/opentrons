@@ -34,7 +34,7 @@ export function TitledButton({
   return (
     <Box fontSize={FONT_SIZE_BODY_1} padding={SPACING_3} {...styleProps}>
       <Flex alignItems={ALIGN_START}>
-        <Box marginRight={SPACING_AUTO}>
+        <Box marginRight={SPACING_AUTO} maxWidth="75%">
           <Text
             as="h4"
             fontWeight={FONT_WEIGHT_SEMIBOLD}
