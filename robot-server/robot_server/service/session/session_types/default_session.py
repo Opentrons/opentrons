@@ -1,6 +1,5 @@
 from typing import cast
 import dataclasses
-from opentrons.calibration.check.models import SessionType
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import CommandQueue, \
@@ -14,7 +13,7 @@ from robot_server.service.session.session_types import BaseSession, \
 class DefaultSession(BaseSession):
     """The default session providing limited command support."""
     DEFAULT_ID: models.IdentifierType = cast(models.IdentifierType,
-                                             SessionType.default.value)
+                                             models.SessionType.default.value)
 
     def __init__(self, configuration: SessionConfiguration,
                  instance_meta: SessionMetaData):
@@ -46,5 +45,5 @@ class DefaultSession(BaseSession):
         return models.EmptyModel()
 
     @property
-    def session_type(self) -> SessionType:
-        return SessionType.default
+    def session_type(self) -> models.SessionType:
+        return models.SessionType.default

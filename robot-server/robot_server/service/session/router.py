@@ -135,7 +135,7 @@ async def get_session_handler(
             response_model_exclude_unset=True,
             response_model=route_models.MultiSessionResponse)
 async def get_sessions_handler(
-        session_type: models.SessionType = Query(
+        session_type: route_models.SessionType = Query(
             None,
             description="Will limit the results to only this session type"),
         session_manager: SessionManager = Depends(get_session_manager)) \
