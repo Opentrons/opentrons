@@ -96,6 +96,7 @@ def uniq(l):
             res.append(i)
     return res
 
+
 def run(protocol: protocol_api.ProtocolContext):
     tiprack = protocol.load_labware(TIPRACK_LOADNAME, TIPRACK_SLOT)
     pipette = protocol.load_instrument(
@@ -160,6 +161,9 @@ def run(protocol: protocol_api.ProtocolContext):
             pipette.move_to(edge_location)
             protocol.pause(f'Moved to {edge_name} edge')
 
+    # go to bottom last. (If there is more than one well, use the last well first
+    # because the pipette is already at the last well at this point)
+    for well_loc in reversed(well_locs):
         set_speeds(RATE)
         pipette.move_to(well.bottom())
         protocol.pause("Moved to the bottom of the well")
