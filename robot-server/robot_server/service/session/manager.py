@@ -1,9 +1,11 @@
+import asyncio
 import logging
 from typing import Optional, Tuple, Dict, Type
 
 from opentrons.hardware_control import ThreadManager
 
-from robot_server.service.session.errors import SessionCreationException
+from robot_server.service.session.errors import SessionCreationException, \
+    UnsupportedFeature
 from robot_server.service.session.session_types.base_session import BaseSession
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.models import IdentifierType, SessionType
@@ -26,11 +28,17 @@ class SessionManager:
 
     def __init__(self, hardware: ThreadManager):
         self._sessions: Dict[IdentifierType, BaseSession] = {}
-        self._active_session_id: Optional[IdentifierType] = None
+        self._active = ActiveSessionId(
+            default_id=DefaultSession.DEFAULT_ID
+        )
         # Create object supplied to all sessions
         self._session_common = SessionConfiguration(
             hardware=hardware,
             is_active=self.is_active
+        )
+        # Create the default session.
+        asyncio.new_event_loop().run_until_complete(
+            self.add(SessionType.default)
         )
 
     async def add(self, session_type: SessionType) -> BaseSession:
@@ -38,18 +46,25 @@ class SessionManager:
         cls = SessionTypeToClass.get(session_type)
         if not cls:
             raise SessionCreationException(
-                f"'{session_type}' is not supported"
+                "Session type is not supported"
             )
         session = await cls.create(configuration=self._session_common,
                                    instance_meta=SessionMetaData())
-        self._active_session_id = session.meta.identifier
+        if session.meta.identifier in self._sessions:
+            raise SessionCreationException(
+                f"Session with id {session.meta.identifier} already exists"
+            )
         self._sessions[session.meta.identifier] = session
+        self._active.active_id = session.meta.identifier
         log.debug(f"Added new session: {session}")
         return session
 
     async def remove(self, identifier: IdentifierType) \
             -> Optional[BaseSession]:
         """Remove a session"""
+        if identifier == DefaultSession.DEFAULT_ID:
+            raise UnsupportedFeature(f"Cannot remove {identifier} session")
+
         session = self.deactivate(identifier)
         if session:
             del self._sessions[session.meta.identifier]
@@ -74,23 +89,40 @@ class SessionManager:
 
     def get_active(self) -> Optional[BaseSession]:
         """Get the active session"""
-        return self.get_by_id(self._active_session_id) if \
-            self._active_session_id else None
+        return self.get_by_id(self._active.active_id)
 
     def is_active(self, identifier: IdentifierType) -> bool:
         """Check if session identifier is active"""
-        return identifier == self._active_session_id
+        return identifier == self._active.active_id
 
     def activate(self, identifier: IdentifierType) -> Optional[BaseSession]:
         """Activate a session"""
         session = self.get_by_id(identifier)
         if session:
-            self._active_session_id = identifier
+            self._active.active_id = identifier
         return session
 
     def deactivate(self, identifier: IdentifierType) \
             -> Optional[BaseSession]:
         """Deactivate a session"""
-        if identifier == self._active_session_id:
-            self._active_session_id = None
+        if identifier == self._active.active_id:
+            self._active.active_id = None
         return self.get_by_id(identifier)
+
+
+class ActiveSessionId:
+    def __init__(self, default_id: IdentifierType):
+        self._default_id = default_id
+        self._active_id = default_id
+
+    @property
+    def active_id(self):
+        return self._active_id
+
+    @active_id.setter
+    def active_id(self, val):
+        self._active_id = val if val is not None else self._default_id
+
+    @property
+    def default_id(self):
+        return self._default_id

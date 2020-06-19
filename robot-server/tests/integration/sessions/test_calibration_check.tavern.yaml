@@ -645,14 +645,19 @@ stages:
     response:
       status_code: 200
 
-  - name: There are no sessions
+  - name: There are no sessions except default
     request:
       url: "{host:s}:{port:d}/sessions"
       method: GET
     response:
       status_code: 200
       json:
-        data: []
+        data:
+          - id: "default"
+            type: Session
+            attributes:
+              sessionType: default
+              details: {}
 ---
 test_name: Calibration check session errors
 strict:

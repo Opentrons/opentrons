@@ -10,7 +10,7 @@ from robot_server.service.json_api import Error, ResourceLink,\
     ResponseDataModel
 from robot_server.service.session.command_execution import create_command
 from robot_server.service.session.errors import SessionCreationException, \
-    SessionCommandException
+    SessionCommandException, SessionException
 from robot_server.service.session.manager import SessionManager, BaseSession
 from robot_server.service.session import models as route_models
 
@@ -86,7 +86,18 @@ async def delete_session_handler(
                               session_id=session_id,
                               api_router=router)
 
-    await session_manager.remove(session_obj.meta.identifier)
+    try:
+        await session_manager.remove(session_obj.meta.identifier)
+    except SessionException as e:
+        log.exception("Failed to remove a session session")
+        raise RobotServerError(
+            status_code=http_status_codes.HTTP_400_BAD_REQUEST,
+            error=Error(
+                title="Removal Failed",
+                detail=f"Failed to remove session "
+                       f"'{session_id}': {str(e)}.",
+            )
+        )
 
     return route_models.SessionResponse(
         data=ResponseDataModel.create(
@@ -124,13 +135,13 @@ async def get_session_handler(
             response_model_exclude_unset=True,
             response_model=route_models.MultiSessionResponse)
 async def get_sessions_handler(
-        type_filter: route_models.SessionType = Query(
+        session_type: models.SessionType = Query(
             None,
             description="Will limit the results to only this session type"),
         session_manager: SessionManager = Depends(get_session_manager)) \
         -> route_models.MultiSessionResponse:
     """Get multiple sessions"""
-    sessions = session_manager.get(session_type=type_filter)
+    sessions = session_manager.get(session_type=session_type)
     return route_models.MultiSessionResponse(
         data=[ResponseDataModel.create(
             attributes=session.get_response_model(),
