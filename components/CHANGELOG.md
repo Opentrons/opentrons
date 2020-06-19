@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.19.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.2) (2020-06-18)
+
+
+### Features
+
+* **api, app:** Check Robot Deck Transform ([#5845](https://github.com/Opentrons/opentrons/issues/5845)) ([ed67383](https://github.com/Opentrons/opentrons/commit/ed67383))
+* **components:** add position props to primitive components ([#5926](https://github.com/Opentrons/opentrons/issues/5926)) ([9b0a666](https://github.com/Opentrons/opentrons/commit/9b0a666))
+* **components:** add useConditionalConfirm hook to shared components ([#5735](https://github.com/Opentrons/opentrons/issues/5735)) ([8e5248f](https://github.com/Opentrons/opentrons/commit/8e5248f))
+* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
+* **test:** add test id to Pipette Select component ([#5791](https://github.com/Opentrons/opentrons/issues/5791)) ([845b508](https://github.com/Opentrons/opentrons/commit/845b508)), closes [#5724](https://github.com/Opentrons/opentrons/issues/5724)
+
+
+
+
+
 # [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
 
 
