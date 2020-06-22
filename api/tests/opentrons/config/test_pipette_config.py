@@ -240,7 +240,7 @@ def test_validate_overrides_pass(override_field,
 
 
 @pytest.fixture
-async def attached_pipettes(async_client, request):
+async def attached_pipettes(hardware, request):
     """ Fixture the robot to have attached pipettes
 
     Mark the node with
@@ -260,8 +260,7 @@ async def attached_pipettes(async_client, request):
     right_name = right_mod.split('_v')[0]
     left_id = marker_with_default('attach_left_id', 'abc123')
     right_id = marker_with_default('attach_right_id', 'abcd123')
-    hw = async_client.app['com.opentrons.hardware']
-    hw._backend._attached_instruments = {
+    hardware._backend._attached_instruments = {
         types.Mount.RIGHT: {
             'model': right_mod, 'id': right_id, 'name': right_name
         },
@@ -269,9 +268,9 @@ async def attached_pipettes(async_client, request):
             'model': left_mod, 'id': left_id, 'name': left_name
             }
     }
-    await hw.cache_instruments()
+    await hardware.cache_instruments()
     return {k.name.lower(): v
-            for k, v in hw._backend._attached_instruments.items()}
+            for k, v in hardware._backend._attached_instruments.items()}
 
 
 async def test_override(attached_pipettes):
