@@ -5,7 +5,7 @@ from pathlib import Path
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
 from opentrons.main import initialize as initialize_api
-from opentrons.config import feature_flags as ff
+from robot_server.service import run as fastapi_run
 
 from robot_server.settings import get_settings
 
@@ -28,12 +28,7 @@ def run(hardware: ThreadManager,
         log.debug(f"Starting Opentrons application on {hostname}:{port}")
         path = None
 
-    if ff.use_fast_api():
-        from robot_server.service import run as fastapi_run
-        fastapi_run(hardware, hostname, port, path)
-    else:
-        from opentrons.server import run as aiohttp_run
-        aiohttp_run(hardware, hostname, port, path)
+    fastapi_run(hardware, hostname, port, path)
 
 
 def main():
