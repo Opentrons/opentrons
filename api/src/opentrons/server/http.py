@@ -1,8 +1,7 @@
 import logging
 
 from opentrons import config
-from .endpoints import (networking, control, update,
-                        deck_calibration)
+from .endpoints import (control, update, deck_calibration)
 
 
 log = logging.getLogger(__name__)
@@ -11,20 +10,6 @@ log = logging.getLogger(__name__)
 class HTTPServer(object):
     def __init__(self, app):
         self.app = app
-        self.app.router.add_get(
-            '/networking/status', networking.status)
-        # TODO(mc, 2018-10-12): s/wifi/networking
-        self.app.router.add_get(
-            '/wifi/list', networking.list_networks)
-        self.app.router.add_post(
-            '/wifi/configure', networking.configure)
-        self.app.router.add_post('/wifi/keys', networking.add_key)
-        self.app.router.add_get('/wifi/keys', networking.list_keys)
-        self.app.router.add_delete(
-            '/wifi/keys/{key_uuid}', networking.remove_key)
-        self.app.router.add_get(
-            '/wifi/eap-options', networking.eap_options)
-        self.app.router.add_post('/wifi/disconnect', networking.disconnect)
         self.app.router.add_post(
             '/identify', control.identify)
         self.app.router.add_get(
