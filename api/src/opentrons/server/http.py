@@ -1,7 +1,7 @@
 import logging
 
 from opentrons import config
-from .endpoints import (networking, control, settings, update,
+from .endpoints import (networking, control, update,
                         deck_calibration)
 
 
@@ -71,26 +71,3 @@ class HTTPServer(object):
             '/robot/lights', control.get_rail_lights)
         self.app.router.add_post(
             '/robot/lights', control.set_rail_lights)
-        self.app.router.add_get(
-            '/settings', settings.get_advanced_settings)
-        self.app.router.add_post(
-            '/settings', settings.set_advanced_setting)
-        self.app.router.add_post(
-            '/settings/log_level/local', settings.set_log_level)
-        if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
-            self.app.router.add_post(
-                '/settings/log_level/upstream', logs.set_syslog_level)
-        self.app.router.add_post(
-            '/settings/reset', settings.reset)
-        self.app.router.add_get(
-            '/settings/reset/options', settings.available_resets)
-        self.app.router.add_get(
-            '/settings/pipettes', settings.pipette_settings
-        )
-        self.app.router.add_get(
-            '/settings/pipettes/{id}', settings.pipette_settings_id)
-        self.app.router.add_patch(
-            '/settings/pipettes/{id}', settings.modify_pipette_settings
-        )
-        self.app.router.add_get(
-            '/settings/robot', settings.get_robot_settings)
