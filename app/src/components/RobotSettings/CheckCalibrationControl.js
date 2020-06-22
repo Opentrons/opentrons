@@ -94,6 +94,9 @@ export function CheckCalibrationControl({
           </SecondaryBtn>
         }
       >
+        {disabledReason !== null && (
+          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
+        )}
         {requestState && requestState.status === RobotApi.FAILURE && (
           <Flex
             alignItems={ALIGN_CENTER}
@@ -111,9 +114,6 @@ export function CheckCalibrationControl({
           </Flex>
         )}
       </TitledControl>
-      {disabledReason !== null && (
-        <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
-      )}
       {showWizard && (
         <Portal>
           <CheckCalibration
