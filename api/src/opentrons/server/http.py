@@ -1,7 +1,7 @@
 import logging
 
 from opentrons import config
-from .endpoints import (control, update, deck_calibration)
+from .endpoints import (control, update)
 
 
 log = logging.getLogger(__name__)
@@ -27,10 +27,6 @@ class HTTPServer(object):
         self.app.router.add_post(
             '/camera/picture', control.take_picture)
 
-        self.app.router.add_post('/calibration/deck/start',
-                                 deck_calibration.start)
-        self.app.router.add_post('/calibration/deck',
-                                 deck_calibration.dispatch)
         self.app.router.add_get(
             '/pipettes', control.get_attached_pipettes)
         self.app.router.add_get(
