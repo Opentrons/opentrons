@@ -24,8 +24,6 @@ class HTTPServer(object):
         else:
             self.app.router.add_post(
                 '/modules/{serial}/update', update.cannot_update_firmware)
-        self.app.router.add_post(
-            '/camera/picture', control.take_picture)
 
         self.app.router.add_get(
             '/pipettes', control.get_attached_pipettes)

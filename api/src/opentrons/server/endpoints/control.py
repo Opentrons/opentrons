@@ -2,7 +2,6 @@ import asyncio
 import functools
 import json
 import logging
-from pathlib import Path
 from typing import Optional
 from aiohttp import web
 
@@ -15,7 +14,6 @@ from opentrons.trackers import pose_tracker
 from opentrons.config import feature_flags as ff
 from opentrons.types import Mount, Point
 from opentrons.hardware_control.types import Axis, CriticalPoint
-from opentrons.system import camera
 
 
 log = logging.getLogger(__name__)
@@ -448,15 +446,3 @@ async def set_rail_lights(request):
     else:
         hw.set_lights(rails=on)
     return web.json_response({'on': on})
-
-
-async def take_picture(request):
-    filename = Path(request.app['com.opentrons.response_file_tempdir'])
-    filename = filename.joinpath('picture.jpg')
-
-    try:
-        await camera.take_picture(filename, request.loop)
-    except camera.CameraException as e:
-        return web.json_response({'message': str(e)}, status=500)
-
-    return web.FileResponse(filename)
