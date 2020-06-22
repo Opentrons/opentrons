@@ -126,12 +126,6 @@ export function registerDiscovery(dispatch: Dispatch): Action => mixed {
   }
 }
 
-export function getRobots(): Array<Service> {
-  if (!client) return []
-
-  return client.services
-}
-
 function filterServicesToPersist(services: Array<Service>) {
   const candidateOverrides = getOverrides('discovery.candidates')
   if (!candidateOverrides) return client.services

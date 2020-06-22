@@ -1,15 +1,6 @@
 // discovery reducer test
 import { discoveryReducer } from '../reducer'
 
-jest.mock('../../shell/remote', () => ({
-  remote: {
-    INITIAL_ROBOTS: [
-      { name: 'foo', ip: '192.168.1.1', port: 31950 },
-      { name: 'bar', ip: '192.168.1.2', port: 31950 },
-    ],
-  },
-}))
-
 describe('discoveryReducer', () => {
   afterEach(() => {
     jest.clearAllMocks()
@@ -17,15 +8,12 @@ describe('discoveryReducer', () => {
 
   const SPECS = [
     {
-      name: 'pulls initial robot list from shell and sets scanning to false',
+      name: 'empty dict for robotsByName and sets scanning to false',
       action: {},
       initialState: undefined,
       expectedState: {
         scanning: false,
-        robotsByName: {
-          foo: [{ name: 'foo', ip: '192.168.1.1', port: 31950 }],
-          bar: [{ name: 'bar', ip: '192.168.1.2', port: 31950 }],
-        },
+        robotsByName: {},
       },
     },
     {

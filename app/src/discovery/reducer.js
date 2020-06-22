@@ -2,7 +2,6 @@
 // robot discovery state
 import groupBy from 'lodash/groupBy'
 import { UI_INITIALIZED } from '../shell'
-import { remote } from '../shell/remote'
 import * as actions from './actions'
 
 import type { Action } from '../types'
@@ -14,7 +13,7 @@ export const normalizeRobots = (robots: Array<Service> = []): RobotsMap => {
 
 export const INITIAL_STATE: DiscoveryState = {
   scanning: false,
-  robotsByName: normalizeRobots(remote.INITIAL_ROBOTS),
+  robotsByName: {},
 }
 
 export function discoveryReducer(

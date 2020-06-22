@@ -1,13 +1,9 @@
 // @flow
-import type { Service } from '@opentrons/discovery-client'
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
 export type Remote = {|
   ipcRenderer: {| send: (string, ...args: Array<mixed>) => void |},
-  CURRENT_VERSION: string,
-  CURRENT_RELEASE_NOTES: string,
-  INITIAL_ROBOTS: Array<Service>,
 |}
 
 export type UpdateInfo = {

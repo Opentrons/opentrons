@@ -1,7 +1,5 @@
 // @flow
 // app updater
-import path from 'path'
-import fs from 'fs'
 import { autoUpdater as updater } from 'electron-updater'
 
 import { UI_INITIALIZED } from '@opentrons/app/src/shell/actions'
@@ -15,11 +13,6 @@ updater.logger = createLogger('update')
 updater.autoDownload = false
 
 export const CURRENT_VERSION: string = updater.currentVersion.version
-export const CURRENT_RELEASE_NOTES: string = fs.readFileSync(
-  // NOTE: __dirname refers to output directory
-  path.join(__dirname, '../build/release-notes.md'),
-  'utf8'
-)
 
 export function registerUpdate(dispatch: Dispatch): Action => mixed {
   return function handleAction(action: Action) {
