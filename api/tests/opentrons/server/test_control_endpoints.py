@@ -1,13 +1,9 @@
 import json
 
-import pytest
 
 from opentrons_shared_data.pipette import name_for_model
 
 from opentrons import types
-from opentrons.legacy_api import modules as legacy_modules
-from opentrons.hardware_control import (
-    API, ExecutionManager)
 
 from opentrons.config import pipette_config
 
@@ -77,80 +73,6 @@ async def test_get_pipettes(async_server, async_client, monkeypatch):
     text = await resp.text()
     assert resp.status == 200
     assert json.loads(text) == expected
-
-
-async def test_get_modules(
-        async_server, loop, async_client, monkeypatch):
-    hw = async_server['com.opentrons.hardware']
-    magdeck = await hw._backend.build_module(
-            port='/dev/ot_module_magdeck1',
-            model='magdeck',
-            interrupt_callback=lambda x: None,
-            execution_manager=ExecutionManager(
-                loop=loop),
-            loop=loop)
-    monkeypatch.setattr(API, 'attached_modules', [magdeck])
-    keys = sorted(['name', 'port', 'serial', 'model', 'fwVersion',
-                   'status', 'data', 'hasAvailableUpdate', 'revision',
-                   'moduleModel', 'displayName'])
-    resp = await async_client.get('/modules')
-    body = await resp.json()
-    assert resp.status == 200
-    assert 'modules' in body
-    assert len(body['modules']) == 1
-    assert sorted(body['modules'][0].keys()) == keys
-    assert 'engaged' in body['modules'][0]['data']
-    tempdeck = await hw._backend.build_module(
-            port='/dev/ot_module_tempdeck1',
-            model='tempdeck',
-            interrupt_callback=lambda x: None,
-            execution_manager=ExecutionManager(
-                    loop=loop),
-            loop=loop)
-    monkeypatch.setattr(API, 'attached_modules', [tempdeck])
-    for model in ('temp_deck_v1', 'temp_deck_v1.1', 'temp_deck_v2'):
-        tempdeck._device_info['model'] = model
-        resp = await async_client.get('/modules')
-        body = await resp.json()
-        assert resp.status == 200
-        assert len(body['modules']) == 1
-        assert not body['modules'][0]['hasAvailableUpdate']
-
-
-@pytest.fixture
-def dummy_attached_leg_modules():
-    mag_module = legacy_modules.MagDeck()
-    mag_port = 'tty1_magdeck'
-    mag_serial = 'mdYYYYMMDD123'
-    mag_module._device_info = {'serial': mag_serial}
-    return {
-        mag_port + 'magdeck': mag_module
-    }
-
-
-async def test_execute_module_command(
-        virtual_smoothie_env,
-        loop,
-        async_server,
-        async_client,
-        monkeypatch):
-    hw = async_server['com.opentrons.hardware']
-
-    magdeck = await hw._backend.build_module(
-            port='/dev/ot_module_magdeck1',
-            model='magdeck',
-            interrupt_callback=lambda x: None,
-            execution_manager=ExecutionManager(
-                loop=loop),
-            loop=loop)
-    monkeypatch.setattr(API, 'attached_modules', [magdeck])
-
-    resp = await async_client.post('/modules/dummySerialMD',
-                                   json={'command_type': 'deactivate'})
-    body = await resp.json()
-    assert resp.status == 200
-    assert 'message' in body
-    assert body['message'] == 'Success'
 
 
 async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
