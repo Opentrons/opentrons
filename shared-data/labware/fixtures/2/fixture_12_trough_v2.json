@@ -175,13 +175,7 @@
         "A11",
         "A12"
       ],
-      "brand": {
-        "brand": "USA Scientific",
-        "brandId": ["1061-8150"]
-      },
       "metadata": {
-        "displayName": "12 Channel Trough",
-        "displayCategory": "reservoir",
         "wellBottomShape": "v"
       }
     }

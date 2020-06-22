@@ -110,13 +110,14 @@ export function fieldsToLabware(
         row: fields.gridSpacingY,
       },
       well: wellProperties,
+      // NOTE(IL, 2020-06-22): as per #5801, `group` should not include brand, displayName, or displayCategory
+      // unless the "wells" are different than the overall labware (eg NEST tubes in an opentrons rack/block).
+      // Since LC doesn't allow the user to specify any of these 3 fields for wells themselves, we'll omit them
+      // from the definition.
       group: {
         metadata: {
-          displayName,
-          displayCategory,
           wellBottomShape: fields.wellBottomShape,
         },
-        brand,
       },
     })
 
