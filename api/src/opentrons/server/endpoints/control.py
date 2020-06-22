@@ -207,44 +207,6 @@ async def execute_module_command(request):
             status=400)
 
 
-async def get_engaged_axes(request):
-    """
-    Query driver for engaged state by axis. Response keys will be axes XYZABC
-    and keys will be True for engaged and False for disengaged. Axes must be
-    manually disengaged, and are automatically re-engaged whenever a "move" or
-    "home" command is called on that axis.
-
-    Response shape example:
-        {"x": {"enabled": true}, "y": {"enabled": false}, ...}
-    """
-    hw = hw_from_req(request)
-    return web.json_response(
-        {str(k).lower(): {'enabled': v}
-         for k, v in hw.engaged_axes.items()})
-
-
-async def disengage_axes(request):
-    """
-    Disengage axes (turn off power) primarily in order to reduce heat
-    consumption.
-    :param request: Must contain an "axes" field with a list of axes
-        to disengage (["x", "y", "z", "a", "b", "c"])
-    :return: message and status code
-    """
-    hw = hw_from_req(request)
-    data = await request.text()
-    axes = json.loads(data).get('axes')
-    invalid_axes = [ax for ax in axes if ax.lower() not in 'xyzabc']
-    if invalid_axes:
-        message = "Invalid axes: {}".format(', '.join(invalid_axes))
-        status = 400
-    else:
-        await hw.disengage_axes([Axis[ax.upper()] for ax in axes])
-        message = "Disengaged axes: {}".format(', '.join(axes))
-        status = 200
-    return web.json_response({"message": message}, status=status)
-
-
 async def position_info(request):
     """
     Positions determined experimentally by issuing move commands. Change

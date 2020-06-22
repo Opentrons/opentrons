@@ -30,10 +30,6 @@ class HTTPServer(object):
         self.app.router.add_get(
             '/pipettes', control.get_attached_pipettes)
         self.app.router.add_get(
-            '/motors/engaged', control.get_engaged_axes)
-        self.app.router.add_post(
-            '/motors/disengage', control.disengage_axes)
-        self.app.router.add_get(
             '/robot/positions', control.position_info)
         self.app.router.add_post(
             '/robot/move', control.move)

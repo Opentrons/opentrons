@@ -1,14 +1,13 @@
 import json
 
 import pytest
-from unittest import mock
 
 from opentrons_shared_data.pipette import name_for_model
 
 from opentrons import types
 from opentrons.legacy_api import modules as legacy_modules
 from opentrons.hardware_control import (
-    API, ExecutionManager, types as hwtypes)
+    API, ExecutionManager)
 
 from opentrons.config import pipette_config
 
@@ -228,53 +227,6 @@ async def test_get_cached_pipettes(async_server, async_client, monkeypatch):
     text2 = await resp2.text()
     assert resp2.status == 200
     assert json.loads(text2) == expected2
-
-
-async def test_disengage_axes(async_client, mocked_hw):
-
-    async def _mock_dummy(*args, **kwargs):
-        pass
-
-    mocked_hw.disengage_axes.side_effect = _mock_dummy
-    res = await async_client.post('/motors/disengage',
-                                  json={'axes': ['x', 'a', 'b']})
-    assert res.status == 200
-    mocked_hw.disengage_axes.assert_called_once_with(
-        [hwtypes.Axis.X, hwtypes.Axis.A, hwtypes.Axis.B])
-    mocked_hw.reset_mock()
-    mocked_hw.disengage_axes.side_effect = _mock_dummy
-    res2 = await async_client.post('/motors/disengage',
-                                   json={'axes': ['asdaf', 'acasc', 'b']})
-    assert res2.status == 400
-    body = await res2.json()
-    assert 'invalid' in body['message'].lower()
-    mocked_hw.disengage_axes.assert_not_called()
-
-
-async def test_engaged_axes(async_client, mocked_hw):
-    pm = mock.PropertyMock()
-    type(mocked_hw).engaged_axes = pm
-    pm.return_value = {
-        hwtypes.Axis.X: True,
-        hwtypes.Axis.Y: False,
-        hwtypes.Axis.Z: True,
-        hwtypes.Axis.A: True,
-        hwtypes.Axis.B: False,
-        hwtypes.Axis.C: True}
-
-    should_return = {
-        'x': {'enabled': True},
-        'y': {'enabled': False},
-        'z': {'enabled': True},
-        'a': {'enabled': True},
-        'b': {'enabled': False},
-        'c': {'enabled': True}
-    }
-    res0 = await async_client.get('/motors/engaged')
-    result0 = await res0.text()
-    assert res0.status == 200
-    assert json.loads(result0) == should_return
-    pm.assert_called_once()
 
 
 async def test_robot_info(async_client):
