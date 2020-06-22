@@ -12,7 +12,7 @@ import {
   BUTTON_TYPE_RESET,
 } from '..'
 
-describe('Link primitive component', () => {
+describe('Btn primitive component', () => {
   it('should be an <button> with css reset and type: button', () => {
     const wrapper = shallow(<Btn />)
 
@@ -44,7 +44,6 @@ describe('Link primitive component', () => {
 
   it('should allow type to be changed', () => {
     const wrapper = shallow(<Btn type={BUTTON_TYPE_SUBMIT} />)
-
     expect(wrapper.find('button').prop('type')).toBe('submit')
 
     wrapper.setProps({ type: BUTTON_TYPE_RESET })
