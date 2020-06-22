@@ -1,10 +1,11 @@
 // electron main entry point
-import { app, ipcMain } from 'electron'
+import { app } from 'electron'
 import contextMenu from 'electron-context-menu'
 
-import { createUi } from './ui'
+import { createMainWindow } from './main-window'
 import { initializeMenu } from './menu'
 import { createLogger } from './log'
+import { createRemote } from './remote'
 import { registerDiscovery } from './discovery'
 import { registerLabware } from './labware'
 import { registerRobotLogs } from './robot-logs'
@@ -13,8 +14,7 @@ import { registerBuildrootUpdate } from './buildroot'
 import { registerSystemInfo } from './system-info'
 import { getConfig, getStore, getOverrides, registerConfig } from './config'
 
-import type { BrowserWindow } from 'electron'
-import type { Dispatch, Logger } from './types'
+import type { Action } from './types'
 
 const config = getConfig()
 const log = createLogger('main')
@@ -31,8 +31,7 @@ if (config.devtools) {
 }
 
 // hold on to references so they don't get garbage collected
-let mainWindow: BrowserWindow | null | undefined
-let rendererLogger: Logger
+let remote
 
 // prepended listener is important here to work around Electron issue
 // https://github.com/electron/electron/issues/19468#issuecomment-623529556
@@ -52,48 +51,25 @@ function startUp(): void {
     log.error('Uncaught Promise rejection: ', { reason })
   )
 
-  mainWindow = createUi()
-  rendererLogger = createRendererLogger()
-
-  mainWindow.once('closed', () => (mainWindow = null))
-
+  createMainWindow()
   contextMenu({ showInspectElement: config.devtools })
   initializeMenu()
 
   // wire modules to UI dispatches
-  const dispatch: Dispatch = action => {
-    // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-    if (mainWindow) {
-      log.silly('Sending action via IPC to renderer', { action })
-      mainWindow.webContents.send('dispatch', action)
-    }
-  }
-
-  const actionHandlers: Dispatch[] = [
-    registerConfig(dispatch),
-    registerDiscovery(dispatch),
-    registerRobotLogs(dispatch, mainWindow),
-    registerUpdate(dispatch),
-    registerBuildrootUpdate(dispatch),
-    registerLabware(dispatch, mainWindow),
-    registerSystemInfo(dispatch),
+  remote = createRemote()
+  const actionHandlers = [
+    registerConfig(remote.dispatch),
+    registerDiscovery(remote.dispatch),
+    registerRobotLogs(remote.dispatch),
+    registerUpdate(remote.dispatch),
+    registerBuildrootUpdate(remote.dispatch),
+    registerLabware(remote.dispatch),
+    registerSystemInfo(remote.dispatch),
   ]
 
-  ipcMain.on('dispatch', (_, action) => {
-    log.debug('Received action via IPC from renderer', { action })
+  remote.inbox.subscribe((action: Action) =>
     actionHandlers.forEach(handler => handler(action))
-  })
-
-  log.silly('Global references', { mainWindow, rendererLogger })
-}
-
-function createRendererLogger(): Logger {
-  log.info('Creating renderer logger')
-
-  const logger = createLogger('renderer')
-  ipcMain.on('log', (_, info) => logger.log(info))
-
-  return logger
+  )
 }
 
 function installDevtools(): Promise<void> {

@@ -2,6 +2,8 @@ import fse from 'fs-extra'
 import { app, shell } from 'electron'
 import { getFullConfig, handleConfigChange } from '../config'
 import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import { createLogger } from '../log'
+import { getMainWindow } from '../main-window'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
 import { sameIdentity } from './compare'
@@ -16,10 +18,11 @@ import type {
   CustomLabwareListActionSource as ListSource,
 } from '@opentrons/app/src/redux/custom-labware/types'
 
-import type { BrowserWindow } from 'electron'
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+const log = createLogger('labware')
 
 const fetchCustomLabware = (): Promise<UncheckedLabwareFile[]> => {
   const { labware: config } = getFullConfig()
@@ -88,13 +91,17 @@ const copyLabware = (
   })
 }
 
-export function registerLabware(
-  dispatch: Dispatch,
-  mainWindow: BrowserWindow
-): Dispatch {
+export function registerLabware(dispatch: Dispatch): Dispatch {
   handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
-    // eslint-disable-next-line @typescript-eslint/no-floating-promises
-    fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
+    fetchAndValidateCustomLabware(
+      dispatch,
+      CustomLabware.CHANGE_DIRECTORY
+    ).catch(error =>
+      log.error(
+        'Unexpected error initializing custom labware after directory change',
+        { error }
+      )
+    )
   })
 
   return function handleActionForLabware(action: Action) {
@@ -105,34 +112,54 @@ export function registerLabware(
           action.type === CustomLabware.FETCH_CUSTOM_LABWARE
             ? CustomLabware.POLL
             : CustomLabware.INITIAL
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        fetchAndValidateCustomLabware(dispatch, source)
+        fetchAndValidateCustomLabware(dispatch, source).catch(error =>
+          log.error('Unexpected error initializing custom labware', { error })
+        )
         break
       }
 
       case CustomLabware.CHANGE_CUSTOM_LABWARE_DIRECTORY: {
         const { labware: config } = getFullConfig()
         const dialogOptions = { defaultPath: config.directory }
+        const mainWindow = getMainWindow()
 
-        // eslint-disable-next-line @typescript-eslint/no-floating-promises
-        showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
-          if (filePaths.length > 0) {
-            const dir = filePaths[0]
-            dispatch(ConfigActions.updateConfigValue('labware.directory', dir))
-          }
-        })
+        if (mainWindow === null) {
+          log.warn(
+            'No main window present, unable to change custom labware directory'
+          )
+          break
+        }
+
+        showOpenDirectoryDialog(mainWindow, dialogOptions)
+          .then(filePaths => {
+            if (filePaths.length > 0) {
+              const dir = filePaths[0]
+              dispatch(
+                ConfigActions.updateConfigValue('labware.directory', dir)
+              )
+            }
+          })
+          .catch(error =>
+            log.error(
+              'Error showing directory dialog to change custom labware directory',
+              { error }
+            )
+          )
+
         break
       }
 
       case CustomLabware.ADD_CUSTOM_LABWARE: {
+        const mainWindow = getMainWindow()
         let addLabwareTask
 
-        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
-        if ((action.payload as { overwrite: DuplicateLabwareFile }).overwrite) {
-          addLabwareTask = overwriteLabware(
-            dispatch,
-            (action.payload as { overwrite: DuplicateLabwareFile }).overwrite
-          )
+        if (mainWindow === null) {
+          log.warn('No main window present, unable to add custom labware')
+          break
+        }
+
+        if (action.payload.overwrite !== null) {
+          addLabwareTask = overwriteLabware(dispatch, action.payload.overwrite)
         } else {
           const dialogOptions = {
             defaultPath: app.getPath('downloads'),

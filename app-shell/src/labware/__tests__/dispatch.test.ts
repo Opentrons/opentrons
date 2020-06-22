@@ -2,6 +2,7 @@ import fse from 'fs-extra'
 import electron from 'electron'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
+import * as MainWin from '../../main-window'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
@@ -17,6 +18,7 @@ jest.mock('fs-extra')
 jest.mock('electron')
 jest.mock('../../config')
 jest.mock('../../dialogs')
+jest.mock('../../main-window')
 jest.mock('../definitions')
 jest.mock('../validation')
 
@@ -36,6 +38,10 @@ const showOpenDirectoryDialog = Dialogs.showOpenDirectoryDialog as jest.MockedFu
 
 const showOpenFileDialog = Dialogs.showOpenFileDialog as jest.MockedFunction<
   typeof Dialogs.showOpenFileDialog
+>
+
+const getMainWindow = MainWin.getMainWindow as jest.MockedFunction<
+  typeof MainWin.getMainWindow
 >
 
 const readLabwareDirectory = Defs.readLabwareDirectory as jest.MockedFunction<
@@ -71,6 +77,7 @@ describe('labware module dispatches', () => {
   const mockMainWindow = ({
     browserWindow: true,
   } as unknown) as electron.BrowserWindow
+
   let dispatch: jest.MockedFunction<Dispatch>
   let handleAction: Dispatch
 
@@ -87,9 +94,10 @@ describe('labware module dispatches', () => {
 
     showOpenDirectoryDialog.mockResolvedValue([])
     showOpenFileDialog.mockResolvedValue([])
+    getMainWindow.mockReturnValue(mockMainWindow)
 
     dispatch = jest.fn()
-    handleAction = registerLabware(dispatch, mockMainWindow)
+    handleAction = registerLabware(dispatch)
   })
 
   afterEach(() => {

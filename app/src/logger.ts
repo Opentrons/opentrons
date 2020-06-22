@@ -1,6 +1,7 @@
 // logger
 import { useRef } from 'react'
-import { remote } from './redux/shell/remote'
+
+import type { Remote } from './redux/shell/types'
 
 // TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
 export type LogLevel =
@@ -14,6 +15,12 @@ export type LogLevel =
 
 export type Log = (message: string, meta?: {}) => void
 
+export interface LogEntry {
+  level: LogLevel
+  message: string
+  label: string
+}
+
 export interface Logger {
   error: Log
   warn: Log
@@ -22,6 +29,7 @@ export interface Logger {
   verbose: Log
   debug: Log
   silly: Log
+  log: (entry: LogEntry) => void
 }
 
 const ERROR: 'error' = 'error'
@@ -31,6 +39,12 @@ const HTTP: 'http' = 'http'
 const VERBOSE: 'verbose' = 'verbose'
 const DEBUG: 'debug' = 'debug'
 const SILLY: 'silly' = 'silly'
+
+let _remote: Remote | null = null
+
+export function initializeLogs(remote: Remote): void {
+  _remote = remote
+}
 
 export function createLogger(filename: string): Logger {
   const label = `app/${filename}`
@@ -43,6 +57,9 @@ export function createLogger(filename: string): Logger {
     [VERBOSE]: (message, meta) => log(VERBOSE, message, label, meta),
     [DEBUG]: (message, meta) => log(DEBUG, message, label, meta),
     [SILLY]: (message, meta) => log(SILLY, message, label, meta),
+    log: ({ level, message, label, ...meta }) => {
+      log(level, message, label, meta)
+    },
   }
 }
 
@@ -65,7 +82,7 @@ function log(level: LogLevel, message: string, label: string, meta?: {}): void {
   }
 
   // send to main process for log file collection
-  remote.ipcRenderer.send('log', { ...meta, level, message, label })
+  _remote?.log({ ...meta, level, message, label })
 }
 
 export function useLogger(filename: string): Logger {

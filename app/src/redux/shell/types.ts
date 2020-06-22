@@ -1,15 +1,14 @@
 import type { Error } from '../types'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
-export interface Remote {
-  ipcRenderer: { send: (s: string, ...args: unknown[]) => void }
-}
+export type { Remote } from './remote'
 
 interface File {
   sha512: string
   url: string
   [key: string]: unknown
 }
+
 export interface UpdateInfo {
   version: string
   files: File[]

@@ -1,7 +1,6 @@
 import path from 'path'
 import { app } from 'electron'
 import uuid from 'uuid/v4'
-import { CONFIG_VERSION_LATEST } from '@opentrons/app/src/redux/config'
 
 import type {
   Config,
@@ -9,6 +8,7 @@ import type {
   ConfigV1,
   ConfigV2,
   ConfigV3,
+  ConfigV4,
 } from '@opentrons/app/src/redux/config/types'
 
 // base config v0 defaults
@@ -85,11 +85,10 @@ export const DEFAULTS_V0: ConfigV0 = {
 
 // config version 1 migration and defaults
 const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
-  const nextConfig = {
+  const nextConfig: ConfigV1 = {
     ...prevConfig,
     version: 1,
     discovery: {
-      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.discovery,
       disableCache: false,
     },
@@ -100,7 +99,7 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
 
 // config version 2 migration and defaults
 const toVersion2 = (prevConfig: ConfigV1): ConfigV2 => {
-  const nextConfig = {
+  const nextConfig: ConfigV2 = {
     ...prevConfig,
     version: 2,
     calibration: {
@@ -113,11 +112,10 @@ const toVersion2 = (prevConfig: ConfigV1): ConfigV2 => {
 
 // config version 3 migration and defaults
 const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
-  const nextConfig = {
+  const nextConfig: ConfigV3 = {
     ...prevConfig,
     version: 3,
     support: {
-      //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
       ...prevConfig.support,
       // name and email were never changed by the app, and its default values
       // were causing problems. Null them out for future implementations
@@ -129,34 +127,36 @@ const toVersion3 = (prevConfig: ConfigV2): ConfigV3 => {
   return nextConfig
 }
 
+// config version 4 migration and defaults
+const toVersion4 = (prevConfig: ConfigV3): ConfigV4 => {
+  const nextConfig: ConfigV4 = {
+    ...prevConfig,
+    version: 4,
+    ui: { ...prevConfig.ui, externalBrowser: false },
+  }
+
+  return nextConfig
+}
+
 const MIGRATIONS: [
   (prefConfig: ConfigV0) => ConfigV1,
   (prefConfig: ConfigV1) => ConfigV2,
-  (prefConfig: ConfigV2) => ConfigV3
-] = [toVersion1, toVersion2, toVersion3]
+  (prefConfig: ConfigV2) => ConfigV3,
+  (prefConfig: ConfigV3) => ConfigV4
+] = [toVersion1, toVersion2, toVersion3, toVersion4]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 
 export function migrate(
-  prevConfig: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3
+  prevConfig: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 | ConfigV4
 ): Config {
-  const prevVersion = prevConfig.version
-  let result: ConfigV0 | ConfigV1 | ConfigV2 | ConfigV3 = prevConfig
+  // NOTE(mc, 2021-06-01): TS will never realistically by able
+  // to track these types; ensure good unit test coverage
+  let result: any = prevConfig
 
-  // loop through the migrations, skipping any migrations that are unnecessary
-  for (let i = prevVersion; i < MIGRATIONS.length; i++) {
-    // NOTE(mc, 2020-05-22): Flow will always be unable to resolve this type
-    // ensure good unit test coverage for this logic
-    const migrateVersion = MIGRATIONS[i]
-    result = migrateVersion(result)
+  while (result.version < MIGRATIONS.length) {
+    result = MIGRATIONS[result.version](result)
   }
 
-  if (result.version < CONFIG_VERSION_LATEST) {
-    throw new Error(
-      `Config migration failed; expected at least version ${CONFIG_VERSION_LATEST} but got ${result.version}`
-    )
-  }
-
-  //  @ts-expect-error(mc, 2021-02-16): will be fixed by config TS types from app
-  return result
+  return result as Config
 }

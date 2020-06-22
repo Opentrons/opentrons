@@ -55,6 +55,7 @@
     "@types/react-test-renderer": "^17.0.1",
     "@types/redux-mock-store": "^1.0.2",
     "@types/semver": "^7.3.6",
+    "@types/ws": "^7.4.4",
     "@typescript-eslint/eslint-plugin": "^4.18.0",
     "@typescript-eslint/parser": "^4.18.0",
     "ajv": "^6.10.2",
@@ -156,6 +157,6 @@
     "webpack-merge": "^4.2.2",
     "webpack-node-externals": "^1.7.2",
     "worker-plugin": "^5.0.0",
-    "ws": "7.1.2"
+    "ws": "7.4.6"
   }
 }

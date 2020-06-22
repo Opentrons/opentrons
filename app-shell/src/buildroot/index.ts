@@ -87,20 +87,24 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         uploadSystemFile(host, path, file)
-          .then(() => ({
-            type: 'buildroot:FILE_UPLOAD_DONE',
-            payload: host.name,
-          }))
-          .catch((error: Error) => {
-            log.warn('Error uploading update to robot', { path, file, error })
+          .then(
+            (): Action => ({
+              type: 'buildroot:FILE_UPLOAD_DONE',
+              payload: host.name,
+            })
+          )
+          .catch(
+            (error: Error): Action => {
+              log.warn('Error uploading update to robot', { path, file, error })
 
-            return {
-              type: 'buildroot:UNEXPECTED_ERROR',
-              payload: {
-                message: `Error uploading update to robot: ${error.message}`,
-              },
+              return {
+                type: 'buildroot:UNEXPECTED_ERROR',
+                payload: {
+                  message: `Error uploading update to robot: ${error.message}`,
+                },
+              }
             }
-          })
+          )
           .then(dispatch)
 
         break
@@ -111,17 +115,21 @@ export function registerBuildrootUpdate(dispatch: Dispatch): Dispatch {
 
         // eslint-disable-next-line @typescript-eslint/no-floating-promises
         readUserFileInfo(systemFile)
-          .then(userFile => ({
-            type: 'buildroot:USER_FILE_INFO',
-            payload: {
-              systemFile: userFile.systemFile,
-              version: userFile.versionInfo.opentrons_api_version,
-            },
-          }))
-          .catch((error: Error) => ({
-            type: 'buildroot:UNEXPECTED_ERROR',
-            payload: { message: error.message },
-          }))
+          .then(
+            (userFile): Action => ({
+              type: 'buildroot:USER_FILE_INFO',
+              payload: {
+                systemFile: userFile.systemFile,
+                version: userFile.versionInfo.opentrons_api_version,
+              },
+            })
+          )
+          .catch(
+            (error: Error): Action => ({
+              type: 'buildroot:UNEXPECTED_ERROR',
+              payload: { message: error.message },
+            })
+          )
           .then(dispatch)
 
         break

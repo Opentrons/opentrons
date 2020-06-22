@@ -1,17 +1,18 @@
 // tests for the shell module
-import { EMPTY } from 'rxjs'
+import { EMPTY, Subject } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
-import { take } from 'rxjs/operators'
 
 import * as Alerts from '../../alerts'
 import * as Config from '../../config'
 import * as ShellUpdate from '../update'
-import { remote as mockRemote } from '../remote'
+import { remote } from '../remote'
 import { shellEpic } from '../epic'
 
 import type { Action, State } from '../../types'
 
-const { ipcRenderer: mockIpc } = mockRemote
+const remoteDispatch = remote.dispatch as jest.MockedFunction<
+  typeof remote.dispatch
+>
 
 jest.mock('../../config')
 
@@ -43,30 +44,35 @@ describe('shell epics', () => {
     jest.resetAllMocks()
   })
 
-  it('"dispatches" actions to IPC if meta.shell', () => {
+  it('sendActionToShellEpic "dispatches" actions to IPC if meta.shell', () => {
     const shellAction: Action = { type: 'foo', meta: { shell: true } } as any
 
-    testScheduler.run(({ hot, expectObservable }) => {
+    testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot<Action>('-a', { a: shellAction })
       const output$ = shellEpic(action$, EMPTY)
 
       expectObservable(output$).toBe('--')
-    })
+      flush()
 
-    // NOTE: this expectation has to outside the testScheduler scope or else
-    // everything breaks for some reason
-    expect(mockIpc.send).toHaveBeenCalledWith('dispatch', shellAction)
+      expect(remoteDispatch).toHaveBeenCalledWith(shellAction)
+    })
   })
 
-  // due to the use of `fromEvent`, this test doesn't work well as a marble
-  // test. `toPromise` based expectation should be sufficient
   it('catches actions from main', () => {
-    const shellAction = { type: 'bar' }
-    const result = shellEpic(EMPTY, EMPTY).pipe(take(1)).toPromise()
+    const mockAction: Action = { type: 'foo' } as any
 
-    ;(mockIpc as any).emit('dispatch', {}, shellAction)
+    testScheduler.run(({ cold, expectObservable }) => {
+      const output$ = shellEpic(EMPTY, EMPTY)
 
-    return expect(result).resolves.toEqual(shellAction)
+      cold('-a').subscribe(() => {
+        // NOTE: the mock remote uses a Subject as the inbox
+        // so we can inject actions
+        const inbox = remote.inbox as Subject<Action>
+        inbox.next(mockAction)
+      })
+
+      expectObservable(output$).toBe('-a', { a: mockAction })
+    })
   })
 
   it('triggers an appUpdateAvailable alert if an app update becomes available', () => {

@@ -1,10 +1,11 @@
 // mock remote object
-// keep in sync with app-shell/src/preload.js
+import { Subject } from 'rxjs'
 
-const EventEmitter = require('events')
+import type { Action } from '../../types'
+import type { Remote } from '../types'
 
-class MockIpcRenderer extends EventEmitter {
-  send = jest.fn()
-}
+const dispatch = jest.fn()
+const log = jest.fn()
+const inbox = new Subject<Action>()
 
-export const remote = { ipcRenderer: new MockIpcRenderer() }
+export const remote: Remote = { dispatch, log, inbox }

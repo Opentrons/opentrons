@@ -98,10 +98,17 @@ export interface ConfigV2 extends Omit<ConfigV1, 'version'> {
 // v3 config changes default values but does not change schema
 export interface ConfigV3 extends Omit<ConfigV2, 'version' | 'support'> {
   version: 3
-  support: ConfigV2['support'] & {
+  support: Omit<ConfigV2['support'], 'name' | 'email'> & {
     name: string | null
     email: string | null
   }
 }
 
-export type Config = ConfigV3
+export interface ConfigV4 extends Omit<ConfigV3, 'version' | 'ui'> {
+  version: 4
+  ui: ConfigV3['ui'] & {
+    externalBrowser: boolean
+  }
+}
+
+export type Config = ConfigV4

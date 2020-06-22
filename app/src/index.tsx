@@ -8,14 +8,17 @@ import { ConnectedRouter } from 'connected-react-router'
 import { I18nextProvider } from 'react-i18next'
 
 import { i18n } from './i18n'
-import { createLogger } from './logger'
+import { initializeLogs, createLogger } from './logger'
 
+import { remote } from './redux/shell/remote'
 import { uiInitialized } from './redux/shell'
 import { history } from './redux/reducer'
 import { store } from './redux/store'
 
 // component tree
 import { App } from './App'
+
+initializeLogs(remote)
 
 const log = createLogger(__filename)
 

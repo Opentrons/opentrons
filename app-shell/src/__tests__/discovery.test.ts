@@ -135,7 +135,7 @@ describe('app-shell/discovery', () => {
   it('sets poll speed on "shell:UI_INTIALIZED"', () => {
     const handleAction = registerDiscovery(dispatch)
 
-    handleAction({ type: 'shell:UI_INITIALIZED' })
+    handleAction({ type: 'shell:UI_INITIALIZED', meta: { shell: true } })
     expect(mockClient.start).toHaveBeenLastCalledWith({
       healthPollInterval: 3000,
     })
@@ -159,6 +159,7 @@ describe('app-shell/discovery', () => {
     handleAction({
       type: 'discovery:REMOVE',
       payload: { robotName: 'robot-name' },
+      meta: { shell: true },
     })
 
     expect(mockClient.removeRobot).toHaveBeenCalledWith('robot-name')
