@@ -9,9 +9,8 @@ log = logging.getLogger(__name__)
 
 
 class HTTPServer(object):
-    def __init__(self, app, log_file_path):
+    def __init__(self, app):
         self.app = app
-        self.log_file_path = log_file_path
         self.app.router.add_get(
             '/networking/status', networking.status)
         # TODO(mc, 2018-10-12): s/wifi/networking
@@ -42,14 +41,6 @@ class HTTPServer(object):
                 '/modules/{serial}/update', update.cannot_update_firmware)
         self.app.router.add_post(
             '/camera/picture', control.take_picture)
-
-        if config.ARCHITECTURE == config.SystemArchitecture.BUILDROOT:
-            from .endpoints import logs
-            self.app.router.add_get('/logs/{syslog_identifier}',
-                                    logs.get_logs_by_id)
-        else:
-            self.app.router.add_static(
-                '/logs', self.log_file_path, show_index=True)
 
         self.app.router.add_post('/calibration/deck/start',
                                  deck_calibration.start)

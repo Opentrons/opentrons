@@ -9,7 +9,6 @@ import typing
 
 from aiohttp import web
 
-from opentrons.config import CONFIG
 from opentrons.hardware_control.threaded_async_lock import ThreadedAsyncLock
 from opentrons.api.routers import MainRouter
 from opentrons.hardware_control import ThreadManager
@@ -56,7 +55,7 @@ def init(hardware: ThreadManager = None,
                      :py:attr:`opentrons.hardware`
     """
     app = web.Application(middlewares=[error_middleware])
-    app['com.opentrons.http'] = HTTPServer(app, CONFIG['log_dir'])
+    app['com.opentrons.http'] = HTTPServer(app)
     app['com.opentrons.hardware'] = hardware
     app['com.opentrons.motion_lock'] = ThreadedAsyncLock()
     app['com.opentrons.rpc'] = RPCServer(
