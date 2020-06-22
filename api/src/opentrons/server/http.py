@@ -10,8 +10,6 @@ log = logging.getLogger(__name__)
 class HTTPServer(object):
     def __init__(self, app):
         self.app = app
-        self.app.router.add_post(
-            '/identify', control.identify)
         self.app.router.add_get(
             '/modules', control.get_attached_modules)
         self.app.router.add_get(
@@ -33,7 +31,3 @@ class HTTPServer(object):
             '/robot/move', control.move)
         self.app.router.add_post(
             '/robot/home', control.home)
-        self.app.router.add_get(
-            '/robot/lights', control.get_rail_lights)
-        self.app.router.add_post(
-            '/robot/lights', control.set_rail_lights)

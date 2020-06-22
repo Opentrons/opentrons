@@ -426,32 +426,3 @@ async def test_move_and_home_existing_pipette(
     }
     res1 = await async_client.post('/robot/home', json=move_data)
     assert res1.status == 200
-
-
-async def test_rail_lights(async_client):
-    resp = await async_client.get('/robot/lights')
-    assert resp.status == 200
-    data = await resp.json()
-    assert not data['on']
-
-    resp = await async_client.post('/robot/lights',
-                                   json={'on': True})
-    assert resp.status == 200
-    data = await resp.json()
-    assert data['on']
-
-    resp = await async_client.get('/robot/lights')
-    assert resp.status == 200
-    data = await resp.json()
-    assert data['on']
-
-    resp = await async_client.post('/robot/lights',
-                                   json={'on': False})
-    assert resp.status == 200
-    data = await resp.json()
-    assert not data['on']
-
-    resp = await async_client.get('/robot/lights')
-    assert resp.status == 200
-    data = await resp.json()
-    assert not data['on']

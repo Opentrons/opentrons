@@ -417,32 +417,3 @@ async def home(request):
         message = "Expected 'robot' or 'pipette' got {}.".format(target)
 
     return web.json_response({"message": message}, status=status)
-
-
-async def identify(request):
-    hw = hw_from_req(request)
-    blink_time = int(request.query.get('seconds', '10'))
-    asyncio.ensure_future(hw.identify(blink_time))
-    return web.json_response({"message": "identifying"})
-
-
-async def get_rail_lights(request):
-    hw = hw_from_req(request)
-    on = hw.get_lights()
-    return web.json_response({'on': on['rails']})
-
-
-async def set_rail_lights(request):
-    hw = hw_from_req(request)
-    data = await request.json()
-    on = data.get('on')
-
-    if on is None:
-        return web.json_response(
-            {'message': '"on" must be true or false, got {}'.format(on)},
-            status=400)
-    if ff.use_protocol_api_v2():
-        await hw.set_lights(rails=on)
-    else:
-        hw.set_lights(rails=on)
-    return web.json_response({'on': on})
