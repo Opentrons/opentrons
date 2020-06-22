@@ -91,7 +91,7 @@ export const PrimaryBtn: BtnComponent = styled(Btn)`
 export const SecondaryBtn: BtnComponent = styled(Btn)`
   ${BUTTON_VARIANT_STYLE}
   background-color: ${Styles.C_WHITE};
-  border-width: ${Styles.BORDER_WIDTH_THIN};
+  border-width: ${Styles.BORDER_WIDTH_DEFAULT};
   color: ${Styles.C_DARK_GRAY};
 
   &:hover,
