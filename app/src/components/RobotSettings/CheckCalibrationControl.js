@@ -10,6 +10,7 @@ import {
   Flex,
   Box,
   Text,
+  SecondaryBtn,
   ALIGN_CENTER,
   SIZE_2,
   SPACING_1,
@@ -25,7 +26,7 @@ import {
 
 import { Portal } from '../portal'
 import { CheckCalibration } from '../CheckCalibration'
-import { TitledButton } from '../TitledButton'
+import { TitledControl } from '../TitledControl'
 
 import type { State } from '../../types'
 
@@ -76,25 +77,23 @@ export function CheckCalibrationControl({
   }, [requestStatus])
 
   // TODO(mc, 2020-06-17): extract alert presentational stuff
-  // TODO(lc, 2020-06-18): edit calCheckDisabled to check for a bad calibration status from the new endpoint
   return (
     <>
-      <TitledButton
+      <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
         title={CHECK_ROBOT_CAL}
         description={<Text>{CHECK_ROBOT_CAL_DESCRIPTION}</Text>}
-        buttonProps={{
-          children: buttonChildren,
-          disabled: buttonDisabled,
-          onClick: ensureSession,
-          // TODO(mc, 2020-06-18): we _still_ can't attach tooltips directly
-          // to disabled buttons because of pointer-events: none. fix this
-          hoverToolTipHandler: targetProps,
-        }}
+        control={
+          <SecondaryBtn
+            {...targetProps}
+            width="9rem"
+            onClick={ensureSession}
+            disabled={buttonDisabled}
+          >
+            {buttonChildren}
+          </SecondaryBtn>
+        }
       >
-        {disabledReason !== null && (
-          <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
-        )}
         {requestState && requestState.status === RobotApi.FAILURE && (
           <Flex
             alignItems={ALIGN_CENTER}
@@ -111,7 +110,10 @@ export function CheckCalibrationControl({
             </Box>
           </Flex>
         )}
-      </TitledButton>
+      </TitledControl>
+      {disabledReason !== null && (
+        <Tooltip {...tooltipProps}>{disabledReason}</Tooltip>
+      )}
       {showWizard && (
         <Portal>
           <CheckCalibration

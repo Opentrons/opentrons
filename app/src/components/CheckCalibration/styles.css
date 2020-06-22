@@ -25,16 +25,12 @@
 }
 
 .intro_header {
-  @apply --modal-contents;
-
   font-weight: bold;
   margin-bottom: 1rem;
   font-size: var('--fs-body-2');
 }
 
 .intro_content {
-  @apply --modal-contents;
-
   margin-bottom: 1rem;
   font-size: var('--fs-body-2');
 }
