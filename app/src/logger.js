@@ -1,9 +1,9 @@
 // @flow
 // logger
 import { useRef } from 'react'
-import { remote } from './shell/remote'
 
-// TODO(mc, 2018-05-17): put this type somewhere common to app and app-shell
+import type { Remote } from './shell/types'
+
 export type LogLevel =
   | 'error'
   | 'warn'
@@ -15,6 +15,8 @@ export type LogLevel =
 
 export type Log = (message: string, meta?: {}) => void
 
+export type LogEntry = { level: LogLevel, message: string, label: string, ... }
+
 export type Logger = {|
   error: Log,
   warn: Log,
@@ -23,6 +25,7 @@ export type Logger = {|
   verbose: Log,
   debug: Log,
   silly: Log,
+  log: LogEntry => void,
 |}
 
 const ERROR: 'error' = 'error'
@@ -32,6 +35,12 @@ const HTTP: 'http' = 'http'
 const VERBOSE: 'verbose' = 'verbose'
 const DEBUG: 'debug' = 'debug'
 const SILLY: 'silly' = 'silly'
+
+let _remote: Remote | void
+
+export function initializeLogs(remote: Remote): void {
+  _remote = remote
+}
 
 export function createLogger(filename: string): Logger {
   const label = `app/${filename}`
@@ -44,10 +53,13 @@ export function createLogger(filename: string): Logger {
     [VERBOSE]: (message, meta) => log(VERBOSE, message, label, meta),
     [DEBUG]: (message, meta) => log(DEBUG, message, label, meta),
     [SILLY]: (message, meta) => log(SILLY, message, label, meta),
+    log: ({ level, message, label, ...meta }) => {
+      log(level, message, label, meta)
+    },
   }
 }
 
-function log(level: LogLevel, message: string, label: string, meta?: {}) {
+function log(level: LogLevel, message: string, label: string, meta?: { ... }) {
   const print = `[${label}] ${level}: ${message}`
 
   // log to web console, too
@@ -66,7 +78,7 @@ function log(level: LogLevel, message: string, label: string, meta?: {}) {
   }
 
   // send to main process for log file collection
-  remote.ipcRenderer.send('log', { ...meta, level, message, label })
+  _remote && _remote.log({ ...meta, level, message, label })
 }
 
 export function useLogger(filename: string): Logger {

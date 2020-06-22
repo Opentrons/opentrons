@@ -1,12 +1,16 @@
+// @flow
 // tests for the shell module
 import { EMPTY } from 'rxjs'
 import { TestScheduler } from 'rxjs/testing'
 import { take } from 'rxjs/operators'
 
-import { remote as mockRemote } from '../remote'
+import { remote } from '../remote'
 import { shellEpic } from '../epic'
 
-const { ipcRenderer: mockIpc } = mockRemote
+import type { Action } from '../../types'
+
+const remoteDispatch: JestMockFn<[Action], void> = remote.dispatch
+const triggerRemoteAction: Action => void = (remote: any).__triggerAction
 
 describe('shell epics', () => {
   let testScheduler
@@ -24,27 +28,26 @@ describe('shell epics', () => {
   it('sendActionToShellEpic "dispatches" actions to IPC if meta.shell', () => {
     const shellAction = { type: 'foo', meta: { shell: true } }
 
-    testScheduler.run(({ hot, expectObservable }) => {
+    testScheduler.run(({ hot, expectObservable, flush }) => {
       const action$ = hot('-a', { a: shellAction })
-      const output$ = shellEpic(action$)
+      const output$ = shellEpic(action$, EMPTY)
 
       expectObservable(output$).toBe('--')
-    })
+      flush()
 
-    // NOTE: this expectation has to outside the testScheduler scope or else
-    // everything breaks for some reason
-    expect(mockIpc.send).toHaveBeenCalledWith('dispatch', shellAction)
+      expect(remoteDispatch).toHaveBeenCalledWith(shellAction)
+    })
   })
 
   // due to the use of `fromEvent`, this test doesn't work well as a marble
   // test. `toPromise` based expectation should be sufficient
   it('catches actions from main', () => {
-    const shellAction = { type: 'bar' }
-    const result = shellEpic(EMPTY)
+    const shellAction: Action = ({ type: 'bar' }: any)
+    const result = shellEpic(EMPTY, EMPTY)
       .pipe(take(1))
       .toPromise()
 
-    mockIpc.emit('dispatch', {}, shellAction)
+    triggerRemoteAction(shellAction)
 
     return expect(result).resolves.toEqual(shellAction)
   })

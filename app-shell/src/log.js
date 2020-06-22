@@ -1,3 +1,4 @@
+// @flow
 // create logger function
 import { app } from 'electron'
 import { inspect } from 'util'
@@ -8,7 +9,9 @@ import winston from 'winston'
 
 import { getConfig } from './config'
 
-export const LOG_DIR = path.join(app.getPath('userData'), 'logs')
+import type { Logger } from '@opentrons/app/src/logger'
+
+export const LOG_DIR: string = path.join(app.getPath('userData'), 'logs')
 const ERROR_LOG = path.join(LOG_DIR, 'error.log')
 const COMBINED_LOG = path.join(LOG_DIR, 'combined.log')
 const FILE_OPTIONS = {
@@ -26,7 +29,7 @@ let config
 let transports
 let log
 
-export function createLogger(filename) {
+export function createLogger(filename: string): Logger {
   if (!config) config = getConfig('log')
   if (!transports) initializeTransports()
 
@@ -57,26 +60,18 @@ function createTransports() {
 
   return [
     // error file log
-    new winston.transports.File(
-      Object.assign(
-        {
-          level: 'error',
-          filename: ERROR_LOG,
-        },
-        FILE_OPTIONS
-      )
-    ),
+    new winston.transports.File({
+      level: 'error',
+      filename: ERROR_LOG,
+      ...FILE_OPTIONS,
+    }),
 
     // regular combined file log
-    new winston.transports.File(
-      Object.assign(
-        {
-          level: config.level.file,
-          filename: COMBINED_LOG,
-        },
-        FILE_OPTIONS
-      )
-    ),
+    new winston.transports.File({
+      level: config.level.file,
+      filename: COMBINED_LOG,
+      ...FILE_OPTIONS,
+    }),
 
     // console log
     new winston.transports.Console({

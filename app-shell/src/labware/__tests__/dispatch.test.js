@@ -4,6 +4,7 @@ import fse from 'fs-extra'
 import electron from 'electron'
 import * as Cfg from '../../config'
 import * as Dialogs from '../../dialogs'
+import * as MainWin from '../../main-window'
 import * as Defs from '../definitions'
 import * as Val from '../validation'
 import { registerLabware } from '..'
@@ -23,6 +24,7 @@ jest.mock('fs-extra')
 jest.mock('electron')
 jest.mock('../../config')
 jest.mock('../../dialogs')
+jest.mock('../../main-window')
 jest.mock('../definitions')
 jest.mock('../validation')
 
@@ -73,17 +75,21 @@ const validateNewLabwareFile: JestMockFn<
   CheckedLabwareFile
 > = Val.validateNewLabwareFile
 
+const getMainWindow: JestMockFn<[], MainWin.MainWindow | null> =
+  MainWin.getMainWindow
+
 // wait a few ticks to let the mock Promises clear
 const flush = () => new Promise(resolve => setTimeout(resolve, 0))
 
 describe('labware module dispatches', () => {
   const labwareDir = '/path/to/somewhere'
-  const mockMainWindow = { browserWindow: true }
+  const mockMainWindow: MainWin.MainWindow = ({ browserWindow: true }: any)
   let dispatch
   let handleAction
 
   beforeEach(() => {
     getFullConfig.mockReturnValue({ labware: { directory: labwareDir } })
+    getMainWindow.mockReturnValue(mockMainWindow)
     ensureDir.mockResolvedValue()
     addLabwareFile.mockResolvedValue()
     removeLabwareFile.mockResolvedValue()
@@ -95,7 +101,7 @@ describe('labware module dispatches', () => {
     showOpenFileDialog.mockResolvedValue([])
 
     dispatch = jest.fn()
-    handleAction = registerLabware(dispatch, mockMainWindow)
+    handleAction = registerLabware(dispatch)
   })
 
   afterEach(() => {

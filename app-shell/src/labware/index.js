@@ -3,6 +3,8 @@ import fse from 'fs-extra'
 import { app, shell } from 'electron'
 import { getFullConfig, handleConfigChange } from '../config'
 import { showOpenDirectoryDialog, showOpenFileDialog } from '../dialogs'
+import { createLogger } from '../log'
+import { getMainWindow } from '../main-window'
 import * as Definitions from './definitions'
 import { validateLabwareFiles, validateNewLabwareFile } from './validation'
 import { sameIdentity } from './compare'
@@ -20,6 +22,8 @@ import type {
 import type { Action, Dispatch } from '../types'
 
 const ensureDir: (dir: string) => Promise<void> = fse.ensureDir
+
+const log = createLogger('labware')
 
 const fetchCustomLabware = (): Promise<Array<UncheckedLabwareFile>> => {
   const { labware: config } = getFullConfig()
@@ -88,10 +92,7 @@ const copyLabware = (
   })
 }
 
-export function registerLabware(
-  dispatch: Dispatch,
-  mainWindow: { ... }
-): Action => void {
+export function registerLabware(dispatch: Dispatch): Action => void {
   handleConfigChange(CustomLabware.LABWARE_DIRECTORY_CONFIG_PATH, () => {
     fetchAndValidateCustomLabware(dispatch, CustomLabware.CHANGE_DIRECTORY)
   })
@@ -111,41 +112,58 @@ export function registerLabware(
       case CustomLabware.CHANGE_CUSTOM_LABWARE_DIRECTORY: {
         const { labware: config } = getFullConfig()
         const dialogOptions = { defaultPath: config.directory }
+        const mainWindow = getMainWindow()
 
-        showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
-          if (filePaths.length > 0) {
-            const dir = filePaths[0]
-            dispatch(ConfigActions.updateConfigValue('labware.directory', dir))
-          }
-        })
+        if (mainWindow) {
+          showOpenDirectoryDialog(mainWindow, dialogOptions).then(filePaths => {
+            if (filePaths.length > 0) {
+              const dir = filePaths[0]
+              dispatch(
+                ConfigActions.updateConfigValue('labware.directory', dir)
+              )
+            }
+          })
+        } else {
+          log.warn(
+            'No main window present, unable to change custom labware directory'
+          )
+        }
         break
       }
 
       case CustomLabware.ADD_CUSTOM_LABWARE: {
+        const mainWindow = getMainWindow()
         let addLabwareTask
 
-        if (action.payload.overwrite) {
-          addLabwareTask = overwriteLabware(dispatch, action.payload.overwrite)
-        } else {
-          const dialogOptions = {
-            defaultPath: app.getPath('downloads'),
-            filters: [
-              { name: 'JSON Labware Definitions', extensions: ['json'] },
-            ],
+        if (mainWindow) {
+          if (action.payload.overwrite) {
+            addLabwareTask = overwriteLabware(
+              dispatch,
+              action.payload.overwrite
+            )
+          } else {
+            const dialogOptions = {
+              defaultPath: app.getPath('downloads'),
+              filters: [
+                { name: 'JSON Labware Definitions', extensions: ['json'] },
+              ],
+            }
+
+            addLabwareTask = showOpenFileDialog(mainWindow, dialogOptions).then(
+              filePaths => {
+                if (filePaths.length > 0) {
+                  return copyLabware(dispatch, filePaths)
+                }
+              }
+            )
           }
 
-          addLabwareTask = showOpenFileDialog(mainWindow, dialogOptions).then(
-            filePaths => {
-              if (filePaths.length > 0) {
-                return copyLabware(dispatch, filePaths)
-              }
-            }
-          )
+          addLabwareTask.catch((error: Error) => {
+            dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
+          })
+        } else {
+          log.warn('No main window present, unable to add custom labware')
         }
-
-        addLabwareTask.catch((error: Error) => {
-          dispatch(CustomLabware.addCustomLabwareFailure(null, error.message))
-        })
 
         break
       }

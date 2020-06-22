@@ -8,7 +8,8 @@ import thunk from 'redux-thunk'
 import { ConnectedRouter, routerMiddleware } from 'connected-react-router'
 import { createEpicMiddleware } from 'redux-observable'
 
-import { createLogger } from './logger'
+import { remote } from './shell/remote'
+import { initializeLogs, createLogger } from './logger'
 import { uiInitialized } from './shell'
 import { apiClientMiddleware as robotApiMiddleware } from './robot/api-client'
 import { rootReducer, history } from './reducer'
@@ -16,6 +17,8 @@ import { rootEpic } from './epic'
 
 // components
 import { App } from './components/App'
+
+initializeLogs(remote)
 
 const log = createLogger(__filename)
 

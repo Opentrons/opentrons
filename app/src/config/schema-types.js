@@ -96,4 +96,13 @@ export type ConfigV1 = $ReadOnly<{|
   |}>,
 |}>
 
-export type Config = ConfigV1
+export type ConfigV2 = $ReadOnly<{|
+  ...ConfigV1,
+  version: 2,
+  ui: $ReadOnly<{|
+    ...$PropertyType<ConfigV1, 'ui'>,
+    externalBrowser: boolean,
+  |}>,
+|}>
+
+export type Config = ConfigV2

@@ -10,6 +10,7 @@ import type {
   Config,
   ConfigV0,
   ConfigV1,
+  ConfigV2,
 } from '@opentrons/app/src/config/types'
 
 // base config v0 defaults
@@ -98,13 +99,27 @@ const toVersion1 = (prevConfig: ConfigV0): ConfigV1 => {
   return nextConfig
 }
 
-const MIGRATIONS: [(ConfigV0) => ConfigV1] = [toVersion1]
+// config version 1 migration and defaults
+const toVersion2 = (prevConfig: ConfigV1): ConfigV2 => {
+  const nextConfig = {
+    ...prevConfig,
+    version: 2,
+    ui: { ...prevConfig.ui, externalBrowser: false },
+  }
+
+  return nextConfig
+}
+
+const MIGRATIONS: [(ConfigV0) => ConfigV1, (ConfigV1) => ConfigV2] = [
+  toVersion1,
+  toVersion2,
+]
 
 export const DEFAULTS: Config = migrate(DEFAULTS_V0)
 
-export function migrate(prevConfig: ConfigV0 | ConfigV1): Config {
+export function migrate(prevConfig: ConfigV0 | ConfigV1 | ConfigV2): Config {
   const prevVersion = prevConfig.version
-  let result: ConfigV0 | ConfigV1 = prevConfig
+  let result: ConfigV0 | ConfigV1 | ConfigV2 = prevConfig
 
   // loop through the migrations, skipping any migrations that are unnecessary
   for (let i = prevVersion; i < MIGRATIONS.length; i++) {

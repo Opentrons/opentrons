@@ -1,10 +1,25 @@
 // @flow
-import type { Error } from '../types'
+import type { Observable } from 'rxjs'
+import type { Action, Error } from '../types'
+import type { LogEntry } from '../logger'
 import type { RobotLogsState, RobotLogsAction } from './robot-logs/types'
 
 export type Remote = {|
-  ipcRenderer: {| send: (string, ...args: Array<mixed>) => void |},
+  dispatch: (action: Action) => void,
+  log: (entry: LogEntry) => void,
+  inbox: Observable<Action>,
 |}
+
+export type WebSocketRemoteDispatchMessage = {|
+  channel: 'dispatch',
+  payload: Action,
+|}
+
+export type WebSocketRemoteLogMessage = {| channel: 'log', payload: LogEntry |}
+
+export type WebSocketRemoteMessage =
+  | WebSocketRemoteDispatchMessage
+  | WebSocketRemoteLogMessage
 
 export type UpdateInfo = {
   version: string,
