@@ -14,6 +14,7 @@ import type { Observable } from 'rxjs'
 import type {
   Remote,
   WebSocketRemoteMessage,
+  WebSocketRemoteLogMessage,
   WebSocketRemoteDispatchMessage,
 } from '@opentrons/app/src/shell/types'
 import type { Action } from './types'
@@ -46,14 +47,13 @@ const createMainRemote = (): Remote => {
 
 const createWebsocketRemote = (): Remote => {
   const server = new WebSocket.Server({ port: 11201 })
-  const clients = []
-
-  server.on('connection', socket => clients.push(socket))
 
   const dispatch = (action: Action) => {
     const message = JSON.stringify({ channel: 'dispatch', payload: action })
     log.silly('Sending action via WebSocket to renderer', { action })
-    clients.forEach(c => c.send(message))
+    Array.from(server.clients)
+      .filter(c => c.readyState === WebSocket.OPEN)
+      .forEach(c => c.send(message))
   }
 
   const incoming: Observable<WebSocketRemoteMessage> = fromEvent(
@@ -67,7 +67,7 @@ const createWebsocketRemote = (): Remote => {
 
   incoming.pipe(
     filter(({ channel }) => channel === 'log'),
-    tap(({ payload }: WebSocketRemoteDispatchMessage) => {
+    tap(({ payload }: WebSocketRemoteLogMessage) => {
       rendererLogger.log(payload)
     })
   )
