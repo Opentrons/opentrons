@@ -43,13 +43,7 @@ const saveFile = (downloadData: $PropertyType<Props, 'downloadData'>) => {
   const blob = new Blob([JSON.stringify(downloadData.fileData)], {
     type: 'application/json',
   })
-  if (process.env.CYPRESS === '1') {
-    // HACK(IL, 2020-04-02): can't figure out a better way to do this yet
-    // https://docs.cypress.io/faq/questions/using-cypress-faq.html#Can-my-tests-interact-with-Redux-Vuex-data-store
-    global.__lastSavedFile__ = downloadData.fileData
-  } else {
-    saveAs(blob, downloadData.fileName)
-  }
+  saveAs(blob, downloadData.fileName)
 }
 
 type WarningContent = {|

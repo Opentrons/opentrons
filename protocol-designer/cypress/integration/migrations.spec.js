@@ -121,24 +121,35 @@ describe('Protocol fixtures migrate and match snapshots', () => {
               .click()
           }
 
-          cy.window().then(window => {
-            const savedFile = cloneDeep(window.__lastSavedFile__)
-            const expected = cloneDeep(expectedExportProtocol)
+          cy.window()
+            .its('__lastSavedFileBlob__')
+            .should('be.a', 'blob')
+            .should(async blob => {
+              const blobText = await blob.text()
+              const savedFile = JSON.parse(blobText)
+              const expectedFile = cloneDeep(expectedExportProtocol)
 
-            assert.match(
-              savedFile.designerApplication.version,
-              /^4\.0\.\d+$/,
-              'designerApplication.version is 4.0.x'
-            )
-            ;[savedFile, expected].forEach(f => {
-              // Homogenize fields we don't want to compare
-              f.metadata.lastModified = 123
-              f.designerApplication.data._internalAppBuildDate = 'Foo Date'
-              f.designerApplication.version = 'x.x.x'
+              assert.match(
+                savedFile.designerApplication.version,
+                /^4\.0\.\d+$/,
+                'designerApplication.version is 4.0.x'
+              )
+              ;[savedFile, expectedFile].forEach(f => {
+                // Homogenize fields we don't want to compare
+                f.metadata.lastModified = 123
+                f.designerApplication.data._internalAppBuildDate = 'Foo Date'
+                f.designerApplication.version = 'x.x.x'
+              })
+
+              expectDeepEqual(assert, savedFile, expectedFile)
             })
 
-            expectDeepEqual(assert, savedFile, expected)
-          })
+          cy.window()
+            .its('__lastSavedFileName__')
+            .should(
+              'equal',
+              `${expectedExportProtocol.metadata.protocolName}.json`
+            )
         })
       })
     }
