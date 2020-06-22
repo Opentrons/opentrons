@@ -52,8 +52,13 @@ const sendAnalyticsEventEpic: Epic = (action$, state$) => {
 const optIntoAnalyticsEpic: Epic = (_, state$) => {
   return state$.pipe(
     map<State, AnalyticsConfig | null>(getAnalyticsConfig),
+    // this epic is for runtime changes in opt-in (not initialization)
+    // ensure config exists so it doesn't conflict with initialzeAnalyticsEpic
+    filter<AnalyticsConfig | null, AnalyticsConfig>(
+      maybeConfig => maybeConfig !== null
+    ),
     pairwise(),
-    filter(([prev, next]) => next !== null && prev?.optedIn !== next?.optedIn),
+    filter(([prev, next]) => prev.optedIn !== next.optedIn),
     tap(([_, config]: [mixed, AnalyticsConfig]) => setMixpanelTracking(config)),
     ignoreElements()
   )
