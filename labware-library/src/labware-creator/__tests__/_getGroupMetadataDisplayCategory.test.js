@@ -3,12 +3,15 @@
 import { _getGroupMetadataDisplayCategory } from '../fieldsToLabware'
 
 describe('_getGroupMetadataDisplayCategory', () => {
-  it('should return null for wellPlate', () => {
-    const result = _getGroupMetadataDisplayCategory({
-      aluminumBlockChildType: null,
-      labwareType: 'wellPlate',
+  it('should return null for wellPlate and reservoir', () => {
+    const labwareTypes = ['wellPlate', 'reservoir']
+    labwareTypes.forEach(labwareType => {
+      const result = _getGroupMetadataDisplayCategory({
+        aluminumBlockChildType: null,
+        labwareType,
+      })
+      expect(result).toBe(null)
     })
-    expect(result).toBe(null)
   })
 
   it('should return "tubeRack" for tubeRack', () => {
