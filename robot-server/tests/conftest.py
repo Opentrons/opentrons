@@ -57,17 +57,13 @@ def server_temporary_directory():
 
 @pytest.fixture(scope="session")
 def run_server(server_temporary_directory):
-    # Here we are loading the test.env into the temporary directory, then
-    # adding in the OT_API_CONFIG_DIR environment variable to the subprocess
-    shutil.copy(f'{os.getcwd()}/test.env', server_temporary_directory)
-    with open(f'{server_temporary_directory}/test.env', 'a') as f:
-        f.write(f'OT_API_CONFIG_DIR={server_temporary_directory}')
     with subprocess.Popen([sys.executable, "-m", "robot_server.main"],
-                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': f'{server_temporary_directory}/test.env'},
+                          env={'OT_ROBOT_SERVER_DOT_ENV_PATH': "test.env",
+                               'OT_API_CONFIG_DIR': server_temporary_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
         # Wait for a bit to get started
-        time.sleep(2)
+        time.sleep(5)
         yield proc
         proc.kill()
 
