@@ -6,9 +6,11 @@ import omit from 'lodash/omit'
 import { Icon, type IconName } from '../icons'
 import styles from './buttons.css'
 
-export const BUTTON_TYPE_SUBMIT: 'submit' = 'submit'
-export const BUTTON_TYPE_RESET: 'reset' = 'reset'
-export const BUTTON_TYPE_BUTTON: 'button' = 'button'
+import {
+  BUTTON_TYPE_SUBMIT,
+  BUTTON_TYPE_RESET,
+  BUTTON_TYPE_BUTTON,
+} from '../primitives'
 
 export type ButtonProps = {
   /** click handler */
@@ -44,10 +46,13 @@ export type ButtonProps = {
     'aria-describedby': string,
     onMouseEnter: () => mixed,
     onMouseLeave: () => mixed,
+    onPointerEnter: () => mixed,
+    onPointerLeave: () => mixed,
     ...
   }>,
   /** html tabindex property */
   tabIndex?: number,
+  ...
 }
 
 // props to strip if using a custom component

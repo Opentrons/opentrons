@@ -9,6 +9,7 @@ import {
   Text,
   LabeledToggle,
   LabeledButton,
+  SecondaryBtn,
   BORDER_SOLID_LIGHT,
   SPACING_2,
 } from '@opentrons/components'
@@ -30,7 +31,7 @@ import { CONNECTABLE } from '../../discovery'
 import type { State, Dispatch } from '../../types'
 import type { ViewableRobot } from '../../discovery/types'
 
-import { TitledButton } from '../TitledButton'
+import { TitledControl } from '../TitledControl'
 import { CheckCalibrationControl } from './CheckCalibrationControl'
 import { DeckCalibrationWarning } from './DeckCalibrationWarning'
 
@@ -100,21 +101,26 @@ export function ControlsCard(props: Props): React.Node {
 
   return (
     <Card title={TITLE} disabled={notConnectable}>
-      <TitledButton
+      {/* TODO(mc, 2020-06-22): move to DeckCalibrationControl component */}
+      <TitledControl
         borderBottom={BORDER_SOLID_LIGHT}
         title="Calibrate deck"
         description={<Text>{CALIBRATE_DECK_DESCRIPTION}</Text>}
-        buttonProps={{
-          onClick: startCalibration,
-          disabled: buttonDisabled,
-          children: 'Calibrate',
-        }}
+        control={
+          <SecondaryBtn
+            width="9rem"
+            onClick={startCalibration}
+            disabled={buttonDisabled}
+          >
+            Calibrate
+          </SecondaryBtn>
+        }
       >
         <DeckCalibrationWarning
           deckCalibrationStatus={deckCalStatus}
           marginTop={SPACING_2}
         />
-      </TitledButton>
+      </TitledControl>
       <LabeledButton
         label="Home all axes"
         buttonProps={{

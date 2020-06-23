@@ -83,6 +83,8 @@ Note: If you specify both of a shorthand prop and the explicit prop (e.g. `margi
 | `borderBottom` | `border-bottom` |
 | `borderLeft`   | `border-left`   |
 | `borderRadius` | `border-radius` |
+| `borderWidth`  | `border-width`  |
+| `borderColor`  | `border-color`  |
 
 ```js static
 import {

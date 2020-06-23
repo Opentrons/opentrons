@@ -58,7 +58,7 @@ describe('ControlsCard', () => {
   let render
 
   const getDeckCalButton = wrapper =>
-    wrapper.find('TitledButton[title="Calibrate deck"]').find('button')
+    wrapper.find('TitledControl[title="Calibrate deck"]').find('button')
 
   const getCheckCalibrationControl = wrapper =>
     wrapper.find(CheckCalibrationControl)
