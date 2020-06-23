@@ -53,7 +53,7 @@ def run_server(server_temp_directory):
         # Note, we should investigate using
         # symlinks for the file copy to avoid
         # having such a long sleep
-        time.sleep(10)
+        time.sleep(15)
         yield proc
         proc.kill()
 
