@@ -5,7 +5,7 @@ from .command import Command, CompletedCommand, complete_command
 from robot_server.service.session import errors
 
 
-class StateMachineExecutor(CommandExecutor):
+class CallableExecutor(CommandExecutor):
     """A command executor that executes StateMachine triggers"""
 
     def __init__(self, state_machine: StateMachine):
