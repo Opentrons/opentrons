@@ -36,7 +36,8 @@ export type CheckCalibrationControlProps = {|
 
 const CHECK = 'Check'
 const CHECK_ROBOT_CAL = 'Check robot calibration'
-const CHECK_ROBOT_CAL_DESCRIPTION = "Check the robot's calibration state"
+const CHECK_ROBOT_CAL_DESCRIPTION =
+  "Check the robot's calibration status and diagnose common pipette positioning problems."
 const COULD_NOT_START = 'Could not start Robot Calibration Check'
 const PLEASE_TRY_AGAIN =
   'Please try again or contact support if you continue to experience issues'
