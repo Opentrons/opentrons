@@ -1,0 +1,94 @@
+{
+  "wells": {
+    "A1": {
+      "totalLiquidVolume": 0,
+      "xDimension": 63.88,
+      "yDimension": 85.5,
+      "shape": "rectangular",
+      "depth": 0,
+      "x": 31.94,
+      "y": 42.75,
+      "z": 62.5
+    },
+    "A2": {
+      "totalLiquidVolume": 0,
+      "xDimension": 63.88,
+      "yDimension": 85.5,
+      "shape": "rectangular",
+      "depth": 0,
+      "x": 95.81,
+      "y": 42.75,
+      "z": 33
+    }
+  },
+  "groups": [
+    {
+      "metadata": {
+        "displayName": "Opentrons Calibration Block - Tall Side",
+        "displayCategory": "other",
+        "wellBottomShape": "flat"
+      },
+      "brand": {
+        "brand": "Opentrons",
+        "brandId": [],
+        "links": []
+      },
+      "wells": [
+        "A1"
+      ]
+    },
+    {
+      "metadata": {
+        "displayName": "Opentrons Calibration Block - Short Side",
+        "displayCategory": "other",
+        "wellBottomShape": "flat"
+      },
+      "brand": {
+        "brand": "Opentrons",
+        "brandId": [],
+        "links": []
+      },
+      "wells": [
+        "A2"
+      ]
+    }
+  ],
+  "brand": {
+    "brand": "Opentrons",
+    "brandId": [],
+    "links": []
+  },
+  "metadata": {
+    "displayName": "Opentrons Calibration Block - Short Side: Right",
+    "displayCategory": "aluminumBlock",
+    "displayVolumeUnits": "mL",
+    "tags": []
+  },
+  "dimensions": {
+    "xDimension": 127.75,
+    "yDimension": 85.5,
+    "zDimension": 62.5
+  },
+  "parameters": {
+    "format": "irregular",
+    "isTiprack": false,
+    "isMagneticModuleCompatible": false,
+    "loadName": "opentrons_calibrationblock_short_side_right"
+  },
+  "ordering": [
+    [
+      "A1"
+    ],
+    [
+      "A2"
+    ]
+  ],
+  "namespace": "opentrons",
+  "version": 1,
+  "schemaVersion": 2,
+  "cornerOffsetFromSlot": {
+    "x": 0,
+    "y": 0,
+    "z": 0
+  }
+}
