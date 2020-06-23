@@ -1,3 +1,6 @@
+from pathlib import Path
+
+
 def generate_plate(wells, cols, spacing, offset, radius, height=0):
     from opentrons.legacy_api.containers.placeable import Container, Well
     c = Container()
@@ -15,3 +18,16 @@ def generate_plate(wells, cols, spacing, offset, radius, height=0):
                        0)
         c.add(well, name, coordinates)
     return c
+
+
+def test_find_smoothie_file(monkeypatch, tmpdir):
+    from opentrons import config
+
+    dummy_file = Path(tmpdir) / 'smoothie-edge-2cac98asda.hex'
+    dummy_file.write_text("hello")
+    monkeypatch.setattr(config, 'ROBOT_FIRMWARE_DIR', Path(tmpdir))
+
+    import opentrons
+
+    monkeypatch.setattr(opentrons, 'IS_ROBOT', True)
+    assert opentrons._find_smoothie_file() == (dummy_file, 'edge-2cac98asda')

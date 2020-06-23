@@ -4,7 +4,7 @@ from pathlib import Path
 
 from opentrons.hardware_control import ThreadManager
 from opentrons.hardware_control.simulator_setup import load_simulator
-from opentrons.main import initialize as initialize_api
+from opentrons import initialize as initialize_api
 from robot_server.service import run as fastapi_run
 
 from robot_server.settings import get_settings
