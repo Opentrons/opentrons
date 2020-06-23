@@ -1,7 +1,7 @@
 {
   "name": "@opentrons/labware-library",
   "productName": "Labware Library",
-  "version": "3.19.0-alpha.3",
+  "version": "3.19.0-alpha.4",
   "description": "Opentrons standard labware library",
   "main": "src/index.js",
   "repository": {
@@ -16,7 +16,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@hot-loader/react-dom": "16.8.6",
-    "@opentrons/components": "3.19.0-alpha.3",
+    "@opentrons/components": "3.19.0-alpha.4",
     "ajv": "6.10.2",
     "classnames": "2.2.5",
     "cookie": "0.4.0",
