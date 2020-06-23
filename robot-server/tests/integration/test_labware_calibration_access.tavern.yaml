@@ -11,11 +11,9 @@ stages:
     response:
       status_code: 200
       json:
-        links: !anydict
-        data: !anydict
-          id: ""
-          type: LabwareCalibration
-          attributes: ""
+        meta: "null"
+        links: "null"
+        data: []
 ---
 test_name: GET Labware Calibrations, All Calibrations
 marks:
@@ -29,13 +27,11 @@ stages:
       method: GET
     response:
       status_code: 200
-      save:
-        json:
-          calibration_id: data.id
       json:
+        meta: None
         links: !anydict
         data: &calibration_data
-          id: "{calibration_id}"
+          id: ""
           type: LabwareCalibration
           attributes: &calibration_data_attributes
             details: &session_data_attribute_details
@@ -44,7 +40,7 @@ test_name: GET Labware Calibrations, Filter LoadName
 marks:
   - usefixtures:
       - run_server
-      - set_up_index_file
+      - set_up_index_file_temporary_directory
 stages:
   - name: GET request returns the calibration for deep well plate
     request:
@@ -54,14 +50,12 @@ stages:
         loadName: 'nest_96_wellplate_2ml_deep'
     response:
       status_code: 200
-      save:
-        json:
-          calibration_id: data.id
       json:
+        meta: None
         links: !anydict
         data:
           <<: *calibration_data
-          id: "{calibration_id}"
+          id: ""
           type: LabwareCalibration
           attributes:
             <<: *calibration_data_attributes
@@ -70,7 +64,7 @@ test_name: GET Labware Calibrations, Filter Version & namespace
 marks:
   - usefixtures:
       - run_server
-      - set_up_index_file
+      - set_up_index_file_temporary_directory
 stages:
   - name: Labware Calibrations GET request returns an empty list
     request:
@@ -81,14 +75,11 @@ stages:
         namespace: "opentrons"
     response:
       status_code: 200
-      save:
-        json:
-          calibration_id: data.id
       json:
         links: !anydict
         data:
           <<: *calibration_data
-          id: "{calibration_id}"
+          id: ""
           type: LabwareCalibration
           attributes:
             <<: *calibration_data_attributes
