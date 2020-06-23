@@ -7,13 +7,11 @@ assignees: ''
 ---
 
 <!--
-  Thanks for taking the time to file a feature request! Please make sure you've read the
-  "Opening Issues" section of our Contributing Guide:
+  Thanks for taking the time to file a feature request! Please make sure you've read the "Opening Issues" section of our Contributing Guide:
 
   https://github.com/Opentrons/opentrons/blob/edge/CONTRIBUTING.md#opening-issues
 
-  To ensure your issue can be addressed quickly, please fill out the sections
-  below to the best of your ability!
+  To ensure your issue can be addressed quickly, please fill out the sections below to the best of your ability!
 -->
 
 # Overview
