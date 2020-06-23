@@ -51,7 +51,7 @@ describe('CheckCalibrationControl', () => {
     const titledButton = wrapper.find(TitledButton)
 
     expect(titledButton.prop('title')).toBe('Check robot calibration')
-    expect(titledButton.html()).toMatch(/check the robot's calibration state/i)
+    expect(titledButton.html()).toMatch(/check the robot's calibration status/i)
     expect(titledButton.prop('buttonProps')).toMatchObject({
       children: 'Check',
       disabled: false,
