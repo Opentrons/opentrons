@@ -50,8 +50,8 @@ def run_server(server_temp_directory):
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
         # Wait for a bit to get started
-        # Note, we should investigate using
-        # symlinks for the file copy to avoid
+        # TODO (lc, 23-06-2020) We should investigate
+        # using symlinks for the file copy to avoid
         # having such a long sleep
         time.sleep(15)
         yield proc
@@ -59,7 +59,7 @@ def run_server(server_temp_directory):
 
 
 @pytest.fixture
-def attach_pipettes(server_temp_directory, monkeypatch):
+def attach_pipettes(server_temp_directory):
     import json
 
     pipette = {

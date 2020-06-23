@@ -327,8 +327,6 @@ def change_quirks(override_quirks, existing, model_configs):
 
 def load_overrides(pipette_id: str) -> Dict[str, Any]:
     overrides = config.CONFIG['pipette_config_overrides_dir']
-    print("OVERRIDES PATH")
-    print(overrides)
     fi = (overrides/f'{pipette_id}.json').open()
     try:
         return json.load(fi)
