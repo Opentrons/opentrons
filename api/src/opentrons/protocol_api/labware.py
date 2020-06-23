@@ -974,15 +974,25 @@ def load_tip_length_calibration(
         pip_id: str, labware: Labware) -> 'TipLengthCalibration':
     assert labware._is_tiprack, \
         'cannot load tip length for non-tiprack labware'
+    parent_id = _get_parent_identifier(labware.parent)
+    labware_hash = _hash_labware_def(labware._definition)
+    return get_tip_length_data(
+        pip_id=pip_id,
+        labware_hash=labware_hash + parent_id,
+        labware_load_name=labware.load_name)
+
+
+# TODO: AA - move out of protocol_api
+def get_tip_length_data(
+        pip_id: str, labware_hash: str, labware_load_name: str
+) -> 'TipLengthCalibration':
     try:
         pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
-        parent_id = _get_parent_identifier(labware.parent)
-        labware_hash = _hash_labware_def(labware._definition)
         tip_length_data = _read_cal_file(str(pip_tip_length_path))
-        return tip_length_data[labware_hash + parent_id]
+        return tip_length_data[labware_hash]
     except (FileNotFoundError, AttributeError):
         raise TipLengthCalNotFound(
-            f'Tip length of {labware.load_name} has not been '
+            f'Tip length of {labware_load_name} has not been '
             f'calibrated for this pipette: {pip_id} and cannot'
             'be loaded')
 
