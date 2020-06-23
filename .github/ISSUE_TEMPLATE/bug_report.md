@@ -20,16 +20,16 @@ To ensure your issue can be addressed quickly, please fill out the sections belo
 Use this section to describe your bug at a high level. Please include any issues you can find that may be related.
 -->
 
-# Current behavior
-
-<!--
-Describe how the software currently behaves and how that differs from how you think the software should behave.
--->
-
 # Steps to reproduce
 
 <!--
 If this is a bug report and there are specific steps we can take to reproduce the bug, please list them here. This is a good place to put things like software version, hardware version, and operating system.
+-->
+
+# Current behavior
+
+<!--
+Describe how the software currently behaves and how that differs from how you think the software should behave.
 -->
 
 # Expected behavior
