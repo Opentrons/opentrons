@@ -3,12 +3,27 @@ import {
   createRegularLabware,
   //   createIrregularLabware,
   type LabwareDefinition2,
+  type LabwareDisplayCategory,
 } from '@opentrons/shared-data'
 import { DISPLAY_VOLUME_UNITS, type ProcessedLabwareFields } from './fields'
 
 // TODO Ian 2019-07-29: move this constant to shared-data?
 // This is the distance from channel 1 to channel 8 of any 8-channel, not tied to name/model
 export const MULTI_CHANNEL_WIDTH_MM = 64
+
+export const _getGroupMetadataDisplayCategory = (args: {|
+  aluminumBlockChildType: ?string,
+  labwareType: string,
+|}): LabwareDisplayCategory | null => {
+  const { aluminumBlockChildType, labwareType } = args
+  if (labwareType === 'tubeRack') {
+    return 'tubeRack'
+  } else if (labwareType === 'aluminumBlock') {
+    const childIsWellPlate = aluminumBlockChildType === 'pcrPlate'
+    return childIsWellPlate ? 'wellPlate' : 'tubeRack'
+  }
+  return null
+}
 
 export function fieldsToLabware(
   fields: ProcessedLabwareFields
@@ -67,6 +82,11 @@ export function fieldsToLabware(
       //   links: []
     }
 
+    const groupMetadataDisplayCategory = _getGroupMetadataDisplayCategory({
+      aluminumBlockChildType: fields.aluminumBlockChildType,
+      labwareType: fields.labwareType,
+    })
+
     const def = createRegularLabware({
       strict: false,
       metadata: {
@@ -110,13 +130,16 @@ export function fieldsToLabware(
         row: fields.gridSpacingY,
       },
       well: wellProperties,
-      // NOTE(IL, 2020-06-22): as per #5801, `group` should not include brand, displayName, or displayCategory
+      // NOTE(IL, 2020-06-22): as per #5801, `group` should not include brand or displayName
       // unless the "wells" are different than the overall labware (eg NEST tubes in an opentrons rack/block).
       // Since LC doesn't allow the user to specify any of these 3 fields for wells themselves, we'll omit them
       // from the definition.
       group: {
         metadata: {
           wellBottomShape: fields.wellBottomShape,
+          ...(groupMetadataDisplayCategory
+            ? { displayCategory: groupMetadataDisplayCategory }
+            : null),
         },
       },
     })
