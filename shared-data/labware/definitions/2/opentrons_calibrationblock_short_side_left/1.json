@@ -33,9 +33,7 @@
         "brandId": [],
         "links": []
       },
-      "wells": [
-        "A1"
-      ]
+      "wells": ["A1"]
     },
     {
       "metadata": {
@@ -48,9 +46,7 @@
         "brandId": [],
         "links": []
       },
-      "wells": [
-        "A2"
-      ]
+      "wells": ["A2"]
     }
   ],
   "brand": {
@@ -75,14 +71,7 @@
     "isMagneticModuleCompatible": false,
     "loadName": "opentrons_calibrationblock_short_side_left"
   },
-  "ordering": [
-    [
-      "A1"
-    ],
-    [
-      "A2"
-    ]
-  ],
+  "ordering": [["A1"], ["A2"]],
   "namespace": "opentrons",
   "version": 1,
   "schemaVersion": 2,
