@@ -114,3 +114,15 @@ class TipCalibrationStateMachine(StateMachine):
                               transitions=TIP_LENGTH_TRANSITIONS,
                               initial_state=initial_state)
         self._has_calibration_block = has_calibration_block
+
+    async def handle_command(self,
+                             name: str,
+                             data: typing.Dict[typing.Any, typing.Any]):
+        """
+        Handle a client command
+
+        :param name: Name of the command
+        :param data: Data supplied in command
+        :return: None
+        """
+        await self.trigger_transition(trigger=name, **data)

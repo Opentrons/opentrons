@@ -1,6 +1,7 @@
 from opentrons.calibration.check.session import CheckCalibrationSession
 from opentrons.calibration.check import models as calibration_models
 from opentrons.calibration.session import CalibrationException
+from opentrons.calibration.util import StateMachineError
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import \
@@ -17,7 +18,7 @@ class CheckSessionStateExecutor(CallableExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except CalibrationException as e:
+        except (CalibrationException, StateMachineError, AssertionError) as e:
             raise CommandExecutionException(e)
 
 
@@ -30,7 +31,7 @@ class CheckSession(BaseSession):
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
         self._command_executor = CheckSessionStateExecutor(
-            self._calibration_check
+            self._calibration_check.handle_command
         )
         self._command_queue = CommandQueue()
 

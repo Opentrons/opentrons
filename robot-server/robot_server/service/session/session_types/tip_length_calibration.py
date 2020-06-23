@@ -17,7 +17,7 @@ class TipLengthCalibration(BaseSession):
         super().__init__(configuration, instance_meta)
         self._tip_length_calibration = tip_length_calibration
         self._command_executor = CallableExecutor(
-            self._tip_length_calibration
+            self._tip_length_calibration.handle_command
         )
         self._command_queue = CommandQueue()
 

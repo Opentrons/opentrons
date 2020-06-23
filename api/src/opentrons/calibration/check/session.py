@@ -311,6 +311,18 @@ class CheckCalibrationSession(CalibrationSession, StateMachine):
         self.session_type = 'check'
         self._saved_points: typing.Dict[CalibrationCheckState, Point] = {}
 
+    async def handle_command(self,
+                             name: str,
+                             data: typing.Dict[typing.Any, typing.Any]):
+        """
+        Handle a client command
+
+        :param name: Name of the command
+        :param data: Data supplied in command
+        :return: None
+        """
+        await self.trigger_transition(trigger=name, **data)
+
     def _get_pipette_by_rank(self, rank: PipetteRank) -> \
             typing.Optional[PipetteInfo]:
         try:
