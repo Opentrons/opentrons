@@ -96,7 +96,7 @@ class BasicSessionCommand(BaseModel):
     command: CommandName = Field(...,
                                  description="The command description")
 
-    @validator('command', always=True)
+    @validator('command', always=True, allow_reuse=True)
     def check_data_type(cls, v, values):
         """Validate that the command and data match"""
         d = values.get('data')
@@ -109,7 +109,7 @@ class BasicSessionCommand(BaseModel):
 class SessionCommand(BasicSessionCommand):
     """A session command response"""
     status: CommandStatus
-    created_at: datetime
+    created_at: datetime = Field(default_factory=datetime.utcnow)
     started_at: typing.Optional[datetime]
     completed_at: typing.Optional[datetime]
 
