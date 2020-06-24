@@ -114,11 +114,11 @@ export function migrate(prevConfig: ConfigV0 | ConfigV1): Config {
     result = migrateVersion(result)
   }
 
-  if (result.version !== CONFIG_VERSION_LATEST) {
+  if (result.version < CONFIG_VERSION_LATEST) {
     throw new Error(
-      `Config migration failed; expected version ${CONFIG_VERSION_LATEST} but got ${result.version}`
+      `Config migration failed; expected at least version ${CONFIG_VERSION_LATEST} but got ${result.version}`
     )
   }
 
-  return result
+  return ((result: any): Config)
 }
