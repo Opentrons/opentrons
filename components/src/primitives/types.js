@@ -42,6 +42,8 @@ export type BorderProps = {|
   borderBottom?: string,
   borderLeft?: string,
   borderRadius?: string | number,
+  borderWidth?: string | number,
+  borderColor?: string,
 |}
 
 export type FlexboxProps = {|

@@ -60,14 +60,14 @@ describe('useHoverTooltip', () => {
     expect(tooltip.props()).toMatchObject(otherTooltipProps)
   })
 
-  it('attaches onMouseEnter handler to target props with enter delay', () => {
+  it('attaches onPointerEnter handler to target props with enter delay', () => {
     jest.useFakeTimers()
 
     const wrapper = render()
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onMouseEnter')()
+      target.invoke('onPointerEnter')()
     })
     wrapper.update()
 
@@ -84,16 +84,16 @@ describe('useHoverTooltip', () => {
     wrapper.unmount()
   })
 
-  it('attaches onMouseLeave handler to target props without leave delay', () => {
+  it('attaches onPointerLeave handler to target props without leave delay', () => {
     jest.useFakeTimers()
 
     const wrapper = render()
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onMouseEnter')()
+      target.invoke('onPointerEnter')()
       jest.runTimersToTime(300)
-      target.invoke('onMouseLeave')()
+      target.invoke('onPointerLeave')()
     })
     wrapper.update()
 
@@ -110,7 +110,7 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onMouseEnter')()
+      target.invoke('onPointerEnter')()
       jest.runTimersToTime(300)
     })
     wrapper.update()
@@ -135,8 +135,8 @@ describe('useHoverTooltip', () => {
     const target = wrapper.find('[data-test="target"]')
 
     act(() => {
-      target.invoke('onMouseEnter')()
-      target.invoke('onMouseLeave')()
+      target.invoke('onPointerEnter')()
+      target.invoke('onPointerLeave')()
     })
     wrapper.update()
 

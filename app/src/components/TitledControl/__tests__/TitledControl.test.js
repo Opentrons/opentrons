@@ -3,19 +3,18 @@
 import * as React from 'react'
 import { mount } from 'enzyme'
 
-import { TitledButton } from '..'
+import { TitledControl } from '..'
 
-describe('TitledButton', () => {
-  const handleClick = jest.fn()
+describe('TitledControl', () => {
   const render = () => {
     return mount(
-      <TitledButton
+      <TitledControl
         title="Great title"
         description={<span data-test="cool-description" />}
-        buttonProps={{ children: 'click me', onClick: handleClick }}
+        control={<button data-test="control" />}
       >
         <span data-test="child" />
-      </TitledButton>
+      </TitledControl>
     )
   }
 
@@ -35,11 +34,7 @@ describe('TitledButton', () => {
 
   it('should have a button', () => {
     const wrapper = render()
-    const button = wrapper.find('button')
-
-    expect(button.children().html()).toBe('click me')
-    button.simulate('click')
-    expect(handleClick).toHaveBeenCalled()
+    expect(wrapper.exists('[data-test="control"]')).toBe(true)
   })
 
   it('should render children', () => {
