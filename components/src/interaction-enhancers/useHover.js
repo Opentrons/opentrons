@@ -7,8 +7,8 @@ export type UseHoverOptions = $Shape<{|
 |}>
 
 export type HoverHandlers = {|
-  onMouseEnter: () => mixed,
-  onMouseLeave: () => mixed,
+  onPointerEnter: () => mixed,
+  onPointerLeave: () => mixed,
 |}
 
 export type UseHoverResult = [boolean, HoverHandlers]
@@ -52,8 +52,8 @@ export function useHover(options: UseHoverOptions = {}): UseHoverResult {
 
   const handlers = useMemo(
     () => ({
-      onMouseEnter: () => handleHoverChange(true, enterDelay),
-      onMouseLeave: () => handleHoverChange(false, leaveDelay),
+      onPointerEnter: () => handleHoverChange(true, enterDelay),
+      onPointerLeave: () => handleHoverChange(false, leaveDelay),
     }),
     [handleHoverChange, enterDelay, leaveDelay]
   )

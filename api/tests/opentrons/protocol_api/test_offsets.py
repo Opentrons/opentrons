@@ -232,7 +232,7 @@ def test_clear_tip_length_calibration_data(monkeypatch):
     with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
         test_offset = {
             MOCK_HASH: {
-                'tip_length': 22.0,
+                'tipLength': 22.0,
                 'lastModified': 1
             }
         }

@@ -288,7 +288,8 @@ class InstrumentsWrapper(object):
             min_volume=min_volume,
             max_volume=max_volume,
             blow_out_flow_rate=blow_out_flow_rate,
-            requested_as=original_name)
+            requested_as=original_name,
+            pipette_id=pip_id)
 
     def _create_pipette_from_config(
             self,
@@ -303,7 +304,8 @@ class InstrumentsWrapper(object):
             min_volume=None,
             max_volume=None,
             blow_out_flow_rate=None,
-            requested_as=None):
+            requested_as=None,
+            pipette_id=None):
 
         if aspirate_flow_rate is not None:
             config = replace(config, aspirate_flow_rate=aspirate_flow_rate)
@@ -348,7 +350,8 @@ class InstrumentsWrapper(object):
             quirks=config.quirks,
             fallback_tip_length=config.tip_length,  # TODO move to labware
             blow_out_flow_rate=config.blow_out_flow_rate,
-            requested_as=requested_as)
+            requested_as=requested_as,
+            pipette_id=pipette_id)
 
         return p
 

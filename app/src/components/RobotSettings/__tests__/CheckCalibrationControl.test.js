@@ -10,7 +10,7 @@ import { mockRobot } from '../../../robot-api/__fixtures__'
 
 import { Icon, Tooltip } from '@opentrons/components'
 import { Portal } from '../../portal'
-import { TitledButton } from '../../TitledButton'
+import { TitledControl } from '../../TitledControl'
 import { CheckCalibration } from '../../CheckCalibration'
 import { CheckCalibrationControl } from '../CheckCalibrationControl'
 
@@ -46,16 +46,12 @@ describe('CheckCalibrationControl', () => {
     jest.resetAllMocks()
   })
 
-  it('should render a TitledButton', () => {
+  it('should render a TitledControl', () => {
     const wrapper = render({ disabledReason: null })
-    const titledButton = wrapper.find(TitledButton)
+    const titledButton = wrapper.find(TitledControl)
 
     expect(titledButton.prop('title')).toBe('Check robot calibration')
     expect(titledButton.html()).toMatch(/check the robot's calibration state/i)
-    expect(titledButton.prop('buttonProps')).toMatchObject({
-      children: 'Check',
-      disabled: false,
-    })
   })
 
   it('should be able to disable the button', () => {
