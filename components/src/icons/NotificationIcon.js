@@ -11,7 +11,7 @@ export type NotificationIconProps = {|
   ...IconProps,
   /** name constant of the optional notifcation icon to display */
   childName: IconName | null,
-  /** color to apply to notification icon */
+  /** color to apply to notification icon (defaults to COLOR_WARNING) */
   childColor?: string,
 |}
 
@@ -20,13 +20,7 @@ const SCALE_FACTOR = 3
 /**
  * Inline SVG icon component with additional nested notification icon. Takes
  * all the same props as Icon in addition to the ones listed above.
- *
- * If you need access to the IconName type, you can:
- * ```js
- * import type { IconName } from '@opentrons/components'
- * ```
  */
-
 export function NotificationIcon(props: NotificationIconProps): React.Node {
   const { childName, childColor, ...iconProps } = props
   const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
