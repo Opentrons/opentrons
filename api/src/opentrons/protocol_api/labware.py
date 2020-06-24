@@ -961,7 +961,6 @@ def _get_labware_offset_path(labware: Labware):
 
     parent_id = _get_parent_identifier(labware.parent)
     labware_hash = _hash_labware_def(labware._definition)
-    _add_to_index_offset_file(labware, labware_hash)
     return OFFSETS_PATH/f'{labware_hash}{parent_id}.json'
 
 
@@ -973,6 +972,8 @@ def save_calibration(labware: Labware, delta: Point):
     modify the delta and the lastModified fields under the "default" key.
     """
     labware_offset_path = _get_labware_offset_path(labware)
+    labware_hash = _hash_labware_def(labware._definition)
+    _add_to_index_offset_file(labware, labware_hash)
     calibration_data = _helper_offset_data_format(
         str(labware_offset_path), delta)
     with labware_offset_path.open('w') as f:
@@ -1437,19 +1438,20 @@ def get_all_calibrations() -> List[CalibrationInformation]:
     index_file = _read_file(str(index_path))
     for key, data in index_file.items():
         cal_path = OFFSETS_PATH / f'{key}.json'
-        cal_blob = _read_file(str(cal_path))
-        calibration = _format_calibration_type(cal_blob)
-        details = details_from_uri(data['uri'])
-        definition = get_labware_definition(
-            details.load_name, details.namespace, details.version)
-        all_calibrations.append(
-            CalibrationInformation(
-                calibration=calibration,
-                definition=definition,
-                parent=_format_parent(data),
-                labware_id=key,
-                uri=data['uri']
-            ))
+        if cal_path.exists():
+            cal_blob = _read_file(str(cal_path))
+            calibration = _format_calibration_type(cal_blob)
+            details = details_from_uri(data['uri'])
+            definition = get_labware_definition(
+                details.load_name, details.namespace, details.version)
+            all_calibrations.append(
+                CalibrationInformation(
+                    calibration=calibration,
+                    definition=definition,
+                    parent=_format_parent(data),
+                    labware_id=key,
+                    uri=data['uri']
+                ))
     return all_calibrations
 
 
