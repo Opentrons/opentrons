@@ -217,9 +217,7 @@ def infer_config_base_dir() -> Path:
 
     :return pathlib.Path: The path to the desired root settings dir.
     """
-    print("inferring base")
     if 'OT_API_CONFIG_DIR' in os.environ:
-        print("Conferring base here")
         return Path(os.environ['OT_API_CONFIG_DIR'])
     elif IS_ROBOT:
         return Path('/data')
@@ -494,3 +492,7 @@ CONFIG = load_and_migrate()
 #: The currently loaded config. This should not change for the lifetime
 #: of the program. This is a dict much like os.environ() where the keys
 #: are config element names
+
+
+def get_tip_length_cal_path():
+    return get_opentrons_path('tip_length_calibration_dir')

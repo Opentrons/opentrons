@@ -76,7 +76,7 @@ def _grab_value(
     if filtering == 'loadname':
         return details.load_name == comparison
     if filtering == 'version':
-        return details.version == str(comparison)
+        return details.version == comparison
     return False
 
 

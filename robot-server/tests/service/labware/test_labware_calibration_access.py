@@ -1,5 +1,4 @@
 import pytest
-import time
 
 from opentrons.protocol_api import labware
 

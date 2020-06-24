@@ -28,13 +28,13 @@ from typing import (
 import jsonschema  # type: ignore
 
 from .util import ModifiedList, requires_version, first_parent
+from opentrons.config import get_tip_length_cal_path
 from opentrons.types import Location, Point
 from opentrons.protocols.types import APIVersion
 from opentrons_shared_data import load_shared_data, get_shared_data_root
 from .definitions import MAX_SUPPORTED_VERSION, DeckItem
 from .constants import (OPENTRONS_NAMESPACE, CUSTOM_NAMESPACE,
-                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH,
-                        TIP_LENGTH_CALIBRATION_PATH)
+                        STANDARD_DEFS_PATH, OFFSETS_PATH, USER_DEFS_PATH)
 if TYPE_CHECKING:
     from .module_geometry import ModuleGeometry  # noqa(F401)
     from .dev_types import (
@@ -86,14 +86,25 @@ class DateTimeDecoder(json.JSONDecoder):
 
 
 @dataclass
-class CalibrationData:
+class OffsetData:
     """
     Class to categorize the shape of a
     given calibration data.
     TODO(6/8): Move to a separate file
     """
-    value: Union[Optional[float], List[float]]
+    value: List[float]
     last_modified: Optional[str]
+
+
+@dataclass
+class TipLengthData:
+    """
+    Class to categorize the shape of a
+    given calibration data.
+    TODO(6/8): Move to a separate file
+    """
+    value: Optional[float] = None
+    last_modified: Optional[str] = None
 
 
 @dataclass
@@ -106,7 +117,7 @@ class ParentOptions:
     TODO(6/8): Move to a separate file
     """
     slot: str
-    module: str
+    module: str = ''
 
 
 @dataclass
@@ -116,8 +127,8 @@ class CalibrationTypes:
     data might be stored for a labware.
     TODO(6/8): Move to a separate file
     """
-    offset: CalibrationData
-    tip_length: CalibrationData
+    offset: OffsetData
+    tip_length: TipLengthData
 
 
 @dataclass
@@ -932,7 +943,7 @@ def _add_to_index_offset_file(labware: Labware, lw_hash: str):
     if mod_parent:
         mod_dict = {
             'parent': mod_parent,
-            'full_parent': f'{slot}-{mod_parent}'}
+            'fullParent': f'{slot}-{mod_parent}'}
     else:
         mod_dict = {}
     full_id = f'{lw_hash}{mod_parent}'
@@ -986,7 +997,7 @@ def save_tip_length(labware: Labware, length: float):
 
 # TODO: AA - move out of protocol_api
 def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
-    index_file = TIP_LENGTH_CALIBRATION_PATH/'index.json'
+    index_file = get_tip_length_cal_path()/'index.json'
     try:
         index_data = _read_file(str(index_file))
     except FileNotFoundError:
@@ -1004,7 +1015,7 @@ def _append_to_index_tip_length_file(pip_id: str, lw_hash: str):
 # TODO: AA - move out of protocol_api
 def save_tip_length_calibration(
         pip_id: str, tip_length_cal: 'PipTipLengthCalibration'):
-    tip_length_dir_path = TIP_LENGTH_CALIBRATION_PATH
+    tip_length_dir_path = get_tip_length_cal_path()
     tip_length_dir_path.mkdir(parents=True, exist_ok=True)
     pip_tip_length_path = tip_length_dir_path/f'{pip_id}.json'
 
@@ -1057,7 +1068,7 @@ def get_tip_length_data(
         pip_id: str, labware_hash: str, labware_load_name: str
 ) -> 'TipLengthCalibration':
     try:
-        pip_tip_length_path = TIP_LENGTH_CALIBRATION_PATH/f'{pip_id}.json'
+        pip_tip_length_path = get_tip_length_cal_path()/f'{pip_id}.json'
         tip_length_data = _read_cal_file(str(pip_tip_length_path))
         return tip_length_data[labware_hash]
     except (FileNotFoundError, AttributeError):
@@ -1072,7 +1083,7 @@ def clear_tip_length_calibration():
     """
     Delete all tip length calibration files.
     """
-    tip_length_path = TIP_LENGTH_CALIBRATION_PATH
+    tip_length_path = get_tip_length_cal_path()
     try:
         targets = (
             f for f in tip_length_path.iterdir() if f.suffix == '.json')
@@ -1389,7 +1400,7 @@ def get_all_labware_definitions() -> List[str]:
 
 def _format_calibration_type(
         data: 'CalibrationDict') -> 'CalibrationTypes':
-    offset = CalibrationData(
+    offset = OffsetData(
         value=data['default']['offset'],
         last_modified=data['default']['lastModified']
     )
@@ -1397,24 +1408,17 @@ def _format_calibration_type(
     # the labware calibraiton file. We should
     # have a follow-up PR to grab tip lengths
     # based on the loaded pips + labware
-    tip_length = CalibrationData(
-        value=None,
-        last_modified=None
-    )
     return CalibrationTypes(
             offset=offset,
-            tip_length=tip_length
+            tip_length=TipLengthData()
         )
 
 
 def _format_parent(data: 'CalibrationIndexDict') -> ParentOptions:
+    options = ParentOptions(slot=data['slot'])
     if data['module']:
-        mod = data['module']['parent']
-    else:
-        mod = ''
-    return ParentOptions(
-        slot=data['slot'],
-        module=mod)
+        options.module = data['module']['parent']
+    return options
 
 
 def get_all_calibrations() -> List[CalibrationInformation]:

@@ -140,7 +140,7 @@ class TipLengthCalibration(TypedDict):
 
 class ModuleDict(TypedDict):
     parent: str
-    full_parent: str
+    fullParent: str
 
 
 class CalibrationIndexDict(TypedDict):

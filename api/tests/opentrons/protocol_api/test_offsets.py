@@ -5,6 +5,7 @@ import time
 
 import pytest
 import datetime
+from opentrons import config
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
 
@@ -63,7 +64,7 @@ def path(calibration_name):
 
 
 def tlc_path(pip_id):
-    return labware.TIP_LENGTH_CALIBRATION_PATH \
+    return config.get_tip_length_cal_path() \
         / '{}.json'.format(pip_id)
 
 
@@ -228,7 +229,7 @@ def test_load_tip_length_calibration_data(monkeypatch, clear_tlc_calibration):
 
 
 def test_clear_tip_length_calibration_data(monkeypatch):
-    calpath = labware.TIP_LENGTH_CALIBRATION_PATH
+    calpath = config.get_tip_length_cal_path()
     with open(calpath/f'{PIPETTE_ID}.json', 'w') as offset_file:
         test_offset = {
             MOCK_HASH: {
