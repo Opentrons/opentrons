@@ -8,6 +8,7 @@ export type HealthResponse = {
   system_version?: string,
   logs?: Array<string>,
   protocol_api_version?: [number, number],
+  ...
 }
 
 export type Capability =
@@ -28,7 +29,13 @@ export type ServerHealthResponse = {
   smoothieVersion: string,
   systemVersion: string,
   capabilities?: CapabilityMap,
+  ...
 }
+
+export type HealthErrorResponse = {|
+  status: number,
+  body: string | { [string]: mixed, ... },
+|}
 
 export type Candidate = {
   ip: string,
