@@ -3,7 +3,7 @@ from opentrons.calibration.tip_length.state_machine import \
 
 from .base_session import BaseSession, SessionMetaData
 from ..command_execution import CommandQueue, CommandExecutor, \
-    StateMachineExecutor
+    CallableExecutor
 from ..configuration import SessionConfiguration
 from ..models import EmptyModel, SessionType, SessionDetails
 
@@ -16,8 +16,8 @@ class TipLengthCalibration(BaseSession):
                  ):
         super().__init__(configuration, instance_meta)
         self._tip_length_calibration = tip_length_calibration
-        self._command_executor = StateMachineExecutor(
-            self._tip_length_calibration
+        self._command_executor = CallableExecutor(
+            self._tip_length_calibration.handle_command
         )
         self._command_queue = CommandQueue()
 

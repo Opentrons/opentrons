@@ -1,10 +1,11 @@
 from opentrons.calibration.check.session import CheckCalibrationSession
 from opentrons.calibration.check import models as calibration_models
 from opentrons.calibration.session import CalibrationException
+from opentrons.calibration.util import StateMachineError
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import \
-    CommandQueue, StateMachineExecutor, Command, CompletedCommand
+    CommandQueue, CallableExecutor, Command, CompletedCommand
 from robot_server.service.session.configuration import SessionConfiguration
 from robot_server.service.session.session_types.base_session \
     import BaseSession, SessionMetaData
@@ -12,12 +13,12 @@ from robot_server.service.session.errors import SessionCreationException, \
     CommandExecutionException
 
 
-class CheckSessionStateExecutor(StateMachineExecutor):
+class CheckSessionStateExecutor(CallableExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         try:
             return await super().execute(command)
-        except CalibrationException as e:
+        except (CalibrationException, StateMachineError, AssertionError) as e:
             raise CommandExecutionException(e)
 
 
@@ -30,7 +31,7 @@ class CheckSession(BaseSession):
         super().__init__(configuration, instance_meta)
         self._calibration_check = calibration_check
         self._command_executor = CheckSessionStateExecutor(
-            self._calibration_check
+            self._calibration_check.handle_command
         )
         self._command_queue = CommandQueue()
 
@@ -88,7 +89,7 @@ class CheckSession(BaseSession):
         )
 
     @property
-    def command_executor(self) -> StateMachineExecutor:
+    def command_executor(self) -> CallableExecutor:
         return self._command_executor
 
     @property
