@@ -189,8 +189,10 @@ def _build_safe_height(from_loc: types.Location,
                     f"only be raised to {constraints.instr_max_height} mm "
                     "above the deck. "
                     "This may be because the labware is incorrectly defined, "
-                    "incorrectly calibrated, or physically too tall. Please "
-                    "check your labware definitions and calibrations.")
+                    "incorrectly calibrated, or physically too tall. This "
+                    "could also be caused by the pipette and its tipracks "
+                    "being mismatched. Please check your labware definitions "
+                    "and calibrations.")
         from_safety = 0.0  # (ignore since it’s in a max())
 
     return max_many(

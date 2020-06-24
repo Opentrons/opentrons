@@ -27,6 +27,15 @@ AdvancedLiquidHandling = Union[
     List[List[Well]]]
 
 
+VALID_PIP_TIPRACK_COMBO = {
+    '10ul': ['p10', 'p20'],
+    '20ul': ['p10', 'p20'],
+    '200ul': ['p50', 'p300'],
+    '300ul': ['p50', 'p300'],
+    '1000ul': ['p1000']
+}
+
+
 class InstrumentContext(CommandPublisher):
     """ A context for a specific pipette or instrument.
 
@@ -62,10 +71,12 @@ class InstrumentContext(CommandPublisher):
         self._hw_manager = hardware_mgr
         self._ctx = ctx
         self._mount = mount
+        self._log = log_parent.getChild(repr(self))
 
         self._tip_racks = tip_racks or list()
         for tip_rack in self.tip_racks:
             assert tip_rack.is_tiprack
+            self._validate_tiprack(tip_rack)
         if trash is None:
             self.trash_container = self._ctx.fixed_trash
         else:
@@ -75,7 +86,6 @@ class InstrumentContext(CommandPublisher):
 
         self._last_location: Union[Labware, Well, None] = None
         self._last_tip_picked_up_from: Union[Well, None] = None
-        self._log = log_parent.getChild(repr(self))
         self._well_bottom_clearance = Clearances(
             default_aspirate=1.0, default_dispense=1.0)
         self._flow_rates = FlowRates(self)
@@ -122,6 +132,17 @@ class InstrumentContext(CommandPublisher):
     @default_speed.setter
     def default_speed(self, speed: float):
         self._default_speed = speed
+
+    def _validate_tiprack(self, tiprack: Labware):
+        if tiprack._definition['namespace'] == 'opentrons':
+            tiprack_id = tiprack.load_name.split('_')[-1]
+            valid_pips = VALID_PIP_TIPRACK_COMBO.get(tiprack_id)
+            if valid_pips and self.name.split('_')[0] not in valid_pips:
+                self._log.warning(
+                    f'The pipette {self.name} and its tiprack '
+                    f'{tiprack.load_name} in slot {tiprack.parent} appear to '
+                    'be mismatched. Please check your protocol before running '
+                    'on the robot.')
 
     @requires_version(2, 0)
     def aspirate(self,
@@ -654,6 +675,7 @@ class InstrumentContext(CommandPublisher):
                 " However, it is a {}".format(location))
 
         assert tiprack.is_tiprack, "{} is not a tiprack".format(str(tiprack))
+        self._validate_tiprack(tiprack)
         cmds.do_publish(self.broker, cmds.pick_up_tip, self.pick_up_tip,
                         'before', None, None, self, location=target)
         self.move_to(target.top())
