@@ -153,6 +153,20 @@ def _dispense(instruments: Dict[str, InstrumentContext],
     pipette.dispense(volume, location)
 
 
+# TODO IMMEDIATELY: copy-pasted
+def _air_gap(instruments: Dict[str, InstrumentContext],
+             loaded_labware: Dict[str, labware.Labware],
+             params: 'StandardLiquidHandlingParams') -> None:
+    pipette_id = params['pipette']
+    pipette = instruments[pipette_id]
+    offset_from_bottom = params['offsetFromBottomMm']
+    volume = params['volume']
+    _set_flow_rate(pipette, params)
+    # TODO IMMEDIATELY: must subtract well z dim (height)
+    offset_from_top = offset_from_bottom
+    pipette.air_gap(volume, offset_from_top)
+
+
 def _touch_tip(instruments: Dict[str, InstrumentContext],
                loaded_labware: Dict[str, labware.Labware],
                params: 'TouchTipParams') -> None:

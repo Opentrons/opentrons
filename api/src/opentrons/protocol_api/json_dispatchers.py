@@ -1,6 +1,6 @@
 from typing import TYPE_CHECKING
 from opentrons.protocol_api.execute_v3 import _blowout, _pick_up_tip, \
-    _drop_tip, _aspirate, _dispense, _touch_tip
+    _drop_tip, _aspirate, _dispense, _touch_tip, _air_gap
 from opentrons.protocol_api.execute_v4 import _engage_magnet, \
     _disengage_magnet, _temperature_module_set_temp, \
     _temperature_module_deactivate, \
@@ -29,10 +29,6 @@ if TYPE_CHECKING:
     )
 
 
-def not_implemented(*args, **kwargs) -> None:
-    raise NotImplementedError('Not implemented')
-
-
 pipette_command_map: 'JsonV4PipetteDispatch' = {
     JsonPipetteCommand.blowout.value: _blowout,
     JsonPipetteCommand.pickUpTip.value: _pick_up_tip,
@@ -40,7 +36,7 @@ pipette_command_map: 'JsonV4PipetteDispatch' = {
     JsonPipetteCommand.aspirate.value: _aspirate,
     JsonPipetteCommand.dispense.value: _dispense,
     JsonPipetteCommand.touchTip.value: _touch_tip,
-    JsonPipetteCommand.airGap.value: not_implemented,
+    JsonPipetteCommand.airGap.value: _air_gap,
 }
 
 magnetic_module_command_map: 'JsonV4MagneticModuleDispatch' = {
