@@ -1,3 +1,4 @@
+from datetime import datetime
 from enum import Enum
 import typing
 from uuid import uuid4
@@ -92,6 +93,9 @@ class Session(BasicSession):
     details: SessionDetails =\
         Field(...,
               description="Detailed session specific status")
+    created_at: datetime = \
+        Field(...,
+              description="Date and time that this session was created")
 
 
 class BasicSessionCommand(BaseModel):

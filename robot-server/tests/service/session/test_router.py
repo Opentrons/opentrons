@@ -23,8 +23,6 @@ from robot_server.service.session.session_types import NullSession, \
 @pytest.fixture
 def mock_session_meta():
     return SessionMetaData(identifier="some_id",
-                           name="session name",
-                           description="session description",
                            created_at=datetime(2000, 1, 1, 0, 0, 0))
 
 
@@ -35,6 +33,7 @@ def session_response(mock_session_meta):
             'details': {
             },
             'sessionType': 'null',
+            'created_at': mock_session_meta.created_at.isoformat(),
         },
         'type': 'Session',
         'id': mock_session_meta.identifier

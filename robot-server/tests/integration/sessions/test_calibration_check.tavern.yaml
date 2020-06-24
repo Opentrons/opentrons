@@ -33,6 +33,7 @@ stages:
           type: Session
           attributes: &session_data_attributes
             sessionType: calibrationCheck
+            created_at: !re_match "\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
             details: &session_data_attribute_details
               currentStep: sessionStarted
               instruments: !anydict
