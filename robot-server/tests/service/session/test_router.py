@@ -11,7 +11,7 @@ from robot_server.service.dependencies import get_session_manager
 from robot_server.service.session.command_execution import CommandExecutor, \
     Command
 from robot_server.service.session.command_execution.command import \
-    CommandResult, CompletedCommand, CommandContent, CommandMeta
+    CommandResult, CompletedCommand, CommandContent, CommandMeta, CommandStatus
 from robot_server.service.session.errors import SessionCreationException, \
     UnsupportedCommandException, CommandExecutionException
 from robot_server.service.session.models import CommandName, EmptyModel, \
@@ -68,7 +68,7 @@ def mock_command_executor():
         return CompletedCommand(content=command.content,
                                 meta=command.meta,
                                 result=CommandResult(
-                                    status="done",
+                                    status=CommandStatus.executed,
                                     started_at=datetime(2019, 1, 1),
                                     completed_at=datetime(2020, 1, 1))
                                 )
@@ -312,7 +312,7 @@ def test_execute_command(api_client,
             'attributes': {
                 'command': 'jog',
                 'data': {'vector': [1.0, 2.0, 3.0]},
-                'status': 'done',
+                'status': 'executed',
                 'created_at': '2000-01-01T00:00:00',
                 'started_at': '2019-01-01T00:00:00',
                 'completed_at': '2020-01-01T00:00:00',
@@ -362,7 +362,7 @@ def test_execute_command_no_body(api_client,
             'attributes': {
                 'command': 'loadLabware',
                 'data': {},
-                'status': 'done',
+                'status': 'executed',
                 'created_at': '2000-01-01T00:00:00',
                 'started_at': '2019-01-01T00:00:00',
                 'completed_at': '2020-01-01T00:00:00',

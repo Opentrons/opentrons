@@ -37,6 +37,13 @@ SessionDetails = typing.Union[
 ]
 
 
+class CommandStatus(str, Enum):
+    """The command status"""
+    executed = "executed"
+    queued = "queued"
+    failed = "failed"
+
+
 class CommandName(str, Enum):
     """The available session commands"""
     load_labware = CalibrationCheckTrigger.load_labware.value
@@ -101,7 +108,7 @@ class BasicSessionCommand(BaseModel):
 
 class SessionCommand(BasicSessionCommand):
     """A session command response"""
-    status: str
+    status: CommandStatus
     created_at: datetime
     started_at: typing.Optional[datetime]
     completed_at: typing.Optional[datetime]

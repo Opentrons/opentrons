@@ -1,8 +1,9 @@
 from opentrons.calibration.util import StateMachine, StateMachineError
 
 from .base_executor import CommandExecutor
-from .command import Command, CompletedCommand, Completer
+from .command import Command, CompletedCommand, CommandResult
 from robot_server.service.session import errors
+from robot_server.util import timeit
 
 
 class StateMachineExecutor(CommandExecutor):
@@ -18,7 +19,7 @@ class StateMachineExecutor(CommandExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Execute command"""
-        with Completer(command=command) as completer:
+        with timeit() as time_it:
             try:
                 trigger = command.content.name.value
                 data = command.content.data
@@ -31,4 +32,9 @@ class StateMachineExecutor(CommandExecutor):
             except StateMachineError as e:
                 raise errors.UnsupportedCommandException(str(e))
 
-        return completer.completed
+        return CompletedCommand(
+            content=command.content,
+            meta=command.meta,
+            result=CommandResult(started_at=time_it.start,
+                                 completed_at=time_it.end)
+        )
