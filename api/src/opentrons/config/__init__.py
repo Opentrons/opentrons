@@ -480,11 +480,19 @@ def reload():
     CONFIG.update(load_and_migrate())
 
 
+def get_opentrons_path(path_name: str) -> Path:
+    # Helper function to look-up the path
+    # to specific configuration files for
+    # the Opentrons system
+    global CONFIG
+    return CONFIG[path_name]
+
+
 CONFIG = load_and_migrate()
 #: The currently loaded config. This should not change for the lifetime
 #: of the program. This is a dict much like os.environ() where the keys
 #: are config element names
 
 
-def get_tip_length_cal_path() -> Path:
-    return CONFIG['tip_length_calibration_dir']
+def get_tip_length_cal_path():
+    return get_opentrons_path('tip_length_calibration_dir')

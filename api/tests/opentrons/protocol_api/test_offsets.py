@@ -5,9 +5,9 @@ import time
 
 import pytest
 import datetime
+from opentrons import config
 from opentrons.protocol_api import labware
 from opentrons.types import Point, Location
-from opentrons import config
 
 MOCK_HASH = 'mock_hash'
 PIPETTE_ID = 'pipette_id'
@@ -59,12 +59,12 @@ minimalLabwareDef = {
 
 
 def path(calibration_name):
-    return config.CONFIG['labware_calibration_offsets_dir_v2']\
+    return labware.OFFSETS_PATH \
         / '{}.json'.format(calibration_name)
 
 
 def tlc_path(pip_id):
-    return config.CONFIG['tip_length_calibration_dir']\
+    return config.get_tip_length_cal_path() \
         / '{}.json'.format(pip_id)
 
 
@@ -314,7 +314,7 @@ def test_wells_rebuilt_with_offset():
 
 
 def test_clear_calibrations():
-    calpath = config.CONFIG['labware_calibration_offsets_dir_v2']
+    calpath = labware.OFFSETS_PATH
     with open(calpath/'1.json', 'w') as offset_file:
         test_offset = {
             "default": {

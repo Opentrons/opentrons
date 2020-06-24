@@ -1,4 +1,5 @@
 import pytest
+from pathlib import Path
 
 from opentrons.types import Location, Point
 from opentrons.protocol_api.geometry import (
@@ -157,7 +158,8 @@ def test_force_direct():
     assert different_lw == [(lw2.wells()[0].bottom().point, None)]
 
 
-def test_no_labware_loc():
+def test_no_labware_loc(monkeypatch, tmpdir):
+    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
     labware_def = labware.get_labware_definition(labware_name)
 
     deck = Deck()
@@ -183,14 +185,16 @@ def test_no_labware_loc():
     no_from_well = plan_moves(no_well, lw1.wells()[1].top(), deck,
                               P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
     check_arc_basic(no_from_well, no_well, lw1.wells()[1].top())
-    assert no_from_well[0][0].z\
-        == labware_def['dimensions']['zDimension'] + 7.0
+
+    no_from_well_height = no_from_well[0][0].z
+    lw_height_expected = labware_def['dimensions']['zDimension'] + 7
+    assert no_from_well_height == lw_height_expected
 
     no_to_well = plan_moves(lw1.wells()[1].top(), no_well, deck,
                             P300M_GEN2_MAX_HEIGHT, 7.0, 15.0)
     check_arc_basic(no_to_well, lw1.wells()[1].top(), no_well)
-    assert no_to_well[0][0].z\
-        == labware_def['dimensions']['zDimension'] + 7.0
+    no_to_well_height = no_to_well[0][0].z
+    assert no_to_well_height == lw_height_expected
 
 
 def test_arc_tall_point():
