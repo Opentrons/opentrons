@@ -5,8 +5,10 @@ import classnames from 'classnames'
 
 import styles from './navbar.css'
 import { Button } from '../buttons'
-import { NotificationIcon, type IconName } from '../icons'
+import { NotificationIcon } from '../icons'
 import { HoverTooltip } from '../tooltips'
+
+import type { IconName } from '../icons'
 
 export type NavButtonProps = {|
   /** optional click event for nav button */
@@ -63,7 +65,6 @@ export function NavButton(props: NavButtonProps): React.Node {
               name={props.iconName}
               childName={props.notification ? 'circle' : null}
               className={styles.icon}
-              childClassName={styles.notification}
             />
             {props.title && <span className={styles.title}>{props.title}</span>}
           </Button>

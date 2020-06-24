@@ -1,6 +1,7 @@
 // @flow
 import * as React from 'react'
 
+import { COLOR_WARNING } from '../styles'
 import { Icon } from './Icon'
 import { ICON_DATA_BY_NAME } from './icon-data'
 
@@ -9,9 +10,9 @@ import type { IconProps, IconName } from './Icon'
 export type NotificationIconProps = {|
   ...IconProps,
   /** name constant of the optional notifcation icon to display */
-  childName: ?IconName,
-  /** classes to apply (e.g. for color) to notification icon */
-  childClassName?: string,
+  childName: IconName | null,
+  /** color to apply to notification icon */
+  childColor?: string,
 |}
 
 const SCALE_FACTOR = 3
@@ -27,7 +28,7 @@ const SCALE_FACTOR = 3
  */
 
 export function NotificationIcon(props: NotificationIconProps): React.Node {
-  const { childName, childClassName, ...iconProps } = props
+  const { childName, childColor, ...iconProps } = props
   const { viewBox } = ICON_DATA_BY_NAME[iconProps.name]
   const [x, y, width, height] = viewBox.split(' ').map(Number)
   const scaledWidth = width / SCALE_FACTOR
@@ -38,11 +39,11 @@ export function NotificationIcon(props: NotificationIconProps): React.Node {
       {childName && (
         <Icon
           name={childName}
-          className={props.childClassName}
+          color={childColor ?? COLOR_WARNING}
           x={x + (SCALE_FACTOR - 1) * scaledWidth}
           y={y + (SCALE_FACTOR - 1) * scaledHeight}
-          width={scaledWidth}
-          height={scaledHeight}
+          svgWidth={scaledWidth}
+          svgHeight={scaledHeight}
         />
       )}
     </Icon>

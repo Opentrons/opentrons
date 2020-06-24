@@ -7,6 +7,7 @@ import type { StyledComponent } from 'styled-components'
 import type { StyleProps } from './types'
 
 export type LinkProps = {|
+  /** render link with target="_blank" */
   external?: boolean,
   ...StyleProps,
 |}
