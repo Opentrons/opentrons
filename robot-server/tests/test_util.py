@@ -31,17 +31,17 @@ def mock_utcnow(mock_start_time):
         yield p
 
 
-def test_time_it(mock_utcnow, mock_start_time):
-    with util.timeit() as t:
+def test_duration(mock_utcnow, mock_start_time):
+    with util.duration() as t:
         pass
 
     assert t.start == mock_start_time
     assert t.end == mock_start_time + timedelta(days=1)
 
 
-def test_time_it_raises(mock_utcnow, mock_start_time):
+def test_duration_raises(mock_utcnow, mock_start_time):
     try:
-        with util.timeit() as t:
+        with util.duration() as t:
             raise AssertionError()
     except AssertionError:
         pass

@@ -1,7 +1,8 @@
 import typing
 
+from robot_server.util import duration
 from .base_executor import CommandExecutor
-from .command import Command, CompletedCommand, complete_command
+from .command import Command, CompletedCommand, CommandResult
 
 
 CommandHandler = typing.Callable[
@@ -22,10 +23,16 @@ class CallableExecutor(CommandExecutor):
 
     async def execute(self, command: Command) -> CompletedCommand:
         """Execute command"""
-        name_arg = command.content.name.value
-        data = command.content.data
-        data_arg = data.dict() if data else {}
+        with duration() as time_it:
+            name_arg = command.content.name.value
+            data = command.content.data
+            data_arg = data.dict() if data else {}
 
-        await self._callable(name_arg, data_arg)
+            await self._callable(name_arg, data_arg)
 
-        return complete_command(command=command, status="executed")
+        return CompletedCommand(
+            content=command.content,
+            meta=command.meta,
+            result=CommandResult(started_at=time_it.start,
+                                 completed_at=time_it.end)
+        )
