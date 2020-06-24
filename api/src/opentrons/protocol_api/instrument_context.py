@@ -27,12 +27,12 @@ AdvancedLiquidHandling = Union[
     List[List[Well]]]
 
 
-VALID_PIP_TIPRACK_COMBO = {
-    '10ul': ['p10', 'p20'],
-    '20ul': ['p10', 'p20'],
-    '200ul': ['p50', 'p300'],
-    '300ul': ['p50', 'p300'],
-    '1000ul': ['p1000']
+VALID_PIP_TIPRACK_VOL = {
+    'p10': [10, 20],
+    'p20': [10, 20],
+    'p50': [200, 300],
+    'p300': [200, 300],
+    'p1000': [1000]
 }
 
 
@@ -134,10 +134,12 @@ class InstrumentContext(CommandPublisher):
         self._default_speed = speed
 
     def _validate_tiprack(self, tiprack: Labware):
+        # TODO AA 2020-06-24 - we should instead add the acceptable Opentrons
+        # tipracks to the pipette as a refactor
         if tiprack._definition['namespace'] == 'opentrons':
-            tiprack_id = tiprack.load_name.split('_')[-1]
-            valid_pips = VALID_PIP_TIPRACK_COMBO.get(tiprack_id)
-            if valid_pips and self.name.split('_')[0] not in valid_pips:
+            tiprack_vol = tiprack.wells()[0].max_volume
+            valid_vols = VALID_PIP_TIPRACK_VOL[self.name.split('_')[0]]
+            if tiprack_vol not in valid_vols:
                 self._log.warning(
                     f'The pipette {self.name} and its tiprack '
                     f'{tiprack.load_name} in slot {tiprack.parent} appear to '
