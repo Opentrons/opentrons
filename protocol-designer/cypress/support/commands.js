@@ -48,15 +48,11 @@ Cypress.Commands.add('openFilePage', () => {
 //
 Cypress.Commands.add(
   'choosePipettes',
-  (left_pipette_name, right_pipette_name) => {
-    cy.get('[id="PipetteSelect_left"]')
-      .click()
-      .contains(left_pipette_name)
-      .click()
-    cy.get('[id="PipetteSelect_right"]')
-      .click()
-      .contains(right_pipette_name)
-      .click()
+  (left_pipette_selector, right_pipette_selector) => {
+    cy.get('[id="PipetteSelect_left"]').click()
+    cy.get(left_pipette_selector).click()
+    cy.get('[id="PipetteSelect_right"]').click()
+    cy.get(right_pipette_selector).click()
   }
 )
 
