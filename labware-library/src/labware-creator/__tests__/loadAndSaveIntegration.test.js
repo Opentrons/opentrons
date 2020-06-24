@@ -48,7 +48,7 @@ describe('load and immediately save integrity test', () => {
       //   - does not save all original metadata fields, eg `metadata.tags`,
       //   - may set some fields to a fixed default value, eg namespace and displayVolumeUnits
       //   - may save empty arrays where original def had `undefined`s (brandId, quirks)
-      //   - will include all possible `groups` properties, which input does not always have (fixtures should, though)
+      //   - display name should be ignored b/c we don't want to test display-name-defaulting
       const tweakedInputDef = {
         ...inputDef,
         brand: {
@@ -68,13 +68,6 @@ describe('load and immediately save integrity test', () => {
           displayName: fakeDisplayName,
         },
         namespace: DEFAULT_CUSTOM_NAMESPACE, // specifying this is not yet supported
-        groups: inputDef.groups.map(group => ({
-          ...group,
-          metadata: {
-            ...group.metadata,
-            displayName: fakeDisplayName,
-          },
-        })),
       }
 
       expect(outputDef).toEqual(tweakedInputDef)
