@@ -314,8 +314,12 @@ To move a location, you create a :py:class:`.types.Point` representing a
    def run(protocol):
         plate = protocol.load_labware(
            'corning_24_wellplate_3.4ml_flat', slot='1')
-        plate['A1'].center().move(
-           types.Point(x=1, y=1, z=1)) # 1mm up, to the right, and towards the
-                                       # back of the robot
+
+        # Get a location 1 mm right, 1 mm back, and 1 mm up
+        # from the center of well A1.
+        adjusted_location = plate['A1'].center().move(types.Point(x=1, y=1, z=1))
+
+        # Move to that location.
+        pipette.move_to(adjusted_location)
 
 .. versionadded:: 2.0
