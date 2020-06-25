@@ -62,12 +62,11 @@ def load_modules_from_json(
     # to ensure `load_module` side-effects are deterministic
     # (eg, multiple module support)
     sorted_modules = sorted(
-        module_data.keys(),
-        key=lambda module_id: module_data[module_id]['slot'] +
-        module_data[module_id]['model'])
+        module_data.items(),
+        key=lambda v: v[1]['slot'] +
+        v[1]['model'])
 
-    for module_id in sorted_modules:
-        module_props = module_data[module_id]
+    for module_id, module_props in sorted_modules:
         model = module_props['model']
         slot = module_props['slot']
         if slot == TC_SPANNING_SLOT:
