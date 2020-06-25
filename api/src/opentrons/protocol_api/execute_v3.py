@@ -153,7 +153,6 @@ def _dispense(instruments: Dict[str, InstrumentContext],
     pipette.dispense(volume, location)
 
 
-# TODO IMMEDIATELY: copy-pasted
 def _air_gap(instruments: Dict[str, InstrumentContext],
              loaded_labware: Dict[str, labware.Labware],
              params: 'StandardLiquidHandlingParams') -> None:
@@ -162,8 +161,14 @@ def _air_gap(instruments: Dict[str, InstrumentContext],
     offset_from_bottom = params['offsetFromBottomMm']
     volume = params['volume']
     _set_flow_rate(pipette, params)
-    # TODO IMMEDIATELY: must subtract well z dim (height)
-    offset_from_top = offset_from_bottom
+    well = _get_well(loaded_labware, params)
+    offset_from_top = offset_from_bottom - well._depth
+
+    # NOTE(IL, 2020-06-25): air_gap API fn is stateful, uses location
+    # cache. The JSON atomic command should be stateless. We'll
+    # explicitly move_to the specified well to ensure the location
+    # cache is set to that well.
+    pipette.move_to(well.top().move(Point(0, 0, offset_from_top)))
     pipette.air_gap(volume, offset_from_top)
 
 

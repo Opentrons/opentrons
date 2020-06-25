@@ -173,23 +173,35 @@ def test_drop_tip():
 def test_air_gap():
     m = mock.MagicMock()
     m.pipette_mock = mock.create_autospec(InstrumentContext)
-    m.mock_get_location_with_offset = mock.MagicMock(
-        return_value=mock.sentinel.location)
     m.mock_set_flow_rate = mock.MagicMock()
 
+    deck = Location(Point(0, 0, 0), 'deck')
+    well_name = 'A2'
+    some_labware = labware.Labware(minimalLabwareDef2, deck)
+    loaded_labware = {'someLabwareId': some_labware}
+    params = {'labware': 'someLabwareId', 'well': well_name}
+
     params = {'pipette': 'somePipetteId', 'volume': 42,
-              'labware': 'someLabwareId', 'well': 'someWell',
+              'labware': 'someLabwareId', 'well': well_name,
               'offsetFromBottomMm': 12}
+
     instruments = {'somePipetteId': m.pipette_mock}
+
+    loaded_labware = {'someLabwareId': some_labware}
 
     with mock.patch(
             'opentrons.protocol_api.execute_v3._set_flow_rate',
             new=m.mock_set_flow_rate):
-        _air_gap(instruments, mock.sentinel.loaded_labware, params)
+        _air_gap(instruments, loaded_labware, params)
 
+    # NOTE: air_gap `height` arg is mm from well top,
+    # so we expect it to equal offsetFromBottomMm - well depth.
     assert m.mock_calls == [
         mock.call.mock_set_flow_rate(m.pipette_mock, params),
-        mock.call.pipette_mock.air_gap(42, 12)
+        mock.call.pipette_mock.move_to(
+            Location(point=Point(x=19, y=28, z=17.0),
+                     labware=some_labware[well_name])),
+        mock.call.pipette_mock.air_gap(42, 12 - 40)
     ]
 
 
