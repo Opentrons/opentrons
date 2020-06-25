@@ -1,6 +1,6 @@
 {
   "name": "@opentrons/api-server",
-  "version": "3.19.0-alpha.4",
+  "version": "3.19.0-alpha.5",
   "description": "Opentrons API server application",
   "repository": {
     "type": "git",
