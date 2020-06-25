@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [3.19.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.4...v3.19.0-alpha.5) (2020-06-25)
+
+
+### Bug Fixes
+
+* **app:** calcheck: content fixups ([#5989](https://github.com/Opentrons/opentrons/issues/5989)) ([21b5e4e](https://github.com/Opentrons/opentrons/commit/21b5e4e))
+* **app:** calcheck: fix display of bad deck transform ([#5988](https://github.com/Opentrons/opentrons/issues/5988)) ([22b15ff](https://github.com/Opentrons/opentrons/commit/22b15ff))
+* **app:** replace wrong assets for xy multi cal check ([#5996](https://github.com/Opentrons/opentrons/issues/5996)) ([072062d](https://github.com/Opentrons/opentrons/commit/072062d))
+
+
+
+
+
 # [3.19.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.3...v3.19.0-alpha.4) (2020-06-23)
 
 **Note:** Version bump only for package @opentrons/app
