@@ -1,11 +1,12 @@
 import json
+from pathlib import Path
 
 import pytest
 
 from opentrons.protocol_api import (
     labware, MAX_SUPPORTED_VERSION, module_geometry)
+
 from opentrons_shared_data import load_shared_data
-from opentrons import config
 from opentrons.types import Point, Location
 from opentrons.protocols.types import APIVersion
 from opentrons.protocol_api.geometry import Deck
@@ -34,11 +35,26 @@ test_data = {
 
 
 @pytest.fixture
-def index_file_dir(tmpdir):
-    config.CONFIG['labware_calibration_offsets_dir_v2'] = tmpdir
-    # config.reload()
+def index_file_dir(tmpdir, monkeypatch):
+    monkeypatch.setattr(labware, 'OFFSETS_PATH', Path(tmpdir))
     yield tmpdir
-    config.reload()
+
+
+@pytest.fixture
+def set_up_index_file(index_file_dir):
+    deck = Deck()
+    labware_list = [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml']
+    for idx, name in enumerate(labware_list):
+        parent = deck.position_for(idx+1)
+        definition = labware.get_labware_definition(name)
+        lw = labware.Labware(definition, parent)
+        labware.save_calibration(lw, Point(0, 0, 0))
+
+    return labware_list
 
 
 def test_well_init():
@@ -499,12 +515,41 @@ def test_add_index_file(labware_name, index_file_dir):
         mod_dict = {str_parent: f'{slot}-{str_parent}'}
     else:
         mod_dict = {}
+    full_id = f'{labware_hash}{str_parent}'
     blob = {
-            "id": f'{labware_hash}',
-            "slot": f'{labware_hash}{str_parent}',
+            "uri": f'{lw_uri}',
+            "slot": full_id,
             "module": mod_dict
         }
 
     lw_path = index_file_dir / 'index.json'
     info = labware._read_file(lw_path)
-    assert info[lw_uri] == blob
+    assert info[full_id] == blob
+
+
+def test_delete_one_calibration(set_up_index_file):
+    lw_to_delete = 'nest_96_wellplate_2ml_deep'
+    all_cals = labware.get_all_calibrations()
+    id_saved = ''
+
+    def get_load_names(all_cals):
+        nonlocal id_saved
+        load_names = []
+        for cal in all_cals:
+            uri = cal.uri
+            dets = labware.details_from_uri(uri)
+            if dets.load_name == lw_to_delete:
+                id_saved = cal.labware_id
+            load_names.append(dets.load_name)
+        return load_names
+
+    load_names = get_load_names(all_cals)
+
+    assert lw_to_delete in load_names
+
+    labware.delete_offset_file(id_saved)
+
+    all_cals = labware.get_all_calibrations()
+    load_names = get_load_names(all_cals)
+
+    assert lw_to_delete not in load_names

@@ -13,6 +13,10 @@ from robot_server.service.dependencies import get_hardware
 from opentrons.hardware_control import API, HardwareAPILike
 from opentrons import config
 
+from opentrons.protocol_api import labware
+from opentrons.types import Point
+from opentrons.protocol_api.geometry import Deck
+
 
 @pytest.fixture
 def hardware():
@@ -74,3 +78,24 @@ def attach_pipettes(server_temp_directory):
         json.dump(pipette, pipette_file)
     yield
     os.remove(pipette_file_path)
+
+
+@pytest.fixture
+def set_up_index_file_temporary_directory(server_temp_directory, monkeypatch):
+    temp_path = config.CONFIG['labware_calibration_offsets_dir_v2']
+    monkeypatch.setattr(labware, 'OFFSETS_PATH', temp_path)
+    labware.clear_calibrations()
+    deck = Deck()
+    labware_list = [
+        'nest_96_wellplate_2ml_deep',
+        'corning_384_wellplate_112ul_flat',
+        'geb_96_tiprack_1000ul',
+        'nest_12_reservoir_15ml',
+        'opentrons_96_tiprack_10ul']
+    for idx, name in enumerate(labware_list):
+        parent = deck.position_for(idx+1)
+        definition = labware.get_labware_definition(name)
+        lw = labware.Labware(definition, parent)
+        labware.save_calibration(lw, Point(0, 0, 0))
+        if name == 'opentrons_96_tiprack_10ul':
+            labware.save_tip_length(lw, 30)
