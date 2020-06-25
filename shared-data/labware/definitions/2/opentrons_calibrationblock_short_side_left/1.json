@@ -25,26 +25,14 @@
     {
       "metadata": {
         "displayName": "Opentrons Calibration Block - Short Side",
-        "displayCategory": "other",
         "wellBottomShape": "flat"
-      },
-      "brand": {
-        "brand": "Opentrons",
-        "brandId": [],
-        "links": []
       },
       "wells": ["A1"]
     },
     {
       "metadata": {
         "displayName": "Opentrons Calibration Block - Tall Side",
-        "displayCategory": "other",
         "wellBottomShape": "flat"
-      },
-      "brand": {
-        "brand": "Opentrons",
-        "brandId": [],
-        "links": []
       },
       "wells": ["A2"]
     }
