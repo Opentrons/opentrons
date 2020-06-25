@@ -297,13 +297,14 @@ representing the combination of a point in space (another named tuple) and
 a reference to the associated :py:class:`.Well` (or :py:class:`.Labware`, or
 slot name, depending on context).
 
-To further change positions, you can use :py:meth:`.Location.move`, which
-lets you move the Location. This function takes a single argument, ``point``,
-which should be a :py:class:`opentrons.types.Point`. This is a named tuple
-with elements ``x``, ``y``, and ``z``, representing a 3 dimensional point.
+To adjust the position within a well, you can use :py:meth:`.Location.move`.
 
-To move a location, you create a :py:class:`.types.Point` representing a
-3d offset and give it to :py:meth:`.Location.move`:
+:py:meth:`.Location.move` takes a single argument, ``point``,
+which should be a :py:class:`opentrons.types.Point`. This is a named tuple
+with elements ``x``, ``y``, and ``z``, representing a 3 dimensional offset.
+
+:py:meth:`.Location.move` returns a new location with that offset applied.
+You can use that location anywhere you could use a well.  For example:
 
 .. code-block:: python
 
