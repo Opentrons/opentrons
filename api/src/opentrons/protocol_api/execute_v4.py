@@ -57,9 +57,18 @@ def load_modules_from_json(
         protocol: 'JsonProtocolV4') -> Dict[str, ModuleContext]:
     module_data = protocol['modules']
     modules_by_id = {}
-    for module_id, props in module_data.items():
-        model = props['model']
-        slot = props['slot']
+
+    # the sort order doesn't matter, we just need it to be stable
+    # to ensure `load_module` side-effects are deterministic
+    # (eg, multiple module support)
+    sorted_modules = sorted(
+        module_data.items(),
+        key=lambda v: v[1]['slot'] +
+        v[1]['model'])
+
+    for module_id, module_props in sorted_modules:
+        model = module_props['model']
+        slot = module_props['slot']
         if slot == TC_SPANNING_SLOT:
             instr = ctx.load_module(model)
         else:
