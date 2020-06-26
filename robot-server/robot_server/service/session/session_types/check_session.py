@@ -1,7 +1,8 @@
-from opentrons.calibration.check.session import CheckCalibrationSession
-from opentrons.calibration.check import models as calibration_models
-from opentrons.calibration.session import CalibrationException
-from opentrons.calibration.util import StateMachineError
+from robot_server.robot.calibration.check.session import\
+    CheckCalibrationSession
+from robot_server.robot.calibration.check import models as calibration_models
+from robot_server.robot.calibration.session import CalibrationException
+from robot_server.robot.calibration.util import StateMachineError
 
 from robot_server.service.session import models
 from robot_server.service.session.command_execution import \

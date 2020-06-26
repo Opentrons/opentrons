@@ -1,7 +1,7 @@
 import typing
 from enum import Enum
 
-from opentrons.calibration.util import StateMachine, WILDCARD
+from robot_server.robot.calibration.util import StateMachine, WILDCARD
 
 
 """

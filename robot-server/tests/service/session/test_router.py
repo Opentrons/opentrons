@@ -4,7 +4,7 @@ from datetime import datetime
 
 import typing
 
-from opentrons.calibration.check.models import JogPosition
+from robot_server.robot.calibration.check.models import JogPosition
 from pydantic.main import BaseModel
 
 from robot_server.service.dependencies import get_session_manager

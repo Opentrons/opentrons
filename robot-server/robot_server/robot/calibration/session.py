@@ -1,9 +1,9 @@
 import typing
 from uuid import UUID, uuid4
 
-from opentrons.calibration.constants import LOOKUP_LABWARE
-from opentrons.calibration.helper_classes import PipetteInfo, PipetteRank, \
-    LabwareInfo, Moves, CheckMove
+from robot_server.robot.calibration.constants import LOOKUP_LABWARE
+from robot_server.robot.calibration.helper_classes import PipetteInfo, \
+    PipetteRank, LabwareInfo, Moves, CheckMove
 from opentrons.config import feature_flags as ff
 from opentrons.hardware_control import ThreadManager, Pipette, CriticalPoint
 from opentrons.hardware_control.util import plan_arc

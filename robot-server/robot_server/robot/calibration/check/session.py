@@ -4,13 +4,14 @@ from uuid import uuid4
 from enum import Enum
 from dataclasses import dataclass
 
-from opentrons.calibration.session import CalibrationSession, \
+from robot_server.robot.calibration.session import CalibrationSession, \
     CalibrationException, HEIGHT_SAFETY_BUFFER
 from opentrons.types import Mount, Point, Location
 
-from opentrons.calibration.util import StateMachine, WILDCARD
-from opentrons.calibration.check.models import ComparisonStatus, OffsetVector
-from opentrons.calibration.helper_classes import (
+from robot_server.robot.calibration.util import StateMachine, WILDCARD
+from robot_server.robot.calibration.check.models import ComparisonStatus, \
+    OffsetVector
+from robot_server.robot.calibration.helper_classes import (
     CheckMove, DeckCalibrationError, PipetteRank, PipetteInfo, PipetteStatus
 )
 from opentrons.hardware_control import ThreadManager

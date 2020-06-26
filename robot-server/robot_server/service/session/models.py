@@ -3,8 +3,9 @@ import typing
 from uuid import uuid4
 
 from pydantic import BaseModel, Field, validator
-from opentrons.calibration.check import models as calibration_models
-from opentrons.calibration.check.session import CalibrationCheckTrigger
+from robot_server.robot.calibration.check import models as calibration_models
+from robot_server.robot.calibration.check.session import \
+    CalibrationCheckTrigger
 
 from robot_server.service.json_api import \
     ResponseDataModel, ResponseModel, RequestDataModel, RequestModel
