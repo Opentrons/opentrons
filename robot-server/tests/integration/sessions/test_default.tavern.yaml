@@ -1,0 +1,103 @@
+---
+test_name: Default session cannot be created
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Create the session
+    request:
+      url: "{host:s}:{port:d}/sessions"
+      method: POST
+      json:
+        data:
+          type: Session
+          attributes:
+            sessionType: default
+    response:
+      status_code: 400
+      json:
+        errors:
+          - status: "400"
+            title: !anystr
+            detail: !re_match ".+Session with id default already exists.+"
+---
+test_name: Default session cannot be deleted
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Delete the session
+    request:
+      url: "{host:s}:{port:d}/sessions/default"
+      method: DELETE
+    response:
+      status_code: 400
+      json:
+        errors:
+          - status: "400"
+            title: !anystr
+            detail: !re_match ".+Cannot remove default session.+"
+---
+test_name: Get the default
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Get the session
+    request:
+      url: "{host:s}:{port:d}/sessions/default"
+      method: GET
+    response:
+      status_code: 200
+      json:
+        links: !anydict
+        data:
+          id: default
+          type: Session
+          attributes:
+            sessionType: default
+            details: {}
+---
+test_name: Default Commands
+marks:
+  - usefixtures:
+      - run_server
+stages:
+  - name: Send a home_all_motors command
+    request:
+      url: "{host:s}:{port:d}/sessions/default/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: home_all_motors
+            data: {}
+    response:
+      status_code: 200
+  - name: Send a toggle_lights command
+    request:
+      url: "{host:s}:{port:d}/sessions/default/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: toggle_lights
+            data: {}
+    response:
+      status_code: 200
+  - name: Rejects an unknown command
+    request:
+      url: "{host:s}:{port:d}/sessions/default/commands/execute"
+      method: POST
+      json:
+        data:
+          type: SessionCommand
+          attributes:
+            command: loadLabware
+            data: {}
+    response:
+      status_code: 400
+
+

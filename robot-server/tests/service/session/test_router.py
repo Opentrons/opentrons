@@ -419,7 +419,7 @@ def test_execute_command_session_inactive(
         mock_session_meta,
         mock_command_executor):
     """Test that only the active session can execute commands"""
-    session_manager_with_session._active_session_id = None
+    session_manager_with_session._active.active_id = None
 
     response = api_client.post(
         f"/sessions/{mock_session_meta.identifier}/commands/execute",

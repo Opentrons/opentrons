@@ -38,9 +38,13 @@ SessionDetails = typing.Union[
 
 class CommandName(str, Enum):
     """The available session commands"""
+    home_all_motors = "home_all_motors"
+    home_pipette = "home_pipette"
+    toggle_lights = "toggle_lights"
     load_labware = CalibrationCheckTrigger.load_labware.value
     prepare_pipette = CalibrationCheckTrigger.prepare_pipette.value
-    jog = (CalibrationCheckTrigger.jog.value, calibration_models.JogPosition)
+    jog = (CalibrationCheckTrigger.jog.value,
+           calibration_models.JogPosition)
     pick_up_tip = CalibrationCheckTrigger.pick_up_tip.value
     confirm_tip_attached = CalibrationCheckTrigger.confirm_tip_attached.value
     invalidate_tip = CalibrationCheckTrigger.invalidate_tip.value
