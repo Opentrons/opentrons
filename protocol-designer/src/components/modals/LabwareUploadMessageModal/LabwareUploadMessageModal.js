@@ -14,8 +14,6 @@ import type { LabwareUploadMessage } from '../../../labware-defs'
 const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   const { message } = props
 
-  console.log({ message })
-
   if (
     message.messageType === 'EXACT_LABWARE_MATCH' ||
     message.messageType === 'INVALID_JSON_FILE' ||
