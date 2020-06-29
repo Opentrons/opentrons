@@ -1,6 +1,7 @@
 from enum import Enum
 import typing
 from uuid import uuid4
+from datetime import datetime
 
 from pydantic import BaseModel, Field, validator
 from robot_server.robot.calibration.check import models as calibration_models
@@ -35,6 +36,13 @@ SessionDetails = typing.Union[
     calibration_models.CalibrationSessionStatus,
     EmptyModel
 ]
+
+
+class CommandStatus(str, Enum):
+    """The command status"""
+    executed = "executed"
+    queued = "queued"
+    failed = "failed"
 
 
 class CommandName(str, Enum):
@@ -86,15 +94,14 @@ class Session(BasicSession):
               description="Detailed session specific status")
 
 
-class SessionCommand(BaseModel):
+class BasicSessionCommand(BaseModel):
     """A session command"""
     data: CommandDataType
     # For validation, command MUST appear after data
     command: CommandName = Field(...,
                                  description="The command description")
-    status: typing.Optional[str]
 
-    @validator('command', always=True)
+    @validator('command', always=True, allow_reuse=True)
     def check_data_type(cls, v, values):
         """Validate that the command and data match"""
         d = values.get('data')
@@ -102,6 +109,14 @@ class SessionCommand(BaseModel):
             raise ValueError(f"Invalid command data for command type {v}. "
                              f"Expecting {v.model}")
         return v
+
+
+class SessionCommand(BasicSessionCommand):
+    """A session command response"""
+    status: CommandStatus
+    created_at: datetime = Field(default_factory=datetime.utcnow)
+    started_at: typing.Optional[datetime]
+    completed_at: typing.Optional[datetime]
 
 
 # Session create and query requests/responses
@@ -117,7 +132,7 @@ MultiSessionResponse = ResponseModel[
 
 # Session command requests/responses
 CommandRequest = RequestModel[
-    RequestDataModel[SessionCommand]
+    RequestDataModel[BasicSessionCommand]
 ]
 CommandResponse = ResponseModel[
     ResponseDataModel[SessionCommand], dict
