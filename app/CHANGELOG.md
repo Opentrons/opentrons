@@ -3,40 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.4...v3.19.0-alpha.5) (2020-06-25)
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 
 ### Bug Fixes
 
+* **app:** fix clunky text wrapping for multi tip pick up in cal check ([#6026](https://github.com/Opentrons/opentrons/issues/6026)) ([76edd1d](https://github.com/Opentrons/opentrons/commit/76edd1d))
 * **app:** calcheck: content fixups ([#5989](https://github.com/Opentrons/opentrons/issues/5989)) ([21b5e4e](https://github.com/Opentrons/opentrons/commit/21b5e4e))
 * **app:** calcheck: fix display of bad deck transform ([#5988](https://github.com/Opentrons/opentrons/issues/5988)) ([22b15ff](https://github.com/Opentrons/opentrons/commit/22b15ff))
 * **app:** replace wrong assets for xy multi cal check ([#5996](https://github.com/Opentrons/opentrons/issues/5996)) ([072062d](https://github.com/Opentrons/opentrons/commit/072062d))
-
-
-
-
-
-# [3.19.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.3...v3.19.0-alpha.4) (2020-06-23)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.19.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.2...v3.19.0-alpha.3) (2020-06-22)
-
-**Note:** Version bump only for package @opentrons/app
-
-
-
-
-
-# [3.19.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.2) (2020-06-18)
-
-
-### Bug Fixes
-
 * **app:** clear <input> value after robot update file select ([#5789](https://github.com/Opentrons/opentrons/issues/5789)) ([62372b0](https://github.com/Opentrons/opentrons/commit/62372b0)), closes [#5781](https://github.com/Opentrons/opentrons/issues/5781)
 * **app:** delete local records of session if id not found  ([#5863](https://github.com/Opentrons/opentrons/issues/5863)) ([9f8adfb](https://github.com/Opentrons/opentrons/commit/9f8adfb))
 * **app:** fix cal check tiprack images at large window sizes ([#5841](https://github.com/Opentrons/opentrons/issues/5841)) ([065ce49](https://github.com/Opentrons/opentrons/commit/065ce49))
@@ -55,37 +30,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/Opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/Opentrons/opentrons/commit/5ad57d9))
 * **components:** add position props to primitive components ([#5926](https://github.com/Opentrons/opentrons/issues/5926)) ([9b0a666](https://github.com/Opentrons/opentrons/commit/9b0a666))
 * **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
-
-
-
-
-
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
-
-
-### Bug Fixes
-
-* **app:** clear <input> value after robot update file select ([#5789](https://github.com/Opentrons/opentrons/issues/5789)) ([62372b0](https://github.com/Opentrons/opentrons/commit/62372b0)), closes [#5781](https://github.com/Opentrons/opentrons/issues/5781)
-* **app:** fix cal check tiprack images at large window sizes ([#5841](https://github.com/Opentrons/opentrons/issues/5841)) ([065ce49](https://github.com/Opentrons/opentrons/commit/065ce49))
-* **app:** fix up calibration check copy ([#5779](https://github.com/Opentrons/opentrons/issues/5779)) ([57b9ca8](https://github.com/Opentrons/opentrons/commit/57b9ca8))
-* **app:** interpolate session type into session exit event name ([#5804](https://github.com/Opentrons/opentrons/issues/5804)) ([bee8cb0](https://github.com/Opentrons/opentrons/commit/bee8cb0))
-
-
-### Features
-
-* **api, app:** implement automatic door safety stop feature ([#5706](https://github.com/Opentrons/opentrons/issues/5706)) ([ad94d07](https://github.com/Opentrons/opentrons/commit/ad94d07)), closes [#2820](https://github.com/Opentrons/opentrons/issues/2820) [#2752](https://github.com/Opentrons/opentrons/issues/2752)
-* **app:** add network interface collection to system-info ([#5764](https://github.com/Opentrons/opentrons/issues/5764)) ([7d64efa](https://github.com/Opentrons/opentrons/commit/7d64efa)), closes [#5397](https://github.com/Opentrons/opentrons/issues/5397)
-* **app, app-shell:** add ability to disable discovery cache ([#5759](https://github.com/Opentrons/opentrons/issues/5759)) ([5ad57d9](https://github.com/Opentrons/opentrons/commit/5ad57d9))
-* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
-
-
-
-
-
-
-
-**Note:** Version bump only for package @opentrons/app
-
 
 
 

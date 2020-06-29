@@ -3,45 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.5](https://github.com/opentrons/opentrons/compare/v3.19.0-alpha.4...v3.19.0-alpha.5) (2020-06-25)
+# [3.19.0](https://github.com/opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 
 ### Bug Fixes
 
+* **app:** fix clunky text wrapping for multi tip pick up in cal check ([#6026](https://github.com/opentrons/opentrons/issues/6026)) ([76edd1d](https://github.com/opentrons/opentrons/commit/76edd1d))
 * **app:** calcheck: content fixups ([#5989](https://github.com/opentrons/opentrons/issues/5989)) ([21b5e4e](https://github.com/opentrons/opentrons/commit/21b5e4e))
 * **app:** calcheck: fix display of bad deck transform ([#5988](https://github.com/opentrons/opentrons/issues/5988)) ([22b15ff](https://github.com/opentrons/opentrons/commit/22b15ff))
 * **app:** replace wrong assets for xy multi cal check ([#5996](https://github.com/opentrons/opentrons/issues/5996)) ([072062d](https://github.com/opentrons/opentrons/commit/072062d))
-
-
-### Features
-
-* **api:** add warning when a wrong tiprack is used for the pipette in the protocol ([#5997](https://github.com/opentrons/opentrons/issues/5997)) ([24b7756](https://github.com/opentrons/opentrons/commit/24b7756))
-
-
-
-
-
-# [3.19.0-alpha.4](https://github.com/opentrons/opentrons/compare/v3.19.0-alpha.3...v3.19.0-alpha.4) (2020-06-23)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.19.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.2...v3.19.0-alpha.3) (2020-06-22)
-
-**Note:** Version bump only for package opentrons
-
-
-
-
-
-# [3.19.0-alpha.2](https://github.com/opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.2) (2020-06-18)
-
-
-### Bug Fixes
-
 * **api:** catch factory tests up to gpio changes ([#5747](https://github.com/opentrons/opentrons/issues/5747)) ([751d9a4](https://github.com/opentrons/opentrons/commit/751d9a4))
 * **api:** convert extra seconds to minutes in delay command ([#5755](https://github.com/opentrons/opentrons/issues/5755)) ([df26e07](https://github.com/opentrons/opentrons/commit/df26e07)), closes [#5414](https://github.com/opentrons/opentrons/issues/5414)
 * **api:** disallow calling Session._run while protocol is running. ([#5831](https://github.com/opentrons/opentrons/issues/5831)) ([fce1f79](https://github.com/opentrons/opentrons/commit/fce1f79)), closes [#5239](https://github.com/opentrons/opentrons/issues/5239)
@@ -78,10 +48,19 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **scripts:** make python_build_utils 2.7 compatible again ([#5886](https://github.com/opentrons/opentrons/issues/5886)) ([bd9e6b7](https://github.com/opentrons/opentrons/commit/bd9e6b7))
 * **shared-data:** recursively specify subpackages ([#5844](https://github.com/opentrons/opentrons/issues/5844)) ([3ccbbea](https://github.com/opentrons/opentrons/commit/3ccbbea))
 * fix makefile refactor for push tasks ([#5773](https://github.com/opentrons/opentrons/issues/5773)) ([db743bc](https://github.com/opentrons/opentrons/commit/db743bc))
+* **api:** catch factory tests up to gpio changes ([#5747](https://github.com/opentrons/opentrons/issues/5747)) ([751d9a4](https://github.com/opentrons/opentrons/commit/751d9a4))
+* **api:** convert extra seconds to minutes in delay command ([#5755](https://github.com/opentrons/opentrons/issues/5755)) ([df26e07](https://github.com/opentrons/opentrons/commit/df26e07)), closes [#5414](https://github.com/opentrons/opentrons/issues/5414)
+* **api:** do not allow v1 imports in v2 protocols ([#5859](https://github.com/opentrons/opentrons/issues/5859)) ([7ed945d](https://github.com/opentrons/opentrons/commit/7ed945d)), closes [#5852](https://github.com/opentrons/opentrons/issues/5852)
+* **api:** Enable audio on GPIO startup ([#5787](https://github.com/opentrons/opentrons/issues/5787)) ([907401c](https://github.com/opentrons/opentrons/commit/907401c)), closes [/github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py#L217](https://github.com//github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py/issues/L217)
+* **build:** allow test pypi uploads to fail again ([#5849](https://github.com/opentrons/opentrons/issues/5849)) ([61b5eba](https://github.com/opentrons/opentrons/commit/61b5eba))
+* **protocol-designer:** Add scroll to top on export modal display ([#5744](https://github.com/opentrons/opentrons/issues/5744)) ([f797cdc](https://github.com/opentrons/opentrons/commit/f797cdc)), closes [#5422](https://github.com/opentrons/opentrons/issues/5422)
+
+
 
 
 ### Features
 
+* **api:** add warning when a wrong tiprack is used for the pipette in the protocol ([#5997](https://github.com/opentrons/opentrons/issues/5997)) ([24b7756](https://github.com/opentrons/opentrons/commit/24b7756))
 * **api:** add info to debug warning on how IS_ROBOT is determined ([#5783](https://github.com/opentrons/opentrons/issues/5783)) ([fbbf1b6](https://github.com/opentrons/opentrons/commit/fbbf1b6))
 * **api:** add skeleton state machine instance for tip length calibration ([#5805](https://github.com/opentrons/opentrons/issues/5805)) ([dd36d53](https://github.com/opentrons/opentrons/commit/dd36d53)), closes [#5605](https://github.com/opentrons/opentrons/issues/5605)
 * **api:** define data architecture for tip length calibration in v2 ([#5820](https://github.com/opentrons/opentrons/issues/5820)) ([f149cb6](https://github.com/opentrons/opentrons/commit/f149cb6)), closes [#5606](https://github.com/opentrons/opentrons/issues/5606)
@@ -128,33 +107,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-
-
-# [3.19.0-alpha.1](https://github.com/opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
-
-
-### Bug Fixes
-
-* **api:** catch factory tests up to gpio changes ([#5747](https://github.com/opentrons/opentrons/issues/5747)) ([751d9a4](https://github.com/opentrons/opentrons/commit/751d9a4))
-* **api:** convert extra seconds to minutes in delay command ([#5755](https://github.com/opentrons/opentrons/issues/5755)) ([df26e07](https://github.com/opentrons/opentrons/commit/df26e07)), closes [#5414](https://github.com/opentrons/opentrons/issues/5414)
-* **api:** do not allow v1 imports in v2 protocols ([#5859](https://github.com/opentrons/opentrons/issues/5859)) ([7ed945d](https://github.com/opentrons/opentrons/commit/7ed945d)), closes [#5852](https://github.com/opentrons/opentrons/issues/5852)
-* **api:** Enable audio on GPIO startup ([#5787](https://github.com/opentrons/opentrons/issues/5787)) ([907401c](https://github.com/opentrons/opentrons/commit/907401c)), closes [/github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py#L217](https://github.com//github.com/Opentrons/opentrons/blob/751d9a402fa5d1f936df43ed12fd7387be23237f/api/src/opentrons/tools/factory_test.py/issues/L217)
-* **api:** Fix return tip behavior in check session ([#5772](https://github.com/opentrons/opentrons/issues/5772)) ([34ef09c](https://github.com/opentrons/opentrons/commit/34ef09c))
-* **api:** prevent thermocycler wait_for_temp() from exiting prematurely ([#5807](https://github.com/opentrons/opentrons/issues/5807)) ([7720b28](https://github.com/opentrons/opentrons/commit/7720b28)), closes [#5602](https://github.com/opentrons/opentrons/issues/5602)
-* **api:** return rail lights to original state post cal-check ([#5861](https://github.com/opentrons/opentrons/issues/5861)) ([3a6cc41](https://github.com/opentrons/opentrons/commit/3a6cc41))
-* **app:** clear <input> value after robot update file select ([#5789](https://github.com/opentrons/opentrons/issues/5789)) ([62372b0](https://github.com/opentrons/opentrons/commit/62372b0)), closes [#5781](https://github.com/opentrons/opentrons/issues/5781)
-* fix makefile refactor for push tasks ([#5773](https://github.com/opentrons/opentrons/issues/5773)) ([db743bc](https://github.com/opentrons/opentrons/commit/db743bc))
-* **app:** fix cal check tiprack images at large window sizes ([#5841](https://github.com/opentrons/opentrons/issues/5841)) ([065ce49](https://github.com/opentrons/opentrons/commit/065ce49))
-* **app:** fix up calibration check copy ([#5779](https://github.com/opentrons/opentrons/issues/5779)) ([57b9ca8](https://github.com/opentrons/opentrons/commit/57b9ca8))
-* **app:** interpolate session type into session exit event name ([#5804](https://github.com/opentrons/opentrons/issues/5804)) ([bee8cb0](https://github.com/opentrons/opentrons/commit/bee8cb0))
-* **build:** allow test pypi uploads to fail again ([#5849](https://github.com/opentrons/opentrons/issues/5849)) ([61b5eba](https://github.com/opentrons/opentrons/commit/61b5eba))
-* **protocol-designer:** Add scroll to top on export modal display ([#5744](https://github.com/opentrons/opentrons/issues/5744)) ([f797cdc](https://github.com/opentrons/opentrons/commit/f797cdc)), closes [#5422](https://github.com/opentrons/opentrons/issues/5422)
-* **protocol-designer:** Remove errant p tag ([#5786](https://github.com/opentrons/opentrons/issues/5786)) ([6695bd3](https://github.com/opentrons/opentrons/commit/6695bd3))
-* **robot-server:** make sure fastapi validation errors are properly documented ([#5748](https://github.com/opentrons/opentrons/issues/5748)) ([dbecbfc](https://github.com/opentrons/opentrons/commit/dbecbfc))
-* **robot-server:** preserve newlines in text logs ([#5850](https://github.com/opentrons/opentrons/issues/5850)) ([6420b5f](https://github.com/opentrons/opentrons/commit/6420b5f)), closes [#5846](https://github.com/opentrons/opentrons/issues/5846)
-* **shared-data:** recursively specify subpackages ([#5844](https://github.com/opentrons/opentrons/issues/5844)) ([3ccbbea](https://github.com/opentrons/opentrons/commit/3ccbbea))
-
-
 ### Features
 
 * **api:** add info to debug warning on how IS_ROBOT is determined ([#5783](https://github.com/opentrons/opentrons/issues/5783)) ([fbbf1b6](https://github.com/opentrons/opentrons/commit/fbbf1b6))
@@ -181,16 +133,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 * **robot-server:** session manager ([#5796](https://github.com/opentrons/opentrons/issues/5796)) ([c1fd7e8](https://github.com/opentrons/opentrons/commit/c1fd7e8)), closes [#5763](https://github.com/opentrons/opentrons/issues/5763) [#5765](https://github.com/opentrons/opentrons/issues/5765)
 * **test:** add button names to edit pipette, swap pipette, and continue to liquids ([#5826](https://github.com/opentrons/opentrons/issues/5826)) ([cc3ba61](https://github.com/opentrons/opentrons/commit/cc3ba61)), closes [#5724](https://github.com/opentrons/opentrons/issues/5724)
 * **test:** add test id to Pipette Select component ([#5791](https://github.com/opentrons/opentrons/issues/5791)) ([845b508](https://github.com/opentrons/opentrons/commit/845b508)), closes [#5724](https://github.com/opentrons/opentrons/issues/5724)
-
-
-
-
-
-
-
-**Note:** Version bump only for package opentrons
-
-
 
 
 

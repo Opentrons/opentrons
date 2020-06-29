@@ -3,55 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [3.19.0-alpha.5](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.4...v3.19.0-alpha.5) (2020-06-25)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [3.19.0-alpha.4](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.3...v3.19.0-alpha.4) (2020-06-23)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [3.19.0-alpha.3](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.2...v3.19.0-alpha.3) (2020-06-22)
-
-**Note:** Version bump only for package protocol-library-kludge
-
-
-
-
-
-# [3.19.0-alpha.2](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.2) (2020-06-18)
-
+# [3.19.0](https://github.com/Opentrons/opentrons/compare/v3.18.1...v3.19.0) (2020-06-29)
 
 ### Features
 
 * **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
-
-
-
-
-
-# [3.19.0-alpha.1](https://github.com/Opentrons/opentrons/compare/v3.19.0-alpha.0...v3.19.0-alpha.1) (2020-06-10)
-
-
-### Features
-
-* **js:** update lodash to 4.17.15 ([#5788](https://github.com/Opentrons/opentrons/issues/5788)) ([5a145dc](https://github.com/Opentrons/opentrons/commit/5a145dc))
-
-
-
-
-
-
-
-**Note:** Version bump only for package protocol-library-kludge
 
 
 
