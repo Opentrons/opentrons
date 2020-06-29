@@ -58,14 +58,14 @@ def run_server(server_temp_directory):
         # using symlinks for the file copy to avoid
         # having such a long delay
         import requests
+        from requests.exceptions import ConnectionError
         while True:
             try:
-                s = requests.get("http://localhost:31950/health")
-                if s.status_code == 200:
-                    # Got a 200. Ready to run
-                    break
-            except IOError:
+                requests.get("http://localhost:31950/health")
+            except ConnectionError:
                 pass
+            else:
+                break
             time.sleep(0.5)
 
         yield proc
