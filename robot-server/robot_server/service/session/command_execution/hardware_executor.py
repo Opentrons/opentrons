@@ -1,10 +1,12 @@
 import typing
 from opentrons.hardware_control import ThreadManager
 
-from . import Command, CompletedCommand, complete_command
+from . import Command, CompletedCommand
 from . base_executor import CommandExecutor
+from .command import CommandResult
 from ..errors import UnsupportedCommandException
 from ..models import CommandDataType, CommandName
+from robot_server.util import duration
 
 
 COMMAND_HANDLER = typing.Callable[
@@ -44,12 +46,18 @@ class HardwareExecutor(CommandExecutor):
     async def execute(self, command: Command) -> CompletedCommand:
         func = self.get_handler(command.content.name)
         if func:
-            await func(self._hardware, command.content.data)
+            with duration() as timed:
+                await func(self._hardware, command.content.data)
         else:
             raise UnsupportedCommandException(
                 f"Command '{command.content.name}' is not supported."
             )
-        return complete_command(command, "executed")
+        return CompletedCommand(
+            content=command.content,
+            meta=command.meta,
+            result=CommandResult(started_at=timed.start,
+                                 completed_at=timed.end)
+        )
 
     def get_handler(self, command_name: CommandName) \
             -> typing.Optional[COMMAND_HANDLER]:
