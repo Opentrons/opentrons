@@ -53,11 +53,21 @@ def run_server(server_temp_directory):
                                'OT_API_CONFIG_DIR': server_temp_directory},
                           stdout=subprocess.PIPE,
                           stderr=subprocess.PIPE) as proc:
-        # Wait for a bit to get started
+        # Wait for a bit to get started by polling /health
         # TODO (lc, 23-06-2020) We should investigate
         # using symlinks for the file copy to avoid
-        # having such a long sleep
-        time.sleep(15)
+        # having such a long delay
+        import requests
+        while True:
+            try:
+                s = requests.get("http://localhost:31950/health")
+                if s.status_code == 200:
+                    # Got a 200. Ready to run
+                    break
+            except IOError:
+                pass
+            time.sleep(0.5)
+
         yield proc
         proc.kill()
 
