@@ -33,7 +33,7 @@ stages:
           type: Session
           attributes:
             sessionType: tipLengthCalibration
-            created_at: !re_match "\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
+            created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+.\\d+"
             details: {}
 
   - name: Load labware
@@ -82,5 +82,6 @@ stages:
             type: Session
             attributes:
               sessionType: default
+              created_at: !re_search "^\\d+-\\d+-\\d+T\\d+:\\d+:\\d+"
               details: {}
 
