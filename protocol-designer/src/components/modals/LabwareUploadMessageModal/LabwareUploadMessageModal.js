@@ -14,31 +14,22 @@ import type { LabwareUploadMessage } from '../../../labware-defs'
 const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
   const { message } = props
 
-  if (message.messageType === 'NOT_JSON') {
-    return (
-      <p>
-        The Protocol Designer only accepts custom JSON labware definitions made
-        with our Labware Creator. This is not a .json file!
-      </p>
-    )
-  } else if (message.messageType === 'INVALID_JSON_FILE') {
+  if (
+    message.messageType === 'EXACT_LABWARE_MATCH' ||
+    message.messageType === 'INVALID_JSON_FILE' ||
+    message.messageType === 'ONLY_TIPRACK' ||
+    message.messageType === 'NOT_JSON' ||
+    message.messageType === 'USES_STANDARD_NAMESPACE'
+  ) {
     return (
       <>
         <p>
-          The Protocol Designer only accepts custom JSON labware definitions
-          made with our Labware Creator
+          {i18n.t(
+            `modal.labware_upload_message.message.${message.messageType}`
+          )}
         </p>
         {message.errorText ? <p>{message.errorText}</p> : null}
       </>
-    )
-  } else if (message.messageType === 'EXACT_LABWARE_MATCH') {
-    return <p>This labware is identical to one you have already uploaded.</p>
-  } else if (message.messageType === 'USES_STANDARD_NAMESPACE') {
-    return (
-      <p>
-        This labware definition appears to be an Opentrons standard labware.
-        Please upload only custom labware.
-      </p>
     )
   } else if (
     message.messageType === 'ASK_FOR_LABWARE_OVERWRITE' ||
@@ -49,14 +40,16 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
     return (
       <>
         <p>
-          This labware shares an API Load name and/or a display name with{' '}
-          {canOverwrite ? 'custom' : 'Opentrons standard'} labware that has
-          already been uploaded.
+          {i18n.t('modal.labware_upload_message.name_conflict.shares_name', {
+            customOrStandard: canOverwrite ? 'custom' : 'Opentrons standard',
+          })}
         </p>
         {canOverwrite && defsMatchingLoadName.length > 0 ? (
           <p>
             <strong>
-              Shared load name:{' '}
+              {i18n.t(
+                'modal.labware_upload_message.name_conflict.shared_load_name'
+              )}
               {defsMatchingLoadName
                 .map(def => def?.parameters.loadName || '?')
                 .join(', ')}
@@ -66,51 +59,29 @@ const MessageBody = (props: {| message: LabwareUploadMessage |}) => {
         {canOverwrite && defsMatchingDisplayName.length > 0 ? (
           <p>
             <strong>
-              Shared display name:{' '}
+              {i18n.t(
+                'modal.labware_upload_message.name_conflict.shared_display_name'
+              )}
               {defsMatchingDisplayName
                 .map(def => def?.metadata.displayName || '?')
                 .join(', ')}
             </strong>
           </p>
         ) : null}
-        <p>
-          If you wish to add this labware then please return to the Labware
-          Creator and export it again with a unique load name and display name.
-        </p>
+        <p>{i18n.t('modal.labware_upload_message.name_conflict.re_export')}</p>
         {canOverwrite && (
           <p>
-            If you intended to replace your previous labware with this new
-            version then proceed with the Overwrite button below.
+            {i18n.t('modal.labware_upload_message.name_conflict.overwrite')}
           </p>
         )}
         {canOverwrite && message.isOverwriteMismatched && (
           <p>
-            <strong>WARNING:</strong> the new labware has a different
-            arrangement of wells than the definition it is replacing. Clicking
-            the Overwrite button will deselect all wells in any existing steps
-            that use the overwritten definition. You will have to edit each of
-            those steps and re-select the wells.
+            <strong>
+              {i18n.t('modal.labware_upload_message.name_conflict.warning')}
+            </strong>{' '}
+            {i18n.t('modal.labware_upload_message.name_conflict.mismatched')}
           </p>
         )}
-      </>
-    )
-  } else if (message.messageType === 'LABWARE_NAME_CONFLICT') {
-    return (
-      <>
-        <p>
-          This labware shares an API Load name and/or a display name with
-          Opentrons standard labware.
-        </p>
-        <p>
-          If you wish to add this labware then please return to the Labware
-          Creator and export it again with a unique load name and display name.
-        </p>
-      </>
-    )
-  } else if (message.messageType === 'ONLY_TIPRACK') {
-    return (
-      <>
-        <p>This labware definition is not a Tip Rack.</p>
       </>
     )
   }
