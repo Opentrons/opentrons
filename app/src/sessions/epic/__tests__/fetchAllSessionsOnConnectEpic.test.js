@@ -1,4 +1,6 @@
 // @flow
+import '../../../robot-api/__utils__/epic-test-mocks'
+
 import { TestScheduler } from 'rxjs/testing'
 
 import * as DiscoverySelectors from '../../../discovery/selectors'

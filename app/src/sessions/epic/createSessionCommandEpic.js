@@ -1,4 +1,6 @@
 // @flow
+import '../../robot-api/__utils__/epic-test-mocks'
+
 import { ofType } from 'redux-observable'
 import { of } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'

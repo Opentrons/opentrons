@@ -1,4 +1,6 @@
 // @flow
+import '../../../robot-api/__utils__/epic-test-mocks'
+
 import { sessionsEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import { mockRobot } from '../../../robot-api/__fixtures__'

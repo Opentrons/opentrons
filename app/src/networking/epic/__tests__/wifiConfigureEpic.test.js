@@ -1,4 +1,6 @@
 // @flow
+import '../../../robot-api/__utils__/epic-test-mocks'
+
 import { networkingEpic } from '..'
 import * as Fixtures from '../../__fixtures__'
 import * as Discovery from '../../../discovery'
