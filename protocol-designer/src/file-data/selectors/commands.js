@@ -9,6 +9,7 @@ import * as StepGeneration from '../../step-generation'
 // import { selectors as featureFlagSelectors } from '../../feature-flags'
 import { selectors as labwareIngredSelectors } from '../../labware-ingred/selectors'
 import { selectors as stepFormSelectors } from '../../step-forms'
+import type { Substeps } from '../../steplist/types'
 import type { BaseState, Selector } from '../../types'
 import type { StepIdType } from '../../form-types'
 import type {
@@ -161,6 +162,9 @@ export const getTimelineIsBeingComputed: Selector<boolean> = state =>
 // exposes errors and last valid robotState
 export const getRobotStateTimeline: Selector<StepGeneration.Timeline> = state =>
   state.fileData.computedRobotStateTimeline
+
+export const getSubsteps: Selector<Substeps> = state =>
+  state.fileData.computedSubsteps
 
 type WarningsPerStep = {
   [stepId: number | string]: ?Array<StepGeneration.CommandCreatorWarning>,

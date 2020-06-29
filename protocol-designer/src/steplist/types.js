@@ -166,7 +166,7 @@ export type SubstepItemData =
   | ThermocyclerProfileSubstepItem
   | ThermocyclerStateSubstepItem
 
-export type SubSteps = { [StepIdType]: ?SubstepItemData }
+export type Substeps = { [StepIdType]: ?SubstepItemData }
 
 export type StepFormErrors = Array<FormError>
 

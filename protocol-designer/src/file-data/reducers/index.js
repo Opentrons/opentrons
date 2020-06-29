@@ -8,6 +8,7 @@ import type { FileMetadataFields, SaveFileMetadataAction } from '../types'
 import type { LoadFileAction, NewProtocolFields } from '../../load-file'
 import type { ComputeRobotStateTimelineSuccessAction } from '../actions'
 import type { Timeline } from '../../step-generation'
+import type { Substeps } from '../../steplist/types'
 
 export const timelineIsBeingComputed: Reducer<boolean, any> = handleActions(
   {
@@ -22,9 +23,19 @@ export const computedRobotStateTimeline: Reducer<Timeline, any> = handleActions(
     COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
       state,
       action: ComputeRobotStateTimelineSuccessAction
-    ) => action.payload,
+    ) => action.payload.standardTimeline,
   },
   { timeline: [] }
+)
+
+export const computedSubsteps: Reducer<Substeps, any> = handleActions(
+  {
+    COMPUTE_ROBOT_STATE_TIMELINE_SUCCESS: (
+      state,
+      action: ComputeRobotStateTimelineSuccessAction
+    ) => action.payload.substeps,
+  },
+  {}
 )
 
 const defaultFields = {
@@ -82,6 +93,7 @@ const fileMetadata = handleActions(
 
 export type RootState = {|
   computedRobotStateTimeline: Timeline,
+  computedSubsteps: Substeps,
   currentProtocolExists: boolean,
   fileMetadata: FileMetadataFields,
   timelineIsBeingComputed: boolean,
@@ -89,6 +101,7 @@ export type RootState = {|
 
 const _allReducers = {
   computedRobotStateTimeline,
+  computedSubsteps,
   currentProtocolExists,
   fileMetadata,
   timelineIsBeingComputed,

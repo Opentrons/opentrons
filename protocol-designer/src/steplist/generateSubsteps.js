@@ -330,7 +330,7 @@ function transferLikeSubsteps(args: {|
   }
 }
 
-// NOTE: This is the fn used by the `allSubsteps` selector
+// TODO IMMEDIATELY: rename, and move into the timeline middleware dir
 export function generateSubsteps(
   stepArgsAndErrors: ?StepArgsAndErrors,
   invariantContext: InvariantContext,
@@ -465,7 +465,7 @@ export function generateSubsteps(
   }
 
   console.warn(
-    "allSubsteps doesn't support commandCreatorFnName: ",
+    "generateSubsteps doesn't support commandCreatorFnName: ",
     stepArgs.commandCreatorFnName,
     stepId
   )
